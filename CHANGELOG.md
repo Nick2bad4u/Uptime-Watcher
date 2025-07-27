@@ -7,14 +7,109 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[8a29645](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8a29645fc0fc06a6c54aad864b6d8cac7b49dfce)...
+[8a29645](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8a29645fc0fc06a6c54aad864b6d8cac7b49dfce)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/8a29645fc0fc06a6c54aad864b6d8cac7b49dfce...8a29645fc0fc06a6c54aad864b6d8cac7b49dfce))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 9.2.0 [`(8a29645)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8a29645fc0fc06a6c54aad864b6d8cac7b49dfce)
+
+
+
+
+
+
+## [9.2.0] - 2025-07-27
+
+
 [[64a9ed3](https://github.com/Nick2bad4u/Uptime-Watcher/commit/64a9ed3aaebdd6733c17b3c7dff3a442176b94af)...
-[64a9ed3](https://github.com/Nick2bad4u/Uptime-Watcher/commit/64a9ed3aaebdd6733c17b3c7dff3a442176b94af)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/64a9ed3aaebdd6733c17b3c7dff3a442176b94af...64a9ed3aaebdd6733c17b3c7dff3a442176b94af))
+[f7da81f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f7da81f7b934c87cf4a98ccf4b1504caa8cef94f)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/64a9ed3aaebdd6733c17b3c7dff3a442176b94af...f7da81f7b934c87cf4a98ccf4b1504caa8cef94f))
+
+
+### ✨ Features
+
+- ✨ [feat] Add type-safe theme merging and settings reset
+
+- Adds deep theme merging utility to centralize and simplify custom theme overrides, addressing code duplication and improving maintainability.
+- Implements backend-synchronized settings reset, ensuring all application settings can be restored to defaults via IPC and the database, with improved frontend synchronization.
+- Refactors code to use type-safe property access for database rows, form data, and Chart.js configs, reducing index signature errors and enhancing reliability.
+- Introduces configuration-driven approaches for cache clearing, monitor display identifiers, and monitor type labels for easier extensibility.
+- Updates docs and tests to reflect new features and API contracts.
+- Relates to duplicate code and maintainability recommendations in the provided review. [`(8eae8ed)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8eae8ed0e0c2fb33d2e9497ed2039642a5b107bd)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 9.1.0 [`(64a9ed3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/64a9ed3aaebdd6733c17b3c7dff3a442176b94af)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(8c6ee58)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8c6ee58af2865e87465b03553a189e2a0709fd7c)
+
+
+
+### � Documentation
+
+- 📝 [docs] Improve clarity and structure in review reports
+
+- Updates review documentation to enhance readability with better formatting and spacing between sections and claims.
+- Improves visibility of analysis details, false positives, and implementation plans.
+- Clarifies assessment of static analysis findings, test coverage, and key learnings for future development workflow.
+- No logic or code changes; documentation only. [`(f7da81f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f7da81f7b934c87cf4a98ccf4b1504caa8cef94f)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Remove unused API Extractor dev dependency
+
+- Cleans up build configuration by dropping @microsoft/api-extractor and related transitive packages from devDependencies.
+- Reduces installation footprint and potential maintenance overhead.
+- No longer required for the current development workflow. [`(6d1af3d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6d1af3dfec907b729f90d7544f61dbfd31d54a0c)
+
+
+- Update changelogs for v9.1.0 [skip ci] [`(a80625c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a80625c80c914a0fdd803e14e3e554c3e95f6bfb)
+
+
+
+### 👷 CI/CD
+
+- 👷 [ci] Remove scheduled and release triggers from workflow
+
+- Streamlines workflow execution by relying solely on manual and workflow_run triggers.
+- Prevents unintended or redundant runs, focusing asset size reporting on relevant build completions. [`(22d9cfd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/22d9cfde0fef394a7a44aeabca97d10ca87b6767)
+
+
+- 👷 [ci] Update workflow to improve build reliability
+
+- Switches dependency installation to `npm ci` for reproducibility and cleaner installs.
+- Adds `continue-on-error` to dependency and build steps to allow analysis to proceed even if setup fails.
+- Replaces autobuild with a custom Electron Vite build step for better compatibility.
+- Enhances workflow resilience and aligns build process with project requirements. [`(c9910cb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c9910cb8333ff0aa32356d705d56af9ab1b8a1a4)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Excludes Docusaurus docs from linting and updates tsconfig root dir
+
+- Ignores files in the Docusaurus documentation directory for markdown, JSON, and browser-specific linting rules to reduce unnecessary lint errors.
+- Switches TypeScript config root directory to use `import.meta.dirname` for improved compatibility with ESM modules. [`(60bb237)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/60bb237ebdfe3ddac56d9e0ecfcc83a78da23d09)
+
+
+- 🔧 [build] Update Electron build deps, CI, and coverage paths
+
+- Aligns Electron package dependencies to latest compatible versions for improved stability and reduced maintenance overhead.
+- Switches coverage reporting to explicit lcov.info files for more accurate coverage uploads.
+- Forces npm install in audit CI workflow to resolve dependency conflicts.
+- Refines Electron logging type usage for better clarity.
+- Adds detailed duplicate code and static analysis report for future refactoring. [`(0ed9ce0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0ed9ce0f79552537176c8bd1b8c707f6ef5a4eca)
 
 
 
