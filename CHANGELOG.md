@@ -7,14 +7,68 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[0eb124c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0eb124c6135f3b1594a56b4d4e585b154f8bdc08)...
-[0eb124c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0eb124c6135f3b1594a56b4d4e585b154f8bdc08)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/0eb124c6135f3b1594a56b4d4e585b154f8bdc08...0eb124c6135f3b1594a56b4d4e585b154f8bdc08))
+[[d92d616](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d92d61606f727bb13ed16ec057baf467986c9f6f)...
+[d92d616](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d92d61606f727bb13ed16ec057baf467986c9f6f)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/d92d61606f727bb13ed16ec057baf467986c9f6f...d92d61606f727bb13ed16ec057baf467986c9f6f))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 8.9.0 [`(d92d616)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d92d61606f727bb13ed16ec057baf467986c9f6f)
+
+
+
+
+
+
+## [8.9.0] - 2025-07-27
+
+
+[[68eef81](https://github.com/Nick2bad4u/Uptime-Watcher/commit/68eef81d9de1272c6f5ee775f1fcd593f0bfb4e2)...
+[da3746e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/da3746e894f9c290229c2e6bad873450dcb3e90a)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/68eef81d9de1272c6f5ee775f1fcd593f0bfb4e2...da3746e894f9c290229c2e6bad873450dcb3e90a))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 8.8.0 [`(0eb124c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0eb124c6135f3b1594a56b4d4e585b154f8bdc08)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(da3746e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/da3746e894f9c290229c2e6bad873450dcb3e90a)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Refactors and fixes unit tests for improved reliability
+
+- Updates and restructures multiple test suites for clarity and maintainability
+- Refactors mocks to better match actual dependencies and behaviors, improving test isolation
+- Fixes broken and outdated tests, and disables unreliable ones to reduce false negatives
+- Simplifies and reduces redundant test cases, focusing on essential edge cases and realistic scenarios
+- Enhances test coverage for error handling, async logic, cache operations, and theme management
+- Aligns test file imports and structure for consistency, supporting future coverage improvements [`(6a6678a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6a6678ababdee426f6fce0d53da899b967df10cc)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v8.8.0 [skip ci] [`(e755f83)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e755f83d15a4801bb009ed68c0665dd19d207685)
+
+
+
+### 👷 CI/CD
+
+- 👷 [ci] Allow coverage jobs to continue on error
+
+Enables frontend and electron test steps to proceed even if tests fail,
+preventing workflow interruptions and ensuring coverage reports are generated
+for all runs.
+
+Improves CI resilience during partial test failures. [`(68eef81)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/68eef81d9de1272c6f5ee775f1fcd593f0bfb4e2)
 
 
 
