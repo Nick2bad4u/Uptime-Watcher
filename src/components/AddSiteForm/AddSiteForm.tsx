@@ -192,6 +192,36 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
         setFormError(undefined);
     }, [clearError, setFormError]);
 
+    // Memoized callbacks for form components to optimize re-renders
+    const handleAddModeChange = useCallback(
+        (value: string) => {
+            if (isValidAddMode(value)) {
+                setAddMode(value);
+            } else {
+                logger.error(`Invalid add mode value: ${value}`);
+            }
+        },
+        [setAddMode]
+    );
+
+    // Memoized options arrays to prevent unnecessary re-renders
+    const addModeOptions = React.useMemo(
+        () => [
+            { label: "Create New Site", value: "new" },
+            { label: "Add to Existing Site", value: "existing" },
+        ],
+        []
+    );
+
+    const checkIntervalOptions = React.useMemo(
+        () =>
+            CHECK_INTERVALS.map((interval) => ({
+                label: interval.label,
+                value: interval.value,
+            })),
+        []
+    );
+
     return (
         <ThemedBox className="max-w-md mx-auto" padding="lg" rounded="lg" surface="base">
             <form
@@ -207,17 +237,8 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
                     id="addMode"
                     label="Add Mode"
                     name="addMode"
-                    onChange={(value) => {
-                        if (isValidAddMode(value)) {
-                            setAddMode(value);
-                        } else {
-                            logger.error(`Invalid add mode value: ${value}`);
-                        }
-                    }}
-                    options={[
-                        { label: "Create New Site", value: "new" },
-                        { label: "Add to Existing Site", value: "existing" },
-                    ]}
+                    onChange={handleAddModeChange}
+                    options={addModeOptions}
                     value={addMode}
                 />
 
@@ -305,10 +326,7 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
                             logger.error(`Invalid check interval value: ${value}`);
                         }
                     }}
-                    options={CHECK_INTERVALS.map((interval) => ({
-                        label: interval.label,
-                        value: interval.value,
-                    }))}
+                    options={checkIntervalOptions}
                     value={checkInterval}
                 />
 

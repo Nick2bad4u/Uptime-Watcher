@@ -12,7 +12,7 @@
 
 import type { MonitorFieldDefinition } from "@shared/types";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import logger from "../../services/logger";
 import { ThemedText } from "../../theme/components";
@@ -195,9 +195,31 @@ export function DynamicMonitorFields({ isLoading = false, monitorType, onChange,
  * ```
  */
 function DynamicField({ disabled = false, field, onChange, value }: DynamicFieldProps) {
-    const handleChange = (newValue: number | string) => {
-        onChange(newValue);
-    };
+    const handleChange = useCallback(
+        (newValue: number | string) => {
+            onChange(newValue);
+        },
+        [onChange]
+    );
+
+    const handleNumericChange = useCallback(
+        (val: string) => {
+            const numericValue = Number(val);
+            if (val === "" || !Number.isNaN(numericValue)) {
+                handleChange(val === "" ? 0 : numericValue);
+            } else {
+                logger.error(`Invalid numeric input: ${val}`);
+            }
+        },
+        [handleChange]
+    );
+
+    const handleStringChange = useCallback(
+        (val: string) => {
+            handleChange(val);
+        },
+        [handleChange]
+    );
 
     switch (field.type) {
         case "number": {
@@ -209,14 +231,7 @@ function DynamicField({ disabled = false, field, onChange, value }: DynamicField
                     label={field.label}
                     {...(field.max !== undefined && { max: field.max })}
                     {...(field.min !== undefined && { min: field.min })}
-                    onChange={(val: string) => {
-                        const numericValue = Number(val);
-                        if (val === "" || !Number.isNaN(numericValue)) {
-                            handleChange(val === "" ? 0 : numericValue);
-                        } else {
-                            logger.error(`Invalid numeric input: ${val}`);
-                        }
-                    }}
+                    onChange={handleNumericChange}
                     {...(field.placeholder && { placeholder: field.placeholder })}
                     required={field.required}
                     type="number"
@@ -233,7 +248,7 @@ function DynamicField({ disabled = false, field, onChange, value }: DynamicField
                     {...(field.helpText && { helpText: field.helpText })}
                     id={field.name}
                     label={field.label}
-                    onChange={(val: string) => handleChange(val)}
+                    onChange={handleStringChange}
                     {...(field.placeholder && { placeholder: field.placeholder })}
                     required={field.required}
                     type={field.type}
