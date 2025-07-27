@@ -74,15 +74,15 @@ jobs:
                       ${{ runner.os }}-.-node-modules-
 
             - name: Install dependencies
-              run: npm install --force
-              working-directory: .
+              run: npm ci --force
+              continue-on-error: true # If this fails, the analysis will still run, but it may not be complete.
 
             # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
             # If this step fails, then you should remove it and run the build manually (see below)
-            - name: Autobuild
-              uses: github/codeql-action/autobuild@4e828ff8d448a8a6e532957b1811f387a63867e8 # v3.29.4
-              with:
-                  working-directory: .
+            - name: Build Electron Vite Project
+              run: npm run build:electron-vite
+              continue-on-error: true
+              
 
             # ℹ️ Command-line programs to run using the OS shell.
             # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
