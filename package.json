@@ -351,7 +351,7 @@
     "docusaurus-plugin-typedoc": "^1.4.0",
     "electron": "^37.2.4",
     "electron-builder": "^24.13.3",
-    "electron-builder-squirrel-windows": "^24.13.3",
+    "electron-builder-squirrel-windows": "^26.0.3",
     "electron-devtools-installer": "^4.0.0",
     "electron-publish": "^26.0.11",
     "eslint": "^9.32.0",
