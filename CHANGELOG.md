@@ -7,14 +7,75 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[3afbde2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3afbde2be61b73929f2e6f36595ebf01fe51825c)...
-[3afbde2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3afbde2be61b73929f2e6f36595ebf01fe51825c)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/3afbde2be61b73929f2e6f36595ebf01fe51825c...3afbde2be61b73929f2e6f36595ebf01fe51825c))
+[[64a9ed3](https://github.com/Nick2bad4u/Uptime-Watcher/commit/64a9ed3aaebdd6733c17b3c7dff3a442176b94af)...
+[64a9ed3](https://github.com/Nick2bad4u/Uptime-Watcher/commit/64a9ed3aaebdd6733c17b3c7dff3a442176b94af)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/64a9ed3aaebdd6733c17b3c7dff3a442176b94af...64a9ed3aaebdd6733c17b3c7dff3a442176b94af))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 9.1.0 [`(64a9ed3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/64a9ed3aaebdd6733c17b3c7dff3a442176b94af)
+
+
+
+
+
+
+## [9.1.0] - 2025-07-27
+
+
+[[01140e1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/01140e16ee361ebe59bf8191072bd36c96b7ea39)...
+[1c723c1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1c723c1938766f9b995063194e662585fd7c96a5)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/01140e16ee361ebe59bf8191072bd36c96b7ea39...1c723c1938766f9b995063194e662585fd7c96a5))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 9.0.0 [`(3afbde2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3afbde2be61b73929f2e6f36595ebf01fe51825c)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(1c723c1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1c723c1938766f9b995063194e662585fd7c96a5)
+
+
+
+### � Documentation
+
+- 📝 [docs] Add AI claim review & final report; clean up code
+
+- Adds detailed documentation reviewing static analysis AI findings, outlining valid issues, false positives, and remediation strategy for maintainability, performance, and security.
+- Introduces associated final report summarizing fixes, test coverage, and recommendations.
+- Cleans up unused import from config, fixes redundant test conditions, and bumps Node.js engine requirement.
+- Improves code quality by optimizing React memoization and removing dead code.
+- Ensures comprehensive test coverage and aligns with project standards. [`(b09dde3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b09dde3dbd7ed1ba0d07a6f78dc820d8af95f153)
+
+
+
+### ⚡ Performance
+
+- ⚡ [perf] Memoize callbacks and options in form fields
+
+- Optimizes form components by memoizing event handlers and option arrays to reduce unnecessary re-renders.
+- Improves maintainability and performance, especially for complex forms with dynamic fields.
+- Refactors numeric and string input handling for better callback reuse and clarity. [`(01140e1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/01140e16ee361ebe59bf8191072bd36c96b7ea39)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v9.0.0 [skip ci] [`(ccbb011)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ccbb01114ddb34d7f133928e0a630c9bceb558da)
+
+
+
+### 👷 CI/CD
+
+- 👷 [ci] Enforces npm install with --force in workflows
+
+- Ensures dependency installation proceeds even if conflicts or peer issues arise during CI builds.
+- Mitigates errors from strict npm resolution, improving workflow reliability across platforms.
+- Reduces potential for blocked builds due to dependency inconsistencies. [`(57143b4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/57143b4d0f8699a671f24b8f2dfeacc18fcee73d)
 
 
 
