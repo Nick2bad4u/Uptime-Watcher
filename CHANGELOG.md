@@ -7,14 +7,85 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[d92d616](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d92d61606f727bb13ed16ec057baf467986c9f6f)...
-[d92d616](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d92d61606f727bb13ed16ec057baf467986c9f6f)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/d92d61606f727bb13ed16ec057baf467986c9f6f...d92d61606f727bb13ed16ec057baf467986c9f6f))
+[[3afbde2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3afbde2be61b73929f2e6f36595ebf01fe51825c)...
+[3afbde2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3afbde2be61b73929f2e6f36595ebf01fe51825c)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/3afbde2be61b73929f2e6f36595ebf01fe51825c...3afbde2be61b73929f2e6f36595ebf01fe51825c))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 9.0.0 [`(3afbde2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3afbde2be61b73929f2e6f36595ebf01fe51825c)
+
+
+
+
+
+
+## [9.0.0] - 2025-07-27
+
+
+[[f3f27cd](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f3f27cdc75c14cfbd26892dbc1123683a0806a7c)...
+[fdb7653](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fdb7653868d97a1229ecae984025111265fbbe97)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/f3f27cdc75c14cfbd26892dbc1123683a0806a7c...fdb7653868d97a1229ecae984025111265fbbe97))
+
+
+### 🛠️ Bug Fixes
+
+- Package.json & package-lock.json to reduce vulnerabilities [`(c0edb0a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c0edb0a975248f4d7440da7002b220e761b06922)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 8.9.0 [`(d92d616)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d92d61606f727bb13ed16ec057baf467986c9f6f)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(fdb7653)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fdb7653868d97a1229ecae984025111265fbbe97)
+
+
+
+### 💼 Other
+
+- Merge PR #40
+
+[Snyk] Security upgrade electron-builder-squirrel-windows from 24.13.3 to 26.0.3 [`(1e4538c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1e4538c5b50738ed9b944a33d144e5d382996404)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Remove unused monitor types test file
+
+- Cleans up obsolete or unnecessary unit test to reduce clutter
+- Improves maintainability by deleting a redundant test file [`(0b3e373)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0b3e373a1fd70f132fd3813e8d2ada124e85720a)
+
+
+- 🧪 [test] Update unit tests for consistency and modern style
+
+- Unifies import statements to use double quotes across all test files for style consistency
+- Modernizes test formatting and indentation for improved readability and maintainability
+- Updates mock setups and test assertions to align with current best practices
+- Ensures tests follow a consistent structure for easier navigation and future extension [`(f3f27cd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f3f27cdc75c14cfbd26892dbc1123683a0806a7c)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v8.9.0 [skip ci] [`(acf6064)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/acf606472b2dff67145e283858d00ce17d9cdaea)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update linting tools and add unused exports checks
+
+- Updates pre-commit configurations to newer versions and expands hook coverage for better file integrity and code hygiene.
+- Adds unused exports linting via new dev dependency, enabling detection of unreferenced code in main and electron entry points.
+- Revises Node version requirement and improves script organization for duplicate checking.
+- Improves maintainability and code quality by leveraging enhanced tooling. [`(0e4b19c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0e4b19c086d9f60d38938eff4feebf2d14ed36ea)
 
 
 
