@@ -119,6 +119,7 @@ export default [
     // Markdown files
     {
         files: ["**/*.md"],
+        ignores: ["docs/docusaurus/**"],
         ...markdown.configs.recommended[0],
         plugins: { markdown },
         language: "markdown/gfm",
@@ -127,6 +128,7 @@ export default [
     // JSON files
     {
         files: ["**/*.json", "**/*.json5", "**/*.jsonc"],
+        ignores: ["docs/docusaurus/**"],
         ...json.configs.recommended[0],
         languageOptions: {
             parser: jsoncEslintParser,
@@ -155,7 +157,7 @@ export default [
                 project: "./tsconfig.json",
                 sourceType: "module",
                 ecmaVersion: "latest",
-                tsconfigRootDir: __dirname,
+                tsconfigRootDir: import.meta.dirname,
                 ecmaFeatures: {
                     jsx: true,
                 },
@@ -496,7 +498,7 @@ export default [
                 project: "./tsconfig.electron.json",
                 sourceType: "module",
                 ecmaVersion: "latest",
-                tsconfigRootDir: __dirname,
+                tsconfigRootDir: import.meta.dirname,
                 ecmaFeatures: {
                     jsx: true,
                 },
@@ -800,7 +802,7 @@ export default [
                 project: "./tsconfig.json",
                 sourceType: "module",
                 ecmaVersion: "latest",
-                tsconfigRootDir: __dirname,
+                tsconfigRootDir: import.meta.dirname,
                 ecmaFeatures: {
                     jsx: true,
                 },
@@ -865,7 +867,7 @@ export default [
                 project: "./tsconfig.electron.test.json",
                 sourceType: "module",
                 ecmaVersion: "latest",
-                tsconfigRootDir: __dirname,
+                tsconfigRootDir: import.meta.dirname,
                 ecmaFeatures: {
                     jsx: true,
                 },
@@ -919,5 +921,6 @@ export default [
         languageOptions: {
             globals: globals.browser,
         },
+        ignores: ["docs/docusaurus/**"],
     },
 ];
