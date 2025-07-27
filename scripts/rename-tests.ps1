@@ -38,10 +38,10 @@ foreach ($file in $files) {
 
     if ($file.Name -ne $finalName) {
         if ($DryRun) {
-            Write-Host "[Dry Run] Would rename '$($file.Name)' to '$($finalName)'"
+            Write-Output "[Dry Run] Would rename '$($file.Name)' to '$($finalName)'"
         } else {
             Rename-Item -Path $file.FullName -NewName $finalName
-            Write-Host "Renamed '$($file.Name)' to '$($finalName)'"
+            Write-Output "Renamed '$($file.Name)' to '$($finalName)'"
         }
     }
 }

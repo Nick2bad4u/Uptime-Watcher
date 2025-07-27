@@ -1,7 +1,7 @@
 # Setup script for metrics branch
 # This creates an orphan branch specifically for hosting repository metrics
 
-Write-Host "Setting up metrics branch for repository stats..." -ForegroundColor Green
+Write-Output "Setting up metrics branch for repository stats..." -ForegroundColor Green
 
 # Create and switch to orphan metrics branch
 git checkout --orphan metrics
@@ -31,5 +31,5 @@ git push -u origin metrics
 # Switch back to main branch
 git checkout main
 
-Write-Host "Metrics branch created successfully!" -ForegroundColor Green
-Write-Host "You can now reference metrics from: https://raw.githubusercontent.com/nick2bad4u/Uptime-Watcher/metrics/metrics.repository.svg" -ForegroundColor Yellow
+Write-Output "Metrics branch created successfully!" -ForegroundColor Green
+Write-Output "You can now reference metrics from: https://raw.githubusercontent.com/nick2bad4u/Uptime-Watcher/metrics/metrics.repository.svg" -ForegroundColor Yellow

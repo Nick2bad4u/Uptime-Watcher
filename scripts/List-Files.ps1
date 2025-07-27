@@ -34,18 +34,18 @@ function List-FilesBySubdirectory {
     foreach ($dir in $subdirs) {
         # Get files in current directory (non-recursive)
         $files = Get-ChildItem -Path $dir.FullName -File | Sort-Object Name
-        
+
         if ($files.Count -gt 0) {
             # Display directory header
             Write-Output ""
             Write-Output "Directory: $($dir.FullName)"
             Write-Output ("-" * ("Directory: $($dir.FullName)".Length))
-            
+
             # Display files
             foreach ($file in $files) {
                 Write-Output "  $($file.Name) (Size: $([math]::Round($file.Length / 1KB, 2)) KB, Modified: $($file.LastWriteTime))"
             }
-            
+
             # Display file count
             Write-Output ""
             Write-Output "Total files in this directory: $($files.Count)"

@@ -14,7 +14,7 @@
         "**/docs/**",
         "**/test/**",
         "**/tests/**",
-        "src/test/**",
+        "**/src/test/**",
         "**/electron/test/**"
     ]
 }

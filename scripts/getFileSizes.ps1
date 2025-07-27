@@ -24,7 +24,7 @@ $filteredFiles = if (-not $IncludeTests) {
 # Process files and collect data
 $results = foreach ($file in $filteredFiles) {
     $sizeKB = [math]::Round($file.Length / 1KB, 2)
-    
+
     # Get line count (skip for binary files)
     $lineCount = $null
     if ($file.Extension -notin @('.png','.jpg','.gif','.ico','.svg','.woff','.ttf','.eot','.woff2','.bin')) {
@@ -57,78 +57,78 @@ switch ($Format) {
         $sorted | ConvertTo-Json -Depth 2 | Out-String
         break
     }
-    
+
     'Csv' {
         $sorted | Export-Csv -Path "file-analysis.csv" -NoTypeInformation
-        Write-Host "✅ CSV output saved to file-analysis.csv" -ForegroundColor Green
+        Write-Output "✅ CSV output saved to file-analysis.csv" -ForegroundColor Green
         break
     }
-    
+
     'Markdown' {
         $mdOutput = "## File Analysis Report`n"
         $mdOutput += "| File | Size (KB) | Lines | Type | Last Modified |`n"
         $mdOutput += "|------|-----------|-------|------|---------------|`n"
-        
+
         foreach ($item in $sorted) {
             $mdOutput += "| $($item.Name) | $($item.SizeKB) | $($item.LineCount) | $($item.Extension) | $($item.LastModified) |`n"
         }
-        
+
         $mdOutput | Out-File "file-analysis.md"
-        Write-Host "✅ Markdown output saved to file-analysis.md" -ForegroundColor Green
+        Write-Output "✅ Markdown output saved to file-analysis.md" -ForegroundColor Green
         break
     }
-    
+
     'Table' {
         # Create formatted display
         Clear-Host
-        Write-Host "`n📁 FILE ANALYSIS REPORT" -ForegroundColor Cyan
-        Write-Host "======================"
-        Write-Host "Path: Src\electron" -ForegroundColor DarkGray
-        Write-Host "Include tests: $($IncludeTests.IsPresent)" -ForegroundColor DarkGray
-        Write-Host "Generated: $(Get-Date -Format 'yyyy-MM-dd HH:mm')`n" -ForegroundColor DarkGray
-        
+        Write-Output "`n📁 FILE ANALYSIS REPORT" -ForegroundColor Cyan
+        Write-Output "======================"
+        Write-Output "Path: Src\electron" -ForegroundColor DarkGray
+        Write-Output "Include tests: $($IncludeTests.IsPresent)" -ForegroundColor DarkGray
+        Write-Output "Generated: $(Get-Date -Format 'yyyy-MM-dd HH:mm')`n" -ForegroundColor DarkGray
+
         $sorted | Format-Table -AutoSize @{
             Label = "File"
-            Expression = { 
+            Expression = {
                 # Color code by file type
                 $color = if ($_.Extension -in '.js','.ts') { 'Cyan' }
                          elseif ($_.Extension -in '.html','.css') { 'Magenta' }
                          elseif ($_.Extension -in '.json','.yml') { 'Green' }
                          else { 'White' }
-                Write-Host $_.Name -ForegroundColor $color -NoNewline
+                Write-Output $_.Name -ForegroundColor $color -NoNewline
                 ""
             }
         },
         @{
             Label = "Size (KB)"
-            Expression = { 
+            Expression = {
                 $color = if ($_.SizeKB -gt 100) { 'Red' }
                          elseif ($_.SizeKB -gt 50) { 'Yellow' }
                          else { 'White' }
-                Write-Host ("{0:N2}" -f $_.SizeKB) -ForegroundColor $color -NoNewline
+                Write-Output ("{0:N2}" -f $_.SizeKB) -ForegroundColor $color -NoNewline
                 ""
             }
             Align = 'Right'
         },
         @{
             Label = "Lines"
-            Expression = { 
+            Expression = {
                 if ($_.LineCount -ne "Binary" -and $_.LineCount -ne "Error") {
                     $color = if ($_.LineCount -gt 500) { 'Red' }
                              elseif ($_.LineCount -gt 100) { 'Yellow' }
                              else { 'White' }
-                    Write-Host $_.LineCount -ForegroundColor $color -NoNewline
+                    Write-Output $_.LineCount -ForegroundColor $color -NoNewline
                 } else {
-                    Write-Host $_.LineCount -ForegroundColor DarkGray -NoNewline
+                    Write-Output $_.LineCount -ForegroundColor DarkGray -NoNewline
                 }
                 ""
             }
             Align = 'Right'
         }
-        
-        Write-Host "`n📊 Summary" -ForegroundColor Yellow
-        Write-Host "Files: $($sorted.Count)" -ForegroundColor White
-        Write-Host "Total size: $([math]::Round(($sorted | Measure-Object -Property SizeKB -Sum).Sum, 2)) KB" -ForegroundColor White
-        Write-Host "Excluded tests: $(($files.Count - $filteredFiles.Count))" -ForegroundColor DarkGray
+
+        Write-Output "`n📊 Summary" -ForegroundColor Yellow
+        Write-Output "Files: $($sorted.Count)" -ForegroundColor White
+        Write-Output "Total size: $([math]::Round(($sorted | Measure-Object -Property SizeKB -Sum).Sum, 2)) KB" -ForegroundColor White
+        Write-Output "Excluded tests: $(($files.Count - $filteredFiles.Count))" -ForegroundColor DarkGray
     }
 }

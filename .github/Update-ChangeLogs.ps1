@@ -7,7 +7,7 @@ $repoRoot = Resolve-Path "$PSScriptRoot\.."
 $changelogDir = "$repoRoot\docs\changelogs"
 if (!(Test-Path $changelogDir)) {
     New-Item -ItemType Directory -Path $changelogDir -Force | Out-Null
-    Write-Host "Created directory: $changelogDir"
+    Write-Output "Created directory: $changelogDir"
 }
 
 # Define specific folders to process (avoid build/dist directories)
@@ -30,24 +30,24 @@ $foldersToProcess = @(
     @{ Path = "$repoRoot\scripts"; Name = "scripts" }
 )
 
-Write-Host "Processing $($foldersToProcess.Count) specific directories for changelog generation..."
+Write-Output "Processing $($foldersToProcess.Count) specific directories for changelog generation..."
 
 foreach ($folderInfo in $foldersToProcess) {
     $folder = $folderInfo.Path
     $folderName = $folderInfo.Name
-    
+
     if (Test-Path $folder) {
         # Generate changelog filename
         $changelogFileName = "changelog-$folderName.md"
         $changelogPath = "$changelogDir\$changelogFileName"
-        
+
         Push-Location $folder
         try {
-            Write-Host "Generating changelog for: $folder -> $changelogFileName"
+            Write-Output "Generating changelog for: $folder -> $changelogFileName"
             npx git-cliff --output $changelogPath
-            
+
             if (Test-Path $changelogPath) {
-                Write-Host "✓ Successfully generated: $changelogPath"
+                Write-Output "✓ Successfully generated: $changelogPath"
             } else {
                 Write-Warning "⚠ Changelog file not created for: $folder"
             }
@@ -63,4 +63,4 @@ foreach ($folderInfo in $foldersToProcess) {
     }
 }
 
-Write-Host "`nChangelog generation complete! Check the docs/changelogs/ directory for generated files."
+Write-Output "`nChangelog generation complete! Check the docs/changelogs/ directory for generated files."

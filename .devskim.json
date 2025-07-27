@@ -18,7 +18,17 @@
         "**/dist-electron/**",
         "**/dist/**",
         "**/coverage/**",
-        "**/release/**"
+        "**/release/**",
+        "**/build/**",
+        "**/out/**",
+        "**/test/**",
+        "**/tests/**",
+        "**/test-results/**",
+        "coverage-results.json",
+        ".vscode/settings.json",
+        "**/docs/TSDoc/**",
+        ".devskim.json",
+        "**/**.xml"
     ],
     "Suppressions": [
         {
@@ -43,12 +53,36 @@
             "Justification": "Development-only: Checking for 127.0.0.1 is required for dev/debug logic. This code is not present in production builds.",
             "FilePattern": "*",
             "RuleId": "DS162092"
+        },
+        {
+            "Justification": "Manual review: 'http://localhost/' is used in test context for ScreenshotThumbnail. This is not production code.",
+            "FilePattern": "src/test/ScreenshotThumbnail.test.tsx",
+            "LineNumber": 87,
+            "RuleId": "DS162092"
+        },
+        {
+            "Justification": "Manual review: 'http://localhost:5173' is used for development server URL, not present in production builds.",
+            "FilePattern": "electron/services/window/WindowService.ts",
+            "LineNumber": 73,
+            "RuleId": "DS162092"
+        },
+        {
+            "Justification": "Manual review: setTimeout is used to open DevTools in a controlled context, not with untrusted data.",
+            "FilePattern": "electron/services/window/WindowService.ts",
+            "LineNumber": 287,
+            "RuleId": "DS172411"
+        },
+        {
+            "Justification": "Manual review: setTimeout is used to abort a fetch after a fixed timeout, not with untrusted data.",
+            "FilePattern": "electron/services/window/WindowService.ts",
+            "LineNumber": 368,
+            "RuleId": "DS172411"
         }
     ],
     "DisableSuppression": false,
     "DisableParallel": false,
     "IgnoreDefaultRules": false,
-    "CrawlArchives": false,
+    "CrawlArchives": true,
     "ExitCodeIsNumIssues": false,
     "BasePath": "",
     "AbsolutePaths": false,

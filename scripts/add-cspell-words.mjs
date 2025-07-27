@@ -15,7 +15,7 @@ const __dirname = path.dirname(__filename);
 // Allow custom words file path via CLI argument or environment variable, fallback to default
 // By default, resolve custom-words.txt relative to the project root (two directories up from this script)
 const CUSTOM_WORDS_FILE = path.resolve(
-    process.argv[2] || process.env.CUSTOM_WORDS_FILE || path.join(__dirname, "..", "..", "custom-words.txt")
+    process.argv[2] || process.env.CUSTOM_WORDS_FILE || path.join(__dirname, "..", "custom-words.txt")
 );
 
 // 1. Read current custom words into a Set
@@ -34,14 +34,12 @@ const currentWords = new Set(
 const CSPELL_COMMAND = [
     "npx",
     "cspell",
-    "**/*",
+    "\"**/*.{js,jsx,ts,tsx,md,css,scss,json}\"",
+    "--gitignore",
+    "--config .cspell.json",
     "--words-only",
     "--unique",
-    "--exclude=custom-words.txt",
-    "--exclude=node_modules/**",
-    "--exclude=dist/**",
-    "--exclude=build/**",
-    "--exclude=.git/**",
+    "--no-progress"
 ].join(" ");
 
 let cspellOutput;

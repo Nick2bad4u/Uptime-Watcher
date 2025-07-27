@@ -9,9 +9,14 @@ dist-electron/
 docs/Validator.md
 .markdownlintignore
 .github/prompts/*.md
+.github/prompts/ConsistencyCheck.prompt.md
 LICENSE
 .github/instructions/*.md
 docs/guides/Documentation-Contribution.md
 deps
 docs/README.md
 https://raw.githubusercontent.com/nick2bad4u/Uptime-Watcher/metrics/metrics.repository.svg
+https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/LICENSE.md
+https://raw.githubusercontent.com/nick2bad4u/Uptime-Watcher/metrics/metrics.repository.svg
+docs/guides/Documentation-Contribution.md
+docs/README.md

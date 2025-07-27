@@ -224,3 +224,5 @@ report/
 
 #Ignore vscode AI rules
 .github\copilot-instructions.md
+stylelintcache
+.cspellcache
