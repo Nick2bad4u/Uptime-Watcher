@@ -7,14 +7,56 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[ea90eee](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ea90eee642760d0f577bd4371c5ee1e96184e9cd)...
-[ea90eee](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ea90eee642760d0f577bd4371c5ee1e96184e9cd)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/ea90eee642760d0f577bd4371c5ee1e96184e9cd...ea90eee642760d0f577bd4371c5ee1e96184e9cd))
+[[0eb124c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0eb124c6135f3b1594a56b4d4e585b154f8bdc08)...
+[0eb124c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0eb124c6135f3b1594a56b4d4e585b154f8bdc08)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/0eb124c6135f3b1594a56b4d4e585b154f8bdc08...0eb124c6135f3b1594a56b4d4e585b154f8bdc08))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 8.8.0 [`(0eb124c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0eb124c6135f3b1594a56b4d4e585b154f8bdc08)
+
+
+
+
+
+
+## [8.8.0] - 2025-07-26
+
+
+[[dd17a16](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dd17a16e6257cd6b9b8c73f2319ad6b80c275add)...
+[c57bb4e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c57bb4e728595e8f1190ed6c8ea33e7eaa0eb5e2)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/dd17a16e6257cd6b9b8c73f2319ad6b80c275add...c57bb4e728595e8f1190ed6c8ea33e7eaa0eb5e2))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 8.7.0 [`(ea90eee)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ea90eee642760d0f577bd4371c5ee1e96184e9cd)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(c57bb4e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c57bb4e728595e8f1190ed6c8ea33e7eaa0eb5e2)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Add and update unit tests, remove legacy and obsolete tests
+
+- Introduces new and improved test coverage for backend utilities, cache logic, logger, and monitor lifecycle.
+- Removes outdated, redundant, or overly broad frontend and backend test suites for improved maintainability and clarity.
+- Refines test logic to accommodate recent code changes and stricter validation; improves reliability of UUID and site analytics tests.
+- Adds shared monitor type UI interface definitions to support future extensibility.
+- Updates mocks and setup for better isolation and cross-environment compatibility.
+- Refactors tests to ensure consistency with current codebase and corrects expectation mismatches. [`(dd17a16)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dd17a16e6257cd6b9b8c73f2319ad6b80c275add)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v8.7.0 [skip ci] [`(6d5dcac)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6d5dcaccde6a01714bd16b2e7be9fee856b353f1)
 
 
 
