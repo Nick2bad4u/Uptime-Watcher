@@ -2,11 +2,6 @@ name: Print Release Asset Sizes
 
 on:
     workflow_dispatch:
-    schedule:
-        - cron: "32 4 * * *"
-    release:
-        types:
-            - edited
     workflow_run:
         workflows: ["Build and Release Electron App"]
         types:
