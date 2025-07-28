@@ -186,11 +186,11 @@ describe("Interfaces Utility", () => {
             };
 
             // Test edge cases
-            mockLogger.debug("");  // Empty message
-            mockLogger.info("test");  // No additional args
-            mockLogger.warn("test", undefined);  // Undefined arg
-            mockLogger.error("test", null);  // Null error
-            mockLogger.error("test", new Error());  // Error without message
+            mockLogger.debug(""); // Empty message
+            mockLogger.info("test"); // No additional args
+            mockLogger.warn("test", undefined); // Undefined arg
+            mockLogger.error("test", null); // Null error
+            mockLogger.error("test", new Error()); // Error without message
 
             expect(mockLogger.debug).toHaveBeenCalledWith("");
             expect(mockLogger.info).toHaveBeenCalledWith("test");
@@ -228,7 +228,7 @@ describe("Interfaces Utility", () => {
             const flexibleLogger: Logger = {
                 debug: (message: string, ...args: unknown[]) => {
                     // Should accept any unknown types
-                    args.forEach(arg => {
+                    args.forEach((arg) => {
                         // Can handle any type of argument
                         if (typeof arg === "object" && arg !== null) {
                             // Handle objects
@@ -315,11 +315,11 @@ describe("Interfaces Utility", () => {
             }
 
             const logger = new AdvancedLogger();
-            
+
             // Can be used as Logger interface
             const loggerInterface: Logger = logger;
             expect(loggerInterface).toBeDefined();
-            
+
             // But also has additional methods
             expect(typeof logger.setLevel).toBe("function");
         });

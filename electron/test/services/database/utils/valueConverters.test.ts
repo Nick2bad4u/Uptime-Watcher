@@ -16,15 +16,7 @@ import {
 describe("Value Converters Utility", () => {
     describe("DbValue Type", () => {
         it("should accept valid DbValue types", () => {
-            const values: DbValue[] = [
-                null,
-                123,
-                "string",
-                0,
-                -1,
-                3.14,
-                "",
-            ];
+            const values: DbValue[] = [null, 123, "string", 0, -1, 3.14, ""];
 
             expect(values).toHaveLength(7);
             expect(values[0]).toBeNull();
@@ -73,11 +65,7 @@ describe("Value Converters Utility", () => {
             addBooleanField("isOptional", undefined, updateFields, updateValues);
             addBooleanField("isActive", true, updateFields, updateValues);
 
-            expect(updateFields).toEqual([
-                "isEnabled = ?",
-                "isDisabled = ?",
-                "isActive = ?",
-            ]);
+            expect(updateFields).toEqual(["isEnabled = ?", "isDisabled = ?", "isActive = ?"]);
             expect(updateValues).toEqual([1, 0, 1]);
         });
 
@@ -89,11 +77,7 @@ describe("Value Converters Utility", () => {
             addBooleanField("field-name", false, updateFields, updateValues);
             addBooleanField("fieldName123", true, updateFields, updateValues);
 
-            expect(updateFields).toEqual([
-                "field_name = ?",
-                "field-name = ?",
-                "fieldName123 = ?",
-            ]);
+            expect(updateFields).toEqual(["field_name = ?", "field-name = ?", "fieldName123 = ?"]);
             expect(updateValues).toEqual([1, 0, 1]);
         });
     });
@@ -168,11 +152,7 @@ describe("Value Converters Utility", () => {
             addNumberField("negInfinity", -Infinity, updateFields, updateValues);
             addNumberField("nanValue", NaN, updateFields, updateValues);
 
-            expect(updateFields).toEqual([
-                "infinity = ?",
-                "negInfinity = ?",
-                "nanValue = ?",
-            ]);
+            expect(updateFields).toEqual(["infinity = ?", "negInfinity = ?", "nanValue = ?"]);
             expect(updateValues).toEqual([Infinity, -Infinity, NaN]);
         });
     });
@@ -216,16 +196,8 @@ describe("Value Converters Utility", () => {
             addStringField("unicode", "Unicode: 🚀 ñ ç", updateFields, updateValues);
             addStringField("quotes", `Quotes: "Hello" 'World'`, updateFields, updateValues);
 
-            expect(updateFields).toEqual([
-                "special = ?",
-                "unicode = ?",
-                "quotes = ?",
-            ]);
-            expect(updateValues).toEqual([
-                "Special chars: @#$%^&*()",
-                "Unicode: 🚀 ñ ç",
-                `Quotes: "Hello" 'World'`,
-            ]);
+            expect(updateFields).toEqual(["special = ?", "unicode = ?", "quotes = ?"]);
+            expect(updateValues).toEqual(["Special chars: @#$%^&*()", "Unicode: 🚀 ñ ç", `Quotes: "Hello" 'World'`]);
         });
 
         it("should handle non-string values by converting", () => {
@@ -403,13 +375,7 @@ describe("Value Converters Utility", () => {
                 "checkInterval = ?",
                 "notificationsEnabled = ?",
             ]);
-            expect(updateValues).toEqual([
-                "My Website",
-                "https://example.com",
-                1,
-                60000,
-                0,
-            ]);
+            expect(updateValues).toEqual(["My Website", "https://example.com", 1, 60000, 0]);
         });
 
         it("should handle complex value conversion scenario", () => {
@@ -440,18 +406,8 @@ describe("Value Converters Utility", () => {
             addStringField("description", rawData.description, updateFields, updateValues);
             addBooleanField("isEnabled", rawData.isEnabled, updateFields, updateValues);
 
-            expect(updateFields).toEqual([
-                "timestamp = ?",
-                "timeout = ?",
-                "retries = ?",
-                "isEnabled = ?",
-            ]);
-            expect(updateValues).toEqual([
-                "2023-12-25T10:30:00.000Z",
-                5000,
-                3,
-                1,
-            ]);
+            expect(updateFields).toEqual(["timestamp = ?", "timeout = ?", "retries = ?", "isEnabled = ?"]);
+            expect(updateValues).toEqual(["2023-12-25T10:30:00.000Z", 5000, 3, 1]);
         });
     });
 });

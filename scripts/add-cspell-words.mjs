@@ -34,12 +34,12 @@ const currentWords = new Set(
 const CSPELL_COMMAND = [
     "npx",
     "cspell",
-    "\"**/*.{js,jsx,ts,tsx,md,css,scss,json}\"",
+    '"**/*.{js,jsx,ts,tsx,md,css,scss,json}"',
     "--gitignore",
     "--config .cspell.json",
     "--words-only",
     "--unique",
-    "--no-progress"
+    "--no-progress",
 ].join(" ");
 
 let cspellOutput;

@@ -4,24 +4,20 @@
  */
 
 import { describe, it, expect } from "vitest";
-import {
-    type MonitorType,
-    getBaseMonitorTypes,
-    isBaseMonitorType,
-} from "../../../services/monitoring/monitorTypes";
+import { type MonitorType, getBaseMonitorTypes, isBaseMonitorType } from "../../../services/monitoring/monitorTypes";
 
 describe("Monitor Types Utility", () => {
     describe("getBaseMonitorTypes", () => {
         it("should return array of base monitor types", () => {
             const types = getBaseMonitorTypes();
-            
+
             expect(Array.isArray(types)).toBe(true);
             expect(types.length).toBeGreaterThan(0);
         });
 
         it("should include http and port types", () => {
             const types = getBaseMonitorTypes();
-            
+
             expect(types).toContain("http");
             expect(types).toContain("port");
         });
@@ -29,20 +25,20 @@ describe("Monitor Types Utility", () => {
         it("should return a new array each time (not mutate original)", () => {
             const types1 = getBaseMonitorTypes();
             const types2 = getBaseMonitorTypes();
-            
+
             expect(types1).not.toBe(types2); // Different array instances
             expect(types1).toEqual(types2); // Same content
-            
+
             // Mutate one array
             types1.push("fake" as MonitorType);
-            
+
             // Other array should not be affected
             expect(types2).not.toContain("fake");
         });
 
         it("should return only base types", () => {
             const types = getBaseMonitorTypes();
-            
+
             // Should only contain known base types
             for (const type of types) {
                 expect(["http", "port"]).toContain(type);
@@ -52,13 +48,13 @@ describe("Monitor Types Utility", () => {
         it("should maintain consistent ordering", () => {
             const types1 = getBaseMonitorTypes();
             const types2 = getBaseMonitorTypes();
-            
+
             expect(types1).toEqual(types2);
         });
 
         it("should return non-empty array", () => {
             const types = getBaseMonitorTypes();
-            
+
             expect(types.length).toBeGreaterThan(0);
         });
     });
@@ -108,7 +104,7 @@ describe("Monitor Types Utility", () => {
 
         it("should work with all base monitor types", () => {
             const baseTypes = getBaseMonitorTypes();
-            
+
             for (const type of baseTypes) {
                 expect(isBaseMonitorType(type)).toBe(true);
             }
@@ -116,7 +112,7 @@ describe("Monitor Types Utility", () => {
 
         it("should provide proper type narrowing", () => {
             const unknownType: string = "http";
-            
+
             if (isBaseMonitorType(unknownType)) {
                 // TypeScript should narrow the type here
                 const monitorType: MonitorType = unknownType;
@@ -129,7 +125,7 @@ describe("Monitor Types Utility", () => {
         it("should allow assignment of valid monitor types", () => {
             const httpType: MonitorType = "http";
             const portType: MonitorType = "port";
-            
+
             expect(httpType).toBe("http");
             expect(portType).toBe("port");
         });
@@ -140,7 +136,7 @@ describe("Monitor Types Utility", () => {
                 type: "http",
                 enabled: true,
             };
-            
+
             expect(types).toContain("http");
             expect(config.type).toBe("http");
         });
@@ -156,7 +152,7 @@ describe("Monitor Types Utility", () => {
                         return "unknown monitor";
                 }
             }
-            
+
             expect(testMonitorType("http")).toBe("http monitor");
             expect(testMonitorType("port")).toBe("port monitor");
         });
@@ -165,7 +161,7 @@ describe("Monitor Types Utility", () => {
     describe("Integration with Base Types", () => {
         it("should maintain consistency with getBaseMonitorTypes", () => {
             const baseTypes = getBaseMonitorTypes();
-            
+
             // All returned types should be valid according to isBaseMonitorType
             for (const type of baseTypes) {
                 expect(isBaseMonitorType(type)).toBe(true);
@@ -174,11 +170,11 @@ describe("Monitor Types Utility", () => {
 
         it("should handle all base types consistently", () => {
             const baseTypes = getBaseMonitorTypes();
-            
+
             // Test that isBaseMonitorType works for all base types
             for (const type of baseTypes) {
                 expect(isBaseMonitorType(type)).toBe(true);
-                
+
                 // Test case sensitivity for each type
                 expect(isBaseMonitorType(type.toUpperCase())).toBe(false);
                 expect(isBaseMonitorType(type.charAt(0).toUpperCase() + type.slice(1))).toBe(false);
@@ -187,7 +183,7 @@ describe("Monitor Types Utility", () => {
 
         it("should not include extended or dynamic types", () => {
             const baseTypes = getBaseMonitorTypes();
-            
+
             // Should only include the core built-in types
             expect(baseTypes).not.toContain("ping");
             expect(baseTypes).not.toContain("dns");
@@ -198,16 +194,8 @@ describe("Monitor Types Utility", () => {
 
     describe("Error Handling and Edge Cases", () => {
         it("should handle malformed input gracefully", () => {
-            const malformedInputs = [
-                "http\0",
-                "http\t",
-                "http\n",
-                "ht\ttp",
-                "h ttp",
-                "port\r",
-                "po rt",
-            ];
-            
+            const malformedInputs = ["http\0", "http\t", "http\n", "ht\ttp", "h ttp", "port\r", "po rt"];
+
             for (const input of malformedInputs) {
                 expect(isBaseMonitorType(input)).toBe(false);
             }
@@ -220,7 +208,7 @@ describe("Monitor Types Utility", () => {
                 "httр", // Cyrillic p
                 "роrt", // Cyrillic p
             ];
-            
+
             for (const input of specialInputs) {
                 expect(isBaseMonitorType(input)).toBe(false);
             }
@@ -248,12 +236,8 @@ describe("Monitor Types Utility", () => {
         });
 
         it("should handle large arrays of types efficiently", () => {
-            const testTypes = [
-                ...Array(50).fill("http"),
-                ...Array(50).fill("port"),
-                ...Array(50).fill("invalid"),
-            ];
-            
+            const testTypes = [...Array(50).fill("http"), ...Array(50).fill("port"), ...Array(50).fill("invalid")];
+
             for (const type of testTypes) {
                 const result = isBaseMonitorType(type);
                 expect(typeof result).toBe("boolean");
@@ -266,7 +250,7 @@ describe("Monitor Types Utility", () => {
             // Example from JSDoc
             const baseTypes = getBaseMonitorTypes(); // ["http", "port"]
             expect(baseTypes).toEqual(expect.arrayContaining(["http", "port"]));
-            
+
             // Type guard example
             if (isBaseMonitorType("http")) {
                 // TypeScript knows this is a valid MonitorType
@@ -282,7 +266,7 @@ describe("Monitor Types Utility", () => {
                 }
                 return `Unknown monitor type: ${type}`;
             }
-            
+
             expect(processMonitorType("http")).toBe("Processing http monitor");
             expect(processMonitorType("invalid")).toBe("Unknown monitor type: invalid");
         });

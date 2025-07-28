@@ -409,14 +409,11 @@ describe("DatabaseManager", () => {
             const result = await databaseManager.importData(testData);
 
             expect(result).toBe(false);
-            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
-                "internal:database:data-imported",
-                {
-                    operation: "data-imported",
-                    success: false,
-                    timestamp: expect.any(Number),
-                }
-            );
+            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith("internal:database:data-imported", {
+                operation: "data-imported",
+                success: false,
+                timestamp: expect.any(Number),
+            });
 
             // Restore the original method
             (databaseManager as any).loadSites = originalLoadSites;
@@ -663,7 +660,7 @@ describe("DatabaseManager", () => {
             // Set up all required mocks
             const { SiteLoadingOrchestrator } = await import("../../utils/database/SiteRepositoryService");
             const { DataImportExportService } = await import("../../utils/database/DataImportExportService");
-            
+
             const mockOrchestrator = {
                 loadSitesFromDatabase: vi.fn().mockResolvedValue({
                     success: true,
@@ -698,7 +695,7 @@ describe("DatabaseManager", () => {
             // Verify all operations called their respective services
             const initDatabase = await import("../../utils/database/databaseInitializer");
             expect(initDatabase.initDatabase).toHaveBeenCalled();
-            
+
             // Check that the orchestrator was used, not the repository directly
             expect(mockOrchestrator.loadSitesFromDatabase).toHaveBeenCalled();
             expect(mockExportService.exportAllData).toHaveBeenCalled();
@@ -740,7 +737,7 @@ describe("DatabaseManager", () => {
         it("should handle empty import data", async () => {
             const { DataImportExportService } = await import("../../utils/database/DataImportExportService");
             const { SiteLoadingOrchestrator } = await import("../../utils/database/SiteRepositoryService");
-            
+
             // Mock both services that are used in importData
             const mockImportService = {
                 importDataFromJson: vi.fn().mockResolvedValue({ sites: [], settings: [] }),

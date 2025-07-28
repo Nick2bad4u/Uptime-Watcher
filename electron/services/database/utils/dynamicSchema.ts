@@ -198,68 +198,11 @@ export function generateSqlParameters(): { columns: string[]; placeholders: stri
 export function mapMonitorToRow(monitor: Record<string, unknown>): Record<string, unknown> {
     const row: Record<string, unknown> = {};
 
-    // Only map fields that are actually present in the monitor object
-    // This prevents overwriting existing database values with defaults during partial updates
-    if (monitor["checkInterval"] !== undefined) {
-        row["check_interval"] = safeGetRowProperty(monitor, "checkInterval", 300_000);
-    }
-    if (monitor["createdAt"] !== undefined) {
-        row["created_at"] = safeGetRowProperty(monitor, "createdAt", Date.now());
-    }
-    if (monitor["monitoring"] !== undefined || monitor["enabled"] !== undefined) {
-        row["enabled"] = (() => {
-            const monitoring = monitor["monitoring"];
-            const enabled = monitor["enabled"];
-            return monitoring === true || enabled === true ? 1 : 0;
-        })();
-    }
-    if (monitor["lastChecked"] !== undefined) {
-        row["last_checked"] = (() => {
-            const lastChecked = monitor["lastChecked"];
-            if (lastChecked instanceof Date) {
-                return lastChecked.getTime();
-            }
-            if (typeof lastChecked === "number") {
-                return lastChecked;
-            }
-            return null;
-        })();
-    }
-    if (monitor["lastError"] !== undefined) {
-        row["last_error"] = safeGetRowProperty(monitor, "lastError", null);
-    }
-    if (monitor["nextCheck"] !== undefined) {
-        row["next_check"] = safeGetRowProperty(monitor, "nextCheck", null);
-    }
-    if (monitor["responseTime"] !== undefined) {
-        row["response_time"] = safeGetRowProperty(monitor, "responseTime", -1);
-    }
-    if (monitor["retryAttempts"] !== undefined) {
-        row["retry_attempts"] = safeGetRowProperty(monitor, "retryAttempts", 3);
-    }
-    if (monitor["siteIdentifier"] !== undefined) {
-        row["site_identifier"] = safeGetRowProperty(monitor, "siteIdentifier", "");
-    }
-    if (monitor["status"] !== undefined) {
-        row["status"] = safeGetRowProperty(monitor, "status", "pending");
-    }
-    if (monitor["timeout"] !== undefined) {
-        row["timeout"] = safeGetRowProperty(monitor, "timeout", 10_000);
-    }
-    if (monitor["type"] !== undefined) {
-        row["type"] = safeGetRowProperty(monitor, "type", "http");
-    }
-    if (monitor["updatedAt"] !== undefined) {
-        row["updated_at"] = safeGetRowProperty(monitor, "updatedAt", Date.now());
-    }
+    // Map standard fields first
+    mapStandardFields(monitor, row);
 
-    // Dynamically map monitor type specific fields
-    const fieldDefs = generateDatabaseFieldDefinitions();
-    for (const fieldDef of fieldDefs) {
-        if (monitor[fieldDef.sourceField] !== undefined) {
-            row[fieldDef.columnName] = convertToDatabase(monitor[fieldDef.sourceField], fieldDef.sqlType);
-        }
-    }
+    // Map dynamic monitor type-specific fields
+    mapDynamicFields(monitor, row);
 
     return row;
 }
@@ -310,6 +253,20 @@ export function mapRowToMonitor(row: Record<string, unknown>): Record<string, un
 }
 
 /**
+ * Converts enabled/monitoring fields to database format.
+ *
+ * @param monitor - Monitor object containing enabled/monitoring properties
+ * @returns Database value (1 for true, 0 for false)
+ *
+ * @internal
+ */
+function convertEnabledField(monitor: Record<string, unknown>): number {
+    const monitoring = monitor["monitoring"];
+    const enabled = monitor["enabled"];
+    return monitoring === true || enabled === true ? 1 : 0;
+}
+
+/**
  * Converts a database value to its corresponding JavaScript type.
  *
  * @remarks
@@ -340,6 +297,24 @@ function convertFromDatabase(value: unknown, sqlType: string): unknown {
             return value;
         }
     }
+}
+
+/**
+ * Converts lastChecked field to database format.
+ *
+ * @param lastChecked - Value to convert (Date, number, or other)
+ * @returns Timestamp as number or null
+ *
+ * @internal
+ */
+function convertLastCheckedField(lastChecked: unknown): null | number {
+    if (lastChecked instanceof Date) {
+        return lastChecked.getTime();
+    }
+    if (typeof lastChecked === "number") {
+        return lastChecked;
+    }
+    return null;
 }
 
 /**
@@ -402,6 +377,73 @@ function getSqlTypeFromFieldType(fieldType: string): string {
         default: {
             return "TEXT"; // Safe default for unknown types
         }
+    }
+}
+
+/**
+ * Maps dynamic monitor type-specific fields to database row.
+ *
+ * @param monitor - Monitor object to map
+ * @param row - Database row object to populate
+ *
+ * @internal
+ */
+function mapDynamicFields(monitor: Record<string, unknown>, row: Record<string, unknown>): void {
+    const fieldDefs = generateDatabaseFieldDefinitions();
+    for (const fieldDef of fieldDefs) {
+        if (monitor[fieldDef.sourceField] !== undefined) {
+            row[fieldDef.columnName] = convertToDatabase(monitor[fieldDef.sourceField], fieldDef.sqlType);
+        }
+    }
+}
+
+/**
+ * Maps standard monitor fields to database row.
+ *
+ * @param monitor - Monitor object to map
+ * @param row - Database row object to populate
+ *
+ * @internal
+ */
+function mapStandardFields(monitor: Record<string, unknown>, row: Record<string, unknown>): void {
+    if (monitor["checkInterval"] !== undefined) {
+        row["check_interval"] = safeGetRowProperty(monitor, "checkInterval", 300_000);
+    }
+    if (monitor["createdAt"] !== undefined) {
+        row["created_at"] = safeGetRowProperty(monitor, "createdAt", Date.now());
+    }
+    if (monitor["monitoring"] !== undefined || monitor["enabled"] !== undefined) {
+        row["enabled"] = convertEnabledField(monitor);
+    }
+    if (monitor["lastChecked"] !== undefined) {
+        row["last_checked"] = convertLastCheckedField(monitor["lastChecked"]);
+    }
+    if (monitor["lastError"] !== undefined) {
+        row["last_error"] = safeGetRowProperty(monitor, "lastError", null);
+    }
+    if (monitor["nextCheck"] !== undefined) {
+        row["next_check"] = safeGetRowProperty(monitor, "nextCheck", null);
+    }
+    if (monitor["responseTime"] !== undefined) {
+        row["response_time"] = safeGetRowProperty(monitor, "responseTime", -1);
+    }
+    if (monitor["retryAttempts"] !== undefined) {
+        row["retry_attempts"] = safeGetRowProperty(monitor, "retryAttempts", 3);
+    }
+    if (monitor["siteIdentifier"] !== undefined) {
+        row["site_identifier"] = safeGetRowProperty(monitor, "siteIdentifier", "");
+    }
+    if (monitor["status"] !== undefined) {
+        row["status"] = safeGetRowProperty(monitor, "status", "pending");
+    }
+    if (monitor["timeout"] !== undefined) {
+        row["timeout"] = safeGetRowProperty(monitor, "timeout", 10_000);
+    }
+    if (monitor["type"] !== undefined) {
+        row["type"] = safeGetRowProperty(monitor, "type", "http");
+    }
+    if (monitor["updatedAt"] !== undefined) {
+        row["updated_at"] = safeGetRowProperty(monitor, "updatedAt", Date.now());
     }
 }
 

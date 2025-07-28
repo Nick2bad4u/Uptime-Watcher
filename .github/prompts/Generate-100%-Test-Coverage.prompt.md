@@ -16,6 +16,7 @@ You cannot stop until all files have 90% branch coverage.
 You cannot stop even if it takes a long time to complete.
 
 # Special Instructions
+
 - Do not worry about covering console statements, logging, barrel exports, constants (non-code, etc.) or other development-only features. (such as development extensions, debug logging, etc.)
 - Focus on the functional code and logic of the application.
 - Ensure that all edge cases are covered where applicable.

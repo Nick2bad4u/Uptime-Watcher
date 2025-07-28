@@ -2,8 +2,8 @@ name: Codacy Coverage Reporter
 
 on: ["push"]
 
-permissions:  # added using https://github.com/step-security/secure-repo
-  contents: read
+permissions: # added using https://github.com/step-security/secure-repo
+    contents: read
 
 jobs:
     codacy-coverage-reporter:

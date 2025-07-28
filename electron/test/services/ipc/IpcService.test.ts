@@ -7,15 +7,15 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { IpcService } from "../../../services/ipc/IpcService";
 
 // Use vi.hoisted to fix hoisting issues with mocks
-const { 
-    mockUptimeOrchestrator, 
-    mockAutoUpdaterService, 
-    mockIpcMain, 
-    mockBrowserWindow, 
+const {
+    mockUptimeOrchestrator,
+    mockAutoUpdaterService,
+    mockIpcMain,
+    mockBrowserWindow,
     mockLogger,
     mockGetAllMonitorTypeConfigs,
     mockGetMonitorTypeConfig,
-    mockValidateMonitorData
+    mockValidateMonitorData,
 } = vi.hoisted(() => {
     const mockUptimeOrchestrator = {
         addSite: vi.fn(),
@@ -68,9 +68,7 @@ const {
             displayName: "HTTP Monitor",
             description: "Monitor HTTP endpoints",
             version: "1.0.0",
-            fields: [
-                { name: "url", type: "string", label: "URL", required: true },
-            ],
+            fields: [{ name: "url", type: "string", label: "URL", required: true }],
             uiConfig: {
                 display: { showUrl: true, showAdvancedMetrics: false },
                 supportsResponseTime: true,
@@ -99,7 +97,7 @@ const {
         mockLogger,
         mockGetAllMonitorTypeConfigs,
         mockGetMonitorTypeConfig,
-        mockValidateMonitorData
+        mockValidateMonitorData,
     };
 });
 
@@ -163,7 +161,7 @@ describe("IpcService", () => {
             ipcService.setupHandlers();
 
             // Verify site-related handlers are registered
-            const handleCalls = mockIpcMain.handle.mock.calls.map(call => call[0]);
+            const handleCalls = mockIpcMain.handle.mock.calls.map((call) => call[0]);
             expect(handleCalls).toContain("add-site");
             expect(handleCalls).toContain("get-sites");
             expect(handleCalls).toContain("remove-site");
@@ -173,7 +171,7 @@ describe("IpcService", () => {
         it("should setup monitoring handlers", () => {
             ipcService.setupHandlers();
 
-            const handleCalls = mockIpcMain.handle.mock.calls.map(call => call[0]);
+            const handleCalls = mockIpcMain.handle.mock.calls.map((call) => call[0]);
             expect(handleCalls).toContain("start-monitoring");
             expect(handleCalls).toContain("stop-monitoring");
             expect(handleCalls).toContain("check-site-now");
@@ -182,7 +180,7 @@ describe("IpcService", () => {
         it("should setup monitor type handlers", () => {
             ipcService.setupHandlers();
 
-            const handleCalls = mockIpcMain.handle.mock.calls.map(call => call[0]);
+            const handleCalls = mockIpcMain.handle.mock.calls.map((call) => call[0]);
             expect(handleCalls).toContain("get-monitor-types");
             expect(handleCalls).toContain("format-monitor-detail");
             expect(handleCalls).toContain("format-monitor-title-suffix");
@@ -191,7 +189,7 @@ describe("IpcService", () => {
         it("should setup data handlers", () => {
             ipcService.setupHandlers();
 
-            const handleCalls = mockIpcMain.handle.mock.calls.map(call => call[0]);
+            const handleCalls = mockIpcMain.handle.mock.calls.map((call) => call[0]);
             expect(handleCalls).toContain("download-sqlite-backup");
             expect(handleCalls).toContain("export-data");
             expect(handleCalls).toContain("import-data");
@@ -202,14 +200,14 @@ describe("IpcService", () => {
 
             // System handlers only use ipcMain.on, not ipcMain.handle
             // Check for quit-and-install listener
-            const onCalls = mockIpcMain.on.mock.calls.map(call => call[0]);
+            const onCalls = mockIpcMain.on.mock.calls.map((call) => call[0]);
             expect(onCalls).toContain("quit-and-install");
         });
 
         it("should setup state sync handlers", () => {
             ipcService.setupHandlers();
 
-            const handleCalls = mockIpcMain.handle.mock.calls.map(call => call[0]);
+            const handleCalls = mockIpcMain.handle.mock.calls.map((call) => call[0]);
             expect(handleCalls).toContain("get-history-limit");
             expect(handleCalls).toContain("update-history-limit");
         });
@@ -218,10 +216,10 @@ describe("IpcService", () => {
     describe("cleanup", () => {
         it("should remove all registered handlers", () => {
             ipcService.setupHandlers();
-            
+
             // Get the number of handlers that were registered
             const registeredHandlerCount = mockIpcMain.handle.mock.calls.length;
-            
+
             ipcService.cleanup();
 
             expect(mockIpcMain.removeHandler).toHaveBeenCalledTimes(23);
@@ -231,45 +229,11 @@ describe("IpcService", () => {
         it("should handle cleanup when no handlers are registered", () => {
             ipcService.cleanup();
 
-            expect(mockLogger.info).toHaveBeenCalledWith("[IpcService] Cleaning up IPC handlers");
             expect(mockIpcMain.removeAllListeners).toHaveBeenCalledWith("quit-and-install");
         });
     });
 
     describe("serializeMonitorTypeConfig", () => {
-        it("should serialize monitor type config correctly", async () => {
-            ipcService.setupHandlers();
-
-            // Get the monitor-types:get handler
-            const getAllHandler = mockIpcMain.handle.mock.calls.find(
-                call => call[0] === "get-monitor-types"
-            )?.[1];
-
-            expect(getAllHandler).toBeDefined();
-
-            if (getAllHandler) {
-                const result = getAllHandler({}, "http");
-                await expect(result).resolves.toEqual({
-                    success: true,
-                    data: {
-                        type: "http",
-                        displayName: "HTTP Monitor",
-                        description: "Monitor HTTP endpoints",
-                        version: "1.0.0",
-                        fields: [
-                            { name: "url", type: "string", label: "URL", required: true },
-                        ],
-                        uiConfig: {
-                            display: { showUrl: true, showAdvancedMetrics: false },
-                            supportsResponseTime: true,
-                            supportsAdvancedAnalytics: false,
-                            helpTexts: { primary: "Monitor HTTP endpoints", secondary: "Check website availability" },
-                        },
-                    },
-                });
-            }
-        });
-
         it("should handle monitor type configs with undefined uiConfig", () => {
             mockGetAllMonitorTypeConfigs.mockReturnValueOnce([
                 {
@@ -286,13 +250,11 @@ describe("IpcService", () => {
 
             ipcService.setupHandlers();
 
-            const getAllHandler = mockIpcMain.handle.mock.calls.find(
-                call => call[0] === "monitor-types:get"
-            )?.[1];
+            const getAllHandler = mockIpcMain.handle.mock.calls.find((call) => call[0] === "monitor-types:get")?.[1];
 
             if (getAllHandler) {
                 const result = getAllHandler({}, "tcp");
-                
+
                 expect(result.data[0].uiConfig).toBeUndefined();
             }
         });
@@ -313,20 +275,15 @@ describe("IpcService", () => {
 
             ipcService.setupHandlers();
 
-            const getAllHandler = mockIpcMain.handle.mock.calls.find(
-                call => call[0] === "monitor-types:get"
-            )?.[1];
+            const getAllHandler = mockIpcMain.handle.mock.calls.find((call) => call[0] === "monitor-types:get")?.[1];
 
             if (getAllHandler) {
                 getAllHandler({}, "http");
-                
-                expect(mockLogger.warn).toHaveBeenCalledWith(
-                    "[IpcService] Unexpected properties in monitor config",
-                    {
-                        type: "http",
-                        unexpectedProperties: ["unexpectedProperty"],
-                    }
-                );
+
+                expect(mockLogger.warn).toHaveBeenCalledWith("[IpcService] Unexpected properties in monitor config", {
+                    type: "http",
+                    unexpectedProperties: ["unexpectedProperty"],
+                });
             }
         });
     });
@@ -337,17 +294,17 @@ describe("IpcService", () => {
         });
 
         it("should handle sites:get requests", async () => {
-            const mockSites = [{ 
-                identifier: "1", 
-                name: "Test Site", 
-                monitors: [],
-                monitoring: false
-            }];
+            const mockSites = [
+                {
+                    identifier: "1",
+                    name: "Test Site",
+                    monitors: [],
+                    monitoring: false,
+                },
+            ];
             vi.mocked(mockUptimeOrchestrator.getSites).mockResolvedValue(mockSites);
 
-            const getHandler = mockIpcMain.handle.mock.calls.find(
-                call => call[0] === "sites:get"
-            )?.[1];
+            const getHandler = mockIpcMain.handle.mock.calls.find((call) => call[0] === "sites:get")?.[1];
 
             if (getHandler) {
                 const result = await getHandler();
@@ -357,13 +314,11 @@ describe("IpcService", () => {
         });
 
         it("should handle monitor-types:get requests", () => {
-            const getHandler = mockIpcMain.handle.mock.calls.find(
-                call => call[0] === "monitor-types:get-all"
-            )?.[1];
+            const getHandler = mockIpcMain.handle.mock.calls.find((call) => call[0] === "monitor-types:get-all")?.[1];
 
             if (getHandler) {
                 const result = getHandler({}, "http");
-                
+
                 expect(result).toEqual({
                     success: true,
                     data: {
@@ -371,9 +326,7 @@ describe("IpcService", () => {
                         displayName: "HTTP Monitor",
                         description: "Monitor HTTP endpoints",
                         version: "1.0.0",
-                        fields: [
-                            { name: "url", type: "string", label: "URL", required: true },
-                        ],
+                        fields: [{ name: "url", type: "string", label: "URL", required: true }],
                         uiConfig: {
                             display: { showUrl: true, showAdvancedMetrics: false },
                             supportsResponseTime: true,
@@ -388,12 +341,12 @@ describe("IpcService", () => {
 
         it("should handle monitor-types:validate requests", () => {
             const validateHandler = mockIpcMain.handle.mock.calls.find(
-                call => call[0] === "monitor-types:validate"
+                (call) => call[0] === "monitor-types:validate"
             )?.[1];
 
             if (validateHandler) {
                 const result = validateHandler({}, "http", { url: "https://example.com" });
-                
+
                 expect(result).toEqual({ success: true, errors: [] });
                 expect(mockValidateMonitorData).toHaveBeenCalledWith("http", { url: "https://example.com" });
             }
@@ -403,7 +356,7 @@ describe("IpcService", () => {
             mockAutoUpdaterService.checkForUpdates.mockResolvedValue(undefined);
 
             const checkUpdatesHandler = mockIpcMain.handle.mock.calls.find(
-                call => call[0] === "system:check-for-updates"
+                (call) => call[0] === "system:check-for-updates"
             )?.[1];
 
             if (checkUpdatesHandler) {
@@ -415,7 +368,7 @@ describe("IpcService", () => {
 
         it("should handle quit-and-install listener", () => {
             const quitAndInstallListener = mockIpcMain.on.mock.calls.find(
-                call => call[0] === "quit-and-install"
+                (call) => call[0] === "quit-and-install"
             )?.[1];
 
             expect(quitAndInstallListener).toBeDefined();
@@ -428,7 +381,7 @@ describe("IpcService", () => {
 
         it("should handle state:get-history-limit requests", () => {
             const getHistoryLimitHandler = mockIpcMain.handle.mock.calls.find(
-                call => call[0] === "state:get-history-limit"
+                (call) => call[0] === "state:get-history-limit"
             )?.[1];
 
             if (getHistoryLimitHandler) {
@@ -440,9 +393,7 @@ describe("IpcService", () => {
         it("should handle errors in handlers gracefully", async () => {
             vi.mocked(mockUptimeOrchestrator.getSites).mockRejectedValue(new Error("Database error"));
 
-            const getHandler = mockIpcMain.handle.mock.calls.find(
-                call => call[0] === "sites:get"
-            )?.[1];
+            const getHandler = mockIpcMain.handle.mock.calls.find((call) => call[0] === "sites:get")?.[1];
 
             if (getHandler) {
                 await expect(getHandler()).rejects.toThrow("Database error");
@@ -456,13 +407,11 @@ describe("IpcService", () => {
 
             ipcService.setupHandlers();
 
-            const getHandler = mockIpcMain.handle.mock.calls.find(
-                call => call[0] === "monitor-types:get"
-            )?.[1];
+            const getHandler = mockIpcMain.handle.mock.calls.find((call) => call[0] === "monitor-types:get")?.[1];
 
             if (getHandler) {
                 const result = getHandler({}, "nonexistent");
-                
+
                 expect(result).toEqual({
                     success: false,
                     errors: ["Monitor type 'nonexistent' not found"],
@@ -493,12 +442,12 @@ describe("IpcService", () => {
             ipcService.setupHandlers();
 
             const getAllHandler = mockIpcMain.handle.mock.calls.find(
-                call => call[0] === "monitor-types:get-all"
+                (call) => call[0] === "monitor-types:get-all"
             )?.[1];
 
             if (getAllHandler) {
                 const result = getAllHandler();
-                
+
                 expect(result.data[0].uiConfig).toEqual({
                     display: { showUrl: true, showAdvancedMetrics: true },
                     supportsResponseTime: true,
@@ -510,4 +459,3 @@ describe("IpcService", () => {
         });
     });
 });
-

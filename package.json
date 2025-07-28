@@ -168,7 +168,7 @@
     "lint:quick": "npm run lint:js && npm run lint:ts && npm run lint:prettier",
     "lint:resolve-audit": "npx resolve-audit --skip-dev",
     "lint:secrets": "npx detect-secrets scan",
-    "lint:security": "npm run lint:security:sensitive && npm run lint:security:resolve-audit",
+    "lint:security": "npm run lint:security:resolve-audit && npm run lint:security:sensitive",
     "lint:security:resolve-audit": "npx resolve-audit --skip-dev",
     "lint:security:sensitive": "npx detect-secrets scan",
     "lint:sloc": "npx sloc src/ electron/ shared/",
