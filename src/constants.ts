@@ -7,7 +7,10 @@
  * Font family constants for theme reuse.
  *
  * @remarks
- * Monospace fonts prioritize consist/**
+ * Monospace fonts prioritize consistent character spacing.
+ */
+
+/**
  * CSS transition timing for consistent animations.
  *
  * @remarks

@@ -18,6 +18,8 @@ export default defineConfig({
         // Transpile all files with ESBuild to remove comments from code coverage.
         // Required for `test.coverage.ignoreEmptyLines` to work:
         include: ["**/*.js", "**/*.jsx", "**/*.mjs", "**/*.ts", "**/*.tsx"],
+        // More aggressive transformation to help coverage parsing
+        keepNames: true, // Preserve function names for better coverage reports
     },
     plugins: [
         react({
@@ -81,6 +83,9 @@ export default defineConfig({
             ],
             ignoreEmptyLines: true, // Ignore empty lines in coverage reports
             experimentalAstAwareRemapping: true, // Enable AST-aware remapping for better accuracy
+            processingConcurrency: 2, // Reduce concurrency to avoid parsing conflicts
+            skipFull: false, // Don't skip full coverage collection
+            all: true, // Include all source files in coverage
             provider: "v8",
             reporter: ["text", "json", "lcov", "html"],
             reportsDirectory: "./coverage",

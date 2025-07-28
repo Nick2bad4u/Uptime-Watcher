@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { ThemeManager } from "../theme/ThemeManager";
 import { lightTheme, darkTheme } from "../theme/themes";
+import type { Theme } from "../theme/types";
 
 // Mock DOM environment
 Object.defineProperty(window, "matchMedia", {
@@ -243,6 +244,164 @@ describe("ThemeManager", () => {
             expect(cssVariables).toContain("--color-");
             expect(cssVariables).toContain("--font-size-");
             expect(cssVariables).toContain("--spacing-");
+        });
+    });
+
+    describe("Edge Cases and Error Handling", () => {
+        it("should handle null/undefined theme properties gracefully", () => {
+            const manager = ThemeManager.getInstance();
+
+            // Create a theme with null/undefined properties to test all edge cases
+            const themeWithNullProps = {
+                name: "null-test",
+                isDark: false,
+                colors: null,
+                spacing: undefined,
+                borderRadius: null,
+                shadows: undefined,
+                typography: null,
+            } as any as Theme;
+
+            // This should not throw even with null/undefined properties
+            expect(() => {
+                manager.generateCSSVariables(themeWithNullProps);
+            }).not.toThrow();
+
+            // Apply theme should also handle this gracefully
+            expect(() => {
+                manager.applyTheme(lightTheme); // Use valid theme object
+            }).not.toThrow();
+        });
+
+        it("should handle partial typography object", () => {
+            const manager = ThemeManager.getInstance();
+            
+            const themeWithPartialTypography = {
+                name: "partial-typography",
+                isDark: false,
+                colors: {},
+                spacing: {},
+                borderRadius: {},
+                shadows: {},
+                typography: {
+                    fontSize: null, // Test null fontSize
+                    fontFamily: undefined, // Test undefined fontFamily
+                },
+            } as any as Theme;
+
+            expect(() => {
+                manager.generateCSSVariables(themeWithPartialTypography);
+            }).not.toThrow();
+        });
+
+        it("should handle empty objects for theme properties", () => {
+            const manager = ThemeManager.getInstance();
+            
+            const themeWithEmptyObjects = {
+                name: "empty-objects",
+                isDark: false,
+                colors: {},
+                spacing: {},
+                borderRadius: {},
+                shadows: {},
+                typography: {},
+            } as any as Theme;
+
+            const result = manager.generateCSSVariables(themeWithEmptyObjects);
+            expect(result).toBe(":root {\n\n}"); // Should return empty CSS block for empty objects
+        });
+
+        it("should handle complex color structures with null values", () => {
+            const manager = ThemeManager.getInstance();
+            
+            const themeWithComplexColors = {
+                name: "complex-colors",
+                isDark: false,
+                colors: {
+                    primary: {
+                        50: "#f0f9ff",
+                        500: null, // Test null color value
+                    },
+                    secondary: null, // Test null color category
+                },
+                spacing: {},
+                borderRadius: {},
+                shadows: {},
+                typography: {},
+            } as any as Theme;
+
+            expect(() => {
+                manager.generateCSSVariables(themeWithComplexColors);
+            }).not.toThrow();
+        });
+
+        it("should handle nested null checks in apply methods", () => {
+            const manager = ThemeManager.getInstance();
+            
+            // Test with theme that has some properties as null to trigger the private method null checks
+            const themeWithNullBorderRadius = {
+                ...lightTheme,
+                borderRadius: null,
+            } as any as Theme;
+
+            const themeWithNullSpacing = {
+                ...lightTheme,
+                spacing: null,
+            } as any as Theme;
+
+            const themeWithNullShadows = {
+                ...lightTheme,
+                shadows: null,
+            } as any as Theme;
+
+            const themeWithNullColors = {
+                ...lightTheme,
+                colors: null,
+            } as any as Theme;
+
+            const themeWithNullTypography = {
+                ...lightTheme,
+                typography: null,
+            } as any as Theme;
+
+            // Test with typography that has null fontSize specifically (line 330)
+            const themeWithNullFontSize = {
+                ...lightTheme,
+                typography: {
+                    ...lightTheme.typography,
+                    fontSize: null,
+                } as any,
+            } as any as Theme;
+
+            // These should all complete without throwing, exercising the null checks
+            expect(() => manager.generateCSSVariables(themeWithNullBorderRadius)).not.toThrow();
+            expect(() => manager.generateCSSVariables(themeWithNullSpacing)).not.toThrow();
+            expect(() => manager.generateCSSVariables(themeWithNullShadows)).not.toThrow();
+            expect(() => manager.generateCSSVariables(themeWithNullColors)).not.toThrow();
+            expect(() => manager.generateCSSVariables(themeWithNullTypography)).not.toThrow();
+            expect(() => manager.generateCSSVariables(themeWithNullFontSize)).not.toThrow();
+
+            // Also test applyTheme method which calls the apply methods directly
+            expect(() => manager.applyTheme(themeWithNullBorderRadius)).not.toThrow();
+            expect(() => manager.applyTheme(themeWithNullSpacing)).not.toThrow();
+            expect(() => manager.applyTheme(themeWithNullShadows)).not.toThrow();
+            expect(() => manager.applyTheme(themeWithNullColors)).not.toThrow();
+            expect(() => manager.applyTheme(themeWithNullTypography)).not.toThrow();
+            expect(() => manager.applyTheme(themeWithNullFontSize)).not.toThrow();
+        });
+
+        it("should handle undefined document in applyThemeClasses", () => {
+            const manager = ThemeManager.getInstance();
+
+            // Mock document to be undefined to trigger line 302
+            const originalDocument = global.document;
+            delete (global as any).document;
+
+            // This should handle undefined document gracefully
+            expect(() => manager.applyTheme(lightTheme)).not.toThrow();
+
+            // Restore document
+            global.document = originalDocument;
         });
     });
 });
