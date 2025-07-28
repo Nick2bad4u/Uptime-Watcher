@@ -444,7 +444,6 @@ describe("DatabaseManager", () => {
     });
 
     describe("Site Loading Operations", () => {
-
         it("should emit site loading events", async () => {
             const loadSitesSpy = vi.spyOn(databaseManager as any, "loadSites").mockResolvedValue(undefined);
             const eventEmitterSpy = vi.spyOn((databaseManager as any).eventEmitter, "emitTyped");
@@ -530,7 +529,6 @@ describe("DatabaseManager", () => {
     });
 
     describe("Integration Scenarios", () => {
-
         it("should handle history limit workflow", async () => {
             // Get initial limit
             const initialLimit = databaseManager.getHistoryLimit();
