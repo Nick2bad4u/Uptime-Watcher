@@ -56,11 +56,12 @@ const configureLogging = () => {
 log.initialize({ preload: true });
 
 type ElectronLogLevel = "debug" | "error" | "info" | "silly" | "verbose" | "warn";
+const ElectronLogFile = "uptime-watcher-main.log";
 
 const { consoleLevel, fileLevel } = configureLogging();
 log.transports.file.level = fileLevel as ElectronLogLevel;
 log.transports.console.level = consoleLevel as ElectronLogLevel;
-log.transports.file.fileName = "uptime-watcher-main.log";
+log.transports.file.fileName = ElectronLogFile;
 log.transports.file.maxSize = 1024 * 1024 * 5; // 5MB max file size
 log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";
 log.transports.console.format = "[{h}:{i}:{s}.{ms}] [{level}] {text}";
