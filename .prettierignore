@@ -11,7 +11,7 @@ coverage/
 *.min.css
 dist/
 dist-electron/
-docs/docusaurus/
+docs/docusaurus/**/**
 
 # Ignore Change Logs
 **/CHANGELOG.md
@@ -23,4 +23,4 @@ package-lock.json
 package.json
 
 # Ignore specific files
-**/coverage-results.json"
+**/coverage-results.json

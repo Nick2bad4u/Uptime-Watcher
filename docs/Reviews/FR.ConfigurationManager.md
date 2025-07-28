@@ -14,23 +14,27 @@ The ConfigurationManager is a well-designed centralized configuration service th
 ### ✅ Single Responsibility Principle (SRP) - **EXCELLENT**
 
 **Strengths:**
+
 - Clear single responsibility: managing business configuration and policies
 - Configuration caching is a natural extension of the core responsibility
 - Validator composition delegates domain-specific validation appropriately
 - Clean separation between configuration retrieval and validation
 
 **Minor Considerations:**
+
 - Cache management could potentially be extracted, but it's so tightly coupled to configuration that it's appropriate here
 
 ### ✅ Open-Closed Principle (OCP) - **EXCELLENT**
 
 **Strengths:**
+
 - Uses composition pattern with validators - new validation rules can be added without modifying this class
 - Configuration values are externalized to constants
 - Cache implementation is abstracted through `StandardizedCache`
 - Validation methods are extensible through the validator pattern
 
 **Examples of Extensibility:**
+
 ```typescript
 // New validator can be added without modifying ConfigurationManager
 private readonly newValidator: NewValidator;
@@ -44,6 +48,7 @@ public getNewConfigurationValue(): number {
 ### ✅ Liskov Substitution Principle (LSP) - **EXCELLENT**
 
 **Strengths:**
+
 - No inheritance hierarchy to violate
 - All dependencies are interface-based and substitutable
 - Validator composition allows for easy substitution of validation strategies
@@ -51,6 +56,7 @@ public getNewConfigurationValue(): number {
 ### ✅ Interface Segregation Principle (ISP) - **EXCELLENT**
 
 **Strengths:**
+
 - Clean, focused public API with methods grouped by concern
 - Validation methods return standardized `ValidationResult`
 - Cache management methods are separate from business rule methods
@@ -59,25 +65,28 @@ public getNewConfigurationValue(): number {
 ### ✅ Dependency Inversion Principle (DIP) - **GOOD**
 
 **Strengths:**
+
 - Uses `StandardizedCache` abstraction
 - Validators are injected through composition
 - Constants are externalized and imported
 
 **Minor Improvements:**
+
 - Could potentially inject validators rather than creating them in constructor
 - Could abstract the `isDev()` function for better testability
 
 ## Bugs and Issues
 
 ### 🐛 **Bug 1: Potential Cache Key Collision**
+
 **Location:** Lines 296-309 (validateMonitorConfiguration)  
 **Issue:** Cache key generation could theoretically collide for monitors with same properties in different orders
 
 ```typescript
 const cacheKey = `monitor:${monitor.id}:${[
-    `checkInterval:${monitor.checkInterval}`,
-    `host:${monitor.host ?? ""}`,
-    // ... deterministic ordering but still potential for collision
+ `checkInterval:${monitor.checkInterval}`,
+ `host:${monitor.host ?? ""}`,
+ // ... deterministic ordering but still potential for collision
 ].join("|")}`;
 ```
 
@@ -85,6 +94,7 @@ const cacheKey = `monitor:${monitor.id}:${[
 **Fix:** Use JSON.stringify with sorted keys or hash function
 
 ### 🟡 **Minor Issue: Async Methods Without Async Operations**
+
 **Location:** Lines 296, 337 (validation methods)  
 **Issue:** Methods are marked `async` but don't perform async operations
 
@@ -120,8 +130,8 @@ private generateCacheKey(prefix: string, object: Record<string, unknown>): strin
 
 ```typescript
 interface ConfigurationManagerDependencies {
-    siteValidator: ISiteValidator;
-    monitorValidator: IMonitorValidator;
+ siteValidator: ISiteValidator;
+ monitorValidator: IMonitorValidator;
 }
 ```
 
@@ -132,14 +142,15 @@ interface ConfigurationManagerDependencies {
 
 ```typescript
 interface IEnvironmentService {
-    isDevelopment(): boolean;
-    isProduction(): boolean;
+ isDevelopment(): boolean;
+ isProduction(): boolean;
 }
 ```
 
 ## TSDoc Improvements
 
 ### ✅ **Strengths:**
+
 - Excellent class-level documentation with clear examples
 - Comprehensive method documentation
 - Good use of `@remarks`, `@example`, and `@returns` tags
@@ -148,6 +159,7 @@ interface IEnvironmentService {
 ### 📝 **Areas for Improvement:**
 
 1. **Add `@since` tags** for version tracking:
+
    ```typescript
    /**
     * @since 1.0.0
@@ -155,6 +167,7 @@ interface IEnvironmentService {
    ```
 
 2. **Enhance complex method documentation**:
+
    - `validateMonitorConfiguration()` could explain caching strategy better
    - `shouldAutoStartMonitoring()` could document all business rules more clearly
 
@@ -168,24 +181,28 @@ interface IEnvironmentService {
 ## Performance Considerations
 
 ### ✅ **Strengths:**
+
 - Excellent caching implementation reduces redundant validation
 - Lazy evaluation of configuration values
 - Efficient cache key generation with deterministic ordering
 - Proper cache size limits to prevent memory bloat
 
 ### 📝 **Minor Optimizations:**
+
 - Consider cache warming for frequently accessed configurations
 - Monitor cache hit rates and adjust TTL if needed
 
 ## Testing Considerations
 
 ### ✅ **Excellent Testability:**
+
 - Pure functions with no side effects
 - Clear dependencies that can be mocked
 - Predictable caching behavior
 - Validation logic is isolated in validators
 
 ### 📝 **Test Recommendations:**
+
 - Test cache behavior (hits, misses, expiration)
 - Test validation with various edge cases
 - Test business rule logic with different site configurations
@@ -194,25 +211,31 @@ interface IEnvironmentService {
 ## Architecture Strengths
 
 ### 1. **Excellent Separation of Concerns**
+
 Configuration management is clearly separated from validation logic, which is delegated to specialized validators.
 
 ### 2. **Composition Over Inheritance**
+
 Uses composition pattern effectively with validators, making the system extensible and testable.
 
 ### 3. **Standardized Caching**
+
 Implements consistent caching patterns that could be reused across the application.
 
 ### 4. **Business Rule Centralization**
+
 Successfully centralizes business logic that was previously scattered, improving maintainability.
 
 ## Planned Fixes
 
 ### Phase 1: Minor Improvements
+
 1. **Enhance Cache Key Generation** - Use more robust key generation
 2. **Remove Unnecessary Async** - Clean up Promise wrapping if not needed
 3. **Add Missing TSDoc** - Complete documentation gaps
 
 ### Phase 2: Architectural Enhancements (Optional)
+
 1. **Dependency Injection** - Inject validators and environment service
 2. **Cache Warming** - Implement strategy for frequently accessed configs
 3. **Configuration Versioning** - Add support for configuration schema versions

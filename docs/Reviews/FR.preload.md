@@ -14,49 +14,62 @@ The preload.ts file demonstrates excellent architecture for secure IPC communica
 ### ✅ Single Responsibility Principle (SRP) - **EXCELLENT**
 
 **Strengths:**
+
 - Clear single responsibility: providing secure IPC bridge between main and renderer processes
 - Each API domain (sites, monitoring, data, etc.) has focused responsibilities
 - Clean separation between different functional areas
 - No mixed concerns within API domains
 
 **Examples:**
+
 ```typescript
 const siteAPI = {
-    // Only site-related operations
-    addSite, getSites, updateSite, removeSite, removeMonitor, checkSiteNow
+ // Only site-related operations
+ addSite,
+ getSites,
+ updateSite,
+ removeSite,
+ removeMonitor,
+ checkSiteNow,
 };
 
 const monitoringAPI = {
-    // Only monitoring control operations  
-    startMonitoring, stopMonitoring, startMonitoringForSite, stopMonitoringForSite
+ // Only monitoring control operations
+ startMonitoring,
+ stopMonitoring,
+ startMonitoringForSite,
+ stopMonitoringForSite,
 };
 ```
 
 ### ✅ Open-Closed Principle (OCP) - **EXCELLENT**
 
 **Strengths:**
+
 - New API domains can be added without modifying existing code
 - Individual API domains can be extended with new methods easily
 - Uses object composition pattern for extensibility
 - Event handling system is extensible
 
 **Examples:**
+
 ```typescript
 // New domains can be added easily
 const newDomainAPI = {
-    newMethod: () => ipcRenderer.invoke("new-method")
+ newMethod: () => ipcRenderer.invoke("new-method"),
 };
 
 // And exposed without modifying existing structure
 contextBridge.exposeInMainWorld("electronAPI", {
-    // ... existing domains
-    newDomain: newDomainAPI
+ // ... existing domains
+ newDomain: newDomainAPI,
 });
 ```
 
 ### ✅ Liskov Substitution Principle (LSP) - **EXCELLENT**
 
 **Strengths:**
+
 - No inheritance hierarchy to violate
 - All API methods follow consistent contracts
 - Event handler patterns are consistent across domains
@@ -65,12 +78,14 @@ contextBridge.exposeInMainWorld("electronAPI", {
 ### ✅ Interface Segregation Principle (ISP) - **EXCELLENT**
 
 **Strengths:**
+
 - APIs are segregated by functional domain (sites, monitoring, data, etc.)
 - Each domain only exposes methods relevant to that concern
 - Event handlers are specific to their event types
 - No forced dependencies on unused functionality
 
 **Examples:**
+
 ```typescript
 // Clean segregation - each domain has only relevant methods
 sites: siteAPI,           // Only site CRUD operations
@@ -82,6 +97,7 @@ events: eventsAPI,        // Only event subscriptions
 ### ✅ Dependency Inversion Principle (DIP) - **EXCELLENT**
 
 **Strengths:**
+
 - Depends on Electron's IPC abstraction, not concrete implementations
 - All IPC communication goes through standard Electron APIs
 - Type safety through TypeScript interfaces
@@ -90,6 +106,7 @@ events: eventsAPI,        // Only event subscriptions
 ## Bugs and Issues
 
 ### 🟡 **Minor Issue: Potential Memory Leaks in Event Handlers**
+
 **Location:** Lines 230-320 (event handler methods)  
 **Issue:** Event handlers return cleanup functions but don't provide automatic cleanup mechanism
 
@@ -107,6 +124,7 @@ onMonitorDown: (callback: (data: MonitorDownEventData) => void) => {
 **Fix:** Consider automatic cleanup mechanism or better documentation about cleanup requirements
 
 ### 🟡 **Minor Issue: Inconsistent Return Type Documentation**
+
 **Location:** Lines 96-109 (downloadSQLiteBackup)  
 **Issue:** Promise return type is documented differently than implemented
 
@@ -128,23 +146,23 @@ downloadSQLiteBackup: async (): Promise<{ buffer: ArrayBuffer; fileName: string 
 
 ```typescript
 interface EventSubscription {
-    unsubscribe(): void;
-    isActive(): boolean;
+ unsubscribe(): void;
+ isActive(): boolean;
 }
 
 const createEventSubscription = (channel: string, handler: Function): EventSubscription => {
-    ipcRenderer.on(channel, handler);
-    let active = true;
-    
-    return {
-        unsubscribe: () => {
-            if (active) {
-                ipcRenderer.removeListener(channel, handler);
-                active = false;
-            }
-        },
-        isActive: () => active
-    };
+ ipcRenderer.on(channel, handler);
+ let active = true;
+
+ return {
+  unsubscribe: () => {
+   if (active) {
+    ipcRenderer.removeListener(channel, handler);
+    active = false;
+   }
+  },
+  isActive: () => active,
+ };
 };
 ```
 
@@ -155,7 +173,7 @@ const createEventSubscription = (channel: string, handler: Function): EventSubsc
 
 ```typescript
 // Instead of type assertion
-downloadSQLiteBackup: (): Promise<{ buffer: ArrayBuffer; fileName: string }> => 
+downloadSQLiteBackup: (): Promise<{ buffer: ArrayBuffer; fileName: string }> =>
     ipcRenderer.invoke("download-sqlite-backup"),
 ```
 
@@ -166,14 +184,15 @@ downloadSQLiteBackup: (): Promise<{ buffer: ArrayBuffer; fileName: string }> =>
 
 ```typescript
 contextBridge.exposeInMainWorld("electronAPI", {
-    version: "1.0.0",
-    // ... existing APIs
+ version: "1.0.0",
+ // ... existing APIs
 });
 ```
 
 ## TSDoc Improvements
 
 ### ✅ **Strengths:**
+
 - Outstanding documentation quality with comprehensive examples
 - Excellent use of `@remarks`, `@example`, and `@param` tags
 - Clear explanation of security implications
@@ -183,6 +202,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 ### 📝 **Areas for Improvement:**
 
 1. **Add `@since` tags** for API versioning:
+
    ```typescript
    /**
     * @since 1.0.0
@@ -190,6 +210,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
    ```
 
 2. **Document cleanup requirements more clearly**:
+
    ```typescript
    /**
     * @returns Cleanup function to remove the listener
@@ -215,6 +236,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 5. **Event Handler Safety**: Event handlers are properly typed and scoped
 
 ### 📝 **Security Recommendations:**
+
 - Document security implications in TSDoc
 - Consider rate limiting for API calls if needed
 - Add input validation documentation for complex parameters
@@ -222,12 +244,14 @@ contextBridge.exposeInMainWorld("electronAPI", {
 ## Performance Considerations
 
 ### ✅ **Strengths:**
+
 - Efficient IPC communication patterns
 - No unnecessary data serialization
 - Proper async/await usage
 - Event handlers use efficient listener patterns
 
 ### 📝 **Minor Optimizations:**
+
 - Consider batching related API calls
 - Add caching for frequently accessed data
 - Document performance characteristics of expensive operations
@@ -235,12 +259,14 @@ contextBridge.exposeInMainWorld("electronAPI", {
 ## Testing Considerations
 
 ### ✅ **Excellent Testability:**
+
 - Clean separation of concerns
 - Predictable IPC patterns
 - Well-defined interfaces
 - No side effects in API definitions
 
 ### 📝 **Test Recommendations:**
+
 - Test IPC communication patterns
 - Test event handler registration/cleanup
 - Test type safety with various inputs
@@ -249,28 +275,35 @@ contextBridge.exposeInMainWorld("electronAPI", {
 ## Architecture Strengths
 
 ### 1. **Perfect Domain Segregation**
+
 APIs are cleanly separated by functional domain, making the system easy to understand and maintain.
 
 ### 2. **Security-First Design**
+
 Proper use of contextBridge and controlled API surface demonstrates excellent security awareness.
 
 ### 3. **Type Safety**
+
 Comprehensive TypeScript types prevent common IPC communication errors.
 
 ### 4. **Documentation Excellence**
+
 Outstanding documentation makes the API easy to use and understand.
 
 ### 5. **Consistent Patterns**
+
 All API methods follow consistent patterns, making the system predictable.
 
 ## Planned Fixes
 
 ### Phase 1: Minor Improvements
+
 1. **Add Automatic Event Cleanup** - Implement subscription pattern for better resource management
 2. **Improve Type Safety** - Remove type assertions where possible
 3. **Enhance Documentation** - Add security and cleanup documentation
 
 ### Phase 2: Enhancements (Optional)
+
 1. **Add API Versioning** - Support for API evolution
 2. **Performance Monitoring** - Add performance tracking for expensive operations
 3. **Input Validation** - Document and potentially implement client-side validation
