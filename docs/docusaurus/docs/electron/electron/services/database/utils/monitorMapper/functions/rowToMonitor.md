@@ -2,9 +2,9 @@
 
 > **rowToMonitor**(`row`): [`Monitor`](../../../../../../shared/types/interfaces/Monitor.md)
 
-Defined in: [electron/services/database/utils/monitorMapper.ts:134](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/monitorMapper.ts#L134)
+Defined in: [electron/services/database/utils/monitorMapper.ts:174](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/monitorMapper.ts#L174)
 
-Convert database row to monitor object using dynamic schema.
+Converts a single database row to a monitor object using the dynamic schema system.
 
 ## Parameters
 
@@ -12,32 +12,32 @@ Convert database row to monitor object using dynamic schema.
 
 [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\>
 
-Database row data
+The raw database row to convert.
 
 ## Returns
 
 [`Monitor`](../../../../../../shared/types/interfaces/Monitor.md)
 
-Converted monitor object
-
-## Throws
-
-Error When row mapping fails or required fields are invalid
+The mapped monitor object.
 
 ## Remarks
 
-**Dynamic Schema Integration**: Uses `mapRowToMonitor()` from dynamic schema system
-to handle monitor type-specific fields automatically.
+- Maps snake_case DB fields to camelCase.
+- Handles monitor type-specific fields via [mapRowToMonitor](../../dynamicSchema/functions/mapRowToMonitor.md).
+- Applies default values for missing/invalid fields.
+- Does not load history (history is loaded separately).
+- Logs and re-throws errors for full traceability.
 
-**Property Mapping**: Maps database conventions to TypeScript conventions:
-- `enabled` (DB) → `monitoring` (Frontend): Technical field vs user-facing state
-- snake_case (DB) → camelCase (TypeScript): Architectural consistency
+## Throws
 
-**Default Value Behavior**:
-- Missing numeric fields default to sensible values (checkInterval: 300000ms, timeout: 5000ms)
-- Invalid IDs default to "-1" for error tracking
-- Missing status defaults to "down" for safety
-- Missing responseTime uses complex fallback: dynamicMonitor.responseTime → row.responseTime → -1
+Error if mapping fails or required fields are invalid.
 
-**Error Handling**: Catches and logs mapping failures with full context for debugging.
-All errors are re-thrown to ensure proper error propagation.
+## Example
+
+```typescript
+const monitor = rowToMonitor(dbRow);
+```
+
+## See
+
+[mapRowToMonitor](../../dynamicSchema/functions/mapRowToMonitor.md)

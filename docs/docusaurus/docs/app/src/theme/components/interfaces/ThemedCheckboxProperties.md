@@ -1,6 +1,6 @@
 # Interface: ThemedCheckboxProperties
 
-Defined in: [src/theme/components.tsx:180](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L180)
+Defined in: [src/theme/components.tsx:180](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L180)
 
 Props for the ThemedCheckbox component
 
@@ -10,7 +10,7 @@ Props for the ThemedCheckbox component
 
 > `readonly` `optional` **aria-label**: `string`
 
-Defined in: [src/theme/components.tsx:181](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L181)
+Defined in: [src/theme/components.tsx:181](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L181)
 
 ***
 
@@ -18,7 +18,7 @@ Defined in: [src/theme/components.tsx:181](https://github.com/Nick2bad4u/Uptime-
 
 > `readonly` `optional` **checked**: `boolean`
 
-Defined in: [src/theme/components.tsx:182](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L182)
+Defined in: [src/theme/components.tsx:182](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L182)
 
 ***
 
@@ -26,7 +26,7 @@ Defined in: [src/theme/components.tsx:182](https://github.com/Nick2bad4u/Uptime-
 
 > `readonly` `optional` **className**: `string`
 
-Defined in: [src/theme/components.tsx:183](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L183)
+Defined in: [src/theme/components.tsx:183](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L183)
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: [src/theme/components.tsx:183](https://github.com/Nick2bad4u/Uptime-
 
 > `readonly` `optional` **disabled**: `boolean`
 
-Defined in: [src/theme/components.tsx:184](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L184)
+Defined in: [src/theme/components.tsx:184](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L184)
 
 ***
 
@@ -42,7 +42,7 @@ Defined in: [src/theme/components.tsx:184](https://github.com/Nick2bad4u/Uptime-
 
 > `readonly` `optional` **onChange**: (`e`) => `void`
 
-Defined in: [src/theme/components.tsx:185](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L185)
+Defined in: [src/theme/components.tsx:185](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L185)
 
 #### Parameters
 
@@ -60,4 +60,4 @@ Defined in: [src/theme/components.tsx:185](https://github.com/Nick2bad4u/Uptime-
 
 > `readonly` `optional` **required**: `boolean`
 
-Defined in: [src/theme/components.tsx:186](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L186)
+Defined in: [src/theme/components.tsx:186](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L186)

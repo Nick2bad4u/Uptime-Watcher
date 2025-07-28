@@ -1,6 +1,6 @@
 # Class: SiteManager
 
-Defined in: [electron/managers/SiteManager.ts:130](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/SiteManager.ts#L130)
+Defined in: [electron/managers/SiteManager.ts:144](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/SiteManager.ts#L144)
 
 Manages site operations and maintains in-memory cache.
 
@@ -22,9 +22,9 @@ site changes and enables reactive UI updates.
 
 > **new SiteManager**(`dependencies`): `SiteManager`
 
-Defined in: [electron/managers/SiteManager.ts:153](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/SiteManager.ts#L153)
+Defined in: [electron/managers/SiteManager.ts:173](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/SiteManager.ts#L173)
 
-Create a new SiteManager instance.
+Constructs a new SiteManager instance.
 
 #### Parameters
 
@@ -32,7 +32,7 @@ Create a new SiteManager instance.
 
 [`SiteManagerDependencies`](../interfaces/SiteManagerDependencies.md)
 
-Required dependencies for site management operations
+Required dependencies for site management operations.
 
 #### Returns
 
@@ -45,15 +45,21 @@ database service, event emitter, and optional monitoring operations. Creates
 internal service orchestrators for coordinated operations and sets up the
 in-memory cache for performance optimization.
 
+#### Example
+
+```typescript
+const siteManager = new SiteManager({ ... });
+```
+
 ## Methods
 
 ### addSite()
 
 > **addSite**(`siteData`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Site`](../../../../shared/types/interfaces/Site.md)\>
 
-Defined in: [electron/managers/SiteManager.ts:203](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/SiteManager.ts#L203)
+Defined in: [electron/managers/SiteManager.ts:231](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/SiteManager.ts#L231)
 
-Add a new site to the database and cache.
+Adds a new site to the database and cache.
 
 #### Parameters
 
@@ -61,9 +67,23 @@ Add a new site to the database and cache.
 
 [`Site`](../../../../shared/types/interfaces/Site.md)
 
+The site data to add.
+
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Site`](../../../../shared/types/interfaces/Site.md)\>
+
+The newly added site object.
+
+#### Throws
+
+If site validation fails or database operation fails.
+
+#### Example
+
+```typescript
+const site = await siteManager.addSite(siteData);
+```
 
 ***
 
@@ -71,9 +91,9 @@ Add a new site to the database and cache.
 
 > **getSiteFromCache**(`identifier`): `undefined` \| [`Site`](../../../../shared/types/interfaces/Site.md)
 
-Defined in: [electron/managers/SiteManager.ts:235](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/SiteManager.ts#L235)
+Defined in: [electron/managers/SiteManager.ts:272](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/SiteManager.ts#L272)
 
-Get a specific site from cache with smart background loading.
+Gets a specific site from cache with smart background loading.
 
 #### Parameters
 
@@ -81,9 +101,23 @@ Get a specific site from cache with smart background loading.
 
 `string`
 
+The site identifier to retrieve.
+
 #### Returns
 
 `undefined` \| [`Site`](../../../../shared/types/interfaces/Site.md)
+
+The site object if found in cache, otherwise undefined.
+
+#### Remarks
+
+If the site is not found in cache, triggers background loading and emits a cache miss event.
+
+#### Example
+
+```typescript
+const site = siteManager.getSiteFromCache("site_123");
+```
 
 ***
 
@@ -91,15 +125,19 @@ Get a specific site from cache with smart background loading.
 
 > **getSites**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Site`](../../../../shared/types/interfaces/Site.md)[]\>
 
-Defined in: [electron/managers/SiteManager.ts:277](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/SiteManager.ts#L277)
+Defined in: [electron/managers/SiteManager.ts:313](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/SiteManager.ts#L313)
 
-Get all sites from database with full monitor and history data.
+Gets all sites from the database with full monitor and history data.
 
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Site`](../../../../shared/types/interfaces/Site.md)[]\>
 
-Promise resolving to array of complete site objects
+Promise resolving to array of complete site objects.
+
+#### Throws
+
+If database operation fails.
 
 #### Remarks
 
@@ -121,13 +159,19 @@ console.log(`Found ${allSites.length} sites`);
 
 > **getSitesCache**(): [`StandardizedCache`](../../../utils/cache/StandardizedCache/classes/StandardizedCache.md)\<[`Site`](../../../../shared/types/interfaces/Site.md)\>
 
-Defined in: [electron/managers/SiteManager.ts:287](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/SiteManager.ts#L287)
+Defined in: [electron/managers/SiteManager.ts:327](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/SiteManager.ts#L327)
 
-Get the standardized sites cache (for internal use by other managers).
+Gets the standardized sites cache (for internal use by other managers).
 
 #### Returns
 
 [`StandardizedCache`](../../../utils/cache/StandardizedCache/classes/StandardizedCache.md)\<[`Site`](../../../../shared/types/interfaces/Site.md)\>
+
+The standardized cache instance for sites.
+
+#### Remarks
+
+Used for internal coordination between managers. External consumers should use getSites().
 
 ***
 
@@ -135,15 +179,15 @@ Get the standardized sites cache (for internal use by other managers).
 
 > **getSitesFromCache**(): [`Site`](../../../../shared/types/interfaces/Site.md)[]
 
-Defined in: [electron/managers/SiteManager.ts:305](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/SiteManager.ts#L305)
+Defined in: [electron/managers/SiteManager.ts:344](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/SiteManager.ts#L344)
 
-Get sites from in-memory cache for fast access.
+Gets sites from in-memory cache for fast access.
 
 #### Returns
 
 [`Site`](../../../../shared/types/interfaces/Site.md)[]
 
-The current site cache instance
+Array of site objects currently in cache.
 
 #### Remarks
 
@@ -161,14 +205,29 @@ guaranteed fresh data or subscribe to cache update events.
 
 > **initialize**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/managers/SiteManager.ts:313](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/SiteManager.ts#L313)
+Defined in: [electron/managers/SiteManager.ts:360](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/SiteManager.ts#L360)
 
-Initialize the SiteManager by loading all sites into cache.
-This method should be called during application startup.
+Initializes the SiteManager by loading all sites into cache.
 
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
+
+A promise that resolves when initialization is complete.
+
+#### Throws
+
+If loading sites from database fails.
+
+#### Remarks
+
+This method should be called during application startup.
+
+#### Example
+
+```typescript
+await siteManager.initialize();
+```
 
 ***
 
@@ -176,9 +235,9 @@ This method should be called during application startup.
 
 > **removeMonitor**(`siteIdentifier`, `monitorId`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`boolean`\>
 
-Defined in: [electron/managers/SiteManager.ts:328](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/SiteManager.ts#L328)
+Defined in: [electron/managers/SiteManager.ts:384](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/SiteManager.ts#L384)
 
-Remove a monitor from a site.
+Removes a monitor from a site.
 
 #### Parameters
 
@@ -186,13 +245,29 @@ Remove a monitor from a site.
 
 `string`
 
+The identifier of the site.
+
 ##### monitorId
 
 `string`
 
+The monitor ID to remove.
+
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`boolean`\>
+
+True if the monitor was removed, false otherwise.
+
+#### Throws
+
+If database or cache update fails.
+
+#### Example
+
+```typescript
+const success = await siteManager.removeMonitor("site_123", "monitor_456");
+```
 
 ***
 
@@ -200,9 +275,9 @@ Remove a monitor from a site.
 
 > **removeSite**(`identifier`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`boolean`\>
 
-Defined in: [electron/managers/SiteManager.ts:374](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/SiteManager.ts#L374)
+Defined in: [electron/managers/SiteManager.ts:438](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/SiteManager.ts#L438)
 
-Remove a site from the database and cache.
+Removes a site from the database and cache.
 
 #### Parameters
 
@@ -210,9 +285,23 @@ Remove a site from the database and cache.
 
 `string`
 
+The site identifier to remove.
+
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`boolean`\>
+
+True if the site was removed, false otherwise.
+
+#### Throws
+
+If database or cache update fails.
+
+#### Example
+
+```typescript
+const success = await siteManager.removeSite("site_123");
+```
 
 ***
 
@@ -220,9 +309,9 @@ Remove a site from the database and cache.
 
 > **updateSite**(`identifier`, `updates`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Site`](../../../../shared/types/interfaces/Site.md)\>
 
-Defined in: [electron/managers/SiteManager.ts:405](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/SiteManager.ts#L405)
+Defined in: [electron/managers/SiteManager.ts:478](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/SiteManager.ts#L478)
 
-Update a site in the database and cache.
+Updates a site in the database and cache.
 
 #### Parameters
 
@@ -230,13 +319,29 @@ Update a site in the database and cache.
 
 `string`
 
+The site identifier to update.
+
 ##### updates
 
 [`Partial`](https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype)\<[`Site`](../../../../shared/types/interfaces/Site.md)\>
 
+Partial site data to update.
+
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Site`](../../../../shared/types/interfaces/Site.md)\>
+
+The updated site object.
+
+#### Throws
+
+If validation, database, or cache update fails.
+
+#### Example
+
+```typescript
+const updatedSite = await siteManager.updateSite("site_123", { name: "New Name" });
+```
 
 ***
 
@@ -244,9 +349,9 @@ Update a site in the database and cache.
 
 > **updateSitesCache**(`sites`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/managers/SiteManager.ts:474](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/SiteManager.ts#L474)
+Defined in: [electron/managers/SiteManager.ts:558](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/SiteManager.ts#L558)
 
-Update the sites cache with new data.
+Updates the sites cache with new data, replacing all existing entries atomically.
 
 #### Parameters
 
@@ -254,6 +359,20 @@ Update the sites cache with new data.
 
 [`Site`](../../../../shared/types/interfaces/Site.md)[]
 
+Array of [Site](../../../../shared/types/interfaces/Site.md) objects to update the cache with.
+
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
+
+A promise that resolves when cache update is complete.
+
+#### Remarks
+
+Uses a temporary cache for atomic replacement to ensure consistency and avoid partial updates. Emits a cache-updated event after completion.
+
+#### Example
+
+```typescript
+await siteManager.updateSitesCache(sitesArray);
+```

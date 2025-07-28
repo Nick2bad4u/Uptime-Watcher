@@ -1,6 +1,6 @@
 # Interface: UpdateInfo
 
-Defined in: [src/stores/updates/types.ts:11](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/updates/types.ts#L11)
+Defined in: [src/stores/updates/types.ts:11](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/updates/types.ts#L11)
 
 Update information interface.
 
@@ -10,7 +10,7 @@ Update information interface.
 
 > **releaseDate**: `string`
 
-Defined in: [src/stores/updates/types.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/updates/types.ts#L13)
+Defined in: [src/stores/updates/types.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/updates/types.ts#L13)
 
 Release date
 
@@ -20,7 +20,7 @@ Release date
 
 > **releaseName**: `string`
 
-Defined in: [src/stores/updates/types.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/updates/types.ts#L15)
+Defined in: [src/stores/updates/types.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/updates/types.ts#L15)
 
 Release name
 
@@ -30,7 +30,7 @@ Release name
 
 > **releaseNotes**: `string`
 
-Defined in: [src/stores/updates/types.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/updates/types.ts#L17)
+Defined in: [src/stores/updates/types.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/updates/types.ts#L17)
 
 Release notes
 
@@ -40,6 +40,6 @@ Release notes
 
 > **version**: `string`
 
-Defined in: [src/stores/updates/types.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/updates/types.ts#L19)
+Defined in: [src/stores/updates/types.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/updates/types.ts#L19)
 
 Version number

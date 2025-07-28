@@ -2,7 +2,7 @@
 
 > **useSiteAnalytics**(`monitor`, `timeRange`): [`SiteAnalytics`](../interfaces/SiteAnalytics.md)
 
-Defined in: [src/hooks/site/useSiteAnalytics.ts:124](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteAnalytics.ts#L124)
+Defined in: [src/hooks/site/useSiteAnalytics.ts:127](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteAnalytics.ts#L127)
 
 Hook for calculating comprehensive site analytics and metrics.
 
@@ -22,13 +22,17 @@ The monitor to analyze (can be undefined)
 
 Time period to analyze (defaults to "24h")
 
-`"1h"` | `"7d"` | `"24h"` | `"30d"` | `"12h"`
+`"1h"` | `"24h"` | `"7d"` | `"30d"` | `"12h"`
 
 ## Returns
 
 [`SiteAnalytics`](../interfaces/SiteAnalytics.md)
 
 Comprehensive analytics object with all calculated metrics
+
+## See
+
+[SiteAnalytics](../interfaces/SiteAnalytics.md) for the complete interface specification
 
 ## Example
 

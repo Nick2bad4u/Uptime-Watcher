@@ -1,9 +1,13 @@
 # Class: MonitorValidator
 
-Defined in: [electron/managers/validators/MonitorValidator.ts:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/validators/MonitorValidator.ts#L30)
+Defined in: [electron/managers/validators/MonitorValidator.ts:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/validators/MonitorValidator.ts#L36)
 
-Validates monitor configuration according to business rules.
-Uses registry-driven validation with Zod schemas.
+Validates monitor configuration according to business rules and shared Zod schemas.
+
+## Remarks
+
+This class provides monitor validation logic for SiteManager and ConfigurationManager.
+It uses registry-driven validation and shared Zod schemas to ensure consistency between frontend and backend validation rules.
 
 ## Constructors
 
@@ -21,9 +25,9 @@ Uses registry-driven validation with Zod schemas.
 
 > **shouldApplyDefaultInterval**(`monitor`): `boolean`
 
-Defined in: [electron/managers/validators/MonitorValidator.ts:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/validators/MonitorValidator.ts#L37)
+Defined in: [electron/managers/validators/MonitorValidator.ts:53](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/validators/MonitorValidator.ts#L53)
 
-Business rule: Determine if a monitor should receive a default interval.
+Determines if a monitor should receive a default check interval according to business rules.
 
 #### Parameters
 
@@ -31,13 +35,25 @@ Business rule: Determine if a monitor should receive a default interval.
 
 [`Monitor`](../../../../../shared/types/interfaces/Monitor.md)
 
-The monitor configuration to evaluate
+The monitor configuration to evaluate. Must be a member of [Site.monitors](../../../../../shared/types/interfaces/Site.md#monitors).
 
 #### Returns
 
 `boolean`
 
-True if the monitor should receive a default check interval
+`true` if the monitor should receive a default check interval; otherwise, `false`.
+
+#### Remarks
+
+A default interval is applied if the monitor's `checkInterval` is zero.
+
+#### Example
+
+```typescript
+if (validator.shouldApplyDefaultInterval(monitor)) {
+  monitor.checkInterval = DEFAULT_INTERVAL;
+}
+```
 
 ***
 
@@ -45,10 +61,9 @@ True if the monitor should receive a default check interval
 
 > **validateMonitorConfiguration**(`monitor`): [`ValidationResult`](../../interfaces/interfaces/ValidationResult.md)
 
-Defined in: [electron/managers/validators/MonitorValidator.ts:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/validators/MonitorValidator.ts#L48)
+Defined in: [electron/managers/validators/MonitorValidator.ts:74](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/validators/MonitorValidator.ts#L74)
 
-Validate monitor configuration according to business rules.
-Uses shared Zod schemas for comprehensive validation.
+Validates a monitor configuration according to business rules and shared Zod schemas.
 
 #### Parameters
 
@@ -56,10 +71,23 @@ Uses shared Zod schemas for comprehensive validation.
 
 [`Monitor`](../../../../../shared/types/interfaces/Monitor.md)
 
-The monitor configuration to validate
+The monitor configuration to validate. Must be a member of [Site.monitors](../../../../../shared/types/interfaces/Site.md#monitors).
 
 #### Returns
 
 [`ValidationResult`](../../interfaces/interfaces/ValidationResult.md)
 
-Validation result with errors and validity status
+A [ValidationResult](../../interfaces/interfaces/ValidationResult.md) object containing an array of error messages and validity status.
+
+#### Remarks
+
+Uses registry-driven validation for timing, retry attempts, and type-specific requirements.
+
+#### Example
+
+```typescript
+const result = validator.validateMonitorConfiguration(monitor);
+if (!result.isValid) {
+  console.error(result.errors);
+}
+```

@@ -1,9 +1,8 @@
 # Interface: CacheOptions
 
-Defined in: [src/utils/cache.ts:6](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/cache.ts#L6)
+Defined in: [src/utils/cache.ts:11](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/utils/cache.ts#L11)
 
-Unified caching utility for the application.
-Provides type-safe caching with TTL support and proper cleanup.
+Configuration options for cache instances.
 
 ## Properties
 
@@ -11,7 +10,7 @@ Provides type-safe caching with TTL support and proper cleanup.
 
 > `optional` **maxSize**: `number`
 
-Defined in: [src/utils/cache.ts:8](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/cache.ts#L8)
+Defined in: [src/utils/cache.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/utils/cache.ts#L13)
 
 Maximum number of entries
 
@@ -21,6 +20,6 @@ Maximum number of entries
 
 > `optional` **ttl**: `number`
 
-Defined in: [src/utils/cache.ts:10](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/cache.ts#L10)
+Defined in: [src/utils/cache.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/utils/cache.ts#L15)
 
 Time to live in milliseconds

@@ -2,11 +2,10 @@
 
 > `const` **versionManager**: `VersionManager`
 
-Defined in: [electron/services/monitoring/MigrationSystem.ts:279](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MigrationSystem.ts#L279)
+Defined in: [electron/services/monitoring/MigrationSystem.ts:519](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MigrationSystem.ts#L519)
 
-Manager for monitor type version tracking.
+Singleton manager for monitor type version tracking.
 
 ## Remarks
 
-Singleton instance for tracking applied versions and migration state.
-Provides version queries and updates for monitor types.
+Use to query and update migration state for all monitor types. Shared across the application.

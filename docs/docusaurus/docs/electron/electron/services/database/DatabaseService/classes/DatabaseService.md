@@ -1,6 +1,6 @@
 # Class: DatabaseService
 
-Defined in: [electron/services/database/DatabaseService.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/DatabaseService.ts#L40)
+Defined in: [electron/services/database/DatabaseService.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/DatabaseService.ts#L42)
 
 Core database service for SQLite connection and schema management.
 
@@ -40,17 +40,19 @@ const db = dbService.getDatabase();
 
 > **close**(): `void`
 
-Defined in: [electron/services/database/DatabaseService.ts:85](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/DatabaseService.ts#L85)
+Defined in: [electron/services/database/DatabaseService.ts:94](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/DatabaseService.ts#L94)
 
-Close the database connection safely.
+Closes the database connection safely.
 
 #### Returns
 
 `void`
 
+void
+
 #### Throws
 
-Error When connection close fails
+Error When connection close fails.
 
 #### Remarks
 
@@ -65,15 +67,21 @@ Error When connection close fails
 - Uses node-sqlite3-wasm which is compiled for Node.js compatibility
 - No platform-specific caveats for Windows/macOS/Linux
 
+#### Example
+
+```typescript
+dbService.close();
+```
+
 ***
 
 ### executeTransaction()
 
 > **executeTransaction**\<`T`\>(`operation`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`T`\>
 
-Defined in: [electron/services/database/DatabaseService.ts:121](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/DatabaseService.ts#L121)
+Defined in: [electron/services/database/DatabaseService.ts:135](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/DatabaseService.ts#L135)
 
-Execute a function within a database transaction.
+Executes a function within a database transaction.
 
 #### Type Parameters
 
@@ -81,23 +89,25 @@ Execute a function within a database transaction.
 
 `T`
 
+The return type of the operation.
+
 #### Parameters
 
 ##### operation
 
 (`db`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`T`\>
 
-Function to execute within the transaction
+Function to execute within the transaction.
 
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`T`\>
 
-Promise resolving to the operation result
+Promise resolving to the operation result.
 
 #### Throws
 
-Error When transaction fails or operation throws
+Error When transaction fails or operation throws.
 
 #### Remarks
 
@@ -113,29 +123,43 @@ Automatically handles transaction lifecycle:
 - Rolls back transaction if operation throws
 Ensures data consistency for complex operations involving multiple queries.
 
+#### Example
+
+```typescript
+await dbService.executeTransaction(async (db) => {
+  // ...your db logic...
+});
+```
+
 ***
 
 ### getDatabase()
 
 > **getDatabase**(): `Database`
 
-Defined in: [electron/services/database/DatabaseService.ts:149](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/DatabaseService.ts#L149)
+Defined in: [electron/services/database/DatabaseService.ts:165](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/DatabaseService.ts#L165)
 
-Get the database instance.
+Gets the database instance.
 
 #### Returns
 
 `Database`
 
-The active database connection
+The active database connection.
 
 #### Throws
 
-Error When database is not initialized
+Error When database is not initialized.
 
 #### Remarks
 
 Call [DatabaseService.initialize](#initialize) first to set up the database connection.
+
+#### Example
+
+```typescript
+const db = dbService.getDatabase();
+```
 
 ***
 
@@ -143,19 +167,19 @@ Call [DatabaseService.initialize](#initialize) first to set up the database conn
 
 > **initialize**(): `Database`
 
-Defined in: [electron/services/database/DatabaseService.ts:179](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/DatabaseService.ts#L179)
+Defined in: [electron/services/database/DatabaseService.ts:197](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/DatabaseService.ts#L197)
 
-Initialize the database connection and create schema if it doesn't exist.
+Initializes the database connection and creates schema if it doesn't exist.
 
 #### Returns
 
 `Database`
 
-The initialized database instance
+The initialized database instance.
 
 #### Throws
 
-Error When database initialization fails
+Error When database initialization fails.
 
 #### Remarks
 
@@ -174,23 +198,35 @@ Error When database initialization fails
 - setupMonitorTypeValidation() intentionally receives no database parameter
 - Future validation logic may require database access for consistency
 
+#### Example
+
+```typescript
+dbService.initialize();
+```
+
 ***
 
 ### getInstance()
 
 > `static` **getInstance**(): `DatabaseService`
 
-Defined in: [electron/services/database/DatabaseService.ts:64](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/DatabaseService.ts#L64)
+Defined in: [electron/services/database/DatabaseService.ts:69](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/DatabaseService.ts#L69)
 
-Get the singleton database service instance.
+Gets the singleton database service instance.
 
 #### Returns
 
 `DatabaseService`
 
-The shared DatabaseService instance
+The shared DatabaseService instance.
 
 #### Remarks
 
 Uses singleton pattern to ensure only one database connection
 exists throughout the application lifecycle.
+
+#### Example
+
+```typescript
+const dbService = DatabaseService.getInstance();
+```

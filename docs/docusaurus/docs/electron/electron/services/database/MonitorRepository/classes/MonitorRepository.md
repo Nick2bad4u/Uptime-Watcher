@@ -1,6 +1,14 @@
 # Class: MonitorRepository
 
-Defined in: [electron/services/database/MonitorRepository.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/MonitorRepository.ts#L25)
+Defined in: [electron/services/database/MonitorRepository.ts:72](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/MonitorRepository.ts#L72)
+
+Repository for managing monitor data persistence.
+
+## Remarks
+
+Handles all CRUD operations for monitors in the database using the repository pattern.
+All mutations are wrapped in transactions for consistency and error handling.
+All operations use the DatabaseService for transaction management and maintain atomicity.
 
 ## Constructors
 
@@ -8,7 +16,9 @@ Defined in: [electron/services/database/MonitorRepository.ts:25](https://github.
 
 > **new MonitorRepository**(`dependencies`): `MonitorRepository`
 
-Defined in: [electron/services/database/MonitorRepository.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/MonitorRepository.ts#L28)
+Defined in: [electron/services/database/MonitorRepository.ts:85](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/MonitorRepository.ts#L85)
+
+Constructs a new MonitorRepository instance.
 
 #### Parameters
 
@@ -16,9 +26,17 @@ Defined in: [electron/services/database/MonitorRepository.ts:28](https://github.
 
 [`MonitorRepositoryDependencies`](../interfaces/MonitorRepositoryDependencies.md)
 
+The required dependencies for monitor operations.
+
 #### Returns
 
 `MonitorRepository`
+
+#### Example
+
+```typescript
+const repo = new MonitorRepository({ databaseService });
+```
 
 ## Methods
 
@@ -26,11 +44,9 @@ Defined in: [electron/services/database/MonitorRepository.ts:28](https://github.
 
 > **bulkCreate**(`siteIdentifier`, `monitors`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Monitor`](../../../../../shared/types/interfaces/Monitor.md)[]\>
 
-Defined in: [electron/services/database/MonitorRepository.ts:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/MonitorRepository.ts#L37)
+Defined in: [electron/services/database/MonitorRepository.ts:103](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/MonitorRepository.ts#L103)
 
-Bulk create monitors (for import functionality).
-Returns the created monitor with their new IDs.
-Uses transactions to ensure atomicity.
+Bulk creates monitors for a site.
 
 #### Parameters
 
@@ -38,13 +54,33 @@ Uses transactions to ensure atomicity.
 
 `string`
 
+The site identifier to associate monitors with.
+
 ##### monitors
 
 [`Monitor`](../../../../../shared/types/interfaces/Monitor.md)[]
 
+Array of monitor configuration objects to create.
+
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Monitor`](../../../../../shared/types/interfaces/Monitor.md)[]\>
+
+Promise resolving to array of created monitors with IDs.
+
+#### Throws
+
+Error if the database operation fails or monitor creation fails.
+
+#### Remarks
+
+Uses a transaction for atomicity. Each monitor is inserted and its ID is returned.
+
+#### Example
+
+```typescript
+await repo.bulkCreate("site-123", monitorsArray);
+```
 
 ***
 
@@ -52,10 +88,9 @@ Uses transactions to ensure atomicity.
 
 > **create**(`siteIdentifier`, `monitor`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`string`\>
 
-Defined in: [electron/services/database/MonitorRepository.ts:83](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/MonitorRepository.ts#L83)
+Defined in: [electron/services/database/MonitorRepository.ts:161](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/MonitorRepository.ts#L161)
 
-Create a new monitor and return its ID.
-Uses transactions to ensure atomicity.
+Creates a new monitor for a site.
 
 #### Parameters
 
@@ -63,13 +98,33 @@ Uses transactions to ensure atomicity.
 
 `string`
 
+The site identifier to associate the monitor with.
+
 ##### monitor
 
 [`Omit`](https://www.typescriptlang.org/docs/handbook/utility-types.html#omittype-keys)\<[`Site`](../../../../../shared/types/interfaces/Site.md)\[`"monitors"`\]\[`0`\], `"id"`\>
 
+Monitor configuration data (without ID).
+
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`string`\>
+
+Promise resolving to the created monitor ID as string.
+
+#### Throws
+
+Error if the database operation fails or monitor creation fails.
+
+#### Remarks
+
+Uses a transaction for atomicity.
+
+#### Example
+
+```typescript
+const id = await repo.create("site-123", monitorObj);
+```
 
 ***
 
@@ -77,7 +132,7 @@ Uses transactions to ensure atomicity.
 
 > **createInternal**(`db`, `siteIdentifier`, `monitor`): `string`
 
-Defined in: [electron/services/database/MonitorRepository.ts:110](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/MonitorRepository.ts#L110)
+Defined in: [electron/services/database/MonitorRepository.ts:185](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/MonitorRepository.ts#L185)
 
 Internal method to create a monitor within an existing transaction.
 
@@ -87,34 +142,33 @@ Internal method to create a monitor within an existing transaction.
 
 `Database`
 
-Database connection (must be within active transaction)
+Database connection (must be within active transaction).
 
 ##### siteIdentifier
 
 `string`
 
-Site identifier to associate monitor with
+Site identifier to associate monitor with.
 
 ##### monitor
 
 [`Omit`](https://www.typescriptlang.org/docs/handbook/utility-types.html#omittype-keys)\<[`Site`](../../../../../shared/types/interfaces/Site.md)\[`"monitors"`\]\[`0`\], `"id"`\>
 
-Monitor configuration data
+Monitor configuration data (without ID).
 
 #### Returns
 
 `string`
 
-Generated monitor ID as string
+Generated monitor ID as string.
 
 #### Throws
 
-Error When monitor creation fails or returns invalid ID
+Error when monitor creation fails or returns invalid ID.
 
 #### Remarks
 
-**IMPORTANT**: This method must be called within an existing transaction context.
-Uses enhanced type safety validation to prevent silent failures from schema changes.
+Must be called within an active transaction context.
 
 ***
 
@@ -122,10 +176,9 @@ Uses enhanced type safety validation to prevent silent failures from schema chan
 
 > **delete**(`monitorId`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`boolean`\>
 
-Defined in: [electron/services/database/MonitorRepository.ts:142](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/MonitorRepository.ts#L142)
+Defined in: [electron/services/database/MonitorRepository.ts:226](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/MonitorRepository.ts#L226)
 
-Delete a monitor and its history.
-Uses a transaction to ensure atomicity.
+Deletes a monitor and its history.
 
 #### Parameters
 
@@ -133,9 +186,27 @@ Uses a transaction to ensure atomicity.
 
 `string`
 
+The monitor ID to delete.
+
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`boolean`\>
+
+Promise resolving to true if deleted, false otherwise.
+
+#### Throws
+
+Error if the database operation fails.
+
+#### Remarks
+
+Uses a transaction for atomicity. History is deleted before monitor.
+
+#### Example
+
+```typescript
+const deleted = await repo.delete("monitor-123");
+```
 
 ***
 
@@ -143,14 +214,29 @@ Uses a transaction to ensure atomicity.
 
 > **deleteAll**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/database/MonitorRepository.ts:169](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/MonitorRepository.ts#L169)
+Defined in: [electron/services/database/MonitorRepository.ts:261](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/MonitorRepository.ts#L261)
 
-Clear all monitors from the database.
-Uses transactions to ensure atomicity.
+Clears all monitors from the database.
 
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
+
+Promise that resolves when all monitors are deleted.
+
+#### Throws
+
+Error if the database operation fails.
+
+#### Remarks
+
+Uses a transaction for atomicity.
+
+#### Example
+
+```typescript
+await repo.deleteAll();
+```
 
 ***
 
@@ -158,10 +244,9 @@ Uses transactions to ensure atomicity.
 
 > **deleteAllInternal**(`db`): `void`
 
-Defined in: [electron/services/database/MonitorRepository.ts:182](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/MonitorRepository.ts#L182)
+Defined in: [electron/services/database/MonitorRepository.ts:278](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/MonitorRepository.ts#L278)
 
 Internal method to clear all monitors from the database within an existing transaction.
-Use this method when you're already within a transaction context.
 
 #### Parameters
 
@@ -169,9 +254,17 @@ Use this method when you're already within a transaction context.
 
 `Database`
 
+Database connection (must be within active transaction).
+
 #### Returns
 
 `void`
+
+void
+
+#### Remarks
+
+Use this method when already within a transaction context.
 
 ***
 
@@ -179,10 +272,9 @@ Use this method when you're already within a transaction context.
 
 > **deleteBySiteIdentifier**(`siteIdentifier`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/database/MonitorRepository.ts:191](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/MonitorRepository.ts#L191)
+Defined in: [electron/services/database/MonitorRepository.ts:296](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/MonitorRepository.ts#L296)
 
-Delete all monitors for a specific site.
-Uses a transaction to ensure atomicity.
+Deletes all monitors for a specific site.
 
 #### Parameters
 
@@ -190,9 +282,27 @@ Uses a transaction to ensure atomicity.
 
 `string`
 
+The site identifier to delete monitors for.
+
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
+
+Promise that resolves when all monitors are deleted for the site.
+
+#### Throws
+
+Error if the database operation fails.
+
+#### Remarks
+
+Uses a transaction for atomicity.
+
+#### Example
+
+```typescript
+await repo.deleteBySiteIdentifier("site-123");
+```
 
 ***
 
@@ -200,10 +310,9 @@ Uses a transaction to ensure atomicity.
 
 > **deleteBySiteIdentifierInternal**(`db`, `siteIdentifier`): `void`
 
-Defined in: [electron/services/database/MonitorRepository.ts:213](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/MonitorRepository.ts#L213)
+Defined in: [electron/services/database/MonitorRepository.ts:323](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/MonitorRepository.ts#L323)
 
 Internal method to delete all monitors for a specific site within an existing transaction.
-This method should be called from within a database transaction.
 
 #### Parameters
 
@@ -211,13 +320,23 @@ This method should be called from within a database transaction.
 
 `Database`
 
+Database connection (must be within active transaction).
+
 ##### siteIdentifier
 
 `string`
 
+The site identifier to delete monitors for.
+
 #### Returns
 
 `void`
+
+void
+
+#### Remarks
+
+Deletes all history for monitors before deleting monitors.
 
 ***
 
@@ -225,10 +344,9 @@ This method should be called from within a database transaction.
 
 > **deleteInternal**(`db`, `monitorId`): `boolean`
 
-Defined in: [electron/services/database/MonitorRepository.ts:232](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/MonitorRepository.ts#L232)
+Defined in: [electron/services/database/MonitorRepository.ts:347](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/MonitorRepository.ts#L347)
 
 Internal method to delete a monitor and its history within an existing transaction.
-This method should be called from within a database transaction.
 
 #### Parameters
 
@@ -236,13 +354,23 @@ This method should be called from within a database transaction.
 
 `Database`
 
+Database connection (must be within active transaction).
+
 ##### monitorId
 
 `string`
 
+The monitor ID to delete.
+
 #### Returns
 
 `boolean`
+
+True if deleted, false otherwise.
+
+#### Remarks
+
+Deletes history before deleting monitor.
 
 ***
 
@@ -250,9 +378,9 @@ This method should be called from within a database transaction.
 
 > **findByIdentifier**(`monitorId`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`undefined` \| [`Monitor`](../../../../../shared/types/interfaces/Monitor.md)\>
 
-Defined in: [electron/services/database/MonitorRepository.ts:244](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/MonitorRepository.ts#L244)
+Defined in: [electron/services/database/MonitorRepository.ts:369](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/MonitorRepository.ts#L369)
 
-Find a monitor by its identifier with resilient error handling.
+Finds a monitor by its unique identifier.
 
 #### Parameters
 
@@ -260,9 +388,27 @@ Find a monitor by its identifier with resilient error handling.
 
 `string`
 
+The unique identifier of the monitor to find.
+
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`undefined` \| [`Monitor`](../../../../../shared/types/interfaces/Monitor.md)\>
+
+A promise resolving to the monitor object, or `undefined` if not found.
+
+#### Throws
+
+Error if the database operation fails.
+
+#### Remarks
+
+Uses a direct database query and maps the result to a monitor object.
+
+#### Example
+
+```typescript
+const monitor = await repo.findByIdentifier("monitor-123");
+```
 
 ***
 
@@ -270,9 +416,9 @@ Find a monitor by its identifier with resilient error handling.
 
 > **findBySiteIdentifier**(`siteIdentifier`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Monitor`](../../../../../shared/types/interfaces/Monitor.md)[]\>
 
-Defined in: [electron/services/database/MonitorRepository.ts:266](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/MonitorRepository.ts#L266)
+Defined in: [electron/services/database/MonitorRepository.ts:396](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/MonitorRepository.ts#L396)
 
-Find all monitors for a specific site.
+Finds all monitors for a specific site.
 
 #### Parameters
 
@@ -280,13 +426,27 @@ Find all monitors for a specific site.
 
 `string`
 
-Site identifier to find monitors for
+The site identifier to find monitors for.
 
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Monitor`](../../../../../shared/types/interfaces/Monitor.md)[]\>
 
-Promise resolving to array of monitors for the site
+A promise resolving to an array of monitor objects.
+
+#### Throws
+
+Error if the database operation fails.
+
+#### Remarks
+
+Uses a direct database query and maps the results to monitor objects.
+
+#### Example
+
+```typescript
+const monitors = await repo.findBySiteIdentifier("site-123");
+```
 
 ***
 
@@ -294,13 +454,29 @@ Promise resolving to array of monitors for the site
 
 > **getAllMonitorIds**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`object`[]\>
 
-Defined in: [electron/services/database/MonitorRepository.ts:281](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/MonitorRepository.ts#L281)
+Defined in: [electron/services/database/MonitorRepository.ts:417](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/MonitorRepository.ts#L417)
 
-Get all monitor IDs.
+Gets all monitor IDs in the database.
 
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`object`[]\>
+
+A promise resolving to an array of objects with monitor IDs.
+
+#### Throws
+
+Error if the database operation fails.
+
+#### Remarks
+
+Returns all monitor IDs as objects with an `id` property.
+
+#### Example
+
+```typescript
+const ids = await repo.getAllMonitorIds();
+```
 
 ***
 
@@ -308,10 +484,9 @@ Get all monitor IDs.
 
 > **update**(`monitorId`, `monitor`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/database/MonitorRepository.ts:293](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/MonitorRepository.ts#L293)
+Defined in: [electron/services/database/MonitorRepository.ts:439](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/MonitorRepository.ts#L439)
 
-Update an existing monitor.
-Uses transactions to ensure atomicity.
+Updates a monitor's configuration.
 
 #### Parameters
 
@@ -319,13 +494,33 @@ Uses transactions to ensure atomicity.
 
 `string`
 
+The unique identifier of the monitor to update.
+
 ##### monitor
 
 [`Partial`](https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype)\<[`Site`](../../../../../shared/types/interfaces/Site.md)\[`"monitors"`\]\[`0`\]\>
 
+Partial monitor configuration data to update.
+
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
+
+A promise that resolves when the update is complete.
+
+#### Throws
+
+Error if the database operation fails.
+
+#### Remarks
+
+Only provided fields are updated. Uses a transaction for atomicity.
+
+#### Example
+
+```typescript
+await repo.update("monitor-123", { checkInterval: 60000 });
+```
 
 ***
 
@@ -333,9 +528,9 @@ Uses transactions to ensure atomicity.
 
 > **updateInternal**(`db`, `monitorId`, `monitor`): `void`
 
-Defined in: [electron/services/database/MonitorRepository.ts:326](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/MonitorRepository.ts#L326)
+Defined in: [electron/services/database/MonitorRepository.ts:463](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/MonitorRepository.ts#L463)
 
-Update an existing monitor (internal version for use within existing transactions).
+Updates a monitor's configuration within an existing transaction context.
 
 #### Parameters
 
@@ -343,33 +538,28 @@ Update an existing monitor (internal version for use within existing transaction
 
 `Database`
 
-Database connection (must be within active transaction)
+The database connection (must be within an active transaction).
 
 ##### monitorId
 
 `string`
 
-ID of monitor to update
+The unique identifier of the monitor to update.
 
 ##### monitor
 
 [`Partial`](https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype)\<[`Site`](../../../../../shared/types/interfaces/Site.md)\[`"monitors"`\]\[`0`\]\>
 
-Partial monitor data to update
+Partial monitor configuration data to update.
 
 #### Returns
 
 `void`
 
+#### Throws
+
+Error if the update query fails.
+
 #### Remarks
 
-**IMPORTANT**: This method must be called within an existing transaction context.
-
-**Field Mapping Logic:**
-Converts camelCase field names to snake_case database columns using dynamic mapping.
-Only updates fields that are provided and are primitive types (string, number, boolean).
-
-**Domain-Specific Behavior**:
-The 'enabled' field is automatically derived from 'monitoring' state per domain contract.
-If neither 'monitoring' nor 'enabled' are provided, the 'enabled' field is skipped
-to preserve the current monitoring state (see shouldSkipMonitoringFields).
+Only provided fields are updated. Converts camelCase to snake_case for DB columns. Use this method only when already within a transaction context.

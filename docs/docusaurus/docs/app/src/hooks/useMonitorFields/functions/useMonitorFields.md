@@ -2,9 +2,7 @@
 
 > **useMonitorFields**(): [`UseMonitorFieldsResult`](../interfaces/UseMonitorFieldsResult.md)
 
-Defined in: [src/hooks/useMonitorFields.ts:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/useMonitorFields.ts#L31)
-
-Hook to access monitor field definitions from the registry.
+Defined in: [src/hooks/useMonitorFields.ts:67](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/useMonitorFields.ts#L67)
 
 ## Returns
 

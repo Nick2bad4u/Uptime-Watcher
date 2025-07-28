@@ -2,7 +2,7 @@
 
 > **addHistoryEntry**(`db`, `monitorId`, `entry`, `details?`): `void`
 
-Defined in: [electron/services/database/utils/historyManipulation.ts:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/historyManipulation.ts#L30)
+Defined in: [electron/services/database/utils/historyManipulation.ts:35](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/historyManipulation.ts#L35)
 
 **`Internal`**
 

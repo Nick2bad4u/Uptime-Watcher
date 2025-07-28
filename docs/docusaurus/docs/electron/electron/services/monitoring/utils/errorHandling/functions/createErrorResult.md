@@ -2,9 +2,9 @@
 
 > **createErrorResult**(`error`, `responseTime`, `correlationId?`): [`MonitorCheckResult`](../../../types/interfaces/MonitorCheckResult.md)
 
-Defined in: [electron/services/monitoring/utils/errorHandling.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/utils/errorHandling.ts#L25)
+Defined in: [electron/services/monitoring/utils/errorHandling.ts:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/utils/errorHandling.ts#L36)
 
-Create a standardized error result for monitor checks.
+Constructs a standardized error result for monitor checks.
 
 ## Parameters
 
@@ -12,28 +12,36 @@ Create a standardized error result for monitor checks.
 
 `string`
 
-Error message describing what went wrong
+The error message describing what went wrong.
 
 ### responseTime
 
 `number`
 
-Response time in milliseconds at point of failure
+The response time in milliseconds at the point of failure.
 
 ### correlationId?
 
 `string`
 
-Optional correlation ID for event tracking
+Optional correlation ID for event tracking and logging.
 
 ## Returns
 
 [`MonitorCheckResult`](../../../types/interfaces/MonitorCheckResult.md)
 
-Standardized monitor check result indicating failure
+A [MonitorCheckResult](../../../types/interfaces/MonitorCheckResult.md) object indicating failure.
 
 ## Remarks
 
-The details field is set to "Error" as a placeholder to indicate
-an error state rather than a specific HTTP status code.
-This distinguishes error results from successful HTTP responses.
+The `details` field is set to `"Error"` to distinguish error states from valid HTTP responses. This function is used for both network and generic errors. The returned object always has `status: "down"`.
+
+## Example
+
+```typescript
+createErrorResult("Timeout", 500, "corr-123");
+```
+
+## See
+
+[MonitorCheckResult](../../../types/interfaces/MonitorCheckResult.md)

@@ -2,9 +2,9 @@
 
 > **isValidHistoryRow**(`row`): `boolean`
 
-Defined in: [electron/services/database/utils/historyMapper.ts:58](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/historyMapper.ts#L58)
+Defined in: [electron/services/database/utils/historyMapper.ts:83](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/historyMapper.ts#L83)
 
-Validate that a row contains the minimum required fields for a history entry.
+Validates that a database row contains the minimum required fields for a history entry.
 
 ## Parameters
 
@@ -12,10 +12,20 @@ Validate that a row contains the minimum required fields for a history entry.
 
 [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\>
 
-Database row to validate
+The database row to validate.
 
 ## Returns
 
 `boolean`
 
-True if row is valid
+`true` if the row is valid for a history entry, otherwise `false`.
+
+## Remarks
+
+Ensures that the row has a valid monitor ID, status, and timestamp.
+
+## Example
+
+```typescript
+if (isValidHistoryRow(row)) { ... }
+```

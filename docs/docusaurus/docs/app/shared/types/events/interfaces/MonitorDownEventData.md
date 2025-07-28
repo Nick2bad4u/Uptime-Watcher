@@ -1,8 +1,28 @@
 # Interface: MonitorDownEventData
 
-Defined in: [shared/types/events.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types/events.ts#L25)
+Defined in: [shared/types/events.ts:73](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types/events.ts#L73)
 
-Event data when a monitor goes down
+Payload for events when a monitor goes down (unavailable).
+
+## Remarks
+
+Emitted when a monitored endpoint or service is detected as down.
+- `monitor`: The monitor that went down.
+- `site`: The site containing the monitor.
+- `siteId`: The unique identifier of the site.
+- `timestamp`: The time (in ms since epoch) when the event occurred.
+
+## Example
+
+// Example event payload for a monitor down event
+```typescript
+const event: MonitorDownEventData = {
+  monitor,
+  site,
+  siteId: site.id,
+  timestamp: Date.now()
+};
+```
 
 ## Properties
 
@@ -10,9 +30,9 @@ Event data when a monitor goes down
 
 > **monitor**: [`Monitor`](../../interfaces/Monitor.md)
 
-Defined in: [shared/types/events.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types/events.ts#L27)
+Defined in: [shared/types/events.ts:77](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types/events.ts#L77)
 
-Monitor that went down
+The monitor that went down.
 
 ***
 
@@ -20,9 +40,9 @@ Monitor that went down
 
 > **site**: [`Site`](../../interfaces/Site.md)
 
-Defined in: [shared/types/events.ts:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types/events.ts#L29)
+Defined in: [shared/types/events.ts:81](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types/events.ts#L81)
 
-Site containing the monitor
+The site containing the monitor.
 
 ***
 
@@ -30,9 +50,9 @@ Site containing the monitor
 
 > **siteId**: `string`
 
-Defined in: [shared/types/events.ts:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types/events.ts#L31)
+Defined in: [shared/types/events.ts:85](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types/events.ts#L85)
 
-Site identifier
+The unique identifier of the site.
 
 ***
 
@@ -40,6 +60,6 @@ Site identifier
 
 > **timestamp**: `number`
 
-Defined in: [shared/types/events.ts:33](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types/events.ts#L33)
+Defined in: [shared/types/events.ts:89](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types/events.ts#L89)
 
-Timestamp when the event occurred
+The time (in ms since epoch) when the event occurred.

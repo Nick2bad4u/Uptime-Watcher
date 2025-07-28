@@ -3,6 +3,7 @@
 ## Functions
 
 - [getEnvironment](functions/getEnvironment.md)
+- [getEnvVar](functions/getEnvVar.md)
 - [getNodeEnv](functions/getNodeEnv.md)
 - [isBrowserEnvironment](functions/isBrowserEnvironment.md)
 - [isDevelopment](functions/isDevelopment.md)

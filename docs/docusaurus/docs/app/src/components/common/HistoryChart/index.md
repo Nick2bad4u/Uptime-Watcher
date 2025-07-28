@@ -2,7 +2,7 @@
 
 ## Interfaces
 
-- [HistoryChartProperties](interfaces/HistoryChartProperties.md)
+- [HistoryChartProps](interfaces/HistoryChartProps.md)
 
 ## Variables
 

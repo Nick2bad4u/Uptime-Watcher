@@ -13,7 +13,7 @@
         "typedoc-plugin-dt-links",
         "typedoc-plugin-external-package-links"
     ],
-    "tsconfig": "tsconfig.json",
+    "tsconfig": "../tsconfig.json",
     "pretty": true,
     "externalSymbolLinkMappings": {
         "@types/react": {

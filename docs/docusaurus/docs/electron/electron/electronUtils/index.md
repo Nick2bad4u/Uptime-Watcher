@@ -1,10 +1,11 @@
 # electron/electronUtils
 
-Electron utility functions for common main process operations.
+Utility functions for Electron main process operations.
 
 ## Remarks
 
-Provides reusable utility functions for environment detection and development helpers.
+Provides helpers for environment detection and development-mode checks
+specific to the Electron main process.
 
 ## Functions
 

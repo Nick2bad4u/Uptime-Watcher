@@ -2,7 +2,7 @@
 
 > **withFallback**\<`T`\>(`value`, `fallback`): `T`
 
-Defined in: [src/utils/fallbacks.ts:75](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/fallbacks.ts#L75)
+Defined in: [src/utils/fallbacks.ts:79](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/utils/fallbacks.ts#L79)
 
 Get value with fallback, checking for null/undefined.
 
@@ -16,12 +16,18 @@ Get value with fallback, checking for null/undefined.
 
 ### value
 
+The value to check for null or undefined
+
 `undefined` | `null` | `T`
 
 ### fallback
 
 `T`
 
+The fallback value to use if value is null or undefined
+
 ## Returns
 
 `T`
+
+The original value if not null/undefined, otherwise the fallback

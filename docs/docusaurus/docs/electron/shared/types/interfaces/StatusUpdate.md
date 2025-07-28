@@ -1,6 +1,6 @@
 # Interface: StatusUpdate
 
-Defined in: [shared/types.ts:55](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L55)
+Defined in: [shared/types.ts:119](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L119)
 
 ## Properties
 
@@ -8,7 +8,7 @@ Defined in: [shared/types.ts:55](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > `optional` **details**: `string`
 
-Defined in: [shared/types.ts:56](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L56)
+Defined in: [shared/types.ts:120](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L120)
 
 ***
 
@@ -16,7 +16,7 @@ Defined in: [shared/types.ts:56](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > **monitorId**: `string`
 
-Defined in: [shared/types.ts:57](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L57)
+Defined in: [shared/types.ts:121](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L121)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [shared/types.ts:57](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > `optional` **previousStatus**: [`MonitorStatus`](../type-aliases/MonitorStatus.md)
 
-Defined in: [shared/types.ts:58](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L58)
+Defined in: [shared/types.ts:122](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L122)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [shared/types.ts:58](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > `optional` **site**: [`Site`](Site.md)
 
-Defined in: [shared/types.ts:59](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L59)
+Defined in: [shared/types.ts:123](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L123)
 
 ***
 
@@ -40,7 +40,7 @@ Defined in: [shared/types.ts:59](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > **siteIdentifier**: `string`
 
-Defined in: [shared/types.ts:60](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L60)
+Defined in: [shared/types.ts:124](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L124)
 
 ***
 
@@ -48,7 +48,7 @@ Defined in: [shared/types.ts:60](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > **status**: [`MonitorStatus`](../type-aliases/MonitorStatus.md)
 
-Defined in: [shared/types.ts:61](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L61)
+Defined in: [shared/types.ts:125](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L125)
 
 ***
 
@@ -56,4 +56,4 @@ Defined in: [shared/types.ts:61](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > **timestamp**: `string`
 
-Defined in: [shared/types.ts:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L62)
+Defined in: [shared/types.ts:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L126)

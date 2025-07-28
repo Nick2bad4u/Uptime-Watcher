@@ -2,7 +2,7 @@
 
 > **useAvailabilityColors**(): `object`
 
-Defined in: [src/theme/useTheme.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/useTheme.ts#L17)
+Defined in: [src/theme/useTheme.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/useTheme.ts#L17)
 
 ## Returns
 

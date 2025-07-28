@@ -1,6 +1,6 @@
 # Interface: SiteLoadingConfig
 
-Defined in: [electron/utils/database/interfaces.ts:35](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/interfaces.ts#L35)
+Defined in: [electron/utils/database/interfaces.ts:35](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/interfaces.ts#L35)
 
 Configuration for site loading operations.
 
@@ -10,7 +10,7 @@ Configuration for site loading operations.
 
 > **eventEmitter**: [`TypedEventBus`](../../../../events/TypedEventBus/classes/TypedEventBus.md)\<[`UptimeEvents`](../../../../events/eventTypes/interfaces/UptimeEvents.md)\>
 
-Defined in: [electron/utils/database/interfaces.ts:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/interfaces.ts#L37)
+Defined in: [electron/utils/database/interfaces.ts:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/interfaces.ts#L37)
 
 Typed event emitter for error handling
 
@@ -20,7 +20,7 @@ Typed event emitter for error handling
 
 > **logger**: [`Logger`](../../../interfaces/interfaces/Logger.md)
 
-Defined in: [electron/utils/database/interfaces.ts:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/interfaces.ts#L39)
+Defined in: [electron/utils/database/interfaces.ts:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/interfaces.ts#L39)
 
 Logger instance
 
@@ -30,7 +30,7 @@ Logger instance
 
 > **repositories**: `object`
 
-Defined in: [electron/utils/database/interfaces.ts:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/interfaces.ts#L41)
+Defined in: [electron/utils/database/interfaces.ts:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/interfaces.ts#L41)
 
 Repository dependencies
 

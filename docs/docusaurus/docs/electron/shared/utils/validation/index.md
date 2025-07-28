@@ -2,7 +2,7 @@
 
 ## Functions
 
+- [getMonitorValidationErrors](functions/getMonitorValidationErrors.md)
 - [validateMonitor](functions/validateMonitor.md)
-- [validateMonitorFields](functions/validateMonitorFields.md)
 - [validateMonitorType](functions/validateMonitorType.md)
 - [validateSite](functions/validateSite.md)

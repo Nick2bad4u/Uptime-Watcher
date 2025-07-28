@@ -2,7 +2,7 @@
 
 > **withRetry**\<`T`\>(`operation`, `options`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`T`\>
 
-Defined in: [electron/utils/retry.ts:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/retry.ts#L32)
+Defined in: [electron/utils/retry.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/retry.ts#L34)
 
 Generic retry utility with configurable parameters
 
@@ -11,6 +11,8 @@ Generic retry utility with configurable parameters
 ### T
 
 `T`
+
+The return type of the async operation
 
 ## Parameters
 

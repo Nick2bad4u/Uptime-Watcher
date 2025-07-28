@@ -2,9 +2,9 @@
 
 > **performPortCheckWithRetry**(`host`, `port`, `timeout`, `maxRetries`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`MonitorCheckResult`](../../../types/interfaces/MonitorCheckResult.md)\>
 
-Defined in: [electron/services/monitoring/utils/portRetry.ts:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/utils/portRetry.ts#L62)
+Defined in: [electron/services/monitoring/utils/portRetry.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/utils/portRetry.ts#L52)
 
-Perform port check with sophisticated retry logic and exponential backoff.
+Performs a TCP port connectivity check with retry logic and exponential backoff.
 
 ## Parameters
 
@@ -12,43 +12,38 @@ Perform port check with sophisticated retry logic and exponential backoff.
 
 `string`
 
-Target hostname or IP address to check
+Target hostname or IP address to check.
 
 ### port
 
 `number`
 
-Port number to test connectivity
+Port number to test connectivity.
 
 ### timeout
 
 `number`
 
-Maximum time to wait for each connection attempt in milliseconds
+Maximum time to wait for each connection attempt in milliseconds.
 
 ### maxRetries
 
 `number`
 
-Number of additional retry attempts after initial failure (0 = try once only)
+Number of additional retry attempts after initial failure (0 = try once only).
 
 ## Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`MonitorCheckResult`](../../../types/interfaces/MonitorCheckResult.md)\>
 
-Promise resolving to monitor check result with timing and status information
+A promise that resolves to a [MonitorCheckResult](../../../types/interfaces/MonitorCheckResult.md) containing port details, response time, and status. If all attempts fail, the result is a standardized error result.
 
 ## Remarks
 
-Uses [withOperationalHooks](../../../../../utils/operationalHooks/functions/withOperationalHooks.md) for sophisticated retry logic with exponential backoff.
-The maxRetries parameter represents additional attempts after the initial attempt,
-so maxRetries=3 results in 4 total attempts (1 initial + 3 retries).
-
-Retry logic includes:
-- Exponential backoff between attempts
-- Debug logging in development mode
-- Timing preservation across retry attempts
-- Standardized error handling via [handlePortCheckError](../../portErrorHandling/functions/handlePortCheckError.md)
+This function wraps [performSinglePortCheck](../../portChecker/functions/performSinglePortCheck.md) with retry logic using [withOperationalHooks](../../../../../utils/operationalHooks/functions/withOperationalHooks.md).
+It attempts to connect to the specified host and port, retrying on failure up to `maxRetries` times
+(for a total of `maxRetries + 1` attempts). Exponential backoff is applied between attempts.
+Debug logging is enabled in development mode. If all attempts fail, a standardized error result is returned via [handlePortCheckError](../../portErrorHandling/functions/handlePortCheckError.md).
 
 ## Example
 
@@ -62,6 +57,6 @@ const result = await performPortCheckWithRetry("example.com", 443, 3000, 3);
 
 ## See
 
- - [withOperationalHooks](../../../../../utils/operationalHooks/functions/withOperationalHooks.md) for retry mechanism details
- - [performSinglePortCheck](../../portChecker/functions/performSinglePortCheck.md) for single attempt logic
- - [handlePortCheckError](../../portErrorHandling/functions/handlePortCheckError.md) for error result formatting
+ - [withOperationalHooks](../../../../../utils/operationalHooks/functions/withOperationalHooks.md)
+ - [performSinglePortCheck](../../portChecker/functions/performSinglePortCheck.md)
+ - [handlePortCheckError](../../portErrorHandling/functions/handlePortCheckError.md)

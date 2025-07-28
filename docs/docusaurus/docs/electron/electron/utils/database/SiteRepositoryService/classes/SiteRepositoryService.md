@@ -1,6 +1,6 @@
 # Class: SiteRepositoryService
 
-Defined in: [electron/utils/database/SiteRepositoryService.ts:117](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/SiteRepositoryService.ts#L117)
+Defined in: [electron/utils/database/SiteRepositoryService.ts:133](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/SiteRepositoryService.ts#L133)
 
 **`Beta`**
 
@@ -23,7 +23,7 @@ comprehensive error handling throughout all operations.
 
 > **new SiteRepositoryService**(`config`): `SiteRepositoryService`
 
-Defined in: [electron/utils/database/SiteRepositoryService.ts:137](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/SiteRepositoryService.ts#L137)
+Defined in: [electron/utils/database/SiteRepositoryService.ts:153](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/SiteRepositoryService.ts#L153)
 
 **`Beta`**
 
@@ -53,7 +53,7 @@ for proper operation and comprehensive functionality.
 
 > **applyHistoryLimitSetting**(`monitoringConfig`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/utils/database/SiteRepositoryService.ts:147](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/SiteRepositoryService.ts#L147)
+Defined in: [electron/utils/database/SiteRepositoryService.ts:163](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/SiteRepositoryService.ts#L163)
 
 **`Beta`**
 
@@ -76,7 +76,7 @@ Side effect operation separated from data loading.
 
 > **getHistoryLimitSetting**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`undefined` \| `number`\>
 
-Defined in: [electron/utils/database/SiteRepositoryService.ts:159](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/SiteRepositoryService.ts#L159)
+Defined in: [electron/utils/database/SiteRepositoryService.ts:175](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/SiteRepositoryService.ts#L175)
 
 **`Beta`**
 
@@ -93,7 +93,7 @@ Pure data operation without side effects.
 
 > **getSitesFromDatabase**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Site`](../../../../../shared/types/interfaces/Site.md)[]\>
 
-Defined in: [electron/utils/database/SiteRepositoryService.ts:195](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/SiteRepositoryService.ts#L195)
+Defined in: [electron/utils/database/SiteRepositoryService.ts:211](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/SiteRepositoryService.ts#L211)
 
 **`Beta`**
 
@@ -112,8 +112,8 @@ SiteLoadingError When database operation fails
 #### Remarks
 
 Performs a complete site loading operation including all associated
-monitors and their status history. This is a pure data operation
-without side effects, making it ideal for testing and composition.
+monitors and their status history. This operation includes logging
+and error handling side effects for comprehensive error tracking.
 
 The operation builds complete site objects by fetching site metadata,
 associated monitors, and historical data in an efficient manner while
@@ -125,7 +125,7 @@ maintaining proper error handling throughout the process.
 
 > **loadSitesIntoCache**(`siteCache`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/utils/database/SiteRepositoryService.ts:217](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/SiteRepositoryService.ts#L217)
+Defined in: [electron/utils/database/SiteRepositoryService.ts:233](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/SiteRepositoryService.ts#L233)
 
 **`Beta`**
 

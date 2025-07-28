@@ -1,9 +1,19 @@
 # Class: ValidationError
 
-Defined in: [electron/utils/correlation.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/correlation.ts#L15)
+Defined in: [electron/utils/correlation.ts:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/correlation.ts#L22)
 
 Validation error class for business rule violations.
 Extends Error with additional validation context.
+
+## Param
+
+Array of validation error messages
+
+## Example
+
+```typescript
+throw new ValidationError(['Invalid email format', 'Password too short']);
+```
 
 ## Extends
 
@@ -15,7 +25,7 @@ Extends Error with additional validation context.
 
 > **new ValidationError**(`errors`): `ValidationError`
 
-Defined in: [electron/utils/correlation.ts:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/correlation.ts#L16)
+Defined in: [electron/utils/correlation.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/correlation.ts#L23)
 
 #### Parameters
 
@@ -37,4 +47,4 @@ Defined in: [electron/utils/correlation.ts:16](https://github.com/Nick2bad4u/Upt
 
 > **errors**: `string`[]
 
-Defined in: [electron/utils/correlation.ts:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/correlation.ts#L16)
+Defined in: [electron/utils/correlation.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/correlation.ts#L23)

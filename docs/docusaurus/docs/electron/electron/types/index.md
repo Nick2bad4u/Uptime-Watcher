@@ -56,6 +56,12 @@ Re-exports [Monitor](../../shared/types/interfaces/Monitor.md)
 
 ***
 
+### MONITOR\_STATUS
+
+Re-exports [MONITOR_STATUS](../../shared/types/variables/MONITOR_STATUS.md)
+
+***
+
 ### MonitorFieldDefinition
 
 Re-exports [MonitorFieldDefinition](../../shared/types/interfaces/MonitorFieldDefinition.md)

@@ -2,9 +2,9 @@
 
 > **registerMonitorType**(`config`): `void`
 
-Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:149](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorTypeRegistry.ts#L149)
+Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:199](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorTypeRegistry.ts#L199)
 
-Register a new monitor type.
+Registers a new monitor type with its configuration.
 
 ## Parameters
 
@@ -12,8 +12,12 @@ Register a new monitor type.
 
 [`BaseMonitorConfig`](../interfaces/BaseMonitorConfig.md)
 
-Monitor type configuration
+The monitor type configuration object to register.
 
 ## Returns
 
 `void`
+
+## Remarks
+
+Adds the provided [BaseMonitorConfig](../interfaces/BaseMonitorConfig.md) to the internal registry, making it available for use in the system.

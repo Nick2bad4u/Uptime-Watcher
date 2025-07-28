@@ -2,9 +2,9 @@
 
 > **validateMonitorField**(`type`, `fieldName`, `value`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`string`[]\>
 
-Defined in: [src/utils/monitorValidation.ts:108](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/monitorValidation.ts#L108)
+Defined in: [src/utils/monitorValidation.ts:131](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/utils/monitorValidation.ts#L131)
 
-Validate individual monitor field.
+Validate individual monitor field with improved error filtering.
 
 ## Parameters
 

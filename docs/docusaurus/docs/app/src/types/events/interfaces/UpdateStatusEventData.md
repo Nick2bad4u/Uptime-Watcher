@@ -1,6 +1,6 @@
 # Interface: UpdateStatusEventData
 
-Defined in: [src/types/events.ts:77](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/types/events.ts#L77)
+Defined in: [src/types/events.ts:92](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/types/events.ts#L92)
 
 Event data for update status changes
 
@@ -10,7 +10,7 @@ Event data for update status changes
 
 > `optional` **error**: `string`
 
-Defined in: [src/types/events.ts:79](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/types/events.ts#L79)
+Defined in: [src/types/events.ts:94](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/types/events.ts#L94)
 
 Error message if status is error
 
@@ -18,27 +18,11 @@ Error message if status is error
 
 ### info?
 
-> `optional` **info**: `object`
+> `optional` **info**: [`UpdateReleaseInfo`](UpdateReleaseInfo.md)
 
-Defined in: [src/types/events.ts:81](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/types/events.ts#L81)
+Defined in: [src/types/events.ts:96](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/types/events.ts#L96)
 
 Update information if available
-
-#### releaseDate
-
-> **releaseDate**: `string`
-
-#### releaseName
-
-> **releaseName**: `string`
-
-#### releaseNotes
-
-> **releaseNotes**: `string`
-
-#### version
-
-> **version**: `string`
 
 ***
 
@@ -46,7 +30,7 @@ Update information if available
 
 > `optional` **progress**: `number`
 
-Defined in: [src/types/events.ts:88](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/types/events.ts#L88)
+Defined in: [src/types/events.ts:98](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/types/events.ts#L98)
 
 Progress percentage (0-100)
 
@@ -56,6 +40,6 @@ Progress percentage (0-100)
 
 > **status**: `"error"` \| `"available"` \| `"checking"` \| `"downloaded"` \| `"downloading"` \| `"idle"`
 
-Defined in: [src/types/events.ts:90](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/types/events.ts#L90)
+Defined in: [src/types/events.ts:100](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/types/events.ts#L100)
 
 Current update status

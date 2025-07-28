@@ -1,9 +1,12 @@
 # Class: DataImportExportService
 
-Defined in: [electron/utils/database/DataImportExportService.ts:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/DataImportExportService.ts#L48)
+Defined in: [electron/utils/database/DataImportExportService.ts:55](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/DataImportExportService.ts#L55)
 
 Service for handling data import/export operations.
+
 Separates data operations from side effects for better testability.
+Handles the complete lifecycle of data import/export including validation,
+transformation, and persistence.
 
 ## Constructors
 
@@ -11,7 +14,7 @@ Separates data operations from side effects for better testability.
 
 > **new DataImportExportService**(`config`): `DataImportExportService`
 
-Defined in: [electron/utils/database/DataImportExportService.ts:61](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/DataImportExportService.ts#L61)
+Defined in: [electron/utils/database/DataImportExportService.ts:68](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/DataImportExportService.ts#L68)
 
 #### Parameters
 
@@ -29,7 +32,7 @@ Defined in: [electron/utils/database/DataImportExportService.ts:61](https://gith
 
 > **exportAllData**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`string`\>
 
-Defined in: [electron/utils/database/DataImportExportService.ts:72](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/DataImportExportService.ts#L72)
+Defined in: [electron/utils/database/DataImportExportService.ts:79](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/DataImportExportService.ts#L79)
 
 Export all application data as JSON string.
 Pure data operation without side effects.
@@ -44,7 +47,7 @@ Pure data operation without side effects.
 
 > **importDataFromJson**(`jsonData`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<\` `settings`: [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\>; `sites`: [`ImportSite`](../interfaces/ImportSite.md)[]; \`\>
 
-Defined in: [electron/utils/database/DataImportExportService.ts:105](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/DataImportExportService.ts#L105)
+Defined in: [electron/utils/database/DataImportExportService.ts:112](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/DataImportExportService.ts#L112)
 
 Import data from JSON string.
 Pure data operation that returns the imported data.
@@ -65,7 +68,7 @@ Pure data operation that returns the imported data.
 
 > **persistImportedData**(`sites`, `settings`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/utils/database/DataImportExportService.ts:138](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/DataImportExportService.ts#L138)
+Defined in: [electron/utils/database/DataImportExportService.ts:145](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/DataImportExportService.ts#L145)
 
 Import sites and settings into database.
 Database operation that persists the imported data.

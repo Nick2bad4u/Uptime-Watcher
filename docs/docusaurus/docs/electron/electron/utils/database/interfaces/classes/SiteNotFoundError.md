@@ -1,8 +1,10 @@
 # Class: SiteNotFoundError
 
-Defined in: [electron/utils/database/interfaces.ts:75](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/interfaces.ts#L75)
+Defined in: [electron/utils/database/interfaces.ts:93](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/interfaces.ts#L93)
 
-Custom error types for better error handling.
+Custom error for site not found scenarios.
+
+Thrown when attempting to access a site that doesn't exist in the system.
 
 ## Extends
 
@@ -14,13 +16,17 @@ Custom error types for better error handling.
 
 > **new SiteNotFoundError**(`identifier`): `SiteNotFoundError`
 
-Defined in: [electron/utils/database/interfaces.ts:76](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/interfaces.ts#L76)
+Defined in: [electron/utils/database/interfaces.ts:99](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/interfaces.ts#L99)
+
+Create a new SiteNotFoundError.
 
 #### Parameters
 
 ##### identifier
 
 `string`
+
+The site identifier that was not found
 
 #### Returns
 

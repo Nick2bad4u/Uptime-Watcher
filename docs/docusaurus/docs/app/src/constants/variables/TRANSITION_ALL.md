@@ -2,6 +2,11 @@
 
 > `const` **TRANSITION\_ALL**: `"all 0.2s ease-in-out"` = `"all 0.2s ease-in-out"`
 
-Defined in: [src/constants.ts:131](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/constants.ts#L131)
+Defined in: [src/constants.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/constants.ts#L17)
 
-Standard transition timing for smooth animations
+Font family constants for theme reuse.
+
+## Remarks
+
+Monospace fonts prioritize consist/**
+CSS transition timing for consistent animations.

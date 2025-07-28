@@ -2,10 +2,9 @@
 
 > **getDefaultMonitorId**(`monitorIds`): `string`
 
-Defined in: [src/utils/monitorUiHelpers.ts:130](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/monitorUiHelpers.ts#L130)
+Defined in: [src/utils/monitorUiHelpers.ts:147](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/utils/monitorUiHelpers.ts#L147)
 
 Get the default monitor ID from a list of monitor IDs.
-Returns the first monitor ID or an empty string if none exist.
 
 ## Parameters
 
@@ -19,4 +18,10 @@ Array of monitor IDs
 
 `string`
 
-Default monitor ID (first in array or empty string)
+Default monitor ID (first valid ID in array) or empty string if array is empty or contains no valid IDs
+
+## Remarks
+
+This function returns the first element of the array if it exists, otherwise an empty string.
+It does not validate whether the IDs are actually valid monitor identifiers - that should
+be done by the caller if needed. Empty arrays return an empty string as a safe fallback.

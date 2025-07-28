@@ -1,8 +1,8 @@
 # electron/main
 
 Main entry point for the Electron application.
-Sets up proper shutdown handlers for graceful cleanup.
 
 ## Remarks
 
-contextIsolation is enabled and uses preload scripts for secure logging.
+Sets up logging, initializes the application service, and configures shutdown handlers
+for graceful cleanup. Uses context isolation and preload scripts for secure logging.

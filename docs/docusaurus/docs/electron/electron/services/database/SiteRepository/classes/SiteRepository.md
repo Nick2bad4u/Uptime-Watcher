@@ -1,6 +1,14 @@
 # Class: SiteRepository
 
-Defined in: [electron/services/database/SiteRepository.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SiteRepository.ts#L42)
+Defined in: [electron/services/database/SiteRepository.ts:60](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SiteRepository.ts#L60)
+
+Repository for managing site data persistence.
+
+## Remarks
+
+Handles all CRUD operations for sites in the database using the repository pattern.
+All mutations are wrapped in transactions for consistency and error handling.
+Data normalization is applied for site names and monitoring status.
 
 ## Constructors
 
@@ -8,7 +16,9 @@ Defined in: [electron/services/database/SiteRepository.ts:42](https://github.com
 
 > **new SiteRepository**(`dependencies`): `SiteRepository`
 
-Defined in: [electron/services/database/SiteRepository.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SiteRepository.ts#L45)
+Defined in: [electron/services/database/SiteRepository.ts:73](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SiteRepository.ts#L73)
+
+Constructs a new SiteRepository instance.
 
 #### Parameters
 
@@ -16,9 +26,17 @@ Defined in: [electron/services/database/SiteRepository.ts:45](https://github.com
 
 [`SiteRepositoryDependencies`](../interfaces/SiteRepositoryDependencies.md)
 
+The required dependencies for site operations.
+
 #### Returns
 
 `SiteRepository`
+
+#### Example
+
+```typescript
+const repo = new SiteRepository({ databaseService });
+```
 
 ## Methods
 
@@ -26,10 +44,9 @@ Defined in: [electron/services/database/SiteRepository.ts:45](https://github.com
 
 > **bulkInsert**(`sites`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/database/SiteRepository.ts:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SiteRepository.ts#L62)
+Defined in: [electron/services/database/SiteRepository.ts:93](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SiteRepository.ts#L93)
 
-Bulk insert sites (for import functionality).
-Uses executeTransaction for atomic operation.
+Bulk inserts sites into the database.
 
 #### Parameters
 
@@ -37,22 +54,29 @@ Uses executeTransaction for atomic operation.
 
 [`SiteRow`](../../utils/siteMapper/interfaces/SiteRow.md)[]
 
-Array of site data to insert
+Array of site data to insert.
 
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-#### Throws
-
-Re-throws database errors after logging for upstream handling
+A promise that resolves when all sites are inserted.
 
 #### Remarks
 
-Performs bulk insertion with consistent data normalization:
-- Uses INSERT OR IGNORE to handle conflicts gracefully
-- Applies standard name and monitoring defaults
-- Wraps operation in database transaction for atomicity
+- Uses a transaction for atomicity.
+- Applies default values for missing name or monitoring fields.
+- Uses `INSERT OR IGNORE` to avoid duplicate identifiers.
+
+#### Throws
+
+If the database operation fails.
+
+#### Example
+
+```typescript
+await repo.bulkInsert([{ identifier: "abc", name: "Site", monitoring: true }]);
+```
 
 ***
 
@@ -60,7 +84,7 @@ Performs bulk insertion with consistent data normalization:
 
 > **bulkInsertInternal**(`db`, `sites`): `void`
 
-Defined in: [electron/services/database/SiteRepository.ts:96](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SiteRepository.ts#L96)
+Defined in: [electron/services/database/SiteRepository.ts:124](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SiteRepository.ts#L124)
 
 Internal method to bulk insert sites within an existing transaction.
 
@@ -70,28 +94,29 @@ Internal method to bulk insert sites within an existing transaction.
 
 `Database`
 
-Database connection (must be within active transaction)
+Database connection (must be within active transaction).
 
 ##### sites
 
 [`SiteRow`](../../utils/siteMapper/interfaces/SiteRow.md)[]
 
-Array of site data to insert
+Array of site data to insert.
 
 #### Returns
 
 `void`
 
+void
+
 #### Remarks
 
-**IMPORTANT**: This method is strictly synchronous and must be called
-within an existing database transaction context. It uses prepared
-statements for performance and applies consistent data normalization.
+- Must be called within an active transaction context.
+- Uses prepared statements for performance.
+- Normalizes site data before insertion.
 
-**Data Normalization:**
-- Names: Default to "Unnamed Site" when null/undefined
-- Monitoring: Default to true when undefined
-- Uses INSERT OR IGNORE to handle identifier conflicts gracefully
+#### Throws
+
+Error When database operations fail.
 
 ***
 
@@ -99,9 +124,9 @@ statements for performance and applies consistent data normalization.
 
 > **delete**(`identifier`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`boolean`\>
 
-Defined in: [electron/services/database/SiteRepository.ts:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SiteRepository.ts#L126)
+Defined in: [electron/services/database/SiteRepository.ts:159](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SiteRepository.ts#L159)
 
-Delete a site from the database.
+Deletes a site by its identifier.
 
 #### Parameters
 
@@ -109,13 +134,23 @@ Delete a site from the database.
 
 `string`
 
-Unique site identifier to delete
+Unique site identifier to delete.
 
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`boolean`\>
 
-Promise resolving to true if site was deleted, false if not found
+Promise resolving to `true` if the site was deleted, `false` if not found.
+
+#### Throws
+
+If the database operation fails.
+
+#### Example
+
+```typescript
+const deleted = await repo.delete("site-123");
+```
 
 ***
 
@@ -123,18 +158,29 @@ Promise resolving to true if site was deleted, false if not found
 
 > **deleteAll**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/database/SiteRepository.ts:146](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SiteRepository.ts#L146)
+Defined in: [electron/services/database/SiteRepository.ts:185](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SiteRepository.ts#L185)
 
-Clear all sites from the database.
+Deletes all sites from the database.
 
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
+Promise that resolves when all sites are deleted.
+
 #### Remarks
 
 **WARNING**: This operation is irreversible and will delete all site data.
-Use with caution in production environments.
+
+#### Throws
+
+If the database operation fails.
+
+#### Example
+
+```typescript
+await repo.deleteAll();
+```
 
 ***
 
@@ -142,9 +188,9 @@ Use with caution in production environments.
 
 > **deleteAllInternal**(`db`): `void`
 
-Defined in: [electron/services/database/SiteRepository.ts:164](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SiteRepository.ts#L164)
+Defined in: [electron/services/database/SiteRepository.ts:204](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SiteRepository.ts#L204)
 
-Internal method to clear all sites from the database within an existing transaction.
+Internal method to delete all sites within an existing transaction.
 
 #### Parameters
 
@@ -152,16 +198,18 @@ Internal method to clear all sites from the database within an existing transact
 
 `Database`
 
-Database connection (must be within active transaction)
+Database connection (must be within active transaction).
 
 #### Returns
 
 `void`
 
+void
+
 #### Remarks
 
-**IMPORTANT**: This method must be called within an existing transaction context.
-It performs a hard delete of all site records.
+- Must be called within an active transaction context.
+- Performs a hard delete of all site records.
 
 ***
 
@@ -169,9 +217,9 @@ It performs a hard delete of all site records.
 
 > **deleteInternal**(`db`, `identifier`): `boolean`
 
-Defined in: [electron/services/database/SiteRepository.ts:178](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SiteRepository.ts#L178)
+Defined in: [electron/services/database/SiteRepository.ts:221](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SiteRepository.ts#L221)
 
-Delete a site from the database (internal version for use within existing transactions).
+Internal method to delete a site by identifier within an existing transaction.
 
 #### Parameters
 
@@ -179,23 +227,28 @@ Delete a site from the database (internal version for use within existing transa
 
 `Database`
 
-Database connection (must be within active transaction)
+Database connection (must be within active transaction).
 
 ##### identifier
 
 `string`
 
-Site identifier to delete
+Site identifier to delete.
 
 #### Returns
 
 `boolean`
 
-True if the site was deleted, false if not found
+`true` if the site was deleted, `false` if not found.
+
+#### Remarks
+
+- Must be called within an active transaction context.
+- Logs deletion status.
 
 #### Throws
 
-Re-throws database errors after logging for upstream handling
+Error When database operations fail.
 
 ***
 
@@ -203,9 +256,9 @@ Re-throws database errors after logging for upstream handling
 
 > **exists**(`identifier`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`boolean`\>
 
-Defined in: [electron/services/database/SiteRepository.ts:202](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SiteRepository.ts#L202)
+Defined in: [electron/services/database/SiteRepository.ts:250](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SiteRepository.ts#L250)
 
-Check if a site exists by identifier.
+Checks if a site exists by its identifier.
 
 #### Parameters
 
@@ -213,13 +266,23 @@ Check if a site exists by identifier.
 
 `string`
 
-Site identifier to check
+Site identifier to check.
 
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`boolean`\>
 
-Promise resolving to true if site exists, false otherwise
+Promise resolving to `true` if the site exists, `false` otherwise.
+
+#### Throws
+
+If the database operation fails.
+
+#### Example
+
+```typescript
+const exists = await repo.exists("site-123");
+```
 
 ***
 
@@ -227,20 +290,29 @@ Promise resolving to true if site exists, false otherwise
 
 > **exportAll**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`SiteRow`](../../utils/siteMapper/interfaces/SiteRow.md)[]\>
 
-Defined in: [electron/services/database/SiteRepository.ts:223](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SiteRepository.ts#L223)
+Defined in: [electron/services/database/SiteRepository.ts:275](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SiteRepository.ts#L275)
 
-Export all sites for backup/import functionality.
+Exports all sites for backup or import functionality.
 
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`SiteRow`](../../utils/siteMapper/interfaces/SiteRow.md)[]\>
 
-Promise resolving to array of all site data
+Promise resolving to an array of all site data.
 
 #### Remarks
 
 Returns raw site data suitable for backup or export operations.
-Uses consistent query and validation patterns.
+
+#### Throws
+
+If the database operation fails.
+
+#### Example
+
+```typescript
+const allSites = await repo.exportAll();
+```
 
 ***
 
@@ -248,20 +320,29 @@ Uses consistent query and validation patterns.
 
 > **findAll**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`SiteRow`](../../utils/siteMapper/interfaces/SiteRow.md)[]\>
 
-Defined in: [electron/services/database/SiteRepository.ts:240](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SiteRepository.ts#L240)
+Defined in: [electron/services/database/SiteRepository.ts:296](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SiteRepository.ts#L296)
 
-Get all sites from the database (without monitors).
+Retrieves all sites from the database.
 
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`SiteRow`](../../utils/siteMapper/interfaces/SiteRow.md)[]\>
 
-Promise resolving to array of all site data
+Promise resolving to an array of all site data.
 
 #### Remarks
 
-Uses consistent query patterns and validation. Identical to exportAll
-in functionality but semantically different purpose.
+Functionally identical to [exportAll](#exportall), but intended for general querying.
+
+#### Throws
+
+If the database operation fails.
+
+#### Example
+
+```typescript
+const sites = await repo.findAll();
+```
 
 ***
 
@@ -269,9 +350,9 @@ in functionality but semantically different purpose.
 
 > **findByIdentifier**(`identifier`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`undefined` \| [`SiteRow`](../../utils/siteMapper/interfaces/SiteRow.md)\>
 
-Defined in: [electron/services/database/SiteRepository.ts:256](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SiteRepository.ts#L256)
+Defined in: [electron/services/database/SiteRepository.ts:315](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SiteRepository.ts#L315)
 
-Find a site by its identifier with resilient error handling.
+Finds a site by its identifier.
 
 #### Parameters
 
@@ -279,17 +360,23 @@ Find a site by its identifier with resilient error handling.
 
 `string`
 
-Site identifier to find
+Site identifier to find.
 
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`undefined` \| [`SiteRow`](../../utils/siteMapper/interfaces/SiteRow.md)\>
 
-Promise resolving to site data if found, undefined otherwise
+Promise resolving to site data if found, or `undefined` if not found.
 
 #### Throws
 
-Re-throws database errors after logging for upstream handling
+If the database operation fails.
+
+#### Example
+
+```typescript
+const site = await repo.findByIdentifier("site-123");
+```
 
 ***
 
@@ -297,9 +384,9 @@ Re-throws database errors after logging for upstream handling
 
 > **upsert**(`site`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/database/SiteRepository.ts:289](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SiteRepository.ts#L289)
+Defined in: [electron/services/database/SiteRepository.ts:353](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SiteRepository.ts#L353)
 
-Create or update a site in the database.
+Creates or updates a site in the database.
 
 #### Parameters
 
@@ -307,20 +394,28 @@ Create or update a site in the database.
 
 [`Pick`](https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys)\<[`SiteRow`](../../utils/siteMapper/interfaces/SiteRow.md), `"identifier"` \| `"monitoring"` \| `"name"`\>
 
-Site data to create or update
+Site data to create or update.
 
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-#### Throws
-
-Re-throws database errors after logging for upstream handling
+Promise that resolves when the operation completes.
 
 #### Remarks
 
-Uses INSERT OR REPLACE to handle both creation and updates atomically.
-Applies consistent data normalization with standard defaults.
+- Uses `INSERT OR REPLACE` for atomic upsert.
+- Normalizes site data before persistence.
+
+#### Throws
+
+If the database operation fails.
+
+#### Example
+
+```typescript
+await repo.upsert({ identifier: "site-123", name: "My Site", monitoring: true });
+```
 
 ***
 
@@ -328,9 +423,9 @@ Applies consistent data normalization with standard defaults.
 
 > **upsertInternal**(`db`, `site`): `void`
 
-Defined in: [electron/services/database/SiteRepository.ts:316](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SiteRepository.ts#L316)
+Defined in: [electron/services/database/SiteRepository.ts:375](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SiteRepository.ts#L375)
 
-Internal method to create or update a site within an existing transaction.
+Creates or updates a site within an existing transaction context.
 
 #### Parameters
 
@@ -338,13 +433,13 @@ Internal method to create or update a site within an existing transaction.
 
 `Database`
 
-Database connection (must be within active transaction)
+The database connection (must be within an active transaction).
 
 ##### site
 
 [`Pick`](https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys)\<[`SiteRow`](../../utils/siteMapper/interfaces/SiteRow.md), `"identifier"` \| `"monitoring"` \| `"name"`\>
 
-Site data to create or update
+Site data to create or update.
 
 #### Returns
 
@@ -352,9 +447,5 @@ Site data to create or update
 
 #### Remarks
 
-**IMPORTANT**: This method must be called within an existing transaction context.
-
-**Data Normalization:**
-- Names: Default to "Unnamed Site" when null/undefined (consistent with bulk operations)
-- Monitoring: Default to true when undefined (safe default)
-- Uses INSERT OR REPLACE for atomic upsert operation
+- Must be called within an active transaction context.
+- Applies default values for missing fields.

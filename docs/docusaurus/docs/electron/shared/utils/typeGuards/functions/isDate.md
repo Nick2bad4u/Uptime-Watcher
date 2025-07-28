@@ -2,9 +2,9 @@
 
 > **isDate**(`value`): `value is Date`
 
-Defined in: [shared/utils/typeGuards.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/typeGuards.ts#L49)
+Defined in: [shared/utils/typeGuards.ts:111](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/typeGuards.ts#L111)
 
-Type predicate for Date instances.
+Determines if a value is a valid `Date` instance.
 
 ## Parameters
 
@@ -12,6 +12,18 @@ Type predicate for Date instances.
 
 `unknown`
 
+The value to check.
+
 ## Returns
 
 `value is Date`
+
+True if `value` is a valid `Date` object; otherwise, false.
+
+## Example
+
+```ts
+if (isDate(dateCandidate)) {
+  // dateCandidate is a Date
+}
+```

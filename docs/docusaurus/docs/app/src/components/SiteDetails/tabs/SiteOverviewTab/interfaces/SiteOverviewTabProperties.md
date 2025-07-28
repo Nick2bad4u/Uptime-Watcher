@@ -1,6 +1,6 @@
 # Interface: SiteOverviewTabProperties
 
-Defined in: [src/components/SiteDetails/tabs/SiteOverviewTab.tsx:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SiteOverviewTab.tsx#L29)
+Defined in: [src/components/SiteDetails/tabs/SiteOverviewTab.tsx:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SiteOverviewTab.tsx#L29)
 
 Props for the SiteOverviewTab component
 
@@ -10,7 +10,7 @@ Props for the SiteOverviewTab component
 
 > `readonly` **avgResponseTime**: `number`
 
-Defined in: [src/components/SiteDetails/tabs/SiteOverviewTab.tsx:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SiteOverviewTab.tsx#L31)
+Defined in: [src/components/SiteDetails/tabs/SiteOverviewTab.tsx:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SiteOverviewTab.tsx#L31)
 
 Average response time across all monitors
 
@@ -20,7 +20,7 @@ Average response time across all monitors
 
 > `readonly` **handleRemoveSite**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/components/SiteDetails/tabs/SiteOverviewTab.tsx:33](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SiteOverviewTab.tsx#L33)
+Defined in: [src/components/SiteDetails/tabs/SiteOverviewTab.tsx:33](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SiteOverviewTab.tsx#L33)
 
 Handler for removing the site
 
@@ -34,7 +34,7 @@ Handler for removing the site
 
 > `readonly` **handleStartSiteMonitoring**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/components/SiteDetails/tabs/SiteOverviewTab.tsx:35](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SiteOverviewTab.tsx#L35)
+Defined in: [src/components/SiteDetails/tabs/SiteOverviewTab.tsx:35](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SiteOverviewTab.tsx#L35)
 
 Handler for starting site-level monitoring
 
@@ -48,7 +48,7 @@ Handler for starting site-level monitoring
 
 > `readonly` **handleStopSiteMonitoring**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/components/SiteDetails/tabs/SiteOverviewTab.tsx:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SiteOverviewTab.tsx#L37)
+Defined in: [src/components/SiteDetails/tabs/SiteOverviewTab.tsx:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SiteOverviewTab.tsx#L37)
 
 Handler for stopping site-level monitoring
 
@@ -62,7 +62,7 @@ Handler for stopping site-level monitoring
 
 > `readonly` **isLoading**: `boolean`
 
-Defined in: [src/components/SiteDetails/tabs/SiteOverviewTab.tsx:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SiteOverviewTab.tsx#L39)
+Defined in: [src/components/SiteDetails/tabs/SiteOverviewTab.tsx:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SiteOverviewTab.tsx#L39)
 
 Whether any async operation is in progress
 
@@ -72,7 +72,7 @@ Whether any async operation is in progress
 
 > `readonly` **site**: [`Site`](../../../../../../shared/types/interfaces/Site.md)
 
-Defined in: [src/components/SiteDetails/tabs/SiteOverviewTab.tsx:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SiteOverviewTab.tsx#L41)
+Defined in: [src/components/SiteDetails/tabs/SiteOverviewTab.tsx:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SiteOverviewTab.tsx#L41)
 
 The site object to display overview for
 
@@ -82,7 +82,7 @@ The site object to display overview for
 
 > `readonly` **totalChecks**: `number`
 
-Defined in: [src/components/SiteDetails/tabs/SiteOverviewTab.tsx:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SiteOverviewTab.tsx#L43)
+Defined in: [src/components/SiteDetails/tabs/SiteOverviewTab.tsx:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SiteOverviewTab.tsx#L43)
 
 Total number of checks across all monitors
 
@@ -92,6 +92,6 @@ Total number of checks across all monitors
 
 > `readonly` **uptime**: `number`
 
-Defined in: [src/components/SiteDetails/tabs/SiteOverviewTab.tsx:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SiteOverviewTab.tsx#L45)
+Defined in: [src/components/SiteDetails/tabs/SiteOverviewTab.tsx:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SiteOverviewTab.tsx#L45)
 
 Total uptime percentage across all monitors

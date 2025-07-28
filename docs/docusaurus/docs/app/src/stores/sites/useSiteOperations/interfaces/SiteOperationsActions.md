@@ -1,6 +1,6 @@
 # Interface: SiteOperationsActions
 
-Defined in: [src/stores/sites/useSiteOperations.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSiteOperations.ts#L19)
+Defined in: [src/stores/sites/useSiteOperations.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/useSiteOperations.ts#L19)
 
 ## Properties
 
@@ -8,7 +8,7 @@ Defined in: [src/stores/sites/useSiteOperations.ts:19](https://github.com/Nick2b
 
 > **addMonitorToSite**: (`siteId`, `monitor`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/useSiteOperations.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSiteOperations.ts#L21)
+Defined in: [src/stores/sites/useSiteOperations.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/useSiteOperations.ts#L21)
 
 Add a monitor to an existing site
 
@@ -32,7 +32,7 @@ Add a monitor to an existing site
 
 > **createSite**: (`siteData`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/useSiteOperations.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSiteOperations.ts#L23)
+Defined in: [src/stores/sites/useSiteOperations.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/useSiteOperations.ts#L23)
 
 Create a new site
 
@@ -66,7 +66,7 @@ Create a new site
 
 > **deleteSite**: (`identifier`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/useSiteOperations.ts:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSiteOperations.ts#L30)
+Defined in: [src/stores/sites/useSiteOperations.ts:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/useSiteOperations.ts#L30)
 
 Delete a site
 
@@ -86,7 +86,7 @@ Delete a site
 
 > **downloadSQLiteBackup**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/useSiteOperations.ts:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSiteOperations.ts#L32)
+Defined in: [src/stores/sites/useSiteOperations.ts:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/useSiteOperations.ts#L32)
 
 Download SQLite backup
 
@@ -100,7 +100,7 @@ Download SQLite backup
 
 > **initializeSites**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<\` `message`: `string`; `sitesLoaded`: `number`; `success`: `boolean`; \`\>
 
-Defined in: [src/stores/sites/useSiteOperations.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSiteOperations.ts#L34)
+Defined in: [src/stores/sites/useSiteOperations.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/useSiteOperations.ts#L34)
 
 Initialize sites data from backend
 
@@ -114,7 +114,7 @@ Initialize sites data from backend
 
 > **modifySite**: (`identifier`, `updates`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/useSiteOperations.ts:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSiteOperations.ts#L36)
+Defined in: [src/stores/sites/useSiteOperations.ts:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/useSiteOperations.ts#L36)
 
 Modify an existing site
 
@@ -138,7 +138,7 @@ Modify an existing site
 
 > **removeMonitorFromSite**: (`siteId`, `monitorId`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/useSiteOperations.ts:38](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSiteOperations.ts#L38)
+Defined in: [src/stores/sites/useSiteOperations.ts:38](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/useSiteOperations.ts#L38)
 
 Remove a monitor from a site
 
@@ -162,7 +162,7 @@ Remove a monitor from a site
 
 > **updateMonitorRetryAttempts**: (`siteId`, `monitorId`, `retryAttempts`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/useSiteOperations.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSiteOperations.ts#L40)
+Defined in: [src/stores/sites/useSiteOperations.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/useSiteOperations.ts#L40)
 
 Update monitor retry attempts
 
@@ -190,7 +190,7 @@ Update monitor retry attempts
 
 > **updateMonitorTimeout**: (`siteId`, `monitorId`, `timeout`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/useSiteOperations.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSiteOperations.ts#L42)
+Defined in: [src/stores/sites/useSiteOperations.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/useSiteOperations.ts#L42)
 
 Update monitor timeout
 
@@ -218,7 +218,7 @@ Update monitor timeout
 
 > **updateSiteCheckInterval**: (`siteId`, `monitorId`, `interval`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/useSiteOperations.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSiteOperations.ts#L44)
+Defined in: [src/stores/sites/useSiteOperations.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/useSiteOperations.ts#L44)
 
 Update site check interval
 

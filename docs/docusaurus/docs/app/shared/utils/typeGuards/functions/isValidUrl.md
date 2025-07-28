@@ -2,9 +2,9 @@
 
 > **isValidUrl**(`value`): `value is string`
 
-Defined in: [shared/utils/typeGuards.ts:133](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/typeGuards.ts#L133)
+Defined in: [shared/utils/typeGuards.ts:246](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/typeGuards.ts#L246)
 
-Type predicate for valid URL strings.
+Determines if a value is a valid URL string.
 
 ## Parameters
 
@@ -12,6 +12,18 @@ Type predicate for valid URL strings.
 
 `unknown`
 
+The value to check.
+
 ## Returns
 
 `value is string`
+
+True if `value` is a string representing a valid URL; otherwise, false.
+
+## Example
+
+```ts
+if (isValidUrl(str)) {
+  // str is a valid URL string
+}
+```

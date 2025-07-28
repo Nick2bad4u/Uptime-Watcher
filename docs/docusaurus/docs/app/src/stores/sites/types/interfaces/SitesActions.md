@@ -1,6 +1,6 @@
 # Interface: SitesActions
 
-Defined in: [src/stores/sites/types.ts:7](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L7)
+Defined in: [src/stores/sites/types.ts:7](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L7)
 
 ## Properties
 
@@ -8,7 +8,7 @@ Defined in: [src/stores/sites/types.ts:7](https://github.com/Nick2bad4u/Uptime-W
 
 > **addMonitorToSite**: (`siteId`, `monitor`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/types.ts:9](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L9)
+Defined in: [src/stores/sites/types.ts:9](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L9)
 
 Add a monitor to an existing site
 
@@ -32,7 +32,7 @@ Add a monitor to an existing site
 
 > **addSite**: (`site`) => `void`
 
-Defined in: [src/stores/sites/types.ts:11](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L11)
+Defined in: [src/stores/sites/types.ts:11](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L11)
 
 Add a site to the store
 
@@ -52,7 +52,7 @@ Add a site to the store
 
 > **checkSiteNow**: (`siteId`, `monitorId`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/types.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L13)
+Defined in: [src/stores/sites/types.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L13)
 
 Check a site now
 
@@ -76,7 +76,7 @@ Check a site now
 
 > **createSite**: (`siteData`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/types.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L15)
+Defined in: [src/stores/sites/types.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L15)
 
 Create a new site
 
@@ -106,7 +106,7 @@ Create a new site
 
 > **deleteSite**: (`identifier`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/types.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L17)
+Defined in: [src/stores/sites/types.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L17)
 
 Delete a site
 
@@ -126,7 +126,7 @@ Delete a site
 
 > **downloadSQLiteBackup**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/types.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L19)
+Defined in: [src/stores/sites/types.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L19)
 
 Download SQLite backup
 
@@ -140,7 +140,7 @@ Download SQLite backup
 
 > **fullSyncFromBackend**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/types.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L21)
+Defined in: [src/stores/sites/types.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L21)
 
 Full sync from backend
 
@@ -154,7 +154,7 @@ Full sync from backend
 
 > **getSelectedMonitorId**: (`siteId`) => `undefined` \| `string`
 
-Defined in: [src/stores/sites/types.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L23)
+Defined in: [src/stores/sites/types.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L23)
 
 Get selected monitor ID for a site
 
@@ -174,7 +174,7 @@ Get selected monitor ID for a site
 
 > **getSelectedSite**: () => `undefined` \| [`Site`](../../../../../shared/types/interfaces/Site.md)
 
-Defined in: [src/stores/sites/types.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L25)
+Defined in: [src/stores/sites/types.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L25)
 
 Get the currently selected site
 
@@ -188,7 +188,7 @@ Get the currently selected site
 
 > **getSyncStatus**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<\` `lastSync`: `undefined` \| `null` \| `number`; `siteCount`: `number`; `success`: `boolean`; `synchronized`: `boolean`; \`\>
 
-Defined in: [src/stores/sites/types.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L27)
+Defined in: [src/stores/sites/types.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L27)
 
 Get sync status
 
@@ -202,7 +202,7 @@ Get sync status
 
 > **initializeSites**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<\` `message`: `string`; `sitesLoaded`: `number`; `success`: `boolean`; \`\>
 
-Defined in: [src/stores/sites/types.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L34)
+Defined in: [src/stores/sites/types.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L34)
 
 Initialize sites data from backend
 
@@ -216,7 +216,7 @@ Initialize sites data from backend
 
 > **modifySite**: (`identifier`, `updates`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/types.ts:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L36)
+Defined in: [src/stores/sites/types.ts:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L36)
 
 Modify an existing site
 
@@ -240,7 +240,7 @@ Modify an existing site
 
 > **removeMonitorFromSite**: (`siteId`, `monitorId`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/types.ts:38](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L38)
+Defined in: [src/stores/sites/types.ts:38](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L38)
 
 Remove a monitor from a site
 
@@ -264,7 +264,7 @@ Remove a monitor from a site
 
 > **removeSite**: (`identifier`) => `void`
 
-Defined in: [src/stores/sites/types.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L40)
+Defined in: [src/stores/sites/types.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L40)
 
 Remove a site from the store
 
@@ -284,7 +284,7 @@ Remove a site from the store
 
 > **setSelectedMonitorId**: (`siteId`, `monitorId`) => `void`
 
-Defined in: [src/stores/sites/types.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L42)
+Defined in: [src/stores/sites/types.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L42)
 
 Set selected monitor ID for a site
 
@@ -308,7 +308,7 @@ Set selected monitor ID for a site
 
 > **setSelectedSite**: (`site`) => `void`
 
-Defined in: [src/stores/sites/types.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L44)
+Defined in: [src/stores/sites/types.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L44)
 
 Set selected site
 
@@ -328,7 +328,7 @@ Set selected site
 
 > **setSites**: (`sites`) => `void`
 
-Defined in: [src/stores/sites/types.ts:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L46)
+Defined in: [src/stores/sites/types.ts:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L46)
 
 Set sites data
 
@@ -348,7 +348,7 @@ Set sites data
 
 > **startSiteMonitoring**: (`siteId`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/types.ts:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L48)
+Defined in: [src/stores/sites/types.ts:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L48)
 
 Start monitoring for all monitors of a site
 
@@ -368,7 +368,7 @@ Start monitoring for all monitors of a site
 
 > **startSiteMonitorMonitoring**: (`siteId`, `monitorId`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/types.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L50)
+Defined in: [src/stores/sites/types.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L50)
 
 Start monitoring for a site monitor
 
@@ -392,7 +392,7 @@ Start monitoring for a site monitor
 
 > **stopSiteMonitoring**: (`siteId`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/types.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L52)
+Defined in: [src/stores/sites/types.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L52)
 
 Stop monitoring for all monitors of a site
 
@@ -412,7 +412,7 @@ Stop monitoring for all monitors of a site
 
 > **stopSiteMonitorMonitoring**: (`siteId`, `monitorId`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/types.ts:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L54)
+Defined in: [src/stores/sites/types.ts:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L54)
 
 Stop monitoring for a site monitor
 
@@ -436,7 +436,7 @@ Stop monitoring for a site monitor
 
 > **subscribeToStatusUpdates**: (`callback`) => `void`
 
-Defined in: [src/stores/sites/types.ts:56](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L56)
+Defined in: [src/stores/sites/types.ts:56](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L56)
 
 Subscribe to status updates
 
@@ -456,7 +456,7 @@ Subscribe to status updates
 
 > **subscribeToSyncEvents**: () => () => `void`
 
-Defined in: [src/stores/sites/types.ts:58](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L58)
+Defined in: [src/stores/sites/types.ts:58](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L58)
 
 Subscribe to sync events
 
@@ -474,7 +474,7 @@ Subscribe to sync events
 
 > **syncSitesFromBackend**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/types.ts:60](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L60)
+Defined in: [src/stores/sites/types.ts:60](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L60)
 
 Sync sites from backend
 
@@ -488,7 +488,7 @@ Sync sites from backend
 
 > **unsubscribeFromStatusUpdates**: () => `void`
 
-Defined in: [src/stores/sites/types.ts:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L62)
+Defined in: [src/stores/sites/types.ts:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L62)
 
 Unsubscribe from status updates
 
@@ -502,7 +502,7 @@ Unsubscribe from status updates
 
 > **updateMonitorRetryAttempts**: (`siteId`, `monitorId`, `retryAttempts`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/types.ts:64](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L64)
+Defined in: [src/stores/sites/types.ts:64](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L64)
 
 Update monitor retry attempts
 
@@ -530,7 +530,7 @@ Update monitor retry attempts
 
 > **updateMonitorTimeout**: (`siteId`, `monitorId`, `timeout`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/types.ts:66](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L66)
+Defined in: [src/stores/sites/types.ts:66](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L66)
 
 Update monitor timeout
 
@@ -558,7 +558,7 @@ Update monitor timeout
 
 > **updateSiteCheckInterval**: (`siteId`, `monitorId`, `interval`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/types.ts:68](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/types.ts#L68)
+Defined in: [src/stores/sites/types.ts:68](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/types.ts#L68)
 
 Update site check interval
 

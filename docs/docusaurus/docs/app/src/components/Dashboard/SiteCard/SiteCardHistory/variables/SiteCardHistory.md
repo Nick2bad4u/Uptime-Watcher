@@ -2,7 +2,7 @@
 
 > `const` **SiteCardHistory**: [`NamedExoticComponent`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L571)\<[`SiteCardHistoryProperties`](../interfaces/SiteCardHistoryProperties.md)\>
 
-Defined in: [src/components/Dashboard/SiteCard/SiteCardHistory.tsx:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/SiteCardHistory.tsx#L48)
+Defined in: [src/components/Dashboard/SiteCard/SiteCardHistory.tsx:51](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/SiteCardHistory.tsx#L51)
 
 History visualization component for site cards displaying monitor status over time.
 

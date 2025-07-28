@@ -2,7 +2,7 @@
 
 > **TitleSuffixFormatter** = (`monitor`) => `string`
 
-Defined in: [src/utils/monitorTitleFormatters.ts:11](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/monitorTitleFormatters.ts#L11)
+Defined in: [src/utils/monitorTitleFormatters.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/utils/monitorTitleFormatters.ts#L17)
 
 Type for monitor title suffix formatter functions
 
@@ -12,6 +12,10 @@ Type for monitor title suffix formatter functions
 
 [`Monitor`](../../../../shared/types/interfaces/Monitor.md)
 
+Monitor object to generate suffix for
+
 ## Returns
 
 `string`
+
+Formatted suffix string for display

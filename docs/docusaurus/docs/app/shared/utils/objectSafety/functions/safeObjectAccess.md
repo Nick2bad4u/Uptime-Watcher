@@ -2,7 +2,7 @@
 
 > **safeObjectAccess**\<`T`\>(`obj`, `key`, `fallback`, `validator?`): `T`
 
-Defined in: [shared/utils/objectSafety.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/objectSafety.ts#L23)
+Defined in: [shared/utils/objectSafety.ts:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/objectSafety.ts#L29)
 
 Type-safe object property access with fallback.
 
@@ -22,9 +22,9 @@ Object to access property from
 
 ### key
 
-Property key
+`PropertyKey`
 
-`string` | `number`
+Property key (string or symbol only)
 
 ### fallback
 
@@ -36,11 +36,19 @@ Fallback value if property doesn't exist or is wrong type
 
 (`value`) => `value is T`
 
+Optional type guard function to validate the property value
+
 ## Returns
 
 `T`
 
 Property value or fallback
+
+## Remarks
+
+Only accepts string and symbol keys as these are the valid property key types
+in JavaScript. Number keys are automatically converted to strings by JavaScript,
+so use string keys directly to avoid confusion.
 
 ## Example
 

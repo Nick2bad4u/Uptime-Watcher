@@ -1,6 +1,6 @@
 # Interface: SiteAnalytics
 
-Defined in: [src/hooks/site/useSiteAnalytics.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteAnalytics.ts#L28)
+Defined in: [src/hooks/site/useSiteAnalytics.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteAnalytics.ts#L28)
 
 Comprehensive analytics data for a site monitor
 
@@ -10,7 +10,7 @@ Comprehensive analytics data for a site monitor
 
 > **avgResponseTime**: `number`
 
-Defined in: [src/hooks/site/useSiteAnalytics.ts:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteAnalytics.ts#L30)
+Defined in: [src/hooks/site/useSiteAnalytics.ts:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteAnalytics.ts#L30)
 
 Average response time in milliseconds
 
@@ -20,7 +20,7 @@ Average response time in milliseconds
 
 > **downCount**: `number`
 
-Defined in: [src/hooks/site/useSiteAnalytics.ts:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteAnalytics.ts#L32)
+Defined in: [src/hooks/site/useSiteAnalytics.ts:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteAnalytics.ts#L32)
 
 Number of failed checks
 
@@ -30,7 +30,7 @@ Number of failed checks
 
 > **downtimePeriods**: [`DowntimePeriod`](DowntimePeriod.md)[]
 
-Defined in: [src/hooks/site/useSiteAnalytics.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteAnalytics.ts#L34)
+Defined in: [src/hooks/site/useSiteAnalytics.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteAnalytics.ts#L34)
 
 Array of downtime periods
 
@@ -40,7 +40,7 @@ Array of downtime periods
 
 > **fastestResponse**: `number`
 
-Defined in: [src/hooks/site/useSiteAnalytics.ts:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteAnalytics.ts#L36)
+Defined in: [src/hooks/site/useSiteAnalytics.ts:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteAnalytics.ts#L36)
 
 Fastest response time recorded
 
@@ -50,7 +50,7 @@ Fastest response time recorded
 
 > **filteredHistory**: [`StatusHistory`](../../../../../shared/types/interfaces/StatusHistory.md)[]
 
-Defined in: [src/hooks/site/useSiteAnalytics.ts:38](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteAnalytics.ts#L38)
+Defined in: [src/hooks/site/useSiteAnalytics.ts:38](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteAnalytics.ts#L38)
 
 Status history filtered by time range
 
@@ -60,7 +60,7 @@ Status history filtered by time range
 
 > **incidentCount**: `number`
 
-Defined in: [src/hooks/site/useSiteAnalytics.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteAnalytics.ts#L40)
+Defined in: [src/hooks/site/useSiteAnalytics.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteAnalytics.ts#L40)
 
 Number of separate downtime incidents
 
@@ -70,7 +70,7 @@ Number of separate downtime incidents
 
 > **mttr**: `number`
 
-Defined in: [src/hooks/site/useSiteAnalytics.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteAnalytics.ts#L42)
+Defined in: [src/hooks/site/useSiteAnalytics.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteAnalytics.ts#L42)
 
 Mean Time To Recovery in milliseconds
 
@@ -80,7 +80,7 @@ Mean Time To Recovery in milliseconds
 
 > **p50**: `number`
 
-Defined in: [src/hooks/site/useSiteAnalytics.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteAnalytics.ts#L44)
+Defined in: [src/hooks/site/useSiteAnalytics.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteAnalytics.ts#L44)
 
 50th percentile response time
 
@@ -90,7 +90,7 @@ Defined in: [src/hooks/site/useSiteAnalytics.ts:44](https://github.com/Nick2bad4
 
 > **p95**: `number`
 
-Defined in: [src/hooks/site/useSiteAnalytics.ts:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteAnalytics.ts#L46)
+Defined in: [src/hooks/site/useSiteAnalytics.ts:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteAnalytics.ts#L46)
 
 95th percentile response time
 
@@ -100,7 +100,7 @@ Defined in: [src/hooks/site/useSiteAnalytics.ts:46](https://github.com/Nick2bad4
 
 > **p99**: `number`
 
-Defined in: [src/hooks/site/useSiteAnalytics.ts:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteAnalytics.ts#L48)
+Defined in: [src/hooks/site/useSiteAnalytics.ts:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteAnalytics.ts#L48)
 
 99th percentile response time
 
@@ -110,7 +110,7 @@ Defined in: [src/hooks/site/useSiteAnalytics.ts:48](https://github.com/Nick2bad4
 
 > **slowestResponse**: `number`
 
-Defined in: [src/hooks/site/useSiteAnalytics.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteAnalytics.ts#L50)
+Defined in: [src/hooks/site/useSiteAnalytics.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteAnalytics.ts#L50)
 
 Slowest response time recorded
 
@@ -120,7 +120,7 @@ Slowest response time recorded
 
 > **totalChecks**: `number`
 
-Defined in: [src/hooks/site/useSiteAnalytics.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteAnalytics.ts#L52)
+Defined in: [src/hooks/site/useSiteAnalytics.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteAnalytics.ts#L52)
 
 Total number of checks performed
 
@@ -130,7 +130,7 @@ Total number of checks performed
 
 > **totalDowntime**: `number`
 
-Defined in: [src/hooks/site/useSiteAnalytics.ts:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteAnalytics.ts#L54)
+Defined in: [src/hooks/site/useSiteAnalytics.ts:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteAnalytics.ts#L54)
 
 Total downtime in milliseconds
 
@@ -140,7 +140,7 @@ Total downtime in milliseconds
 
 > **upCount**: `number`
 
-Defined in: [src/hooks/site/useSiteAnalytics.ts:56](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteAnalytics.ts#L56)
+Defined in: [src/hooks/site/useSiteAnalytics.ts:56](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteAnalytics.ts#L56)
 
 Number of successful checks
 
@@ -150,6 +150,16 @@ Number of successful checks
 
 > **uptime**: `string`
 
-Defined in: [src/hooks/site/useSiteAnalytics.ts:58](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteAnalytics.ts#L58)
+Defined in: [src/hooks/site/useSiteAnalytics.ts:58](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteAnalytics.ts#L58)
 
 Uptime percentage as formatted string
+
+***
+
+### uptimeRaw
+
+> **uptimeRaw**: `number`
+
+Defined in: [src/hooks/site/useSiteAnalytics.ts:60](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteAnalytics.ts#L60)
+
+Raw uptime percentage as number for calculations

@@ -2,14 +2,12 @@
 
 > **useThemeClasses**(): `object`
 
-Defined in: [src/theme/useTheme.ts:218](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/useTheme.ts#L218)
+Defined in: [src/theme/useTheme.ts:288](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/useTheme.ts#L288)
 
 Hook for theme-aware CSS classes using CSS custom properties.
 Provides utility functions for generating dynamic CSS classes based on the current theme.
 
 ## Returns
-
-`object`
 
 Object with methods for generating background, text, and status classes
 
@@ -53,15 +51,28 @@ Object with methods for generating background, text, and status classes
 
 > **getColor**: (`path`) => `string`
 
+Get theme-aware color from a dot-notation path.
+
 #### Parameters
 
 ##### path
 
 `string`
 
+Dot-notation path to the color (e.g., "colors.status.up")
+
 #### Returns
 
 `string`
+
+Color value as string, or theme-aware fallback if path is invalid
+
+#### Example
+
+```typescript
+const upColor = getColor("status.up");
+const primaryBg = getColor("background.primary");
+```
 
 ### getStatusClass()
 

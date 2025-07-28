@@ -1,14 +1,19 @@
 # Interface: HistoryRepositoryDependencies
 
-Defined in: [electron/services/database/HistoryRepository.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/HistoryRepository.ts#L20)
+Defined in: [electron/services/database/HistoryRepository.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/HistoryRepository.ts#L23)
 
-Repository for managing history data persistence.
-Handles CRUD operations for monitor history in the database.
+Defines the dependencies required by the [HistoryRepository](../classes/HistoryRepository.md) for managing history data persistence.
+
+## Remarks
+
+Provides the required [DatabaseService](../../DatabaseService/classes/DatabaseService.md) for all history operations. This interface is used for dependency injection.
 
 ## Properties
 
 ### databaseService
 
-> **databaseService**: [`DatabaseService`](../../DatabaseService/classes/DatabaseService.md)
+> `readonly` **databaseService**: [`DatabaseService`](../../DatabaseService/classes/DatabaseService.md)
 
-Defined in: [electron/services/database/HistoryRepository.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/HistoryRepository.ts#L21)
+Defined in: [electron/services/database/HistoryRepository.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/HistoryRepository.ts#L28)
+
+The database service used for transactional operations.

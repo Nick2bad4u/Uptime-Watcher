@@ -1,6 +1,6 @@
 # Interface: SiteDetailsProperties
 
-Defined in: [src/components/SiteDetails/SiteDetails.tsx:61](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/SiteDetails.tsx#L61)
+Defined in: [src/components/SiteDetails/SiteDetails.tsx:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/SiteDetails.tsx#L62)
 
 Props for the SiteDetails component
 
@@ -10,7 +10,7 @@ Props for the SiteDetails component
 
 > `readonly` **onClose**: () => `void`
 
-Defined in: [src/components/SiteDetails/SiteDetails.tsx:63](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/SiteDetails.tsx#L63)
+Defined in: [src/components/SiteDetails/SiteDetails.tsx:64](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/SiteDetails.tsx#L64)
 
 Callback function to close the site details view
 
@@ -24,6 +24,6 @@ Callback function to close the site details view
 
 > `readonly` **site**: [`Site`](../../../../../shared/types/interfaces/Site.md)
 
-Defined in: [src/components/SiteDetails/SiteDetails.tsx:65](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/SiteDetails.tsx#L65)
+Defined in: [src/components/SiteDetails/SiteDetails.tsx:66](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/SiteDetails.tsx#L66)
 
 The site object to display details for

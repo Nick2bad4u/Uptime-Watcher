@@ -1,8 +1,29 @@
 # Interface: MonitoringControlEventData
 
-Defined in: [shared/types/events.ts:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types/events.ts#L39)
+Defined in: [shared/types/events.ts:114](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types/events.ts#L114)
 
-Event data for monitoring control operations (global monitoring start/stop)
+Payload for monitoring control events (global monitoring start/stop).
+
+## Remarks
+
+Used to signal global monitoring state changes, such as starting or stopping all monitors.
+- `activeMonitors`: Number of active monitors (for stopped events).
+- `monitorCount`: Number of monitors involved in the operation.
+- `reason`: Reason for stopping (for stopped events).
+- `siteCount`: Number of sites involved in the operation.
+- `timestamp`: The time (in ms since epoch) when the event occurred.
+
+## Example
+
+// Example: Monitoring stopped by user
+```typescript
+const event: MonitoringControlEventData = {
+  reason: 'user',
+  activeMonitors: 0,
+  siteCount: 3,
+  timestamp: Date.now()
+};
+```
 
 ## Properties
 
@@ -10,9 +31,9 @@ Event data for monitoring control operations (global monitoring start/stop)
 
 > `optional` **activeMonitors**: `number`
 
-Defined in: [shared/types/events.ts:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types/events.ts#L41)
+Defined in: [shared/types/events.ts:118](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types/events.ts#L118)
 
-Number of active monitors (for stopped events)
+Number of active monitors (for stopped events).
 
 ***
 
@@ -20,9 +41,9 @@ Number of active monitors (for stopped events)
 
 > `optional` **monitorCount**: `number`
 
-Defined in: [shared/types/events.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types/events.ts#L43)
+Defined in: [shared/types/events.ts:122](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types/events.ts#L122)
 
-Number of monitors involved
+Number of monitors involved in the operation.
 
 ***
 
@@ -30,9 +51,13 @@ Number of monitors involved
 
 > `optional` **reason**: `"error"` \| `"shutdown"` \| `"user"`
 
-Defined in: [shared/types/events.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types/events.ts#L45)
+Defined in: [shared/types/events.ts:127](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types/events.ts#L127)
 
-Reason for stopping (for stopped events)
+Reason for stopping (for stopped events).
+
+#### Remarks
+
+Can be 'error', 'shutdown', or 'user'.
 
 ***
 
@@ -40,9 +65,9 @@ Reason for stopping (for stopped events)
 
 > `optional` **siteCount**: `number`
 
-Defined in: [shared/types/events.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types/events.ts#L47)
+Defined in: [shared/types/events.ts:131](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types/events.ts#L131)
 
-Number of sites involved
+Number of sites involved in the operation.
 
 ***
 
@@ -50,6 +75,6 @@ Number of sites involved
 
 > **timestamp**: `number`
 
-Defined in: [shared/types/events.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types/events.ts#L49)
+Defined in: [shared/types/events.ts:135](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types/events.ts#L135)
 
-Timestamp when the event occurred
+The time (in ms since epoch) when the event occurred.

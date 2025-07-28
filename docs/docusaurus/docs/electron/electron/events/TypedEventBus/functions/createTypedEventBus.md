@@ -2,9 +2,9 @@
 
 > **createTypedEventBus**\<`EventMap`\>(`name?`, `options?`): [`TypedEventBus`](../classes/TypedEventBus.md)\<`EventMap`\>
 
-Defined in: [electron/events/TypedEventBus.ts:519](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L519)
+Defined in: [electron/events/TypedEventBus.ts:522](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/events/TypedEventBus.ts#L522)
 
-Utility function to create a typed event bus instance.
+Factory function to create a new typed event bus instance.
 
 ## Type Parameters
 
@@ -12,17 +12,19 @@ Utility function to create a typed event bus instance.
 
 `EventMap` *extends* [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\>
 
+Map of event names to their data types.
+
 ## Parameters
 
 ### name?
 
 `string`
 
-Optional name for the bus
+Optional name for the bus (used in logging and diagnostics).
 
 ### options?
 
-Optional configuration options
+Optional configuration options for the event bus.
 
 #### maxMiddleware?
 
@@ -32,19 +34,14 @@ Optional configuration options
 
 [`TypedEventBus`](../classes/TypedEventBus.md)\<`EventMap`\>
 
-A new TypedEventBus instance
+A new [TypedEventBus](../classes/TypedEventBus.md) instance.
 
 ## Remarks
 
-Convenience factory function for creating typed event bus instances.
-Equivalent to `new TypedEventBus`EventMap`(name, options)`.
+This function is a convenience wrapper for the [TypedEventBus](../classes/TypedEventBus.md) constructor.
 
 ## Example
 
 ```typescript
-interface AppEvents {
-  'user:login': { userId: string };
-}
-
-const bus = createTypedEventBus<AppEvents>('main-bus', { maxMiddleware: 50 });
+const bus = createTypedEventBus<MyEvents>('my-bus', { maxMiddleware: 30 });
 ```

@@ -1,8 +1,8 @@
 # Interface: RadioOption
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:272](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L272)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:338](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/FormFields.tsx#L338)
 
-Option interface for RadioGroup items
+Option interface for RadioGroup items.
 
 ## Properties
 
@@ -10,7 +10,7 @@ Option interface for RadioGroup items
 
 > **label**: `string`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:274](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L274)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:340](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/FormFields.tsx#L340)
 
 Display text for the radio option
 
@@ -20,6 +20,6 @@ Display text for the radio option
 
 > **value**: `string`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:276](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L276)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:342](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/FormFields.tsx#L342)
 
 Value to be selected

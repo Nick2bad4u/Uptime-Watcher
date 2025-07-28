@@ -1,9 +1,12 @@
 # Interface: UIStore
 
-Defined in: [src/stores/ui/types.ts:14](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/ui/types.ts#L14)
+Defined in: [src/stores/ui/types.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/ui/types.ts#L21)
 
-UI store interface.
-Manages user interface state and interactions.
+Interface for the UI store.
+
+## Remarks
+
+Provides state and actions for managing user interface interactions and modal visibility.
 
 ## Properties
 
@@ -11,9 +14,9 @@ Manages user interface state and interactions.
 
 > **activeSiteDetailsTab**: `string`
 
-Defined in: [src/stores/ui/types.ts:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/ui/types.ts#L16)
+Defined in: [src/stores/ui/types.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/ui/types.ts#L25)
 
-Active tab in site details modal
+The active tab in the site details modal.
 
 ***
 
@@ -21,9 +24,9 @@ Active tab in site details modal
 
 > **selectedSiteId**: `undefined` \| `string`
 
-Defined in: [src/stores/ui/types.ts:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/ui/types.ts#L18)
+Defined in: [src/stores/ui/types.ts:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/ui/types.ts#L30)
 
-Currently selected site identifier
+The identifier of the currently selected site.
 
 ***
 
@@ -31,15 +34,17 @@ Currently selected site identifier
 
 > **setActiveSiteDetailsTab**: (`tab`) => `void`
 
-Defined in: [src/stores/ui/types.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/ui/types.ts#L20)
+Defined in: [src/stores/ui/types.ts:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/ui/types.ts#L37)
 
-Set active tab in site details modal
+Sets the active tab in the site details modal.
 
 #### Parameters
 
 ##### tab
 
 `string`
+
+The tab identifier to activate.
 
 #### Returns
 
@@ -51,13 +56,15 @@ Set active tab in site details modal
 
 > **setSelectedSite**: (`site`) => `void`
 
-Defined in: [src/stores/ui/types.ts:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/ui/types.ts#L22)
+Defined in: [src/stores/ui/types.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/ui/types.ts#L44)
 
-Set selected site
+Sets the selected site.
 
 #### Parameters
 
 ##### site
+
+The site to select, or `undefined` to clear selection.
 
 `undefined` | [`Site`](../../../../../shared/types/interfaces/Site.md)
 
@@ -71,15 +78,17 @@ Set selected site
 
 > **setShowAdvancedMetrics**: (`show`) => `void`
 
-Defined in: [src/stores/ui/types.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/ui/types.ts#L24)
+Defined in: [src/stores/ui/types.ts:51](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/ui/types.ts#L51)
 
-Set advanced metrics visibility
+Sets the visibility of advanced metrics in the UI.
 
 #### Parameters
 
 ##### show
 
 `boolean`
+
+Whether to show advanced metrics.
 
 #### Returns
 
@@ -91,15 +100,17 @@ Set advanced metrics visibility
 
 > **setShowSettings**: (`show`) => `void`
 
-Defined in: [src/stores/ui/types.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/ui/types.ts#L27)
+Defined in: [src/stores/ui/types.ts:60](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/ui/types.ts#L60)
 
-Set settings modal visibility
+Sets the visibility of the settings modal.
 
 #### Parameters
 
 ##### show
 
 `boolean`
+
+Whether to show the settings modal.
 
 #### Returns
 
@@ -111,15 +122,17 @@ Set settings modal visibility
 
 > **setShowSiteDetails**: (`show`) => `void`
 
-Defined in: [src/stores/ui/types.ts:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/ui/types.ts#L30)
+Defined in: [src/stores/ui/types.ts:67](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/ui/types.ts#L67)
 
-Set site details modal visibility
+Sets the visibility of the site details modal.
 
 #### Parameters
 
 ##### show
 
 `boolean`
+
+Whether to show the site details modal.
 
 #### Returns
 
@@ -131,15 +144,17 @@ Set site details modal visibility
 
 > **setSiteDetailsChartTimeRange**: (`range`) => `void`
 
-Defined in: [src/stores/ui/types.ts:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/ui/types.ts#L32)
+Defined in: [src/stores/ui/types.ts:74](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/ui/types.ts#L74)
 
-Set chart time range
+Sets the selected time range for site details charts.
 
 #### Parameters
 
 ##### range
 
 [`ChartTimeRange`](../../../types/type-aliases/ChartTimeRange.md)
+
+The chart time range to select.
 
 #### Returns
 
@@ -151,9 +166,9 @@ Set chart time range
 
 > **showAdvancedMetrics**: `boolean`
 
-Defined in: [src/stores/ui/types.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/ui/types.ts#L34)
+Defined in: [src/stores/ui/types.ts:79](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/ui/types.ts#L79)
 
-Whether to show advanced metrics
+Whether advanced metrics are visible in the UI.
 
 ***
 
@@ -161,9 +176,9 @@ Whether to show advanced metrics
 
 > **showSettings**: `boolean`
 
-Defined in: [src/stores/ui/types.ts:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/ui/types.ts#L37)
+Defined in: [src/stores/ui/types.ts:86](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/ui/types.ts#L86)
 
-Whether settings modal is open
+Whether the settings modal is currently open.
 
 ***
 
@@ -171,9 +186,9 @@ Whether settings modal is open
 
 > **showSiteDetails**: `boolean`
 
-Defined in: [src/stores/ui/types.ts:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/ui/types.ts#L39)
+Defined in: [src/stores/ui/types.ts:91](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/ui/types.ts#L91)
 
-Whether site details modal is open
+Whether the site details modal is currently open.
 
 ***
 
@@ -181,6 +196,6 @@ Whether site details modal is open
 
 > **siteDetailsChartTimeRange**: [`ChartTimeRange`](../../../types/type-aliases/ChartTimeRange.md)
 
-Defined in: [src/stores/ui/types.ts:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/ui/types.ts#L41)
+Defined in: [src/stores/ui/types.ts:96](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/ui/types.ts#L96)
 
-Selected time range for charts
+The selected time range for charts in the site details modal.

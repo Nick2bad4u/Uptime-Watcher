@@ -2,9 +2,9 @@
 
 > **rowToHistoryEntry**(`row`): [`StatusHistory`](../../../../../../shared/types/interfaces/StatusHistory.md)
 
-Defined in: [electron/services/database/utils/historyMapper.ts:95](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/historyMapper.ts#L95)
+Defined in: [electron/services/database/utils/historyMapper.ts:132](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/historyMapper.ts#L132)
 
-Convert database row to history entry.
+Converts a single database row to a [StatusHistory](../../../../../../shared/types/interfaces/StatusHistory.md) object.
 
 ## Parameters
 
@@ -12,19 +12,25 @@ Convert database row to history entry.
 
 [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\>
 
-Raw database row
+The raw database row to convert.
 
 ## Returns
 
 [`StatusHistory`](../../../../../../shared/types/interfaces/StatusHistory.md)
 
-Mapped StatusHistory object
-
-## Throws
-
-Error When row mapping fails
+The mapped [StatusHistory](../../../../../../shared/types/interfaces/StatusHistory.md) object.
 
 ## Remarks
 
-Uses safe number conversion and status validation to ensure data integrity.
-Invalid numbers default to 0, invalid status values default to "down" with logging.
+Performs safe number conversion and status validation. If a value is invalid,
+it defaults to a safe fallback and logs a warning or error.
+
+## Throws
+
+Error If mapping fails due to unexpected data types or missing fields.
+
+## Example
+
+```typescript
+const entry = rowToHistoryEntry(dbRow);
+```

@@ -3,6 +3,7 @@
 ## Interfaces
 
 - [UseSiteDetailsProperties](interfaces/UseSiteDetailsProperties.md)
+- [UseSiteDetailsResult](interfaces/UseSiteDetailsResult.md)
 
 ## Functions
 

@@ -2,7 +2,7 @@
 
 > **typedObjectKeys**\<`T`\>(`obj`): keyof `T`[]
 
-Defined in: [shared/utils/objectSafety.ts:172](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/objectSafety.ts#L172)
+Defined in: [shared/utils/objectSafety.ts:194](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/objectSafety.ts#L194)
 
 Type-safe Object.keys that preserves key types for known object shapes.
 
@@ -25,6 +25,14 @@ Object to get keys from
 keyof `T`[]
 
 Array of keys with proper typing
+
+## Remarks
+
+This function uses type assertion to preserve compile-time type information.
+Note that Object.keys() only returns enumerable string-keyed properties,
+so symbol keys are not included in the result. The cast assumes all keys
+are of type keyof T, which is safe for plain objects but may not include
+all possible keys for objects with symbol keys or inherited properties.
 
 ## Example
 

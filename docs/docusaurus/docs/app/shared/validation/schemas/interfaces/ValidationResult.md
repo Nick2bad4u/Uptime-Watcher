@@ -1,6 +1,12 @@
 # Interface: ValidationResult
 
-Defined in: [shared/validation/schemas.ts:118](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/validation/schemas.ts#L118)
+Defined in: [shared/validation/schemas.ts:189](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/validation/schemas.ts#L189)
+
+Result object returned by validation functions.
+
+## Remarks
+
+Contains the validated data (if successful), errors, warnings, and metadata.
 
 ## Properties
 
@@ -8,7 +14,9 @@ Defined in: [shared/validation/schemas.ts:118](https://github.com/Nick2bad4u/Upt
 
 > `optional` **data**: `unknown`
 
-Defined in: [shared/validation/schemas.ts:119](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/validation/schemas.ts#L119)
+Defined in: [shared/validation/schemas.ts:193](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/validation/schemas.ts#L193)
+
+The validated data, if validation succeeded.
 
 ***
 
@@ -16,7 +24,9 @@ Defined in: [shared/validation/schemas.ts:119](https://github.com/Nick2bad4u/Upt
 
 > **errors**: `string`[]
 
-Defined in: [shared/validation/schemas.ts:120](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/validation/schemas.ts#L120)
+Defined in: [shared/validation/schemas.ts:197](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/validation/schemas.ts#L197)
+
+Array of validation error messages.
 
 ***
 
@@ -24,7 +34,9 @@ Defined in: [shared/validation/schemas.ts:120](https://github.com/Nick2bad4u/Upt
 
 > **metadata**: [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\>
 
-Defined in: [shared/validation/schemas.ts:121](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/validation/schemas.ts#L121)
+Defined in: [shared/validation/schemas.ts:201](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/validation/schemas.ts#L201)
+
+Metadata about the validation process (e.g., monitor type, field name).
 
 ***
 
@@ -32,7 +44,9 @@ Defined in: [shared/validation/schemas.ts:121](https://github.com/Nick2bad4u/Upt
 
 > **success**: `boolean`
 
-Defined in: [shared/validation/schemas.ts:122](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/validation/schemas.ts#L122)
+Defined in: [shared/validation/schemas.ts:205](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/validation/schemas.ts#L205)
+
+Indicates whether validation was successful.
 
 ***
 
@@ -40,4 +54,6 @@ Defined in: [shared/validation/schemas.ts:122](https://github.com/Nick2bad4u/Upt
 
 > **warnings**: `string`[]
 
-Defined in: [shared/validation/schemas.ts:123](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/validation/schemas.ts#L123)
+Defined in: [shared/validation/schemas.ts:209](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/validation/schemas.ts#L209)
+
+Array of validation warnings (e.g., optional fields missing).

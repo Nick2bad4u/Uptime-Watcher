@@ -1,6 +1,6 @@
 # Interface: ThemeStyles
 
-Defined in: [src/hooks/useThemeStyles.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/useThemeStyles.ts#L13)
+Defined in: [src/hooks/useThemeStyles.ts:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/useThemeStyles.ts#L41)
 
 Theme styles interface for CSS-in-JS styling
 
@@ -10,7 +10,9 @@ Theme styles interface for CSS-in-JS styling
 
 > **collapseButtonStyle**: [`CSSProperties`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L2383)
 
-Defined in: [src/hooks/useThemeStyles.ts:14](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/useThemeStyles.ts#L14)
+Defined in: [src/hooks/useThemeStyles.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/useThemeStyles.ts#L43)
+
+Button styles for collapse/expand controls
 
 ***
 
@@ -18,7 +20,9 @@ Defined in: [src/hooks/useThemeStyles.ts:14](https://github.com/Nick2bad4u/Uptim
 
 > **contentStyle**: [`CSSProperties`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L2383)
 
-Defined in: [src/hooks/useThemeStyles.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/useThemeStyles.ts#L15)
+Defined in: [src/hooks/useThemeStyles.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/useThemeStyles.ts#L45)
+
+Main content area styling
 
 ***
 
@@ -26,7 +30,9 @@ Defined in: [src/hooks/useThemeStyles.ts:15](https://github.com/Nick2bad4u/Uptim
 
 > **headerStyle**: [`CSSProperties`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L2383)
 
-Defined in: [src/hooks/useThemeStyles.ts:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/useThemeStyles.ts#L16)
+Defined in: [src/hooks/useThemeStyles.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/useThemeStyles.ts#L47)
+
+Header section styling
 
 ***
 
@@ -34,7 +40,9 @@ Defined in: [src/hooks/useThemeStyles.ts:16](https://github.com/Nick2bad4u/Uptim
 
 > **metaStyle**: [`CSSProperties`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L2383)
 
-Defined in: [src/hooks/useThemeStyles.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/useThemeStyles.ts#L17)
+Defined in: [src/hooks/useThemeStyles.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/useThemeStyles.ts#L49)
+
+Metadata text styling
 
 ***
 
@@ -42,7 +50,9 @@ Defined in: [src/hooks/useThemeStyles.ts:17](https://github.com/Nick2bad4u/Uptim
 
 > **overlayStyle**: [`CSSProperties`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L2383)
 
-Defined in: [src/hooks/useThemeStyles.ts:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/useThemeStyles.ts#L18)
+Defined in: [src/hooks/useThemeStyles.ts:51](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/useThemeStyles.ts#L51)
+
+Overlay/modal backdrop styling
 
 ***
 
@@ -50,7 +60,9 @@ Defined in: [src/hooks/useThemeStyles.ts:18](https://github.com/Nick2bad4u/Uptim
 
 > **titleStyle**: [`CSSProperties`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L2383)
 
-Defined in: [src/hooks/useThemeStyles.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/useThemeStyles.ts#L19)
+Defined in: [src/hooks/useThemeStyles.ts:53](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/useThemeStyles.ts#L53)
+
+Primary title text styling
 
 ***
 
@@ -58,4 +70,6 @@ Defined in: [src/hooks/useThemeStyles.ts:19](https://github.com/Nick2bad4u/Uptim
 
 > **urlStyle**: [`CSSProperties`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L2383)
 
-Defined in: [src/hooks/useThemeStyles.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/useThemeStyles.ts#L20)
+Defined in: [src/hooks/useThemeStyles.ts:55](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/useThemeStyles.ts#L55)
+
+URL/link text styling

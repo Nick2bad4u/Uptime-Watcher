@@ -2,9 +2,9 @@
 
 > **isFunction**(`value`): `value is (args: unknown[]) => unknown`
 
-Defined in: [shared/utils/typeGuards.ts:70](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/typeGuards.ts#L70)
+Defined in: [shared/utils/typeGuards.ts:148](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/typeGuards.ts#L148)
 
-Type predicate for function values.
+Determines if a value is a function.
 
 ## Parameters
 
@@ -12,6 +12,18 @@ Type predicate for function values.
 
 `unknown`
 
+The value to check.
+
 ## Returns
 
 `value is (args: unknown[]) => unknown`
+
+True if `value` is a function; otherwise, false.
+
+## Example
+
+```ts
+if (isFunction(fn)) {
+  // fn is (...args: unknown[]) => unknown
+}
+```

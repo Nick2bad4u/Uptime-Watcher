@@ -2,9 +2,9 @@
 
 > **performSinglePortCheck**(`host`, `port`, `timeout`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`MonitorCheckResult`](../../../types/interfaces/MonitorCheckResult.md)\>
 
-Defined in: [electron/services/monitoring/utils/portChecker.ts:53](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/utils/portChecker.ts#L53)
+Defined in: [electron/services/monitoring/utils/portChecker.ts:61](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/utils/portChecker.ts#L61)
 
-Perform a single port check attempt without retry logic.
+Performs a single TCP port connectivity check to a specified host and port, without retry logic.
 
 ## Parameters
 
@@ -12,40 +12,31 @@ Perform a single port check attempt without retry logic.
 
 `string`
 
-Target hostname or IP address to check
+The target hostname or IP address to check (e.g., "localhost", "192.168.1.1").
 
 ### port
 
 `number`
 
-Port number to test connectivity
+The TCP port number to test for connectivity.
 
 ### timeout
 
 `number`
 
-Maximum time to wait for connection in milliseconds
+The maximum time to wait for a connection, in milliseconds.
 
 ## Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`MonitorCheckResult`](../../../types/interfaces/MonitorCheckResult.md)\>
 
-Promise resolving to monitor check result with timing information
-
-## Throws
-
-PortCheckError When port is not reachable, includes response time for retry logic
+A promise that resolves to a [MonitorCheckResult](../../../types/interfaces/MonitorCheckResult.md) containing port details, response time, and status.
 
 ## Remarks
 
-Uses the `is-port-reachable` library to test TCP connectivity to the specified port.
-Measures response time using high-precision performance.now() timing.
+Uses the "is-port-reachable" library to test TCP connectivity to the given host and port, measuring response time with high-precision `performance.now()`. Debug logging is enabled in development mode. This function does not mutate state or trigger events; it is intended for use within repository or service layers that handle orchestration and event propagation.
 
-On successful connection, returns a result with status "up" and actual response time.
-On connection failure, throws PortCheckError with timing information to support
-retry mechanisms that need response time data.
-
-Debug logging is automatically enabled in development mode for troubleshooting.
+On success, resolves to a [MonitorCheckResult](../../../types/interfaces/MonitorCheckResult.md) with status `"up"` and the measured response time. On failure, throws a [PortCheckError](../../portErrorHandling/classes/PortCheckError.md) containing the error message and response time for use in retry or error handling logic.
 
 ## Example
 
@@ -60,7 +51,11 @@ try {
 }
 ```
 
+## Throws
+
+PortCheckError Thrown if the port is not reachable within the timeout, with response time included for diagnostics and retry logic.
+
 ## See
 
- - [PortCheckError](../../portErrorHandling/classes/PortCheckError.md) for error details
- - [MonitorCheckResult](../../../types/interfaces/MonitorCheckResult.md) for return type structure
+ - [MonitorCheckResult](../../../types/interfaces/MonitorCheckResult.md)
+ - [PortCheckError](../../portErrorHandling/classes/PortCheckError.md)

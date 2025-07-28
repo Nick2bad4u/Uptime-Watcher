@@ -1,6 +1,6 @@
 # Interface: MonitoringLifecycleConfig
 
-Defined in: [electron/utils/monitoring/monitorLifecycle.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/monitoring/monitorLifecycle.ts#L25)
+Defined in: [electron/utils/monitoring/monitorLifecycle.ts:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/monitoring/monitorLifecycle.ts#L36)
 
 Configuration object for monitoring lifecycle functions.
 
@@ -10,7 +10,9 @@ Configuration object for monitoring lifecycle functions.
 
 > **databaseService**: [`DatabaseService`](../../../../services/database/DatabaseService/classes/DatabaseService.md)
 
-Defined in: [electron/utils/monitoring/monitorLifecycle.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/monitoring/monitorLifecycle.ts#L26)
+Defined in: [electron/utils/monitoring/monitorLifecycle.ts:38](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/monitoring/monitorLifecycle.ts#L38)
+
+Database service for executing transactions and maintaining data consistency
 
 ***
 
@@ -18,7 +20,9 @@ Defined in: [electron/utils/monitoring/monitorLifecycle.ts:26](https://github.co
 
 > **eventEmitter**: [`TypedEventBus`](../../../../events/TypedEventBus/classes/TypedEventBus.md)\<[`UptimeEvents`](../../../../events/eventTypes/interfaces/UptimeEvents.md)\>
 
-Defined in: [electron/utils/monitoring/monitorLifecycle.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/monitoring/monitorLifecycle.ts#L27)
+Defined in: [electron/utils/monitoring/monitorLifecycle.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/monitoring/monitorLifecycle.ts#L40)
+
+Event emitter for communicating monitoring state changes to other components
 
 ***
 
@@ -26,7 +30,9 @@ Defined in: [electron/utils/monitoring/monitorLifecycle.ts:27](https://github.co
 
 > **logger**: [`Logger`](../../../interfaces/interfaces/Logger.md)
 
-Defined in: [electron/utils/monitoring/monitorLifecycle.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/monitoring/monitorLifecycle.ts#L28)
+Defined in: [electron/utils/monitoring/monitorLifecycle.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/monitoring/monitorLifecycle.ts#L42)
+
+Logger instance for debugging and operational information
 
 ***
 
@@ -34,7 +40,9 @@ Defined in: [electron/utils/monitoring/monitorLifecycle.ts:28](https://github.co
 
 > **monitorRepository**: [`MonitorRepository`](../../../../services/database/MonitorRepository/classes/MonitorRepository.md)
 
-Defined in: [electron/utils/monitoring/monitorLifecycle.ts:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/monitoring/monitorLifecycle.ts#L29)
+Defined in: [electron/utils/monitoring/monitorLifecycle.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/monitoring/monitorLifecycle.ts#L44)
+
+Repository for monitor data access and manipulation
 
 ***
 
@@ -42,7 +50,9 @@ Defined in: [electron/utils/monitoring/monitorLifecycle.ts:29](https://github.co
 
 > **monitorScheduler**: [`MonitorScheduler`](../../../../services/monitoring/MonitorScheduler/classes/MonitorScheduler.md)
 
-Defined in: [electron/utils/monitoring/monitorLifecycle.ts:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/monitoring/monitorLifecycle.ts#L30)
+Defined in: [electron/utils/monitoring/monitorLifecycle.ts:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/monitoring/monitorLifecycle.ts#L46)
+
+Scheduler service for managing monitor execution intervals and timing
 
 ***
 
@@ -50,4 +60,6 @@ Defined in: [electron/utils/monitoring/monitorLifecycle.ts:30](https://github.co
 
 > **sites**: [`StandardizedCache`](../../../cache/StandardizedCache/classes/StandardizedCache.md)\<[`Site`](../../../../../shared/types/interfaces/Site.md)\>
 
-Defined in: [electron/utils/monitoring/monitorLifecycle.ts:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/monitoring/monitorLifecycle.ts#L31)
+Defined in: [electron/utils/monitoring/monitorLifecycle.ts:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/monitoring/monitorLifecycle.ts#L48)
+
+Cache containing site data with associated monitors

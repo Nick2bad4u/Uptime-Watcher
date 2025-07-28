@@ -1,8 +1,19 @@
 # Interface: SiteStats
 
-Defined in: [src/hooks/site/useSiteStats.ts:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteStats.ts#L16)
+Defined in: [src/hooks/site/useSiteStats.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteStats.ts#L21)
 
 Interface for site statistics data
+
+## Remarks
+
+All values are computed from StatusHistory records:
+- uptime: Integer percentage (0-100) based on status="up" ratio
+- checkCount: Total number of history records processed
+- averageResponseTime: Mean response time for successful checks only
+
+## Extended by
+
+- [`UseSiteResult`](../../useSite/interfaces/UseSiteResult.md)
 
 ## Properties
 
@@ -10,7 +21,9 @@ Interface for site statistics data
 
 > **averageResponseTime**: `number`
 
-Defined in: [src/hooks/site/useSiteStats.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteStats.ts#L17)
+Defined in: [src/hooks/site/useSiteStats.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteStats.ts#L23)
+
+Average response time in milliseconds (only for successful "up" checks)
 
 ***
 
@@ -18,7 +31,9 @@ Defined in: [src/hooks/site/useSiteStats.ts:17](https://github.com/Nick2bad4u/Up
 
 > **checkCount**: `number`
 
-Defined in: [src/hooks/site/useSiteStats.ts:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteStats.ts#L18)
+Defined in: [src/hooks/site/useSiteStats.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteStats.ts#L25)
+
+Total number of checks performed
 
 ***
 
@@ -26,4 +41,6 @@ Defined in: [src/hooks/site/useSiteStats.ts:18](https://github.com/Nick2bad4u/Up
 
 > **uptime**: `number`
 
-Defined in: [src/hooks/site/useSiteStats.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteStats.ts#L19)
+Defined in: [src/hooks/site/useSiteStats.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteStats.ts#L27)
+
+Uptime percentage as integer (0-100)

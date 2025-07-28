@@ -1,5 +1,10 @@
 # src/utils/monitorValidation
 
+## Interfaces
+
+- [MonitorCreationData](interfaces/MonitorCreationData.md)
+- [ValidationResult](interfaces/ValidationResult.md)
+
 ## Functions
 
 - [createMonitorObject](functions/createMonitorObject.md)

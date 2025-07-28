@@ -1,10 +1,8 @@
 # src/types
 
-Type definitions for the Uptime Watcher application frontend.
-
 ## Remarks
 
-All core domain types are imported from shared/types.ts for consistency.
+Type definitions for the Uptime Watcher frontend.
 
 ## References
 
@@ -83,6 +81,12 @@ Re-exports [isSiteStatus](../../shared/types/functions/isSiteStatus.md)
 ### Monitor
 
 Re-exports [Monitor](../../shared/types/interfaces/Monitor.md)
+
+***
+
+### MONITOR\_STATUS
+
+Re-exports [MONITOR_STATUS](../../shared/types/variables/MONITOR_STATUS.md)
 
 ***
 

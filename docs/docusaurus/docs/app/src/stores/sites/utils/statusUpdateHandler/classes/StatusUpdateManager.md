@@ -1,18 +1,53 @@
 # Class: StatusUpdateManager
 
-Defined in: [src/stores/sites/utils/statusUpdateHandler.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/utils/statusUpdateHandler.ts#L27)
+Defined in: [src/stores/sites/utils/statusUpdateHandler.ts:98](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/utils/statusUpdateHandler.ts#L98)
 
-Manages status update subscriptions
+Manages status update subscriptions and event handling with efficient incremental updates.
+
+## Remarks
+
+Provides a centralized manager for subscribing to and handling real-time status updates
+from the backend. Handles IPC event management and cleanup automatically.
+Prioritizes incremental updates over full syncs for better performance.
+
+## Example
+
+```typescript
+const manager = new StatusUpdateManager({
+  fullSyncFromBackend: () => syncSites(),
+  getSites: () => store.getSites(),
+  setSites: (sites) => store.setSites(sites)
+});
+
+manager.subscribe();
+```
 
 ## Constructors
 
 ### Constructor
 
-> **new StatusUpdateManager**(): `StatusUpdateManager`
+> **new StatusUpdateManager**(`options`): `StatusUpdateManager`
+
+Defined in: [src/stores/sites/utils/statusUpdateHandler.ts:115](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/utils/statusUpdateHandler.ts#L115)
+
+Constructs a new StatusUpdateManager instance.
+
+#### Parameters
+
+##### options
+
+[`StatusUpdateHandlerOptions`](../interfaces/StatusUpdateHandlerOptions.md)
+
+Configuration options for the status update manager
 
 #### Returns
 
 `StatusUpdateManager`
+
+#### Remarks
+
+Initializes the manager with the required dependencies for status update handling.
+Does not start listening for events until subscribe() is called.
 
 ## Methods
 
@@ -20,37 +55,45 @@ Manages status update subscriptions
 
 > **isSubscribed**(): `boolean`
 
-Defined in: [src/stores/sites/utils/statusUpdateHandler.ts:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/utils/statusUpdateHandler.ts#L36)
+Defined in: [src/stores/sites/utils/statusUpdateHandler.ts:130](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/utils/statusUpdateHandler.ts#L130)
 
-Check if currently subscribed
+Check if currently subscribed to status updates.
 
 #### Returns
 
 `boolean`
 
+True if subscribed and listening for events, false otherwise
+
+#### Remarks
+
+Returns true when event listeners are active.
+
 ***
 
 ### subscribe()
 
-> **subscribe**(`handler`, `fullSyncHandler?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
+> **subscribe**(): `void`
 
-Defined in: [src/stores/sites/utils/statusUpdateHandler.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/utils/statusUpdateHandler.ts#L43)
+Defined in: [src/stores/sites/utils/statusUpdateHandler.ts:147](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/utils/statusUpdateHandler.ts#L147)
 
-Subscribe to status updates and monitoring events
-
-#### Parameters
-
-##### handler
-
-(`update`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
-
-##### fullSyncHandler?
-
-() => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
+Subscribe to status updates from the backend with efficient incremental processing.
 
 #### Returns
 
-[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
+`void`
+
+#### Remarks
+
+Sets up IPC event listeners for monitor status changes and monitoring lifecycle events.
+Automatically performs an initial full sync when subscribing.
+Prioritizes incremental updates over full syncs for better performance.
+
+#### Example
+
+```typescript
+manager.subscribe();
+```
 
 ***
 
@@ -58,10 +101,22 @@ Subscribe to status updates and monitoring events
 
 > **unsubscribe**(): `void`
 
-Defined in: [src/stores/sites/utils/statusUpdateHandler.ts:116](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/utils/statusUpdateHandler.ts#L116)
+Defined in: [src/stores/sites/utils/statusUpdateHandler.ts:226](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/utils/statusUpdateHandler.ts#L226)
 
-Unsubscribe from status updates and monitoring events
+Unsubscribe from all status update events.
 
 #### Returns
 
 `void`
+
+#### Remarks
+
+Cleans up all IPC event listeners and resets internal state.
+Safe to call multiple times - will not throw if already unsubscribed.
+
+#### Example
+
+```typescript
+manager.unsubscribe();
+console.log(manager.isSubscribed()); // false
+```

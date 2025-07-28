@@ -1,6 +1,6 @@
 # Interface: NotificationConfig
 
-Defined in: [electron/services/notifications/NotificationService.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/notifications/NotificationService.ts#L15)
+Defined in: [electron/services/notifications/NotificationService.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/notifications/NotificationService.ts#L15)
 
 Configuration options for the notification service.
 
@@ -15,7 +15,7 @@ to the user. Both settings can be independently enabled or disabled.
 
 > **showDownAlerts**: `boolean`
 
-Defined in: [electron/services/notifications/NotificationService.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/notifications/NotificationService.ts#L17)
+Defined in: [electron/services/notifications/NotificationService.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/notifications/NotificationService.ts#L17)
 
 Whether to show notifications when monitors go down
 
@@ -25,6 +25,6 @@ Whether to show notifications when monitors go down
 
 > **showUpAlerts**: `boolean`
 
-Defined in: [electron/services/notifications/NotificationService.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/notifications/NotificationService.ts#L19)
+Defined in: [electron/services/notifications/NotificationService.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/notifications/NotificationService.ts#L19)
 
 Whether to show notifications when monitors come back up

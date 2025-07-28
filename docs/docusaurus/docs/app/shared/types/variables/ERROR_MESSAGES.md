@@ -2,9 +2,13 @@
 
 > `const` **ERROR\_MESSAGES**: `object`
 
-Defined in: [shared/types.ts:96](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L96)
+Defined in: [shared/types.ts:160](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L160)
 
 ## Type declaration
+
+### CANNOT\_REMOVE\_LAST\_MONITOR
+
+> `readonly` **CANNOT\_REMOVE\_LAST\_MONITOR**: `"Cannot remove the last monitor from a site. Use site removal instead."` = `"Cannot remove the last monitor from a site. Use site removal instead."`
 
 ### FAILED\_TO\_ADD\_MONITOR
 
@@ -29,6 +33,10 @@ Defined in: [shared/types.ts:96](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 ### FAILED\_TO\_UPDATE\_SITE
 
 > `readonly` **FAILED\_TO\_UPDATE\_SITE**: `"Failed to update site"` = `"Failed to update site"`
+
+### MONITOR\_NOT\_FOUND
+
+> `readonly` **MONITOR\_NOT\_FOUND**: `"Monitor not found"` = `"Monitor not found"`
 
 ### SITE\_NOT\_FOUND
 

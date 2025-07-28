@@ -2,19 +2,17 @@
 
 > `const` **migrationRegistry**: `MigrationRegistry`
 
-Defined in: [electron/services/monitoring/MigrationSystem.ts:270](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MigrationSystem.ts#L270)
+Defined in: [electron/services/monitoring/MigrationSystem.ts:509](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MigrationSystem.ts#L509)
 
-Registry for monitor type migrations.
+Singleton registry for monitor type migrations.
 
 ## Remarks
 
-Singleton instance for registering and retrieving migration rules.
-Provides migration path calculation and validation for monitor data upgrades.
+Use to register and retrieve migration rules for all monitor types. Shared across the application.
 
 ## Example
 
 ```typescript
-// Register a migration
 migrationRegistry.registerMigration("http", {
   fromVersion: "1.0.0",
   toVersion: "1.1.0",

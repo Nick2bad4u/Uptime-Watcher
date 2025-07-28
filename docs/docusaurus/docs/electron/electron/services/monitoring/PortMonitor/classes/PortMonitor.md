@@ -1,6 +1,6 @@
 # Class: PortMonitor
 
-Defined in: [electron/services/monitoring/PortMonitor.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/PortMonitor.ts#L47)
+Defined in: [electron/services/monitoring/PortMonitor.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/PortMonitor.ts#L49)
 
 Service for performing port monitoring checks.
 
@@ -23,7 +23,7 @@ provides detailed error reporting for troubleshooting connectivity issues.
 
 > **new PortMonitor**(`config`): `PortMonitor`
 
-Defined in: [electron/services/monitoring/PortMonitor.ts:60](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/PortMonitor.ts#L60)
+Defined in: [electron/services/monitoring/PortMonitor.ts:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/PortMonitor.ts#L62)
 
 Create a new PortMonitor instance.
 
@@ -51,7 +51,7 @@ with different configurations for various monitoring needs.
 
 > **check**(`monitor`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`MonitorCheckResult`](../../types/interfaces/MonitorCheckResult.md)\>
 
-Defined in: [electron/services/monitoring/PortMonitor.ts:85](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/PortMonitor.ts#L85)
+Defined in: [electron/services/monitoring/PortMonitor.ts:89](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/PortMonitor.ts#L89)
 
 Perform a port connectivity check on the given monitor.
 
@@ -80,6 +80,8 @@ connectivity checking. Falls back to service defaults when monitor-specific
 values are not provided. Validates monitor configuration before attempting
 connection and provides detailed error information for failures.
 
+Now uses type guards to safely handle potentially undefined configuration values.
+
 The check will use the monitor's configured timeout if available,
 falling back to the service default. Response time includes the full
 connection establishment time for accurate performance metrics.
@@ -94,7 +96,7 @@ connection establishment time for accurate performance metrics.
 
 > **getConfig**(): [`MonitorConfig`](../../types/interfaces/MonitorConfig.md)
 
-Defined in: [electron/services/monitoring/PortMonitor.ts:118](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/PortMonitor.ts#L118)
+Defined in: [electron/services/monitoring/PortMonitor.ts:122](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/PortMonitor.ts#L122)
 
 Get the current configuration.
 
@@ -118,7 +120,7 @@ in the future, they would be referenced, not cloned.
 
 > **getType**(): `"http"` \| `"port"`
 
-Defined in: [electron/services/monitoring/PortMonitor.ts:132](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/PortMonitor.ts#L132)
+Defined in: [electron/services/monitoring/PortMonitor.ts:136](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/PortMonitor.ts#L136)
 
 Get the monitor type this service handles.
 
@@ -144,7 +146,7 @@ for type safety and consistency across the application.
 
 > **updateConfig**(`config`): `void`
 
-Defined in: [electron/services/monitoring/PortMonitor.ts:152](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/PortMonitor.ts#L152)
+Defined in: [electron/services/monitoring/PortMonitor.ts:158](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/PortMonitor.ts#L158)
 
 Update the configuration for this monitor.
 
@@ -169,6 +171,8 @@ of timeout values and other parameters without recreating the monitor instance.
 The merge is shallow - nested objects are not deeply merged. Only validates
 that provided values are of correct types but does not validate ranges or
 other business logic constraints.
+
+Note: Only validates port-relevant configuration properties.
 
 #### Throws
 

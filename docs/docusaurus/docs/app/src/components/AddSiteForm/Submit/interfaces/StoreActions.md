@@ -1,6 +1,6 @@
 # Interface: StoreActions
 
-Defined in: [src/components/AddSiteForm/Submit.tsx:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/Submit.tsx#L50)
+Defined in: [src/components/AddSiteForm/Submit.tsx:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/Submit.tsx#L50)
 
 Store actions interface for form submission operations.
 
@@ -16,7 +16,7 @@ the code more testable and flexible.
 
 > **addMonitorToSite**: (`siteId`, `monitor`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/components/AddSiteForm/Submit.tsx:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/Submit.tsx#L52)
+Defined in: [src/components/AddSiteForm/Submit.tsx:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/Submit.tsx#L52)
 
 Add a monitor to an existing site
 
@@ -40,7 +40,7 @@ Add a monitor to an existing site
 
 > **clearError**: () => `void`
 
-Defined in: [src/components/AddSiteForm/Submit.tsx:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/Submit.tsx#L54)
+Defined in: [src/components/AddSiteForm/Submit.tsx:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/Submit.tsx#L54)
 
 Clear any existing error state
 
@@ -54,7 +54,7 @@ Clear any existing error state
 
 > **createSite**: (`siteData`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/components/AddSiteForm/Submit.tsx:56](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/Submit.tsx#L56)
+Defined in: [src/components/AddSiteForm/Submit.tsx:56](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/Submit.tsx#L56)
 
 Create a new site with monitors
 
@@ -66,7 +66,11 @@ Create a new site with monitors
 
 `string`
 
-###### monitors
+###### monitoring?
+
+`boolean`
+
+###### monitors?
 
 [`Monitor`](../../../../../shared/types/interfaces/Monitor.md)[]
 

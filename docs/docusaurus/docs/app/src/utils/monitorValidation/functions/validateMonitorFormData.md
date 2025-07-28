@@ -1,8 +1,8 @@
 # Function: validateMonitorFormData()
 
-> **validateMonitorFormData**(`type`, `data`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<\` `errors`: `string`[]; `success`: `boolean`; `warnings`: `string`[]; \`\>
+> **validateMonitorFormData**(`type`, `data`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`ValidationResult`](../interfaces/ValidationResult.md)\>
 
-Defined in: [src/utils/monitorValidation.ts:172](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/monitorValidation.ts#L172)
+Defined in: [src/utils/monitorValidation.ts:211](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/utils/monitorValidation.ts#L211)
 
 Validate monitor form data with only the fields that are provided.
 Used for form validation where not all monitor fields are available yet.
@@ -23,6 +23,6 @@ Partial monitor data from form
 
 ## Returns
 
-[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<\` `errors`: `string`[]; `success`: `boolean`; `warnings`: `string`[]; \`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`ValidationResult`](../interfaces/ValidationResult.md)\>
 
 Promise resolving to validation result

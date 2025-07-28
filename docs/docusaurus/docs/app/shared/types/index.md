@@ -1,5 +1,11 @@
 # shared/types
 
+Shared type definitions used across frontend and backend.
+
+## Remarks
+
+All core domain types (Monitor, Site, StatusUpdate, etc.) live here. Both frontend and backend must import from this file for consistency. Event types are separate to avoid circular dependencies.
+
 ## Interfaces
 
 - [Monitor](interfaces/Monitor.md)
@@ -21,6 +27,7 @@
 - [DEFAULT\_MONITOR\_STATUS](variables/DEFAULT_MONITOR_STATUS.md)
 - [DEFAULT\_SITE\_STATUS](variables/DEFAULT_SITE_STATUS.md)
 - [ERROR\_MESSAGES](variables/ERROR_MESSAGES.md)
+- [MONITOR\_STATUS](variables/MONITOR_STATUS.md)
 
 ## Functions
 

@@ -1,8 +1,8 @@
 # Variable: ERROR\_MESSAGES
 
-> `const` `readonly` **ERROR\_MESSAGES**: `object`
+> `const` **ERROR\_MESSAGES**: `object`
 
-Defined in: [src/constants/errors.ts:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/constants/errors.ts#L16)
+Defined in: [src/constants/errors.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/constants/errors.ts#L19)
 
 Standardized error messages used across the application.
 
@@ -35,3 +35,8 @@ Standardized error messages used across the application.
 ### SITE\_NOT\_FOUND
 
 > `readonly` **SITE\_NOT\_FOUND**: `"Site not found"` = `"Site not found"`
+
+## Remarks
+
+These constants provide consistent error messaging throughout the application.
+The `as const` assertion ensures type safety and prevents modification.

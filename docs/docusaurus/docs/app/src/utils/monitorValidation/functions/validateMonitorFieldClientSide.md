@@ -1,8 +1,8 @@
 # Function: validateMonitorFieldClientSide()
 
-> **validateMonitorFieldClientSide**(`type`, `fieldName`, `value`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<\` `errors`: `string`[]; `success`: `boolean`; \`\>
+> **validateMonitorFieldClientSide**(`type`, `fieldName`, `value`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`ValidationResult`](../interfaces/ValidationResult.md)\>
 
-Defined in: [src/utils/monitorValidation.ts:141](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/monitorValidation.ts#L141)
+Defined in: [src/utils/monitorValidation.ts:178](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/utils/monitorValidation.ts#L178)
 
 Validate a specific monitor field for real-time feedback using shared schemas.
 Provides immediate validation without IPC round-trip.
@@ -29,6 +29,6 @@ Field value to validate
 
 ## Returns
 
-[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<\` `errors`: `string`[]; `success`: `boolean`; \`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`ValidationResult`](../interfaces/ValidationResult.md)\>
 
 Promise resolving to validation result

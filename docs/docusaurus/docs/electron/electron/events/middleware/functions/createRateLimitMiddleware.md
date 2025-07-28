@@ -2,15 +2,15 @@
 
 > **createRateLimitMiddleware**(`options`): [`EventMiddleware`](../../TypedEventBus/type-aliases/EventMiddleware.md)
 
-Defined in: [electron/events/middleware.ts:413](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/middleware.ts#L413)
+Defined in: [electron/events/middleware.ts:447](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/events/middleware.ts#L447)
 
-Rate limiting middleware to prevent event spam.
+Creates middleware that rate-limits event processing.
 
 ## Parameters
 
 ### options
 
-Configuration options for rate limiting
+Configuration options for rate limiting.
 
 #### burstLimit?
 
@@ -28,14 +28,14 @@ Configuration options for rate limiting
 
 [`EventMiddleware`](../../TypedEventBus/type-aliases/EventMiddleware.md)
 
-EventMiddleware function that enforces rate limits on events
+EventMiddleware function that enforces rate limits on events.
 
 ## Remarks
 
 Options include:
-- `burstLimit`: Maximum events allowed in rapid succession (default: 10)
-- `maxEventsPerSecond`: Maximum events allowed per second (default: 100)
-- `onRateLimit`: Optional callback when rate limit is exceeded
+- `burstLimit`: Maximum number of events allowed in a burst (default: 10).
+- `maxEventsPerSecond`: Maximum number of events allowed per second (default: 100).
+- `onRateLimit`: Optional callback invoked when an event is rate-limited.
 
 ## Example
 
@@ -44,7 +44,7 @@ const rateLimitMiddleware = createRateLimitMiddleware({
   burstLimit: 5,
   maxEventsPerSecond: 50,
   onRateLimit: (event, data) => {
-    console.warn(`Rate limit exceeded for ${event}`);
+    console.warn(`Rate limit hit for event: ${event}`);
   }
 });
 eventBus.use(rateLimitMiddleware);

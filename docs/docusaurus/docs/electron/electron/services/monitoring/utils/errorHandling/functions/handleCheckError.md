@@ -2,9 +2,9 @@
 
 > **handleCheckError**(`error`, `url`, `correlationId?`): [`MonitorCheckResult`](../../../types/interfaces/MonitorCheckResult.md)
 
-Defined in: [electron/services/monitoring/utils/errorHandling.ts:82](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/utils/errorHandling.ts#L82)
+Defined in: [electron/services/monitoring/utils/errorHandling.ts:106](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/utils/errorHandling.ts#L106)
 
-Handle errors that occur during health checks with correlation tracking.
+Handles unknown errors that occur during health checks, with correlation tracking.
 
 ## Parameters
 
@@ -12,28 +12,36 @@ Handle errors that occur during health checks with correlation tracking.
 
 `unknown`
 
-Unknown error that occurred during monitoring
+The unknown error thrown during monitoring (can be any type).
 
 ### url
 
 `string`
 
-The URL being monitored when error occurred
+The URL being monitored when the error occurred.
 
 ### correlationId?
 
 `string`
 
-Optional correlation ID for event tracking
+Optional correlation ID for event tracking and logging.
 
 ## Returns
 
 [`MonitorCheckResult`](../../../types/interfaces/MonitorCheckResult.md)
 
-Standardized monitor check result for the error
+A [MonitorCheckResult](../../../types/interfaces/MonitorCheckResult.md) object representing the error.
 
 ## Remarks
 
-Attempts to extract response time from Axios errors via declaration merging.
-For non-Error objects, uses "Unknown error" as a fallback message since
-we cannot guarantee the structure of thrown values in JavaScript.
+Attempts to extract response time from Axios errors if available. For non-Error objects, uses "Unknown error" as a fallback message. Logs all errors for diagnostic purposes. Always returns a [MonitorCheckResult](../../../types/interfaces/MonitorCheckResult.md) and never throws.
+
+## Example
+
+```typescript
+handleCheckError(new Error("Unexpected failure"), "https://example.com", "corr-789");
+```
+
+## See
+
+[MonitorCheckResult](../../../types/interfaces/MonitorCheckResult.md)

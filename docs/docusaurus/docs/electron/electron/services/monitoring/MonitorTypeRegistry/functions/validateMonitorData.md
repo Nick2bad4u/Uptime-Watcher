@@ -2,9 +2,9 @@
 
 > **validateMonitorData**(`type`, `data`): `object`
 
-Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:160](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorTypeRegistry.ts#L160)
+Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:214](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorTypeRegistry.ts#L214)
 
-Validate monitor data using shared Zod schemas.
+Validates monitor data using shared Zod schemas for the specified monitor type.
 
 ## Parameters
 
@@ -12,19 +12,19 @@ Validate monitor data using shared Zod schemas.
 
 `string`
 
-Monitor type
+The monitor type identifier.
 
 ### data
 
 `unknown`
 
-Monitor data to validate
+The monitor data to validate.
 
 ## Returns
 
 `object`
 
-Validation result
+Validation result object with data, errors, warnings, metadata, and success flag.
 
 ### data?
 
@@ -45,3 +45,7 @@ Validation result
 ### warnings
 
 > **warnings**: `string`[]
+
+## Remarks
+
+Uses the shared validation logic to validate monitor data against the schema for the given type. Returns a structured result with errors, warnings, and metadata.

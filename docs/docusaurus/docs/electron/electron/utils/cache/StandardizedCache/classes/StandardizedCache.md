@@ -1,6 +1,6 @@
 # Class: StandardizedCache\<T\>
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:72](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/cache/StandardizedCache.ts#L72)
+Defined in: [electron/utils/cache/StandardizedCache.ts:72](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/cache/StandardizedCache.ts#L72)
 
 Standardized cache implementation.
 
@@ -24,7 +24,7 @@ Features:
 
 > **new StandardizedCache**\<`T`\>(`config`): `StandardizedCache`\<`T`\>
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:96](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/cache/StandardizedCache.ts#L96)
+Defined in: [electron/utils/cache/StandardizedCache.ts:96](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/cache/StandardizedCache.ts#L96)
 
 #### Parameters
 
@@ -44,7 +44,7 @@ Defined in: [electron/utils/cache/StandardizedCache.ts:96](https://github.com/Ni
 
 > **get** **size**(): `number`
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:76](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/cache/StandardizedCache.ts#L76)
+Defined in: [electron/utils/cache/StandardizedCache.ts:76](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/cache/StandardizedCache.ts#L76)
 
 Get current cache size.
 
@@ -58,9 +58,12 @@ Get current cache size.
 
 > **bulkUpdate**(`items`): `void`
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:113](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/cache/StandardizedCache.ts#L113)
+Defined in: [electron/utils/cache/StandardizedCache.ts:116](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/cache/StandardizedCache.ts#L116)
 
 Bulk update cache with new data.
+
+Note: Emits only a single bulk-updated event for performance.
+Individual item cache events are not emitted during bulk operations.
 
 #### Parameters
 
@@ -78,7 +81,7 @@ Bulk update cache with new data.
 
 > **cleanup**(): `number`
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/cache/StandardizedCache.ts#L126)
+Defined in: [electron/utils/cache/StandardizedCache.ts:129](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/cache/StandardizedCache.ts#L129)
 
 Clean up expired entries.
 
@@ -92,7 +95,7 @@ Clean up expired entries.
 
 > **clear**(): `void`
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:156](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/cache/StandardizedCache.ts#L156)
+Defined in: [electron/utils/cache/StandardizedCache.ts:159](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/cache/StandardizedCache.ts#L159)
 
 Clear all items from cache.
 
@@ -106,7 +109,7 @@ Clear all items from cache.
 
 > **delete**(`key`): `boolean`
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:173](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/cache/StandardizedCache.ts#L173)
+Defined in: [electron/utils/cache/StandardizedCache.ts:176](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/cache/StandardizedCache.ts#L176)
 
 Delete item from cache.
 
@@ -126,7 +129,7 @@ Delete item from cache.
 
 > **entries**(): `IterableIterator`\<\[`string`, `T`\]\>
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:189](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/cache/StandardizedCache.ts#L189)
+Defined in: [electron/utils/cache/StandardizedCache.ts:192](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/cache/StandardizedCache.ts#L192)
 
 Get cache entries iterator.
 
@@ -140,7 +143,7 @@ Get cache entries iterator.
 
 > **get**(`key`): `undefined` \| `T`
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:217](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/cache/StandardizedCache.ts#L217)
+Defined in: [electron/utils/cache/StandardizedCache.ts:220](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/cache/StandardizedCache.ts#L220)
 
 Get item from cache.
 
@@ -160,7 +163,7 @@ Get item from cache.
 
 > **getAll**(): `T`[]
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:245](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/cache/StandardizedCache.ts#L245)
+Defined in: [electron/utils/cache/StandardizedCache.ts:249](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/cache/StandardizedCache.ts#L249)
 
 Get all cached values.
 
@@ -174,9 +177,10 @@ Get all cached values.
 
 > **getStats**(): [`CacheStats`](../interfaces/CacheStats.md)
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:273](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/cache/StandardizedCache.ts#L273)
+Defined in: [electron/utils/cache/StandardizedCache.ts:278](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/cache/StandardizedCache.ts#L278)
 
 Get cache statistics.
+Returns a snapshot of the current statistics, not a live reference.
 
 #### Returns
 
@@ -188,7 +192,7 @@ Get cache statistics.
 
 > **has**(`key`): `boolean`
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:280](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/cache/StandardizedCache.ts#L280)
+Defined in: [electron/utils/cache/StandardizedCache.ts:285](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/cache/StandardizedCache.ts#L285)
 
 Check if key exists in cache.
 
@@ -208,7 +212,7 @@ Check if key exists in cache.
 
 > **invalidate**(`key`): `void`
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:301](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/cache/StandardizedCache.ts#L301)
+Defined in: [electron/utils/cache/StandardizedCache.ts:306](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/cache/StandardizedCache.ts#L306)
 
 Invalidate specific key.
 
@@ -228,7 +232,7 @@ Invalidate specific key.
 
 > **invalidateAll**(): `void`
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:314](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/cache/StandardizedCache.ts#L314)
+Defined in: [electron/utils/cache/StandardizedCache.ts:319](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/cache/StandardizedCache.ts#L319)
 
 Invalidate all keys.
 
@@ -242,9 +246,10 @@ Invalidate all keys.
 
 > **keys**(): `string`[]
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:326](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/cache/StandardizedCache.ts#L326)
+Defined in: [electron/utils/cache/StandardizedCache.ts:332](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/cache/StandardizedCache.ts#L332)
 
 Get all cache keys.
+Filters out expired keys automatically.
 
 #### Returns
 
@@ -256,7 +261,7 @@ Get all cache keys.
 
 > **onInvalidation**(`callback`): () => `void`
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:336](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/cache/StandardizedCache.ts#L336)
+Defined in: [electron/utils/cache/StandardizedCache.ts:365](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/cache/StandardizedCache.ts#L365)
 
 Register invalidation callback for cache events.
 
@@ -266,7 +271,9 @@ Register invalidation callback for cache events.
 
 (`key?`) => `void`
 
-Function to call when cache items are invalidated
+Function to call when cache items are invalidated.
+                  Called with a specific key when a single item is invalidated,
+                  or with undefined when all items are invalidated.
 
 #### Returns
 
@@ -284,7 +291,7 @@ Cleanup function to remove the callback
 
 > **set**(`key`, `data`, `ttl?`): `void`
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:350](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/cache/StandardizedCache.ts#L350)
+Defined in: [electron/utils/cache/StandardizedCache.ts:383](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/cache/StandardizedCache.ts#L383)
 
 Set item in cache.
 
@@ -294,13 +301,19 @@ Set item in cache.
 
 `string`
 
+The cache key
+
 ##### data
 
 `T`
 
+The data to cache
+
 ##### ttl?
 
 `number`
+
+Time to live in milliseconds. If 0 or negative, the item will not expire.
 
 #### Returns
 

@@ -2,7 +2,7 @@
 
 > **generateCorrelationId**(): `string`
 
-Defined in: [electron/utils/correlation.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/correlation.ts#L28)
+Defined in: [electron/utils/correlation.ts:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/correlation.ts#L41)
 
 Generate a unique correlation ID for tracking operations.
 Uses crypto.randomBytes for cryptographically secure random values.
@@ -11,4 +11,11 @@ Uses crypto.randomBytes for cryptographically secure random values.
 
 `string`
 
-A unique correlation ID string
+A unique correlation ID string (16 hex characters)
+
+## Example
+
+```typescript
+const correlationId = generateCorrelationId();
+console.log(correlationId); // "a1b2c3d4e5f67890"
+```

@@ -1,8 +1,8 @@
 # Interface: DynamicMonitorFieldsProps
 
-Defined in: [src/components/AddSiteForm/DynamicMonitorFields.tsx:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/DynamicMonitorFields.tsx#L37)
+Defined in: [src/components/AddSiteForm/DynamicMonitorFields.tsx:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/DynamicMonitorFields.tsx#L54)
 
-Props for the DynamicMonitorFields component
+Props for the [DynamicMonitorFields](../functions/DynamicMonitorFields.md) component.
 
 ## Properties
 
@@ -10,9 +10,9 @@ Props for the DynamicMonitorFields component
 
 > `readonly` `optional` **isLoading**: `boolean`
 
-Defined in: [src/components/AddSiteForm/DynamicMonitorFields.tsx:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/DynamicMonitorFields.tsx#L39)
+Defined in: [src/components/AddSiteForm/DynamicMonitorFields.tsx:58](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/DynamicMonitorFields.tsx#L58)
 
-Whether the form is in a loading state
+Whether the form is in a loading state.
 
 ***
 
@@ -20,9 +20,9 @@ Whether the form is in a loading state
 
 > `readonly` **monitorType**: `string`
 
-Defined in: [src/components/AddSiteForm/DynamicMonitorFields.tsx:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/DynamicMonitorFields.tsx#L41)
+Defined in: [src/components/AddSiteForm/DynamicMonitorFields.tsx:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/DynamicMonitorFields.tsx#L62)
 
-Selected monitor type
+The selected monitor type for which to render fields.
 
 ***
 
@@ -30,9 +30,9 @@ Selected monitor type
 
 > `readonly` **onChange**: [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, (`value`) => `void`\>
 
-Defined in: [src/components/AddSiteForm/DynamicMonitorFields.tsx:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/DynamicMonitorFields.tsx#L43)
+Defined in: [src/components/AddSiteForm/DynamicMonitorFields.tsx:66](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/DynamicMonitorFields.tsx#L66)
 
-Change handlers for each field
+Change handlers for each field, keyed by field name.
 
 ***
 
@@ -40,6 +40,6 @@ Change handlers for each field
 
 > `readonly` **values**: [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `number` \| `string`\>
 
-Defined in: [src/components/AddSiteForm/DynamicMonitorFields.tsx:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/DynamicMonitorFields.tsx#L45)
+Defined in: [src/components/AddSiteForm/DynamicMonitorFields.tsx:70](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/DynamicMonitorFields.tsx#L70)
 
-Current form values
+Current values for each field, keyed by field name.

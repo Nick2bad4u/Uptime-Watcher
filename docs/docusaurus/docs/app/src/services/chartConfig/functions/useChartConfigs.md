@@ -2,7 +2,7 @@
 
 > **useChartConfigs**(`theme`, `totalChecks`): `object`
 
-Defined in: [src/services/chartConfig.ts:293](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/services/chartConfig.ts#L293)
+Defined in: [src/services/chartConfig.ts:319](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/services/chartConfig.ts#L319)
 
 React hook for getting theme-aware chart configurations.
 
@@ -37,3 +37,13 @@ Object containing various chart configuration options
 ### lineChartOptions
 
 > **lineChartOptions**: `_DeepPartialObject`\<`CoreChartOptions`\<`"line"`\> & `ElementChartOptions`\<`"line"`\> & `PluginChartOptions`\<`"line"`\> & `DatasetChartOptions`\<`"line"`\> & `ScaleChartOptions`\<`"line"`\> & `LineControllerChartOptions`\>
+
+## Example
+
+```typescript
+const { barChartOptions, doughnutOptions, lineChartOptions } = useChartConfigs(theme, 100);
+// Use with Chart.js components
+<Bar data={chartData} options={barChartOptions} />
+<Doughnut data={statusData} options={doughnutOptions} />
+<Line data={timeSeriesData} options={lineChartOptions} />
+```

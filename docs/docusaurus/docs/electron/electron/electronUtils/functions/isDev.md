@@ -2,20 +2,24 @@
 
 > **isDev**(): `boolean`
 
-Defined in: [electron/electronUtils.ts:35](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/electronUtils.ts#L35)
+Defined in: [electron/electronUtils.ts:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/electronUtils.ts#L39)
 
-Determines if the Electron app is running in development mode (unpackaged and NODE_ENV=development).
+Determines if the Electron app is running in development mode.
 
 ## Returns
 
 `boolean`
 
-`true` if running in Electron development mode (unpackaged and NODE_ENV=development), `false` otherwise
+`true` if running in Electron development mode (unpackaged and `NODE_ENV=development`), otherwise `false`.
 
 ## Remarks
 
-This function extends `isDevelopment()` by also checking that the Electron app is not packaged.
-Use this to distinguish between development and production builds in Electron-specific code.
+This function returns `true` only if both:
+- The `NODE_ENV` environment variable is set to `"development"` (as determined by `isDevelopment()`), and
+- The Electron app is not packaged (`app.isPackaged` is `false`).
+
+Use this to distinguish between development and production builds in Electron-specific code,
+such as enabling hot reload or verbose logging only during development.
 
 ## Example
 

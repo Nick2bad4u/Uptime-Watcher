@@ -2,6 +2,16 @@
 
 > **EventSeverity** = `"critical"` \| `"high"` \| `"low"` \| `"medium"`
 
-Defined in: [electron/events/eventTypes.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/eventTypes.ts#L47)
+Defined in: [electron/events/eventTypes.ts:83](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/events/eventTypes.ts#L83)
 
-Severity level of an event for prioritization.
+Severity level of an event for prioritization and alerting.
+
+## Remarks
+
+Used to prioritize event handling and alerting in middleware and UI.
+
+## Example
+
+```typescript
+const severity: EventSeverity = "critical";
+```

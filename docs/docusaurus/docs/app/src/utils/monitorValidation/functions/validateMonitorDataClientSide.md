@@ -1,8 +1,8 @@
 # Function: validateMonitorDataClientSide()
 
-> **validateMonitorDataClientSide**(`type`, `data`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<\` `errors`: `string`[]; `success`: `boolean`; `warnings`: `string`[]; \`\>
+> **validateMonitorDataClientSide**(`type`, `data`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`ValidationResult`](../interfaces/ValidationResult.md)\>
 
-Defined in: [src/utils/monitorValidation.ts:76](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/monitorValidation.ts#L76)
+Defined in: [src/utils/monitorValidation.ts:99](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/utils/monitorValidation.ts#L99)
 
 Perform client-side validation using shared Zod schemas.
 Provides immediate feedback without IPC round-trip.
@@ -23,6 +23,6 @@ Monitor data to validate
 
 ## Returns
 
-[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<\` `errors`: `string`[]; `success`: `boolean`; `warnings`: `string`[]; \`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`ValidationResult`](../interfaces/ValidationResult.md)\>
 
 Promise resolving to validation result

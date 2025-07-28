@@ -1,6 +1,6 @@
 # Interface: ErrorHandlingFrontendStore
 
-Defined in: [shared/utils/errorHandling.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/errorHandling.ts#L19)
+Defined in: [shared/utils/errorHandling.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/errorHandling.ts#L19)
 
 ## Properties
 
@@ -8,7 +8,7 @@ Defined in: [shared/utils/errorHandling.ts:19](https://github.com/Nick2bad4u/Upt
 
 > **clearError**: () => `void`
 
-Defined in: [shared/utils/errorHandling.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/errorHandling.ts#L20)
+Defined in: [shared/utils/errorHandling.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/errorHandling.ts#L20)
 
 #### Returns
 
@@ -20,7 +20,7 @@ Defined in: [shared/utils/errorHandling.ts:20](https://github.com/Nick2bad4u/Upt
 
 > **setError**: (`err`) => `void`
 
-Defined in: [shared/utils/errorHandling.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/errorHandling.ts#L21)
+Defined in: [shared/utils/errorHandling.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/errorHandling.ts#L21)
 
 #### Parameters
 
@@ -38,7 +38,7 @@ Defined in: [shared/utils/errorHandling.ts:21](https://github.com/Nick2bad4u/Upt
 
 > **setLoading**: (`loading`) => `void`
 
-Defined in: [shared/utils/errorHandling.ts:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/errorHandling.ts#L22)
+Defined in: [shared/utils/errorHandling.ts:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/errorHandling.ts#L22)
 
 #### Parameters
 

@@ -2,9 +2,9 @@
 
 > **createDatabaseBackup**(`dbPath`, `fileName`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`DatabaseBackupResult`](../interfaces/DatabaseBackupResult.md)\>
 
-Defined in: [electron/services/database/utils/databaseBackup.ts:69](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/databaseBackup.ts#L69)
+Defined in: [electron/services/database/utils/databaseBackup.ts:86](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/databaseBackup.ts#L86)
 
-Create a database backup by reading the SQLite file into a buffer.
+Creates a backup of the SQLite database by reading the file into a buffer.
 
 ## Parameters
 
@@ -12,42 +12,30 @@ Create a database backup by reading the SQLite file into a buffer.
 
 `string`
 
-Absolute path to the SQLite database file to backup
+Absolute path to the SQLite database file to backup.
 
 ### fileName
 
-`string` = `DATABASE_FILE_NAME`
+`string` = `BACKUP_DB_FILE_NAME`
 
-Optional custom filename for the backup (defaults to "uptime-watcher-backup.sqlite")
+Optional custom filename for the backup (defaults to "uptime-watcher-backup.sqlite").
 
 ## Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`DatabaseBackupResult`](../interfaces/DatabaseBackupResult.md)\>
 
-Promise resolving to backup data with buffer, filename, and metadata
-
-## Throws
-
-Re-throws file system errors after logging for upstream handling
+Promise resolving to a [DatabaseBackupResult](../interfaces/DatabaseBackupResult.md) containing the backup buffer, filename, and metadata.
 
 ## Remarks
 
-**Backup Process:**
-- Reads the entire SQLite database file into memory as a Buffer
-- Returns structured result with buffer data and comprehensive metadata
-- Uses dynamic import of fs/promises to minimize startup overhead
-- Enhanced error handling for import failures and file operations
+Reads the entire SQLite database file into memory as a Buffer and returns a structured result with buffer data, filename, and comprehensive metadata. Uses dynamic import of `fs/promises` to minimize startup overhead. Enhanced error handling for import failures and file operations. Loads the entire database into memory (suitable for typical database sizes). For very large databases, consider streaming approaches.
 
-**Performance Considerations:**
-- Loads entire database into memory (suitable for typical database sizes)
-- For very large databases, consider streaming approaches
+## Throws
 
-**Error Handling:**
-- Handles dynamic import failures gracefully
-- Logs stack traces for enhanced debugging
-- Provides detailed error context for troubleshooting
+Re-throws file system errors after logging for upstream handling, including dynamic import failures and file read errors.
 
-**Usage:**
+## Example
+
 ```typescript
 const backup = await createDatabaseBackup("/path/to/database.sqlite");
 // backup.buffer contains the database data

@@ -1,18 +1,12 @@
 # Class: HttpMonitor
 
-Defined in: [electron/services/monitoring/HttpMonitor.ts:84](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/HttpMonitor.ts#L84)
+Defined in: [electron/services/monitoring/HttpMonitor.ts:94](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/HttpMonitor.ts#L94)
 
-Service for performing HTTP/HTTPS monitoring checks.
+HTTP/HTTPS monitoring service implementing [IMonitorService](../../types/interfaces/IMonitorService.md) for endpoint health checks.
 
 ## Remarks
 
-Implements the IMonitorService interface to provide HTTP endpoint monitoring
-with advanced features for reliability and performance. Uses Axios with custom
-interceptors for precise timing and comprehensive error handling.
-
-The service is designed for monitoring use cases where response time accuracy
-and failure detection are critical. It includes intelligent status code
-interpretation suitable for uptime monitoring scenarios.
+Provides endpoint health checks with retry logic, timing, and error handling. Uses Axios for requests, with custom interceptors for timing. All configuration is managed via shallow merging and validated on update. All errors are standardized for frontend consumption.
 
 ## Implements
 
@@ -24,9 +18,9 @@ interpretation suitable for uptime monitoring scenarios.
 
 > **new HttpMonitor**(`config`): `HttpMonitor`
 
-Defined in: [electron/services/monitoring/HttpMonitor.ts:99](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/HttpMonitor.ts#L99)
+Defined in: [electron/services/monitoring/HttpMonitor.ts:124](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/HttpMonitor.ts#L124)
 
-Initialize the HTTP monitor with optional configuration.
+Constructs a new HttpMonitor instance.
 
 #### Parameters
 
@@ -34,7 +28,7 @@ Initialize the HTTP monitor with optional configuration.
 
 [`MonitorConfig`](../../types/interfaces/MonitorConfig.md) = `{}`
 
-Optional configuration overrides for HTTP monitoring
+Optional configuration overrides for HTTP monitoring. See [MonitorConfig](../../types/interfaces/MonitorConfig.md).
 
 #### Returns
 
@@ -42,8 +36,14 @@ Optional configuration overrides for HTTP monitoring
 
 #### Remarks
 
-Creates an Axios instance with optimized settings for monitoring,
-including timing interceptors, appropriate timeouts, and security limits.
+Initializes Axios instance with timing interceptors and merged configuration. All configuration values are shallow-merged with defaults.
+
+#### Default Value
+
+```ts
+timeout: DEFAULT_REQUEST_TIMEOUT, userAgent: USER_AGENT
+@public
+```
 
 ## Methods
 
@@ -51,9 +51,9 @@ including timing interceptors, appropriate timeouts, and security limits.
 
 > **check**(`monitor`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`MonitorCheckResult`](../../types/interfaces/MonitorCheckResult.md)\>
 
-Defined in: [electron/services/monitoring/HttpMonitor.ts:128](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/HttpMonitor.ts#L128)
+Defined in: [electron/services/monitoring/HttpMonitor.ts:159](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/HttpMonitor.ts#L159)
 
-Perform an HTTP health check on the given monitor.
+Performs an HTTP health check for the given monitor configuration.
 
 #### Parameters
 
@@ -61,24 +61,31 @@ Perform an HTTP health check on the given monitor.
 
 [`Monitor`](../../../../../shared/types/interfaces/Monitor.md)
 
-Monitor configuration of type [Site](../../../../../shared/types/interfaces/Site.md)["monitors"][0] containing URL and settings
+Monitor configuration object (must be type "http").
 
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`MonitorCheckResult`](../../types/interfaces/MonitorCheckResult.md)\>
 
-Promise resolving to check result with status and timing data
-
-#### Throws
-
-Error when monitor type is not "http"
+Promise resolving to [MonitorCheckResult](../../types/interfaces/MonitorCheckResult.md) with status and timing.
 
 #### Remarks
 
-Uses per-monitor retry attempts and timeout configuration for robust
-connectivity checking. Falls back to service defaults when monitor-specific
-values are not provided. Utilizes operational hooks for retry logic and
-comprehensive error handling.
+Uses per-monitor timeout and retryAttempts if provided, otherwise falls back to defaults.
+All requests use retry logic and exponential backoff via [withOperationalHooks](../../../../utils/operationalHooks/functions/withOperationalHooks.md).
+Returns a standardized result for all error cases.
+
+Now uses type guards to safely handle potentially undefined configuration values.
+
+#### Example
+
+```typescript
+const result = await httpMonitor.check({ type: "http", url: "https://example.com" });
+```
+
+#### Throws
+
+Error if monitor type is not "http".
 
 #### Implementation of
 
@@ -90,13 +97,15 @@ comprehensive error handling.
 
 > **getConfig**(): [`MonitorConfig`](../../types/interfaces/MonitorConfig.md)
 
-Defined in: [electron/services/monitoring/HttpMonitor.ts:147](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/HttpMonitor.ts#L147)
+Defined in: [electron/services/monitoring/HttpMonitor.ts:181](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/HttpMonitor.ts#L181)
 
-Get the current configuration.
+Returns the current configuration for this monitor service.
 
 #### Returns
 
 [`MonitorConfig`](../../types/interfaces/MonitorConfig.md)
+
+A shallow copy of the current [MonitorConfig](../../types/interfaces/MonitorConfig.md).
 
 ***
 
@@ -104,13 +113,19 @@ Get the current configuration.
 
 > **getType**(): `"http"` \| `"port"`
 
-Defined in: [electron/services/monitoring/HttpMonitor.ts:154](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/HttpMonitor.ts#L154)
+Defined in: [electron/services/monitoring/HttpMonitor.ts:193](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/HttpMonitor.ts#L193)
 
-Get the monitor type this service handles.
+Returns the monitor type handled by this service.
 
 #### Returns
 
 `"http"` \| `"port"`
+
+The string "http".
+
+#### Remarks
+
+Used by the monitor factory to route checks to the appropriate service.
 
 #### Implementation of
 
@@ -122,9 +137,9 @@ Get the monitor type this service handles.
 
 > **updateConfig**(`config`): `void`
 
-Defined in: [electron/services/monitoring/HttpMonitor.ts:174](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/HttpMonitor.ts#L174)
+Defined in: [electron/services/monitoring/HttpMonitor.ts:207](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/HttpMonitor.ts#L207)
 
-Update the configuration for this monitor.
+Updates the configuration for this monitor service.
 
 #### Parameters
 
@@ -132,7 +147,7 @@ Update the configuration for this monitor.
 
 [`Partial`](https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype)\<[`MonitorConfig`](../../types/interfaces/MonitorConfig.md)\>
 
-Partial configuration to merge with existing settings
+Partial configuration to merge with existing settings.
 
 #### Returns
 
@@ -140,17 +155,11 @@ Partial configuration to merge with existing settings
 
 #### Remarks
 
-Updates the monitor's configuration by performing a shallow merge of the provided
-partial configuration with existing settings. This recreates the underlying Axios
-instance with the updated configuration to ensure all changes take effect.
-
-The merge is shallow - nested objects are not deeply merged. Only validates
-that provided values are of correct types but does not validate ranges or
-other business logic constraints.
+Performs a shallow merge and recreates the Axios instance. Only validates types, not value ranges. Throws if invalid types are provided.
 
 #### Throws
 
-Error if config contains invalid property types
+Error if config contains invalid property types.
 
 #### Implementation of
 

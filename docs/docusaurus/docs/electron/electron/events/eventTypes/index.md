@@ -1,13 +1,5 @@
 # electron/events/eventTypes
 
-Type definitions for all events in the Uptime Watcher application.
-
-## Remarks
-
-Provides compile-time type safety for event data across the application.
-Events are organized by domain (site, monitor, database, system) and include
-comprehensive metadata for debugging and auditing purposes.
-
 ## Interfaces
 
 - [UptimeEvents](interfaces/UptimeEvents.md)

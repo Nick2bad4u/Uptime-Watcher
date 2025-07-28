@@ -2,7 +2,7 @@
 
 > **handleSubmit**(`event`, `properties`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/components/AddSiteForm/Submit.tsx:86](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/Submit.tsx#L86)
+Defined in: [src/components/AddSiteForm/Submit.tsx:91](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/Submit.tsx#L91)
 
 Handles form submission for adding sites or monitors.
 

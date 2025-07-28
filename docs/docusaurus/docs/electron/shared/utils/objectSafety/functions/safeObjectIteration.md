@@ -2,7 +2,7 @@
 
 > **safeObjectIteration**(`obj`, `callback`, `context`): `void`
 
-Defined in: [shared/utils/objectSafety.ts:59](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/objectSafety.ts#L59)
+Defined in: [shared/utils/objectSafety.ts:68](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/objectSafety.ts#L68)
 
 Safely iterate over object entries with type safety and error handling.
 
@@ -29,3 +29,5 @@ Optional context for error logging
 ## Returns
 
 `void`
+
+void

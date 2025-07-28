@@ -1,6 +1,6 @@
 # Interface: OverviewTabProperties
 
-Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/OverviewTab.tsx#L31)
+Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/OverviewTab.tsx#L32)
 
 Props for the OverviewTab component.
 
@@ -10,7 +10,7 @@ Props for the OverviewTab component.
 
 > `readonly` **avgResponseTime**: `number`
 
-Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:33](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/OverviewTab.tsx#L33)
+Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/OverviewTab.tsx#L34)
 
 Average response time across all checks
 
@@ -20,7 +20,7 @@ Average response time across all checks
 
 > `readonly` **fastestResponse**: `number`
 
-Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:35](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/OverviewTab.tsx#L35)
+Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/OverviewTab.tsx#L36)
 
 Fastest recorded response time
 
@@ -30,7 +30,7 @@ Fastest recorded response time
 
 > `readonly` **formatResponseTime**: (`time`) => `string`
 
-Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/OverviewTab.tsx#L37)
+Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:38](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/OverviewTab.tsx#L38)
 
 Function to format response time for display
 
@@ -50,7 +50,7 @@ Function to format response time for display
 
 > `readonly` **handleIntervalChange**: (`e`) => `void`
 
-Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/OverviewTab.tsx#L39)
+Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/OverviewTab.tsx#L40)
 
 Handler for monitor check interval changes
 
@@ -70,7 +70,7 @@ Handler for monitor check interval changes
 
 > `readonly` **handleRemoveMonitor**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/OverviewTab.tsx#L41)
+Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/OverviewTab.tsx#L42)
 
 Handler for removing the monitor
 
@@ -84,7 +84,7 @@ Handler for removing the monitor
 
 > `readonly` **handleSaveInterval**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/OverviewTab.tsx#L43)
+Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/OverviewTab.tsx#L44)
 
 Handler for saving interval changes
 
@@ -98,7 +98,7 @@ Handler for saving interval changes
 
 > `readonly` **handleSaveTimeout**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/OverviewTab.tsx#L45)
+Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/OverviewTab.tsx#L46)
 
 Handler for saving timeout changes
 
@@ -112,7 +112,7 @@ Handler for saving timeout changes
 
 > `readonly` **handleTimeoutChange**: (`e`) => `void`
 
-Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/OverviewTab.tsx#L47)
+Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/OverviewTab.tsx#L48)
 
 Handler for monitor timeout changes
 
@@ -132,7 +132,7 @@ Handler for monitor timeout changes
 
 > `readonly` **intervalChanged**: `boolean`
 
-Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/OverviewTab.tsx#L49)
+Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/OverviewTab.tsx#L50)
 
 Whether the check interval has been changed
 
@@ -142,7 +142,7 @@ Whether the check interval has been changed
 
 > `readonly` **isLoading**: `boolean`
 
-Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:51](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/OverviewTab.tsx#L51)
+Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/OverviewTab.tsx#L52)
 
 Whether any async operation is in progress
 
@@ -152,7 +152,7 @@ Whether any async operation is in progress
 
 > `readonly` **localCheckInterval**: `number`
 
-Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:53](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/OverviewTab.tsx#L53)
+Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/OverviewTab.tsx#L54)
 
 Local state value for check interval
 
@@ -162,7 +162,7 @@ Local state value for check interval
 
 > `readonly` **localTimeout**: `number`
 
-Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:55](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/OverviewTab.tsx#L55)
+Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:56](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/OverviewTab.tsx#L56)
 
 Local state value for timeout
 
@@ -172,7 +172,7 @@ Local state value for timeout
 
 > `readonly` **onCheckNow**: () => `void`
 
-Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:57](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/OverviewTab.tsx#L57)
+Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:58](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/OverviewTab.tsx#L58)
 
 Handler for immediate check trigger
 
@@ -186,7 +186,7 @@ Handler for immediate check trigger
 
 > `readonly` **selectedMonitor**: [`Monitor`](../../../../../../shared/types/interfaces/Monitor.md)
 
-Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:59](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/OverviewTab.tsx#L59)
+Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:60](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/OverviewTab.tsx#L60)
 
 Currently selected monitor
 
@@ -196,7 +196,7 @@ Currently selected monitor
 
 > `readonly` **slowestResponse**: `number`
 
-Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:61](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/OverviewTab.tsx#L61)
+Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/OverviewTab.tsx#L62)
 
 Slowest recorded response time
 
@@ -206,7 +206,7 @@ Slowest recorded response time
 
 > `readonly` **timeoutChanged**: `boolean`
 
-Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:63](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/OverviewTab.tsx#L63)
+Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:64](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/OverviewTab.tsx#L64)
 
 Whether the timeout has been changed
 
@@ -216,7 +216,7 @@ Whether the timeout has been changed
 
 > `readonly` **totalChecks**: `number`
 
-Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:65](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/OverviewTab.tsx#L65)
+Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:66](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/OverviewTab.tsx#L66)
 
 Total number of checks performed
 
@@ -226,6 +226,6 @@ Total number of checks performed
 
 > `readonly` **uptime**: `string`
 
-Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:67](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/OverviewTab.tsx#L67)
+Defined in: [src/components/SiteDetails/tabs/OverviewTab.tsx:68](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/OverviewTab.tsx#L68)
 
 Uptime percentage as a string

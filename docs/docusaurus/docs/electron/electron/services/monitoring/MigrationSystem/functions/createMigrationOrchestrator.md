@@ -2,17 +2,22 @@
 
 > **createMigrationOrchestrator**(): `MigrationOrchestrator`
 
-Defined in: [electron/services/monitoring/MigrationSystem.ts:290](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MigrationSystem.ts#L290)
+Defined in: [electron/services/monitoring/MigrationSystem.ts:536](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MigrationSystem.ts#L536)
 
-Factory function for creating migration orchestrator instances.
+Factory for creating migration orchestrator instances.
 
 ## Returns
 
 `MigrationOrchestrator`
 
-New migration orchestrator instance
+A new MigrationOrchestrator instance.
 
 ## Remarks
 
-Use this when you need an isolated orchestrator instance instead of
-the shared singleton pattern. Useful for testing or specialized workflows.
+Use for isolated migration workflows or testing. Returns a new MigrationOrchestrator instance using the shared registry and version manager.
+
+## Example
+
+```typescript
+const orchestrator = createMigrationOrchestrator();
+```

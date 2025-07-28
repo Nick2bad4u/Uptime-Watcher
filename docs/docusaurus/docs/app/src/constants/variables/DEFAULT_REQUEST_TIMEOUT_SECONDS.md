@@ -2,6 +2,11 @@
 
 > `const` **DEFAULT\_REQUEST\_TIMEOUT\_SECONDS**: `10` = `10`
 
-Defined in: [src/constants.ts:66](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/constants.ts#L66)
+Defined in: [src/constants.ts:130](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/constants.ts#L130)
 
-Default request timeout in seconds for UI display (10 seconds)
+Default request timeout in seconds for UI display.
+
+## Remarks
+
+UI-friendly representation of the timeout value for form fields
+and user-facing settings.

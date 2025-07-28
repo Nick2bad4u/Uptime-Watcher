@@ -2,7 +2,7 @@
 
 > **startMonitoringForSite**(`config`, `identifier`, `monitorId?`, `callback?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`boolean`\>
 
-Defined in: [electron/utils/monitoring/monitorLifecycle.ts:91](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/monitoring/monitorLifecycle.ts#L91)
+Defined in: [electron/utils/monitoring/monitorLifecycle.ts:123](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/monitoring/monitorLifecycle.ts#L123)
 
 Start monitoring for a specific site or monitor.
 

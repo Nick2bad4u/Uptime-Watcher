@@ -1,8 +1,12 @@
 # Interface: SiteMonitorResult
 
-Defined in: [src/hooks/site/useSiteMonitor.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteMonitor.ts#L19)
+Defined in: [src/hooks/site/useSiteMonitor.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteMonitor.ts#L19)
 
 Result interface for the useSiteMonitor hook.
+
+## Extended by
+
+- [`UseSiteResult`](../../useSite/interfaces/UseSiteResult.md)
 
 ## Properties
 
@@ -10,7 +14,7 @@ Result interface for the useSiteMonitor hook.
 
 > **filteredHistory**: [`StatusHistory`](../../../../../shared/types/interfaces/StatusHistory.md)[]
 
-Defined in: [src/hooks/site/useSiteMonitor.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteMonitor.ts#L21)
+Defined in: [src/hooks/site/useSiteMonitor.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteMonitor.ts#L21)
 
 Filtered history for the selected monitor
 
@@ -20,7 +24,7 @@ Filtered history for the selected monitor
 
 > **handleMonitorIdChange**: (`e`) => `void`
 
-Defined in: [src/hooks/site/useSiteMonitor.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteMonitor.ts#L24)
+Defined in: [src/hooks/site/useSiteMonitor.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteMonitor.ts#L24)
 
 Handler for monitor selection changes
 
@@ -40,7 +44,7 @@ Handler for monitor selection changes
 
 > **isMonitoring**: `boolean`
 
-Defined in: [src/hooks/site/useSiteMonitor.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteMonitor.ts#L26)
+Defined in: [src/hooks/site/useSiteMonitor.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteMonitor.ts#L26)
 
 Whether the selected monitor is actively being monitored
 
@@ -50,7 +54,7 @@ Whether the selected monitor is actively being monitored
 
 > **latestSite**: [`Site`](../../../../../shared/types/interfaces/Site.md)
 
-Defined in: [src/hooks/site/useSiteMonitor.ts:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteMonitor.ts#L29)
+Defined in: [src/hooks/site/useSiteMonitor.ts:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteMonitor.ts#L29)
 
 Most up-to-date site data from store
 
@@ -60,7 +64,7 @@ Most up-to-date site data from store
 
 > **monitor**: `undefined` \| [`Monitor`](../../../../../shared/types/interfaces/Monitor.md)
 
-Defined in: [src/hooks/site/useSiteMonitor.ts:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteMonitor.ts#L31)
+Defined in: [src/hooks/site/useSiteMonitor.ts:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteMonitor.ts#L31)
 
 Currently selected monitor object
 
@@ -70,7 +74,7 @@ Currently selected monitor object
 
 > **monitorIds**: `string`[]
 
-Defined in: [src/hooks/site/useSiteMonitor.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteMonitor.ts#L34)
+Defined in: [src/hooks/site/useSiteMonitor.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteMonitor.ts#L34)
 
 Array of all monitor IDs for this site
 
@@ -80,7 +84,7 @@ Array of all monitor IDs for this site
 
 > **responseTime**: `undefined` \| `number`
 
-Defined in: [src/hooks/site/useSiteMonitor.ts:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteMonitor.ts#L37)
+Defined in: [src/hooks/site/useSiteMonitor.ts:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteMonitor.ts#L37)
 
 Response time of the selected monitor
 
@@ -90,7 +94,7 @@ Response time of the selected monitor
 
 > **selectedMonitorId**: `string`
 
-Defined in: [src/hooks/site/useSiteMonitor.ts:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteMonitor.ts#L39)
+Defined in: [src/hooks/site/useSiteMonitor.ts:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteMonitor.ts#L39)
 
 ID of the currently selected monitor
 
@@ -100,6 +104,10 @@ ID of the currently selected monitor
 
 > **status**: [`MonitorStatus`](../../../../../shared/types/type-aliases/MonitorStatus.md)
 
-Defined in: [src/hooks/site/useSiteMonitor.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteMonitor.ts#L42)
+Defined in: [src/hooks/site/useSiteMonitor.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteMonitor.ts#L43)
 
 Current status of the selected monitor
+
+#### Remarks
+
+Falls back to DEFAULT_MONITOR_STATUS ("pending") when no monitor is selected

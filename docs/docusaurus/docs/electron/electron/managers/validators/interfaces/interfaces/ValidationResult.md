@@ -1,13 +1,27 @@
 # Interface: ValidationResult
 
-Defined in: [electron/managers/validators/interfaces.ts:8](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/validators/interfaces.ts#L8)
+Defined in: [electron/managers/validators/interfaces.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/validators/interfaces.ts#L23)
 
-Validation result interface for consistent error reporting across the application.
+Represents the result of a validation operation, providing error details and validity status.
 
 ## Remarks
 
-Used by validators to return standardized validation results with error details
-and validity status. Enables consistent error handling and user feedback.
+Used by validators throughout the application to return standardized results.
+Enables consistent error handling and user feedback by encapsulating both error messages and overall validity.
+
+## Example
+
+```typescript
+const result: ValidationResult = {
+  errors: [],
+  isValid: true
+};
+// or
+const result: ValidationResult = {
+  errors: ["Field is required"],
+  isValid: false
+};
+```
 
 ## Properties
 
@@ -15,9 +29,13 @@ and validity status. Enables consistent error handling and user feedback.
 
 > **errors**: `string`[]
 
-Defined in: [electron/managers/validators/interfaces.ts:10](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/validators/interfaces.ts#L10)
+Defined in: [electron/managers/validators/interfaces.ts:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/validators/interfaces.ts#L30)
 
-Array of validation error messages (empty if valid)
+An array of validation error messages.
+
+#### Remarks
+
+If validation passes, this array will be empty. If validation fails, it contains one or more error messages describing each failure.
 
 ***
 
@@ -25,6 +43,16 @@ Array of validation error messages (empty if valid)
 
 > **isValid**: `boolean`
 
-Defined in: [electron/managers/validators/interfaces.ts:12](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/validators/interfaces.ts#L12)
+Defined in: [electron/managers/validators/interfaces.ts:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/validators/interfaces.ts#L39)
 
-True if validation passed, false if any errors were found
+Indicates whether the validation passed.
+
+#### Remarks
+
+`true` if validation passed (no errors), `false` if any errors were found.
+
+#### Default Value
+
+```ts
+false
+```

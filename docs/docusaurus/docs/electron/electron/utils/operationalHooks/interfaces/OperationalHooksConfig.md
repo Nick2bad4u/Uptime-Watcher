@@ -1,6 +1,6 @@
 # Interface: OperationalHooksConfig\<T\>
 
-Defined in: [electron/utils/operationalHooks.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/operationalHooks.ts#L13)
+Defined in: [electron/utils/operationalHooks.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/operationalHooks.ts#L13)
 
 Configuration for operational hooks.
 
@@ -16,7 +16,7 @@ Configuration for operational hooks.
 
 > `optional` **backoff**: `"exponential"` \| `"linear"`
 
-Defined in: [electron/utils/operationalHooks.ts:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/operationalHooks.ts#L18)
+Defined in: [electron/utils/operationalHooks.ts:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/operationalHooks.ts#L18)
 
 Backoff strategy for retry delays.
 
@@ -32,7 +32,7 @@ Backoff strategy for retry delays.
 
 > `optional` **context**: [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\>
 
-Defined in: [electron/utils/operationalHooks.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/operationalHooks.ts#L23)
+Defined in: [electron/utils/operationalHooks.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/operationalHooks.ts#L23)
 
 Context data to include in events.
 
@@ -42,7 +42,7 @@ Context data to include in events.
 
 > `optional` **emitEvents**: `boolean`
 
-Defined in: [electron/utils/operationalHooks.ts:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/operationalHooks.ts#L29)
+Defined in: [electron/utils/operationalHooks.ts:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/operationalHooks.ts#L29)
 
 Whether to emit events for this operation.
 
@@ -58,7 +58,7 @@ true
 
 > `optional` **eventEmitter**: [`TypedEventBus`](../../../events/TypedEventBus/classes/TypedEventBus.md)\<[`UptimeEvents`](../../../events/eventTypes/interfaces/UptimeEvents.md)\>
 
-Defined in: [electron/utils/operationalHooks.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/operationalHooks.ts#L34)
+Defined in: [electron/utils/operationalHooks.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/operationalHooks.ts#L34)
 
 Event emitter for operation events.
 
@@ -68,7 +68,7 @@ Event emitter for operation events.
 
 > `optional` **initialDelay**: `number`
 
-Defined in: [electron/utils/operationalHooks.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/operationalHooks.ts#L40)
+Defined in: [electron/utils/operationalHooks.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/operationalHooks.ts#L40)
 
 Initial delay between retries in milliseconds.
 
@@ -84,7 +84,7 @@ Initial delay between retries in milliseconds.
 
 > `optional` **maxRetries**: `number`
 
-Defined in: [electron/utils/operationalHooks.ts:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/operationalHooks.ts#L46)
+Defined in: [electron/utils/operationalHooks.ts:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/operationalHooks.ts#L46)
 
 Maximum number of retry attempts.
 
@@ -100,7 +100,7 @@ Maximum number of retry attempts.
 
 > `optional` **onFailure**: (`error`, `attempts`) => `void` \| [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/utils/operationalHooks.ts:51](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/operationalHooks.ts#L51)
+Defined in: [electron/utils/operationalHooks.ts:51](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/operationalHooks.ts#L51)
 
 Callback when operation fails permanently.
 
@@ -124,7 +124,7 @@ Callback when operation fails permanently.
 
 > `optional` **onRetry**: (`attempt`, `error`) => `void` \| [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/utils/operationalHooks.ts:56](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/operationalHooks.ts#L56)
+Defined in: [electron/utils/operationalHooks.ts:56](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/operationalHooks.ts#L56)
 
 Callback when retry is attempted.
 
@@ -148,7 +148,7 @@ Callback when retry is attempted.
 
 > `optional` **onSuccess**: (`result`) => `void` \| [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/utils/operationalHooks.ts:61](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/operationalHooks.ts#L61)
+Defined in: [electron/utils/operationalHooks.ts:61](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/operationalHooks.ts#L61)
 
 Callback when operation succeeds.
 
@@ -168,7 +168,7 @@ Callback when operation succeeds.
 
 > **operationName**: `string`
 
-Defined in: [electron/utils/operationalHooks.ts:66](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/operationalHooks.ts#L66)
+Defined in: [electron/utils/operationalHooks.ts:66](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/operationalHooks.ts#L66)
 
 Name of the operation for logging and event emission.
 
@@ -178,7 +178,7 @@ Name of the operation for logging and event emission.
 
 > `optional` **throwOnFailure**: `boolean`
 
-Defined in: [electron/utils/operationalHooks.ts:72](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/operationalHooks.ts#L72)
+Defined in: [electron/utils/operationalHooks.ts:72](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/operationalHooks.ts#L72)
 
 Whether to throw on final failure.
 

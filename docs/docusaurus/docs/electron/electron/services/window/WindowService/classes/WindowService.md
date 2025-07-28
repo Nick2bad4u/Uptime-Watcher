@@ -1,6 +1,6 @@
 # Class: WindowService
 
-Defined in: [electron/services/window/WindowService.ts:61](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/window/WindowService.ts#L61)
+Defined in: [electron/services/window/WindowService.ts:61](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/window/WindowService.ts#L61)
 
 Service responsible for window management and lifecycle.
 
@@ -17,7 +17,7 @@ isolation and disabled node integration.
 
 > **new WindowService**(): `WindowService`
 
-Defined in: [electron/services/window/WindowService.ts:86](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/window/WindowService.ts#L86)
+Defined in: [electron/services/window/WindowService.ts:86](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/window/WindowService.ts#L86)
 
 Create a new WindowService instance.
 
@@ -36,7 +36,7 @@ Windows are not created automatically - call createMainWindow() to create the ma
 
 > **closeMainWindow**(): `void`
 
-Defined in: [electron/services/window/WindowService.ts:95](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/window/WindowService.ts#L95)
+Defined in: [electron/services/window/WindowService.ts:95](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/window/WindowService.ts#L95)
 
 Close the main window.
 
@@ -50,7 +50,7 @@ Close the main window.
 
 > **createMainWindow**(): `BrowserWindow`
 
-Defined in: [electron/services/window/WindowService.ts:117](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/window/WindowService.ts#L117)
+Defined in: [electron/services/window/WindowService.ts:117](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/window/WindowService.ts#L117)
 
 Create and configure the main application window.
 
@@ -78,7 +78,7 @@ event is fired to prevent visual flash.
 
 > **getAllWindows**(): `BrowserWindow`[]
 
-Defined in: [electron/services/window/WindowService.ts:141](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/window/WindowService.ts#L141)
+Defined in: [electron/services/window/WindowService.ts:141](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/window/WindowService.ts#L141)
 
 Get all browser windows.
 
@@ -92,7 +92,7 @@ Get all browser windows.
 
 > **getMainWindow**(): `null` \| `BrowserWindow`
 
-Defined in: [electron/services/window/WindowService.ts:150](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/window/WindowService.ts#L150)
+Defined in: [electron/services/window/WindowService.ts:150](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/window/WindowService.ts#L150)
 
 Get the main window instance.
 
@@ -108,7 +108,7 @@ Main window instance or null if not created
 
 > **hasMainWindow**(): `boolean`
 
-Defined in: [electron/services/window/WindowService.ts:159](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/window/WindowService.ts#L159)
+Defined in: [electron/services/window/WindowService.ts:159](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/window/WindowService.ts#L159)
 
 Check if the main window exists and is not destroyed.
 
@@ -124,7 +124,7 @@ True if main window is available for operations
 
 > **sendToRenderer**(`channel`, `data?`): `void`
 
-Defined in: [electron/services/window/WindowService.ts:169](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/window/WindowService.ts#L169)
+Defined in: [electron/services/window/WindowService.ts:169](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/window/WindowService.ts#L169)
 
 Send a message to the main window's renderer process.
 

@@ -7,4 +7,5 @@
 - [MonitoringControlEventData](interfaces/MonitoringControlEventData.md)
 - [MonitorUpEventData](interfaces/MonitorUpEventData.md)
 - [TestEventData](interfaces/TestEventData.md)
+- [UpdateReleaseInfo](interfaces/UpdateReleaseInfo.md)
 - [UpdateStatusEventData](interfaces/UpdateStatusEventData.md)

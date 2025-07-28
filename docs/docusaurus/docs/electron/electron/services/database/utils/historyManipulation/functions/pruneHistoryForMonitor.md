@@ -2,7 +2,7 @@
 
 > **pruneHistoryForMonitor**(`db`, `monitorId`, `limit`): `void`
 
-Defined in: [electron/services/database/utils/historyManipulation.ts:184](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/historyManipulation.ts#L184)
+Defined in: [electron/services/database/utils/historyManipulation.ts:189](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/historyManipulation.ts#L189)
 
 **`Internal`**
 

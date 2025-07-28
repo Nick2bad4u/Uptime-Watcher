@@ -2,7 +2,7 @@
 
 > `const` **default**: `object`
 
-Defined in: [src/services/logger.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/services/logger.ts#L24)
+Defined in: [src/services/logger.ts:64](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/services/logger.ts#L64)
 
 ## Type declaration
 
@@ -64,7 +64,7 @@ Defined in: [src/services/logger.ts:24](https://github.com/Nick2bad4u/Uptime-Wat
 
 ### debug()
 
-> **debug**: (`message`, ...`arguments_`) => `void`
+> **debug**: (`message`, ...`args`) => `void`
 
 #### Parameters
 
@@ -72,7 +72,7 @@ Defined in: [src/services/logger.ts:24](https://github.com/Nick2bad4u/Uptime-Wat
 
 `string`
 
-##### arguments\_
+##### args
 
 ...`unknown`[]
 
@@ -82,7 +82,7 @@ Defined in: [src/services/logger.ts:24](https://github.com/Nick2bad4u/Uptime-Wat
 
 ### error()
 
-> **error**: (`message`, `error?`, ...`arguments_`) => `void`
+> **error**: (`message`, `error?`, ...`args`) => `void`
 
 #### Parameters
 
@@ -94,7 +94,7 @@ Defined in: [src/services/logger.ts:24](https://github.com/Nick2bad4u/Uptime-Wat
 
 [`Error`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)
 
-##### arguments\_?
+##### args?
 
 ...`unknown`[]
 
@@ -104,7 +104,7 @@ Defined in: [src/services/logger.ts:24](https://github.com/Nick2bad4u/Uptime-Wat
 
 ### info()
 
-> **info**: (`message`, ...`arguments_`) => `void`
+> **info**: (`message`, ...`args`) => `void`
 
 #### Parameters
 
@@ -112,7 +112,7 @@ Defined in: [src/services/logger.ts:24](https://github.com/Nick2bad4u/Uptime-Wat
 
 `string`
 
-##### arguments\_
+##### args
 
 ...`unknown`[]
 
@@ -124,9 +124,24 @@ Defined in: [src/services/logger.ts:24](https://github.com/Nick2bad4u/Uptime-Wat
 
 > **raw**: `RendererLogger` & `object` = `log`
 
+Raw access to the underlying electron-log instance.
+
+#### Remarks
+
+Use with caution! Direct access bypasses the application's
+logging conventions and structured format. Only use for advanced
+scenarios where the standard logger methods are insufficient.
+
+#### Example
+
+```typescript
+// Only use when absolutely necessary
+logger.raw.transports.file.level = "warn";
+```
+
 ### silly()
 
-> **silly**: (`message`, ...`arguments_`) => `void`
+> **silly**: (`message`, ...`args`) => `void`
 
 #### Parameters
 
@@ -134,7 +149,7 @@ Defined in: [src/services/logger.ts:24](https://github.com/Nick2bad4u/Uptime-Wat
 
 `string`
 
-##### arguments\_
+##### args
 
 ...`unknown`[]
 
@@ -336,7 +351,7 @@ Defined in: [src/services/logger.ts:24](https://github.com/Nick2bad4u/Uptime-Wat
 
 ### verbose()
 
-> **verbose**: (`message`, ...`arguments_`) => `void`
+> **verbose**: (`message`, ...`args`) => `void`
 
 #### Parameters
 
@@ -344,7 +359,7 @@ Defined in: [src/services/logger.ts:24](https://github.com/Nick2bad4u/Uptime-Wat
 
 `string`
 
-##### arguments\_
+##### args
 
 ...`unknown`[]
 
@@ -354,7 +369,7 @@ Defined in: [src/services/logger.ts:24](https://github.com/Nick2bad4u/Uptime-Wat
 
 ### warn()
 
-> **warn**: (`message`, ...`arguments_`) => `void`
+> **warn**: (`message`, ...`args`) => `void`
 
 #### Parameters
 
@@ -362,7 +377,7 @@ Defined in: [src/services/logger.ts:24](https://github.com/Nick2bad4u/Uptime-Wat
 
 `string`
 
-##### arguments\_
+##### args
 
 ...`unknown`[]
 

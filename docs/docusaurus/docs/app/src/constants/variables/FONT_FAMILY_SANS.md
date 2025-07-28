@@ -2,4 +2,10 @@
 
 > `const` **FONT\_FAMILY\_SANS**: `string`[]
 
-Defined in: [src/constants.ts:8](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/constants.ts#L8)
+Defined in: [src/constants.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/constants.ts#L47)
+
+Sans-serif font family constants for general UI text.
+
+## Remarks
+
+Prioritizes system fonts for optimal performance and native appearance.

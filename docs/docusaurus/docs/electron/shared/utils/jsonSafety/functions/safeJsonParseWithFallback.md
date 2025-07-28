@@ -2,7 +2,7 @@
 
 > **safeJsonParseWithFallback**\<`T`\>(`json`, `validator`, `fallback`): `T`
 
-Defined in: [shared/utils/jsonSafety.ts:127](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/jsonSafety.ts#L127)
+Defined in: [shared/utils/jsonSafety.ts:133](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/jsonSafety.ts#L133)
 
 Safely parse JSON string with fallback value.
 
@@ -37,6 +37,10 @@ Fallback value if parsing fails
 `T`
 
 Parsed data if successful, fallback if failed
+
+## Throws
+
+Never throws - parsing errors result in fallback value being returned
 
 ## Example
 

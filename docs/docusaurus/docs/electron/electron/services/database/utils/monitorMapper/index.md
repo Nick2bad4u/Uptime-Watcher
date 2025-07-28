@@ -1,12 +1,5 @@
 # electron/services/database/utils/monitorMapper
 
-Monitor data mapping utilities.
-
-## Remarks
-
-Handles conversion between database rows and application monitor objects.
-Uses dynamic schema based on monitor type registry for extensible monitor types.
-
 ## Interfaces
 
 - [MonitorRow](interfaces/MonitorRow.md)

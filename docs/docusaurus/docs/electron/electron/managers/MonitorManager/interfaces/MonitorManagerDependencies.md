@@ -1,6 +1,12 @@
 # Interface: MonitorManagerDependencies
 
-Defined in: [electron/managers/MonitorManager.ts:11](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L11)
+Defined in: [electron/managers/MonitorManager.ts:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/MonitorManager.ts#L22)
+
+Defines the dependencies required by [MonitorManager](../classes/MonitorManager.md) for orchestration and data access.
+
+## Remarks
+
+All dependencies are injected to support testability and separation of concerns. This interface is used for dependency injection in the [MonitorManager](../classes/MonitorManager.md) constructor.
 
 ## Properties
 
@@ -8,7 +14,13 @@ Defined in: [electron/managers/MonitorManager.ts:11](https://github.com/Nick2bad
 
 > **databaseService**: [`DatabaseService`](../../../services/database/DatabaseService/classes/DatabaseService.md)
 
-Defined in: [electron/managers/MonitorManager.ts:12](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L12)
+Defined in: [electron/managers/MonitorManager.ts:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/MonitorManager.ts#L29)
+
+Database service for transactional operations.
+
+#### Remarks
+
+Used for all database access and transaction management.
 
 ***
 
@@ -16,7 +28,13 @@ Defined in: [electron/managers/MonitorManager.ts:12](https://github.com/Nick2bad
 
 > **eventEmitter**: [`TypedEventBus`](../../../events/TypedEventBus/classes/TypedEventBus.md)\<[`UptimeEvents`](../../../events/eventTypes/interfaces/UptimeEvents.md)\>
 
-Defined in: [electron/managers/MonitorManager.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L13)
+Defined in: [electron/managers/MonitorManager.ts:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/MonitorManager.ts#L36)
+
+Event bus for emitting and listening to monitor events.
+
+#### Remarks
+
+Used for all event-driven communication between backend and frontend.
 
 ***
 
@@ -24,11 +42,19 @@ Defined in: [electron/managers/MonitorManager.ts:13](https://github.com/Nick2bad
 
 > **getHistoryLimit**: () => `number`
 
-Defined in: [electron/managers/MonitorManager.ts:14](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L14)
+Defined in: [electron/managers/MonitorManager.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/MonitorManager.ts#L44)
+
+Returns the history limit for status checks.
 
 #### Returns
 
 `number`
+
+The maximum number of status updates to keep in history.
+
+#### Remarks
+
+Used to determine how many status updates to retain in history.
 
 ***
 
@@ -36,11 +62,19 @@ Defined in: [electron/managers/MonitorManager.ts:14](https://github.com/Nick2bad
 
 > **getSitesCache**: () => [`StandardizedCache`](../../../utils/cache/StandardizedCache/classes/StandardizedCache.md)\<[`Site`](../../../../shared/types/interfaces/Site.md)\>
 
-Defined in: [electron/managers/MonitorManager.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L15)
+Defined in: [electron/managers/MonitorManager.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/MonitorManager.ts#L52)
+
+Returns the current sites cache.
 
 #### Returns
 
 [`StandardizedCache`](../../../utils/cache/StandardizedCache/classes/StandardizedCache.md)\<[`Site`](../../../../shared/types/interfaces/Site.md)\>
+
+The current [StandardizedCache](../../../utils/cache/StandardizedCache/classes/StandardizedCache.md) of [Site](../../../../shared/types/interfaces/Site.md) objects.
+
+#### Remarks
+
+Provides access to the in-memory cache of all sites.
 
 ***
 
@@ -48,7 +82,9 @@ Defined in: [electron/managers/MonitorManager.ts:15](https://github.com/Nick2bad
 
 > **repositories**: `object`
 
-Defined in: [electron/managers/MonitorManager.ts:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L16)
+Defined in: [electron/managers/MonitorManager.ts:59](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/MonitorManager.ts#L59)
+
+Repository interfaces for DB access.
 
 #### history
 
@@ -62,10 +98,20 @@ Defined in: [electron/managers/MonitorManager.ts:16](https://github.com/Nick2bad
 
 > **site**: [`SiteRepository`](../../../services/database/SiteRepository/classes/SiteRepository.md)
 
+#### Remarks
+
+Provides access to the repositories for history, monitor, and site entities.
+
 ***
 
 ### siteService
 
 > **siteService**: [`SiteService`](../../../services/site/SiteService/classes/SiteService.md)
 
-Defined in: [electron/managers/MonitorManager.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L21)
+Defined in: [electron/managers/MonitorManager.ts:70](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/MonitorManager.ts#L70)
+
+Service for site-level business logic.
+
+#### Remarks
+
+Used for site-related business operations and orchestration.

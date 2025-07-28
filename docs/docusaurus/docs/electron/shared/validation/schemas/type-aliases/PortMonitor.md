@@ -2,7 +2,9 @@
 
 > **PortMonitor** = `object`
 
-Defined in: [shared/validation/schemas.ts:114](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/validation/schemas.ts#L114)
+Defined in: [shared/validation/schemas.ts:174](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/validation/schemas.ts#L174)
+
+Type representing a validated port monitor.
 
 ## Type declaration
 
@@ -34,6 +36,13 @@ Defined in: [shared/validation/schemas.ts:114](https://github.com/Nick2bad4u/Upt
 
 > **responseTime**: `number`
 
+Response time in milliseconds.
+
+#### Remarks
+
+Uses -1 as a sentinel value to indicate "never checked" state.
+Positive values represent actual response times in milliseconds.
+
 ### retryAttempts
 
 > **retryAttempts**: `number`
@@ -49,3 +58,7 @@ Defined in: [shared/validation/schemas.ts:114](https://github.com/Nick2bad4u/Upt
 ### type
 
 > **type**: `"port"`
+
+## See
+
+[portMonitorSchema](../variables/portMonitorSchema.md)

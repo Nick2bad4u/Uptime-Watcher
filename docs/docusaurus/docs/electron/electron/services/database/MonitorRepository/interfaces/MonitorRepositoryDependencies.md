@@ -1,9 +1,13 @@
 # Interface: MonitorRepositoryDependencies
 
-Defined in: [electron/services/database/MonitorRepository.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/MonitorRepository.ts#L21)
+Defined in: [electron/services/database/MonitorRepository.ts:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/MonitorRepository.ts#L31)
 
-Repository for managing monitor data persistence.
-Handles CRUD operations for monitors in the database.
+Repository dependencies for managing monitor data persistence.
+
+## Remarks
+
+Provides the required database service for monitor operations.
+Used for dependency injection pattern to ensure proper service coupling.
 
 ## Properties
 
@@ -11,4 +15,10 @@ Handles CRUD operations for monitors in the database.
 
 > **databaseService**: [`DatabaseService`](../../DatabaseService/classes/DatabaseService.md)
 
-Defined in: [electron/services/database/MonitorRepository.ts:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/MonitorRepository.ts#L22)
+Defined in: [electron/services/database/MonitorRepository.ts:38](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/MonitorRepository.ts#L38)
+
+Database service for transactional operations.
+
+#### Remarks
+
+Must be properly initialized before being passed to the repository.

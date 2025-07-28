@@ -1,6 +1,6 @@
 # Interface: SiteCardHeaderProperties
 
-Defined in: [src/components/Dashboard/SiteCard/SiteCardHeader.tsx:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/SiteCardHeader.tsx#L18)
+Defined in: [src/components/Dashboard/SiteCard/SiteCardHeader.tsx:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/SiteCardHeader.tsx#L18)
 
 Props for the SiteCardHeader component
 
@@ -10,7 +10,7 @@ Props for the SiteCardHeader component
 
 > **hasMonitor**: `boolean`
 
-Defined in: [src/components/Dashboard/SiteCard/SiteCardHeader.tsx:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/SiteCardHeader.tsx#L20)
+Defined in: [src/components/Dashboard/SiteCard/SiteCardHeader.tsx:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/SiteCardHeader.tsx#L20)
 
 Whether site has any monitors configured
 
@@ -20,7 +20,7 @@ Whether site has any monitors configured
 
 > **isLoading**: `boolean`
 
-Defined in: [src/components/Dashboard/SiteCard/SiteCardHeader.tsx:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/SiteCardHeader.tsx#L22)
+Defined in: [src/components/Dashboard/SiteCard/SiteCardHeader.tsx:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/SiteCardHeader.tsx#L22)
 
 Whether any operation is currently loading
 
@@ -30,7 +30,7 @@ Whether any operation is currently loading
 
 > **isMonitoring**: `boolean`
 
-Defined in: [src/components/Dashboard/SiteCard/SiteCardHeader.tsx:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/SiteCardHeader.tsx#L24)
+Defined in: [src/components/Dashboard/SiteCard/SiteCardHeader.tsx:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/SiteCardHeader.tsx#L24)
 
 Whether monitoring is currently active
 
@@ -40,7 +40,7 @@ Whether monitoring is currently active
 
 > **onCheckNow**: () => `void`
 
-Defined in: [src/components/Dashboard/SiteCard/SiteCardHeader.tsx:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/SiteCardHeader.tsx#L26)
+Defined in: [src/components/Dashboard/SiteCard/SiteCardHeader.tsx:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/SiteCardHeader.tsx#L26)
 
 Handler for immediate check button
 
@@ -54,7 +54,7 @@ Handler for immediate check button
 
 > **onMonitorIdChange**: (`event`) => `void`
 
-Defined in: [src/components/Dashboard/SiteCard/SiteCardHeader.tsx:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/SiteCardHeader.tsx#L28)
+Defined in: [src/components/Dashboard/SiteCard/SiteCardHeader.tsx:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/SiteCardHeader.tsx#L28)
 
 Handler for monitor selection changes
 
@@ -74,7 +74,7 @@ Handler for monitor selection changes
 
 > **onStartMonitoring**: () => `void`
 
-Defined in: [src/components/Dashboard/SiteCard/SiteCardHeader.tsx:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/SiteCardHeader.tsx#L30)
+Defined in: [src/components/Dashboard/SiteCard/SiteCardHeader.tsx:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/SiteCardHeader.tsx#L30)
 
 Handler for start monitoring button
 
@@ -88,7 +88,7 @@ Handler for start monitoring button
 
 > **onStopMonitoring**: () => `void`
 
-Defined in: [src/components/Dashboard/SiteCard/SiteCardHeader.tsx:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/SiteCardHeader.tsx#L32)
+Defined in: [src/components/Dashboard/SiteCard/SiteCardHeader.tsx:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/SiteCardHeader.tsx#L32)
 
 Handler for stop monitoring button
 
@@ -102,7 +102,7 @@ Handler for stop monitoring button
 
 > **selectedMonitorId**: `string`
 
-Defined in: [src/components/Dashboard/SiteCard/SiteCardHeader.tsx:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/SiteCardHeader.tsx#L34)
+Defined in: [src/components/Dashboard/SiteCard/SiteCardHeader.tsx:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/SiteCardHeader.tsx#L34)
 
 Currently selected monitor ID
 
@@ -112,6 +112,6 @@ Currently selected monitor ID
 
 > **site**: [`Site`](../../../../../../shared/types/interfaces/Site.md)
 
-Defined in: [src/components/Dashboard/SiteCard/SiteCardHeader.tsx:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/SiteCardHeader.tsx#L36)
+Defined in: [src/components/Dashboard/SiteCard/SiteCardHeader.tsx:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/SiteCardHeader.tsx#L36)
 
 Site data to display

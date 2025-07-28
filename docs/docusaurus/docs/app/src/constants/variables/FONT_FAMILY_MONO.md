@@ -2,6 +2,10 @@
 
 > `const` **FONT\_FAMILY\_MONO**: `string`[]
 
-Defined in: [src/constants.ts:7](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/constants.ts#L7)
+Defined in: [src/constants.ts:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/constants.ts#L39)
 
-Font family constants for theme reuse
+Font family constants for theme reuse.
+
+## Remarks
+
+Monospace fonts prioritize consistent character width for code display.

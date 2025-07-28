@@ -2,7 +2,7 @@
 
 > **getAnalyticsLabel**(`monitorType`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`string`\>
 
-Defined in: [src/utils/monitorUiHelpers.ts:112](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/monitorUiHelpers.ts#L112)
+Defined in: [src/utils/monitorUiHelpers.ts:125](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/utils/monitorUiHelpers.ts#L125)
 
 Get analytics label for monitor type.
 

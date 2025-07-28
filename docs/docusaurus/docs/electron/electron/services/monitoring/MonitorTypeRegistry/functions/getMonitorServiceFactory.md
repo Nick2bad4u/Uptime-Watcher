@@ -2,9 +2,9 @@
 
 > **getMonitorServiceFactory**(`type`): `undefined` \| () => [`IMonitorService`](../../types/interfaces/IMonitorService.md)
 
-Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:110](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorTypeRegistry.ts#L110)
+Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:144](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorTypeRegistry.ts#L144)
 
-Get service factory for a monitor type.
+Gets the service factory function for a given monitor type.
 
 ## Parameters
 
@@ -12,10 +12,14 @@ Get service factory for a monitor type.
 
 `string`
 
-Monitor type
+The monitor type identifier.
 
 ## Returns
 
 `undefined` \| () => [`IMonitorService`](../../types/interfaces/IMonitorService.md)
 
-Service factory function or undefined
+Service factory function or undefined if the type is not registered.
+
+## Remarks
+
+Returns the factory function for creating monitor service instances for the specified type, or undefined if not registered.

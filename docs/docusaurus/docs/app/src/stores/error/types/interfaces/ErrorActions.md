@@ -1,8 +1,13 @@
 # Interface: ErrorActions
 
-Defined in: [src/stores/error/types.ts:5](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/error/types.ts#L5)
+Defined in: [src/stores/error/types.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/error/types.ts#L20)
 
-Error store types and interfaces.
+Error management actions for the error store.
+
+## Remarks
+
+Provides methods for managing application-wide error states and loading indicators.
+Supports both global errors and store-specific error isolation.
 
 ## Properties
 
@@ -10,7 +15,7 @@ Error store types and interfaces.
 
 > **clearAllErrors**: () => `void`
 
-Defined in: [src/stores/error/types.ts:7](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/error/types.ts#L7)
+Defined in: [src/stores/error/types.ts:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/error/types.ts#L22)
 
 Clear all errors
 
@@ -24,7 +29,7 @@ Clear all errors
 
 > **clearError**: () => `void`
 
-Defined in: [src/stores/error/types.ts:9](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/error/types.ts#L9)
+Defined in: [src/stores/error/types.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/error/types.ts#L24)
 
 Clear global error
 
@@ -38,7 +43,7 @@ Clear global error
 
 > **clearStoreError**: (`store`) => `void`
 
-Defined in: [src/stores/error/types.ts:11](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/error/types.ts#L11)
+Defined in: [src/stores/error/types.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/error/types.ts#L26)
 
 Clear error for specific store
 
@@ -58,7 +63,7 @@ Clear error for specific store
 
 > **getOperationLoading**: (`operation`) => `boolean`
 
-Defined in: [src/stores/error/types.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/error/types.ts#L13)
+Defined in: [src/stores/error/types.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/error/types.ts#L28)
 
 Get loading state for specific operation
 
@@ -78,7 +83,7 @@ Get loading state for specific operation
 
 > **getStoreError**: (`store`) => `undefined` \| `string`
 
-Defined in: [src/stores/error/types.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/error/types.ts#L15)
+Defined in: [src/stores/error/types.ts:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/error/types.ts#L30)
 
 Get error for specific store
 
@@ -98,7 +103,7 @@ Get error for specific store
 
 > **setError**: (`error`) => `void`
 
-Defined in: [src/stores/error/types.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/error/types.ts#L17)
+Defined in: [src/stores/error/types.ts:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/error/types.ts#L32)
 
 Set global error message
 
@@ -118,7 +123,7 @@ Set global error message
 
 > **setLoading**: (`loading`) => `void`
 
-Defined in: [src/stores/error/types.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/error/types.ts#L19)
+Defined in: [src/stores/error/types.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/error/types.ts#L34)
 
 Set global loading state
 
@@ -138,7 +143,7 @@ Set global loading state
 
 > **setOperationLoading**: (`operation`, `loading`) => `void`
 
-Defined in: [src/stores/error/types.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/error/types.ts#L21)
+Defined in: [src/stores/error/types.ts:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/error/types.ts#L36)
 
 Set loading state for specific operation
 
@@ -162,7 +167,7 @@ Set loading state for specific operation
 
 > **setStoreError**: (`store`, `error`) => `void`
 
-Defined in: [src/stores/error/types.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/error/types.ts#L23)
+Defined in: [src/stores/error/types.ts:38](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/error/types.ts#L38)
 
 Set error for specific store
 

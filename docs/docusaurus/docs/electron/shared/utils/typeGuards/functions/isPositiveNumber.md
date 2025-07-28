@@ -2,9 +2,9 @@
 
 > **isPositiveNumber**(`value`): `value is number`
 
-Defined in: [shared/utils/typeGuards.ts:105](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/typeGuards.ts#L105)
+Defined in: [shared/utils/typeGuards.ts:198](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/typeGuards.ts#L198)
 
-Type predicate for positive numbers.
+Determines if a value is a positive number (greater than zero).
 
 ## Parameters
 
@@ -12,6 +12,10 @@ Type predicate for positive numbers.
 
 `unknown`
 
+The value to check.
+
 ## Returns
 
 `value is number`
+
+True if `value` is a positive number; otherwise, false.

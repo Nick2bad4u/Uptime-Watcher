@@ -2,9 +2,9 @@
 
 > **handlePortCheckError**(`error`, `host`, `port`): [`PortCheckErrorResult`](../interfaces/PortCheckErrorResult.md)
 
-Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:76](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/utils/portErrorHandling.ts#L76)
+Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:143](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/utils/portErrorHandling.ts#L143)
 
-Handle errors that occur during port checks with standardized formatting.
+Normalizes errors from port checks into a standardized result structure for frontend consumption.
 
 ## Parameters
 
@@ -12,31 +12,44 @@ Handle errors that occur during port checks with standardized formatting.
 
 `unknown`
 
-Unknown error that occurred during port checking
+The error thrown during port checking. May be any type, but typically an [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error) or [PortCheckError](../classes/PortCheckError.md).
 
 ### host
 
 `string`
 
-The hostname or IP address being checked
+The hostname or IP address being checked.
 
 ### port
 
 `number`
 
-The port number being checked
+The port number being checked.
 
 ## Returns
 
 [`PortCheckErrorResult`](../interfaces/PortCheckErrorResult.md)
 
-Standardized error result for monitor check failures
+A [PortCheckErrorResult](../interfaces/PortCheckErrorResult.md) containing error details, standardized message, timing, and status.
 
 ## Remarks
 
-Processes various error types and normalizes them into a consistent format
-for frontend consumption. Extracts timing information from PortCheckError
-instances to support retry logic analysis.
+Converts any error thrown during a port check into a [PortCheckErrorResult](../interfaces/PortCheckErrorResult.md) object. If the error is a
+[PortCheckError](../classes/PortCheckError.md), its response time is preserved; otherwise, responseTime is set to -1. Logs debug information
+in development mode for diagnostics.
 
-Response time defaults to -1 when timing information is unavailable,
-distinguishing from valid 0ms responses.
+## Example
+
+```typescript
+try {
+  // ...port check logic...
+} catch (err) {
+  const result = handlePortCheckError(err, "example.com", 443);
+  // result.status === "down"
+}
+```
+
+## See
+
+ - [PortCheckError](../classes/PortCheckError.md)
+ - [PortCheckErrorResult](../interfaces/PortCheckErrorResult.md)

@@ -1,16 +1,26 @@
 # Interface: UseMonitorFieldsResult
 
-Defined in: [src/hooks/useMonitorFields.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/useMonitorFields.ts#L17)
+Defined in: [src/hooks/useMonitorFields.ts:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/useMonitorFields.ts#L54)
 
 Result interface for the useMonitorFields hook
 
 ## Properties
 
+### error?
+
+> `optional` **error**: `string`
+
+Defined in: [src/hooks/useMonitorFields.ts:56](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/useMonitorFields.ts#L56)
+
+Error message if loading failed
+
+***
+
 ### getFields()
 
 > **getFields**: (`monitorType`) => [`MonitorFieldDefinition`](../../../../shared/types/interfaces/MonitorFieldDefinition.md)[]
 
-Defined in: [src/hooks/useMonitorFields.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/useMonitorFields.ts#L19)
+Defined in: [src/hooks/useMonitorFields.ts:58](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/useMonitorFields.ts#L58)
 
 Get field definitions for a specific monitor type
 
@@ -30,7 +40,7 @@ Get field definitions for a specific monitor type
 
 > **getRequiredFields**: (`monitorType`) => `string`[]
 
-Defined in: [src/hooks/useMonitorFields.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/useMonitorFields.ts#L21)
+Defined in: [src/hooks/useMonitorFields.ts:60](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/useMonitorFields.ts#L60)
 
 Get required fields for a specific monitor type
 
@@ -50,7 +60,7 @@ Get required fields for a specific monitor type
 
 > **isFieldRequired**: (`monitorType`, `fieldName`) => `boolean`
 
-Defined in: [src/hooks/useMonitorFields.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/useMonitorFields.ts#L23)
+Defined in: [src/hooks/useMonitorFields.ts:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/useMonitorFields.ts#L62)
 
 Check if a field is required for a monitor type
 
@@ -74,6 +84,6 @@ Check if a field is required for a monitor type
 
 > **isLoaded**: `boolean`
 
-Defined in: [src/hooks/useMonitorFields.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/useMonitorFields.ts#L25)
+Defined in: [src/hooks/useMonitorFields.ts:64](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/useMonitorFields.ts#L64)
 
 Whether field definitions are loaded

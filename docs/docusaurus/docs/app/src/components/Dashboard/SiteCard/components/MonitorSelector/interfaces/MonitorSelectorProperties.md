@@ -1,6 +1,6 @@
 # Interface: MonitorSelectorProperties
 
-Defined in: [src/components/Dashboard/SiteCard/components/MonitorSelector.tsx:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/components/MonitorSelector.tsx#L16)
+Defined in: [src/components/Dashboard/SiteCard/components/MonitorSelector.tsx:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/components/MonitorSelector.tsx#L16)
 
 Props for the MonitorSelector component.
 
@@ -10,7 +10,7 @@ Props for the MonitorSelector component.
 
 > `optional` **className**: `string`
 
-Defined in: [src/components/Dashboard/SiteCard/components/MonitorSelector.tsx:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/components/MonitorSelector.tsx#L18)
+Defined in: [src/components/Dashboard/SiteCard/components/MonitorSelector.tsx:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/components/MonitorSelector.tsx#L18)
 
 Optional CSS classes for custom styling
 
@@ -20,7 +20,7 @@ Optional CSS classes for custom styling
 
 > **monitors**: [`Monitor`](../../../../../../../shared/types/interfaces/Monitor.md)[]
 
-Defined in: [src/components/Dashboard/SiteCard/components/MonitorSelector.tsx:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/components/MonitorSelector.tsx#L20)
+Defined in: [src/components/Dashboard/SiteCard/components/MonitorSelector.tsx:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/components/MonitorSelector.tsx#L20)
 
 Array of available monitors to choose from
 
@@ -30,7 +30,7 @@ Array of available monitors to choose from
 
 > **onChange**: (`event`) => `void`
 
-Defined in: [src/components/Dashboard/SiteCard/components/MonitorSelector.tsx:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/components/MonitorSelector.tsx#L22)
+Defined in: [src/components/Dashboard/SiteCard/components/MonitorSelector.tsx:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/components/MonitorSelector.tsx#L22)
 
 Callback function for selection change events
 
@@ -50,6 +50,6 @@ Callback function for selection change events
 
 > **selectedMonitorId**: `string`
 
-Defined in: [src/components/Dashboard/SiteCard/components/MonitorSelector.tsx:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/components/MonitorSelector.tsx#L24)
+Defined in: [src/components/Dashboard/SiteCard/components/MonitorSelector.tsx:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/components/MonitorSelector.tsx#L24)
 
 ID of the currently selected monitor

@@ -1,6 +1,6 @@
 # Interface: MonitorFieldChangeHandlers
 
-Defined in: [src/types/monitor-forms.ts:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/types/monitor-forms.ts#L41)
+Defined in: [src/types/monitor-forms.ts:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/types/monitor-forms.ts#L41)
 
 Type-safe field change handlers for monitor forms
 
@@ -10,7 +10,7 @@ Type-safe field change handlers for monitor forms
 
 > **boolean**: (`fieldName`, `value`) => `void`
 
-Defined in: [src/types/monitor-forms.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/types/monitor-forms.ts#L43)
+Defined in: [src/types/monitor-forms.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/types/monitor-forms.ts#L43)
 
 Handler for boolean fields
 
@@ -34,7 +34,7 @@ Handler for boolean fields
 
 > **number**: (`fieldName`, `value`) => `void`
 
-Defined in: [src/types/monitor-forms.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/types/monitor-forms.ts#L45)
+Defined in: [src/types/monitor-forms.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/types/monitor-forms.ts#L45)
 
 Handler for number fields
 
@@ -58,7 +58,7 @@ Handler for number fields
 
 > **object**: (`fieldName`, `value`) => `void`
 
-Defined in: [src/types/monitor-forms.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/types/monitor-forms.ts#L47)
+Defined in: [src/types/monitor-forms.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/types/monitor-forms.ts#L47)
 
 Handler for object fields
 
@@ -82,7 +82,7 @@ Handler for object fields
 
 > **string**: (`fieldName`, `value`) => `void`
 
-Defined in: [src/types/monitor-forms.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/types/monitor-forms.ts#L49)
+Defined in: [src/types/monitor-forms.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/types/monitor-forms.ts#L49)
 
 Handler for string fields
 

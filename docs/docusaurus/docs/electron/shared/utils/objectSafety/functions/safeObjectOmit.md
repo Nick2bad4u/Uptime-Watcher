@@ -2,7 +2,7 @@
 
 > **safeObjectOmit**\<`T`, `K`\>(`obj`, `keys`): [`Omit`](https://www.typescriptlang.org/docs/handbook/utility-types.html#omittype-keys)\<`T`, `K`\>
 
-Defined in: [shared/utils/objectSafety.ts:96](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/objectSafety.ts#L96)
+Defined in: [shared/utils/objectSafety.ts:105](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/objectSafety.ts#L105)
 
 Create a type-safe object with specified keys omitted.
 

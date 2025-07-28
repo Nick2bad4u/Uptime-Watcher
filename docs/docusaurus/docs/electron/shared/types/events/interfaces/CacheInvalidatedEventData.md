@@ -1,8 +1,27 @@
 # Interface: CacheInvalidatedEventData
 
-Defined in: [shared/types/events.ts:11](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types/events.ts#L11)
+Defined in: [shared/types/events.ts:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types/events.ts#L30)
 
-Event data for cache invalidation
+Payload for cache invalidation events.
+
+## Remarks
+
+Used to notify listeners that a cache entry or the entire cache has been invalidated for a specific reason.
+- `identifier`: The specific identifier affected (optional for global invalidation).
+- `reason`: The reason for invalidation.
+- `timestamp`: The time (in ms since epoch) when invalidation occurred.
+- `type`: The type of cache invalidation.
+
+## Example
+
+// Invalidate all site caches due to manual action
+```typescript
+const event: CacheInvalidatedEventData = {
+  type: 'all',
+  reason: 'manual',
+  timestamp: Date.now()
+};
+```
 
 ## Properties
 
@@ -10,9 +29,13 @@ Event data for cache invalidation
 
 > `optional` **identifier**: `string`
 
-Defined in: [shared/types/events.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types/events.ts#L13)
+Defined in: [shared/types/events.ts:35](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types/events.ts#L35)
 
-Specific identifier affected (optional for global invalidation)
+The specific identifier affected (optional for global invalidation).
+
+#### Remarks
+
+If omitted, the invalidation is considered global.
 
 ***
 
@@ -20,9 +43,13 @@ Specific identifier affected (optional for global invalidation)
 
 > **reason**: `"manual"` \| `"delete"` \| `"expiry"` \| `"update"`
 
-Defined in: [shared/types/events.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types/events.ts#L15)
+Defined in: [shared/types/events.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types/events.ts#L40)
 
-Reason for invalidation
+The reason for invalidation.
+
+#### Remarks
+
+Can be 'delete', 'expiry', 'manual', or 'update'.
 
 ***
 
@@ -30,9 +57,9 @@ Reason for invalidation
 
 > **timestamp**: `number`
 
-Defined in: [shared/types/events.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types/events.ts#L17)
+Defined in: [shared/types/events.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types/events.ts#L44)
 
-Timestamp when invalidation occurred
+The time (in ms since epoch) when invalidation occurred.
 
 ***
 
@@ -40,6 +67,10 @@ Timestamp when invalidation occurred
 
 > **type**: `"all"` \| `"monitor"` \| `"site"`
 
-Defined in: [shared/types/events.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types/events.ts#L19)
+Defined in: [shared/types/events.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types/events.ts#L49)
 
-Type of cache invalidation
+The type of cache invalidation.
+
+#### Remarks
+
+'all' for global, 'monitor' for a specific monitor, 'site' for a specific site.

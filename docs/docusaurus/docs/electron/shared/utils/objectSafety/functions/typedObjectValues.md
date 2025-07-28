@@ -2,7 +2,7 @@
 
 > **typedObjectValues**\<`T`\>(`obj`): `T`\[keyof `T`\][]
 
-Defined in: [shared/utils/objectSafety.ts:189](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/objectSafety.ts#L189)
+Defined in: [shared/utils/objectSafety.ts:218](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/objectSafety.ts#L218)
 
 Type-safe Object.values that preserves value types for known object shapes.
 
@@ -25,6 +25,14 @@ Object to get values from
 `T`\[keyof `T`\][]
 
 Array of values with proper typing
+
+## Remarks
+
+This function uses type assertion to preserve compile-time type information.
+Object.values() only returns enumerable property values, so non-enumerable
+properties and symbol-keyed properties are not included. The cast assumes
+all values are of type T[keyof T], which is accurate for the enumerable
+properties that Object.values() actually returns.
 
 ## Example
 

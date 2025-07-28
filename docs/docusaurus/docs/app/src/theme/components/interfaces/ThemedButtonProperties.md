@@ -1,6 +1,6 @@
 # Interface: ThemedButtonProperties
 
-Defined in: [src/theme/components.tsx:134](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L134)
+Defined in: [src/theme/components.tsx:134](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L134)
 
 Props for the ThemedButton component
 
@@ -10,7 +10,7 @@ Props for the ThemedButton component
 
 > `readonly` `optional` **aria-label**: `string`
 
-Defined in: [src/theme/components.tsx:135](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L135)
+Defined in: [src/theme/components.tsx:135](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L135)
 
 ***
 
@@ -18,7 +18,7 @@ Defined in: [src/theme/components.tsx:135](https://github.com/Nick2bad4u/Uptime-
 
 > `readonly` `optional` **children**: [`ReactNode`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L427)
 
-Defined in: [src/theme/components.tsx:136](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L136)
+Defined in: [src/theme/components.tsx:136](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L136)
 
 ***
 
@@ -26,7 +26,7 @@ Defined in: [src/theme/components.tsx:136](https://github.com/Nick2bad4u/Uptime-
 
 > `readonly` `optional` **className**: `string`
 
-Defined in: [src/theme/components.tsx:137](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L137)
+Defined in: [src/theme/components.tsx:137](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L137)
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: [src/theme/components.tsx:137](https://github.com/Nick2bad4u/Uptime-
 
 > `readonly` `optional` **disabled**: `boolean`
 
-Defined in: [src/theme/components.tsx:138](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L138)
+Defined in: [src/theme/components.tsx:138](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L138)
 
 ***
 
@@ -42,7 +42,7 @@ Defined in: [src/theme/components.tsx:138](https://github.com/Nick2bad4u/Uptime-
 
 > `readonly` `optional` **fullWidth**: `boolean`
 
-Defined in: [src/theme/components.tsx:139](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L139)
+Defined in: [src/theme/components.tsx:139](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L139)
 
 ***
 
@@ -50,7 +50,7 @@ Defined in: [src/theme/components.tsx:139](https://github.com/Nick2bad4u/Uptime-
 
 > `readonly` `optional` **icon**: [`ReactNode`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L427)
 
-Defined in: [src/theme/components.tsx:140](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L140)
+Defined in: [src/theme/components.tsx:140](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L140)
 
 ***
 
@@ -58,7 +58,7 @@ Defined in: [src/theme/components.tsx:140](https://github.com/Nick2bad4u/Uptime-
 
 > `readonly` `optional` **iconColor**: `string`
 
-Defined in: [src/theme/components.tsx:141](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L141)
+Defined in: [src/theme/components.tsx:141](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L141)
 
 ***
 
@@ -66,7 +66,7 @@ Defined in: [src/theme/components.tsx:141](https://github.com/Nick2bad4u/Uptime-
 
 > `readonly` `optional` **iconPosition**: `"left"` \| `"right"`
 
-Defined in: [src/theme/components.tsx:142](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L142)
+Defined in: [src/theme/components.tsx:142](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L142)
 
 ***
 
@@ -74,7 +74,7 @@ Defined in: [src/theme/components.tsx:142](https://github.com/Nick2bad4u/Uptime-
 
 > `readonly` `optional` **loading**: `boolean`
 
-Defined in: [src/theme/components.tsx:143](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L143)
+Defined in: [src/theme/components.tsx:143](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L143)
 
 ***
 
@@ -82,7 +82,7 @@ Defined in: [src/theme/components.tsx:143](https://github.com/Nick2bad4u/Uptime-
 
 > `readonly` `optional` **onClick**: (`e?`) => `void`
 
-Defined in: [src/theme/components.tsx:144](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L144)
+Defined in: [src/theme/components.tsx:144](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L144)
 
 #### Parameters
 
@@ -100,7 +100,7 @@ Defined in: [src/theme/components.tsx:144](https://github.com/Nick2bad4u/Uptime-
 
 > `readonly` `optional` **size**: [`ButtonSize`](../type-aliases/ButtonSize.md)
 
-Defined in: [src/theme/components.tsx:145](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L145)
+Defined in: [src/theme/components.tsx:145](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L145)
 
 ***
 
@@ -108,7 +108,7 @@ Defined in: [src/theme/components.tsx:145](https://github.com/Nick2bad4u/Uptime-
 
 > `readonly` `optional` **style**: [`CSSProperties`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L2383)
 
-Defined in: [src/theme/components.tsx:146](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L146)
+Defined in: [src/theme/components.tsx:146](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L146)
 
 ***
 
@@ -116,7 +116,7 @@ Defined in: [src/theme/components.tsx:146](https://github.com/Nick2bad4u/Uptime-
 
 > `readonly` `optional` **title**: `string`
 
-Defined in: [src/theme/components.tsx:147](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L147)
+Defined in: [src/theme/components.tsx:147](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L147)
 
 ***
 
@@ -124,7 +124,7 @@ Defined in: [src/theme/components.tsx:147](https://github.com/Nick2bad4u/Uptime-
 
 > `readonly` `optional` **type**: `"button"` \| `"reset"` \| `"submit"`
 
-Defined in: [src/theme/components.tsx:148](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L148)
+Defined in: [src/theme/components.tsx:148](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L148)
 
 ***
 
@@ -132,4 +132,4 @@ Defined in: [src/theme/components.tsx:148](https://github.com/Nick2bad4u/Uptime-
 
 > `readonly` `optional` **variant**: [`ButtonVariant`](../type-aliases/ButtonVariant.md)
 
-Defined in: [src/theme/components.tsx:149](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L149)
+Defined in: [src/theme/components.tsx:149](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/components.tsx#L149)

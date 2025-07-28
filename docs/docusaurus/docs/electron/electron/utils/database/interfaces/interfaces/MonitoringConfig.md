@@ -1,6 +1,6 @@
 # Interface: MonitoringConfig
 
-Defined in: [electron/utils/database/interfaces.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/interfaces.ts#L21)
+Defined in: [electron/utils/database/interfaces.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/interfaces.ts#L21)
 
 Configuration for monitoring operations.
 
@@ -10,7 +10,7 @@ Configuration for monitoring operations.
 
 > **setHistoryLimit**: (`limit`) => `void`
 
-Defined in: [electron/utils/database/interfaces.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/interfaces.ts#L23)
+Defined in: [electron/utils/database/interfaces.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/interfaces.ts#L23)
 
 Function to set history limit
 
@@ -30,7 +30,7 @@ Function to set history limit
 
 > **setupNewMonitors**: (`site`, `newMonitorIds`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/utils/database/interfaces.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/interfaces.ts#L25)
+Defined in: [electron/utils/database/interfaces.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/interfaces.ts#L25)
 
 Function to setup new monitors for a site
 
@@ -54,7 +54,7 @@ Function to setup new monitors for a site
 
 > **startMonitoring**: (`identifier`, `monitorId`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`boolean`\>
 
-Defined in: [electron/utils/database/interfaces.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/interfaces.ts#L27)
+Defined in: [electron/utils/database/interfaces.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/interfaces.ts#L27)
 
 Function to start monitoring for a site/monitor
 
@@ -78,7 +78,7 @@ Function to start monitoring for a site/monitor
 
 > **stopMonitoring**: (`identifier`, `monitorId`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`boolean`\>
 
-Defined in: [electron/utils/database/interfaces.ts:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/interfaces.ts#L29)
+Defined in: [electron/utils/database/interfaces.ts:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/interfaces.ts#L29)
 
 Function to stop monitoring for a site/monitor
 

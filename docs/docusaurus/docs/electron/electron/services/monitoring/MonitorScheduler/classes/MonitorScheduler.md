@@ -1,15 +1,20 @@
 # Class: MonitorScheduler
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:14](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorScheduler.ts#L14)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorScheduler.ts#L21)
 
-Service for managing monitor scheduling and intervals.
-Handles per-monitor interval timers and scheduling logic.
+Manages scheduling, execution, and lifecycle of monitor checks for sites and their monitors.
 
 ## Remarks
 
-Manages individual timer intervals for each monitor, allowing different
-check frequencies per monitor. Provides lifecycle management for starting,
-stopping, and restarting monitoring operations.
+Maintains per-monitor interval timers, supports dynamic check intervals, and provides lifecycle management for starting, stopping, and restarting monitoring operations. All monitor checks are triggered via an async callback, and errors during checks are logged without affecting other monitors. Designed for robust, event-driven monitoring orchestration.
+
+## Example
+
+```typescript
+const scheduler = new MonitorScheduler();
+scheduler.setCheckCallback(async (siteId, monitorId) => { ... });
+scheduler.startSite(siteObj);
+```
 
 ## Constructors
 
@@ -27,13 +32,15 @@ stopping, and restarting monitoring operations.
 
 > **getActiveCount**(): `number`
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorScheduler.ts#L43)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorScheduler.ts#L54)
 
-Get the number of active monitoring intervals.
+Returns the number of currently active monitoring intervals.
 
 #### Returns
 
 `number`
+
+The number of scheduled monitor intervals.
 
 ***
 
@@ -41,13 +48,15 @@ Get the number of active monitoring intervals.
 
 > **getActiveMonitors**(): `string`[]
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorScheduler.ts#L50)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:65](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorScheduler.ts#L65)
 
-Get all active monitoring keys.
+Returns all active monitor interval keys.
 
 #### Returns
 
 `string`[]
+
+An array of interval keys in the format `$`siteIdentifier`|$`monitorId``.
 
 ***
 
@@ -55,9 +64,9 @@ Get all active monitoring keys.
 
 > **isMonitoring**(`siteIdentifier`, `monitorId`): `boolean`
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:57](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorScheduler.ts#L57)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:78](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorScheduler.ts#L78)
 
-Check if a monitor is currently being monitored.
+Determines if a monitor is currently being scheduled and actively monitored.
 
 #### Parameters
 
@@ -65,13 +74,19 @@ Check if a monitor is currently being monitored.
 
 `string`
 
+Unique identifier for the site.
+
 ##### monitorId
 
 `string`
 
+Unique identifier for the monitor.
+
 #### Returns
 
 `boolean`
+
+`true` if the monitor is actively scheduled; otherwise, `false`.
 
 ***
 
@@ -79,9 +94,9 @@ Check if a monitor is currently being monitored.
 
 > **performImmediateCheck**(`siteIdentifier`, `monitorId`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:65](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorScheduler.ts#L65)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:97](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorScheduler.ts#L97)
 
-Perform an immediate check for a monitor (used when starting monitoring).
+Performs an immediate check for a specific monitor by invoking the registered check callback.
 
 #### Parameters
 
@@ -89,13 +104,27 @@ Perform an immediate check for a monitor (used when starting monitoring).
 
 `string`
 
+Unique identifier for the site.
+
 ##### monitorId
 
 `string`
 
+Unique identifier for the monitor.
+
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
+
+A promise that resolves when the check completes.
+
+#### Remarks
+
+Invokes the registered check callback for the specified monitor. Errors are logged and do not interrupt execution. If no callback is set, this method does nothing.
+
+#### Throws
+
+Any error thrown by the callback is caught and logged; errors are not re-thrown.
 
 ***
 
@@ -103,9 +132,9 @@ Perform an immediate check for a monitor (used when starting monitoring).
 
 > **restartMonitor**(`siteIdentifier`, `monitor`): `boolean`
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:91](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorScheduler.ts#L91)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:125](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorScheduler.ts#L125)
 
-Restart monitoring for a specific monitor.
+Restarts monitoring for a specific monitor.
 
 #### Parameters
 
@@ -113,28 +142,29 @@ Restart monitoring for a specific monitor.
 
 `string`
 
-Site identifier
+Unique identifier for the site.
 
 ##### monitor
 
 [`Monitor`](../../../../../shared/types/interfaces/Monitor.md)
 
-Monitor configuration
+Monitor configuration object.
 
 #### Returns
 
 `boolean`
 
-True if monitoring was successfully restarted, false if monitor has no ID
+`true` if monitoring was restarted; `false` if the monitor has no ID.
 
 #### Remarks
 
-Stops existing monitoring for the monitor and starts fresh with current configuration.
-Useful when monitor settings (like check interval) have changed.
+Stops any existing interval for the monitor, then starts a new one. Useful when monitor settings (such as interval) change. If the monitor has no ID, no action is taken.
 
-Return value semantics:
-- true: Monitor was successfully stopped and restarted
-- false: Monitor has no ID and cannot be monitored
+#### Example
+
+```typescript
+scheduler.restartMonitor("siteA", monitorObj);
+```
 
 ***
 
@@ -142,9 +172,9 @@ Return value semantics:
 
 > **setCheckCallback**(`callback`): `void`
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:103](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorScheduler.ts#L103)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:149](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorScheduler.ts#L149)
 
-Set the callback function to execute when a monitor check is scheduled.
+Registers the callback to execute when a monitor check is scheduled.
 
 #### Parameters
 
@@ -152,9 +182,21 @@ Set the callback function to execute when a monitor check is scheduled.
 
 (`siteIdentifier`, `monitorId`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
+Function to execute for each scheduled monitor check. Receives the site identifier and monitor ID.
+
 #### Returns
 
 `void`
+
+#### Remarks
+
+Must be called before starting any monitoring. The callback should be async and handle errors internally. This callback is invoked for every scheduled or immediate monitor check.
+
+#### Example
+
+```typescript
+scheduler.setCheckCallback(async (siteId, monitorId) => { ... });
+```
 
 ***
 
@@ -162,9 +204,9 @@ Set the callback function to execute when a monitor check is scheduled.
 
 > **startMonitor**(`siteIdentifier`, `monitor`): `boolean`
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:110](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorScheduler.ts#L110)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:172](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorScheduler.ts#L172)
 
-Start monitoring for a specific monitor with its own interval.
+Starts monitoring for a specific monitor with its own interval.
 
 #### Parameters
 
@@ -172,13 +214,33 @@ Start monitoring for a specific monitor with its own interval.
 
 `string`
 
+Unique identifier for the site.
+
 ##### monitor
 
 [`Monitor`](../../../../../shared/types/interfaces/Monitor.md)
 
+Monitor configuration object.
+
 #### Returns
 
 `boolean`
+
+`true` if monitoring started; `false` if the monitor has no ID.
+
+#### Remarks
+
+Stops any existing interval for the monitor before starting. Validates and applies the monitor's checkInterval. Triggers an immediate check after starting. Throws if the checkInterval is invalid. If the monitor has no ID, no action is taken.
+
+#### Throws
+
+Error if checkInterval is invalid.
+
+#### Example
+
+```typescript
+scheduler.startMonitor("siteA", monitorObj);
+```
 
 ***
 
@@ -186,9 +248,9 @@ Start monitoring for a specific monitor with its own interval.
 
 > **startSite**(`site`): `void`
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:163](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorScheduler.ts#L163)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:237](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorScheduler.ts#L237)
 
-Start monitoring for all monitors in a site.
+Starts monitoring for all monitors in a site.
 
 #### Parameters
 
@@ -196,9 +258,21 @@ Start monitoring for all monitors in a site.
 
 [`Site`](../../../../../shared/types/interfaces/Site.md)
 
+Site configuration object containing monitors.
+
 #### Returns
 
 `void`
+
+#### Remarks
+
+Only monitors with `monitoring: true` and a valid ID are started. This method is idempotent and safe to call multiple times.
+
+#### Example
+
+```typescript
+scheduler.startSite(siteObj);
+```
 
 ***
 
@@ -206,13 +280,23 @@ Start monitoring for all monitors in a site.
 
 > **stopAll**(): `void`
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:174](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorScheduler.ts#L174)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:258](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorScheduler.ts#L258)
 
-Stop all monitoring intervals.
+Stops all monitoring intervals and clears all tracked monitors.
 
 #### Returns
 
 `void`
+
+#### Remarks
+
+Clears all interval timers and removes all monitors from tracking. Logs an info message when complete. Safe to call even if no monitors are active.
+
+#### Example
+
+```typescript
+scheduler.stopAll();
+```
 
 ***
 
@@ -220,9 +304,9 @@ Stop all monitoring intervals.
 
 > **stopMonitor**(`siteIdentifier`, `monitorId`): `boolean`
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:198](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorScheduler.ts#L198)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:283](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorScheduler.ts#L283)
 
-Stop monitoring for a specific monitor.
+Stops monitoring for a specific monitor.
 
 #### Parameters
 
@@ -230,29 +314,29 @@ Stop monitoring for a specific monitor.
 
 `string`
 
-Site identifier
+Unique identifier for the site.
 
 ##### monitorId
 
 `string`
 
-Monitor ID to stop
+Unique identifier for the monitor.
 
 #### Returns
 
 `boolean`
 
-True if monitoring was stopped, false if not currently monitoring
+`true` if monitoring was stopped; `false` if not currently monitored.
 
 #### Remarks
 
-Clears the interval timer and removes the monitor from active tracking.
-Safe to call even if monitor is not currently being monitored.
+Clears the interval timer and removes the monitor from tracking. Safe to call even if the monitor is not currently monitored. Logs debug information about the stop operation.
 
-Side effects:
-- Clears associated interval timer
-- Removes monitor from internal tracking
-- Logs debug information about the stop operation
+#### Example
+
+```typescript
+scheduler.stopMonitor("siteA", "monitor123");
+```
 
 ***
 
@@ -260,9 +344,9 @@ Side effects:
 
 > **stopSite**(`siteIdentifier`, `monitors?`): `void`
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:215](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorScheduler.ts#L215)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:314](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorScheduler.ts#L314)
 
-Stop monitoring for all monitors in a site.
+Stops monitoring for all monitors in a site.
 
 #### Parameters
 
@@ -270,10 +354,25 @@ Stop monitoring for all monitors in a site.
 
 `string`
 
+Unique identifier for the site.
+
 ##### monitors?
 
 [`Monitor`](../../../../../shared/types/interfaces/Monitor.md)[]
 
+Optional array of monitor configurations to stop. If omitted, all monitors for the site are stopped.
+
 #### Returns
 
 `void`
+
+#### Remarks
+
+If `monitors` is provided, only those monitors are stopped. Otherwise, all monitors for the site are stopped. Safe to call even if no monitors are active for the site.
+
+#### Example
+
+```typescript
+scheduler.stopSite("siteA");
+scheduler.stopSite("siteA", [monitorObj1, monitorObj2]);
+```

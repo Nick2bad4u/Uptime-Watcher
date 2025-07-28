@@ -10,4 +10,4 @@
 
 ## Functions
 
-- [createStatusUpdateHandler](functions/createStatusUpdateHandler.md)
+- [~~createStatusUpdateHandler~~](functions/createStatusUpdateHandler.md)

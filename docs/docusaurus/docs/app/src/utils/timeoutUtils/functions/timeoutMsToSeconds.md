@@ -2,7 +2,7 @@
 
 > **timeoutMsToSeconds**(`timeoutMs`): `number`
 
-Defined in: [src/utils/timeoutUtils.ts:58](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/timeoutUtils.ts#L58)
+Defined in: [src/utils/timeoutUtils.ts:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/utils/timeoutUtils.ts#L62)
 
 Convert timeout from milliseconds to seconds for UI display.
 
@@ -18,4 +18,9 @@ Timeout in milliseconds
 
 `number`
 
-Timeout in seconds
+Timeout in seconds (may include decimal places for precise conversion)
+
+## Remarks
+
+Performs direct division without rounding. For UI display where whole seconds
+are preferred, consider using Math.round() or Math.floor() on the result.

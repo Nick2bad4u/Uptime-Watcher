@@ -2,9 +2,10 @@
 
 > **isValidTimestamp**(`value`): `value is number`
 
-Defined in: [shared/utils/typeGuards.ts:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/typeGuards.ts#L126)
+Defined in: [shared/utils/typeGuards.ts:229](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/typeGuards.ts#L229)
 
-Type predicate for checking if value is a valid timestamp.
+Determines if a value is a valid Unix timestamp (seconds or milliseconds).
+Allows timestamps up to 1 day in the future from the current time.
 
 ## Parameters
 
@@ -12,6 +13,10 @@ Type predicate for checking if value is a valid timestamp.
 
 `unknown`
 
+The value to check.
+
 ## Returns
 
 `value is number`
+
+True if `value` is a valid timestamp; otherwise, false.

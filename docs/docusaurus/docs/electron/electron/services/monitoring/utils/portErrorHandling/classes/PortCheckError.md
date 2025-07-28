@@ -1,13 +1,26 @@
 # Class: PortCheckError
 
-Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/utils/portErrorHandling.ts#L43)
+Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:89](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/utils/portErrorHandling.ts#L89)
 
-Custom error class that preserves response time information from failed port checks.
+Custom error class for port connectivity failures, preserving response time information.
 
 ## Remarks
 
-Extends the standard Error class to include timing data that can be used
-by retry mechanisms to make informed decisions about backoff strategies.
+Extends the standard [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error) class to include timing data, supporting diagnostics and retry/backoff strategies.
+
+## Example
+
+```typescript
+throw new PortCheckError("Port not reachable", 1200);
+```
+
+## Param
+
+The error message describing the failure.
+
+## Param
+
+The time taken until failure in milliseconds.
 
 ## Extends
 
@@ -19,9 +32,9 @@ by retry mechanisms to make informed decisions about backoff strategies.
 
 > **new PortCheckError**(`message`, `responseTime`): `PortCheckError`
 
-Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:53](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/utils/portErrorHandling.ts#L53)
+Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:108](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/utils/portErrorHandling.ts#L108)
 
-Create a new PortCheckError with timing information.
+Constructs a new PortCheckError with timing information.
 
 #### Parameters
 
@@ -29,17 +42,21 @@ Create a new PortCheckError with timing information.
 
 `string`
 
-Error message describing the failure
+The error message describing the failure.
 
 ##### responseTime
 
 `number`
 
-Time taken until failure in milliseconds
+The time taken until failure in milliseconds.
 
 #### Returns
 
 `PortCheckError`
+
+#### Remarks
+
+Sets the error name to "PortCheckError" and preserves the response time for analysis.
 
 #### Overrides
 
@@ -51,6 +68,6 @@ Time taken until failure in milliseconds
 
 > `readonly` **responseTime**: `number`
 
-Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/utils/portErrorHandling.ts#L45)
+Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:96](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/utils/portErrorHandling.ts#L96)
 
-Response time at point of failure in milliseconds
+The response time at the point of failure, in milliseconds.

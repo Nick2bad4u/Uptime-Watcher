@@ -1,6 +1,6 @@
 # Interface: DataImportExportConfig
 
-Defined in: [electron/utils/database/DataImportExportService.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/DataImportExportService.ts#L23)
+Defined in: [electron/utils/database/DataImportExportService.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/DataImportExportService.ts#L25)
 
 Configuration for data import/export operations.
 
@@ -10,7 +10,7 @@ Configuration for data import/export operations.
 
 > **databaseService**: [`DatabaseService`](../../../../services/database/DatabaseService/classes/DatabaseService.md)
 
-Defined in: [electron/utils/database/DataImportExportService.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/DataImportExportService.ts#L24)
+Defined in: [electron/utils/database/DataImportExportService.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/DataImportExportService.ts#L26)
 
 ***
 
@@ -18,7 +18,7 @@ Defined in: [electron/utils/database/DataImportExportService.ts:24](https://gith
 
 > **eventEmitter**: [`TypedEventBus`](../../../../events/TypedEventBus/classes/TypedEventBus.md)\<[`UptimeEvents`](../../../../events/eventTypes/interfaces/UptimeEvents.md)\>
 
-Defined in: [electron/utils/database/DataImportExportService.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/DataImportExportService.ts#L25)
+Defined in: [electron/utils/database/DataImportExportService.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/DataImportExportService.ts#L27)
 
 ***
 
@@ -26,7 +26,7 @@ Defined in: [electron/utils/database/DataImportExportService.ts:25](https://gith
 
 > **logger**: [`Logger`](../../../interfaces/interfaces/Logger.md)
 
-Defined in: [electron/utils/database/DataImportExportService.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/DataImportExportService.ts#L26)
+Defined in: [electron/utils/database/DataImportExportService.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/DataImportExportService.ts#L28)
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: [electron/utils/database/DataImportExportService.ts:26](https://gith
 
 > **repositories**: `object`
 
-Defined in: [electron/utils/database/DataImportExportService.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/DataImportExportService.ts#L27)
+Defined in: [electron/utils/database/DataImportExportService.ts:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/DataImportExportService.ts#L29)
 
 #### history
 

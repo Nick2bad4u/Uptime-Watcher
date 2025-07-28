@@ -1,9 +1,14 @@
 # Class: SettingsRepository
 
-Defined in: [electron/services/database/SettingsRepository.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L17)
+Defined in: [electron/services/database/SettingsRepository.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SettingsRepository.ts#L52)
 
 Repository for managing application settings persistence.
-Handles CRUD operations for settings in the database.
+
+Handles all CRUD operations for settings in the database, following the repository pattern.
+
+## Remarks
+
+All operations are wrapped in transactions and use the repository pattern for consistency, error handling, and maintainability. This class should be used as the sole interface for settings data access and mutation.
 
 ## Constructors
 
@@ -11,7 +16,9 @@ Handles CRUD operations for settings in the database.
 
 > **new SettingsRepository**(`dependencies`): `SettingsRepository`
 
-Defined in: [electron/services/database/SettingsRepository.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L20)
+Defined in: [electron/services/database/SettingsRepository.ts:65](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SettingsRepository.ts#L65)
+
+Constructs a new SettingsRepository instance.
 
 #### Parameters
 
@@ -19,9 +26,17 @@ Defined in: [electron/services/database/SettingsRepository.ts:20](https://github
 
 [`SettingsRepositoryDependencies`](../interfaces/SettingsRepositoryDependencies.md)
 
+The required dependencies for settings operations.
+
 #### Returns
 
 `SettingsRepository`
+
+#### Example
+
+```typescript
+const repo = new SettingsRepository({ databaseService });
+```
 
 ## Methods
 
@@ -29,10 +44,9 @@ Defined in: [electron/services/database/SettingsRepository.ts:20](https://github
 
 > **bulkInsert**(`settings`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/database/SettingsRepository.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L28)
+Defined in: [electron/services/database/SettingsRepository.ts:82](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SettingsRepository.ts#L82)
 
-Bulk insert settings (for import functionality).
-Uses a prepared statement and transaction for better performance.
+Bulk inserts settings (for import functionality).
 
 #### Parameters
 
@@ -40,9 +54,27 @@ Uses a prepared statement and transaction for better performance.
 
 [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\>
 
+Key-value pairs to insert.
+
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
+
+A promise that resolves when all settings are inserted.
+
+#### Throws
+
+Error if the database operation fails.
+
+#### Remarks
+
+Uses a prepared statement and transaction for better performance.
+
+#### Example
+
+```typescript
+await repo.bulkInsert({ theme: "dark", language: "en" });
+```
 
 ***
 
@@ -50,9 +82,9 @@ Uses a prepared statement and transaction for better performance.
 
 > **bulkInsertInternal**(`db`, `settings`): `void`
 
-Defined in: [electron/services/database/SettingsRepository.ts:64](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L64)
+Defined in: [electron/services/database/SettingsRepository.ts:114](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SettingsRepository.ts#L114)
 
-Internal method to bulk insert settings within an existing transaction.
+Bulk inserts settings within an existing transaction context.
 
 #### Parameters
 
@@ -60,13 +92,13 @@ Internal method to bulk insert settings within an existing transaction.
 
 `Database`
 
-Database connection (must be within active transaction)
+The database connection (must be within an active transaction).
 
 ##### settings
 
 [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\>
 
-Key-value pairs to insert
+Key-value pairs to insert.
 
 #### Returns
 
@@ -74,15 +106,13 @@ Key-value pairs to insert
 
 #### Throws
 
-Error When database operations fail
+Error when database operations fail.
 
 #### Remarks
 
 **IMPORTANT**: This method must be called within an existing transaction context.
 
-**Error Handling**: Uses prepared statements which may throw on constraint violations
-or database errors. All exceptions are propagated to the calling transaction context
-for proper rollback handling.
+**Error Handling**: Uses prepared statements which may throw on constraint violations or database errors. All exceptions are propagated to the calling transaction context for proper rollback handling.
 
 **Performance**: Uses prepared statements for optimal bulk insert performance.
 
@@ -92,9 +122,9 @@ for proper rollback handling.
 
 > **delete**(`key`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/database/SettingsRepository.ts:87](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L87)
+Defined in: [electron/services/database/SettingsRepository.ts:145](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SettingsRepository.ts#L145)
 
-Delete a setting by key.
+Deletes a setting by key.
 
 #### Parameters
 
@@ -102,9 +132,23 @@ Delete a setting by key.
 
 `string`
 
+The setting key to delete.
+
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
+
+A promise that resolves when the setting is deleted.
+
+#### Throws
+
+Error if the database operation fails.
+
+#### Example
+
+```typescript
+await repo.delete("theme");
+```
 
 ***
 
@@ -112,13 +156,25 @@ Delete a setting by key.
 
 > **deleteAll**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/database/SettingsRepository.ts:104](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L104)
+Defined in: [electron/services/database/SettingsRepository.ts:169](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SettingsRepository.ts#L169)
 
-Clear all settings from the database.
+Clears all settings from the database.
 
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
+
+A promise that resolves when all settings are deleted.
+
+#### Throws
+
+Error if the database operation fails.
+
+#### Example
+
+```typescript
+await repo.deleteAll();
+```
 
 ***
 
@@ -126,10 +182,9 @@ Clear all settings from the database.
 
 > **deleteAllInternal**(`db`): `void`
 
-Defined in: [electron/services/database/SettingsRepository.ts:117](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L117)
+Defined in: [electron/services/database/SettingsRepository.ts:185](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SettingsRepository.ts#L185)
 
-Internal method to clear all settings from the database within an existing transaction.
-Use this method when you're already within a transaction context.
+Clears all settings from the database within an existing transaction context.
 
 #### Parameters
 
@@ -137,9 +192,15 @@ Use this method when you're already within a transaction context.
 
 `Database`
 
+The database connection (must be within an active transaction).
+
 #### Returns
 
 `void`
+
+#### Remarks
+
+Use this method only when already within a transaction context.
 
 ***
 
@@ -147,10 +208,9 @@ Use this method when you're already within a transaction context.
 
 > **deleteInternal**(`db`, `key`): `void`
 
-Defined in: [electron/services/database/SettingsRepository.ts:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L126)
+Defined in: [electron/services/database/SettingsRepository.ts:198](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SettingsRepository.ts#L198)
 
-Internal method to delete a setting by key within an existing transaction.
-Use this method when you're already within a transaction context.
+Deletes a setting by key within an existing transaction context.
 
 #### Parameters
 
@@ -158,13 +218,21 @@ Use this method when you're already within a transaction context.
 
 `Database`
 
+The database connection (must be within an active transaction).
+
 ##### key
 
 `string`
 
+The setting key to delete.
+
 #### Returns
 
 `void`
+
+#### Remarks
+
+Use this method only when already within a transaction context.
 
 ***
 
@@ -172,9 +240,9 @@ Use this method when you're already within a transaction context.
 
 > **get**(`key`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`undefined` \| `string`\>
 
-Defined in: [electron/services/database/SettingsRepository.ts:139](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L139)
+Defined in: [electron/services/database/SettingsRepository.ts:216](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SettingsRepository.ts#L216)
 
-Get a setting by key.
+Gets a setting by key.
 
 #### Parameters
 
@@ -182,13 +250,23 @@ Get a setting by key.
 
 `string`
 
-Setting key to retrieve
+The setting key to retrieve.
 
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`undefined` \| `string`\>
 
-Promise resolving to setting value or undefined if not found
+A promise resolving to the setting value or `undefined` if not found.
+
+#### Throws
+
+Error if the database operation fails.
+
+#### Example
+
+```typescript
+const theme = await repo.get("theme");
+```
 
 ***
 
@@ -196,21 +274,29 @@ Promise resolving to setting value or undefined if not found
 
 > **getAll**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\>\>
 
-Defined in: [electron/services/database/SettingsRepository.ts:159](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L159)
+Defined in: [electron/services/database/SettingsRepository.ts:236](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SettingsRepository.ts#L236)
 
-Get all settings.
+Gets all settings.
 
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\>\>
 
-Promise resolving to all settings as key-value pairs
+A promise resolving to all settings as key-value pairs.
+
+#### Throws
+
+Error if the database operation fails.
 
 #### Remarks
 
-**Performance Note**: Settings tables are typically small (under 100 entries) by design.
-No pagination is needed as settings are configuration data, not user-generated content.
-If settings grow beyond expected size, consider splitting into separate configuration domains.
+**Performance Note**: Settings tables are typically small (under 100 entries) by design. No pagination is needed as settings are configuration data, not user-generated content. If settings grow beyond expected size, consider splitting into separate configuration domains.
+
+#### Example
+
+```typescript
+const allSettings = await repo.getAll();
+```
 
 ***
 
@@ -218,9 +304,9 @@ If settings grow beyond expected size, consider splitting into separate configur
 
 > **set**(`key`, `value`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/database/SettingsRepository.ts:177](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L177)
+Defined in: [electron/services/database/SettingsRepository.ts:257](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SettingsRepository.ts#L257)
 
-Set a setting value.
+Sets a setting value.
 
 #### Parameters
 
@@ -228,23 +314,29 @@ Set a setting value.
 
 `string`
 
-Setting key to set
+The setting key to set.
 
 ##### value
 
 `string`
 
-Setting value to store
+The setting value to store.
 
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Promise that resolves when setting is saved
+A promise that resolves when the setting is saved.
 
 #### Throws
 
-Error When database operation fails
+Error if the database operation fails.
+
+#### Example
+
+```typescript
+await repo.set("theme", "dark");
+```
 
 ***
 
@@ -252,10 +344,9 @@ Error When database operation fails
 
 > **setInternal**(`db`, `key`, `value`): `void`
 
-Defined in: [electron/services/database/SettingsRepository.ts:195](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L195)
+Defined in: [electron/services/database/SettingsRepository.ts:280](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SettingsRepository.ts#L280)
 
-Internal method to set a setting value within an existing transaction.
-Use this method when you're already within a transaction context.
+Sets a setting value within an existing transaction context.
 
 #### Parameters
 
@@ -263,14 +354,24 @@ Use this method when you're already within a transaction context.
 
 `Database`
 
+The database connection (must be within an active transaction).
+
 ##### key
 
 `string`
+
+The setting key to set.
 
 ##### value
 
 `string`
 
+The setting value to store.
+
 #### Returns
 
 `void`
+
+#### Remarks
+
+Use this method only when already within a transaction context.

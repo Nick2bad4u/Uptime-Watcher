@@ -1,6 +1,6 @@
 # Interface: StatusHistory
 
-Defined in: [shared/types.ts:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L48)
+Defined in: [shared/types.ts:112](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L112)
 
 ## Properties
 
@@ -8,7 +8,7 @@ Defined in: [shared/types.ts:48](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > `optional` **details**: `string`
 
-Defined in: [shared/types.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L49)
+Defined in: [shared/types.ts:113](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L113)
 
 ***
 
@@ -16,7 +16,7 @@ Defined in: [shared/types.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > **responseTime**: `number`
 
-Defined in: [shared/types.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L50)
+Defined in: [shared/types.ts:114](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L114)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [shared/types.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > **status**: `"down"` \| `"up"`
 
-Defined in: [shared/types.ts:51](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L51)
+Defined in: [shared/types.ts:115](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L115)
 
 ***
 
@@ -32,4 +32,4 @@ Defined in: [shared/types.ts:51](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > **timestamp**: `number`
 
-Defined in: [shared/types.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L52)
+Defined in: [shared/types.ts:116](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L116)

@@ -1,9 +1,13 @@
 # Interface: SettingsStore
 
-Defined in: [src/stores/settings/types.ts:12](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/settings/types.ts#L12)
+Defined in: [src/stores/settings/types.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/settings/types.ts#L23)
 
-Settings store interface.
-Manages user preferences and application configuration.
+Settings store interface for managing application configuration.
+
+## Remarks
+
+Manages user preferences and application configuration with backend synchronization.
+Provides methods for initializing, updating, and resetting application settings.
 
 ## Properties
 
@@ -11,7 +15,7 @@ Manages user preferences and application configuration.
 
 > **initializeSettings**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<\` `message`: `string`; `settingsLoaded`: `boolean`; `success`: `boolean`; \`\>
 
-Defined in: [src/stores/settings/types.ts:14](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/settings/types.ts#L14)
+Defined in: [src/stores/settings/types.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/settings/types.ts#L25)
 
 Initialize settings from backend
 
@@ -23,15 +27,23 @@ Initialize settings from backend
 
 ### resetSettings()
 
-> **resetSettings**: () => `void`
+> **resetSettings**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<\` `message`: `string`; `success`: `boolean`; \`\>
 
-Defined in: [src/stores/settings/types.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/settings/types.ts#L17)
+Defined in: [src/stores/settings/types.ts:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/settings/types.ts#L37)
 
-Reset all settings to default values
+Reset all settings to default values with backend synchronization
 
 #### Returns
 
-`void`
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<\` `message`: `string`; `success`: `boolean`; \`\>
+
+Promise resolving to operation result
+
+#### Remarks
+
+This method performs both local and backend reset operations.
+Backend synchronization ensures settings are persisted across
+application restarts and synchronized with other instances.
 
 ***
 
@@ -39,9 +51,23 @@ Reset all settings to default values
 
 > **settings**: [`AppSettings`](../../../types/interfaces/AppSettings.md)
 
-Defined in: [src/stores/settings/types.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/settings/types.ts#L21)
+Defined in: [src/stores/settings/types.ts:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/settings/types.ts#L41)
 
 Application settings
+
+***
+
+### syncFromBackend()
+
+> **syncFromBackend**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<\` `message`: `string`; `success`: `boolean`; \`\>
+
+Defined in: [src/stores/settings/types.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/settings/types.ts#L44)
+
+Force synchronize settings from backend
+
+#### Returns
+
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<\` `message`: `string`; `success`: `boolean`; \`\>
 
 ***
 
@@ -49,7 +75,7 @@ Application settings
 
 > **updateHistoryLimitValue**: (`limit`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/settings/types.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/settings/types.ts#L24)
+Defined in: [src/stores/settings/types.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/settings/types.ts#L47)
 
 Update history limit with backend sync
 
@@ -69,7 +95,7 @@ Update history limit with backend sync
 
 > **updateSettings**: (`settings`) => `void`
 
-Defined in: [src/stores/settings/types.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/settings/types.ts#L28)
+Defined in: [src/stores/settings/types.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/settings/types.ts#L50)
 
 Update multiple settings at once
 

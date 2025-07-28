@@ -1,6 +1,6 @@
 # Class: ChartConfigService
 
-Defined in: [src/services/chartConfig.ts:84](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/services/chartConfig.ts#L84)
+Defined in: [src/services/chartConfig.ts:84](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/services/chartConfig.ts#L84)
 
 Chart Configuration Service for theme-aware chart styling.
 
@@ -16,7 +16,7 @@ and spacing to all chart configurations.
 
 > **new ChartConfigService**(`theme`): `ChartConfigService`
 
-Defined in: [src/services/chartConfig.ts:93](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/services/chartConfig.ts#L93)
+Defined in: [src/services/chartConfig.ts:94](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/services/chartConfig.ts#L94)
 
 Creates a new chart configuration service.
 
@@ -38,7 +38,7 @@ Theme instance containing colors, typography, and spacing
 
 > **getBarChartConfig**(): `ChartOptions`\<`"bar"`\>
 
-Defined in: [src/services/chartConfig.ts:100](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/services/chartConfig.ts#L100)
+Defined in: [src/services/chartConfig.ts:104](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/services/chartConfig.ts#L104)
 
 Status distribution bar chart configuration
 
@@ -46,13 +46,15 @@ Status distribution bar chart configuration
 
 `ChartOptions`\<`"bar"`\>
 
+Chart configuration options for bar charts
+
 ***
 
 ### getDoughnutChartConfig()
 
 > **getDoughnutChartConfig**(`totalChecks`): `ChartOptions`\<`"doughnut"`\>
 
-Defined in: [src/services/chartConfig.ts:122](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/services/chartConfig.ts#L122)
+Defined in: [src/services/chartConfig.ts:130](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/services/chartConfig.ts#L130)
 
 Uptime doughnut chart configuration
 
@@ -62,9 +64,13 @@ Uptime doughnut chart configuration
 
 `number`
 
+Total number of checks for percentage calculation
+
 #### Returns
 
 `ChartOptions`\<`"doughnut"`\>
+
+Chart configuration options for doughnut charts
 
 ***
 
@@ -72,10 +78,12 @@ Uptime doughnut chart configuration
 
 > **getLineChartConfig**(): `ChartOptions`\<`"line"`\>
 
-Defined in: [src/services/chartConfig.ts:152](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/services/chartConfig.ts#L152)
+Defined in: [src/services/chartConfig.ts:166](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/services/chartConfig.ts#L166)
 
 Response time line chart configuration
 
 #### Returns
 
 `ChartOptions`\<`"line"`\>
+
+Chart configuration options for line charts with responsive scaling

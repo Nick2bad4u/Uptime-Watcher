@@ -1,6 +1,6 @@
 # Interface: SafeJsonResult\<T\>
 
-Defined in: [shared/utils/jsonSafety.ts:9](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/jsonSafety.ts#L9)
+Defined in: [shared/utils/jsonSafety.ts:9](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/jsonSafety.ts#L9)
 
 Safe JSON parsing result.
 
@@ -16,7 +16,7 @@ Safe JSON parsing result.
 
 > `optional` **data**: `T`
 
-Defined in: [shared/utils/jsonSafety.ts:10](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/jsonSafety.ts#L10)
+Defined in: [shared/utils/jsonSafety.ts:10](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/jsonSafety.ts#L10)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [shared/utils/jsonSafety.ts:10](https://github.com/Nick2bad4u/Uptime
 
 > `optional` **error**: `string`
 
-Defined in: [shared/utils/jsonSafety.ts:11](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/jsonSafety.ts#L11)
+Defined in: [shared/utils/jsonSafety.ts:11](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/jsonSafety.ts#L11)
 
 ***
 
@@ -32,4 +32,4 @@ Defined in: [shared/utils/jsonSafety.ts:11](https://github.com/Nick2bad4u/Uptime
 
 > **success**: `boolean`
 
-Defined in: [shared/utils/jsonSafety.ts:12](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/jsonSafety.ts#L12)
+Defined in: [shared/utils/jsonSafety.ts:12](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/jsonSafety.ts#L12)

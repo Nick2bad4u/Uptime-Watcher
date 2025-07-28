@@ -1,8 +1,13 @@
 # Interface: MonitorRow
 
-Defined in: [electron/services/database/utils/monitorMapper.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/monitorMapper.ts#L19)
+Defined in: [electron/services/database/utils/monitorMapper.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/monitorMapper.ts#L24)
 
-Monitor row interface for database operations.
+Represents a monitor row as stored in the database.
+
+## Remarks
+
+Used for low-level database operations and mapping.
+Field names use camelCase for consistency with TypeScript conventions.
 
 ## Properties
 
@@ -10,7 +15,9 @@ Monitor row interface for database operations.
 
 > **checkInterval**: `number`
 
-Defined in: [electron/services/database/utils/monitorMapper.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/monitorMapper.ts#L20)
+Defined in: [electron/services/database/utils/monitorMapper.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/monitorMapper.ts#L26)
+
+The interval (in ms) between checks.
 
 ***
 
@@ -18,7 +25,9 @@ Defined in: [electron/services/database/utils/monitorMapper.ts:20](https://githu
 
 > **createdAt**: `number`
 
-Defined in: [electron/services/database/utils/monitorMapper.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/monitorMapper.ts#L21)
+Defined in: [electron/services/database/utils/monitorMapper.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/monitorMapper.ts#L28)
+
+The creation timestamp (ms since epoch).
 
 ***
 
@@ -26,7 +35,9 @@ Defined in: [electron/services/database/utils/monitorMapper.ts:21](https://githu
 
 > **enabled**: `boolean`
 
-Defined in: [electron/services/database/utils/monitorMapper.ts:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/monitorMapper.ts#L22)
+Defined in: [electron/services/database/utils/monitorMapper.ts:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/monitorMapper.ts#L30)
+
+Whether the monitor is enabled for checking.
 
 ***
 
@@ -34,7 +45,9 @@ Defined in: [electron/services/database/utils/monitorMapper.ts:22](https://githu
 
 > **id**: `string`
 
-Defined in: [electron/services/database/utils/monitorMapper.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/monitorMapper.ts#L23)
+Defined in: [electron/services/database/utils/monitorMapper.ts:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/monitorMapper.ts#L32)
+
+Unique identifier for the monitor.
 
 ***
 
@@ -42,7 +55,9 @@ Defined in: [electron/services/database/utils/monitorMapper.ts:23](https://githu
 
 > `optional` **lastChecked**: [`Date`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date)
 
-Defined in: [electron/services/database/utils/monitorMapper.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/monitorMapper.ts#L24)
+Defined in: [electron/services/database/utils/monitorMapper.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/monitorMapper.ts#L34)
+
+The last time this monitor was checked, if available.
 
 ***
 
@@ -50,7 +65,9 @@ Defined in: [electron/services/database/utils/monitorMapper.ts:24](https://githu
 
 > `optional` **lastError**: `string`
 
-Defined in: [electron/services/database/utils/monitorMapper.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/monitorMapper.ts#L25)
+Defined in: [electron/services/database/utils/monitorMapper.ts:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/monitorMapper.ts#L36)
+
+The last error message, if any.
 
 ***
 
@@ -58,7 +75,9 @@ Defined in: [electron/services/database/utils/monitorMapper.ts:25](https://githu
 
 > `optional` **responseTime**: `number`
 
-Defined in: [electron/services/database/utils/monitorMapper.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/monitorMapper.ts#L26)
+Defined in: [electron/services/database/utils/monitorMapper.ts:38](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/monitorMapper.ts#L38)
+
+The last recorded response time in ms, if available.
 
 ***
 
@@ -66,7 +85,9 @@ Defined in: [electron/services/database/utils/monitorMapper.ts:26](https://githu
 
 > **retryAttempts**: `number`
 
-Defined in: [electron/services/database/utils/monitorMapper.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/monitorMapper.ts#L27)
+Defined in: [electron/services/database/utils/monitorMapper.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/monitorMapper.ts#L40)
+
+Number of retry attempts for failed checks.
 
 ***
 
@@ -74,7 +95,9 @@ Defined in: [electron/services/database/utils/monitorMapper.ts:27](https://githu
 
 > **siteIdentifier**: `string`
 
-Defined in: [electron/services/database/utils/monitorMapper.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/monitorMapper.ts#L28)
+Defined in: [electron/services/database/utils/monitorMapper.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/monitorMapper.ts#L42)
+
+The identifier of the site this monitor belongs to.
 
 ***
 
@@ -82,7 +105,9 @@ Defined in: [electron/services/database/utils/monitorMapper.ts:28](https://githu
 
 > **status**: [`MonitorStatus`](../../../../../../shared/types/type-aliases/MonitorStatus.md)
 
-Defined in: [electron/services/database/utils/monitorMapper.ts:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/monitorMapper.ts#L29)
+Defined in: [electron/services/database/utils/monitorMapper.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/monitorMapper.ts#L44)
+
+The current status of the monitor ("up" or "down").
 
 ***
 
@@ -90,7 +115,9 @@ Defined in: [electron/services/database/utils/monitorMapper.ts:29](https://githu
 
 > **timeout**: `number`
 
-Defined in: [electron/services/database/utils/monitorMapper.ts:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/monitorMapper.ts#L30)
+Defined in: [electron/services/database/utils/monitorMapper.ts:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/monitorMapper.ts#L46)
+
+The timeout (in ms) for checks.
 
 ***
 
@@ -98,7 +125,9 @@ Defined in: [electron/services/database/utils/monitorMapper.ts:30](https://githu
 
 > **type**: `"http"` \| `"port"`
 
-Defined in: [electron/services/database/utils/monitorMapper.ts:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/monitorMapper.ts#L31)
+Defined in: [electron/services/database/utils/monitorMapper.ts:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/monitorMapper.ts#L48)
+
+The monitor type (e.g., "http").
 
 ***
 
@@ -106,4 +135,6 @@ Defined in: [electron/services/database/utils/monitorMapper.ts:31](https://githu
 
 > **updatedAt**: `number`
 
-Defined in: [electron/services/database/utils/monitorMapper.ts:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/monitorMapper.ts#L32)
+Defined in: [electron/services/database/utils/monitorMapper.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/monitorMapper.ts#L50)
+
+The last updated timestamp (ms since epoch).

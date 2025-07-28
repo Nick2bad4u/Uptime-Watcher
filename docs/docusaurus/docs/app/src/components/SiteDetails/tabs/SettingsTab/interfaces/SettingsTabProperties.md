@@ -1,6 +1,6 @@
 # Interface: SettingsTabProperties
 
-Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SettingsTab.tsx#L34)
+Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SettingsTab.tsx#L34)
 
 Props for the SettingsTab component.
 
@@ -10,7 +10,7 @@ Props for the SettingsTab component.
 
 > `readonly` **currentSite**: [`Site`](../../../../../../shared/types/interfaces/Site.md)
 
-Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SettingsTab.tsx#L36)
+Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SettingsTab.tsx#L36)
 
 Current site being configured
 
@@ -20,7 +20,7 @@ Current site being configured
 
 > `readonly` **handleIntervalChange**: (`e`) => `void`
 
-Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:38](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SettingsTab.tsx#L38)
+Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:38](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SettingsTab.tsx#L38)
 
 Handler for monitor check interval changes
 
@@ -40,7 +40,7 @@ Handler for monitor check interval changes
 
 > `readonly` **handleRemoveSite**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SettingsTab.tsx#L40)
+Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SettingsTab.tsx#L40)
 
 Handler for removing/deleting the site
 
@@ -54,7 +54,7 @@ Handler for removing/deleting the site
 
 > `readonly` **handleRetryAttemptsChange**: (`e`) => `void`
 
-Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SettingsTab.tsx#L42)
+Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SettingsTab.tsx#L42)
 
 Handler for monitor retry attempts changes
 
@@ -74,7 +74,7 @@ Handler for monitor retry attempts changes
 
 > `readonly` **handleSaveInterval**: () => `void`
 
-Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SettingsTab.tsx#L44)
+Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SettingsTab.tsx#L44)
 
 Handler for saving interval changes
 
@@ -88,7 +88,7 @@ Handler for saving interval changes
 
 > `readonly` **handleSaveName**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SettingsTab.tsx#L46)
+Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SettingsTab.tsx#L46)
 
 Handler for saving site name changes
 
@@ -102,7 +102,7 @@ Handler for saving site name changes
 
 > `readonly` **handleSaveRetryAttempts**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SettingsTab.tsx#L48)
+Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SettingsTab.tsx#L48)
 
 Handler for saving retry attempts changes
 
@@ -116,7 +116,7 @@ Handler for saving retry attempts changes
 
 > `readonly` **handleSaveTimeout**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SettingsTab.tsx#L50)
+Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SettingsTab.tsx#L50)
 
 Handler for saving timeout changes
 
@@ -130,7 +130,7 @@ Handler for saving timeout changes
 
 > `readonly` **handleTimeoutChange**: (`e`) => `void`
 
-Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SettingsTab.tsx#L52)
+Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SettingsTab.tsx#L52)
 
 Handler for monitor timeout changes
 
@@ -150,7 +150,7 @@ Handler for monitor timeout changes
 
 > `readonly` **hasUnsavedChanges**: `boolean`
 
-Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SettingsTab.tsx#L54)
+Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SettingsTab.tsx#L54)
 
 Whether there are unsaved changes pending
 
@@ -160,7 +160,7 @@ Whether there are unsaved changes pending
 
 > `readonly` **intervalChanged**: `boolean`
 
-Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:56](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SettingsTab.tsx#L56)
+Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:56](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SettingsTab.tsx#L56)
 
 Whether the check interval has been modified
 
@@ -170,7 +170,7 @@ Whether the check interval has been modified
 
 > `readonly` **isLoading**: `boolean`
 
-Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:58](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SettingsTab.tsx#L58)
+Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:58](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SettingsTab.tsx#L58)
 
 Whether any async operation is in progress
 
@@ -180,7 +180,7 @@ Whether any async operation is in progress
 
 > `readonly` **localCheckInterval**: `number`
 
-Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:60](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SettingsTab.tsx#L60)
+Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:60](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SettingsTab.tsx#L60)
 
 Local state value for check interval
 
@@ -190,7 +190,7 @@ Local state value for check interval
 
 > `readonly` **localName**: `string`
 
-Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SettingsTab.tsx#L62)
+Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SettingsTab.tsx#L62)
 
 Local state value for site name
 
@@ -200,7 +200,7 @@ Local state value for site name
 
 > `readonly` **localRetryAttempts**: `number`
 
-Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:64](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SettingsTab.tsx#L64)
+Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:64](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SettingsTab.tsx#L64)
 
 Local state value for retry attempts
 
@@ -210,7 +210,7 @@ Local state value for retry attempts
 
 > `readonly` **localTimeout**: `number`
 
-Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:66](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SettingsTab.tsx#L66)
+Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:66](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SettingsTab.tsx#L66)
 
 Local state value for timeout in seconds (converted to ms when saving)
 
@@ -220,7 +220,7 @@ Local state value for timeout in seconds (converted to ms when saving)
 
 > `readonly` **retryAttemptsChanged**: `boolean`
 
-Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:68](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SettingsTab.tsx#L68)
+Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:68](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SettingsTab.tsx#L68)
 
 Whether the retry attempts have been changed
 
@@ -230,7 +230,7 @@ Whether the retry attempts have been changed
 
 > `readonly` **selectedMonitor**: [`Monitor`](../../../../../../shared/types/interfaces/Monitor.md)
 
-Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:70](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SettingsTab.tsx#L70)
+Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:70](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SettingsTab.tsx#L70)
 
 Currently selected monitor being configured
 
@@ -240,7 +240,7 @@ Currently selected monitor being configured
 
 > `readonly` **setLocalName**: (`name`) => `void`
 
-Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:72](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SettingsTab.tsx#L72)
+Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:72](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SettingsTab.tsx#L72)
 
 Function to update local site name state
 
@@ -260,6 +260,6 @@ Function to update local site name state
 
 > `readonly` **timeoutChanged**: `boolean`
 
-Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:74](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/SettingsTab.tsx#L74)
+Defined in: [src/components/SiteDetails/tabs/SettingsTab.tsx:74](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/SettingsTab.tsx#L74)
 
 Whether the timeout has been changed

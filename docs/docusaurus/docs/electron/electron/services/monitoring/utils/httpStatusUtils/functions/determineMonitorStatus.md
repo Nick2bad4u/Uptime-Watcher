@@ -2,9 +2,9 @@
 
 > **determineMonitorStatus**(`httpStatus`): `"down"` \| `"up"`
 
-Defined in: [electron/services/monitoring/utils/httpStatusUtils.ts:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/utils/httpStatusUtils.ts#L29)
+Defined in: [electron/services/monitoring/utils/httpStatusUtils.ts:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/utils/httpStatusUtils.ts#L32)
 
-Determine monitor status based on HTTP status code.
+Determines monitor status ("up" or "down") from an HTTP status code.
 
 ## Parameters
 
@@ -12,29 +12,30 @@ Determine monitor status based on HTTP status code.
 
 `number`
 
-HTTP status code to evaluate
+The HTTP status code to evaluate (integer).
 
 ## Returns
 
 `"down"` \| `"up"`
 
-Monitor status: "up" if site is responding, "down" if server error or invalid code
+"up" if the site is responding (including client errors and redirects), "down" if server error or invalid code.
 
 ## Remarks
 
-Business rules for status determination:
-- 1xx (Informational): "up" - rare but valid responses indicating server is active
-- 2xx (Success): "up" - successful requests
-- 3xx (Redirection): "up" - site is responding with redirects
-- 4xx (Client Error): "up" - site is responding, client-side issue
-- 5xx (Server Error): "down" - server-side issues indicate service problems
-- Invalid codes (\< 100, \> 599): "down" - malformed or non-HTTP responses
+- 1xx–4xx: "up" (site is responding)
+- 5xx: "down" (server error)
+- \<100 or \>599: "down" (invalid code)
+Used by monitoring services to classify site health.
 
 ## Example
 
 ```typescript
 determineMonitorStatus(200); // "up"
-determineMonitorStatus(404); // "up" - site responding but resource not found
-determineMonitorStatus(500); // "down" - server error
-determineMonitorStatus(999); // "down" - invalid HTTP status code
+determineMonitorStatus(404); // "up"
+determineMonitorStatus(500); // "down"
+determineMonitorStatus(999); // "down"
 ```
+
+## See
+
+[MDN: HTTP response status codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)

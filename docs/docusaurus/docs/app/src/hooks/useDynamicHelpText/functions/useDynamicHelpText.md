@@ -1,25 +1,26 @@
 # Function: useDynamicHelpText()
 
-> **useDynamicHelpText**(`monitorType`): `object`
+> **useDynamicHelpText**(`monitorType`): [`DynamicHelpTextResult`](../interfaces/DynamicHelpTextResult.md)
 
-Defined in: [src/hooks/useDynamicHelpText.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/useDynamicHelpText.ts#L15)
+Defined in: [src/hooks/useDynamicHelpText.ts:68](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/useDynamicHelpText.ts#L68)
 
-Hook for dynamic help text loading.
+Custom hook for dynamically loading monitor type help text.
 
 ## Parameters
 
 ### monitorType
 
+The monitor type to load help text for
+
 `"http"` | `"port"`
 
 ## Returns
 
-`object`
+[`DynamicHelpTextResult`](../interfaces/DynamicHelpTextResult.md)
 
-### primary?
+Object containing help text data and loading state
 
-> `optional` **primary**: `string`
+## Remarks
 
-### secondary?
-
-> `optional` **secondary**: `string`
+Provides monitor-specific help text with automatic loading state management.
+Handles cancellation of pending requests on unmount or monitor type changes.

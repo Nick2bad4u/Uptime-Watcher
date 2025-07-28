@@ -1,8 +1,12 @@
 # Interface: ErrorBoundaryProperties
 
-Defined in: [src/stores/error/ErrorBoundary.tsx:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/error/ErrorBoundary.tsx#L16)
+Defined in: [src/stores/error/ErrorBoundary.tsx:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/error/ErrorBoundary.tsx#L23)
 
-Props for the ErrorBoundary component
+Props for the [ErrorBoundary](../classes/ErrorBoundary.md) component.
+
+## Remarks
+
+Accepts children to render, an optional fallback component for error display, and an optional error handler callback.
 
 ## Properties
 
@@ -10,15 +14,15 @@ Props for the ErrorBoundary component
 
 > **children**: [`ReactNode`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L427)
 
-Defined in: [src/stores/error/ErrorBoundary.tsx:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/error/ErrorBoundary.tsx#L17)
+Defined in: [src/stores/error/ErrorBoundary.tsx:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/error/ErrorBoundary.tsx#L24)
 
 ***
 
 ### fallback?
 
-> `optional` **fallback**: [`ComponentType`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L123)\<\` `error?`: [`Error`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error); `retry`: () => `void`; \`\>
+> `optional` **fallback**: [`ComponentType`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L123)\<\` `error?`: [`Error`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error); `onRetry`: () => `void`; \`\>
 
-Defined in: [src/stores/error/ErrorBoundary.tsx:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/error/ErrorBoundary.tsx#L18)
+Defined in: [src/stores/error/ErrorBoundary.tsx:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/error/ErrorBoundary.tsx#L25)
 
 ***
 
@@ -26,7 +30,7 @@ Defined in: [src/stores/error/ErrorBoundary.tsx:18](https://github.com/Nick2bad4
 
 > `optional` **onError**: (`error`, `errorInfo`) => `void`
 
-Defined in: [src/stores/error/ErrorBoundary.tsx:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/error/ErrorBoundary.tsx#L19)
+Defined in: [src/stores/error/ErrorBoundary.tsx:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/error/ErrorBoundary.tsx#L26)
 
 #### Parameters
 

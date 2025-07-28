@@ -1,6 +1,46 @@
 # Interface: BaseMonitorConfig
 
-Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorTypeRegistry.ts#L24)
+Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorTypeRegistry.ts#L43)
+
+Configuration contract for a monitor type in the monitoring system.
+
+## Remarks
+
+Each monitor type (e.g., HTTP, Port) must provide a configuration object
+describing its metadata, validation schema, UI display options, and service factory.
+This enables dynamic registration, validation, and UI rendering for new monitor types.
+
+## Param
+
+Description of what this monitor checks.
+
+## Param
+
+Human-readable display name for UI.
+
+## Param
+
+Field definitions for dynamic form generation.
+
+## Param
+
+Factory function to create monitor service instances.
+
+## Param
+
+Unique identifier for the monitor type.
+
+## Param
+
+Optional UI display configuration for analytics, history, and help texts.
+
+## Param
+
+Zod validation schema for this monitor type.
+
+## Param
+
+Version of the monitor implementation.
 
 ## Properties
 
@@ -8,7 +48,7 @@ Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:24](https://git
 
 > `readonly` **description**: `string`
 
-Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorTypeRegistry.ts#L26)
+Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorTypeRegistry.ts#L45)
 
 Description of what this monitor checks
 
@@ -18,7 +58,7 @@ Description of what this monitor checks
 
 > `readonly` **displayName**: `string`
 
-Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorTypeRegistry.ts#L28)
+Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorTypeRegistry.ts#L47)
 
 Human-readable display name
 
@@ -28,7 +68,7 @@ Human-readable display name
 
 > `readonly` **fields**: [`MonitorFieldDefinition`](../../../../../shared/types/interfaces/MonitorFieldDefinition.md)[]
 
-Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorTypeRegistry.ts#L30)
+Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorTypeRegistry.ts#L49)
 
 Field definitions for dynamic form generation
 
@@ -38,7 +78,7 @@ Field definitions for dynamic form generation
 
 > `readonly` **serviceFactory**: () => [`IMonitorService`](../../types/interfaces/IMonitorService.md)
 
-Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorTypeRegistry.ts#L32)
+Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:51](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorTypeRegistry.ts#L51)
 
 Factory function to create monitor service instances
 
@@ -52,7 +92,7 @@ Factory function to create monitor service instances
 
 > `readonly` **type**: `string`
 
-Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorTypeRegistry.ts#L34)
+Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:53](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorTypeRegistry.ts#L53)
 
 Unique identifier for the monitor type
 
@@ -62,7 +102,7 @@ Unique identifier for the monitor type
 
 > `readonly` `optional` **uiConfig**: `object`
 
-Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorTypeRegistry.ts#L36)
+Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:55](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorTypeRegistry.ts#L55)
 
 UI display configuration
 
@@ -172,7 +212,7 @@ Whether this monitor type supports response time analytics
 
 > `readonly` **validationSchema**: `ZodType`
 
-Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:64](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorTypeRegistry.ts#L64)
+Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:83](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorTypeRegistry.ts#L83)
 
 Zod validation schema for this monitor type
 
@@ -182,6 +222,6 @@ Zod validation schema for this monitor type
 
 > `readonly` **version**: `string`
 
-Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:66](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorTypeRegistry.ts#L66)
+Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:85](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorTypeRegistry.ts#L85)
 
 Version of the monitor implementation

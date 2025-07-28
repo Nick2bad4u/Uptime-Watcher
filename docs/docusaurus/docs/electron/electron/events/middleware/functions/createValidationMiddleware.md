@@ -2,9 +2,9 @@
 
 > **createValidationMiddleware**\<`T`\>(`validators`): [`EventMiddleware`](../../TypedEventBus/type-aliases/EventMiddleware.md)
 
-Defined in: [electron/events/middleware.ts:478](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/middleware.ts#L478)
+Defined in: [electron/events/middleware.ts:512](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/events/middleware.ts#L512)
 
-Validation middleware that validates event data against schemas with type safety.
+Creates middleware that validates event data using a map of validator functions.
 
 ## Type Parameters
 
@@ -12,7 +12,7 @@ Validation middleware that validates event data against schemas with type safety
 
 `T` *extends* [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\>
 
-Record type defining event names and their expected data structures
+Record type defining event names and their data types.
 
 ## Parameters
 
@@ -20,18 +20,17 @@ Record type defining event names and their expected data structures
 
 `ValidatorMap`\<`T`\>
 
-Map of event names to validator functions
+Map of event names to their validator functions.
 
 ## Returns
 
 [`EventMiddleware`](../../TypedEventBus/type-aliases/EventMiddleware.md)
 
-EventMiddleware function
+EventMiddleware function that validates event data before processing.
 
 ## Remarks
 
-This middleware validates event data before processing. It supports both simple boolean
-validators and detailed validators that can provide specific error messages.
+If validation fails, the event is blocked and an error is logged. Throws on validation failure.
 
 ## Example
 
@@ -43,4 +42,5 @@ const validators = {
 };
 
 const validationMiddleware = createValidationMiddleware(validators);
+eventBus.use(validationMiddleware);
 ```

@@ -1,6 +1,6 @@
 # Interface: Site
 
-Defined in: [shared/types.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L42)
+Defined in: [shared/types.ts:106](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L106)
 
 ## Properties
 
@@ -8,7 +8,7 @@ Defined in: [shared/types.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > **identifier**: `string`
 
-Defined in: [shared/types.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L43)
+Defined in: [shared/types.ts:107](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L107)
 
 ***
 
@@ -16,7 +16,7 @@ Defined in: [shared/types.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > **monitoring**: `boolean`
 
-Defined in: [shared/types.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L44)
+Defined in: [shared/types.ts:108](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L108)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [shared/types.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > **monitors**: [`Monitor`](Monitor.md)[]
 
-Defined in: [shared/types.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L45)
+Defined in: [shared/types.ts:109](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L109)
 
 ***
 
@@ -32,4 +32,4 @@ Defined in: [shared/types.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > **name**: `string`
 
-Defined in: [shared/types.ts:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L46)
+Defined in: [shared/types.ts:110](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L110)

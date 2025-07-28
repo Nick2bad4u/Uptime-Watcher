@@ -1,6 +1,6 @@
 # Interface: MonitorUIConfig
 
-Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:70](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorTypeRegistry.ts#L70)
+Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:89](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorTypeRegistry.ts#L89)
 
 ## Properties
 
@@ -8,7 +8,7 @@ Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:70](https://git
 
 > `optional` **chartFormatters**: `object`
 
-Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:72](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorTypeRegistry.ts#L72)
+Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:91](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorTypeRegistry.ts#L91)
 
 Chart data formatters
 
@@ -30,7 +30,7 @@ Chart data formatters
 
 > `optional` **detailLabelFormatter**: `string`
 
-Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:78](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorTypeRegistry.ts#L78)
+Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:97](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorTypeRegistry.ts#L97)
 
 Detail label formatter function name
 
@@ -40,7 +40,7 @@ Detail label formatter function name
 
 > `optional` **display**: `object`
 
-Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:80](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorTypeRegistry.ts#L80)
+Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:99](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorTypeRegistry.ts#L99)
 
 Display preferences
 
@@ -62,7 +62,7 @@ Display preferences
 
 > `optional` **helpTexts**: `object`
 
-Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:86](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorTypeRegistry.ts#L86)
+Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:105](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MonitorTypeRegistry.ts#L105)
 
 Help text for form fields
 

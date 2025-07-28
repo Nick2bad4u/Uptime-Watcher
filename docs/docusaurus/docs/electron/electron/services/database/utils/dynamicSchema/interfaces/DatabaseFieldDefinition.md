@@ -1,8 +1,12 @@
 # Interface: DatabaseFieldDefinition
 
-Defined in: [electron/services/database/utils/dynamicSchema.ts:11](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/dynamicSchema.ts#L11)
+Defined in: [electron/services/database/utils/dynamicSchema.ts:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/dynamicSchema.ts#L22)
 
 Database field definition for dynamic monitor schema.
+
+## Remarks
+
+Used to describe dynamically generated columns for monitor types. All fields are mapped from monitor type registry definitions and used in dynamic schema generation.
 
 ## Properties
 
@@ -10,9 +14,13 @@ Database field definition for dynamic monitor schema.
 
 > **columnName**: `string`
 
-Defined in: [electron/services/database/utils/dynamicSchema.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/dynamicSchema.ts#L13)
+Defined in: [electron/services/database/utils/dynamicSchema.ts:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/dynamicSchema.ts#L29)
 
-Column name in database
+Column name in database (snake_case).
+
+#### Remarks
+
+Generated from the monitor type field name.
 
 ***
 
@@ -20,9 +28,19 @@ Column name in database
 
 > `optional` **defaultValue**: `null` \| `string`
 
-Defined in: [electron/services/database/utils/dynamicSchema.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/dynamicSchema.ts#L15)
+Defined in: [electron/services/database/utils/dynamicSchema.ts:38](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/dynamicSchema.ts#L38)
 
-Default value for the column (null for dynamic fields)
+Default value for the column.
+
+#### Remarks
+
+Always `null` for dynamic fields.
+
+#### Default Value
+
+```ts
+null
+```
 
 ***
 
@@ -30,9 +48,9 @@ Default value for the column (null for dynamic fields)
 
 > **monitorType**: `string`
 
-Defined in: [electron/services/database/utils/dynamicSchema.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/dynamicSchema.ts#L17)
+Defined in: [electron/services/database/utils/dynamicSchema.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/dynamicSchema.ts#L42)
 
-Monitor type this field belongs to
+Monitor type this field belongs to.
 
 ***
 
@@ -40,9 +58,19 @@ Monitor type this field belongs to
 
 > **nullable**: `boolean`
 
-Defined in: [electron/services/database/utils/dynamicSchema.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/dynamicSchema.ts#L19)
+Defined in: [electron/services/database/utils/dynamicSchema.ts:51](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/dynamicSchema.ts#L51)
 
-Whether column allows NULL values
+Whether column allows NULL values.
+
+#### Remarks
+
+All dynamic fields are nullable.
+
+#### Default Value
+
+```ts
+true
+```
 
 ***
 
@@ -50,9 +78,9 @@ Whether column allows NULL values
 
 > **sourceField**: `string`
 
-Defined in: [electron/services/database/utils/dynamicSchema.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/dynamicSchema.ts#L21)
+Defined in: [electron/services/database/utils/dynamicSchema.ts:55](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/dynamicSchema.ts#L55)
 
-Field name from monitor type definition
+Field name from monitor type definition (camelCase).
 
 ***
 
@@ -60,6 +88,10 @@ Field name from monitor type definition
 
 > **sqlType**: `string`
 
-Defined in: [electron/services/database/utils/dynamicSchema.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/dynamicSchema.ts#L23)
+Defined in: [electron/services/database/utils/dynamicSchema.ts:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/dynamicSchema.ts#L62)
 
-SQL data type
+SQL data type for the column.
+
+#### Remarks
+
+Determined by monitor type registry field type.

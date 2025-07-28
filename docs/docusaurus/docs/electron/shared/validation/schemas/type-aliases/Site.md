@@ -2,7 +2,9 @@
 
 > **Site** = `object`
 
-Defined in: [shared/validation/schemas.ts:115](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/validation/schemas.ts#L115)
+Defined in: [shared/validation/schemas.ts:181](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/validation/schemas.ts#L181)
+
+Type representing a validated site.
 
 ## Type declaration
 
@@ -21,3 +23,7 @@ Defined in: [shared/validation/schemas.ts:115](https://github.com/Nick2bad4u/Upt
 ### name
 
 > **name**: `string`
+
+## See
+
+[siteSchema](../variables/siteSchema.md)

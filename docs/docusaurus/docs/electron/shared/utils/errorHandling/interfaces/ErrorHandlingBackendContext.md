@@ -1,6 +1,6 @@
 # Interface: ErrorHandlingBackendContext
 
-Defined in: [shared/utils/errorHandling.ts:12](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/errorHandling.ts#L12)
+Defined in: [shared/utils/errorHandling.ts:12](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/errorHandling.ts#L12)
 
 Shared error handling utility for async operations.
 Provides a unified pattern for error logging, reporting, and state management.
@@ -17,7 +17,7 @@ Usage (backend):
 
 > **logger**: `object`
 
-Defined in: [shared/utils/errorHandling.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/errorHandling.ts#L13)
+Defined in: [shared/utils/errorHandling.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/errorHandling.ts#L13)
 
 #### error()
 
@@ -43,4 +43,4 @@ Defined in: [shared/utils/errorHandling.ts:13](https://github.com/Nick2bad4u/Upt
 
 > `optional` **operationName**: `string`
 
-Defined in: [shared/utils/errorHandling.ts:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/errorHandling.ts#L16)
+Defined in: [shared/utils/errorHandling.ts:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/errorHandling.ts#L16)

@@ -2,7 +2,7 @@
 
 > **safeNumberConvert**(`value`): `undefined` \| `number`
 
-Defined in: [electron/services/database/utils/valueConverters.ts:147](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/valueConverters.ts#L147)
+Defined in: [electron/services/database/utils/valueConverters.ts:151](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/valueConverters.ts#L151)
 
 Safely convert a value to number or return undefined.
 

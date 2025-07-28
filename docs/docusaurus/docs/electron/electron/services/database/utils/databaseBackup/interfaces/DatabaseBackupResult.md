@@ -1,23 +1,26 @@
 # Interface: DatabaseBackupResult
 
-Defined in: [electron/services/database/utils/databaseBackup.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/databaseBackup.ts#L20)
+Defined in: [electron/services/database/utils/databaseBackup.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/databaseBackup.ts#L21)
 
 Result interface for database backup operations.
 
 ## Remarks
 
-Provides structured return type for backup operations with comprehensive
-metadata for tracking and validation.
+Provides a structured return type for backup operations with comprehensive metadata for tracking and validation. Used as the return value for [createDatabaseBackup](../functions/createDatabaseBackup.md).
 
 ## Properties
 
 ### buffer
 
-> **buffer**: [`Buffer`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/node/buffer.buffer.d.ts#L356)
+> **buffer**: [`Buffer`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/5216a9587cc018ac42f777f31b0e07038423e30a/types/node/buffer.buffer.d.ts#L356)
 
-Defined in: [electron/services/database/utils/databaseBackup.ts:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/databaseBackup.ts#L22)
+Defined in: [electron/services/database/utils/databaseBackup.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/databaseBackup.ts#L28)
 
-Binary buffer containing the complete SQLite database
+Binary buffer containing the complete SQLite database.
+
+#### Remarks
+
+The raw contents of the SQLite database file as a Node.js Buffer.
 
 ***
 
@@ -25,9 +28,13 @@ Binary buffer containing the complete SQLite database
 
 > **fileName**: `string`
 
-Defined in: [electron/services/database/utils/databaseBackup.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/databaseBackup.ts#L24)
+Defined in: [electron/services/database/utils/databaseBackup.ts:35](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/databaseBackup.ts#L35)
 
-Standardized filename for the backup file
+Standardized filename for the backup file.
+
+#### Remarks
+
+The filename used for the backup file, typically "uptime-watcher-backup.sqlite".
 
 ***
 
@@ -35,24 +42,40 @@ Standardized filename for the backup file
 
 > **metadata**: `object`
 
-Defined in: [electron/services/database/utils/databaseBackup.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/databaseBackup.ts#L26)
+Defined in: [electron/services/database/utils/databaseBackup.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/databaseBackup.ts#L42)
 
-Metadata about the backup operation
+Metadata about the backup operation.
 
 #### createdAt
 
 > **createdAt**: `number`
 
-Backup creation timestamp
+Backup creation timestamp.
+
+##### Remarks
+
+The Unix timestamp (in milliseconds) when the backup was created.
 
 #### originalPath
 
 > **originalPath**: `string`
 
-Original database file path
+Original database file path.
+
+##### Remarks
+
+The absolute path to the original SQLite database file that was backed up.
 
 #### sizeBytes
 
 > **sizeBytes**: `number`
 
-Database file size in bytes
+Database file size in bytes.
+
+##### Remarks
+
+The size of the database file in bytes at the time of backup.
+
+#### Remarks
+
+Contains details about the backup creation, including timestamp, original path, and file size.

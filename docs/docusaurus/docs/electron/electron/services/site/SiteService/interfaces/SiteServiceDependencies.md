@@ -1,8 +1,12 @@
 # Interface: SiteServiceDependencies
 
-Defined in: [electron/services/site/SiteService.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/site/SiteService.ts#L17)
+Defined in: [electron/services/site/SiteService.ts:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/site/SiteService.ts#L22)
 
-Dependencies for SiteService.
+Defines the dependencies required by [SiteService](../classes/SiteService.md) for site operations.
+
+## Remarks
+
+Includes all repositories and the database service needed for coordinating site, monitor, and history operations.
 
 ## Properties
 
@@ -10,7 +14,7 @@ Dependencies for SiteService.
 
 > **databaseService**: [`DatabaseService`](../../../database/DatabaseService/classes/DatabaseService.md)
 
-Defined in: [electron/services/site/SiteService.ts:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/site/SiteService.ts#L18)
+Defined in: [electron/services/site/SiteService.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/site/SiteService.ts#L23)
 
 ***
 
@@ -18,7 +22,7 @@ Defined in: [electron/services/site/SiteService.ts:18](https://github.com/Nick2b
 
 > **historyRepository**: [`HistoryRepository`](../../../database/HistoryRepository/classes/HistoryRepository.md)
 
-Defined in: [electron/services/site/SiteService.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/site/SiteService.ts#L19)
+Defined in: [electron/services/site/SiteService.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/site/SiteService.ts#L24)
 
 ***
 
@@ -26,7 +30,7 @@ Defined in: [electron/services/site/SiteService.ts:19](https://github.com/Nick2b
 
 > **monitorRepository**: [`MonitorRepository`](../../../database/MonitorRepository/classes/MonitorRepository.md)
 
-Defined in: [electron/services/site/SiteService.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/site/SiteService.ts#L20)
+Defined in: [electron/services/site/SiteService.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/site/SiteService.ts#L25)
 
 ***
 
@@ -34,4 +38,4 @@ Defined in: [electron/services/site/SiteService.ts:20](https://github.com/Nick2b
 
 > **siteRepository**: [`SiteRepository`](../../../database/SiteRepository/classes/SiteRepository.md)
 
-Defined in: [electron/services/site/SiteService.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/site/SiteService.ts#L21)
+Defined in: [electron/services/site/SiteService.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/site/SiteService.ts#L26)

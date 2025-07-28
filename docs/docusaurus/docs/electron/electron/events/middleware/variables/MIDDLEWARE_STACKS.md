@@ -2,9 +2,9 @@
 
 > `const` **MIDDLEWARE\_STACKS**: `object`
 
-Defined in: [electron/events/middleware.ts:556](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/middleware.ts#L556)
+Defined in: [electron/events/middleware.ts:590](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/events/middleware.ts#L590)
 
-Pre-configured middleware stacks for common use cases.
+Predefined middleware stacks for different environments.
 
 ## Type declaration
 
@@ -98,8 +98,8 @@ Includes:
 
 ## Remarks
 
-These middleware stacks provide sensible defaults for different environments
-and can be used directly with TypedEventBus or as starting points for custom configurations.
+Provides convenient factory functions for common middleware stacks: custom, development, production, and testing.
+Each stack returns a composed middleware chain suitable for the target environment.
 
 ## Example
 

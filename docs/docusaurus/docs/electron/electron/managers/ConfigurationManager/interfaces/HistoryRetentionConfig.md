@@ -1,6 +1,12 @@
 # Interface: HistoryRetentionConfig
 
-Defined in: [electron/managers/ConfigurationManager.ts:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L18)
+Defined in: [electron/managers/ConfigurationManager.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/ConfigurationManager.ts#L26)
+
+Describes the configuration for history retention limits.
+
+## Remarks
+
+Used by [ConfigurationManager.getHistoryRetentionRules](../classes/ConfigurationManager.md#gethistoryretentionrules) to specify allowed history limits.
 
 ## Properties
 
@@ -8,7 +14,15 @@ Defined in: [electron/managers/ConfigurationManager.ts:18](https://github.com/Ni
 
 > **defaultLimit**: `number`
 
-Defined in: [electron/managers/ConfigurationManager.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L19)
+Defined in: [electron/managers/ConfigurationManager.ts:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/ConfigurationManager.ts#L32)
+
+The default history retention limit.
+
+#### Default Value
+
+```ts
+DEFAULT_HISTORY_LIMIT
+```
 
 ***
 
@@ -16,7 +30,15 @@ Defined in: [electron/managers/ConfigurationManager.ts:19](https://github.com/Ni
 
 > **maxLimit**: `number`
 
-Defined in: [electron/managers/ConfigurationManager.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L20)
+Defined in: [electron/managers/ConfigurationManager.ts:38](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/ConfigurationManager.ts#L38)
+
+The maximum allowed history retention limit.
+
+#### Default Value
+
+```ts
+Number.MAX_SAFE_INTEGER
+```
 
 ***
 
@@ -24,4 +46,12 @@ Defined in: [electron/managers/ConfigurationManager.ts:20](https://github.com/Ni
 
 > **minLimit**: `number`
 
-Defined in: [electron/managers/ConfigurationManager.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L21)
+Defined in: [electron/managers/ConfigurationManager.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/ConfigurationManager.ts#L44)
+
+The minimum allowed history retention limit.
+
+#### Default Value
+
+```ts
+25
+```

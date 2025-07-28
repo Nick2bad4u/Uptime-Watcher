@@ -2,7 +2,7 @@
 
 > **createPersistConfig**\<`T`\>(`name`, `partialize?`): `object`
 
-Defined in: [src/stores/utils.ts:74](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/utils.ts#L74)
+Defined in: [src/stores/utils.ts:74](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/utils.ts#L74)
 
 Creates a persistence configuration for Zustand store persistence.
 
@@ -38,7 +38,7 @@ Configuration object for zustand/middleware/persist
 
 ### partialize
 
-> **partialize**: `undefined` \| (`state`) => `T`
+> **partialize**: `undefined` \| (`state`) => [`Partial`](https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype)\<`T`\>
 
 ## Remarks
 

@@ -1,6 +1,6 @@
 # Interface: IMonitorService
 
-Defined in: [electron/services/monitoring/types.ts:53](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/types.ts#L53)
+Defined in: [electron/services/monitoring/types.ts:53](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/types.ts#L53)
 
 Interface for monitor services that perform health checks.
 
@@ -15,7 +15,7 @@ consistent behavior across different monitoring types (HTTP, port, etc.).
 
 > **check**(`monitor`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`MonitorCheckResult`](MonitorCheckResult.md)\>
 
-Defined in: [electron/services/monitoring/types.ts:67](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/types.ts#L67)
+Defined in: [electron/services/monitoring/types.ts:67](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/types.ts#L67)
 
 Perform a health check on a monitor.
 
@@ -49,7 +49,7 @@ unless the monitor configuration itself is invalid.
 
 > **getType**(): `"http"` \| `"port"`
 
-Defined in: [electron/services/monitoring/types.ts:78](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/types.ts#L78)
+Defined in: [electron/services/monitoring/types.ts:78](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/types.ts#L78)
 
 Get the type of monitor this service handles.
 
@@ -70,7 +70,7 @@ Must match one of the values in the monitor's `type` field.
 
 > **updateConfig**(`config`): `void`
 
-Defined in: [electron/services/monitoring/types.ts:89](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/types.ts#L89)
+Defined in: [electron/services/monitoring/types.ts:89](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/types.ts#L89)
 
 Update the configuration for this monitor service.
 

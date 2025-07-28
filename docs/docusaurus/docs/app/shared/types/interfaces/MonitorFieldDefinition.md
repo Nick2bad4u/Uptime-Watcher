@@ -1,9 +1,12 @@
 # Interface: MonitorFieldDefinition
 
-Defined in: [shared/types.ts:110](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L110)
+Defined in: [shared/types.ts:180](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L180)
 
 Field definition for dynamic form generation.
-Used for monitor type configuration in both frontend and backend.
+
+## Remarks
+
+Used for monitor type configuration in both frontend and backend. Defines the structure of fields for dynamic forms and monitor configuration.
 
 ## Properties
 
@@ -11,7 +14,7 @@ Used for monitor type configuration in both frontend and backend.
 
 > `optional` **helpText**: `string`
 
-Defined in: [shared/types.ts:112](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L112)
+Defined in: [shared/types.ts:182](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L182)
 
 Help text for the field
 
@@ -21,7 +24,7 @@ Help text for the field
 
 > **label**: `string`
 
-Defined in: [shared/types.ts:114](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L114)
+Defined in: [shared/types.ts:184](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L184)
 
 Display label for the field
 
@@ -31,7 +34,7 @@ Display label for the field
 
 > `optional` **max**: `number`
 
-Defined in: [shared/types.ts:116](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L116)
+Defined in: [shared/types.ts:186](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L186)
 
 Max value for number fields
 
@@ -41,7 +44,7 @@ Max value for number fields
 
 > `optional` **min**: `number`
 
-Defined in: [shared/types.ts:118](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L118)
+Defined in: [shared/types.ts:188](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L188)
 
 Min value for number fields
 
@@ -51,7 +54,7 @@ Min value for number fields
 
 > **name**: `string`
 
-Defined in: [shared/types.ts:120](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L120)
+Defined in: [shared/types.ts:190](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L190)
 
 Field name (matches monitor property)
 
@@ -61,7 +64,7 @@ Field name (matches monitor property)
 
 > `optional` **placeholder**: `string`
 
-Defined in: [shared/types.ts:122](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L122)
+Defined in: [shared/types.ts:192](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L192)
 
 Placeholder text
 
@@ -71,7 +74,7 @@ Placeholder text
 
 > **required**: `boolean`
 
-Defined in: [shared/types.ts:124](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L124)
+Defined in: [shared/types.ts:194](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L194)
 
 Whether field is required
 
@@ -81,6 +84,6 @@ Whether field is required
 
 > **type**: `"number"` \| `"url"` \| `"text"`
 
-Defined in: [shared/types.ts:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L126)
+Defined in: [shared/types.ts:196](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/types.ts#L196)
 
 Input type for form rendering

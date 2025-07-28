@@ -1,8 +1,10 @@
 # Interface: ImportSite
 
-Defined in: [electron/utils/database/DataImportExportService.ts:38](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/DataImportExportService.ts#L38)
+Defined in: [electron/utils/database/DataImportExportService.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/DataImportExportService.ts#L42)
 
 Type for imported site data structure.
+
+Represents the structure of site data during import operations.
 
 ## Properties
 
@@ -10,7 +12,7 @@ Type for imported site data structure.
 
 > **identifier**: `string`
 
-Defined in: [electron/utils/database/DataImportExportService.ts:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/DataImportExportService.ts#L39)
+Defined in: [electron/utils/database/DataImportExportService.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/DataImportExportService.ts#L43)
 
 ***
 
@@ -18,7 +20,7 @@ Defined in: [electron/utils/database/DataImportExportService.ts:39](https://gith
 
 > `optional` **monitors**: [`Monitor`](../../../../../shared/types/interfaces/Monitor.md)[]
 
-Defined in: [electron/utils/database/DataImportExportService.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/DataImportExportService.ts#L40)
+Defined in: [electron/utils/database/DataImportExportService.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/DataImportExportService.ts#L44)
 
 ***
 
@@ -26,4 +28,4 @@ Defined in: [electron/utils/database/DataImportExportService.ts:40](https://gith
 
 > `optional` **name**: `string`
 
-Defined in: [electron/utils/database/DataImportExportService.ts:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/DataImportExportService.ts#L41)
+Defined in: [electron/utils/database/DataImportExportService.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/utils/database/DataImportExportService.ts#L45)

@@ -1,5 +1,13 @@
 # shared/utils/typeGuards
 
+Comprehensive type guard utilities for enhanced type safety.
+
+## Remarks
+
+This module provides centralized type checking logic using proper TypeScript type predicates.
+Each utility function is a type guard that narrows the type of the checked value.
+All TSDoc tags follow the official TSDoc standard.
+
 ## Functions
 
 - [hasProperties](functions/hasProperties.md)

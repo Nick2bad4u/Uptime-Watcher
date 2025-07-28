@@ -1,8 +1,12 @@
 # Interface: ActionButtonGroupProperties
 
-Defined in: [src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx#L15)
+Defined in: [src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx#L16)
 
 Props for the ActionButtonGroup component.
+
+## See
+
+ActionButtonGroup
 
 ## Properties
 
@@ -10,7 +14,7 @@ Props for the ActionButtonGroup component.
 
 > **disabled**: `boolean`
 
-Defined in: [src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx#L17)
+Defined in: [src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx#L18)
 
 Whether all buttons should be disabled
 
@@ -20,7 +24,7 @@ Whether all buttons should be disabled
 
 > **isLoading**: `boolean`
 
-Defined in: [src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx#L19)
+Defined in: [src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx#L20)
 
 Whether any operation is currently loading
 
@@ -30,7 +34,7 @@ Whether any operation is currently loading
 
 > **isMonitoring**: `boolean`
 
-Defined in: [src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx#L21)
+Defined in: [src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx#L22)
 
 Whether monitoring is currently active
 
@@ -40,7 +44,7 @@ Whether monitoring is currently active
 
 > **onCheckNow**: () => `void`
 
-Defined in: [src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx#L23)
+Defined in: [src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx#L24)
 
 Callback function to trigger immediate site check
 
@@ -54,7 +58,7 @@ Callback function to trigger immediate site check
 
 > **onStartMonitoring**: () => `void`
 
-Defined in: [src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx#L25)
+Defined in: [src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx#L26)
 
 Callback function to start monitoring
 
@@ -68,7 +72,7 @@ Callback function to start monitoring
 
 > **onStopMonitoring**: () => `void`
 
-Defined in: [src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx#L27)
+Defined in: [src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx#L28)
 
 Callback function to stop monitoring
 

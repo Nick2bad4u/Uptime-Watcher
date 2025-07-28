@@ -1,21 +1,19 @@
 # Interface: SiteRepositoryDependencies
 
-Defined in: [electron/services/database/SiteRepository.ts:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SiteRepository.ts#L18)
+Defined in: [electron/services/database/SiteRepository.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SiteRepository.ts#L15)
 
-Repository for managing site data persistence.
-Handles CRUD operations for sites in the database.
+Defines the dependencies required by the [SiteRepository](../classes/SiteRepository.md) for managing site data persistence.
 
 ## Remarks
 
-**Data Consistency Standards:**
-- Site names: Default to "Unnamed Site" when null/undefined for consistency
-- Monitoring: Default to true (1) when undefined for safety
-- All operations maintain referential integrity within transactions
+Used to inject the [DatabaseService](../../DatabaseService/classes/DatabaseService.md) for transactional operations. This interface is used for dependency injection.
 
 ## Properties
 
 ### databaseService
 
-> **databaseService**: [`DatabaseService`](../../DatabaseService/classes/DatabaseService.md)
+> `readonly` **databaseService**: [`DatabaseService`](../../DatabaseService/classes/DatabaseService.md)
 
-Defined in: [electron/services/database/SiteRepository.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SiteRepository.ts#L19)
+Defined in: [electron/services/database/SiteRepository.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/SiteRepository.ts#L20)
+
+The database service used for transactional operations.

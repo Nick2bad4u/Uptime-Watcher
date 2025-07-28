@@ -2,7 +2,7 @@
 
 > `const` **monitorOperations**: `object`
 
-Defined in: [src/stores/sites/utils/monitorOperations.ts:114](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/utils/monitorOperations.ts#L114)
+Defined in: [src/stores/sites/utils/monitorOperations.ts:168](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/stores/sites/utils/monitorOperations.ts#L168)
 
 Creates monitor update operations
 
@@ -76,13 +76,23 @@ Update monitor status
 
 [`Monitor`](../../../../../../shared/types/interfaces/Monitor.md)
 
+The monitor to update
+
 ##### status
 
 [`MonitorStatus`](../../../../../../shared/types/type-aliases/MonitorStatus.md)
 
+The new status to set
+
 #### Returns
 
 [`Monitor`](../../../../../../shared/types/interfaces/Monitor.md)
+
+Updated monitor with validated status
+
+#### Throws
+
+Error if status is not valid
 
 ### updateTimeout()
 

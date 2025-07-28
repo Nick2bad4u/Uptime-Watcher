@@ -1,6 +1,6 @@
 # Interface: AnalyticsTabProperties
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L25)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L42)
 
 Props for the AnalyticsTab component.
 Contains comprehensive metrics, chart data, and formatting functions.
@@ -11,7 +11,7 @@ Contains comprehensive metrics, chart data, and formatting functions.
 
 > `readonly` **avgResponseTime**: `number`
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L27)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L44)
 
 Average response time across all checks
 
@@ -21,7 +21,7 @@ Average response time across all checks
 
 > `readonly` **barChartData**: [`StatusBarChartData`](../../../../../services/chartConfig/interfaces/StatusBarChartData.md)
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L29)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L46)
 
 Chart.js data configuration for bar chart
 
@@ -31,7 +31,7 @@ Chart.js data configuration for bar chart
 
 > `readonly` **barChartOptions**: `ChartOptions`\<`"bar"`\>
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L31)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L48)
 
 Chart.js options configuration for bar chart
 
@@ -41,7 +41,7 @@ Chart.js options configuration for bar chart
 
 > `readonly` **doughnutOptions**: `ChartOptions`\<`"doughnut"`\>
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:33](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L33)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L50)
 
 Chart.js options configuration for doughnut chart
 
@@ -51,7 +51,7 @@ Chart.js options configuration for doughnut chart
 
 > `readonly` **downCount**: `number`
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:35](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L35)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L52)
 
 Number of failed checks
 
@@ -61,7 +61,7 @@ Number of failed checks
 
 > `readonly` **downtimePeriods**: [`DowntimePeriod`](../../../../../hooks/site/useSiteAnalytics/interfaces/DowntimePeriod.md)[]
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L37)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L54)
 
 Array of downtime periods with durations
 
@@ -71,7 +71,7 @@ Array of downtime periods with durations
 
 > `readonly` **formatDuration**: (`ms`) => `string`
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L39)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:56](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L56)
 
 Function to format duration values
 
@@ -91,7 +91,7 @@ Function to format duration values
 
 > `readonly` **formatResponseTime**: (`time`) => `string`
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L41)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:58](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L58)
 
 Function to format response time values
 
@@ -111,7 +111,7 @@ Function to format response time values
 
 > `readonly` **getAvailabilityDescription**: (`percentage`) => `string`
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L43)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:60](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L60)
 
 Function to get description based on availability percentage
 
@@ -131,7 +131,7 @@ Function to get description based on availability percentage
 
 > `readonly` **lineChartData**: [`ResponseTimeChartData`](../../../../../services/chartConfig/interfaces/ResponseTimeChartData.md)
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L45)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L62)
 
 Chart.js data configuration for line chart
 
@@ -141,7 +141,7 @@ Chart.js data configuration for line chart
 
 > `readonly` **lineChartOptions**: `ChartOptions`\<`"line"`\>
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L47)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:64](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L64)
 
 Chart.js options configuration for line chart
 
@@ -151,7 +151,7 @@ Chart.js options configuration for line chart
 
 > `readonly` **monitorType**: `"http"` \| `"port"`
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L49)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:66](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L66)
 
 Type of monitor being analyzed
 
@@ -161,7 +161,7 @@ Type of monitor being analyzed
 
 > `readonly` **mttr**: `number`
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:51](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L51)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:68](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L68)
 
 Mean time to recovery in milliseconds
 
@@ -171,7 +171,7 @@ Mean time to recovery in milliseconds
 
 > `readonly` **p50**: `number`
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:53](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L53)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:70](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L70)
 
 50th percentile response time
 
@@ -181,7 +181,7 @@ Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:53](https://github
 
 > `readonly` **p95**: `number`
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:55](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L55)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:72](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L72)
 
 95th percentile response time
 
@@ -191,7 +191,7 @@ Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:55](https://github
 
 > `readonly` **p99**: `number`
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:57](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L57)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:74](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L74)
 
 99th percentile response time
 
@@ -201,7 +201,7 @@ Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:57](https://github
 
 > `readonly` **setShowAdvancedMetrics**: (`show`) => `void`
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:59](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L59)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:76](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L76)
 
 Function to toggle advanced metrics visibility
 
@@ -221,7 +221,7 @@ Function to toggle advanced metrics visibility
 
 > `readonly` **setSiteDetailsChartTimeRange**: (`range`) => `void`
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:61](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L61)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:78](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L78)
 
 Function to set the chart time range
 
@@ -229,7 +229,7 @@ Function to set the chart time range
 
 ##### range
 
-`"1h"` | `"7d"` | `"24h"` | `"30d"`
+`"1h"` | `"24h"` | `"7d"` | `"30d"`
 
 #### Returns
 
@@ -241,7 +241,7 @@ Function to set the chart time range
 
 > `readonly` **showAdvancedMetrics**: `boolean`
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:63](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L63)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:80](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L80)
 
 Whether advanced metrics are currently shown
 
@@ -249,9 +249,9 @@ Whether advanced metrics are currently shown
 
 ### siteDetailsChartTimeRange
 
-> `readonly` **siteDetailsChartTimeRange**: `"1h"` \| `"7d"` \| `"24h"` \| `"30d"`
+> `readonly` **siteDetailsChartTimeRange**: `"1h"` \| `"24h"` \| `"7d"` \| `"30d"`
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:65](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L65)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:82](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L82)
 
 Current chart time range selection
 
@@ -261,7 +261,7 @@ Current chart time range selection
 
 > `readonly` **totalChecks**: `number`
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:67](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L67)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:84](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L84)
 
 Total number of checks performed
 
@@ -271,7 +271,7 @@ Total number of checks performed
 
 > `readonly` **totalDowntime**: `number`
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:69](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L69)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:86](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L86)
 
 Total downtime in milliseconds
 
@@ -281,7 +281,7 @@ Total downtime in milliseconds
 
 > `readonly` **upCount**: `number`
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:71](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L71)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:88](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L88)
 
 Number of successful checks
 
@@ -291,7 +291,7 @@ Number of successful checks
 
 > `readonly` **uptime**: `string`
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:73](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L73)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:90](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L90)
 
 Uptime percentage as string
 
@@ -301,6 +301,6 @@ Uptime percentage as string
 
 > `readonly` **uptimeChartData**: [`UptimeChartData`](../../../../../services/chartConfig/interfaces/UptimeChartData.md)
 
-Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:75](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L75)
+Defined in: [src/components/SiteDetails/tabs/AnalyticsTab.tsx:92](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/tabs/AnalyticsTab.tsx#L92)
 
 Chart.js data configuration for uptime chart

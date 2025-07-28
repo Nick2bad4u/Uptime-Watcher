@@ -2,7 +2,7 @@
 
 > `const` **SiteAnalyticsUtils**: `object`
 
-Defined in: [src/hooks/site/useSiteAnalytics.ts:226](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteAnalytics.ts#L226)
+Defined in: [src/hooks/site/useSiteAnalytics.ts:171](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSiteAnalytics.ts#L171)
 
 Utility functions for common calculations
 
@@ -56,9 +56,17 @@ Get availability status based on uptime percentage
 
 `number`
 
+Uptime percentage (0-100)
+
 #### Returns
 
 `"critical"` \| `"excellent"` \| `"good"` \| `"warning"`
+
+Status level based on uptime thresholds
+
+#### Remarks
+
+Thresholds: ≥99.9% = excellent, ≥99% = good, ≥95% = warning, \<95% = critical
 
 ### getPerformanceStatus()
 
@@ -72,6 +80,14 @@ Get performance status based on response time
 
 `number`
 
+Average response time in milliseconds
+
 #### Returns
 
 `"critical"` \| `"excellent"` \| `"good"` \| `"warning"`
+
+Status level based on response time thresholds
+
+#### Remarks
+
+Thresholds: ≤200ms = excellent, ≤500ms = good, ≤1000ms = warning, \>1000ms = critical

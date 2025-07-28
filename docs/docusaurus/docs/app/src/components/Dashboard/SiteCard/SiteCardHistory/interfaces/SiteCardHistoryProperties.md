@@ -1,6 +1,6 @@
 # Interface: SiteCardHistoryProperties
 
-Defined in: [src/components/Dashboard/SiteCard/SiteCardHistory.tsx:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/SiteCardHistory.tsx#L18)
+Defined in: [src/components/Dashboard/SiteCard/SiteCardHistory.tsx:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/SiteCardHistory.tsx#L21)
 
 Props for the SiteCardHistory component.
 
@@ -10,7 +10,7 @@ Props for the SiteCardHistory component.
 
 > **filteredHistory**: [`StatusHistory`](../../../../../../shared/types/interfaces/StatusHistory.md)[]
 
-Defined in: [src/components/Dashboard/SiteCard/SiteCardHistory.tsx:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/SiteCardHistory.tsx#L20)
+Defined in: [src/components/Dashboard/SiteCard/SiteCardHistory.tsx:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/SiteCardHistory.tsx#L23)
 
 Filtered history data for visualization
 
@@ -20,6 +20,6 @@ Filtered history data for visualization
 
 > **monitor**: `undefined` \| [`Monitor`](../../../../../../shared/types/interfaces/Monitor.md)
 
-Defined in: [src/components/Dashboard/SiteCard/SiteCardHistory.tsx:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/Dashboard/SiteCard/SiteCardHistory.tsx#L22)
+Defined in: [src/components/Dashboard/SiteCard/SiteCardHistory.tsx:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/Dashboard/SiteCard/SiteCardHistory.tsx#L25)
 
 Monitor data containing type and configuration

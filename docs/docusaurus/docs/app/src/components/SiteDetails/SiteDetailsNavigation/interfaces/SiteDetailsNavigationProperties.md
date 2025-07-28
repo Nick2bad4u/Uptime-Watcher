@@ -1,6 +1,6 @@
 # Interface: SiteDetailsNavigationProperties
 
-Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/SiteDetailsNavigation.tsx#L19)
+Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/SiteDetailsNavigation.tsx#L19)
 
 Props for the SiteDetailsNavigation component.
 Contains all necessary handlers and state for monitoring control.
@@ -11,7 +11,7 @@ Contains all necessary handlers and state for monitoring control.
 
 > `readonly` **activeSiteDetailsTab**: `string`
 
-Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/SiteDetailsNavigation.tsx#L21)
+Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/SiteDetailsNavigation.tsx#L21)
 
 Currently active tab in the site details view
 
@@ -21,7 +21,7 @@ Currently active tab in the site details view
 
 > `readonly` **currentSite**: [`Site`](../../../../../shared/types/interfaces/Site.md)
 
-Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/SiteDetailsNavigation.tsx#L23)
+Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/SiteDetailsNavigation.tsx#L23)
 
 The site object being displayed
 
@@ -31,7 +31,7 @@ The site object being displayed
 
 > `readonly` **handleMonitorIdChange**: (`event`) => `void`
 
-Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/SiteDetailsNavigation.tsx#L25)
+Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/SiteDetailsNavigation.tsx#L25)
 
 Handler for monitor selection changes
 
@@ -51,7 +51,7 @@ Handler for monitor selection changes
 
 > `readonly` **handleStartMonitoring**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/SiteDetailsNavigation.tsx#L27)
+Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/SiteDetailsNavigation.tsx#L27)
 
 Handler for starting monitoring
 
@@ -65,7 +65,7 @@ Handler for starting monitoring
 
 > `readonly` **handleStartSiteMonitoring**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/SiteDetailsNavigation.tsx#L29)
+Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/SiteDetailsNavigation.tsx#L29)
 
 Handler for starting site-level monitoring
 
@@ -79,7 +79,7 @@ Handler for starting site-level monitoring
 
 > `readonly` **handleStopMonitoring**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/SiteDetailsNavigation.tsx#L31)
+Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/SiteDetailsNavigation.tsx#L31)
 
 Handler for stopping monitoring
 
@@ -93,7 +93,7 @@ Handler for stopping monitoring
 
 > `readonly` **handleStopSiteMonitoring**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:33](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/SiteDetailsNavigation.tsx#L33)
+Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:33](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/SiteDetailsNavigation.tsx#L33)
 
 Handler for stopping site-level monitoring
 
@@ -107,7 +107,7 @@ Handler for stopping site-level monitoring
 
 > `readonly` **isLoading**: `boolean`
 
-Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:35](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/SiteDetailsNavigation.tsx#L35)
+Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:35](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/SiteDetailsNavigation.tsx#L35)
 
 Whether any async operation is in progress
 
@@ -117,7 +117,7 @@ Whether any async operation is in progress
 
 > `readonly` **isMonitoring**: `boolean`
 
-Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/SiteDetailsNavigation.tsx#L37)
+Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/SiteDetailsNavigation.tsx#L37)
 
 Whether monitoring is currently active
 
@@ -127,7 +127,7 @@ Whether monitoring is currently active
 
 > `readonly` **selectedMonitorId**: `string`
 
-Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/SiteDetailsNavigation.tsx#L39)
+Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/SiteDetailsNavigation.tsx#L39)
 
 Currently selected monitor ID
 
@@ -137,7 +137,7 @@ Currently selected monitor ID
 
 > `readonly` **setActiveSiteDetailsTab**: (`tab`) => `void`
 
-Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/SiteDetailsNavigation.tsx#L41)
+Defined in: [src/components/SiteDetails/SiteDetailsNavigation.tsx:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/SiteDetails/SiteDetailsNavigation.tsx#L41)
 
 Function to set the active tab
 

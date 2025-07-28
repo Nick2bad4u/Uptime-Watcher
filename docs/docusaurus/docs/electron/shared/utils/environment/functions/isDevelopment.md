@@ -2,7 +2,7 @@
 
 > **isDevelopment**(): `boolean`
 
-Defined in: [shared/utils/environment.ts:58](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/environment.ts#L58)
+Defined in: [shared/utils/environment.ts:109](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/shared/utils/environment.ts#L109)
 
 Check if running in development mode.
 Safe alternative to direct process.env.NODE_ENV access.
@@ -12,6 +12,12 @@ Safe alternative to direct process.env.NODE_ENV access.
 `boolean`
 
 True if in development mode
+
+## Remarks
+
+Uses strict equality check against 'development' string. Only recognizes
+the standard NODE_ENV value 'development' - variants like 'dev' are not
+supported. This ensures consistent behavior across the application.
 
 ## Example
 

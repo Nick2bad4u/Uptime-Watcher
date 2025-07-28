@@ -1,6 +1,12 @@
 # Interface: VersionInfo
 
-Defined in: [electron/services/monitoring/MigrationSystem.ts:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MigrationSystem.ts#L16)
+Defined in: [electron/services/monitoring/MigrationSystem.ts:82](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MigrationSystem.ts#L82)
+
+Tracks version information for a monitor type.
+
+## Remarks
+
+Used by VersionManager to record migration state and applied versions for each monitor type.
 
 ## Properties
 
@@ -8,7 +14,13 @@ Defined in: [electron/services/monitoring/MigrationSystem.ts:16](https://github.
 
 > **applied**: `boolean`
 
-Defined in: [electron/services/monitoring/MigrationSystem.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MigrationSystem.ts#L17)
+Defined in: [electron/services/monitoring/MigrationSystem.ts:89](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MigrationSystem.ts#L89)
+
+Indicates if the version has been applied.
+
+#### Remarks
+
+True if the migration to this version has been completed.
 
 ***
 
@@ -16,7 +28,13 @@ Defined in: [electron/services/monitoring/MigrationSystem.ts:17](https://github.
 
 > **timestamp**: `number`
 
-Defined in: [electron/services/monitoring/MigrationSystem.ts:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MigrationSystem.ts#L18)
+Defined in: [electron/services/monitoring/MigrationSystem.ts:96](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MigrationSystem.ts#L96)
+
+Timestamp when the version was set.
+
+#### Remarks
+
+Milliseconds since epoch.
 
 ***
 
@@ -24,4 +42,10 @@ Defined in: [electron/services/monitoring/MigrationSystem.ts:18](https://github.
 
 > **version**: `string`
 
-Defined in: [electron/services/monitoring/MigrationSystem.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MigrationSystem.ts#L19)
+Defined in: [electron/services/monitoring/MigrationSystem.ts:103](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/monitoring/MigrationSystem.ts#L103)
+
+The version string.
+
+#### Remarks
+
+Semantic version string (e.g., "1.1.0").

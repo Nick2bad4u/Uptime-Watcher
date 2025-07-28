@@ -2,15 +2,15 @@
 
 > **rowToMonitorOrUndefined**(`row`): `undefined` \| [`Monitor`](../../../../../../shared/types/interfaces/Monitor.md)
 
-Defined in: [electron/services/database/utils/monitorMapper.ts:212](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/monitorMapper.ts#L212)
+Defined in: [electron/services/database/utils/monitorMapper.ts:253](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/services/database/utils/monitorMapper.ts#L253)
 
-Convert database row to monitor object or return undefined if not found.
+Converts a database row to a monitor object, or returns `undefined` if the row is missing.
 
 ## Parameters
 
 ### row
 
-Database row data or undefined
+The raw database row or `undefined`.
 
 `undefined` | [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\>
 
@@ -18,19 +18,24 @@ Database row data or undefined
 
 `undefined` \| [`Monitor`](../../../../../../shared/types/interfaces/Monitor.md)
 
-Converted monitor object or undefined
-
-## Throws
-
-Error When row mapping fails for valid rows (propagated from rowToMonitor)
+The mapped monitor object, or `undefined` if the row is missing.
 
 ## Remarks
 
-**Null Safety**: Safely handles undefined/null rows without throwing errors.
-Used by repository methods that may not find matching records.
+- Returns `undefined` if the input row is `undefined` or `null`.
+- Otherwise, delegates to [rowToMonitor](rowToMonitor.md).
+- Used by repository methods where a missing monitor is not an error.
 
-**Error Behavior**: If row exists but is invalid, errors from `rowToMonitor()` are
-propagated to allow proper error handling by calling code.
+## Throws
 
-**Usage Pattern**: Commonly used in `MonitorRepository.findByIdentifier()` where
-missing monitors are expected and should return undefined.
+Error if mapping fails for a valid row.
+
+## Example
+
+```typescript
+const monitor = rowToMonitorOrUndefined(dbRowOrUndefined);
+```
+
+## See
+
+[rowToMonitor](rowToMonitor.md)

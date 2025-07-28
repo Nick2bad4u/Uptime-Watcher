@@ -1,8 +1,8 @@
 # Function: useSite()
 
-> **useSite**(`site`): `object`
+> **useSite**(`site`): [`UseSiteResult`](../interfaces/UseSiteResult.md)
 
-Defined in: [src/hooks/site/useSite.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSite.ts#L13)
+Defined in: [src/hooks/site/useSite.ts:60](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/hooks/site/useSite.ts#L60)
 
 A comprehensive hook that combines site monitoring, actions, statistics, and UI state
 
@@ -16,116 +16,47 @@ The site to work with
 
 ## Returns
 
+[`UseSiteResult`](../interfaces/UseSiteResult.md)
+
 Combined data and functionality from all site-related hooks
 
-### averageResponseTime
+## See
 
-> **averageResponseTime**: `number`
+[UseSiteResult](../interfaces/UseSiteResult.md) for the complete interface specification
 
-### checkCount
+## Remarks
 
-> **checkCount**: `number`
+This hook serves as a composition layer that combines:
+- Monitor data and selection (from useSiteMonitor)
+- Site statistics and analytics (from useSiteStats)
+- Action handlers for site operations (from useSiteActions)
+- UI loading state (from useErrorStore)
 
-### filteredHistory
+Property precedence: Actions → Monitor → Stats → Loading state.
+The isLoading property is added last and will not be overwritten.
 
-> **filteredHistory**: [`StatusHistory`](../../../../../shared/types/interfaces/StatusHistory.md)[]
+## Example
 
-Filtered history for the selected monitor
+```tsx
+function SiteCard({ site }) {
+  const {
+    monitor,
+    status,
+    uptime,
+    handleCheckNow,
+    handleStartMonitoring,
+    isLoading
+  } = useSite(site);
 
-### handleCardClick()
-
-> **handleCardClick**: () => `void`
-
-#### Returns
-
-`void`
-
-### handleCheckNow()
-
-> **handleCheckNow**: () => `void`
-
-#### Returns
-
-`void`
-
-### handleMonitorIdChange()
-
-> **handleMonitorIdChange**: (`e`) => `void`
-
-Handler for monitor selection changes
-
-#### Parameters
-
-##### e
-
-[`ChangeEvent`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L2018)\<[`HTMLSelectElement`](https://developer.mozilla.org/docs/Web/API/HTMLSelectElement)\>
-
-#### Returns
-
-`void`
-
-### handleStartMonitoring()
-
-> **handleStartMonitoring**: () => `void`
-
-#### Returns
-
-`void`
-
-### handleStopMonitoring()
-
-> **handleStopMonitoring**: () => `void`
-
-#### Returns
-
-`void`
-
-### isLoading
-
-> **isLoading**: `boolean`
-
-### isMonitoring
-
-> **isMonitoring**: `boolean`
-
-Whether the selected monitor is actively being monitored
-
-### latestSite
-
-> **latestSite**: [`Site`](../../../../../shared/types/interfaces/Site.md)
-
-Most up-to-date site data from store
-
-### monitor
-
-> **monitor**: `undefined` \| [`Monitor`](../../../../../shared/types/interfaces/Monitor.md)
-
-Currently selected monitor object
-
-### monitorIds
-
-> **monitorIds**: `string`[]
-
-Array of all monitor IDs for this site
-
-### responseTime
-
-> **responseTime**: `undefined` \| `number`
-
-Response time of the selected monitor
-
-### selectedMonitorId
-
-> **selectedMonitorId**: `string`
-
-ID of the currently selected monitor
-
-### status
-
-> **status**: [`MonitorStatus`](../../../../../shared/types/type-aliases/MonitorStatus.md)
-
-Current status of the selected monitor
-
-### uptime
-
-> **uptime**: `number`
+  return (
+    <div>
+      <h3>{site.name}</h3>
+      <p>Status: {status}</p>
+      <p>Uptime: {uptime}%</p>
+      <button onClick={handleCheckNow} disabled={isLoading}>
+        Check Now
+      </button>
+    </div>
+  );
+}
+```

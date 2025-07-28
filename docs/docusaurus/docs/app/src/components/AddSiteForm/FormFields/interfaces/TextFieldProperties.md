@@ -1,8 +1,8 @@
 # Interface: TextFieldProperties
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:97](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L97)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:118](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/FormFields.tsx#L118)
 
-Props for the TextField component
+Props for the TextField component.
 
 ## Properties
 
@@ -10,7 +10,7 @@ Props for the TextField component
 
 > `optional` **disabled**: `boolean`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:99](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L99)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:120](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/FormFields.tsx#L120)
 
 Whether the field is disabled
 
@@ -20,7 +20,7 @@ Whether the field is disabled
 
 > `optional` **error**: `string`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:101](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L101)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:122](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/FormFields.tsx#L122)
 
 Error message to display
 
@@ -30,7 +30,7 @@ Error message to display
 
 > `optional` **helpText**: `string`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:103](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L103)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:124](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/FormFields.tsx#L124)
 
 Help text to show below the field
 
@@ -40,7 +40,7 @@ Help text to show below the field
 
 > **id**: `string`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:105](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L105)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/FormFields.tsx#L126)
 
 Unique ID for the input field
 
@@ -50,7 +50,7 @@ Unique ID for the input field
 
 > **label**: `string`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:107](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L107)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:128](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/FormFields.tsx#L128)
 
 Label text to display
 
@@ -60,7 +60,7 @@ Label text to display
 
 > `optional` **max**: `number`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:109](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L109)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:130](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/FormFields.tsx#L130)
 
 Maximum value for number inputs
 
@@ -70,7 +70,7 @@ Maximum value for number inputs
 
 > `optional` **min**: `number`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:111](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L111)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:132](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/FormFields.tsx#L132)
 
 Minimum value for number inputs
 
@@ -80,7 +80,7 @@ Minimum value for number inputs
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:113](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L113)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:134](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/FormFields.tsx#L134)
 
 Callback when value changes
 
@@ -100,7 +100,7 @@ Callback when value changes
 
 > `optional` **placeholder**: `string`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:115](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L115)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:136](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/FormFields.tsx#L136)
 
 Placeholder text for the input
 
@@ -110,7 +110,7 @@ Placeholder text for the input
 
 > `optional` **required**: `boolean`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:117](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L117)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:138](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/FormFields.tsx#L138)
 
 Whether the field is required
 
@@ -120,7 +120,7 @@ Whether the field is required
 
 > `optional` **type**: `"number"` \| `"url"` \| `"text"`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:119](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L119)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:140](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/FormFields.tsx#L140)
 
 Input type (text, url, or number)
 
@@ -130,6 +130,6 @@ Input type (text, url, or number)
 
 > **value**: `string`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:121](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L121)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:142](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/FormFields.tsx#L142)
 
 Current field value

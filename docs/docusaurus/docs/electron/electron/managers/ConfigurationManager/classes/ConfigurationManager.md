@@ -1,16 +1,14 @@
 # Class: ConfigurationManager
 
-Defined in: [electron/managers/ConfigurationManager.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L34)
+Defined in: [electron/managers/ConfigurationManager.ts:57](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/ConfigurationManager.ts#L57)
 
-Manages business configuration and policies with standardized caching.
-Centralizes business rules that were previously scattered across utilities.
-Uses composition pattern with specialized validators to reduce complexity.
-Implements caching for validation results and configuration values for performance.
+Manages business configuration, validation, and policy rules for the application.
 
 ## Remarks
 
-ConfigurationManager instances should be obtained via ServiceContainer.getInstance().getConfigurationManager()
-This ensures proper dependency injection and lifecycle management
+Centralizes business logic for configuration decisions, validation, and caching of results.
+Uses composition with specialized validators and standardized caches for performance.
+All configuration and validation flows should use this manager for consistency.
 
 ## Constructors
 
@@ -18,11 +16,17 @@ This ensures proper dependency injection and lifecycle management
 
 > **new ConfigurationManager**(): `ConfigurationManager`
 
-Defined in: [electron/managers/ConfigurationManager.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L40)
+Defined in: [electron/managers/ConfigurationManager.ts:108](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/ConfigurationManager.ts#L108)
+
+Creates a new ConfigurationManager instance.
 
 #### Returns
 
 `ConfigurationManager`
+
+#### Remarks
+
+Instantiates specialized validators and initializes standardized caches for configuration and validation results.
 
 ## Methods
 
@@ -30,13 +34,17 @@ Defined in: [electron/managers/ConfigurationManager.ts:40](https://github.com/Ni
 
 > **clearValidationCache**(): `void`
 
-Defined in: [electron/managers/ConfigurationManager.ts:63](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L63)
+Defined in: [electron/managers/ConfigurationManager.ts:134](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/ConfigurationManager.ts#L134)
 
-Clear validation cache when configuration changes.
+Clears the validation cache.
 
 #### Returns
 
 `void`
+
+#### Remarks
+
+Use this method to invalidate cached validation results after configuration updates or changes.
 
 ***
 
@@ -44,13 +52,15 @@ Clear validation cache when configuration changes.
 
 > **getCacheStats**(): `object`
 
-Defined in: [electron/managers/ConfigurationManager.ts:70](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L70)
+Defined in: [electron/managers/ConfigurationManager.ts:149](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/ConfigurationManager.ts#L149)
 
-Get cache statistics for monitoring.
+Gets cache statistics for configuration and validation caches.
 
 #### Returns
 
 `object`
+
+An object containing statistics for both configuration and validation caches.
 
 ##### configuration
 
@@ -60,19 +70,32 @@ Get cache statistics for monitoring.
 
 > **validation**: [`CacheStats`](../../../utils/cache/StandardizedCache/interfaces/CacheStats.md)
 
+#### Example
+
+```typescript
+const stats = configManager.getCacheStats();
+console.log(stats);
+```
+
 ***
 
 ### getDefaultMonitorInterval()
 
 > **getDefaultMonitorInterval**(): `number`
 
-Defined in: [electron/managers/ConfigurationManager.ts:83](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L83)
+Defined in: [electron/managers/ConfigurationManager.ts:167](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/ConfigurationManager.ts#L167)
 
-Get the default monitor check interval according to business rules.
+Gets the default monitor check interval according to business rules.
 
 #### Returns
 
 `number`
+
+The default check interval in milliseconds.
+
+#### Remarks
+
+This value is used when a monitor does not specify a custom interval.
 
 ***
 
@@ -80,14 +103,19 @@ Get the default monitor check interval according to business rules.
 
 > **getHistoryRetentionRules**(): [`HistoryRetentionConfig`](../interfaces/HistoryRetentionConfig.md)
 
-Defined in: [electron/managers/ConfigurationManager.ts:91](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L91)
+Defined in: [electron/managers/ConfigurationManager.ts:179](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/ConfigurationManager.ts#L179)
 
-Get history retention configuration according to business rules.
-These limits align with the history limit options available in the UI.
+Gets history retention configuration according to business rules.
 
 #### Returns
 
 [`HistoryRetentionConfig`](../interfaces/HistoryRetentionConfig.md)
+
+The [HistoryRetentionConfig](../interfaces/HistoryRetentionConfig.md) object specifying default, minimum, and maximum history limits.
+
+#### Remarks
+
+These limits align with the history limit options available in the UI.
 
 ***
 
@@ -95,13 +123,15 @@ These limits align with the history limit options available in the UI.
 
 > **getMaximumPortNumber**(): `number`
 
-Defined in: [electron/managers/ConfigurationManager.ts:102](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L102)
+Defined in: [electron/managers/ConfigurationManager.ts:192](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/ConfigurationManager.ts#L192)
 
-Business rule: Get the maximum allowed port number.
+Gets the maximum allowed port number according to business rules.
 
 #### Returns
 
 `number`
+
+The maximum allowed port number (65535).
 
 ***
 
@@ -109,13 +139,15 @@ Business rule: Get the maximum allowed port number.
 
 > **getMinimumCheckInterval**(): `number`
 
-Defined in: [electron/managers/ConfigurationManager.ts:109](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L109)
+Defined in: [electron/managers/ConfigurationManager.ts:201](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/ConfigurationManager.ts#L201)
 
-Business rule: Get the minimum allowed check interval.
+Gets the minimum allowed check interval according to business rules.
 
 #### Returns
 
 `number`
+
+The minimum allowed check interval in milliseconds (1000 ms).
 
 ***
 
@@ -123,13 +155,15 @@ Business rule: Get the minimum allowed check interval.
 
 > **getMinimumTimeout**(): `number`
 
-Defined in: [electron/managers/ConfigurationManager.ts:116](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L116)
+Defined in: [electron/managers/ConfigurationManager.ts:210](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/ConfigurationManager.ts#L210)
 
-Business rule: Get the minimum allowed timeout.
+Gets the minimum allowed timeout according to business rules.
 
 #### Returns
 
 `number`
+
+The minimum allowed timeout in milliseconds (1000 ms).
 
 ***
 
@@ -137,9 +171,9 @@ Business rule: Get the minimum allowed timeout.
 
 > **shouldApplyDefaultInterval**(`monitor`): `boolean`
 
-Defined in: [electron/managers/ConfigurationManager.ts:123](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L123)
+Defined in: [electron/managers/ConfigurationManager.ts:223](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/ConfigurationManager.ts#L223)
 
-Business rule: Determine if a monitor should receive a default interval.
+Determines if a monitor should receive a default check interval.
 
 #### Parameters
 
@@ -147,9 +181,17 @@ Business rule: Determine if a monitor should receive a default interval.
 
 [`Monitor`](../../../../shared/types/interfaces/Monitor.md)
 
+The monitor configuration to evaluate. Must be a member of [Site.monitors](../../../../shared/types/interfaces/Site.md#monitors).
+
 #### Returns
 
 `boolean`
+
+`true` if the monitor should receive a default check interval; otherwise, `false`.
+
+#### Remarks
+
+Delegates to [MonitorValidator.shouldApplyDefaultInterval](../../validators/MonitorValidator/classes/MonitorValidator.md#shouldapplydefaultinterval).
 
 ***
 
@@ -157,9 +199,9 @@ Business rule: Determine if a monitor should receive a default interval.
 
 > **shouldAutoStartMonitoring**(`site`): `boolean`
 
-Defined in: [electron/managers/ConfigurationManager.ts:130](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L130)
+Defined in: [electron/managers/ConfigurationManager.ts:237](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/ConfigurationManager.ts#L237)
 
-Business rule: Determine if monitoring should be auto-started for a site.
+Determines if monitoring should be auto-started for a site according to business rules.
 
 #### Parameters
 
@@ -167,9 +209,18 @@ Business rule: Determine if monitoring should be auto-started for a site.
 
 [`Site`](../../../../shared/types/interfaces/Site.md)
 
+The [Site](../../../../shared/types/interfaces/Site.md) configuration to evaluate.
+
 #### Returns
 
 `boolean`
+
+`true` if monitoring should be auto-started for the site; otherwise, `false`.
+
+#### Remarks
+
+Monitoring is not auto-started in development mode or for sites without monitors.
+The site's `monitoring` property takes precedence.
 
 ***
 
@@ -177,10 +228,9 @@ Business rule: Determine if monitoring should be auto-started for a site.
 
 > **shouldIncludeInExport**(`site`): `boolean`
 
-Defined in: [electron/managers/ConfigurationManager.ts:149](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L149)
+Defined in: [electron/managers/ConfigurationManager.ts:261](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/ConfigurationManager.ts#L261)
 
-Business rule: Determine if a site should be included in exports.
-Delegates to site validator for consistency.
+Determines if a site should be included in exports according to business rules.
 
 #### Parameters
 
@@ -188,9 +238,17 @@ Delegates to site validator for consistency.
 
 [`Site`](../../../../shared/types/interfaces/Site.md)
 
+The [Site](../../../../shared/types/interfaces/Site.md) configuration to evaluate.
+
 #### Returns
 
 `boolean`
+
+`true` if the site should be included in exports; otherwise, `false`.
+
+#### Remarks
+
+Delegates to [SiteValidator.shouldIncludeInExport](../../validators/SiteValidator/classes/SiteValidator.md#shouldincludeinexport) for consistency.
 
 ***
 
@@ -198,9 +256,9 @@ Delegates to site validator for consistency.
 
 > **validateMonitorConfiguration**(`monitor`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`ValidationResult`](../../validators/interfaces/interfaces/ValidationResult.md)\>
 
-Defined in: [electron/managers/ConfigurationManager.ts:164](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L164)
+Defined in: [electron/managers/ConfigurationManager.ts:275](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/ConfigurationManager.ts#L275)
 
-Validate monitor configuration according to business rules with caching.
+Validates a monitor configuration according to business rules, with caching.
 
 #### Parameters
 
@@ -208,19 +266,18 @@ Validate monitor configuration according to business rules with caching.
 
 [`Monitor`](../../../../shared/types/interfaces/Monitor.md)
 
-The monitor configuration to validate
+The monitor configuration to validate. Must be a member of [Site.monitors](../../../../shared/types/interfaces/Site.md#monitors).
 
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`ValidationResult`](../../validators/interfaces/interfaces/ValidationResult.md)\>
 
-Promise resolving to validation result with errors and validity status
+A promise resolving to a [ValidationResult](../../validators/interfaces/interfaces/ValidationResult.md) with errors and validity status.
 
 #### Remarks
 
-Delegates to specialized monitor validator and caches results for performance.
-Marked as async for forward compatibility with future validator implementations
-that may require asynchronous operations or cache backends.
+Delegates to [MonitorValidator.validateMonitorConfiguration](../../validators/MonitorValidator/classes/MonitorValidator.md#validatemonitorconfiguration) and caches results for performance.
+Marked as `async` for forward compatibility with future asynchronous validator implementations.
 
 ***
 
@@ -228,9 +285,9 @@ that may require asynchronous operations or cache backends.
 
 > **validateSiteConfiguration**(`site`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`ValidationResult`](../../validators/interfaces/interfaces/ValidationResult.md)\>
 
-Defined in: [electron/managers/ConfigurationManager.ts:207](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L207)
+Defined in: [electron/managers/ConfigurationManager.ts:319](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/electron/managers/ConfigurationManager.ts#L319)
 
-Validate site configuration according to business rules with caching.
+Validates a site configuration according to business rules, with caching.
 
 #### Parameters
 
@@ -238,16 +295,15 @@ Validate site configuration according to business rules with caching.
 
 [`Site`](../../../../shared/types/interfaces/Site.md)
 
-The site configuration to validate
+The [Site](../../../../shared/types/interfaces/Site.md) configuration to validate.
 
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`ValidationResult`](../../validators/interfaces/interfaces/ValidationResult.md)\>
 
-Promise resolving to validation result with errors and validity status
+A promise resolving to a [ValidationResult](../../validators/interfaces/interfaces/ValidationResult.md) with errors and validity status.
 
 #### Remarks
 
-Delegates to specialized site validator and caches results for performance.
-Marked as async for forward compatibility with future validator implementations
-that may require asynchronous operations or cache backends.
+Delegates to [SiteValidator.validateSiteConfiguration](../../validators/SiteValidator/classes/SiteValidator.md#validatesiteconfiguration) and caches results for performance.
+Marked as `async` for forward compatibility with future asynchronous validator implementations.

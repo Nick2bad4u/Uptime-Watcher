@@ -1,8 +1,8 @@
 # Interface: DynamicFieldProps
 
-Defined in: [src/components/AddSiteForm/DynamicMonitorFields.tsx:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/DynamicMonitorFields.tsx#L21)
+Defined in: [src/components/AddSiteForm/DynamicMonitorFields.tsx:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/DynamicMonitorFields.tsx#L28)
 
-Props for the DynamicField component
+Props for the DynamicField component.
 
 ## Properties
 
@@ -10,9 +10,9 @@ Props for the DynamicField component
 
 > `readonly` `optional` **disabled**: `boolean`
 
-Defined in: [src/components/AddSiteForm/DynamicMonitorFields.tsx:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/DynamicMonitorFields.tsx#L23)
+Defined in: [src/components/AddSiteForm/DynamicMonitorFields.tsx:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/DynamicMonitorFields.tsx#L32)
 
-Whether the field is disabled
+Whether the field is disabled.
 
 ***
 
@@ -20,9 +20,9 @@ Whether the field is disabled
 
 > `readonly` **field**: [`MonitorFieldDefinition`](../../../../../shared/types/interfaces/MonitorFieldDefinition.md)
 
-Defined in: [src/components/AddSiteForm/DynamicMonitorFields.tsx:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/DynamicMonitorFields.tsx#L25)
+Defined in: [src/components/AddSiteForm/DynamicMonitorFields.tsx:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/DynamicMonitorFields.tsx#L36)
 
-Field definition
+Field definition describing the field's properties.
 
 ***
 
@@ -30,13 +30,15 @@ Field definition
 
 > `readonly` **onChange**: (`value`) => `void`
 
-Defined in: [src/components/AddSiteForm/DynamicMonitorFields.tsx:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/DynamicMonitorFields.tsx#L27)
+Defined in: [src/components/AddSiteForm/DynamicMonitorFields.tsx:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/DynamicMonitorFields.tsx#L42)
 
-Change handler
+Change handler for the field value.
 
 #### Parameters
 
 ##### value
+
+The new value for the field.
 
 `string` | `number`
 
@@ -50,6 +52,6 @@ Change handler
 
 > `readonly` **value**: `string` \| `number`
 
-Defined in: [src/components/AddSiteForm/DynamicMonitorFields.tsx:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/DynamicMonitorFields.tsx#L29)
+Defined in: [src/components/AddSiteForm/DynamicMonitorFields.tsx:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/components/AddSiteForm/DynamicMonitorFields.tsx#L46)
 
-Current field value
+Current value of the field.

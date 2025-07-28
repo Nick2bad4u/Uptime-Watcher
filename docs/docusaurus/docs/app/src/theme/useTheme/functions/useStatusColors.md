@@ -2,7 +2,7 @@
 
 > **useStatusColors**(): `object`
 
-Defined in: [src/theme/useTheme.ts:85](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/useTheme.ts#L85)
+Defined in: [src/theme/useTheme.ts:89](https://github.com/Nick2bad4u/Uptime-Watcher/blob/8a1973382d5fe14c52996ecda381894eb7ecd4a6/src/theme/useTheme.ts#L89)
 
 Hook for accessing theme-aware status colors.
 
@@ -14,16 +14,16 @@ Object containing status colors from the current theme
 
 ### down
 
-> **down**: `string` = `currentTheme.colors.status.down`
+> **down**: `string`
 
 ### pending
 
-> **pending**: `string` = `currentTheme.colors.status.pending`
+> **pending**: `string`
 
 ### unknown
 
-> **unknown**: `string` = `currentTheme.colors.status.unknown`
+> **unknown**: `string`
 
 ### up
 
-> **up**: `string` = `currentTheme.colors.status.up`
+> **up**: `string`
