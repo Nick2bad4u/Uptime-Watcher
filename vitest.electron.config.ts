@@ -65,6 +65,7 @@ export default defineConfig({
                 "**/index.tsx", // Exclude JSX barrel export files
                 "electron/components/**/index.ts", // Component barrel files
                 "electron/hooks/**/index.ts", // Hook barrel files
+                "**/docs/**", // Exclude documentation files
             ],
             include: ["electron/**/*.ts"],
             ignoreEmptyLines: true, // Ignore empty lines in coverage reports

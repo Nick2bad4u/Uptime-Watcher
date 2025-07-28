@@ -278,7 +278,7 @@ export class SettingsRepository {
      * Use this method only when already within a transaction context.
      */
     public setInternal(db: Database, key: string, value: string): void {
-        db.run("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", [key, value]);
+        db.run(SETTINGS_QUERIES.INSERT_OR_REPLACE, [key, value]);
         if (isDev()) {
             logger.debug(`[SettingsRepository] Set setting (internal): ${key} = ${value}`);
         }

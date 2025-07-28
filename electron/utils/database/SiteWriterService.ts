@@ -35,6 +35,18 @@ import { Logger, MonitoringConfig, SiteNotFoundError, SiteWritingConfig } from "
  * Service for handling site writing operations.
  * Separates data operations from side effects for better testability.
  */
+
+/**
+ * Common SQL queries for site writer operations.
+ *
+ * @remarks
+ * Centralizes query strings for maintainability and consistency. This constant is internal to the service and not exported.
+ * @internal
+ */
+const SITE_WRITER_QUERIES = {
+    SELECT_MONITORS_BY_SITE: "SELECT * FROM monitors WHERE site_identifier = ?",
+} as const;
+
 export class SiteWriterService {
     private readonly databaseService: DatabaseService;
     private readonly logger: Logger;
@@ -527,7 +539,7 @@ export class SiteWriterService {
     private updateMonitorsPreservingHistory(db: Database, siteIdentifier: string, newMonitors: Site["monitors"]): void {
         // Fetch existing monitors using the transaction database instance
         // This ensures consistent reads within the transaction boundary
-        const monitorRows = db.all("SELECT * FROM monitors WHERE site_identifier = ?", [siteIdentifier]) as Record<
+        const monitorRows = db.all(SITE_WRITER_QUERIES.SELECT_MONITORS_BY_SITE, [siteIdentifier]) as Record<
             string,
             unknown
         >[];

@@ -14,6 +14,58 @@ import { generateMonitorTableSchema } from "./dynamicSchema";
  */
 
 /**
+ * Common SQL queries for database schema operations.
+ *
+ * @remarks
+ * Centralizes query strings for maintainability and consistency. This constant is internal to the utility module and not exported.
+ * @internal
+ */
+const SCHEMA_QUERIES = {
+    BEGIN_TRANSACTION: "BEGIN TRANSACTION",
+    COMMIT: "COMMIT",
+    CREATE_INDEX_HISTORY_MONITOR_ID: "CREATE INDEX IF NOT EXISTS idx_history_monitor_id ON history(monitor_id)",
+    CREATE_INDEX_HISTORY_TIMESTAMP: "CREATE INDEX IF NOT EXISTS idx_history_timestamp ON history(timestamp)",
+    CREATE_INDEX_MONITORS_SITE_IDENTIFIER:
+        "CREATE INDEX IF NOT EXISTS idx_monitors_site_identifier ON monitors(site_identifier)",
+    CREATE_INDEX_MONITORS_TYPE: "CREATE INDEX IF NOT EXISTS idx_monitors_type ON monitors(type)",
+    CREATE_TABLE_HISTORY: `
+            CREATE TABLE IF NOT EXISTS history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                monitor_id INTEGER NOT NULL,
+                timestamp INTEGER,
+                status TEXT,
+                responseTime INTEGER,
+                details TEXT,
+                FOREIGN KEY(monitor_id) REFERENCES monitors(id)
+            )`,
+    CREATE_TABLE_LOGS: `
+            CREATE TABLE IF NOT EXISTS logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                level TEXT,
+                message TEXT,
+                data TEXT
+            )`,
+    CREATE_TABLE_SETTINGS: `
+            CREATE TABLE IF NOT EXISTS settings (
+                key TEXT PRIMARY KEY,
+                value TEXT
+            )`,
+    CREATE_TABLE_SITES: `
+            CREATE TABLE IF NOT EXISTS sites (
+                identifier TEXT PRIMARY KEY,
+                name TEXT,
+                monitoring INTEGER DEFAULT 1
+            )`,
+    CREATE_TABLE_STATS: `
+            CREATE TABLE IF NOT EXISTS stats (
+                key TEXT PRIMARY KEY,
+                value TEXT
+            )`,
+    ROLLBACK: "ROLLBACK",
+} as const;
+
+/**
  * Creates database indexes for improved query performance.
  *
  * @remarks
@@ -30,16 +82,16 @@ import { generateMonitorTableSchema } from "./dynamicSchema";
 export function createDatabaseIndexes(db: Database): void {
     try {
         // Index on monitor site_identifier for faster site queries
-        db.run("CREATE INDEX IF NOT EXISTS idx_monitors_site_identifier ON monitors(site_identifier)");
+        db.run(SCHEMA_QUERIES.CREATE_INDEX_MONITORS_SITE_IDENTIFIER);
 
         // Index on monitor type for monitor type queries
-        db.run("CREATE INDEX IF NOT EXISTS idx_monitors_type ON monitors(type)");
+        db.run(SCHEMA_QUERIES.CREATE_INDEX_MONITORS_TYPE);
 
         // Index on history monitor_id for faster history queries
-        db.run("CREATE INDEX IF NOT EXISTS idx_history_monitor_id ON history(monitor_id)");
+        db.run(SCHEMA_QUERIES.CREATE_INDEX_HISTORY_MONITOR_ID);
 
         // Index on history timestamp for time-based queries
-        db.run("CREATE INDEX IF NOT EXISTS idx_history_timestamp ON history(timestamp)");
+        db.run(SCHEMA_QUERIES.CREATE_INDEX_HISTORY_TIMESTAMP);
 
         logger.debug("[DatabaseSchema] All indexes created successfully");
     } catch (error) {
@@ -60,17 +112,17 @@ export function createDatabaseIndexes(db: Database): void {
  */
 export function createDatabaseSchema(db: Database): void {
     try {
-        db.run("BEGIN TRANSACTION");
+        db.run(SCHEMA_QUERIES.BEGIN_TRANSACTION);
 
         try {
             createDatabaseTables(db);
             createDatabaseIndexes(db);
             setupMonitorTypeValidation();
 
-            db.run("COMMIT");
+            db.run(SCHEMA_QUERIES.COMMIT);
             logger.info("[DatabaseSchema] Database schema created successfully");
         } catch (error) {
-            db.run("ROLLBACK");
+            db.run(SCHEMA_QUERIES.ROLLBACK);
             throw error;
         }
     } catch (error) {
@@ -100,13 +152,7 @@ export function createDatabaseSchema(db: Database): void {
 export function createDatabaseTables(db: Database): void {
     try {
         // Sites table with INTEGER boolean for SQLite consistency
-        db.run(`
-            CREATE TABLE IF NOT EXISTS sites (
-                identifier TEXT PRIMARY KEY,
-                name TEXT,
-                monitoring INTEGER DEFAULT 1
-            );
-        `);
+        db.run(SCHEMA_QUERIES.CREATE_TABLE_SITES);
 
         // Monitors table with dynamic schema based on monitor type registry
         const dynamicMonitorSchema = generateMonitorTableSchema();
@@ -114,44 +160,16 @@ export function createDatabaseTables(db: Database): void {
         db.run(dynamicMonitorSchema);
 
         // History table with proper constraints and clear field naming
-        db.run(`
-            CREATE TABLE IF NOT EXISTS history (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                monitor_id INTEGER NOT NULL,
-                timestamp INTEGER,
-                status TEXT,
-                responseTime INTEGER,
-                details TEXT,
-                FOREIGN KEY(monitor_id) REFERENCES monitors(id)
-            );
-        `);
+        db.run(SCHEMA_QUERIES.CREATE_TABLE_HISTORY);
 
         // Settings table
-        db.run(`
-            CREATE TABLE IF NOT EXISTS settings (
-                key TEXT PRIMARY KEY,
-                value TEXT
-            );
-        `);
+        db.run(SCHEMA_QUERIES.CREATE_TABLE_SETTINGS);
 
         // Stats table
-        db.run(`
-            CREATE TABLE IF NOT EXISTS stats (
-                key TEXT PRIMARY KEY,
-                value TEXT
-            );
-        `);
+        db.run(SCHEMA_QUERIES.CREATE_TABLE_STATS);
 
         // Logs table
-        db.run(`
-            CREATE TABLE IF NOT EXISTS logs (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-                level TEXT,
-                message TEXT,
-                data TEXT
-            );
-        `);
+        db.run(SCHEMA_QUERIES.CREATE_TABLE_LOGS);
 
         logger.info("[DatabaseSchema] All tables created successfully");
     } catch (error) {

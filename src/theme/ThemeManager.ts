@@ -68,45 +68,11 @@ export class ThemeManager {
     generateCSSVariables(theme: Theme): string {
         const variables: string[] = [];
 
-        // Colors
-        for (const [category, colors] of Object.entries(theme.colors)) {
-            if (typeof colors === "object" && colors !== null) {
-                // Type-safe access to color values - colors are either string or nested color objects
-                for (const [key, value] of Object.entries(colors as Record<string, string>)) {
-                    variables.push(`  --color-${category}-${key}: ${value};`);
-                }
-            } else {
-                variables.push(`  --color-${category}: ${colors};`);
-            }
-        }
-
-        // Typography
-        for (const [size, value] of Object.entries(theme.typography.fontSize)) {
-            variables.push(`  --font-size-${size}: ${value};`);
-        }
-
-        for (const [weight, value] of Object.entries(theme.typography.fontWeight)) {
-            variables.push(`  --font-weight-${weight}: ${value};`);
-        }
-
-        for (const [height, value] of Object.entries(theme.typography.lineHeight)) {
-            variables.push(`  --line-height-${height}: ${value};`);
-        }
-
-        // Spacing
-        for (const [size, value] of Object.entries(theme.spacing)) {
-            variables.push(`  --spacing-${size}: ${value};`);
-        }
-
-        // Shadows
-        for (const [size, value] of Object.entries(theme.shadows)) {
-            variables.push(`  --shadow-${size}: ${value};`);
-        }
-
-        // Border radius
-        for (const [size, value] of Object.entries(theme.borderRadius)) {
-            variables.push(`  --radius-${size}: ${value};`);
-        }
+        this.addColorVariables(theme, variables);
+        this.addTypographyVariables(theme, variables);
+        this.addSpacingVariables(theme, variables);
+        this.addShadowVariables(theme, variables);
+        this.addBorderRadiusVariables(theme, variables);
 
         return `:root {\n${variables.join("\n")}\n}`;
     }
@@ -137,7 +103,8 @@ export class ThemeManager {
      * This ensures safe operation across all deployment environments.
      */
     getSystemThemePreference(): "dark" | "light" {
-        if (typeof window !== "undefined") {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (typeof window !== "undefined" && window.matchMedia) {
             return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
         }
         return "light";
@@ -189,11 +156,99 @@ export class ThemeManager {
     }
 
     /**
+     * Add border radius CSS variables from theme.
+     */
+    private addBorderRadiusVariables(theme: Theme, variables: string[]): void {
+        // Border radius - defensive check for runtime safety
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (theme.borderRadius) {
+            for (const [size, value] of Object.entries(theme.borderRadius)) {
+                variables.push(`  --radius-${size}: ${value};`);
+            }
+        }
+    }
+
+    /**
+     * Add color CSS variables from theme.
+     */
+    private addColorVariables(theme: Theme, variables: string[]): void {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (theme.colors) {
+            for (const [category, colors] of Object.entries(theme.colors)) {
+                if (typeof colors === "object" && colors !== null) {
+                    // Type-safe access to color values - colors are either string or nested color objects
+                    for (const [key, value] of Object.entries(colors as Record<string, string>)) {
+                        variables.push(`  --color-${category}-${key}: ${value};`);
+                    }
+                } else {
+                    variables.push(`  --color-${category}: ${colors};`);
+                }
+            }
+        }
+    }
+
+    /**
+     * Add shadow CSS variables from theme.
+     */
+    private addShadowVariables(theme: Theme, variables: string[]): void {
+        // Shadows - defensive check for runtime safety
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (theme.shadows) {
+            for (const [size, value] of Object.entries(theme.shadows)) {
+                variables.push(`  --shadow-${size}: ${value};`);
+            }
+        }
+    }
+
+    /**
+     * Add spacing CSS variables from theme.
+     */
+    private addSpacingVariables(theme: Theme, variables: string[]): void {
+        // Spacing - defensive check for runtime safety
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (theme.spacing) {
+            for (const [size, value] of Object.entries(theme.spacing)) {
+                variables.push(`  --spacing-${size}: ${value};`);
+            }
+        }
+    }
+
+    /**
+     * Add typography CSS variables from theme.
+     */
+    private addTypographyVariables(theme: Theme, variables: string[]): void {
+        // Typography - defensive checks for runtime safety
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (theme.typography?.fontSize) {
+            for (const [size, value] of Object.entries(theme.typography.fontSize)) {
+                variables.push(`  --font-size-${size}: ${value};`);
+            }
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (theme.typography?.fontWeight) {
+            for (const [weight, value] of Object.entries(theme.typography.fontWeight)) {
+                variables.push(`  --font-weight-${weight}: ${value};`);
+            }
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (theme.typography?.lineHeight) {
+            for (const [height, value] of Object.entries(theme.typography.lineHeight)) {
+                variables.push(`  --line-height-${height}: ${value};`);
+            }
+        }
+    }
+
+    /**
      * Apply border radius CSS custom properties
      */
     private applyBorderRadius(root: HTMLElement, borderRadius: Theme["borderRadius"]): void {
-        for (const [size, value] of Object.entries(borderRadius)) {
-            root.style.setProperty(`--radius-${size}`, String(value));
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (borderRadius) {
+            for (const [size, value] of Object.entries(borderRadius)) {
+                root.style.setProperty(`--radius-${size}`, String(value));
+            }
         }
     }
 
@@ -201,14 +256,17 @@ export class ThemeManager {
      * Apply color CSS custom properties
      */
     private applyColors(root: HTMLElement, colors: Theme["colors"]): void {
-        for (const [category, colorValue] of Object.entries(colors)) {
-            if (typeof colorValue === "object" && colorValue !== null) {
-                // Type-safe access to color values - colorValue is a nested color object with string values
-                for (const [key, value] of Object.entries(colorValue as Record<string, string>)) {
-                    root.style.setProperty(`--color-${category}-${key}`, String(value));
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (colors) {
+            for (const [category, colorValue] of Object.entries(colors)) {
+                if (typeof colorValue === "object" && colorValue !== null) {
+                    // Type-safe access to color values - colorValue is a nested color object with string values
+                    for (const [key, value] of Object.entries(colorValue as Record<string, string>)) {
+                        root.style.setProperty(`--color-${category}-${key}`, String(value));
+                    }
+                } else {
+                    root.style.setProperty(`--color-${category}`, String(colorValue));
                 }
-            } else {
-                root.style.setProperty(`--color-${category}`, String(colorValue));
             }
         }
     }
@@ -217,8 +275,11 @@ export class ThemeManager {
      * Apply shadow CSS custom properties
      */
     private applyShadows(root: HTMLElement, shadows: Theme["shadows"]): void {
-        for (const [size, value] of Object.entries(shadows)) {
-            root.style.setProperty(`--shadow-${size}`, String(value));
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (shadows) {
+            for (const [size, value] of Object.entries(shadows)) {
+                root.style.setProperty(`--shadow-${size}`, String(value));
+            }
         }
     }
 
@@ -226,8 +287,11 @@ export class ThemeManager {
      * Apply spacing CSS custom properties
      */
     private applySpacing(root: HTMLElement, spacing: Theme["spacing"]): void {
-        for (const [size, value] of Object.entries(spacing)) {
-            root.style.setProperty(`--spacing-${size}`, String(value));
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (spacing) {
+            for (const [size, value] of Object.entries(spacing)) {
+                root.style.setProperty(`--spacing-${size}`, String(value));
+            }
         }
     }
 
@@ -268,16 +332,25 @@ export class ThemeManager {
      * Apply typography CSS custom properties
      */
     private applyTypography(root: HTMLElement, typography: Theme["typography"]): void {
-        for (const [size, value] of Object.entries(typography.fontSize)) {
-            root.style.setProperty(`--font-size-${size}`, String(value));
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (typography?.fontSize) {
+            for (const [size, value] of Object.entries(typography.fontSize)) {
+                root.style.setProperty(`--font-size-${size}`, String(value));
+            }
         }
 
-        for (const [weight, value] of Object.entries(typography.fontWeight)) {
-            root.style.setProperty(`--font-weight-${weight}`, String(value));
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (typography?.fontWeight) {
+            for (const [weight, value] of Object.entries(typography.fontWeight)) {
+                root.style.setProperty(`--font-weight-${weight}`, String(value));
+            }
         }
 
-        for (const [height, value] of Object.entries(typography.lineHeight)) {
-            root.style.setProperty(`--line-height-${height}`, String(value));
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (typography?.lineHeight) {
+            for (const [height, value] of Object.entries(typography.lineHeight)) {
+                root.style.setProperty(`--line-height-${height}`, String(value));
+            }
         }
     }
 }

@@ -14,6 +14,21 @@ import { logger } from "../../../utils/logger";
  */
 
 /**
+ * Common SQL queries for history manipulation operations.
+ *
+ * @remarks
+ * Centralizes query strings for maintainability and consistency. This constant is internal to the utility module and not exported.
+ * @internal
+ */
+const HISTORY_MANIPULATION_QUERIES = {
+    DELETE_ALL: "DELETE FROM history",
+    DELETE_BY_IDS: "DELETE FROM history WHERE id IN",
+    DELETE_BY_MONITOR: "DELETE FROM history WHERE monitor_id = ?",
+    INSERT_ENTRY: "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)",
+    SELECT_EXCESS_ENTRIES: "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
+} as const;
+
+/**
  * Add a new history entry for a monitor.
  *
  * @param db - Database connection instance
@@ -34,7 +49,7 @@ import { logger } from "../../../utils/logger";
  */
 export function addHistoryEntry(db: Database, monitorId: string, entry: StatusHistory, details?: string): void {
     try {
-        db.run("INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)", [
+        db.run(HISTORY_MANIPULATION_QUERIES.INSERT_ENTRY, [
             monitorId,
             entry.timestamp,
             entry.status,
@@ -85,9 +100,7 @@ export function bulkInsertHistory(
 
     try {
         // Prepare the statement once for better performance
-        const stmt = db.prepare(
-            "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)"
-        );
+        const stmt = db.prepare(HISTORY_MANIPULATION_QUERIES.INSERT_ENTRY);
 
         try {
             for (const entry of historyEntries) {
@@ -129,7 +142,7 @@ export function bulkInsertHistory(
  */
 export function deleteAllHistory(db: Database): void {
     try {
-        db.run("DELETE FROM history");
+        db.run(HISTORY_MANIPULATION_QUERIES.DELETE_ALL);
         if (isDev()) {
             logger.debug("[HistoryManipulation] Cleared all history");
         }
@@ -155,7 +168,7 @@ export function deleteAllHistory(db: Database): void {
  */
 export function deleteHistoryByMonitorId(db: Database, monitorId: string): void {
     try {
-        db.run("DELETE FROM history WHERE monitor_id = ?", [monitorId]);
+        db.run(HISTORY_MANIPULATION_QUERIES.DELETE_BY_MONITOR, [monitorId]);
         if (isDev()) {
             logger.debug(`[HistoryManipulation] Deleted history for monitor: ${monitorId}`);
         }
@@ -193,10 +206,9 @@ export function pruneHistoryForMonitor(db: Database, monitorId: string, limit: n
 
     try {
         // Get entries to delete (keep only the most recent 'limit' entries)
-        const excess = db.all("SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?", [
-            monitorId,
-            limit,
-        ]) as { id: number }[];
+        const excess = db.all(HISTORY_MANIPULATION_QUERIES.SELECT_EXCESS_ENTRIES, [monitorId, limit]) as {
+            id: number;
+        }[];
 
         if (excess.length > 0) {
             // Convert numeric IDs to ensure type safety and validate they are numbers
@@ -205,7 +217,7 @@ export function pruneHistoryForMonitor(db: Database, monitorId: string, limit: n
             if (excessIds.length > 0) {
                 // Use parameterized query to avoid SQL injection
                 const placeholders = excessIds.map(() => "?").join(",");
-                db.run(`DELETE FROM history WHERE id IN (${placeholders})`, excessIds);
+                db.run(`${HISTORY_MANIPULATION_QUERIES.DELETE_BY_IDS} (${placeholders})`, excessIds);
                 if (isDev()) {
                     logger.debug(
                         `[HistoryManipulation] Pruned ${excessIds.length} old history entries for monitor: ${monitorId}`

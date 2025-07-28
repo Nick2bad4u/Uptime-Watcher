@@ -33,7 +33,7 @@ interface CacheInvalidationData {
 export function setupCacheSync(): () => void {
     // Check if we're in an Electron environment with cache invalidation events available
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (typeof window === "undefined" || !window.electronAPI) {
+    if (typeof window === "undefined" || !window.electronAPI?.events) {
         logger.warn("Cache invalidation events not available - frontend cache sync disabled");
         return () => {
             // No-op cleanup

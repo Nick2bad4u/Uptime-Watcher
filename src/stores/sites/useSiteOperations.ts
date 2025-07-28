@@ -125,7 +125,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 // Stop monitoring for all monitors of this site before deleting
                 // Filter out null/undefined values to handle corrupted data
                 const site = deps.getSites().find((s) => s.identifier === identifier);
-                if (site) {
+                if (site?.monitors) {
                     for (const monitor of site.monitors) {
                         try {
                             await MonitoringService.stopMonitoring(identifier, monitor.id);

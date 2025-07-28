@@ -29,6 +29,20 @@ export interface HistoryRepositoryDependencies {
 }
 
 /**
+ * Common SQL queries for history persistence operations.
+ *
+ * @remarks
+ * Centralizes query strings for maintainability and consistency. This constant is internal to the repository and not exported.
+ * @internal
+ */
+const HISTORY_QUERIES = {
+    DELETE_BY_IDS: "DELETE FROM history WHERE id IN",
+    INSERT_ENTRY: "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)",
+    SELECT_EXCESS_ENTRIES: "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
+    SELECT_MONITOR_IDS: "SELECT id FROM monitors",
+} as const;
+
+/**
  * Repository for managing history data persistence.
  *
  * Handles all CRUD operations for monitor history in the database, following the repository pattern.
@@ -123,9 +137,7 @@ export class HistoryRepository {
                 // Use executeTransaction for atomic bulk insert operation
                 await this.databaseService.executeTransaction((db) => {
                     // Prepare the statement once for better performance
-                    const stmt = db.prepare(
-                        "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)"
-                    );
+                    const stmt = db.prepare(HISTORY_QUERIES.INSERT_ENTRY);
 
                     try {
                         for (const entry of historyEntries) {
@@ -321,12 +333,12 @@ export class HistoryRepository {
             async () => {
                 // Use executeTransaction for atomic multi-monitor operation
                 await this.databaseService.executeTransaction((db) => {
-                    const monitors = db.all("SELECT id FROM monitors") as { id: number }[];
+                    const monitors = db.all(HISTORY_QUERIES.SELECT_MONITOR_IDS) as { id: number }[];
                     for (const monitor of monitors) {
-                        const excessEntries = db.all(
-                            "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
-                            [String(monitor.id), limit]
-                        ) as { id: number }[];
+                        const excessEntries = db.all(HISTORY_QUERIES.SELECT_EXCESS_ENTRIES, [
+                            String(monitor.id),
+                            limit,
+                        ]) as { id: number }[];
                         if (excessEntries.length > 0) {
                             // Convert numeric IDs to ensure type safety and validate they are numbers
                             const excessIds = excessEntries
@@ -335,7 +347,7 @@ export class HistoryRepository {
 
                             if (excessIds.length > 0) {
                                 const placeholders = excessIds.map(() => "?").join(",");
-                                db.run(`DELETE FROM history WHERE id IN (${placeholders})`, excessIds);
+                                db.run(`${HISTORY_QUERIES.DELETE_BY_IDS} (${placeholders})`, excessIds);
                             }
                         }
                     }
@@ -362,7 +374,7 @@ export class HistoryRepository {
         }
 
         // Get all monitor IDs
-        const monitorRows = db.all("SELECT id FROM monitors") as { id: number }[];
+        const monitorRows = db.all(HISTORY_QUERIES.SELECT_MONITOR_IDS) as { id: number }[];
 
         // Prune history for each monitor
         for (const row of monitorRows) {

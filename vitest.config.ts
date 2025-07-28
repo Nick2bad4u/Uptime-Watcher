@@ -80,6 +80,7 @@ export default defineConfig({
                 "index.ts", // Barrel export file at root
                 "**/index.ts", // Any other index files
                 "**/index.tsx", // Exclude JSX barrel export files
+                "**/docs/**", // Exclude documentation files
             ],
             ignoreEmptyLines: true, // Ignore empty lines in coverage reports
             experimentalAstAwareRemapping: true, // Enable AST-aware remapping for better accuracy

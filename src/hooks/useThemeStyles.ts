@@ -62,11 +62,16 @@ export function useThemeStyles(isCollapsed = false): ThemeStyles {
         if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
             return false; // Default to light mode for SSR
         }
-        return window.matchMedia("(prefers-color-scheme: dark)").matches;
+        try {
+            return window.matchMedia("(prefers-color-scheme: dark)").matches;
+        } catch {
+            // Fallback if matchMedia throws an error
+            return false;
+        }
     });
 
     // Use ref to store cleanup function to avoid linting issues
-    const cleanupRef = useRef<(() => void) | null>(null);
+    const cleanupRef = useRef<(() => void) | undefined>(undefined);
 
     // Set up media query listener for theme changes
     useEffect(() => {
@@ -74,18 +79,23 @@ export function useThemeStyles(isCollapsed = false): ThemeStyles {
             return; // Skip in SSR environments
         }
 
-        const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-        const handleThemeChange = (e: MediaQueryListEvent) => {
-            setIsDarkMode(e.matches);
-        };
+        try {
+            const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+            const handleThemeChange = (e: MediaQueryListEvent) => {
+                setIsDarkMode(e.matches);
+            };
 
-        // Use modern addEventListener API
-        mediaQuery.addEventListener("change", handleThemeChange);
+            // Use modern addEventListener API
+            mediaQuery.addEventListener("change", handleThemeChange);
 
-        // Store cleanup function in ref
-        cleanupRef.current = () => {
-            mediaQuery.removeEventListener("change", handleThemeChange);
-        };
+            // Store cleanup function in ref
+            cleanupRef.current = () => {
+                mediaQuery.removeEventListener("change", handleThemeChange);
+            };
+        } catch {
+            // Fallback if matchMedia throws an error - do nothing
+            cleanupRef.current = undefined;
+        }
     }, []);
 
     // Cleanup effect for component unmount

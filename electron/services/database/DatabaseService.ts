@@ -8,6 +8,19 @@ import { logger } from "../../utils/logger";
 import { createDatabaseSchema } from "./utils/databaseSchema";
 
 /**
+ * Common SQL queries for database service operations.
+ *
+ * @remarks
+ * Centralizes query strings for maintainability and consistency. This constant is internal to the service and not exported.
+ * @internal
+ */
+const DATABASE_SERVICE_QUERIES = {
+    BEGIN_TRANSACTION: "BEGIN TRANSACTION",
+    COMMIT: "COMMIT",
+    ROLLBACK: "ROLLBACK",
+} as const;
+
+/**
  * @public
  * Core database service for SQLite connection and schema management.
  *
@@ -136,13 +149,13 @@ export class DatabaseService {
         const db = this.getDatabase();
 
         try {
-            db.run("BEGIN TRANSACTION");
+            db.run(DATABASE_SERVICE_QUERIES.BEGIN_TRANSACTION);
             const result = await operation(db);
-            db.run("COMMIT");
+            db.run(DATABASE_SERVICE_QUERIES.COMMIT);
             return result;
         } catch (error) {
             try {
-                db.run("ROLLBACK");
+                db.run(DATABASE_SERVICE_QUERIES.ROLLBACK);
             } catch (rollbackError) {
                 logger.error("[DatabaseService] Failed to rollback transaction", rollbackError);
             }

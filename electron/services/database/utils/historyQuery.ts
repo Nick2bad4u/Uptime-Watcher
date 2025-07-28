@@ -14,6 +14,21 @@ import { rowToHistoryEntry } from "./historyMapper";
  */
 
 /**
+ * Common SQL queries for history query operations.
+ *
+ * @remarks
+ * Centralizes query strings for maintainability and consistency. This constant is internal to the utility module and not exported.
+ * @internal
+ */
+const HISTORY_QUERY_QUERIES = {
+    SELECT_ALL_BY_MONITOR:
+        "SELECT timestamp, status, responseTime, details FROM history WHERE monitor_id = ? ORDER BY timestamp DESC",
+    SELECT_COUNT_BY_MONITOR: "SELECT COUNT(*) as count FROM history WHERE monitor_id = ?",
+    SELECT_LATEST_BY_MONITOR:
+        "SELECT timestamp, status, responseTime, details FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT 1",
+} as const;
+
+/**
  * Find all history entries for a specific monitor.
  *
  * @param db - Database connection instance
@@ -33,10 +48,10 @@ import { rowToHistoryEntry } from "./historyMapper";
  */
 export function findHistoryByMonitorId(db: Database, monitorId: string): StatusHistory[] {
     try {
-        const historyRows = db.all(
-            "SELECT timestamp, status, responseTime, details FROM history WHERE monitor_id = ? ORDER BY timestamp DESC",
-            [monitorId]
-        ) as Record<string, unknown>[];
+        const historyRows = db.all(HISTORY_QUERY_QUERIES.SELECT_ALL_BY_MONITOR, [monitorId]) as Record<
+            string,
+            unknown
+        >[];
 
         return historyRows.map((row) => rowToHistoryEntry(row));
     } catch (error) {
@@ -64,7 +79,7 @@ export function findHistoryByMonitorId(db: Database, monitorId: string): StatusH
  */
 export function getHistoryCount(db: Database, monitorId: string): number {
     try {
-        const result = db.get("SELECT COUNT(*) as count FROM history WHERE monitor_id = ?", [monitorId]) as
+        const result = db.get(HISTORY_QUERY_QUERIES.SELECT_COUNT_BY_MONITOR, [monitorId]) as
             | undefined
             | { count: number };
 
@@ -95,10 +110,9 @@ export function getHistoryCount(db: Database, monitorId: string): number {
  */
 export function getLatestHistoryEntry(db: Database, monitorId: string): StatusHistory | undefined {
     try {
-        const row = db.get(
-            "SELECT timestamp, status, responseTime, details FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT 1",
-            [monitorId]
-        ) as Record<string, unknown> | undefined;
+        const row = db.get(HISTORY_QUERY_QUERIES.SELECT_LATEST_BY_MONITOR, [monitorId]) as
+            | Record<string, unknown>
+            | undefined;
 
         if (!row) {
             return undefined;
