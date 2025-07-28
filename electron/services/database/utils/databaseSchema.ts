@@ -5,26 +5,27 @@ import { getRegisteredMonitorTypes } from "../../monitoring/MonitorTypeRegistry"
 import { generateMonitorTableSchema } from "./dynamicSchema";
 
 /**
- * Database schema management utilities.
+ * Utilities for managing the SQLite database schema, including table and index creation and validation setup.
  *
  * @remarks
- * Provides functions for creating database tables, indexes, and setting up
- * validation frameworks. All table creation operations are idempotent using
- * "IF NOT EXISTS" clauses.
+ * Provides functions for creating database tables, indexes, and setting up validation frameworks. All table creation operations are idempotent using "IF NOT EXISTS" clauses. Used during application startup and migrations.
+ *
+ * @public
  */
 
 /**
- * Create database indexes for better query performance.
- *
- * @param db - SQLite database instance
- * @throws When index creation fails
+ * Creates database indexes for improved query performance.
  *
  * @remarks
  * Creates the following indexes:
- * - idx_monitors_site_identifier: Fast site-based monitor queries
- * - idx_monitors_type: Monitor type filtering
- * - idx_history_monitor_id: Fast history lookups by monitor
- * - idx_history_timestamp: Time-based history queries
+ * - `idx_monitors_site_identifier`: Fast site-based monitor queries
+ * - `idx_monitors_type`: Monitor type filtering
+ * - `idx_history_monitor_id`: Fast history lookups by monitor
+ * - `idx_history_timestamp`: Time-based history queries
+ *
+ * @param db - The {@link Database} instance to create indexes on.
+ * @throws When index creation fails. Errors are logged and re-thrown for upstream handling.
+ * @public
  */
 export function createDatabaseIndexes(db: Database): void {
     try {
@@ -48,24 +49,24 @@ export function createDatabaseIndexes(db: Database): void {
 }
 
 /**
- * Create database schema (tables and indexes) within a transaction.
- *
- * @param db - SQLite database instance
- * @throws When schema creation fails
+ * Creates the full database schema (tables and indexes) within a transaction.
  *
  * @remarks
- * Creates all tables and indexes within coordinated operations to ensure
- * consistent schema creation. Uses explicit transaction handling via BEGIN/COMMIT.
+ * Creates all tables and indexes within coordinated operations to ensure consistent schema creation. Uses explicit transaction handling via BEGIN/COMMIT. Rolls back on error to maintain database integrity.
+ *
+ * @param db - The {@link Database} instance to create the schema on.
+ * @throws When schema creation fails. Errors are logged and re-thrown for upstream handling.
+ * @public
  */
 export function createDatabaseSchema(db: Database): void {
     try {
         db.run("BEGIN TRANSACTION");
-        
+
         try {
             createDatabaseTables(db);
             createDatabaseIndexes(db);
             setupMonitorTypeValidation();
-            
+
             db.run("COMMIT");
             logger.info("[DatabaseSchema] Database schema created successfully");
         } catch (error) {
@@ -79,19 +80,22 @@ export function createDatabaseSchema(db: Database): void {
 }
 
 /**
- * Create all required database tables if they don't exist.
- *
- * @param db - SQLite database instance
- * @throws When table creation fails
+ * Creates all required database tables if they do not exist.
  *
  * @remarks
  * Creates the following tables:
- * - sites: Site configuration and monitoring status
- * - monitors: Monitor configuration and runtime data (dynamic schema)
- * - history: Historical monitoring data
- * - settings: Application configuration
- * - stats: Runtime statistics
- * - logs: Application logs
+ * - `sites`: Site configuration and monitoring status
+ * - `monitors`: Monitor configuration and runtime data (dynamic schema)
+ * - `history`: Historical monitoring data
+ * - `settings`: Application configuration
+ * - `stats`: Runtime statistics
+ * - `logs`: Application logs
+ *
+ * Uses dynamic schema generation for the monitors table. All table creation operations are idempotent.
+ *
+ * @param db - The {@link Database} instance to create tables on.
+ * @throws When table creation fails. Errors are logged and re-thrown for upstream handling.
+ * @public
  */
 export function createDatabaseTables(db: Database): void {
     try {
@@ -157,15 +161,14 @@ export function createDatabaseTables(db: Database): void {
 }
 
 /**
- * Setup monitor type validation framework.
- *
- * @returns void
- * @throws When validation setup fails
+ * Sets up the monitor type validation framework for the database.
  *
  * @remarks
- * Integrates with MonitorTypeRegistry to provide runtime validation of monitor types.
- * Sets up database-level constraints and validation triggers to ensure data integrity
- * for monitor type fields. This ensures only valid monitor types can be stored.
+ * Integrates with {@link getRegisteredMonitorTypes} to provide runtime validation of monitor types. Intended to set up database-level constraints and validation triggers to ensure data integrity for monitor type fields. Currently logs the available types and prepares for future enhancements.
+ *
+ * @returns void
+ * @throws When validation setup fails. Errors are logged but not re-thrown, as this is a non-critical enhancement.
+ * @public
  */
 export function setupMonitorTypeValidation(): void {
     try {
@@ -201,17 +204,14 @@ export function setupMonitorTypeValidation(): void {
 }
 
 /**
- * Validate generated SQL schema before execution.
- *
- * @param schema - Generated SQL schema string
- * @throws {@link Error} When schema validation fails
+ * Validates a generated SQL schema string before execution.
  *
  * @remarks
- * **Validation Checks:**
- * - Ensures schema is non-empty string
- * - Verifies required table definition exists
- * - Checks for placeholder values that indicate generation errors
- * - Prevents runtime failures from malformed SQL
+ * Performs validation checks to ensure the schema is a non-empty string, contains the required table definition, and does not include placeholder values that indicate generation errors. Prevents runtime failures from malformed SQL.
+ *
+ * @param schema - The generated SQL schema string to validate.
+ * @throws {@link Error} When schema validation fails due to missing or invalid content.
+ * @internal
  */
 function validateGeneratedSchema(schema: string): void {
     if (!schema || typeof schema !== "string") {

@@ -1,11 +1,10 @@
 /**
  * Service factory for database-related services following the Factory pattern.
- * Provides centralized creation and configuration of database services.
  *
  * @remarks
- * This factory implements the Factory pattern to resolve the Dependency Inversion
- * Principle violations in DatabaseManager. All service creation is centralized
- * here with proper abstraction interfaces.
+ * Provides centralized creation and configuration of database services. Implements the Factory pattern to resolve Dependency Inversion Principle violations in DatabaseManager. All service creation is centralized here with proper abstraction interfaces and dependency injection.
+ *
+ * @public
  */
 
 import { UptimeEvents } from "../../events/eventTypes";
@@ -23,7 +22,12 @@ import { SettingsRepository } from "../database/SettingsRepository";
 import { SiteRepository } from "../database/SiteRepository";
 
 /**
- * Dependencies required by the database service factory.
+ * Defines the dependencies required by the {@link DatabaseServiceFactory} for service creation.
+ *
+ * @remarks
+ * Includes all repositories, the database service, and the event emitter needed for constructing database-related services.
+ *
+ * @public
  */
 export interface DatabaseServiceFactoryDependencies {
     databaseService: DatabaseService;
@@ -38,6 +42,11 @@ export interface DatabaseServiceFactoryDependencies {
 
 /**
  * Abstract interface for backup service operations.
+ *
+ * @remarks
+ * Used for type safety and dependency injection for backup-related operations.
+ *
+ * @public
  */
 export interface IDataBackupService {
     downloadDatabaseBackup(): Promise<{ buffer: Buffer; fileName: string }>;
@@ -45,6 +54,11 @@ export interface IDataBackupService {
 
 /**
  * Abstract interface for import/export service operations.
+ *
+ * @remarks
+ * Used for type safety and dependency injection for import/export-related operations.
+ *
+ * @public
  */
 export interface IDataImportExportService {
     exportAllData(): Promise<string>;
@@ -54,6 +68,11 @@ export interface IDataImportExportService {
 
 /**
  * Abstract interface for site repository service operations.
+ *
+ * @remarks
+ * Used for type safety and dependency injection for site repository operations.
+ *
+ * @public
  */
 export interface ISiteRepositoryService {
     getSitesFromDatabase(): Promise<Site[]>;
@@ -63,17 +82,21 @@ export interface ISiteRepositoryService {
  * Factory for creating database-related services with proper dependency injection.
  *
  * @remarks
- * Centralizes service creation to resolve Dependency Inversion Principle violations.
- * All services are created with proper abstractions and dependency injection.
+ * Centralizes service creation to resolve Dependency Inversion Principle violations. All services are created with proper abstractions and dependency injection. This class is the single entry point for constructing all database-related services in the backend.
+ *
+ * @public
  */
 export class DatabaseServiceFactory {
     private readonly dependencies: DatabaseServiceFactoryDependencies;
     private readonly loggerAdapter: LoggerAdapter;
 
     /**
-     * Creates a new DatabaseServiceFactory instance.
+     * Constructs a new {@link DatabaseServiceFactory} instance.
      *
-     * @param dependencies - Required dependencies for service creation
+     * @remarks
+     * Initializes the factory with all required dependencies and sets up a logger adapter for use by created services.
+     *
+     * @param dependencies - The {@link DatabaseServiceFactoryDependencies} required for service creation.
      */
     constructor(dependencies: DatabaseServiceFactoryDependencies) {
         this.dependencies = dependencies;
@@ -83,7 +106,10 @@ export class DatabaseServiceFactory {
     /**
      * Creates a data backup service instance.
      *
-     * @returns Data backup service implementation
+     * @remarks
+     * Returns a new {@link DataBackupService} with injected dependencies for backup operations.
+     *
+     * @returns Data backup service implementation.
      */
     public createBackupService(): IDataBackupService {
         return new DataBackupService({
@@ -95,7 +121,10 @@ export class DatabaseServiceFactory {
     /**
      * Creates a data import/export service instance.
      *
-     * @returns Data import/export service implementation
+     * @remarks
+     * Returns a new {@link DataImportExportService} with injected dependencies for import/export operations.
+     *
+     * @returns Data import/export service implementation.
      */
     public createImportExportService(): IDataImportExportService {
         return new DataImportExportService({
@@ -109,7 +138,10 @@ export class DatabaseServiceFactory {
     /**
      * Creates a site repository service instance.
      *
-     * @returns Site repository service implementation
+     * @remarks
+     * Returns a new {@link SiteRepositoryService} with injected dependencies for site repository operations.
+     *
+     * @returns Site repository service implementation.
      */
     public createSiteRepositoryService(): SiteRepositoryService {
         return new SiteRepositoryService({

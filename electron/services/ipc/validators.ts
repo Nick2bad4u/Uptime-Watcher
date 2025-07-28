@@ -1,6 +1,13 @@
 /**
  * Parameter validators for specific IPC handler groups.
+ *
+ * @remarks
  * Provides type-safe validation for different categories of IPC operations.
+ * Each validator returns `null` if parameters are valid, or an array of error messages if invalid.
+ * All validators conform to the {@link IpcParameterValidator} interface.
+ *
+ * @see {@link IpcParameterValidator}
+ * @public
  */
 
 import type { IpcParameterValidator } from "./types";
@@ -8,14 +15,23 @@ import type { IpcParameterValidator } from "./types";
 import { IpcValidators } from "./utils";
 
 /**
- * Parameter validators for site management operations.
+ * Parameter validators for site management IPC handlers.
+ *
+ * @remarks
+ * Each property is a validator for a specific site-related IPC channel.
+ * Validators ensure correct parameter count and types for each handler.
  *
  * @public
  */
 export const SiteHandlerValidators = {
     /**
-     * Validates parameters for add-site handler.
-     * Expects: [Site]
+     * Validates parameters for the "add-site" IPC handler.
+     *
+     * @remarks
+     * Expects a single parameter: a site object.
+     *
+     * @param params - The parameters passed to the handler.
+     * @returns `null` if valid, or an array of error messages.
      */
     addSite: ((params: unknown[]): null | string[] => {
         const errors: string[] = [];
@@ -33,16 +49,26 @@ export const SiteHandlerValidators = {
     }) satisfies IpcParameterValidator,
 
     /**
-     * Validates parameters for get-sites handler.
-     * Expects: []
+     * Validates parameters for the "get-sites" IPC handler.
+     *
+     * @remarks
+     * Expects no parameters.
+     *
+     * @param params - The parameters passed to the handler.
+     * @returns `null` if valid, or an array of error messages.
      */
     getSites: ((params: unknown[]): null | string[] => {
         return params.length === 0 ? null : ["No parameters expected"];
     }) satisfies IpcParameterValidator,
 
     /**
-     * Validates parameters for remove-monitor handler.
-     * Expects: [string, string] (siteIdentifier, monitorId)
+     * Validates parameters for the "remove-monitor" IPC handler.
+     *
+     * @remarks
+     * Expects two parameters: site identifier and monitor ID (both strings).
+     *
+     * @param params - The parameters passed to the handler.
+     * @returns `null` if valid, or an array of error messages.
      */
     removeMonitor: ((params: unknown[]): null | string[] => {
         const errors: string[] = [];
@@ -65,8 +91,13 @@ export const SiteHandlerValidators = {
     }) satisfies IpcParameterValidator,
 
     /**
-     * Validates parameters for remove-site handler.
-     * Expects: [string] (identifier)
+     * Validates parameters for the "remove-site" IPC handler.
+     *
+     * @remarks
+     * Expects a single parameter: the site identifier (string).
+     *
+     * @param params - The parameters passed to the handler.
+     * @returns `null` if valid, or an array of error messages.
      */
     removeSite: ((params: unknown[]): null | string[] => {
         const errors: string[] = [];
@@ -84,8 +115,13 @@ export const SiteHandlerValidators = {
     }) satisfies IpcParameterValidator,
 
     /**
-     * Validates parameters for update-site handler.
-     * Expects: [string, Partial<Site>] (identifier, updates)
+     * Validates parameters for the "update-site" IPC handler.
+     *
+     * @remarks
+     * Expects two parameters: site identifier (string) and updates (object).
+     *
+     * @param params - The parameters passed to the handler.
+     * @returns `null` if valid, or an array of error messages.
      */
     updateSite: ((params: unknown[]): null | string[] => {
         const errors: string[] = [];
@@ -109,14 +145,22 @@ export const SiteHandlerValidators = {
 } as const;
 
 /**
- * Parameter validators for monitoring control operations.
+ * Parameter validators for monitoring control IPC handlers.
+ *
+ * @remarks
+ * Each property is a validator for a specific monitoring-related IPC channel.
  *
  * @public
  */
 export const MonitoringHandlerValidators = {
     /**
-     * Validates parameters for check-site-now handler.
-     * Expects: [string, string] (identifier, monitorId)
+     * Validates parameters for the "check-site-now" IPC handler.
+     *
+     * @remarks
+     * Expects two parameters: site identifier and monitor ID (both strings).
+     *
+     * @param params - The parameters passed to the handler.
+     * @returns `null` if valid, or an array of error messages.
      */
     checkSiteNow: ((params: unknown[]): null | string[] => {
         const errors: string[] = [];
@@ -139,16 +183,26 @@ export const MonitoringHandlerValidators = {
     }) satisfies IpcParameterValidator,
 
     /**
-     * Validates parameters for start-monitoring handler.
-     * Expects: []
+     * Validates parameters for the "start-monitoring" IPC handler.
+     *
+     * @remarks
+     * Expects no parameters.
+     *
+     * @param params - The parameters passed to the handler.
+     * @returns `null` if valid, or an array of error messages.
      */
     startMonitoring: ((params: unknown[]): null | string[] => {
         return params.length === 0 ? null : ["No parameters expected"];
     }) satisfies IpcParameterValidator,
 
     /**
-     * Validates parameters for start-monitoring-for-site handler.
-     * Expects: [string, string?] (identifier, optional monitorId)
+     * Validates parameters for the "start-monitoring-for-site" IPC handler.
+     *
+     * @remarks
+     * Expects one or two parameters: site identifier (string), and optional monitor ID (string).
+     *
+     * @param params - The parameters passed to the handler.
+     * @returns `null` if valid, or an array of error messages.
      */
     startMonitoringForSite: ((params: unknown[]): null | string[] => {
         const errors: string[] = [];
@@ -173,16 +227,26 @@ export const MonitoringHandlerValidators = {
     }) satisfies IpcParameterValidator,
 
     /**
-     * Validates parameters for stop-monitoring handler.
-     * Expects: []
+     * Validates parameters for the "stop-monitoring" IPC handler.
+     *
+     * @remarks
+     * Expects no parameters.
+     *
+     * @param params - The parameters passed to the handler.
+     * @returns `null` if valid, or an array of error messages.
      */
     stopMonitoring: ((params: unknown[]): null | string[] => {
         return params.length === 0 ? null : ["No parameters expected"];
     }) satisfies IpcParameterValidator,
 
     /**
-     * Validates parameters for stop-monitoring-for-site handler.
-     * Expects: [string, string?] (identifier, optional monitorId)
+     * Validates parameters for the "stop-monitoring-for-site" IPC handler.
+     *
+     * @remarks
+     * Expects one or two parameters: site identifier (string), and optional monitor ID (string).
+     *
+     * @param params - The parameters passed to the handler.
+     * @returns `null` if valid, or an array of error messages.
      */
     stopMonitoringForSite: ((params: unknown[]): null | string[] => {
         const errors: string[] = [];
@@ -208,38 +272,61 @@ export const MonitoringHandlerValidators = {
 } as const;
 
 /**
- * Parameter validators for data management operations.
+ * Parameter validators for data management IPC handlers.
+ *
+ * @remarks
+ * Each property is a validator for a specific data-related IPC channel.
  *
  * @public
  */
 export const DataHandlerValidators = {
     /**
-     * Validates parameters for download-sqlite-backup handler.
-     * Expects: []
+     * Validates parameters for the "download-sqlite-backup" IPC handler.
+     *
+     * @remarks
+     * Expects no parameters.
+     *
+     * @param params - The parameters passed to the handler.
+     * @returns `null` if valid, or an array of error messages.
      */
     downloadSqliteBackup: ((params: unknown[]): null | string[] => {
         return params.length === 0 ? null : ["No parameters expected"];
     }) satisfies IpcParameterValidator,
 
     /**
-     * Validates parameters for export-data handler.
-     * Expects: []
+     * Validates parameters for the "export-data" IPC handler.
+     *
+     * @remarks
+     * Expects no parameters.
+     *
+     * @param params - The parameters passed to the handler.
+     * @returns `null` if valid, or an array of error messages.
      */
     exportData: ((params: unknown[]): null | string[] => {
         return params.length === 0 ? null : ["No parameters expected"];
     }) satisfies IpcParameterValidator,
 
     /**
-     * Validates parameters for get-history-limit handler.
-     * Expects: []
+     * Validates parameters for the "get-history-limit" IPC handler.
+     *
+     * @remarks
+     * Expects no parameters.
+     *
+     * @param params - The parameters passed to the handler.
+     * @returns `null` if valid, or an array of error messages.
      */
     getHistoryLimit: ((params: unknown[]): null | string[] => {
         return params.length === 0 ? null : ["No parameters expected"];
     }) satisfies IpcParameterValidator,
 
     /**
-     * Validates parameters for import-data handler.
-     * Expects: [string] (data)
+     * Validates parameters for the "import-data" IPC handler.
+     *
+     * @remarks
+     * Expects a single parameter: the data string.
+     *
+     * @param params - The parameters passed to the handler.
+     * @returns `null` if valid, or an array of error messages.
      */
     importData: ((params: unknown[]): null | string[] => {
         const errors: string[] = [];
@@ -257,16 +344,26 @@ export const DataHandlerValidators = {
     }) satisfies IpcParameterValidator,
 
     /**
-     * Validates parameters for reset-settings handler.
-     * Expects: []
+     * Validates parameters for the "reset-settings" IPC handler.
+     *
+     * @remarks
+     * Expects no parameters.
+     *
+     * @param params - The parameters passed to the handler.
+     * @returns `null` if valid, or an array of error messages.
      */
     resetSettings: ((params: unknown[]): null | string[] => {
         return params.length === 0 ? null : ["No parameters expected"];
     }) satisfies IpcParameterValidator,
 
     /**
-     * Validates parameters for update-history-limit handler.
-     * Expects: [number] (limit)
+     * Validates parameters for the "update-history-limit" IPC handler.
+     *
+     * @remarks
+     * Expects a single parameter: the new history limit (number).
+     *
+     * @param params - The parameters passed to the handler.
+     * @returns `null` if valid, or an array of error messages.
      */
     updateHistoryLimit: ((params: unknown[]): null | string[] => {
         const errors: string[] = [];
@@ -285,14 +382,22 @@ export const DataHandlerValidators = {
 } as const;
 
 /**
- * Parameter validators for monitor type operations.
+ * Parameter validators for monitor type IPC handlers.
+ *
+ * @remarks
+ * Each property is a validator for a specific monitor type-related IPC channel.
  *
  * @public
  */
 export const MonitorTypeHandlerValidators = {
     /**
-     * Validates parameters for format-monitor-detail handler.
-     * Expects: [string, string] (monitorType, details)
+     * Validates parameters for the "format-monitor-detail" IPC handler.
+     *
+     * @remarks
+     * Expects two parameters: monitor type (string) and details (string).
+     *
+     * @param params - The parameters passed to the handler.
+     * @returns `null` if valid, or an array of error messages.
      */
     formatMonitorDetail: ((params: unknown[]): null | string[] => {
         const errors: string[] = [];
@@ -315,8 +420,13 @@ export const MonitorTypeHandlerValidators = {
     }) satisfies IpcParameterValidator,
 
     /**
-     * Validates parameters for format-monitor-title-suffix handler.
-     * Expects: [string, Record\<string, unknown\>] (monitorType, monitor)
+     * Validates parameters for the "format-monitor-title-suffix" IPC handler.
+     *
+     * @remarks
+     * Expects two parameters: monitor type (string) and monitor object.
+     *
+     * @param params - The parameters passed to the handler.
+     * @returns `null` if valid, or an array of error messages.
      */
     formatMonitorTitleSuffix: ((params: unknown[]): null | string[] => {
         const errors: string[] = [];
@@ -339,16 +449,27 @@ export const MonitorTypeHandlerValidators = {
     }) satisfies IpcParameterValidator,
 
     /**
-     * Validates parameters for get-monitor-types handler.
-     * Expects: []
+     * Validates parameters for the "get-monitor-types" IPC handler.
+     *
+     * @remarks
+     * Expects no parameters.
+     *
+     * @param params - The parameters passed to the handler.
+     * @returns `null` if valid, or an array of error messages.
      */
     getMonitorTypes: ((params: unknown[]): null | string[] => {
         return params.length === 0 ? null : ["No parameters expected"];
     }) satisfies IpcParameterValidator,
 
     /**
-     * Validates parameters for validate-monitor-data handler.
-     * Expects: [string, unknown] (monitorType, data)
+     * Validates parameters for the "validate-monitor-data" IPC handler.
+     *
+     * @remarks
+     * Expects two parameters: monitor type (string) and data (any).
+     * Only the monitor type is validated for type.
+     *
+     * @param params - The parameters passed to the handler.
+     * @returns `null` if valid, or an array of error messages.
      */
     validateMonitorData: ((params: unknown[]): null | string[] => {
         const errors: string[] = [];
@@ -369,22 +490,35 @@ export const MonitorTypeHandlerValidators = {
 } as const;
 
 /**
- * Parameter validators for state synchronization operations.
+ * Parameter validators for state synchronization IPC handlers.
+ *
+ * @remarks
+ * Each property is a validator for a specific state sync-related IPC channel.
  *
  * @public
  */
 export const StateSyncHandlerValidators = {
     /**
-     * Validates parameters for get-sync-status handler.
-     * Expects: []
+     * Validates parameters for the "get-sync-status" IPC handler.
+     *
+     * @remarks
+     * Expects no parameters.
+     *
+     * @param params - The parameters passed to the handler.
+     * @returns `null` if valid, or an array of error messages.
      */
     getSyncStatus: ((params: unknown[]): null | string[] => {
         return params.length === 0 ? null : ["No parameters expected"];
     }) satisfies IpcParameterValidator,
 
     /**
-     * Validates parameters for request-full-sync handler.
-     * Expects: []
+     * Validates parameters for the "request-full-sync" IPC handler.
+     *
+     * @remarks
+     * Expects no parameters.
+     *
+     * @param params - The parameters passed to the handler.
+     * @returns `null` if valid, or an array of error messages.
      */
     requestFullSync: ((params: unknown[]): null | string[] => {
         return params.length === 0 ? null : ["No parameters expected"];

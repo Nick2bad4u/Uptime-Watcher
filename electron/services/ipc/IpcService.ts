@@ -5,15 +5,14 @@ import { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import { logger } from "../../utils/logger";
 import { getAllMonitorTypeConfigs, getMonitorTypeConfig, validateMonitorData } from "../monitoring/MonitorTypeRegistry";
 import { AutoUpdaterService } from "../updater/AutoUpdaterService";
+import { createValidationResponse, registerStandardizedIpcHandler } from "./utils";
 import {
-    createValidationResponse,
     DataHandlerValidators,
     MonitoringHandlerValidators,
     MonitorTypeHandlerValidators,
-    registerStandardizedIpcHandler,
     SiteHandlerValidators,
     StateSyncHandlerValidators,
-} from "./";
+} from "./validators";
 
 /**
  * Inter-Process Communication (IPC) service for Electron main-renderer communication.

@@ -5,11 +5,12 @@ import { logger } from "../../../utils/logger";
 import { rowToHistoryEntry } from "./historyMapper";
 
 /**
- * Utility functions for querying history data from the database.
+ * Utility functions for querying monitor history data from the database.
  *
  * @remarks
- * These are internal utility functions designed to be called from HistoryRepository methods
- * that handle async operations, error recovery, and operational hooks.
+ * These are internal utility functions designed to be called from {@link HistoryRepository} methods that handle async operations, error recovery, and operational hooks. All functions assume transaction context and error handling are managed by the caller.
+ *
+ * @internal
  */
 
 /**

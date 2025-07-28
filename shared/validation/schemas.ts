@@ -1,14 +1,21 @@
 /**
- * Shared Zod validation schemas for monitor types.
- * Used by both frontend and backend to ensure data integrity.
+ * Shared Zod validation schemas and validation utilities for monitor and site data.
  *
- * Validation constraints match the UI constants in src/constants.ts
+ * @remarks
+ * These schemas and functions are used by both frontend and backend to ensure data integrity.
+ * Validation constraints are synchronized with UI constants in {@link constants.ts}.
+ * All validation logic is centralized here for consistency and maintainability.
  */
 
 import validator from "validator";
 import { z } from "zod";
 
-// Validation constraints (matching UI constants)
+/**
+ * Validation constraints for monitor fields.
+ *
+ * @remarks
+ * These values must match the UI constants in {@link constants.ts}.
+ */
 const VALIDATION_CONSTRAINTS = {
     CHECK_INTERVAL: {
         MAX: 2_592_000_000, // 30 days (maximum from CHECK_INTERVALS)
@@ -24,7 +31,12 @@ const VALIDATION_CONSTRAINTS = {
     },
 } as const;
 
-// Base monitor schema with common fields
+/**
+ * Zod schema for base monitor fields shared by all monitor types.
+ *
+ * @remarks
+ * This schema is extended by type-specific monitor schemas.
+ */
 export const baseMonitorSchema = z.object({
     checkInterval: z
         .number()
@@ -39,7 +51,6 @@ export const baseMonitorSchema = z.object({
      * @remarks
      * Uses -1 as a sentinel value to indicate "never checked" state.
      * Positive values represent actual response times in milliseconds.
-     * This sentinel pattern provides a clear API contract for consumers.
      */
     responseTime: z.number().min(-1), // -1 is sentinel for "never checked"
     retryAttempts: z
@@ -54,7 +65,12 @@ export const baseMonitorSchema = z.object({
     type: z.enum(["http", "port"]),
 });
 
-// HTTP monitor specific schema
+/**
+ * Zod schema for HTTP monitor fields.
+ *
+ * @remarks
+ * Extends {@link baseMonitorSchema} and adds the `url` field with robust validation.
+ */
 export const httpMonitorSchema = baseMonitorSchema.extend({
     type: z.literal("http"),
     url: z.string().refine((val) => {
@@ -73,7 +89,12 @@ export const httpMonitorSchema = baseMonitorSchema.extend({
     }, "Must be a valid HTTP or HTTPS URL"),
 });
 
-// Port monitor specific schema
+/**
+ * Zod schema for port monitor fields.
+ *
+ * @remarks
+ * Extends {@link baseMonitorSchema} and adds `host` and `port` fields with strict validation.
+ */
 export const portMonitorSchema = baseMonitorSchema.extend({
     host: z.string().refine((val) => {
         // Use validator.js for robust host validation
@@ -99,10 +120,20 @@ export const portMonitorSchema = baseMonitorSchema.extend({
     type: z.literal("port"),
 });
 
-// Union schema for all monitor types
+/**
+ * Zod discriminated union schema for all monitor types.
+ *
+ * @remarks
+ * Supports both HTTP and port monitors.
+ */
 export const monitorSchema = z.discriminatedUnion("type", [httpMonitorSchema, portMonitorSchema]);
 
-// Site schema
+/**
+ * Zod schema for site data.
+ *
+ * @remarks
+ * Validates site identifier, name, monitoring flag, and an array of monitors.
+ */
 export const siteSchema = z.object({
     identifier: z.string().min(1, "Site identifier is required").max(100, "Site identifier too long"),
     monitoring: z.boolean(),
@@ -110,33 +141,84 @@ export const siteSchema = z.object({
     name: z.string().min(1, "Site name is required").max(200, "Site name too long"),
 });
 
-// Organized schemas by monitor type
+/**
+ * Organized monitor schemas by type.
+ *
+ * @remarks
+ * Useful for dynamic schema selection.
+ */
 export const monitorSchemas = {
     http: httpMonitorSchema,
     port: portMonitorSchema,
 } as const;
 
-// Type exports
+/**
+ * Type representing a validated HTTP monitor.
+ *
+ * @see {@link httpMonitorSchema}
+ */
 export type HttpMonitor = z.infer<typeof httpMonitorSchema>;
+
+/**
+ * Type representing a validated monitor (HTTP or port).
+ *
+ * @see {@link monitorSchema}
+ */
 export type Monitor = z.infer<typeof monitorSchema>;
+
+/**
+ * Type representing a validated port monitor.
+ *
+ * @see {@link portMonitorSchema}
+ */
 export type PortMonitor = z.infer<typeof portMonitorSchema>;
+
+/**
+ * Type representing a validated site.
+ *
+ * @see {@link siteSchema}
+ */
 export type Site = z.infer<typeof siteSchema>;
 
-// Validation result type
+/**
+ * Result object returned by validation functions.
+ *
+ * @remarks
+ * Contains the validated data (if successful), errors, warnings, and metadata.
+ */
 export interface ValidationResult {
+    /**
+     * The validated data, if validation succeeded.
+     */
     data?: unknown;
+    /**
+     * Array of validation error messages.
+     */
     errors: string[];
+    /**
+     * Metadata about the validation process (e.g., monitor type, field name).
+     */
     metadata: Record<string, unknown>;
+    /**
+     * Indicates whether validation was successful.
+     */
     success: boolean;
+    /**
+     * Array of validation warnings (e.g., optional fields missing).
+     */
     warnings: string[];
 }
 
 /**
- * Validate monitor data using shared Zod schemas.
+ * Validates monitor data using the appropriate Zod schema.
  *
- * @param type - Monitor type string ("http" or "port")
- * @param data - Monitor data to validate
- * @returns Validation result with success status, data, errors, and warnings
+ * @remarks
+ * Selects the schema based on monitor type ("http" or "port").
+ * Returns a {@link ValidationResult} with success status, validated data, errors, and warnings.
+ *
+ * @param type - The monitor type string ("http" or "port").
+ * @param data - The monitor data to validate.
+ * @returns The validation result object.
  *
  * @example
  * ```typescript
@@ -150,6 +232,7 @@ export interface ValidationResult {
  *   console.error("Validation errors:", result.errors);
  * }
  * ```
+ * @throws {@link z.ZodError} If validation fails and is not handled internally.
  */
 export function validateMonitorData(type: string, data: unknown): ValidationResult {
     try {
@@ -214,16 +297,18 @@ export function validateMonitorData(type: string, data: unknown): ValidationResu
 }
 
 /**
- * Validate a specific field of a monitor.
- *
- * @param type - Monitor type string ("http" or "port")
- * @param fieldName - Name of the field to validate
- * @param value - Field value to validate
- * @returns Validation result with success status and field-specific errors
+ * Validates a specific field of a monitor using the appropriate schema.
  *
  * @remarks
- * Validates individual monitor fields using the appropriate schema.
- * Useful for real-time validation during form input.
+ * Useful for real-time validation during form input. Only validates the specified field.
+ *
+ * @param type - The monitor type string ("http" or "port").
+ * @param fieldName - The name of the field to validate.
+ * @param value - The value of the field to validate.
+ * @returns The validation result object for the field.
+ *
+ * @throws {@link z.ZodError} If validation fails and is not handled internally.
+ * @throws Error If the field name is unknown for the given monitor type.
  */
 export function validateMonitorField(type: string, fieldName: string, value: unknown): ValidationResult {
     try {
@@ -270,14 +355,16 @@ export function validateMonitorField(type: string, fieldName: string, value: unk
 }
 
 /**
- * Validate site data using shared Zod schema.
- *
- * @param data - Site data to validate
- * @returns Validation result with success status, data, and errors
+ * Validates site data using the shared Zod schema.
  *
  * @remarks
- * Validates complete site structure including all monitors.
+ * Validates the complete site structure, including all monitors.
  * Ensures data integrity for site operations.
+ *
+ * @param data - The site data to validate.
+ * @returns The validation result object for the site.
+ *
+ * @throws {@link z.ZodError} If validation fails and is not handled internally.
  */
 export function validateSiteData(data: unknown): ValidationResult {
     try {
@@ -314,14 +401,13 @@ export function validateSiteData(data: unknown): ValidationResult {
 }
 
 /**
- * Get the appropriate schema for a monitor type.
- *
- * @param type - Monitor type string to get schema for
- * @returns Monitor schema for the type, or undefined if type is unknown
+ * Gets the appropriate Zod schema for a monitor type.
  *
  * @remarks
- * Returns undefined instead of null for consistency with TypeScript best practices.
- * Supports "http" and "port" monitor types.
+ * Returns `undefined` if the type is not recognized.
+ *
+ * @param type - The monitor type string ("http" or "port").
+ * @returns The Zod schema for the monitor type, or `undefined` if unknown.
  */
 function getMonitorSchema(type: string): typeof httpMonitorSchema | typeof portMonitorSchema | undefined {
     if (type === "http") {
@@ -333,19 +419,19 @@ function getMonitorSchema(type: string): typeof httpMonitorSchema | typeof portM
 }
 
 /**
- * Validate a specific field using the appropriate schema.
- *
- * @param type - Monitor type string
- * @param fieldName - Name of the field to validate
- * @param value - Field value to validate
- * @returns Validated field data
- *
- * @throws Error For unknown field names
- * @throws z.ZodError For validation failures
+ * Validates a specific field using the appropriate monitor schema.
  *
  * @remarks
- * Internal helper function that creates a test object and validates
- * the specific field using the appropriate monitor schema.
+ * Internal helper that creates a test object and validates the specific field.
+ * Throws if the field is not recognized for the given monitor type.
+ *
+ * @param type - The monitor type string ("http" or "port").
+ * @param fieldName - The name of the field to validate.
+ * @param value - The value of the field to validate.
+ * @returns An object containing the validated field.
+ *
+ * @throws Error If the field name is unknown for the monitor type.
+ * @throws {@link z.ZodError} If validation fails.
  */
 function validateFieldWithSchema(type: string, fieldName: string, value: unknown): Record<string, unknown> {
     const testData = {

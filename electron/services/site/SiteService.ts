@@ -12,7 +12,12 @@ import { MonitorRepository } from "../database/MonitorRepository";
 import { SiteRepository } from "../database/SiteRepository";
 
 /**
- * Dependencies for SiteService.
+ * Defines the dependencies required by {@link SiteService} for site operations.
+ *
+ * @remarks
+ * Includes all repositories and the database service needed for coordinating site, monitor, and history operations.
+ *
+ * @public
  */
 export interface SiteServiceDependencies {
     databaseService: DatabaseService;
@@ -23,11 +28,21 @@ export interface SiteServiceDependencies {
 
 /**
  * Service for coordinating site operations across multiple repositories.
- * Handles complex operations that require coordination between site, monitor, and history data.
+ *
+ * @remarks
+ * Handles complex operations that require coordination between site, monitor, and history data. Provides atomic deletion, detailed loading, and batch operations for sites and their related entities.
+ *
+ * @public
  */
 export class SiteService {
     /**
      * Default name for sites when no name is provided.
+     *
+     * @remarks
+     * Used as a fallback when a site does not have a name in the database.
+     *
+     * @defaultValue "Unnamed Site"
+     * @internal
      */
     private static readonly DEFAULT_SITE_NAME = "Unnamed Site";
 
@@ -36,6 +51,11 @@ export class SiteService {
     private readonly monitorRepository: MonitorRepository;
     private readonly siteRepository: SiteRepository;
 
+    /**
+     * Constructs a new {@link SiteService} instance.
+     *
+     * @param dependencies - The {@link SiteServiceDependencies} required for service operations.
+     */
     constructor(dependencies: SiteServiceDependencies) {
         this.databaseService = dependencies.databaseService;
         this.historyRepository = dependencies.historyRepository;
@@ -44,13 +64,15 @@ export class SiteService {
     }
 
     /**
-     * Delete a site and all its related data (monitors and history).
-     * Uses transaction to ensure atomicity.
+     * Deletes a site and all its related data (monitors and history) atomically.
      *
-     * @param identifier - Site identifier to delete
-     * @returns Promise resolving to true if all deletions succeeded
+     * @remarks
+     * Uses a transaction to ensure atomicity. Deletes all monitor history, monitors, and the site itself. Throws if any operation fails.
      *
-     * @throws Error When any deletion operation fails
+     * @param identifier - The site identifier to delete.
+     * @returns Promise resolving to true if all deletions succeeded.
+     * @throws Error when any deletion operation fails.
+     * @public
      */
     public async deleteSiteWithRelatedData(identifier: string): Promise<boolean> {
         return withErrorHandling(
@@ -105,11 +127,14 @@ export class SiteService {
     }
 
     /**
-     * Find a site by identifier with all related monitors and history data.
-     * This replaces the complex logic that was previously in SiteRepository.
+     * Finds a site by identifier with all related monitors and history data.
      *
-     * @param identifier - Site identifier to find
-     * @returns Promise resolving to site with details or undefined if not found
+     * @remarks
+     * Replaces the complex logic that was previously in SiteRepository. Loads the site, its monitors, and all monitor history in a single operation.
+     *
+     * @param identifier - The site identifier to find.
+     * @returns Promise resolving to the site with details, or undefined if not found.
+     * @public
      */
     public async findByIdentifierWithDetails(identifier: string): Promise<Site | undefined> {
         return withErrorHandling(
@@ -157,13 +182,13 @@ export class SiteService {
     }
 
     /**
-     * Get all sites with their related monitors and history data.
-     * This replaces the complex logic that was previously in SiteRepository.
-     *
-     * @returns Promise resolving to array of sites with complete data
+     * Gets all sites with their related monitors and history data.
      *
      * @remarks
-     * Optimized to fetch monitor history in parallel for better performance.
+     * Replaces the complex logic that was previously in SiteRepository. Optimized to fetch monitor history in parallel for better performance. Returns all sites with complete details.
+     *
+     * @returns Promise resolving to an array of sites with complete data.
+     * @public
      */
     public async getAllWithDetails(): Promise<Site[]> {
         return withErrorHandling(
@@ -206,10 +231,14 @@ export class SiteService {
     }
 
     /**
-     * Get the display name for a site, using default if none provided.
+     * Gets the display name for a site, using the default if none is provided.
      *
-     * @param siteName - The site name from database
-     * @returns Display name with fallback to default
+     * @remarks
+     * Used internally to ensure all sites have a displayable name.
+     *
+     * @param siteName - The site name from the database.
+     * @returns Display name with fallback to the default.
+     * @internal
      */
     private getDisplayName(siteName: null | string | undefined): string {
         return siteName ?? SiteService.DEFAULT_SITE_NAME;

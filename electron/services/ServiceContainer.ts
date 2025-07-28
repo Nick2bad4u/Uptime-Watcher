@@ -2,16 +2,17 @@
  * Centralized dependency injection container for all Electron services.
  *
  * @remarks
- * Provides a unified way to manage service dependencies and lifecycle,
- * ensuring proper initialization order and singleton management where appropriate.
+ * Provides a unified mechanism for managing service dependencies and their lifecycle,
+ * ensuring correct initialization order and singleton management.
  *
- * Services are categorized by type:
- * - **Core Services**: Essential infrastructure (Database, IPC)
- * - **Application Services**: Business logic orchestrators
- * - **Feature Services**: Specific functionality (Monitoring, Notifications)
- * - **Utility Services**: Support functions (Window, Updater)
+ * Services are categorized as:
+ * - Core Services: Infrastructure (Database, IPC)
+ * - Application Services: Business logic orchestrators
+ * - Feature Services: Specific functionality (Monitoring, Notifications)
+ * - Utility Services: Support functions (Window, Updater)
+ *
+ * @public
  */
-
 import { UptimeEvents } from "../events/eventTypes";
 import { TypedEventBus } from "../events/TypedEventBus";
 import { ConfigurationManager } from "../managers/ConfigurationManager";
@@ -33,86 +34,142 @@ import { AutoUpdaterService } from "./updater/AutoUpdaterService";
 import { WindowService } from "./window/WindowService";
 
 /**
- * Configuration interface for service container behavior.
+ * Configuration options for {@link ServiceContainer}.
  *
  * @remarks
- * Controls various aspects of service initialization and behavior.
- * All properties are optional with sensible defaults.
+ * Controls service initialization and runtime behavior.
  *
  * @public
  */
 export interface ServiceContainerConfig {
     /**
-     * Enable debug logging for service initialization and lifecycle events.
-     *
-     * @defaultValue false
+     * Enables debug logging for service initialization and lifecycle events.
      *
      * @remarks
-     * When enabled, logs detailed information about:
-     * - Service creation and dependency injection
-     * - Initialization order and timing
-     * - Manager setup and event forwarding
-     * - Error contexts and recovery attempts
+     * When enabled, logs detailed information about service creation, dependency injection,
+     * initialization order, timing, manager setup, event forwarding, and error contexts.
      *
-     * Useful for debugging service dependency issues and startup problems.
+     * @defaultValue false
      */
     enableDebugLogging?: boolean;
 
     /**
      * Custom notification service configuration.
      *
-     * @defaultValue `{ showDownAlerts: true, showUpAlerts: true }`
-     *
      * @remarks
      * Controls system notification behavior for monitor status changes.
-     * Can be modified at runtime via NotificationService.updateConfig().
+     * Can be modified at runtime via {@link NotificationService.updateConfig}.
      *
-     * @see {@link NotificationService} for runtime configuration updates
+     * @defaultValue `{ showDownAlerts: true, showUpAlerts: true }`
+     *
+     * @see {@link NotificationService}
      */
     notificationConfig?: {
-        /** Enable notifications when monitors go down */
+        /** Enables notifications when monitors go down. */
         showDownAlerts: boolean;
-        /** Enable notifications when monitors come back up */
+        /** Enables notifications when monitors come back up. */
         showUpAlerts: boolean;
     };
 }
 
 /**
- * Centralized service container for dependency management.
+ * Centralized service container for dependency management and lifecycle orchestration.
+ *
+ * @remarks
+ * Provides singleton access to all core, application, feature, and utility services.
+ * Ensures correct initialization order and dependency injection.
+ *
+ * @public
  */
 export class ServiceContainer {
     private static instance: ServiceContainer | undefined = undefined;
 
+    /**
+     * Singleton instance of {@link AutoUpdaterService}.
+     * @internal
+     */
     private _autoUpdaterService?: AutoUpdaterService;
-
-    // Manager Services (Business Layer)
+    /**
+     * Singleton instance of {@link ConfigurationManager}.
+     * @internal
+     */
     private _configurationManager?: ConfigurationManager;
-
+    /**
+     * Singleton instance of {@link DatabaseManager}.
+     * @internal
+     */
     private _databaseManager?: DatabaseManager;
-
-    // Core Services (Infrastructure)
+    /**
+     * Singleton instance of {@link DatabaseService}.
+     * @internal
+     */
     private _databaseService?: DatabaseService;
-
-    // Repository Services (Data Layer)
+    /**
+     * Singleton instance of {@link HistoryRepository}.
+     * @internal
+     */
     private _historyRepository?: HistoryRepository;
-
+    /**
+     * Singleton instance of {@link IpcService}.
+     * @internal
+     */
     private _ipcService?: IpcService;
-
+    /**
+     * Singleton instance of {@link MonitorManager}.
+     * @internal
+     */
     private _monitorManager?: MonitorManager;
+    /**
+     * Singleton instance of {@link MonitorRepository}.
+     * @internal
+     */
     private _monitorRepository?: MonitorRepository;
+    /**
+     * Singleton instance of {@link NotificationService}.
+     * @internal
+     */
     private _notificationService?: NotificationService;
+    /**
+     * Singleton instance of {@link SettingsRepository}.
+     * @internal
+     */
     private _settingsRepository?: SettingsRepository;
-
+    /**
+     * Singleton instance of {@link SiteManager}.
+     * @internal
+     */
     private _siteManager?: SiteManager;
+    /**
+     * Singleton instance of {@link SiteRepository}.
+     * @internal
+     */
     private _siteRepository?: SiteRepository;
+    /**
+     * Singleton instance of {@link SiteService}.
+     * @internal
+     */
     private _siteService?: SiteService;
-    // Application Services (Business Logic)
+    /**
+     * Singleton instance of {@link UptimeOrchestrator}.
+     * @internal
+     */
     private _uptimeOrchestrator?: UptimeOrchestrator;
-    // Utility Services
+    /**
+     * Singleton instance of {@link WindowService}.
+     * @internal
+     */
     private _windowService?: WindowService;
 
     private readonly config: ServiceContainerConfig;
 
+    /**
+     * Constructs a new {@link ServiceContainer}.
+     *
+     * @remarks
+     * Use {@link ServiceContainer.getInstance} to obtain the singleton instance.
+     *
+     * @param config - Optional configuration for service container behavior.
+     */
     private constructor(config: ServiceContainerConfig = {}) {
         this.config = config;
         if (config.enableDebugLogging) {
@@ -121,7 +178,13 @@ export class ServiceContainer {
     }
 
     /**
-     * Get the singleton service container instance.
+     * Gets the singleton {@link ServiceContainer} instance.
+     *
+     * @remarks
+     * If the instance does not exist, it is created with the provided configuration.
+     *
+     * @param config - Optional configuration for the container.
+     * @returns The singleton {@link ServiceContainer} instance.
      */
     public static getInstance(config?: ServiceContainerConfig): ServiceContainer {
         ServiceContainer.instance ??= new ServiceContainer(config ?? {});
@@ -129,25 +192,18 @@ export class ServiceContainer {
     }
 
     /**
-     * Reset the singleton container for testing purposes.
+     * Resets the singleton container for testing purposes.
      *
      * @remarks
-     * **Testing Utility**: Clears the singleton instance to allow clean test isolation.
+     * Clears the singleton instance to allow clean test isolation.
+     * Does not clean up existing service instances or close resources.
+     * Call cleanup methods on services before reset if needed.
      *
-     * **Usage Pattern:**
+     * @example
      * ```typescript
-     * // In test setup
      * ServiceContainer.resetForTesting();
-     *
-     * // Create fresh container for test
      * const container = ServiceContainer.getInstance({ enableDebugLogging: true });
      * ```
-     *
-     * **Important Notes:**
-     * - Only use in test environments
-     * - Does not clean up existing service instances
-     * - Does not close database connections or cleanup resources
-     * - Call cleanup methods on services before reset if needed
      *
      * @internal
      */
@@ -155,6 +211,11 @@ export class ServiceContainer {
         ServiceContainer.instance = undefined;
     }
 
+    /**
+     * Gets the {@link AutoUpdaterService} singleton.
+     *
+     * @returns The {@link AutoUpdaterService} instance.
+     */
     public getAutoUpdaterService(): AutoUpdaterService {
         if (!this._autoUpdaterService) {
             this._autoUpdaterService = new AutoUpdaterService();
@@ -165,7 +226,11 @@ export class ServiceContainer {
         return this._autoUpdaterService;
     }
 
-    // Manager Services (Business Layer)
+    /**
+     * Gets the {@link ConfigurationManager} singleton.
+     *
+     * @returns The {@link ConfigurationManager} instance.
+     */
     public getConfigurationManager(): ConfigurationManager {
         if (!this._configurationManager) {
             this._configurationManager = new ConfigurationManager();
@@ -176,12 +241,17 @@ export class ServiceContainer {
         return this._configurationManager;
     }
 
+    /**
+     * Gets the {@link DatabaseManager} singleton.
+     *
+     * @remarks
+     * Instantiates with required repositories, configuration manager, and event bus.
+     *
+     * @returns The {@link DatabaseManager} instance.
+     */
     public getDatabaseManager(): DatabaseManager {
         if (!this._databaseManager) {
-            // Create a separate event bus for DatabaseManager to avoid circular dependency
             const databaseEventBus = new TypedEventBus<UptimeEvents>("DatabaseManagerEventBus");
-
-            // DatabaseManager requires repositories, configuration manager, and event bus
             this._databaseManager = new DatabaseManager({
                 configurationManager: this.getConfigurationManager(),
                 eventEmitter: databaseEventBus,
@@ -200,13 +270,21 @@ export class ServiceContainer {
         return this._databaseManager;
     }
 
-    // Core Services
+    /**
+     * Gets the {@link DatabaseService} singleton.
+     *
+     * @returns The {@link DatabaseService} instance.
+     */
     public getDatabaseService(): DatabaseService {
         this._databaseService ??= DatabaseService.getInstance();
         return this._databaseService;
     }
 
-    // Repository Services (Data Layer)
+    /**
+     * Gets the {@link HistoryRepository} singleton.
+     *
+     * @returns The {@link HistoryRepository} instance.
+     */
     public getHistoryRepository(): HistoryRepository {
         if (!this._historyRepository) {
             this._historyRepository = new HistoryRepository({
@@ -220,9 +298,12 @@ export class ServiceContainer {
     }
 
     /**
-     * Get initialization status summary for debugging.
+     * Gets a summary of initialization status for all services.
      *
-     * @returns Object with service names and their initialization status
+     * @remarks
+     * Useful for debugging and diagnostics.
+     *
+     * @returns An object mapping service names to their initialization status.
      */
     public getInitializationStatus(): Record<string, boolean> {
         return {
@@ -245,21 +326,16 @@ export class ServiceContainer {
     }
 
     /**
-     * Get all initialized services for shutdown and debugging.
-     *
-     * @returns Array of service name/instance pairs for all initialized services
+     * Gets all initialized services for shutdown and debugging.
      *
      * @remarks
      * Dynamically discovers all initialized services by inspecting private fields.
-     * This approach automatically includes new services without manual updates.
-     *
      * Only includes services that are actually initialized (not undefined).
-     * Useful for shutdown procedures, health checks, and debugging.
+     *
+     * @returns Array of objects containing service names and their instances.
      */
     public getInitializedServices(): { name: string; service: unknown }[] {
         const services: { name: string; service: unknown }[] = [];
-
-        // Dynamically discover initialized services using reflection
         const serviceMap: Record<string, unknown> = {
             AutoUpdaterService: this._autoUpdaterService,
             ConfigurationManager: this._configurationManager,
@@ -277,23 +353,26 @@ export class ServiceContainer {
             UptimeOrchestrator: this._uptimeOrchestrator,
             WindowService: this._windowService,
         };
-
-        // Only include services that are actually initialized
         for (const [serviceName, serviceInstance] of Object.entries(serviceMap)) {
             if (serviceInstance !== undefined) {
                 services.push({ name: serviceName, service: serviceInstance });
             }
         }
-
         return services;
     }
 
+    /**
+     * Gets the {@link IpcService} singleton.
+     *
+     * @remarks
+     * Instantiates with dependencies on orchestrator and updater.
+     *
+     * @returns The {@link IpcService} instance.
+     */
     public getIpcService(): IpcService {
         if (!this._ipcService) {
-            // IPC service depends on orchestrator and updater
             const orchestrator = this.getUptimeOrchestrator();
             const updater = this.getAutoUpdaterService();
-
             this._ipcService = new IpcService(orchestrator, updater);
             if (this.config.enableDebugLogging) {
                 logger.debug("[ServiceContainer] Created IpcService with dependencies");
@@ -302,21 +381,26 @@ export class ServiceContainer {
         return this._ipcService;
     }
 
+    /**
+     * Gets the {@link MonitorManager} singleton.
+     *
+     * @remarks
+     * Instantiates with repositories, event bus, and dependency injection.
+     * Forwards important events to the main orchestrator.
+     *
+     * @returns The {@link MonitorManager} instance.
+     * @throws Error if {@link SiteManager} is not initialized when required.
+     */
     public getMonitorManager(): MonitorManager {
         if (!this._monitorManager) {
-            // Create a separate event bus for MonitorManager to avoid circular dependency
             const monitorEventBus = new TypedEventBus<UptimeEvents>("MonitorManagerEventBus");
-
-            // MonitorManager requires repositories and event bus
             this._monitorManager = new MonitorManager({
                 databaseService: this.getDatabaseService(),
                 eventEmitter: monitorEventBus,
                 getHistoryLimit: () => {
-                    // Get actual history limit from DatabaseManager instead of hardcoded value
                     return this.getDatabaseManager().getHistoryLimit();
                 },
                 getSitesCache: () => {
-                    // Direct access to avoid circular dependency - SiteManager should be created before MonitorManager
                     if (!this._siteManager) {
                         throw new Error(
                             "Service dependency error: SiteManager not fully initialized. " +
@@ -333,10 +417,7 @@ export class ServiceContainer {
                 },
                 siteService: this.getSiteService(),
             });
-
-            // Forward important events from MonitorManager to main orchestrator for frontend
             this.setupEventForwarding(monitorEventBus, "MonitorManager");
-
             if (this.config.enableDebugLogging) {
                 logger.debug("[ServiceContainer] Created MonitorManager with dependencies");
             }
@@ -344,6 +425,11 @@ export class ServiceContainer {
         return this._monitorManager;
     }
 
+    /**
+     * Gets the {@link MonitorRepository} singleton.
+     *
+     * @returns The {@link MonitorRepository} instance.
+     */
     public getMonitorRepository(): MonitorRepository {
         if (!this._monitorRepository) {
             this._monitorRepository = new MonitorRepository({
@@ -356,6 +442,11 @@ export class ServiceContainer {
         return this._monitorRepository;
     }
 
+    /**
+     * Gets the {@link NotificationService} singleton.
+     *
+     * @returns The {@link NotificationService} instance.
+     */
     public getNotificationService(): NotificationService {
         if (!this._notificationService) {
             this._notificationService = new NotificationService(this.config.notificationConfig);
@@ -366,6 +457,11 @@ export class ServiceContainer {
         return this._notificationService;
     }
 
+    /**
+     * Gets the {@link SettingsRepository} singleton.
+     *
+     * @returns The {@link SettingsRepository} instance.
+     */
     public getSettingsRepository(): SettingsRepository {
         if (!this._settingsRepository) {
             this._settingsRepository = new SettingsRepository({
@@ -378,23 +474,28 @@ export class ServiceContainer {
         return this._settingsRepository;
     }
 
+    /**
+     * Gets the {@link SiteManager} singleton.
+     *
+     * @remarks
+     * Instantiates with repositories, event bus, and monitoring operations.
+     * Forwards important events to the main orchestrator.
+     *
+     * @returns The {@link SiteManager} instance.
+     * @throws Error if setting the history limit fails.
+     */
     public getSiteManager(): SiteManager {
         if (!this._siteManager) {
-            // Create monitoring operations interface that will be passed to SiteManager
             const monitoringOperations: IMonitoringOperations = {
                 /**
-                 * Set history limit for monitor data retention.
-                 *
-                 * @param limit - Maximum number of history entries to retain
-                 * @returns Promise that resolves when limit is set
+                 * Sets the history limit for monitor data retention.
                  *
                  * @remarks
-                 * Delegates to DatabaseManager's setHistoryLimit method which:
-                 * - Validates input (must be non-negative integer)
-                 * - Updates database settings
-                 * - Cleans up excess history records
-                 * - Emits events to notify other components
-                 * - Updates internal history limit state
+                 * Delegates to {@link DatabaseManager.setHistoryLimit}.
+                 *
+                 * @param limit - Maximum number of history entries to retain.
+                 * @returns Promise that resolves when the limit is set.
+                 * @throws Error if setting the limit fails.
                  */
                 setHistoryLimit: async (limit: number): Promise<void> => {
                     try {
@@ -406,27 +507,44 @@ export class ServiceContainer {
                             error: error instanceof Error ? error.message : String(error),
                             limit,
                         });
-                        throw error; // Re-throw to let caller handle
+                        throw error;
                     }
                 },
+                /**
+                 * Sets up new monitors for a site.
+                 *
+                 * @param site - The {@link Site} to set up monitors for.
+                 * @param newMonitorIds - Array of monitor IDs to set up.
+                 * @returns Promise that resolves when setup is complete.
+                 */
                 setupNewMonitors: async (site: Site, newMonitorIds: string[]): Promise<void> => {
                     const monitorManager = this.getMonitorManager();
                     return monitorManager.setupNewMonitors(site, newMonitorIds);
                 },
+                /**
+                 * Starts monitoring for a site and monitor ID.
+                 *
+                 * @param identifier - The site identifier.
+                 * @param monitorId - The monitor ID.
+                 * @returns Promise resolving to true if monitoring started, false otherwise.
+                 */
                 startMonitoringForSite: async (identifier: string, monitorId: string): Promise<boolean> => {
                     const monitorManager = this.getMonitorManager();
                     return monitorManager.startMonitoringForSite(identifier, monitorId);
                 },
+                /**
+                 * Stops monitoring for a site and monitor ID.
+                 *
+                 * @param identifier - The site identifier.
+                 * @param monitorId - The monitor ID.
+                 * @returns Promise resolving to true if monitoring stopped, false otherwise.
+                 */
                 stopMonitoringForSite: async (identifier: string, monitorId: string): Promise<boolean> => {
                     const monitorManager = this.getMonitorManager();
                     return monitorManager.stopMonitoringForSite(identifier, monitorId);
                 },
             };
-
-            // SiteManager requires repositories and event bus
-            // Create a separate event bus for SiteManager to avoid circular dependency
             const siteEventBus = new TypedEventBus<UptimeEvents>("SiteManagerEventBus");
-
             this._siteManager = new SiteManager({
                 configurationManager: this.getConfigurationManager(),
                 databaseService: this.getDatabaseService(),
@@ -437,9 +555,7 @@ export class ServiceContainer {
                 settingsRepository: this.getSettingsRepository(),
                 siteRepository: this.getSiteRepository(),
             });
-            // Forward important events from SiteManager to main orchestrator for frontend
             this.setupEventForwarding(siteEventBus, "SiteManager");
-
             if (this.config.enableDebugLogging) {
                 logger.debug("[ServiceContainer] Created SiteManager with dependencies");
             }
@@ -447,6 +563,11 @@ export class ServiceContainer {
         return this._siteManager;
     }
 
+    /**
+     * Gets the {@link SiteRepository} singleton.
+     *
+     * @returns The {@link SiteRepository} instance.
+     */
     public getSiteRepository(): SiteRepository {
         if (!this._siteRepository) {
             this._siteRepository = new SiteRepository({
@@ -459,6 +580,11 @@ export class ServiceContainer {
         return this._siteRepository;
     }
 
+    /**
+     * Gets the {@link SiteService} singleton.
+     *
+     * @returns The {@link SiteService} instance.
+     */
     public getSiteService(): SiteService {
         if (!this._siteService) {
             this._siteService = new SiteService({
@@ -474,10 +600,16 @@ export class ServiceContainer {
         return this._siteService;
     }
 
-    // Application Services
+    /**
+     * Gets the {@link UptimeOrchestrator} singleton.
+     *
+     * @remarks
+     * Instantiates with injected manager dependencies.
+     *
+     * @returns The {@link UptimeOrchestrator} instance.
+     */
     public getUptimeOrchestrator(): UptimeOrchestrator {
         if (!this._uptimeOrchestrator) {
-            // Create UptimeOrchestrator with injected manager dependencies
             this._uptimeOrchestrator = new UptimeOrchestrator({
                 databaseManager: this.getDatabaseManager(),
                 monitorManager: this.getMonitorManager(),
@@ -490,7 +622,11 @@ export class ServiceContainer {
         return this._uptimeOrchestrator;
     }
 
-    // Utility Services
+    /**
+     * Gets the {@link WindowService} singleton.
+     *
+     * @returns The {@link WindowService} instance.
+     */
     public getWindowService(): WindowService {
         if (!this._windowService) {
             this._windowService = new WindowService();
@@ -502,94 +638,83 @@ export class ServiceContainer {
     }
 
     /**
-     * Initialize all services in the correct order.
+     * Initializes all services in the correct order.
+     *
+     * @remarks
+     * Ensures all dependencies are resolved and services are ready for use.
+     * Should be called once during application startup.
+     *
+     * @returns Promise that resolves when all services are initialized.
      */
     public async initialize(): Promise<void> {
         logger.info("[ServiceContainer] Initializing services");
-
-        // Initialize core services first
         this.getDatabaseService().initialize();
-
-        // Initialize repositories
         this.getHistoryRepository();
         this.getMonitorRepository();
         this.getSettingsRepository();
         this.getSiteRepository();
-
-        // Initialize services
         this.getSiteService();
-
-        // Initialize managers - order matters for circular dependencies
         this.getSiteManager();
         this.getMonitorManager();
-
-        // Initialize DatabaseManager with proper settings loading
         const databaseManager = this.getDatabaseManager();
         await databaseManager.initialize();
-
         this.getConfigurationManager();
-
-        // Initialize application services
         await this.getUptimeOrchestrator().initialize();
-
-        // Initialize IPC (depends on orchestrator)
         this.getIpcService().setupHandlers();
-
         logger.info("[ServiceContainer] All services initialized successfully");
     }
 
     /**
-     * Get the main orchestrator (but only when it's actually being used, not during creation)
+     * Gets the main orchestrator if initialized.
+     *
+     * @remarks
+     * Used internally for event forwarding.
+     *
+     * @returns The {@link UptimeOrchestrator} instance, or null if not initialized.
+     * @internal
      */
     private getMainOrchestrator(): null | UptimeOrchestrator {
         return this._uptimeOrchestrator ?? null;
     }
 
     /**
-     * Setup event forwarding from manager event buses to the main orchestrator.
-     * This ensures frontend status updates work properly while maintaining dependency isolation.
+     * Sets up event forwarding from a manager's event bus to the main orchestrator.
+     *
+     * @remarks
+     * Ensures frontend status updates work properly while maintaining dependency isolation.
+     *
+     * @param managerEventBus - The {@link TypedEventBus} to forward events from.
+     * @param managerName - The name of the manager for logging.
      */
     private setupEventForwarding(managerEventBus: TypedEventBus<UptimeEvents>, managerName: string): void {
-        // List of events that should be forwarded to the frontend
         const eventsToForward = [
-            // Monitor status events
             "monitor:status-changed",
             "monitor:up",
             "monitor:down",
-
-            // Monitor lifecycle events
             "monitoring:started",
             "monitoring:stopped",
             "internal:monitor:started",
             "internal:monitor:stopped",
             "internal:monitor:manual-check-completed",
             "internal:monitor:site-setup-completed",
-
-            // Site lifecycle events
             "site:added",
             "site:updated",
             "site:removed",
             "internal:site:updated",
             "site:cache-updated",
             "internal:site:cache-updated",
-
-            // System events
             "sites:state-synchronized",
             "site:cache-miss",
             "system:error",
         ] as const;
 
-        // Set up forwarding for each important event
         for (const eventType of eventsToForward) {
             managerEventBus.on(eventType, (data: unknown) => {
                 const mainOrchestrator = this.getMainOrchestrator();
                 if (mainOrchestrator) {
-                    // Forward the event to the main orchestrator so frontend can receive it
-                    // Use unknown type to let the event system handle validation
                     mainOrchestrator.emitTyped(eventType, data as UptimeEvents[typeof eventType]).catch((error) => {
                         logger.error(`[ServiceContainer] Error forwarding ${eventType} from ${managerName}:`, error);
                     });
-
                     if (this.config.enableDebugLogging) {
                         logger.debug(
                             `[ServiceContainer] Forwarded ${eventType} from ${managerName} to main orchestrator`
@@ -598,7 +723,6 @@ export class ServiceContainer {
                 }
             });
         }
-
         if (this.config.enableDebugLogging) {
             logger.debug(
                 `[ServiceContainer] Set up event forwarding for ${managerName} (${eventsToForward.length} events)`

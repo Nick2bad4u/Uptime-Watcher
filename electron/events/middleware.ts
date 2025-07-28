@@ -70,6 +70,7 @@ type ValidatorMap<T extends Record<string, unknown>> = Partial<{
 
 /**
  * Constant log message for event emission.
+ *
  * @internal
  */
 const EVENT_EMITTED_MSG = "[EventBus] Event emitted";
@@ -494,7 +495,7 @@ export function createRateLimitMiddleware(options: {
  * @returns EventMiddleware function that validates event data before processing.
  *
  * @remarks
- * If validation fails, the event is blocked and an error is logged.
+ * If validation fails, the event is blocked and an error is logged. Throws on validation failure.
  *
  * @example
  * ```typescript

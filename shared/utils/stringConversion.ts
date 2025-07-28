@@ -1,40 +1,52 @@
 /**
  * String conversion utilities for safe type conversion across the application.
- * Provides consistent string conversion handling for database operations and data mapping.
+ *
+ * @remarks
+ * Provides consistent and robust string conversion handling for database operations,
+ * data mapping, and UI display. Ensures that all value types are converted to
+ * meaningful string representations, avoiding ambiguous or unhelpful outputs such as
+ * '[object Object]'.
+ *
+ * @see {@link safeStringify}
  */
 
 import { safeJsonStringifyWithFallback } from "./jsonSafety";
 
 /**
- * Safely convert a value to string, handling complex objects appropriately.
- *
- * @param value - Value to convert to string
- * @returns String representation of the value
+ * Safely converts any value to a string, handling all JavaScript types with
+ * meaningful and predictable output.
  *
  * @remarks
- * This function provides safe string conversion that:
- * - Returns empty string for null/undefined values
- * - Preserves strings as-is
- * - Converts numbers and booleans using String()
- * - Uses JSON.stringify for objects when possible
- * - For objects that can't be JSON serialized, uses custom toString() if available
- * - Provides meaningful fallbacks for functions, symbols, and other types
- * - Never returns '[object Object]' - uses descriptive placeholders instead
+ * This function provides comprehensive string conversion logic:
+ * - Returns an empty string for `null` or `undefined`.
+ * - Returns the value as-is if it is already a string.
+ * - Converts numbers and booleans using `String()`.
+ * - For objects, attempts to use {@link safeJsonStringifyWithFallback} for serialization.
+ *   If serialization fails (e.g., circular references), returns a descriptive placeholder.
+ * - For functions, returns the string `"[Function]"`.
+ * - For symbols, returns the result of `Symbol.prototype.toString()`.
+ * - For all other types, returns `"[Unknown Type]"`.
  *
- * This approach completely avoids the '[object Object]' issue by providing
- * meaningful string representations for all value types.
+ * This approach guarantees that the result is always a string and never the
+ * ambiguous '[object Object]'. It is suitable for logging, UI display, and
+ * database storage where type safety and clarity are required.
  *
  * @example
  * ```typescript
- * safeStringify(null) // ""
- * safeStringify("hello") // "hello"
- * safeStringify(42) // "42"
- * safeStringify({a: 1}) // '{"a":1}'
- * safeStringify(() => {}) // "[Function]"
- * safeStringify(Symbol("test")) // "Symbol(test)"
- * const circular = {}; circular.self = circular;
- * safeStringify(circular) // "[Complex Object]" (for circular references)
+ * safeStringify(null); // ""
+ * safeStringify("hello"); // "hello"
+ * safeStringify(42); // "42"
+ * safeStringify({ a: 1 }); // '{"a":1}'
+ * safeStringify(() => {}); // "[Function]"
+ * safeStringify(Symbol("test")); // "Symbol(test)"
+ * const circular: any = {}; circular.self = circular;
+ * safeStringify(circular); // "[Complex Object]"
  * ```
+ *
+ * @param value - The value to convert to a string. Can be any JavaScript type.
+ * @returns The string representation of the input value.
+ *
+ * @see {@link safeJsonStringifyWithFallback}
  */
 export function safeStringify(value: unknown): string {
     if (value === null || value === undefined) {

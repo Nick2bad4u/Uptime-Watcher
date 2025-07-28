@@ -1,12 +1,10 @@
 /**
- * Command pattern implementation for database operations.
- * Provides atomic operations with rollback capabilities and consistent error handling.
+ * Command pattern implementation for database operations, providing atomic operations with rollback capabilities and consistent error handling.
  *
  * @remarks
- * This implementation addresses the SOLID principle violations in DatabaseManager
- * by extracting complex operations into discrete, testable command objects.
- * Each command encapsulates a single database operation with its validation,
- * execution, and rollback logic.
+ * This implementation addresses SOLID principle violations in DatabaseManager by extracting complex operations into discrete, testable command objects. Each command encapsulates a single database operation with its validation, execution, and rollback logic.
+ *
+ * @public
  */
 
 import { UptimeEvents } from "../../events/eventTypes";
@@ -17,37 +15,58 @@ import { DatabaseServiceFactory } from "../factories/DatabaseServiceFactory";
 
 /**
  * Base interface for all database commands.
- * Defines the contract for atomic database operations with rollback capabilities.
+ *
+ * @remarks
+ * Defines the contract for atomic database operations with rollback capabilities, including validation, execution, rollback, and description for logging.
+ *
+ * @typeParam TResult - The result type returned by the command's execute method.
+ * @public
  */
 export interface IDatabaseCommand<TResult = void> {
     /**
      * Executes the command operation.
-     * @returns Promise resolving to the operation result
-     * @throws When command execution fails
+     *
+     * @remarks
+     * Performs the main database operation encapsulated by the command.
+     *
+     * @returns Promise resolving to the operation result.
+     * @throws When command execution fails.
      */
     execute(): Promise<TResult>;
 
     /**
      * Gets a description of the command for logging and debugging.
-     * @returns Human-readable command description
+     *
+     * @returns Human-readable command description.
      */
     getDescription(): string;
 
     /**
      * Rolls back the command operation if possible.
-     * @returns Promise resolving when rollback is complete
+     *
+     * @remarks
+     * Attempts to revert the effects of the command. Not all commands require rollback.
+     *
+     * @returns Promise resolving when rollback is complete.
      */
     rollback(): Promise<void>;
 
     /**
      * Validates the command before execution.
-     * @returns Promise resolving to validation result
+     *
+     * @remarks
+     * Ensures the command is in a valid state before execution. Returns a validation result with errors if any.
+     *
+     * @returns Promise resolving to validation result.
      */
     validate(): Promise<{ errors: string[]; isValid: boolean }>;
 }
 
 /**
- * Abstract base class for database commands providing common functionality.
+ * Abstract base class for database commands providing common functionality for event emission and dependency management.
+ *
+ * @typeParam TResult - The result type returned by the command's execute method.
+ * @public
  */
 export abstract class DatabaseCommand<TResult = void> implements IDatabaseCommand<TResult> {
     protected readonly cache: StandardizedCache<Site>;
@@ -71,9 +90,14 @@ export abstract class DatabaseCommand<TResult = void> implements IDatabaseComman
 
     /**
      * Emits a failure event for the command operation.
-     * @param eventType - The event type to emit
-     * @param error - The error that occurred
-     * @param data - Additional event data
+     *
+     * @remarks
+     * Used internally to emit a typed event indicating command failure, including error details and additional event data.
+     *
+     * @param eventType - The event type to emit.
+     * @param error - The {@link Error} that occurred.
+     * @param data - Additional event data to include in the event payload.
+     * @internal
      */
     protected async emitFailureEvent(
         eventType: keyof UptimeEvents,
@@ -90,8 +114,13 @@ export abstract class DatabaseCommand<TResult = void> implements IDatabaseComman
 
     /**
      * Emits a success event for the command operation.
-     * @param eventType - The event type to emit
-     * @param data - Additional event data
+     *
+     * @remarks
+     * Used internally to emit a typed event indicating command success, including additional event data.
+     *
+     * @param eventType - The event type to emit.
+     * @param data - Additional event data to include in the event payload.
+     * @internal
      */
     protected async emitSuccessEvent(
         eventType: keyof UptimeEvents,
@@ -106,13 +135,22 @@ export abstract class DatabaseCommand<TResult = void> implements IDatabaseComman
 }
 
 /**
- * Command executor that provides transaction-like semantics for command execution.
+ * Command executor that provides transaction-like semantics for command execution and rollback.
+ *
+ * @remarks
+ * Maintains a history of executed commands and provides automatic rollback on failure. Supports full rollback of all executed commands in reverse order to maintain transactional integrity.
+ *
+ * @public
  */
 export class DatabaseCommandExecutor {
     private readonly executedCommands: IDatabaseCommand<unknown>[] = [];
 
     /**
-     * Clears the command history without rollback.
+     * Clears the command history without performing rollback.
+     *
+     * @remarks
+     * Removes all references to previously executed commands. Does not attempt to revert any changes.
+     * @public
      */
     public clear(): void {
         this.executedCommands.length = 0;
@@ -120,9 +158,15 @@ export class DatabaseCommandExecutor {
 
     /**
      * Executes a command with automatic rollback on failure.
-     * @param command - The command to execute
-     * @returns Promise resolving to the command result
-     * @throws When command validation or execution fails
+     *
+     * @remarks
+     * Validates the command before execution. If execution fails, attempts to rollback the command. Adds the command to the history if successful.
+     *
+     * @typeParam TResult - The result type returned by the command's execute method.
+     * @param command - The {@link IDatabaseCommand} to execute.
+     * @returns Promise resolving to the command result.
+     * @throws When command validation or execution fails.
+     * @public
      */
     public async execute<TResult>(command: IDatabaseCommand<TResult>): Promise<TResult> {
         // Validate command before execution
@@ -150,15 +194,12 @@ export class DatabaseCommandExecutor {
     /**
      * Rolls back all executed commands in reverse order.
      *
-     * @returns Promise resolving when all rollbacks are complete
-     *
      * @remarks
-     * Executes rollback operations for all previously executed commands in reverse order
-     * to maintain transactional integrity. Individual rollback failures are collected
-     * but don't prevent other rollbacks from executing. Uses array index access which
-     * is safe for typed arrays (hence the eslint-disable comment).
+     * Executes rollback operations for all previously executed commands in reverse order to maintain transactional integrity. Individual rollback failures are collected but do not prevent other rollbacks from executing. Uses array index access which is safe for typed arrays (hence the eslint-disable comment).
      *
-     * @throws AggregateError containing all rollback failures if any occurred
+     * @returns Promise resolving when all rollbacks are complete.
+     * @throws AggregateError containing all rollback failures if any occurred.
+     * @public
      */
     public async rollbackAll(): Promise<void> {
         const errors: Error[] = [];
@@ -185,7 +226,12 @@ export class DatabaseCommandExecutor {
 }
 
 /**
- * Command for downloading database backup.
+ * Command for downloading a database backup as a buffer and file name.
+ *
+ * @remarks
+ * Encapsulates the logic for downloading a backup and emitting a success event. Rollback and validation are no-ops.
+ *
+ * @public
  */
 export class DownloadBackupCommand extends DatabaseCommand<{ buffer: Buffer; fileName: string }> {
     public async execute(): Promise<{ buffer: Buffer; fileName: string }> {
@@ -207,12 +253,10 @@ export class DownloadBackupCommand extends DatabaseCommand<{ buffer: Buffer; fil
     /**
      * No-op rollback for backup operations.
      *
-     * @returns Resolved promise since backup operations are read-only and don't require rollback
-     *
      * @remarks
-     * Backup operations are inherently safe and don't modify the database state,
-     * so no rollback action is necessary. Returns a resolved promise to satisfy
-     * the IDatabaseCommand interface contract.
+     * Backup operations are inherently safe and do not modify the database state, so no rollback action is necessary. Returns a resolved promise to satisfy the {@link IDatabaseCommand} interface contract.
+     *
+     * @returns Resolved promise since backup operations are read-only and do not require rollback.
      */
     public rollback(): Promise<void> {
         // Backup operations don't need rollback - return resolved promise
@@ -222,11 +266,10 @@ export class DownloadBackupCommand extends DatabaseCommand<{ buffer: Buffer; fil
     /**
      * Validates backup operation prerequisites.
      *
-     * @returns Resolved promise with validation result indicating success
-     *
      * @remarks
-     * Backup operations have minimal prerequisites, so validation always succeeds.
-     * Returns a resolved promise to satisfy the IDatabaseCommand interface contract.
+     * Backup operations have minimal prerequisites, so validation always succeeds. Returns a resolved promise to satisfy the {@link IDatabaseCommand} interface contract.
+     *
+     * @returns Resolved promise with validation result indicating success.
      */
     public validate(): Promise<{ errors: string[]; isValid: boolean }> {
         // No specific validation needed for backup - return resolved promise
@@ -236,6 +279,11 @@ export class DownloadBackupCommand extends DatabaseCommand<{ buffer: Buffer; fil
 
 /**
  * Command for exporting all application data to JSON.
+ *
+ * @remarks
+ * Encapsulates the logic for exporting all data and emitting a success event. Rollback and validation are no-ops.
+ *
+ * @public
  */
 export class ExportDataCommand extends DatabaseCommand<string> {
     public async execute(): Promise<string> {
@@ -266,6 +314,11 @@ export class ExportDataCommand extends DatabaseCommand<string> {
 
 /**
  * Command for importing application data from JSON.
+ *
+ * @remarks
+ * Encapsulates the logic for importing data, updating the cache, and emitting a success event. Rollback restores the previous cache state. Validation checks for valid JSON and non-empty input.
+ *
+ * @public
  */
 export class ImportDataCommand extends DatabaseCommand<boolean> {
     private backupSites: Site[] = [];
@@ -342,7 +395,12 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
 }
 
 /**
- * Command for loading sites from database into cache.
+ * Command for loading sites from the database into the in-memory cache.
+ *
+ * @remarks
+ * Encapsulates the logic for loading all sites from the database and atomically replacing the cache. Rollback restores the previous cache state. Validation is a no-op.
+ *
+ * @public
  */
 export class LoadSitesCommand extends DatabaseCommand<Site[]> {
     private readonly originalCacheState: Map<string, Site> = new Map();

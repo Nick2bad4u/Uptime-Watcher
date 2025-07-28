@@ -1,5 +1,10 @@
 /**
  * Shared type definitions used across frontend and backend.
+ *
+ * @remarks
+ * All core domain types (Monitor, Site, StatusUpdate, etc.) live here. Both frontend and backend must import from this file for consistency. Event types are separate to avoid circular dependencies.
+ *
+ * @packageDocumentation
  */
 /**
  * Shared type definitions for Uptime Watcher (frontend & backend).
@@ -12,15 +17,54 @@
  * @packageDocumentation
  */
 
+/**
+ * Status values for monitors.
+ *
+ * @remarks
+ * Used throughout the system to represent the current state of a monitor.
+ *
+ * @public
+ */
 export type MonitorStatus = "down" | "paused" | "pending" | "up";
 
-// Base monitor types - source of truth for type safety
+/**
+ * Base monitor types - source of truth for type safety.
+ *
+ * @remarks
+ * Used to enumerate all supported monitor types in the system.
+ *
+ * @public
+ */
 export const BASE_MONITOR_TYPES = ["http", "port"] as const;
+
+/**
+ * Type representing all supported monitor types.
+ *
+ * @remarks
+ * Derived from {@link BASE_MONITOR_TYPES} for strict type safety.
+ *
+ * @public
+ */
 export type MonitorType = (typeof BASE_MONITOR_TYPES)[number];
 
+/**
+ * Status values for sites.
+ *
+ * @remarks
+ * Can be a monitor status or special values "mixed" or "unknown".
+ *
+ * @public
+ */
 export type SiteStatus = "mixed" | "unknown" | MonitorStatus;
 
-// Monitor status constants to avoid hardcoded strings
+/**
+ * Monitor status constants to avoid hardcoded strings.
+ *
+ * @remarks
+ * Provides named constants for all monitor status values.
+ *
+ * @public
+ */
 export const MONITOR_STATUS = {
     DOWN: "down" as const,
     PAUSED: "paused" as const,
@@ -28,8 +72,20 @@ export const MONITOR_STATUS = {
     UP: "up" as const,
 } satisfies Record<string, MonitorStatus>;
 
-// Default status constants
+/**
+ * Default monitor status value.
+ *
+ * @defaultValue MONITOR_STATUS.PENDING
+ * @public
+ */
 export const DEFAULT_MONITOR_STATUS: MonitorStatus = MONITOR_STATUS.PENDING;
+
+/**
+ * Default site status value.
+ *
+ * @defaultValue "unknown"
+ * @public
+ */
 export const DEFAULT_SITE_STATUS: SiteStatus = "unknown";
 
 export interface Monitor {
@@ -115,7 +171,11 @@ export const ERROR_MESSAGES = {
 
 /**
  * Field definition for dynamic form generation.
- * Used for monitor type configuration in both frontend and backend.
+ *
+ * @remarks
+ * Used for monitor type configuration in both frontend and backend. Defines the structure of fields for dynamic forms and monitor configuration.
+ *
+ * @public
  */
 export interface MonitorFieldDefinition {
     /** Help text for the field */
@@ -138,7 +198,11 @@ export interface MonitorFieldDefinition {
 
 /**
  * Minimal Site interface for status calculations.
- * This allows the utilities to work with both frontend and backend Site types.
+ *
+ * @remarks
+ * Allows utilities to work with both frontend and backend Site types. Used for status calculations and summary operations.
+ *
+ * @public
  */
 export interface SiteForStatus {
     monitors: Array<{

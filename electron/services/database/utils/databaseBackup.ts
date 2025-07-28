@@ -2,69 +2,86 @@ import { BACKUP_DB_FILE_NAME } from "../../../constants";
 import { logger } from "../../../utils/logger";
 
 /**
- * Database backup utilities for creating SQLite database backups.
+ * Utilities for creating SQLite database backups.
  *
  * @remarks
- * Provides functionality to create backup copies of the SQLite database
- * for export, download, or archival purposes. Uses Node.js file system
- * APIs with lazy importing to minimize startup overhead.
+ * Provides functionality to create backup copies of the SQLite database for export, download, or archival purposes. Uses Node.js file system APIs with lazy importing to minimize startup overhead and improve performance.
+ *
+ * @public
  */
 
 /**
  * Result interface for database backup operations.
  *
  * @remarks
- * Provides structured return type for backup operations with comprehensive
- * metadata for tracking and validation.
+ * Provides a structured return type for backup operations with comprehensive metadata for tracking and validation. Used as the return value for {@link createDatabaseBackup}.
+ *
+ * @public
  */
 export interface DatabaseBackupResult {
-    /** Binary buffer containing the complete SQLite database */
+    /**
+     * Binary buffer containing the complete SQLite database.
+     *
+     * @remarks
+     * The raw contents of the SQLite database file as a Node.js Buffer.
+     */
     buffer: Buffer;
-    /** Standardized filename for the backup file */
+    /**
+     * Standardized filename for the backup file.
+     *
+     * @remarks
+     * The filename used for the backup file, typically "uptime-watcher-backup.sqlite".
+     */
     fileName: string;
-    /** Metadata about the backup operation */
+    /**
+     * Metadata about the backup operation.
+     *
+     * @remarks
+     * Contains details about the backup creation, including timestamp, original path, and file size.
+     */
     metadata: {
-        /** Backup creation timestamp */
+        /**
+         * Backup creation timestamp.
+         *
+         * @remarks
+         * The Unix timestamp (in milliseconds) when the backup was created.
+         */
         createdAt: number;
-        /** Original database file path */
+        /**
+         * Original database file path.
+         *
+         * @remarks
+         * The absolute path to the original SQLite database file that was backed up.
+         */
         originalPath: string;
-        /** Database file size in bytes */
+        /**
+         * Database file size in bytes.
+         *
+         * @remarks
+         * The size of the database file in bytes at the time of backup.
+         */
         sizeBytes: number;
     };
 }
 
 /**
- * Create a database backup by reading the SQLite file into a buffer.
- *
- * @param dbPath - Absolute path to the SQLite database file to backup
- * @param fileName - Optional custom filename for the backup (defaults to "uptime-watcher-backup.sqlite")
- * @returns Promise resolving to backup data with buffer, filename, and metadata
- *
- * @throws Re-throws file system errors after logging for upstream handling
+ * Creates a backup of the SQLite database by reading the file into a buffer.
  *
  * @remarks
- * **Backup Process:**
- * - Reads the entire SQLite database file into memory as a Buffer
- * - Returns structured result with buffer data and comprehensive metadata
- * - Uses dynamic import of fs/promises to minimize startup overhead
- * - Enhanced error handling for import failures and file operations
+ * Reads the entire SQLite database file into memory as a Buffer and returns a structured result with buffer data, filename, and comprehensive metadata. Uses dynamic import of `fs/promises` to minimize startup overhead. Enhanced error handling for import failures and file operations. Loads the entire database into memory (suitable for typical database sizes). For very large databases, consider streaming approaches.
  *
- * **Performance Considerations:**
- * - Loads entire database into memory (suitable for typical database sizes)
- * - For very large databases, consider streaming approaches
- *
- * **Error Handling:**
- * - Handles dynamic import failures gracefully
- * - Logs stack traces for enhanced debugging
- * - Provides detailed error context for troubleshooting
- *
- * **Usage:**
+ * @param dbPath - Absolute path to the SQLite database file to backup.
+ * @param fileName - Optional custom filename for the backup (defaults to "uptime-watcher-backup.sqlite").
+ * @returns Promise resolving to a {@link DatabaseBackupResult} containing the backup buffer, filename, and metadata.
+ * @throws Re-throws file system errors after logging for upstream handling, including dynamic import failures and file read errors.
+ * @example
  * ```typescript
  * const backup = await createDatabaseBackup("/path/to/database.sqlite");
  * // backup.buffer contains the database data
  * // backup.fileName contains "uptime-watcher-backup.sqlite"
  * // backup.metadata contains operation details
  * ```
+ * @public
  */
 export async function createDatabaseBackup(
     dbPath: string,

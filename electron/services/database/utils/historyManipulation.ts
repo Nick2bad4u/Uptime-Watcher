@@ -5,7 +5,12 @@ import { StatusHistory } from "../../../types";
 import { logger } from "../../../utils/logger";
 
 /**
- * Utility functions for manipulating history data in the database.
+ * Utility functions for manipulating monitor history data in the database.
+ *
+ * @remarks
+ * Provides low-level helpers for adding, bulk inserting, deleting, and pruning monitor history entries. All functions are intended for internal use by repository classes and assume transaction context is managed by the caller.
+ *
+ * @internal
  */
 
 /**

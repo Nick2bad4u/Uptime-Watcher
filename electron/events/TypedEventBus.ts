@@ -29,26 +29,25 @@ import { generateCorrelationId } from "../utils/correlation";
 import { logger } from "../utils/logger";
 
 /**
- * Diagnostic information about an event bus instance.
+ * Diagnostic information about a {@link TypedEventBus} instance.
  *
  * @remarks
- * Provides runtime insights into event bus configuration and usage.
- * Useful for debugging, monitoring, and performance analysis.
+ * Provides runtime insights into event bus configuration and usage, including listener and middleware statistics.
  *
  * @public
  */
 export interface EventBusDiagnostics {
-    /** Unique identifier for this event bus instance */
+    /** Unique identifier for this event bus instance. */
     busId: string;
-    /** Number of listeners registered for each event */
+    /** Number of listeners registered for each event. */
     listenerCounts: Record<string, number>;
-    /** Maximum number of listeners allowed per event */
+    /** Maximum number of listeners allowed per event. */
     maxListeners: number;
-    /** Maximum number of middleware functions allowed */
+    /** Maximum number of middleware functions allowed. */
     maxMiddleware: number;
-    /** Number of registered middleware functions */
+    /** Number of registered middleware functions. */
     middlewareCount: number;
-    /** Percentage of middleware slots used (0-100) */
+    /** Percentage of middleware slots used (0-100). */
     middlewareUtilization: number;
 }
 
@@ -56,37 +55,31 @@ export interface EventBusDiagnostics {
  * Metadata automatically added to all emitted events.
  *
  * @remarks
- * Provides debugging and tracking information automatically added to every event.
- * Available in all event listeners under the `_meta` property.
+ * Provides debugging and tracking information for each event emission.
+ * This metadata is available in all event listeners under the `_meta` property.
  *
  * @public
  */
 export interface EventMetadata {
-    /** Identifier of the event bus that emitted this event */
+    /** Identifier of the event bus that emitted this event. */
     busId: string;
-    /** Unique identifier for tracking this specific event emission */
+    /** Unique identifier for tracking this specific event emission. */
     correlationId: string;
-    /** Name of the event that was emitted */
+    /** Name of the event that was emitted. */
     eventName: string;
-    /** Unix timestamp when the event was emitted */
+    /** Unix timestamp when the event was emitted. */
     timestamp: number;
 }
 
 /**
  * Middleware function for event processing.
  *
- * @param event - Name of the event being processed
- * @param data - Event data payload (read-only for inspection)
- * @param next - Function to call to continue to the next middleware
- *
  * @remarks
  * Middleware can inspect event data, add logging, collect metrics, perform validation,
- * or handle other cross-cutting concerns. Middleware should NOT modify the data object
+ * or handle other cross-cutting concerns. Middleware should NOT modify the data object,
  * as modifications will not be reflected in the final event delivered to listeners.
- *
  * Call `next()` to continue processing or throw an error to stop the middleware chain.
- * Data transformations should be performed before calling `emitTyped()` rather than
- * within middleware functions.
+ * Data transformations should be performed before calling {@link TypedEventBus.emitTyped}.
  *
  * @example
  * ```typescript
@@ -95,14 +88,14 @@ export interface EventMetadata {
  *   await next(); // Continue to next middleware
  *   console.log(`Completed event: ${event}`);
  * };
- *
- * const validationMiddleware: EventMiddleware = async (event, data, next) => {
- *   if (!isValidData(data)) {
- *     throw new Error('Invalid event data'); // Stop processing
- *   }
- *   await next(); // Continue if valid
- * };
  * ```
+ *
+ * @typeParam T - The type of event data payload.
+ * @param event - Name of the event being processed.
+ * @param data - Event data payload (read-only for inspection).
+ * @param next - Function to call to continue to the next middleware.
+ * @returns A promise that resolves when the middleware chain is complete.
+ * @throws Error if the middleware wishes to abort event processing.
  */
 export type EventMiddleware<T = unknown> = (
     event: string,
@@ -118,11 +111,11 @@ export type EventMiddleware<T = unknown> = (
  * middleware processing, and comprehensive debugging capabilities. Events are
  * processed through a middleware chain before emission.
  *
- * @typeParam EventMap - Map of event names to their data types
+ * @typeParam EventMap - Map of event names to their data types.
  *
  * @public
  */
-// eslint-disable-next-line unicorn/prefer-event-target -- EventEmitter required for Node.js specific features
+// eslint-disable-next-line unicorn/prefer-event-target -- Required for Node.js EventEmitter compatibility
 export class TypedEventBus<EventMap extends Record<string, unknown>> extends EventEmitter {
     private readonly busId: string;
     private readonly maxMiddleware: number;
@@ -131,20 +124,10 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
     /**
      * Create a new typed event bus.
      *
-     * @param name - Optional name for the bus (used in logging and diagnostics)
-     * @param options - Optional configuration options
-     *
-     * @throws {@link Error} When maxMiddleware is not positive
-     *
      * @remarks
      * If no name is provided, a unique correlation ID will be generated.
      * The bus is configured with a reasonable max listener limit for development use.
      * A maximum middleware limit prevents memory leaks from excessive middleware registration.
-     *
-     * **Configuration Guidelines:**
-     * - options.maxMiddleware: Maximum number of middleware functions allowed (default: 20, must be positive)
-     * - Values ≤ 0 will throw an error
-     * - Consider performance impact with high middleware counts
      *
      * @example
      * ```typescript
@@ -154,6 +137,10 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
      * // Custom middleware limit
      * const bus = new TypedEventBus<MyEvents>('my-bus', { maxMiddleware: 30 });
      * ```
+     *
+     * @param name - Optional name for the bus (used in logging and diagnostics).
+     * @param options - Optional configuration options.
+     * @throws Error when `maxMiddleware` is not positive.
      */
     constructor(name?: string, options?: { maxMiddleware?: number }) {
         super();
@@ -187,28 +174,23 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
     /**
      * Emit a typed event through the middleware chain.
      *
-     * @param event - The event name (must be a key in EventMap)
-     * @param data - The event data (must match the type for this event)
-     *
-     * @throws {@link Error} When middleware processing fails
-     *
      * @remarks
      * Guarantees type safety between event name and data. The event is processed
      * through all registered middleware before being emitted to listeners.
      * Automatic metadata is added including correlation ID, timestamp, and bus ID.
      *
      * **Middleware Processing:**
-     * - Middleware is intended for cross-cutting concerns (logging, validation, rate limiting)
+     * - Middleware is intended for cross-cutting concerns (logging, validation, rate limiting).
      * - Middleware receives the original event data for inspection but cannot modify
-     *   the data that gets delivered to listeners
-     * - Data transformations should be performed before calling emitTyped()
-     * - If middleware throws an error, event emission is aborted
+     *   the data that gets delivered to listeners.
+     * - Data transformations should be performed before calling {@link TypedEventBus.emitTyped}.
+     * - If middleware throws an error, event emission is aborted.
      *
      * **Data Transformation Behavior:**
-     * - **Objects**: Spread with added _meta property
-     * - **Arrays**: Preserved with non-enumerable _meta property
-     * - **Primitives**: Wrapped as \{ value: primitiveData, _meta: metadata \}
-     * - **Objects with _meta**: Original _meta preserved as _originalMeta
+     * - **Objects**: Spread with added `_meta` property.
+     * - **Arrays**: Preserved with non-enumerable `_meta` property.
+     * - **Primitives**: Wrapped as `{ value: primitiveData, _meta: metadata }`.
+     * - **Objects with _meta**: Original `_meta` preserved as `_originalMeta`.
      *
      * @example
      * ```typescript
@@ -224,6 +206,12 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
      * await bus.emitTyped('count:updated', 42);
      * // Listener receives: { value: 42, _meta: {...} }
      * ```
+     *
+     * @typeParam K - The event name (must be a key in EventMap).
+     * @param event - The event name.
+     * @param data - The event data (must match the type for this event).
+     * @returns A promise that resolves when the event has been emitted.
+     * @throws Error when middleware processing fails.
      */
     async emitTyped<K extends keyof EventMap>(event: K, data: EventMap[K]): Promise<void> {
         const correlationId = generateCorrelationId();
@@ -255,11 +243,11 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
     /**
      * Get diagnostic information about the event bus.
      *
-     * @returns Diagnostic data including listener counts and middleware information
-     *
      * @remarks
      * Provides runtime information useful for debugging and monitoring.
      * Includes listener counts per event, middleware count, and configuration.
+     *
+     * @returns Diagnostic data including listener counts and middleware information.
      */
     getDiagnostics(): EventBusDiagnostics {
         const listenerCounts: Record<string, number> = {};
@@ -281,12 +269,13 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
     /**
      * Remove typed event listener(s).
      *
-     * @param event - The event name to remove listeners for.
-     * @param listener - Specific listener to remove, or undefined to remove all listeners for the event.
-     * @returns This event bus instance for chaining.
-     *
      * @remarks
      * If no listener is specified, all listeners for the event are removed.
+     *
+     * @typeParam K - The event name (must be a key in EventMap).
+     * @param event - The event name to remove listeners for.
+     * @param listener - Specific listener to remove, or `undefined` to remove all listeners for the event.
+     * @returns This event bus instance for chaining.
      *
      * @example
      * ```typescript
@@ -312,12 +301,13 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
     /**
      * Register a one-time typed event listener.
      *
+     * @remarks
+     * The listener is automatically removed after the first time the event is emitted.
+     *
+     * @typeParam K - The event name (must be a key in EventMap).
      * @param event - The event name to listen for.
      * @param listener - Function to call when the event is emitted (called only once).
      * @returns This event bus instance for chaining.
-     *
-     * @remarks
-     * The listener is automatically removed after the first time the event is emitted.
      *
      * @example
      * ```typescript
@@ -340,13 +330,14 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
     /**
      * Register a typed event listener with guaranteed type safety.
      *
-     * @param event - The event name to listen for
-     * @param listener - Function to call when the event is emitted
-     * @returns This event bus instance for chaining
-     *
      * @remarks
      * The listener receives the original event data plus automatically added metadata.
      * TypeScript will enforce that the listener signature matches the event data type.
+     *
+     * @typeParam K - The event name (must be a key in EventMap).
+     * @param event - The event name to listen for.
+     * @param listener - Function to call when the event is emitted.
+     * @returns This event bus instance for chaining.
      */
     onTyped<K extends keyof EventMap>(
         event: K,
@@ -362,8 +353,11 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
     /**
      * Remove a specific middleware from the processing chain.
      *
-     * @param middleware - The middleware function to remove
-     * @returns `true` if middleware was found and removed, `false` otherwise
+     * @remarks
+     * If the middleware is found, it is removed from the chain.
+     *
+     * @param middleware - The middleware function to remove.
+     * @returns `true` if middleware was found and removed, `false` otherwise.
      */
     removeMiddleware(middleware: EventMiddleware): boolean {
         const index = this.middlewares.indexOf(middleware);
@@ -378,16 +372,15 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
     /**
      * Register middleware to process events before emission.
      *
-     * @param middleware - Middleware function to register
-     * @throws {@link Error} When the maximum middleware limit is exceeded
-     *
      * @remarks
      * Middleware is executed in registration order. Each middleware must call
      * `next()` to continue the chain or throw an error to abort processing.
-     *
      * A maximum middleware limit prevents memory leaks from excessive registrations.
      * If you need more middleware, consider increasing the limit in the constructor
      * or combining multiple middleware functions into one.
+     *
+     * @param middleware - Middleware function to register.
+     * @throws Error when the maximum middleware limit is exceeded.
      */
     use(middleware: EventMiddleware): void {
         if (this.middlewares.length >= this.maxMiddleware) {
@@ -406,19 +399,15 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
     /**
      * Create enhanced event data with metadata, handling edge cases safely.
      *
-     * @param data - Original event data
-     * @param metadata - Metadata to add
-     * @returns Enhanced data with _meta property
-     *
      * @remarks
-     * Handles arrays, objects with existing _meta properties, and primitives safely.
+     * Handles arrays, objects with existing `_meta` properties, and primitives safely.
      * Preserves original data structure and type safety.
      *
      * **Special Behaviors:**
-     * - **Arrays**: Preserves array structure with non-enumerable _meta property
-     * - **Objects with _meta**: Existing _meta preserved as _originalMeta property
-     * - **Primitives**: Wrapped in \{ value: data, _meta: metadata \} structure
-     * - **Type Safety**: All transformations maintain compile-time type guarantees
+     * - **Arrays**: Preserves array structure with non-enumerable `_meta` property.
+     * - **Objects with _meta**: Existing `_meta` preserved as `_originalMeta` property.
+     * - **Primitives**: Wrapped in `{ value: data, _meta: metadata }` structure.
+     * - **Type Safety**: All transformations maintain compile-time type guarantees.
      *
      * @example
      * ```typescript
@@ -432,6 +421,11 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
      * // Primitive handling
      * createEnhancedData(42, meta) // → { value: 42, _meta: meta }
      * ```
+     *
+     * @typeParam T - The type of the original event data.
+     * @param data - Original event data.
+     * @param metadata - Metadata to add.
+     * @returns Enhanced data with `_meta` property.
      */
     private createEnhancedData<T>(data: T, metadata: EventMetadata): T & { _meta: EventMetadata } {
         // Handle arrays specially to preserve array nature
@@ -471,15 +465,15 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
     /**
      * Process event through middleware chain.
      *
-     * @param eventName - Name of the event being processed
-     * @param data - Event data payload
-     * @param correlationId - Unique ID for tracking this event emission
-     *
-     * @throws {@link Error} When any middleware in the chain throws
-     *
      * @remarks
      * Executes middleware in registration order. If any middleware throws an error,
      * the chain is aborted and the error is propagated to the caller.
+     *
+     * @param eventName - Name of the event being processed.
+     * @param data - Event data payload.
+     * @param correlationId - Unique ID for tracking this event emission.
+     * @returns A promise that resolves when all middleware have completed.
+     * @throws Error if any middleware in the chain throws.
      */
     private async processMiddleware(eventName: string, data: unknown, correlationId: string): Promise<void> {
         if (this.middlewares.length === 0) {
@@ -512,18 +506,18 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
 /**
  * Factory function to create a new typed event bus instance.
  *
- * @typeParam EventMap - Map of event names to their data types.
- * @param name - Optional name for the bus (used in logging and diagnostics).
- * @param options - Optional configuration options for the event bus.
- * @returns A new {@link TypedEventBus} instance.
- *
  * @remarks
- * This function is a convenience wrapper for the TypedEventBus constructor.
+ * This function is a convenience wrapper for the {@link TypedEventBus} constructor.
  *
  * @example
  * ```typescript
  * const bus = createTypedEventBus<MyEvents>('my-bus', { maxMiddleware: 30 });
  * ```
+ *
+ * @typeParam EventMap - Map of event names to their data types.
+ * @param name - Optional name for the bus (used in logging and diagnostics).
+ * @param options - Optional configuration options for the event bus.
+ * @returns A new {@link TypedEventBus} instance.
  */
 export function createTypedEventBus<EventMap extends Record<string, unknown>>(
     name?: string,

@@ -92,7 +92,14 @@ function isPartialMonitor(value: unknown): value is Partial<Monitor> {
 }
 
 /**
- * Validate basic required monitor fields
+ * Validates basic required monitor fields.
+ *
+ * @remarks
+ * Checks for required fields such as id, type, and status, and validates their types. Adds error messages to the provided errors array for any missing or invalid fields.
+ *
+ * @param monitor - Partial monitor object to validate.
+ * @param errors - Array to collect validation error messages.
+ * @internal
  */
 function validateBasicMonitorFields(monitor: Partial<Monitor>, errors: string[]): void {
     if (!monitor.id) {
@@ -113,7 +120,14 @@ function validateBasicMonitorFields(monitor: Partial<Monitor>, errors: string[])
 }
 
 /**
- * Validate HTTP monitor specific fields
+ * Validates HTTP monitor-specific fields.
+ *
+ * @remarks
+ * Checks that the url field is present and a string. Adds an error message if missing or invalid.
+ *
+ * @param monitor - Partial monitor object to validate.
+ * @param errors - Array to collect validation error messages.
+ * @internal
  */
 function validateHttpMonitorFields(monitor: Partial<Monitor>, errors: string[]): void {
     if (!monitor.url || typeof monitor.url !== "string") {
@@ -122,7 +136,14 @@ function validateHttpMonitorFields(monitor: Partial<Monitor>, errors: string[]):
 }
 
 /**
- * Validate port monitor specific fields
+ * Validates port monitor-specific fields.
+ *
+ * @remarks
+ * Checks that the host field is present and a string, and that the port is a valid number in the range 1-65535. Adds error messages for any missing or invalid fields.
+ *
+ * @param monitor - Partial monitor object to validate.
+ * @param errors - Array to collect validation error messages.
+ * @internal
  */
 function validatePortMonitorFields(monitor: Partial<Monitor>, errors: string[]): void {
     if (!monitor.host || typeof monitor.host !== "string") {
@@ -134,7 +155,14 @@ function validatePortMonitorFields(monitor: Partial<Monitor>, errors: string[]):
 }
 
 /**
- * Validate type-specific monitor fields
+ * Validates type-specific monitor fields by delegating to the appropriate field validator.
+ *
+ * @remarks
+ * Calls the correct field validation function based on the monitor type ("http" or "port"). Adds error messages to the provided errors array for any missing or invalid fields.
+ *
+ * @param monitor - Partial monitor object to validate.
+ * @param errors - Array to collect validation error messages.
+ * @internal
  */
 function validateTypeSpecificFields(monitor: Partial<Monitor>, errors: string[]): void {
     if (monitor.type === "http") {

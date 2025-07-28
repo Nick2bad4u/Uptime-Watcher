@@ -542,14 +542,18 @@ export class SiteManager {
     }
 
     /**
-     * Updates the sites cache with new data.
+     * Updates the sites cache with new data, replacing all existing entries atomically.
      *
-     * @param sites - Array of site objects to update the cache with.
+     * @remarks
+     * Uses a temporary cache for atomic replacement to ensure consistency and avoid partial updates. Emits a cache-updated event after completion.
+     *
+     * @param sites - Array of {@link Site} objects to update the cache with.
      * @returns A promise that resolves when cache update is complete.
      * @example
      * ```typescript
      * await siteManager.updateSitesCache(sitesArray);
      * ```
+     * @public
      */
     public async updateSitesCache(sites: Site[]): Promise<void> {
         // Create temporary cache for atomic replacement
@@ -583,10 +587,12 @@ export class SiteManager {
     /**
      * Creates monitoring configuration for site operations.
      *
-     * @returns Configuration for managing monitoring operations.
-     * @throws When monitoring operations are not available but required
      * @remarks
-     * Used internally for coordinated monitoring actions during site updates.
+     * Used internally for coordinated monitoring actions during site updates. Throws if monitoring operations are not available but required.
+     *
+     * @returns Configuration for managing monitoring operations.
+     * @throws When monitoring operations are not available but required.
+     * @internal
      */
     private createMonitoringConfig(): MonitoringConfig {
         return {
@@ -621,11 +627,15 @@ export class SiteManager {
     }
 
     /**
-     * Executes monitor deletion.
+     * Executes monitor deletion from the database.
+     *
+     * @remarks
+     * Used internally to remove a monitor from the database. The repository handles its own transaction.
      *
      * @param monitorId - The monitor ID to delete.
-     * @returns True if the monitor was deleted, false otherwise.
+     * @returns `true` if the monitor was deleted, `false` otherwise.
      * @throws If database operation fails.
+     * @internal
      */
     private async executeMonitorDeletion(monitorId: string): Promise<boolean> {
         // MonitorRepository.delete() already handles its own transaction,
@@ -636,8 +646,12 @@ export class SiteManager {
     /**
      * Formats validation errors for better readability.
      *
+     * @remarks
+     * Used internally to format error messages for display or logging.
+     *
      * @param errors - Array of error messages.
      * @returns Formatted error string.
+     * @internal
      */
     private formatValidationErrors(errors: string[]): string {
         if (errors.length === 1) {
@@ -650,12 +664,12 @@ export class SiteManager {
     /**
      * Loads a site in the background and updates cache.
      *
+     * @remarks
+     * Performs silent background loading with error logging and event emission. This ensures background operations don't disrupt the main application flow while still providing observability through logging and events.
+     *
      * @param identifier - The site identifier to load.
      * @returns A promise that resolves when background loading is complete.
-     * @remarks
-     * Performs silent background loading with error logging and event emission.
-     * This ensures background operations don't disrupt the main application flow while
-     * still providing observability through logging and events.
+     * @internal
      */
     private async loadSiteInBackground(identifier: string): Promise<void> {
         try {
@@ -706,9 +720,13 @@ export class SiteManager {
     /**
      * Validates site data according to business rules.
      *
-     * @param site - The site object to validate.
+     * @remarks
+     * Used internally to validate site configuration before database operations. Throws if validation fails.
+     *
+     * @param site - The {@link Site} object to validate.
      * @returns A promise that resolves if validation passes.
      * @throws If validation fails.
+     * @internal
      */
     private async validateSite(site: Site): Promise<void> {
         const validationResult = await this.configurationManager.validateSiteConfiguration(site);

@@ -6,7 +6,8 @@
  * Events are organized by domain (site, monitor, database, system, etc.) and include
  * comprehensive metadata for debugging, auditing, and middleware processing.
  *
- * @packageDocumentation
+ * @see {@link UptimeEvents}
+ * @public
  */
 
 import type { Monitor, Site, StatusUpdate } from "../types";
@@ -17,6 +18,10 @@ import type { Monitor, Site, StatusUpdate } from "../types";
  * @remarks
  * Used for event filtering, routing, and middleware processing.
  *
+ * @example
+ * ```typescript
+ * const category: EventCategory = "database";
+ * ```
  * @public
  */
 export type EventCategory = "database" | "monitoring" | "system" | "ui";
@@ -27,6 +32,10 @@ export type EventCategory = "database" | "monitoring" | "system" | "ui";
  * @remarks
  * Indicates whether a monitoring event was triggered manually or by a scheduled process.
  *
+ * @example
+ * ```typescript
+ * const checkType: EventCheckType = "manual";
+ * ```
  * @public
  */
 export type EventCheckType = "manual" | "scheduled";
@@ -37,6 +46,10 @@ export type EventCheckType = "manual" | "scheduled";
  * @remarks
  * Used for distinguishing between development, production, and test environments in event payloads.
  *
+ * @example
+ * ```typescript
+ * const env: EventEnvironment = "production";
+ * ```
  * @public
  */
 export type EventEnvironment = "development" | "production" | "test";
@@ -47,6 +60,10 @@ export type EventEnvironment = "development" | "production" | "test";
  * @remarks
  * Used to indicate the cause or initiator of an event, such as user action or system error.
  *
+ * @example
+ * ```typescript
+ * const reason: EventReason = "user";
+ * ```
  * @public
  */
 export type EventReason = "error" | "shutdown" | "user";
@@ -57,6 +74,10 @@ export type EventReason = "error" | "shutdown" | "user";
  * @remarks
  * Used to prioritize event handling and alerting in middleware and UI.
  *
+ * @example
+ * ```typescript
+ * const severity: EventSeverity = "critical";
+ * ```
  * @public
  */
 export type EventSeverity = "critical" | "high" | "low" | "medium";
@@ -67,6 +88,10 @@ export type EventSeverity = "critical" | "high" | "low" | "medium";
  * @remarks
  * Indicates the origin of an event, such as user action, system process, or data migration.
  *
+ * @example
+ * ```typescript
+ * const source: EventSource = "system";
+ * ```
  * @public
  */
 export type EventSource = "import" | "migration" | "system" | "user";
@@ -77,6 +102,10 @@ export type EventSource = "import" | "migration" | "system" | "user";
  * @remarks
  * Used to distinguish between manual, scheduled, or shutdown triggers for events.
  *
+ * @example
+ * ```typescript
+ * const trigger: EventTriggerType = "scheduled";
+ * ```
  * @public
  */
 export type EventTriggerType = "manual" | "scheduled" | "shutdown";
@@ -85,18 +114,17 @@ export type EventTriggerType = "manual" | "scheduled" | "shutdown";
  * Comprehensive event map for the Uptime Watcher application.
  *
  * @remarks
- * Defines all events that can be emitted throughout the application lifecycle,
- * organized by functional domains. Each event includes strongly typed data
- * for compile-time safety and comprehensive metadata for debugging, auditing, and event-driven workflows.
+ * Defines all events that can be emitted throughout the application lifecycle, organized by functional domains.
+ * Each event includes strongly typed data for compile-time safety and comprehensive metadata for debugging,
+ * auditing, and event-driven workflows.
  *
- * Event Categories:
- * - **Site Events**: Site CRUD operations and lifecycle
- * - **Monitor Events**: Individual monitor status and operations
- * - **Database Events**: Data persistence and backup operations
- * - **System Events**: Application lifecycle and errors
- * - **Internal Events**: Manager-to-manager communication
- * - **Performance Events**: Metrics and warnings
- *
+ * @see {@link EventCategory}
+ * @see {@link EventCheckType}
+ * @see {@link EventEnvironment}
+ * @see {@link EventReason}
+ * @see {@link EventSeverity}
+ * @see {@link EventSource}
+ * @see {@link EventTriggerType}
  * @public
  */
 export interface UptimeEvents extends Record<string, unknown> {
@@ -882,6 +910,12 @@ export interface UptimeEvents extends Record<string, unknown> {
  * @remarks
  * Organizes all events by functional domain for filtering, routing, and middleware processing.
  * Internal events are intentionally separated for manager-to-manager communication.
+ *
+ * @example
+ * ```typescript
+ * const isMonitorEvent = EVENT_CATEGORIES.MONITOR.includes("monitor:up");
+ * ```
+ * @public
  */
 export const EVENT_CATEGORIES = {
     CACHE: ["cache:invalidated", "site:cache-miss", "site:cache-updated"] as const,
@@ -944,6 +978,12 @@ export const EVENT_CATEGORIES = {
  * @remarks
  * Categorizes events by operational importance for filtering and middleware processing.
  * Higher priority events should receive immediate attention and processing.
+ *
+ * @example
+ * ```typescript
+ * const isCritical = EVENT_PRIORITIES.CRITICAL.includes("system:error");
+ * ```
+ * @public
  */
 export const EVENT_PRIORITIES = {
     CRITICAL: ["performance:warning", "system:error", "system:shutdown"] as const,
@@ -958,25 +998,32 @@ export const EVENT_PRIORITIES = {
     MEDIUM: ["config:changed", "monitor:added", "site:added", "site:updated"] as const,
 } as const;
 
-// Type-safe helpers for event categorization
+/**
+ * Type mapping for event priorities.
+ *
+ * @remarks
+ * Used internally for type-safe mapping of event priorities.
+ * @internal
+ */
 type EventPriorityMap = typeof EVENT_PRIORITIES;
 
 /**
- * Get the priority level of an event with type safety.
- *
- * @param eventName - The event name to check priority for
- * @returns The priority level of the event. Returns "MEDIUM" for uncategorized events as a safe default.
+ * Gets the priority level of an event with type safety.
  *
  * @remarks
- * Uses type-safe lookup to determine event priority. Events not explicitly categorized
- * default to MEDIUM priority. This ensures all events have a priority assigned for
- * consistent middleware and filtering behavior.
+ * Uses type-safe lookup to determine event priority. Events not explicitly categorized default to MEDIUM priority.
+ * This ensures all events have a priority assigned for consistent middleware and filtering behavior.
+ *
+ * @param eventName - The event name to check priority for. Must be a key of {@link UptimeEvents}.
+ * @returns The priority level of the event as a key of {@link EVENT_PRIORITIES}. Returns "MEDIUM" for uncategorized events.
  *
  * @example
  * ```typescript
  * const priority = getEventPriority("system:error"); // Returns "CRITICAL"
  * const defaultPriority = getEventPriority("unknown:event"); // Returns "MEDIUM"
  * ```
+ * @see {@link EVENT_PRIORITIES}
+ * @public
  */
 export function getEventPriority(eventName: keyof UptimeEvents): keyof typeof EVENT_PRIORITIES {
     for (const [priority, events] of Object.entries(EVENT_PRIORITIES) as Array<
@@ -990,17 +1037,15 @@ export function getEventPriority(eventName: keyof UptimeEvents): keyof typeof EV
 }
 
 /**
- * Type guard to check if an event belongs to a specific category.
+ * Determines if an event belongs to a specific category.
  *
- * @param eventName - The event name to categorize
- * @param category - The category to check against
- * Provides type-safe event categorization for filtering and routing.
- * Internal events are separated into their own categories (INTERNAL_DATABASE,
- * INTERNAL_MONITOR, INTERNAL_SITE) for manager-to-manager communication.
+ * @remarks
+ * Provides type-safe event categorization for filtering and routing. Internal events are separated into their own categories
+ * (INTERNAL_DATABASE, INTERNAL_MONITOR, INTERNAL_SITE) for manager-to-manager communication.
  *
- * @param eventName - The event name to categorize
- * @param category - The category to check against
- * @returns True if the event belongs to the specified category, false if the category doesn't exist or event doesn't match
+ * @param eventName - The event name to categorize. Must be a key of {@link UptimeEvents}.
+ * @param category - The category to check against. Must be a key of {@link EVENT_CATEGORIES}.
+ * @returns True if the event belongs to the specified category, false if the category doesn't exist or event doesn't match.
  *
  * @example
  * ```typescript
@@ -1008,6 +1053,8 @@ export function getEventPriority(eventName: keyof UptimeEvents): keyof typeof EV
  * const isInternalEvent = isEventOfCategory("internal:site:added", "INTERNAL_SITE"); // Returns true
  * const invalidCategory = isEventOfCategory("monitor:up", "NONEXISTENT"); // Returns false
  * ```
+ * @see {@link EVENT_CATEGORIES}
+ * @public
  */
 export function isEventOfCategory(eventName: keyof UptimeEvents, category: keyof typeof EVENT_CATEGORIES): boolean {
     // Use a switch statement for safe category checking

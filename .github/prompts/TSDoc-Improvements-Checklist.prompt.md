@@ -30,7 +30,7 @@ Use proper linking where available, and ensure that all TSDoc comments are clear
   - `@param` — Document all function and method parameters, specifying their purpose and expected types. (DONT USE `@property`)
   - `@returns` — Clearly describe the return value of functions and methods.
   - `@throws` — List any errors or exceptions that can be thrown, with conditions for each.
-  - `@example` — Provide usage examples, especially for complex or non-obvious APIs.
+  - `@example` — Provide usage examples, especially for complex or non-obvious APIs. (Do not use `@example` for simple getters/setters. Do not overuse `@example` unless it adds significant value.)
 
 - **Additional Tags:**  
   Where relevant, incorporate these tags for completeness and clarity:
@@ -87,7 +87,7 @@ Elevate the clarity, accuracy, and completeness of TSDoc comments for enhanced m
 
 - `@packageDocumentation` -- Used to indicate a doc comment that describes an entire NPM package, found in the entry point \*.d.ts file.
 
-#### Recommended General Order for Block Tags
+#### REQUIRED Order for Block Tags (!IMPORTANT!)
 
 - _Summary_ (first line, no tag)  
   (Always begins the comment, not a tag.)

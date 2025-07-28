@@ -31,16 +31,29 @@ import { monitorLogger } from "../utils/logger";
 import { ConfigurationManager } from "./ConfigurationManager";
 
 /**
- * Dependencies interface for DatabaseManager constructor.
+ * Defines the dependencies required to construct a {@link DatabaseManager} instance.
+ *
+ * @remarks
+ * This interface is used for dependency injection, enabling testability and modularity. All repositories and services required for database operations must be provided.
+ *
+ * @see {@link DatabaseManager}
  */
 export interface DatabaseManagerDependencies {
+    /** The configuration manager for business rules and policies. */
     configurationManager: ConfigurationManager;
+    /** The typed event emitter for system-wide coordination. */
     eventEmitter: TypedEventBus<UptimeEvents>;
+    /** The set of repositories used for all database operations. */
     repositories: {
+        /** The main database service. */
         database: DatabaseService;
+        /** Repository for status history. */
         history: HistoryRepository;
+        /** Repository for monitor data. */
         monitor: MonitorRepository;
+        /** Repository for application settings. */
         settings: SettingsRepository;
+        /** Repository for site data. */
         site: SiteRepository;
     };
 }
@@ -89,60 +102,76 @@ export interface DatabaseManagerDependencies {
  */
 export class DatabaseManager {
     /**
-     * Command executor for database operations.
+     * Executes database commands using the command pattern.
+     *
      * @readonly
+     * @privateRemarks
+     * Used internally to decouple command logic from the manager.
      */
     private readonly commandExecutor: DatabaseCommandExecutor;
 
     /**
      * Configuration manager for business rules and policies.
+     *
      * @readonly
      */
     private readonly configurationManager: ConfigurationManager;
 
     /**
-     * Dependencies injected into the DatabaseManager.
+     * All dependencies injected into the DatabaseManager.
+     *
      * @readonly
      */
     private readonly dependencies: DatabaseManagerDependencies;
+
     /**
-     * Typed event emitter for database events.
+     * Typed event emitter for database and system events.
+     *
      * @readonly
      */
     private readonly eventEmitter: TypedEventBus<UptimeEvents>;
+
     /**
      * Current history limit for status history retention.
+     *
      * @defaultValue DEFAULT_HISTORY_LIMIT
      */
     private historyLimit: number = DEFAULT_HISTORY_LIMIT;
+
     /**
-     * Service factory for creating database services.
+     * Service factory for creating database-related services.
+     *
      * @readonly
      */
     private readonly serviceFactory: DatabaseServiceFactory;
+
     /**
      * Site cache for loaded site data.
+     *
      * @readonly
      */
     private readonly siteCache: StandardizedCache<Site>;
+
     /**
-     * Site loading orchestrator for data loading operations.
+     * Orchestrator for loading site data from the database.
+     *
      * @readonly
      */
     private readonly siteLoadingOrchestrator: SiteLoadingOrchestrator;
 
     /**
-     * Create a new DatabaseManager instance.
+     * Constructs a new {@link DatabaseManager} instance.
      *
-     * @param dependencies - Dependencies required for database operations.
      * @remarks
-     * Services are created with proper dependency injection patterns.
+     * All dependencies are injected for testability and modularity. Services and orchestrators are created using the provided repositories and event emitter.
+     *
+     * @param dependencies - The set of dependencies required for all database operations.
      */
     constructor(dependencies: DatabaseManagerDependencies) {
         this.dependencies = dependencies;
         this.configurationManager = dependencies.configurationManager;
         this.eventEmitter = dependencies.eventEmitter;
-        
+
         // Create services with injected dependencies (still SOLID compliant)
         this.siteCache = createSiteCache();
         this.serviceFactory = new DatabaseServiceFactory({
@@ -165,10 +194,13 @@ export class DatabaseManager {
     }
 
     /**
-     * Downloads a SQLite database backup.
+     * Downloads a SQLite database backup file.
      *
-     * @returns Promise resolving to an object containing the backup buffer and file name.
-     * @throws When backup creation fails or file system operations fail
+     * @remarks
+     * Uses the command pattern to execute a backup operation and returns the backup buffer and file name.
+     *
+     * @returns A promise resolving to an object containing the backup buffer and file name.
+     * @throws Error if backup creation or file system operations fail.
      *
      * @example
      * ```typescript
@@ -184,8 +216,11 @@ export class DatabaseManager {
     /**
      * Exports all application data to a JSON string.
      *
-     * @returns Promise resolving to a JSON string containing all exported data.
-     * @throws When database access fails or data serialization fails
+     * @remarks
+     * Uses the command pattern to serialize all application data for backup or migration.
+     *
+     * @returns A promise resolving to a JSON string containing all exported data.
+     * @throws Error if database access or data serialization fails.
      *
      * @example
      * ```typescript
@@ -200,58 +235,20 @@ export class DatabaseManager {
     /**
      * Gets the current history limit for status history retention.
      *
-     * @returns Current history limit value.
-     *
-     * @example
-     * ```typescript
-     * const limit = databaseManager.getHistoryLimit();
-     * ```
+     * @returns The current history limit value.
      */
     public getHistoryLimit(): number {
         return this.historyLimit;
     }
 
     /**
-     * Import data from JSON string with comprehensive error handling.
-     *
-     * @param data - JSON string containing import data
-     * @returns Promise resolving to success status
+     * Imports data from a JSON string with comprehensive error handling.
      *
      * @remarks
-     * **Error Handling Pattern:**
-     * This method demonstrates the standard error handling pattern used throughout
-     * the application: `withErrorHandling()` + `.catch()` chaining.
+     * Uses the standard error handling pattern: {@link withErrorHandling} for logging and debugging, and `.catch()` for method-specific recovery and event emission. Always emits a failure event if import fails.
      *
-     * - **withErrorHandling()**: Provides standardized error logging and debugging
-     * - **.catch()**: Provides method-specific recovery behavior (events, fallbacks)
-     *
-     * **Why This Pattern:**
-     * 1. **Separation of Concerns**: withErrorHandling handles logging/debugging
-     * 2. **Custom Recovery**: .catch() handles method-specific failure behavior
-     * 3. **Event Consistency**: Ensures failure events are always emitted
-     * 4. **Type Safety**: Maintains return type contracts (boolean/specific types)
-     *
-     * **Usage Guidelines:**
-     * - Use withErrorHandling for all async operations that need error logging
-     * - Chain .catch() when you need custom recovery behavior
-     * - Always emit failure events in .catch() for observability
-     * - Return appropriate fallback values (false, empty arrays, etc.)
-     *
-     * @example
-     * ```typescript
-     * // Standard pattern used throughout the application
-     * return withErrorHandling(
-     *   async () => {
-     *     // Main operation logic
-     *     return successResult;
-     *   },
-     *   { logger, operationName: "operation description" }
-     * ).catch(async (error) => {
-     *   // Method-specific recovery logic
-     *   await this.emitFailureEvent();
-     *   return fallbackValue;
-     * });
-     * ```
+     * @param data - The JSON string containing import data.
+     * @returns A promise resolving to a boolean indicating success.
      */
     public async importData(data: string): Promise<boolean> {
         return withErrorHandling(
@@ -279,17 +276,13 @@ export class DatabaseManager {
     }
 
     /**
-     * Initializes the database and loads sites.
+     * Initializes the database and loads all sites.
      *
-     * @returns Promise resolving when initialization is complete.
-     * @throws When database initialization fails
-     * @throws When site loading fails during initialization
-     * @throws When settings loading fails
+     * @remarks
+     * Loads the current history limit from settings, initializes the database, loads all sites, and emits a transaction-completed event. Errors during event emission are logged but do not interrupt initialization.
      *
-     * @example
-     * ```typescript
-     * await databaseManager.initialize();
-     * ```
+     * @returns A promise that resolves when initialization is complete.
+     * @throws Error if database initialization, site loading, or settings loading fails.
      */
     public async initialize(): Promise<void> {
         return withErrorHandling(
@@ -338,13 +331,11 @@ export class DatabaseManager {
     /**
      * Refreshes sites from the database and updates the cache.
      *
-     * @returns Promise resolving to an array of sites.
-     * @throws When database access fails or cache update fails
+     * @remarks
+     * Loads all sites from the database, updates the cache, emits a sites-refreshed event, and returns the loaded sites. If an error occurs, emits a sites-refreshed event with zero count and returns an empty array.
      *
-     * @example
-     * ```typescript
-     * const sites = await databaseManager.refreshSites();
-     * ```
+     * @returns A promise resolving to an array of loaded {@link Site} objects.
+     * @throws Error if database access or cache update fails.
      */
     public async refreshSites(): Promise<Site[]> {
         // Load sites first
@@ -379,23 +370,12 @@ export class DatabaseManager {
     }
 
     /**
-     * Reset all application settings to their default values.
-     *
-     * @returns Promise resolving when settings have been reset.
+     * Resets all application settings to their default values.
      *
      * @remarks
-     * This method resets all application settings to their default values,
-     * including:
-     * - History limit reset to DEFAULT_HISTORY_LIMIT
-     * - Any other persisted settings reset to defaults
+     * Resets the history limit and (in the future) other persisted settings to their defaults. The operation is performed within a database transaction for consistency.
      *
-     * The operation is performed within a database transaction to ensure
-     * consistency across all setting changes.
-     *
-     * @example
-     * ```typescript
-     * await databaseManager.resetSettings();
-     * ```
+     * @returns A promise that resolves when settings have been reset.
      */
     public async resetSettings(): Promise<void> {
         // Reset history limit to default using the existing validated method
@@ -413,15 +393,13 @@ export class DatabaseManager {
     /**
      * Sets the history limit for status history retention.
      *
-     * @param limit - The new history limit value to set.
-     * @returns Promise resolving when the history limit is updated.
-     * @throws TypeError if limit is not a valid number or integer.
-     * @throws RangeError if limit is negative, infinite, or too large.
+     * @remarks
+     * Validates the input and updates the history limit in the database and in memory. Emits a history-limit-updated event on success.
      *
-     * @example
-     * ```typescript
-     * await databaseManager.setHistoryLimit(100);
-     * ```
+     * @param limit - The new history limit value to set.
+     * @returns A promise that resolves when the history limit is updated.
+     * @throws TypeError if limit is not a valid number or integer.
+     * @throws RangeError if limit is negative, infinite, or exceeds the configured maximum.
      */
     public async setHistoryLimit(limit: number): Promise<void> {
         // Comprehensive input validation
@@ -476,9 +454,10 @@ export class DatabaseManager {
     /**
      * Emits a history limit updated event.
      *
-     * @param limit - The new history limit.
      * @remarks
      * Consolidates all history limit event emissions to avoid redundancy and ensure consistent event structure.
+     *
+     * @param limit - The new history limit.
      */
     private async emitHistoryLimitUpdated(limit: number): Promise<void> {
         try {
@@ -514,7 +493,7 @@ export class DatabaseManager {
      * Loads sites from the database and updates the cache using atomic replacement.
      *
      * @remarks
-     * Loads all sites from the database into a temporary cache, then atomically replaces the existing cache to prevent race conditions. Sets up monitoring configuration for each loaded site.
+     * Loads all sites from the database into a temporary cache, then atomically replaces the existing cache to prevent race conditions. Sets up monitoring configuration for each loaded site. Intended for internal use only.
      *
      * @internal
      */

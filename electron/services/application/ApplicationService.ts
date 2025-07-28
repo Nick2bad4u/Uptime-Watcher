@@ -13,20 +13,34 @@ import { ServiceContainer } from "../ServiceContainer";
  * Uses dependency injection through ServiceContainer to manage all services
  * and their dependencies. Provides proper initialization order and cleanup.
  */
+/**
+ * Main application service that orchestrates all other services and coordinates application lifecycle.
+ *
+ * @remarks
+ * Uses dependency injection through {@link ServiceContainer} to manage all services and their dependencies. Provides proper initialization order, event handler setup, and cleanup. Handles Electron app events and orchestrates service startup and shutdown.
+ *
+ * @public
+ */
 export class ApplicationService {
+    /**
+     * The container for all application services.
+     *
+     * @readonly
+     * @internal
+     */
     private readonly serviceContainer: ServiceContainer;
 
     /**
-     * Constructs the ApplicationService and sets up the service container.
+     * Constructs the {@link ApplicationService} and sets up the service container.
      *
      * @remarks
-     * Creates a ServiceContainer instance with appropriate debug settings
-     * and sets up application-level event handlers. This constructor should
-     * be called once during application startup.
+     * Creates a {@link ServiceContainer} instance with appropriate debug settings and sets up application-level event handlers. This constructor should be called once during application startup.
+     *
      * @example
      * ```typescript
      * const appService = new ApplicationService();
      * ```
+     * @public
      */
     constructor() {
         logger.info("[ApplicationService] Initializing application services");
@@ -42,16 +56,16 @@ export class ApplicationService {
     /**
      * Cleans up resources before application shutdown.
      *
-     * @returns A promise that resolves when cleanup is complete.
      * @remarks
-     * Performs ordered shutdown of all services including IPC cleanup,
-     * monitoring stoppage, and window closure. Follows project error handling
-     * standards by re-throwing errors after logging for upstream handling.
+     * Performs ordered shutdown of all services including IPC cleanup, monitoring stoppage, and window closure. Follows project error handling standards by re-throwing errors after logging for upstream handling.
+     *
+     * @returns A promise that resolves when cleanup is complete.
      * @throws Re-throws any errors encountered during cleanup for upstream handling.
      * @example
      * ```typescript
      * await appService.cleanup();
      * ```
+     * @public
      */
     public async cleanup(): Promise<void> {
         logger.info("[ApplicationService] Starting cleanup");
@@ -88,12 +102,11 @@ export class ApplicationService {
     /**
      * Handles the application ready event and initializes all services.
      *
-     * @returns A promise that resolves when initialization is complete.
      * @remarks
-     * Performs ordered initialization of all services through the ServiceContainer,
-     * creates the main application window, and sets up event handlers and auto-updater.
-     * This method is called automatically when Electron's 'ready' event fires.
-     * @throws Errors are caught and logged by the calling setupApplication method.
+     * Performs ordered initialization of all services through the {@link ServiceContainer}, creates the main application window, and sets up event handlers and auto-updater. This method is called automatically when Electron's 'ready' event fires. Errors are caught and logged by the calling {@link setupApplication} method.
+     *
+     * @returns A promise that resolves when initialization is complete.
+     * @internal
      */
     private async onAppReady(): Promise<void> {
         logger.info("[ApplicationService] App ready - initializing services");
@@ -122,8 +135,8 @@ export class ApplicationService {
      * - 'window-all-closed': Handles application shutdown (platform-specific)
      * - 'activate': Handles application reactivation (macOS dock click)
      *
-     * This method is called during constructor to ensure event handlers are
-     * registered before Electron's ready event fires.
+     * This method is called during construction to ensure event handlers are registered before Electron's ready event fires.
+     * @internal
      */
     private setupApplication(): void {
         app.on("ready", () => {
@@ -159,8 +172,8 @@ export class ApplicationService {
      * - Initialize the auto-updater mechanism
      * - Perform initial update check with error handling
      *
-     * Update check errors are logged but not re-thrown to prevent
-     * application startup failures due to network issues.
+     * Update check errors are logged but not re-thrown to prevent application startup failures due to network issues.
+     * @internal
      */
     private setupAutoUpdater(): void {
         const autoUpdater = this.serviceContainer.getAutoUpdaterService();
@@ -180,16 +193,14 @@ export class ApplicationService {
      * Sets up typed event handlers for uptime monitoring system events.
      *
      * @remarks
-     * Establishes communication bridge between the uptime monitoring system
-     * and the renderer process by forwarding typed events including:
+     * Establishes communication bridge between the uptime monitoring system and the renderer process by forwarding typed events including:
      * - Monitor status changes (up/down/status-changed)
      * - Monitoring lifecycle events (started/stopped)
      * - Cache invalidation events
      * - System errors
      *
-     * Also triggers desktop notifications for monitor state changes.
-     * All event forwarding includes error handling to prevent event
-     * processing failures from affecting monitoring operations.
+     * Also triggers desktop notifications for monitor state changes. All event forwarding includes error handling to prevent event processing failures from affecting monitoring operations.
+     * @internal
      */
     private setupUptimeEventHandlers(): void {
         const orchestrator = this.serviceContainer.getUptimeOrchestrator();

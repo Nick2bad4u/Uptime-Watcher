@@ -1,6 +1,10 @@
 /**
  * Error boundary component for store-related errors.
- * Provides fallback UI when store operations fail.
+ *
+ * @remarks
+ * Provides fallback UI when store operations fail. Catches errors in child components and displays a fallback component or UI. Used to prevent the entire app from crashing due to store or rendering errors.
+ *
+ * @public
  */
 
 import React from "react";
@@ -9,7 +13,10 @@ import { DefaultErrorFallback } from "../../components/error/DefaultErrorFallbac
 import logger from "../../services/logger";
 
 /**
- * Props for the ErrorBoundary component
+ * Props for the {@link ErrorBoundary} component.
+ *
+ * @remarks
+ * Accepts children to render, an optional fallback component for error display, and an optional error handler callback.
  *
  * @public
  */
@@ -20,7 +27,10 @@ export interface ErrorBoundaryProperties {
 }
 
 /**
- * State for the ErrorBoundary component
+ * State for the {@link ErrorBoundary} component.
+ *
+ * @remarks
+ * Tracks error and error info for rendering fallback UI and debugging.
  *
  * @public
  */
@@ -31,7 +41,19 @@ export interface ErrorBoundaryState {
 }
 
 /**
- * Error boundary component for wrapping store-connected components
+ * Error boundary component for wrapping store-connected components.
+ *
+ * @remarks
+ * Catches errors in child components, logs them, and displays a fallback UI. Supports custom fallback components and error handling callbacks. Used to wrap store-connected or critical UI components.
+ *
+ * @example
+ * ```tsx
+ * <ErrorBoundary>
+ *   <MyComponent />
+ * </ErrorBoundary>
+ * ```
+ *
+ * @public
  */
 export class ErrorBoundary extends React.Component<ErrorBoundaryProperties, ErrorBoundaryState> {
     constructor(properties: ErrorBoundaryProperties) {
@@ -85,16 +107,20 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProperties, Erro
 }
 
 /**
- * Higher-order component for wrapping components with error boundary
+ * Higher-order component for wrapping components with error boundary protection.
  *
- * @param Component - The component to wrap with error boundary protection
- * @param fallback - Optional custom fallback component for error display
- * @returns Wrapped component with error boundary functionality
+ * @remarks
+ * Returns a new component that wraps the given component in an {@link ErrorBoundary}. Supports custom fallback components for error display. Sets a display name for easier debugging in React DevTools.
  *
+ * @typeParam P - The props type for the wrapped component.
+ * @param Component - The component to wrap with error boundary protection.
+ * @param fallback - Optional custom fallback component for error display.
+ * @returns Wrapped component with error boundary functionality.
  * @example
  * ```tsx
  * const SafeComponent = withErrorBoundary(MyComponent, CustomErrorFallback);
  * ```
+ * @public
  */
 export const withErrorBoundary = <P extends object>(
     Component: React.ComponentType<P>,
