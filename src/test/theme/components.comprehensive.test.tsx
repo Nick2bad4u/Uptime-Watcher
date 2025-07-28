@@ -10,33 +10,16 @@ import { vi } from "vitest";
 import "@testing-library/jest-dom";
 
 import {
-    MiniChartBar,
-    StatusIndicator,
-    ThemedBadge,
     ThemedBox,
     ThemedButton,
     ThemedCard,
     ThemedCheckbox,
     ThemedIconButton,
-    ThemedInput,
-    ThemedProgress,
-    ThemedSelect,
-    ThemedText,
-    ThemedTooltip,
     ThemeProvider,
-    type MiniChartBarProperties,
-    type StatusIndicatorProperties,
-    type ThemedBadgeProperties,
-    type ThemedBoxProperties,
     type ThemedButtonProperties,
     type ThemedCardProperties,
     type ThemedCheckboxProperties,
     type ThemedIconButtonProperties,
-    type ThemedInputProperties,
-    type ThemedProgressProperties,
-    type ThemedSelectProperties,
-    type ThemedTextProperties,
-    type ThemedTooltipProperties,
 } from "../../theme/components";
 
 // Mock the theme hook
