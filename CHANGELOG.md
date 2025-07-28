@@ -7,14 +7,121 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[8a29645](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8a29645fc0fc06a6c54aad864b6d8cac7b49dfce)...
-[8a29645](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8a29645fc0fc06a6c54aad864b6d8cac7b49dfce)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/8a29645fc0fc06a6c54aad864b6d8cac7b49dfce...8a29645fc0fc06a6c54aad864b6d8cac7b49dfce))
+[[327ba3d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/327ba3dbe64d845d8573a9dee8a9bf9a7fdab91e)...
+[327ba3d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/327ba3dbe64d845d8573a9dee8a9bf9a7fdab91e)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/327ba3dbe64d845d8573a9dee8a9bf9a7fdab91e...327ba3dbe64d845d8573a9dee8a9bf9a7fdab91e))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 9.3.0 [`(327ba3d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/327ba3dbe64d845d8573a9dee8a9bf9a7fdab91e)
+
+
+
+
+
+
+## [9.3.0] - 2025-07-28
+
+
+[[b80855d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b80855dc70fcc914f192eef8c06523beb85bfcb9)...
+[4213764](https://github.com/Nick2bad4u/Uptime-Watcher/commit/421376425638d9f5214612fb1e00cbee64c7bc32)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/b80855dc70fcc914f192eef8c06523beb85bfcb9...421376425638d9f5214612fb1e00cbee64c7bc32))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 9.2.0 [`(8a29645)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8a29645fc0fc06a6c54aad864b6d8cac7b49dfce)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(94d8c22)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/94d8c22827b779afc24034ff161d73e319265cdb)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Modularize DB ops, add type safety & atomicity
+
+- Refactors database and monitoring logic to decouple responsibilities using command and factory patterns, improving SOLID compliance and testability
+- Centralizes backup, import/export, and site repository logic with new factories and command objects, enabling atomic operations and easier rollbacks
+- Introduces type guards for monitor configs to ensure runtime type safety, addressing historical undefined value issues
+- Adds constants for retries, intervals, and migration steps to replace magic numbers and improve maintainability
+- Strengthens migration system with explicit version validation, improved error handling, and configurable step limits
+- Improves cache update methods to prevent race conditions and enable atomic replacement, reducing risk of data inconsistency
+- Updates documentation and usage examples for clarity, especially around async event handlers and frontend integration
+- Enhances error reporting and recovery for critical operations, logging inconsistencies and emitting system error events for observability [`(ed3b585)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ed3b5852cd0f990c3ebff31b929aa613f4744f7d)
+
+
+
+### � Documentation
+
+- 📝 [docs] Remove obsolete audit, analysis, and remediation docs
+
+Removes outdated codebase audit, code report, ESLint analysis, and
+fix planning documentation. Cleans up repository by deleting
+large, now-redundant markdown and text reports covering
+consistency checks, error handling, IPC pattern standardization,
+and code quality issues.
+
+- Improves maintainability by eliminating stale reference material
+- Ensures documentation reflects current architecture and practices [`(216b072)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/216b072e6e3aea81e45092c4919bc6adfaf0e842)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Remove unused theme component imports from tests
+
+- Streamlines test file by eliminating unused component and type imports.
+- Reduces clutter and improves maintainability of the test suite. [`(7aa170d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7aa170d33c99048cd1c64986cbe49df2db699c1f)
+
+
+- 🧪 [test] Streamline and expand component test suite formatting
+
+- Refactors test files for themed components, utilities, and services to condense array values, assertions, and props into single lines for improved readability and maintainability.
+- Ensures consistent formatting and style across all test cases, reducing visual clutter and improving future modification.
+- Does not alter test coverage logic or assertions; focuses purely on code style and structure. [`(65ada1d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/65ada1d97a89fe7cfebdd5770f390168098079d8)
+
+
+- 🧪 [test] Achieve 90%+ branch coverage for core components and services
+
+- Adds comprehensive test suites for themed UI components, application service lifecycle, database utilities, IPC handlers, monitor types, notification service, and utility functions.
+- Increases coverage of all conditional branches, edge cases, and integration scenarios, ensuring robust behavior and improved reliability.
+- Updates prompts and test coverage requirements from 100% to 90% branch coverage, clarifying testing scope and excluding development-only features.
+- Refactors and expands existing tests for better mocking, error handling, and coverage of asynchronous logic and configuration scenarios.
+- Improves maintainability and future testability by documenting hard-to-mock cases and enhancing branch coverage criteria.
+
+Relates to coverage improvement and test reliability. [`(b80855d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b80855dc70fcc914f192eef8c06523beb85bfcb9)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Standardize output commands, add Grype, update lint configs
+
+- Replaces all `Write-Host` usages with `Write-Output` in scripts for consistent logging and better compatibility with non-interactive shells.
+- Adds Grype vulnerability scanning configuration and related lint scripts for enhanced security checks.
+- Refactors spell-check and stylelint commands to use project-specific cache and config files, improving performance and reliability.
+- Updates ignore files and custom word list to reflect new tooling and project conventions.
+- Revises mega-linter and GitHub workflow configs for better reporting and security permissions.
+- Improves script file analysis and summary logic for more accurate and readable output. [`(b4a8f51)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b4a8f516e0f2be54c85b98643055131258b4d9ae)
+
+
+- Update changelogs for v9.2.0 [skip ci] [`(8f1551d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8f1551db306aa0bb12669490f601beaccd6b4d79)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update dev dependencies and adjust lint scripts
+
+- Updates multiple dev dependencies for testing, linting, and docs to latest patch/minor versions for improved compatibility and bug fixes.
+- Upgrades cross-env to v10, adjusting related dependencies and Node.js engine requirements.
+- Adds new dependency for globrex and @epic-web/invariant as required by updated packages.
+- Removes duplicate and reorders lint scripts for vulnerability checking and spell fixing for better script clarity and maintenance. [`(4213764)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/421376425638d9f5214612fb1e00cbee64c7bc32)
 
 
 
