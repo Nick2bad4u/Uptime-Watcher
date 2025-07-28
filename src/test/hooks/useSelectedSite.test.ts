@@ -1,0 +1,349 @@
+/**
+ * @fileoverview Tests for useSelectedSite hook
+ * Tests the hook that manages selected site state across store boundaries
+ */
+
+import { renderHook } from "@testing-library/react";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
+import { useSelectedSite } from "../../hooks/useSelectedSite";
+import type { Site } from "../../types";
+
+// Mock the store hooks
+vi.mock("../../stores/ui/useUiStore", () => ({
+    useUIStore: vi.fn(),
+}));
+
+vi.mock("../../stores/sites/useSitesStore", () => ({
+    useSitesStore: vi.fn(),
+}));
+
+import { useUIStore } from "../../stores/ui/useUiStore";
+import { useSitesStore } from "../../stores/sites/useSitesStore";
+
+describe("useSelectedSite", () => {
+    const mockUseUIStore = useUIStore as any;
+    const mockUseSitesStore = useSitesStore as any;
+
+    const mockSites: Site[] = [
+        {
+            identifier: "site-1",
+            name: "Test Site 1",
+            url: "https://example1.com",
+            monitors: [],
+            uptime: 99.5,
+            status: "up",
+            history: [],
+            lastCheck: Date.now(),
+            isCollapsed: false,
+            screenshot: null,
+        },
+        {
+            identifier: "site-2",
+            name: "Test Site 2",
+            url: "https://example2.com",
+            monitors: [],
+            uptime: 98.2,
+            status: "down",
+            history: [],
+            lastCheck: Date.now(),
+            isCollapsed: false,
+            screenshot: null,
+        },
+        {
+            identifier: "site-3",
+            name: "Test Site 3",
+            url: "https://example3.com",
+            monitors: [],
+            uptime: 100,
+            status: "up",
+            history: [],
+            lastCheck: Date.now(),
+            isCollapsed: false,
+            screenshot: null,
+        },
+    ];
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    describe("Basic functionality", () => {
+        it("should return undefined when no site is selected", () => {
+            mockUseUIStore.mockReturnValue(null);
+            mockUseSitesStore.mockReturnValue(mockSites);
+
+            const { result } = renderHook(() => useSelectedSite());
+
+            expect(result.current).toBeUndefined();
+        });
+
+        it("should return undefined when selectedSiteId is undefined", () => {
+            mockUseUIStore.mockReturnValue(undefined);
+            mockUseSitesStore.mockReturnValue(mockSites);
+
+            const { result } = renderHook(() => useSelectedSite());
+
+            expect(result.current).toBeUndefined();
+        });
+
+        it("should return undefined when selectedSiteId is empty string", () => {
+            mockUseUIStore.mockReturnValue("");
+            mockUseSitesStore.mockReturnValue(mockSites);
+
+            const { result } = renderHook(() => useSelectedSite());
+
+            expect(result.current).toBeUndefined();
+        });
+
+        it("should return the correct site when a valid site is selected", () => {
+            mockUseUIStore.mockReturnValue("site-2");
+            mockUseSitesStore.mockReturnValue(mockSites);
+
+            const { result } = renderHook(() => useSelectedSite());
+
+            expect(result.current).toEqual(mockSites[1]);
+            expect(result.current?.identifier).toBe("site-2");
+            expect(result.current?.name).toBe("Test Site 2");
+        });
+
+        it("should return undefined when selected site ID does not exist in sites", () => {
+            mockUseUIStore.mockReturnValue("non-existent-site");
+            mockUseSitesStore.mockReturnValue(mockSites);
+
+            const { result } = renderHook(() => useSelectedSite());
+
+            expect(result.current).toBeUndefined();
+        });
+    });
+
+    describe("Store selector behavior", () => {
+        it("should call useUIStore with correct selector", () => {
+            const mockSelector = vi.fn().mockReturnValue("site-1");
+            mockUseUIStore.mockImplementation((selector: any) => selector({ selectedSiteId: "site-1" }));
+            mockUseSitesStore.mockReturnValue(mockSites);
+
+            renderHook(() => useSelectedSite());
+
+            expect(mockUseUIStore).toHaveBeenCalledWith(expect.any(Function));
+        });
+
+        it("should call useSitesStore with correct selector", () => {
+            mockUseUIStore.mockReturnValue("site-1");
+            mockUseSitesStore.mockImplementation((selector: any) => selector({ sites: mockSites }));
+
+            renderHook(() => useSelectedSite());
+
+            expect(mockUseSitesStore).toHaveBeenCalledWith(expect.any(Function));
+        });
+    });
+
+    describe("Different site scenarios", () => {
+        it("should handle selecting the first site", () => {
+            mockUseUIStore.mockReturnValue("site-1");
+            mockUseSitesStore.mockReturnValue(mockSites);
+
+            const { result } = renderHook(() => useSelectedSite());
+
+            expect(result.current).toEqual(mockSites[0]);
+        });
+
+        it("should handle selecting the last site", () => {
+            mockUseUIStore.mockReturnValue("site-3");
+            mockUseSitesStore.mockReturnValue(mockSites);
+
+            const { result } = renderHook(() => useSelectedSite());
+
+            expect(result.current).toEqual(mockSites[2]);
+        });
+
+        it("should work with single site in array", () => {
+            const singleSite = [mockSites[0]];
+            mockUseUIStore.mockReturnValue("site-1");
+            mockUseSitesStore.mockReturnValue(singleSite);
+
+            const { result } = renderHook(() => useSelectedSite());
+
+            expect(result.current).toEqual(singleSite[0]);
+        });
+
+        it("should return undefined with empty sites array", () => {
+            mockUseUIStore.mockReturnValue("site-1");
+            mockUseSitesStore.mockReturnValue([]);
+
+            const { result } = renderHook(() => useSelectedSite());
+
+            expect(result.current).toBeUndefined();
+        });
+    });
+
+    describe("Edge cases", () => {
+        it("should handle sites with similar identifiers", () => {
+            const sitesWithSimilarIds: Site[] = [
+                { ...mockSites[0], identifier: "site" },
+                { ...mockSites[1], identifier: "site-1" },
+                { ...mockSites[2], identifier: "site-10" },
+            ];
+
+            mockUseUIStore.mockReturnValue("site-1");
+            mockUseSitesStore.mockReturnValue(sitesWithSimilarIds);
+
+            const { result } = renderHook(() => useSelectedSite());
+
+            expect(result.current?.identifier).toBe("site-1");
+            expect(result.current).toEqual(sitesWithSimilarIds[1]);
+        });
+
+        it("should handle duplicate site identifiers (returns first match)", () => {
+            const sitesWithDuplicates: Site[] = [
+                { ...mockSites[0], identifier: "duplicate", name: "First Duplicate" },
+                { ...mockSites[1], identifier: "duplicate", name: "Second Duplicate" },
+            ];
+
+            mockUseUIStore.mockReturnValue("duplicate");
+            mockUseSitesStore.mockReturnValue(sitesWithDuplicates);
+
+            const { result } = renderHook(() => useSelectedSite());
+
+            expect(result.current?.name).toBe("First Duplicate");
+        });
+
+        it("should handle sites with special characters in identifiers", () => {
+            const siteWithSpecialChars: Site = {
+                ...mockSites[0],
+                identifier: "site-with-@special#chars$",
+            };
+
+            mockUseUIStore.mockReturnValue("site-with-@special#chars$");
+            mockUseSitesStore.mockReturnValue([siteWithSpecialChars]);
+
+            const { result } = renderHook(() => useSelectedSite());
+
+            expect(result.current).toEqual(siteWithSpecialChars);
+        });
+
+        it("should handle very long site identifiers", () => {
+            const longIdentifier = "a".repeat(1000);
+            const siteWithLongId: Site = {
+                ...mockSites[0],
+                identifier: longIdentifier,
+            };
+
+            mockUseUIStore.mockReturnValue(longIdentifier);
+            mockUseSitesStore.mockReturnValue([siteWithLongId]);
+
+            const { result } = renderHook(() => useSelectedSite());
+
+            expect(result.current).toEqual(siteWithLongId);
+        });
+    });
+
+    describe("State updates and reactivity", () => {
+        it("should update when selectedSiteId changes", () => {
+            mockUseSitesStore.mockReturnValue(mockSites);
+            
+            // Start with site-1 selected
+            mockUseUIStore.mockReturnValue("site-1");
+            const { result, rerender } = renderHook(() => useSelectedSite());
+            expect(result.current?.identifier).toBe("site-1");
+            
+            // Change to site-2
+            mockUseUIStore.mockReturnValue("site-2");
+            rerender();
+            expect(result.current?.identifier).toBe("site-2");
+        });
+
+        it("should update when sites array changes", () => {
+            mockUseUIStore.mockReturnValue("site-1");
+            
+            // Start with original sites
+            mockUseSitesStore.mockReturnValue(mockSites);
+            const { result, rerender } = renderHook(() => useSelectedSite());
+            expect(result.current?.name).toBe("Test Site 1");
+            
+            // Update sites array with modified site
+            const updatedSites = mockSites.map(site =>
+                site.identifier === "site-1" 
+                    ? { ...site, name: "Updated Test Site 1" }
+                    : site
+            );
+            mockUseSitesStore.mockReturnValue(updatedSites);
+            rerender();
+            expect(result.current?.name).toBe("Updated Test Site 1");
+        });
+
+        it("should handle transition from selected to no selection", () => {
+            mockUseSitesStore.mockReturnValue(mockSites);
+            
+            // Start with site selected
+            mockUseUIStore.mockReturnValue("site-1");
+            const { result, rerender } = renderHook(() => useSelectedSite());
+            expect(result.current).toBeDefined();
+            
+            // Change to no selection
+            mockUseUIStore.mockReturnValue(null);
+            rerender();
+            expect(result.current).toBeUndefined();
+        });
+
+        it("should handle transition from no selection to selected", () => {
+            mockUseSitesStore.mockReturnValue(mockSites);
+            
+            // Start with no selection
+            mockUseUIStore.mockReturnValue(null);
+            const { result, rerender } = renderHook(() => useSelectedSite());
+            expect(result.current).toBeUndefined();
+            
+            // Change to site selected
+            mockUseUIStore.mockReturnValue("site-2");
+            rerender();
+            expect(result.current?.identifier).toBe("site-2");
+        });
+    });
+
+    describe("Memoization behavior", () => {
+        it("should return the same object reference when inputs don't change", () => {
+            mockUseUIStore.mockReturnValue("site-1");
+            mockUseSitesStore.mockReturnValue(mockSites);
+
+            const { result, rerender } = renderHook(() => useSelectedSite());
+            const firstResult = result.current;
+            
+            rerender();
+            const secondResult = result.current;
+            
+            expect(firstResult).toBe(secondResult);
+        });
+
+        it("should return new reference when selectedSiteId changes", () => {
+            mockUseSitesStore.mockReturnValue(mockSites);
+            
+            mockUseUIStore.mockReturnValue("site-1");
+            const { result, rerender } = renderHook(() => useSelectedSite());
+            const firstResult = result.current;
+            
+            mockUseUIStore.mockReturnValue("site-2");
+            rerender();
+            const secondResult = result.current;
+            
+            expect(firstResult).not.toBe(secondResult);
+        });
+
+        it("should return new reference when sites array changes", () => {
+            mockUseUIStore.mockReturnValue("site-1");
+            
+            mockUseSitesStore.mockReturnValue(mockSites);
+            const { result, rerender } = renderHook(() => useSelectedSite());
+            const firstResult = result.current;
+            
+            // Create a new array with new objects but same content to force memoization to recalculate
+            const newSites = mockSites.map(site => ({ ...site }));
+            mockUseSitesStore.mockReturnValue(newSites);
+            rerender();
+            const secondResult = result.current;
+            
+            // The site objects are different even though the content is the same
+            expect(firstResult).not.toBe(secondResult);
+        });
+    });
+});

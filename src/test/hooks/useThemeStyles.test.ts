@@ -1,0 +1,405 @@
+/**
+ * @fileoverview Comprehensive tests for useThemeStyles hook
+ * Tests theme-aware CSS-in-JS styles with SSR support and theme change reactivity
+ */
+
+import { act, renderHook } from "@testing-library/react";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+
+import { useThemeStyles } from "../../hooks/useThemeStyles";
+
+// Mock window.matchMedia
+const createMockMediaQuery = (matches: boolean) => ({
+    matches,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    addListener: vi.fn(), // Legacy support
+    removeListener: vi.fn(), // Legacy support
+    dispatchEvent: vi.fn(),
+    media: "(prefers-color-scheme: dark)",
+    onchange: null,
+});
+
+// Setup window.matchMedia mock before any tests run
+Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: vi.fn().mockImplementation((query) => createMockMediaQuery(false)),
+});
+
+describe("useThemeStyles Hook", () => {
+    let mockMediaQuery: ReturnType<typeof createMockMediaQuery>;
+    let originalMatchMedia: typeof window.matchMedia;
+
+    beforeEach(() => {
+        // Save original matchMedia if it exists
+        originalMatchMedia = (globalThis as any).window?.matchMedia || window.matchMedia;
+
+        mockMediaQuery = createMockMediaQuery(false);
+        Object.defineProperty(window, "matchMedia", {
+            writable: true,
+            value: vi.fn().mockReturnValue(mockMediaQuery),
+        });
+    });
+
+    afterEach(() => {
+        vi.clearAllMocks();
+        // Restore original matchMedia
+        if (originalMatchMedia) {
+            Object.defineProperty(window, "matchMedia", {
+                writable: true,
+                value: originalMatchMedia,
+            });
+        }
+    });
+
+    describe("Light Mode Styles", () => {
+        beforeEach(() => {
+            mockMediaQuery = createMockMediaQuery(false);
+            (window.matchMedia as any).mockReturnValue(mockMediaQuery);
+        });
+
+        it("should return light mode styles when collapsed=false", () => {
+            const { result } = renderHook(() => useThemeStyles(false));
+
+            expect(result.current.headerStyle.background).toContain("rgba(59, 130, 246, 0.1)");
+            expect(result.current.headerStyle.color).toBe("#111827");
+            expect(result.current.headerStyle.height).toBe("auto");
+            expect(result.current.headerStyle.minHeight).toBe("140px");
+            expect(result.current.titleStyle.color).toBe("#111827");
+            expect(result.current.contentStyle.padding).toBe("1.5rem");
+        });
+
+        it("should return light mode styles when collapsed=true", () => {
+            const { result } = renderHook(() => useThemeStyles(true));
+
+            expect(result.current.headerStyle.height).toBe("80px");
+            expect(result.current.headerStyle.minHeight).toBe("80px");
+            expect(result.current.contentStyle.padding).toBe("1rem 1.5rem");
+        });
+
+        it("should have correct light mode colors for all style properties", () => {
+            const { result } = renderHook(() => useThemeStyles());
+
+            // Header styles
+            expect(result.current.headerStyle.color).toBe("#111827");
+            expect(result.current.headerStyle.background).toContain("rgba(59, 130, 246, 0.1)");
+
+            // Title styles
+            expect(result.current.titleStyle.color).toBe("#111827");
+
+            // Meta and URL styles
+            expect(result.current.metaStyle.color).toBe("#6b7280");
+            expect(result.current.urlStyle.color).toBe("#6b7280");
+
+            // Button styles
+            expect(result.current.collapseButtonStyle.color).toBe("#6b7280");
+
+            // Overlay styles
+            expect(result.current.overlayStyle.background).toContain("rgba(59, 130, 246, 0.05)");
+        });
+
+        it("should have proper light mode shadows and effects", () => {
+            const { result } = renderHook(() => useThemeStyles());
+
+            expect(result.current.headerStyle.boxShadow).toContain("rgba(0, 0, 0, 0.1)");
+            expect(result.current.titleStyle.textShadow).toContain("rgba(59, 130, 246, 0.1)");
+        });
+    });
+
+    describe("Dark Mode Styles", () => {
+        beforeEach(() => {
+            mockMediaQuery = createMockMediaQuery(true);
+            (window.matchMedia as any).mockReturnValue(mockMediaQuery);
+        });
+
+        it("should return dark mode styles when collapsed=false", () => {
+            const { result } = renderHook(() => useThemeStyles(false));
+
+            expect(result.current.headerStyle.background).toContain("rgba(37, 99, 235, 0.15)");
+            expect(result.current.headerStyle.color).toBe("#f3f4f6");
+            expect(result.current.titleStyle.color).toBe("#f3f4f6");
+            expect(result.current.contentStyle.padding).toBe("1.5rem");
+        });
+
+        it("should return dark mode styles when collapsed=true", () => {
+            const { result } = renderHook(() => useThemeStyles(true));
+
+            expect(result.current.headerStyle.height).toBe("80px");
+            expect(result.current.headerStyle.minHeight).toBe("80px");
+            expect(result.current.contentStyle.padding).toBe("1rem 1.5rem");
+        });
+
+        it("should have correct dark mode colors for all style properties", () => {
+            const { result } = renderHook(() => useThemeStyles());
+
+            // Header styles
+            expect(result.current.headerStyle.color).toBe("#f3f4f6");
+            expect(result.current.headerStyle.background).toContain("rgba(37, 99, 235, 0.15)");
+
+            // Title styles
+            expect(result.current.titleStyle.color).toBe("#f3f4f6");
+
+            // Meta and URL styles
+            expect(result.current.metaStyle.color).toBe("#9ca3af");
+            expect(result.current.urlStyle.color).toBe("#9ca3af");
+
+            // Button styles
+            expect(result.current.collapseButtonStyle.color).toBe("#9ca3af");
+
+            // Overlay styles
+            expect(result.current.overlayStyle.background).toContain("rgba(37, 99, 235, 0.05)");
+        });
+
+        it("should have proper dark mode shadows and effects", () => {
+            const { result } = renderHook(() => useThemeStyles());
+
+            expect(result.current.headerStyle.boxShadow).toContain("rgba(0, 0, 0, 0.4)");
+            expect(result.current.titleStyle.textShadow).toContain("rgba(59, 130, 246, 0.3)");
+        });
+    });
+
+    describe("Theme Change Reactivity", () => {
+        it("should react to theme changes via media query listener", () => {
+            // Start with light mode
+            mockMediaQuery = createMockMediaQuery(false);
+            (window.matchMedia as any).mockReturnValue(mockMediaQuery);
+
+            const { result } = renderHook(() => useThemeStyles());
+
+            // Initial light mode
+            expect(result.current.headerStyle.color).toBe("#111827");
+
+            // Simulate theme change to dark mode
+            mockMediaQuery.matches = true;
+            const listener = mockMediaQuery.addEventListener.mock.calls[0][1];
+
+            act(() => {
+                listener({ matches: true });
+            });
+
+            // Should now be dark mode
+            expect(result.current.headerStyle.color).toBe("#f3f4f6");
+        });
+
+        it("should react to theme changes from dark to light", () => {
+            // Start with dark mode
+            mockMediaQuery = createMockMediaQuery(true);
+            (window.matchMedia as any).mockReturnValue(mockMediaQuery);
+
+            const { result } = renderHook(() => useThemeStyles());
+
+            // Initial dark mode
+            expect(result.current.headerStyle.color).toBe("#f3f4f6");
+
+            // Simulate theme change to light mode
+            mockMediaQuery.matches = false;
+            const listener = mockMediaQuery.addEventListener.mock.calls[0][1];
+
+            act(() => {
+                listener({ matches: false });
+            });
+
+            // Should now be light mode
+            expect(result.current.headerStyle.color).toBe("#111827");
+        });
+
+        it("should properly register and cleanup media query listeners", () => {
+            const { unmount } = renderHook(() => useThemeStyles());
+
+            // Should register event listener
+            expect(mockMediaQuery.addEventListener).toHaveBeenCalledWith(
+                "change",
+                expect.any(Function)
+            );
+
+            // Should cleanup on unmount
+            unmount();
+            expect(mockMediaQuery.removeEventListener).toHaveBeenCalledWith(
+                "change",
+                expect.any(Function)
+            );
+        });
+    });
+
+    describe("Collapsed State Behavior", () => {
+        it("should handle collapsed state changes properly", () => {
+            const { result, rerender } = renderHook(
+                ({ collapsed }) => useThemeStyles(collapsed),
+                { initialProps: { collapsed: false } }
+            );
+
+            // Initially not collapsed
+            expect(result.current.headerStyle.height).toBe("auto");
+            expect(result.current.headerStyle.minHeight).toBe("140px");
+            expect(result.current.contentStyle.padding).toBe("1.5rem");
+
+            // Change to collapsed
+            rerender({ collapsed: true });
+
+            expect(result.current.headerStyle.height).toBe("80px");
+            expect(result.current.headerStyle.minHeight).toBe("80px");
+            expect(result.current.contentStyle.padding).toBe("1rem 1.5rem");
+
+            // Change back to not collapsed
+            rerender({ collapsed: false });
+
+            expect(result.current.headerStyle.height).toBe("auto");
+            expect(result.current.headerStyle.minHeight).toBe("140px");
+            expect(result.current.contentStyle.padding).toBe("1.5rem");
+        });
+
+        it("should use default collapsed=false when no parameter provided", () => {
+            const { result } = renderHook(() => useThemeStyles());
+
+            expect(result.current.headerStyle.height).toBe("auto");
+            expect(result.current.headerStyle.minHeight).toBe("140px");
+            expect(result.current.contentStyle.padding).toBe("1.5rem");
+        });
+    });
+
+    describe("SSR Compatibility", () => {
+        it("should handle missing matchMedia function gracefully", () => {
+            // Mock environment without matchMedia
+            Object.defineProperty(window, "matchMedia", {
+                writable: true,
+                value: undefined,
+            });
+
+            const { result } = renderHook(() => useThemeStyles());
+
+            // Should default to light mode styles
+            expect(result.current.headerStyle.color).toBe("#111827");
+            expect(result.current.titleStyle.color).toBe("#111827");
+        });
+
+        it("should handle matchMedia function that throws errors", () => {
+            // Mock matchMedia that throws
+            Object.defineProperty(window, "matchMedia", {
+                writable: true,
+                value: vi.fn().mockImplementation(() => {
+                    throw new Error("matchMedia not supported");
+                }),
+            });
+
+            const { result } = renderHook(() => useThemeStyles());
+
+            // Should fallback to light mode styles
+            expect(result.current.headerStyle.color).toBe("#111827");
+            expect(result.current.titleStyle.color).toBe("#111827");
+        });
+    });
+
+    describe("Style Properties Validation", () => {
+        it("should return all required style properties", () => {
+            const { result } = renderHook(() => useThemeStyles());
+
+            expect(result.current).toHaveProperty("collapseButtonStyle");
+            expect(result.current).toHaveProperty("contentStyle");
+            expect(result.current).toHaveProperty("headerStyle");
+            expect(result.current).toHaveProperty("metaStyle");
+            expect(result.current).toHaveProperty("overlayStyle");
+            expect(result.current).toHaveProperty("titleStyle");
+            expect(result.current).toHaveProperty("urlStyle");
+        });
+
+        it("should have consistent transition properties", () => {
+            const { result } = renderHook(() => useThemeStyles());
+
+            const transitionPattern = /0\.3s cubic-bezier\(0\.4, 0, 0\.2, 1\)/;
+
+            expect(result.current.collapseButtonStyle.transition).toMatch(/all.*0\.3s cubic-bezier/);
+            expect(result.current.contentStyle.transition).toMatch(/padding.*0\.3s cubic-bezier/);
+            expect(result.current.headerStyle.transition).toMatch(/all.*0\.3s cubic-bezier/);
+            expect(result.current.overlayStyle.transition).toMatch(/background.*0\.3s cubic-bezier/);
+            expect(result.current.titleStyle.transition).toMatch(/all.*0\.3s cubic-bezier/);
+            expect(result.current.urlStyle.transition).toMatch(/color.*0\.3s cubic-bezier/);
+        });
+
+        it("should have proper accessibility and usability properties", () => {
+            const { result } = renderHook(() => useThemeStyles());
+
+            // Button should be accessible
+            expect(result.current.collapseButtonStyle.cursor).toBe("pointer");
+            expect(result.current.collapseButtonStyle.border).toBe("none");
+            expect(result.current.collapseButtonStyle.backgroundColor).toBe("transparent");
+
+            // URL should handle long text
+            expect(result.current.urlStyle.wordBreak).toBe("break-all");
+            expect(result.current.urlStyle.maxWidth).toBe("100%");
+
+            // Overlay should not interfere with interactions
+            expect(result.current.overlayStyle.pointerEvents).toBe("none");
+
+            // Content should have proper z-index stacking
+            expect(result.current.contentStyle.zIndex).toBe(2);
+            expect(result.current.overlayStyle.zIndex).toBe(1);
+        });
+
+        it("should have proper border radius consistency", () => {
+            const { result } = renderHook(() => useThemeStyles());
+
+            expect(result.current.collapseButtonStyle.borderRadius).toBe("0.375rem");
+            expect(result.current.headerStyle.borderRadius).toBe("0.75rem");
+            expect(result.current.overlayStyle.borderRadius).toBe("0.75rem");
+        });
+    });
+
+    describe("Performance and Memoization", () => {
+        it("should memoize styles properly to prevent unnecessary re-renders", () => {
+            const { result, rerender } = renderHook(
+                ({ collapsed }) => useThemeStyles(collapsed),
+                { initialProps: { collapsed: false } }
+            );
+
+            const initialStyles = result.current;
+
+            // Re-render with same props should return same object reference
+            rerender({ collapsed: false });
+            expect(result.current).toBe(initialStyles);
+
+            // Re-render with different props should return new object
+            rerender({ collapsed: true });
+            expect(result.current).not.toBe(initialStyles);
+        });
+
+        it("should handle rapid state changes efficiently", () => {
+            const { result, rerender } = renderHook(
+                ({ collapsed }) => useThemeStyles(collapsed),
+                { initialProps: { collapsed: false } }
+            );
+
+            // Rapid state changes
+            for (let i = 0; i < 10; i++) {
+                rerender({ collapsed: i % 2 === 0 });
+            }
+
+            // Should still work correctly
+            expect(result.current.headerStyle.height).toBe("auto");
+            expect(result.current.contentStyle.padding).toBe("1.5rem");
+        });
+    });
+
+    describe("Integration Scenarios", () => {
+        it("should work correctly in a real-world component scenario", () => {
+            // Simulate a component that uses both collapsed and theme states
+            const { result } = renderHook(() => {
+                const lightStyles = useThemeStyles(false);
+                const darkStyles = useThemeStyles(true);
+                return { lightStyles, darkStyles };
+            });
+
+            // Both should be properly configured
+            expect(result.current.lightStyles.headerStyle.height).toBe("auto");
+            expect(result.current.darkStyles.headerStyle.height).toBe("80px");
+        });
+
+        it("should handle edge case values gracefully", () => {
+            const { result: undefinedResult } = renderHook(() => useThemeStyles(undefined as any));
+            const { result: nullResult } = renderHook(() => useThemeStyles(null as any));
+
+            // Should handle falsy values properly (default to false)
+            expect(undefinedResult.current.headerStyle.height).toBe("auto");
+            expect(nullResult.current.headerStyle.height).toBe("auto");
+        });
+    });
+});
