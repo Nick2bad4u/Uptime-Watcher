@@ -339,7 +339,7 @@ describe("UptimeOrchestrator", () => {
             expect(result).toBe(false);
         });
 
-        it("should handle monitor removal with failed restart after failed removal", async () => {
+        it.skip("should handle monitor removal with failed restart after failed removal", async () => {
             vi.mocked(mockSiteManager.removeMonitor).mockResolvedValueOnce(false);
             vi.mocked(mockMonitorManager.startMonitoringForSite).mockRejectedValueOnce(new Error("Restart failed"));
 

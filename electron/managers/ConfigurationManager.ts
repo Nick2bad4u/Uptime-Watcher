@@ -290,21 +290,23 @@ export class ConfigurationManager {
      * ```
      */
     public async validateMonitorConfiguration(monitor: Site["monitors"][0]): Promise<ValidationResult> {
-        // Create stable cache key from monitor properties that affect validation
-        // Use deterministic ordering to prevent cache misses from property order changes
-        const cacheKey = `monitor:${monitor.id}:${[
-            `checkInterval:${monitor.checkInterval}`,
-            `host:${monitor.host ?? ""}`,
-            `lastChecked:${monitor.lastChecked?.getTime() ?? ""}`,
-            `monitoring:${monitor.monitoring}`,
-            `port:${monitor.port ?? ""}`,
-            `responseTime:${monitor.responseTime}`,
-            `retryAttempts:${monitor.retryAttempts}`,
-            `status:${monitor.status}`,
-            `timeout:${monitor.timeout}`,
-            `type:${monitor.type}`,
-            `url:${monitor.url ?? ""}`,
-        ].join("|")}`;
+        // Create stable cache key using deterministic JSON serialization
+        const monitorForKey = {
+            checkInterval: monitor.checkInterval,
+            host: monitor.host ?? "",
+            id: monitor.id,
+            lastChecked: monitor.lastChecked?.getTime() ?? null,
+            monitoring: monitor.monitoring,
+            port: monitor.port ?? null,
+            responseTime: monitor.responseTime,
+            retryAttempts: monitor.retryAttempts,
+            status: monitor.status,
+            timeout: monitor.timeout,
+            type: monitor.type,
+            url: monitor.url ?? "",
+        };
+
+        const cacheKey = `monitor:${JSON.stringify(monitorForKey)}`;
 
         // Check cache first
         const cached = this.validationCache.get(cacheKey);
@@ -340,13 +342,15 @@ export class ConfigurationManager {
      * ```
      */
     public async validateSiteConfiguration(site: Site): Promise<ValidationResult> {
-        // Create stable cache key from site properties that affect validation
-        const cacheKey = `site:${site.identifier}:${[
-            `identifier:${site.identifier}`,
-            `monitorCount:${site.monitors.length}`,
-            `monitoring:${site.monitoring}`,
-            `name:${site.name}`,
-        ].join("|")}`;
+        // Create stable cache key using deterministic JSON serialization
+        const siteForKey = {
+            identifier: site.identifier,
+            monitorCount: site.monitors.length,
+            monitoring: site.monitoring,
+            name: site.name,
+        };
+
+        const cacheKey = `site:${JSON.stringify(siteForKey)}`;
 
         // Check cache first
         const cached = this.validationCache.get(cacheKey);

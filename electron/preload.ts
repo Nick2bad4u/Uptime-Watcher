@@ -220,6 +220,19 @@ const eventsAPI = {
      * @remarks
      * Called when backend caches are invalidated, allowing frontend to clear its caches.
      * Useful for keeping frontend and backend caches synchronized.
+     *
+     * **IMPORTANT:** Call the returned cleanup function to prevent memory leaks,
+     * especially when components unmount or are destroyed.
+     *
+     * @example
+     * ```typescript
+     * const cleanup = window.electronAPI.events.onCacheInvalidated((data) => {
+     *   console.log('Cache invalidated:', data);
+     * });
+     *
+     * // Later, when component unmounts:
+     * cleanup();
+     * ```
      */
     onCacheInvalidated: (callback: (data: CacheInvalidatedEventData) => void) => {
         const handler = (_: Electron.IpcRendererEvent, data: CacheInvalidatedEventData) => {

@@ -10,19 +10,23 @@ import { withErrorHandling } from "../../shared/utils/errorHandling";
 import { DEFAULT_HISTORY_LIMIT } from "../constants";
 import { UptimeEvents } from "../events/eventTypes";
 import { TypedEventBus } from "../events/TypedEventBus";
+import {
+    DatabaseCommandExecutor,
+    DownloadBackupCommand,
+    ExportDataCommand,
+    ImportDataCommand,
+} from "../services/commands/DatabaseCommands";
 import { DatabaseService } from "../services/database/DatabaseService";
 import { HistoryRepository } from "../services/database/HistoryRepository";
 import { MonitorRepository } from "../services/database/MonitorRepository";
 import { SettingsRepository } from "../services/database/SettingsRepository";
 import { SiteRepository } from "../services/database/SiteRepository";
+import { DatabaseServiceFactory } from "../services/factories/DatabaseServiceFactory";
 import { Site } from "../types";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
-import { DataBackupService } from "../utils/database/DataBackupService";
-import { initDatabase } from "../utils/database/databaseInitializer";
-import { DataImportExportService } from "../utils/database/DataImportExportService";
 import { setHistoryLimit as setHistoryLimitUtil } from "../utils/database/historyLimitManager";
-import { createSiteCache, LoggerAdapter } from "../utils/database/serviceFactory";
-import { SiteLoadingOrchestrator, SiteRepositoryService } from "../utils/database/SiteRepositoryService";
+import { createSiteCache } from "../utils/database/serviceFactory";
+import { SiteLoadingOrchestrator } from "../utils/database/SiteRepositoryService";
 import { monitorLogger } from "../utils/logger";
 import { ConfigurationManager } from "./ConfigurationManager";
 
@@ -85,6 +89,12 @@ export interface DatabaseManagerDependencies {
  */
 export class DatabaseManager {
     /**
+     * Command executor for database operations.
+     * @readonly
+     */
+    private readonly commandExecutor: DatabaseCommandExecutor;
+
+    /**
      * Configuration manager for business rules and policies.
      * @readonly
      */
@@ -106,32 +116,59 @@ export class DatabaseManager {
      */
     private historyLimit: number = DEFAULT_HISTORY_LIMIT;
     /**
+     * Service factory for creating database services.
+     * @readonly
+     */
+    private readonly serviceFactory: DatabaseServiceFactory;
+    /**
      * Site cache for loaded site data.
      * @readonly
      */
     private readonly siteCache: StandardizedCache<Site>;
+    /**
+     * Site loading orchestrator for data loading operations.
+     * @readonly
+     */
+    private readonly siteLoadingOrchestrator: SiteLoadingOrchestrator;
 
     /**
      * Create a new DatabaseManager instance.
      *
      * @param dependencies - Dependencies required for database operations.
      * @remarks
-     * Instantiates the site cache and sets up event emitter and repositories.
+     * Services are created with proper dependency injection patterns.
      */
     constructor(dependencies: DatabaseManagerDependencies) {
         this.dependencies = dependencies;
         this.configurationManager = dependencies.configurationManager;
         this.eventEmitter = dependencies.eventEmitter;
+        
+        // Create services with injected dependencies (still SOLID compliant)
         this.siteCache = createSiteCache();
+        this.serviceFactory = new DatabaseServiceFactory({
+            databaseService: dependencies.repositories.database,
+            eventEmitter: dependencies.eventEmitter,
+            repositories: {
+                history: dependencies.repositories.history,
+                monitor: dependencies.repositories.monitor,
+                settings: dependencies.repositories.settings,
+                site: dependencies.repositories.site,
+            },
+        });
+
+        // Create site loading orchestrator
+        const siteRepositoryService = this.serviceFactory.createSiteRepositoryService();
+        this.siteLoadingOrchestrator = new SiteLoadingOrchestrator(siteRepositoryService);
+
+        // Initialize command executor
+        this.commandExecutor = new DatabaseCommandExecutor();
     }
 
-    /**
-     * Download SQLite database backup.
-     */
     /**
      * Downloads a SQLite database backup.
      *
      * @returns Promise resolving to an object containing the backup buffer and file name.
+     * @throws When backup creation fails or file system operations fail
      *
      * @example
      * ```typescript
@@ -140,31 +177,15 @@ export class DatabaseManager {
      * ```
      */
     public async downloadBackup(): Promise<{ buffer: Buffer; fileName: string }> {
-        const loggerAdapter = new LoggerAdapter(monitorLogger);
-        const dataBackupService = new DataBackupService({
-            eventEmitter: this.eventEmitter,
-            logger: loggerAdapter,
-        });
-        const result = await dataBackupService.downloadDatabaseBackup();
-
-        // Emit typed backup downloaded event
-        await this.eventEmitter.emitTyped("internal:database:backup-downloaded", {
-            fileName: result.fileName,
-            operation: "backup-downloaded",
-            success: true,
-            timestamp: Date.now(),
-        });
-
-        return result;
+        const command = new DownloadBackupCommand(this.serviceFactory, this.eventEmitter, this.siteCache);
+        return this.commandExecutor.execute(command);
     }
 
-    /**
-     * Export all application data to JSON string.
-     */
     /**
      * Exports all application data to a JSON string.
      *
      * @returns Promise resolving to a JSON string containing all exported data.
+     * @throws When database access fails or data serialization fails
      *
      * @example
      * ```typescript
@@ -172,36 +193,10 @@ export class DatabaseManager {
      * ```
      */
     public async exportData(): Promise<string> {
-        const loggerAdapter = new LoggerAdapter(monitorLogger);
-        const dataImportExportService = new DataImportExportService({
-            databaseService: this.dependencies.repositories.database,
-            eventEmitter: this.eventEmitter,
-            logger: loggerAdapter,
-            repositories: {
-                history: this.dependencies.repositories.history,
-                monitor: this.dependencies.repositories.monitor,
-                settings: this.dependencies.repositories.settings,
-                site: this.dependencies.repositories.site,
-            },
-        });
-        const result = await dataImportExportService.exportAllData();
-
-        // Emit typed data exported event
-        await this.eventEmitter.emitTyped("internal:database:data-exported", {
-            fileName: `export-${Date.now()}.json`,
-            operation: "data-exported",
-            success: true,
-            timestamp: Date.now(),
-        });
-
-        return result;
+        const command = new ExportDataCommand(this.serviceFactory, this.eventEmitter, this.siteCache);
+        return this.commandExecutor.execute(command);
     }
 
-    /**
-     * Get current history limit.
-     *
-     * @returns Current history limit value
-     */
     /**
      * Gets the current history limit for status history retention.
      *
@@ -261,35 +256,8 @@ export class DatabaseManager {
     public async importData(data: string): Promise<boolean> {
         return withErrorHandling(
             async () => {
-                const loggerAdapter = new LoggerAdapter(monitorLogger);
-                const dataImportExportService = new DataImportExportService({
-                    databaseService: this.dependencies.repositories.database,
-                    eventEmitter: this.eventEmitter,
-                    logger: loggerAdapter,
-                    repositories: {
-                        history: this.dependencies.repositories.history,
-                        monitor: this.dependencies.repositories.monitor,
-                        settings: this.dependencies.repositories.settings,
-                        site: this.dependencies.repositories.site,
-                    },
-                });
-
-                // Parse the import data
-                const { settings, sites } = await dataImportExportService.importDataFromJson(data);
-
-                // Persist to database
-                await dataImportExportService.persistImportedData(sites, settings);
-
-                // Reload sites from database
-                await this.loadSites();
-
-                // Emit typed data imported event
-                await this.eventEmitter.emitTyped("internal:database:data-imported", {
-                    operation: "data-imported",
-                    success: true,
-                    timestamp: Date.now(),
-                });
-
+                const command = new ImportDataCommand(this.serviceFactory, this.eventEmitter, this.siteCache, data);
+                await this.commandExecutor.execute(command);
                 return true;
             },
             { logger: monitorLogger, operationName: "import data" }
@@ -311,12 +279,12 @@ export class DatabaseManager {
     }
 
     /**
-     * Initialize the database and load sites.
-     */
-    /**
      * Initializes the database and loads sites.
      *
      * @returns Promise resolving when initialization is complete.
+     * @throws When database initialization fails
+     * @throws When site loading fails during initialization
+     * @throws When settings loading fails
      *
      * @example
      * ```typescript
@@ -324,16 +292,6 @@ export class DatabaseManager {
      * ```
      */
     public async initialize(): Promise<void> {
-        /**
-         * Initializes the database and loads sites.
-         *
-         * @returns Promise resolving when initialization is complete.
-         *
-         * @example
-         * ```typescript
-         * await databaseManager.initialize();
-         * ```
-         */
         return withErrorHandling(
             async () => {
                 // First, load current settings from database including history limit
@@ -356,11 +314,8 @@ export class DatabaseManager {
                     );
                 }
 
-                await initDatabase(
-                    this.dependencies.repositories.database,
-                    this.loadSites.bind(this),
-                    this.eventEmitter
-                );
+                this.dependencies.repositories.database.initialize();
+                await this.loadSites();
 
                 // Emit typed database initialized event (with error handling for event emission)
                 try {
@@ -381,14 +336,10 @@ export class DatabaseManager {
     }
 
     /**
-     * Refresh sites from database and update cache.
-     *
-     * @returns Promise resolving to array of sites
-     */
-    /**
      * Refreshes sites from the database and updates the cache.
      *
      * @returns Promise resolving to an array of sites.
+     * @throws When database access fails or cache update fails
      *
      * @example
      * ```typescript
@@ -396,16 +347,6 @@ export class DatabaseManager {
      * ```
      */
     public async refreshSites(): Promise<Site[]> {
-        /**
-         * Refreshes sites from the database and updates the cache.
-         *
-         * @returns Promise resolving to an array of sites.
-         *
-         * @example
-         * ```typescript
-         * const sites = await databaseManager.refreshSites();
-         * ```
-         */
         // Load sites first
         await this.loadSites();
 
@@ -470,17 +411,10 @@ export class DatabaseManager {
     }
 
     /**
-     * Set history limit for monitor data retention.
-     *
-     * @param limit - Number of history records to retain (must be non-negative integer, 0 disables history tracking)
-     * @throws Error if limit is not a valid non-negative integer
-     */
-    /**
      * Sets the history limit for status history retention.
      *
      * @param limit - The new history limit value to set.
      * @returns Promise resolving when the history limit is updated.
-     *
      * @throws TypeError if limit is not a valid number or integer.
      * @throws RangeError if limit is negative, infinite, or too large.
      *
@@ -490,20 +424,6 @@ export class DatabaseManager {
      * ```
      */
     public async setHistoryLimit(limit: number): Promise<void> {
-        /**
-         * Sets the history limit for status history retention.
-         *
-         * @param limit - The new history limit value to set.
-         * @returns Promise resolving when the history limit is updated.
-         *
-         * @throws TypeError if limit is not a valid number or integer.
-         * @throws RangeError if limit is negative, infinite, or too large.
-         *
-         * @example
-         * ```typescript
-         * await databaseManager.setHistoryLimit(100);
-         * ```
-         */
         // Comprehensive input validation
         if (typeof limit !== "number" || Number.isNaN(limit)) {
             throw new TypeError(
@@ -554,14 +474,6 @@ export class DatabaseManager {
     }
 
     /**
-     * Centralized method to emit history limit updated event.
-     *
-     * @param limit - The new history limit
-     * @remarks
-     * This method consolidates all history limit event emissions to avoid redundancy
-     * and ensure consistent event structure across the application.
-     */
-    /**
      * Emits a history limit updated event.
      *
      * @param limit - The new history limit.
@@ -569,13 +481,6 @@ export class DatabaseManager {
      * Consolidates all history limit event emissions to avoid redundancy and ensure consistent event structure.
      */
     private async emitHistoryLimitUpdated(limit: number): Promise<void> {
-        /**
-         * Emits a history limit updated event.
-         *
-         * @param limit - The new history limit.
-         * @remarks
-         * Consolidates all history limit event emissions to avoid redundancy and ensure consistent event structure.
-         */
         try {
             await this.eventEmitter.emitTyped("internal:database:history-limit-updated", {
                 limit,
@@ -588,25 +493,12 @@ export class DatabaseManager {
     }
 
     /**
-     * Centralized method to emit sites cache update requested event.
-     *
-     * @remarks
-     * This method consolidates all sites cache update event emissions to avoid redundancy
-     * and ensure consistent event structure across the application.
-     */
-    /**
      * Emits a sites cache update requested event.
      *
      * @remarks
      * Consolidates all sites cache update event emissions to avoid redundancy and ensure consistent event structure.
      */
     private async emitSitesCacheUpdateRequested(): Promise<void> {
-        /**
-         * Emits a sites cache update requested event.
-         *
-         * @remarks
-         * Consolidates all sites cache update event emissions to avoid redundancy and ensure consistent event structure.
-         */
         try {
             await this.eventEmitter.emitTyped("internal:database:update-sites-cache-requested", {
                 operation: "update-sites-cache-requested",
@@ -619,22 +511,6 @@ export class DatabaseManager {
     }
 
     /**
-     * Load sites from database and update cache using atomic replacement.
-     *
-     * @remarks
-     * This method loads all sites from the database into a temporary cache,
-     * then atomically replaces the existing cache to prevent race conditions.
-     * It also sets up monitoring configuration for each loaded site.
-     * **Race Condition Prevention:**
-     * Uses atomic cache replacement instead of clear-then-populate to ensure
-     * other operations reading from cache never see empty/inconsistent data.
-     * The old cache remains accessible until the new one is fully loaded.
-     *
-     * @internal
-     * This method is private and intended for internal database operations only.
-     * External consumers should use public methods like initialize() or refreshSites().
-     */
-    /**
      * Loads sites from the database and updates the cache using atomic replacement.
      *
      * @remarks
@@ -643,33 +519,11 @@ export class DatabaseManager {
      * @internal
      */
     private async loadSites(): Promise<void> {
-        /**
-         * Loads sites from the database and updates the cache using atomic replacement.
-         *
-         * @remarks
-         * Loads all sites from the database into a temporary cache, then atomically replaces the existing cache to prevent race conditions. Sets up monitoring configuration for each loaded site.
-         *
-         * @internal
-         */
         const operationId = `loadSites-${Date.now()}`;
         monitorLogger.debug(`[DatabaseManager:${operationId}] Starting site loading operation`);
 
         // Create a temporary cache for atomic replacement (prevents race conditions)
-        const tempCache = createSiteCache();
-
-        // Create the site loading orchestrator with injected dependencies
-        const loggerAdapter = new LoggerAdapter(monitorLogger);
-        const siteRepositoryService = new SiteRepositoryService({
-            eventEmitter: this.eventEmitter,
-            logger: loggerAdapter,
-            repositories: {
-                history: this.dependencies.repositories.history,
-                monitor: this.dependencies.repositories.monitor,
-                settings: this.dependencies.repositories.settings,
-                site: this.dependencies.repositories.site,
-            },
-        });
-        const siteLoadingOrchestrator = new SiteLoadingOrchestrator(siteRepositoryService);
+        const tempCache = new StandardizedCache<Site>({ name: "tempSiteCache" });
 
         // Create monitoring configuration
         const monitoringConfig = {
@@ -714,7 +568,7 @@ export class DatabaseManager {
         };
 
         // Load sites using the new service-based architecture into temporary cache
-        const result = await siteLoadingOrchestrator.loadSitesFromDatabase(tempCache, monitoringConfig);
+        const result = await this.siteLoadingOrchestrator.loadSitesFromDatabase(tempCache, monitoringConfig);
 
         if (!result.success) {
             throw new Error(result.message);

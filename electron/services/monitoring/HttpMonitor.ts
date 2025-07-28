@@ -28,10 +28,12 @@ import { isDev } from "../../electronUtils";
 import { Site } from "../../types";
 import { logger } from "../../utils/logger";
 import { withOperationalHooks } from "../../utils/operationalHooks";
+import { DEFAULT_RETRY_ATTEMPTS } from "./constants";
 import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
 import { createErrorResult, handleCheckError } from "./utils/errorHandling";
 import { createHttpClient } from "./utils/httpClient";
 import { determineMonitorStatus } from "./utils/httpStatusUtils";
+import { getMonitorRetryAttempts, getMonitorTimeout, hasValidUrl } from "./utils/monitorTypeGuards";
 
 /**
  * Extends Axios types to support timing metadata for monitoring.
@@ -138,7 +140,11 @@ export class HttpMonitor implements IMonitorService {
      * Performs an HTTP health check for the given monitor configuration.
      *
      * @remarks
-     * Uses per-monitor timeout and retryAttempts if provided, otherwise falls back to defaults. All requests use retry logic and exponential backoff via {@link withOperationalHooks}. Returns a standardized result for all error cases.
+     * Uses per-monitor timeout and retryAttempts if provided, otherwise falls back to defaults.
+     * All requests use retry logic and exponential backoff via {@link withOperationalHooks}.
+     * Returns a standardized result for all error cases.
+     *
+     * Now uses type guards to safely handle potentially undefined configuration values.
      *
      * @example
      * ```typescript
@@ -147,7 +153,7 @@ export class HttpMonitor implements IMonitorService {
      *
      * @param monitor - Monitor configuration object (must be type "http").
      * @returns Promise resolving to {@link MonitorCheckResult} with status and timing.
-     * @throws Error if monitor type is not "http".
+     * @throws {@link Error} if monitor type is not "http".
      * @public
      */
     public async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
@@ -155,13 +161,13 @@ export class HttpMonitor implements IMonitorService {
             throw new Error(`HttpMonitor cannot handle monitor type: ${monitor.type}`);
         }
 
-        if (!monitor.url) {
-            return createErrorResult("HTTP monitor missing URL", 0);
+        if (!hasValidUrl(monitor)) {
+            return createErrorResult("HTTP monitor missing or invalid URL", 0);
         }
 
-        // Note: Despite type definitions, these values can be undefined in practice (see tests)
-        const timeout = (monitor.timeout as number | undefined) ?? this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT;
-        const retryAttempts = (monitor.retryAttempts as number | undefined) ?? 3; // Default retry attempts
+        // Use type-safe utility functions instead of type assertions
+        const timeout = getMonitorTimeout(monitor, this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT);
+        const retryAttempts = getMonitorRetryAttempts(monitor, DEFAULT_RETRY_ATTEMPTS);
 
         return this.performHealthCheckWithRetry(monitor.url, timeout, retryAttempts);
     }

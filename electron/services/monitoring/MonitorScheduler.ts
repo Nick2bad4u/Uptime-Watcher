@@ -1,6 +1,7 @@
 import { isDev } from "../../electronUtils";
 import { Site } from "../../types";
 import { logger } from "../../utils/logger";
+import { MIN_CHECK_INTERVAL } from "./constants";
 
 /**
  * Manages scheduling, execution, and lifecycle of monitor checks for sites and their monitors.
@@ -402,9 +403,10 @@ export class MonitorScheduler {
         }
 
         // Minimum interval to prevent excessive CPU usage
-        const MIN_INTERVAL = 1000; // 1 second
-        if (checkInterval < MIN_INTERVAL) {
-            logger.warn(`Check interval ${checkInterval}ms is very short, minimum recommended: ${MIN_INTERVAL}ms`);
+        if (checkInterval < MIN_CHECK_INTERVAL) {
+            logger.warn(
+                `Check interval ${checkInterval}ms is very short, minimum recommended: ${MIN_CHECK_INTERVAL}ms`
+            );
         }
 
         return checkInterval;

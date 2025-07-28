@@ -198,8 +198,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     /**
      * Constructs a new UptimeOrchestrator with injected dependencies.
      *
-     * @param dependencies - The manager dependencies
-     * @throws Error if dependencies are not provided
+     * @param dependencies - The manager dependencies required for orchestration
+     * @throws When dependencies are not provided or invalid
      *
      * @remarks
      * Sets up event bus middleware and assigns provided managers.
@@ -208,6 +208,16 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Dependencies must be injected through the ServiceContainer pattern
      * rather than creating managers directly. This ensures proper
      * initialization order and dependency management.
+     *
+     * @example
+     * ```typescript
+     * const orchestrator = new UptimeOrchestrator({
+     *   databaseManager,
+     *   monitorManager,
+     *   siteManager
+     * });
+     * await orchestrator.initialize();
+     * ```
      */
     constructor(dependencies?: UptimeOrchestratorDependencies) {
         super("UptimeOrchestrator");
@@ -235,7 +245,9 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      *
      * @param siteData - The site data to add.
      * @returns Promise resolving to the added Site object.
-     * @throws Error if site creation or monitoring setup fails
+     * @throws When site creation fails due to validation errors
+     * @throws When monitoring setup fails critically
+     * @throws When site cleanup fails after monitoring setup failure
      */
     public async addSite(siteData: Site): Promise<Site> {
         let site: Site | undefined;
@@ -340,7 +352,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Ensures proper initialization order and error handling.
      *
      * @returns Promise that resolves when initialization is complete.
-     * @throws Error if any manager initialization fails
+     * @throws When any manager initialization fails
+     * @throws When validation of initialized managers fails
      */
     public async initialize(): Promise<void> {
         try {
@@ -366,17 +379,21 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
     /**
      * Removes a monitor from a site and stops its monitoring.
-     * Uses a single database transaction to ensure atomicity.
+     * Uses a two-phase commit pattern to ensure atomicity.
      *
      * @param siteIdentifier - The site identifier.
      * @param monitorId - The monitor identifier.
      * @returns Promise resolving to true if removed, false otherwise.
-     * @throws Error if the removal operation fails critically
+     * @throws When the removal operation fails critically
+     * @throws When database inconsistency occurs and cannot be resolved
      */
     public async removeMonitor(siteIdentifier: string, monitorId: string): Promise<boolean> {
+        let monitoringStopped = false;
+        let databaseRemoved = false;
+
         try {
-            // Step 1: Stop monitoring immediately (before transaction)
-            const monitoringStopped = await this.monitorManager.stopMonitoringForSite(siteIdentifier, monitorId);
+            // Phase 1: Stop monitoring immediately (reversible)
+            monitoringStopped = await this.monitorManager.stopMonitoringForSite(siteIdentifier, monitorId);
 
             // If stopping monitoring failed, log warning but continue with database removal
             // The monitor may not be running, but database record should still be removed
@@ -386,26 +403,39 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 );
             }
 
-            // Step 2: Remove monitor from database using transaction
-            const removed = await this.siteManager.removeMonitor(siteIdentifier, monitorId);
+            // Phase 2: Remove monitor from database using transaction (irreversible)
+            databaseRemoved = await this.siteManager.removeMonitor(siteIdentifier, monitorId);
 
-            // If database removal succeeded, we're done
-            if (removed) {
+            // If both phases succeeded, we're done
+            if (databaseRemoved) {
                 return true;
             }
 
-            // If database removal failed but monitoring was stopped, restart monitoring
+            // If database removal failed, attempt compensation
             if (monitoringStopped) {
+                logger.warn(
+                    `[UptimeOrchestrator] Database removal failed for ${siteIdentifier}/${monitorId}, attempting to restart monitoring`
+                );
                 try {
                     await this.monitorManager.startMonitoringForSite(siteIdentifier, monitorId);
                     logger.info(
-                        `[UptimeOrchestrator] Restarted monitoring for ${siteIdentifier}/${monitorId} after failed removal`
+                        `[UptimeOrchestrator] Successfully restarted monitoring for ${siteIdentifier}/${monitorId} after failed removal`
                     );
                 } catch (restartError) {
-                    logger.error(
-                        `[UptimeOrchestrator] Failed to restart monitoring for ${siteIdentifier}/${monitorId} after failed removal:`,
-                        restartError
+                    // This is a critical inconsistency - monitor stopped but database record exists
+                    const criticalError = new Error(
+                        `Critical state inconsistency: Monitor ${siteIdentifier}/${monitorId} stopped but database removal failed and restart failed`
                     );
+                    logger.error(`[UptimeOrchestrator] ${criticalError.message}:`, restartError);
+                    // Emit system error for this critical inconsistency
+                    await this.emitTyped("system:error", {
+                        context: "monitor-removal-compensation",
+                        error: criticalError,
+                        recovery: "Manual intervention required - check monitor state and database consistency",
+                        severity: "critical",
+                        timestamp: Date.now(),
+                    });
+                    throw criticalError;
                 }
             }
 
@@ -524,71 +554,116 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
+     * Handles the database initialized event asynchronously.
+     *
+     * @returns Promise that resolves when the event handling is complete
+     */
+    private async handleDatabaseInitialized(): Promise<void> {
+        await this.emitTyped("database:transaction-completed", {
+            duration: 0,
+            operation: "initialize",
+            success: true,
+            timestamp: Date.now(),
+        });
+    }
+
+    /**
+     * Handles the get sites from cache request asynchronously.
+     *
+     * @returns Promise that resolves when the response is sent
+     */
+    private async handleGetSitesFromCacheRequest(): Promise<void> {
+        const sites = this.siteManager.getSitesFromCache();
+        await this.emitTyped("internal:database:get-sites-from-cache-response", {
+            operation: "get-sites-from-cache-response",
+            sites,
+            timestamp: Date.now(),
+        });
+    }
+
+    /**
+     * Handles the update sites cache request asynchronously.
+     *
+     * @param data - The sites cache update request data
+     * @returns Promise that resolves when the cache update is complete
+     *
+     * @remarks
+     * Extracted from event handler to enable proper async handling and testing.
+     * Updates the site cache and sets up monitoring for all loaded sites.
+     *
+     * Uses Promise.allSettled to handle monitoring setup failures gracefully.
+     * Critical failures include both rejected promises and fulfilled promises
+     * where the operation reported failure. The logic correctly identifies failures
+     * by checking either rejected status or successful completion with failure result.
+     */
+    private async handleUpdateSitesCacheRequest(data: UpdateSitesCacheRequestData): Promise<void> {
+        await this.siteManager.updateSitesCache(data.sites);
+
+        // CRITICAL: Set up monitoring for each loaded site
+        const setupResults = await Promise.allSettled(
+            data.sites.map(async (site) => {
+                try {
+                    await this.monitorManager.setupSiteForMonitoring(site);
+                    return { site: site.identifier, success: true };
+                } catch (error) {
+                    logger.error(`[UptimeOrchestrator] Failed to setup monitoring for site ${site.identifier}:`, error);
+                    return { error, site: site.identifier, success: false };
+                }
+            })
+        );
+
+        // Validate that critical sites were set up successfully
+        const successful = setupResults.filter(
+            (result) => result.status === "fulfilled" && result.value.success
+        ).length;
+        const failed = setupResults.length - successful;
+
+        if (failed > 0) {
+            const criticalFailures = setupResults.filter((result) => {
+                return result.status === "rejected" || !result.value.success;
+            }).length;
+
+            if (criticalFailures > 0) {
+                const errorMessage = `Critical monitoring setup failures: ${criticalFailures} of ${data.sites.length} sites failed`;
+                logger.error(`[UptimeOrchestrator] ${errorMessage}`);
+                // For critical operations, we might want to emit an error event
+                await this.emitTyped("system:error", {
+                    context: "site-monitoring-setup",
+                    error: new Error(errorMessage),
+                    recovery: "Check site configurations and restart monitoring",
+                    severity: "high",
+                    timestamp: Date.now(),
+                });
+            } else {
+                logger.warn(
+                    `[UptimeOrchestrator] Site monitoring setup completed: ${successful} successful, ${failed} failed`
+                );
+            }
+        } else {
+            logger.info(`[UptimeOrchestrator] Successfully set up monitoring for all ${successful} loaded sites`);
+        }
+    }
+
+    /**
      * Set up database manager event handlers.
      */
     private setupDatabaseEventHandlers(): void {
         this.on("internal:database:update-sites-cache-requested", (data: UpdateSitesCacheRequestData) => {
-            void (async () => {
-                await this.siteManager.updateSitesCache(data.sites);
-
-                // CRITICAL: Set up monitoring for each loaded site
-                const setupResults = await Promise.allSettled(
-                    data.sites.map(async (site) => {
-                        try {
-                            await this.monitorManager.setupSiteForMonitoring(site);
-                            return { site: site.identifier, success: true };
-                        } catch (error) {
-                            logger.error(
-                                `[UptimeOrchestrator] Failed to setup monitoring for site ${site.identifier}:`,
-                                error
-                            );
-                            return { error, site: site.identifier, success: false };
-                        }
-                    })
-                );
-
-                // Log summary of setup results
-                const successful = setupResults.filter(
-                    (result) => result.status === "fulfilled" && result.value.success
-                ).length;
-                const failed = setupResults.length - successful;
-
-                if (failed > 0) {
-                    logger.warn(
-                        `[UptimeOrchestrator] Site monitoring setup completed: ${successful} successful, ${failed} failed`
-                    );
-                } else {
-                    logger.info(
-                        `[UptimeOrchestrator] Successfully set up monitoring for all ${successful} loaded sites`
-                    );
-                }
-            })();
+            this.handleUpdateSitesCacheRequest(data).catch((error) => {
+                logger.error("[UptimeOrchestrator] Error handling update-sites-cache-requested:", error);
+            });
         });
 
         this.on("internal:database:get-sites-from-cache-requested", () => {
-            void (async () => {
-                const sites = this.siteManager.getSitesFromCache();
-                await this.emitTyped("internal:database:get-sites-from-cache-response", {
-                    operation: "get-sites-from-cache-response",
-                    sites,
-                    timestamp: Date.now(),
-                });
-            })();
+            this.handleGetSitesFromCacheRequest().catch((error) => {
+                logger.error("[UptimeOrchestrator] Error handling get-sites-from-cache-requested:", error);
+            });
         });
 
         this.on("internal:database:initialized", () => {
-            void (async () => {
-                try {
-                    await this.emitTyped("database:transaction-completed", {
-                        duration: 0,
-                        operation: "initialize",
-                        success: true,
-                        timestamp: Date.now(),
-                    });
-                } catch (error) {
-                    logger.error("[UptimeOrchestrator] Error handling internal:database:initialized:", error);
-                }
-            })();
+            this.handleDatabaseInitialized().catch((error) => {
+                logger.error("[UptimeOrchestrator] Error handling internal:database:initialized:", error);
+            });
         });
     }
 

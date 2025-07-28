@@ -8,6 +8,7 @@
  */
 
 import { logger } from "../../utils/logger";
+import { MAX_LOG_DATA_LENGTH, MAX_MIGRATION_STEPS } from "./constants";
 
 /**
  * Describes a migration rule for a monitor type.
@@ -185,9 +186,22 @@ class MigrationOrchestrator {
                         warnings.push(`Applied breaking migration: ${migration.description}`);
                     }
                 } catch (error) {
-                    const errorMessage = `Migration failed: ${migration.description} - ${error}`;
-                    errors.push(errorMessage);
-                    logger.error(errorMessage, error);
+                    // Preserve error context for better debugging
+                    const errorDetails = error instanceof Error ? error.message : String(error);
+                    const errorMessage = `Migration failed: ${migration.description}`;
+
+                    errors.push(`${errorMessage} - ${errorDetails}`);
+                    logger.error(errorMessage, {
+                        currentData: JSON.stringify(currentData).slice(0, MAX_LOG_DATA_LENGTH), // Truncate for logging
+                        error,
+                        migration: {
+                            description: migration.description,
+                            fromVersion: migration.fromVersion,
+                            isBreaking: migration.isBreaking,
+                            toVersion: migration.toVersion,
+                        },
+                        monitorType,
+                    });
                     break;
                 }
             }
@@ -255,43 +269,63 @@ class MigrationRegistry {
      * Calculates the migration path (sequence of rules) from one version to another.
      *
      * @remarks
-     * Throws if no valid path exists, a circular path is detected, or the path exceeds 100 steps. Used internally by orchestrators and for migration feasibility checks.
+     * Throws if no valid path exists, a circular path is detected, or the path exceeds the maximum steps limit.
+     * Used internally by orchestrators and for migration feasibility checks.
+     *
+     * Algorithm ensures no infinite loops by checking for visited versions before adding them to the path.
+     * The maximum path length prevents excessive migration chains that could indicate design issues.
      *
      * @param monitorType - The monitor type.
      * @param fromVersion - The source version.
      * @param toVersion - The target version.
      * @returns Array of migration rules to apply in order.
-     * @throws Throws if no migration path exists, circular path detected, or path exceeds 100 steps.
+     * @throws {@link Error} If no migration path exists, circular path detected, or path exceeds maximum steps.
      */
     getMigrationPath(monitorType: string, fromVersion: string, toVersion: string): MigrationRule[] {
+        // Validate version strings
+        this.validateVersionString(fromVersion, "fromVersion");
+        this.validateVersionString(toVersion, "toVersion");
+
         const rules = this.migrations.get(monitorType) ?? [];
         const path: MigrationRule[] = [];
         const visitedVersions = new Set<string>();
+        const maxMigrationSteps = MAX_MIGRATION_STEPS; // Use configurable constant
 
         let currentVersion = fromVersion;
 
         while (currentVersion !== toVersion) {
-            // Prevent infinite loops by checking if we've already visited this version
+            // Check for circular paths BEFORE adding to visited set
             if (visitedVersions.has(currentVersion)) {
-                throw new Error(`Circular migration path detected for ${monitorType} at version ${currentVersion}`);
+                throw new Error(
+                    `Circular migration path detected for ${monitorType} at version ${currentVersion}. ` +
+                        `Visited versions: ${[...visitedVersions].join(" -> ")}`
+                );
             }
-            visitedVersions.add(currentVersion);
 
+            // Find next migration rule
             const nextRule = rules.find((rule) => rule.fromVersion === currentVersion);
 
             if (!nextRule) {
-                throw new Error(`No migration path from ${currentVersion} to ${toVersion} for ${monitorType}`);
+                const availableFromVersions = rules.map((r) => r.fromVersion).join(", ");
+                throw new Error(
+                    `No migration path from ${currentVersion} to ${toVersion} for ${monitorType}. ` +
+                        `Available migration starting points: [${availableFromVersions}]`
+                );
+            }
+
+            // Add to visited AFTER confirming we have a valid next step
+            visitedVersions.add(currentVersion);
+
+            // Additional safeguard: limit the number of migration steps
+            if (path.length >= maxMigrationSteps) {
+                throw new Error(
+                    `Migration path too long for ${monitorType}: ${path.length} steps exceeded maximum of ${maxMigrationSteps}. ` +
+                        `This may indicate a circular dependency or design issue.`
+                );
             }
 
             path.push(nextRule);
             currentVersion = nextRule.toVersion;
-
-            // Additional safeguard: limit the number of migration steps
-            if (path.length > 100) {
-                throw new Error(
-                    `Migration path too long for ${monitorType}: ${path.length} steps exceeded maximum of 100`
-                );
-            }
         }
 
         return path;
@@ -330,13 +364,19 @@ class MigrationRegistry {
      *
      * @remarks
      * Used for sorting migration rules and determining migration order.
+     * Now includes validation to prevent NaN comparisons from malformed versions.
      *
      * @param a - First version string.
      * @param b - Second version string.
      * @returns -1 if a \< b, 1 if a \> b, 0 if equal.
+     * @throws {@link Error} If either version string is malformed.
      * @internal
      */
     private compareVersions(a: string, b: string): number {
+        // Validate both version strings before comparison
+        this.validateVersionString(a, "version a");
+        this.validateVersionString(b, "version b");
+
         const versionA = a.split(".").map(Number);
         const versionB = b.split(".").map(Number);
 
@@ -351,6 +391,40 @@ class MigrationRegistry {
         }
 
         return 0;
+    }
+
+    /**
+     * Validates a version string format to ensure safe processing.
+     *
+     * @remarks
+     * Ensures version strings follow semantic versioning pattern and contain only valid characters.
+     * Prevents injection attacks and ensures consistent version comparison behavior.
+     *
+     * @param version - The version string to validate.
+     * @param parameterName - The parameter name for error reporting.
+     * @throws {@link Error} If the version string format is invalid.
+     * @internal
+     */
+    private validateVersionString(version: string, parameterName: string): void {
+        if (!version || typeof version !== "string") {
+            throw new Error(`${parameterName} must be a non-empty string, got: ${typeof version}`);
+        }
+
+        // Basic semantic version validation: x.y.z where x, y, z are non-negative integers
+        const versionPattern = /^\d+\.\d+\.\d+(?:-[\da-z-]+)?(?:\+[\da-z-]+)?$/i;
+        if (!versionPattern.test(version)) {
+            throw new Error(
+                `${parameterName} "${version}" is not a valid semantic version. Expected format: x.y.z (e.g., "1.0.0")`
+            );
+        }
+
+        // Additional validation: ensure numeric parts are reasonable (prevent overflow)
+        const parts = version.split(".").slice(0, 3).map(Number);
+        for (const part of parts) {
+            if (part < 0 || part > Number.MAX_SAFE_INTEGER) {
+                throw new Error(`${parameterName} "${version}" contains invalid numeric parts`);
+            }
+        }
     }
 }
 

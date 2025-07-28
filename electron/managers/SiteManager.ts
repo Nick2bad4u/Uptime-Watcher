@@ -145,10 +145,13 @@ export class SiteManager {
     private readonly configurationManager: ConfigurationManager;
     private readonly eventEmitter: TypedEventBus<UptimeEvents>;
     private readonly monitoringOperations: IMonitoringOperations | undefined;
-    private readonly repositories: Omit<
-        SiteManagerDependencies,
-        "configurationManager" | "eventEmitter" | "monitoringOperations"
-    >;
+    private readonly repositories: {
+        databaseService: DatabaseService;
+        historyRepository: HistoryRepository;
+        monitorRepository: MonitorRepository;
+        settingsRepository: SettingsRepository;
+        siteRepository: SiteRepository;
+    };
     private readonly siteRepositoryService: SiteRepositoryService;
     private readonly sitesCache: StandardizedCache<Site>;
     private readonly siteWriterService: SiteWriterService;
@@ -549,9 +552,24 @@ export class SiteManager {
      * ```
      */
     public async updateSitesCache(sites: Site[]): Promise<void> {
-        this.sitesCache.clear();
+        // Create temporary cache for atomic replacement
+        const tempCache = new StandardizedCache<Site>({
+            defaultTTL: 600_000, // 10 minutes
+            enableStats: true,
+            eventEmitter: this.eventEmitter,
+            maxSize: 500,
+            name: "sites-temp",
+        });
+
+        // Populate temporary cache
         for (const site of sites) {
-            this.sitesCache.set(site.identifier, site);
+            tempCache.set(site.identifier, site);
+        }
+
+        // Atomic replacement: clear and copy from temp cache
+        this.sitesCache.clear();
+        for (const [key, site] of tempCache.entries()) {
+            this.sitesCache.set(key, site);
         }
 
         // Emit cache updated event
@@ -566,43 +584,38 @@ export class SiteManager {
      * Creates monitoring configuration for site operations.
      *
      * @returns Configuration for managing monitoring operations.
+     * @throws When monitoring operations are not available but required
      * @remarks
      * Used internally for coordinated monitoring actions during site updates.
      */
     private createMonitoringConfig(): MonitoringConfig {
         return {
             setHistoryLimit: (limit: number) => {
-                if (this.monitoringOperations) {
-                    // Execute but don't await the promise
-                    this.monitoringOperations.setHistoryLimit(limit).catch((error) => {
-                        logger.error("[SiteManager] Failed to set history limit", error);
-                    });
-                } else {
-                    logger.warn("MonitoringOperations not available for setHistoryLimit");
+                if (!this.monitoringOperations) {
+                    throw new Error("MonitoringOperations not available but required for setHistoryLimit");
                 }
+                // Execute but don't await the promise
+                this.monitoringOperations.setHistoryLimit(limit).catch((error) => {
+                    logger.error("[SiteManager] Failed to set history limit", error);
+                });
             },
             setupNewMonitors: async (site: Site, newMonitorIds: string[]) => {
-                if (this.monitoringOperations) {
-                    await this.monitoringOperations.setupNewMonitors(site, newMonitorIds);
-                } else {
-                    logger.warn("MonitoringOperations not available for setupNewMonitors");
+                if (!this.monitoringOperations) {
+                    throw new Error("MonitoringOperations not available but required for setupNewMonitors");
                 }
+                await this.monitoringOperations.setupNewMonitors(site, newMonitorIds);
             },
             startMonitoring: async (identifier: string, monitorId: string) => {
-                if (this.monitoringOperations) {
-                    return this.monitoringOperations.startMonitoringForSite(identifier, monitorId);
-                } else {
-                    logger.warn("MonitoringOperations not available for startMonitoring");
-                    return false;
+                if (!this.monitoringOperations) {
+                    throw new Error("MonitoringOperations not available but required for startMonitoring");
                 }
+                return this.monitoringOperations.startMonitoringForSite(identifier, monitorId);
             },
             stopMonitoring: async (identifier: string, monitorId: string) => {
-                if (this.monitoringOperations) {
-                    return this.monitoringOperations.stopMonitoringForSite(identifier, monitorId);
-                } else {
-                    logger.warn("MonitoringOperations not available for stopMonitoring");
-                    return false;
+                if (!this.monitoringOperations) {
+                    throw new Error("MonitoringOperations not available but required for stopMonitoring");
                 }
+                return this.monitoringOperations.stopMonitoringForSite(identifier, monitorId);
             },
         };
     }
@@ -640,9 +653,9 @@ export class SiteManager {
      * @param identifier - The site identifier to load.
      * @returns A promise that resolves when background loading is complete.
      * @remarks
-     * Performs silent background loading with error logging but no exception throwing.
+     * Performs silent background loading with error logging and event emission.
      * This ensures background operations don't disrupt the main application flow while
-     * still providing observability through logging.
+     * still providing observability through logging and events.
      */
     private async loadSiteInBackground(identifier: string): Promise<void> {
         try {
@@ -663,10 +676,30 @@ export class SiteManager {
                 logger.debug(`[SiteManager] Background site load completed: ${identifier}`);
             } else {
                 logger.debug(`[SiteManager] Site not found during background load: ${identifier}`);
+
+                // Emit not found event for observability
+                await this.eventEmitter.emitTyped("site:cache-miss", {
+                    backgroundLoading: false,
+                    identifier,
+                    operation: "cache-lookup",
+                    timestamp: Date.now(),
+                });
             }
         } catch (error) {
-            // Silent failure for background operations - don't throw
+            // Emit error event for observability while maintaining non-blocking behavior
             logger.debug(`[SiteManager] Background site load failed for ${identifier}`, error);
+
+            try {
+                await this.eventEmitter.emitTyped("site:cache-miss", {
+                    backgroundLoading: false,
+                    identifier,
+                    operation: "cache-lookup",
+                    timestamp: Date.now(),
+                });
+            } catch (emitError) {
+                // Even emit failures shouldn't crash background operations
+                logger.debug(`[SiteManager] Failed to emit background load error event`, emitError);
+            }
         }
     }
 

@@ -348,7 +348,17 @@ export class MonitorManager {
             },
             identifier,
             monitorId,
-            (id, mid) => this.startMonitoringForSite(id, mid)
+            // Create a proper recursive handler that avoids infinite loops
+            async (recursiveId: string, recursiveMonitorId?: string) => {
+                // Only recurse if it's a different site/monitor combination
+                if (recursiveId !== identifier || recursiveMonitorId !== monitorId) {
+                    return this.startMonitoringForSite(recursiveId, recursiveMonitorId);
+                } else {
+                    // Prevent infinite recursion by using direct scheduler call
+                    logger.warn(`[MonitorManager] Preventing recursive call for ${identifier}/${monitorId ?? "all"}`);
+                    return false;
+                }
+            }
         );
 
         if (result) {
@@ -424,7 +434,17 @@ export class MonitorManager {
             },
             identifier,
             monitorId,
-            (id, mid) => this.stopMonitoringForSite(id, mid)
+            // Create a proper recursive handler that avoids infinite loops
+            async (recursiveId: string, recursiveMonitorId?: string) => {
+                // Only recurse if it's a different site/monitor combination
+                if (recursiveId !== identifier || recursiveMonitorId !== monitorId) {
+                    return this.stopMonitoringForSite(recursiveId, recursiveMonitorId);
+                } else {
+                    // Prevent infinite recursion by using direct scheduler call
+                    logger.warn(`[MonitorManager] Preventing recursive call for ${identifier}/${monitorId ?? "all"}`);
+                    return false;
+                }
+            }
         );
 
         if (result) {

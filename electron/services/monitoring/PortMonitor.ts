@@ -30,7 +30,9 @@
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
 import { MonitorType, Site } from "../../types";
+import { DEFAULT_RETRY_ATTEMPTS } from "./constants";
 import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
+import { getMonitorRetryAttempts, getMonitorTimeout, hasValidHost, hasValidPort } from "./utils/monitorTypeGuards";
 import { performPortCheckWithRetry } from "./utils/portRetry";
 
 /**
@@ -70,13 +72,15 @@ export class PortMonitor implements IMonitorService {
      * @param monitor - Monitor configuration of type {@link Site}["monitors"][0] containing host, port, and connection settings
      * @returns Promise resolving to check result with status and timing data
      *
-     * @throws Error when monitor type is not "port"
+     * @throws {@link Error} when monitor type is not "port"
      *
      * @remarks
      * Uses per-monitor retry attempts and timeout configuration for robust
      * connectivity checking. Falls back to service defaults when monitor-specific
      * values are not provided. Validates monitor configuration before attempting
      * connection and provides detailed error information for failures.
+     *
+     * Now uses type guards to safely handle potentially undefined configuration values.
      *
      * The check will use the monitor's configured timeout if available,
      * falling back to the service default. Response time includes the full
@@ -87,18 +91,18 @@ export class PortMonitor implements IMonitorService {
             throw new Error(`PortMonitor cannot handle monitor type: ${monitor.type}`);
         }
 
-        if (!monitor.host || !monitor.port) {
+        if (!hasValidHost(monitor) || !hasValidPort(monitor)) {
             return {
-                details: "Missing host or port configuration",
-                error: "Port monitor missing host or port",
+                details: "Missing or invalid host/port configuration",
+                error: "Port monitor missing valid host or port",
                 responseTime: 0,
                 status: "down",
             };
         }
 
-        // Note: Despite type definitions, these values can be undefined in practice (see tests)
-        const timeout = (monitor.timeout as number | undefined) ?? this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT;
-        const retryAttempts = (monitor.retryAttempts as number | undefined) ?? 3; // Default retry attempts
+        // Use type-safe utility functions instead of type assertions
+        const timeout = getMonitorTimeout(monitor, this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT);
+        const retryAttempts = getMonitorRetryAttempts(monitor, DEFAULT_RETRY_ATTEMPTS);
 
         return performPortCheckWithRetry(monitor.host, monitor.port, timeout, retryAttempts);
     }
@@ -147,16 +151,18 @@ export class PortMonitor implements IMonitorService {
      * that provided values are of correct types but does not validate ranges or
      * other business logic constraints.
      *
-     * @throws Error if config contains invalid property types
+     * Note: Only validates port-relevant configuration properties.
+     *
+     * @throws {@link Error} if config contains invalid property types
      */
     public updateConfig(config: Partial<MonitorConfig>): void {
-        // Basic validation of config properties
+        // Basic validation of config properties - only validate relevant ones for port monitoring
         if (config.timeout !== undefined && (typeof config.timeout !== "number" || config.timeout <= 0)) {
             throw new Error("Invalid timeout: must be a positive number");
         }
-        if (config.userAgent !== undefined && typeof config.userAgent !== "string") {
-            throw new Error("Invalid userAgent: must be a string");
-        }
+
+        // Note: userAgent is not relevant for port monitoring, so we don't validate it
+        // This fixes the configuration validation inconsistency identified in the review
 
         this.config = {
             ...this.config,

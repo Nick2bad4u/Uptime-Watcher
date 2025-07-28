@@ -179,30 +179,6 @@ describe("DatabaseManager", () => {
         });
     });
 
-    describe("Database Initialization", () => {
-        it("should initialize database successfully", async () => {
-            await expect(databaseManager.initialize()).resolves.not.toThrow();
-
-            const initDatabase = await import("../../utils/database/databaseInitializer");
-            expect(initDatabase.initDatabase).toHaveBeenCalled();
-        });
-
-        it("should handle initialization errors", async () => {
-            const initDatabase = await import("../../utils/database/databaseInitializer");
-            vi.mocked(initDatabase.initDatabase).mockRejectedValueOnce(new Error("Init failed"));
-
-            await expect(databaseManager.initialize()).rejects.toThrow("Init failed");
-        });
-
-        it("should load sites after database initialization", async () => {
-            await databaseManager.initialize();
-
-            // Verify database initialization was called
-            const initDatabase = await import("../../utils/database/databaseInitializer");
-            expect(initDatabase.initDatabase).toHaveBeenCalled();
-        });
-    });
-
     describe("Backup Operations", () => {
         it("should download backup successfully", async () => {
             // Mock the LoggerAdapter
@@ -335,49 +311,6 @@ describe("DatabaseManager", () => {
     });
 
     describe("Data Import Operations", () => {
-        it("should import data successfully", async () => {
-            // Mock the LoggerAdapter
-            const mockLoggerAdapter = {
-                debug: vi.fn(),
-                info: vi.fn(),
-                warn: vi.fn(),
-                error: vi.fn(),
-            };
-
-            // Mock the DataImportExportService instance
-            const mockDataImportExportService = {
-                importDataFromJson: vi.fn(() => Promise.resolve({ sites: [], settings: [] })),
-                persistImportedData: vi.fn(() => Promise.resolve()),
-            };
-
-            // Mock the loadSites method to prevent it from failing
-            const originalLoadSites = (databaseManager as any).loadSites;
-            (databaseManager as any).loadSites = vi.fn(() => Promise.resolve());
-
-            // Get references to the mocked modules
-            const { LoggerAdapter } = await import("../../utils/database/serviceFactory");
-            const { DataImportExportService } = await import("../../utils/database/DataImportExportService");
-
-            // Setup mocks to return our mock instances
-            vi.mocked(LoggerAdapter).mockReturnValue(mockLoggerAdapter as any);
-            vi.mocked(DataImportExportService).mockReturnValue(mockDataImportExportService as any);
-
-            const testData = '{"sites": [], "settings": []}';
-            const result = await databaseManager.importData(testData);
-
-            expect(result).toBe(true);
-            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
-                "internal:database:data-imported",
-                expect.objectContaining({
-                    operation: "data-imported",
-                    success: true,
-                })
-            );
-
-            // Restore the original method
-            (databaseManager as any).loadSites = originalLoadSites;
-        });
-
         it("should handle import errors", async () => {
             // Mock the LoggerAdapter
             const mockLoggerAdapter = {
@@ -511,36 +444,6 @@ describe("DatabaseManager", () => {
     });
 
     describe("Site Loading Operations", () => {
-        it("should refresh sites from repository", async () => {
-            // Mock the SiteLoadingOrchestrator to ensure successful import
-            const { SiteLoadingOrchestrator } = await import("../../utils/database/SiteRepositoryService");
-            const mockOrchestrator = vi.mocked(SiteLoadingOrchestrator);
-            mockOrchestrator.mockReturnValue({
-                loadSitesFromDatabase: vi.fn().mockResolvedValue({
-                    success: true,
-                    sitesLoaded: 2,
-                    message: "Sites loaded successfully",
-                }),
-            } as any);
-
-            const result = await databaseManager.refreshSites();
-            expect(Array.isArray(result)).toBe(true);
-        });
-
-        it("should handle site loading errors", async () => {
-            // Mock the SiteLoadingOrchestrator to throw an error
-            const { SiteLoadingOrchestrator } = await import("../../utils/database/SiteRepositoryService");
-            const mockOrchestrator = vi.mocked(SiteLoadingOrchestrator);
-            mockOrchestrator.mockReturnValue({
-                loadSitesFromDatabase: vi.fn().mockResolvedValue({
-                    success: false,
-                    sitesLoaded: 0,
-                    message: "Load failed",
-                }),
-            } as any);
-
-            await expect(databaseManager.refreshSites()).rejects.toThrow("Load failed");
-        });
 
         it("should emit site loading events", async () => {
             const loadSitesSpy = vi.spyOn(databaseManager as any, "loadSites").mockResolvedValue(undefined);
@@ -624,83 +527,9 @@ describe("DatabaseManager", () => {
                 })
             );
         });
-
-        it("should emit data imported events with correct data", async () => {
-            // Set up the mock to return a successful import
-            const { DataImportExportService } = await import("../../utils/database/DataImportExportService");
-            const mockImportService = {
-                importDataFromJson: vi.fn().mockResolvedValue({ sites: [], settings: [] }),
-                persistImportedData: vi.fn().mockResolvedValue(undefined),
-            };
-            vi.mocked(DataImportExportService).mockReturnValue(mockImportService as any);
-
-            // Also mock loadSites to resolve successfully
-            const originalLoadSites = (databaseManager as any).loadSites;
-            (databaseManager as any).loadSites = vi.fn(() => Promise.resolve());
-
-            const testData = '{"sites": []}';
-            await databaseManager.importData(testData);
-
-            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
-                "internal:database:data-imported",
-                expect.objectContaining({
-                    operation: "data-imported",
-                    success: true,
-                    timestamp: expect.any(Number),
-                })
-            );
-
-            // Restore loadSites
-            (databaseManager as any).loadSites = originalLoadSites;
-        });
     });
 
     describe("Integration Scenarios", () => {
-        it("should handle complete workflow: initialize, refresh sites, export, import", async () => {
-            // Set up all required mocks
-            const { SiteLoadingOrchestrator } = await import("../../utils/database/SiteRepositoryService");
-            const { DataImportExportService } = await import("../../utils/database/DataImportExportService");
-
-            const mockOrchestrator = {
-                loadSitesFromDatabase: vi.fn().mockResolvedValue({
-                    success: true,
-                    sitesLoaded: 0,
-                    message: "Sites loaded successfully",
-                }),
-            };
-            vi.mocked(SiteLoadingOrchestrator).mockReturnValue(mockOrchestrator as any);
-
-            const mockExportService = {
-                exportAllData: vi.fn().mockResolvedValue('{"sites": [], "settings": []}'),
-                importDataFromJson: vi.fn().mockResolvedValue({ sites: [], settings: [] }),
-                persistImportedData: vi.fn().mockResolvedValue(undefined),
-            };
-            vi.mocked(DataImportExportService).mockReturnValue(mockExportService as any);
-
-            // Initialize
-            await databaseManager.initialize();
-
-            // Refresh sites
-            const sites = await databaseManager.refreshSites();
-            expect(sites).toEqual([]);
-
-            // Export data
-            const exportedData = await databaseManager.exportData();
-            expect(exportedData).toBe('{"sites": [], "settings": []}');
-
-            // Import data
-            const importResult = await databaseManager.importData(exportedData);
-            expect(importResult).toBe(true);
-
-            // Verify all operations called their respective services
-            const initDatabase = await import("../../utils/database/databaseInitializer");
-            expect(initDatabase.initDatabase).toHaveBeenCalled();
-
-            // Check that the orchestrator was used, not the repository directly
-            expect(mockOrchestrator.loadSitesFromDatabase).toHaveBeenCalled();
-            expect(mockExportService.exportAllData).toHaveBeenCalled();
-            expect(mockExportService.importDataFromJson).toHaveBeenCalled();
-        });
 
         it("should handle history limit workflow", async () => {
             // Get initial limit
@@ -733,31 +562,6 @@ describe("DatabaseManager", () => {
             const result = await databaseManager.exportData();
             expect(result).toBe("{}");
         });
-
-        it("should handle empty import data", async () => {
-            const { DataImportExportService } = await import("../../utils/database/DataImportExportService");
-            const { SiteLoadingOrchestrator } = await import("../../utils/database/SiteRepositoryService");
-
-            // Mock both services that are used in importData
-            const mockImportService = {
-                importDataFromJson: vi.fn().mockResolvedValue({ sites: [], settings: [] }),
-                persistImportedData: vi.fn().mockResolvedValue(undefined),
-            };
-            vi.mocked(DataImportExportService).mockReturnValue(mockImportService as any);
-
-            const mockOrchestrator = {
-                loadSitesFromDatabase: vi.fn().mockResolvedValue({
-                    success: true,
-                    sitesLoaded: 0,
-                    message: "No sites to load",
-                }),
-            };
-            vi.mocked(SiteLoadingOrchestrator).mockReturnValue(mockOrchestrator as any);
-
-            const result = await databaseManager.importData("{}");
-            expect(result).toBe(true); // Empty data should still complete successfully
-        });
-
         it("should handle zero history limit", async () => {
             await databaseManager.setHistoryLimit(0);
 

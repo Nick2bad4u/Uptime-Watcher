@@ -4,6 +4,23 @@ import { getMonitorServiceFactory, getRegisteredMonitorTypes, isValidMonitorType
 import { IMonitorService, MonitorConfig } from "./types";
 
 /**
+ * Result of monitor service retrieval with configuration status.
+ *
+ * @remarks
+ * This interface uses `exactOptionalPropertyTypes` TypeScript configuration,
+ * which means optional properties must be explicitly handled to avoid type errors.
+ * The `configurationError` property should only be included when there's an actual error.
+ */
+export interface MonitorServiceResult {
+    /** Whether configuration was successfully applied (if config was provided) */
+    configurationApplied: boolean;
+    /** Configuration error message if application failed (only present when there's an error) */
+    configurationError?: string;
+    /** The monitor service instance */
+    instance: IMonitorService;
+}
+
+/**
  * Factory for creating, caching, and managing monitor service instances for all registered monitor types.
  *
  * @remarks
@@ -80,13 +97,14 @@ export class MonitorFactory {
      * - Uses the singleton pattern: returns the cached instance if available, otherwise creates a new one.
      * - If a configuration is provided, updates the instance's configuration if forced or if the instance is new.
      * - Throws if the monitor type is unsupported or if no factory is registered for the type.
+     * - Configuration failures are logged but do not prevent service retrieval.
      *
      * @param type - The monitor type string. Must be a valid registered type.
      * @param config - Optional monitor configuration to apply to the instance.
      * @param forceConfigUpdate - If true, updates the configuration on an existing instance even if already set.
      * @returns The monitor service instance for the specified type.
      *
-     * @throws Error If the monitor type is not supported or no service factory is registered for the type.
+     * @throws {@link Error} If the monitor type is not supported or no service factory is registered for the type.
      *
      * @example
      * ```typescript
@@ -97,9 +115,43 @@ export class MonitorFactory {
      * @see {@link MonitorConfig}
      * @see {@link getMonitorServiceFactory}
      * @see {@link isValidMonitorType}
+     * @see {@link getMonitorWithResult} for version that returns configuration status
      * @public
      */
     public static getMonitor(type: MonitorType, config?: MonitorConfig, forceConfigUpdate = false): IMonitorService {
+        const result = this.getMonitorWithResult(type, config, forceConfigUpdate);
+        return result.instance;
+    }
+
+    /**
+     * Retrieves the monitor service instance with configuration application status.
+     *
+     * @remarks
+     * Same as {@link getMonitor} but returns detailed result including configuration application status.
+     * Use this method when you need to know if configuration was successfully applied.
+     *
+     * @param type - The monitor type string. Must be a valid registered type.
+     * @param config - Optional monitor configuration to apply to the instance.
+     * @param forceConfigUpdate - If true, updates the configuration on an existing instance even if already set.
+     * @returns Result object containing the service instance and configuration status.
+     *
+     * @throws {@link Error} If the monitor type is not supported or no service factory is registered for the type.
+     *
+     * @example
+     * ```typescript
+     * const result = MonitorFactory.getMonitorWithResult("http", { timeout: 5000 });
+     * if (!result.configurationApplied && result.configurationError) {
+     *   console.warn("Config failed:", result.configurationError);
+     * }
+     * ```
+     *
+     * @public
+     */
+    public static getMonitorWithResult(
+        type: MonitorType,
+        config?: MonitorConfig,
+        forceConfigUpdate = false
+    ): MonitorServiceResult {
         // Validate monitor type using registry
         if (!isValidMonitorType(type)) {
             const availableTypes = getRegisteredMonitorTypes().join(", ");
@@ -123,17 +175,33 @@ export class MonitorFactory {
             this.serviceInstances.set(type, instance);
         }
 
+        // Track configuration application status
+        let configurationApplied = true;
+        let configurationError: string | undefined;
+
         // Apply configuration if provided and either forcing update or instance is new
         if (config && (forceConfigUpdate || this.serviceInstances.get(type) === instance)) {
             try {
                 instance.updateConfig(config);
+                // configurationApplied remains true
             } catch (error) {
-                // Log and continue; do not throw from config update
+                configurationApplied = false;
+                configurationError = error instanceof Error ? error.message : String(error);
+
+                // Log but don't throw for backward compatibility
                 logger.warn(`Failed to update config for monitor type ${type}`, { error });
             }
+        } else if (config) {
+            // Config was provided but not applied (existing instance, no force)
+            configurationApplied = false;
+            configurationError = "Configuration not applied to existing instance (use forceConfigUpdate=true)";
         }
 
-        return instance;
+        return {
+            configurationApplied,
+            ...(configurationError !== undefined && { configurationError }),
+            instance,
+        };
     }
 
     /**

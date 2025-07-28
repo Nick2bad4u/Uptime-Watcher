@@ -5,7 +5,7 @@ import * as path from "node:path";
 
 import { DB_FILE_NAME } from "../../constants";
 import { logger } from "../../utils/logger";
-import { createDatabaseIndexes, createDatabaseTables, setupMonitorTypeValidation } from "./utils/databaseSchema";
+import { createDatabaseSchema } from "./utils/databaseSchema";
 
 /**
  * @public
@@ -205,9 +205,7 @@ export class DatabaseService {
 
             this._db = new Database(dbPath);
 
-            createDatabaseTables(this._db);
-            createDatabaseIndexes(this._db);
-            setupMonitorTypeValidation();
+            createDatabaseSchema(this._db);
 
             logger.info("[DatabaseService] Database initialized successfully");
             return this._db;

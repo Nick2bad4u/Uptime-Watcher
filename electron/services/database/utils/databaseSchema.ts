@@ -40,9 +40,40 @@ export function createDatabaseIndexes(db: Database): void {
         // Index on history timestamp for time-based queries
         db.run("CREATE INDEX IF NOT EXISTS idx_history_timestamp ON history(timestamp)");
 
-        logger.info("[DatabaseSchema] All indexes created successfully");
+        logger.debug("[DatabaseSchema] All indexes created successfully");
     } catch (error) {
         logger.error("[DatabaseSchema] Failed to create indexes", error);
+        throw error;
+    }
+}
+
+/**
+ * Create database schema (tables and indexes) within a transaction.
+ *
+ * @param db - SQLite database instance
+ * @throws When schema creation fails
+ *
+ * @remarks
+ * Creates all tables and indexes within coordinated operations to ensure
+ * consistent schema creation. Uses explicit transaction handling via BEGIN/COMMIT.
+ */
+export function createDatabaseSchema(db: Database): void {
+    try {
+        db.run("BEGIN TRANSACTION");
+        
+        try {
+            createDatabaseTables(db);
+            createDatabaseIndexes(db);
+            setupMonitorTypeValidation();
+            
+            db.run("COMMIT");
+            logger.info("[DatabaseSchema] Database schema created successfully");
+        } catch (error) {
+            db.run("ROLLBACK");
+            throw error;
+        }
+    } catch (error) {
+        logger.error("[DatabaseSchema] Failed to create database schema", error);
         throw error;
     }
 }
