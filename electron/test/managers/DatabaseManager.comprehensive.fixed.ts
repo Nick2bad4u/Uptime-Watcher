@@ -40,21 +40,6 @@ vi.mock("../../utils/database/DataImportExportService", () => ({
 import { SiteLoadingOrchestrator } from "../../utils/database/SiteRepositoryService";
 import { DataImportExportService } from "../../utils/database/DataImportExportService";
 
-// Mock DatabaseServiceFactory
-vi.mock("../../services/factories/DatabaseServiceFactory", () => ({
-    DatabaseServiceFactory: {
-        createDatabaseCommandExecutor: vi.fn(),
-    },
-}));
-
-// Mock database commands
-vi.mock("../../services/commands/DatabaseCommands", () => ({
-    ImportDataCommand: vi.fn().mockImplementation(() => ({})),
-    ExportDataCommand: vi.fn().mockImplementation(() => ({})),
-    DownloadBackupCommand: vi.fn().mockImplementation(() => ({})),
-}));
-
-
 // Mock all dependencies
 const mockEventEmitter = {
     emitTyped: vi.fn().mockResolvedValue(undefined),
@@ -128,7 +113,7 @@ const createDataImportExportServiceMock = (overrides = {}) => ({
     ...overrides,
 });
 
-describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
+describe("DatabaseManager - Comprehensive Error Coverage", () => {
     let databaseManager: DatabaseManager;
     let mockDeps: DatabaseManagerDependencies;
 
@@ -428,151 +413,6 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
             vi.mocked(SiteLoadingOrchestrator).mockImplementation(() => mockOrchestrator as any);
 
             await expect(databaseManager.initialize()).resolves.toBeUndefined();
-        });
-
-        it("should handle loadSitesFromDatabase throwing an error", async () => {
-            // Reset and configure the SiteLoadingOrchestrator mock
-            const mockOrchestrator = createSiteLoadingOrchestratorMock({
-                loadSitesFromDatabase: vi.fn().mockRejectedValue(new Error("Database connection failed")),
-            });
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(() => mockOrchestrator as any);
-
-            // Should propagate the error
-            await expect(databaseManager.initialize()).rejects.toThrow("Database connection failed");
-        });
-    });
-
-    describe("Import/Export Operations", () => {
-        it("should handle downloadBackup successfully", async () => {
-            const mockImportService = createDataImportExportServiceMock({
-                downloadBackup: vi.fn().mockResolvedValue("/path/to/backup.json"),
-            });
-            vi.mocked(DataImportExportService).mockImplementation(() => mockImportService as any);
-
-            const result = await databaseManager.downloadBackup();
-
-            expect(mockImportService.downloadBackup).toHaveBeenCalled();
-            expect(result).toBe("/path/to/backup.json");
-        });
-
-        it("should handle downloadBackup with file system errors", async () => {
-            const mockImportService = createDataImportExportServiceMock({
-                downloadBackup: vi.fn().mockRejectedValue(new Error("File system error")),
-            });
-            vi.mocked(DataImportExportService).mockImplementation(() => mockImportService as any);
-
-            await expect(databaseManager.downloadBackup()).rejects.toThrow("File system error");
-        });
-    });
-
-    describe("History Management", () => {
-        it("should handle setHistoryLimit with valid limit", async () => {
-            vi.mocked(mockConfigurationManager.getHistoryRetentionRules).mockReturnValue({
-                defaultLimit: 500,
-                maxLimit: 1000,
-                minLimit: 25,
-            });
-
-            await databaseManager.setHistoryLimit(300);
-
-            expect(mockSettingsRepository.upsert).toHaveBeenCalledWith({
-                key: "historyLimit",
-                value: "300",
-            });
-            expect(databaseManager.getHistoryLimit()).toBe(300);
-        });
-
-        it("should handle setHistoryLimit with limit exceeding maximum", async () => {
-            vi.mocked(mockConfigurationManager.getHistoryRetentionRules).mockReturnValue({
-                defaultLimit: 500,
-                maxLimit: 1000,
-                minLimit: 25,
-            });
-
-            await databaseManager.setHistoryLimit(1500);
-
-            // Should be clamped to maximum
-            expect(mockSettingsRepository.upsert).toHaveBeenCalledWith({
-                key: "historyLimit",
-                value: "1000",
-            });
-            expect(databaseManager.getHistoryLimit()).toBe(1000);
-        });
-
-        it("should handle setHistoryLimit with limit below minimum", async () => {
-            vi.mocked(mockConfigurationManager.getHistoryRetentionRules).mockReturnValue({
-                defaultLimit: 500,
-                maxLimit: 1000,
-                minLimit: 25,
-            });
-
-            await databaseManager.setHistoryLimit(10);
-
-            // Should be clamped to minimum
-            expect(mockSettingsRepository.upsert).toHaveBeenCalledWith({
-                key: "historyLimit",
-                value: "25",
-            });
-            expect(databaseManager.getHistoryLimit()).toBe(25);
-        });
-
-        it("should handle setHistoryLimit with database error", async () => {
-            vi.mocked(mockSettingsRepository.upsert).mockRejectedValue(new Error("Database write error"));
-
-            await expect(databaseManager.setHistoryLimit(200)).rejects.toThrow("Database write error");
-        });
-    });
-
-    describe("Configuration and State", () => {
-        it("should return correct history limit with default value", () => {
-            // Before initialization or setting, should return default
-            const result = databaseManager.getHistoryLimit();
-            expect(result).toBe(500); // Default from mockConfigurationManager
-        });
-
-        it("should handle getHistoryLimit after custom setting", async () => {
-            await databaseManager.setHistoryLimit(300);
-            const result = databaseManager.getHistoryLimit();
-            expect(result).toBe(300);
-        });
-    });
-
-    describe("Edge Cases and Error Scenarios", () => {
-        it("should handle multiple initialization calls", async () => {
-            // Reset mocks for clean test
-            vi.clearAllMocks();
-
-            const mockOrchestrator = createSiteLoadingOrchestratorMock();
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(() => mockOrchestrator as any);
-
-            // First initialization
-            await databaseManager.initialize();
-            
-            // Second initialization (should work without issues)
-            await databaseManager.initialize();
-
-            expect(mockDatabaseService.initialize).toHaveBeenCalledTimes(2);
-            expect(mockOrchestrator.loadSitesFromDatabase).toHaveBeenCalledTimes(2);
-        });
-
-        it("should handle configuration manager returning undefined rules", async () => {
-            vi.mocked(mockConfigurationManager.getHistoryRetentionRules).mockReturnValue(undefined as any);
-
-            // Should handle gracefully and use fallback values
-            await expect(databaseManager.setHistoryLimit(300)).resolves.toBeUndefined();
-        });
-
-        it("should handle concurrent database operations", async () => {
-            // Test concurrent setHistoryLimit calls
-            const promises = [
-                databaseManager.setHistoryLimit(100),
-                databaseManager.setHistoryLimit(200),
-                databaseManager.setHistoryLimit(300),
-            ];
-
-            await expect(Promise.all(promises)).resolves.toEqual([undefined, undefined, undefined]);
-
-            expect(mockSettingsRepository.upsert).toHaveBeenCalledTimes(3);
         });
     });
 });

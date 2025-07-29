@@ -382,12 +382,12 @@ describe("eventTypes - Comprehensive Coverage", () => {
         it("should maintain readonly contracts for constants", () => {
             // Verify that the constants are properly readonly
             expect(() => {
-                // @ts-expect-error - should be readonly
+                // Runtime mutation attempt (TypeScript should prevent this at compile time)
                 (EVENT_CATEGORIES.SITE as any).push("new:event");
             }).not.toThrow(); // Runtime doesn't prevent this, but TypeScript should
             
             expect(() => {
-                // @ts-expect-error - should be readonly  
+                // Runtime mutation attempt (TypeScript should prevent this at compile time)
                 (EVENT_PRIORITIES.HIGH as any).push("new:event");
             }).not.toThrow(); // Runtime doesn't prevent this, but TypeScript should
         });

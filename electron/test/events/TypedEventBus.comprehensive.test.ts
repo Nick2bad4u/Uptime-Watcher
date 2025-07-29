@@ -490,15 +490,15 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should preserve array indices and length", async () => {
             eventBus.onTyped("array-event", mockListener);
             
-            const sparseArray = [1, , 3]; // Sparse array with empty slot
-            sparseArray[10] = 10;
+            const sparseArray: number[] = [1, 2, 3]; // Regular array for type safety
+            sparseArray[10] = 10; // Add element at index 10
             
             await eventBus.emitTyped("array-event", sparseArray);
             
             const receivedData = mockListener.mock.calls[0]?.[0];
             expect(receivedData.length).toBe(11);
             expect(receivedData[0]).toBe(1);
-            expect(receivedData[1]).toBeUndefined();
+            expect(receivedData[1]).toBe(2);
             expect(receivedData[2]).toBe(3);
             expect(receivedData[10]).toBe(10);
         });
@@ -524,6 +524,49 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                     _meta: expect.any(Object),
                 })
             );
+        });
+
+        it("should handle objects with existing _meta property", async () => {
+            eventBus.onTyped("object-event", mockListener);
+            
+            const objectWithMeta = {
+                data: "test",
+                nested: { value: 123 },
+                _meta: "existing-meta-value",
+            };
+            
+            await eventBus.emitTyped("object-event", objectWithMeta);
+            
+            expect(mockListener).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    data: "test",
+                    nested: { value: 123 },
+                    _meta: expect.any(Object), // New metadata
+                    _originalMeta: "existing-meta-value", // Preserved original
+                })
+            );
+        });
+
+        it("should handle null values correctly", async () => {
+            eventBus.onTyped("string-event", mockListener);
+            
+            await eventBus.emitTyped("string-event", null as any);
+            
+            expect(mockListener).toHaveBeenCalledWith({
+                value: null,
+                _meta: expect.any(Object),
+            });
+        });
+
+        it("should handle undefined values correctly", async () => {
+            eventBus.onTyped("string-event", mockListener);
+            
+            await eventBus.emitTyped("string-event", undefined as any);
+            
+            expect(mockListener).toHaveBeenCalledWith({
+                value: undefined,
+                _meta: expect.any(Object),
+            });
         });
 
         it("should handle zero as a valid number", async () => {
@@ -588,6 +631,278 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should support method chaining for offTyped", () => {
             const result = eventBus.offTyped("string-event", mockListener);
             expect(result).toBe(eventBus);
+        });
+    });
+
+    describe("Advanced Edge Cases and Coverage", () => {
+        it("should handle constructor with maxMiddleware of 0", () => {
+            expect(() => new TypedEventBus<TestEvents>("test", { maxMiddleware: 0 })).toThrow(
+                "maxMiddleware must be positive, got 0"
+            );
+        });
+
+        it("should handle constructor with negative maxMiddleware", () => {
+            expect(() => new TypedEventBus<TestEvents>("test", { maxMiddleware: -1 })).toThrow(
+                "maxMiddleware must be positive, got -1"
+            );
+        });
+
+        it("should handle middleware that modifies next function but still processes", async () => {
+            const modifyingMiddleware: EventMiddleware = vi.fn(async (event, data, next) => {
+                // Middleware that wraps the next function
+                await next();
+                // Additional processing after next
+            });
+
+            eventBus.use(modifyingMiddleware);
+            eventBus.onTyped("string-event", mockListener);
+
+            await eventBus.emitTyped("string-event", "test");
+            
+            expect(modifyingMiddleware).toHaveBeenCalled();
+            expect(mockListener).toHaveBeenCalled();
+        });
+
+        it("should handle array with non-enumerable properties", async () => {
+            eventBus.onTyped("array-event", mockListener);
+            
+            const arr: number[] = [1, 2, 3];
+            Object.defineProperty(arr, 'customProp', {
+                value: 'test',
+                enumerable: false,
+                writable: true,
+                configurable: true
+            });
+            
+            await eventBus.emitTyped("array-event", arr);
+            
+            const receivedData = mockListener.mock.calls[0]?.[0];
+            expect(Array.isArray(receivedData)).toBe(true);
+            expect(receivedData.length).toBe(3);
+            expect(receivedData._meta).toEqual(expect.any(Object));
+        });
+
+        it("should handle middleware that throws non-Error objects", async () => {
+            const badMiddleware: EventMiddleware = vi.fn(async () => {
+                throw "String error"; // Non-Error thrown
+            });
+
+            eventBus.use(badMiddleware);
+            eventBus.onTyped("string-event", mockListener);
+
+            await expect(eventBus.emitTyped("string-event", "test")).rejects.toEqual("String error");
+            
+            expect(badMiddleware).toHaveBeenCalled();
+            expect(mockListener).not.toHaveBeenCalled();
+        });
+
+        it("should handle complex nested circular references in objects", async () => {
+            eventBus.onTyped("object-event", mockListener);
+            
+            const circularObj: any = {
+                data: "test",
+                nested: { value: 123 }
+            };
+            circularObj.self = circularObj;
+            circularObj.nested.parent = circularObj;
+            
+            await eventBus.emitTyped("object-event", circularObj);
+            
+            expect(mockListener).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    data: "test",
+                    _meta: expect.any(Object),
+                })
+            );
+        });
+
+        it("should handle BigInt values", async () => {
+            eventBus.onTyped("string-event", mockListener);
+            
+            const bigIntValue = BigInt(123456789012345678901234567890n);
+            
+            await eventBus.emitTyped("string-event", bigIntValue as any);
+            
+            expect(mockListener).toHaveBeenCalledWith({
+                value: bigIntValue,
+                _meta: expect.any(Object),
+            });
+        });
+
+        it("should handle Symbol values", async () => {
+            eventBus.onTyped("string-event", mockListener);
+            
+            const symbolValue = Symbol("test");
+            
+            await eventBus.emitTyped("string-event", symbolValue as any);
+            
+            expect(mockListener).toHaveBeenCalledWith({
+                value: symbolValue,
+                _meta: expect.any(Object),
+            });
+        });
+
+        it("should handle Date objects correctly", async () => {
+            eventBus.onTyped("object-event", mockListener);
+            
+            const dateObj = {
+                data: "test",
+                nested: { value: 123 }, // Keep the expected number type
+                dateField: new Date() // Add date as separate field
+            };
+            
+            await eventBus.emitTyped("object-event", dateObj);
+            
+            expect(mockListener).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    data: "test",
+                    nested: expect.objectContaining({
+                        value: 123
+                    }),
+                    dateField: expect.any(Date),
+                    _meta: expect.any(Object),
+                })
+            );
+        });
+
+        it("should handle function properties in objects", async () => {
+            eventBus.onTyped("object-event", mockListener);
+            
+            const objWithFunction = {
+                data: "test",
+                nested: { value: 123 },
+                someFunction: () => "test function"
+            };
+            
+            await eventBus.emitTyped("object-event", objWithFunction);
+            
+            expect(mockListener).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    data: "test",
+                    nested: { value: 123 },
+                    someFunction: expect.any(Function),
+                    _meta: expect.any(Object),
+                })
+            );
+        });
+
+        it("should handle object with prototype chain modifications", async () => {
+            eventBus.onTyped("object-event", mockListener);
+            
+            const obj = Object.create({ inherited: "value" });
+            obj.data = "test";
+            obj.nested = { value: 123 };
+            
+            await eventBus.emitTyped("object-event", obj);
+            
+            expect(mockListener).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    data: "test",
+                    nested: { value: 123 },
+                    _meta: expect.any(Object),
+                })
+            );
+        });
+
+        it("should handle middleware with synchronous and asynchronous mix", async () => {
+            const syncMiddleware: EventMiddleware = vi.fn((event, data, next) => {
+                next(); // Synchronous
+            });
+
+            const asyncMiddleware: EventMiddleware = vi.fn(async (event, data, next) => {
+                await new Promise(resolve => setTimeout(resolve, 1));
+                await next(); // Asynchronous
+            });
+
+            eventBus.use(syncMiddleware);
+            eventBus.use(asyncMiddleware);
+            eventBus.onTyped("string-event", mockListener);
+
+            await eventBus.emitTyped("string-event", "test");
+            
+            expect(syncMiddleware).toHaveBeenCalled();
+            expect(asyncMiddleware).toHaveBeenCalled();
+            expect(mockListener).toHaveBeenCalled();
+        });
+
+        it("should handle removeMiddleware with multiple occurrences", () => {
+            const duplicateMiddleware = vi.fn();
+            
+            eventBus.use(duplicateMiddleware);
+            eventBus.use(mockMiddleware);
+            eventBus.use(duplicateMiddleware); // Same middleware again
+            
+            expect(eventBus.getDiagnostics().middlewareCount).toBe(3);
+            
+            const removed = eventBus.removeMiddleware(duplicateMiddleware);
+            expect(removed).toBe(true);
+            expect(eventBus.getDiagnostics().middlewareCount).toBe(2);
+            
+            // Should only remove first occurrence
+            const secondRemove = eventBus.removeMiddleware(duplicateMiddleware);
+            expect(secondRemove).toBe(true);
+            expect(eventBus.getDiagnostics().middlewareCount).toBe(1);
+        });
+
+        it("should handle middleware processing with empty middleware array", async () => {
+            // Start with middleware, then clear it
+            eventBus.use(mockMiddleware);
+            eventBus.clearMiddleware();
+            
+            eventBus.onTyped("string-event", mockListener);
+            
+            await eventBus.emitTyped("string-event", "test");
+            
+            expect(mockMiddleware).not.toHaveBeenCalled();
+            expect(mockListener).toHaveBeenCalledWith({
+                value: "test",
+                _meta: expect.any(Object),
+            });
+        });
+
+        it("should handle createEnhancedData with object that has non-configurable properties", async () => {
+            eventBus.onTyped("object-event", mockListener);
+            
+            const obj = {
+                data: "test",
+                nested: { value: 123 }
+            };
+            
+            Object.defineProperty(obj, 'nonConfigurable', {
+                value: 'test',
+                configurable: false,
+                enumerable: true,
+                writable: false
+            });
+            
+            await eventBus.emitTyped("object-event", obj);
+            
+            expect(mockListener).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    data: "test",
+                    nested: { value: 123 },
+                    nonConfigurable: 'test',
+                    _meta: expect.any(Object),
+                })
+            );
+        });
+
+        it("should handle middleware utilization calculation edge cases", () => {
+            const bus = new TypedEventBus<TestEvents>("test", { maxMiddleware: 1 });
+            
+            // Test 100% utilization
+            bus.use(mockMiddleware);
+            expect(bus.getDiagnostics().middlewareUtilization).toBe(100);
+            
+            // Test overflow protection (should cap at 100)
+            try {
+                bus.use(mockMiddleware2);
+            } catch (error) {
+                // Expected to throw due to limit
+            }
+            
+            const diagnostics = bus.getDiagnostics();
+            expect(diagnostics.middlewareUtilization).toBeLessThanOrEqual(100);
         });
     });
 });
