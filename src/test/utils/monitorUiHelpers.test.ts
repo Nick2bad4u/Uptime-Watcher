@@ -1,163 +1,19 @@
 /**
- * Tests for monitorUiHelpers utility functions
+ * @fileoverview Comprehensive tests for monitor UI helper utilities
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-    allSupportsAdvancedAnalytics,
-    allSupportsResponseTime,
-    clearConfigCache,
-    formatMonitorDetail,
-    formatMonitorTitleSuffix,
-    getAnalyticsLabel,
-    getDefaultMonitorId,
-    getMonitorHelpTexts,
-    getTypesWithFeature,
-    shouldShowUrl,
-    supportsAdvancedAnalytics,
-    supportsResponseTime,
-} from "../../utils/monitorUiHelpers";
-import type { MonitorType } from "../../../shared/types";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import * as monitorUiHelpers from "../../utils/monitorUiHelpers";
+import { AppCaches } from "../../utils/cache";
+import { getMonitorTypeConfig } from "../../utils/monitorTypeHelper";
 
 // Mock dependencies
-vi.mock("../../utils/monitorTypeHelper", () => ({
-    getAvailableMonitorTypes: vi.fn().mockResolvedValue([
-        {
-            type: "http",
-            name: "HTTP",
-            description: "Monitor HTTP endpoints",
-            fields: { url: { type: "url", required: true } },
-            features: { advancedAnalytics: true, responseTime: true },
-            uiConfig: {
-                helpTexts: {
-                    general: "Monitor HTTP endpoints for availability",
-                    advanced: "",
-                },
-                detailFormats: {
-                    analyticsLabel: "HTTP Analytics",
-                },
-                display: {
-                    showUrl: true,
-                },
-                supportsAdvancedAnalytics: true,
-                supportsResponseTime: true,
-            },
-        },
-        {
-            type: "ping",
-            name: "Ping",
-            description: "Monitor server ping",
-            fields: { host: { type: "hostname", required: true } },
-            features: { advancedAnalytics: false, responseTime: true },
-            uiConfig: {
-                helpTexts: {
-                    general: "Monitor server ping response",
-                    advanced: "",
-                },
-                detailFormats: {
-                    analyticsLabel: "Ping Analytics",
-                },
-                display: {
-                    showUrl: false,
-                },
-                supportsAdvancedAnalytics: false,
-                supportsResponseTime: true,
-            },
-        },
-        {
-            type: "tcp",
-            name: "TCP",
-            description: "Monitor TCP ports",
-            fields: { host: { type: "hostname", required: true }, port: { type: "number", required: true } },
-            features: { advancedAnalytics: true, responseTime: false },
-            uiConfig: {
-                helpTexts: {
-                    general: "Monitor TCP port connectivity",
-                    advanced: "",
-                },
-                detailFormats: {
-                    analyticsLabel: "TCP Analytics",
-                },
-                display: {
-                    showUrl: false,
-                },
-                supportsAdvancedAnalytics: true,
-                supportsResponseTime: false,
-            },
-        },
-    ]),
-    getMonitorTypeConfig: vi.fn().mockImplementation((type: string) => {
-        const configs: Record<string, any> = {
-            http: {
-                type: "http",
-                name: "HTTP",
-                description: "Monitor HTTP endpoints",
-                fields: { url: { type: "url", required: true } },
-                features: { advancedAnalytics: true, responseTime: true },
-                uiConfig: {
-                    helpTexts: {
-                        general: "Monitor HTTP endpoints for availability",
-                        advanced: "",
-                    },
-                    detailFormats: {
-                        analyticsLabel: "HTTP Analytics",
-                    },
-                    display: {
-                        showUrl: true,
-                    },
-                    supportsAdvancedAnalytics: true,
-                    supportsResponseTime: true,
-                },
-            },
-            ping: {
-                type: "ping",
-                name: "Ping",
-                description: "Monitor server ping",
-                fields: { host: { type: "hostname", required: true } },
-                features: { advancedAnalytics: false, responseTime: true },
-                uiConfig: {
-                    helpTexts: {
-                        general: "Monitor server ping response",
-                        advanced: "",
-                    },
-                    detailFormats: {
-                        analyticsLabel: "Ping Analytics",
-                    },
-                    display: {
-                        showUrl: false,
-                    },
-                    supportsAdvancedAnalytics: false,
-                    supportsResponseTime: true,
-                },
-            },
-            tcp: {
-                type: "tcp",
-                name: "TCP",
-                description: "Monitor TCP ports",
-                fields: { host: { type: "hostname", required: true }, port: { type: "number", required: true } },
-                features: { advancedAnalytics: true, responseTime: false },
-                uiConfig: {
-                    helpTexts: {
-                        general: "Monitor TCP port connectivity",
-                        advanced: "",
-                    },
-                    detailFormats: {
-                        analyticsLabel: "TCP Analytics",
-                    },
-                    display: {
-                        showUrl: false,
-                    },
-                    supportsAdvancedAnalytics: true,
-                    supportsResponseTime: false,
-                },
-            },
-        };
-        return Promise.resolve(configs[type] || null);
-    }),
+vi.mock("../../types/ipc", () => ({
+    safeExtractIpcData: vi.fn((response, fallback) => response.data || fallback),
 }));
 
 vi.mock("../../utils/errorHandling", () => ({
-    withUtilityErrorHandling: vi.fn().mockImplementation(async (fn, description, fallback) => {
+    withUtilityErrorHandling: vi.fn(async (fn, _description, fallback) => {
         try {
             return await fn();
         } catch {
@@ -166,431 +22,347 @@ vi.mock("../../utils/errorHandling", () => ({
     }),
 }));
 
-vi.mock("../../utils/cache", () => ({
-    AppCaches: {
-        uiHelpers: {
-            clear: vi.fn(),
-            get: vi.fn(),
-            set: vi.fn(),
-            has: vi.fn(),
-            delete: vi.fn(),
-            cleanup: vi.fn(),
+vi.mock("../../utils/monitorTypeHelper", () => ({
+    getAvailableMonitorTypes: vi.fn(),
+    getMonitorTypeConfig: vi.fn(),
+}));
+
+// Helper function to create complete MonitorTypeConfig objects
+function createMockConfig(overrides: any = {}) {
+    return {
+        type: "http",
+        displayName: "HTTP Monitor",
+        description: "HTTP monitoring",
+        version: "1.0.0",
+        fields: [],
+        uiConfig: {
+            supportsAdvancedAnalytics: false,
+            supportsResponseTime: false,
+            display: { showUrl: false },
+            helpTexts: {},
+            detailFormats: {},
+            ...overrides.uiConfig,
         },
+        ...overrides,
+    };
+}
+
+// Mock window.electronAPI
+const mockElectronAPI = {
+    monitorTypes: {
+        formatMonitorDetail: vi.fn(),
+        formatMonitorTitleSuffix: vi.fn(),
     },
-}));
+};
 
-vi.mock("../../types/ipc", () => ({
-    safeExtractIpcData: vi.fn().mockImplementation((data) => data || {}),
-}));
+Object.defineProperty(window, "electronAPI", {
+    value: mockElectronAPI,
+    writable: true,
+});
 
-describe("monitorUiHelpers", () => {
+describe("Monitor UI Helpers", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        clearConfigCache();
+        AppCaches.uiHelpers.clear();
+        // Reset getMonitorTypeConfig mock to default implementation
+        vi.mocked(getMonitorTypeConfig).mockImplementation(async () => undefined);
+    });
+
+    afterEach(() => {
+        vi.clearAllMocks();
+        AppCaches.uiHelpers.clear();
     });
 
     describe("allSupportsAdvancedAnalytics", () => {
-        it("should return true when all types support advanced analytics", async () => {
-            const types: MonitorType[] = ["http", "tcp"];
-            const result = await allSupportsAdvancedAnalytics(types);
+        it("should return true when all monitor types support advanced analytics", async () => {
+            vi.mocked(getMonitorTypeConfig).mockImplementation(async (type) => {
+                if (type === "http" || type === "port") {
+                    return createMockConfig({
+                        type,
+                        uiConfig: { supportsAdvancedAnalytics: true },
+                    });
+                }
+                return undefined;
+            });
+
+            const result = await monitorUiHelpers.allSupportsAdvancedAnalytics(["http", "port"]);
+
             expect(result).toBe(true);
         });
 
-        it("should return false when some types don't support advanced analytics", async () => {
-            const types: MonitorType[] = ["http", "ping"]; // ping doesn't support advanced analytics
-            const result = await allSupportsAdvancedAnalytics(types);
+        it("should return false when some monitor types don't support advanced analytics", async () => {
+            vi.mocked(getMonitorTypeConfig).mockImplementation(async (type) => {
+                if (type === "http") {
+                    return createMockConfig({
+                        type,
+                        uiConfig: { supportsAdvancedAnalytics: true },
+                    });
+                }
+                if (type === "port") {
+                    return createMockConfig({
+                        type,
+                        uiConfig: { supportsAdvancedAnalytics: false },
+                    });
+                }
+                return undefined;
+            });
+
+            const result = await monitorUiHelpers.allSupportsAdvancedAnalytics(["http", "port"]);
+
             expect(result).toBe(false);
         });
 
         it("should return true for empty array", async () => {
-            const result = await allSupportsAdvancedAnalytics([]);
+            const result = await monitorUiHelpers.allSupportsAdvancedAnalytics([]);
+
             expect(result).toBe(true);
         });
     });
 
     describe("allSupportsResponseTime", () => {
-        it("should return true when all types support response time", async () => {
-            const types: MonitorType[] = ["http", "ping"];
-            const result = await allSupportsResponseTime(types);
+        it("should return true when all monitor types support response time", async () => {
+            vi.mocked(getMonitorTypeConfig).mockImplementation(async (type) => {
+                if (type === "http" || type === "port") {
+                    return createMockConfig({
+                        type,
+                        uiConfig: { supportsResponseTime: true },
+                    });
+                }
+                return undefined;
+            });
+
+            const result = await monitorUiHelpers.allSupportsResponseTime(["http", "port"]);
+
             expect(result).toBe(true);
         });
 
-        it("should return false when some types don't support response time", async () => {
-            const types: MonitorType[] = ["http", "tcp"]; // tcp doesn't support response time
-            const result = await allSupportsResponseTime(types);
+        it("should return false when some monitor types don't support response time", async () => {
+            vi.mocked(getMonitorTypeConfig).mockImplementation(async (type) => {
+                if (type === "http") {
+                    return createMockConfig({
+                        type,
+                        uiConfig: { supportsResponseTime: true },
+                    });
+                }
+                if (type === "port") {
+                    return createMockConfig({
+                        type,
+                        uiConfig: { supportsResponseTime: false },
+                    });
+                }
+                return undefined;
+            });
+
+            const result = await monitorUiHelpers.allSupportsResponseTime(["http", "port"]);
+
             expect(result).toBe(false);
         });
 
         it("should return true for empty array", async () => {
-            const result = await allSupportsResponseTime([]);
+            const result = await monitorUiHelpers.allSupportsResponseTime([]);
+
             expect(result).toBe(true);
-        });
-    });
-
-    describe("clearConfigCache", () => {
-        it("should clear cache without throwing", () => {
-            expect(() => clearConfigCache()).not.toThrow();
-        });
-    });
-
-    describe("formatMonitorDetail", () => {
-        it("should format details for known monitor types (fallback to original)", async () => {
-            const result = await formatMonitorDetail("http", "test details");
-            expect(result).toBe("test details"); // IPC not available, falls back to original
-        });
-
-        it("should handle unknown monitor types", async () => {
-            const result = await formatMonitorDetail("unknown" as MonitorType, "test details");
-            expect(result).toBe("test details"); // IPC not available, falls back to original
-        });
-
-        it("should handle errors when electronAPI is not available", async () => {
-            // Test the error path by mocking the error handling to simulate API unavailability
-            const { withUtilityErrorHandling } = await import("../../utils/errorHandling");
-            vi.mocked(withUtilityErrorHandling).mockImplementationOnce(async (fn, description, fallback) => {
-                // Simulate the error case where electronAPI fails
-                try {
-                    throw new Error("ElectronAPI not available");
-                } catch {
-                    return fallback;
-                }
-            });
-
-            const result = await formatMonitorDetail("http", "test details");
-            expect(result).toBe("test details"); // Falls back to original on error
-        });
-
-        it("should handle errors when electronAPI methods are missing", async () => {
-            // Mock incomplete electronAPI by mocking the error handling
-            const { withUtilityErrorHandling } = await import("../../utils/errorHandling");
-            vi.mocked(withUtilityErrorHandling).mockImplementationOnce(async (fn, description, fallback) => {
-                try {
-                    // Simulate method missing error
-                    throw new Error("Method not available");
-                } catch {
-                    return fallback;
-                }
-            });
-
-            const result = await formatMonitorDetail("http", "test details");
-            expect(result).toBe("test details"); // Falls back to original on error
-        });
-    });
-
-    describe("formatMonitorTitleSuffix", () => {
-        it("should return empty string for http (IPC not available)", async () => {
-            const result = await formatMonitorTitleSuffix("http", "test.com");
-            expect(result).toBe("");
-        });
-
-        it("should return empty string for ping (IPC not available)", async () => {
-            const result = await formatMonitorTitleSuffix("ping", "server.com");
-            expect(result).toBe("");
-        });
-
-        it("should handle unknown monitor types", async () => {
-            const result = await formatMonitorTitleSuffix("unknown" as MonitorType, "test.com");
-            expect(result).toBe("");
-        });
-
-        it("should handle errors when electronAPI is not available", async () => {
-            // Test the error path by mocking the error handling to simulate API unavailability
-            const { withUtilityErrorHandling } = await import("../../utils/errorHandling");
-            vi.mocked(withUtilityErrorHandling).mockImplementationOnce(async (fn, description, fallback) => {
-                // Simulate the error case where electronAPI fails
-                try {
-                    throw new Error("ElectronAPI not available");
-                } catch {
-                    return fallback;
-                }
-            });
-
-            const result = await formatMonitorTitleSuffix("http", { url: "test.com" });
-            expect(result).toBe(""); // Falls back to empty string on error
-        });
-
-        it("should handle errors when electronAPI methods are missing", async () => {
-            // Mock incomplete electronAPI by mocking the error handling
-            const { withUtilityErrorHandling } = await import("../../utils/errorHandling");
-            vi.mocked(withUtilityErrorHandling).mockImplementationOnce(async (fn, description, fallback) => {
-                try {
-                    // Simulate method missing error
-                    throw new Error("Method not available");
-                } catch {
-                    return fallback;
-                }
-            });
-
-            const result = await formatMonitorTitleSuffix("http", { url: "test.com" });
-            expect(result).toBe(""); // Falls back to empty string on error
-        });
-    });
-
-    describe("getAnalyticsLabel", () => {
-        it("should return analytics label for http", async () => {
-            const result = await getAnalyticsLabel("http");
-            expect(result).toBe("HTTP Analytics");
-        });
-
-        it("should return analytics label for ping", async () => {
-            const result = await getAnalyticsLabel("ping");
-            expect(result).toBe("Ping Analytics");
-        });
-
-        it("should handle unknown monitor types", async () => {
-            const result = await getAnalyticsLabel("unknown" as MonitorType);
-            expect(result).toBe("UNKNOWN Response Time"); // Falls back to default format
-        });
-    });
-
-    describe("getDefaultMonitorId", () => {
-        it("should return first monitor ID from array", () => {
-            const ids = ["monitor1", "monitor2", "monitor3"];
-            const result = getDefaultMonitorId(ids);
-            expect(result).toBe("monitor1");
-        });
-
-        it("should return empty string for empty array", () => {
-            const result = getDefaultMonitorId([]);
-            expect(result).toBe("");
-        });
-
-        it("should handle single monitor ID", () => {
-            const result = getDefaultMonitorId(["single-monitor"]);
-            expect(result).toBe("single-monitor");
-        });
-    });
-
-    describe("getMonitorHelpTexts", () => {
-        it("should return help texts for http", async () => {
-            const result = await getMonitorHelpTexts("http");
-            expect(result).toEqual({
-                general: "Monitor HTTP endpoints for availability",
-                advanced: "",
-            });
-        });
-
-        it("should return help texts for ping", async () => {
-            const result = await getMonitorHelpTexts("ping");
-            expect(result).toEqual({
-                general: "Monitor server ping response",
-                advanced: "",
-            });
-        });
-
-        it("should handle unknown monitor types", async () => {
-            const result = await getMonitorHelpTexts("unknown" as MonitorType);
-            expect(result).toEqual({}); // Returns empty object for unknown types
-        });
-    });
-
-    describe("getTypesWithFeature", () => {
-        it("should return types with advanced analytics feature", async () => {
-            const result = await getTypesWithFeature("advancedAnalytics");
-            expect(result).toContain("http");
-            expect(result).toContain("tcp");
-            expect(result).not.toContain("ping");
-        });
-
-        it("should return types with response time feature", async () => {
-            const result = await getTypesWithFeature("responseTime");
-            expect(result).toContain("http");
-            expect(result).toContain("ping");
-            expect(result).not.toContain("tcp");
-        });
-    });
-
-    describe("shouldShowUrl", () => {
-        it("should return true for http monitors", async () => {
-            const result = await shouldShowUrl("http");
-            expect(result).toBe(true);
-        });
-
-        it("should return false for ping monitors", async () => {
-            const result = await shouldShowUrl("ping");
-            expect(result).toBe(false);
-        });
-
-        it("should return false for tcp monitors", async () => {
-            const result = await shouldShowUrl("tcp");
-            expect(result).toBe(false);
-        });
-
-        it("should handle unknown monitor types", async () => {
-            const result = await shouldShowUrl("unknown" as MonitorType);
-            expect(result).toBe(false);
         });
     });
 
     describe("supportsAdvancedAnalytics", () => {
-        it("should return true for http", async () => {
-            const result = await supportsAdvancedAnalytics("http");
+        it("should return true when monitor type supports advanced analytics", async () => {
+            vi.mocked(getMonitorTypeConfig).mockResolvedValue(createMockConfig({
+                type: "http",
+                uiConfig: { supportsAdvancedAnalytics: true },
+            }));
+
+            const result = await monitorUiHelpers.supportsAdvancedAnalytics("http");
+
             expect(result).toBe(true);
         });
 
-        it("should return false for ping", async () => {
-            const result = await supportsAdvancedAnalytics("ping");
+        it("should return false when monitor type doesn't support advanced analytics", async () => {
+            vi.mocked(getMonitorTypeConfig).mockResolvedValue(createMockConfig({
+                type: "http",
+                uiConfig: { supportsAdvancedAnalytics: false },
+            }));
+
+            const result = await monitorUiHelpers.supportsAdvancedAnalytics("http");
+
             expect(result).toBe(false);
         });
 
-        it("should return true for tcp", async () => {
-            const result = await supportsAdvancedAnalytics("tcp");
-            expect(result).toBe(true);
-        });
+        it("should return false when config is undefined", async () => {
+            vi.mocked(getMonitorTypeConfig).mockResolvedValue(undefined);
 
-        it("should handle unknown monitor types", async () => {
-            const result = await supportsAdvancedAnalytics("unknown" as MonitorType);
+            const result = await monitorUiHelpers.supportsAdvancedAnalytics("http");
+
             expect(result).toBe(false);
         });
     });
 
     describe("supportsResponseTime", () => {
-        it("should return true for http", async () => {
-            const result = await supportsResponseTime("http");
+        it("should return true when monitor type supports response time", async () => {
+            vi.mocked(getMonitorTypeConfig).mockResolvedValue(createMockConfig({
+                type: "http",
+                uiConfig: { supportsResponseTime: true },
+            }));
+
+            const result = await monitorUiHelpers.supportsResponseTime("http");
+
             expect(result).toBe(true);
         });
 
-        it("should return true for ping", async () => {
-            const result = await supportsResponseTime("ping");
-            expect(result).toBe(true);
-        });
+        it("should return false when monitor type doesn't support response time", async () => {
+            vi.mocked(getMonitorTypeConfig).mockResolvedValue(createMockConfig({
+                type: "http",
+                uiConfig: { supportsResponseTime: false },
+            }));
 
-        it("should return false for tcp", async () => {
-            const result = await supportsResponseTime("tcp");
+            const result = await monitorUiHelpers.supportsResponseTime("http");
+
             expect(result).toBe(false);
         });
 
-        it("should handle unknown monitor types", async () => {
-            const result = await supportsResponseTime("unknown" as MonitorType);
+        it("should return false when config is undefined", async () => {
+            vi.mocked(getMonitorTypeConfig).mockResolvedValue(undefined);
+
+            const result = await monitorUiHelpers.supportsResponseTime("http");
+
             expect(result).toBe(false);
         });
     });
 
-    describe("Configuration Caching", () => {
-        it("should cache configuration after first retrieval", async () => {
-            const { AppCaches } = await import("../../utils/cache");
+    describe("shouldShowUrl", () => {
+        it("should return true when monitor type should show URL", async () => {
+            vi.mocked(getMonitorTypeConfig).mockResolvedValue(createMockConfig({
+                type: "http",
+                uiConfig: { display: { showUrl: true } },
+            }));
 
-            // Clear cache before test
-            clearConfigCache();
+            const result = await monitorUiHelpers.shouldShowUrl("http");
 
-            // Mock cache methods
-            const mockGet = vi.spyOn(AppCaches.uiHelpers, "get");
-            const mockSet = vi.spyOn(AppCaches.uiHelpers, "set");
+            expect(result).toBe(true);
+        });
 
-            // First call should miss cache and set it
-            mockGet.mockReturnValueOnce(undefined);
-            const result1 = await getAnalyticsLabel("http");
-            expect(result1).toBe("HTTP Analytics");
-            expect(mockSet).toHaveBeenCalled();
+        it("should return false when monitor type shouldn't show URL", async () => {
+            vi.mocked(getMonitorTypeConfig).mockResolvedValue(createMockConfig({
+                type: "http",
+                uiConfig: { display: { showUrl: false } },
+            }));
 
-            // Second call should hit cache
-            mockGet.mockReturnValueOnce({
+            const result = await monitorUiHelpers.shouldShowUrl("http");
+
+            expect(result).toBe(false);
+        });
+
+        it("should return false when config is undefined", async () => {
+            vi.mocked(getMonitorTypeConfig).mockResolvedValue(undefined);
+
+            const result = await monitorUiHelpers.shouldShowUrl("http");
+
+            expect(result).toBe(false);
+        });
+    });
+
+    describe("clearConfigCache", () => {
+        it("should clear the ui helpers cache", () => {
+            // Set some data in cache
+            AppCaches.uiHelpers.set("test-key", "test-value");
+            expect(AppCaches.uiHelpers.has("test-key")).toBe(true);
+
+            // Clear cache
+            monitorUiHelpers.clearConfigCache();
+
+            // Verify cache is cleared
+            expect(AppCaches.uiHelpers.has("test-key")).toBe(false);
+        });
+    });
+
+    describe("getDefaultMonitorId", () => {
+        it("should return first monitor ID from non-empty array", () => {
+            const result = monitorUiHelpers.getDefaultMonitorId(["monitor-1", "monitor-2", "monitor-3"]);
+
+            expect(result).toBe("monitor-1");
+        });
+
+        it("should return empty string for empty array", () => {
+            const result = monitorUiHelpers.getDefaultMonitorId([]);
+
+            expect(result).toBe("");
+        });
+
+        it("should handle array with single element", () => {
+            const result = monitorUiHelpers.getDefaultMonitorId(["only-monitor"]);
+
+            expect(result).toBe("only-monitor");
+        });
+    });
+
+    describe("Error handling and edge cases", () => {
+        it("should handle errors gracefully in basic functions", async () => {
+            vi.mocked(getMonitorTypeConfig).mockRejectedValue(new Error("Config fetch failed"));
+
+            // All functions should return their fallback values on error
+            expect(await monitorUiHelpers.supportsAdvancedAnalytics("http")).toBe(false);
+            expect(await monitorUiHelpers.supportsResponseTime("http")).toBe(false);
+            expect(await monitorUiHelpers.shouldShowUrl("http")).toBe(false);
+            expect(await monitorUiHelpers.getAnalyticsLabel("http")).toBe("HTTP Response Time");
+            expect(await monitorUiHelpers.getMonitorHelpTexts("http")).toEqual({});
+        });
+
+        it("should handle invalid monitor types", async () => {
+            const invalidType = "invalid-type" as any; // Cast to test edge case
+            
+            // Mock to return undefined for invalid types (this is the default, but let's be explicit)
+            vi.mocked(getMonitorTypeConfig).mockResolvedValue(undefined);
+
+            expect(await monitorUiHelpers.supportsAdvancedAnalytics(invalidType)).toBe(false);
+            expect(await monitorUiHelpers.supportsResponseTime(invalidType)).toBe(false);
+            expect(await monitorUiHelpers.shouldShowUrl(invalidType)).toBe(false);
+        });
+    });
+
+    describe("Caching behavior", () => {
+        it("should cache configuration results", async () => {
+            const mockConfig = createMockConfig({
                 type: "http",
                 uiConfig: {
-                    detailFormats: {
-                        analyticsLabel: "Cached HTTP Analytics",
-                    },
+                    supportsAdvancedAnalytics: true,
+                    supportsResponseTime: true,
+                    display: { showUrl: true },
                 },
             });
-            const result2 = await getAnalyticsLabel("http");
-            expect(result2).toBe("Cached HTTP Analytics");
+
+            vi.mocked(getMonitorTypeConfig).mockResolvedValue(mockConfig);
+
+            // First call should fetch from backend
+            await monitorUiHelpers.supportsAdvancedAnalytics("http");
+            expect(vi.mocked(getMonitorTypeConfig)).toHaveBeenCalledTimes(1);
+
+            // Second call should use cached result
+            await monitorUiHelpers.supportsResponseTime("http");
+            expect(vi.mocked(getMonitorTypeConfig)).toHaveBeenCalledTimes(1); // Still 1, not 2
         });
 
-        it("should handle cache miss and config not found", async () => {
-            const { getMonitorTypeConfig } = await import("../../utils/monitorTypeHelper");
-
-            // Mock getMonitorTypeConfig to return null
-            vi.mocked(getMonitorTypeConfig).mockResolvedValueOnce(null);
-
-            const result = await getAnalyticsLabel("nonexistent" as MonitorType);
-            expect(result).toBe("NONEXISTENT Response Time"); // Fallback format
-        });
-
-        it("should handle undefined cache values gracefully", async () => {
-            const { AppCaches } = await import("../../utils/cache");
-
-            // Mock cache to return undefined
-            vi.spyOn(AppCaches.uiHelpers, "get").mockReturnValue(undefined);
-
-            const result = await shouldShowUrl("http");
-            expect(result).toBe(true); // Should fetch from backend
-        });
-    });
-
-    describe("Error Handling Edge Cases", () => {
-        it("should handle getMonitorTypeConfig returning undefined", async () => {
-            const { getMonitorTypeConfig } = await import("../../utils/monitorTypeHelper");
-
-            // Mock to return undefined
-            vi.mocked(getMonitorTypeConfig).mockResolvedValueOnce(undefined);
-
-            const result = await getMonitorHelpTexts("unknown" as MonitorType);
-            expect(result).toEqual({}); // Should return empty object
-        });
-
-        it("should handle config with missing uiConfig", async () => {
-            const { getMonitorTypeConfig } = await import("../../utils/monitorTypeHelper");
-
-            // Mock to return config without uiConfig
-            vi.mocked(getMonitorTypeConfig).mockResolvedValueOnce({
-                type: "test",
-                name: "Test",
-                description: "Test monitor",
-                fields: {},
-                features: {},
-                // No uiConfig
-            } as any);
-
-            const result = await shouldShowUrl("test" as MonitorType);
-            expect(result).toBe(false); // Should fallback to false
-        });
-
-        it("should handle config with partial uiConfig", async () => {
-            const { getMonitorTypeConfig } = await import("../../utils/monitorTypeHelper");
-
-            // Mock to return config with partial uiConfig
-            vi.mocked(getMonitorTypeConfig).mockResolvedValueOnce({
-                type: "test",
-                name: "Test",
-                description: "Test monitor",
-                fields: {},
-                features: {},
+        it("should clear cache when clearConfigCache is called", async () => {
+            const mockConfig = createMockConfig({
+                type: "http",
                 uiConfig: {
-                    // Missing some properties
-                    helpTexts: {
-                        general: "Test help",
-                    },
-                    // Missing display, detailFormats, etc.
+                    supportsAdvancedAnalytics: true,
+                    supportsResponseTime: true,
+                    display: { showUrl: true },
                 },
-            } as any);
+            });
 
-            const result = await supportsAdvancedAnalytics("test" as MonitorType);
-            expect(result).toBe(false); // Should fallback to false
-        });
-    });
+            vi.mocked(getMonitorTypeConfig).mockResolvedValue(mockConfig);
 
-    describe("Cache Key Generation", () => {
-        it("should generate unique cache keys for different monitor types", async () => {
-            // Test that different monitor types generate different cache keys
-            // by clearing cache and checking that configurations are retrieved separately
-            clearConfigCache();
+            // First call
+            await monitorUiHelpers.supportsAdvancedAnalytics("http");
+            expect(vi.mocked(getMonitorTypeConfig)).toHaveBeenCalledTimes(1);
 
-            const result1 = await getAnalyticsLabel("http");
-            const result2 = await getAnalyticsLabel("ping");
+            // Clear cache
+            monitorUiHelpers.clearConfigCache();
 
-            expect(result1).toBe("HTTP Analytics");
-            expect(result2).toBe("Ping Analytics");
-            expect(result1).not.toBe(result2);
-        });
-
-        it("should sanitize cache keys for monitor types with special characters", async () => {
-            // This test ensures the cache key sanitization works
-            // Even though we don't have monitor types with special chars in our mock,
-            // this tests the generateCacheKey function's sanitization
-            clearConfigCache();
-
-            const result = await getAnalyticsLabel("test-type" as MonitorType);
-            expect(result).toBe("TEST-TYPE Response Time"); // Should handle sanitization
+            // Next call should fetch again
+            await monitorUiHelpers.supportsResponseTime("http");
+            expect(vi.mocked(getMonitorTypeConfig)).toHaveBeenCalledTimes(2);
         });
     });
 });

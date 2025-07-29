@@ -4,16 +4,16 @@ import { SiteManager } from "../../managers/SiteManager";
 describe("SiteManager", () => {
     let manager: SiteManager;
     let mockDependencies: any;
-    let mockSitesCache: any;
+    // let mockSitesCache: any; // Currently unused
 
     beforeEach(() => {
-        mockSitesCache = {
-            delete: vi.fn(),
-            get: vi.fn(),
-            set: vi.fn(),
-            has: vi.fn(),
-            clear: vi.fn(),
-        };
+        // const mockSitesCache = { // Currently unused
+        //     delete: vi.fn(),
+        //     get: vi.fn(),
+        //     set: vi.fn(),
+        //     has: vi.fn(),
+        //     clear: vi.fn(),
+        // };
 
         mockDependencies = {
             configurationManager: {
@@ -233,7 +233,7 @@ describe("SiteManager", () => {
                 .mockResolvedValue([updatedSite]);
 
             // Mock the updateSitesCache method
-            const mockUpdateSitesCache = vi.spyOn(manager, "updateSitesCache").mockResolvedValue(undefined);
+            vi.spyOn(manager, "updateSitesCache").mockResolvedValue(undefined);
 
             mockDependencies.databaseService.executeTransaction.mockImplementation(async (fn: any) => {
                 return await fn();

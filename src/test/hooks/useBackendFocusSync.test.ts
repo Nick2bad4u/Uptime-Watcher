@@ -10,20 +10,54 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useBackendFocusSync } from "../../hooks/useBackendFocusSync";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
+import type { SitesStore } from "../../stores/sites/types";
 
 // Mock the useSitesStore
 const mockFullSyncFromBackend = vi.fn();
 
+// Create a minimal mock store with only the required properties
+const createMockStore = (): Partial<SitesStore> => ({
+    fullSyncFromBackend: mockFullSyncFromBackend,
+    sites: [],
+    selectedMonitorIds: {},
+    selectedSiteId: undefined,
+    // Add minimal mock implementations for other required methods
+    addMonitorToSite: vi.fn(),
+    addSite: vi.fn(),
+    checkSiteNow: vi.fn(),
+    createSite: vi.fn(),
+    deleteSite: vi.fn(),
+    downloadSQLiteBackup: vi.fn(),
+    getSelectedMonitorId: vi.fn(),
+    getSelectedSite: vi.fn(),
+    getSyncStatus: vi.fn(),
+    initializeSites: vi.fn(),
+    modifySite: vi.fn(),
+    removeMonitorFromSite: vi.fn(),
+    removeSite: vi.fn(),
+    setSelectedMonitorId: vi.fn(),
+    setSelectedSite: vi.fn(),
+    setSites: vi.fn(),
+    startSiteMonitoring: vi.fn(),
+    startSiteMonitorMonitoring: vi.fn(),
+    stopSiteMonitoring: vi.fn(),
+    stopSiteMonitorMonitoring: vi.fn(),
+    subscribeToStatusUpdates: vi.fn(),
+    subscribeToSyncEvents: vi.fn(),
+    syncSitesFromBackend: vi.fn(),
+    unsubscribeFromStatusUpdates: vi.fn(),
+    updateMonitorRetryAttempts: vi.fn(),
+    updateMonitorTimeout: vi.fn(),
+    updateSiteCheckInterval: vi.fn(),
+});
+
 vi.mock("../../stores/sites/useSitesStore", () => ({
     useSitesStore: vi.fn((selector) => {
+        const mockStore = createMockStore() as SitesStore;
         if (typeof selector === "function") {
-            return selector({
-                fullSyncFromBackend: mockFullSyncFromBackend,
-            });
+            return selector(mockStore);
         }
-        return {
-            fullSyncFromBackend: mockFullSyncFromBackend,
-        };
+        return mockStore;
     }),
 }));
 
@@ -87,10 +121,12 @@ describe("useBackendFocusSync Hook", () => {
 
             // Get the event handler that was registered
             expect(mockAddEventListener).toHaveBeenCalledWith("focus", expect.any(Function));
-            const focusHandler = mockAddEventListener.mock.calls[0][1];
+            const focusHandler = mockAddEventListener.mock.calls[0]?.[1];
 
             // Simulate focus event
-            focusHandler();
+            if (focusHandler) {
+                focusHandler();
+            }
 
             expect(mockFullSyncFromBackend).toHaveBeenCalledTimes(1);
         });
@@ -98,12 +134,14 @@ describe("useBackendFocusSync Hook", () => {
         it("should handle multiple focus events", () => {
             renderHook(() => useBackendFocusSync(true));
 
-            const focusHandler = mockAddEventListener.mock.calls[0][1];
+            const focusHandler = mockAddEventListener.mock.calls[0]?.[1];
 
             // Simulate multiple focus events
-            focusHandler();
-            focusHandler();
-            focusHandler();
+            if (focusHandler) {
+                focusHandler();
+                focusHandler();
+                focusHandler();
+            }
 
             expect(mockFullSyncFromBackend).toHaveBeenCalledTimes(3);
         });
@@ -113,7 +151,7 @@ describe("useBackendFocusSync Hook", () => {
 
             // Verify listener was added
             expect(mockAddEventListener).toHaveBeenCalledWith("focus", expect.any(Function));
-            const focusHandler = mockAddEventListener.mock.calls[0][1];
+            const focusHandler = mockAddEventListener.mock.calls[0]?.[1];
 
             // Unmount the component
             unmount();
@@ -148,7 +186,7 @@ describe("useBackendFocusSync Hook", () => {
 
             // Initially enabled - listener should be added
             expect(mockAddEventListener).toHaveBeenCalledWith("focus", expect.any(Function));
-            const focusHandler = mockAddEventListener.mock.calls[0][1];
+            const focusHandler = mockAddEventListener.mock.calls[0]?.[1];
 
             // Disable the hook
             rerender({ enabled: false });
@@ -185,30 +223,29 @@ describe("useBackendFocusSync Hook", () => {
 
         it("should re-run effect when fullSyncFromBackend function changes", () => {
             const newMockFullSync = vi.fn();
+            const mockStore = createMockStore() as SitesStore;
 
             // Initially return the first mock function
             vi.mocked(useSitesStore).mockImplementation((selector) => {
+                const store = { ...mockStore, fullSyncFromBackend: mockFullSyncFromBackend };
                 if (typeof selector === "function") {
-                    return selector({
-                        fullSyncFromBackend: mockFullSyncFromBackend,
-                    });
+                    return selector(store);
                 }
-                return { fullSyncFromBackend: mockFullSyncFromBackend };
+                return store;
             });
 
             const { rerender } = renderHook(() => useBackendFocusSync(true));
 
             expect(mockAddEventListener).toHaveBeenCalledTimes(1);
-            const firstHandler = mockAddEventListener.mock.calls[0][1];
+            const firstHandler = mockAddEventListener.mock.calls[0]?.[1];
 
             // Change the mock to return a new function
             vi.mocked(useSitesStore).mockImplementation((selector) => {
+                const store = { ...mockStore, fullSyncFromBackend: newMockFullSync };
                 if (typeof selector === "function") {
-                    return selector({
-                        fullSyncFromBackend: newMockFullSync,
-                    });
+                    return selector(store);
                 }
-                return { fullSyncFromBackend: newMockFullSync };
+                return store;
             });
 
             // Force re-render
@@ -219,7 +256,7 @@ describe("useBackendFocusSync Hook", () => {
             expect(mockAddEventListener).toHaveBeenCalledTimes(2);
 
             // New handler should call the new function
-            const secondHandler = mockAddEventListener.mock.calls[1][1];
+            const secondHandler = mockAddEventListener.mock.calls[1]?.[1];
             secondHandler();
 
             expect(newMockFullSync).toHaveBeenCalledTimes(1);
@@ -235,10 +272,14 @@ describe("useBackendFocusSync Hook", () => {
 
             renderHook(() => useBackendFocusSync(true));
 
-            const focusHandler = mockAddEventListener.mock.calls[0][1];
+            const focusHandler = mockAddEventListener.mock.calls[0]?.[1];
 
             // Should not throw when focus handler is called
-            expect(() => focusHandler()).not.toThrow();
+            expect(() => {
+                if (focusHandler) {
+                    focusHandler();
+                }
+            }).not.toThrow();
         });
 
         it("should handle fullSyncFromBackend returning a rejected promise", () => {
@@ -246,10 +287,14 @@ describe("useBackendFocusSync Hook", () => {
 
             renderHook(() => useBackendFocusSync(true));
 
-            const focusHandler = mockAddEventListener.mock.calls[0][1];
+            const focusHandler = mockAddEventListener.mock.calls[0]?.[1];
 
             // Should not throw when focus handler is called
-            expect(() => focusHandler()).not.toThrow();
+            expect(() => {
+                if (focusHandler) {
+                    focusHandler();
+                }
+            }).not.toThrow();
         });
 
         it("should work with truthy non-boolean values for enabled", () => {
@@ -287,13 +332,13 @@ describe("useBackendFocusSync Hook", () => {
     describe("Integration scenarios", () => {
         beforeEach(() => {
             // Reset the mock implementation for integration tests
+            const mockStore = createMockStore() as SitesStore;
             vi.mocked(useSitesStore).mockImplementation((selector) => {
+                const store = { ...mockStore, fullSyncFromBackend: mockFullSyncFromBackend };
                 if (typeof selector === "function") {
-                    return selector({
-                        fullSyncFromBackend: mockFullSyncFromBackend,
-                    });
+                    return selector(store);
                 }
-                return { fullSyncFromBackend: mockFullSyncFromBackend };
+                return store;
             });
         });
 
@@ -302,8 +347,10 @@ describe("useBackendFocusSync Hook", () => {
 
             expect(mockAddEventListener).toHaveBeenCalledWith("focus", expect.any(Function));
 
-            const focusHandler = mockAddEventListener.mock.calls[0][1];
-            focusHandler();
+            const focusHandler = mockAddEventListener.mock.calls[0]?.[1];
+            if (focusHandler) {
+                focusHandler();
+            }
 
             expect(mockFullSyncFromBackend).toHaveBeenCalledTimes(1);
         });
@@ -311,7 +358,7 @@ describe("useBackendFocusSync Hook", () => {
         it("should properly clean up when component unmounts while enabled", () => {
             const { unmount } = renderHook(() => useBackendFocusSync(true));
 
-            const focusHandler = mockAddEventListener.mock.calls[0][1];
+            const focusHandler = mockAddEventListener.mock.calls[0]?.[1];
 
             unmount();
 
@@ -324,12 +371,16 @@ describe("useBackendFocusSync Hook", () => {
 
             expect(mockAddEventListener).toHaveBeenCalledTimes(2);
 
-            const handler1 = mockAddEventListener.mock.calls[0][1];
-            const handler2 = mockAddEventListener.mock.calls[1][1];
+            const handler1 = mockAddEventListener.mock.calls[0]?.[1];
+            const handler2 = mockAddEventListener.mock.calls[1]?.[1];
 
             // Both handlers should work independently
-            handler1();
-            handler2();
+            if (handler1) {
+                handler1();
+            }
+            if (handler2) {
+                handler2();
+            }
 
             expect(mockFullSyncFromBackend).toHaveBeenCalledTimes(2);
 

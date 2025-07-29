@@ -246,7 +246,7 @@ describe("Monitor Types Utility", () => {
             ];
 
             for (const type of testTypes) {
-                const result = isBaseMonitorType(type);
+                const result = isBaseMonitorType(type as string);
                 expect(typeof result).toBe("boolean");
             }
         });

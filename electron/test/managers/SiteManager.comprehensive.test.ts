@@ -4,8 +4,26 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Site } from "../../types";
+import type { Site, Monitor } from "../../types";
 import { SiteManager, type IMonitoringOperations } from "../../managers/SiteManager";
+
+/**
+ * Helper function to create a complete Monitor object with all required properties
+ */
+function createMockMonitor(overrides: Partial<Monitor> = {}): Monitor {
+    return {
+        id: "mock-monitor",
+        type: "http",
+        monitoring: true,
+        checkInterval: 5000,
+        timeout: 5000,
+        retryAttempts: 3,
+        responseTime: 0,
+        status: "pending",
+        history: [],
+        ...overrides,
+    };
+}
 
 // Mock all the dependencies
 vi.mock("../../utils/logger", () => ({
@@ -120,18 +138,18 @@ describe("SiteManager - Comprehensive", () => {
             name: "Test Site",
             monitoring: true,
             monitors: [
-                {
+                createMockMonitor({
                     id: "monitor-1",
-                    type: "http" as const,
+                    type: "http",
                     url: "https://example.com",
                     checkInterval: 5000,
                     timeout: 10_000,
                     retryAttempts: 3,
                     monitoring: true,
-                    status: "pending" as const,
+                    status: "pending",
                     responseTime: 0,
                     history: [],
-                },
+                }),
             ],
         };
 
@@ -507,20 +525,20 @@ describe("SiteManager - Comprehensive", () => {
             const mockSiteWriterService = siteManager["siteWriterService"];
             const mockSiteRepositoryService = siteManager["siteRepositoryService"];
 
-            const newMonitor = {
+            const newMonitor = createMockMonitor({
                 id: "monitor-2",
-                type: "http" as const,
+                type: "http",
                 url: "https://example2.com",
                 checkInterval: 10_000,
                 timeout: 5000,
                 retryAttempts: 2,
                 monitoring: true,
-                status: "pending" as const,
+                status: "pending",
                 responseTime: 0,
                 history: [],
-            };
+            });
 
-            const updates = { monitors: [mockSite.monitors[0], newMonitor] };
+            const updates = { monitors: [mockSite.monitors[0]!, newMonitor] };
             const updatedSite = { ...mockSite, ...updates };
 
             vi.mocked(mockCache.get).mockReturnValueOnce(mockSite).mockReturnValueOnce(updatedSite);
@@ -586,7 +604,7 @@ describe("SiteManager - Comprehensive", () => {
             const mockCache = siteManager["sitesCache"];
             const mockSiteWriterService = siteManager["siteWriterService"];
 
-            const updates = { monitors: [mockSite.monitors[0]] };
+            const updates = { monitors: [mockSite.monitors[0]!] };
             const updatedSite = { ...mockSite, ...updates };
 
             vi.mocked(mockCache.get).mockReturnValueOnce(mockSite).mockReturnValueOnce(updatedSite);
@@ -594,7 +612,7 @@ describe("SiteManager - Comprehensive", () => {
 
             // Mock handleMonitorIntervalChanges to call setHistoryLimit which should throw
             vi.mocked(mockSiteWriterService.handleMonitorIntervalChanges).mockImplementation(
-                async (id, orig, monitors, config) => {
+                async (_id, _orig, _monitors, config) => {
                     config.setHistoryLimit(100);
                 }
             );
@@ -609,20 +627,20 @@ describe("SiteManager - Comprehensive", () => {
             const mockSiteWriterService = siteManager["siteWriterService"];
             const mockSiteRepositoryService = siteManager["siteRepositoryService"];
 
-            const newMonitor = {
+            const newMonitor = createMockMonitor({
                 id: "monitor-2",
-                type: "http" as const,
+                type: "http",
                 url: "https://example2.com",
                 checkInterval: 10_000,
                 timeout: 5000,
                 retryAttempts: 2,
                 monitoring: true,
-                status: "pending" as const,
+                status: "pending",
                 responseTime: 0,
                 history: [],
-            };
+            });
 
-            const updates = { monitors: [mockSite.monitors[0], newMonitor] };
+            const updates = { monitors: [mockSite.monitors[0]!, newMonitor] };
             const updatedSite = { ...mockSite, ...updates };
 
             vi.mocked(mockCache.get).mockReturnValueOnce(mockSite).mockReturnValueOnce(updatedSite);

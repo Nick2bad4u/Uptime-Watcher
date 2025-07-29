@@ -262,8 +262,8 @@ describe("useMonitorTypes Hook", () => {
 
     describe("Loading States", () => {
         it("should manage loading state correctly during initial load", async () => {
-            let resolvePromise: (value: any) => void;
-            const loadPromise = new Promise((resolve) => {
+            let resolvePromise: (value: { label: string; value: string }[]) => void;
+            const loadPromise = new Promise<{ label: string; value: string }[]>((resolve) => {
                 resolvePromise = resolve;
             });
             mockGetMonitorTypeOptions.mockReturnValue(loadPromise);
@@ -296,8 +296,8 @@ describe("useMonitorTypes Hook", () => {
             });
 
             // Start refresh
-            let resolveRefresh: (value: any) => void;
-            const refreshPromise = new Promise((resolve) => {
+            let resolveRefresh: (value: { label: string; value: string }[]) => void;
+            const refreshPromise = new Promise<{ label: string; value: string }[]>((resolve) => {
                 resolveRefresh = resolve;
             });
             mockGetMonitorTypeOptions.mockReturnValue(refreshPromise);
@@ -381,8 +381,8 @@ describe("useMonitorTypes Hook", () => {
 
     describe("Integration Scenarios", () => {
         it("should handle hook unmounting during loading", async () => {
-            let resolvePromise: (value: any) => void;
-            const loadPromise = new Promise((resolve) => {
+            let resolvePromise: (value: { label: string; value: string }[]) => void;
+            const loadPromise = new Promise<{ label: string; value: string }[]>((resolve) => {
                 resolvePromise = resolve;
             });
             mockGetMonitorTypeOptions.mockReturnValue(loadPromise);

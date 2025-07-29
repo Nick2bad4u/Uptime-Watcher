@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import * as fs from "node:fs";
-import * as path from "node:path";
+import path from "node:path";
 
 // Mock dependencies
 vi.mock("../utils", () => ({
@@ -41,33 +41,34 @@ describe("Additional Coverage Tests", () => {
 
     describe("Utilities Coverage", () => {
         it("should validate utility exports", async () => {
-            const utils = await import("../utils");
+            const correlation = await import("../utils/correlation");
+            const logger = await import("../utils/logger");
 
-            expect(utils.generateCorrelationId).toBeDefined();
-            expect(utils.logger).toBeDefined();
+            expect(correlation.generateCorrelationId).toBeDefined();
+            expect(logger.logger).toBeDefined();
         });
     });
 
     describe("Environment Coverage", () => {
         it("should handle different environment configurations", () => {
-            const originalEnv = process.env.NODE_ENV;
+            const originalEnv = process.env["NODE_ENV"];
 
             // Test development environment
-            process.env.NODE_ENV = "development";
-            expect(process.env.NODE_ENV).toBe("development");
+            process.env["NODE_ENV"] = "development";
+            expect(process.env["NODE_ENV"]).toBe("development");
 
             // Test production environment
-            process.env.NODE_ENV = "production";
-            expect(process.env.NODE_ENV).toBe("production");
+            process.env["NODE_ENV"] = "production";
+            expect(process.env["NODE_ENV"]).toBe("production");
 
             // Restore original environment
-            process.env.NODE_ENV = originalEnv;
+            process.env["NODE_ENV"] = originalEnv;
         });
     });
 
     describe("Mock Coverage", () => {
         it("should verify all mocks are working correctly", async () => {
-            const { logger } = await import("../utils");
+            const { logger } = await import("../utils/logger");
 
             logger.info("test");
             logger.error("test");

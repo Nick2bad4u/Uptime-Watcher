@@ -16,13 +16,58 @@ vi.mock("../../utils/monitorTypeHelper", () => ({
     clearMonitorTypeCache: vi.fn(), // <-- ensure this is a real mock function that records arguments
 }));
 
-// Mock electronAPI for various scenarios
-const createMockElectronAPI = (hasAPI = true, hasEvents = true) => ({
-    events: hasEvents
-        ? {
-              onCacheInvalidated: vi.fn(),
-          }
-        : undefined,
+// Mock electronAPI for various scenarios  
+const createMockElectronAPI = (_hasAPI = true, hasEvents = true) => ({
+    data: {
+        downloadSQLiteBackup: vi.fn(),
+        exportData: vi.fn(),
+        importData: vi.fn(),
+    },
+    events: {
+        onCacheInvalidated: hasEvents ? vi.fn() : vi.fn().mockReturnValue(() => {}),
+        onMonitorDown: vi.fn(),
+        onMonitoringStarted: vi.fn(),
+        onMonitoringStopped: vi.fn(),
+        onMonitorStatusChanged: vi.fn(),
+        onMonitorUp: vi.fn(),
+        onTestEvent: vi.fn(),
+        onUpdateStatus: vi.fn(),
+        removeAllListeners: vi.fn(),
+    },
+    monitoring: {
+        startMonitoring: vi.fn(),
+        startMonitoringForSite: vi.fn(),
+        stopMonitoring: vi.fn(),
+        stopMonitoringForSite: vi.fn(),
+    },
+    monitorTypes: {
+        formatMonitorDetail: vi.fn(),
+        formatMonitorTitleSuffix: vi.fn(),
+        getMonitorTypes: vi.fn(),
+        validateMonitorData: vi.fn(),
+    },
+    settings: {
+        getHistoryLimit: vi.fn(),
+        resetSettings: vi.fn(),
+        updateHistoryLimit: vi.fn(),
+    },
+    sites: {
+        addSite: vi.fn(),
+        checkSiteNow: vi.fn(),
+        getSites: vi.fn(),
+        removeMonitor: vi.fn(),
+        removeSite: vi.fn(),
+        updateSite: vi.fn(),
+    },
+    stateSync: {
+        getSyncStatus: vi.fn(),
+        onStateSyncEvent: vi.fn(),
+        requestFullSync: vi.fn(),
+    },
+    system: {
+        openExternal: vi.fn(),
+        quitAndInstall: vi.fn(),
+    },
 });
 
 describe("cacheSync", () => {
@@ -36,9 +81,9 @@ describe("cacheSync", () => {
 
         // Clean up any existing window.electronAPI
         if (typeof window !== "undefined") {
-            // @ts-expect-error - Testing environment cleanup
+
             // delete window.electronAPI;
-            window.electronAPI = undefined;
+            (window as any).electronAPI = undefined;
         }
     });
 
@@ -47,8 +92,8 @@ describe("cacheSync", () => {
             it("should return no-op cleanup function and warn", () => {
                 // Mock window as undefined
                 const originalWindow = global.window;
-                // @ts-expect-error - Testing environment manipulation
-                delete global.window;
+
+                delete (global as any).window;
 
                 const cleanup = setupCacheSync();
 
@@ -67,8 +112,8 @@ describe("cacheSync", () => {
 
         describe("when electronAPI is not available", () => {
             it("should return no-op cleanup function and warn", () => {
-                // @ts-expect-error - Testing environment setup
-                global.window = {};
+
+                (global as any).window = {};
 
                 const cleanup = setupCacheSync();
 
@@ -91,11 +136,11 @@ describe("cacheSync", () => {
                 mockCleanup = vi.fn();
                 mockOnCacheInvalidated.mockReturnValue(mockCleanup);
 
-                // @ts-expect-error - Testing environment setup
-                global.window = {
+
+                (global as any).window = {
                     electronAPI: createMockElectronAPI(true, true),
                 };
-                // @ts-expect-error - Mock API setup
+
                 global.window.electronAPI.events.onCacheInvalidated = mockOnCacheInvalidated;
             });
 
@@ -109,7 +154,7 @@ describe("cacheSync", () => {
 
             it("should handle 'all' cache invalidation type", () => {
                 setupCacheSync();
-                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0][0];
+                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0]?.[0];
 
                 const invalidationData = {
                     type: "all" as const,
@@ -126,7 +171,7 @@ describe("cacheSync", () => {
 
             it("should handle 'monitor' cache invalidation type", () => {
                 setupCacheSync();
-                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0][0];
+                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0]?.[0];
 
                 const invalidationData = {
                     type: "monitor" as const,
@@ -145,7 +190,7 @@ describe("cacheSync", () => {
 
             it("should handle 'monitor' cache invalidation type without identifier", () => {
                 setupCacheSync();
-                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0][0];
+                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0]?.[0];
 
                 const invalidationData = {
                     type: "monitor" as const,
@@ -163,7 +208,7 @@ describe("cacheSync", () => {
 
             it("should handle 'site' cache invalidation type", () => {
                 setupCacheSync();
-                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0][0];
+                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0]?.[0];
 
                 const invalidationData = {
                     type: "site" as const,
@@ -182,7 +227,7 @@ describe("cacheSync", () => {
 
             it("should handle 'site' cache invalidation type without identifier", () => {
                 setupCacheSync();
-                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0][0];
+                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0]?.[0];
 
                 const invalidationData = {
                     type: "site" as const,
@@ -199,10 +244,10 @@ describe("cacheSync", () => {
 
             it("should handle unknown cache invalidation type", () => {
                 setupCacheSync();
-                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0][0];
+                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0]?.[0];
 
                 const invalidationData = {
-                    // @ts-expect-error - Testing invalid type
+
                     type: "unknown",
                     reason: "Invalid type test",
                 };
@@ -220,7 +265,7 @@ describe("cacheSync", () => {
                 });
 
                 setupCacheSync();
-                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0][0];
+                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0]?.[0];
 
                 const invalidationData = {
                     type: "all" as const,
@@ -243,7 +288,7 @@ describe("cacheSync", () => {
                 });
 
                 setupCacheSync();
-                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0][0];
+                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0]?.[0];
 
                 const invalidationData = {
                     type: "all" as const,
@@ -261,7 +306,7 @@ describe("cacheSync", () => {
 
             it("should handle cache invalidation with all optional properties", () => {
                 setupCacheSync();
-                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0][0];
+                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0]?.[0];
 
                 const invalidationData = {
                     type: "monitor" as const,
@@ -280,7 +325,7 @@ describe("cacheSync", () => {
 
             it("should handle cache invalidation with minimal required properties", () => {
                 setupCacheSync();
-                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0][0];
+                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0]?.[0];
 
                 const invalidationData = {
                     type: "site" as const,
@@ -298,10 +343,13 @@ describe("cacheSync", () => {
 
         describe("when electronAPI exists but events is missing", () => {
             it("should handle missing events property gracefully", () => {
-                // @ts-expect-error - Testing environment setup
-                global.window = {
-                    electronAPI: createMockElectronAPI(true, false),
-                };
+
+                (global as any).window = {
+                    electronAPI: {
+                        ...createMockElectronAPI(true, false),
+                        events: undefined,
+                    },
+                } as any;
 
                 const cleanup = setupCacheSync();
 
@@ -324,17 +372,17 @@ describe("cacheSync", () => {
                 mockCleanup = vi.fn();
                 mockOnCacheInvalidated.mockReturnValue(mockCleanup);
 
-                // @ts-expect-error - Testing environment setup
-                global.window = {
+
+                (global as any).window = {
                     electronAPI: createMockElectronAPI(true, true),
                 };
-                // @ts-expect-error - Mock API setup
+
                 global.window.electronAPI.events.onCacheInvalidated = mockOnCacheInvalidated;
             });
 
             it("should handle null invalidation data gracefully", () => {
                 setupCacheSync();
-                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0][0];
+                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0]?.[0];
 
                 // Test with null data (should throw error and be caught)
                 invalidationHandler(null);
@@ -349,7 +397,7 @@ describe("cacheSync", () => {
                 });
 
                 setupCacheSync();
-                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0][0];
+                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0]?.[0];
 
                 const invalidationData = {
                     type: "monitor" as const,
@@ -363,7 +411,7 @@ describe("cacheSync", () => {
 
             it("should handle empty reason string", () => {
                 setupCacheSync();
-                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0][0];
+                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0]?.[0];
 
                 const invalidationData = {
                     type: "all" as const,
@@ -381,15 +429,15 @@ describe("cacheSync", () => {
                 mockCleanup = vi.fn();
                 mockOnCacheInvalidated.mockReturnValue(mockCleanup);
 
-                // @ts-expect-error - Testing environment setup
-                global.window = {
+
+                (global as any).window = {
                     electronAPI: createMockElectronAPI(true, true),
                 };
-                // @ts-expect-error - Mock API setup
+
                 global.window.electronAPI.events.onCacheInvalidated = mockOnCacheInvalidated;
 
                 setupCacheSync();
-                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0][0];
+                const invalidationHandler = mockOnCacheInvalidated.mock.calls[0]?.[0];
 
                 const invalidationData = {
                     type: "monitor" as const,

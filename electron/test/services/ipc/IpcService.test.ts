@@ -119,7 +119,7 @@ vi.mock("../monitoring/MonitorTypeRegistry", () => ({
 
 vi.mock("./", () => ({
     createValidationResponse: vi.fn((success, errors = []) => ({ success, errors })),
-    registerStandardizedIpcHandler: vi.fn((channel, handler, validators) => {
+    registerStandardizedIpcHandler: vi.fn((channel, handler, _validators) => {
         mockIpcMain.handle(channel, handler);
     }),
     DataHandlerValidators: {},
@@ -218,7 +218,7 @@ describe("IpcService", () => {
             ipcService.setupHandlers();
 
             // Get the number of handlers that were registered
-            const registeredHandlerCount = mockIpcMain.handle.mock.calls.length;
+            // const registeredHandlerCount = mockIpcMain.handle.mock.calls.length; // Currently unused
 
             ipcService.cleanup();
 

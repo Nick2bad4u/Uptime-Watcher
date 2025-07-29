@@ -439,8 +439,8 @@ describe("Chart Utilities", () => {
             const yScale = getScaleConfig(complexConfig, "y");
             expect(xScale).toBeDefined();
             expect(yScale).toBeDefined();
-            expect(xScale?.type).toBe("category");
-            expect(yScale?.type).toBe("linear");
+            expect(xScale?.["type"]).toBe("category");
+            expect(yScale?.["type"]).toBe("linear");
 
             // Test getScaleProperty
             expect(getScaleProperty(complexConfig, "x", "type")).toBe("category");

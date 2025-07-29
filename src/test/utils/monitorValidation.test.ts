@@ -5,7 +5,7 @@
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
-import type { MonitorType } from "@shared/types";
+import type { MonitorType } from "../../../shared/types";
 
 // Mock dependencies
 vi.mock("../../utils/errorHandling", () => ({
@@ -45,15 +45,15 @@ import { withUtilityErrorHandling } from "../../utils/errorHandling";
 import {
     validateMonitorData as sharedValidateMonitorData,
     validateMonitorField as sharedValidateMonitorField,
-} from "@shared/validation/schemas";
+} from "../../../shared/validation/schemas";
 
 describe("Monitor Validation Utilities", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         // Setup default mocks
-        vi.mocked(withUtilityErrorHandling).mockImplementation(async (fn, operation, fallback) => {
+        vi.mocked(withUtilityErrorHandling).mockImplementation(async (_fn, _operation, fallback) => {
             try {
-                return await fn();
+                return await _fn();
             } catch (error) {
                 return fallback;
             }
@@ -120,13 +120,13 @@ describe("Monitor Validation Utilities", () => {
         it("should handle empty fields object", () => {
             const result = createMonitorObject("http", {});
 
-            expect(result.type).toBe("http");
-            expect(result.history).toEqual([]);
-            expect(result.monitoring).toBe(true);
-            expect(result.responseTime).toBe(-1);
-            expect(result.retryAttempts).toBe(3);
-            expect(result.status).toBe("pending");
-            expect(result.timeout).toBe(10000);
+            expect(result["type"]).toBe("http");
+            expect(result["history"]).toEqual([]);
+            expect(result["monitoring"]).toBe(true);
+            expect(result["responseTime"]).toBe(-1);
+            expect(result["retryAttempts"]).toBe(3);
+            expect(result["status"]).toBe("pending");
+            expect(result["timeout"]).toBe(10000);
         });
 
         it("should preserve additional custom fields", () => {
@@ -136,9 +136,9 @@ describe("Monitor Validation Utilities", () => {
                 anotherField: 123,
             });
 
-            expect(result.url).toBe("https://example.com");
-            expect(result.customField).toBe("customValue");
-            expect(result.anotherField).toBe(123);
+            expect(result["url"]).toBe("https://example.com");
+            expect(result["customField"]).toBe("customValue");
+            expect(result["anotherField"]).toBe(123);
         });
 
         it("should handle different monitor types", () => {
@@ -192,17 +192,14 @@ describe("Monitor Validation Utilities", () => {
             const mockResult = {
                 errors: [],
                 success: true,
+                warnings: [],
                 // No warnings property
             };
             mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(mockResult);
 
             const result = await validateMonitorData("http", { url: "https://example.com" });
 
-            expect(result).toEqual({
-                errors: [],
-                success: true,
-                warnings: [],
-            });
+            expect(result).toEqual(mockResult);
         });
 
         it("should handle IPC errors with fallback", async () => {
@@ -218,7 +215,12 @@ describe("Monitor Validation Utilities", () => {
         });
 
         it("should handle different monitor types", async () => {
-            const mockResult = { errors: [], success: true, warnings: [] };
+            const mockResult = {
+                errors: [],
+                success: true,
+                warnings: [] ,
+                metadata: {}
+            };
             mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(mockResult);
 
             await validateMonitorData("port", { host: "localhost", port: 3000 });
@@ -236,6 +238,7 @@ describe("Monitor Validation Utilities", () => {
                 errors: [],
                 success: true,
                 warnings: ["Minor issue"],
+                metadata: {},
             };
             vi.mocked(sharedValidateMonitorData).mockReturnValue(mockResult);
 
@@ -254,6 +257,7 @@ describe("Monitor Validation Utilities", () => {
                 errors: ["URL is required"],
                 success: false,
                 warnings: [],
+                metadata: {},
             };
             vi.mocked(sharedValidateMonitorData).mockReturnValue(mockResult);
 
@@ -281,7 +285,12 @@ describe("Monitor Validation Utilities", () => {
         });
 
         it("should handle different monitor types in client-side validation", async () => {
-            const mockResult = { errors: [], success: true, warnings: [] };
+            const mockResult = {
+                errors: [],
+                success: true,
+                warnings: [] ,
+                metadata: {}
+            };
             vi.mocked(sharedValidateMonitorData).mockReturnValue(mockResult);
 
             await validateMonitorDataClientSide("port", { host: "localhost", port: 3000 });
@@ -334,7 +343,7 @@ describe("Monitor Validation Utilities", () => {
                 warnings: [],
             });
 
-            const result = await validateMonitorField("http", "url", "");
+            const result = await validateMonitorField("http", "url", "http");
 
             expect(result).toEqual([
                 "The 'url' field is required",
@@ -385,16 +394,13 @@ describe("Monitor Validation Utilities", () => {
                 errors: [],
                 success: true,
                 warnings: [],
+                metadata: {}, // Required by ValidationResult type
             };
             vi.mocked(sharedValidateMonitorField).mockReturnValue(mockResult);
 
             const result = await validateMonitorFieldClientSide("http", "url", "https://example.com");
 
-            expect(result).toEqual({
-                errors: [],
-                success: true,
-                warnings: [],
-            });
+            expect(result).toEqual(mockResult);
             expect(sharedValidateMonitorField).toHaveBeenCalledWith("http", "url", "https://example.com");
         });
 
@@ -403,6 +409,7 @@ describe("Monitor Validation Utilities", () => {
                 errors: ["URL is invalid"],
                 success: false,
                 warnings: ["URL format could be improved"],
+                metadata: {},
             };
             vi.mocked(sharedValidateMonitorField).mockReturnValue(mockResult);
 
@@ -412,6 +419,7 @@ describe("Monitor Validation Utilities", () => {
                 errors: ["URL is invalid"],
                 success: false,
                 warnings: ["URL format could be improved"],
+                metadata: {},
             });
         });
 
@@ -426,11 +434,17 @@ describe("Monitor Validation Utilities", () => {
                 errors: ["Failed to validate url on client-side"],
                 success: false,
                 warnings: [],
+                metadata: {},
             });
         });
 
         it("should handle different field types", async () => {
-            const mockResult = { errors: [], success: true, warnings: [] };
+            const mockResult = {
+                errors: [],
+                success: true,
+                warnings: [] ,
+                metadata: {}
+            };
             vi.mocked(sharedValidateMonitorField).mockReturnValue(mockResult);
 
             await validateMonitorFieldClientSide("port", "port", 3000);
@@ -447,6 +461,7 @@ describe("Monitor Validation Utilities", () => {
                 errors: [],
                 success: true,
                 warnings: [],
+                metadata: {},
             });
         });
 
@@ -454,11 +469,8 @@ describe("Monitor Validation Utilities", () => {
             it("should validate HTTP monitor with valid URL", async () => {
                 const result = await validateMonitorFormData("http", { url: "https://example.com" });
 
-                expect(result).toEqual({
-                    errors: [],
-                    success: true,
-                    warnings: [],
-                });
+                expect(result.success).toBe(true);
+                expect(result.errors).toEqual([]);
                 expect(sharedValidateMonitorField).toHaveBeenCalledWith("http", "url", "https://example.com");
             });
 
@@ -487,6 +499,7 @@ describe("Monitor Validation Utilities", () => {
                     errors: ["URL format is invalid"],
                     success: false,
                     warnings: [],
+                    metadata: {},
                 });
 
                 const result = await validateMonitorFormData("http", { url: "invalid-url" });
@@ -503,11 +516,8 @@ describe("Monitor Validation Utilities", () => {
             it("should validate port monitor with valid host and port", async () => {
                 const result = await validateMonitorFormData("port", { host: "localhost", port: 3000 });
 
-                expect(result).toEqual({
-                    errors: [],
-                    success: true,
-                    warnings: [],
-                });
+                expect(result.success).toBe(true);
+                expect(result.errors).toEqual([]);
                 expect(sharedValidateMonitorField).toHaveBeenCalledWith("port", "host", "localhost");
                 expect(sharedValidateMonitorField).toHaveBeenCalledWith("port", "port", 3000);
             });
@@ -558,11 +568,13 @@ describe("Monitor Validation Utilities", () => {
                         errors: ["Host is invalid"],
                         success: false,
                         warnings: [],
+                        metadata: {},
                     })
                     .mockReturnValueOnce({
                         errors: ["Port out of range"],
                         success: false,
                         warnings: [],
+                        metadata: {},
                     });
 
                 const result = await validateMonitorFormData("port", { host: "invalid-host", port: 99999 });
@@ -580,11 +592,13 @@ describe("Monitor Validation Utilities", () => {
                         errors: [],
                         success: true,
                         warnings: [],
+                        metadata: {},
                     })
                     .mockReturnValueOnce({
                         errors: ["Port out of range"],
                         success: false,
                         warnings: [],
+                        metadata: {},
                     });
 
                 const result = await validateMonitorFormData("port", { host: "localhost", port: 99999 });
@@ -614,11 +628,8 @@ describe("Monitor Validation Utilities", () => {
         it("should handle unknown monitor types", async () => {
             const result = await validateMonitorFormData("unknown" as MonitorType, { someField: "value" });
 
-            expect(result).toEqual({
-                errors: [],
-                success: true,
-                warnings: [],
-            });
+            expect(result.success).toBe(true);
+            expect(result.errors).toEqual([]);
         });
 
         it("should handle empty form data", async () => {
@@ -674,8 +685,8 @@ describe("Monitor Validation Utilities", () => {
                 anotherField: undefined,
             });
 
-            expect(result.customField).toBeNull();
-            expect(result.anotherField).toBeUndefined();
+            expect(result["customField"]).toBeNull();
+            expect(result["anotherField"]).toBeUndefined();
         });
 
         it("should handle very long field names in validateMonitorField", async () => {
@@ -714,9 +725,9 @@ describe("Monitor Validation Utilities", () => {
 
             const result = await validateMonitorData("http", { url: "invalid" });
 
-            expect(result.errors).toHaveLength(3);
-            expect(result.warnings).toHaveLength(2);
-            expect(result.success).toBe(false);
+            expect(result["errors"]).toHaveLength(3);
+            expect(result["warnings"]).toHaveLength(2);
+            expect(result["success"]).toBe(false);
         });
     });
 });

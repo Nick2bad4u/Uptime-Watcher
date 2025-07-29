@@ -228,7 +228,7 @@ describe("Electron Types", () => {
                 timestamp: "",
             };
 
-            expect(update.site.identifier).toBe("update-site");
+            expect(update.site?.identifier).toBe("update-site");
             expect(update.previousStatus).toBe("down");
         });
 
@@ -246,7 +246,7 @@ describe("Electron Types", () => {
                 timestamp: "",
             };
 
-            expect(update.site.identifier).toBe("new-site");
+            expect(update.site?.identifier).toBe("new-site");
             expect(update.previousStatus).toBeUndefined();
         });
     });
@@ -358,8 +358,8 @@ describe("Electron Types", () => {
                 timestamp: "",
             };
 
-            expect(update.site.identifier).toBe("status-update-site");
-            expect(update.site.monitors).toHaveLength(1);
+            expect(update.site?.identifier).toBe("status-update-site");
+            expect(update.site?.monitors).toHaveLength(1);
             expect(update.previousStatus).toBe("pending");
         });
     });

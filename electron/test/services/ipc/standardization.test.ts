@@ -118,8 +118,8 @@ describe("IPC Standardization Concepts", () => {
             validateIpcResponse(response);
             expect(response.success).toBe(true);
             expect(response.data).toEqual({ result: "test-data" });
-            expect(response.metadata?.handler).toBe("mock-handler");
-            expect(response.metadata?.duration).toBeTypeOf("number");
+            expect(response.metadata?.["handler"]).toBe("mock-handler");
+            expect(response.metadata?.["duration"]).toBeTypeOf("number");
         });
 
         it("should validate error response format", async () => {
@@ -132,8 +132,8 @@ describe("IPC Standardization Concepts", () => {
             validateIpcResponse(response);
             expect(response.success).toBe(false);
             expect(response.error).toBe("Test error");
-            expect(response.metadata?.handler).toBe("mock-handler");
-            expect(response.metadata?.duration).toBeTypeOf("number");
+            expect(response.metadata?.["handler"]).toBe("mock-handler");
+            expect(response.metadata?.["duration"]).toBeTypeOf("number");
         });
 
         it("should validate parameter validation error format", async () => {
@@ -150,7 +150,7 @@ describe("IPC Standardization Concepts", () => {
             validateIpcResponse(response);
             expect(response.success).toBe(false);
             expect(response.error).toBe("Parameter validation failed");
-            expect(response.metadata?.validationErrors).toEqual(["Parameter must be string"]);
+            expect(response.metadata?.["validationErrors"]).toEqual(["Parameter must be string"]);
         });
     });
 
@@ -247,10 +247,10 @@ describe("IPC Standardization Concepts", () => {
             const errorResponse = await errorHandler();
 
             // Both should have consistent metadata structure
-            expect(successResponse.metadata?.handler).toBe("mock-handler");
-            expect(errorResponse.metadata?.handler).toBe("mock-handler");
-            expect(typeof successResponse.metadata?.duration).toBe("number");
-            expect(typeof errorResponse.metadata?.duration).toBe("number");
+            expect(successResponse.metadata?.["handler"]).toBe("mock-handler");
+            expect(errorResponse.metadata?.["handler"]).toBe("mock-handler");
+            expect(typeof successResponse.metadata?.["duration"]).toBe("number");
+            expect(typeof errorResponse.metadata?.["duration"]).toBe("number");
         });
     });
 
@@ -265,7 +265,7 @@ describe("IPC Standardization Concepts", () => {
 
             validateIpcResponse(response);
             expect(response.success).toBe(true);
-            expect(response.metadata?.duration).toBeGreaterThan(5); // Should take at least 5ms
+            expect(response.metadata?.["duration"]).toBeGreaterThan(5); // Should take at least 5ms
         });
 
         it("should include performance metadata even for errors", async () => {
@@ -278,7 +278,7 @@ describe("IPC Standardization Concepts", () => {
 
             validateIpcResponse(response);
             expect(response.success).toBe(false);
-            expect(response.metadata?.duration).toBeGreaterThan(3); // Should include processing time
+            expect(response.metadata?.["duration"]).toBeGreaterThan(3); // Should include processing time
         });
     });
 

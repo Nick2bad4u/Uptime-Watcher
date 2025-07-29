@@ -288,7 +288,7 @@ describe("Time Utilities", () => {
 
         it("should fall back to formatIntervalDuration when label is empty", () => {
             expect(getIntervalLabel({ value: 5000, label: "" })).toBe("5s");
-            expect(getIntervalLabel({ value: 60000, label: undefined })).toBe("1m");
+            expect(getIntervalLabel({ value: 60000 })).toBe("1m");
             expect(getIntervalLabel({ value: 3600000 })).toBe("1h");
         });
 

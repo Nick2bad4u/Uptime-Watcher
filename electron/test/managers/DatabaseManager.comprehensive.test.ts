@@ -233,7 +233,7 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
             // Reset and configure the SiteLoadingOrchestrator mock
             // Mock to test the cache operations in loadSites
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
-                loadSitesFromDatabase: vi.fn().mockImplementation(async (tempCache, config) => {
+                loadSitesFromDatabase: vi.fn().mockImplementation(async (_tempCache, config) => {
                     // Call the callbacks to test cache operations
                     if (config.stopMonitoring) await config.stopMonitoring("site1", "monitor1");
                     return {
@@ -299,7 +299,7 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
             // Reset and configure the SiteLoadingOrchestrator mock
             // Create a mock that uses the startMonitoring callback
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
-                loadSitesFromDatabase: vi.fn().mockImplementation(async (tempCache, config) => {
+                loadSitesFromDatabase: vi.fn().mockImplementation(async (_tempCache, config) => {
                     // Simulate calling startMonitoring which triggers emitSitesCacheUpdateRequested
                     if (config.startMonitoring) await config.startMonitoring("site1", "monitor1");
                     return {
@@ -374,7 +374,7 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
         it("should handle stopMonitoring callback in loadSites", async () => {
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
-                loadSitesFromDatabase: vi.fn().mockImplementation(async (tempCache, config) => {
+                loadSitesFromDatabase: vi.fn().mockImplementation(async (_tempCache, config) => {
                     // Test the stopMonitoring callback
                     if (config.stopMonitoring) {
                         await config.stopMonitoring("site1", "monitor1");
@@ -395,7 +395,7 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
         it("should handle setupNewMonitors callback in loadSites", async () => {
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
-                loadSitesFromDatabase: vi.fn().mockImplementation(async (tempCache, config) => {
+                loadSitesFromDatabase: vi.fn().mockImplementation(async (_tempCache, config) => {
                     // Test the setupNewMonitors callback
                     if (config.setupNewMonitors) {
                         await config.setupNewMonitors(["monitor1", "monitor2"]);
@@ -415,7 +415,7 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
         it("should handle setHistoryLimit callback in monitoring config", async () => {
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
-                loadSitesFromDatabase: vi.fn().mockImplementation(async (tempCache, config) => {
+                loadSitesFromDatabase: vi.fn().mockImplementation(async (_tempCache, config) => {
                     // Test the setHistoryLimit callback
                     if (config.setHistoryLimit) {
                         await config.setHistoryLimit(200);

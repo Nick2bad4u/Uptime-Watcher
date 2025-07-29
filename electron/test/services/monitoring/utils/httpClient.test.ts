@@ -6,7 +6,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import axios, { AxiosInstance } from "axios";
 import { createHttpClient, setupTimingInterceptors } from "../../../../services/monitoring/utils/httpClient";
-import { MonitorConfig } from "../../../../services/monitoring";
+import { MonitorConfig } from "../../../../services/monitoring/types";
 
 // Mock axios
 vi.mock("axios", () => ({

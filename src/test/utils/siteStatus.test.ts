@@ -11,8 +11,11 @@ import {
     getSiteStatusVariant,
     type SiteStatus,
 } from "../../utils/siteStatus";
-// @ts-expect-error test file
-import type { SiteForStatus } from "@shared/types";
+/**
+ * Site Status Utility Tests
+ * @description Tests for site status utility functions
+ */
+import type { SiteForStatus } from "../../../shared/types";
 
 describe("siteStatus exports", () => {
     it("should export calculateSiteMonitoringStatus function", () => {

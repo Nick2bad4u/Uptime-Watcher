@@ -448,7 +448,7 @@ describe("DatabaseManager", () => {
             const loadSitesSpy = vi.spyOn(databaseManager as any, "loadSites").mockResolvedValue(undefined);
             const eventEmitterSpy = vi.spyOn((databaseManager as any).eventEmitter, "emitTyped");
 
-            const result = await databaseManager.refreshSites();
+            await databaseManager.refreshSites();
 
             expect(loadSitesSpy).toHaveBeenCalled();
             expect(eventEmitterSpy).toHaveBeenCalledWith("internal:database:sites-refreshed", {

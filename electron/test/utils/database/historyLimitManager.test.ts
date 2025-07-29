@@ -19,7 +19,9 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { setHistoryLimit, getHistoryLimit } from "../../../utils/database/historyLimitManager";
-import type { HistoryRepository, SettingsRepository, DatabaseService } from "../../../services/database";
+import type { HistoryRepository } from "../../../services/database/HistoryRepository";
+import type { SettingsRepository } from "../../../services/database/SettingsRepository";
+import type { DatabaseService } from "../../../services/database/DatabaseService";
 import type { Database } from "node-sqlite3-wasm";
 
 // Mock repositories

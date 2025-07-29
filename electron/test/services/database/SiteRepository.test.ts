@@ -86,7 +86,7 @@ describe("SiteRepository", () => {
                 monitoring: true,
             };
 
-            mockDatabaseService.executeTransaction.mockImplementation(async (callback) => {
+            mockDatabaseService.executeTransaction.mockImplementation(async (callback: any) => {
                 return callback(mockDatabase);
             });
 
@@ -118,7 +118,7 @@ describe("SiteRepository", () => {
                 finalize: vi.fn(),
             });
 
-            mockDatabaseService.executeTransaction.mockImplementation((callback) => {
+            mockDatabaseService.executeTransaction.mockImplementation((callback: any) => {
                 const mockDb = {
                     prepare: mockPrepare,
                     run: vi.fn().mockReturnValue({ changes: 1 }),
@@ -137,7 +137,7 @@ describe("SiteRepository", () => {
                 finalize: vi.fn(),
             });
 
-            mockDatabaseService.executeTransaction.mockImplementation((callback) => {
+            mockDatabaseService.executeTransaction.mockImplementation((callback: any) => {
                 const mockDb = {
                     prepare: mockPrepare,
                     run: vi.fn().mockReturnValue({ changes: 0 }),
@@ -167,7 +167,7 @@ describe("SiteRepository", () => {
             });
             const mockRun = vi.fn();
 
-            mockDatabaseService.executeTransaction.mockImplementation((callback) => {
+            mockDatabaseService.executeTransaction.mockImplementation((callback: any) => {
                 const mockDb = {
                     prepare: mockPrepare,
                     run: mockRun,
@@ -229,7 +229,7 @@ describe("SiteRepository", () => {
                 finalize: vi.fn(),
             });
 
-            mockDatabaseService.executeTransaction.mockImplementation((callback) => {
+            mockDatabaseService.executeTransaction.mockImplementation((callback: any) => {
                 const mockDb = { prepare: mockPrepare };
                 return callback(mockDb);
             });

@@ -227,31 +227,18 @@ describe("Interfaces Utility", () => {
 
         it("should allow flexible argument types", () => {
             const flexibleLogger: Logger = {
-                debug: (message: string, ...args: unknown[]) => {
+                debug: (_message: string, ..._args: unknown[]) => {
                     // Should accept any unknown types
-                    for (const arg of args) {
-                        // Can handle any type of argument
-                        if (typeof arg === "object" && arg !== null) {
-                            // Handle objects
-                        } else if (typeof arg === "string") {
-                            // Handle strings
-                        }
-                        // etc.
-                    }
+                    // Implementation removed for test clarity
                 },
-                error: (message: string, error?: unknown, ...args: unknown[]) => {
+                error: (_message: string, _error?: unknown, ..._args: unknown[]) => {
                     // Error can be anything
-                    if (error instanceof Error) {
-                        // Handle Error objects
-                    } else if (typeof error === "string") {
-                        // Handle string errors
-                    }
-                    // Handle additional args
+                    // Implementation removed for test clarity
                 },
-                info: (message: string, ...args: unknown[]) => {
+                info: (_message: string, ..._args: unknown[]) => {
                     // Info accepts any additional args
                 },
-                warn: (message: string, ...args: unknown[]) => {
+                warn: (_message: string, ..._args: unknown[]) => {
                     // Warn accepts any additional args
                 },
             };
@@ -310,7 +297,7 @@ describe("Interfaces Utility", () => {
                 }
 
                 // Additional public method
-                public setLevel(level: string): void {
+                public setLevel(_level: string): void {
                     // Implementation
                 }
             }

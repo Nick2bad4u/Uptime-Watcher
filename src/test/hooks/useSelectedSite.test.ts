@@ -7,7 +7,7 @@ import { renderHook } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
 import { useSelectedSite } from "../../hooks/useSelectedSite";
-import type { Site } from "../../types";
+import type { Site } from "../../../shared/types";
 
 // Mock the store hooks
 vi.mock("../../stores/ui/useUiStore", () => ({
@@ -28,39 +28,21 @@ describe("useSelectedSite", () => {
     const mockSites: Site[] = [
         {
             identifier: "site-1",
-            name: "Test Site 1",
-            url: "https://example1.com",
+            name: "Test Site 1", 
             monitors: [],
-            uptime: 99.5,
-            status: "up",
-            history: [],
-            lastCheck: Date.now(),
-            isCollapsed: false,
-            screenshot: null,
+            monitoring: false,
         },
         {
             identifier: "site-2",
             name: "Test Site 2",
-            url: "https://example2.com",
             monitors: [],
-            uptime: 98.2,
-            status: "down",
-            history: [],
-            lastCheck: Date.now(),
-            isCollapsed: false,
-            screenshot: null,
+            monitoring: true,
         },
         {
             identifier: "site-3",
             name: "Test Site 3",
-            url: "https://example3.com",
             monitors: [],
-            uptime: 100,
-            status: "up",
-            history: [],
-            lastCheck: Date.now(),
-            isCollapsed: false,
-            screenshot: null,
+            monitoring: false,
         },
     ];
 
@@ -119,7 +101,6 @@ describe("useSelectedSite", () => {
 
     describe("Store selector behavior", () => {
         it("should call useUIStore with correct selector", () => {
-            const mockSelector = vi.fn().mockReturnValue("site-1");
             mockUseUIStore.mockImplementation((selector: any) => selector({ selectedSiteId: "site-1" }));
             mockUseSitesStore.mockReturnValue(mockSites);
 
@@ -180,9 +161,9 @@ describe("useSelectedSite", () => {
     describe("Edge cases", () => {
         it("should handle sites with similar identifiers", () => {
             const sitesWithSimilarIds: Site[] = [
-                { ...mockSites[0], identifier: "site" },
-                { ...mockSites[1], identifier: "site-1" },
-                { ...mockSites[2], identifier: "site-10" },
+                { identifier: "site", name: "Test Site 1", monitors: [], monitoring: true },
+                { identifier: "site-1", name: "Test Site 2", monitors: [], monitoring: true },
+                { identifier: "site-10", name: "Test Site 3", monitors: [], monitoring: false },
             ];
 
             mockUseUIStore.mockReturnValue("site-1");
@@ -196,8 +177,8 @@ describe("useSelectedSite", () => {
 
         it("should handle duplicate site identifiers (returns first match)", () => {
             const sitesWithDuplicates: Site[] = [
-                { ...mockSites[0], identifier: "duplicate", name: "First Duplicate" },
-                { ...mockSites[1], identifier: "duplicate", name: "Second Duplicate" },
+                { identifier: "duplicate", name: "First Duplicate", monitors: [], monitoring: true },
+                { identifier: "duplicate", name: "Second Duplicate", monitors: [], monitoring: false },
             ];
 
             mockUseUIStore.mockReturnValue("duplicate");
@@ -210,8 +191,10 @@ describe("useSelectedSite", () => {
 
         it("should handle sites with special characters in identifiers", () => {
             const siteWithSpecialChars: Site = {
-                ...mockSites[0],
                 identifier: "site-with-@special#chars$",
+                name: "Test Site 1",
+                monitors: [],
+                monitoring: true,
             };
 
             mockUseUIStore.mockReturnValue("site-with-@special#chars$");
@@ -225,8 +208,10 @@ describe("useSelectedSite", () => {
         it("should handle very long site identifiers", () => {
             const longIdentifier = "a".repeat(1000);
             const siteWithLongId: Site = {
-                ...mockSites[0],
                 identifier: longIdentifier,
+                name: "Test Site 1",
+                monitors: [],
+                monitoring: false,
             };
 
             mockUseUIStore.mockReturnValue(longIdentifier);

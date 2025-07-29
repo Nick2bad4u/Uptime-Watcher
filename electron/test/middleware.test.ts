@@ -138,7 +138,7 @@ describe("middleware.ts", () => {
 
         it("throws on invalid boolean validator", async () => {
             const next = vi.fn();
-            const validators = { eventK: (data: any) => false };
+            const validators = { eventK: (_data: any) => false };
             const mw = createValidationMiddleware<typeof validators>(validators);
             await expect(mw("eventK", 1, next)).rejects.toThrow("Validation failed for event 'eventK'");
             expect(logger.error).toHaveBeenCalled();

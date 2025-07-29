@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import type { MonitorCheckResult, IMonitorService, MonitorConfig } from "../services/monitoring";
+import type { MonitorCheckResult, IMonitorService, MonitorConfig } from "../services/monitoring/types";
 import type { Site } from "../types";
 
 describe("Monitoring Types", () => {
@@ -61,7 +61,7 @@ describe("Monitoring Types", () => {
                 getType(): Site["monitors"][0]["type"] {
                     return "http";
                 },
-                updateConfig: function (config: Partial<MonitorConfig>): void {
+                updateConfig: function (_config: Partial<MonitorConfig>): void {
                     throw new Error("Function not implemented.");
                 },
             };
@@ -95,7 +95,7 @@ describe("Monitoring Types", () => {
                 getType(): Site["monitors"][0]["type"] {
                     return "http";
                 },
-                updateConfig: function (config: Partial<MonitorConfig>): void {
+                updateConfig: function (_config: Partial<MonitorConfig>): void {
                     throw new Error("Function not implemented.");
                 },
             };
@@ -133,7 +133,7 @@ describe("Monitoring Types", () => {
                 getType(): Site["monitors"][0]["type"] {
                     return "port";
                 },
-                updateConfig: function (config: Partial<MonitorConfig>): void {
+                updateConfig: function (_config: Partial<MonitorConfig>): void {
                     throw new Error("Function not implemented.");
                 },
             };

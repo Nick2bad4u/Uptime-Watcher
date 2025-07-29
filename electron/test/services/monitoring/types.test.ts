@@ -5,7 +5,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import type { IMonitorService, MonitorCheckResult, MonitorConfig } from "../../../services/monitoring";
+import type { IMonitorService, MonitorCheckResult, MonitorConfig } from "../../../services/monitoring/types";
 
 describe("Monitoring Types", () => {
     describe("MonitorCheckResult", () => {
@@ -78,7 +78,7 @@ describe("Monitoring Types", () => {
                 getType() {
                     return "http";
                 },
-                updateConfig: function (config: Partial<MonitorConfig>): void {
+                updateConfig: function (_config: Partial<MonitorConfig>): void {
                     throw new Error("Function not implemented.");
                 },
             };
@@ -99,7 +99,7 @@ describe("Monitoring Types", () => {
                 getType() {
                     return "port";
                 },
-                updateConfig: function (config: Partial<MonitorConfig>): void {
+                updateConfig: function (_config: Partial<MonitorConfig>): void {
                     throw new Error("Function not implemented.");
                 },
             };

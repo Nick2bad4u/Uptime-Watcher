@@ -8,7 +8,7 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { MonitorType } from "../../types";
+import type { MonitorType } from "../../../shared/types";
 
 import { useDynamicHelpText } from "../../hooks/useDynamicHelpText";
 import { getMonitorHelpTexts } from "../../utils/monitorUiHelpers";
@@ -83,7 +83,7 @@ describe("useDynamicHelpText Hook", () => {
                 primary: "Only primary help text",
             });
 
-            const { result } = renderHook(() => useDynamicHelpText("ping"));
+            const { result } = renderHook(() => useDynamicHelpText("http" as any));
 
             await waitFor(() => {
                 expect(result.current.isLoading).toBe(false);
@@ -114,7 +114,7 @@ describe("useDynamicHelpText Hook", () => {
         it("should handle non-Error objects", async () => {
             vi.mocked(getMonitorHelpTexts).mockRejectedValue("String error");
 
-            const { result } = renderHook(() => useDynamicHelpText("tcp"));
+            const { result } = renderHook(() => useDynamicHelpText("port" as any));
 
             await waitFor(() => {
                 expect(result.current.isLoading).toBe(false);
@@ -209,8 +209,8 @@ describe("useDynamicHelpText Hook", () => {
 
     describe("Cleanup and cancellation", () => {
         it("should cancel pending requests on unmount", async () => {
-            let resolvePromise: (value: any) => void;
-            const pendingPromise = new Promise((resolve) => {
+            let resolvePromise: (value: { primary?: string; secondary?: string }) => void;
+            const pendingPromise = new Promise<{ primary?: string; secondary?: string }>((resolve) => {
                 resolvePromise = resolve;
             });
             vi.mocked(getMonitorHelpTexts).mockReturnValue(pendingPromise);
@@ -235,8 +235,8 @@ describe("useDynamicHelpText Hook", () => {
         });
 
         it("should cancel pending requests when monitor type changes", async () => {
-            let resolveFirstPromise: (value: any) => void;
-            const firstPromise = new Promise((resolve) => {
+            let resolveFirstPromise: (value: { primary?: string; secondary?: string }) => void;
+            const firstPromise = new Promise<{ primary?: string; secondary?: string }>((resolve) => {
                 resolveFirstPromise = resolve;
             });
 
@@ -272,7 +272,7 @@ describe("useDynamicHelpText Hook", () => {
     });
 
     describe("Different monitor types", () => {
-        const monitorTypes: MonitorType[] = ["http", "ping", "tcp"];
+        const monitorTypes: MonitorType[] = ["http", "port"];
 
         it.each(monitorTypes)("should handle %s monitor type", async (monitorType) => {
             const expectedHelp = {
@@ -295,8 +295,8 @@ describe("useDynamicHelpText Hook", () => {
 
     describe("State transitions", () => {
         it("should properly transition through loading states", async () => {
-            let resolvePromise: (value: any) => void;
-            const controllablePromise = new Promise((resolve) => {
+            let resolvePromise: (value: { primary?: string; secondary?: string }) => void;
+            const controllablePromise = new Promise<{ primary?: string; secondary?: string }>((resolve) => {
                 resolvePromise = resolve;
             });
             vi.mocked(getMonitorHelpTexts).mockReturnValue(controllablePromise);

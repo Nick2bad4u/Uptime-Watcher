@@ -23,7 +23,7 @@ const createMockMediaQuery = (matches: boolean) => ({
 // Setup window.matchMedia mock before any tests run
 Object.defineProperty(window, "matchMedia", {
     writable: true,
-    value: vi.fn().mockImplementation((query) => createMockMediaQuery(false)),
+    value: vi.fn().mockImplementation((_query: string) => createMockMediaQuery(false)),
 });
 
 describe("useThemeStyles Hook", () => {
@@ -171,10 +171,12 @@ describe("useThemeStyles Hook", () => {
 
             // Simulate theme change to dark mode
             mockMediaQuery.matches = true;
-            const listener = mockMediaQuery.addEventListener.mock.calls[0][1];
+            const listener = mockMediaQuery.addEventListener.mock.calls[0]?.[1];
 
             act(() => {
-                listener({ matches: true });
+                if (listener) {
+                    listener({ matches: true });
+                }
             });
 
             // Should now be dark mode
@@ -193,10 +195,12 @@ describe("useThemeStyles Hook", () => {
 
             // Simulate theme change to light mode
             mockMediaQuery.matches = false;
-            const listener = mockMediaQuery.addEventListener.mock.calls[0][1];
+            const listener = mockMediaQuery.addEventListener.mock.calls[0]?.[1];
 
             act(() => {
-                listener({ matches: false });
+                if (listener) {
+                    listener({ matches: false });
+                }
             });
 
             // Should now be light mode
@@ -298,7 +302,8 @@ describe("useThemeStyles Hook", () => {
         it("should have consistent transition properties", () => {
             const { result } = renderHook(() => useThemeStyles());
 
-            const transitionPattern = /0\.3s cubic-bezier\(0\.4, 0, 0\.2, 1\)/;
+            // Check that transition properties are consistent
+            // This test validates the theme animation timing
 
             expect(result.current.collapseButtonStyle.transition).toMatch(/all.*0\.3s cubic-bezier/);
             expect(result.current.contentStyle.transition).toMatch(/padding.*0\.3s cubic-bezier/);

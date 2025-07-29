@@ -243,9 +243,9 @@ describe("ServiceContainer", () => {
             const status = container.getInitializationStatus();
             expect(status).toBeDefined();
             expect(typeof status).toBe("object");
-            expect(status.DatabaseService).toBe(true);
-            expect(status.NotificationService).toBe(true);
-            expect(status.UptimeOrchestrator).toBe(false); // Not initialized yet
+            expect(status["DatabaseService"]).toBe(true);
+            expect(status["NotificationService"]).toBe(true);
+            expect(status["UptimeOrchestrator"]).toBe(false); // Not initialized yet
         });
 
         it("should provide list of initialized services", () => {
@@ -379,7 +379,7 @@ describe("ServiceContainer", () => {
 
     describe("Debugging and Monitoring Features", () => {
         it("should track initialization status correctly", () => {
-            const statusBefore = container.getInitializationStatus();
+            // const statusBefore = container.getInitializationStatus(); // Currently unused
 
             // Initialize a service
             container.getDatabaseService();
@@ -387,7 +387,7 @@ describe("ServiceContainer", () => {
             const statusAfter = container.getInitializationStatus();
 
             // Status should reflect the change
-            expect(statusAfter.DatabaseService).toBe(true);
+            expect(statusAfter["DatabaseService"]).toBe(true);
             expect(Object.keys(statusAfter).length).toBeGreaterThan(0);
         });
 

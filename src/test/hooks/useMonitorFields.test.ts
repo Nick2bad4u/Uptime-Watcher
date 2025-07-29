@@ -8,7 +8,7 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { MonitorFieldDefinition } from "@shared/types";
+import type { MonitorFieldDefinition } from "../../../shared/types";
 
 import { useMonitorFields } from "../../hooks/useMonitorFields";
 import type { MonitorTypeConfig } from "../../utils/monitorTypeHelper";
@@ -27,17 +27,57 @@ vi.mock("../../types/ipc", () => ({
 
 // Mock the window.electronAPI
 const mockElectronAPI = {
+    data: {
+        downloadSQLiteBackup: vi.fn(),
+        exportData: vi.fn(),
+        importData: vi.fn(),
+    },
+    events: {
+        onCacheInvalidated: vi.fn(),
+        onMonitorDown: vi.fn(),
+        onMonitoringStarted: vi.fn(),
+        onMonitoringStopped: vi.fn(),
+        onMonitorStatusChanged: vi.fn(),
+        onMonitorUp: vi.fn(),
+        onTestEvent: vi.fn(),
+        onUpdateStatus: vi.fn(),
+        removeAllListeners: vi.fn(),
+    },
+    monitoring: {
+        startMonitoring: vi.fn(),
+        startMonitoringForSite: vi.fn(),
+        stopMonitoring: vi.fn(),
+        stopMonitoringForSite: vi.fn(),
+    },
     monitorTypes: {
+        formatMonitorDetail: vi.fn(),
+        formatMonitorTitleSuffix: vi.fn(),
         getMonitorTypes: vi.fn(),
+        validateMonitorData: vi.fn(),
+    },
+    settings: {
+        getHistoryLimit: vi.fn(),
+        resetSettings: vi.fn(),
+        updateHistoryLimit: vi.fn(),
+    },
+    sites: {
+        addSite: vi.fn(),
+        checkSiteNow: vi.fn(),
+        getSites: vi.fn(),
+        removeMonitor: vi.fn(),
+        removeSite: vi.fn(),
+        updateSite: vi.fn(),
+    },
+    stateSync: {
+        getSyncStatus: vi.fn(),
+        onStateSyncEvent: vi.fn(),
+        requestFullSync: vi.fn(),
+    },
+    system: {
+        openExternal: vi.fn(),
+        quitAndInstall: vi.fn(),
     },
 };
-
-// Define in global scope for TypeScript
-declare global {
-    interface Window {
-        electronAPI: typeof mockElectronAPI;
-    }
-}
 
 // Set up the mock globally
 Object.defineProperty(window, "electronAPI", {
@@ -68,7 +108,7 @@ describe("useMonitorFields Hook", () => {
             const mockFieldDefinitions: MonitorFieldDefinition[] = [
                 {
                     name: "url",
-                    type: "string",
+                    type: "text",
                     required: true,
                     label: "URL",
                     placeholder: "Enter URL to monitor",
@@ -88,13 +128,14 @@ describe("useMonitorFields Hook", () => {
                     fields: mockFieldDefinitions,
                     displayName: "HTTP Monitor",
                     description: "Monitor HTTP endpoints",
+                    version: "1.0.0",
                 },
                 {
                     type: "ping",
                     fields: [
                         {
                             name: "host",
-                            type: "string",
+                            type: "text",
                             required: true,
                             label: "Host",
                             placeholder: "Enter hostname or IP",
@@ -102,6 +143,7 @@ describe("useMonitorFields Hook", () => {
                     ],
                     displayName: "Ping Monitor",
                     description: "Monitor host availability",
+                    version: "1.0.0",
                 },
             ];
 
@@ -123,7 +165,7 @@ describe("useMonitorFields Hook", () => {
             expect(result.current.error).toBeUndefined();
             expect(result.current.getFields("http")).toEqual(mockFieldDefinitions);
             expect(result.current.getFields("ping")).toHaveLength(1);
-            expect(result.current.getFields("ping")[0].name).toBe("host");
+            expect(result.current.getFields("ping")[0]?.name).toBe("host");
         });
 
         it("should handle empty configurations", async () => {
@@ -155,13 +197,13 @@ describe("useMonitorFields Hook", () => {
                     fields: [
                         {
                             name: "url",
-                            type: "string",
+                            type: "text",
                             required: true,
                             label: "URL",
                         },
                         {
                             name: "method",
-                            type: "string",
+                            type: "text",
                             required: false,
                             label: "Method",
                         },
@@ -174,13 +216,14 @@ describe("useMonitorFields Hook", () => {
                     ],
                     displayName: "HTTP Monitor",
                     description: "Monitor HTTP endpoints",
+                    version: "1.0.0",
                 },
                 {
                     type: "tcp",
                     fields: [
                         {
                             name: "host",
-                            type: "string",
+                            type: "text",
                             required: true,
                             label: "Host",
                         },
@@ -193,6 +236,7 @@ describe("useMonitorFields Hook", () => {
                     ],
                     displayName: "TCP Monitor",
                     description: "Monitor TCP connections",
+                    version: "1.0.0",
                 },
             ];
 
@@ -267,19 +311,20 @@ describe("useMonitorFields Hook", () => {
                         fields: [
                             {
                                 name: "optional1",
-                                type: "string",
+                                type: "text",
                                 required: false,
                                 label: "Optional 1",
                             },
                             {
                                 name: "optional2",
-                                type: "string",
+                                type: "text",
                                 required: false,
                                 label: "Optional 2",
                             },
                         ],
                         displayName: "Optional Only Monitor",
                         description: "Monitor with all optional fields",
+                    version: "1.0.0",
                     },
                 ];
 
@@ -429,13 +474,14 @@ describe("useMonitorFields Hook", () => {
                     fields: [
                         {
                             name: "url",
-                            type: "string",
+                            type: "text",
                             required: true,
                             label: "URL",
                         },
                     ],
                     displayName: "HTTP Monitor",
                     description: "Monitor HTTP endpoints",
+                    version: "1.0.0",
                 },
             ];
 
@@ -475,13 +521,14 @@ describe("useMonitorFields Hook", () => {
                     fields: [
                         {
                             name: "field1",
-                            type: "string",
+                            type: "text",
                             // Missing required property
                             label: "Field 1",
                         } as MonitorFieldDefinition,
                     ],
                     displayName: "Incomplete Monitor",
                     description: "Monitor with incomplete field def",
+                    version: "1.0.0",
                 },
             ];
 
@@ -511,6 +558,7 @@ describe("useMonitorFields Hook", () => {
                     fields: undefined as any,
                     displayName: "No Fields Monitor",
                     description: "Monitor with no fields",
+                    version: "1.0.0",
                 },
             ];
 

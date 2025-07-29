@@ -58,7 +58,7 @@ describe("monitorTypeHelper", () => {
             fields: [
                 {
                     name: "url",
-                    type: "string",
+                    type: "text",
                     required: true,
                     label: "URL",
                     placeholder: "https://example.com",
@@ -88,7 +88,7 @@ describe("monitorTypeHelper", () => {
             fields: [
                 {
                     name: "host",
-                    type: "string",
+                    type: "text",
                     required: true,
                     label: "Host",
                     placeholder: "example.com",
@@ -114,7 +114,7 @@ describe("monitorTypeHelper", () => {
             fields: [
                 {
                     name: "host",
-                    type: "string",
+                    type: "text",
                     required: true,
                     label: "Host",
                     placeholder: "example.com",

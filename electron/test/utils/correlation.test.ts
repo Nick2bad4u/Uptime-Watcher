@@ -62,7 +62,9 @@ describe("Correlation Utility", () => {
                 // eslint-disable-next-line unicorn/no-array-reduce
                 const charCounts = chars.reduce(
                     (acc, char) => {
-                        acc[char] = (acc[char] || 0) + 1;
+                        if (char) {
+                            acc[char] = (acc[char] || 0) + 1;
+                        }
                         return acc;
                     },
                     {} as Record<string, number>
