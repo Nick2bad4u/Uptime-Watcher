@@ -6,8 +6,10 @@
  * for CSS property order, formatting, and modern CSS practices.
  */
 /** @type {import('stylelint').Config} */
+
+/* eslint-disable unicorn/prefer-module -- Needed for Stylelint */
+
 module.exports = {
-    plugins: ["stylelint-plugin-defensive-css", "stylelint-use-nesting", "stylelint-prettier"],
     extends: [
         "stylelint-config-standard",
         "@stylistic/stylelint-config",
@@ -15,11 +17,12 @@ module.exports = {
         "stylelint-config-recess-order",
         "stylelint-prettier/recommended",
     ],
+    plugins: ["stylelint-plugin-defensive-css", "stylelint-use-nesting", "stylelint-prettier"],
     rules: {
-        "@stylistic/indentation": null,
         "@stylistic/declaration-colon-newline-after": null,
-        "plugin/use-defensive-css": [true, { severity: "warning" }],
+        "@stylistic/indentation": null,
         "csstools/use-nesting": "always",
+        "plugin/use-defensive-css": [true, { severity: "warning" }],
         "prettier/prettier": true,
     },
 };

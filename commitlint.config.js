@@ -7,6 +7,7 @@
  * - type(scope): description
  * - Examples: feat(auth): add login functionality, fix(api): resolve timeout issue
  */
+// eslint-disable-next-line unicorn/prefer-module
 module.exports = {
     extends: ["@commitlint/config-conventional"],
 };

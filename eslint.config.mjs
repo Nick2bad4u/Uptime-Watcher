@@ -10,9 +10,24 @@
  * - Enhanced security and performance rules
  */
 
-// import { plugin as ex } from "eslint-plugin-exception-handling";
-// import eslintPluginNoInferred from "eslint-plugin-no-inferred-method-name";
-// import stylistic from "@stylistic/eslint-plugin";
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-magic-numbers */
+/* eslint-disable no-inline-comments */
+/* eslint-disable n/no-unpublished-import */
+/* eslint-disable perfectionist/sort-imports */
+/* eslint-disable max-lines */
+/* eslint-disable id-length */
+/* eslint-disable sort-keys */
+/* eslint-disable perfectionist/sort-objects */
+/* eslint-disable object-shorthand */
+/* eslint-disable sort-imports */
+/* eslint-disable depend/ban-dependencies */
+
+
+// Import { plugin as ex } from "eslint-plugin-exception-handling";
+// Import eslintPluginNoInferred from "eslint-plugin-no-inferred-method-name";
+// Import stylistic from "@stylistic/eslint-plugin";
 import depend from "eslint-plugin-depend";
 import eslintPluginJsonc from "eslint-plugin-jsonc";
 import eslintPluginMath from "eslint-plugin-math";
@@ -27,7 +42,7 @@ import nodePlugin from "eslint-plugin-n";
 import nounsanitized from "eslint-plugin-no-unsanitized";
 import pluginBoundaries from "eslint-plugin-boundaries";
 import pluginCompat from "eslint-plugin-compat";
-import pluginEslintComments from "eslint-plugin-eslint-comments";
+import comments from "@eslint-community/eslint-plugin-eslint-comments/configs"
 import pluginFunctional from "eslint-plugin-functional";
 import pluginImport from "eslint-plugin-import";
 import pluginNoOnly from "eslint-plugin-no-only-tests";
@@ -67,54 +82,63 @@ export default [
             "_ZENTASKS*",
             ".agentic-tools*",
             ".devskim.json",
-            ".github/",
-            ".jscpd.json",
-            ".lintstagedrc.json",
-            ".markdown-link-check.json",
-            ".markdownlint.json",
-            ".prettierrc.json",
-            ".vscode/",
             "**/_ZENTASKS*",
             "**/.agentic-tools*",
-            "**/.devskim.json",
-            "**/.github/**",
-            "**/.jscpd.json",
-            "**/.lintstagedrc.json",
-            "**/.markdown-link-check.json",
-            "**/.markdownlint.json",
-            "**/.prettierrc.json",
-            "**/.vscode/**",
-            "**/*.md",
             "**/chatproject.md",
-            "**/commitlint.config.js",
             "**/coverage-results.json",
             "**/Coverage/**",
             "**/coverage/**",
-            "**/cspell.json",
             "**/dist-electron/**",
             "**/dist/**",
             "**/node_modules/**",
             "**/release/**",
-            "**/stylelint.config.js",
             "**/test/themeTypes.test.tsx",
             "**/test/types.test.tsx",
-            "**/tsconfig*.json",
-            "commitlint.config.js",
             "Coverage/",
             "coverage/",
-            "cspell.json",
             "dist-electron/",
             "dist/",
             "node_modules/**",
-            "package-lock.json",
-            "package.json",
             "release/",
-            "stylelint.config.js",
             "test/themeTypes.test.tsx",
             "test/types.test.tsx",
-            "tsconfig*.json",
+            "docs/docusaurus/**",
+            "docs/Reviews/**",
+            ".github/chatmodes/**",
+            ".github/PULL_REQUEST_TEMPLATE/**",
+            ".github/ISSUE_TEMPLATE/**",
+            ".github/prompts/**",
+            ".github/instructions/**",
             // "**/*.config.{js,mjs,ts}",
         ],
+    },
+    // Global browser environment
+    {
+        languageOptions: {
+            globals: {
+                ...globals.node,
+                ...vitest.environments.env.globals,
+                __dirname: "readonly",
+                __filename: "readonly",
+                afterAll: "readonly",
+                afterEach: "readonly",
+                beforeAll: "readonly",
+                beforeEach: "readonly",
+                Buffer: "readonly",
+                describe: "readonly",
+                document: "readonly",
+                expect: "readonly",
+                global: "readonly",
+                globalThis: "readonly",
+                it: "readonly",
+                module: "readonly",
+                process: "readonly",
+                require: "readonly",
+                test: "readonly",
+                vi: "readonly",
+                window: "readonly",
+            },
+        },
     },
 
     // Markdown files
@@ -208,7 +232,7 @@ export default [
         },
         plugins: {
             "@typescript-eslint": tseslint,
-            "eslint-comments": pluginEslintComments,
+            "@eslint-community/eslint-comments": comments,
             "jsx-a11y": jsxA11y,
             "no-unsanitized": nounsanitized,
             "prefer-arrow": pluginPreferArrow,
@@ -253,7 +277,7 @@ export default [
             ...pluginReactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.recommended.rules,
             ...pluginSonarjs.configs.recommended.rules,
-            ...pluginEslintComments.configs.recommended.rules,
+            ...comments.recommended[0],
             ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginBoundaries.configs.recommended.rules,
             ...pluginRedos.configs.recommended.rules,
@@ -371,7 +395,7 @@ export default [
                 },
             ], // Allow "class" prefix for className and other legitimate uses
             "unicorn/no-array-callback-reference": "off", // Conflicts with React
-            "unicorn/no-array-for-each": "off", // forEach is fine
+            "unicorn/no-array-for-each": "off", // ForEach is fine
             "unicorn/no-negated-condition": "off", // Sometimes clearer
             "unicorn/prefer-includes": "warn",
             "unicorn/prefer-module": "off", // CommonJS needed for Electron
@@ -385,9 +409,9 @@ export default [
             // "prefer-arrow/prefer-arrow-functions": [
             //     "warn",
             //     {
-            //         disallowPrototype: true,
-            //         singleReturnOnly: false,
-            //         classPropertiesAllowed: false,
+            //         DisallowPrototype: true,
+            //         SingleReturnOnly: false,
+            //         ClassPropertiesAllowed: false,
             //     },
             // ],
 
@@ -558,7 +582,7 @@ export default [
         },
         plugins: {
             "@typescript-eslint": tseslint,
-            "eslint-comments": pluginEslintComments,
+            "@eslint-community/eslint-comments": comments,
             "jsx-a11y": jsxA11y,
             "no-unsanitized": nounsanitized,
             "prefer-arrow": pluginPreferArrow,
@@ -601,7 +625,7 @@ export default [
             ...pluginReactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.recommended.rules,
             ...pluginSonarjs.configs.recommended.rules,
-            ...pluginEslintComments.configs.recommended.rules,
+            ...comments.recommended[0],
             ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginBoundaries.configs.recommended.rules,
             ...pluginRedos.configs.recommended.rules,
@@ -851,6 +875,14 @@ export default [
         },
         settings: {
             react: { version: "19" },
+            n: { allowModules: ["electron", "node", "electron-devtools-installer"] },
+            "import/resolver": {
+                // You will also need to install and configure the TypeScript resolver
+                // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
+                typescript: true,
+                node: true,
+                project: ["./tsconfig.test.json"],
+            },
         },
         plugins: {
             "@typescript-eslint": tseslint,
@@ -861,10 +893,12 @@ export default [
             "unused-imports": pluginUnusedImports,
             react: pluginReact,
             "react-hooks": pluginReactHooks,
+            n: nodePlugin,
         },
         rules: {
             ...tseslint.configs.recommended.rules,
             ...vitest.configs.recommended.rules,
+
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-non-null-assertion": "off",
             "@typescript-eslint/no-unused-vars": "off",
@@ -884,7 +918,7 @@ export default [
     // Test files (Backend) + Configuration files
     {
         files: [
-            "**/*.config.{js,mjs,ts}", // Configuration files
+            "**/*.config.{ts}", // Configuration files
             "electron/**/*.spec.{ts,tsx}",
             "electron/**/*.test.{ts,tsx}",
             "electron/test/**/*.{ts,tsx}",
@@ -929,6 +963,7 @@ export default [
             pluginImport: pluginImport,
             unicorn: pluginUnicorn,
             vitest: vitest,
+            n: nodePlugin,
         },
         rules: {
             ...tseslint.configs.recommended.rules,
@@ -957,13 +992,102 @@ export default [
             // No Only Tests
             "no-only-tests/no-only-tests": "error",
         },
+        settings: {
+            n: { allowModules: ["electron", "node", "electron-devtools-installer"] },
+            "import/resolver": {
+                // You will also need to install and configure the TypeScript resolver
+                // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
+                typescript: true,
+                node: true,
+                project: ["./tsconfig.electron.test.json"],
+            },
+        },
     },
 
-    // Global browser environment
+    // JS/MJS Configuration files
     {
+        files: [
+            "**/*.config.{js,mjs}",
+        ],
         languageOptions: {
-            globals: globals.browser,
+            globals: {
+                ...globals.node,
+                __dirname: "readonly",
+                __filename: "readonly",
+                process: "readonly",
+                require: "readonly",
+                module: "readonly",
+            },
         },
-        ignores: ["docs/docusaurus/**"],
+        plugins: {
+            "@typescript-eslint": tseslint,
+            "@eslint-community/eslint-comments": comments,
+            "jsx-a11y": jsxA11y,
+            "no-unsanitized": nounsanitized,
+            "prefer-arrow": pluginPreferArrow,
+            "react-hooks": pluginReactHooks,
+            "sort-class-members": pluginSortClassMembers,
+            "unused-imports": pluginUnusedImports,
+            "write-good-comments": pluginWriteGood,
+            boundaries: pluginBoundaries,
+            compat: pluginCompat,
+            css: cssPlugin,
+            depend: depend,
+            functional: pluginFunctional,
+            js: js,
+            math: eslintPluginMath,
+            n: nodePlugin,
+            perfectionist: pluginPerfectionist,
+            pluginImport: pluginImport,
+            prettier: pluginPrettier,
+            promise: pluginPromise,
+            putout: putout,
+            react: pluginReact,
+            redos: pluginRedos,
+            regexp: pluginRegexp,
+            security: pluginSecurity,
+            sonarjs: pluginSonarjs,
+            tailwind: tailwind,
+            tsdoc: pluginTsdoc,
+            unicorn: pluginUnicorn,
+        },
+        rules: {
+            ...js.configs.all.rules,
+            ...pluginRegexp.configs["flat/recommended"].rules,
+            ...pluginImport.flatConfigs.typescript.rules,
+            ...pluginPromise.configs["flat/recommended"].rules,
+            ...pluginUnicorn.configs.recommended.rules,
+            ...pluginReact.configs.recommended.rules,
+            ...pluginReactHooks.configs["recommended-latest"].rules,
+            ...jsxA11y.flatConfigs.recommended.rules,
+            ...pluginSonarjs.configs.recommended.rules,
+            ...comments.recommended[0],
+            ...pluginPerfectionist.configs["recommended-natural"].rules,
+            ...pluginRedos.configs.recommended.rules,
+            ...nodePlugin.configs["flat/recommended"].rules,
+            ...depend.configs["flat/recommended"].rules,
+            ...eslintPluginMath.configs.recommended.rules,
+
+            "unicorn/no-keyword-prefix": "off", // Allow "class" prefix for className and other legitimate uses
+            "unicorn/no-useless-undefined": "off", // Allow undefined in config setups
+            "unicorn/consistent-function-scoping": "off", // Configs often use different scoping
+            "unicorn/no-unused-properties": "off", // Allow unused properties in config setups
+            "unicorn/no-null": "off", // Null is common in config setups
+            "unicorn/no-await-expression-member": "off", // Allow await in config expressions
+            "unicorn/filename-case": "off", // Allow config files to have any case
+            "unicorn/prevent-abbreviations": "off", // Too many false positives in configs
+            "unused-imports/no-unused-imports": "error",
+
+        },
+        settings: {
+            n: { allowModules: ["electron", "node", "electron-devtools-installer"] },
+            "import/resolver": {
+                node: true,
+            },
+            react: { version: "19" },
+
+        },
     },
+
+
 ];

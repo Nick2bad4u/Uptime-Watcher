@@ -24,10 +24,27 @@
             "@/*": ["src/*"],
             "@shared/*": ["shared/*"]
         },
-        "types": ["node", "vitest/globals", "@testing-library/jest-dom", "jest", "electron"]
+        "types": [
+            "@testing-library/jest-dom",
+            "electron",
+            "jest",
+            "node",
+            "react-dom",
+            "react",
+            "vite/client",
+            "vitest/globals"
+        ]
     },
     "exclude": ["node_modules"],
     "include": [
+        "*.config.js",
+        "*.config.mjs",
+        "*.config.ts",
+        "**/*.config.js",
+        "**/*.config.mjs",
+        "**/*.config.ts",
+        "eslint.config.mjs",
+        "postcss.config.js",
         "shared/**/*.spec.ts",
         "shared/**/*.test.ts",
         "shared/**/*.ts",
@@ -38,6 +55,7 @@
         "src/**/*.ts",
         "src/**/*.tsx",
         "src/test/**/*",
+        "tailwind.config.js",
         "vitest.config.ts"
     ]
 }

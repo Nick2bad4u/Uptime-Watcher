@@ -24,29 +24,38 @@
             "@/*": ["electron/*"],
             "@shared/*": ["shared/*"]
         },
-        "types": ["node", "vitest/globals", "@testing-library/jest-dom", "jest", "electron"]
+        "types": [
+            "@testing-library/jest-dom",
+            "electron",
+            "jest",
+            "node",
+            "react-dom",
+            "react",
+            "vite/client",
+            "vitest/globals"
+        ]
     },
     "exclude": ["node_modules"],
     "include": [
+        "*.config.js",
+        "*.config.mjs",
+        "*.config.ts",
+        "**/*.config.js",
+        "**/*.config.mjs",
+        "**/*.config.ts",
         "electron/**/*.spec.ts",
         "electron/**/*.test.ts",
         "electron/**/*.ts",
         "electron/**/*.tsx",
         "electron/test/**/*",
+        "eslint.config.mjs",
+        "postcss.config.js",
         "shared/**/*.spec.ts",
         "shared/**/*.test.ts",
         "shared/**/*.ts",
         "shared/**/*.tsx",
         "shared/test/**/*",
-        "vitest.electron.config.ts",
-        "**/*.config.ts",
-        "**/*.config.js",
-        "**/*.config.mjs",
-        "*.config.ts",
-        "*.config.js",
-        "*.config.mjs",
-        "eslint.config.mjs",
-        "postcss.config.js",
-        "tailwind.config.js"
+        "tailwind.config.js",
+        "vitest.electron.config.ts"
     ]
 }
