@@ -7,14 +7,85 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[e1870f3](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e1870f3c2998531e8525727bef582d33f59415c4)...
-[e1870f3](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e1870f3c2998531e8525727bef582d33f59415c4)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e1870f3c2998531e8525727bef582d33f59415c4...e1870f3c2998531e8525727bef582d33f59415c4))
+[[491dd22](https://github.com/Nick2bad4u/Uptime-Watcher/commit/491dd22c8c5ea282ee3fe21ee2c05ed6d178badb)...
+[491dd22](https://github.com/Nick2bad4u/Uptime-Watcher/commit/491dd22c8c5ea282ee3fe21ee2c05ed6d178badb)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/491dd22c8c5ea282ee3fe21ee2c05ed6d178badb...491dd22c8c5ea282ee3fe21ee2c05ed6d178badb))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 9.5.0 [`(491dd22)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/491dd22c8c5ea282ee3fe21ee2c05ed6d178badb)
+
+
+
+
+
+
+## [9.5.0] - 2025-07-29
+
+
+[[c3c148a](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c3c148a3c01ba14adbc73628598d7220aa0ba74f)...
+[3685103](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3685103239e0095d0fe0a1151c0767db9d7ccd60)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/c3c148a3c01ba14adbc73628598d7220aa0ba74f...3685103239e0095d0fe0a1151c0767db9d7ccd60))
+
+
+### �️ Bug Fixes
+
+- 🛠️ [fix] Improve safety and logging config, return validation metadata
+
+- Ensures monitor lists are safely handled if null or undefined to prevent runtime errors.
+- Updates console logging level detection to use a more reliable environment variable check for production mode.
+- Returns metadata in monitor field validation results for richer error handling and diagnostics.
+- Removes redundant ESLint disable comments for cleaner code. [`(94ae942)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/94ae942a2e31a8054725772aab9be2e059167679)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 9.4.0 [`(e1870f3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e1870f3c2998531e8525727bef582d33f59415c4)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(3685103)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3685103239e0095d0fe0a1151c0767db9d7ccd60)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Add comprehensive and edge case tests across codebase
+
+- Expands test coverage with new comprehensive suites for configuration, validation, lifecycle utilities, UI helpers, and React components
+- Refactors and enhances existing tests for stricter typing, branch coverage, and edge case handling
+- Updates test mocks and type imports for accuracy and maintainability
+- Improves test clarity, correctness, and resilience to code changes
+- Supports future codebase stability and confidence in core logic under varied scenarios [`(6195be8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6195be8a11be30e41497c789d80b5a8582ec0a50)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v9.4.0 [skip ci] [`(b9e3fc6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b9e3fc6e97268f167b40252f13bca7ad38c5117d)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update lint configs, dependencies, and cleanup TODOs
+
+- Replaces deprecated ESLint plugin with maintained alternative and updates rule references for improved linting compatibility.
+- Adds new ESLint-related dependencies and configuration for better TypeScript and JS config file support.
+- Refines test and config file type inclusions for TypeScript, enhancing IDE and test tooling accuracy.
+- Enables ESLint caching in lint scripts to speed up development workflows.
+- Cleans up and reorganizes ignore patterns and rule settings for more precise linting behavior.
+- Removes obsolete TODO file and updates code comments for clarity. [`(af76141)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/af76141771dda0688594c53a973d4bf1b3db1d85)
+
+
+- 🔧 [build] Add type-check scripts for test environments
+
+- Introduces new scripts to perform TypeScript type checks specifically for test configurations in both frontend and Electron.
+- Enhances CI and developer workflows by enabling early detection of type errors in test code, improving code reliability. [`(c3c148a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c3c148a3c01ba14adbc73628598d7220aa0ba74f)
 
 
 
