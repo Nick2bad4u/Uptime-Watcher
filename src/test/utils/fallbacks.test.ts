@@ -1,6 +1,6 @@
 /**
  * Tests for fallback and default value utilities
- * 
+ *
  * @fileoverview Comprehensive tests covering all branches and edge cases
  * for fallback utilities used throughout the application.
  */
@@ -16,7 +16,7 @@ import {
     truncateForLogging,
     UiDefaults,
     MonitorDefaults,
-    SiteDefaults
+    SiteDefaults,
 } from "../../utils/fallbacks";
 import type { Monitor } from "../../types";
 
@@ -29,14 +29,14 @@ vi.mock("../../services/logger", () => ({
 
 // Mock the error handling utilities
 vi.mock("../../utils/errorHandling", () => ({
-    ensureError: vi.fn((error) => error instanceof Error ? error : new Error(String(error))),
+    ensureError: vi.fn((error) => (error instanceof Error ? error : new Error(String(error)))),
     withUtilityErrorHandling: vi.fn(async (operation) => {
         try {
             return await operation();
         } catch (error) {
             throw error;
         }
-    })
+    }),
 }));
 
 describe("Fallback Utilities", () => {
@@ -105,7 +105,7 @@ describe("Fallback Utilities", () => {
         it("should return a sync function that handles async operations", () => {
             const asyncOperation = vi.fn().mockResolvedValue("success");
             const handler = withAsyncErrorHandling(asyncOperation, "test operation");
-            
+
             expect(typeof handler).toBe("function");
             expect(handler()).toBeUndefined(); // Returns void
         });
@@ -113,16 +113,16 @@ describe("Fallback Utilities", () => {
         it("should execute the async operation when handler is called", () => {
             const asyncOperation = vi.fn().mockResolvedValue("success");
             const handler = withAsyncErrorHandling(asyncOperation, "test operation");
-            
+
             handler();
-            
+
             expect(asyncOperation).toHaveBeenCalledOnce();
         });
 
         it("should handle async operations that throw errors", () => {
             const asyncOperation = vi.fn().mockRejectedValue(new Error("Async error"));
             const handler = withAsyncErrorHandling(asyncOperation, "test operation");
-            
+
             // Should not throw when called
             expect(() => handler()).not.toThrow();
         });
@@ -131,7 +131,7 @@ describe("Fallback Utilities", () => {
             const asyncOperation = vi.fn().mockResolvedValue("success");
             const handler1 = withAsyncErrorHandling(asyncOperation, "operation 1");
             const handler2 = withAsyncErrorHandling(asyncOperation, "operation 2");
-            
+
             expect(typeof handler1).toBe("function");
             expect(typeof handler2).toBe("function");
             expect(handler1).not.toBe(handler2); // Different instances
@@ -147,9 +147,9 @@ describe("Fallback Utilities", () => {
             it("should return operation result when operation succeeds", () => {
                 const operation = vi.fn().mockReturnValue("success result");
                 const fallback = "fallback value";
-                
+
                 const result = withSyncErrorHandling(operation, "test operation", fallback);
-                
+
                 expect(result).toBe("success result");
                 expect(operation).toHaveBeenCalledOnce();
             });
@@ -158,9 +158,9 @@ describe("Fallback Utilities", () => {
                 const complexResult = { data: [1, 2, 3], status: "ok" };
                 const operation = vi.fn().mockReturnValue(complexResult);
                 const fallback = { data: [], status: "error" };
-                
+
                 const result = withSyncErrorHandling(operation, "complex operation", fallback);
-                
+
                 expect(result).toBe(complexResult);
                 expect(result).toEqual({ data: [1, 2, 3], status: "ok" });
             });
@@ -168,9 +168,9 @@ describe("Fallback Utilities", () => {
             it("should handle operations returning falsy values", () => {
                 const operation = vi.fn().mockReturnValue(false);
                 const fallback = true;
-                
+
                 const result = withSyncErrorHandling(operation, "boolean operation", fallback);
-                
+
                 expect(result).toBe(false);
             });
         });
@@ -182,9 +182,9 @@ describe("Fallback Utilities", () => {
                     throw new Error("Operation failed");
                 });
                 const fallback = "fallback value";
-                
+
                 const result = withSyncErrorHandling(operation, "test operation", fallback);
-                
+
                 expect(result).toBe(fallback);
                 expect(operation).toHaveBeenCalledOnce();
                 expect(logger.default.error).toHaveBeenCalled();
@@ -196,9 +196,9 @@ describe("Fallback Utilities", () => {
                     throw "String error";
                 });
                 const fallback = "fallback";
-                
+
                 const result = withSyncErrorHandling(operation, "string error test", fallback);
-                
+
                 expect(result).toBe(fallback);
                 expect(logger.default.error).toHaveBeenCalled();
             });
@@ -209,13 +209,10 @@ describe("Fallback Utilities", () => {
                 const operation = vi.fn().mockImplementation(() => {
                     throw error;
                 });
-                
+
                 withSyncErrorHandling(operation, "specific operation", "fallback");
-                
-                expect(logger.default.error).toHaveBeenCalledWith(
-                    "specific operation failed",
-                    error
-                );
+
+                expect(logger.default.error).toHaveBeenCalledWith("specific operation failed", error);
             });
         });
     });
@@ -245,7 +242,7 @@ describe("Fallback Utilities", () => {
             it("should handle complex types", () => {
                 const original = { id: 1, name: "test" };
                 const fallback = { id: 0, name: "default" };
-                
+
                 expect(withFallback(original, fallback)).toBe(original);
                 expect(withFallback(null, fallback)).toBe(fallback);
             });
@@ -259,9 +256,9 @@ describe("Fallback Utilities", () => {
                     id: "1",
                     name: "Test Monitor",
                     type: "http",
-                    url: "https://example.com"
+                    url: "https://example.com",
                 } as Monitor;
-                
+
                 const result = getMonitorDisplayIdentifier(monitor, "Site Fallback");
                 expect(result).toBe("https://example.com");
             });
@@ -270,9 +267,9 @@ describe("Fallback Utilities", () => {
                 const monitor: Monitor = {
                     id: "1",
                     name: "Test Monitor",
-                    type: "http"
+                    type: "http",
                 } as Monitor;
-                
+
                 const result = getMonitorDisplayIdentifier(monitor, "Site Fallback");
                 expect(result).toBe("Site Fallback");
             });
@@ -285,9 +282,9 @@ describe("Fallback Utilities", () => {
                     name: "Test Monitor",
                     type: "port",
                     host: "example.com",
-                    port: 80
+                    port: 80,
                 } as Monitor;
-                
+
                 const result = getMonitorDisplayIdentifier(monitor, "Site Fallback");
                 expect(result).toBe("example.com:80");
             });
@@ -297,9 +294,9 @@ describe("Fallback Utilities", () => {
                     id: "1",
                     name: "Test Monitor",
                     type: "port",
-                    host: "example.com"
+                    host: "example.com",
                 } as Monitor;
-                
+
                 const result = getMonitorDisplayIdentifier(monitor, "Site Fallback");
                 expect(result).toBe("example.com");
             });
@@ -309,9 +306,9 @@ describe("Fallback Utilities", () => {
                     id: "1",
                     name: "Test Monitor",
                     type: "port",
-                    port: 80
+                    port: 80,
                 } as Monitor;
-                
+
                 const result = getMonitorDisplayIdentifier(monitor, "Site Fallback");
                 expect(result).toBe("Site Fallback");
             });
@@ -323,9 +320,9 @@ describe("Fallback Utilities", () => {
                     id: "1",
                     name: "Test Monitor",
                     type: "unknown",
-                    url: "https://example.com"
+                    url: "https://example.com",
                 } as Monitor;
-                
+
                 const result = getMonitorDisplayIdentifier(monitor, "Site Fallback");
                 expect(result).toBe("https://example.com");
             });
@@ -335,9 +332,9 @@ describe("Fallback Utilities", () => {
                     id: "1",
                     name: "Test Monitor",
                     type: "unknown",
-                    host: "example.com"
+                    host: "example.com",
                 } as Monitor;
-                
+
                 const result = getMonitorDisplayIdentifier(monitor, "Site Fallback");
                 expect(result).toBe("example.com");
             });
@@ -348,9 +345,9 @@ describe("Fallback Utilities", () => {
                     name: "Test Monitor",
                     type: "unknown",
                     host: "example.com",
-                    port: 8080
+                    port: 8080,
                 } as Monitor;
-                
+
                 const result = getMonitorDisplayIdentifier(monitor, "Site Fallback");
                 expect(result).toBe("example.com:8080");
             });
@@ -361,9 +358,9 @@ describe("Fallback Utilities", () => {
                 const monitor: Monitor = {
                     id: "1",
                     name: "Test Monitor",
-                    type: "unknown"
+                    type: "unknown",
                 } as Monitor;
-                
+
                 const result = getMonitorDisplayIdentifier(monitor, "Site Fallback");
                 expect(result).toBe("Site Fallback");
             });
@@ -372,9 +369,9 @@ describe("Fallback Utilities", () => {
                 const monitor: Monitor = {
                     id: "1",
                     name: "Test Monitor",
-                    type: "unknown"
+                    type: "unknown",
                 } as Monitor;
-                
+
                 expect(getMonitorDisplayIdentifier(monitor, "Custom Fallback")).toBe("Custom Fallback");
                 expect(getMonitorDisplayIdentifier(monitor, "")).toBe("");
             });
@@ -387,9 +384,9 @@ describe("Fallback Utilities", () => {
                     // Malformed properties that might cause errors
                     url: null,
                     host: null,
-                    port: "invalid"
+                    port: "invalid",
                 } as any;
-                
+
                 const result = getMonitorDisplayIdentifier(monitor, "Error Fallback");
                 expect(result).toBe("Error Fallback");
             });
@@ -548,7 +545,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should truncate error messages", () => {
-                const error = "Connection failed: Unable to connect to server at example.com:8080 after 30 seconds timeout";
+                const error =
+                    "Connection failed: Unable to connect to server at example.com:8080 after 30 seconds timeout";
                 const result = truncateForLogging(error, 50);
                 expect(result.length).toBe(50);
                 expect(result).toBe("Connection failed: Unable to connect to server at ");

@@ -98,7 +98,7 @@ describe("Monitoring Data Validation", () => {
 
         it("should handle scientific notation", () => {
             expect(parseUptimeValue("1e2")).toBe(100); // 100
-            expect(parseUptimeValue("5e1")).toBe(50);  // 50
+            expect(parseUptimeValue("5e1")).toBe(50); // 50
             expect(parseUptimeValue("1e3")).toBe(100); // 1000, clamped to 100
         });
     });
@@ -208,22 +208,18 @@ describe("Monitoring Data Validation", () => {
 
     describe("Integration tests", () => {
         it("should work together for URL processing workflow", () => {
-            const urls = [
-                "https://example.com",
-                "invalid-url",
-                "https://test.com:8080/path"
-            ];
+            const urls = ["https://example.com", "invalid-url", "https://test.com:8080/path"];
 
-            const results = urls.map(url => ({
+            const results = urls.map((url) => ({
                 url,
                 isValid: isValidUrl(url),
-                hostname: safeGetHostname(url)
+                hostname: safeGetHostname(url),
             }));
 
             expect(results).toEqual([
                 { url: "https://example.com", isValid: true, hostname: "example.com" },
                 { url: "invalid-url", isValid: false, hostname: "" },
-                { url: "https://test.com:8080/path", isValid: true, hostname: "test.com" }
+                { url: "https://test.com:8080/path", isValid: true, hostname: "test.com" },
             ]);
         });
 
@@ -231,19 +227,19 @@ describe("Monitoring Data Validation", () => {
             const monitoringData = [
                 { uptime: "95.5%", url: "https://example.com" },
                 { uptime: "invalid", url: "not-a-url" },
-                { uptime: " 100% ", url: "https://test.com" }
+                { uptime: " 100% ", url: "https://test.com" },
             ];
 
-            const processed = monitoringData.map(data => ({
+            const processed = monitoringData.map((data) => ({
                 uptimeValue: parseUptimeValue(data.uptime),
                 isValidUrl: isValidUrl(data.url),
-                hostname: safeGetHostname(data.url)
+                hostname: safeGetHostname(data.url),
             }));
 
             expect(processed).toEqual([
                 { uptimeValue: 95.5, isValidUrl: true, hostname: "example.com" },
                 { uptimeValue: 0, isValidUrl: false, hostname: "" },
-                { uptimeValue: 100, isValidUrl: true, hostname: "test.com" }
+                { uptimeValue: 100, isValidUrl: true, hostname: "test.com" },
             ]);
 
             // Should have logged warning for invalid uptime

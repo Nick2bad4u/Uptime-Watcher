@@ -275,7 +275,7 @@ describe("ThemeManager", () => {
 
         it("should handle partial typography object", () => {
             const manager = ThemeManager.getInstance();
-            
+
             const themeWithPartialTypography = {
                 name: "partial-typography",
                 isDark: false,
@@ -296,7 +296,7 @@ describe("ThemeManager", () => {
 
         it("should handle empty objects for theme properties", () => {
             const manager = ThemeManager.getInstance();
-            
+
             const themeWithEmptyObjects = {
                 name: "empty-objects",
                 isDark: false,
@@ -313,7 +313,7 @@ describe("ThemeManager", () => {
 
         it("should handle complex color structures with null values", () => {
             const manager = ThemeManager.getInstance();
-            
+
             const themeWithComplexColors = {
                 name: "complex-colors",
                 isDark: false,
@@ -337,7 +337,7 @@ describe("ThemeManager", () => {
 
         it("should handle nested null checks in apply methods", () => {
             const manager = ThemeManager.getInstance();
-            
+
             // Test with theme that has some properties as null to trigger the private method null checks
             const themeWithNullBorderRadius = {
                 ...lightTheme,

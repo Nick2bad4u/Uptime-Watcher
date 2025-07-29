@@ -1,6 +1,6 @@
 /**
  * Tests for useBackendFocusSync hook
- * 
+ *
  * @fileoverview Comprehensive tests covering all branches and edge cases
  * for the backend focus synchronization hook.
  */
@@ -31,14 +31,14 @@ describe("useBackendFocusSync Hook", () => {
     // Store original addEventListener and removeEventListener
     const originalAddEventListener = window.addEventListener;
     const originalRemoveEventListener = window.removeEventListener;
-    
+
     // Mock event listener functions
     const mockAddEventListener = vi.fn();
     const mockRemoveEventListener = vi.fn();
 
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         // Replace window event listener methods with mocks
         window.addEventListener = mockAddEventListener;
         window.removeEventListener = mockRemoveEventListener;
@@ -126,10 +126,9 @@ describe("useBackendFocusSync Hook", () => {
 
     describe("Dynamic enable/disable behavior", () => {
         it("should add listener when changing from disabled to enabled", () => {
-            const { rerender } = renderHook(
-                ({ enabled }) => useBackendFocusSync(enabled),
-                { initialProps: { enabled: false } }
-            );
+            const { rerender } = renderHook(({ enabled }) => useBackendFocusSync(enabled), {
+                initialProps: { enabled: false },
+            });
 
             // Initially disabled - no listener should be added
             expect(mockAddEventListener).not.toHaveBeenCalled();
@@ -143,10 +142,9 @@ describe("useBackendFocusSync Hook", () => {
         });
 
         it("should remove listener when changing from enabled to disabled", () => {
-            const { rerender } = renderHook(
-                ({ enabled }) => useBackendFocusSync(enabled),
-                { initialProps: { enabled: true } }
-            );
+            const { rerender } = renderHook(({ enabled }) => useBackendFocusSync(enabled), {
+                initialProps: { enabled: true },
+            });
 
             // Initially enabled - listener should be added
             expect(mockAddEventListener).toHaveBeenCalledWith("focus", expect.any(Function));
@@ -161,10 +159,9 @@ describe("useBackendFocusSync Hook", () => {
         });
 
         it("should handle rapid enable/disable changes", () => {
-            const { rerender } = renderHook(
-                ({ enabled }) => useBackendFocusSync(enabled),
-                { initialProps: { enabled: false } }
-            );
+            const { rerender } = renderHook(({ enabled }) => useBackendFocusSync(enabled), {
+                initialProps: { enabled: false },
+            });
 
             // Rapidly change enabled state
             rerender({ enabled: true });
@@ -188,7 +185,7 @@ describe("useBackendFocusSync Hook", () => {
 
         it("should re-run effect when fullSyncFromBackend function changes", () => {
             const newMockFullSync = vi.fn();
-            
+
             // Initially return the first mock function
             vi.mocked(useSitesStore).mockImplementation((selector) => {
                 if (typeof selector === "function") {
@@ -220,11 +217,11 @@ describe("useBackendFocusSync Hook", () => {
             // Should have removed old listener and added new one
             expect(mockRemoveEventListener).toHaveBeenCalledWith("focus", firstHandler);
             expect(mockAddEventListener).toHaveBeenCalledTimes(2);
-            
+
             // New handler should call the new function
             const secondHandler = mockAddEventListener.mock.calls[1][1];
             secondHandler();
-            
+
             expect(newMockFullSync).toHaveBeenCalledTimes(1);
             expect(mockFullSyncFromBackend).not.toHaveBeenCalled();
         });
@@ -256,10 +253,9 @@ describe("useBackendFocusSync Hook", () => {
         });
 
         it("should work with truthy non-boolean values for enabled", () => {
-            const { rerender } = renderHook(
-                ({ enabled }) => useBackendFocusSync(enabled as any),
-                { initialProps: { enabled: "true" as any } }
-            );
+            const { rerender } = renderHook(({ enabled }) => useBackendFocusSync(enabled as any), {
+                initialProps: { enabled: "true" as any },
+            });
 
             expect(mockAddEventListener).toHaveBeenCalledTimes(1);
 
@@ -274,10 +270,9 @@ describe("useBackendFocusSync Hook", () => {
         });
 
         it("should work with falsy non-boolean values for enabled", () => {
-            const { rerender } = renderHook(
-                ({ enabled }) => useBackendFocusSync(enabled as any),
-                { initialProps: { enabled: null as any } }
-            );
+            const { rerender } = renderHook(({ enabled }) => useBackendFocusSync(enabled as any), {
+                initialProps: { enabled: null as any },
+            });
 
             expect(mockAddEventListener).not.toHaveBeenCalled();
 
@@ -306,10 +301,10 @@ describe("useBackendFocusSync Hook", () => {
             renderHook(() => useBackendFocusSync(true));
 
             expect(mockAddEventListener).toHaveBeenCalledWith("focus", expect.any(Function));
-            
+
             const focusHandler = mockAddEventListener.mock.calls[0][1];
             focusHandler();
-            
+
             expect(mockFullSyncFromBackend).toHaveBeenCalledTimes(1);
         });
 

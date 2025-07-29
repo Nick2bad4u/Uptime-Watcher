@@ -241,12 +241,12 @@ describe("useSelectedSite", () => {
     describe("State updates and reactivity", () => {
         it("should update when selectedSiteId changes", () => {
             mockUseSitesStore.mockReturnValue(mockSites);
-            
+
             // Start with site-1 selected
             mockUseUIStore.mockReturnValue("site-1");
             const { result, rerender } = renderHook(() => useSelectedSite());
             expect(result.current?.identifier).toBe("site-1");
-            
+
             // Change to site-2
             mockUseUIStore.mockReturnValue("site-2");
             rerender();
@@ -255,17 +255,15 @@ describe("useSelectedSite", () => {
 
         it("should update when sites array changes", () => {
             mockUseUIStore.mockReturnValue("site-1");
-            
+
             // Start with original sites
             mockUseSitesStore.mockReturnValue(mockSites);
             const { result, rerender } = renderHook(() => useSelectedSite());
             expect(result.current?.name).toBe("Test Site 1");
-            
+
             // Update sites array with modified site
-            const updatedSites = mockSites.map(site =>
-                site.identifier === "site-1" 
-                    ? { ...site, name: "Updated Test Site 1" }
-                    : site
+            const updatedSites = mockSites.map((site) =>
+                site.identifier === "site-1" ? { ...site, name: "Updated Test Site 1" } : site
             );
             mockUseSitesStore.mockReturnValue(updatedSites);
             rerender();
@@ -274,12 +272,12 @@ describe("useSelectedSite", () => {
 
         it("should handle transition from selected to no selection", () => {
             mockUseSitesStore.mockReturnValue(mockSites);
-            
+
             // Start with site selected
             mockUseUIStore.mockReturnValue("site-1");
             const { result, rerender } = renderHook(() => useSelectedSite());
             expect(result.current).toBeDefined();
-            
+
             // Change to no selection
             mockUseUIStore.mockReturnValue(null);
             rerender();
@@ -288,12 +286,12 @@ describe("useSelectedSite", () => {
 
         it("should handle transition from no selection to selected", () => {
             mockUseSitesStore.mockReturnValue(mockSites);
-            
+
             // Start with no selection
             mockUseUIStore.mockReturnValue(null);
             const { result, rerender } = renderHook(() => useSelectedSite());
             expect(result.current).toBeUndefined();
-            
+
             // Change to site selected
             mockUseUIStore.mockReturnValue("site-2");
             rerender();
@@ -308,40 +306,40 @@ describe("useSelectedSite", () => {
 
             const { result, rerender } = renderHook(() => useSelectedSite());
             const firstResult = result.current;
-            
+
             rerender();
             const secondResult = result.current;
-            
+
             expect(firstResult).toBe(secondResult);
         });
 
         it("should return new reference when selectedSiteId changes", () => {
             mockUseSitesStore.mockReturnValue(mockSites);
-            
+
             mockUseUIStore.mockReturnValue("site-1");
             const { result, rerender } = renderHook(() => useSelectedSite());
             const firstResult = result.current;
-            
+
             mockUseUIStore.mockReturnValue("site-2");
             rerender();
             const secondResult = result.current;
-            
+
             expect(firstResult).not.toBe(secondResult);
         });
 
         it("should return new reference when sites array changes", () => {
             mockUseUIStore.mockReturnValue("site-1");
-            
+
             mockUseSitesStore.mockReturnValue(mockSites);
             const { result, rerender } = renderHook(() => useSelectedSite());
             const firstResult = result.current;
-            
+
             // Create a new array with new objects but same content to force memoization to recalculate
-            const newSites = mockSites.map(site => ({ ...site }));
+            const newSites = mockSites.map((site) => ({ ...site }));
             mockUseSitesStore.mockReturnValue(newSites);
             rerender();
             const secondResult = result.current;
-            
+
             // The site objects are different even though the content is the same
             expect(firstResult).not.toBe(secondResult);
         });

@@ -175,7 +175,7 @@ describe("useSiteSync", () => {
 
         it("should handle StatusUpdateManager subscription errors", async () => {
             const mockCallback = vi.fn();
-            
+
             // Mock StatusUpdateManager to throw an error during subscribe
             const statusUpdateHandlerModule = await import("../../../stores/sites/utils/statusUpdateHandler");
             const mockStatusUpdateManager = {
@@ -184,7 +184,7 @@ describe("useSiteSync", () => {
                 }),
                 unsubscribe: vi.fn(),
             } as any; // Use any to bypass type checking for test mock
-            
+
             vi.mocked(statusUpdateHandlerModule.StatusUpdateManager).mockImplementation(() => mockStatusUpdateManager);
 
             // Should still return success even if subscribe throws (error is caught and logged)
@@ -280,7 +280,7 @@ describe("useSiteSync", () => {
             const error = new Error("Sync failed");
             vi.mocked(SiteService.getSites).mockRejectedValue(error);
 
-            // The function should not throw synchronously 
+            // The function should not throw synchronously
             expect(() => syncActions.syncSitesFromBackend()).not.toThrow();
         });
     });

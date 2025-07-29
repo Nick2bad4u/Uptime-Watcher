@@ -47,6 +47,6 @@
         "*.config.mjs",
         "eslint.config.mjs",
         "postcss.config.js",
-        "tailwind.config.js",
+        "tailwind.config.js"
     ]
 }

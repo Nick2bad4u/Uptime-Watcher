@@ -209,7 +209,7 @@ describe("ThemeManager", () => {
             themeManager.applyTheme(lightTheme);
 
             const documentElement = document.documentElement as any;
-            
+
             // Should set CSS properties for colors, typography, spacing, etc.
             expect(documentElement.style.setProperty).toHaveBeenCalledWith(
                 expect.stringMatching(/--color-/),
@@ -219,7 +219,7 @@ describe("ThemeManager", () => {
 
         it("should handle different theme types", () => {
             const availableThemes = themeManager.getAvailableThemes();
-            
+
             for (const themeName of availableThemes) {
                 const theme = themeManager.getTheme(themeName);
                 expect(() => themeManager.applyTheme(theme)).not.toThrow();
@@ -292,12 +292,12 @@ describe("ThemeManager", () => {
 
             // Should include color variables
             expect(cssVariables).toMatch(/--color-\w+-\w+:/);
-            
+
             // Should include typography variables
             expect(cssVariables).toMatch(/--font-size-\w+:/);
             expect(cssVariables).toMatch(/--font-weight-\w+:/);
             expect(cssVariables).toMatch(/--line-height-\w+:/);
-            
+
             // Should include spacing variables
             expect(cssVariables).toMatch(/--spacing-\w+:/);
         });
@@ -356,7 +356,7 @@ describe("ThemeManager", () => {
     describe("Performance", () => {
         it("should handle multiple theme applications efficiently", () => {
             const theme = themeManager.getTheme("light");
-            
+
             const start = performance.now();
             for (let i = 0; i < 100; i++) {
                 themeManager.applyTheme(theme);
@@ -369,7 +369,7 @@ describe("ThemeManager", () => {
 
         it("should handle CSS variable generation efficiently", () => {
             const theme = themeManager.getTheme("dark");
-            
+
             const start = performance.now();
             for (let i = 0; i < 1000; i++) {
                 themeManager.generateCSSVariables(theme);

@@ -9,7 +9,7 @@ import {
     getIntervalLabel,
     formatRetryAttemptsText,
     TIME_PERIOD_LABELS,
-    type TimePeriod
+    type TimePeriod,
 } from "../../utils/time";
 
 describe("Time Utilities", () => {
@@ -56,7 +56,7 @@ describe("Time Utilities", () => {
         it("should format timestamp as locale string", () => {
             const timestamp = 1640995200000; // January 1, 2022 00:00:00 UTC
             const result = formatFullTimestamp(timestamp);
-            
+
             // The exact format depends on locale and timezone, but should contain date/time info
             expect(result).toMatch(/2021|2022|21|22/); // Should contain year (timezone dependent)
             expect(result).toMatch(/Jan|Dec|1|31|01|12/); // Should contain month or day (timezone dependent)
@@ -71,7 +71,7 @@ describe("Time Utilities", () => {
                 1704067200000, // Jan 1, 2024
             ];
 
-            timestamps.forEach(timestamp => {
+            timestamps.forEach((timestamp) => {
                 const result = formatFullTimestamp(timestamp);
                 expect(typeof result).toBe("string");
                 expect(result.length).toBeGreaterThan(5);
@@ -124,7 +124,7 @@ describe("Time Utilities", () => {
 
         beforeEach(() => {
             // Mock Date.now to return a fixed timestamp
-            mockNow = vi.spyOn(Date, 'now').mockReturnValue(1640995200000); // Jan 1, 2022 00:00:00 UTC
+            mockNow = vi.spyOn(Date, "now").mockReturnValue(1640995200000); // Jan 1, 2022 00:00:00 UTC
         });
 
         afterEach(() => {
@@ -134,7 +134,7 @@ describe("Time Utilities", () => {
         it("should return 'Just now' for recent timestamps", () => {
             const recentTimestamp = 1640995200000 - 30000; // 30 seconds ago
             expect(formatRelativeTimestamp(recentTimestamp)).toBe("Just now");
-            
+
             const veryRecentTimestamp = 1640995200000 - 5000; // 5 seconds ago
             expect(formatRelativeTimestamp(veryRecentTimestamp)).toBe("Just now");
         });
@@ -142,7 +142,7 @@ describe("Time Utilities", () => {
         it("should format seconds ago for timestamps 31+ seconds old", () => {
             const timestamp = 1640995200000 - 45000; // 45 seconds ago
             expect(formatRelativeTimestamp(timestamp)).toBe("45 seconds ago");
-            
+
             const timestamp2 = 1640995200000 - 59000; // 59 seconds ago
             expect(formatRelativeTimestamp(timestamp2)).toBe("59 seconds ago");
         });
@@ -150,10 +150,10 @@ describe("Time Utilities", () => {
         it("should format minutes ago", () => {
             const timestamp1 = 1640995200000 - 60000; // 1 minute ago
             expect(formatRelativeTimestamp(timestamp1)).toBe("1 minute ago");
-            
+
             const timestamp2 = 1640995200000 - 120000; // 2 minutes ago
             expect(formatRelativeTimestamp(timestamp2)).toBe("2 minutes ago");
-            
+
             const timestamp3 = 1640995200000 - 1800000; // 30 minutes ago
             expect(formatRelativeTimestamp(timestamp3)).toBe("30 minutes ago");
         });
@@ -161,10 +161,10 @@ describe("Time Utilities", () => {
         it("should format hours ago", () => {
             const timestamp1 = 1640995200000 - 3600000; // 1 hour ago
             expect(formatRelativeTimestamp(timestamp1)).toBe("1 hour ago");
-            
+
             const timestamp2 = 1640995200000 - 7200000; // 2 hours ago
             expect(formatRelativeTimestamp(timestamp2)).toBe("2 hours ago");
-            
+
             const timestamp3 = 1640995200000 - 21600000; // 6 hours ago
             expect(formatRelativeTimestamp(timestamp3)).toBe("6 hours ago");
         });
@@ -172,10 +172,10 @@ describe("Time Utilities", () => {
         it("should format days ago", () => {
             const timestamp1 = 1640995200000 - 86400000; // 1 day ago
             expect(formatRelativeTimestamp(timestamp1)).toBe("1 day ago");
-            
+
             const timestamp2 = 1640995200000 - 172800000; // 2 days ago
             expect(formatRelativeTimestamp(timestamp2)).toBe("2 days ago");
-            
+
             const timestamp3 = 1640995200000 - 604800000; // 7 days ago
             expect(formatRelativeTimestamp(timestamp3)).toBe("7 days ago");
         });
@@ -184,11 +184,11 @@ describe("Time Utilities", () => {
             // Exactly 30 seconds
             const thirtySecondsAgo = 1640995200000 - 30000;
             expect(formatRelativeTimestamp(thirtySecondsAgo)).toBe("Just now");
-            
+
             // Exactly 31 seconds
             const thirtyOneSecondsAgo = 1640995200000 - 31000;
             expect(formatRelativeTimestamp(thirtyOneSecondsAgo)).toBe("31 seconds ago");
-            
+
             // Current timestamp (0 difference)
             expect(formatRelativeTimestamp(1640995200000)).toBe("Just now");
         });
@@ -318,7 +318,7 @@ describe("Time Utilities", () => {
         it("should handle edge cases", () => {
             // Test negative values (not expected but should be handled)
             expect(formatRetryAttemptsText(-1)).toBe("(Retry -1 times before marking down)");
-            
+
             // Test very large values
             expect(formatRetryAttemptsText(100)).toBe("(Retry 100 times before marking down)");
         });
@@ -342,15 +342,15 @@ describe("Time Utilities", () => {
 
         it("should have correct types for all keys", () => {
             const periods: TimePeriod[] = ["1h", "12h", "24h", "7d", "30d"];
-            
-            periods.forEach(period => {
+
+            periods.forEach((period) => {
                 expect(TIME_PERIOD_LABELS[period]).toBeDefined();
                 expect(typeof TIME_PERIOD_LABELS[period]).toBe("string");
             });
         });
 
         it("should provide meaningful labels", () => {
-            Object.values(TIME_PERIOD_LABELS).forEach(label => {
+            Object.values(TIME_PERIOD_LABELS).forEach((label) => {
                 expect(label).toMatch(/^Last/); // All labels start with "Last"
                 expect(label.length).toBeGreaterThan(5); // Meaningful length
             });
@@ -360,7 +360,7 @@ describe("Time Utilities", () => {
     describe("Edge cases and robustness", () => {
         it("should handle very large numbers gracefully", () => {
             const largeNumber = Number.MAX_SAFE_INTEGER;
-            
+
             // These should not throw errors
             expect(() => formatDuration(largeNumber)).not.toThrow();
             expect(() => formatIntervalDuration(largeNumber)).not.toThrow();
@@ -380,7 +380,7 @@ describe("Time Utilities", () => {
             // Test common floating point edge cases
             const result1 = formatResponseTime(0.1 + 0.2); // Often equals 0.30000000000000004
             expect(result1).toBe("0.30000000000000004ms");
-            
+
             const result2 = formatDuration(999.9999); // Should floor to 999ms = 0s
             expect(result2).toBe("0s");
         });

@@ -1,6 +1,6 @@
 /**
  * Tests for duration utility functions
- * 
+ *
  * @fileoverview Comprehensive tests covering all branches and edge cases
  * for duration calculation utilities.
  */
@@ -182,10 +182,10 @@ describe("Duration Utilities", () => {
             it("should provide predictable results for common configurations", () => {
                 // Standard web check
                 expect(calculateMaxDuration(10, 2)).toBe("32s");
-                
+
                 // Database check
                 expect(calculateMaxDuration(30, 1)).toBe("2m");
-                
+
                 // API health check
                 expect(calculateMaxDuration(15, 3)).toBe("2m");
             });
@@ -196,7 +196,7 @@ describe("Duration Utilities", () => {
                 // Verify the exact exponential backoff calculation
                 const timeout = 1;
                 const retries = 4;
-                
+
                 // Expected backoff: 0.5, 1.0, 2.0, 4.0 = 7.5 seconds
                 // Total: 1 * 5 + 7.5 = 12.5, ceil = 13 seconds
                 expect(calculateMaxDuration(timeout, retries)).toBe("13s");
@@ -206,14 +206,14 @@ describe("Duration Utilities", () => {
                 // Test exactly at 60 seconds boundary
                 const result1 = calculateMaxDuration(59, 0);
                 expect(result1).toBe("59s");
-                
+
                 const result2 = calculateMaxDuration(60, 0);
                 expect(result2).toBe("1m");
-                
+
                 // Test exactly at 3600 seconds boundary
                 const result3 = calculateMaxDuration(3599, 0);
                 expect(result3).toBe("60m");
-                
+
                 const result4 = calculateMaxDuration(3600, 0);
                 expect(result4).toBe("1h");
             });

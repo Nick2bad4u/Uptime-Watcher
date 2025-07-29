@@ -92,9 +92,21 @@ vi.mock("../constants", () => ({
 // Mock all theme components
 vi.mock("../theme/components", () => ({
     ThemeProvider: ({ children }: { children: React.ReactNode }) => <div data-testid="theme-provider">{children}</div>,
-    ThemedBox: ({ children, ...props }: any) => <div data-testid="themed-box" {...props}>{children}</div>,
-    ThemedButton: ({ children, ...props }: any) => <button data-testid="themed-button" {...props}>{children}</button>,
-    ThemedText: ({ children, ...props }: any) => <span data-testid="themed-text" {...props}>{children}</span>,
+    ThemedBox: ({ children, ...props }: any) => (
+        <div data-testid="themed-box" {...props}>
+            {children}
+        </div>
+    ),
+    ThemedButton: ({ children, ...props }: any) => (
+        <button data-testid="themed-button" {...props}>
+            {children}
+        </button>
+    ),
+    ThemedText: ({ children, ...props }: any) => (
+        <span data-testid="themed-text" {...props}>
+            {children}
+        </span>
+    ),
 }));
 
 // Mock ErrorBoundary
@@ -137,7 +149,7 @@ describe.skip("App Component", () => {
 
     it("should render with proper structure", () => {
         render(<App />);
-        
+
         expect(screen.getByTestId("error-boundary")).toBeInTheDocument();
         expect(screen.getByTestId("theme-provider")).toBeInTheDocument();
     });

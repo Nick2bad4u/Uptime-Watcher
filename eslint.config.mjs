@@ -629,7 +629,6 @@ export default [
             "no-var": "error",
             "prefer-const": "error",
 
-
             "putout/align-spaces": "error",
             "putout/array-element-newline": "off",
             "putout/destructuring-as-function-argument": "off",

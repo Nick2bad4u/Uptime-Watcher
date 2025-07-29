@@ -1,6 +1,6 @@
 /**
  * Tests for useDynamicHelpText hook
- * 
+ *
  * @fileoverview Comprehensive tests covering all branches and edge cases
  * for the dynamic help text loading hook.
  */
@@ -33,7 +33,7 @@ describe("useDynamicHelpText Hook", () => {
     describe("Basic functionality", () => {
         it("should return initial loading state", () => {
             vi.mocked(getMonitorHelpTexts).mockImplementation(() => new Promise(() => {})); // Never resolves
-            
+
             const { result } = renderHook(() => useDynamicHelpText("http"));
 
             expect(result.current.isLoading).toBe(true);
@@ -147,8 +147,7 @@ describe("useDynamicHelpText Hook", () => {
                 .mockResolvedValueOnce({ primary: "Ping help" });
 
             const { result, rerender } = renderHook(
-                ({ monitorType }: { monitorType: MonitorType }) => 
-                    useDynamicHelpText(monitorType),
+                ({ monitorType }: { monitorType: MonitorType }) => useDynamicHelpText(monitorType),
                 { initialProps: { monitorType: "http" as MonitorType } }
             );
 
@@ -182,8 +181,7 @@ describe("useDynamicHelpText Hook", () => {
                 .mockResolvedValueOnce({ primary: "Success help" });
 
             const { result, rerender } = renderHook(
-                ({ monitorType }: { monitorType: MonitorType }) => 
-                    useDynamicHelpText(monitorType),
+                ({ monitorType }: { monitorType: MonitorType }) => useDynamicHelpText(monitorType),
                 { initialProps: { monitorType: "http" as MonitorType } }
             );
 
@@ -229,7 +227,7 @@ describe("useDynamicHelpText Hook", () => {
             resolvePromise!({ primary: "Should not be set" });
 
             // Wait a bit to ensure the promise resolves
-            await new Promise(resolve => setTimeout(resolve, 10));
+            await new Promise((resolve) => setTimeout(resolve, 10));
 
             // The component should still show loading state from last render
             expect(result.current.isLoading).toBe(true);
@@ -241,14 +239,13 @@ describe("useDynamicHelpText Hook", () => {
             const firstPromise = new Promise((resolve) => {
                 resolveFirstPromise = resolve;
             });
-            
+
             vi.mocked(getMonitorHelpTexts)
                 .mockReturnValueOnce(firstPromise)
                 .mockResolvedValueOnce({ primary: "Second result" });
 
             const { result, rerender } = renderHook(
-                ({ monitorType }: { monitorType: MonitorType }) => 
-                    useDynamicHelpText(monitorType),
+                ({ monitorType }: { monitorType: MonitorType }) => useDynamicHelpText(monitorType),
                 { initialProps: { monitorType: "http" as MonitorType } }
             );
 
@@ -334,8 +331,7 @@ describe("useDynamicHelpText Hook", () => {
                 .mockResolvedValueOnce({ primary: "TCP help" });
 
             const { result, rerender } = renderHook(
-                ({ monitorType }: { monitorType: MonitorType }) => 
-                    useDynamicHelpText(monitorType),
+                ({ monitorType }: { monitorType: MonitorType }) => useDynamicHelpText(monitorType),
                 { initialProps: { monitorType: "http" as MonitorType } }
             );
 

@@ -101,7 +101,11 @@ export default defineConfig({
         // Test file patterns - exclude electron tests as they have their own config
         exclude: ["**/node_modules/**", "**/dist/**", "**/dist-electron/**", "electron/**", "**/coverage/**"],
         globals: true, // Enable global test functions (describe, it, expect)
-        include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}", "shared/**/*.test.ts", "shared/**/*.spec.ts"],
+        include: [
+            "src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
+            "shared/**/*.test.ts",
+            "shared/**/*.spec.ts",
+        ],
         outputFile: {
             json: "./coverage/test-results.json",
         },

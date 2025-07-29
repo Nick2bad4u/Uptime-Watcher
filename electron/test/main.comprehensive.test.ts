@@ -88,19 +88,19 @@ describe("main.ts - Electron Main Process", () => {
         vi.clearAllMocks();
         originalArgv = process.argv;
         originalVersions = process.versions;
-        
+
         // Reset mocks to default states
         mockIsDev.mockReturnValue(true);
-        mockInstallExtension.mockResolvedValue([
-            { name: "React Developer Tools" },
-            { name: "Redux DevTools" }
-        ]);
+        mockInstallExtension.mockResolvedValue([{ name: "React Developer Tools" }, { name: "Redux DevTools" }]);
         // Ensure cleanup is a mock function before setting mockResolvedValue
-        if (typeof mockApplicationService.cleanup !== "function" || !("mockResolvedValue" in mockApplicationService.cleanup)) {
+        if (
+            typeof mockApplicationService.cleanup !== "function" ||
+            !("mockResolvedValue" in mockApplicationService.cleanup)
+        ) {
             mockApplicationService.cleanup = vi.fn();
         }
         mockApplicationService.cleanup.mockResolvedValue(undefined);
-        
+
         // Set up process.versions.electron to indicate we're in Electron
         Object.defineProperty(process, "versions", {
             value: { ...originalVersions, electron: "25.0.0" },
@@ -211,7 +211,7 @@ describe("main.ts - Electron Main Process", () => {
             await import("../main");
 
             // Get the cleanup handler
-            const beforeExitHandler = processOnSpy.mock.calls.find(call => call[0] === "beforeExit")?.[1];
+            const beforeExitHandler = processOnSpy.mock.calls.find((call) => call[0] === "beforeExit")?.[1];
             const willQuitHandler = (mockApp.on as any).mock.calls.find((call: any) => call[0] === "will-quit")?.[1];
 
             expect(beforeExitHandler).toBeDefined();
@@ -221,7 +221,7 @@ describe("main.ts - Electron Main Process", () => {
             if (beforeExitHandler) beforeExitHandler();
             if (willQuitHandler) willQuitHandler();
 
-            await new Promise(resolve => setTimeout(resolve, 10)); // Allow async cleanup to complete
+            await new Promise((resolve) => setTimeout(resolve, 10)); // Allow async cleanup to complete
 
             // Cleanup should only be called once
             expect(mockApplicationService.cleanup).toHaveBeenCalledTimes(1);
@@ -233,16 +233,16 @@ describe("main.ts - Electron Main Process", () => {
 
             await import("../main");
 
-            const beforeExitHandler = processOnSpy.mock.calls.find(call => call[0] === "beforeExit")?.[1];
+            const beforeExitHandler = processOnSpy.mock.calls.find((call) => call[0] === "beforeExit")?.[1];
 
             expect(beforeExitHandler).toBeDefined();
 
             if (beforeExitHandler) {
                 // The beforeExit handler doesn't throw synchronously - it logs and handles errors internally
                 expect(() => beforeExitHandler()).not.toThrow();
-                
+
                 // Give some time for the async cleanup to run and error handling to complete
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await new Promise((resolve) => setTimeout(resolve, 100));
             }
 
             expect(mockLogger.error).toHaveBeenCalledWith("[Main] Cleanup failed", expect.any(Error));
@@ -262,10 +262,9 @@ describe("main.ts - Electron Main Process", () => {
             const whenReadyPromise = (mockApp.whenReady as any).mock.results[0].value;
             await whenReadyPromise;
 
-            expect(mockInstallExtension).toHaveBeenCalledWith(
-                [REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS],
-                { loadExtensionOptions: { allowFileAccess: true } }
-            );
+            expect(mockInstallExtension).toHaveBeenCalledWith([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS], {
+                loadExtensionOptions: { allowFileAccess: true },
+            });
             expect(mockLogger.info).toHaveBeenCalledWith(
                 "[Main] Added Extensions: React Developer Tools, Redux DevTools"
             );
@@ -349,7 +348,7 @@ describe("main.ts - Electron Main Process", () => {
 
             await import("../main");
 
-            const beforeExitHandler = processOnSpy.mock.calls.find(call => call[0] === "beforeExit")?.[1];
+            const beforeExitHandler = processOnSpy.mock.calls.find((call) => call[0] === "beforeExit")?.[1];
 
             // Should not throw when cleanup method is missing
             expect(() => {
@@ -365,7 +364,7 @@ describe("main.ts - Electron Main Process", () => {
 
             await import("../main");
 
-            const beforeExitHandler = processOnSpy.mock.calls.find(call => call[0] === "beforeExit")?.[1];
+            const beforeExitHandler = processOnSpy.mock.calls.find((call) => call[0] === "beforeExit")?.[1];
 
             // Should not throw when applicationService is null
             expect(() => {

@@ -68,9 +68,7 @@ describe("useMonitorTypes Hook", () => {
                 { label: "WebSocket", value: "websocket" },
             ];
 
-            mockGetMonitorTypeOptions
-                .mockResolvedValueOnce(initialOptions)
-                .mockResolvedValueOnce(refreshedOptions);
+            mockGetMonitorTypeOptions.mockResolvedValueOnce(initialOptions).mockResolvedValueOnce(refreshedOptions);
 
             const { result } = renderHook(() => useMonitorTypes());
 
@@ -143,10 +141,7 @@ describe("useMonitorTypes Hook", () => {
             expect(result.current.error).toBe(
                 "Monitor types loading failed: Network connection failed. Using fallback options."
             );
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to load monitor types from backend",
-                testError
-            );
+            expect(mockLogger.error).toHaveBeenCalledWith("Failed to load monitor types from backend", testError);
         });
 
         it("should handle non-Error objects", async () => {
@@ -204,7 +199,7 @@ describe("useMonitorTypes Hook", () => {
             );
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to load monitor types from backend",
-                new Error('[object Object]')
+                new Error("[object Object]")
             );
         });
 
@@ -212,9 +207,7 @@ describe("useMonitorTypes Hook", () => {
             const testError = new Error("Initial error");
             const successOptions = [{ label: "HTTP", value: "http" }];
 
-            mockGetMonitorTypeOptions
-                .mockRejectedValueOnce(testError)
-                .mockResolvedValueOnce(successOptions);
+            mockGetMonitorTypeOptions.mockRejectedValueOnce(testError).mockResolvedValueOnce(successOptions);
 
             const { result } = renderHook(() => useMonitorTypes());
 
@@ -242,9 +235,7 @@ describe("useMonitorTypes Hook", () => {
             const initialOptions = [{ label: "HTTP", value: "http" }];
             const refreshError = new Error("Refresh failed");
 
-            mockGetMonitorTypeOptions
-                .mockResolvedValueOnce(initialOptions)
-                .mockRejectedValueOnce(refreshError);
+            mockGetMonitorTypeOptions.mockResolvedValueOnce(initialOptions).mockRejectedValueOnce(refreshError);
 
             const { result } = renderHook(() => useMonitorTypes());
 
@@ -264,9 +255,7 @@ describe("useMonitorTypes Hook", () => {
                 expect(result.current.isLoading).toBe(false);
             });
 
-            expect(result.current.error).toBe(
-                "Monitor types loading failed: Refresh failed. Using fallback options."
-            );
+            expect(result.current.error).toBe("Monitor types loading failed: Refresh failed. Using fallback options.");
             expect(result.current.options).toEqual([...FALLBACK_MONITOR_TYPE_OPTIONS]);
         });
     });
@@ -432,9 +421,9 @@ describe("useMonitorTypes Hook", () => {
 
             expect(result.current.options).toEqual(realWorldOptions);
             expect(result.current.options).toHaveLength(5);
-            expect(result.current.options.every(opt => 
-                typeof opt.label === 'string' && typeof opt.value === 'string'
-            )).toBe(true);
+            expect(
+                result.current.options.every((opt) => typeof opt.label === "string" && typeof opt.value === "string")
+            ).toBe(true);
         });
     });
 
@@ -449,10 +438,10 @@ describe("useMonitorTypes Hook", () => {
             });
 
             // Check that all expected properties exist with correct types
-            expect(typeof result.current.isLoading).toBe('boolean');
+            expect(typeof result.current.isLoading).toBe("boolean");
             expect(Array.isArray(result.current.options)).toBe(true);
-            expect(typeof result.current.refresh).toBe('function');
-            expect(result.current.error === undefined || typeof result.current.error === 'string').toBe(true);
+            expect(typeof result.current.refresh).toBe("function");
+            expect(result.current.error === undefined || typeof result.current.error === "string").toBe(true);
         });
 
         it("should have refresh function that returns a Promise", async () => {

@@ -256,17 +256,17 @@ describe("Status Utilities", () => {
     describe("Comprehensive edge cases and integration", () => {
         it("should handle all known statuses consistently in both functions", () => {
             const knownStatuses = ["down", "mixed", "paused", "pending", "unknown", "up"];
-            
+
             for (const status of knownStatuses) {
                 const icon = getStatusIcon(status);
                 const formatted = formatStatusWithIcon(status);
-                
+
                 // Verify icon is not the default
                 expect(icon).not.toBe("⚪");
-                
+
                 // Verify formatted string starts with the icon
-                expect(formatted).toMatch(new RegExp(`^${icon.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} `));
-                
+                expect(formatted).toMatch(new RegExp(`^${icon.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} `));
+
                 // Verify formatted string ends with properly capitalized status
                 const expectedText = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
                 expect(formatted).toBe(`${icon} ${expectedText}`);
@@ -275,14 +275,14 @@ describe("Status Utilities", () => {
 
         it("should handle unknown statuses consistently in both functions", () => {
             const unknownStatuses = ["invalid", "custom", "error", "maintenance"];
-            
+
             for (const status of unknownStatuses) {
                 const icon = getStatusIcon(status);
                 const formatted = formatStatusWithIcon(status);
-                
+
                 // Verify icon is the default
                 expect(icon).toBe("⚪");
-                
+
                 // Verify formatted string is consistent
                 const expectedText = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
                 expect(formatted).toBe(`⚪ ${expectedText}`);
@@ -292,13 +292,13 @@ describe("Status Utilities", () => {
         it("should maintain consistency across different case variations", () => {
             const baseStatus = "up";
             const variations = ["up", "UP", "Up", "uP"];
-            
+
             // All variations should produce the same icon
             const expectedIcon = getStatusIcon(baseStatus);
             for (const variation of variations) {
                 expect(getStatusIcon(variation)).toBe(expectedIcon);
             }
-            
+
             // All variations should produce consistently formatted text (capitalized)
             for (const variation of variations) {
                 expect(formatStatusWithIcon(variation)).toBe("✅ Up");

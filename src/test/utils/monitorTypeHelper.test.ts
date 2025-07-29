@@ -167,9 +167,7 @@ describe("monitorTypeHelper", () => {
 
         it("should fetch from backend when cache is empty", async () => {
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
-            vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(
-                async (fn) => await fn()
-            );
+            vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(async (fn) => await fn());
             vi.mocked(ipcTypes.safeExtractIpcData).mockReturnValue(mockMonitorTypes);
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
                 success: true,
@@ -186,7 +184,7 @@ describe("monitorTypeHelper", () => {
 
         it("should handle backend fetch errors gracefully", async () => {
             const fallbackValue: MonitorTypeConfig[] = [];
-            
+
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
             vi.mocked(errorHandling.withUtilityErrorHandling).mockResolvedValue(fallbackValue);
 
@@ -198,9 +196,7 @@ describe("monitorTypeHelper", () => {
 
         it("should cache fetched data for subsequent calls", async () => {
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
-            vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(
-                async (fn) => await fn()
-            );
+            vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(async (fn) => await fn());
             vi.mocked(ipcTypes.safeExtractIpcData).mockReturnValue(mockMonitorTypes);
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
                 success: true,
@@ -214,9 +210,7 @@ describe("monitorTypeHelper", () => {
 
         it("should handle empty response from backend", async () => {
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
-            vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(
-                async (fn) => await fn()
-            );
+            vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(async (fn) => await fn());
             vi.mocked(ipcTypes.safeExtractIpcData).mockReturnValue([]);
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
                 success: true,
@@ -231,9 +225,7 @@ describe("monitorTypeHelper", () => {
 
         it("should handle invalid cache data gracefully", async () => {
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(null);
-            vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(
-                async (fn) => await fn()
-            );
+            vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(async (fn) => await fn());
             vi.mocked(ipcTypes.safeExtractIpcData).mockReturnValue(mockMonitorTypes);
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
                 success: true,
@@ -411,9 +403,7 @@ describe("monitorTypeHelper", () => {
 
             const result = await getMonitorTypeOptions();
 
-            expect(result).toEqual([
-                { label: "Monitor (v2.0) - Advanced & Fast", value: "special" },
-            ]);
+            expect(result).toEqual([{ label: "Monitor (v2.0) - Advanced & Fast", value: "special" }]);
         });
     });
 
@@ -433,7 +423,7 @@ describe("monitorTypeHelper", () => {
 
         it("should use fallback value from error handler", async () => {
             const fallbackValue = [mockMonitorTypes[0]];
-            
+
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
             vi.mocked(errorHandling.withUtilityErrorHandling).mockResolvedValue(fallbackValue);
 
@@ -446,9 +436,7 @@ describe("monitorTypeHelper", () => {
     describe("IPC integration", () => {
         it("should call electronAPI with correct method", async () => {
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
-            vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(
-                async (fn) => await fn()
-            );
+            vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(async (fn) => await fn());
             vi.mocked(ipcTypes.safeExtractIpcData).mockReturnValue(mockMonitorTypes);
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
                 success: true,
@@ -458,10 +446,7 @@ describe("monitorTypeHelper", () => {
             await getAvailableMonitorTypes();
 
             expect(mockElectronAPI.monitorTypes.getMonitorTypes).toHaveBeenCalledTimes(1);
-            expect(ipcTypes.safeExtractIpcData).toHaveBeenCalledWith(
-                { success: true, data: mockMonitorTypes },
-                []
-            );
+            expect(ipcTypes.safeExtractIpcData).toHaveBeenCalledWith({ success: true, data: mockMonitorTypes }, []);
         });
     });
 });

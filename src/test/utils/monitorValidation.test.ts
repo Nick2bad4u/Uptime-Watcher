@@ -42,7 +42,10 @@ import {
 
 // Import mocked functions
 import { withUtilityErrorHandling } from "../../utils/errorHandling";
-import { validateMonitorData as sharedValidateMonitorData, validateMonitorField as sharedValidateMonitorField } from "@shared/validation/schemas";
+import {
+    validateMonitorData as sharedValidateMonitorData,
+    validateMonitorField as sharedValidateMonitorField,
+} from "@shared/validation/schemas";
 
 describe("Monitor Validation Utilities", () => {
     beforeEach(() => {
@@ -163,7 +166,9 @@ describe("Monitor Validation Utilities", () => {
                 success: true,
                 warnings: ["Minor issue"],
             });
-            expect(mockElectronAPI.monitorTypes.validateMonitorData).toHaveBeenCalledWith("http", { url: "https://example.com" });
+            expect(mockElectronAPI.monitorTypes.validateMonitorData).toHaveBeenCalledWith("http", {
+                url: "https://example.com",
+            });
         });
 
         it("should handle validation errors from backend", async () => {
@@ -218,7 +223,10 @@ describe("Monitor Validation Utilities", () => {
 
             await validateMonitorData("port", { host: "localhost", port: 3000 });
 
-            expect(mockElectronAPI.monitorTypes.validateMonitorData).toHaveBeenCalledWith("port", { host: "localhost", port: 3000 });
+            expect(mockElectronAPI.monitorTypes.validateMonitorData).toHaveBeenCalledWith("port", {
+                host: "localhost",
+                port: 3000,
+            });
         });
     });
 
@@ -316,7 +324,12 @@ describe("Monitor Validation Utilities", () => {
 
         it("should handle field errors with different patterns", async () => {
             mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue({
-                errors: ["The 'url' field is required", `"url" must be a valid URL`, "url: invalid format", "url contains invalid characters"],
+                errors: [
+                    "The 'url' field is required",
+                    `"url" must be a valid URL`,
+                    "url: invalid format",
+                    "url contains invalid characters",
+                ],
                 success: false,
                 warnings: [],
             });

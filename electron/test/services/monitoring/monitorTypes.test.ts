@@ -239,7 +239,11 @@ describe("Monitor Types Utility", () => {
         });
 
         it("should handle large arrays of types efficiently", () => {
-            const testTypes = [...Array.from({length: 50}).fill("http"), ...Array.from({length: 50}).fill("port"), ...Array.from({length: 50}).fill("invalid")];
+            const testTypes = [
+                ...Array.from({ length: 50 }).fill("http"),
+                ...Array.from({ length: 50 }).fill("port"),
+                ...Array.from({ length: 50 }).fill("invalid"),
+            ];
 
             for (const type of testTypes) {
                 const result = isBaseMonitorType(type);

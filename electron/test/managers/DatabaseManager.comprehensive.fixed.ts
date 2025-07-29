@@ -172,7 +172,10 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             // Should not throw even if event emission fails
             await expect(databaseManager.initialize()).resolves.toBeUndefined();
 
-            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith("database:transaction-completed", expect.any(Object));
+            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
+                "database:transaction-completed",
+                expect.any(Object)
+            );
         });
 
         it("should handle settings.get returning a value during initialize", async () => {
@@ -254,7 +257,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
 
             await databaseManager.initialize();
             const result = await databaseManager.refreshSites();
-            
+
             expect(Array.isArray(result)).toBe(true);
         });
     });
@@ -345,7 +348,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
 
         it("should handle setHistoryLimit with utility throwing error", async () => {
             await databaseManager.initialize();
-            
+
             // Mock the utilities to throw an error
             vi.mocked(mockSettingsRepository.upsert).mockRejectedValue(new Error("Failed to set limit"));
 

@@ -4,7 +4,12 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-import { TypedEventBus, createTypedEventBus, type EventMiddleware, type EventBusDiagnostics } from "../../events/TypedEventBus";
+import {
+    TypedEventBus,
+    createTypedEventBus,
+    type EventMiddleware,
+    type EventBusDiagnostics,
+} from "../../events/TypedEventBus";
 
 // Mock logger to prevent actual logging during tests
 vi.mock("../../utils/logger", () => ({
@@ -116,7 +121,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should execute middleware in order", async () => {
             const executionOrder: number[] = [];
-            
+
             const middleware1: EventMiddleware = vi.fn(async (event, data, next) => {
                 executionOrder.push(1);
                 await next();
@@ -143,10 +148,10 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should throw error when middleware limit exceeded", () => {
             const bus = new TypedEventBus<TestEvents>("test", { maxMiddleware: 2 });
-            
+
             bus.use(mockMiddleware);
             bus.use(mockMiddleware2);
-            
+
             expect(() => bus.use(vi.fn())).toThrow(
                 "Maximum middleware limit (2) exceeded. Consider increasing maxMiddleware or combining middleware functions."
             );
@@ -162,7 +167,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             eventBus.onTyped("string-event", mockListener);
 
             await expect(eventBus.emitTyped("string-event", "test")).rejects.toThrow("Middleware error");
-            
+
             expect(errorMiddleware).toHaveBeenCalled();
             expect(mockMiddleware2).not.toHaveBeenCalled();
             expect(mockListener).not.toHaveBeenCalled();
@@ -185,9 +190,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should remove specific middleware", () => {
             eventBus.use(mockMiddleware);
             eventBus.use(mockMiddleware2);
-            
+
             expect(eventBus.getDiagnostics().middlewareCount).toBe(2);
-            
+
             const removed = eventBus.removeMiddleware(mockMiddleware);
             expect(removed).toBe(true);
             expect(eventBus.getDiagnostics().middlewareCount).toBe(1);
@@ -196,7 +201,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should return false when removing non-existent middleware", () => {
             eventBus.use(mockMiddleware);
             const nonExistentMiddleware = vi.fn();
-            
+
             const removed = eventBus.removeMiddleware(nonExistentMiddleware);
             expect(removed).toBe(false);
             expect(eventBus.getDiagnostics().middlewareCount).toBe(1);
@@ -205,18 +210,18 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should clear all middleware", () => {
             eventBus.use(mockMiddleware);
             eventBus.use(mockMiddleware2);
-            
+
             expect(eventBus.getDiagnostics().middlewareCount).toBe(2);
-            
+
             eventBus.clearMiddleware();
             expect(eventBus.getDiagnostics().middlewareCount).toBe(0);
         });
 
         it("should skip middleware processing when no middleware registered", async () => {
             eventBus.onTyped("string-event", mockListener);
-            
+
             await eventBus.emitTyped("string-event", "test");
-            
+
             expect(mockListener).toHaveBeenCalledWith(
                 expect.objectContaining({
                     value: "test",
@@ -229,9 +234,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
     describe("Data Type Transformations", () => {
         it("should handle string primitives correctly", async () => {
             eventBus.onTyped("string-event", mockListener);
-            
+
             await eventBus.emitTyped("string-event", "test string");
-            
+
             expect(mockListener).toHaveBeenCalledWith({
                 value: "test string",
                 _meta: expect.objectContaining({
@@ -245,9 +250,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle number primitives correctly", async () => {
             eventBus.onTyped("number-event", mockListener);
-            
+
             await eventBus.emitTyped("number-event", 42);
-            
+
             expect(mockListener).toHaveBeenCalledWith({
                 value: 42,
                 _meta: expect.any(Object),
@@ -256,9 +261,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle boolean primitives correctly", async () => {
             eventBus.onTyped("primitive-boolean", mockListener);
-            
+
             await eventBus.emitTyped("primitive-boolean", true);
-            
+
             expect(mockListener).toHaveBeenCalledWith({
                 value: true,
                 _meta: expect.any(Object),
@@ -267,9 +272,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle null values correctly", async () => {
             eventBus.onTyped("null-event", mockListener);
-            
+
             await eventBus.emitTyped("null-event", null);
-            
+
             expect(mockListener).toHaveBeenCalledWith({
                 value: null,
                 _meta: expect.any(Object),
@@ -278,9 +283,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle undefined values correctly", async () => {
             eventBus.onTyped("undefined-event", mockListener);
-            
+
             await eventBus.emitTyped("undefined-event", undefined);
-            
+
             expect(mockListener).toHaveBeenCalledWith({
                 value: undefined,
                 _meta: expect.any(Object),
@@ -289,10 +294,10 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle objects without _meta property", async () => {
             eventBus.onTyped("object-event", mockListener);
-            
+
             const testData = { data: "test", nested: { value: 123 } };
             await eventBus.emitTyped("object-event", testData);
-            
+
             expect(mockListener).toHaveBeenCalledWith({
                 data: "test",
                 nested: { value: 123 },
@@ -302,10 +307,10 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle objects with existing _meta property", async () => {
             eventBus.onTyped("object-with-meta", mockListener);
-            
+
             const testData = { data: "test", _meta: "existing-meta" };
             await eventBus.emitTyped("object-with-meta", testData);
-            
+
             expect(mockListener).toHaveBeenCalledWith({
                 data: "test",
                 _meta: expect.any(Object),
@@ -315,22 +320,22 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle arrays correctly", async () => {
             eventBus.onTyped("array-event", mockListener);
-            
+
             const testArray = [1, 2, 3, 4, 5];
             await eventBus.emitTyped("array-event", testArray);
-            
+
             const receivedData = mockListener.mock.calls[0]?.[0];
             expect(Array.isArray(receivedData)).toBe(true);
             expect(receivedData).toEqual([1, 2, 3, 4, 5]);
             expect(receivedData._meta).toEqual(expect.any(Object));
-            
+
             // Verify _meta is non-enumerable
             expect(Object.propertyIsEnumerable.call(receivedData, "_meta")).toBe(false);
         });
 
         it("should handle complex objects correctly", async () => {
             eventBus.onTyped("complex-object", mockListener);
-            
+
             const complexData = {
                 id: "test-id",
                 items: [
@@ -338,9 +343,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                     { name: "item2", value: 20 },
                 ],
             };
-            
+
             await eventBus.emitTyped("complex-object", complexData);
-            
+
             expect(mockListener).toHaveBeenCalledWith({
                 id: "test-id",
                 items: [
@@ -355,40 +360,40 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
     describe("Typed Event Methods", () => {
         it("should support onTyped method", async () => {
             eventBus.onTyped("string-event", mockListener);
-            
+
             await eventBus.emitTyped("string-event", "test");
-            
+
             expect(mockListener).toHaveBeenCalledTimes(1);
         });
 
         it("should support onceTyped method", async () => {
             eventBus.onceTyped("string-event", mockListener);
-            
+
             await eventBus.emitTyped("string-event", "test1");
             await eventBus.emitTyped("string-event", "test2");
-            
+
             expect(mockListener).toHaveBeenCalledTimes(1);
         });
 
         it("should support offTyped with specific listener", async () => {
             eventBus.onTyped("string-event", mockListener);
             eventBus.offTyped("string-event", mockListener);
-            
+
             await eventBus.emitTyped("string-event", "test");
-            
+
             expect(mockListener).not.toHaveBeenCalled();
         });
 
         it("should support offTyped without listener to remove all", async () => {
             const listener1 = vi.fn();
             const listener2 = vi.fn();
-            
+
             eventBus.onTyped("string-event", listener1);
             eventBus.onTyped("string-event", listener2);
             eventBus.offTyped("string-event"); // Remove all listeners
-            
+
             await eventBus.emitTyped("string-event", "test");
-            
+
             expect(listener1).not.toHaveBeenCalled();
             expect(listener2).not.toHaveBeenCalled();
         });
@@ -398,16 +403,16 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should provide accurate diagnostics", () => {
             const listener1 = vi.fn();
             const listener2 = vi.fn();
-            
+
             eventBus.onTyped("string-event", listener1);
             eventBus.onTyped("string-event", listener2);
             eventBus.onTyped("number-event", listener1);
-            
+
             eventBus.use(mockMiddleware);
             eventBus.use(mockMiddleware2);
-            
+
             const diagnostics: EventBusDiagnostics = eventBus.getDiagnostics();
-            
+
             expect(diagnostics).toEqual({
                 busId: "test-bus",
                 listenerCounts: {
@@ -423,7 +428,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle empty diagnostics", () => {
             const diagnostics = eventBus.getDiagnostics();
-            
+
             expect(diagnostics).toEqual({
                 busId: "test-bus",
                 listenerCounts: {},
@@ -436,10 +441,10 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should calculate middleware utilization correctly", () => {
             const bus = new TypedEventBus<TestEvents>("test", { maxMiddleware: 4 });
-            
+
             bus.use(mockMiddleware);
             bus.use(mockMiddleware2);
-            
+
             const diagnostics = bus.getDiagnostics();
             expect(diagnostics.middlewareUtilization).toBe(50); // 2/4 * 100
         });
@@ -447,10 +452,10 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should handle maxMiddleware of 0 in utilization calculation", () => {
             // This tests the edge case protection in getDiagnostics
             const bus = new TypedEventBus<TestEvents>("test", { maxMiddleware: 1 });
-            
+
             // Manually set maxMiddleware to 0 to test the protection
             (bus as any).maxMiddleware = 0;
-            
+
             const diagnostics = bus.getDiagnostics();
             expect(diagnostics.middlewareUtilization).toBe(0);
         });
@@ -459,26 +464,26 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
     describe("Error Handling and Edge Cases", () => {
         it("should handle middleware that doesn't call next", async () => {
             const badMiddleware: EventMiddleware = vi.fn(); // Doesn't call next()
-            
+
             eventBus.use(badMiddleware);
             eventBus.onTyped("string-event", mockListener);
-            
+
             await eventBus.emitTyped("string-event", "test");
-            
+
             expect(badMiddleware).toHaveBeenCalled();
             expect(mockListener).toHaveBeenCalled(); // Should still be called
         });
 
         it("should handle undefined/null middleware in chain", async () => {
             eventBus.use(mockMiddleware);
-            
+
             // Manually insert null middleware to test the safety check
             (eventBus as any).middlewares.push(undefined);
-            
+
             eventBus.onTyped("string-event", mockListener);
-            
+
             await eventBus.emitTyped("string-event", "test");
-            
+
             expect(mockMiddleware).toHaveBeenCalled();
             expect(mockListener).toHaveBeenCalled();
         });
@@ -489,12 +494,12 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should preserve array indices and length", async () => {
             eventBus.onTyped("array-event", mockListener);
-            
+
             const sparseArray: number[] = [1, 2, 3]; // Regular array for type safety
             sparseArray[10] = 10; // Add element at index 10
-            
+
             await eventBus.emitTyped("array-event", sparseArray);
-            
+
             const receivedData = mockListener.mock.calls[0]?.[0];
             expect(receivedData.length).toBe(11);
             expect(receivedData[0]).toBe(1);
@@ -505,16 +510,16 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle objects with special properties", async () => {
             eventBus.onTyped("object-event", mockListener);
-            
+
             const objectWithSpecialProps = {
                 data: "test",
                 nested: { value: 123 },
                 constructor: "custom",
                 toString: "custom-toString",
             };
-            
+
             await eventBus.emitTyped("object-event", objectWithSpecialProps);
-            
+
             expect(mockListener).toHaveBeenCalledWith(
                 expect.objectContaining({
                     data: "test",
@@ -528,15 +533,15 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle objects with existing _meta property", async () => {
             eventBus.onTyped("object-event", mockListener);
-            
+
             const objectWithMeta = {
                 data: "test",
                 nested: { value: 123 },
                 _meta: "existing-meta-value",
             };
-            
+
             await eventBus.emitTyped("object-event", objectWithMeta);
-            
+
             expect(mockListener).toHaveBeenCalledWith(
                 expect.objectContaining({
                     data: "test",
@@ -549,9 +554,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle null values correctly", async () => {
             eventBus.onTyped("string-event", mockListener);
-            
+
             await eventBus.emitTyped("string-event", null as any);
-            
+
             expect(mockListener).toHaveBeenCalledWith({
                 value: null,
                 _meta: expect.any(Object),
@@ -560,9 +565,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle undefined values correctly", async () => {
             eventBus.onTyped("string-event", mockListener);
-            
+
             await eventBus.emitTyped("string-event", undefined as any);
-            
+
             expect(mockListener).toHaveBeenCalledWith({
                 value: undefined,
                 _meta: expect.any(Object),
@@ -571,9 +576,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle zero as a valid number", async () => {
             eventBus.onTyped("number-event", mockListener);
-            
+
             await eventBus.emitTyped("number-event", 0);
-            
+
             expect(mockListener).toHaveBeenCalledWith({
                 value: 0,
                 _meta: expect.any(Object),
@@ -582,9 +587,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle empty string", async () => {
             eventBus.onTyped("string-event", mockListener);
-            
+
             await eventBus.emitTyped("string-event", "");
-            
+
             expect(mockListener).toHaveBeenCalledWith({
                 value: "",
                 _meta: expect.any(Object),
@@ -593,9 +598,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle empty object", async () => {
             eventBus.onTyped("object-event", mockListener);
-            
+
             await eventBus.emitTyped("object-event", { data: "", nested: { value: 0 } });
-            
+
             expect(mockListener).toHaveBeenCalledWith(
                 expect.objectContaining({
                     data: "",
@@ -607,9 +612,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle empty array", async () => {
             eventBus.onTyped("array-event", mockListener);
-            
+
             await eventBus.emitTyped("array-event", []);
-            
+
             const receivedData = mockListener.mock.calls[0]?.[0];
             expect(Array.isArray(receivedData)).toBe(true);
             expect(receivedData.length).toBe(0);
@@ -658,24 +663,24 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             eventBus.onTyped("string-event", mockListener);
 
             await eventBus.emitTyped("string-event", "test");
-            
+
             expect(modifyingMiddleware).toHaveBeenCalled();
             expect(mockListener).toHaveBeenCalled();
         });
 
         it("should handle array with non-enumerable properties", async () => {
             eventBus.onTyped("array-event", mockListener);
-            
+
             const arr: number[] = [1, 2, 3];
-            Object.defineProperty(arr, 'customProp', {
-                value: 'test',
+            Object.defineProperty(arr, "customProp", {
+                value: "test",
                 enumerable: false,
                 writable: true,
-                configurable: true
+                configurable: true,
             });
-            
+
             await eventBus.emitTyped("array-event", arr);
-            
+
             const receivedData = mockListener.mock.calls[0]?.[0];
             expect(Array.isArray(receivedData)).toBe(true);
             expect(receivedData.length).toBe(3);
@@ -691,23 +696,23 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             eventBus.onTyped("string-event", mockListener);
 
             await expect(eventBus.emitTyped("string-event", "test")).rejects.toEqual("String error");
-            
+
             expect(badMiddleware).toHaveBeenCalled();
             expect(mockListener).not.toHaveBeenCalled();
         });
 
         it("should handle complex nested circular references in objects", async () => {
             eventBus.onTyped("object-event", mockListener);
-            
+
             const circularObj: any = {
                 data: "test",
-                nested: { value: 123 }
+                nested: { value: 123 },
             };
             circularObj.self = circularObj;
             circularObj.nested.parent = circularObj;
-            
+
             await eventBus.emitTyped("object-event", circularObj);
-            
+
             expect(mockListener).toHaveBeenCalledWith(
                 expect.objectContaining({
                     data: "test",
@@ -718,11 +723,11 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle BigInt values", async () => {
             eventBus.onTyped("string-event", mockListener);
-            
+
             const bigIntValue = BigInt(123_456_789_012_345_678_901_234_567_890n);
-            
+
             await eventBus.emitTyped("string-event", bigIntValue as any);
-            
+
             expect(mockListener).toHaveBeenCalledWith({
                 value: bigIntValue,
                 _meta: expect.any(Object),
@@ -731,11 +736,11 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle Symbol values", async () => {
             eventBus.onTyped("string-event", mockListener);
-            
+
             const symbolValue = Symbol("test");
-            
+
             await eventBus.emitTyped("string-event", symbolValue as any);
-            
+
             expect(mockListener).toHaveBeenCalledWith({
                 value: symbolValue,
                 _meta: expect.any(Object),
@@ -744,20 +749,20 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle Date objects correctly", async () => {
             eventBus.onTyped("object-event", mockListener);
-            
+
             const dateObj = {
                 data: "test",
                 nested: { value: 123 }, // Keep the expected number type
-                dateField: new Date() // Add date as separate field
+                dateField: new Date(), // Add date as separate field
             };
-            
+
             await eventBus.emitTyped("object-event", dateObj);
-            
+
             expect(mockListener).toHaveBeenCalledWith(
                 expect.objectContaining({
                     data: "test",
                     nested: expect.objectContaining({
-                        value: 123
+                        value: 123,
                     }),
                     dateField: expect.any(Date),
                     _meta: expect.any(Object),
@@ -767,15 +772,15 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle function properties in objects", async () => {
             eventBus.onTyped("object-event", mockListener);
-            
+
             const objWithFunction = {
                 data: "test",
                 nested: { value: 123 },
-                someFunction: () => "test function"
+                someFunction: () => "test function",
             };
-            
+
             await eventBus.emitTyped("object-event", objWithFunction);
-            
+
             expect(mockListener).toHaveBeenCalledWith(
                 expect.objectContaining({
                     data: "test",
@@ -788,13 +793,13 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle object with prototype chain modifications", async () => {
             eventBus.onTyped("object-event", mockListener);
-            
+
             const obj = Object.create({ inherited: "value" });
             obj.data = "test";
             obj.nested = { value: 123 };
-            
+
             await eventBus.emitTyped("object-event", obj);
-            
+
             expect(mockListener).toHaveBeenCalledWith(
                 expect.objectContaining({
                     data: "test",
@@ -810,7 +815,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             });
 
             const asyncMiddleware: EventMiddleware = vi.fn(async (event, data, next) => {
-                await new Promise(resolve => setTimeout(resolve, 1));
+                await new Promise((resolve) => setTimeout(resolve, 1));
                 await next(); // Asynchronous
             });
 
@@ -819,7 +824,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             eventBus.onTyped("string-event", mockListener);
 
             await eventBus.emitTyped("string-event", "test");
-            
+
             expect(syncMiddleware).toHaveBeenCalled();
             expect(asyncMiddleware).toHaveBeenCalled();
             expect(mockListener).toHaveBeenCalled();
@@ -827,17 +832,17 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle removeMiddleware with multiple occurrences", () => {
             const duplicateMiddleware = vi.fn();
-            
+
             eventBus.use(duplicateMiddleware);
             eventBus.use(mockMiddleware);
             eventBus.use(duplicateMiddleware); // Same middleware again
-            
+
             expect(eventBus.getDiagnostics().middlewareCount).toBe(3);
-            
+
             const removed = eventBus.removeMiddleware(duplicateMiddleware);
             expect(removed).toBe(true);
             expect(eventBus.getDiagnostics().middlewareCount).toBe(2);
-            
+
             // Should only remove first occurrence
             const secondRemove = eventBus.removeMiddleware(duplicateMiddleware);
             expect(secondRemove).toBe(true);
@@ -848,11 +853,11 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             // Start with middleware, then clear it
             eventBus.use(mockMiddleware);
             eventBus.clearMiddleware();
-            
+
             eventBus.onTyped("string-event", mockListener);
-            
+
             await eventBus.emitTyped("string-event", "test");
-            
+
             expect(mockMiddleware).not.toHaveBeenCalled();
             expect(mockListener).toHaveBeenCalledWith({
                 value: "test",
@@ -862,26 +867,26 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle createEnhancedData with object that has non-configurable properties", async () => {
             eventBus.onTyped("object-event", mockListener);
-            
+
             const obj = {
                 data: "test",
-                nested: { value: 123 }
+                nested: { value: 123 },
             };
-            
-            Object.defineProperty(obj, 'nonConfigurable', {
-                value: 'test',
+
+            Object.defineProperty(obj, "nonConfigurable", {
+                value: "test",
                 configurable: false,
                 enumerable: true,
-                writable: false
+                writable: false,
             });
-            
+
             await eventBus.emitTyped("object-event", obj);
-            
+
             expect(mockListener).toHaveBeenCalledWith(
                 expect.objectContaining({
                     data: "test",
                     nested: { value: 123 },
-                    nonConfigurable: 'test',
+                    nonConfigurable: "test",
                     _meta: expect.any(Object),
                 })
             );
@@ -889,18 +894,18 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle middleware utilization calculation edge cases", () => {
             const bus = new TypedEventBus<TestEvents>("test", { maxMiddleware: 1 });
-            
+
             // Test 100% utilization
             bus.use(mockMiddleware);
             expect(bus.getDiagnostics().middlewareUtilization).toBe(100);
-            
+
             // Test overflow protection (should cap at 100)
             try {
                 bus.use(mockMiddleware2);
             } catch {
                 // Expected to throw due to limit
             }
-            
+
             const diagnostics = bus.getDiagnostics();
             expect(diagnostics.middlewareUtilization).toBeLessThanOrEqual(100);
         });

@@ -61,8 +61,8 @@ const mockSiteWriterServiceInstance = {
 };
 
 vi.mock("../../utils/database/SiteWriterService", () => {
-    return { 
-        SiteWriterService: vi.fn().mockImplementation(() => mockSiteWriterServiceInstance)
+    return {
+        SiteWriterService: vi.fn().mockImplementation(() => mockSiteWriterServiceInstance),
     };
 });
 
@@ -87,7 +87,7 @@ const mockCache = {
 
 vi.mock("../../utils/cache/StandardizedCache", () => {
     return {
-        StandardizedCache: vi.fn().mockImplementation(() => mockCache)
+        StandardizedCache: vi.fn().mockImplementation(() => mockCache),
     };
 });
 
@@ -99,7 +99,7 @@ describe("SiteManager - Comprehensive", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         // Reset the shared mock instance
         mockSiteWriterServiceInstance.createSite.mockResolvedValue(undefined);
         mockSiteWriterServiceInstance.updateSite.mockResolvedValue(undefined);
@@ -113,7 +113,7 @@ describe("SiteManager - Comprehensive", () => {
         mockCache.getAll.mockReturnValue([]);
         mockCache.keys.mockReturnValue([]);
         mockCache.entries.mockReturnValue([]);
-        Object.defineProperty(mockCache, 'size', { value: 0, writable: true });
+        Object.defineProperty(mockCache, "size", { value: 0, writable: true });
 
         mockSite = {
             identifier: "site-1",
@@ -188,7 +188,7 @@ describe("SiteManager - Comprehensive", () => {
         it("should initialize SiteManager without monitoring operations", () => {
             const depsWithoutMonitoring = { ...mockDeps };
             delete depsWithoutMonitoring.monitoringOperations;
-            
+
             siteManager = new SiteManager(depsWithoutMonitoring);
             expect(siteManager).toBeDefined();
         });
@@ -207,7 +207,10 @@ describe("SiteManager - Comprehensive", () => {
             expect(mockDeps.configurationManager.validateSiteConfiguration).toHaveBeenCalledWith(mockSite);
             expect(mockSiteWriterServiceInstance.createSite).toHaveBeenCalledWith(mockSite);
             expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith("site:added", expect.any(Object));
-            expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith("sites:state-synchronized", expect.any(Object));
+            expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "sites:state-synchronized",
+                expect.any(Object)
+            );
             expect(result).toEqual(mockSite);
         });
 
@@ -239,9 +242,7 @@ describe("SiteManager - Comprehensive", () => {
                 errors: [undefined as any],
             });
 
-            await expect(siteManager.addSite(mockSite)).rejects.toThrow(
-                "Site validation failed for 'site-1': "
-            );
+            await expect(siteManager.addSite(mockSite)).rejects.toThrow("Site validation failed for 'site-1': ");
         });
 
         it.skip("should handle createSite errors", async () => {
@@ -296,7 +297,7 @@ describe("SiteManager - Comprehensive", () => {
         it("should handle background loading error", async () => {
             const mockCache = siteManager["sitesCache"];
             const mockSiteRepositoryService = siteManager["siteRepositoryService"];
-            
+
             // Mock cache.get to return undefined (cache miss)
             mockCache.get = vi.fn().mockReturnValue(undefined);
             // Mock getSitesFromDatabase to throw error
@@ -305,11 +306,11 @@ describe("SiteManager - Comprehensive", () => {
             const result = siteManager.getSiteFromCache("site-1");
 
             // Wait for background loading to complete
-            await new Promise(resolve => setTimeout(resolve, 10));
+            await new Promise((resolve) => setTimeout(resolve, 10));
 
             expect(result).toBeUndefined();
             expect(mockSiteRepositoryService.getSitesFromDatabase).toHaveBeenCalled();
-            await new Promise(resolve => setTimeout(resolve, 10));
+            await new Promise((resolve) => setTimeout(resolve, 10));
         });
     });
 
@@ -383,7 +384,7 @@ describe("SiteManager - Comprehensive", () => {
                     findAll: vi.fn().mockRejectedValue(new Error("Init error")),
                 },
             };
-            
+
             const failingSiteManager = new SiteManager(failingDeps);
             await expect(failingSiteManager.initialize()).rejects.toThrow();
         });
@@ -462,10 +463,10 @@ describe("SiteManager - Comprehensive", () => {
             const mockCache = siteManager["sitesCache"];
             const mockSiteWriterService = siteManager["siteWriterService"];
             const mockSiteRepositoryService = siteManager["siteRepositoryService"];
-            
+
             const updates = { name: "Updated Site" };
             const updatedSite = { ...mockSite, ...updates };
-            
+
             vi.mocked(mockCache.get)
                 .mockReturnValueOnce(mockSite) // First call to get original site
                 .mockReturnValueOnce(updatedSite); // Second call after refresh
@@ -505,7 +506,7 @@ describe("SiteManager - Comprehensive", () => {
             const mockCache = siteManager["sitesCache"];
             const mockSiteWriterService = siteManager["siteWriterService"];
             const mockSiteRepositoryService = siteManager["siteRepositoryService"];
-            
+
             const newMonitor = {
                 id: "monitor-2",
                 type: "http" as const,
@@ -518,13 +519,11 @@ describe("SiteManager - Comprehensive", () => {
                 responseTime: 0,
                 history: [],
             };
-            
+
             const updates = { monitors: [mockSite.monitors[0], newMonitor] };
             const updatedSite = { ...mockSite, ...updates };
-            
-            vi.mocked(mockCache.get)
-                .mockReturnValueOnce(mockSite)
-                .mockReturnValueOnce(updatedSite);
+
+            vi.mocked(mockCache.get).mockReturnValueOnce(mockSite).mockReturnValueOnce(updatedSite);
             vi.mocked(mockSiteWriterService.updateSite).mockResolvedValue(updatedSite);
             vi.mocked(mockSiteWriterService.detectNewMonitors).mockReturnValue(["monitor-2"]);
             vi.mocked(mockSiteRepositoryService.getSitesFromDatabase).mockResolvedValue([updatedSite]);
@@ -540,10 +539,10 @@ describe("SiteManager - Comprehensive", () => {
             const mockCache = siteManager["sitesCache"];
             const mockSiteWriterService = siteManager["siteWriterService"];
             const mockSiteRepositoryService = siteManager["siteRepositoryService"];
-            
+
             const updates = { name: "Updated Site" };
             const updatedSite = { ...mockSite, ...updates };
-            
+
             vi.mocked(mockCache.get)
                 .mockReturnValueOnce(mockSite) // First call to get original site
                 .mockReturnValueOnce(undefined); // Second call after refresh returns undefined
@@ -569,7 +568,10 @@ describe("SiteManager - Comprehensive", () => {
 
             expect(mockCache.clear).toHaveBeenCalled();
             expect(mockCache.set).toHaveBeenCalledWith("site-1", mockSite);
-            expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith("internal:site:cache-updated", expect.any(Object));
+            expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "internal:site:cache-updated",
+                expect.any(Object)
+            );
         });
     });
 
@@ -583,19 +585,19 @@ describe("SiteManager - Comprehensive", () => {
         it.skip("should throw error when setHistoryLimit called without monitoring operations", async () => {
             const mockCache = siteManager["sitesCache"];
             const mockSiteWriterService = siteManager["siteWriterService"];
-            
+
             const updates = { monitors: [mockSite.monitors[0]] };
             const updatedSite = { ...mockSite, ...updates };
-            
-            vi.mocked(mockCache.get)
-                .mockReturnValueOnce(mockSite)
-                .mockReturnValueOnce(updatedSite);
+
+            vi.mocked(mockCache.get).mockReturnValueOnce(mockSite).mockReturnValueOnce(updatedSite);
             vi.mocked(mockSiteWriterService.updateSite).mockResolvedValue(updatedSite);
 
             // Mock handleMonitorIntervalChanges to call setHistoryLimit which should throw
-            vi.mocked(mockSiteWriterService.handleMonitorIntervalChanges).mockImplementation(async (id, orig, monitors, config) => {
-                config.setHistoryLimit(100);
-            });
+            vi.mocked(mockSiteWriterService.handleMonitorIntervalChanges).mockImplementation(
+                async (id, orig, monitors, config) => {
+                    config.setHistoryLimit(100);
+                }
+            );
 
             await expect(siteManager.updateSite("site-1", updates)).rejects.toThrow(
                 "MonitoringOperations not available but required for setHistoryLimit"
@@ -606,7 +608,7 @@ describe("SiteManager - Comprehensive", () => {
             const mockCache = siteManager["sitesCache"];
             const mockSiteWriterService = siteManager["siteWriterService"];
             const mockSiteRepositoryService = siteManager["siteRepositoryService"];
-            
+
             const newMonitor = {
                 id: "monitor-2",
                 type: "http" as const,
@@ -619,13 +621,11 @@ describe("SiteManager - Comprehensive", () => {
                 responseTime: 0,
                 history: [],
             };
-            
+
             const updates = { monitors: [mockSite.monitors[0], newMonitor] };
             const updatedSite = { ...mockSite, ...updates };
-            
-            vi.mocked(mockCache.get)
-                .mockReturnValueOnce(mockSite)
-                .mockReturnValueOnce(updatedSite);
+
+            vi.mocked(mockCache.get).mockReturnValueOnce(mockSite).mockReturnValueOnce(updatedSite);
             vi.mocked(mockSiteWriterService.updateSite).mockResolvedValue(updatedSite);
             vi.mocked(mockSiteWriterService.detectNewMonitors).mockReturnValue(["monitor-2"]);
             vi.mocked(mockSiteRepositoryService.getSitesFromDatabase).mockResolvedValue([updatedSite]);
@@ -637,7 +637,7 @@ describe("SiteManager - Comprehensive", () => {
 
         it("should throw error when startMonitoring called without monitoring operations", async () => {
             const config = siteManager["createMonitoringConfig"]();
-            
+
             await expect(config.startMonitoring("site-1", "monitor-1")).rejects.toThrow(
                 "MonitoringOperations not available but required for startMonitoring"
             );
@@ -645,7 +645,7 @@ describe("SiteManager - Comprehensive", () => {
 
         it("should throw error when stopMonitoring called without monitoring operations", async () => {
             const config = siteManager["createMonitoringConfig"]();
-            
+
             await expect(config.stopMonitoring("site-1", "monitor-1")).rejects.toThrow(
                 "MonitoringOperations not available but required for stopMonitoring"
             );
@@ -659,37 +659,37 @@ describe("SiteManager - Comprehensive", () => {
 
         it.skip("should handle setHistoryLimit error gracefully", async () => {
             vi.mocked(mockMonitoringOperations.setHistoryLimit).mockRejectedValue(new Error("History limit error"));
-            
+
             const config = siteManager["createMonitoringConfig"]();
-            
+
             // Should not throw, just log error
             await expect(config.setHistoryLimit(100)).resolves.toBeUndefined();
-            
+
             expect(mockMonitoringOperations.setHistoryLimit).toHaveBeenCalledWith(100);
         });
 
         it("should call setupNewMonitors successfully", async () => {
             const config = siteManager["createMonitoringConfig"]();
-            
+
             await config.setupNewMonitors(mockSite, ["monitor-1"]);
-            
+
             expect(mockMonitoringOperations.setupNewMonitors).toHaveBeenCalledWith(mockSite, ["monitor-1"]);
         });
 
         it("should call startMonitoring successfully", async () => {
             const config = siteManager["createMonitoringConfig"]();
-            
+
             const result = await config.startMonitoring("site-1", "monitor-1");
-            
+
             expect(mockMonitoringOperations.startMonitoringForSite).toHaveBeenCalledWith("site-1", "monitor-1");
             expect(result).toBe(true);
         });
 
         it("should call stopMonitoring successfully", async () => {
             const config = siteManager["createMonitoringConfig"]();
-            
+
             const result = await config.stopMonitoring("site-1", "monitor-1");
-            
+
             expect(mockMonitoringOperations.stopMonitoringForSite).toHaveBeenCalledWith("site-1", "monitor-1");
             expect(result).toBe(true);
         });
@@ -703,7 +703,7 @@ describe("SiteManager - Comprehensive", () => {
         it("should load site in background successfully", async () => {
             const mockCache = siteManager["sitesCache"];
             const mockSiteRepositoryService = siteManager["siteRepositoryService"];
-            
+
             vi.mocked(mockSiteRepositoryService.getSitesFromDatabase).mockResolvedValue([mockSite]);
 
             await siteManager["loadSiteInBackground"]("site-1");
@@ -714,31 +714,37 @@ describe("SiteManager - Comprehensive", () => {
 
         it("should handle site not found during background loading", async () => {
             const mockSiteRepositoryService = siteManager["siteRepositoryService"];
-            
+
             vi.mocked(mockSiteRepositoryService.getSitesFromDatabase).mockResolvedValue([]);
 
             await siteManager["loadSiteInBackground"]("site-1");
 
-            expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith("site:cache-miss", expect.objectContaining({
-                backgroundLoading: false,
-            }));
+            expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "site:cache-miss",
+                expect.objectContaining({
+                    backgroundLoading: false,
+                })
+            );
         });
 
         it("should handle database error during background loading", async () => {
             const mockSiteRepositoryService = siteManager["siteRepositoryService"];
-            
+
             vi.mocked(mockSiteRepositoryService.getSitesFromDatabase).mockRejectedValue(new Error("DB error"));
 
             await siteManager["loadSiteInBackground"]("site-1");
 
-            expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith("site:cache-miss", expect.objectContaining({
-                backgroundLoading: false,
-            }));
+            expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "site:cache-miss",
+                expect.objectContaining({
+                    backgroundLoading: false,
+                })
+            );
         });
 
         it("should handle event emission error during background loading", async () => {
             const mockSiteRepositoryService = siteManager["siteRepositoryService"];
-            
+
             vi.mocked(mockSiteRepositoryService.getSitesFromDatabase).mockRejectedValue(new Error("DB error"));
             vi.mocked(mockDeps.eventEmitter.emitTyped).mockRejectedValue(new Error("Event error"));
 
@@ -838,9 +844,7 @@ describe("SiteManager - Comprehensive", () => {
             // Update site
             const updates = { name: "Updated Site" };
             const updatedSite = { ...mockSite, ...updates };
-            vi.mocked(mockCache.get)
-                .mockReturnValueOnce(mockSite)
-                .mockReturnValueOnce(updatedSite);
+            vi.mocked(mockCache.get).mockReturnValueOnce(mockSite).mockReturnValueOnce(updatedSite);
             vi.mocked(mockSiteWriterService.updateSite).mockResolvedValue(updatedSite);
             vi.mocked(mockSiteRepositoryService.getSitesFromDatabase).mockResolvedValue([updatedSite]);
 

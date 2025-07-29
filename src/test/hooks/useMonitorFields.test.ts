@@ -1,6 +1,6 @@
 /**
  * Tests for useMonitorFields hook
- * 
+ *
  * @fileoverview Comprehensive tests covering all branches and edge cases
  * for the monitor fields hook that manages dynamic form field definitions.
  */
@@ -40,7 +40,7 @@ declare global {
 }
 
 // Set up the mock globally
-Object.defineProperty(window, 'electronAPI', {
+Object.defineProperty(window, "electronAPI", {
     value: mockElectronAPI,
     writable: true,
 });
@@ -100,7 +100,7 @@ describe("useMonitorFields Hook", () => {
                             placeholder: "Enter hostname or IP",
                         },
                     ],
-                    displayName: "Ping Monitor", 
+                    displayName: "Ping Monitor",
                     description: "Monitor host availability",
                 },
             ];
@@ -219,11 +219,11 @@ describe("useMonitorFields Hook", () => {
 
                 const httpFields = result.current.getFields("http");
                 expect(httpFields).toHaveLength(3);
-                expect(httpFields.map(f => f.name)).toEqual(["url", "method", "timeout"]);
+                expect(httpFields.map((f) => f.name)).toEqual(["url", "method", "timeout"]);
 
                 const tcpFields = result.current.getFields("tcp");
                 expect(tcpFields).toHaveLength(2);
-                expect(tcpFields.map(f => f.name)).toEqual(["host", "port"]);
+                expect(tcpFields.map((f) => f.name)).toEqual(["host", "port"]);
             });
 
             it("should return empty array for non-existent monitor types", async () => {
@@ -426,12 +426,14 @@ describe("useMonitorFields Hook", () => {
             const mockConfigs: MonitorTypeConfig[] = [
                 {
                     type: "http",
-                    fields: [{
-                        name: "url",
-                        type: "string",
-                        required: true,
-                        label: "URL",
-                    }],
+                    fields: [
+                        {
+                            name: "url",
+                            type: "string",
+                            required: true,
+                            label: "URL",
+                        },
+                    ],
                     displayName: "HTTP Monitor",
                     description: "Monitor HTTP endpoints",
                 },

@@ -4,12 +4,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import {
-    getNestedScaleProperty,
-    getScaleConfig,
-    getScaleProperty,
-    hasScales,
-} from "../../utils/chartUtils";
+import { getNestedScaleProperty, getScaleConfig, getScaleProperty, hasScales } from "../../utils/chartUtils";
 
 describe("Chart Utilities", () => {
     describe("hasScales", () => {
@@ -428,7 +423,9 @@ describe("Chart Utilities", () => {
                             text: "Revenue ($)",
                         },
                         ticks: {
-                            callback: function(value: number) { return "$" + value; },
+                            callback: function (value: number) {
+                                return "$" + value;
+                            },
                         },
                     },
                 },
@@ -460,7 +457,9 @@ describe("Chart Utilities", () => {
             const invalidInputs = [null, undefined, "", 0, false, [], {}];
 
             for (const input of invalidInputs) {
-                expect(hasScales(input)).toBe(input === false ? false : !!(input && typeof input === "object" && "scales" in input));
+                expect(hasScales(input)).toBe(
+                    input === false ? false : !!(input && typeof input === "object" && "scales" in input)
+                );
                 expect(getScaleConfig(input, "x")).toBeUndefined();
                 expect(getScaleProperty(input, "x", "type")).toBeUndefined();
                 expect(getNestedScaleProperty(input, "x", "title.text")).toBeUndefined();

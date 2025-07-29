@@ -136,32 +136,38 @@ describe("Console Statement Remediation", () => {
         let replacement = "";
 
         switch (statement.type) {
-        case "error": {
-            replacement = statement.context.includes("catch") || statement.context.includes("error") ? 'logger.error("Operation failed", error);' : 'logger.error("Error message");';
-        
-        break;
-        }
-        case "warn": {
-            replacement = 'logger.warn("Warning message");';
-        
-        break;
-        }
-        case "log": {
-            replacement = statement.context.includes("debug") || statement.context.includes("Debug") ? 'logger.debug("Debug information");' : 'logger.info("Information message");';
-        
-        break;
-        }
-        case "debug": {
-            replacement = 'logger.debug("Debug information");';
-        
-        break;
-        }
-        case "info": {
-            replacement = 'logger.info("Information message");';
-        
-        break;
-        }
-        // No default
+            case "error": {
+                replacement =
+                    statement.context.includes("catch") || statement.context.includes("error")
+                        ? 'logger.error("Operation failed", error);'
+                        : 'logger.error("Error message");';
+
+                break;
+            }
+            case "warn": {
+                replacement = 'logger.warn("Warning message");';
+
+                break;
+            }
+            case "log": {
+                replacement =
+                    statement.context.includes("debug") || statement.context.includes("Debug")
+                        ? 'logger.debug("Debug information");'
+                        : 'logger.info("Information message");';
+
+                break;
+            }
+            case "debug": {
+                replacement = 'logger.debug("Debug information");';
+
+                break;
+            }
+            case "info": {
+                replacement = 'logger.info("Information message");';
+
+                break;
+            }
+            // No default
         }
 
         return {
@@ -204,22 +210,22 @@ describe("Console Statement Remediation", () => {
                         const category = categorizeConsoleStatement(statement, file);
 
                         switch (category.category) {
-                        case "legitimate": {
-                            categorized.legitimate++;
-                        
-                        break;
-                        }
-                        case "needs-replacement": {
-                            categorized.needsReplacement++;
-                        
-                        break;
-                        }
-                        case "test-file": {
-                            categorized.testFile++;
-                        
-                        break;
-                        }
-                        // No default
+                            case "legitimate": {
+                                categorized.legitimate++;
+
+                                break;
+                            }
+                            case "needs-replacement": {
+                                categorized.needsReplacement++;
+
+                                break;
+                            }
+                            case "test-file": {
+                                categorized.testFile++;
+
+                                break;
+                            }
+                            // No default
                         }
                     }
 

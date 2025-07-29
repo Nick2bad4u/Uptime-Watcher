@@ -317,27 +317,25 @@ describe("monitorTitleFormatters", () => {
         });
 
         it("should register a new formatter for custom type", () => {
-            const customFormatter: TitleSuffixFormatter = (monitor) => 
-                ` (Custom: ${monitor.name})`;
-            
+            const customFormatter: TitleSuffixFormatter = (monitor) => ` (Custom: ${monitor.name})`;
+
             registerTitleSuffixFormatter("custom", customFormatter);
-            
+
             const formatter = getTitleSuffixFormatter("custom");
             expect(formatter).toBeDefined();
             expect(formatter).toBe(customFormatter);
         });
 
         it("should use registered custom formatter in formatTitleSuffix", () => {
-            const customFormatter: TitleSuffixFormatter = (monitor) => 
-                ` [${monitor.name}]`;
-            
+            const customFormatter: TitleSuffixFormatter = (monitor) => ` [${monitor.name}]`;
+
             registerTitleSuffixFormatter("api", customFormatter);
-            
+
             const monitor = createMockMonitor({
                 type: "api",
                 name: "API Monitor",
             });
-            
+
             const result = formatTitleSuffix(monitor);
             expect(result).toBe(" [API Monitor]");
         });
@@ -345,13 +343,13 @@ describe("monitorTitleFormatters", () => {
         it("should replace existing formatter when registering same type", () => {
             const originalFormatter: TitleSuffixFormatter = () => " (Original)";
             const newFormatter: TitleSuffixFormatter = () => " (New)";
-            
+
             registerTitleSuffixFormatter("test", originalFormatter);
             registerTitleSuffixFormatter("test", newFormatter);
-            
+
             const formatter = getTitleSuffixFormatter("test");
             expect(formatter).toBe(newFormatter);
-            
+
             const monitor = createMockMonitor({ type: "test" });
             const result = formatTitleSuffix(monitor);
             expect(result).toBe(" (New)");
@@ -363,15 +361,15 @@ describe("monitorTitleFormatters", () => {
                 const database = (monitor as any).database as string;
                 return host && database ? ` (${host}/${database})` : "";
             };
-            
+
             registerTitleSuffixFormatter("database", databaseFormatter);
-            
+
             const monitor = createMockMonitor({
                 type: "database",
                 host: "db.example.com",
                 database: "users_db",
             } as any);
-            
+
             const result = formatTitleSuffix(monitor);
             expect(result).toBe(" (db.example.com/users_db)");
         });
@@ -381,19 +379,19 @@ describe("monitorTitleFormatters", () => {
                 const status = (monitor as any).enabled;
                 return status ? " (Active)" : "";
             };
-            
+
             registerTitleSuffixFormatter("conditional", conditionalFormatter);
-            
+
             const enabledMonitor = createMockMonitor({
                 type: "conditional",
                 enabled: true,
             } as any);
-            
+
             const disabledMonitor = createMockMonitor({
                 type: "conditional",
                 enabled: false,
             } as any);
-            
+
             expect(formatTitleSuffix(enabledMonitor)).toBe(" (Active)");
             expect(formatTitleSuffix(disabledMonitor)).toBe("");
         });
@@ -403,7 +401,7 @@ describe("monitorTitleFormatters", () => {
                 const url = monitor.url as string;
                 const host = monitor.host as string;
                 const port = monitor.port as number;
-                
+
                 if (url) {
                     return ` (${url})`;
                 } else if (host && port) {
@@ -413,37 +411,37 @@ describe("monitorTitleFormatters", () => {
                 }
                 return " (No endpoint)";
             };
-            
+
             registerTitleSuffixFormatter("complex", complexFormatter);
-            
+
             const urlMonitor = createMockMonitor({
                 type: "complex",
                 url: "https://api.example.com",
                 host: "ignored.com",
                 port: 8080,
             });
-            
+
             const hostPortMonitor = createMockMonitor({
                 type: "complex",
                 url: "",
                 host: "service.example.com",
                 port: 3000,
             });
-            
+
             const hostOnlyMonitor = createMockMonitor({
                 type: "complex",
                 url: "",
                 host: "simple.example.com",
                 port: 0,
             });
-            
+
             const noEndpointMonitor = createMockMonitor({
                 type: "complex",
                 url: "",
                 host: "",
                 port: 0,
             });
-            
+
             expect(formatTitleSuffix(urlMonitor)).toBe(" (https://api.example.com)");
             expect(formatTitleSuffix(hostPortMonitor)).toBe(" (service.example.com:3000)");
             expect(formatTitleSuffix(hostOnlyMonitor)).toBe(" (simple.example.com)");
@@ -452,9 +450,9 @@ describe("monitorTitleFormatters", () => {
 
         it("should handle registration with empty type string", () => {
             const emptyTypeFormatter: TitleSuffixFormatter = () => " (Empty type)";
-            
+
             registerTitleSuffixFormatter("", emptyTypeFormatter);
-            
+
             const formatter = getTitleSuffixFormatter("");
             expect(formatter).toBeDefined();
             expect(formatter).toBe(emptyTypeFormatter);
@@ -465,16 +463,16 @@ describe("monitorTitleFormatters", () => {
                 type: "http",
                 url: "https://original.example.com",
             });
-            
+
             // Verify original behavior
             expect(formatTitleSuffix(httpMonitor)).toBe(" (https://original.example.com)");
-            
+
             // Register custom formatter
             registerTitleSuffixFormatter("custom", () => " (Custom)");
-            
+
             // Verify original formatter still works
             expect(formatTitleSuffix(httpMonitor)).toBe(" (https://original.example.com)");
-            
+
             // Verify custom formatter works
             const customMonitor = createMockMonitor({ type: "custom" });
             expect(formatTitleSuffix(customMonitor)).toBe(" (Custom)");
@@ -500,14 +498,10 @@ describe("monitorTitleFormatters", () => {
                     name: "Mystery Service",
                 }),
             ];
-            
+
             const results = monitors.map(formatTitleSuffix);
-            
-            expect(results).toEqual([
-                " (https://example.com)",
-                " (db.example.com:5432)",
-                "",
-            ]);
+
+            expect(results).toEqual([" (https://example.com)", " (db.example.com:5432)", ""]);
         });
 
         it("should demonstrate formatter registration workflow", () => {
@@ -516,22 +510,22 @@ describe("monitorTitleFormatters", () => {
                 const host = monitor.host as string;
                 return host ? ` (ping ${host})` : " (ping)";
             });
-            
+
             // Create monitors
             const pingMonitorWithHost = createMockMonitor({
                 type: "ping",
                 host: "google.com",
             });
-            
+
             const pingMonitorWithoutHost = createMockMonitor({
                 type: "ping",
                 host: "",
             });
-            
+
             // Test formatting
             expect(formatTitleSuffix(pingMonitorWithHost)).toBe(" (ping google.com)");
             expect(formatTitleSuffix(pingMonitorWithoutHost)).toBe(" (ping)");
-            
+
             // Verify getter works
             const formatter = getTitleSuffixFormatter("ping");
             expect(formatter).toBeDefined();

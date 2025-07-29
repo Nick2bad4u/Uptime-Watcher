@@ -51,7 +51,9 @@ describe("Correlation Utility", () => {
         });
 
         it("should be cryptographically random", () => {
-            const ids = Array.from({length: 1000}).fill(0).map(() => generateCorrelationId());
+            const ids = Array.from({ length: 1000 })
+                .fill(0)
+                .map(() => generateCorrelationId());
 
             // Check that we don't have obvious patterns
             // Test that no character appears in the same position too often

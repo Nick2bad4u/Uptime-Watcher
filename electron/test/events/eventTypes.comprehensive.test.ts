@@ -4,12 +4,12 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { 
-    isEventOfCategory, 
+import {
+    isEventOfCategory,
     getEventPriority,
     EVENT_CATEGORIES,
     EVENT_PRIORITIES,
-    type UptimeEvents 
+    type UptimeEvents,
 } from "../../events/eventTypes";
 
 describe("eventTypes - Comprehensive Coverage", () => {
@@ -17,7 +17,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
         it("should have all expected category keys", () => {
             const expectedCategories = [
                 "CACHE",
-                "CONFIG", 
+                "CONFIG",
                 "DATABASE",
                 "INTERNAL_DATABASE",
                 "INTERNAL_MONITOR",
@@ -26,9 +26,9 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 "MONITORING",
                 "PERFORMANCE",
                 "SITE",
-                "SYSTEM"
+                "SYSTEM",
             ];
-            
+
             const actualCategories = Object.keys(EVENT_CATEGORIES);
             expect(actualCategories).toEqual(expect.arrayContaining(expectedCategories));
             expect(actualCategories.length).toBe(expectedCategories.length);
@@ -223,7 +223,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 // These will test the default case in the switch statement
                 // @ts-expect-error - intentionally testing unknown category
                 expect(isEventOfCategory("site:added", "UNKNOWN_CATEGORY")).toBe(false);
-                // @ts-expect-error - intentionally testing unknown category  
+                // @ts-expect-error - intentionally testing unknown category
                 expect(isEventOfCategory("monitor:up", "NOT_A_REAL_CATEGORY")).toBe(false);
                 // @ts-expect-error - intentionally testing unknown category
                 expect(isEventOfCategory("system:error", "FAKE_CATEGORY")).toBe(false);
@@ -243,7 +243,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 // This ensures we test all branches thoroughly
                 const categories = Object.keys(EVENT_CATEGORIES) as Array<keyof typeof EVENT_CATEGORIES>;
                 const testEvent = "site:added" as keyof UptimeEvents;
-                
+
                 for (const category of categories) {
                     const result = isEventOfCategory(testEvent, category);
                     if (category === "SITE") {
@@ -297,7 +297,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 expect(getEventPriority("database:error")).toBe("MEDIUM");
                 expect(getEventPriority("internal:database:initialized")).toBe("MEDIUM");
                 expect(getEventPriority("monitoring:started")).toBe("MEDIUM");
-                
+
                 // Test completely unknown events (though they wouldn't exist in real UptimeEvents)
                 expect(getEventPriority("unknown:event" as keyof UptimeEvents)).toBe("MEDIUM");
             });
@@ -308,7 +308,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 // This test ensures the for loop in getEventPriority processes all entries
                 const allPriorityEvents = Object.values(EVENT_PRIORITIES).flat();
                 const uniqueEvents = [...new Set(allPriorityEvents)];
-                
+
                 // Test each event returns its correct priority
                 for (const eventName of uniqueEvents) {
                     const priority = getEventPriority(eventName as keyof UptimeEvents);
@@ -348,7 +348,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
                     // SITE (some already tested in priority tests)
                     "sites:state-synchronized",
                     // SYSTEM (some already tested in priority tests)
-                    "system:startup"
+                    "system:startup",
                 ];
 
                 for (const event of testEvents) {
@@ -361,7 +361,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 // Verify that all events in priority categories actually exist in event categories
                 const allCategoryEvents = Object.values(EVENT_CATEGORIES).flat();
                 const allPriorityEvents = Object.values(EVENT_PRIORITIES).flat();
-                
+
                 for (const priorityEvent of allPriorityEvents) {
                     expect(allCategoryEvents).toContain(priorityEvent as any);
                 }
@@ -374,7 +374,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
             // This test ensures types work correctly
             const eventName: keyof UptimeEvents = "site:added";
             const category: keyof typeof EVENT_CATEGORIES = "SITE";
-            
+
             expect(isEventOfCategory(eventName, category)).toBe(true);
             expect(getEventPriority(eventName)).toBe("MEDIUM");
         });
@@ -385,7 +385,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 // Runtime mutation attempt (TypeScript should prevent this at compile time)
                 (EVENT_CATEGORIES.SITE as any).push("new:event");
             }).not.toThrow(); // Runtime doesn't prevent this, but TypeScript should
-            
+
             expect(() => {
                 // Runtime mutation attempt (TypeScript should prevent this at compile time)
                 (EVENT_PRIORITIES.HIGH as any).push("new:event");

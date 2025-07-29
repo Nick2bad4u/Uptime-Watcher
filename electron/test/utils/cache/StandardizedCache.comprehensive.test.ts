@@ -5,7 +5,7 @@ import { UptimeEvents } from "../../../events/eventTypes";
 
 /**
  * Comprehensive test suite for StandardizedCache
- * 
+ *
  * This test suite aims for 98% branch coverage by testing:
  * - All configuration options and their combinations
  * - TTL expiration scenarios including edge cases
@@ -26,7 +26,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
     beforeEach(() => {
         eventBus = new TypedEventBus<UptimeEvents>();
         // Mock console to avoid test output noise
-        consoleSpy = vi.spyOn(console, 'debug').mockImplementation(() => {});
+        consoleSpy = vi.spyOn(console, "debug").mockImplementation(() => {});
         vi.useFakeTimers();
     });
 
@@ -38,7 +38,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
     describe("Configuration Options", () => {
         it("should use default configuration values", () => {
             cache = new StandardizedCache({ name: "test-cache" });
-            
+
             expect(cache.size).toBe(0);
             const stats = cache.getStats();
             expect(stats.hits).toBe(0);
@@ -50,14 +50,14 @@ describe("StandardizedCache - Comprehensive Tests", () => {
         it("should respect custom defaultTTL", () => {
             cache = new StandardizedCache({
                 name: "test-cache",
-                defaultTTL: 1000
+                defaultTTL: 1000,
             });
 
             cache.set("key1", "value1");
-            
+
             // Should exist initially
             expect(cache.get("key1")).toBe("value1");
-            
+
             // Should expire after TTL
             vi.advanceTimersByTime(1001);
             expect(cache.get("key1")).toBeUndefined();
@@ -66,11 +66,11 @@ describe("StandardizedCache - Comprehensive Tests", () => {
         it("should handle defaultTTL of 0 (no expiration)", () => {
             cache = new StandardizedCache({
                 name: "test-cache",
-                defaultTTL: 0
+                defaultTTL: 0,
             });
 
             cache.set("key1", "value1");
-            
+
             // Should not expire even after long time
             vi.advanceTimersByTime(999_999);
             expect(cache.get("key1")).toBe("value1");
@@ -79,11 +79,11 @@ describe("StandardizedCache - Comprehensive Tests", () => {
         it("should handle negative defaultTTL (no expiration)", () => {
             cache = new StandardizedCache({
                 name: "test-cache",
-                defaultTTL: -1000
+                defaultTTL: -1000,
             });
 
             cache.set("key1", "value1");
-            
+
             // Should not expire even after long time
             vi.advanceTimersByTime(999_999);
             expect(cache.get("key1")).toBe("value1");
@@ -92,7 +92,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
         it("should respect custom maxSize", () => {
             cache = new StandardizedCache({
                 name: "test-cache",
-                maxSize: 2
+                maxSize: 2,
             });
 
             cache.set("key1", "value1");
@@ -110,7 +110,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
         it("should handle enableStats = false", () => {
             cache = new StandardizedCache({
                 name: "test-cache",
-                enableStats: false
+                enableStats: false,
             });
 
             cache.set("key1", "value1");
@@ -130,22 +130,22 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             cache = new StandardizedCache({
                 name: "test-cache",
-                eventEmitter: eventBus
+                eventEmitter: eventBus,
             });
 
             cache.set("key1", "value1");
-            
+
             expect(eventSpy).toHaveBeenCalledWith({
                 cacheName: "test-cache",
                 timestamp: expect.any(Number),
                 key: "key1",
-                ttl: 300_000 // Default TTL
+                ttl: 300_000, // Default TTL
             });
         });
 
         it("should work without event emitter", () => {
             cache = new StandardizedCache({
-                name: "test-cache"
+                name: "test-cache",
                 // No eventEmitter provided
             });
 
@@ -162,7 +162,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
         beforeEach(() => {
             cache = new StandardizedCache({
                 name: "test-cache",
-                defaultTTL: 1000
+                defaultTTL: 1000,
             });
         });
 
@@ -178,14 +178,14 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
         it("should handle TTL of 0 on individual items (no expiration)", () => {
             cache.set("key1", "value1", 0);
-            
+
             vi.advanceTimersByTime(999_999);
             expect(cache.get("key1")).toBe("value1");
         });
 
         it("should handle negative TTL on individual items (no expiration)", () => {
             cache.set("key1", "value1", -500);
-            
+
             vi.advanceTimersByTime(999_999);
             expect(cache.get("key1")).toBe("value1");
         });
@@ -197,26 +197,26 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             cache = new StandardizedCache({
                 name: "test-cache",
                 defaultTTL: 1000,
-                eventEmitter: eventBus
+                eventEmitter: eventBus,
             });
 
             cache.set("key1", "value1", 500);
-            
+
             vi.advanceTimersByTime(600);
             cache.get("key1"); // Should trigger expiration check
-            
+
             expect(eventSpy).toHaveBeenCalledWith({
                 cacheName: "test-cache",
                 timestamp: expect.any(Number),
-                key: "key1"
+                key: "key1",
             });
         });
 
         it("should handle expired items in has() method", () => {
             cache.set("key1", "value1", 500);
-            
+
             expect(cache.has("key1")).toBe(true);
-            
+
             vi.advanceTimersByTime(600);
             expect(cache.has("key1")).toBe(false);
         });
@@ -224,9 +224,9 @@ describe("StandardizedCache - Comprehensive Tests", () => {
         it("should clean up expired items in entries() method", () => {
             cache.set("key1", "value1", 500);
             cache.set("key2", "value2", 1500);
-            
+
             vi.advanceTimersByTime(600);
-            
+
             const entries = [...cache.entries()];
             expect(entries).toHaveLength(1);
             expect(entries[0]).toEqual(["key2", "value2"]);
@@ -235,9 +235,9 @@ describe("StandardizedCache - Comprehensive Tests", () => {
         it("should clean up expired items in getAll() method", () => {
             cache.set("key1", "value1", 500);
             cache.set("key2", "value2", 1500);
-            
+
             vi.advanceTimersByTime(600);
-            
+
             const values = cache.getAll();
             expect(values).toHaveLength(1);
             expect(values[0]).toBe("value2");
@@ -246,9 +246,9 @@ describe("StandardizedCache - Comprehensive Tests", () => {
         it("should clean up expired items in keys() method", () => {
             cache.set("key1", "value1", 500);
             cache.set("key2", "value2", 1500);
-            
+
             vi.advanceTimersByTime(600);
-            
+
             const keys = cache.keys();
             expect(keys).toHaveLength(1);
             expect(keys[0]).toBe("key2");
@@ -260,7 +260,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             cache = new StandardizedCache({
                 name: "test-cache",
                 maxSize: 3,
-                eventEmitter: eventBus
+                eventEmitter: eventBus,
             });
         });
 
@@ -279,7 +279,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             // Add new item - should evict key1 (oldest by insertion time)
             vi.advanceTimersByTime(1);
             cache.set("key4", "value4");
-            
+
             expect(cache.size).toBe(3);
             expect(cache.has("key1")).toBe(false); // Should be evicted (oldest)
             expect(cache.has("key2")).toBe(true);
@@ -290,7 +290,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
                 cacheName: "test-cache",
                 timestamp: expect.any(Number),
                 key: "key1",
-                reason: "lru"
+                reason: "lru",
             });
         });
 
@@ -303,7 +303,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             // Update existing key - should not trigger eviction
             cache.set("key1", "new_value1");
-            
+
             expect(cache.size).toBe(3);
             expect(cache.get("key1")).toBe("new_value1");
             expect(cache.has("key2")).toBe(true);
@@ -314,7 +314,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             // Create cache with max size 1
             const smallCache = new StandardizedCache({
                 name: "small-cache",
-                maxSize: 1
+                maxSize: 1,
             });
 
             // This should not throw even though there's nothing to evict
@@ -328,13 +328,13 @@ describe("StandardizedCache - Comprehensive Tests", () => {
         beforeEach(() => {
             cache = new StandardizedCache({
                 name: "test-cache",
-                enableStats: true
+                enableStats: true,
             });
         });
 
         it("should track hit/miss statistics accurately", () => {
             cache.set("key1", "value1");
-            
+
             // Generate hits and misses
             cache.get("key1"); // Hit
             cache.get("key1"); // Hit
@@ -359,13 +359,13 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
         it("should update lastAccess timestamp on hits", () => {
             cache.set("key1", "value1");
-            
+
             const initialStats = cache.getStats();
             expect(initialStats.lastAccess).toBeUndefined();
-            
+
             vi.advanceTimersByTime(1000);
             cache.get("key1");
-            
+
             const updatedStats = cache.getStats();
             expect(updatedStats.lastAccess).toBeDefined();
             expect(updatedStats.lastAccess).toBeGreaterThan(0);
@@ -373,7 +373,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
         it("should not update lastAccess on misses", () => {
             cache.get("nonexistent");
-            
+
             const stats = cache.getStats();
             expect(stats.lastAccess).toBeUndefined();
             expect(stats.misses).toBe(1);
@@ -381,12 +381,12 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
         it("should track entry hit counts", () => {
             cache.set("key1", "value1");
-            
+
             // Access multiple times
             cache.get("key1");
             cache.get("key1");
             cache.get("key1");
-            
+
             // We can't directly access entry hit counts, but we can verify overall stats
             const stats = cache.getStats();
             expect(stats.hits).toBe(3);
@@ -395,10 +395,10 @@ describe("StandardizedCache - Comprehensive Tests", () => {
         it("should return snapshot of stats, not live reference", () => {
             const stats1 = cache.getStats();
             const stats2 = cache.getStats();
-            
+
             expect(stats1).not.toBe(stats2); // Different objects
             expect(stats1).toEqual(stats2); // Same values
-            
+
             // Modifying returned stats should not affect cache
             stats1.hits = 999;
             expect(cache.getStats().hits).toBe(0);
@@ -409,7 +409,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
         beforeEach(() => {
             cache = new StandardizedCache({
                 name: "test-cache",
-                eventEmitter: eventBus
+                eventEmitter: eventBus,
             });
         });
 
@@ -418,12 +418,12 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             eventBus.on("internal:cache:item-cached", eventSpy);
 
             cache.set("key1", "value1", 2000);
-            
+
             expect(eventSpy).toHaveBeenCalledWith({
                 cacheName: "test-cache",
                 timestamp: expect.any(Number),
                 key: "key1",
-                ttl: 2000
+                ttl: 2000,
             });
         });
 
@@ -433,11 +433,11 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             cache.set("key1", "value1");
             cache.delete("key1");
-            
+
             expect(eventSpy).toHaveBeenCalledWith({
                 cacheName: "test-cache",
                 timestamp: expect.any(Number),
-                key: "key1"
+                key: "key1",
             });
         });
 
@@ -448,11 +448,11 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             cache.set("key1", "value1");
             cache.set("key2", "value2");
             cache.clear();
-            
+
             expect(eventSpy).toHaveBeenCalledWith({
                 cacheName: "test-cache",
                 timestamp: expect.any(Number),
-                itemCount: 2
+                itemCount: 2,
             });
         });
 
@@ -463,13 +463,13 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             cache.bulkUpdate([
                 { key: "key1", data: "value1" },
                 { key: "key2", data: "value2" },
-                { key: "key3", data: "value3" }
+                { key: "key3", data: "value3" },
             ]);
-            
+
             expect(eventSpy).toHaveBeenCalledWith({
                 cacheName: "test-cache",
                 timestamp: expect.any(Number),
-                itemCount: 3
+                itemCount: 3,
             });
         });
 
@@ -479,11 +479,11 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             cache.set("key1", "value1");
             cache.invalidate("key1");
-            
+
             expect(eventSpy).toHaveBeenCalledWith({
                 cacheName: "test-cache",
                 timestamp: expect.any(Number),
-                key: "key1"
+                key: "key1",
             });
         });
 
@@ -494,11 +494,11 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             cache.set("key1", "value1");
             cache.set("key2", "value2");
             cache.invalidateAll();
-            
+
             expect(eventSpy).toHaveBeenCalledWith({
                 cacheName: "test-cache",
                 timestamp: expect.any(Number),
-                itemCount: 2
+                itemCount: 2,
             });
         });
 
@@ -508,15 +508,15 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             cache.set("key1", "value1", 500);
             cache.set("key2", "value2", 1000);
-            
+
             vi.advanceTimersByTime(750);
             const cleaned = cache.cleanup();
-            
+
             expect(cleaned).toBe(1);
             expect(eventSpy).toHaveBeenCalledWith({
                 cacheName: "test-cache",
                 timestamp: expect.any(Number),
-                itemCount: 1
+                itemCount: 1,
             });
         });
     });
@@ -524,7 +524,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
     describe("Invalidation Callbacks", () => {
         beforeEach(() => {
             cache = new StandardizedCache({
-                name: "test-cache"
+                name: "test-cache",
             });
         });
 
@@ -582,7 +582,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             cache.onInvalidation(callback);
 
             cache.set("key1", "value1", 500);
-            
+
             vi.advanceTimersByTime(600);
             cache.get("key1"); // Trigger expiration check
 
@@ -593,7 +593,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             const callback = vi.fn();
             const smallCache = new StandardizedCache({
                 name: "small-cache",
-                maxSize: 1
+                maxSize: 1,
             });
             smallCache.onInvalidation(callback);
 
@@ -645,7 +645,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             cache.set("key1", "value1", 500);
             cache.set("key2", "value2", 1000);
-            
+
             vi.advanceTimersByTime(750);
             cache.cleanup();
 
@@ -656,7 +656,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
     describe("Bulk Operations", () => {
         beforeEach(() => {
             cache = new StandardizedCache({
-                name: "test-cache"
+                name: "test-cache",
             });
         });
 
@@ -664,7 +664,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             cache.bulkUpdate([
                 { key: "key1", data: "value1" },
                 { key: "key2", data: "value2", ttl: 1000 },
-                { key: "key3", data: "value3", ttl: 0 }
+                { key: "key3", data: "value3", ttl: 0 },
             ]);
 
             expect(cache.size).toBe(3);
@@ -685,7 +685,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             cache.bulkUpdate([
                 { key: "key1", data: "updated1" },
-                { key: "key3", data: "value3" }
+                { key: "key3", data: "value3" },
             ]);
 
             expect(cache.get("key1")).toBe("updated1");
@@ -697,7 +697,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
     describe("Cleanup Functionality", () => {
         beforeEach(() => {
             cache = new StandardizedCache({
-                name: "test-cache"
+                name: "test-cache",
             });
         });
 
@@ -734,7 +734,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
     describe("Iterator Methods", () => {
         beforeEach(() => {
             cache = new StandardizedCache({
-                name: "test-cache"
+                name: "test-cache",
             });
         });
 
@@ -755,7 +755,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             cache.set("key2", "value2", 1500);
 
             vi.advanceTimersByTime(1000);
-            
+
             const entries = [...cache.entries()];
             expect(entries).toHaveLength(1);
             expect(entries[0]).toEqual(["key2", "value2"]);
@@ -791,7 +791,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
     describe("Edge Cases and Error Handling", () => {
         it("should handle setting same key multiple times", () => {
             cache = new StandardizedCache({ name: "test-cache" });
-            
+
             cache.set("key1", "value1");
             cache.set("key1", "value2");
             cache.set("key1", "value3");
@@ -802,27 +802,27 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
         it("should handle deleting non-existent keys", () => {
             cache = new StandardizedCache({ name: "test-cache" });
-            
+
             expect(cache.delete("nonexistent")).toBe(false);
         });
 
         it("should handle invalidating non-existent keys", () => {
             cache = new StandardizedCache({ name: "test-cache" });
-            
+
             expect(() => {
                 cache.invalidate("nonexistent");
             }).not.toThrow();
         });
 
         it("should handle complex data types", () => {
-            cache = new StandardizedCache<{ nested: { data: string[] } }>({ 
-                name: "test-cache" 
+            cache = new StandardizedCache<{ nested: { data: string[] } }>({
+                name: "test-cache",
             });
-            
+
             const complexData = {
                 nested: {
-                    data: ["item1", "item2", "item3"]
-                }
+                    data: ["item1", "item2", "item3"],
+                },
             };
 
             cache.set("complex", complexData);
@@ -833,7 +833,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             expect(() => {
                 cache = new StandardizedCache({
                     name: "test-cache",
-                    maxSize: 0
+                    maxSize: 0,
                 });
                 cache.set("key1", "value1");
             }).not.toThrow();
@@ -842,7 +842,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
         it("should handle maxSize of 1", () => {
             cache = new StandardizedCache({
                 name: "test-cache",
-                maxSize: 1
+                maxSize: 1,
             });
 
             cache.set("key1", "value1");
@@ -857,7 +857,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
         it("should maintain size consistency after all operations", () => {
             cache = new StandardizedCache({
                 name: "test-cache",
-                maxSize: 5
+                maxSize: 5,
             });
 
             // Add items
@@ -895,7 +895,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
                 maxSize: 3,
                 defaultTTL: 1000,
                 enableStats: true,
-                eventEmitter: eventBus
+                eventEmitter: eventBus,
             });
 
             cache.onInvalidation(invalidationSpy);
@@ -930,7 +930,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             // Test bulk operations
             cache.bulkUpdate([
                 { key: "bulk1", data: "bulkValue1" },
-                { key: "bulk2", data: "bulkValue2" }
+                { key: "bulk2", data: "bulkValue2" },
             ]);
 
             // Test invalidation
@@ -945,7 +945,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
         it("should handle rapid operations without issues", () => {
             cache = new StandardizedCache({
                 name: "rapid-test",
-                maxSize: 100
+                maxSize: 100,
             });
 
             // Perform many rapid operations

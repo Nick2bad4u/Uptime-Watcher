@@ -207,26 +207,19 @@ describe("useThemeStyles Hook", () => {
             const { unmount } = renderHook(() => useThemeStyles());
 
             // Should register event listener
-            expect(mockMediaQuery.addEventListener).toHaveBeenCalledWith(
-                "change",
-                expect.any(Function)
-            );
+            expect(mockMediaQuery.addEventListener).toHaveBeenCalledWith("change", expect.any(Function));
 
             // Should cleanup on unmount
             unmount();
-            expect(mockMediaQuery.removeEventListener).toHaveBeenCalledWith(
-                "change",
-                expect.any(Function)
-            );
+            expect(mockMediaQuery.removeEventListener).toHaveBeenCalledWith("change", expect.any(Function));
         });
     });
 
     describe("Collapsed State Behavior", () => {
         it("should handle collapsed state changes properly", () => {
-            const { result, rerender } = renderHook(
-                ({ collapsed }) => useThemeStyles(collapsed),
-                { initialProps: { collapsed: false } }
-            );
+            const { result, rerender } = renderHook(({ collapsed }) => useThemeStyles(collapsed), {
+                initialProps: { collapsed: false },
+            });
 
             // Initially not collapsed
             expect(result.current.headerStyle.height).toBe("auto");
@@ -346,10 +339,9 @@ describe("useThemeStyles Hook", () => {
 
     describe("Performance and Memoization", () => {
         it("should memoize styles properly to prevent unnecessary re-renders", () => {
-            const { result, rerender } = renderHook(
-                ({ collapsed }) => useThemeStyles(collapsed),
-                { initialProps: { collapsed: false } }
-            );
+            const { result, rerender } = renderHook(({ collapsed }) => useThemeStyles(collapsed), {
+                initialProps: { collapsed: false },
+            });
 
             const initialStyles = result.current;
 
@@ -363,10 +355,9 @@ describe("useThemeStyles Hook", () => {
         });
 
         it("should handle rapid state changes efficiently", () => {
-            const { result, rerender } = renderHook(
-                ({ collapsed }) => useThemeStyles(collapsed),
-                { initialProps: { collapsed: false } }
-            );
+            const { result, rerender } = renderHook(({ collapsed }) => useThemeStyles(collapsed), {
+                initialProps: { collapsed: false },
+            });
 
             // Rapid state changes
             for (let i = 0; i < 10; i++) {

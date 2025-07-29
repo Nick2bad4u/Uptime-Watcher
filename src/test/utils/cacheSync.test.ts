@@ -32,8 +32,8 @@ describe("cacheSync", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        mockEnsureError.mockImplementation((error) => error instanceof Error ? error : new Error(String(error)));
-        
+        mockEnsureError.mockImplementation((error) => (error instanceof Error ? error : new Error(String(error))));
+
         // Clean up any existing window.electronAPI
         if (typeof window !== "undefined") {
             // @ts-expect-error - Testing environment cleanup
@@ -56,10 +56,10 @@ describe("cacheSync", () => {
                     "Cache invalidation events not available - frontend cache sync disabled"
                 );
                 expect(cleanup).toBeInstanceOf(Function);
-                
+
                 // Test no-op cleanup
                 cleanup();
-                
+
                 // Restore window
                 global.window = originalWindow;
             });
@@ -76,7 +76,7 @@ describe("cacheSync", () => {
                     "Cache invalidation events not available - frontend cache sync disabled"
                 );
                 expect(cleanup).toBeInstanceOf(Function);
-                
+
                 // Test no-op cleanup
                 cleanup();
             });
@@ -137,8 +137,8 @@ describe("cacheSync", () => {
                 invalidationHandler(invalidationData);
 
                 expect(mockLogger.debug).toHaveBeenCalledWith("Received cache invalidation event", invalidationData);
-                expect(mockLogger.debug).toHaveBeenCalledWith("[CacheSync] Clearing monitor-related caches", { 
-                    identifier: "monitor-123" 
+                expect(mockLogger.debug).toHaveBeenCalledWith("[CacheSync] Clearing monitor-related caches", {
+                    identifier: "monitor-123",
                 });
                 expect(mockClearMonitorTypeCache).toHaveBeenCalledWith();
             });
@@ -155,8 +155,8 @@ describe("cacheSync", () => {
                 invalidationHandler(invalidationData);
 
                 expect(mockLogger.debug).toHaveBeenCalledWith("Received cache invalidation event", invalidationData);
-                expect(mockLogger.debug).toHaveBeenCalledWith("[CacheSync] Clearing monitor-related caches", { 
-                    identifier: undefined 
+                expect(mockLogger.debug).toHaveBeenCalledWith("[CacheSync] Clearing monitor-related caches", {
+                    identifier: undefined,
                 });
                 expect(mockClearMonitorTypeCache).toHaveBeenCalledWith();
             });
@@ -174,8 +174,8 @@ describe("cacheSync", () => {
                 invalidationHandler(invalidationData);
 
                 expect(mockLogger.debug).toHaveBeenCalledWith("Received cache invalidation event", invalidationData);
-                expect(mockLogger.debug).toHaveBeenCalledWith("[CacheSync] Clearing site-related caches", { 
-                    identifier: "site-456" 
+                expect(mockLogger.debug).toHaveBeenCalledWith("[CacheSync] Clearing site-related caches", {
+                    identifier: "site-456",
                 });
                 // Note: Currently no site-specific cache clearers implemented
             });
@@ -192,8 +192,8 @@ describe("cacheSync", () => {
                 invalidationHandler(invalidationData);
 
                 expect(mockLogger.debug).toHaveBeenCalledWith("Received cache invalidation event", invalidationData);
-                expect(mockLogger.debug).toHaveBeenCalledWith("[CacheSync] Clearing site-related caches", { 
-                    identifier: undefined 
+                expect(mockLogger.debug).toHaveBeenCalledWith("[CacheSync] Clearing site-related caches", {
+                    identifier: undefined,
                 });
             });
 
@@ -231,7 +231,7 @@ describe("cacheSync", () => {
 
                 expect(mockEnsureError).toHaveBeenCalledWith(testError);
                 expect(mockLogger.error).toHaveBeenCalledWith(
-                    "[CacheSync] Failed to clear monitorType cache:", 
+                    "[CacheSync] Failed to clear monitorType cache:",
                     testError
                 );
             });
@@ -254,7 +254,7 @@ describe("cacheSync", () => {
 
                 expect(mockLogger.debug).toHaveBeenCalledWith("[CacheSync] Clearing all frontend caches");
                 expect(mockLogger.error).toHaveBeenCalledWith(
-                    "[CacheSync] Failed to clear monitorType cache:", 
+                    "[CacheSync] Failed to clear monitorType cache:",
                     testError
                 );
             });
@@ -272,8 +272,8 @@ describe("cacheSync", () => {
                 invalidationHandler(invalidationData);
 
                 expect(mockLogger.debug).toHaveBeenCalledWith("Received cache invalidation event", invalidationData);
-                expect(mockLogger.debug).toHaveBeenCalledWith("[CacheSync] Clearing monitor-related caches", { 
-                    identifier: "test-monitor-789" 
+                expect(mockLogger.debug).toHaveBeenCalledWith("[CacheSync] Clearing monitor-related caches", {
+                    identifier: "test-monitor-789",
                 });
                 expect(mockClearMonitorTypeCache).toHaveBeenCalledWith();
             });
@@ -290,8 +290,8 @@ describe("cacheSync", () => {
                 invalidationHandler(invalidationData);
 
                 expect(mockLogger.debug).toHaveBeenCalledWith("Received cache invalidation event", invalidationData);
-                expect(mockLogger.debug).toHaveBeenCalledWith("[CacheSync] Clearing site-related caches", { 
-                    identifier: undefined 
+                expect(mockLogger.debug).toHaveBeenCalledWith("[CacheSync] Clearing site-related caches", {
+                    identifier: undefined,
                 });
             });
         });
@@ -309,7 +309,7 @@ describe("cacheSync", () => {
                     "Cache invalidation events not available - frontend cache sync disabled"
                 );
                 expect(cleanup).toBeInstanceOf(Function);
-                
+
                 // Test no-op cleanup
                 cleanup();
             });
@@ -333,17 +333,13 @@ describe("cacheSync", () => {
             });
 
             it("should handle null invalidation data gracefully", () => {
-
                 setupCacheSync();
                 const invalidationHandler = mockOnCacheInvalidated.mock.calls[0][0];
 
                 // Test with null data (should throw error and be caught)
                 invalidationHandler(null);
 
-                expect(mockLogger.error).toHaveBeenCalledWith(
-                    "Error handling cache invalidation:", 
-                    expect.any(Error)
-                );
+                expect(mockLogger.error).toHaveBeenCalledWith("Error handling cache invalidation:", expect.any(Error));
             });
 
             it("should handle cache clearing function throwing errors", () => {
@@ -362,14 +358,10 @@ describe("cacheSync", () => {
 
                 invalidationHandler(invalidationData);
 
-                expect(mockLogger.error).toHaveBeenCalledWith(
-                    "Error handling cache invalidation:", 
-                    clearError
-                );
+                expect(mockLogger.error).toHaveBeenCalledWith("Error handling cache invalidation:", clearError);
             });
 
             it("should handle empty reason string", () => {
-
                 setupCacheSync();
                 const invalidationHandler = mockOnCacheInvalidated.mock.calls[0][0];
 
@@ -407,8 +399,8 @@ describe("cacheSync", () => {
 
                 invalidationHandler(invalidationData);
 
-                expect(mockLogger.debug).toHaveBeenCalledWith("[CacheSync] Clearing monitor-related caches", { 
-                    identifier: "" 
+                expect(mockLogger.debug).toHaveBeenCalledWith("[CacheSync] Clearing monitor-related caches", {
+                    identifier: "",
                 });
                 expect(mockClearMonitorTypeCache).toHaveBeenCalledWith();
             });

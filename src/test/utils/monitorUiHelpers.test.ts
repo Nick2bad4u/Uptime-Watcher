@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { 
+import {
     allSupportsAdvancedAnalytics,
     allSupportsResponseTime,
     clearConfigCache,
@@ -15,7 +15,7 @@ import {
     getTypesWithFeature,
     shouldShowUrl,
     supportsAdvancedAnalytics,
-    supportsResponseTime
+    supportsResponseTime,
 } from "../../utils/monitorUiHelpers";
 import type { MonitorType } from "../../../shared/types";
 
@@ -28,41 +28,41 @@ vi.mock("../../utils/monitorTypeHelper", () => ({
             description: "Monitor HTTP endpoints",
             fields: { url: { type: "url", required: true } },
             features: { advancedAnalytics: true, responseTime: true },
-            uiConfig: { 
+            uiConfig: {
                 helpTexts: {
                     general: "Monitor HTTP endpoints for availability",
-                    advanced: ""
+                    advanced: "",
                 },
                 detailFormats: {
-                    analyticsLabel: "HTTP Analytics"
+                    analyticsLabel: "HTTP Analytics",
                 },
                 display: {
-                    showUrl: true
+                    showUrl: true,
                 },
                 supportsAdvancedAnalytics: true,
-                supportsResponseTime: true
-            }
+                supportsResponseTime: true,
+            },
         },
         {
             type: "ping",
-            name: "Ping", 
+            name: "Ping",
             description: "Monitor server ping",
             fields: { host: { type: "hostname", required: true } },
             features: { advancedAnalytics: false, responseTime: true },
             uiConfig: {
                 helpTexts: {
                     general: "Monitor server ping response",
-                    advanced: ""
+                    advanced: "",
                 },
                 detailFormats: {
-                    analyticsLabel: "Ping Analytics"
+                    analyticsLabel: "Ping Analytics",
                 },
                 display: {
-                    showUrl: false
+                    showUrl: false,
                 },
                 supportsAdvancedAnalytics: false,
-                supportsResponseTime: true
-            }
+                supportsResponseTime: true,
+            },
         },
         {
             type: "tcp",
@@ -73,18 +73,18 @@ vi.mock("../../utils/monitorTypeHelper", () => ({
             uiConfig: {
                 helpTexts: {
                     general: "Monitor TCP port connectivity",
-                    advanced: ""
+                    advanced: "",
                 },
                 detailFormats: {
-                    analyticsLabel: "TCP Analytics"
+                    analyticsLabel: "TCP Analytics",
                 },
                 display: {
-                    showUrl: false
+                    showUrl: false,
                 },
                 supportsAdvancedAnalytics: true,
-                supportsResponseTime: false
-            }
-        }
+                supportsResponseTime: false,
+            },
+        },
     ]),
     getMonitorTypeConfig: vi.fn().mockImplementation((type: string) => {
         const configs: Record<string, any> = {
@@ -94,41 +94,41 @@ vi.mock("../../utils/monitorTypeHelper", () => ({
                 description: "Monitor HTTP endpoints",
                 fields: { url: { type: "url", required: true } },
                 features: { advancedAnalytics: true, responseTime: true },
-                uiConfig: { 
+                uiConfig: {
                     helpTexts: {
                         general: "Monitor HTTP endpoints for availability",
-                        advanced: ""
+                        advanced: "",
                     },
                     detailFormats: {
-                        analyticsLabel: "HTTP Analytics"
+                        analyticsLabel: "HTTP Analytics",
                     },
                     display: {
-                        showUrl: true
+                        showUrl: true,
                     },
                     supportsAdvancedAnalytics: true,
-                    supportsResponseTime: true
-                }
+                    supportsResponseTime: true,
+                },
             },
             ping: {
                 type: "ping",
-                name: "Ping", 
+                name: "Ping",
                 description: "Monitor server ping",
                 fields: { host: { type: "hostname", required: true } },
                 features: { advancedAnalytics: false, responseTime: true },
                 uiConfig: {
                     helpTexts: {
                         general: "Monitor server ping response",
-                        advanced: ""
+                        advanced: "",
                     },
                     detailFormats: {
-                        analyticsLabel: "Ping Analytics"
+                        analyticsLabel: "Ping Analytics",
                     },
                     display: {
-                        showUrl: false
+                        showUrl: false,
                     },
                     supportsAdvancedAnalytics: false,
-                    supportsResponseTime: true
-                }
+                    supportsResponseTime: true,
+                },
             },
             tcp: {
                 type: "tcp",
@@ -139,21 +139,21 @@ vi.mock("../../utils/monitorTypeHelper", () => ({
                 uiConfig: {
                     helpTexts: {
                         general: "Monitor TCP port connectivity",
-                        advanced: ""
+                        advanced: "",
                     },
                     detailFormats: {
-                        analyticsLabel: "TCP Analytics"
+                        analyticsLabel: "TCP Analytics",
                     },
                     display: {
-                        showUrl: false
+                        showUrl: false,
                     },
                     supportsAdvancedAnalytics: true,
-                    supportsResponseTime: false
-                }
-            }
+                    supportsResponseTime: false,
+                },
+            },
         };
         return Promise.resolve(configs[type] || null);
-    })
+    }),
 }));
 
 vi.mock("../../utils/errorHandling", () => ({
@@ -163,7 +163,7 @@ vi.mock("../../utils/errorHandling", () => ({
         } catch {
             return fallback;
         }
-    })
+    }),
 }));
 
 vi.mock("../../utils/cache", () => ({
@@ -174,13 +174,13 @@ vi.mock("../../utils/cache", () => ({
             set: vi.fn(),
             has: vi.fn(),
             delete: vi.fn(),
-            cleanup: vi.fn()
-        }
-    }
+            cleanup: vi.fn(),
+        },
+    },
 }));
 
 vi.mock("../../types/ipc", () => ({
-    safeExtractIpcData: vi.fn().mockImplementation((data) => data || {})
+    safeExtractIpcData: vi.fn().mockImplementation((data) => data || {}),
 }));
 
 describe("monitorUiHelpers", () => {
@@ -366,15 +366,15 @@ describe("monitorUiHelpers", () => {
             const result = await getMonitorHelpTexts("http");
             expect(result).toEqual({
                 general: "Monitor HTTP endpoints for availability",
-                advanced: ""
+                advanced: "",
             });
         });
 
         it("should return help texts for ping", async () => {
             const result = await getMonitorHelpTexts("ping");
             expect(result).toEqual({
-                general: "Monitor server ping response", 
-                advanced: ""
+                general: "Monitor server ping response",
+                advanced: "",
             });
         });
 
@@ -469,28 +469,28 @@ describe("monitorUiHelpers", () => {
     describe("Configuration Caching", () => {
         it("should cache configuration after first retrieval", async () => {
             const { AppCaches } = await import("../../utils/cache");
-            
+
             // Clear cache before test
             clearConfigCache();
-            
+
             // Mock cache methods
-            const mockGet = vi.spyOn(AppCaches.uiHelpers, 'get');
-            const mockSet = vi.spyOn(AppCaches.uiHelpers, 'set');
-            
+            const mockGet = vi.spyOn(AppCaches.uiHelpers, "get");
+            const mockSet = vi.spyOn(AppCaches.uiHelpers, "set");
+
             // First call should miss cache and set it
             mockGet.mockReturnValueOnce(undefined);
             const result1 = await getAnalyticsLabel("http");
             expect(result1).toBe("HTTP Analytics");
             expect(mockSet).toHaveBeenCalled();
-            
+
             // Second call should hit cache
             mockGet.mockReturnValueOnce({
                 type: "http",
                 uiConfig: {
                     detailFormats: {
-                        analyticsLabel: "Cached HTTP Analytics"
-                    }
-                }
+                        analyticsLabel: "Cached HTTP Analytics",
+                    },
+                },
             });
             const result2 = await getAnalyticsLabel("http");
             expect(result2).toBe("Cached HTTP Analytics");
@@ -498,20 +498,20 @@ describe("monitorUiHelpers", () => {
 
         it("should handle cache miss and config not found", async () => {
             const { getMonitorTypeConfig } = await import("../../utils/monitorTypeHelper");
-            
+
             // Mock getMonitorTypeConfig to return null
             vi.mocked(getMonitorTypeConfig).mockResolvedValueOnce(null);
-            
+
             const result = await getAnalyticsLabel("nonexistent" as MonitorType);
             expect(result).toBe("NONEXISTENT Response Time"); // Fallback format
         });
 
         it("should handle undefined cache values gracefully", async () => {
             const { AppCaches } = await import("../../utils/cache");
-            
+
             // Mock cache to return undefined
-            vi.spyOn(AppCaches.uiHelpers, 'get').mockReturnValue(undefined);
-            
+            vi.spyOn(AppCaches.uiHelpers, "get").mockReturnValue(undefined);
+
             const result = await shouldShowUrl("http");
             expect(result).toBe(true); // Should fetch from backend
         });
@@ -520,34 +520,34 @@ describe("monitorUiHelpers", () => {
     describe("Error Handling Edge Cases", () => {
         it("should handle getMonitorTypeConfig returning undefined", async () => {
             const { getMonitorTypeConfig } = await import("../../utils/monitorTypeHelper");
-            
+
             // Mock to return undefined
             vi.mocked(getMonitorTypeConfig).mockResolvedValueOnce(undefined);
-            
+
             const result = await getMonitorHelpTexts("unknown" as MonitorType);
             expect(result).toEqual({}); // Should return empty object
         });
 
         it("should handle config with missing uiConfig", async () => {
             const { getMonitorTypeConfig } = await import("../../utils/monitorTypeHelper");
-            
+
             // Mock to return config without uiConfig
             vi.mocked(getMonitorTypeConfig).mockResolvedValueOnce({
                 type: "test",
                 name: "Test",
                 description: "Test monitor",
                 fields: {},
-                features: {}
+                features: {},
                 // No uiConfig
             } as any);
-            
+
             const result = await shouldShowUrl("test" as MonitorType);
             expect(result).toBe(false); // Should fallback to false
         });
 
         it("should handle config with partial uiConfig", async () => {
             const { getMonitorTypeConfig } = await import("../../utils/monitorTypeHelper");
-            
+
             // Mock to return config with partial uiConfig
             vi.mocked(getMonitorTypeConfig).mockResolvedValueOnce({
                 type: "test",
@@ -558,12 +558,12 @@ describe("monitorUiHelpers", () => {
                 uiConfig: {
                     // Missing some properties
                     helpTexts: {
-                        general: "Test help"
-                    }
+                        general: "Test help",
+                    },
                     // Missing display, detailFormats, etc.
-                }
+                },
             } as any);
-            
+
             const result = await supportsAdvancedAnalytics("test" as MonitorType);
             expect(result).toBe(false); // Should fallback to false
         });
@@ -574,10 +574,10 @@ describe("monitorUiHelpers", () => {
             // Test that different monitor types generate different cache keys
             // by clearing cache and checking that configurations are retrieved separately
             clearConfigCache();
-            
+
             const result1 = await getAnalyticsLabel("http");
             const result2 = await getAnalyticsLabel("ping");
-            
+
             expect(result1).toBe("HTTP Analytics");
             expect(result2).toBe("Ping Analytics");
             expect(result1).not.toBe(result2);
@@ -588,7 +588,7 @@ describe("monitorUiHelpers", () => {
             // Even though we don't have monitor types with special chars in our mock,
             // this tests the generateCacheKey function's sanitization
             clearConfigCache();
-            
+
             const result = await getAnalyticsLabel("test-type" as MonitorType);
             expect(result).toBe("TEST-TYPE Response Time"); // Should handle sanitization
         });
