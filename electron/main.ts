@@ -56,15 +56,19 @@ const configureLogging = () => {
 log.initialize({ preload: true });
 
 type ElectronLogLevel = "debug" | "error" | "info" | "silly" | "verbose" | "warn";
-const ElectronLogFile = "uptime-watcher-main.log";
+
+const ELECTRON_LOG_FILE = "uptime-watcher-main.log" as const;
+const LOG_FILE_MAX_SIZE = 1024 * 1024 * 5; // 5MB max file size
+const LOG_FILE_FORMAT: string = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";
+const LOG_CONSOLE_FORMAT: string = "[{h}:{i}:{s}.{ms}] [{level}] {text}";
 
 const { consoleLevel, fileLevel } = configureLogging();
 log.transports.file.level = fileLevel as ElectronLogLevel;
 log.transports.console.level = consoleLevel as ElectronLogLevel;
-log.transports.file.fileName = ElectronLogFile;
-log.transports.file.maxSize = 1024 * 1024 * 5; // 5MB max file size
-log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";
-log.transports.console.format = "[{h}:{i}:{s}.{ms}] [{level}] {text}";
+log.transports.file.fileName = ELECTRON_LOG_FILE;
+log.transports.file.maxSize = LOG_FILE_MAX_SIZE;
+log.transports.file.format = LOG_FILE_FORMAT;
+log.transports.console.format = LOG_CONSOLE_FORMAT;
 
 /**
  * Main application class that initializes and manages the Electron app.
