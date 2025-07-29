@@ -5,7 +5,7 @@
  */
 
 import react from "@vitejs/plugin-react";
-import * as path from "node:path";
+import path from "node:path";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
@@ -36,9 +36,9 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            "@": path.resolve(__dirname, "electron"), // Standardize alias pattern
-            "@electron": path.resolve(__dirname, "electron"),
-            "@shared": path.resolve(__dirname, "shared"),
+            "@": path.resolve(import.meta.dirname, "electron"), // Standardize alias pattern
+            "@electron": path.resolve(import.meta.dirname, "electron"),
+            "@shared": path.resolve(import.meta.dirname, "shared"),
         },
     },
     test: {
@@ -87,7 +87,7 @@ export default defineConfig({
         // Global test functions
         globals: true,
         // Test file patterns
-        include: ["electron/**/*.test.ts", "electron/**/*.spec.ts"],
+        include: ["electron/**/*.test.ts", "electron/**/*.spec.ts", "shared/**/*.test.ts", "shared/**/*.spec.ts"],
         outputFile: {
             json: "./coverage/electron/test-results.json",
         },
@@ -105,6 +105,6 @@ export default defineConfig({
         // Setup files for Electron testing
         setupFiles: ["./electron/test/setup.ts"],
         // Test timeout
-        testTimeout: 15000,
+        testTimeout: 15_000,
     },
 });

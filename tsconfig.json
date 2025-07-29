@@ -7,42 +7,45 @@
         "outDir": "dist",
         "target": "ES2024",
         "lib": [
-            "ES7",
-            "ES6",
-            "DOM",
             "DOM.Iterable",
-            "ESNext",
-            "ES2023",
-            "ES2022",
-            "ES2021",
-            "ES2020",
-            "ES2019",
+            "DOM",
+            "ES2017",
             "ES2018",
-            "ES2017"
+            "ES2019",
+            "ES2020",
+            "ES2021",
+            "ES2022",
+            "ES2023",
+            "ES6",
+            "ES7",
+            "ESNext"
         ],
         "paths": {
-            "@/*": [
-                "src/*"
-            ],
-            "@shared/*": [
-                "shared/*"
-            ]
+            "@/*": ["src/*"],
+            "@shared/*": ["shared/*"]
         },
+        "plugins": [
+            {
+                "name": "@styled/typescript-styled-plugin"
+            }
+        ],
         "types": [
-            "node",
-            "react",
-            "react-dom",
-            "vitest/globals",
             "@testing-library/jest-dom",
-            "vite/client",
+            "electron",
             "jest",
-            "electron"
+            "node",
+            "react-dom",
+            "react",
+            "vite/client",
+            "vitest/globals"
         ],
         "allowJs": false,
         "allowSyntheticDefaultImports": true,
         "allowUnreachableCode": false,
         "allowUnusedLabels": false,
         "alwaysStrict": true,
+        "declaration": true,
+        "declarationMap": true,
         "disableSizeLimit": true,
         "downlevelIteration": true,
         "esModuleInterop": true,
@@ -69,52 +72,47 @@
         "strictNullChecks": true,
         "strictPropertyInitialization": true,
         "useDefineForClassFields": true,
-        "useUnknownInCatchVariables": true,
-        "declaration": true,
-        "declarationMap": true,
-        "plugins": [
-            {
-                "name": "@styled/typescript-styled-plugin"
-            },
-        ]
+        "useUnknownInCatchVariables": true
     },
     "exclude": [
-        "node_modules",
-        "**/node_modules",
-        "**/node_modules/**",
-        "node_modules/**/*",
-        "dist",
-        "dist-electron",
-        "electron",
-        "release",
-        "out",
-        "coverage",
-        "**/node_modules/@types/**",
-        "**/node_modules/@typescript-eslint/**",
-        "**/node_modules/typescript/**",
+        "**/dist-electron",
+        "**/dist-electron/**",
         "**/dist",
         "**/dist/**",
-        "**/dist-electron",
-        "**/dist-electron/**"
+        "**/node_modules",
+        "**/node_modules/@types/**",
+        "**/node_modules/@typescript-eslint/**",
+        "**/node_modules/**",
+        "**/node_modules/typescript/**",
+        "coverage",
+        "dist-electron",
+        "dist",
+        "electron",
+        "node_modules",
+        "node_modules/**/*",
+        "out",
+        "release",
+        "shared/**/*.spec.ts",
+        "shared/**/*.test.ts",
+        "src/**/*.test.ts",
+        "src/**/*.test.tsx"
     ],
     "include": [
-        "src/**/*.ts",
-        "src/**/*.tsx",
-        "src/**/*.test.ts",
-        "src/**/*.test.tsx",
-        "src/**/*.css",
+        "global.d.ts",
+        "shared/**/*.css",
         "shared/**/*.ts",
         "shared/**/*.tsx",
-        "shared/**/*.css",
+        "shared/events.ts",
         "src/**/*.css",
-        "vite.config.ts",
-        "vitest.config.ts",
+        "src/**/*.css",
+        "src/**/*.ts",
+        "src/**/*.tsx",
         "src/**/*",
-        "src/types/global.d.ts",
         "src/App.tsx",
-        "global.d.ts",
-        "vite/client",
         "src/index.css",
-        "shared/events.ts"
+        "src/types/global.d.ts",
+        "vite.config.ts",
+        "vite/client",
+        "vitest.config.ts"
     ]
 }

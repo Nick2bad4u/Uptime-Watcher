@@ -1,24 +1,52 @@
 {
     "extends": "./tsconfig.json",
     "compilerOptions": {
-        "outDir": "dist-electron",
-        "module": "ESNext",
-        "target": "ES2024",
-        "lib": ["ES7", "ES6", "DOM", "DOM.Iterable", "ESNext", "ES2023", "ES2022", "ES2021", "ES2020"],
-        "moduleResolution": "bundler",
         "baseUrl": ".",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "outDir": "dist-electron",
+        "target": "ES2024",
+        "lib": [
+            "DOM.Iterable",
+            "DOM",
+            "ES2017",
+            "ES2018",
+            "ES2019",
+            "ES2020",
+            "ES2021",
+            "ES2022",
+            "ES2023",
+            "ES6",
+            "ES7",
+            "ESNext"
+        ],
         "paths": {
-            "@/*": ["electron/*"]
+            "@/*": ["electron/*"],
+            "@shared/*": ["shared/*"]
         },
         "types": ["node", "vitest/globals", "@testing-library/jest-dom", "jest", "electron"]
     },
+    "exclude": ["node_modules"],
     "include": [
+        "electron/**/*.spec.ts",
+        "electron/**/*.test.ts",
         "electron/**/*.ts",
         "electron/**/*.tsx",
-        "electron/**/*.test.ts",
-        "electron/**/*.spec.ts",
         "electron/test/**/*",
-        "vitest.electron.config.ts"
-    ],
-    "exclude": ["node_modules"]
+        "shared/**/*.spec.ts",
+        "shared/**/*.test.ts",
+        "shared/**/*.ts",
+        "shared/**/*.tsx",
+        "shared/test/**/*",
+        "vitest.electron.config.ts",
+        "**/*.config.ts",
+        "**/*.config.js",
+        "**/*.config.mjs",
+        "*.config.ts",
+        "*.config.js",
+        "*.config.mjs",
+        "eslint.config.mjs",
+        "postcss.config.js",
+        "tailwind.config.js",
+    ]
 }

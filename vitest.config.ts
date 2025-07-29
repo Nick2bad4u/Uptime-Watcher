@@ -5,7 +5,7 @@
  */
 
 import react from "@vitejs/plugin-react";
-import * as path from "node:path";
+import path from "node:path";
 import { defineConfig } from "vitest/config";
 
 /**
@@ -42,9 +42,9 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            "@": path.resolve(__dirname, "src"),
-            "@electron": path.resolve(__dirname, "electron"),
-            "@shared": path.resolve(__dirname, "shared"),
+            "@": path.resolve(import.meta.dirname, "src"),
+            "@electron": path.resolve(import.meta.dirname, "electron"),
+            "@shared": path.resolve(import.meta.dirname, "shared"),
         },
     },
     test: {
@@ -101,7 +101,7 @@ export default defineConfig({
         // Test file patterns - exclude electron tests as they have their own config
         exclude: ["**/node_modules/**", "**/dist/**", "**/dist-electron/**", "electron/**", "**/coverage/**"],
         globals: true, // Enable global test functions (describe, it, expect)
-        include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}"],
+        include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}", "shared/**/*.test.ts", "shared/**/*.spec.ts"],
         outputFile: {
             json: "./coverage/test-results.json",
         },
@@ -116,6 +116,6 @@ export default defineConfig({
         // Improve test output
         reporters: ["default", "json", "verbose", "hanging-process"],
         setupFiles: ["./src/test/setup.ts"], // Setup file for testing
-        testTimeout: 15000, // Set Vitest timeout to 15 seconds
+        testTimeout: 15_000, // Set Vitest timeout to 15 seconds
     },
 });

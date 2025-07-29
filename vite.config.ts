@@ -5,10 +5,10 @@
 
 import { codecovVitePlugin } from "@codecov/vite-plugin";
 import react from "@vitejs/plugin-react";
-import * as path from "node:path";
+import path from "node:path";
 import electron from "vite-plugin-electron";
 import { ViteMcp } from "vite-plugin-mcp";
-import { getEnvVar } from "./shared/utils/environment";
+import { getEnvVar as getEnvironmentVariable } from "./shared/utils/environment";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig, type PluginOption } from "vite";
@@ -18,7 +18,7 @@ import { defineConfig, type PluginOption } from "vite";
  * Sets up build settings for both renderer (React) and main/preload processes.
  */
 export default defineConfig(() => {
-    const codecovToken = getEnvVar("CODECOV_TOKEN");
+    const codecovToken = getEnvironmentVariable("CODECOV_TOKEN");
 
     return {
         base: "./", // Ensures relative asset paths for Electron
@@ -101,7 +101,7 @@ export default defineConfig(() => {
                 template: "treemap",
                 emitFile: true,
                 sourcemap: true,
-                projectRoot: path.resolve(__dirname),
+                projectRoot: path.resolve(import.meta.dirname),
                 include: [{ file: "**/*.ts" }, { file: "**/*.tsx" }, { file: "**/*.js" }, { file: "**/*.jsx" }],
                 exclude: [{ file: "node_modules/**" }, { file: "**/*.test.*" }, { file: "**/*.spec.*" }],
             }) as PluginOption,
@@ -124,9 +124,9 @@ export default defineConfig(() => {
         ],
         resolve: {
             alias: {
-                "@": path.resolve(__dirname, "src"),
-                "@electron": path.resolve(__dirname, "electron"),
-                "@shared": path.resolve(__dirname, "shared"),
+                "@": path.resolve(import.meta.dirname, "src"),
+                "@electron": path.resolve(import.meta.dirname, "electron"),
+                "@shared": path.resolve(import.meta.dirname, "shared"),
             },
         },
         server: {
@@ -166,7 +166,11 @@ export default defineConfig(() => {
             // Test file patterns - exclude electron tests as they have their own config
             exclude: ["**/node_modules/**", "**/dist/**", "**/dist-electron/**", "electron/**", "**/coverage/**"],
             globals: true, // Enable global test functions (describe, it, expect)
-            include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}"],
+            include: [
+                "src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
+                "shared/**/*.test.ts",
+                "shared/**/*.spec.ts",
+            ],
             setupFiles: ["./src/test/setup.ts"], // Setup file for testing
             testTimeout: 10_000, // Set Vitest timeout to 10 seconds
         },

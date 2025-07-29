@@ -4,7 +4,7 @@
         "baseUrl": ".",
         "module": "ESNext",
         "moduleResolution": "bundler",
-        "outDir": "dist-electron",
+        "outDir": "dist",
         "target": "ES2024",
         "lib": [
             "DOM.Iterable",
@@ -21,27 +21,23 @@
             "ESNext"
         ],
         "paths": {
-            "@/*": ["electron/*"],
+            "@/*": ["src/*"],
             "@shared/*": ["shared/*"]
         },
-        "declarationMap": false
+        "types": ["node", "vitest/globals", "@testing-library/jest-dom", "jest", "electron"]
     },
-    "exclude": [
-        "electron/**/*.spec.ts",
-        "electron/**/*.test.ts",
-        "electron/test/**/*",
-        "node_modules",
-        "shared/**/*.spec.ts",
-        "shared/**/*.test.ts"
-    ],
+    "exclude": ["node_modules"],
     "include": [
-        "electron/**/*.css",
-        "electron/**/*.ts",
-        "electron/**/*.tsx",
-        "shared/**/*.css",
+        "shared/**/*.spec.ts",
+        "shared/**/*.test.ts",
         "shared/**/*.ts",
         "shared/**/*.tsx",
-        "vite/client",
-        "vitest.electron.config.ts"
+        "shared/test/**/*",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts",
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "src/test/**/*",
+        "vitest.config.ts"
     ]
 }

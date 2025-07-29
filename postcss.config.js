@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prefer-module */
 /**
  * PostCSS configuration for the Uptime Watcher application.
  * Configures Tailwind CSS processing, autoprefixer, and additional plugins for enhanced CSS workflows.

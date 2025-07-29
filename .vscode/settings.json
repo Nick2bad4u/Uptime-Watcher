@@ -7,15 +7,19 @@
     "typescript.tsserver.experimental.enableProjectDiagnostics": true,
     "typescript.check.npmIsInstalled": false,
     "typescript.workspaceSymbols.excludeLibrarySymbols": true,
-    "eslint.workingDirectories": ["."],
+    "eslint.workingDirectories": [
+        "."
+    ],
     "eslint.ignoreUntitled": true,
     "css.lint.importStatement": "ignore",
     "eslint.validate": [
         "javascript",
         "javascriptreact",
+        "typescript",
         "typescriptreact",
         "json",
         "jsonc",
+        "json5",
         "yaml",
         "yml",
         "markdown",
@@ -24,7 +28,19 @@
         "scss",
         "less",
         "toml",
-        "github-actions-workflow"
+        "github-actions-workflow",
+        "vue",
+        "svelte",
+        "astro",
+        "handlebars",
+        "plaintext",
+        "vue-html",
+        "vue-component",
+        "vue-ts",
+        "vue-tsx",
+        "vue-html",
+        "vue-component",
+        "vue-ts",
     ],
     "files.watcherExclude": {
         "**/node_modules/**": true,
@@ -74,10 +90,22 @@
             ],
             "prefer-const": "error",
             "prefer-template": "error",
-            "array-bracket-spacing": ["error", "always"],
-            "generator-star-spacing": ["error", "both"],
-            "space-before-function-paren": ["error", "always"],
-            "yield-star-spacing": ["error", "both"]
+            "array-bracket-spacing": [
+                "error",
+                "always"
+            ],
+            "generator-star-spacing": [
+                "error",
+                "both"
+            ],
+            "space-before-function-paren": [
+                "error",
+                "always"
+            ],
+            "yield-star-spacing": [
+                "error",
+                "both"
+            ]
         }
     },
     "prettier-eslint-typescript.prettierOptions": {
@@ -90,9 +118,20 @@
         "trailingComma": "none",
         "useTabs": false
     },
-    "errorLens.excludeBySource": ["ts(2339)", "ts(2307)", "ts(2304)", "eslint"],
-    "errorLens.exclude": ["**/node_modules/**"],
-    "sonarlint.pathsToExclude": ["**/node_modules/**", "**/dist/**", "**/coverage/**"],
+    "errorLens.excludeBySource": [
+        "ts(2339)",
+        "ts(2307)",
+        "ts(2304)",
+        "eslint"
+    ],
+    "errorLens.exclude": [
+        "**/node_modules/**"
+    ],
+    "sonarlint.pathsToExclude": [
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/coverage/**"
+    ],
     "typescript.preferences.includeCompletionsForImportStatements": false,
     "typescript.preferences.includeCompletionsForModuleExports": false,
     "typescript.preferences.includeCompletionsWithLowerCaseLetters": false,
@@ -109,19 +148,29 @@
             },
             "github": {
                 "command": "npx",
-                "args": ["-y", "@modelcontextprotocol/server-github"],
+                "args": [
+                    "-y",
+                    "@modelcontextprotocol/server-github"
+                ],
                 "env": {
                     "GITHUB_PERSONAL_ACCESS_TOKEN": ""
                 }
             },
             "memory": {
                 "command": "npx",
-                "args": ["-y", "@modelcontextprotocol/server-memory"]
+                "args": [
+                    "-y",
+                    "@modelcontextprotocol/server-memory"
+                ]
             },
             "repomix": {
                 "name": "repomix",
                 "command": "npx",
-                "args": ["-y", "repomix", "--mcp"]
+                "args": [
+                    "-y",
+                    "repomix",
+                    "--mcp"
+                ]
             }
         }
     },
@@ -616,7 +665,12 @@
             "italic": false
         },
         {
-            "tag": ["Features", "Key Features", "@features", "@keyFeatures"],
+            "tag": [
+                "Features",
+                "Key Features",
+                "@features",
+                "@keyFeatures"
+            ],
             "color": "#50FA7B",
             "strikethrough": false,
             "underline": false,

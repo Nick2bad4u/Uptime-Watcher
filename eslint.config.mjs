@@ -10,50 +10,52 @@
  * - Enhanced security and performance rules
  */
 
-import js from "@eslint/js";
-import json from "@eslint/json";
-import markdown from "@eslint/markdown";
-import tseslint from "@typescript-eslint/eslint-plugin";
-import tseslintParser from "@typescript-eslint/parser";
-import pluginImport from "eslint-plugin-import";
-import pluginPromise from "eslint-plugin-promise";
-import pluginUnusedImports from "eslint-plugin-unused-imports";
-import pluginReact from "eslint-plugin-react";
-import pluginReactHooks from "eslint-plugin-react-hooks";
-import jsxA11y from "eslint-plugin-jsx-a11y";
-import pluginPrettier from "eslint-plugin-prettier";
-import pluginSonarjs from "eslint-plugin-sonarjs";
-import pluginSecurity from "eslint-plugin-security";
-import pluginEslintComments from "eslint-plugin-eslint-comments";
-import pluginPerfectionist from "eslint-plugin-perfectionist";
-import pluginUnicorn from "eslint-plugin-unicorn";
-import pluginFunctional from "eslint-plugin-functional";
-import pluginRegexp from "eslint-plugin-regexp";
-import pluginTsdoc from "eslint-plugin-tsdoc";
-import pluginBoundaries from "eslint-plugin-boundaries";
-import pluginPreferArrow from "eslint-plugin-prefer-arrow";
-import pluginSortClassMembers from "eslint-plugin-sort-class-members";
-import pluginRedos from "eslint-plugin-redos";
-import pluginCompat from "eslint-plugin-compat";
-import vitest from "@vitest/eslint-plugin";
-import pluginTestingLibrary from "eslint-plugin-testing-library";
-import vitestGlobals from "eslint-plugin-vitest-globals";
-import globals from "globals";
-import eslintPluginToml from "eslint-plugin-toml";
-import tomlEslintParser from "toml-eslint-parser";
-import jsoncEslintParser from "jsonc-eslint-parser";
-import reactRefresh from "eslint-plugin-react-refresh";
-import putout from "eslint-plugin-putout";
-import pluginNoOnly from "eslint-plugin-no-only-tests";
-import nodePlugin from "eslint-plugin-n";
+// import { plugin as ex } from "eslint-plugin-exception-handling";
+// import eslintPluginNoInferred from "eslint-plugin-no-inferred-method-name";
 // import stylistic from "@stylistic/eslint-plugin";
 import depend from "eslint-plugin-depend";
-import pluginWriteGood from "eslint-plugin-write-good-comments";
-// import { plugin as ex } from "eslint-plugin-exception-handling";
+import eslintPluginJsonc from "eslint-plugin-jsonc";
 import eslintPluginMath from "eslint-plugin-math";
-// import eslintPluginNoInferred from "eslint-plugin-no-inferred-method-name";
+import eslintPluginToml from "eslint-plugin-toml";
+import globals from "globals";
+import js from "@eslint/js";
+import json from "@eslint/json";
+import jsoncEslintParser from "jsonc-eslint-parser";
+import jsxA11y from "eslint-plugin-jsx-a11y";
+import markdown from "@eslint/markdown";
+import nodePlugin from "eslint-plugin-n";
 import nounsanitized from "eslint-plugin-no-unsanitized";
+import pluginBoundaries from "eslint-plugin-boundaries";
+import pluginCompat from "eslint-plugin-compat";
+import pluginEslintComments from "eslint-plugin-eslint-comments";
+import pluginFunctional from "eslint-plugin-functional";
+import pluginImport from "eslint-plugin-import";
+import pluginNoOnly from "eslint-plugin-no-only-tests";
+import pluginPerfectionist from "eslint-plugin-perfectionist";
+import pluginPreferArrow from "eslint-plugin-prefer-arrow";
+import pluginPrettier from "eslint-plugin-prettier";
+import pluginPromise from "eslint-plugin-promise";
+import pluginReact from "eslint-plugin-react";
+import pluginReactHooks from "eslint-plugin-react-hooks";
+import pluginRedos from "eslint-plugin-redos";
+import pluginRegexp from "eslint-plugin-regexp";
+import pluginSecurity from "eslint-plugin-security";
+import pluginSonarjs from "eslint-plugin-sonarjs";
+import pluginSortClassMembers from "eslint-plugin-sort-class-members";
+import pluginTestingLibrary from "eslint-plugin-testing-library";
+import pluginTsdoc from "eslint-plugin-tsdoc";
+import pluginUnicorn from "eslint-plugin-unicorn";
+import pluginUnusedImports from "eslint-plugin-unused-imports";
+import pluginWriteGood from "eslint-plugin-write-good-comments";
+import putout from "eslint-plugin-putout";
+import reactRefresh from "eslint-plugin-react-refresh";
 import tailwind from "eslint-plugin-tailwindcss";
+import tomlEslintParser from "toml-eslint-parser";
+import tseslint from "@typescript-eslint/eslint-plugin";
+import tseslintParser from "@typescript-eslint/parser";
+import vitest from "@vitest/eslint-plugin";
+import vitestGlobals from "eslint-plugin-vitest-globals";
+
 import * as cssPlugin from "eslint-plugin-css";
 
 const __dirname = import.meta.dirname;
@@ -62,57 +64,56 @@ export default [
     // Global ignores - must be first and more comprehensive
     {
         ignores: [
-            "**/node_modules/**",
-            "node_modules/**",
-            "**/dist/**",
-            "dist/",
-            "**/dist-electron/**",
-            "dist-electron/",
-            "**/release/**",
-            "release/",
-            "package.json",
-            "package-lock.json",
-            "**/.vscode/**",
-            ".vscode/",
-            "**/.github/**",
-            ".github/",
-            "**/commitlint.config.js",
-            "commitlint.config.js",
-            "**/stylelint.config.js",
-            "stylelint.config.js",
-            "**/*.config.{js,mjs,ts}",
-            "*.config.{js,mjs,ts}",
-            "**/tsconfig*.json",
-            "tsconfig*.json",
-            "**/Coverage/**",
-            "Coverage/",
-            "**/coverage/**",
-            "coverage/",
-            "**/.agentic-tools*",
-            ".agentic-tools*",
-            "**/_ZENTASKS*",
             "_ZENTASKS*",
-            "**/test/themeTypes.test.tsx",
-            "test/themeTypes.test.tsx",
-            "**/test/types.test.tsx",
-            "test/types.test.tsx",
-            "**/.devskim.json",
+            ".agentic-tools*",
             ".devskim.json",
-            "**/.jscpd.json",
+            ".github/",
             ".jscpd.json",
-            "**/.lintstagedrc.json",
             ".lintstagedrc.json",
-            "**/.markdown-link-check.json",
             ".markdown-link-check.json",
-            "**/.markdownlint.json",
             ".markdownlint.json",
-            "**/.prettierrc.json",
             ".prettierrc.json",
-            "**/cspell.json",
-            "cspell.json",
-            "**/chatproject.md",
-            "**/coverage-results.json",
+            ".vscode/",
+            "**/_ZENTASKS*",
+            "**/.agentic-tools*",
+            "**/.devskim.json",
+            "**/.github/**",
+            "**/.jscpd.json",
+            "**/.lintstagedrc.json",
+            "**/.markdown-link-check.json",
+            "**/.markdownlint.json",
+            "**/.prettierrc.json",
+            "**/.vscode/**",
             "**/*.md",
+            "**/chatproject.md",
+            "**/commitlint.config.js",
+            "**/coverage-results.json",
+            "**/Coverage/**",
+            "**/coverage/**",
+            "**/cspell.json",
+            "**/dist-electron/**",
+            "**/dist/**",
+            "**/node_modules/**",
+            "**/release/**",
+            "**/stylelint.config.js",
+            "**/test/themeTypes.test.tsx",
+            "**/test/types.test.tsx",
+            "**/tsconfig*.json",
+            "commitlint.config.js",
+            "Coverage/",
+            "coverage/",
+            "cspell.json",
+            "dist-electron/",
+            "dist/",
+            "node_modules/**",
+            "package-lock.json",
+            "package.json",
+            "release/",
+            "stylelint.config.js",
+            "test/themeTypes.test.tsx",
+            "test/types.test.tsx",
+            "tsconfig*.json",
+            // "**/*.config.{js,mjs,ts}",
         ],
     },
 
@@ -127,9 +128,11 @@ export default [
 
     // JSON files
     {
-        files: ["**/*.json", "**/*.json5", "**/*.jsonc"],
+        files: ["**/*.json", "**/*.json5", "**/*.jsonc", "*.json", "*.json5", "*.jsonc"],
         ignores: ["docs/docusaurus/**"],
+        plugins: { eslintPluginJsonc: eslintPluginJsonc },
         ...json.configs.recommended[0],
+        ...eslintPluginJsonc.configs["flat/prettier"][0],
         languageOptions: {
             parser: jsoncEslintParser,
             parserOptions: { jsonSyntax: "JSON" },
@@ -150,29 +153,36 @@ export default [
     // TypeScript frontend files (React + Zustand)
     {
         files: ["src/**/*.ts", "src/**/*.tsx", "shared/**/*.ts", "shared/**/*.tsx"],
-        ignores: ["src/test/**/*.{ts,tsx}", "**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}"],
+        ignores: [
+            "**/*.spec.{ts,tsx}",
+            "**/*.test.{ts,tsx}",
+            "shared/**/*.spec.{ts,tsx}",
+            "shared/**/*.test.{ts,tsx}",
+            "shared/test/**/*.ts",
+            "src/test/**/*.{ts,tsx}",
+        ],
         languageOptions: {
             parser: tseslintParser,
             parserOptions: {
+                ecmaVersion: "latest",
                 project: "./tsconfig.json",
                 sourceType: "module",
-                ecmaVersion: "latest",
                 tsconfigRootDir: import.meta.dirname,
                 ecmaFeatures: {
                     jsx: true,
                 },
                 experimentalDecorators: true,
                 JSDocParsingMode: "all",
-                jsxPragma: "React",
                 jsxFragmentName: "React.Fragment",
+                jsxPragma: "React",
                 warnOnUnsupportedTypeScriptVersion: true,
             },
             globals: {
                 ...globals.browser,
                 ...globals.node,
-                window: "readonly",
                 document: "readonly",
                 globalThis: "readonly",
+                window: "readonly",
             },
         },
         settings: {
@@ -198,36 +208,36 @@ export default [
         },
         plugins: {
             "@typescript-eslint": tseslint,
-            pluginImport: pluginImport,
-            promise: pluginPromise,
-            "unused-imports": pluginUnusedImports,
-            react: pluginReact,
-            "react-hooks": pluginReactHooks,
-            "jsx-a11y": jsxA11y,
-            prettier: pluginPrettier,
-            sonarjs: pluginSonarjs,
-            security: pluginSecurity,
             "eslint-comments": pluginEslintComments,
-            perfectionist: pluginPerfectionist,
-            unicorn: pluginUnicorn,
-            functional: pluginFunctional,
-            boundaries: pluginBoundaries,
-            "prefer-arrow": pluginPreferArrow,
-            "sort-class-members": pluginSortClassMembers,
-            redos: pluginRedos,
-            compat: pluginCompat,
-            tsdoc: pluginTsdoc,
-            "react-refresh": reactRefresh,
-            putout: putout,
-            regexp: pluginRegexp,
-            n: nodePlugin,
-            js: js,
-            depend: depend,
-            "write-good-comments": pluginWriteGood,
-            math: eslintPluginMath,
+            "jsx-a11y": jsxA11y,
             "no-unsanitized": nounsanitized,
-            tailwind: tailwind,
+            "prefer-arrow": pluginPreferArrow,
+            "react-hooks": pluginReactHooks,
+            "react-refresh": reactRefresh,
+            "sort-class-members": pluginSortClassMembers,
+            "unused-imports": pluginUnusedImports,
+            "write-good-comments": pluginWriteGood,
+            boundaries: pluginBoundaries,
+            compat: pluginCompat,
             css: cssPlugin,
+            depend: depend,
+            functional: pluginFunctional,
+            js: js,
+            math: eslintPluginMath,
+            n: nodePlugin,
+            perfectionist: pluginPerfectionist,
+            pluginImport: pluginImport,
+            prettier: pluginPrettier,
+            promise: pluginPromise,
+            putout: putout,
+            react: pluginReact,
+            redos: pluginRedos,
+            regexp: pluginRegexp,
+            security: pluginSecurity,
+            sonarjs: pluginSonarjs,
+            tailwind: tailwind,
+            tsdoc: pluginTsdoc,
+            unicorn: pluginUnicorn,
         },
         rules: {
             // TypeScript rules
@@ -253,37 +263,37 @@ export default [
             ...tailwind.configs["flat/recommended"].rules,
             ...cssPlugin.configs["flat/standard"].rules,
 
-            "no-unsanitized/method": "error",
-            "no-unsanitized/property": "error",
-            "n/no-missing-file-extension": "off", // Allow missing file extensions for imports
             "n/file-extension-in-import": "off", // Allow missing file extensions for imports
+            "n/no-missing-file-extension": "off", // Allow missing file extensions for imports
             "n/no-missing-import": "off", // Allow missing imports for dynamic imports
             "n/no-unsupported-features/es-syntax": "off", // Allow modern ES2024+ syntax
+            "no-unsanitized/method": "error",
+            "no-unsanitized/property": "error",
 
             // "write-good-comments/write-good-comments": "warn",
 
-            "putout/array-element-newline": "off",
-            "putout/single-property-destructuring": "off",
-            "putout/multiple-properties-destructuring": "off",
-            "putout/long-properties-destructuring": "off",
-            "putout/destructuring-as-function-argument": "off",
             "putout/align-spaces": "off",
-            "putout/newline-function-call-arguments": "off",
+            "putout/array-element-newline": "off",
+            "putout/destructuring-as-function-argument": "off",
             "putout/function-declaration-paren-newline": "off",
-            "putout/objects-braces-inside-array": "off",
+            "putout/long-properties-destructuring": "off",
+            "putout/multiple-properties-destructuring": "off",
+            "putout/newline-function-call-arguments": "off",
             "putout/object-property-newline": "error",
+            "putout/objects-braces-inside-array": "off",
+            "putout/single-property-destructuring": "off",
 
             "unicorn/prefer-global-this": "off", // Not suitable for Electron
             "unicorn/prevent-abbreviations": "off", // Too many false positives
             // Core quality rules
             // "no-console": "warn", // Allow in development, but warn - DISABLED FOR NOW
+            "consistent-return": "warn",
             "no-debugger": "error",
+            "no-duplicate-imports": "error",
             "prefer-const": "error",
             "prefer-template": "warn",
-            "no-duplicate-imports": "error",
-            "consistent-return": "warn",
-            eqeqeq: ["error", "always"],
             curly: ["error", "all"],
+            eqeqeq: ["error", "always"],
 
             // Import management
             "unused-imports/no-unused-imports": "error",
@@ -298,20 +308,20 @@ export default [
             ],
 
             // React 19 optimized rules
-            "react/jsx-uses-react": "off",
-            "react/react-in-jsx-scope": "off",
-            "react/prop-types": "off",
             "react/jsx-boolean-value": "warn",
-            "react/self-closing-comp": "warn",
-            "react/jsx-no-useless-fragment": "warn",
             "react/jsx-fragments": ["warn", "syntax"],
-            "react/no-array-index-key": "warn",
             "react/jsx-key": "error",
+            "react/jsx-no-useless-fragment": "warn",
+            "react/jsx-uses-react": "off",
+            "react/no-array-index-key": "warn",
             "react/no-unstable-nested-components": "error",
+            "react/prop-types": "off",
+            "react/react-in-jsx-scope": "off",
+            "react/self-closing-comp": "warn",
 
             // React Hooks
-            "react-hooks/rules-of-hooks": "error",
             "react-hooks/exhaustive-deps": "warn",
+            "react-hooks/rules-of-hooks": "error",
 
             // Accessibility
             "jsx-a11y/alt-text": "warn",
@@ -332,12 +342,12 @@ export default [
                             from: "components",
                             allow: ["components", "hooks", "services", "theme", "utils", "types", "stores"],
                         },
-                        { from: "stores", allow: ["services", "types", "utils", "stores", "components"] },
                         { from: "hooks", allow: ["stores", "services", "types", "utils"] },
                         { from: "services", allow: ["types", "utils"] },
+                        { from: "stores", allow: ["services", "types", "utils", "stores", "components"] },
                         { from: "theme", allow: ["types"] },
-                        { from: "utils", allow: ["types"] },
                         { from: "types", allow: [] },
+                        { from: "utils", allow: ["types"] },
                     ],
                 },
             ],
@@ -347,8 +357,8 @@ export default [
                 "warn",
                 {
                     cases: {
-                        kebabCase: true,
                         camelCase: true,
+                        kebabCase: true,
                         pascalCase: true,
                     },
                 },
@@ -360,16 +370,16 @@ export default [
                     checkProperties: false,
                 },
             ], // Allow "class" prefix for className and other legitimate uses
-            "unicorn/prefer-module": "off", // CommonJS needed for Electron
-            "unicorn/prefer-top-level-await": "off", // Not suitable for React
-            "unicorn/no-array-for-each": "off", // forEach is fine
             "unicorn/no-array-callback-reference": "off", // Conflicts with React
-            "unicorn/prefer-ternary": "off", // Can hurt readability
+            "unicorn/no-array-for-each": "off", // forEach is fine
             "unicorn/no-negated-condition": "off", // Sometimes clearer
+            "unicorn/prefer-includes": "warn",
+            "unicorn/prefer-module": "off", // CommonJS needed for Electron
             "unicorn/prefer-node-protocol": "warn",
             "unicorn/prefer-string-slice": "warn",
-            "unicorn/prefer-includes": "warn",
             "unicorn/prefer-string-starts-ends-with": "warn",
+            "unicorn/prefer-ternary": "off", // Can hurt readability
+            "unicorn/prefer-top-level-await": "off", // Not suitable for React
 
             // Function style preferences - disabled as too aggressive
             // "prefer-arrow/prefer-arrow-functions": [
@@ -382,8 +392,8 @@ export default [
             // ],
 
             // Security
-            "security/detect-object-injection": "warn",
             "security/detect-non-literal-regexp": "warn",
+            "security/detect-object-injection": "warn",
 
             // Performance and compatibility
             "compat/compat": "off", // Electron supports modern APIs, Opera Mini not a target
@@ -395,21 +405,21 @@ export default [
             "tsdoc/syntax": "warn",
 
             // RegExp rules for security and performance
-            "regexp/no-unused-capturing-group": "warn",
+            "regexp/no-potentially-useless-backreference": "warn",
             "regexp/no-super-linear-backtracking": "error",
+            "regexp/no-unused-capturing-group": "warn",
+            "regexp/no-useless-escape": "warn",
+            "regexp/no-useless-quantifier": "warn",
             "regexp/optimal-quantifier-concatenation": "warn",
             "regexp/prefer-character-class": "warn",
             "regexp/prefer-plus-quantifier": "warn",
             "regexp/prefer-star-quantifier": "warn",
-            "regexp/no-potentially-useless-backreference": "warn",
-            "regexp/no-useless-escape": "warn",
-            "regexp/no-useless-quantifier": "warn",
 
             // Disable overly strict rules for this project
-            "functional/immutable-data": "off",
-            "functional/no-let": "off", // Let is necessary in many React patterns
             "@typescript-eslint/no-explicit-any": "warn", // Sometimes needed
             "@typescript-eslint/no-non-null-assertion": "warn", // Zustand patterns
+            "functional/immutable-data": "off",
+            "functional/no-let": "off", // Let is necessary in many React patterns
 
             // Function and type safety rules
             "@typescript-eslint/no-restricted-types": [
@@ -427,9 +437,9 @@ export default [
                     },
                 },
             ],
+            "@typescript-eslint/no-empty-object-type": "error",
             "@typescript-eslint/no-unsafe-function-type": "error",
             "@typescript-eslint/no-wrapper-object-types": "error",
-            "@typescript-eslint/no-empty-object-type": "error",
             "@typescript-eslint/prefer-function-type": "error",
             "@typescript-eslint/no-empty-function": [
                 "error",
@@ -460,11 +470,11 @@ export default [
 
             // Enhanced type safety for backend services
             "@typescript-eslint/no-unnecessary-type-assertion": "error", // Remove redundant type assertions
+            "@typescript-eslint/no-unsafe-argument": "warn", // Warn on passing any to typed parameters
             "@typescript-eslint/no-unsafe-assignment": "warn", // Warn on unsafe assignments to any
             "@typescript-eslint/no-unsafe-call": "warn", // Warn on calling any-typed functions
             "@typescript-eslint/no-unsafe-member-access": "warn", // Warn on accessing any-typed properties
             "@typescript-eslint/no-unsafe-return": "warn", // Warn on returning any from typed functions
-            "@typescript-eslint/no-unsafe-argument": "warn", // Warn on passing any to typed parameters
 
             // Backend-specific type safety
             "@typescript-eslint/prefer-readonly": "warn", // Prefer readonly for service class properties
@@ -490,22 +500,29 @@ export default [
 
     // Electron backend files
     {
-        files: ["electron/**/*.ts", "shared/**/*.ts"],
-        ignores: ["electron/test/**/*.ts", "electron/**/*.test.{ts,tsx}", "electron/**/*.spec.{ts,tsx}"],
+        files: ["electron/**/*.ts", "shared/**/*.ts", "shared/**/*.tsx"],
+        ignores: [
+            "electron/**/*.spec.{ts,tsx}",
+            "electron/**/*.test.{ts,tsx}",
+            "electron/test/**/*.ts",
+            "shared/**/*.spec.{ts,tsx}",
+            "shared/**/*.test.{ts,tsx}",
+            "shared/test/**/*.ts",
+        ],
         languageOptions: {
             parser: tseslintParser,
             parserOptions: {
+                ecmaVersion: "latest",
                 project: "./tsconfig.electron.json",
                 sourceType: "module",
-                ecmaVersion: "latest",
                 tsconfigRootDir: import.meta.dirname,
                 ecmaFeatures: {
                     jsx: true,
                 },
                 experimentalDecorators: true,
                 JSDocParsingMode: "all",
-                jsxPragma: "React",
                 jsxFragmentName: "React.Fragment",
+                jsxPragma: "React",
                 warnOnUnsupportedTypeScriptVersion: true,
             },
             globals: {
@@ -541,35 +558,35 @@ export default [
         },
         plugins: {
             "@typescript-eslint": tseslint,
-            pluginImport: pluginImport,
-            promise: pluginPromise,
-            "unused-imports": pluginUnusedImports,
-            react: pluginReact,
-            "react-hooks": pluginReactHooks,
-            "jsx-a11y": jsxA11y,
-            prettier: pluginPrettier,
-            sonarjs: pluginSonarjs,
-            security: pluginSecurity,
             "eslint-comments": pluginEslintComments,
-            perfectionist: pluginPerfectionist,
-            unicorn: pluginUnicorn,
-            functional: pluginFunctional,
-            boundaries: pluginBoundaries,
-            "prefer-arrow": pluginPreferArrow,
-            "sort-class-members": pluginSortClassMembers,
-            redos: pluginRedos,
-            compat: pluginCompat,
-            tsdoc: pluginTsdoc,
-            regexp: pluginRegexp,
-            putout: putout,
-            n: nodePlugin,
-            js: js,
-            depend: depend,
-            "write-good-comments": pluginWriteGood,
-            math: eslintPluginMath,
+            "jsx-a11y": jsxA11y,
             "no-unsanitized": nounsanitized,
-            tailwind: tailwind,
+            "prefer-arrow": pluginPreferArrow,
+            "react-hooks": pluginReactHooks,
+            "sort-class-members": pluginSortClassMembers,
+            "unused-imports": pluginUnusedImports,
+            "write-good-comments": pluginWriteGood,
+            boundaries: pluginBoundaries,
+            compat: pluginCompat,
             css: cssPlugin,
+            depend: depend,
+            functional: pluginFunctional,
+            js: js,
+            math: eslintPluginMath,
+            n: nodePlugin,
+            perfectionist: pluginPerfectionist,
+            pluginImport: pluginImport,
+            prettier: pluginPrettier,
+            promise: pluginPromise,
+            putout: putout,
+            react: pluginReact,
+            redos: pluginRedos,
+            regexp: pluginRegexp,
+            security: pluginSecurity,
+            sonarjs: pluginSonarjs,
+            tailwind: tailwind,
+            tsdoc: pluginTsdoc,
+            unicorn: pluginUnicorn,
         },
         rules: {
             // TypeScript backend rules
@@ -597,32 +614,32 @@ export default [
             "no-unsanitized/method": "error",
             "no-unsanitized/property": "error",
 
-            "n/no-missing-file-extension": "off", // Allow missing file extensions for imports
             "n/file-extension-in-import": "off", // Allow missing file extensions for imports
+            "n/no-missing-file-extension": "off", // Allow missing file extensions for imports
             "n/no-missing-import": "off", // Allow missing imports for dynamic imports
             "n/no-unsupported-features/es-syntax": "off", // Allow modern ES2024+ syntax
 
             // "write-good-comments/write-good-comments": "warn",
 
+            "unicorn/no-null": "off", // Null is common in SQLite and IPC
             "unicorn/prefer-global-this": "off", // Not suitable for Electron
             "unicorn/prevent-abbreviations": "off", // Too many false positives
-            "unicorn/no-null": "off", // Null is common in SQLite and IPC
             // Node.js specific
             // "no-console": "off", // Logging is important for backend - DISABLED FOR NOW
-            "prefer-const": "error",
             "no-var": "error",
+            "prefer-const": "error",
 
-            "putout/array-element-newline": "off",
-            "putout/single-property-destructuring": "off",
-            "putout/multiple-properties-destructuring": "off",
-            "putout/long-properties-destructuring": "off",
-            "putout/destructuring-as-function-argument": "off",
+
             "putout/align-spaces": "error",
-            "putout/newline-function-call-arguments": "off",
+            "putout/array-element-newline": "off",
+            "putout/destructuring-as-function-argument": "off",
             "putout/function-declaration-paren-newline": "error",
-            "putout/objects-braces-inside-array": "error",
+            "putout/long-properties-destructuring": "off",
+            "putout/multiple-properties-destructuring": "off",
+            "putout/newline-function-call-arguments": "off",
             "putout/object-property-newline": "error",
-
+            "putout/objects-braces-inside-array": "error",
+            "putout/single-property-destructuring": "off",
             // Import management
             "unused-imports/no-unused-imports": "error",
             "unused-imports/no-unused-vars": [
@@ -641,14 +658,14 @@ export default [
                 {
                     default: "disallow",
                     rules: [
-                        { from: "main", allow: ["managers", "services", "utils", "events", "types"] },
-                        { from: "preload", allow: ["utils", "types"] },
-                        { from: "managers", allow: ["services", "utils", "events", "types"] },
-                        { from: "services", allow: ["services", "utils", "types"] },
-                        { from: "utils", allow: ["types"] },
                         { from: "events", allow: ["types"] },
+                        { from: "main", allow: ["managers", "services", "utils", "events", "types"] },
+                        { from: "managers", allow: ["services", "utils", "events", "types"] },
+                        { from: "preload", allow: ["utils", "types"] },
+                        { from: "services", allow: ["services", "utils", "types"] },
                         { from: "types", allow: [] },
                         { from: "utils", allow: ["managers", "services", "utils", "events", "types"] },
+                        { from: "utils", allow: ["types"] },
                     ],
                 },
             ],
@@ -673,8 +690,8 @@ export default [
                 "warn",
                 {
                     cases: {
-                        pascalCase: true, // Service classes
                         camelCase: true,
+                        pascalCase: true, // Service classes
                     },
                 },
             ],
@@ -690,29 +707,29 @@ export default [
             "unicorn/prefer-top-level-await": "off", // Not suitable for Electron main
 
             // Security for backend
-            "security/detect-object-injection": "error",
-            "security/detect-non-literal-require": "error",
-            "security/detect-non-literal-fs-filename": "error",
             "redos/no-vulnerable": "error",
+            "security/detect-non-literal-fs-filename": "error",
+            "security/detect-non-literal-require": "error",
+            "security/detect-object-injection": "error",
 
             // Documentation
             "tsdoc/syntax": "warn",
 
             // Allow more flexibility for backend patterns
-            "functional/immutable-data": "off",
-            "functional/prefer-immutable-types": "off",
-            "functional/no-expression-statements": "off",
-            "functional/no-conditional-statement": "off",
-            "functional/no-loop-statements": "off",
-            "functional/no-return-void": "off",
-            "functional/no-conditional-statements": "off",
-            "functional/functional-parameters": "off",
-            "functional/no-let": "off",
-            "functional/no-classes": "off", // Classes are common in Electron services
-            "functional/no-throw-statements": "off", // Throwing errors is common in Electron
-            "functional/no-class-inheritance": "off", // Classes are common in Electron services
-            "functional/no-mixed-types": "off", // Mixed types are common in Electron services
             "@typescript-eslint/no-explicit-any": "warn",
+            "functional/functional-parameters": "off",
+            "functional/immutable-data": "off",
+            "functional/no-class-inheritance": "off", // Classes are common in Electron services
+            "functional/no-classes": "off", // Classes are common in Electron services
+            "functional/no-conditional-statement": "off",
+            "functional/no-conditional-statements": "off",
+            "functional/no-expression-statements": "off",
+            "functional/no-let": "off",
+            "functional/no-loop-statements": "off",
+            "functional/no-mixed-types": "off", // Mixed types are common in Electron services
+            "functional/no-return-void": "off",
+            "functional/no-throw-statements": "off", // Throwing errors is common in Electron
+            "functional/prefer-immutable-types": "off",
 
             // Function and type safety rules (same as frontend)
             "@typescript-eslint/no-restricted-types": [
@@ -730,9 +747,9 @@ export default [
                     },
                 },
             ],
+            "@typescript-eslint/no-empty-object-type": "error",
             "@typescript-eslint/no-unsafe-function-type": "error",
             "@typescript-eslint/no-wrapper-object-types": "error",
-            "@typescript-eslint/no-empty-object-type": "error",
             "@typescript-eslint/prefer-function-type": "error",
             "@typescript-eslint/no-empty-function": [
                 "error",
@@ -756,8 +773,8 @@ export default [
                 "error",
                 {
                     checksConditionals: true, // Check if Promises used in conditionals
-                    checksVoidReturn: true, // Critical for Electron IPC handlers
                     checksSpreads: true, // Check Promise spreads
+                    checksVoidReturn: true, // Critical for Electron IPC handlers
                 },
             ],
             "@typescript-eslint/require-await": "error", // Functions marked async must use await
@@ -765,11 +782,11 @@ export default [
 
             // Enhanced type safety for backend services
             "@typescript-eslint/no-unnecessary-type-assertion": "error", // Remove redundant type assertions
+            "@typescript-eslint/no-unsafe-argument": "warn", // Warn on passing any to typed parameters
             "@typescript-eslint/no-unsafe-assignment": "warn", // Warn on unsafe assignments to any
             "@typescript-eslint/no-unsafe-call": "warn", // Warn on calling any-typed functions
             "@typescript-eslint/no-unsafe-member-access": "warn", // Warn on accessing any-typed properties
             "@typescript-eslint/no-unsafe-return": "warn", // Warn on returning any from typed functions
-            "@typescript-eslint/no-unsafe-argument": "warn", // Warn on passing any to typed parameters
 
             // Backend-specific type safety
             "@typescript-eslint/prefer-readonly": "warn", // Prefer readonly for service class properties
@@ -795,35 +812,42 @@ export default [
 
     // Test files (Frontend)
     {
-        files: ["src/test/**/*.{ts,tsx}", "src/**/*.test.{ts,tsx}", "src/**/*.spec.{ts,tsx}"],
+        files: [
+            "shared/**/*.spec.{ts,tsx}",
+            "shared/**/*.test.{ts,tsx}",
+            "shared/test/**/*.ts",
+            "src/**/*.spec.{ts,tsx}",
+            "src/**/*.test.{ts,tsx}",
+            "src/test/**/*.{ts,tsx}",
+        ],
         languageOptions: {
             parser: tseslintParser,
             parserOptions: {
-                project: "./tsconfig.json",
-                sourceType: "module",
                 ecmaVersion: "latest",
+                project: "./tsconfig.test.json",
+                sourceType: "module",
                 tsconfigRootDir: import.meta.dirname,
                 ecmaFeatures: {
                     jsx: true,
                 },
                 experimentalDecorators: true,
                 JSDocParsingMode: "all",
-                jsxPragma: "React",
                 jsxFragmentName: "React.Fragment",
+                jsxPragma: "React",
                 warnOnUnsupportedTypeScriptVersion: true,
             },
             globals: {
                 ...globals.browser,
                 ...globals.node,
-                vi: "readonly",
-                describe: "readonly",
-                it: "readonly",
-                test: "readonly",
-                expect: "readonly",
-                beforeEach: "readonly",
+                afterAll: "readonly",
                 afterEach: "readonly",
                 beforeAll: "readonly",
-                afterAll: "readonly",
+                beforeEach: "readonly",
+                describe: "readonly",
+                expect: "readonly",
+                it: "readonly",
+                test: "readonly",
+                vi: "readonly",
             },
         },
         settings: {
@@ -842,75 +866,94 @@ export default [
         rules: {
             ...tseslint.configs.recommended.rules,
             ...vitest.configs.recommended.rules,
+            "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-non-null-assertion": "off",
+            "@typescript-eslint/no-unused-vars": "off",
             "testing-library/await-async-queries": "error",
             "testing-library/no-await-sync-queries": "error",
             "testing-library/no-debugging-utils": "warn",
             "testing-library/prefer-screen-queries": "warn",
-            "@typescript-eslint/no-explicit-any": "off",
-            "@typescript-eslint/no-non-null-assertion": "off",
-            "@typescript-eslint/no-unused-vars": "off",
             "unused-imports/no-unused-imports": "error",
 
             // Relaxed function rules for tests (explicit for clarity)
+            "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
             "@typescript-eslint/no-restricted-types": "off", // Tests may need generic Function types
             "@typescript-eslint/no-unsafe-function-type": "off", // Tests may use generic handlers
-            "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
         },
     },
 
-    // Test files (Backend)
+    // Test files (Backend) + Configuration files
     {
-        files: ["electron/test/**/*.{ts,tsx}", "electron/**/*.test.{ts,tsx}", "electron/**/*.spec.{ts,tsx}"],
+        files: [
+            "**/*.config.{js,mjs,ts}", // Configuration files
+            "electron/**/*.spec.{ts,tsx}",
+            "electron/**/*.test.{ts,tsx}",
+            "electron/test/**/*.{ts,tsx}",
+            "shared/**/*.spec.{ts,tsx}",
+            "shared/**/*.test.{ts,tsx}",
+            "shared/test/**/*.ts",
+        ],
         languageOptions: {
             parser: tseslintParser,
             parserOptions: {
+                ecmaVersion: "latest",
                 project: "./tsconfig.electron.test.json",
                 sourceType: "module",
-                ecmaVersion: "latest",
                 tsconfigRootDir: import.meta.dirname,
                 ecmaFeatures: {
                     jsx: true,
                 },
                 experimentalDecorators: true,
                 JSDocParsingMode: "all",
-                jsxPragma: "React",
                 jsxFragmentName: "React.Fragment",
+                jsxPragma: "React",
                 warnOnUnsupportedTypeScriptVersion: true,
             },
             globals: {
                 ...globals.node,
                 ...vitest.environments.env.globals,
-                vi: "readonly",
-                describe: "readonly",
-                it: "readonly",
-                test: "readonly",
-                expect: "readonly",
-                beforeEach: "readonly",
+                afterAll: "readonly",
                 afterEach: "readonly",
                 beforeAll: "readonly",
-                afterAll: "readonly",
+                beforeEach: "readonly",
+                describe: "readonly",
+                expect: "readonly",
+                it: "readonly",
+                test: "readonly",
+                vi: "readonly",
             },
         },
         plugins: {
             "@typescript-eslint": tseslint,
-            vitest,
-            pluginImport: pluginImport,
-            "unused-imports": pluginUnusedImports,
             "no-only-tests": pluginNoOnly,
+            "unused-imports": pluginUnusedImports,
+            pluginImport: pluginImport,
+            unicorn: pluginUnicorn,
+            vitest: vitest,
         },
         rules: {
             ...tseslint.configs.recommended.rules,
             ...vitest.configs.recommended.rules,
+            ...pluginUnicorn.configs.all.rules,
+
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-non-null-assertion": "off",
             "@typescript-eslint/no-unused-vars": "off",
+
+            "unicorn/no-useless-undefined": "off", // Allow undefined in test setups
+            "unicorn/consistent-function-scoping": "off", // Tests often use different scoping
+            "unicorn/no-unused-properties": "off", // Allow unused properties in test setups
+            "unicorn/no-null": "off", // Null is common in test setups
+            "unicorn/no-await-expression-member": "off", // Allow await in test expressions
+            "unicorn/filename-case": "off", // Allow test files to have any case
+            "unicorn/prevent-abbreviations": "off", // Too many false positives in tests
             "unused-imports/no-unused-imports": "error",
 
             // Relaxed function rules for backend tests (explicit for clarity)
+
+            "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
             "@typescript-eslint/no-restricted-types": "off", // Tests may need generic Function types
             "@typescript-eslint/no-unsafe-function-type": "off", // Tests may use generic handlers
-            "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
-
             // No Only Tests
             "no-only-tests/no-only-tests": "error",
         },
