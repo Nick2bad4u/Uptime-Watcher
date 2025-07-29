@@ -8,7 +8,6 @@
  * @packageDocumentation
  */
 
-// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable n/callback-return -- Middleware pattern doesn't follow Node.js callback convention */
 
 import type { EventMiddleware } from "./TypedEventBus";

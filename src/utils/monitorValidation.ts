@@ -187,6 +187,7 @@ export async function validateMonitorFieldClientSide(
 
             return Promise.resolve({
                 errors: result.errors,
+                metadata: result.metadata,
                 success: result.success,
                 warnings: result.warnings,
             });
@@ -194,6 +195,7 @@ export async function validateMonitorFieldClientSide(
         `Client-side field validation for ${fieldName}`,
         {
             errors: [`Failed to validate ${fieldName} on client-side`],
+            metadata: {},
             success: false,
             warnings: [],
         }

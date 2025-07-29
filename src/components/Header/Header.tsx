@@ -18,6 +18,8 @@
  * Displays uptime statistics, theme toggle, and settings access.
  */
 
+import type { Monitor } from "@shared/types";
+
 import { useMemo } from "react";
 
 import { useSitesStore } from "../../stores/sites/useSitesStore";
@@ -55,7 +57,9 @@ export function Header() {
         };
 
         for (const site of sites) {
-            for (const monitor of site.monitors) {
+            // Safely handle cases where monitors might be null/undefined (runtime safety)
+            const monitors = (site.monitors as Monitor[] | null | undefined) ?? [];
+            for (const monitor of monitors) {
                 counts.total++;
                 switch (monitor.status) {
                     case "down": {

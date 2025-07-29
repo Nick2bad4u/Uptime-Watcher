@@ -50,7 +50,10 @@ function getLogTransport<K extends keyof LogTransports>(transportName: K): LogTr
 // 1. It handles IPC communication with main process automatically
 // 2. Provides console logging in renderer while forwarding to main for file logging
 // 3. Avoids direct file access conflicts that would occur with main process logging
-log.transports.console.level = import.meta.env.PROD ? "info" : "debug";
+// Check if we're in production mode (Vite sets MODE to 'production' in production builds)
+const metaEnv = import.meta as { env?: { MODE?: string } };
+const isProduction = metaEnv.env?.MODE === "production";
+log.transports.console.level = isProduction ? "info" : "debug";
 log.transports.console.format = "[{h}:{i}:{s}.{ms}] [{level}] {text}";
 
 // File logging is handled by the main process via IPC communication
