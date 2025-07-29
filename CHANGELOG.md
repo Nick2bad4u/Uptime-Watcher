@@ -7,14 +7,197 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[327ba3d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/327ba3dbe64d845d8573a9dee8a9bf9a7fdab91e)...
-[327ba3d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/327ba3dbe64d845d8573a9dee8a9bf9a7fdab91e)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/327ba3dbe64d845d8573a9dee8a9bf9a7fdab91e...327ba3dbe64d845d8573a9dee8a9bf9a7fdab91e))
+[[e1870f3](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e1870f3c2998531e8525727bef582d33f59415c4)...
+[e1870f3](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e1870f3c2998531e8525727bef582d33f59415c4)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e1870f3c2998531e8525727bef582d33f59415c4...e1870f3c2998531e8525727bef582d33f59415c4))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 9.4.0 [`(e1870f3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e1870f3c2998531e8525727bef582d33f59415c4)
+
+
+
+
+
+
+## [9.4.0] - 2025-07-29
+
+
+[[133b721](https://github.com/Nick2bad4u/Uptime-Watcher/commit/133b72197db9192c99df6ac44caf89494a5f8bb2)...
+[b0317ee](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b0317eea506e794d3f40ed2ffd9a4f5cb264b30b)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/133b72197db9192c99df6ac44caf89494a5f8bb2...b0317eea506e794d3f40ed2ffd9a4f5cb264b30b))
+
+
+### �️ Bug Fixes
+
+- 🛠️ [fix] Unify test config handling and improve JSON linting
+
+- Adds a dedicated shared test TypeScript config to improve test file inclusion and type handling for both frontend and Electron
+- Updates linting setup to support JSONC and prettifies rules/plugins for JSON/JSON5/JSONC files, enabling better JSON linting
+- Expands ESLint and VS Code language validation and ignores for more file types, including new frontend frameworks and config files
+- Refactors path resolution in build and test configs to use `import.meta.dirname` for better ESM compatibility and cross-platform support
+- Reorders and clarifies ESLint plugin imports and rules for more maintainable and predictable linting behavior
+- Refines file inclusion/exclusion patterns in tsconfigs, excludes test/spec files from main builds, and improves coverage for shared and Electron code
+- Disables overly strict or irrelevant ESLint and Unicorn rules in test environments to reduce noise and false positives
+- Fixes minor inconsistencies in test runner configuration and improves maintainability of config files [`(cf476d4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cf476d40a38e28f370ba98ce642729190d20502f)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 9.3.0 [`(327ba3d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/327ba3dbe64d845d8573a9dee8a9bf9a7fdab91e)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(8a19733)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8a1973382d5fe14c52996ecda381894eb7ecd4a6)
+
+
+
+### 💼 Other
+
+- 📃[docs] Typedoc New Docs [`(68c902d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/68c902dba1cfc6e2471ec7e392d11a13b0757cfd)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Centralize and clarify logging config constants
+
+- Consolidates log file name, max size, and format strings into constants for improved maintainability and readability.
+- Reduces repetition and simplifies future updates to logging configuration. [`(25520d4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/25520d43af811dec996c0ca8dc9273fe496dacd3)
+
+
+- 🚜 [refactor] Centralize SQL queries and harden theme/style logic
+
+- Replaces inline SQL query strings with internal constants across database modules for improved maintainability, consistency, and error reduction.
+- Refactors theme variable generation and application logic by extracting repetitive code into dedicated helper methods, adding defensive checks for safer runtime access.
+- Enhances robustness of theme-related React hooks by handling rare cases where matchMedia may throw, and unifying cleanup management.
+- Fixes a potential crash in site operations by checking for existence of monitor data before attempting to stop monitoring.
+- Updates cache sync logic to better detect electron environment features.
+- Excludes documentation files from test coverage reporting for more accurate results. [`(1890260)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1890260bdc488727fe25acbf786914af93bd17a7)
+
+
+
+### � Documentation
+
+- 📝 [docs] Update reviews and docs for SOLID refactor & v9.3.0
+
+- Updates comprehensive code review documents to reflect improvements in SOLID compliance, error handling, architecture, and testability for core manager classes and database utilities
+- Details critical bug fixes, architectural refactors (factory and command patterns), and improved documentation coverage
+- Revises implementation summaries, changelog entries, and compliance tables to highlight increased maintainability, type safety, atomicity, and overall code quality
+- Adjusts output/documentation paths for generated API docs and fixes minor doc formatting and configuration inconsistencies
+- [dependency] Updates version to 9.3.0 and documents new features, patterns, and key quality metrics
+
+Relates to SOLID architecture refactor and v9.3.0 release [`(2ccbabd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2ccbabd4bfc48787f4c3a182dbe68f3259021172)
+
+
+- 📝 [docs] Enhance and standardize code documentation across codebase
+
+- Improves and expands JSDoc/TSDoc comments for nearly all modules, interfaces, types, and exported functions to clarify usage, parameters, return values, error behavior, and intended audience (public/internal)
+- Brings consistency to doc formatting and structure, ensuring all code entities are well-described and discoverable, with explicit remarks and usage examples where appropriate
+- Updates documentation to match actual behavior, describe design rationale, and highlight extensibility, improving onboarding and maintainability
+- Removes duplicate or redundant comments, restructures for clarity, and corrects outdated or misleading explanations
+- Adds missing public/internal annotations, improves type parameter explanations, and ensures referential links (e.g., {@link ...}) are accurate
+- Does not alter runtime behavior or business logic; focuses solely on developer experience and API clarity
+
+Relates to ongoing documentation and maintainability efforts. [`(133b721)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/133b72197db9192c99df6ac44caf89494a5f8bb2)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Reformat tests and configs for consistency and readability
+
+- Applies consistent code formatting across test files and configuration files, improving readability and reducing unnecessary diffs in the future.
+- Collapses object and array literals, standardizes indentation, and aligns multi-line arguments.
+- Updates mock and renderHook invocations to unified inline/expanded formats where needed.
+- Removes extraneous blank lines and ensures uniform spacing throughout.
+- No logic or functional changes introduced; focuses purely on code style and test formatting for maintainability. [`(b0317ee)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b0317eea506e794d3f40ed2ffd9a4f5cb264b30b)
+
+
+- 🎨 [style] Improve code readability and test robustness
+
+- Replaces large numeric literals with underscores for clarity across tests and mocks
+- Refactors array iteration patterns to use for...of or for...entries for better consistency and future-proofing
+- Switches to explicit usage of Number.NaN and similar constants, enhancing code clarity
+- Updates import statements for Node built-ins to the 'node:' prefix for alignment with best practices
+- Adds missing required fields to test data objects, improving type completeness in tests
+- Uses globalThis instead of global for compatibility
+- Minor regex and utility improvements for consistency and maintainability
+- Adds or updates TypeScript error expectations in test files for clarity
+
+These changes boost maintainability, ensure test predictability, and align stylistic conventions throughout the codebase. [`(2bf7af3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2bf7af36c3b8001e0c2d67e55d0598127de308a1)
+
+
+- 🎨 [style] Remove unnecessary blank lines in test suites
+
+- Cleans up test file formatting by deleting superfluous blank lines between describe and it blocks
+- Improves code readability and maintains consistent code style across tests [`(fea3323)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fea33238849df07af94d73ea4442cb75b0b3b55d)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Expand and refine comprehensive and edge case test coverage
+
+- Adds multiple new comprehensive test suites targeting error handling, edge cases, and branch coverage for cache, site, and database logic.
+- Substantially expands StandardizedCache tests to cover TTL, LRU, stats, events, invalidation, bulk ops, cleanup, and error scenarios.
+- Introduces and refines tests for error handling utilities, store action logging, and site status helpers.
+- Updates existing tests for event bus, middleware, and site/database managers to improve mocking, branch coverage, and edge case handling.
+- Skips or marks problematic or redundant tests to avoid false negatives due to mocking/async complexity.
+- Motivated by the goal of achieving high (90%+) branch and statement coverage and ensuring robust behavior under failure and rare scenarios. [`(e68fc85)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e68fc853a2dc870036d2a0309d8de77f3260c254)
+
+
+- 🧪 [test] Add comprehensive frontend and backend test suites
+
+- Introduces extensive unit and integration tests for Electron main process, managers, event bus, middleware, and React hooks
+- Targets 90%+ branch coverage, focusing on edge cases, error handling, and type safety
+- Ensures coverage for dynamic theme, help text, monitor field/type, chart utilities, cache, and site selection logic
+- Replaces or modernizes several test mocks to improve isolation and test reliability
+- Removes legacy site operations test suite in favor of granular, more maintainable coverage
+- Improves maintainability and confidence in code quality by systematically validating all critical branches and behaviors [`(78d8787)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/78d878791b6da3be721d26b39c2ed77ac37fd952)
+
+
+- 🧪 [test] Add comprehensive unit tests for store, theme, and status utilities
+
+- Introduces extensive unit tests to achieve 90%+ branch coverage for store actions, site status utilities, and theme management logic
+- Adds edge case and error handling tests to ensure robust coverage for CRUD operations, monitoring, theme application, and sync event handling
+- Updates test configuration for improved code coverage accuracy and reporting, including full source inclusion and better concurrency handling
+- Improves maintainability and future-proofing by validating edge scenarios and integration points across store and UI themes [`(cbae68c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cbae68cd02ca86b31412f12887c8b3cb6ee168bf)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Define log file name constant for maintainability
+
+- Extracts the log file name into a constant to improve code readability and simplify future updates.
+- Reduces hardcoding and potential for errors from repeated string literals. [`(c15cb5d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c15cb5deeef19cf2e28018f5922019ebfbe7c604)
+
+
+- Update changelogs for v9.3.0 [skip ci] [`(a9b328f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a9b328f8392b6f4b52d33953ab2fe371d7f69978)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Add Docusaurus package config for documentation site
+
+- Introduces a package configuration to set up a Docusaurus-based documentation site.
+- Defines scripts for building, serving, generating API docs with TypeDoc, and deployment workflows.
+- Specifies dependencies and devDependencies required for documentation generation and site management.
+- Establishes Node version and browser compatibility for consistent builds. [`(70a5d1f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/70a5d1f32831e70c9ba29435fc119a6e8117d0d3)
+
+
+- 🔧 [build] Add styled TypeScript plugin and update TypeScript libs
+
+- Integrates @styled/typescript-styled-plugin for enhanced TypeScript support with styled components
+- Expands TypeScript lib targets to include ES2017–ES2019 for broader compatibility
+- Removes unnecessary @types/better-sqlite3 dependency
+- [dependency] Updates project version to 9.3.0 [`(200aa75)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/200aa7539f1d14dc02cd15dbcc8c8c778e2b5cda)
 
 
 
