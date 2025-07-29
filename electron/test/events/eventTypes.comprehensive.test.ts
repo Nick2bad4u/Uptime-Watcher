@@ -244,14 +244,14 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 const categories = Object.keys(EVENT_CATEGORIES) as Array<keyof typeof EVENT_CATEGORIES>;
                 const testEvent = "site:added" as keyof UptimeEvents;
                 
-                categories.forEach(category => {
+                for (const category of categories) {
                     const result = isEventOfCategory(testEvent, category);
                     if (category === "SITE") {
                         expect(result).toBe(true);
                     } else {
                         expect(result).toBe(false);
                     }
-                });
+                }
             });
         });
     });
@@ -310,10 +310,10 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 const uniqueEvents = [...new Set(allPriorityEvents)];
                 
                 // Test each event returns its correct priority
-                uniqueEvents.forEach(eventName => {
+                for (const eventName of uniqueEvents) {
                     const priority = getEventPriority(eventName as keyof UptimeEvents);
                     expect(["CRITICAL", "HIGH", "LOW", "MEDIUM"]).toContain(priority);
-                });
+                }
             });
         });
 
@@ -351,10 +351,10 @@ describe("eventTypes - Comprehensive Coverage", () => {
                     "system:startup"
                 ];
 
-                testEvents.forEach(event => {
+                for (const event of testEvents) {
                     const priority = getEventPriority(event);
                     expect(["CRITICAL", "HIGH", "LOW", "MEDIUM"]).toContain(priority);
-                });
+                }
             });
 
             it("should maintain consistency between constants and functions", () => {
@@ -362,9 +362,9 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 const allCategoryEvents = Object.values(EVENT_CATEGORIES).flat();
                 const allPriorityEvents = Object.values(EVENT_PRIORITIES).flat();
                 
-                allPriorityEvents.forEach(priorityEvent => {
+                for (const priorityEvent of allPriorityEvents) {
                     expect(allCategoryEvents).toContain(priorityEvent as any);
-                });
+                }
             });
         });
     });

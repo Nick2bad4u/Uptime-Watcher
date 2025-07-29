@@ -940,6 +940,7 @@ export default [
             "@typescript-eslint/no-non-null-assertion": "off",
             "@typescript-eslint/no-unused-vars": "off",
 
+            "unicorn/no-keyword-prefix": "off", // Allow "class" prefix for className and other legitimate uses
             "unicorn/no-useless-undefined": "off", // Allow undefined in test setups
             "unicorn/consistent-function-scoping": "off", // Tests often use different scoping
             "unicorn/no-unused-properties": "off", // Allow unused properties in test setups

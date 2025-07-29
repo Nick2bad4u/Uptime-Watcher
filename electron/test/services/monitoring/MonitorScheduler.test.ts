@@ -40,7 +40,7 @@ describe("MonitorScheduler", () => {
         id: "monitor-1",
         type: "http",
         url: "https://example.com",
-        checkInterval: 60000, // 1 minute
+        checkInterval: 60_000, // 1 minute
         timeout: 5000,
         retryAttempts: 3,
         monitoring: true,

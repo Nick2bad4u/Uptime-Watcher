@@ -144,12 +144,15 @@ describe("Monitor Types Utility", () => {
         it("should work with conditional logic", () => {
             function testMonitorType(type: MonitorType) {
                 switch (type) {
-                    case "http":
+                    case "http": {
                         return "http monitor";
-                    case "port":
+                    }
+                    case "port": {
                         return "port monitor";
-                    default:
+                    }
+                    default: {
                         return "unknown monitor";
+                    }
                 }
             }
 
@@ -236,7 +239,7 @@ describe("Monitor Types Utility", () => {
         });
 
         it("should handle large arrays of types efficiently", () => {
-            const testTypes = [...Array(50).fill("http"), ...Array(50).fill("port"), ...Array(50).fill("invalid")];
+            const testTypes = [...Array.from({length: 50}).fill("http"), ...Array.from({length: 50}).fill("port"), ...Array.from({length: 50}).fill("invalid")];
 
             for (const type of testTypes) {
                 const result = isBaseMonitorType(type);

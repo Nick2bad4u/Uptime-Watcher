@@ -111,7 +111,7 @@ describe("Monitoring Types", () => {
                 history: [],
                 responseTime: 0,
                 monitoring: false,
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
             };

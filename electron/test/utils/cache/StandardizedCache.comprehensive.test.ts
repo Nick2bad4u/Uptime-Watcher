@@ -72,7 +72,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             cache.set("key1", "value1");
             
             // Should not expire even after long time
-            vi.advanceTimersByTime(999999);
+            vi.advanceTimersByTime(999_999);
             expect(cache.get("key1")).toBe("value1");
         });
 
@@ -85,7 +85,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             cache.set("key1", "value1");
             
             // Should not expire even after long time
-            vi.advanceTimersByTime(999999);
+            vi.advanceTimersByTime(999_999);
             expect(cache.get("key1")).toBe("value1");
         });
 
@@ -139,7 +139,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
                 cacheName: "test-cache",
                 timestamp: expect.any(Number),
                 key: "key1",
-                ttl: 300000 // Default TTL
+                ttl: 300_000 // Default TTL
             });
         });
 
@@ -179,14 +179,14 @@ describe("StandardizedCache - Comprehensive Tests", () => {
         it("should handle TTL of 0 on individual items (no expiration)", () => {
             cache.set("key1", "value1", 0);
             
-            vi.advanceTimersByTime(999999);
+            vi.advanceTimersByTime(999_999);
             expect(cache.get("key1")).toBe("value1");
         });
 
         it("should handle negative TTL on individual items (no expiration)", () => {
             cache.set("key1", "value1", -500);
             
-            vi.advanceTimersByTime(999999);
+            vi.advanceTimersByTime(999_999);
             expect(cache.get("key1")).toBe("value1");
         });
 
@@ -227,7 +227,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             
             vi.advanceTimersByTime(600);
             
-            const entries = Array.from(cache.entries());
+            const entries = [...cache.entries()];
             expect(entries).toHaveLength(1);
             expect(entries[0]).toEqual(["key2", "value2"]);
         });
@@ -743,7 +743,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             cache.set("key2", "value2");
             cache.set("key3", "value3");
 
-            const entries = Array.from(cache.entries());
+            const entries = [...cache.entries()];
             expect(entries).toHaveLength(3);
             expect(entries).toContainEqual(["key1", "value1"]);
             expect(entries).toContainEqual(["key2", "value2"]);
@@ -756,7 +756,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             vi.advanceTimersByTime(1000);
             
-            const entries = Array.from(cache.entries());
+            const entries = [...cache.entries()];
             expect(entries).toHaveLength(1);
             expect(entries[0]).toEqual(["key2", "value2"]);
         });
@@ -782,7 +782,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
         });
 
         it("should handle empty cache in iterators", () => {
-            expect(Array.from(cache.entries())).toHaveLength(0);
+            expect([...cache.entries()]).toHaveLength(0);
             expect(cache.keys()).toHaveLength(0);
             expect(cache.getAll()).toHaveLength(0);
         });

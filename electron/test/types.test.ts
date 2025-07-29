@@ -29,8 +29,8 @@ describe("Electron Types", () => {
                 history: [],
                 monitoring: true,
                 url: "https://example.com",
-                checkInterval: 300000,
-                timeout: 10000,
+                checkInterval: 300_000,
+                timeout: 10_000,
                 retryAttempts: 3,
             };
 
@@ -52,7 +52,7 @@ describe("Electron Types", () => {
                 monitoring: false,
                 host: "192.168.1.1",
                 port: 80,
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 timeout: 5000,
                 retryAttempts: 2,
             };
@@ -70,6 +70,11 @@ describe("Electron Types", () => {
                 type: "http",
                 status: "pending",
                 history: [],
+                checkInterval: 0,
+                monitoring: false,
+                responseTime: 0,
+                retryAttempts: 0,
+                timeout: 0
             };
 
             expect(monitor.id).toBe("minimal-monitor");
@@ -87,6 +92,11 @@ describe("Electron Types", () => {
                     type: "http",
                     status: status as Monitor["status"],
                     history: [],
+                    checkInterval: 0,
+                    monitoring: false,
+                    responseTime: 0,
+                    retryAttempts: 0,
+                    timeout: 0
                 };
 
                 expect(["up", "down", "pending"]).toContain(monitor.status);
@@ -106,6 +116,11 @@ describe("Electron Types", () => {
                         status: "up",
                         history: [],
                         url: "https://example.com",
+                        checkInterval: 0,
+                        monitoring: false,
+                        responseTime: 0,
+                        retryAttempts: 0,
+                        timeout: 0
                     },
                     {
                         id: "monitor-2",
@@ -114,6 +129,11 @@ describe("Electron Types", () => {
                         history: [],
                         host: "example.com",
                         port: 443,
+                        checkInterval: 0,
+                        monitoring: false,
+                        responseTime: 0,
+                        retryAttempts: 0,
+                        timeout: 0
                     },
                 ],
                 monitoring: true,
@@ -129,6 +149,8 @@ describe("Electron Types", () => {
             const site: Site = {
                 identifier: "minimal-site",
                 monitors: [],
+                monitoring: false,
+                name: ""
             };
 
             expect(site.identifier).toBe("minimal-site");
@@ -151,13 +173,13 @@ describe("Electron Types", () => {
     describe("StatusHistory Interface", () => {
         it("should validate status history object", () => {
             const history: StatusHistory = {
-                timestamp: 1640995200000, // 2022-01-01
+                timestamp: 1_640_995_200_000, // 2022-01-01
                 status: "up",
                 responseTime: 250,
                 details: "OK - 200 response",
             };
 
-            expect(history.timestamp).toBe(1640995200000);
+            expect(history.timestamp).toBe(1_640_995_200_000);
             expect(history.status).toBe("up");
             expect(history.responseTime).toBe(250);
             expect(history.details).toBe("OK - 200 response");
@@ -197,8 +219,13 @@ describe("Electron Types", () => {
                     identifier: "update-site",
                     name: "Update Site",
                     monitors: [],
+                    monitoring: false
                 },
                 previousStatus: "down",
+                monitorId: "",
+                siteIdentifier: "",
+                status: "down",
+                timestamp: ""
             };
 
             expect(update.site.identifier).toBe("update-site");
@@ -210,7 +237,13 @@ describe("Electron Types", () => {
                 site: {
                     identifier: "new-site",
                     monitors: [],
+                    monitoring: false,
+                    name: ""
                 },
+                monitorId: "",
+                siteIdentifier: "",
+                status: "down",
+                timestamp: ""
             };
 
             expect(update.site.identifier).toBe("new-site");
@@ -227,6 +260,11 @@ describe("Electron Types", () => {
                 status: "pending",
                 history: [],
                 url: "https://example.com",
+                checkInterval: 0,
+                monitoring: false,
+                responseTime: 0,
+                retryAttempts: 0,
+                timeout: 0
             };
 
             expect(httpMonitor.type).toBe("http");
@@ -240,6 +278,11 @@ describe("Electron Types", () => {
                 history: [],
                 host: "example.com",
                 port: 80,
+                checkInterval: 0,
+                monitoring: false,
+                responseTime: 0,
+                retryAttempts: 0,
+                timeout: 0
             };
 
             expect(portMonitor.type).toBe("port");
@@ -257,6 +300,11 @@ describe("Electron Types", () => {
                         status: "up",
                         history: [],
                         url: "https://example.com",
+                        checkInterval: 0,
+                        monitoring: false,
+                        responseTime: 0,
+                        retryAttempts: 0,
+                        timeout: 0
                     },
                     {
                         id: "port-monitor",
@@ -265,8 +313,15 @@ describe("Electron Types", () => {
                         history: [],
                         host: "example.com",
                         port: 443,
+                        checkInterval: 0,
+                        monitoring: false,
+                        responseTime: 0,
+                        retryAttempts: 0,
+                        timeout: 0
                     },
                 ],
+                monitoring: false,
+                name: ""
             };
 
             expect(site.monitors).toHaveLength(2);
@@ -283,13 +338,24 @@ describe("Electron Types", () => {
                         type: "http",
                         status: "up",
                         history: [],
+                        checkInterval: 0,
+                        monitoring: false,
+                        responseTime: 0,
+                        retryAttempts: 0,
+                        timeout: 0
                     },
                 ],
+                monitoring: false,
+                name: ""
             };
 
             const update: StatusUpdate = {
                 site,
                 previousStatus: "pending",
+                monitorId: "",
+                siteIdentifier: "",
+                status: "pending",
+                timestamp: ""
             };
 
             expect(update.site.identifier).toBe("status-update-site");

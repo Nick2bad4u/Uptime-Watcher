@@ -194,7 +194,7 @@ describe("historyLimitManager", () => {
 
         it("should handle large limit values", async () => {
             const setHistoryLimitCallback = vi.fn();
-            const limit = 999999;
+            const limit = 999_999;
 
             await setHistoryLimit({
                 limit,
@@ -273,7 +273,7 @@ describe("historyLimitManager", () => {
         });
 
         it("should return large limit values", () => {
-            const expectedLimit = 999999;
+            const expectedLimit = 999_999;
             const getHistoryLimitCallback = vi.fn().mockReturnValue(expectedLimit);
 
             const result = getHistoryLimit(getHistoryLimitCallback);

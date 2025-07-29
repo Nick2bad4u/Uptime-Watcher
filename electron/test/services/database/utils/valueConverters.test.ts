@@ -150,10 +150,10 @@ describe("Value Converters Utility", () => {
 
             addNumberField("infinity", Infinity, updateFields, updateValues);
             addNumberField("negInfinity", -Infinity, updateFields, updateValues);
-            addNumberField("nanValue", NaN, updateFields, updateValues);
+            addNumberField("nanValue", Number.NaN, updateFields, updateValues);
 
             expect(updateFields).toEqual(["infinity = ?", "negInfinity = ?", "nanValue = ?"]);
-            expect(updateValues).toEqual([Infinity, -Infinity, NaN]);
+            expect(updateValues).toEqual([Infinity, -Infinity, Number.NaN]);
         });
     });
 
@@ -292,7 +292,7 @@ describe("Value Converters Utility", () => {
         it("should preserve special number values", () => {
             expect(safeNumberConvert(Infinity)).toBe(Infinity);
             expect(safeNumberConvert(-Infinity)).toBe(-Infinity);
-            expect(safeNumberConvert(NaN)).toBeNaN();
+            expect(safeNumberConvert(Number.NaN)).toBeNaN();
         });
 
         it("should convert valid string numbers", () => {
@@ -364,7 +364,7 @@ describe("Value Converters Utility", () => {
             addStringField("name", "My Website", updateFields, updateValues);
             addStringField("url", "https://example.com", updateFields, updateValues);
             addBooleanField("isActive", true, updateFields, updateValues);
-            addNumberField("checkInterval", 60000, updateFields, updateValues);
+            addNumberField("checkInterval", 60_000, updateFields, updateValues);
             addStringField("description", undefined, updateFields, updateValues); // skipped
             addBooleanField("notificationsEnabled", false, updateFields, updateValues);
 
@@ -375,7 +375,7 @@ describe("Value Converters Utility", () => {
                 "checkInterval = ?",
                 "notificationsEnabled = ?",
             ]);
-            expect(updateValues).toEqual(["My Website", "https://example.com", 1, 60000, 0]);
+            expect(updateValues).toEqual(["My Website", "https://example.com", 1, 60_000, 0]);
         });
 
         it("should handle complex value conversion scenario", () => {

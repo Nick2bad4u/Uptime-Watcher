@@ -719,7 +719,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should handle BigInt values", async () => {
             eventBus.onTyped("string-event", mockListener);
             
-            const bigIntValue = BigInt(123456789012345678901234567890n);
+            const bigIntValue = BigInt(123_456_789_012_345_678_901_234_567_890n);
             
             await eventBus.emitTyped("string-event", bigIntValue as any);
             
@@ -897,7 +897,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             // Test overflow protection (should cap at 100)
             try {
                 bus.use(mockMiddleware2);
-            } catch (error) {
+            } catch {
                 // Expected to throw due to limit
             }
             

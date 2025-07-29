@@ -38,7 +38,7 @@ describe("MonitorRepository", () => {
                     site_identifier: "site1",
                     monitor_type: "http",
                     url: "https://example.com",
-                    interval_ms: 60000,
+                    interval_ms: 60_000,
                     timeout_ms: 5000,
                     enabled: 1,
                 },

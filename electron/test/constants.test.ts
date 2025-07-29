@@ -16,27 +16,27 @@ import {
 describe("Electron Constants", () => {
     describe("Timeout Constants", () => {
         it("should export DEFAULT_REQUEST_TIMEOUT with correct value", () => {
-            expect(DEFAULT_REQUEST_TIMEOUT).toBe(10000);
+            expect(DEFAULT_REQUEST_TIMEOUT).toBe(10_000);
             expect(typeof DEFAULT_REQUEST_TIMEOUT).toBe("number");
         });
 
         it("should have a reasonable timeout value", () => {
             // Should be between 5-30 seconds
             expect(DEFAULT_REQUEST_TIMEOUT).toBeGreaterThanOrEqual(5000);
-            expect(DEFAULT_REQUEST_TIMEOUT).toBeLessThanOrEqual(30000);
+            expect(DEFAULT_REQUEST_TIMEOUT).toBeLessThanOrEqual(30_000);
         });
     });
 
     describe("Interval Constants", () => {
         it("should export DEFAULT_CHECK_INTERVAL with correct value", () => {
-            expect(DEFAULT_CHECK_INTERVAL).toBe(300000); // 5 minutes
+            expect(DEFAULT_CHECK_INTERVAL).toBe(300_000); // 5 minutes
             expect(typeof DEFAULT_CHECK_INTERVAL).toBe("number");
         });
 
         it("should have a reasonable check interval", () => {
             // Should be between 1-30 minutes
-            expect(DEFAULT_CHECK_INTERVAL).toBeGreaterThanOrEqual(60000); // 1 minute
-            expect(DEFAULT_CHECK_INTERVAL).toBeLessThanOrEqual(1800000); // 30 minutes
+            expect(DEFAULT_CHECK_INTERVAL).toBeGreaterThanOrEqual(60_000); // 1 minute
+            expect(DEFAULT_CHECK_INTERVAL).toBeLessThanOrEqual(1_800_000); // 30 minutes
         });
     });
 
@@ -47,7 +47,7 @@ describe("Electron Constants", () => {
         });
 
         it("should follow standard user agent format", () => {
-            expect(USER_AGENT).toMatch(/^[A-Za-z0-9-_]+\/[\d.]+$/);
+            expect(USER_AGENT).toMatch(/^[\w-]+\/[\d.]+$/);
         });
 
         it("should not be empty", () => {
@@ -67,7 +67,7 @@ describe("Electron Constants", () => {
         it("should have reasonable retry delay values", () => {
             expect(RETRY_BACKOFF.INITIAL_DELAY).toBeGreaterThan(0);
             expect(RETRY_BACKOFF.MAX_DELAY).toBeGreaterThan(RETRY_BACKOFF.INITIAL_DELAY);
-            expect(RETRY_BACKOFF.MAX_DELAY).toBeLessThanOrEqual(10000); // Not more than 10 seconds
+            expect(RETRY_BACKOFF.MAX_DELAY).toBeLessThanOrEqual(10_000); // Not more than 10 seconds
         });
 
         it("should be a readonly object", () => {
@@ -102,13 +102,13 @@ describe("Electron Constants", () => {
                 DEFAULT_HISTORY_LIMIT,
             };
 
-            Object.entries(constants).forEach(([name, value]) => {
+            for (const [name, value] of Object.entries(constants)) {
                 const type = typeof value;
                 expect(
                     type === "string" || type === "number" || type === "object",
                     `Constant ${name} should be a primitive or object`
                 ).toBe(true);
-            });
+            }
         });
     });
 

@@ -58,9 +58,11 @@ describe("withRetry", () => {
         process.removeAllListeners("unhandledRejection");
         process.removeAllListeners("rejectionHandled");
 
+        // eslint-disable-next-line unicorn/no-array-for-each
         originalHandlers.unhandledRejection.forEach((handler: any) => {
             process.on("unhandledRejection", handler);
         });
+        // eslint-disable-next-line unicorn/no-array-for-each
         originalHandlers.rejectionHandled.forEach((handler: any) => {
             process.on("rejectionHandled", handler);
         });

@@ -105,9 +105,9 @@ describe("AutoUpdaterService", () => {
                 "error",
             ];
 
-            expectedEvents.forEach((event) => {
+            for (const event of expectedEvents) {
                 expect(mockAutoUpdater.on).toHaveBeenCalledWith(event, expect.any(Function));
-            });
+            }
         });
 
         it("should handle checking-for-update event", () => {
@@ -190,7 +190,7 @@ describe("AutoUpdaterService", () => {
         });
 
         it("should call autoUpdater.checkForUpdatesAndNotify", async () => {
-            mockAutoUpdater.checkForUpdatesAndNotify.mockResolvedValue(undefined);
+            mockAutoUpdater.checkForUpdatesAndNotify.mockResolvedValue();
 
             await autoUpdaterService.checkForUpdates();
 

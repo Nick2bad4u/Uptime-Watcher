@@ -4,6 +4,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
+// @ts-expect-error test file
 import type { Site } from "../../../types";
 
 // Mock all the dependencies

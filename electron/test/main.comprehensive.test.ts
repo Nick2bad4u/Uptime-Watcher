@@ -300,7 +300,7 @@ describe("main.ts - Electron Main Process", () => {
 
         it("should wait for timing before installing extensions", async () => {
             mockIsDev.mockReturnValue(true);
-            const setTimeoutSpy = vi.spyOn(global, "setTimeout");
+            const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
 
             await import("../main");
 

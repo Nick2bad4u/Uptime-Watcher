@@ -28,7 +28,7 @@ describe("Correlation Utility", () => {
             const id = generateCorrelationId();
 
             // Should only contain hex characters (0-9, a-f)
-            expect(id).toMatch(/^[0-9a-f]+$/);
+            expect(id).toMatch(/^[\da-f]+$/);
         });
 
         it("should generate multiple unique IDs", () => {
@@ -51,12 +51,13 @@ describe("Correlation Utility", () => {
         });
 
         it("should be cryptographically random", () => {
-            const ids = new Array(1000).fill(0).map(() => generateCorrelationId());
+            const ids = Array.from({length: 1000}).fill(0).map(() => generateCorrelationId());
 
             // Check that we don't have obvious patterns
             // Test that no character appears in the same position too often
             for (let pos = 0; pos < 16; pos++) {
                 const chars = ids.map((id) => id[pos]);
+                // eslint-disable-next-line unicorn/no-array-reduce
                 const charCounts = chars.reduce(
                     (acc, char) => {
                         acc[char] = (acc[char] || 0) + 1;

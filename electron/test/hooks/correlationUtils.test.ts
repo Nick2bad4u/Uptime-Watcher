@@ -21,7 +21,7 @@ describe("correlationUtils", () => {
             const id = generateCorrelationId();
 
             // Should be a 16-character hex string (8 bytes * 2 hex chars per byte)
-            expect(id).toMatch(/^[a-f0-9]{16}$/);
+            expect(id).toMatch(/^[\da-f]{16}$/);
         });
 
         it("should generate different IDs on multiple calls", () => {

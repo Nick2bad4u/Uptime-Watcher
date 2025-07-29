@@ -190,6 +190,7 @@ describe("Interfaces Utility", () => {
             mockLogger.info("test"); // No additional args
             mockLogger.warn("test", undefined); // Undefined arg
             mockLogger.error("test", null); // Null error
+            // eslint-disable-next-line unicorn/error-message
             mockLogger.error("test", new Error()); // Error without message
 
             expect(mockLogger.debug).toHaveBeenCalledWith("");
@@ -228,7 +229,7 @@ describe("Interfaces Utility", () => {
             const flexibleLogger: Logger = {
                 debug: (message: string, ...args: unknown[]) => {
                     // Should accept any unknown types
-                    args.forEach((arg) => {
+                    for (const arg of args) {
                         // Can handle any type of argument
                         if (typeof arg === "object" && arg !== null) {
                             // Handle objects
@@ -236,7 +237,7 @@ describe("Interfaces Utility", () => {
                             // Handle strings
                         }
                         // etc.
-                    });
+                    }
                 },
                 error: (message: string, error?: unknown, ...args: unknown[]) => {
                     // Error can be anything

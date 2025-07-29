@@ -371,9 +371,9 @@ describe("ServiceContainer", () => {
                 container.getUptimeOrchestrator(),
             ];
 
-            allServices.forEach((service) => {
+            for (const service of allServices) {
                 expect(service).toBeDefined();
-            });
+            }
         });
     });
 

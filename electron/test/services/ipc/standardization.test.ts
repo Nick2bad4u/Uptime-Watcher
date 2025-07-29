@@ -51,6 +51,7 @@ describe("IPC Standardization Concepts", () => {
         // Optional warnings should be string array
         if (response.warnings) {
             expect(Array.isArray(response.warnings)).toBe(true);
+            // eslint-disable-next-line unicorn/no-array-for-each
             response.warnings.forEach((warning: any) => {
                 expect(typeof warning).toBe("string");
             });
@@ -176,7 +177,7 @@ describe("IPC Standardization Concepts", () => {
                 if (typeof value !== "number") {
                     return `${paramName} must be a number`;
                 }
-                if (isNaN(value)) {
+                if (Number.isNaN(value)) {
                     return `${paramName} must be a valid number`;
                 }
                 if (value < 0) {
@@ -188,7 +189,7 @@ describe("IPC Standardization Concepts", () => {
             expect(validateNumber(42, "param")).toBeNull();
             expect(validateNumber(0, "param")).toBeNull();
             expect(validateNumber("42", "param")).toBe("param must be a number");
-            expect(validateNumber(NaN, "param")).toBe("param must be a valid number");
+            expect(validateNumber(Number.NaN, "param")).toBe("param must be a valid number");
             expect(validateNumber(-1, "param")).toBe("param must be non-negative");
         });
 
@@ -294,11 +295,11 @@ describe("IPC Standardization Concepts", () => {
                 "Error responses must never expose internal system details",
             ];
 
-            console.log("\\nIPC Standardization Guidelines:");
+            console.log(String.raw`\nIPC Standardization Guidelines:`);
             console.log("=".repeat(40));
-            guidelines.forEach((guideline, index) => {
+            for (const [index, guideline] of guidelines.entries()) {
                 console.log(`${index + 1}. ${guideline}`);
-            });
+            }
 
             expect(guidelines.length).toBe(8);
         });
@@ -367,13 +368,13 @@ registerStandardizedIpcHandler(
                 },
             ];
 
-            console.log("\\nIPC Testing Patterns:");
+            console.log(String.raw`\nIPC Testing Patterns:`);
             console.log("=".repeat(30));
-            testingApproaches.forEach(({ name, description, example }) => {
+            for (const { name, description, example } of testingApproaches) {
                 console.log(`\\n${name}:`);
                 console.log(`  Description: ${description}`);
                 console.log(`  Example: ${example}`);
-            });
+            }
 
             expect(testingApproaches.length).toBe(5);
         });

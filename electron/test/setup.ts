@@ -126,7 +126,7 @@ vi.mock("path", async () => {
 });
 
 // Global test configuration for Electron tests
-global.console = {
+globalThis.console = {
     ...console,
     log: vi.fn(),
     error: vi.fn(),
@@ -205,20 +205,20 @@ vi.mock("../services/monitoring/MonitorScheduler", () => ({
             }),
             stopSite: vi.fn(function (this: any, siteId: string, monitors?: any[]) {
                 if (monitors) {
-                    monitors.forEach((monitor) => {
+                    for (const monitor of monitors) {
                         if (monitor.id) {
                             this.stopMonitor(siteId, monitor.id);
                         }
-                    });
+                    }
                 } else {
                     // Stop all monitors for the site
                     const keysToDelete: string[] = [];
-                    for (const key of Array.from(this.intervals.keys())) {
+                    for (const key of this.intervals.keys()) {
                         if (typeof key === "string" && key.startsWith(`${siteId}|`)) {
                             keysToDelete.push(key);
                         }
                     }
-                    keysToDelete.forEach((key) => this.intervals.delete(key));
+                    for (const key of keysToDelete) this.intervals.delete(key);
                 }
             }),
             stopAll: vi.fn(function (this: any) {
@@ -237,7 +237,7 @@ vi.mock("../services/monitoring/MonitorScheduler", () => ({
                 return this.intervals.size;
             }),
             getActiveMonitors: vi.fn(function (this: any) {
-                return Array.from(this.intervals.keys());
+                return [...this.intervals.keys()];
             }),
         };
         return instance;

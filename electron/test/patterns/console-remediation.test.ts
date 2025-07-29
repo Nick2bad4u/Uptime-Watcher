@@ -13,11 +13,11 @@
  */
 
 import { describe, it, expect } from "vitest";
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "node:fs";
+import path from "node:path";
 
 describe("Console Statement Remediation", () => {
-    const projectRoot = path.resolve(__dirname, "../../../..");
+    const projectRoot = path.resolve(import.meta.dirname, "../../../..");
     const srcDirs = [path.join(projectRoot, "src"), path.join(projectRoot, "electron")];
 
     /**
@@ -55,8 +55,8 @@ describe("Console Statement Remediation", () => {
         type: "error" | "warn" | "log" | "debug" | "info";
         context: string;
     }[] {
-        const content = fs.readFileSync(filePath, "utf-8");
-        const lines = content.split("\\n");
+        const content = fs.readFileSync(filePath, "utf8");
+        const lines = content.split(String.raw`\n`);
         const consoleStatements: {
             line: number;
             content: string;
@@ -66,7 +66,7 @@ describe("Console Statement Remediation", () => {
 
         const consoleRegex = /console\.(error|warn|log|debug|info)\s*\(/;
 
-        lines.forEach((line, index) => {
+        for (const [index, line] of lines.entries()) {
             const match = line.match(consoleRegex);
             if (match) {
                 const type = match[1] as "error" | "warn" | "log" | "debug" | "info";
@@ -74,7 +74,7 @@ describe("Console Statement Remediation", () => {
                 // Get some context around the line
                 const startLine = Math.max(0, index - 2);
                 const endLine = Math.min(lines.length - 1, index + 2);
-                const context = lines.slice(startLine, endLine + 1).join("\\n");
+                const context = lines.slice(startLine, endLine + 1).join(String.raw`\n`);
 
                 consoleStatements.push({
                     line: index + 1,
@@ -83,7 +83,7 @@ describe("Console Statement Remediation", () => {
                     context,
                 });
             }
-        });
+        }
 
         return consoleStatements;
     }
@@ -135,24 +135,33 @@ describe("Console Statement Remediation", () => {
         // Determine replacement based on type and context
         let replacement = "";
 
-        if (statement.type === "error") {
-            if (statement.context.includes("catch") || statement.context.includes("error")) {
-                replacement = 'logger.error("Operation failed", error);';
-            } else {
-                replacement = 'logger.error("Error message");';
-            }
-        } else if (statement.type === "warn") {
+        switch (statement.type) {
+        case "error": {
+            replacement = statement.context.includes("catch") || statement.context.includes("error") ? 'logger.error("Operation failed", error);' : 'logger.error("Error message");';
+        
+        break;
+        }
+        case "warn": {
             replacement = 'logger.warn("Warning message");';
-        } else if (statement.type === "log") {
-            if (statement.context.includes("debug") || statement.context.includes("Debug")) {
-                replacement = 'logger.debug("Debug information");';
-            } else {
-                replacement = 'logger.info("Information message");';
-            }
-        } else if (statement.type === "debug") {
+        
+        break;
+        }
+        case "log": {
+            replacement = statement.context.includes("debug") || statement.context.includes("Debug") ? 'logger.debug("Debug information");' : 'logger.info("Information message");';
+        
+        break;
+        }
+        case "debug": {
             replacement = 'logger.debug("Debug information");';
-        } else if (statement.type === "info") {
+        
+        break;
+        }
+        case "info": {
             replacement = 'logger.info("Information message");';
+        
+        break;
+        }
+        // No default
         }
 
         return {
@@ -194,12 +203,23 @@ describe("Console Statement Remediation", () => {
                     for (const statement of statements) {
                         const category = categorizeConsoleStatement(statement, file);
 
-                        if (category.category === "legitimate") {
+                        switch (category.category) {
+                        case "legitimate": {
                             categorized.legitimate++;
-                        } else if (category.category === "needs-replacement") {
+                        
+                        break;
+                        }
+                        case "needs-replacement": {
                             categorized.needsReplacement++;
-                        } else if (category.category === "test-file") {
+                        
+                        break;
+                        }
+                        case "test-file": {
                             categorized.testFile++;
+                        
+                        break;
+                        }
+                        // No default
                         }
                     }
 
@@ -224,13 +244,13 @@ describe("Console Statement Remediation", () => {
             console.log(`  • Test files: ${totalTestFile}`);
 
             if (analysisResults.length > 0) {
-                console.log("\\nFiles with console statements:");
-                analysisResults.slice(0, 10).forEach(({ file, statements, categorized }) => {
+                console.log(String.raw`\nFiles with console statements:`);
+                for (const { file, statements, categorized } of analysisResults.slice(0, 10)) {
                     console.log(`\\n${file}:`);
                     console.log(
                         `  Total: ${statements.length}, Needs fix: ${categorized.needsReplacement}, Legitimate: ${categorized.legitimate}`
                     );
-                });
+                }
             }
 
             // The analysis should complete successfully
@@ -267,16 +287,16 @@ describe("Console Statement Remediation", () => {
                 }
             }
 
-            console.log("\\nReplacement Recommendations:");
+            console.log(String.raw`\nReplacement Recommendations:`);
             console.log("=".repeat(50));
 
             if (replacementRecommendations.length > 0) {
-                replacementRecommendations.slice(0, 5).forEach(({ file, line, original, replacement, reason }) => {
+                for (const { file, line, original, replacement, reason } of replacementRecommendations.slice(0, 5)) {
                     console.log(`\\n${file}:${line}`);
                     console.log(`  Original: ${original}`);
                     console.log(`  Replace with: ${replacement}`);
                     console.log(`  Reason: ${reason}`);
-                });
+                }
 
                 console.log(
                     `\\n... and ${Math.max(0, replacementRecommendations.length - 5)} more replacements needed.`
@@ -318,15 +338,15 @@ describe("Console Statement Remediation", () => {
                 },
             ];
 
-            console.log("\\nLogger Usage Guidelines:");
+            console.log(String.raw`\nLogger Usage Guidelines:`);
             console.log("=".repeat(40));
 
-            guidelines.forEach(({ level, usage, example, when }) => {
+            for (const { level, usage, example, when } of guidelines) {
                 console.log(`\\n${level.toUpperCase()}:`);
                 console.log(`  Purpose: ${usage}`);
                 console.log(`  Example: ${example}`);
                 console.log(`  Use when: ${when}`);
-            });
+            }
 
             expect(guidelines.length).toBe(4);
         });
@@ -365,14 +385,14 @@ describe("Console Statement Remediation", () => {
                 },
             ];
 
-            console.log("\\nConsole Statement Migration Strategy:");
+            console.log(String.raw`\nConsole Statement Migration Strategy:`);
             console.log("=".repeat(45));
 
-            migrationSteps.forEach(({ step, title, description, action }) => {
+            for (const { step, title, description, action } of migrationSteps) {
                 console.log(`\\n${step}. ${title}`);
                 console.log(`   ${description}`);
                 console.log(`   Action: ${action}`);
-            });
+            }
 
             expect(migrationSteps.length).toBe(5);
         });
@@ -408,14 +428,14 @@ describe("Console Statement Remediation", () => {
                 },
             ];
 
-            console.log("\\nAutomated Replacement Patterns:");
+            console.log(String.raw`\nAutomated Replacement Patterns:`);
             console.log("=".repeat(40));
 
-            replacementPatterns.forEach(({ pattern, replacement, description }) => {
+            for (const { pattern, replacement, description } of replacementPatterns) {
                 console.log(`\\n${description}:`);
                 console.log(`  Pattern: ${pattern.source}`);
                 console.log(`  Replace: ${replacement}`);
-            });
+            }
 
             // Example function to apply replacements (not actually run)
             const generateReplacementScript = () => {
@@ -435,7 +455,7 @@ function replaceConsoleStatements(fileContent: string): string {
     // Apply replacements (requires manual review)
     ${replacementPatterns
         .map(({ pattern, replacement }) => `result = result.replace(${pattern}, '${replacement}');`)
-        .join("\\n    ")}
+        .join(String.raw`\n    `)}
     
     return result;
 }

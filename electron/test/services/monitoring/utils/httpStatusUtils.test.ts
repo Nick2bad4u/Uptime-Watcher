@@ -65,7 +65,7 @@ describe("HTTP Status Utils", () => {
 
         it("should handle non-integer inputs", () => {
             expect(determineMonitorStatus(200.5)).toBe("down"); // Float
-            expect(determineMonitorStatus(NaN)).toBe("down");
+            expect(determineMonitorStatus(Number.NaN)).toBe("down");
             expect(determineMonitorStatus(Infinity)).toBe("down");
             expect(determineMonitorStatus(-Infinity)).toBe("down");
         });
@@ -81,27 +81,27 @@ describe("HTTP Status Utils", () => {
         it("should provide consistent behavior for common monitoring scenarios", () => {
             // Common success scenarios
             const successCodes = [200, 201, 202, 204];
-            successCodes.forEach((code) => {
+            for (const code of successCodes) {
                 expect(determineMonitorStatus(code)).toBe("up");
-            });
+            }
 
             // Common redirect scenarios
             const redirectCodes = [301, 302, 307, 308];
-            redirectCodes.forEach((code) => {
+            for (const code of redirectCodes) {
                 expect(determineMonitorStatus(code)).toBe("up");
-            });
+            }
 
             // Common client error scenarios (site is responding, just with errors)
             const clientErrorCodes = [400, 401, 403, 404, 429];
-            clientErrorCodes.forEach((code) => {
+            for (const code of clientErrorCodes) {
                 expect(determineMonitorStatus(code)).toBe("up");
-            });
+            }
 
             // Common server error scenarios (site is down/not responding properly)
             const serverErrorCodes = [500, 502, 503, 504];
-            serverErrorCodes.forEach((code) => {
+            for (const code of serverErrorCodes) {
                 expect(determineMonitorStatus(code)).toBe("down");
-            });
+            }
         });
 
         it("should handle string inputs by treating them as invalid", () => {
@@ -132,7 +132,7 @@ describe("HTTP Status Utils", () => {
             // Test with a range of codes to ensure consistent performance
             const testCodes = Array.from({ length: 100 }, (_, i) => i + 100);
 
-            testCodes.forEach((code) => {
+            for (const code of testCodes) {
                 const result = determineMonitorStatus(code);
                 expect(["up", "down"]).toContain(result);
 
@@ -144,7 +144,7 @@ describe("HTTP Status Utils", () => {
                 } else {
                     expect(result).toBe("down");
                 }
-            });
+            }
         });
     });
 

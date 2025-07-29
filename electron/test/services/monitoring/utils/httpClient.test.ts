@@ -61,7 +61,7 @@ describe("HTTP Client Utils", () => {
                 },
                 httpAgent: expect.any(Object),
                 httpsAgent: expect.any(Object),
-                maxBodyLength: 10240,
+                maxBodyLength: 10_240,
                 maxContentLength: 10 * 1024 * 1024,
                 maxRedirects: 5,
                 responseType: "text",
@@ -83,7 +83,7 @@ describe("HTTP Client Utils", () => {
                 headers: {},
                 httpAgent: expect.any(Object),
                 httpsAgent: expect.any(Object),
-                maxBodyLength: 10240,
+                maxBodyLength: 10_240,
                 maxContentLength: 10 * 1024 * 1024,
                 maxRedirects: 5,
                 responseType: "text",
@@ -165,7 +165,7 @@ describe("HTTP Client Utils", () => {
                 },
             } as unknown as AxiosInstance;
 
-            vi.spyOn(performance, "now").mockReturnValue(1234567890);
+            vi.spyOn(performance, "now").mockReturnValue(1_234_567_890);
 
             // Act
             setupTimingInterceptors(mockInstance);
@@ -178,7 +178,7 @@ describe("HTTP Client Utils", () => {
             // Assert
             expect(result).toEqual({
                 metadata: {
-                    startTime: 1234567890,
+                    startTime: 1_234_567_890,
                 },
             });
         });

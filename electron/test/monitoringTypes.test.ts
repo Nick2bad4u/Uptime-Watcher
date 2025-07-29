@@ -174,11 +174,11 @@ describe("Monitoring Types", () => {
 
         it("should create complete config", () => {
             const config: MonitorConfig = {
-                timeout: 10000,
+                timeout: 10_000,
                 userAgent: "Uptime Watcher/1.0",
             };
 
-            expect(config.timeout).toBe(10000);
+            expect(config.timeout).toBe(10_000);
             expect(config.userAgent).toBe("Uptime Watcher/1.0");
         });
     });
