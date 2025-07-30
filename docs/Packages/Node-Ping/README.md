@@ -1,31 +1,30 @@
 # NODE-PING ![Workflow Status](https://github.com/danielzzz/node-ping/actions/workflows/build-test-coverage.yml/badge.svg)
 
-@last-modified: 2023-03-11
-
-## License MIT
-
-"(C) Daniel Zelisko"
-
-## Description
-
-http://github.com/danielzzz/node-ping
-
 a ping wrapper for nodejs
 
+@last-modified: 2023-03-11
+
+# License MIT
+
+\(C\) Daniel Zelisko
+
+<http://github.com/danielzzz/node-ping>
+
+# Description
 
 node-ping is a simple wrapper for the system ping utility
 
-## Installation
+# Installation
 
 npm install ping
 
-## Usage
+# Usage
 
 Below are examples extracted from `examples`
 
-### Tradition calls
+## Tradition calls
 
-```js
+``` js
 var ping = require('ping');
 
 var hosts = ['192.168.1.1', 'google.com', 'yahoo.com'];
@@ -37,9 +36,9 @@ hosts.forEach(function(host){
 });
 ```
 
-### Tradition calls with configuration
+## Tradition calls with configuration
 
-```js
+``` js
 var cfg = {
     timeout: 10,
     // WARNING: -i 2 may not work in other platform like windows
@@ -54,9 +53,9 @@ hosts.forEach(function(host){
 });
 ```
 
-### Promise wrapper
+## Promise wrapper
 
-```js
+``` js
 var ping = require('ping');
 
 var hosts = ['192.168.1.1', 'google.com', 'yahoo.com'];
@@ -69,9 +68,9 @@ hosts.forEach(function (host) {
 });
 ```
 
-### Promise Wrapper with configurable ping options
+## Promise Wrapper with configurable ping options
 
-```js
+``` js
 hosts.forEach(function (host) {
     // WARNING: -i 2 argument may not work in other platform like windows
     ping.promise.probe(host, {
@@ -83,9 +82,9 @@ hosts.forEach(function (host) {
 });
 ```
 
+## Async-Await
 
-### Async-Await
-```js
+``` js
 var ping = require('ping');
 
 var hosts = ['192.168.1.1', 'google.com', 'yahoo.com'];
@@ -96,8 +95,9 @@ for(let host of hosts){
 }
 ```
 
-### Async-Await with configurable ping options
-```js
+## Async-Await with configurable ping options
+
+``` js
 var ping = require('ping');
 
 var hosts = ['192.168.1.1', 'google.com', 'yahoo.com'];
@@ -111,11 +111,12 @@ for(let host of hosts){
     console.log(res);
 }
 ```
-#### Support configuration
+
+### Support configuration
 
 Below is the possible configuration
 
-```js
+``` js
 /**
  * Cross platform config representation
  * @typedef {Object} PingConfig
@@ -136,11 +137,11 @@ Below is the possible configuration
  */
 ```
 
-#### Output specification
+### Output specification
 
-* For callback based implementation:
+- For callback based implementation:
 
-```js
+``` js
 /**
  * Callback after probing given host
  * @callback probeCallback
@@ -149,9 +150,9 @@ Below is the possible configuration
  */
 ```
 
-* For promise based implementation
+- For promise based implementation
 
-```js
+``` js
 /**
  * Parsed response
  * @typedef {object} PingResponse
@@ -170,14 +171,39 @@ Below is the possible configuration
  */
 ```
 
-##### Note
+#### Note
 
-* Since `ping` in this module relies on the `ping` from underlying platform,
-arguments in `PingConfig.extra` will definitely be varied across different
-platforms.
+- Since `ping` in this module relies on the `ping` from underlying platform,
+  arguments in `PingConfig.extra` will definitely be varied across different
+  platforms.
 
-* However, `numeric`, `timeout` and `min_reply` have been abstracted. Values for
-them are expected to be cross platform.
+- However, `numeric`, `timeout` and `min_reply` have been abstracted. Values for
+  them are expected to be cross platform.
 
-* By setting `numeric`, `timeout` or `min_reply` to false, you can run `ping`
-without corresponding arguments.
+- By setting `numeric`, `timeout` or `min_reply` to false, you can run `ping`
+  without corresponding arguments.
+
+# FAQ
+
+- It does not work with busybox's ping implemetation [\#89](https://github.com/danielzzz/node-ping/issues/89)
+
+Try to install package `iputils`. For example, running `apk add iputils`
+
+- For questions regarding to the implementation of `timeout`, and `deadline`, please checkout discussions in
+  [\#101](https://github.com/danielzzz/node-ping/issues/101)
+
+- For questions regarding to the defintions of `host`, `inputHost`, and `numeric_host`, please checkout
+  discussions in [\#133](https://github.com/danielzzz/node-ping/issues/133)
+
+# Contributing
+
+Before opening a pull request please make sure your changes follow the
+[contribution guidelines](https://github.com/danielzzz/node-ping/blob/master/CONTRIBUTING.md).
+
+# Contributors
+
+<a href="https://github.com/danielzzz/node-ping/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=danielzzz/node-ping" />
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).
