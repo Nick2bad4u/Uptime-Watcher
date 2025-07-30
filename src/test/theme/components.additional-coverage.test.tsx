@@ -3,21 +3,16 @@
  * Focuses on components and branches not covered by the comprehensive test suite
  */
 
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { vi } from "vitest";
 import "@testing-library/jest-dom";
 
 import {
-    MiniChartBar,
     StatusIndicator,
     ThemedBadge,
     ThemedInput,
     ThemedProgress,
     ThemedSelect,
-    ThemedText,
-    ThemedTooltip,
-    type MiniChartBarProperties,
-    type StatusIndicatorProperties,
 } from "../../theme/components";
 
 // Mock the theme hook
@@ -325,7 +320,7 @@ describe("Theme Components - Missing Coverage", () => {
         });
     });
 
-    describe("Edge Cases and Conditional Branches", () => {
+    describe("Complex Input Combinations and Props", () => {
         it("should handle various boolean prop combinations", () => {
             const combinations = [
                 { disabled: true, required: true },

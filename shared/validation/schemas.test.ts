@@ -1158,7 +1158,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 id: "test",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 monitoring: true,
                 responseTime: 200,
                 retryAttempts: 3,

@@ -31,9 +31,9 @@ describe("Theme Components - Complete Coverage", () => {
 
     describe("ThemedBox Component", () => {
         it("should render with default props", () => {
-            render(<ThemedBox data-testid="themed-box">Content</ThemedBox>);
+            render(<ThemedBox>Content</ThemedBox>);
             
-            const box = screen.getByTestId("themed-box");
+            const box = screen.getByText("Content");
             expect(box).toBeInTheDocument();
             expect(box).toHaveTextContent("Content");
         });
@@ -259,7 +259,7 @@ describe("Theme Components - Complete Coverage", () => {
                 </ThemedButton>
             );
             
-            const button = screen.getByRole("button", { name: "Icon Button" });
+            const button = screen.getByRole("button", { name: "🚀 Icon Button" });
             expect(button).toBeInTheDocument();
             expect(screen.getByText("🚀")).toBeInTheDocument();
         });
@@ -275,7 +275,7 @@ describe("Theme Components - Complete Coverage", () => {
                 </ThemedButton>
             );
             
-            const button = screen.getByRole("button", { name: "Icon Right" });
+            const button = screen.getByRole("button", { name: "Icon Right 🚀" });
             expect(button).toBeInTheDocument();
         });
 
@@ -290,7 +290,7 @@ describe("Theme Components - Complete Coverage", () => {
                 </ThemedButton>
             );
             
-            const button = screen.getByRole("button", { name: "Colored Icon" });
+            const button = screen.getByRole("button", { name: "🚀 Colored Icon" });
             expect(button).toBeInTheDocument();
         });
 
@@ -459,7 +459,7 @@ describe("Theme Components - Complete Coverage", () => {
             );
             
             const text = screen.getByText("Styled text");
-            expect(text).toHaveStyle("color: red");
+            expect(text).toHaveStyle("color: rgb(255, 0, 0)");
             expect(text).toHaveStyle("font-size: 20px");
         });
     });
@@ -508,9 +508,9 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should handle change events", () => {
-            render(<ThemedCheckbox onChange={mockOnChange} data-testid="change-box" />);
+            render(<ThemedCheckbox onChange={mockOnChange} />);
             
-            const checkbox = screen.getByTestId("change-box");
+            const checkbox = screen.getByRole("checkbox");
             fireEvent.click(checkbox);
             
             expect(mockOnChange).toHaveBeenCalledTimes(1);
@@ -520,14 +520,14 @@ describe("Theme Components - Complete Coverage", () => {
     describe("ThemedSelect Component", () => {
         it("should render with children", () => {
             render(
-                <ThemedSelect data-testid="themed-select" onChange={mockOnChange}>
+                <ThemedSelect onChange={mockOnChange}>
                     <option value="option1">Option 1</option>
                     <option value="option2">Option 2</option>
                     <option value="option3">Option 3</option>
                 </ThemedSelect>
             );
             
-            const select = screen.getByTestId("themed-select");
+            const select = screen.getByRole("combobox");
             expect(select).toBeInTheDocument();
             
             const options = select.querySelectorAll("option");
@@ -536,12 +536,12 @@ describe("Theme Components - Complete Coverage", () => {
 
         it("should handle disabled state", () => {
             render(
-                <ThemedSelect disabled onChange={mockOnChange} data-testid="disabled-select">
+                <ThemedSelect disabled onChange={mockOnChange}>
                     <option value="test">Test</option>
                 </ThemedSelect>
             );
             
-            const select = screen.getByTestId("disabled-select");
+            const select = screen.getByRole("combobox");
             expect(select).toBeDisabled();
         });
 
@@ -550,7 +550,6 @@ describe("Theme Components - Complete Coverage", () => {
                 <ThemedSelect 
                     value="option2"
                     onChange={mockOnChange}
-                    data-testid="controlled-select"
                 >
                     <option value="option1">Option 1</option>
                     <option value="option2">Option 2</option>
@@ -558,7 +557,7 @@ describe("Theme Components - Complete Coverage", () => {
                 </ThemedSelect>
             );
             
-            const select = screen.getByTestId("controlled-select") as HTMLSelectElement;
+            const select = screen.getByRole("combobox") as HTMLSelectElement;
             expect(select.value).toBe("option2");
             
             fireEvent.change(select, { target: { value: "option3" } });
@@ -567,12 +566,12 @@ describe("Theme Components - Complete Coverage", () => {
 
         it("should handle required prop", () => {
             render(
-                <ThemedSelect required onChange={mockOnChange} data-testid="required-select">
+                <ThemedSelect required onChange={mockOnChange}>
                     <option value="test">Test</option>
                 </ThemedSelect>
             );
             
-            const select = screen.getByTestId("required-select");
+            const select = screen.getByRole("combobox");
             expect(select).toHaveAttribute("required");
         });
 
@@ -585,13 +584,12 @@ describe("Theme Components - Complete Coverage", () => {
                     onClick={mockClick}
                     onMouseDown={mockMouseDown}
                     onChange={mockOnChange}
-                    data-testid="event-select"
                 >
                     <option value="test">Test</option>
                 </ThemedSelect>
             );
             
-            const select = screen.getByTestId("event-select");
+            const select = screen.getByRole("combobox");
             fireEvent.click(select);
             fireEvent.mouseDown(select);
             
@@ -605,13 +603,12 @@ describe("Theme Components - Complete Coverage", () => {
                     aria-label="Choose option"
                     aria-describedby="select-help"
                     onChange={mockOnChange}
-                    data-testid="aria-select"
                 >
                     <option value="test">Test</option>
                 </ThemedSelect>
             );
             
-            const select = screen.getByTestId("aria-select");
+            const select = screen.getByLabelText("Choose option");
             expect(select).toHaveAttribute("aria-label", "Choose option");
             expect(select).toHaveAttribute("aria-describedby", "select-help");
         });
@@ -620,12 +617,12 @@ describe("Theme Components - Complete Coverage", () => {
     describe("ThemedCard Component", () => {
         it("should render with default props", () => {
             render(
-                <ThemedCard data-testid="themed-card">
+                <ThemedCard>
                     Card content
                 </ThemedCard>
             );
             
-            const card = screen.getByTestId("themed-card");
+            const card = screen.getByText("Card content").closest("div");
             expect(card).toBeInTheDocument();
             expect(card).toHaveTextContent("Card content");
         });
@@ -635,14 +632,15 @@ describe("Theme Components - Complete Coverage", () => {
                 <ThemedCard 
                     title="Card Title"
                     subtitle="Card Subtitle"
-                    data-testid="titled-card"
                 >
                     Card content
                 </ThemedCard>
             );
             
-            const card = screen.getByTestId("titled-card");
-            expect(card).toBeInTheDocument();
+            const title = screen.getByText("Card Title");
+            const subtitle = screen.getByText("Card Subtitle");
+            expect(title).toBeInTheDocument();
+            expect(subtitle).toBeInTheDocument();
         });
 
         it("should handle clickable state", () => {
@@ -650,13 +648,12 @@ describe("Theme Components - Complete Coverage", () => {
                 <ThemedCard 
                     clickable
                     onClick={mockOnClick}
-                    data-testid="clickable-card"
                 >
                     Clickable card
                 </ThemedCard>
             );
             
-            const card = screen.getByTestId("clickable-card");
+            const card = screen.getByRole("button");
             fireEvent.click(card);
             expect(mockOnClick).toHaveBeenCalledTimes(1);
         });
@@ -665,13 +662,12 @@ describe("Theme Components - Complete Coverage", () => {
             render(
                 <ThemedCard 
                     hoverable
-                    data-testid="hoverable-card"
                 >
                     Hoverable card
                 </ThemedCard>
             );
             
-            const card = screen.getByTestId("hoverable-card");
+            const card = screen.getByText("Hoverable card").closest("div");
             expect(card).toBeInTheDocument();
         });
 
@@ -680,15 +676,14 @@ describe("Theme Components - Complete Coverage", () => {
                 <ThemedCard 
                     icon={<span>📦</span>}
                     iconColor="blue"
-                    data-testid="icon-card"
                 >
                     Card with icon
                 </ThemedCard>
             );
             
-            const card = screen.getByTestId("icon-card");
-            expect(card).toBeInTheDocument();
-            expect(screen.getByText("📦")).toBeInTheDocument();
+            const iconElement = screen.getByText("📦");
+            expect(iconElement).toBeInTheDocument();
+            expect(screen.getByText("Card with icon")).toBeInTheDocument();
         });
 
         it("should handle all variants", () => {
@@ -696,13 +691,13 @@ describe("Theme Components - Complete Coverage", () => {
             
             variants.forEach((variant) => {
                 render(
-                    <ThemedCard variant={variant} data-testid={`card-${variant}`}>
+                    <ThemedCard variant={variant}>
                         Variant {variant}
                     </ThemedCard>
                 );
                 
-                const card = screen.getByTestId(`card-${variant}`);
-                expect(card).toBeInTheDocument();
+                const cardText = screen.getByText(`Variant ${variant}`);
+                expect(cardText).toBeInTheDocument();
             });
         });
 
@@ -714,15 +709,14 @@ describe("Theme Components - Complete Coverage", () => {
                 <ThemedCard 
                     onMouseEnter={mockMouseEnter}
                     onMouseLeave={mockMouseLeave}
-                    data-testid="mouse-card"
                 >
                     Mouse events card
                 </ThemedCard>
             );
             
-            const card = screen.getByTestId("mouse-card");
-            fireEvent.mouseEnter(card);
-            fireEvent.mouseLeave(card);
+            const card = screen.getByText("Mouse events card").closest("div");
+            fireEvent.mouseEnter(card!);
+            fireEvent.mouseLeave(card!);
             
             expect(mockMouseEnter).toHaveBeenCalledTimes(1);
             expect(mockMouseLeave).toHaveBeenCalledTimes(1);
@@ -789,14 +783,13 @@ describe("Theme Components - Complete Coverage", () => {
 
     describe("StatusIndicator Component", () => {
         it("should render with status", () => {
-            render(
+            const { container } = render(
                 <StatusIndicator 
                     status="up"
-                    data-testid="status-indicator"
                 />
             );
             
-            const indicator = screen.getByTestId("status-indicator");
+            const indicator = container.querySelector('.themed-status-indicator');
             expect(indicator).toBeInTheDocument();
         });
 
@@ -804,15 +797,14 @@ describe("Theme Components - Complete Coverage", () => {
             const sizes = ["sm", "md", "lg"] as const;
             
             sizes.forEach((size) => {
-                render(
+                const { container } = render(
                     <StatusIndicator 
                         status="up"
                         size={size}
-                        data-testid={`status-${size}`}
                     />
                 );
                 
-                const indicator = screen.getByTestId(`status-${size}`);
+                const indicator = container.querySelector('.themed-status-indicator');
                 expect(indicator).toBeInTheDocument();
             });
         });
@@ -822,26 +814,24 @@ describe("Theme Components - Complete Coverage", () => {
                 <StatusIndicator 
                     status="up"
                     showText
-                    data-testid="status-with-text"
                 />
             );
             
-            const indicator = screen.getByTestId("status-with-text");
-            expect(indicator).toBeInTheDocument();
+            const textElement = screen.getByText("Up");
+            expect(textElement).toBeInTheDocument();
         });
 
         it("should handle different status values", () => {
             const statuses = ["up", "down", "unknown"] as const;
             
             statuses.forEach((status) => {
-                render(
+                const { container } = render(
                     <StatusIndicator 
                         status={status}
-                        data-testid={`status-${status}`}
                     />
                 );
                 
-                const indicator = screen.getByTestId(`status-${status}`);
+                const indicator = container.querySelector('.themed-status-indicator');
                 expect(indicator).toBeInTheDocument();
             });
         });
@@ -849,29 +839,27 @@ describe("Theme Components - Complete Coverage", () => {
 
     describe("MiniChartBar Component", () => {
         it("should render with status and timestamp", () => {
-            render(
+            const { container } = render(
                 <MiniChartBar 
                     status="up"
                     timestamp={new Date()}
-                    data-testid="mini-chart-bar"
                 />
             );
             
-            const bar = screen.getByTestId("mini-chart-bar");
+            const bar = container.querySelector('.themed-mini-chart-bar');
             expect(bar).toBeInTheDocument();
         });
 
         it("should handle responseTime prop", () => {
-            render(
+            const { container } = render(
                 <MiniChartBar 
                     status="up"
                     timestamp={new Date()}
                     responseTime={150}
-                    data-testid="mini-chart-with-time"
                 />
             );
             
-            const bar = screen.getByTestId("mini-chart-with-time");
+            const bar = container.querySelector('.themed-mini-chart-bar');
             expect(bar).toBeInTheDocument();
         });
 
@@ -879,42 +867,39 @@ describe("Theme Components - Complete Coverage", () => {
             const statuses = ["up", "down", "unknown"] as const;
             
             statuses.forEach((status) => {
-                render(
+                const { container } = render(
                     <MiniChartBar 
                         status={status}
                         timestamp={new Date()}
-                        data-testid={`chart-${status}`}
                     />
                 );
                 
-                const bar = screen.getByTestId(`chart-${status}`);
+                const bar = container.querySelector('.themed-mini-chart-bar');
                 expect(bar).toBeInTheDocument();
             });
         });
 
         it("should handle string timestamp", () => {
-            render(
+            const { container } = render(
                 <MiniChartBar 
                     status="up"
                     timestamp="2024-01-01T00:00:00Z"
-                    data-testid="chart-string-timestamp"
                 />
             );
             
-            const bar = screen.getByTestId("chart-string-timestamp");
+            const bar = container.querySelector('.themed-mini-chart-bar');
             expect(bar).toBeInTheDocument();
         });
 
         it("should handle number timestamp", () => {
-            render(
+            const { container } = render(
                 <MiniChartBar 
                     status="up"
                     timestamp={Date.now()}
-                    data-testid="chart-number-timestamp"
                 />
             );
             
-            const bar = screen.getByTestId("chart-number-timestamp");
+            const bar = container.querySelector('.themed-mini-chart-bar');
             expect(bar).toBeInTheDocument();
         });
     });
@@ -964,7 +949,7 @@ describe("Theme Components - Complete Coverage", () => {
             expect(screen.getByRole("button")).toHaveClass("custom-btn");
             expect(screen.getByRole("textbox")).toHaveClass("custom-input");
             expect(screen.getByText("Text")).toHaveClass("custom-text");
-            expect(screen.getByText("Card")).toHaveClass("custom-card");
+            expect(screen.getByText("Card").closest(".themed-card")).toHaveClass("custom-card");
             expect(screen.getByText("Badge")).toHaveClass("custom-badge");
         });
     });
