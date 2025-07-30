@@ -336,3 +336,5 @@ export function useThemeValue<T>(selector: (theme: Theme) => T): T {
     const { currentTheme } = useTheme();
     return selector(currentTheme);
 }
+
+/* eslint-enable unicorn/consistent-function-scoping */

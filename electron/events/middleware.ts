@@ -8,8 +8,6 @@
  * @packageDocumentation
  */
 
-/* eslint-disable n/callback-return -- Middleware pattern doesn't follow Node.js callback convention */
-
 import type { EventMiddleware } from "./TypedEventBus";
 
 import { isDevelopment } from "../../shared/utils/environment";
@@ -116,6 +114,8 @@ const EVENT_EMITTED_MSG = "[EventBus] Event emitted";
  * eventBus.use(combinedMiddleware);
  * ```
  */
+/* eslint-disable n/callback-return -- Middleware pattern doesn't follow Node.js callback convention */
+
 export function composeMiddleware(...middlewares: EventMiddleware[]): EventMiddleware {
     return async (event: string, data: unknown, next: () => Promise<void> | void) => {
         let index = 0;
@@ -156,6 +156,7 @@ export function composeMiddleware(...middlewares: EventMiddleware[]): EventMiddl
  * eventBus.use(debugMiddleware);
  * ```
  */
+
 export function createDebugMiddleware(options: { enabled?: boolean; verbose?: boolean }): EventMiddleware {
     const { enabled = isDevelopment(), verbose = false } = options;
 
@@ -564,6 +565,7 @@ export function createValidationMiddleware<T extends Record<string, unknown>>(
         await next();
     };
 }
+/* eslint-enable n/callback-return -- re-enable callback return */
 
 /**
  * Predefined middleware stacks for different environments.

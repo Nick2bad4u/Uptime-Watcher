@@ -1,4 +1,3 @@
-/* eslint-disable n/no-unsupported-features/node-builtins -- URL.createObjectURL is always available in modern browsers in Node */
 /**
  * File backup utility for handling file download operations.
  * Provides utilities for browser-based file downloads.
@@ -84,6 +83,8 @@ export function generateBackupFileName(prefix = "backup", extension = "sqlite"):
  * await handleSQLiteBackupDownload(() => fetchBackupData());
  * ```
  */
+/* eslint-disable n/no-unsupported-features/node-builtins -- URL.createObjectURL is always available in modern browsers in Node */
+
 export async function handleSQLiteBackupDownload(downloadFunction: () => Promise<Uint8Array>): Promise<void> {
     // Get the backup data
     const backupData = await downloadFunction();
@@ -172,6 +173,7 @@ function createAndTriggerDownload(buffer: ArrayBuffer, fileName: string, mimeTyp
         }
     }
 }
+/* eslint-enable n/no-unsupported-features/node-builtins -- Re-add rule for Consistency */
 
 /**
  * Handles download errors and applies fallback strategies if possible.
