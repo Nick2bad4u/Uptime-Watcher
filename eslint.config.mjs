@@ -41,6 +41,7 @@ import nodePlugin from "eslint-plugin-n";
 import nounsanitized from "eslint-plugin-no-unsanitized";
 import pluginBoundaries from "eslint-plugin-boundaries";
 import pluginCompat from "eslint-plugin-compat";
+// eslint-disable-next-line depend/ban-dependencies -- Recommended one sucks
 import pluginComments from "eslint-plugin-eslint-comments"
 import pluginFunctional from "eslint-plugin-functional";
 import { importX } from 'eslint-plugin-import-x';
@@ -49,6 +50,7 @@ import pluginPerfectionist from "eslint-plugin-perfectionist";
 import pluginPreferArrow from "eslint-plugin-prefer-arrow";
 import pluginPrettier from "eslint-plugin-prettier";
 import pluginPromise from "eslint-plugin-promise";
+// eslint-disable-next-line depend/ban-dependencies -- Recommended one sucks
 import pluginReact from "eslint-plugin-react";
 import pluginReactHooks from "eslint-plugin-react-hooks";
 import pluginRedos from "eslint-plugin-redos";
@@ -69,6 +71,8 @@ import tseslint from "@typescript-eslint/eslint-plugin";
 import tseslintParser from "@typescript-eslint/parser";
 import vitest from "@vitest/eslint-plugin";
 import vitestGlobals from "eslint-plugin-vitest-globals";
+import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript'
+
 
 import * as cssPlugin from "eslint-plugin-css";
 
@@ -162,6 +166,28 @@ export default [
         },
     },
 
+    {
+        settings: {
+            "import-x/resolver": {
+                node: true,
+            },
+            react: { version: "19" },
+            "import-x/resolver-next": [
+                createTypeScriptImportResolver({
+                    alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
+
+                    bun: true, // Resolve Bun modules (https://github.com/import-js/eslint-import-resolver-typescript#bun)
+                    // Use an array
+                    project: [
+                        "tsconfig.json",
+                        "tsconfig.electron.json",
+                        "tsconfig.electron.test.json",
+                        "tsconfig.test.json",
+                    ],
+                }),
+            ],
+        },
+    },
     // Markdown files
     {
         files: ["**/*.md"],
@@ -249,6 +275,14 @@ export default [
                 typescript: true,
                 node: true,
                 project: ["./tsconfig.json"],
+            },
+            "import/resolver": {
+                // You will also need to install and configure the TypeScript resolver
+                // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
+                typescript: {
+                    alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
+                    project: ["./tsconfig.electron.json"],
+                },
             },
         },
         plugins: {
@@ -600,6 +634,14 @@ export default [
                 node: true,
                 project: ["./tsconfig.electron.json"],
             },
+            "import/resolver": {
+                // You will also need to install and configure the TypeScript resolver
+                // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
+                typescript: {
+                    alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
+                    project: ["./tsconfig.electron.json"],
+                },
+            },
         },
         plugins: {
             "@typescript-eslint": tseslint,
@@ -904,6 +946,14 @@ export default [
                 node: true,
                 project: ["./tsconfig.test.json"],
             },
+            "import/resolver": {
+                // You will also need to install and configure the TypeScript resolver
+                // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
+                typescript: {
+                    alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
+                    project: ["./tsconfig.test.json"],
+                },
+            },
         },
         plugins: {
             "@typescript-eslint": tseslint,
@@ -1025,6 +1075,14 @@ export default [
                 typescript: true,
                 node: true,
                 project: ["./tsconfig.electron.test.json"],
+            },
+            "import/resolver": {
+                // You will also need to install and configure the TypeScript resolver
+                // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
+                typescript: {
+                    alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
+                    project: ["./tsconfig.electron.test.json"],
+                },
             },
         },
     },
