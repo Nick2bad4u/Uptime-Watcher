@@ -7,14 +7,132 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[c7c49f7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c7c49f7c768f3232993ca216e90af4e664060633)...
+[c7c49f7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c7c49f7c768f3232993ca216e90af4e664060633)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/c7c49f7c768f3232993ca216e90af4e664060633...c7c49f7c768f3232993ca216e90af4e664060633))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 9.6.0 [`(c7c49f7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c7c49f7c768f3232993ca216e90af4e664060633)
+
+
+
+
+
+
+## [9.6.0] - 2025-07-30
+
+
 [[491dd22](https://github.com/Nick2bad4u/Uptime-Watcher/commit/491dd22c8c5ea282ee3fe21ee2c05ed6d178badb)...
-[491dd22](https://github.com/Nick2bad4u/Uptime-Watcher/commit/491dd22c8c5ea282ee3fe21ee2c05ed6d178badb)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/491dd22c8c5ea282ee3fe21ee2c05ed6d178badb...491dd22c8c5ea282ee3fe21ee2c05ed6d178badb))
+[fe9b300](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fe9b30087e41466038da594ae1b8252d55a2b39e)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/491dd22c8c5ea282ee3fe21ee2c05ed6d178badb...fe9b30087e41466038da594ae1b8252d55a2b39e))
+
+
+### ✨ Features
+
+- ✨ [feat] Add universal doc downloader scripts with logging
+
+- Introduces configurable scripts for downloading and cleaning documentation from remote sources, supporting both Axios-specific and template-based workflows
+- Adds automatic link rewriting, section cleaning, hash-based change detection, and detailed logging of updated files to facilitate reliable doc syncs
+- Provides a flexible template to adapt doc downloads for other projects with minimal changes [`(1b0bdc3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1b0bdc309fa69fc4dada8450ae008ccea2aa8223)
+
+
+- ✨ [feat] Add Ping monitor type with validation and UI support
+
+- Introduces a cross-platform Ping monitor, enabling network reachability checks via ICMP ping with retry, timeout, and detailed result reporting.
+- Integrates Ping monitor into backend service registry, type definitions, validation schemas, and migration/versioning system.
+- Updates form types, validation logic, and UI scaffolding to support adding and configuring Ping monitors alongside existing types.
+- Refactors shared schema utilities and type guards to dynamically accommodate the new monitor type for robust extensibility. [`(afd7cb4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/afd7cb4621e8273f5a320dc5cefa25b1590796d7)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 9.5.0 [`(491dd22)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/491dd22c8c5ea282ee3fe21ee2c05ed6d178badb)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(fe9b300)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fe9b30087e41466038da594ae1b8252d55a2b39e)
+
+
+
+### � Documentation
+
+- 📝 [docs] Add Node-Sqlite3 and WASM doc sync scripts and imported docs
+
+- Introduces new scripts for automated downloading and cleaning of documentation for Node-Sqlite3 and its WASM variant, enabling streamlined doc updates.
+- Imports key documentation files for Node-Sqlite3, including API, binaries, caching, debugging, and control flow guides, along with tracking logs and content hashes for doc integrity.
+- Establishes a consistent structure for documentation management and future updates. [`(1337cdc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1337cdce8177788ce93ad5ae596c6390a9aa43bb)
+
+
+- 📝 [docs] Add ValidatorJS package documentation sync support
+
+- Introduces automated scripts and configuration for downloading, cleaning, and tracking documentation from the ValidatorJS repository.
+- Adds logic to support section and line removals based on custom markers, and rewrites link references for consistency.
+- Provides log and hash tracking for documentation updates, improving doc sync transparency and change detection.
+- Updates template scripts to support flexible output directory naming and enhanced cleaner logic. [`(5cac379)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5cac3791e224713c63193d582aef0762063d5565)
+
+
+- 📝 [docs] Replace monitor type implementation guide with Node-Ping docs sync and examples
+
+- Removes the in-house guide for adding new monitor types to streamline documentation.
+- Adds automated scripts and logs for syncing documentation from the Node-Ping upstream repository, including example files and hash tracking for change detection.
+- Updates and reorganizes the Node-Ping documentation, consolidating usage instructions and FAQs, and incorporating contributor guidelines and badges.
+- Improves reproducibility and maintainability of third-party package documentation by introducing a script-driven, hash-verified sync process. [`(b368d82)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b368d82508a2660663b8e95b4ca86793e282e518)
+
+
+- 📝 [docs] Update docs sync script for new package structure
+
+- Adapts documentation sync to support subdirectories and multiple formats
+- Changes default doc name, base URL, and page list to reflect new package organization
+- Ensures output directories are created for nested docs and updates file naming logic
+- Adds detailed comments and supported formats for easier customization and future maintenance
+- Excludes the new packages docs directory from linting [`(9a364d8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9a364d8579885d88c42052730409ba4f2dc2b0c3)
+
+
+- 📝 [docs] Add usage documentation for node-ping package
+
+- Introduces a comprehensive markdown guide detailing installation, usage examples, configuration options, and output specifications for the node-ping package.
+- Helps users understand both callback and promise-based APIs, including async/await usage and cross-platform configuration nuances.
+- Aims to improve developer onboarding and clarify module behavior for various use cases. [`(46908a2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/46908a2c3e316ca7bf614a3f01f3432ca8511d4a)
+
+
+- 📝 [docs] Add comprehensive Axios documentation package
+
+- Introduces a full set of Axios documentation files covering API reference, request/response configuration, error handling, interceptors, multipart and urlencoded forms, and usage examples
+- Adds sync log and hash tracking for future doc integrity and updates
+- Enables easier onboarding, better understanding of advanced usage, and improved developer experience for Axios users [`(d3fa008)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d3fa008293f6ea9c8d79ac2f4800979e334f5af6)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Add branch and edge case tests to achieve 98%+ coverage
+
+- Adds comprehensive and branch coverage tests for validation logic, type guards, object and JSON safety utilities, string conversion, and theme/UI components
+- Introduces targeted tests for previously uncovered lines, error handling, and edge cases in utility, theme, and validation modules
+- Removes redundant or obsolete test files to streamline the test suite
+- Improves overall test reliability and ensures that complex error paths and SSR scenarios are exercised
+- Enables more robust future refactoring and increases confidence in code quality [`(e225010)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e225010a7e31c859d896010a447d9bf6c915c5c0)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v9.5.0 [skip ci] [`(b2ee13c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b2ee13cc146cfa61ac7cc25ef4ec0895af69b154)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Add ping library and types to dependencies
+
+- Adds the ping package to enable network reachability checks.
+- Includes type definitions for improved TypeScript support.
+- Prepares for future features requiring network diagnostics. [`(a1e8821)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a1e88217cdab7d9454d5d615e4aef2048d15e184)
 
 
 
