@@ -205,6 +205,10 @@ function buildMonitorData(
         monitorData["url"] = formData["url"].trim();
     }
 
+    if (monitorType === "ping") {
+        monitorData["host"] = formData["host"].trim();
+    }
+
     if (monitorType === "port") {
         monitorData["host"] = formData["host"].trim();
         monitorData["port"] = Number(formData["port"]);
@@ -330,7 +334,7 @@ async function validateCheckInterval(checkInterval: number): Promise<string[]> {
  *
  * @param monitorType - Type of monitor
  * @param url - URL for HTTP monitors
- * @param host - Host for port monitors
+ * @param host - Hostname for monitors
  * @param port - Port for port monitors
  * @returns Promise resolving to array of validation error messages
  */
@@ -346,12 +350,20 @@ async function validateMonitorType(
     };
 
     // Add type-specific fields
-    if (monitorType === "http") {
-        formData["url"] = url.trim();
-    } else {
-        // Port monitor
-        formData["host"] = host.trim();
-        formData["port"] = Number(port);
+    switch (monitorType) {
+        case "http": {
+            formData["url"] = url.trim();
+            break;
+        }
+        case "ping": {
+            formData["host"] = host.trim();
+            break;
+        }
+        case "port": {
+            formData["host"] = host.trim();
+            formData["port"] = Number(port);
+            break;
+        }
     }
 
     // Use form validation that only validates provided fields

@@ -18,6 +18,7 @@ import { monitorSchemas, validateMonitorData as sharedValidateMonitorData } from
 import { logger } from "../../utils/logger";
 import { HttpMonitor } from "./HttpMonitor";
 import { createMigrationOrchestrator, exampleMigrations, migrationRegistry, versionManager } from "./MigrationSystem";
+import { PingMonitor } from "./PingMonitor";
 import { PortMonitor } from "./PortMonitor";
 
 // Base monitor type definition
@@ -366,12 +367,53 @@ registerMonitorType({
     version: "1.0.0",
 });
 
+registerMonitorType({
+    description: "Monitors network connectivity via ping",
+    displayName: "Ping (Host)",
+    fields: [
+        {
+            helpText: "Enter a valid host (domain or IP)",
+            label: "Host",
+            name: "host",
+            placeholder: "example.com or 192.168.1.1",
+            required: true,
+            type: "text",
+        },
+    ],
+    serviceFactory: () => new PingMonitor(),
+    type: "ping",
+    uiConfig: {
+        detailFormats: {
+            analyticsLabel: "Ping Response Time",
+            historyDetail: (details: string) => `Ping: ${details}`,
+        },
+        display: {
+            showAdvancedMetrics: true,
+            showUrl: false,
+        },
+        formatDetail: (details: string) => `Ping: ${details}`,
+        formatTitleSuffix: (monitor: Record<string, unknown>) => {
+            const host = monitor["host"] as string;
+            return host ? ` (${host})` : "";
+        },
+        helpTexts: {
+            primary: "Enter a valid host (domain or IP)",
+            secondary: "The monitor will ping this host according to your monitoring interval",
+        },
+        supportsAdvancedAnalytics: true,
+        supportsResponseTime: true,
+    },
+    validationSchema: monitorSchemas.ping,
+    version: "1.0.0",
+});
+
 // Register example migrations for the migration system
 migrationRegistry.registerMigration("http", exampleMigrations.httpV1_0_to_1_1);
 migrationRegistry.registerMigration("port", exampleMigrations.portV1_0_to_1_1);
 
 // Set current versions for existing monitor types
 versionManager.setVersion("http", "1.0.0");
+versionManager.setVersion("ping", "1.0.0");
 versionManager.setVersion("port", "1.0.0");
 
 /**

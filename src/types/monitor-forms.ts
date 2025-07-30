@@ -66,7 +66,7 @@ export interface MonitorFieldValues {
 /**
  * Union type for all monitor field types
  */
-export type MonitorFormFields = HttpMonitorFields | PortMonitorFields;
+export type MonitorFormFields = HttpMonitorFields | PingMonitorFields | PortMonitorFields;
 
 /**
  * Monitor validation result with specific error types
@@ -87,6 +87,14 @@ export interface MonitorValidationResult {
     success: boolean;
     /** Array of warning messages */
     warnings: string[];
+}
+
+/**
+ * Ping monitor specific fields
+ */
+export interface PingMonitorFields extends BaseMonitorFields {
+    /** Host to ping */
+    host: string;
 }
 
 /**
@@ -130,6 +138,12 @@ export function getDefaultMonitorFields(type: MonitorType): MonitorFormFields {
                 url: "",
             } satisfies HttpMonitorFields;
         }
+        case "ping": {
+            return {
+                ...baseFields,
+                host: "",
+            } satisfies PingMonitorFields;
+        }
         case "port": {
             return {
                 ...baseFields,
@@ -155,11 +169,25 @@ export function getDefaultMonitorFields(type: MonitorType): MonitorFormFields {
  * @returns True if fields contain HTTP monitor properties
  *
  * @remarks
- * Checks for presence of required HTTP properties and absence of port-specific ones
+ * Checks for presence of required HTTP properties and absence of port/ping-specific ones
  * to provide more robust type detection and prevent false positives.
  */
 export function isHttpMonitorFields(fields: MonitorFormFields): fields is HttpMonitorFields {
-    return "url" in fields && !("host" in fields && "port" in fields);
+    return "url" in fields && !("host" in fields);
+}
+
+/**
+ * Type guard to check if fields are for Ping monitor.
+ *
+ * @param fields - Monitor form fields to check
+ * @returns True if fields contain valid ping monitor properties
+ *
+ * @remarks
+ * Validates presence of host property and absence of port property to distinguish
+ * from port monitors which also have a host field.
+ */
+export function isPingMonitorFields(fields: MonitorFormFields): fields is PingMonitorFields {
+    return "host" in fields && !("port" in fields) && !("url" in fields) && typeof fields.host === "string";
 }
 
 /**

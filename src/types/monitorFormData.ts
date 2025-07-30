@@ -50,7 +50,16 @@ export interface HttpFormData extends BaseFormData {
 /**
  * Union type for all supported monitor form data types.
  */
-export type MonitorFormData = HttpFormData | PortFormData;
+export type MonitorFormData = HttpFormData | PingFormData | PortFormData;
+
+/**
+ * Form data for ping monitors.
+ */
+export interface PingFormData extends BaseFormData {
+    /** Target host to ping */
+    host: string;
+    type: "ping";
+}
 
 /**
  * Form data for port monitors.
@@ -70,6 +79,7 @@ export interface PortFormData extends BaseFormData {
  * @returns Default form data for the specified type
  */
 export function createDefaultFormData(type: "http"): Partial<HttpFormData>;
+export function createDefaultFormData(type: "ping"): Partial<PingFormData>;
 export function createDefaultFormData(type: "port"): Partial<PortFormData>;
 export function createDefaultFormData(type: string): Partial<BaseFormData> {
     return {
@@ -92,6 +102,16 @@ export function isHttpFormData(data: Partial<MonitorFormData>): data is HttpForm
 }
 
 /**
+ * Type guard to check if form data is for ping monitor.
+ *
+ * @param data - Form data to check
+ * @returns True if data is ping form data
+ */
+export function isPingFormData(data: Partial<MonitorFormData>): data is PingFormData {
+    return data.type === "ping" && typeof data.host === "string";
+}
+
+/**
  * Type guard to check if form data is for port monitor.
  *
  * @param data - Form data to check
@@ -100,6 +120,16 @@ export function isHttpFormData(data: Partial<MonitorFormData>): data is HttpForm
 export function isPortFormData(data: Partial<MonitorFormData>): data is PortFormData {
     return data.type === "port" && typeof data.host === "string" && typeof data.port === "number";
 }
+
+/**
+ * Registry of type-specific validation functions.
+ * Add new monitor types here to enable dynamic validation.
+ */
+const FORM_DATA_VALIDATORS = {
+    http: isHttpFormData,
+    ping: isPingFormData,
+    port: isPortFormData,
+} as const;
 
 /**
  * Type guard to check if form data is valid and complete.
@@ -114,15 +144,19 @@ export function isValidMonitorFormData(data: unknown): data is MonitorFormData {
 
     const formData = data as Partial<MonitorFormData>;
 
-    if (formData.type === "http") {
-        return isHttpFormData(formData);
+    if (!formData.type || typeof formData.type !== "string") {
+        return false;
     }
 
-    if (formData.type === "port") {
-        return isPortFormData(formData);
+    // Use index signature to avoid TypeScript compiler warnings
+    const validator = (
+        FORM_DATA_VALIDATORS as Record<string, ((data: Partial<MonitorFormData>) => boolean) | undefined>
+    )[formData.type];
+    if (!validator) {
+        return false;
     }
 
-    return false;
+    return validator(formData);
 }
 
 /**

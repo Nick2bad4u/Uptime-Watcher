@@ -62,7 +62,7 @@ export const baseMonitorSchema = z.object({
         .number()
         .min(VALIDATION_CONSTRAINTS.TIMEOUT.MIN, "Timeout must be at least 1 second")
         .max(VALIDATION_CONSTRAINTS.TIMEOUT.MAX, "Timeout cannot exceed 300 seconds"),
-    type: z.enum(["http", "port"]),
+    type: z.enum(["http", "port", "ping"]),
 });
 
 /**
@@ -121,12 +121,40 @@ export const portMonitorSchema = baseMonitorSchema.extend({
 });
 
 /**
+ * Zod schema for ping monitor fields.
+ *
+ * @remarks
+ * Extends {@link baseMonitorSchema} and adds `host` field with strict validation.
+ */
+export const pingMonitorSchema = baseMonitorSchema.extend({
+    host: z.string().refine((val) => {
+        // Use validator.js for robust host validation
+        if (validator.isIP(val)) {
+            return true;
+        }
+        if (
+            validator.isFQDN(val, {
+                allow_numeric_tld: false,
+                allow_trailing_dot: false,
+                allow_underscores: false,
+                allow_wildcard: false,
+                require_tld: true,
+            })
+        ) {
+            return true;
+        }
+        return val === "localhost";
+    }, "Must be a valid hostname, IP address, or localhost"),
+    type: z.literal("ping"),
+});
+
+/**
  * Zod discriminated union schema for all monitor types.
  *
  * @remarks
- * Supports both HTTP and port monitors.
+ * Supports HTTP, port, and ping monitors.
  */
-export const monitorSchema = z.discriminatedUnion("type", [httpMonitorSchema, portMonitorSchema]);
+export const monitorSchema = z.discriminatedUnion("type", [httpMonitorSchema, portMonitorSchema, pingMonitorSchema]);
 
 /**
  * Zod schema for site data.
@@ -149,6 +177,7 @@ export const siteSchema = z.object({
  */
 export const monitorSchemas = {
     http: httpMonitorSchema,
+    ping: pingMonitorSchema,
     port: portMonitorSchema,
 } as const;
 
@@ -160,11 +189,18 @@ export const monitorSchemas = {
 export type HttpMonitor = z.infer<typeof httpMonitorSchema>;
 
 /**
- * Type representing a validated monitor (HTTP or port).
+ * Type representing a validated monitor (HTTP, port, or ping).
  *
  * @see {@link monitorSchema}
  */
 export type Monitor = z.infer<typeof monitorSchema>;
+
+/**
+ * Type representing a validated ping monitor.
+ *
+ * @see {@link pingMonitorSchema}
+ */
+export type PingMonitor = z.infer<typeof pingMonitorSchema>;
 
 /**
  * Type representing a validated port monitor.
@@ -404,18 +440,14 @@ export function validateSiteData(data: unknown): ValidationResult {
  * Gets the appropriate Zod schema for a monitor type.
  *
  * @remarks
+ * Uses the central schema registry for dynamic schema lookup.
  * Returns `undefined` if the type is not recognized.
  *
- * @param type - The monitor type string ("http" or "port").
+ * @param type - The monitor type string (any supported monitor type).
  * @returns The Zod schema for the monitor type, or `undefined` if unknown.
  */
-function getMonitorSchema(type: string): typeof httpMonitorSchema | typeof portMonitorSchema | undefined {
-    if (type === "http") {
-        return httpMonitorSchema;
-    } else if (type === "port") {
-        return portMonitorSchema;
-    }
-    return undefined;
+function getMonitorSchema(type: string): (typeof monitorSchemas)[keyof typeof monitorSchemas] | undefined {
+    return monitorSchemas[type as keyof typeof monitorSchemas];
 }
 
 /**
@@ -438,19 +470,19 @@ function validateFieldWithSchema(type: string, fieldName: string, value: unknown
         [fieldName]: value,
     };
 
-    if (fieldName === "url" && type === "http") {
-        return z.object({ url: httpMonitorSchema.shape.url }).parse(testData);
-    } else if (fieldName === "host" && type === "port") {
-        return z.object({ host: portMonitorSchema.shape.host }).parse(testData);
-    } else if (fieldName === "port" && type === "port") {
-        return z.object({ port: portMonitorSchema.shape.port }).parse(testData);
-    } else {
-        // For common fields, use base schema
-        const commonFields = baseMonitorSchema.shape;
-        if (fieldName in commonFields) {
-            return z.object({ [fieldName]: commonFields[fieldName as keyof typeof commonFields] }).parse(testData);
-        } else {
-            throw new Error(`Unknown field: ${fieldName}`);
-        }
+    // Get the schema for the monitor type
+    const schema = getMonitorSchema(type);
+    if (schema && fieldName in schema.shape) {
+        // Use the specific schema's field definition
+        const fieldSchema = schema.shape[fieldName as keyof typeof schema.shape];
+        return z.object({ [fieldName]: fieldSchema }).parse(testData);
     }
+
+    // Fallback to base schema for common fields
+    const commonFields = baseMonitorSchema.shape;
+    if (fieldName in commonFields) {
+        return z.object({ [fieldName]: commonFields[fieldName as keyof typeof commonFields] }).parse(testData);
+    }
+
+    throw new Error(`Unknown field: ${fieldName}`);
 }

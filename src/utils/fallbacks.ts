@@ -97,9 +97,9 @@ export const MonitorDefaults = {
  */
 const MONITOR_IDENTIFIER_GENERATORS = new Map<string, (monitor: Monitor) => string | undefined>([
     ["http", (monitor) => monitor.url ?? undefined],
+    ["ping", (monitor) => monitor.host ?? undefined],
     ["port", (monitor) => (monitor.host && monitor.port ? `${monitor.host}:${monitor.port}` : undefined)],
     // Add new monitor types here as they're implemented
-    // ["ping", (monitor) => monitor.host ?? undefined],
     // ["dns", (monitor) => `${monitor.domain} (${monitor.recordType})` ?? undefined],
     // ["ssl", (monitor) => monitor.host ?? undefined],
     // ["api", (monitor) => monitor.endpoint ?? undefined],
@@ -175,9 +175,9 @@ function getGenericIdentifier(monitor: Monitor): string | undefined {
  */
 const MONITOR_TYPE_LABELS = new Map<string, string>([
     ["http", "Website URL"],
+    ["ping", "Ping Monitor"],
     ["port", "Host & Port"],
     // Add new monitor types here as they're implemented
-    // ["ping", "Ping Monitor"],
     // ["dns", "DNS Monitor"],
     // ["ssl", "SSL Certificate"],
     // ["api", "API Endpoint"],

@@ -35,7 +35,7 @@ export type MonitorStatus = "down" | "paused" | "pending" | "up";
  *
  * @public
  */
-export const BASE_MONITOR_TYPES = ["http", "port"] as const;
+export const BASE_MONITOR_TYPES = ["http", "port", "ping"] as const;
 
 /**
  * Type representing all supported monitor types.
