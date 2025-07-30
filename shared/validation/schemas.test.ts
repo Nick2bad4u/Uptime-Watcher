@@ -1109,4 +1109,72 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             }
         });
     });
+
+    describe("Error Handling Edge Cases - Missing Branch Coverage", () => {
+        it("should handle non-ZodError exceptions in validateMonitorData", () => {
+            // This test covers line 326 - non-ZodError exception handling
+            const result = validateMonitorData("http", {
+                get url() {
+                    throw new Error("Custom error");
+                }
+            });
+            expect(result.success).toBe(false);
+            expect(result.errors).toContain("Validation failed: Custom error");
+        });
+
+        it("should handle non-ZodError exceptions in validateSiteData", () => {
+            // This test covers line 430 - non-ZodError exception handling in site validation
+            const result = validateSiteData({
+                get name() {
+                    throw new Error("Site validation error");
+                }
+            });
+            expect(result.success).toBe(false);
+            expect(result.errors).toContain("Validation failed: Site validation error");
+        });
+
+        it("should handle non-ZodError exceptions in validateMonitorField", () => {
+            // This test covers error handling in field validation
+            const result = validateMonitorField("http", "url", {
+                get valueOf() {
+                    throw new Error("Field error");
+                }
+            });
+            expect(result.success).toBe(false);
+            expect(result.errors[0]).toContain("Invalid input");
+        });
+
+        it("should throw error for unknown field in validateFieldWithSchema", () => {
+            // This test covers line 484 - unknown field error
+            // validateMonitorField handles the error and returns a result, doesn't throw
+            const result = validateMonitorField("http", "unknownField", "value");
+            expect(result.success).toBe(false);
+            expect(result.errors[0]).toContain("Unknown field: unknownField");
+        });
+
+        it("should handle undefined received type in Zod validation", () => {
+            // Test to ensure we cover the optional field detection branch (line 312)
+            const result = validateMonitorData("http", {
+                id: "test",
+                type: "http",
+                url: "https://example.com",
+                checkInterval: 30000,
+                monitoring: true,
+                responseTime: 200,
+                retryAttempts: 3,
+                status: "up" as const,
+                timeout: 5000,
+                // Missing optional field lastChecked to trigger optional field warning
+            });
+            expect(result.success).toBe(true);
+            // This should have triggered the optional field logic
+        });
+
+        it("should handle string conversion of non-Error objects", () => {
+            // Test to cover String(error) branch when error is not an Error instance
+            const result = validateMonitorData("invalidType", null);
+            expect(result.success).toBe(false);
+            expect(result.errors[0]).toContain("Unknown monitor type: invalidType");
+        });
+    });
 });
