@@ -17,21 +17,15 @@ const crypto = require("crypto");
 /* -------------------- CONFIGURATION -------------------- */
 
 // Unique name for this doc sync; used for log/hashes/folder/file names
-const DOC_NAME = "Example-Package";
+const DOC_NAME = "Node-Sqlite3-WASM";
 
 // Base URL for docs (no trailing slash)
-const BASE_URL = "https://raw.githubusercontent.com/exampleOrg/exampleRepo/refs/heads/master";
+const BASE_URL = "https://github.com/tndrle/node-sqlite3-wasm/raw/refs/heads/main";
 
 // Array of doc/page names (relative, e.g. ["intro", "example"])
 // These should match the paths in your repo, relative to the base URL
 // If you have subdirectories, include them (e.g. "examples/example.js")
-
-// You can download Github Wiki Pages by appending ".md" to the wiki page URL.
-// @example: If your wiki page URL is "https://github.com/TryGhost/node-sqlite3/wiki/API",
-// use "API.md" as the page name.
 const PAGES = [
-    "examples/example.js",
-    "examples/example2.html",
     "README.md",
 ];
 

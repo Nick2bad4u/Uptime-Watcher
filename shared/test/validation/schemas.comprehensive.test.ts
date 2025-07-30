@@ -4,7 +4,6 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { z } from "zod";
 import {
     validateMonitorData,
     validateMonitorField,
@@ -29,7 +28,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             const baseMonitor = {
                 id: "test-monitor",
                 type: "http",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
@@ -55,7 +54,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             const invalidHigh = {
                 id: "test",
                 type: "http",
-                checkInterval: 3000000000, // Too high
+                checkInterval: 3_000_000_000, // Too high
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
@@ -71,7 +70,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             const invalidLow = {
                 id: "test",
                 type: "http",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 500, // Too low
                 retryAttempts: 3,
                 monitoring: true,
@@ -82,8 +81,8 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             const invalidHigh = {
                 id: "test",
                 type: "http",
-                checkInterval: 30000,
-                timeout: 400000, // Too high
+                checkInterval: 30_000,
+                timeout: 400_000, // Too high
                 retryAttempts: 3,
                 monitoring: true,
                 status: "pending",
@@ -98,7 +97,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             const invalidLow = {
                 id: "test",
                 type: "http",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: -1, // Too low
                 monitoring: true,
@@ -109,7 +108,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             const invalidHigh = {
                 id: "test",
                 type: "http",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 15, // Too high
                 monitoring: true,
@@ -125,7 +124,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             const monitor = {
                 id: "test",
                 type: "http",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
@@ -140,7 +139,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             const monitor = {
                 id: "test",
                 type: "http",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
@@ -158,7 +157,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 id: "http-test",
                 type: "http" as const,
                 url: "https://example.com",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
@@ -179,12 +178,12 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 "",
             ];
 
-            invalidUrls.forEach((url) => {
+            for (const url of invalidUrls) {
                 const monitor = {
                     id: "test",
                     type: "http" as const,
                     url,
-                    checkInterval: 30000,
+                    checkInterval: 30_000,
                     timeout: 5000,
                     retryAttempts: 3,
                     monitoring: true,
@@ -193,7 +192,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 };
 
                 expect(() => httpMonitorSchema.parse(monitor)).toThrow();
-            });
+            }
         });
 
         it("should accept both HTTP and HTTPS URLs", () => {
@@ -201,7 +200,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 id: "test",
                 type: "http" as const,
                 url: "https://insecure.example.com", // Test with HTTPS instead
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
@@ -226,7 +225,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 type: "port" as const,
                 host: "example.com",
                 port: 8080,
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
@@ -248,13 +247,13 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 "2001:db8::1", // IPv6
             ];
 
-            validHosts.forEach((host) => {
+            for (const host of validHosts) {
                 const monitor = {
                     id: "test",
                     type: "port" as const,
                     host,
                     port: 8080,
-                    checkInterval: 30000,
+                    checkInterval: 30_000,
                     timeout: 5000,
                     retryAttempts: 3,
                     monitoring: true,
@@ -263,7 +262,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 };
 
                 expect(() => portMonitorSchema.parse(monitor)).not.toThrow();
-            });
+            }
         });
 
         it("should reject invalid hosts", () => {
@@ -275,13 +274,13 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 "example.com.",
             ];
 
-            invalidHosts.forEach((host) => {
+            for (const host of invalidHosts) {
                 const monitor = {
                     id: "test",
                     type: "port" as const,
                     host,
                     port: 8080,
-                    checkInterval: 30000,
+                    checkInterval: 30_000,
                     timeout: 5000,
                     retryAttempts: 3,
                     monitoring: true,
@@ -290,19 +289,19 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 };
 
                 expect(() => portMonitorSchema.parse(monitor)).toThrow();
-            });
+            }
         });
 
         it("should accept valid port ranges", () => {
             const validPorts = [0, 1, 80, 443, 8080, 65_535]; // 0 is valid for validator.js
 
-            validPorts.forEach((port) => {
+            for (const port of validPorts) {
                 const monitor = {
                     id: "test",
                     type: "port" as const,
                     host: "example.com",
                     port,
-                    checkInterval: 30000,
+                    checkInterval: 30_000,
                     timeout: 5000,
                     retryAttempts: 3,
                     monitoring: true,
@@ -311,19 +310,19 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 };
 
                 expect(() => portMonitorSchema.parse(monitor)).not.toThrow();
-            });
+            }
         });
 
         it("should reject invalid ports", () => {
-            const invalidPorts = [-1, 65536, 100_000]; // 0 is valid for validator.js
+            const invalidPorts = [-1, 65_536, 100_000]; // 0 is valid for validator.js
 
-            invalidPorts.forEach((port) => {
+            for (const port of invalidPorts) {
                 const monitor = {
                     id: "test",
                     type: "port" as const,
                     host: "example.com",
                     port,
-                    checkInterval: 30000,
+                    checkInterval: 30_000,
                     timeout: 5000,
                     retryAttempts: 3,
                     monitoring: true,
@@ -332,7 +331,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 };
 
                 expect(() => portMonitorSchema.parse(monitor)).toThrow();
-            });
+            }
         });
     });
 
@@ -342,7 +341,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 id: "ping-test",
                 type: "ping" as const,
                 host: "example.com",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
@@ -362,12 +361,12 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 "localhost",
             ];
 
-            validHosts.forEach((host) => {
+            for (const host of validHosts) {
                 const monitor = {
                     id: "test",
                     type: "ping" as const,
                     host,
-                    checkInterval: 30000,
+                    checkInterval: 30_000,
                     timeout: 5000,
                     retryAttempts: 3,
                     monitoring: true,
@@ -376,7 +375,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 };
 
                 expect(() => pingMonitorSchema.parse(monitor)).not.toThrow();
-            });
+            }
         });
     });
 
@@ -386,7 +385,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 id: "test",
                 type: "http" as const,
                 url: "https://example.com",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
@@ -405,7 +404,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 type: "port" as const,
                 host: "example.com",
                 port: 8080,
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
@@ -423,7 +422,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 id: "test",
                 type: "ping" as const,
                 host: "example.com",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
@@ -448,7 +447,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                         id: "test-monitor",
                         type: "http" as const,
                         url: "https://example.com",
-                        checkInterval: 30000,
+                        checkInterval: 30_000,
                         timeout: 5000,
                         retryAttempts: 3,
                         monitoring: true,
@@ -471,7 +470,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                         id: "http-monitor",
                         type: "http" as const,
                         url: "https://example.com",
-                        checkInterval: 30000,
+                        checkInterval: 30_000,
                         timeout: 5000,
                         retryAttempts: 3,
                         monitoring: true,
@@ -483,7 +482,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                         type: "port" as const,
                         host: "example.com",
                         port: 8080,
-                        checkInterval: 30000,
+                        checkInterval: 30_000,
                         timeout: 5000,
                         retryAttempts: 3,
                         monitoring: true,
@@ -517,7 +516,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                         id: "test-monitor",
                         type: "http" as const,
                         url: "https://example.com",
-                        checkInterval: 30000,
+                        checkInterval: 30_000,
                         timeout: 5000,
                         retryAttempts: 3,
                         monitoring: true,
@@ -546,7 +545,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                         id: "test-monitor",
                         type: "http" as const,
                         url: "https://example.com",
-                        checkInterval: 30000,
+                        checkInterval: 30_000,
                         timeout: 5000,
                         retryAttempts: 3,
                         monitoring: true,
@@ -572,7 +571,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 id: "test",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
@@ -608,7 +607,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             const data = {
                 id: "test",
                 type: "unknown",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
@@ -633,7 +632,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 id: "test",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
@@ -653,7 +652,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 id: "test",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
@@ -780,7 +779,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                         id: "test-monitor",
                         type: "http",
                         url: "https://example.com",
-                        checkInterval: 30000,
+                        checkInterval: 30_000,
                         timeout: 5000,
                         retryAttempts: 3,
                         monitoring: true,
@@ -838,7 +837,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 id: "test",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
@@ -856,7 +855,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 type: "port",
                 host: "example.com",
                 port: 8080,
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
@@ -874,7 +873,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 id: "test",
                 type: "ping",
                 host: "example.com",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
@@ -891,7 +890,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 id: "test",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
@@ -912,7 +911,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                         id: "test-monitor",
                         type: "http",
                         url: "https://example.com",
-                        checkInterval: 30000,
+                        checkInterval: 30_000,
                         timeout: 5000,
                         retryAttempts: 3,
                         monitoring: true,
@@ -949,12 +948,12 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 id: "a".repeat(50), // Reasonable length
                 type: "http" as const,
                 url: "https://example.com",
-                checkInterval: 2592000000, // Maximum allowed (30 days)
-                timeout: 300000, // Maximum allowed (5 minutes)
+                checkInterval: 2_592_000_000, // Maximum allowed (30 days)
+                timeout: 300_000, // Maximum allowed (5 minutes)
                 retryAttempts: 10, // Maximum allowed
                 monitoring: true,
                 status: "pending" as const,
-                responseTime: 999999, // Large response time
+                responseTime: 999_999, // Large response time
             };
 
             expect(() => httpMonitorSchema.parse(monitor)).not.toThrow();
@@ -963,12 +962,12 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         it("should handle all valid status values", () => {
             const statuses = ["up", "down", "pending", "paused"] as const;
 
-            statuses.forEach((status) => {
+            for (const status of statuses) {
                 const monitor = {
                     id: "test",
                     type: "http" as const,
                     url: "https://example.com",
-                    checkInterval: 30000,
+                    checkInterval: 30_000,
                     timeout: 5000,
                     retryAttempts: 3,
                     monitoring: true,
@@ -977,7 +976,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 };
 
                 expect(() => httpMonitorSchema.parse(monitor)).not.toThrow();
-            });
+            }
         });
 
         it("should handle optional lastChecked field", () => {
@@ -985,7 +984,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 id: "test",
                 type: "http" as const,
                 url: "https://example.com",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
@@ -1011,7 +1010,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     id: "test",
                     type: "http",
                     url: "https://example.com",
-                    checkInterval: 30000,
+                    checkInterval: 30_000,
                     timeout: 5000,
                     retryAttempts: 3,
                     monitoring: true,
@@ -1034,7 +1033,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     id: "test",
                     type: "http",
                     url: "https://example.com",
-                    checkInterval: 30000,
+                    checkInterval: 30_000,
                     timeout: 5000,
                     retryAttempts: 3,
                     monitoring: true,
@@ -1082,8 +1081,8 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 const types = ["http", "port", "ping"];
                 const baseFields = ["id", "type", "checkInterval", "timeout", "retryAttempts", "monitoring", "status", "responseTime"];
                 
-                baseFields.forEach(fieldName => {
-                    types.forEach(monitorType => {
+                for (const fieldName of baseFields) {
+                    for (const monitorType of types) {
                         try {
                             const result = validateMonitorField(monitorType, fieldName, getValidValueForField(fieldName, monitorType));
                             expect(result.success).toBe(true);
@@ -1091,15 +1090,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                             // Some combinations might be invalid, that's OK for this test
                             console.log(`Field ${fieldName} for type ${monitorType} threw:`, error);
                         }
-                    });
-                });
+                    }
+                }
             });
 
             function getValidValueForField(fieldName: string, monitorType: string): unknown {
                 const validValues: Record<string, unknown> = {
                     id: "test-id",
                     type: monitorType,
-                    checkInterval: 30000,
+                    checkInterval: 30_000,
                     timeout: 5000,
                     retryAttempts: 3,
                     monitoring: true,
@@ -1141,11 +1140,11 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     { type: "ping", field: "host", value: "" },
                 ];
 
-                testCases.forEach(({ type, field, value }) => {
+                for (const { type, field, value } of testCases) {
                     const result = validateMonitorField(type, field, value);
                     expect(result.success).toBe(false);
                     expect(result.errors.length).toBeGreaterThan(0);
-                });
+                }
             });
         });
     });

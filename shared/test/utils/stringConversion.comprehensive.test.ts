@@ -27,7 +27,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             expect(safeStringify(0)).toBe("0");
             expect(safeStringify(-123)).toBe("-123");
             expect(safeStringify(3.14)).toBe("3.14");
-            expect(safeStringify(NaN)).toBe("NaN");
+            expect(safeStringify(Number.NaN)).toBe("NaN");
             expect(safeStringify(Infinity)).toBe("Infinity");
             expect(safeStringify(-Infinity)).toBe("-Infinity");
         });

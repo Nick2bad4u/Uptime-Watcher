@@ -22,7 +22,6 @@
 /* eslint-disable perfectionist/sort-objects */
 /* eslint-disable object-shorthand */
 /* eslint-disable sort-imports */
-/* eslint-disable depend/ban-dependencies */
 
 
 // Import { plugin as ex } from "eslint-plugin-exception-handling";
@@ -42,9 +41,9 @@ import nodePlugin from "eslint-plugin-n";
 import nounsanitized from "eslint-plugin-no-unsanitized";
 import pluginBoundaries from "eslint-plugin-boundaries";
 import pluginCompat from "eslint-plugin-compat";
-import comments from "@eslint-community/eslint-plugin-eslint-comments/configs"
+import pluginComments from "eslint-plugin-eslint-comments"
 import pluginFunctional from "eslint-plugin-functional";
-import pluginImport from "eslint-plugin-import";
+import { importX } from 'eslint-plugin-import-x';
 import pluginNoOnly from "eslint-plugin-no-only-tests";
 import pluginPerfectionist from "eslint-plugin-perfectionist";
 import pluginPreferArrow from "eslint-plugin-prefer-arrow";
@@ -72,6 +71,27 @@ import vitest from "@vitest/eslint-plugin";
 import vitestGlobals from "eslint-plugin-vitest-globals";
 
 import * as cssPlugin from "eslint-plugin-css";
+
+// Unused and Uninstalled Plugins:
+// eslint-config-prettier
+// eslint-find-rules
+// eslint-formatter-compact
+// eslint-import-resolver-node
+// eslint-import-resolver-typescript
+// eslint-plugin-css-modules
+// eslint-plugin-exception-handling
+// eslint-plugin-html
+// eslint-plugin-import
+// eslint-plugin-json
+// eslint-plugin-no-inferred-method-name
+// eslint-plugin-react-dom
+// eslint-plugin-react-hooks-extra
+// eslint-plugin-react-naming-convention
+// eslint-plugin-react-native
+// eslint-plugin-react-web-api
+// eslint-plugin-react-x
+// eslint-plugin-xss
+// eslint-plugin-yml
 
 const __dirname = import.meta.dirname;
 
@@ -223,7 +243,7 @@ export default [
                 { type: "types", pattern: "src/types.ts" },
             ],
             n: { allowModules: ["electron", "node", "electron-devtools-installer"] },
-            "import/resolver": {
+            "import-x/resolver": {
                 // You will also need to install and configure the TypeScript resolver
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: true,
@@ -233,7 +253,6 @@ export default [
         },
         plugins: {
             "@typescript-eslint": tseslint,
-            "@eslint-community/eslint-comments": comments,
             "jsx-a11y": jsxA11y,
             "no-unsanitized": nounsanitized,
             "prefer-arrow": pluginPreferArrow,
@@ -251,7 +270,7 @@ export default [
             math: eslintPluginMath,
             n: nodePlugin,
             perfectionist: pluginPerfectionist,
-            pluginImport: pluginImport,
+            "import-x": importX,
             prettier: pluginPrettier,
             promise: pluginPromise,
             putout: putout,
@@ -263,6 +282,7 @@ export default [
             tailwind: tailwind,
             tsdoc: pluginTsdoc,
             unicorn: pluginUnicorn,
+            "eslint-comments": pluginComments,
         },
         rules: {
             // TypeScript rules
@@ -271,14 +291,13 @@ export default [
             ...tseslint.configs.stylisticTypeChecked,
             ...pluginRegexp.configs["flat/recommended"].rules,
             ...reactRefresh.configs.vite.rules,
-            ...pluginImport.flatConfigs.typescript.rules,
+            ...importX.flatConfigs.typescript.rules,
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.recommended.rules,
             ...pluginReactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.recommended.rules,
             ...pluginSonarjs.configs.recommended.rules,
-            ...comments.recommended[0],
             ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginBoundaries.configs.recommended.rules,
             ...pluginRedos.configs.recommended.rules,
@@ -287,6 +306,7 @@ export default [
             ...eslintPluginMath.configs.recommended.rules,
             ...tailwind.configs["flat/recommended"].rules,
             ...cssPlugin.configs["flat/standard"].rules,
+            ...pluginComments.configs.recommended.rules,
 
             "n/file-extension-in-import": "off", // Allow missing file extensions for imports
             "n/no-missing-file-extension": "off", // Allow missing file extensions for imports
@@ -573,7 +593,7 @@ export default [
                 { type: "events", pattern: "electron/events/**/*" },
                 { type: "types", pattern: "electron/types.ts" },
             ],
-            "import/resolver": {
+            "import-x/resolver": {
                 // You will also need to install and configure the TypeScript resolver
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: true,
@@ -583,7 +603,6 @@ export default [
         },
         plugins: {
             "@typescript-eslint": tseslint,
-            "@eslint-community/eslint-comments": comments,
             "jsx-a11y": jsxA11y,
             "no-unsanitized": nounsanitized,
             "prefer-arrow": pluginPreferArrow,
@@ -600,7 +619,7 @@ export default [
             math: eslintPluginMath,
             n: nodePlugin,
             perfectionist: pluginPerfectionist,
-            pluginImport: pluginImport,
+            "import-x": importX,
             prettier: pluginPrettier,
             promise: pluginPromise,
             putout: putout,
@@ -612,6 +631,7 @@ export default [
             tailwind: tailwind,
             tsdoc: pluginTsdoc,
             unicorn: pluginUnicorn,
+            "eslint-comments": pluginComments,
         },
         rules: {
             // TypeScript backend rules
@@ -619,14 +639,13 @@ export default [
             ...tseslint.configs.strictTypeChecked,
             ...tseslint.configs.stylisticTypeChecked,
             ...pluginRegexp.configs["flat/recommended"].rules,
-            ...pluginImport.flatConfigs.typescript.rules,
+            ...importX.flatConfigs.typescript.rules,
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.recommended.rules,
             ...pluginReactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.recommended.rules,
             ...pluginSonarjs.configs.recommended.rules,
-            ...comments.recommended[0],
             ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginBoundaries.configs.recommended.rules,
             ...pluginRedos.configs.recommended.rules,
@@ -635,6 +654,7 @@ export default [
             ...eslintPluginMath.configs.recommended.rules,
             ...tailwind.configs["flat/recommended"].rules,
             ...cssPlugin.configs["flat/standard"].rules,
+            ...pluginComments.configs.recommended.rules,
 
             "no-unsanitized/method": "error",
             "no-unsanitized/property": "error",
@@ -877,7 +897,7 @@ export default [
         settings: {
             react: { version: "19" },
             n: { allowModules: ["electron", "node", "electron-devtools-installer"] },
-            "import/resolver": {
+            "import-x/resolver": {
                 // You will also need to install and configure the TypeScript resolver
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: true,
@@ -890,15 +910,19 @@ export default [
             vitest,
             "vitest-globals": vitestGlobals,
             "testing-library": pluginTestingLibrary,
-            pluginImport: pluginImport,
+            "import-x": importX,
             "unused-imports": pluginUnusedImports,
             react: pluginReact,
             "react-hooks": pluginReactHooks,
             n: nodePlugin,
+            "eslint-comments": pluginComments,
+
         },
         rules: {
             ...tseslint.configs.recommended.rules,
             ...vitest.configs.recommended.rules,
+            ...pluginComments.configs.recommended.rules,
+
 
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-non-null-assertion": "off",
@@ -961,7 +985,7 @@ export default [
             "@typescript-eslint": tseslint,
             "no-only-tests": pluginNoOnly,
             "unused-imports": pluginUnusedImports,
-            pluginImport: pluginImport,
+            "import-x": importX,
             unicorn: pluginUnicorn,
             vitest: vitest,
             n: nodePlugin,
@@ -995,7 +1019,7 @@ export default [
         },
         settings: {
             n: { allowModules: ["electron", "node", "electron-devtools-installer"] },
-            "import/resolver": {
+            "import-x/resolver": {
                 // You will also need to install and configure the TypeScript resolver
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: true,
@@ -1022,7 +1046,6 @@ export default [
         },
         plugins: {
             "@typescript-eslint": tseslint,
-            "@eslint-community/eslint-comments": comments,
             "jsx-a11y": jsxA11y,
             "no-unsanitized": nounsanitized,
             "prefer-arrow": pluginPreferArrow,
@@ -1039,7 +1062,7 @@ export default [
             math: eslintPluginMath,
             n: nodePlugin,
             perfectionist: pluginPerfectionist,
-            pluginImport: pluginImport,
+            "import-x": importX,
             prettier: pluginPrettier,
             promise: pluginPromise,
             putout: putout,
@@ -1055,14 +1078,13 @@ export default [
         rules: {
             ...js.configs.all.rules,
             ...pluginRegexp.configs["flat/recommended"].rules,
-            ...pluginImport.flatConfigs.typescript.rules,
+            ...importX.flatConfigs.typescript.rules,
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.recommended.rules,
             ...pluginReact.configs.recommended.rules,
             ...pluginReactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.recommended.rules,
             ...pluginSonarjs.configs.recommended.rules,
-            ...comments.recommended[0],
             ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginRedos.configs.recommended.rules,
             ...nodePlugin.configs["flat/recommended"].rules,
@@ -1082,13 +1104,11 @@ export default [
         },
         settings: {
             n: { allowModules: ["electron", "node", "electron-devtools-installer"] },
-            "import/resolver": {
+            "import-x/resolver": {
                 node: true,
             },
             react: { version: "19" },
 
         },
     },
-
-
 ];
