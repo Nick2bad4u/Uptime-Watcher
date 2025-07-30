@@ -104,6 +104,7 @@ export default [
             "test/types.test.tsx",
             "docs/docusaurus/**",
             "docs/Reviews/**",
+            "docs/Packages/**",
             ".github/chatmodes/**",
             ".github/PULL_REQUEST_TEMPLATE/**",
             ".github/ISSUE_TEMPLATE/**",
