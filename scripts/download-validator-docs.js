@@ -17,17 +17,15 @@ const crypto = require("crypto");
 /* -------------------- CONFIGURATION -------------------- */
 
 // Unique name for this doc sync; used for log/hashes/folder/file names
-const DOC_NAME = "Example-Package";
+const DOC_NAME = "ValidatorJS";
 
 // Base URL for docs (no trailing slash)
-const BASE_URL = "https://raw.githubusercontent.com/exampleOrg/exampleRepo/refs/heads/master";
+const BASE_URL = "https://github.com/validatorjs/validator.js/raw/refs/heads/master";
 
 // Array of doc/page names (relative, e.g. ["intro", "example"])
 // These should match the paths in your repo, relative to the base URL
 // If you have subdirectories, include them (e.g. "examples/example.js")
 const PAGES = [
-    "examples/example.js",
-    "examples/example2.html",
     "README.md",
 ];
 
@@ -51,20 +49,16 @@ const OUTPUT_EXT = "md";
  * SECTION REMOVAL/STRIP OPTIONS:
  * - To remove everything from a marker onwards, add its string to REMOVE_FROM_MARKER (array, any string).
  * - To remove only lines that contain certain markers, add those to REMOVE_LINE_MARKERS (array).
- * - To remove everything ABOVE a marker, add its string to REMOVE_ABOVE_MARKER (array).
  */
-
 // const REMOVE_FROM_MARKER = [
 //     "::::: sponsors_container"
 // ];
-
-// const REMOVE_LINE_MARKERS = [
-//     "::::::: body"
-// ];
-
-// const REMOVE_ABOVE_MARKER = [
-//     "::::: start_here"
-// ];
+const REMOVE_LINE_MARKERS = [
+    "[![Gitter](https://badges.gitter.im/validatorjs/community.svg)](https://gitter.im/validatorjs/community)"
+];
+const REMOVE_ABOVE_MARKER = [
+    "[![Gitter](https://badges.gitter.im/validatorjs/community.svg)](https://gitter.im/validatorjs/community)"
+];
 
 /* --------- END CONFIGURATION (edit above only!) -------- */
 
