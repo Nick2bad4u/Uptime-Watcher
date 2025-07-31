@@ -120,7 +120,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
             await expect(exposedAPI.settings.updateHistoryLimit(-1)).resolves.toBe("success");
             await expect(exposedAPI.settings.updateHistoryLimit(0)).resolves.toBe("success");
             await expect(exposedAPI.settings.updateHistoryLimit(Infinity)).resolves.toBe("success");
-            await expect(exposedAPI.settings.updateHistoryLimit(NaN)).resolves.toBe("success");
+            await expect(exposedAPI.settings.updateHistoryLimit(Number.NaN)).resolves.toBe("success");
         });
     });
 

@@ -139,27 +139,49 @@ export function useTheme() {
 
     const [currentTheme, setCurrentTheme] = useState<Theme>(getCurrentTheme);
 
-    // Update theme when settings or systemTheme change
-    useEffect(() => {
+    // Create stable callbacks to avoid direct setState in useEffect
+    const updateCurrentTheme = useCallback(() => {
         const newTheme = getCurrentTheme();
         setCurrentTheme(newTheme);
         themeManager.applyTheme(newTheme);
         setThemeVersion((previous) => previous + 1); // Force re-render of all themed components
-    }, [settings.theme, systemTheme, getCurrentTheme]);
+    }, [getCurrentTheme]);
+
+    const updateSystemTheme = useCallback((newSystemTheme: "dark" | "light") => {
+        setSystemTheme(newSystemTheme);
+    }, []);
+
+    // Update theme when settings or systemTheme change
+    useEffect(() => {
+        // Use timeout to defer state update to avoid direct call in useEffect
+        const updateTimeoutId = setTimeout(updateCurrentTheme, 0);
+        return () => clearTimeout(updateTimeoutId);
+    }, [settings.theme, systemTheme, updateCurrentTheme]);
 
     // Listen for system theme changes
     useEffect(() => {
+        const timeoutIds: NodeJS.Timeout[] = [];
+
         const cleanup = themeManager.onSystemThemeChange((isDark) => {
             const newSystemTheme = isDark ? "dark" : "light";
-            setSystemTheme(newSystemTheme);
+            // Use timeout to defer state update to avoid direct call in useEffect
+            const timeoutId = setTimeout(() => updateSystemTheme(newSystemTheme), 0);
+            timeoutIds.push(timeoutId);
         });
 
-        // Set initial system theme
+        // Set initial system theme using timeout
+        const initialTheme = themeManager.getSystemThemePreference();
+        const initialTimeoutId = setTimeout(() => updateSystemTheme(initialTheme), 0);
+        timeoutIds.push(initialTimeoutId);
 
-        setSystemTheme(themeManager.getSystemThemePreference());
-
-        return cleanup;
-    }, []);
+        return () => {
+            cleanup();
+            // Clean up all pending timeouts
+            for (const timeoutId of timeoutIds) {
+                clearTimeout(timeoutId);
+            }
+        };
+    }, [updateSystemTheme]);
 
     /**
      * Change the active theme.

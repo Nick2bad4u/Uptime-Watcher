@@ -215,8 +215,11 @@ describe("High-Impact Branch Coverage Tests", () => {
 
                     const circularResult = jsonSafetyModule.safeJsonStringify(circular);
                     expect(circularResult.success).toBe(false);
-                    expect(circularResult.error).toContain("circular") ||
-                        expect(circularResult.error).toContain("Converting circular");
+                    expect(circularResult.error).toBeDefined();
+                    expect(
+                        circularResult.error!.includes("circular") ||
+                            circularResult.error!.includes("Converting circular")
+                    ).toBe(true);
 
                     // Test objects with getters that throw
                     const problematic = {
@@ -259,7 +262,12 @@ describe("High-Impact Branch Coverage Tests", () => {
                     expect(typeGuardsModule.isError([])).toBe(false);
 
                     // Test custom Error subclasses
-                    class CustomError extends Error {}
+                    class CustomError extends Error {
+                        constructor(message?: string) {
+                            super(message);
+                            this.name = "CustomError";
+                        }
+                    }
                     expect(typeGuardsModule.isError(new CustomError())).toBe(true);
                 }
 
@@ -274,7 +282,7 @@ describe("High-Impact Branch Coverage Tests", () => {
 
                     // Test non-Date objects
                     expect(typeGuardsModule.isDate("2023-01-01")).toBe(false);
-                    expect(typeGuardsModule.isDate(1672531200000)).toBe(false);
+                    expect(typeGuardsModule.isDate(1_672_531_200_000)).toBe(false);
                     expect(typeGuardsModule.isDate({ getTime: () => Date.now() })).toBe(false);
                 }
 
@@ -288,7 +296,7 @@ describe("High-Impact Branch Coverage Tests", () => {
                     // Test invalid numbers
                     expect(typeGuardsModule.isFiniteNumber(Infinity)).toBe(false);
                     expect(typeGuardsModule.isFiniteNumber(-Infinity)).toBe(false);
-                    expect(typeGuardsModule.isFiniteNumber(NaN)).toBe(false);
+                    expect(typeGuardsModule.isFiniteNumber(Number.NaN)).toBe(false);
                     expect(typeGuardsModule.isFiniteNumber("42")).toBe(false);
                     expect(typeGuardsModule.isFiniteNumber(null)).toBe(false);
                     expect(typeGuardsModule.isFiniteNumber(undefined)).toBe(false);
@@ -384,10 +392,10 @@ describe("High-Impact Branch Coverage Tests", () => {
                     expect(stringConversionModule.safeStringify(new Error("test error"))).toContain("test error");
 
                     // Test very large objects
-                    const largeObject = Array.from({ length: 1000 }, (_, i) => ({ [`key${i}`]: `value${i}` })).reduce(
-                        (acc, curr) => ({ ...acc, ...curr }),
-                        {}
-                    );
+                    const largeObject = {};
+                    for (let i = 0; i < 1000; i++) {
+                        (largeObject as Record<string, string>)[`key${i}`] = `value${i}`;
+                    }
                     const largeResult = stringConversionModule.safeStringify(largeObject);
                     expect(typeof largeResult).toBe("string");
 

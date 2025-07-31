@@ -43,7 +43,7 @@ vi.mock("../components/Header/Header", () => ({
     Header: () => <header data-testid="header">Header</header>,
 }));
 
-vi.mock("../components/Dashboard/SiteList", () => ({
+vi.mock("../components/Dashboard/SiteList/SiteList", () => ({
     SiteList: () => <div data-testid="site-list">Site List</div>,
 }));
 

@@ -4,7 +4,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { ChartConfigService, useChartConfigs } from "../services/chartConfig";
+import { ChartConfigService, createChartConfigs } from "../services/chartConfig";
 import { Theme } from "../theme/types";
 import { getScaleProperty, getNestedScaleProperty } from "../utils/chartUtils";
 
@@ -371,9 +371,9 @@ describe("ChartConfigService", () => {
     });
 });
 
-describe("useChartConfigs", () => {
+describe("createChartConfigs", () => {
     it("should return all chart configuration objects", () => {
-        const configs = useChartConfigs(mockTheme, 100);
+        const configs = createChartConfigs(mockTheme, 100);
 
         expect(configs).toHaveProperty("lineChartOptions");
         expect(configs).toHaveProperty("barChartOptions");
@@ -381,7 +381,7 @@ describe("useChartConfigs", () => {
     });
 
     it("should return valid chart configurations", () => {
-        const configs = useChartConfigs(mockTheme, 100);
+        const configs = createChartConfigs(mockTheme, 100);
 
         expect(configs.lineChartOptions).toBeDefined();
         expect(configs.barChartOptions).toBeDefined();
@@ -393,7 +393,7 @@ describe("useChartConfigs", () => {
     });
 
     it("should pass totalChecks to doughnut configuration", () => {
-        const configs = useChartConfigs(mockTheme, 150);
+        const configs = createChartConfigs(mockTheme, 150);
         const labelCallback = configs.doughnutOptions.plugins?.tooltip?.callbacks?.label;
 
         if (labelCallback) {
@@ -407,7 +407,7 @@ describe("useChartConfigs", () => {
     });
 
     it("should handle default totalChecks", () => {
-        const configs = useChartConfigs(mockTheme);
+        const configs = createChartConfigs(mockTheme);
         const labelCallback = configs.doughnutOptions.plugins?.tooltip?.callbacks?.label;
 
         if (labelCallback) {
@@ -421,8 +421,8 @@ describe("useChartConfigs", () => {
     });
 
     it("should create new service instance for each call", () => {
-        const configs1 = useChartConfigs(mockTheme, 100);
-        const configs2 = useChartConfigs(mockTheme, 100);
+        const configs1 = createChartConfigs(mockTheme, 100);
+        const configs2 = createChartConfigs(mockTheme, 100);
 
         // Should be different object instances
         expect(configs1).not.toBe(configs2);
@@ -430,7 +430,7 @@ describe("useChartConfigs", () => {
     });
 
     it("should apply theme consistently across all configurations", () => {
-        const configs = useChartConfigs(mockTheme, 100);
+        const configs = createChartConfigs(mockTheme, 100);
 
         expect(configs.lineChartOptions.plugins?.title?.color).toBe(mockTheme.colors.text.primary);
         expect(configs.barChartOptions.plugins?.title?.color).toBe(mockTheme.colors.text.primary);
@@ -452,7 +452,7 @@ describe("useChartConfigs", () => {
             name: "dark",
         };
 
-        const configs = useChartConfigs(darkTheme, 100);
+        const configs = createChartConfigs(darkTheme, 100);
 
         expect(configs.lineChartOptions.plugins?.title?.color).toBe(darkTheme.colors.text.primary);
         expect(configs.barChartOptions.plugins?.title?.color).toBe(darkTheme.colors.text.primary);
