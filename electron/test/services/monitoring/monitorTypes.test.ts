@@ -195,7 +195,15 @@ describe("Monitor Types Utility", () => {
 
     describe("Error Handling and Edge Cases", () => {
         it("should handle malformed input gracefully", () => {
-            const malformedInputs = ["http\0", "http\t", "http\n", "ht\ttp", "h ttp", "port\r", "po rt"];
+            const malformedInputs = [
+                "http\0",
+                "http\t",
+                "http\n",
+                "ht\ttp",
+                "h ttp",
+                "port\r",
+                "po rt",
+            ];
 
             for (const input of malformedInputs) {
                 expect(isBaseMonitorType(input)).toBe(false);

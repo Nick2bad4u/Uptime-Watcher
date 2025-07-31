@@ -83,7 +83,6 @@ import vitestGlobals from "eslint-plugin-vitest-globals";
 import xss from "eslint-plugin-xss";
 import yamlEslintParser from "yaml-eslint-parser";
 
-
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 
 import * as cssPlugin from "eslint-plugin-css";

@@ -16,7 +16,15 @@ import {
 describe("Value Converters Utility", () => {
     describe("DbValue Type", () => {
         it("should accept valid DbValue types", () => {
-            const values: DbValue[] = [null, 123, "string", 0, -1, 3.14, ""];
+            const values: DbValue[] = [
+                null,
+                123,
+                "string",
+                0,
+                -1,
+                3.14,
+                "",
+            ];
 
             expect(values).toHaveLength(7);
             expect(values[0]).toBeNull();
@@ -375,7 +383,13 @@ describe("Value Converters Utility", () => {
                 "checkInterval = ?",
                 "notificationsEnabled = ?",
             ]);
-            expect(updateValues).toEqual(["My Website", "https://example.com", 1, 60_000, 0]);
+            expect(updateValues).toEqual([
+                "My Website",
+                "https://example.com",
+                1,
+                60_000,
+                0,
+            ]);
         });
 
         it("should handle complex value conversion scenario", () => {

@@ -35,7 +35,13 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
     describe("Error Handling Paths", () => {
         it("should handle various error scenarios in service operations", async () => {
             // Test different types of errors
-            const errors = [new Error("Standard error"), { message: "Object error" }, "String error", null, undefined];
+            const errors = [
+                new Error("Standard error"),
+                { message: "Object error" },
+                "String error",
+                null,
+                undefined,
+            ];
 
             for (const error of errors) {
                 expect(() => {
@@ -314,7 +320,13 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                 { state: 123, isValid: false },
             ];
 
-            const validStates = new Set(["initial", "loading", "success", "error", "completed"]);
+            const validStates = new Set([
+                "initial",
+                "loading",
+                "success",
+                "error",
+                "completed",
+            ]);
 
             for (const testCase of stateValidationCases) {
                 expect(() => {
@@ -357,7 +369,16 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
 
         it("should handle event listener management", () => {
             const listeners = new Map();
-            const events = ["connect", "disconnect", "error", "data", null, undefined, "", 123];
+            const events = [
+                "connect",
+                "disconnect",
+                "error",
+                "data",
+                null,
+                undefined,
+                "",
+                123,
+            ];
 
             for (const event of events) {
                 expect(() => {

@@ -81,7 +81,14 @@ describe("useUpdatesStore", () => {
         it("should handle all update status values", () => {
             const { result } = renderHook(() => useUpdatesStore());
 
-            const statuses: UpdateStatus[] = ["idle", "checking", "available", "downloading", "downloaded", "error"];
+            const statuses: UpdateStatus[] = [
+                "idle",
+                "checking",
+                "available",
+                "downloading",
+                "downloaded",
+                "error",
+            ];
 
             for (const status of statuses) {
                 act(() => {
@@ -107,7 +114,13 @@ describe("useUpdatesStore", () => {
         it("should handle progress values from 0 to 100", () => {
             const { result } = renderHook(() => useUpdatesStore());
 
-            const progressValues = [0, 25, 50, 75, 100];
+            const progressValues = [
+                0,
+                25,
+                50,
+                75,
+                100,
+            ];
 
             for (const progress of progressValues) {
                 act(() => {

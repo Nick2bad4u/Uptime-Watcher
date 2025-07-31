@@ -25,7 +25,13 @@ const BASE_URL = "https://github.com/TryGhost/node-sqlite3/wiki";
 // Array of doc/page names (relative, e.g. ["intro", "example"])
 // These should match the paths in your repo, relative to the base URL
 // If you have subdirectories, include them (e.g. "examples/example.js")
-const PAGES = ["API.md", "Binaries.md", "Caching.md", "Control_Flow.md", "Debugging.md"];
+const PAGES = [
+    "API.md",
+    "Binaries.md",
+    "Caching.md",
+    "Control_Flow.md",
+    "Debugging.md",
+];
 
 const INPUT_FORMAT = "gfm"; // Change to your input format if needed
 const OUTPUT_FORMAT = "gfm"; // Change to your desired output format

@@ -293,7 +293,14 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         });
 
         it("should accept valid port ranges", () => {
-            const validPorts = [0, 1, 80, 443, 8080, 65_535]; // 0 is valid for validator.js
+            const validPorts = [
+                0,
+                1,
+                80,
+                443,
+                8080,
+                65_535,
+            ]; // 0 is valid for validator.js
 
             for (const port of validPorts) {
                 const monitor = {
@@ -353,7 +360,13 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         });
 
         it("should accept various valid host formats for ping", () => {
-            const validHosts = ["example.com", "subdomain.example.com", "192.168.1.1", "127.0.0.1", "localhost"];
+            const validHosts = [
+                "example.com",
+                "subdomain.example.com",
+                "192.168.1.1",
+                "127.0.0.1",
+                "localhost",
+            ];
 
             for (const host of validHosts) {
                 const monitor = {

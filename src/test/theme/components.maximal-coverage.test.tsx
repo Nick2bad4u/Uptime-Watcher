@@ -54,7 +54,13 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should apply all padding variants", () => {
-            const paddings = ["xs", "sm", "md", "lg", "xl"] as const;
+            const paddings = [
+                "xs",
+                "sm",
+                "md",
+                "lg",
+                "xl",
+            ] as const;
 
             paddings.forEach((padding) => {
                 render(
@@ -111,7 +117,13 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should handle rounded prop", () => {
-            const roundedOptions = ["none", "sm", "md", "lg", "full"] as const;
+            const roundedOptions = [
+                "none",
+                "sm",
+                "md",
+                "lg",
+                "full",
+            ] as const;
 
             roundedOptions.forEach((rounded) => {
                 render(
@@ -126,7 +138,13 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should handle shadow prop", () => {
-            const shadowOptions = ["sm", "md", "lg", "xl", "inner"] as const;
+            const shadowOptions = [
+                "sm",
+                "md",
+                "lg",
+                "xl",
+                "inner",
+            ] as const;
 
             shadowOptions.forEach((shadow) => {
                 render(
@@ -203,7 +221,13 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should apply all size variants", () => {
-            const sizes = ["xs", "sm", "md", "lg", "xl"] as const;
+            const sizes = [
+                "xs",
+                "sm",
+                "md",
+                "lg",
+                "xl",
+            ] as const;
 
             sizes.forEach((size) => {
                 render(
@@ -310,7 +334,13 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should handle different input types", () => {
-            const types = ["text", "email", "password", "number", "url"] as const;
+            const types = [
+                "text",
+                "email",
+                "password",
+                "number",
+                "url",
+            ] as const;
 
             types.forEach((type) => {
                 render(<ThemedInput type={type} data-testid={`input-${type}`} />);
@@ -372,7 +402,17 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should apply all size variants", () => {
-            const sizes = ["xs", "sm", "base", "md", "lg", "xl", "2xl", "3xl", "4xl"] as const;
+            const sizes = [
+                "xs",
+                "sm",
+                "base",
+                "md",
+                "lg",
+                "xl",
+                "2xl",
+                "3xl",
+                "4xl",
+            ] as const;
 
             sizes.forEach((size) => {
                 render(<ThemedText size={size}>Size {size}</ThemedText>);
@@ -659,7 +699,14 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should apply all variant styles", () => {
-            const variants = ["primary", "secondary", "success", "warning", "error", "info"] as const;
+            const variants = [
+                "primary",
+                "secondary",
+                "success",
+                "warning",
+                "error",
+                "info",
+            ] as const;
 
             variants.forEach((variant) => {
                 render(<ThemedBadge variant={variant}>{variant} Badge</ThemedBadge>);

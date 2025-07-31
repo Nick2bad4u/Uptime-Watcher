@@ -1,6 +1,12 @@
 {
     "version": "0.2",
-    "ignorePaths": ["node_modules", "dist", "dist-electron", "**CHANGELOG.md", "release"],
+    "ignorePaths": [
+        "node_modules",
+        "dist",
+        "dist-electron",
+        "**CHANGELOG.md",
+        "release"
+    ],
     "dictionaryDefinitions": [
         {
             "name": "Uptime-Watcher Project Dictionary",

@@ -17,7 +17,13 @@ export default defineConfig({
         target: "es2024", // Match TypeScript target for consistency
         // Transpile all files with ESBuild to remove comments from code coverage.
         // Required for `test.coverage.ignoreEmptyLines` to work:
-        include: ["**/*.js", "**/*.jsx", "**/*.mjs", "**/*.ts", "**/*.tsx"],
+        include: [
+            "**/*.js",
+            "**/*.jsx",
+            "**/*.mjs",
+            "**/*.ts",
+            "**/*.tsx",
+        ],
         // More aggressive transformation to help coverage parsing
         keepNames: true, // Preserve function names for better coverage reports
     },
@@ -99,7 +105,13 @@ export default defineConfig({
         },
         environment: "jsdom", // Default for React components
         // Test file patterns - exclude electron tests as they have their own config
-        exclude: ["**/node_modules/**", "**/dist/**", "**/dist-electron/**", "electron/**", "**/coverage/**"],
+        exclude: [
+            "**/node_modules/**",
+            "**/dist/**",
+            "**/dist-electron/**",
+            "electron/**",
+            "**/coverage/**",
+        ],
         globals: true, // Enable global test functions (describe, it, expect)
         include: [
             "src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",

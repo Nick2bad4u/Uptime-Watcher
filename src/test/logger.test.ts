@@ -2,11 +2,7 @@
  * Tests for frontend logger service.
  */
 
- 
-
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
- 
 
 // Mock electron-log/renderer
 const mockLog = {

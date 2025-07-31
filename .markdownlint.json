@@ -8,7 +8,16 @@
         "style": "consistent"
     },
     "MD033": {
-        "allowed_elements": ["a", "code", "pre", "div", "span", "img", "strong", "style"]
+        "allowed_elements": [
+            "a",
+            "code",
+            "pre",
+            "div",
+            "span",
+            "img",
+            "strong",
+            "style"
+        ]
     },
     "MD024": {
         "siblings_only": true

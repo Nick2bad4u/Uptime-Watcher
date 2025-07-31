@@ -53,8 +53,7 @@
         { "includes": ["*.html"], "formatter": { "lineWidth": 120 } },
         { "includes": ["*.user.js"], "formatter": { "lineWidth": 120 } },
         { "includes": ["*.md"], "formatter": { "indentWidth": 1 } },
-        { "includes": ["**/package.json", "**/package-lock.json"] }
-    ],
+        { "includes": ["**/package.json", "**/package-lock.json"] }],
     "assist": {
         "enabled": true,
         "actions": { "source": { "organizeImports": "on" } }

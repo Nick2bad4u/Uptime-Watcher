@@ -275,7 +275,14 @@ describe("Theme Components - Missing Coverage", () => {
         });
 
         it("should render with all variant types", () => {
-            const variants = ["primary", "secondary", "success", "warning", "error", "info"] as const;
+            const variants = [
+                "primary",
+                "secondary",
+                "success",
+                "warning",
+                "error",
+                "info",
+            ] as const;
 
             variants.forEach((variant) => {
                 const { unmount } = render(<ThemedBadge variant={variant}>Test Badge</ThemedBadge>);

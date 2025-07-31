@@ -424,7 +424,14 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         });
 
         it("should validate valid ports", () => {
-            const validPorts = [1, 80, 443, 8080, 3000, 65_535];
+            const validPorts = [
+                1,
+                80,
+                443,
+                8080,
+                3000,
+                65_535,
+            ];
 
             for (const port of validPorts) {
                 const validData = {
@@ -1089,7 +1096,13 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         });
 
         it("should handle special IP addresses", () => {
-            const specialIPs = ["127.0.0.1", "0.0.0.0", "255.255.255.255", "::1", "2001:db8::8a2e:370:7334"];
+            const specialIPs = [
+                "127.0.0.1",
+                "0.0.0.0",
+                "255.255.255.255",
+                "::1",
+                "2001:db8::8a2e:370:7334",
+            ];
 
             for (const host of specialIPs) {
                 const validData = {

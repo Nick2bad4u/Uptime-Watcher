@@ -18,10 +18,16 @@
         { "pattern": "^#-linux-builds$" },
         { "pattern": "^#-development$" },
         { "pattern": "^#-credits$" },
-        { "pattern": "^#-license$" }
-    ],
+        { "pattern": "^#-license$" }],
     "timeout": "10s",
     "retryOn429": true,
     "retryCount": 2,
-    "aliveStatusCodes": [200, 206, 301, 302, 307, 308]
+    "aliveStatusCodes": [
+        200,
+        206,
+        301,
+        302,
+        307,
+        308
+    ]
 }

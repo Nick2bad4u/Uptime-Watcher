@@ -104,11 +104,11 @@ const CMD_TEMPLATE = (url, outFile) =>
 /**
  * Rewrites relative Markdown links to absolute URLs for your documentation set.
  * Handles ./, ../, and subdirectory links.
- * 
+ *
  * Limitations:
  * - Does not rewrite links containing anchors (#), query parameters (?), or non-standard formats.
  * - Only rewrites links that start with ./ or ../ and do not contain # or ?.
- * 
+ *
  * @param {string} content
  * @returns {string}
  */
@@ -268,7 +268,7 @@ const pagePromises = PAGES.map((page) => {
  * Main entry point for downloading and processing documentation files.
  * Executes all page download promises in parallel, writes logs upon completion,
  * and handles errors centrally by logging and re-throwing them after attempting to write the log.
- * 
+ *
  * @returns {Promise<void>} Resolves when all downloads and processing are complete.
  */
 (async function main() {

@@ -193,7 +193,15 @@ describe("Validation Error Paths and Edge Cases", () => {
             const isString = (value: unknown): value is string => typeof value === "string";
             const isNumber = (value: unknown): value is number => typeof value === "number" && !Number.isNaN(value);
 
-            const mixedArray = ["hello", 42, null, "world", 3.14, undefined, "test"];
+            const mixedArray = [
+                "hello",
+                42,
+                null,
+                "world",
+                3.14,
+                undefined,
+                "test",
+            ];
 
             expect(filterValidItems(mixedArray, isString)).toEqual(["hello", "world", "test"]);
             expect(filterValidItems(mixedArray, isNumber)).toEqual([42, 3.14]);
@@ -219,7 +227,18 @@ describe("Validation Error Paths and Edge Cases", () => {
                 return chunks;
             };
 
-            expect(chunkArray([1, 2, 3, 4, 5], 2)).toEqual([[1, 2], [3, 4], [5]]);
+            expect(
+                chunkArray(
+                    [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                    ],
+                    2
+                )
+            ).toEqual([[1, 2], [3, 4], [5]]);
             expect(chunkArray([1, 2, 3], 3)).toEqual([[1, 2, 3]]);
             expect(chunkArray([1, 2, 3], 5)).toEqual([[1, 2, 3]]);
             expect(chunkArray([], 2)).toEqual([]);

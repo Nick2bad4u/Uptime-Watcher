@@ -683,7 +683,18 @@ describe("Type Guards - Comprehensive Coverage", () => {
                 config: { timeout: 5000 },
             };
 
-            if (hasProperties(data, ["id", "name", "port", "url", "active", "created", "tags", "config"])) {
+            if (
+                hasProperties(data, [
+                    "id",
+                    "name",
+                    "port",
+                    "url",
+                    "active",
+                    "created",
+                    "tags",
+                    "config",
+                ])
+            ) {
                 expect(isPositiveNumber(data.id)).toBe(true);
                 expect(isString(data.name)).toBe(true);
                 expect(isValidPort(data.port)).toBe(true);

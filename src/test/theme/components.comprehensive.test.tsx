@@ -124,7 +124,13 @@ describe("Theme Components - Comprehensive Coverage", () => {
         });
 
         it("should render all size variants", () => {
-            const sizes = ["xs", "sm", "md", "lg", "xl"] as const;
+            const sizes = [
+                "xs",
+                "sm",
+                "md",
+                "lg",
+                "xl",
+            ] as const;
 
             sizes.forEach((size) => {
                 const { unmount } = render(<ThemedButton {...defaultProps} size={size} />);
@@ -340,7 +346,13 @@ describe("Theme Components - Comprehensive Coverage", () => {
         });
 
         it("should render all size variants", () => {
-            const sizes = ["xs", "sm", "md", "lg", "xl"] as const;
+            const sizes = [
+                "xs",
+                "sm",
+                "md",
+                "lg",
+                "xl",
+            ] as const;
 
             sizes.forEach((size) => {
                 const { unmount } = render(<ThemedIconButton {...defaultProps} size={size} />);

@@ -255,7 +255,14 @@ describe("Status Utilities", () => {
 
     describe("Comprehensive edge cases and integration", () => {
         it("should handle all known statuses consistently in both functions", () => {
-            const knownStatuses = ["down", "mixed", "paused", "pending", "unknown", "up"];
+            const knownStatuses = [
+                "down",
+                "mixed",
+                "paused",
+                "pending",
+                "unknown",
+                "up",
+            ];
 
             for (const status of knownStatuses) {
                 const icon = getStatusIcon(status);

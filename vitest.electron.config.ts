@@ -13,7 +13,13 @@ export default defineConfig({
         target: "es2024", // Match TypeScript target for consistency
         // Transpile all files with ESBuild to remove comments from code coverage.
         // Required for `test.coverage.ignoreEmptyLines` to work:
-        include: ["**/*.js", "**/*.jsx", "**/*.mjs", "**/*.ts", "**/*.tsx"],
+        include: [
+            "**/*.js",
+            "**/*.jsx",
+            "**/*.mjs",
+            "**/*.ts",
+            "**/*.tsx",
+        ],
     },
     plugins: [
         react({

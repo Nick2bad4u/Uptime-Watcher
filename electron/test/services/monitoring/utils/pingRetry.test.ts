@@ -271,7 +271,13 @@ describe("pingRetry utilities", () => {
         it("should handle different host types", async () => {
             mockWithOperationalHooks.mockResolvedValue(mockSingleCheckResult);
 
-            const hostTypes = ["google.com", "192.168.1.1", "localhost", "2001:db8::1", "subdomain.example.org"];
+            const hostTypes = [
+                "google.com",
+                "192.168.1.1",
+                "localhost",
+                "2001:db8::1",
+                "subdomain.example.org",
+            ];
 
             for (const host of hostTypes) {
                 mockWithOperationalHooks.mockClear();

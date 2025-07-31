@@ -330,7 +330,13 @@ describe("Theme Types Module", () => {
 
     describe("ThemeName Type", () => {
         it("should support all theme names", () => {
-            const themeNames: ThemeName[] = ["light", "dark", "high-contrast", "system", "custom"];
+            const themeNames: ThemeName[] = [
+                "light",
+                "dark",
+                "high-contrast",
+                "system",
+                "custom",
+            ];
 
             themeNames.forEach((name) => {
                 expect(typeof name).toBe("string");

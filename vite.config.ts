@@ -164,7 +164,13 @@ export default defineConfig(() => {
             },
             environment: "jsdom", // Default for React components
             // Test file patterns - exclude electron tests as they have their own config
-            exclude: ["**/node_modules/**", "**/dist/**", "**/dist-electron/**", "electron/**", "**/coverage/**"],
+            exclude: [
+                "**/node_modules/**",
+                "**/dist/**",
+                "**/dist-electron/**",
+                "electron/**",
+                "**/coverage/**",
+            ],
             globals: true, // Enable global test functions (describe, it, expect)
             include: [
                 "src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
