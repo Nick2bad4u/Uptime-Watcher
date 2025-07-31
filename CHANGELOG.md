@@ -7,14 +7,212 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[c7c49f7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c7c49f7c768f3232993ca216e90af4e664060633)...
-[c7c49f7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c7c49f7c768f3232993ca216e90af4e664060633)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/c7c49f7c768f3232993ca216e90af4e664060633...c7c49f7c768f3232993ca216e90af4e664060633))
+[[02125af](https://github.com/Nick2bad4u/Uptime-Watcher/commit/02125afc01d45bb8935eaa4fc9306a42daaf2fe4)...
+[02125af](https://github.com/Nick2bad4u/Uptime-Watcher/commit/02125afc01d45bb8935eaa4fc9306a42daaf2fe4)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/02125afc01d45bb8935eaa4fc9306a42daaf2fe4...02125afc01d45bb8935eaa4fc9306a42daaf2fe4))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 9.7.0 [`(02125af)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/02125afc01d45bb8935eaa4fc9306a42daaf2fe4)
+
+
+
+
+
+
+## [9.7.0] - 2025-07-31
+
+
+[[ef810eb](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ef810ebf772dfe59ac317d8af647b3b31c0e9f20)...
+[cd71c5f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cd71c5fb522fee53f2cec54f13fcdbc80c330ef1)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/ef810ebf772dfe59ac317d8af647b3b31c0e9f20...cd71c5fb522fee53f2cec54f13fcdbc80c330ef1))
+
+
+### �️ Bug Fixes
+
+- 🛠️ [fix] Improve error boundary retry and coverage mapping
+
+- Ensures error boundary remounts children on retry to fully reset state after an error, preventing persistent failures.
+- Adds missing shared files to coverage component mappings for more accurate reporting.
+- Clarifies deprecation note for codecov GitHub checks integration. [`(a472bcf)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a472bcf3b3b44be210dd1135874c853520f7597b)
+
+
+- 🛠️ [fix] Defer state updates in effects using named UI delay
+
+- Replaces direct 0ms timeouts in effect hooks with a shared constant for deferred state updates, clarifying intent and improving maintainability
+- Updates documentation to explain use of deferred updates and modern React state patterns
+- Helps comply with React best practices by avoiding direct state changes in effects, reducing risk of unexpected behavior [`(f052aff)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f052aff3cba94f8a8905dfcc2eeff09535770748)
+
+
+- 🛠️ [fix] Work around ESLint plugin iterator bug
+
+- Avoids direct use of the iterator property to bypass a known ESLint plugin issue.
+ - Ensures compatibility with linting tools while preserving iteration functionality. [`(7ecf608)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7ecf60823bb29f3f5231ab0dd3554519f332e19a)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 9.6.0 [`(c7c49f7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c7c49f7c768f3232993ca216e90af4e664060633)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(f903f49)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f903f4989d1bb24b8ac6df34087b8c99b5fa2991)
+
+
+
+### 💼 Other
+
+- 📃[docs] add package docs [`(c1c99fe)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c1c99fe941d77f0eabe0caffade3ba3753da58cb)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Improve state logic, error handling, and code clarity
+
+- Refactors state updates in UI components to avoid direct setState calls in effects, reducing unnecessary renders and improving React best practices
+- Replaces spread syntax for array copying with Array.from for consistency, clarity, and future-proofing
+- Renames and standardizes private/protected variable naming for singleton services, enhancing code readability and maintainability
+- Adds and improves error handling in backend service initializations and IPC calls to provide clearer feedback and more robust fail-safes
+- Refactors frontend logic to better track user-edited fields versus derived or default state for site and monitor details, ensuring correct UI behavior
+- Improves fallback behavior and logging when loading monitor types or settings fails, making user experience more resilient
+- Adjusts effect and cleanup logic in theme and overlay hooks to prevent memory leaks and infinite render loops
+- Updates UI dropdown and form option calculations for accuracy and user-friendliness
+- Moves and renames component files for clearer project structure and easier maintenance
+- Updates chart config service API for clearer intent and usage
+- Expands array-of-strings formatting for font families and status options to improve code readability
+- Refactors code style to use stable callbacks, default objects, and de-structuring for safer property management
+
+Overall, these changes reduce subtle UI bugs, improve maintainability, and make error cases more explicit. [`(39bcee8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/39bcee8d6e9eb0e5921baed5302a9f16b6d746cb)
+
+
+
+### � Documentation
+
+- 📝 [docs] Add comprehensive Electron-Log and Electron-Updater docs
+
+- Introduces detailed documentation for Electron-Log, covering error handling, event logging, extending functionality, initialization in renderer, migration between major versions, and all transport options and formats
+- Adds full Electron-Updater documentation, including setup, configuration, events, staged rollouts, compatibility, and advanced usage patterns
+- Aims to improve developer onboarding and clarify best practices for logging and auto-update workflows in Electron apps [`(3394581)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3394581370161be9e0334fa53afd3534ae1fc4ab)
+
+
+- 📝 [docs] Add comprehensive Chart.js Zoom plugin documentation
+
+- Introduces detailed usage guides, options reference, developer API, and integration instructions for the Chart.js Zoom plugin
+- Adds a variety of interactive code samples covering zoom, pan, drag, wheel, scale types, and advanced configuration scenarios
+- Provides scripts and utilities to support sample execution and documentation consistency
+- Facilitates user onboarding and in-depth understanding of plugin features and extensibility [`(4c7a035)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4c7a035ab6c81a92fa139b15a05a2754e57056e5)
+
+
+- 📝 [docs] Add comprehensive Chart.js user documentation
+
+- Introduces a complete set of user-facing documentation for Chart.js, covering installation, integration, configuration, chart types, axes, options, plugins, accessibility, and performance best practices.
+- Provides detailed usage guides, step-by-step examples, configuration references, and sample code for all major chart types and features.
+- Enhances developer experience by offering clear explanations, option tables, and links to related samples and advanced topics.
+- Lays the foundation for standardized, maintainable, and discoverable documentation across the Chart.js codebase. [`(57eeeda)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/57eeedac7971be3d6e2378358fd418f94135f278)
+
+
+- 📝 [docs] Add ESLint error resolution prompt guidelines
+
+- Introduces a detailed prompt outlining step-by-step procedures and best practices for resolving all ESLint errors and warnings in the codebase
+- Emphasizes thoroughness, documentation of exceptions, and maintaining or improving code quality without bypassing lint rules
+- Aims to standardize lint error handling and support future code consistency [`(a0bc15f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a0bc15f9c18dc9d81e312e1230bf19ebd8c12cbd)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Expand multiline arrays and objects for readability
+
+- Updates formatting across configuration and test files to expand array and object literals over multiple lines.
+- Improves code readability and consistency, especially for longer lists and argument arrays in both config and test cases.
+- No logic or functionality changes; focuses solely on stylistic improvements. [`(bfb8351)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bfb83515aa7e21ae2be7cd0a469eacbc4f116670)
+
+
+- 🎨 [style] Adjust ESLint directive placement for clarity
+
+- Moves, adds, and re-enables ESLint disable/enable comments to better scope rule exemptions to specific functions or code blocks.
+- Improves code readability and ensures linter exceptions are applied only where necessary, supporting future maintainability. [`(ef810eb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ef810ebf772dfe59ac317d8af647b3b31c0e9f20)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Expand and improve frontend test coverage
+
+- Adds comprehensive and additional tests for error boundary, error fallback, theme hooks, settings store, and site status utilities
+- Refactors test assertions for property access and handler checks to enhance reliability and maintainability
+- Updates tests to cover more edge cases, asynchronous behavior, accessibility, and functional re-export validation
+- Improves test clarity for type usage and interaction behaviors, supporting future refactors and feature additions [`(cd71c5f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cd71c5fb522fee53f2cec54f13fcdbc80c330ef1)
+
+
+- 🧪 [test] Update tests for theme and util changes, fix mocks
+
+- Updates tests to use new naming and structure for utility functions and chart config creation.
+- Improves test logic for error checks, custom errors, and large object handling.
+- Corrects mock paths to match file structure changes.
+- Refactors theme hook to defer state updates and avoid direct setState in effects, improving React state handling and stability.
+- Enhances system theme detection and updates using timeouts and stable callbacks.
+- Cleans up redundant ESLint directives and whitespace in test files. [`(69642d6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/69642d603046df7c10aff7c8674899f3342bc319)
+
+
+- 🧪 [test] Improve test coverage and ensure consistent formatting
+
+- Increases branch and edge case coverage across multiple test suites, targeting previously uncovered code paths, error handling, and integration scenarios.
+- Applies consistent formatting and style to test code, improving readability and maintainability.
+- Refactors array, object, and function declarations for brevity and clarity in test files.
+- Streamlines test case definitions and input data, reducing redundancy and improving test execution speed.
+- Updates scripts for documentation downloading to enhance robustness, path resolution, and output handling.
+- Does not modify production code logic; focuses on testing, formatting, and supporting build/test scripts. [`(916b337)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/916b33702fcbecf98dceacaee285c13bd69b25be)
+
+
+- 🧪 [test] Achieve 98%+ branch coverage across core modules
+
+- Adds extensive targeted and comprehensive unit tests for Electron, shared, and frontend code to boost branch coverage above 98%
+- Covers error handling, switch defaults, edge cases, utility functions, store logic, theme hooks, and component render branches
+- Refactors and replaces insufficient or disabled tests with robust, focused coverage
+- Fixes minor inconsistencies in existing tests and aligns test expectations with actual UI/component behavior
+- Ensures proper mocking, error scenarios, and integration coverage for critical store actions and system events
+- Improves test reliability, maintainability, and paves the way for confident future refactors [`(a3c541d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a3c541d9c3c85a329c71b1ed0ff79f14440179af)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v9.6.0 [skip ci] [`(e9335d6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e9335d6f99efec1256a66403eee2bb728200d552)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Add Prettier plugins and update ESLint deps
+
+- Integrates Prettier plugins for JSDoc, Tailwind CSS, and multiline arrays to improve code formatting flexibility and consistency.
+- Configures relevant Prettier options for documentation and styling enhancements.
+- Adds eslint-plugin-array-func to promote functional array usage.
+- Removes unused ESLint plugin dependencies for markdown to streamline the toolchain.
+- Enhances formatting and linting accuracy, aligning with updated project style conventions. [`(5e19bd3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5e19bd321ccb6f72399e17ee4e314cadec38e2e8)
+
+
+- 🔧 [build] Update ESLint config and dependencies for broader linting
+
+- Adds and configures new ESLint plugins for YAML, HTML, React, exception handling, canonical rules, and XSS protection
+- Expands linting to YAML and HTML files; improves React and TypeScript linting coverage
+- Replaces legacy import plugin with a newer alternative for improved compatibility
+- Updates multiple dependencies to latest versions for bug fixes and enhanced stability
+- Enhances code quality, security, and maintainability through expanded linting and up-to-date tooling [`(aff261a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/aff261a85194c86090025615231a5687a9422604)
+
+
+- 🔧 [build] Enhance ESLint TypeScript resolver and update test bail config
+
+- Configures ESLint to use the TypeScript import resolver for improved cross-project import resolution and type handling, supporting multiple tsconfig files and Bun modules.
+- Adds the required resolver dependency to development dependencies.
+- Updates test scripts to increase the Vitest bail threshold from 1 to 50, reducing premature test run termination on errors and improving test feedback.
+- Clarifies and extends the internal test coverage prompt with stricter instructions and improved documentation for handling bugs and edge cases. [`(8a7f376)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8a7f3769862861073e004e9bf8ebf18c86c4c7dc)
 
 
 
