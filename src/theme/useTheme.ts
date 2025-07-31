@@ -161,7 +161,7 @@ export function useTheme() {
     // Listen for system theme changes
     useEffect(() => {
         const timeoutIds: NodeJS.Timeout[] = [];
-
+        
         const cleanup = themeManager.onSystemThemeChange((isDark) => {
             const newSystemTheme = isDark ? "dark" : "light";
             // Use timeout to defer state update to avoid direct call in useEffect
@@ -177,9 +177,9 @@ export function useTheme() {
         return () => {
             cleanup();
             // Clean up all pending timeouts
-            for (const timeoutId of timeoutIds) {
+            timeoutIds.forEach((timeoutId) => {
                 clearTimeout(timeoutId);
-            }
+            });
         };
     }, [updateSystemTheme]);
 
