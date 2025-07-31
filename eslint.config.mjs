@@ -23,7 +23,6 @@
 /* eslint-disable object-shorthand */
 /* eslint-disable sort-imports */
 
-
 // Import { plugin as ex } from "eslint-plugin-exception-handling";
 // Import eslintPluginNoInferred from "eslint-plugin-no-inferred-method-name";
 // Import stylistic from "@stylistic/eslint-plugin";
@@ -42,9 +41,9 @@ import nounsanitized from "eslint-plugin-no-unsanitized";
 import pluginBoundaries from "eslint-plugin-boundaries";
 import pluginCompat from "eslint-plugin-compat";
 // eslint-disable-next-line depend/ban-dependencies -- Recommended one sucks
-import pluginComments from "eslint-plugin-eslint-comments"
+import pluginComments from "eslint-plugin-eslint-comments";
 import pluginFunctional from "eslint-plugin-functional";
-import { importX } from 'eslint-plugin-import-x';
+import { importX } from "eslint-plugin-import-x";
 import pluginNoOnly from "eslint-plugin-no-only-tests";
 import pluginPerfectionist from "eslint-plugin-perfectionist";
 import pluginPreferArrow from "eslint-plugin-prefer-arrow";
@@ -71,8 +70,19 @@ import tseslint from "@typescript-eslint/eslint-plugin";
 import tseslintParser from "@typescript-eslint/parser";
 import vitest from "@vitest/eslint-plugin";
 import vitestGlobals from "eslint-plugin-vitest-globals";
-import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript'
+import { plugin as ex } from "eslint-plugin-exception-handling";
+import html from "eslint-plugin-html";
+import pluginCanonical from "eslint-plugin-canonical";
+import eslintReact from "@eslint-react/eslint-plugin";
+import eslintReactDom from "eslint-plugin-react-dom";
+import eslintReactWeb from "eslint-plugin-react-web-api";
+import eslintReactHooksExtra from "eslint-plugin-react-hooks-extra";
+import eslintReactNamingConvention from "eslint-plugin-react-naming-convention";
+import xss from "eslint-plugin-xss";
+import eslintPluginYml from "eslint-plugin-yml";
+import yamlEslintParser from "yaml-eslint-parser";
 
+import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 
 import * as cssPlugin from "eslint-plugin-css";
 
@@ -81,21 +91,14 @@ import * as cssPlugin from "eslint-plugin-css";
 // eslint-find-rules
 // eslint-formatter-compact
 // eslint-import-resolver-node
-// eslint-import-resolver-typescript
 // eslint-plugin-css-modules
-// eslint-plugin-exception-handling
-// eslint-plugin-html
-// eslint-plugin-import
 // eslint-plugin-json
 // eslint-plugin-no-inferred-method-name
-// eslint-plugin-react-dom
-// eslint-plugin-react-hooks-extra
-// eslint-plugin-react-naming-convention
 // eslint-plugin-react-native
-// eslint-plugin-react-web-api
 // eslint-plugin-react-x
-// eslint-plugin-xss
-// eslint-plugin-yml
+
+// Don't use
+// eslint-plugin-import -- Replaced by import-x
 
 const __dirname = import.meta.dirname;
 
@@ -188,6 +191,29 @@ export default [
             ],
         },
     },
+
+    // YAML files
+    {
+        plugins: { eslintPluginYml: eslintPluginYml },
+        files: ["*.yaml", "*.yml"],
+        ignores: ["docs/docusaurus/**"],
+        ...eslintPluginYml.configs["flat/prettier"].rules,
+        languageOptions: {
+            parser: yamlEslintParser,
+            // Options used with yaml-eslint-parser.
+            parserOptions: {
+                defaultYAMLVersion: "1.2",
+            },
+        },
+    },
+
+    // HTML files
+    {
+        plugins: { html },
+        files: ["**/*.html"],
+        ignores: ["docs/docusaurus/**"],
+    },
+
     // Markdown files
     {
         files: ["**/*.md"],
@@ -317,6 +343,14 @@ export default [
             tsdoc: pluginTsdoc,
             unicorn: pluginUnicorn,
             "eslint-comments": pluginComments,
+            ex: ex,
+            canonical: pluginCanonical,
+            "@eslint-react": eslintReact,
+            "@eslint-react/dom": eslintReactDom,
+            "@eslint-react/web-api": eslintReactWeb,
+            "@eslint-react/hooks-extra": eslintReactHooksExtra,
+            "@eslint-react/naming-convention": eslintReactNamingConvention,
+            xss: xss,
         },
         rules: {
             // TypeScript rules
@@ -341,6 +375,17 @@ export default [
             ...tailwind.configs["flat/recommended"].rules,
             ...cssPlugin.configs["flat/standard"].rules,
             ...pluginComments.configs.recommended.rules,
+            ...pluginCanonical.configs.recommended.rules,
+            ...eslintReact.configs["recommended-typescript"].rules,
+
+            "xss/no-location-href-assign": "error",
+            "canonical/no-barrel-import": "error",
+            "canonical/export-specifier-newline": "off",
+            "canonical/destructuring-property-newline": "off",
+            "canonical/import-specifier-newline": "off",
+            "canonical/filename-no-index": "warn",
+
+            "ex/no-unhandled": "warn",
 
             "n/file-extension-in-import": "off", // Allow missing file extensions for imports
             "n/no-missing-file-extension": "off", // Allow missing file extensions for imports
@@ -674,6 +719,14 @@ export default [
             tsdoc: pluginTsdoc,
             unicorn: pluginUnicorn,
             "eslint-comments": pluginComments,
+            ex: ex,
+            canonical: pluginCanonical,
+            "@eslint-react": eslintReact,
+            "@eslint-react/dom": eslintReactDom,
+            "@eslint-react/web-api": eslintReactWeb,
+            "@eslint-react/hooks-extra": eslintReactHooksExtra,
+            "@eslint-react/naming-convention": eslintReactNamingConvention,
+            xss: xss,
         },
         rules: {
             // TypeScript backend rules
@@ -697,6 +750,18 @@ export default [
             ...tailwind.configs["flat/recommended"].rules,
             ...cssPlugin.configs["flat/standard"].rules,
             ...pluginComments.configs.recommended.rules,
+            ...pluginCanonical.configs.recommended.rules,
+            ...eslintReact.configs["recommended-typescript"].rules,
+
+            "xss/no-location-href-assign": "error",
+
+            "canonical/no-barrel-import": "error",
+            "canonical/export-specifier-newline": "off",
+            "canonical/destructuring-property-newline": "off",
+            "canonical/import-specifier-newline": "off",
+            "canonical/filename-no-index": "warn",
+
+            "ex/no-unhandled": "warn",
 
             "no-unsanitized/method": "error",
             "no-unsanitized/property": "error",
@@ -966,13 +1031,11 @@ export default [
             "react-hooks": pluginReactHooks,
             n: nodePlugin,
             "eslint-comments": pluginComments,
-
         },
         rules: {
             ...tseslint.configs.recommended.rules,
             ...vitest.configs.recommended.rules,
             ...pluginComments.configs.recommended.rules,
-
 
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-non-null-assertion": "off",
@@ -1089,9 +1152,7 @@ export default [
 
     // JS/MJS Configuration files
     {
-        files: [
-            "**/*.config.{js,mjs}",
-        ],
+        files: ["**/*.config.{js,mjs}"],
         languageOptions: {
             globals: {
                 ...globals.node,
@@ -1158,7 +1219,6 @@ export default [
             "unicorn/filename-case": "off", // Allow config files to have any case
             "unicorn/prevent-abbreviations": "off", // Too many false positives in configs
             "unused-imports/no-unused-imports": "error",
-
         },
         settings: {
             n: { allowModules: ["electron", "node", "electron-devtools-installer"] },
@@ -1166,7 +1226,6 @@ export default [
                 node: true,
             },
             react: { version: "19" },
-
         },
     },
 ];
