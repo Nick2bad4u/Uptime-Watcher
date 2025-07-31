@@ -6,7 +6,15 @@
     "endOfLine": "auto",
     "htmlWhitespaceSensitivity": "css",
     "jsxSingleQuote": false,
-    "plugins": [],
+    "plugins": [
+        "prettier-plugin-jsdoc",
+        "prettier-plugin-tailwindcss",
+        "prettier-plugin-multiline-arrays"
+    ],
+    "tsdoc": true,
+    "jsdocPreferCodeFences": true,
+    "tailwindStylesheet": "./src/index.css",
+    "multilineArraysWrapThreshold": 4,
     "printWidth": 120,
     "proseWrap": "preserve",
     "quoteProps": "as-needed",
@@ -56,7 +64,10 @@
             }
         },
         {
-            "files": ["**/package.json", "**/package-lock.json"],
+            "files": [
+                "**/package.json",
+                "**/package-lock.json"
+            ],
             "options": {
                 "requirePragma": true
             }

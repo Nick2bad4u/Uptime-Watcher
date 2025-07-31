@@ -26,11 +26,21 @@
 // Import { plugin as ex } from "eslint-plugin-exception-handling";
 // Import eslintPluginNoInferred from "eslint-plugin-no-inferred-method-name";
 // Import stylistic from "@stylistic/eslint-plugin";
+import { importX } from "eslint-plugin-import-x";
+import { plugin as ex } from "eslint-plugin-exception-handling";
+import arrayFunc from "eslint-plugin-array-func";
 import depend from "eslint-plugin-depend";
 import eslintPluginJsonc from "eslint-plugin-jsonc";
 import eslintPluginMath from "eslint-plugin-math";
 import eslintPluginToml from "eslint-plugin-toml";
+import eslintPluginYml from "eslint-plugin-yml";
+import eslintReact from "@eslint-react/eslint-plugin";
+import eslintReactDom from "eslint-plugin-react-dom";
+import eslintReactHooksExtra from "eslint-plugin-react-hooks-extra";
+import eslintReactNamingConvention from "eslint-plugin-react-naming-convention";
+import eslintReactWeb from "eslint-plugin-react-web-api";
 import globals from "globals";
+import html from "eslint-plugin-html";
 import js from "@eslint/js";
 import json from "@eslint/json";
 import jsoncEslintParser from "jsonc-eslint-parser";
@@ -39,11 +49,11 @@ import markdown from "@eslint/markdown";
 import nodePlugin from "eslint-plugin-n";
 import nounsanitized from "eslint-plugin-no-unsanitized";
 import pluginBoundaries from "eslint-plugin-boundaries";
-import pluginCompat from "eslint-plugin-compat";
+import pluginCanonical from "eslint-plugin-canonical";
 // eslint-disable-next-line depend/ban-dependencies -- Recommended one sucks
 import pluginComments from "eslint-plugin-eslint-comments";
+import pluginCompat from "eslint-plugin-compat";
 import pluginFunctional from "eslint-plugin-functional";
-import { importX } from "eslint-plugin-import-x";
 import pluginNoOnly from "eslint-plugin-no-only-tests";
 import pluginPerfectionist from "eslint-plugin-perfectionist";
 import pluginPreferArrow from "eslint-plugin-prefer-arrow";
@@ -70,17 +80,9 @@ import tseslint from "@typescript-eslint/eslint-plugin";
 import tseslintParser from "@typescript-eslint/parser";
 import vitest from "@vitest/eslint-plugin";
 import vitestGlobals from "eslint-plugin-vitest-globals";
-import { plugin as ex } from "eslint-plugin-exception-handling";
-import html from "eslint-plugin-html";
-import pluginCanonical from "eslint-plugin-canonical";
-import eslintReact from "@eslint-react/eslint-plugin";
-import eslintReactDom from "eslint-plugin-react-dom";
-import eslintReactWeb from "eslint-plugin-react-web-api";
-import eslintReactHooksExtra from "eslint-plugin-react-hooks-extra";
-import eslintReactNamingConvention from "eslint-plugin-react-naming-convention";
 import xss from "eslint-plugin-xss";
-import eslintPluginYml from "eslint-plugin-yml";
 import yamlEslintParser from "yaml-eslint-parser";
+
 
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 
@@ -89,9 +91,9 @@ import * as cssPlugin from "eslint-plugin-css";
 // Unused and Uninstalled Plugins:
 // eslint-config-prettier
 // eslint-find-rules
-// eslint-formatter-compact
-// eslint-import-resolver-node
-// eslint-plugin-css-modules
+// eslint-formatter-compact -- Built into eslint
+// eslint-import-resolver-node -- Replaced by import-x
+// eslint-plugin-css-modules - Replaced by css-plugin
 // eslint-plugin-json
 // eslint-plugin-no-inferred-method-name
 // eslint-plugin-react-native
@@ -109,6 +111,11 @@ export default [
             "_ZENTASKS*",
             ".agentic-tools*",
             ".devskim.json",
+            ".github/chatmodes/**",
+            ".github/instructions/**",
+            ".github/ISSUE_TEMPLATE/**",
+            ".github/prompts/**",
+            ".github/PULL_REQUEST_TEMPLATE/**",
             "**/_ZENTASKS*",
             "**/.agentic-tools*",
             "**/chatproject.md",
@@ -125,18 +132,13 @@ export default [
             "coverage/",
             "dist-electron/",
             "dist/",
+            "docs/docusaurus/**",
+            "docs/Packages/**",
+            "docs/Reviews/**",
             "node_modules/**",
             "release/",
             "test/themeTypes.test.tsx",
             "test/types.test.tsx",
-            "docs/docusaurus/**",
-            "docs/Reviews/**",
-            "docs/Packages/**",
-            ".github/chatmodes/**",
-            ".github/PULL_REQUEST_TEMPLATE/**",
-            ".github/ISSUE_TEMPLATE/**",
-            ".github/prompts/**",
-            ".github/instructions/**",
             // "**/*.config.{js,mjs,ts}",
         ],
     },
@@ -178,13 +180,13 @@ export default [
             "import-x/resolver-next": [
                 createTypeScriptImportResolver({
                     alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
-
+                    noWarnOnMultipleProjects: true, // Don't warn about multiple projects
                     bun: true, // Resolve Bun modules (https://github.com/import-js/eslint-import-resolver-typescript#bun)
                     // Use an array
                     project: [
-                        "tsconfig.json",
                         "tsconfig.electron.json",
                         "tsconfig.electron.test.json",
+                        "tsconfig.json",
                         "tsconfig.test.json",
                     ],
                 }),
@@ -195,7 +197,10 @@ export default [
     // YAML files
     {
         plugins: { eslintPluginYml: eslintPluginYml },
-        files: ["*.yaml", "*.yml"],
+        files: [
+            "*.yaml",
+            "*.yml",
+        ],
         ignores: ["docs/docusaurus/**"],
         ...eslintPluginYml.configs["flat/prettier"].rules,
         languageOptions: {
@@ -225,7 +230,14 @@ export default [
 
     // JSON files
     {
-        files: ["**/*.json", "**/*.json5", "**/*.jsonc", "*.json", "*.json5", "*.jsonc"],
+        files: [
+            "**/*.json",
+            "**/*.json5",
+            "**/*.jsonc",
+            "*.json",
+            "*.json5",
+            "*.jsonc",
+        ],
         ignores: ["docs/docusaurus/**"],
         plugins: { eslintPluginJsonc: eslintPluginJsonc },
         ...json.configs.recommended[0],
@@ -249,7 +261,12 @@ export default [
 
     // TypeScript frontend files (React + Zustand)
     {
-        files: ["src/**/*.ts", "src/**/*.tsx", "shared/**/*.ts", "shared/**/*.tsx"],
+        files: [
+            "src/**/*.ts",
+            "src/**/*.tsx",
+            "shared/**/*.ts",
+            "shared/**/*.tsx",
+        ],
         ignores: [
             "**/*.spec.{ts,tsx}",
             "**/*.test.{ts,tsx}",
@@ -294,7 +311,13 @@ export default [
                 { type: "utils", pattern: "src/utils/**/*" },
                 { type: "types", pattern: "src/types.ts" },
             ],
-            n: { allowModules: ["electron", "node", "electron-devtools-installer"] },
+            n: {
+                allowModules: [
+                    "electron",
+                    "node",
+                    "electron-devtools-installer",
+                ],
+            },
             "import-x/resolver": {
                 // You will also need to install and configure the TypeScript resolver
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
@@ -351,6 +374,7 @@ export default [
             "@eslint-react/hooks-extra": eslintReactHooksExtra,
             "@eslint-react/naming-convention": eslintReactNamingConvention,
             xss: xss,
+            "array-func": arrayFunc,
         },
         rules: {
             // TypeScript rules
@@ -377,6 +401,7 @@ export default [
             ...pluginComments.configs.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-typescript"].rules,
+            ...arrayFunc.configs.all.rules,
 
             "xss/no-location-href-assign": "error",
             "canonical/no-barrel-import": "error",
@@ -407,6 +432,7 @@ export default [
             "putout/objects-braces-inside-array": "off",
             "putout/single-property-destructuring": "off",
 
+            "unicorn/prefer-spread": "off",
             "unicorn/prefer-global-this": "off", // Not suitable for Electron
             "unicorn/prevent-abbreviations": "off", // Too many false positives
             // Core quality rules
@@ -416,8 +442,14 @@ export default [
             "no-duplicate-imports": "error",
             "prefer-const": "error",
             "prefer-template": "warn",
-            curly: ["error", "all"],
-            eqeqeq: ["error", "always"],
+            curly: [
+                "error",
+                "all",
+            ],
+            eqeqeq: [
+                "error",
+                "always",
+            ],
 
             // Import management
             "unused-imports/no-unused-imports": "error",
@@ -433,7 +465,10 @@ export default [
 
             // React 19 optimized rules
             "react/jsx-boolean-value": "warn",
-            "react/jsx-fragments": ["warn", "syntax"],
+            "react/jsx-fragments": [
+                "warn",
+                "syntax",
+            ],
             "react/jsx-key": "error",
             "react/jsx-no-useless-fragment": "warn",
             "react/jsx-uses-react": "off",
@@ -460,15 +495,54 @@ export default [
                     rules: [
                         {
                             from: "app",
-                            allow: ["components", "stores", "hooks", "services", "theme", "utils", "types"],
+                            allow: [
+                                "components",
+                                "stores",
+                                "hooks",
+                                "services",
+                                "theme",
+                                "utils",
+                                "types",
+                            ],
                         },
                         {
                             from: "components",
-                            allow: ["components", "hooks", "services", "theme", "utils", "types", "stores"],
+                            allow: [
+                                "components",
+                                "hooks",
+                                "services",
+                                "theme",
+                                "utils",
+                                "types",
+                                "stores",
+                            ],
                         },
-                        { from: "hooks", allow: ["stores", "services", "types", "utils"] },
-                        { from: "services", allow: ["types", "utils"] },
-                        { from: "stores", allow: ["services", "types", "utils", "stores", "components"] },
+                        {
+                            from: "hooks",
+                            allow: [
+                                "stores",
+                                "services",
+                                "types",
+                                "utils",
+                            ],
+                        },
+                        {
+                            from: "services",
+                            allow: [
+                                "types",
+                                "utils",
+                            ],
+                        },
+                        {
+                            from: "stores",
+                            allow: [
+                                "services",
+                                "types",
+                                "utils",
+                                "stores",
+                                "components",
+                            ],
+                        },
                         { from: "theme", allow: ["types"] },
                         { from: "types", allow: [] },
                         { from: "utils", allow: ["types"] },
@@ -490,7 +564,11 @@ export default [
             "unicorn/no-keyword-prefix": [
                 "error",
                 {
-                    disallowedPrefixes: ["interface", "type", "enum"],
+                    disallowedPrefixes: [
+                        "interface",
+                        "type",
+                        "enum",
+                    ],
                     checkProperties: false,
                 },
             ], // Allow "class" prefix for className and other legitimate uses
@@ -523,7 +601,10 @@ export default [
             "compat/compat": "off", // Electron supports modern APIs, Opera Mini not a target
 
             // Code style
-            "prettier/prettier": ["warn", { usePrettierrc: true }],
+            "prettier/prettier": [
+                "warn",
+                { usePrettierrc: true },
+            ],
 
             // Documentation
             "tsdoc/syntax": "warn",
@@ -590,7 +671,10 @@ export default [
                 },
             ],
             "@typescript-eslint/require-await": "error", // Functions marked async must use await
-            "@typescript-eslint/return-await": ["error", "in-try-catch"], // Proper await handling in try-catch
+            "@typescript-eslint/return-await": [
+                "error",
+                "in-try-catch",
+            ], // Proper await handling in try-catch
 
             // Enhanced type safety for backend services
             "@typescript-eslint/no-unnecessary-type-assertion": "error", // Remove redundant type assertions
@@ -624,7 +708,11 @@ export default [
 
     // Electron backend files
     {
-        files: ["electron/**/*.ts", "shared/**/*.ts", "shared/**/*.tsx"],
+        files: [
+            "electron/**/*.ts",
+            "shared/**/*.ts",
+            "shared/**/*.tsx",
+        ],
         ignores: [
             "electron/**/*.spec.{ts,tsx}",
             "electron/**/*.test.{ts,tsx}",
@@ -662,7 +750,13 @@ export default [
         },
         settings: {
             react: { version: "19" },
-            n: { allowModules: ["electron", "node", "electron-devtools-installer"] },
+            n: {
+                allowModules: [
+                    "electron",
+                    "node",
+                    "electron-devtools-installer",
+                ],
+            },
             "boundaries/elements": [
                 { type: "main", pattern: "electron/main.ts" },
                 { type: "preload", pattern: "electron/preload.ts" },
@@ -727,6 +821,7 @@ export default [
             "@eslint-react/hooks-extra": eslintReactHooksExtra,
             "@eslint-react/naming-convention": eslintReactNamingConvention,
             xss: xss,
+            "array-func": arrayFunc,
         },
         rules: {
             // TypeScript backend rules
@@ -752,6 +847,7 @@ export default [
             ...pluginComments.configs.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-typescript"].rules,
+            ...arrayFunc.configs.all.rules,
 
             "xss/no-location-href-assign": "error",
 
@@ -776,6 +872,7 @@ export default [
             "unicorn/no-null": "off", // Null is common in SQLite and IPC
             "unicorn/prefer-global-this": "off", // Not suitable for Electron
             "unicorn/prevent-abbreviations": "off", // Too many false positives
+            "unicorn/prefer-spread": "off", // Prefer Array.From for readability
             // Node.js specific
             // "no-console": "off", // Logging is important for backend - DISABLED FOR NOW
             "no-var": "error",
@@ -810,12 +907,51 @@ export default [
                     default: "disallow",
                     rules: [
                         { from: "events", allow: ["types"] },
-                        { from: "main", allow: ["managers", "services", "utils", "events", "types"] },
-                        { from: "managers", allow: ["services", "utils", "events", "types"] },
-                        { from: "preload", allow: ["utils", "types"] },
-                        { from: "services", allow: ["services", "utils", "types"] },
+                        {
+                            from: "main",
+                            allow: [
+                                "managers",
+                                "services",
+                                "utils",
+                                "events",
+                                "types",
+                            ],
+                        },
+                        {
+                            from: "managers",
+                            allow: [
+                                "services",
+                                "utils",
+                                "events",
+                                "types",
+                            ],
+                        },
+                        {
+                            from: "preload",
+                            allow: [
+                                "utils",
+                                "types",
+                            ],
+                        },
+                        {
+                            from: "services",
+                            allow: [
+                                "services",
+                                "utils",
+                                "types",
+                            ],
+                        },
                         { from: "types", allow: [] },
-                        { from: "utils", allow: ["managers", "services", "utils", "events", "types"] },
+                        {
+                            from: "utils",
+                            allow: [
+                                "managers",
+                                "services",
+                                "utils",
+                                "events",
+                                "types",
+                            ],
+                        },
                         { from: "utils", allow: ["types"] },
                     ],
                 },
@@ -849,7 +985,11 @@ export default [
             "unicorn/no-keyword-prefix": [
                 "error",
                 {
-                    disallowedPrefixes: ["interface", "type", "enum"],
+                    disallowedPrefixes: [
+                        "interface",
+                        "type",
+                        "enum",
+                    ],
                     checkProperties: false,
                 },
             ],
@@ -909,7 +1049,10 @@ export default [
                 },
             ],
 
-            "prettier/prettier": ["warn", { usePrettierrc: true }],
+            "prettier/prettier": [
+                "warn",
+                { usePrettierrc: true },
+            ],
 
             // Advanced type-checked rules for backend async safety and runtime error prevention
             "@typescript-eslint/no-floating-promises": [
@@ -929,7 +1072,10 @@ export default [
                 },
             ],
             "@typescript-eslint/require-await": "error", // Functions marked async must use await
-            "@typescript-eslint/return-await": ["error", "in-try-catch"], // Proper await handling in try-catch
+            "@typescript-eslint/return-await": [
+                "error",
+                "in-try-catch",
+            ], // Proper await handling in try-catch
 
             // Enhanced type safety for backend services
             "@typescript-eslint/no-unnecessary-type-assertion": "error", // Remove redundant type assertions
@@ -1003,7 +1149,13 @@ export default [
         },
         settings: {
             react: { version: "19" },
-            n: { allowModules: ["electron", "node", "electron-devtools-installer"] },
+            n: {
+                allowModules: [
+                    "electron",
+                    "node",
+                    "electron-devtools-installer",
+                ],
+            },
             "import-x/resolver": {
                 // You will also need to install and configure the TypeScript resolver
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
@@ -1042,7 +1194,7 @@ export default [
             "@typescript-eslint/no-unused-vars": "off",
             "testing-library/await-async-queries": "error",
             "testing-library/no-await-sync-queries": "error",
-            "testing-library/no-debugging-utils": "warn",
+            "testing-library/no-debugging-utils": "off",
             "testing-library/prefer-screen-queries": "warn",
             "unused-imports/no-unused-imports": "error",
 
@@ -1131,7 +1283,13 @@ export default [
             "no-only-tests/no-only-tests": "error",
         },
         settings: {
-            n: { allowModules: ["electron", "node", "electron-devtools-installer"] },
+            n: {
+                allowModules: [
+                    "electron",
+                    "node",
+                    "electron-devtools-installer",
+                ],
+            },
             "import-x/resolver": {
                 // You will also need to install and configure the TypeScript resolver
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
@@ -1221,7 +1379,13 @@ export default [
             "unused-imports/no-unused-imports": "error",
         },
         settings: {
-            n: { allowModules: ["electron", "node", "electron-devtools-installer"] },
+            n: {
+                allowModules: [
+                    "electron",
+                    "node",
+                    "electron-devtools-installer",
+                ],
+            },
             "import-x/resolver": {
                 node: true,
             },
