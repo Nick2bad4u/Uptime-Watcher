@@ -9,7 +9,7 @@
  *   3. Run: `node doc_downloader_template.js`
  */
 
-import exec from "child_process";
+import { exec } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
@@ -17,10 +17,10 @@ import crypto from "node:crypto";
 /* -------------------- CONFIGURATION -------------------- */
 
 // Unique name for this doc sync; used for log/hashes/folder/file names
-const DOC_NAME = "Example-Package";
+const DOC_NAME = "Zod";
 
 // Base URL for docs (no trailing slash)
-const BASE_URL = "https://raw.githubusercontent.com/exampleOrg/exampleRepo/refs/heads/master";
+const BASE_URL = "https://zod.dev";
 
 // Array of doc/page names (relative to BASE_URL).
 // These should match the paths in your repo, relative to the base URL.
@@ -34,9 +34,9 @@ const BASE_URL = "https://raw.githubusercontent.com/exampleOrg/exampleRepo/refs/
 // You can download Github Wiki Pages by appending ".md" to the wiki page URL.
 // @example: If your wiki page URL is "https://github.com/TryGhost/node-sqlite3/wiki/API",
 // use "API.md" as the page name.
-const PAGES = ["examples/example.js", "examples/example2.html", "README.md"];
+const PAGES = ["basics", "api", "error-customization", "error-formatting", "metadata", "json-schema", "ecosystem"];
 
-const INPUT_FORMAT = "gfm"; // Change to your input format if needed
+const INPUT_FORMAT = "markdown"; // Change to your input format if needed
 const OUTPUT_FORMAT = "gfm"; // Change to your desired output format
 
 // Output directory (edit here or use env variable DOCS_OUTPUT_DIR)
@@ -59,17 +59,17 @@ const OUTPUT_EXT = "md";
  * - To remove everything ABOVE a marker, add its string to REMOVE_ABOVE_MARKER (array).
  */
 
-// const REMOVE_FROM_MARKER = [
-//     "::::: sponsors_container"
-// ];
+const REMOVE_FROM_MARKER = [
+    "<div class=\"flex-1\" role=\"none\">"
+];
 
 // const REMOVE_LINE_MARKERS = [
 //     "::::::: body"
 // ];
 
-// const REMOVE_ABOVE_MARKER = [
-//     "::::: start_here"
-// ];
+const REMOVE_ABOVE_MARKER = [
+    "<h1 class=\"text-3xl font-semibold\">"
+];
 
 /* --------- END CONFIGURATION (edit above only!) -------- */
 
