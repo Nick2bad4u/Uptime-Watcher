@@ -53,7 +53,7 @@ describe("SiteValidator - Comprehensive Coverage", () => {
         it("should return false for empty string identifier", () => {
             const site: Site = {
                 identifier: "",
-                name: "Test Site", 
+                name: "Test Site",
                 monitoring: true,
                 monitors: [],
             };

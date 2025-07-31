@@ -23,41 +23,42 @@ const mockUseTheme = vi.mocked(useTheme);
 const mockUseAvailabilityColors = vi.mocked(useAvailabilityColors);
 
 // Create complete mock theme object
-const createMockTheme = (isDark = false) => ({
-    availableThemes: ["light", "dark"],
-    isDark,
-    toggleTheme: vi.fn(),
-    setTheme: vi.fn(),
-    systemTheme: "light",
-    themeName: "light",
-    themeVersion: 1,
-    themeManager: {},
-    currentTheme: {
-        colors: {
-            background: { primary: "#ffffff" },
-            status: { up: "#green", down: "#red", pending: "#yellow" }
-        },
-        typography: {
-            fontSize: {
-                xs: "0.75rem",
-                sm: "0.875rem", 
-                base: "1rem"
+const createMockTheme = (isDark = false) =>
+    ({
+        availableThemes: ["light", "dark"],
+        isDark,
+        toggleTheme: vi.fn(),
+        setTheme: vi.fn(),
+        systemTheme: "light",
+        themeName: "light",
+        themeVersion: 1,
+        themeManager: {},
+        currentTheme: {
+            colors: {
+                background: { primary: "#ffffff" },
+                status: { up: "#green", down: "#red", pending: "#yellow" },
             },
-            fontWeight: {
-                medium: "500"
-            }
+            typography: {
+                fontSize: {
+                    xs: "0.75rem",
+                    sm: "0.875rem",
+                    base: "1rem",
+                },
+                fontWeight: {
+                    medium: "500",
+                },
+            },
+            borderRadius: {
+                sm: "0.125rem",
+                full: "9999px",
+            },
+            spacing: {
+                xs: "0.25rem",
+            },
         },
-        borderRadius: {
-            sm: "0.125rem",
-            full: "9999px"
-        },
-        spacing: {
-            xs: "0.25rem"
-        }
-    },
-    getColor: vi.fn(() => "#ffffff"),
-    getStatusColor: vi.fn(() => "#green")
-} as any);
+        getColor: vi.fn(() => "#ffffff"),
+        getStatusColor: vi.fn(() => "#green"),
+    }) as any;
 
 describe("Header Component", () => {
     const mockSetShowSettings = vi.fn();
@@ -121,9 +122,7 @@ describe("Header Component", () => {
                     {
                         id: "2",
                         name: "Site 2",
-                        monitors: [
-                            { id: "3", status: "up" },
-                        ],
+                        monitors: [{ id: "3", status: "up" }],
                     },
                 ],
             } as any);
@@ -271,7 +270,7 @@ describe("Header Component", () => {
         it("should call toggleTheme when theme button is clicked", () => {
             const mockTheme = createMockTheme();
             mockUseTheme.mockReturnValue(mockTheme);
-            
+
             render(<Header />);
 
             const themeButton = screen.getByLabelText("Toggle theme");
@@ -387,9 +386,7 @@ describe("Header Component", () => {
                     {
                         id: "1",
                         name: "Site 1",
-                        monitors: [
-                            { id: "1", status: "down" },
-                        ],
+                        monitors: [{ id: "1", status: "down" }],
                     },
                 ],
             } as any);
@@ -405,9 +402,7 @@ describe("Header Component", () => {
                     {
                         id: "1",
                         name: "Site 1",
-                        monitors: [
-                            { id: "1", status: "up" },
-                        ],
+                        monitors: [{ id: "1", status: "up" }],
                     },
                 ],
             } as any);

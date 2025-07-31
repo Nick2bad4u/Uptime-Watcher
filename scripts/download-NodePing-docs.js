@@ -2,7 +2,7 @@
  * Universal Doc Downloader & Cleaner Template
  * -------------------------------------------
  * Easily configure all variables at the top!
- * 
+ *
  * HOW TO CONFIGURE:
  *   1. Set variables in the CONFIGURATION section below.
  *   2. Adjust the `rewriteLinks` and `cleanContent` functions if needed.
@@ -25,12 +25,7 @@ const BASE_URL = "https://raw.githubusercontent.com/danielzzz/node-ping/refs/hea
 // Array of doc/page names (relative, e.g. ["intro", "example"])
 // These should match the paths in your repo, relative to the base URL
 // If you have subdirectories, include them (e.g. "examples/example.js")
-const PAGES = [
-    "examples/example.js",
-    "examples/example2.js",
-    "examples/example_win_de_v6.js",
-    "README.md",
-];
+const PAGES = ["examples/example.js", "examples/example2.js", "examples/example_win_de_v6.js", "README.md"];
 
 const INPUT_FORMAT = "gfm"; // Change to your input format if needed
 const OUTPUT_FORMAT = "gfm"; // Change to your desired output format
@@ -48,17 +43,13 @@ const OUTPUT_EXT = "md";
 // gfm is GitHub-Flavored Markdown, which is widely compatible
 // markdown is Pandoc's own Markdown format
 
-/** 
+/**
  * SECTION REMOVAL/STRIP OPTIONS:
  * - To remove everything from a marker onwards, add its string to REMOVE_FROM_MARKER (array, any string).
  * - To remove only lines that contain certain markers, add those to REMOVE_LINE_MARKERS (array).
  */
-const REMOVE_FROM_MARKER = [
-    "::::: sponsors_container"
-];
-const REMOVE_LINE_MARKERS = [
-    "::::::: body"
-];
+const REMOVE_FROM_MARKER = ["::::: sponsors_container"];
+const REMOVE_LINE_MARKERS = ["::::::: body"];
 
 /* --------- END CONFIGURATION (edit above only!) -------- */
 
@@ -77,7 +68,8 @@ const FILE_NAME_TEMPLATE = (page) => {
     return path.join(parsed.dir, `${parsed.name}.${OUTPUT_EXT}`);
 };
 
-const CMD_TEMPLATE = (url, outFile) => `pandoc --wrap=preserve "${url}" -f ${INPUT_FORMAT} -t ${OUTPUT_FORMAT} -o "${outFile}"`;
+const CMD_TEMPLATE = (url, outFile) =>
+    `pandoc --wrap=preserve "${url}" -f ${INPUT_FORMAT} -t ${OUTPUT_FORMAT} -o "${outFile}"`;
 
 /**
  * Rewrites relative Markdown links to absolute URLs for your documentation set.
@@ -103,15 +95,15 @@ function cleanContent(content) {
         const idx = cleaned.indexOf(marker);
         if (idx !== -1) {
             // Find the start of the line for the marker
-            const lineStart = cleaned.lastIndexOf('\n', idx) + 1;
+            const lineStart = cleaned.lastIndexOf("\n", idx) + 1;
             cleaned = cleaned.slice(0, lineStart);
         }
     }
     // Remove lines containing any REMOVE_LINE_MARKERS
     cleaned = cleaned
-        .split('\n')
-        .filter(line => !REMOVE_LINE_MARKERS.some(marker => line.includes(marker)))
-        .join('\n')
+        .split("\n")
+        .filter((line) => !REMOVE_LINE_MARKERS.some((marker) => line.includes(marker)))
+        .join("\n")
         .trimEnd();
 
     return cleaned;
@@ -158,9 +150,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
             try {
                 content = fs.readFileSync(filePath, "utf8");
             } catch (readErr) {
-                console.error(
-                    logMsg.replace("✅", "❌") + ` → Failed to read file: ${readErr.message}`
-                );
+                console.error(logMsg.replace("✅", "❌") + ` → Failed to read file: ${readErr.message}`);
                 return reject(readErr);
             }
             if (!content || content.trim().length === 0) {
@@ -172,9 +162,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
                 processedContent = cleanContent(processedContent);
                 fs.writeFileSync(filePath, processedContent);
             } catch (writeErr) {
-                console.error(
-                    logMsg.replace("✅", "❌") + ` → Failed to write file: ${writeErr.message}`
-                );
+                console.error(logMsg.replace("✅", "❌") + ` → Failed to write file: ${writeErr.message}`);
                 return reject(writeErr);
             }
             console.log(logMsg);

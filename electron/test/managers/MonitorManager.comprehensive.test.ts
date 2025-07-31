@@ -587,7 +587,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             // Get the callback that was set
             const callbackArgs = vi.mocked(scheduleInstance.setCheckCallback).mock.calls[0];
             expect(callbackArgs).toBeDefined();
-            
+
             if (callbackArgs) {
                 const checkCallback = callbackArgs[0];
 

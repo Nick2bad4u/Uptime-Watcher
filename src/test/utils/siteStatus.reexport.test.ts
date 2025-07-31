@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 /**
  * Test suite for src/utils/siteStatus.ts re-exports
- * 
+ *
  * @fileoverview Tests the frontend wrapper that re-exports shared site status utilities
  */
 
@@ -38,7 +38,7 @@ describe("Frontend SiteStatus Re-exports", () => {
         it("should re-export SiteStatus type", async () => {
             // Import to verify type export doesn't cause runtime errors
             const module = await import("../../utils/siteStatus");
-            
+
             // Check that the module has the expected exports
             expect(module).toHaveProperty("calculateSiteMonitoringStatus");
             expect(module).toHaveProperty("calculateSiteStatus");
@@ -51,7 +51,7 @@ describe("Frontend SiteStatus Re-exports", () => {
     describe("Functional integration", () => {
         it("should call re-exported calculateSiteStatus with monitor data", async () => {
             const { calculateSiteStatus } = await import("../../utils/siteStatus");
-            
+
             const site = {
                 monitors: [
                     {
@@ -65,7 +65,7 @@ describe("Frontend SiteStatus Re-exports", () => {
                         responseTime: 200,
                         url: "https://example.com",
                     },
-                ]
+                ],
             };
 
             const result = calculateSiteStatus(site);
@@ -75,7 +75,7 @@ describe("Frontend SiteStatus Re-exports", () => {
 
         it("should call re-exported getSiteDisplayStatus", async () => {
             const { getSiteDisplayStatus } = await import("../../utils/siteStatus");
-            
+
             const site = {
                 monitors: [
                     {
@@ -84,9 +84,9 @@ describe("Frontend SiteStatus Re-exports", () => {
                         status: "up" as const,
                         monitoring: true,
                     },
-                ]
+                ],
             };
-            
+
             const result = getSiteDisplayStatus(site);
             expect(result).toBeDefined();
             expect(typeof result).toBe("string");
@@ -94,7 +94,7 @@ describe("Frontend SiteStatus Re-exports", () => {
 
         it("should call re-exported getSiteStatusDescription", async () => {
             const { getSiteStatusDescription } = await import("../../utils/siteStatus");
-            
+
             const site = {
                 monitors: [
                     {
@@ -103,9 +103,9 @@ describe("Frontend SiteStatus Re-exports", () => {
                         status: "up" as const,
                         monitoring: true,
                     },
-                ]
+                ],
             };
-            
+
             const result = getSiteStatusDescription(site);
             expect(result).toBeDefined();
             expect(typeof result).toBe("string");
@@ -113,7 +113,7 @@ describe("Frontend SiteStatus Re-exports", () => {
 
         it("should call re-exported getSiteStatusVariant", async () => {
             const { getSiteStatusVariant } = await import("../../utils/siteStatus");
-            
+
             const result = getSiteStatusVariant("up");
             expect(result).toBeDefined();
             expect(typeof result).toBe("string");
@@ -121,11 +121,11 @@ describe("Frontend SiteStatus Re-exports", () => {
 
         it("should call re-exported calculateSiteMonitoringStatus", async () => {
             const { calculateSiteMonitoringStatus } = await import("../../utils/siteStatus");
-            
+
             const site = {
                 monitors: [
                     {
-                        id: "test-1", 
+                        id: "test-1",
                         type: "http" as const,
                         status: "up" as const,
                         monitoring: true,
@@ -135,7 +135,7 @@ describe("Frontend SiteStatus Re-exports", () => {
                         responseTime: 200,
                         url: "https://example.com",
                     },
-                ]
+                ],
             };
 
             const result = calculateSiteMonitoringStatus(site);
@@ -147,7 +147,7 @@ describe("Frontend SiteStatus Re-exports", () => {
     describe("Edge cases", () => {
         it("should handle empty monitor arrays", async () => {
             const { calculateSiteStatus } = await import("../../utils/siteStatus");
-            
+
             const site = { monitors: [] };
             const result = calculateSiteStatus(site);
             expect(result).toBeDefined();
@@ -155,7 +155,7 @@ describe("Frontend SiteStatus Re-exports", () => {
 
         it("should handle invalid status strings gracefully", async () => {
             const { getSiteStatusVariant } = await import("../../utils/siteStatus");
-            
+
             // These should handle invalid inputs gracefully
             expect(() => getSiteStatusVariant("invalid" as any)).not.toThrow();
         });

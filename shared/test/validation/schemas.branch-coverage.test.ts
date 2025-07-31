@@ -4,11 +4,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import {
-    validateMonitorData,
-    validateMonitorField,
-    validateSiteData,
-} from "../../validation/schemas";
+import { validateMonitorData, validateMonitorField, validateSiteData } from "../../validation/schemas";
 
 describe("Validation Schemas - Branch Coverage Completion", () => {
     describe("Error handling edge cases", () => {
@@ -66,7 +62,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             // Test completely unknown field to trigger the error case
             const result = validateMonitorField("http", "completelyUnknownField", "value");
             expect(result.success).toBe(false);
-            expect(result.errors.some(error => error.includes("Field validation failed"))).toBe(true);
+            expect(result.errors.some((error) => error.includes("Field validation failed"))).toBe(true);
         });
 
         it("should test field validation with invalid values to trigger Zod errors", () => {
@@ -198,7 +194,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             const result = validateMonitorData("http", complexInvalidData);
             expect(result.success).toBe(false);
             expect(result.errors.length).toBeGreaterThan(0);
-            
+
             // Just verify we have errors, not specific path format since Zod might format differently
             expect(result.errors.length).toBeGreaterThan(3);
         });
@@ -216,7 +212,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             // Test both branches of the error instanceof Error check
             const result1 = validateSiteData(null);
             expect(result1.success).toBe(false);
-            
+
             const result2 = validateMonitorField("unknown", "field", "value");
             expect(result2.success).toBe(false);
         });

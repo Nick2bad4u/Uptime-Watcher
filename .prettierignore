@@ -12,6 +12,7 @@ coverage/
 dist/
 dist-electron/
 docs/docusaurus/**/**
+docs/packages/
 
 # Ignore Change Logs
 **/CHANGELOG.md

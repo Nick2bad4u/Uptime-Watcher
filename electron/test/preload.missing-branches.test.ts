@@ -36,9 +36,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
         await import("../preload");
 
         // Get the exposed API from the mock
-        const exposeCall = mockContextBridge.exposeInMainWorld.mock.calls.find(
-            call => call[0] === "electronAPI"
-        );
+        const exposeCall = mockContextBridge.exposeInMainWorld.mock.calls.find((call) => call[0] === "electronAPI");
         exposedAPI = exposeCall?.[1];
 
         expect(exposedAPI).toBeDefined();
@@ -61,8 +59,12 @@ describe("preload.ts - Missing Branch Coverage", () => {
             // Test monitoring API error handling
             await expect(exposedAPI.monitoring.startMonitoring()).rejects.toThrow("Monitoring failed");
             await expect(exposedAPI.monitoring.stopMonitoring()).rejects.toThrow("Monitoring failed");
-            await expect(exposedAPI.monitoring.startMonitoringForSite("test", "monitor1")).rejects.toThrow("Monitoring failed");
-            await expect(exposedAPI.monitoring.stopMonitoringForSite("test", "monitor1")).rejects.toThrow("Monitoring failed");
+            await expect(exposedAPI.monitoring.startMonitoringForSite("test", "monitor1")).rejects.toThrow(
+                "Monitoring failed"
+            );
+            await expect(exposedAPI.monitoring.stopMonitoringForSite("test", "monitor1")).rejects.toThrow(
+                "Monitoring failed"
+            );
         });
 
         it("should handle invoke errors in data API", async () => {

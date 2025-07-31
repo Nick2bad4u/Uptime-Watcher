@@ -96,15 +96,15 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
                 if (value === null || value === undefined) {
                     return { type: "empty", isValid: false };
                 }
-                
+
                 if (typeof value === "string") {
                     return { type: "string", isValid: value.length > 0 };
                 }
-                
+
                 if (typeof value === "number") {
                     return { type: "number", isValid: !Number.isNaN(value) };
                 }
-                
+
                 return { type: "other", isValid: false };
             };
 
@@ -136,11 +136,11 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
                 if (!Array.isArray(input)) {
                     return 0;
                 }
-                
+
                 if (input.length === 0) {
                     return -1;
                 }
-                
+
                 return input.length;
             };
 
@@ -156,19 +156,19 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
                 if (obj === null) {
                     return { valid: false, reason: "null" };
                 }
-                
+
                 if (obj === undefined) {
                     return { valid: false, reason: "undefined" };
                 }
-                
+
                 if (typeof obj !== "object") {
                     return { valid: false, reason: "not-object" };
                 }
-                
+
                 if (Array.isArray(obj)) {
                     return { valid: false, reason: "array" };
                 }
-                
+
                 return { valid: true, reason: "valid" };
             };
 
@@ -184,11 +184,11 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
     describe("Type guard patterns", () => {
         it("should test common type guard branches", () => {
             const isStringArray = (value: unknown): value is string[] => {
-                return Array.isArray(value) && value.every(item => typeof item === "string");
+                return Array.isArray(value) && value.every((item) => typeof item === "string");
             };
 
             const isNumberArray = (value: unknown): value is number[] => {
-                return Array.isArray(value) && value.every(item => typeof item === "number");
+                return Array.isArray(value) && value.every((item) => typeof item === "number");
             };
 
             expect(isStringArray(["a", "b", "c"])).toBe(true);
@@ -206,13 +206,9 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
 
     describe("Fallback value patterns", () => {
         it("should test fallback logic branches", () => {
-            const getWithFallback = <T>(
-                obj: Record<string, unknown>,
-                key: string,
-                fallback: T
-            ): T => {
+            const getWithFallback = <T>(obj: Record<string, unknown>, key: string, fallback: T): T => {
                 const value = obj[key];
-                return value !== undefined && value !== null ? value as T : fallback;
+                return value !== undefined && value !== null ? (value as T) : fallback;
             };
 
             const testObj = { a: "value", b: null, c: undefined, d: 0, e: false };

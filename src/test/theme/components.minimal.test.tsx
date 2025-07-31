@@ -129,7 +129,7 @@ describe("Theme Components - Basic Functionality", () => {
     describe("StatusIndicator", () => {
         it("should render status indicator", () => {
             const { container } = render(<StatusIndicator status="up" />);
-            expect(container.querySelector('.themed-status-indicator')).toBeInTheDocument();
+            expect(container.querySelector(".themed-status-indicator")).toBeInTheDocument();
         });
 
         it("should show text when enabled", () => {

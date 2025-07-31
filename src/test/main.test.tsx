@@ -35,18 +35,18 @@ vi.mock("../index.css", () => ({}));
 
 describe("Main Entry Point", () => {
     let mockElement: HTMLElement;
-    
+
     beforeEach(() => {
         // Reset mocks
         vi.clearAllMocks();
-        
+
         // Create a mock element
         mockElement = {
             id: "root",
             getAttribute: vi.fn(),
             setAttribute: vi.fn(),
         } as any;
-        
+
         // Mock document with getElementById
         global.document = {
             getElementById: vi.fn().mockReturnValue(null),
@@ -78,10 +78,10 @@ describe("Main Entry Point", () => {
 
     it("should initialize app when root element exists", async () => {
         (document.getElementById as any).mockReturnValue(mockElement);
-        
+
         // Dynamically import main.tsx to trigger initialization
         await import("../main");
-        
+
         expect(document.getElementById).toHaveBeenCalledWith("root");
         expect(mockCreateRoot).toHaveBeenCalledWith(mockElement);
         expect(mockRender).toHaveBeenCalled();
@@ -89,25 +89,25 @@ describe("Main Entry Point", () => {
 
     it("should throw error when root element not found", async () => {
         (document.getElementById as any).mockReturnValue(null);
-        
+
         // Expect the import to throw an error
         await expect(import("../main")).rejects.toThrow("Root element not found");
     });
 
     it("should use getElementById for root element lookup", async () => {
         (document.getElementById as any).mockReturnValue(mockElement);
-        
+
         await import("../main");
-        
+
         expect(document.getElementById).toHaveBeenCalledWith("root");
         expect(document.getElementById).toHaveBeenCalledTimes(1);
     });
 
     it("should render App component within React.StrictMode", async () => {
         (document.getElementById as any).mockReturnValue(mockElement);
-        
+
         await import("../main");
-        
+
         expect(mockRender).toHaveBeenCalledTimes(1);
         // The render call should include the App wrapped in StrictMode
         const renderCall = mockRender.mock.calls[0][0];

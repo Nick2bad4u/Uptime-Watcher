@@ -27,13 +27,7 @@ vi.mock("../../../shared/types", () => ({
 }));
 
 // Now import the modules after mocking
-import { 
-    useTheme, 
-    useAvailabilityColors, 
-    useStatusColors, 
-    useThemeClasses, 
-    useThemeValue 
-} from "../../theme/useTheme";
+import { useTheme, useAvailabilityColors, useStatusColors, useThemeClasses, useThemeValue } from "../../theme/useTheme";
 import { themeManager } from "../../theme/ThemeManager";
 import { useSettingsStore } from "../../stores/settings/useSettingsStore";
 
@@ -252,16 +246,16 @@ describe.skip("useTheme Hooks", () => {
 
         it("should update when theme changes", () => {
             const { result, rerender } = renderHook(() => useStatusColors());
-            
+
             // Initially light theme
             expect(result.current.up).toBe(mockTheme.colors.status.up);
 
             // Switch to dark theme
             mockThemeManager.getTheme.mockReturnValue(mockDarkTheme);
             mockSettings.theme = "dark";
-            
+
             rerender();
-            
+
             expect(result.current.up).toBe(mockDarkTheme.colors.status.up);
         });
     });
@@ -490,9 +484,7 @@ describe.skip("useTheme Hooks", () => {
 
     describe("useThemeValue", () => {
         it("should extract value from theme using selector", () => {
-            const { result } = renderHook(() =>
-                useThemeValue((theme) => theme.colors.status.up)
-            );
+            const { result } = renderHook(() => useThemeValue((theme) => theme.colors.status.up));
 
             expect(result.current).toBe(mockTheme.colors.status.up);
         });
@@ -514,9 +506,7 @@ describe.skip("useTheme Hooks", () => {
         });
 
         it("should update when theme changes", () => {
-            const { result, rerender } = renderHook(() =>
-                useThemeValue((theme) => theme.isDark)
-            );
+            const { result, rerender } = renderHook(() => useThemeValue((theme) => theme.isDark));
 
             // Initially light theme
             expect(result.current).toBe(false);

@@ -9,15 +9,15 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 const mockLog = {
     initialize: vi.fn(),
     transports: {
-        file: { 
-            level: "info", 
+        file: {
+            level: "info",
             fileName: "uptime-watcher-main.log",
             maxSize: 1024 * 1024 * 5,
-            format: "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}"
+            format: "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}",
         },
-        console: { 
+        console: {
             level: "debug",
-            format: "[{h}:{i}:{s}.{ms}] [{level}] {text}"
+            format: "[{h}:{i}:{s}.{ms}] [{level}] {text}",
         },
     },
     info: vi.fn(),
@@ -76,25 +76,25 @@ describe("main.ts - Missing Branch Coverage", () => {
 
     beforeEach(() => {
         originalArgv = [...process.argv];
-        
+
         // Clear all mocks and reset modules
         vi.resetAllMocks();
         vi.clearAllMocks();
         vi.resetModules();
-        
+
         // Reset log transport levels to default
         mockLog.transports.file.level = "info";
         mockLog.transports.console.level = "debug";
-        
+
         // Reset app mock properties
         mockApp.isPackaged = false;
         mockApp.whenReady.mockClear();
         mockApp.whenReady.mockResolvedValue(undefined);
-        
+
         // Reset other mocks
         mockIsDev.mockReturnValue(true);
         mockInstallExtension.mockResolvedValue([]);
-        
+
         // Clear process.versions.electron to test the conditional
         delete (process.versions as any).electron;
     });

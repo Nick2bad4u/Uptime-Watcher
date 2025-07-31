@@ -16,7 +16,7 @@ vi.mock("../../utils/monitorTypeHelper", () => ({
     clearMonitorTypeCache: vi.fn(), // <-- ensure this is a real mock function that records arguments
 }));
 
-// Mock electronAPI for various scenarios  
+// Mock electronAPI for various scenarios
 const createMockElectronAPI = (_hasAPI = true, hasEvents = true) => ({
     data: {
         downloadSQLiteBackup: vi.fn(),
@@ -81,7 +81,6 @@ describe("cacheSync", () => {
 
         // Clean up any existing window.electronAPI
         if (typeof window !== "undefined") {
-
             // delete window.electronAPI;
             (window as any).electronAPI = undefined;
         }
@@ -112,7 +111,6 @@ describe("cacheSync", () => {
 
         describe("when electronAPI is not available", () => {
             it("should return no-op cleanup function and warn", () => {
-
                 (global as any).window = {};
 
                 const cleanup = setupCacheSync();
@@ -135,7 +133,6 @@ describe("cacheSync", () => {
                 mockOnCacheInvalidated = vi.fn();
                 mockCleanup = vi.fn();
                 mockOnCacheInvalidated.mockReturnValue(mockCleanup);
-
 
                 (global as any).window = {
                     electronAPI: createMockElectronAPI(true, true),
@@ -247,7 +244,6 @@ describe("cacheSync", () => {
                 const invalidationHandler = mockOnCacheInvalidated.mock.calls[0]?.[0];
 
                 const invalidationData = {
-
                     type: "unknown",
                     reason: "Invalid type test",
                 };
@@ -343,7 +339,6 @@ describe("cacheSync", () => {
 
         describe("when electronAPI exists but events is missing", () => {
             it("should handle missing events property gracefully", () => {
-
                 (global as any).window = {
                     electronAPI: {
                         ...createMockElectronAPI(true, false),
@@ -371,7 +366,6 @@ describe("cacheSync", () => {
                 mockOnCacheInvalidated = vi.fn();
                 mockCleanup = vi.fn();
                 mockOnCacheInvalidated.mockReturnValue(mockCleanup);
-
 
                 (global as any).window = {
                     electronAPI: createMockElectronAPI(true, true),
@@ -428,7 +422,6 @@ describe("cacheSync", () => {
                 mockOnCacheInvalidated = vi.fn();
                 mockCleanup = vi.fn();
                 mockOnCacheInvalidated.mockReturnValue(mockCleanup);
-
 
                 (global as any).window = {
                     electronAPI: createMockElectronAPI(true, true),

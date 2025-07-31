@@ -357,7 +357,7 @@ describe("useSettingsStore", () => {
             mockWithErrorHandling.mockImplementation(async (fn, handlers) => {
                 handlers.setLoading?.(true);
                 loadingStatesDuringCall.push(true);
-                
+
                 try {
                     const result = await fn();
                     return result;

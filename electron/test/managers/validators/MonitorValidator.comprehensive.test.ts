@@ -13,36 +13,36 @@ vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({
     isValidMonitorType: vi.fn((type: string) => ["http", "port"].includes(type)),
     validateMonitorData: vi.fn((type: string, data: any) => {
         if (type === "http" && data.url && data.url.startsWith("https://")) {
-            return { 
-                success: true, 
-                errors: [], 
-                warnings: [], 
+            return {
+                success: true,
+                errors: [],
+                warnings: [],
                 metadata: {},
-                data 
+                data,
             };
         }
         if (type === "port" && data.host && typeof data.port === "number") {
-            return { 
-                success: true, 
-                errors: [], 
-                warnings: [], 
+            return {
+                success: true,
+                errors: [],
+                warnings: [],
                 metadata: {},
-                data 
+                data,
             };
         }
         if (type === "invalid") {
-            return { 
-                success: false, 
+            return {
+                success: false,
                 errors: ["Invalid monitor type specific validation"],
-                warnings: [], 
-                metadata: {}
+                warnings: [],
+                metadata: {},
             };
         }
-        return { 
-            success: false, 
+        return {
+            success: false,
             errors: ["Validation failed for monitor data"],
-            warnings: [], 
-            metadata: {}
+            warnings: [],
+            metadata: {},
         };
     }),
 }));
@@ -240,13 +240,15 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             delete (monitorWithBadData as any).url; // Remove URL for invalid monitor
 
             // First mock the type as valid, then make validation fail
-            const { isValidMonitorType, validateMonitorData } = await import("../../../services/monitoring/MonitorTypeRegistry");
+            const { isValidMonitorType, validateMonitorData } = await import(
+                "../../../services/monitoring/MonitorTypeRegistry"
+            );
             vi.mocked(isValidMonitorType).mockReturnValueOnce(true);
             vi.mocked(validateMonitorData).mockReturnValueOnce({
                 success: false,
                 errors: ["Custom validation error"],
                 warnings: [],
-                metadata: {}
+                metadata: {},
             });
 
             const result = validator.validateMonitorConfiguration(monitorWithBadData);

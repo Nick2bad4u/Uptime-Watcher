@@ -9,7 +9,7 @@ import type { Site, StatusUpdate } from "../../../../../shared/types";
 // Mock the error handling utility
 vi.mock("../../../../utils/errorHandling", () => ({
     withUtilityErrorHandling: vi.fn(),
-    ensureError: vi.fn((err) => err instanceof Error ? err : new Error(String(err))),
+    ensureError: vi.fn((err) => (err instanceof Error ? err : new Error(String(err)))),
 }));
 
 // Mock the logger
@@ -225,9 +225,9 @@ describe("StatusUpdateHandler", () => {
 
             // Create proper MonitorStatusChangedEvent format (what the backend sends)
             const monitorStatusEvent = {
-                siteId: "site1",           // Note: siteId, not siteIdentifier
-                monitorId: "monitor1", 
-                newStatus: "down" as const,  // Note: newStatus, not status
+                siteId: "site1", // Note: siteId, not siteIdentifier
+                monitorId: "monitor1",
+                newStatus: "down" as const, // Note: newStatus, not status
                 previousStatus: "up" as const,
             };
 
@@ -238,9 +238,9 @@ describe("StatusUpdateHandler", () => {
             // The actual onUpdate gets called with the full StatusUpdate including the site
             expect(mockOnUpdate).toHaveBeenCalled();
             const actualUpdate = mockOnUpdate.mock.calls[0][0];
-            expect(actualUpdate.siteIdentifier).toBe("site1");  // Converted to siteIdentifier in StatusUpdate
+            expect(actualUpdate.siteIdentifier).toBe("site1"); // Converted to siteIdentifier in StatusUpdate
             expect(actualUpdate.monitorId).toBe("monitor1");
-            expect(actualUpdate.status).toBe("down");           // Converted to status in StatusUpdate
+            expect(actualUpdate.status).toBe("down"); // Converted to status in StatusUpdate
         });
 
         it("should handle monitoring started events", async () => {
@@ -470,7 +470,7 @@ describe("StatusUpdateHandler", () => {
 
             await statusChangedCallback(null);
             await statusChangedCallback(undefined);
-            
+
             // Account for the initial full sync in subscribe() plus the 2 fallback syncs
             expect(mockFullSyncFromBackend).toHaveBeenCalledTimes(3);
         });

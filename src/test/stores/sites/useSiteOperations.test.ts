@@ -66,7 +66,7 @@ vi.mock("../../../stores/sites/utils/monitorOperations", () => ({
     normalizeMonitor: vi.fn((monitor) => monitor),
     updateMonitorInSite: vi.fn((site, monitorId, updates) => ({
         ...site,
-        monitors: site.monitors.map(m => m.id === monitorId ? { ...m, ...updates } : m),
+        monitors: site.monitors.map((m) => (m.id === monitorId ? { ...m, ...updates } : m)),
     })),
 }));
 
@@ -122,7 +122,7 @@ describe("createSiteOperationsActions", () => {
             await actions.addMonitorToSite("test-site", mockMonitor);
 
             expect(SiteService.updateSite).toHaveBeenCalledWith("test-site", {
-                monitors: expect.arrayContaining([mockMonitor, mockMonitor]) // Original + new
+                monitors: expect.arrayContaining([mockMonitor, mockMonitor]), // Original + new
             });
             expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
         });
@@ -130,7 +130,9 @@ describe("createSiteOperationsActions", () => {
         it("should throw error when site is not found", async () => {
             vi.mocked(mockDeps.getSites).mockReturnValue([]);
 
-            await expect(actions.addMonitorToSite("nonexistent-site", mockMonitor)).rejects.toThrow(ERROR_MESSAGES.SITE_NOT_FOUND);
+            await expect(actions.addMonitorToSite("nonexistent-site", mockMonitor)).rejects.toThrow(
+                ERROR_MESSAGES.SITE_NOT_FOUND
+            );
         });
 
         it("should handle normalized monitor data", async () => {
@@ -154,12 +156,14 @@ describe("createSiteOperationsActions", () => {
                 name: "New Site",
             });
 
-            expect(SiteService.addSite).toHaveBeenCalledWith(expect.objectContaining({
-                identifier: "new-site",
-                name: "New Site",
-                monitoring: true,
-                monitors: expect.any(Array),
-            }));
+            expect(SiteService.addSite).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    identifier: "new-site",
+                    name: "New Site",
+                    monitoring: true,
+                    monitors: expect.any(Array),
+                })
+            );
             expect(mockDeps.addSite).toHaveBeenCalledWith(newSite);
         });
 
@@ -281,7 +285,9 @@ describe("createSiteOperationsActions", () => {
         it("should throw error when site is not found", async () => {
             vi.mocked(mockDeps.getSites).mockReturnValue([]);
 
-            await expect(actions.removeMonitorFromSite("nonexistent-site", "monitor-1")).rejects.toThrow(ERROR_MESSAGES.SITE_NOT_FOUND);
+            await expect(actions.removeMonitorFromSite("nonexistent-site", "monitor-1")).rejects.toThrow(
+                ERROR_MESSAGES.SITE_NOT_FOUND
+            );
         });
     });
 
@@ -297,7 +303,9 @@ describe("createSiteOperationsActions", () => {
         it("should throw error when site is not found", async () => {
             vi.mocked(mockDeps.getSites).mockReturnValue([]);
 
-            await expect(actions.updateMonitorRetryAttempts("nonexistent-site", "monitor-1", 5)).rejects.toThrow(ERROR_MESSAGES.SITE_NOT_FOUND);
+            await expect(actions.updateMonitorRetryAttempts("nonexistent-site", "monitor-1", 5)).rejects.toThrow(
+                ERROR_MESSAGES.SITE_NOT_FOUND
+            );
         });
     });
 
@@ -313,7 +321,9 @@ describe("createSiteOperationsActions", () => {
         it("should throw error when site is not found", async () => {
             vi.mocked(mockDeps.getSites).mockReturnValue([]);
 
-            await expect(actions.updateMonitorTimeout("nonexistent-site", "monitor-1", 10000)).rejects.toThrow(ERROR_MESSAGES.SITE_NOT_FOUND);
+            await expect(actions.updateMonitorTimeout("nonexistent-site", "monitor-1", 10000)).rejects.toThrow(
+                ERROR_MESSAGES.SITE_NOT_FOUND
+            );
         });
     });
 
@@ -329,7 +339,9 @@ describe("createSiteOperationsActions", () => {
         it("should throw error when site is not found", async () => {
             vi.mocked(mockDeps.getSites).mockReturnValue([]);
 
-            await expect(actions.updateSiteCheckInterval("nonexistent-site", "monitor-1", 120000)).rejects.toThrow(ERROR_MESSAGES.SITE_NOT_FOUND);
+            await expect(actions.updateSiteCheckInterval("nonexistent-site", "monitor-1", 120000)).rejects.toThrow(
+                ERROR_MESSAGES.SITE_NOT_FOUND
+            );
         });
     });
 
@@ -347,7 +359,7 @@ describe("createSiteOperationsActions", () => {
         it("should handle empty site identifier", async () => {
             // Reset the mock to avoid interference from other tests
             vi.mocked(SiteService.removeSite).mockResolvedValue(undefined);
-            
+
             // Test that empty identifier is handled
             await actions.deleteSite("");
             // Should complete without throwing due to mock

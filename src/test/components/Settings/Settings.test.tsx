@@ -39,7 +39,7 @@ vi.mock("../../../services/logger", () => ({
 }));
 
 vi.mock("../../../utils/errorHandling", () => ({
-    ensureError: vi.fn((error) => error instanceof Error ? error : new Error(String(error))),
+    ensureError: vi.fn((error) => (error instanceof Error ? error : new Error(String(error)))),
 }));
 
 // Import after mocks
@@ -154,7 +154,7 @@ describe("Settings Component", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         mockUseErrorStore.mockReturnValue(mockErrorStore);
         mockUseSettingsStore.mockReturnValue(mockSettingsStore);
         mockUseSitesStore.mockReturnValue(mockSitesStore);
@@ -171,102 +171,102 @@ describe("Settings Component", () => {
 
     it("should render settings modal", () => {
         render(<Settings onClose={mockOnClose} />);
-        
+
         expect(screen.getByText("⚙️ Settings")).toBeInTheDocument();
         expect(screen.getByText("History Limit")).toBeInTheDocument();
     });
 
     it("should call onClose when close button is clicked", () => {
         render(<Settings onClose={mockOnClose} />);
-        
+
         const closeButton = screen.getByText("✕");
         fireEvent.click(closeButton);
-        
+
         expect(mockOnClose).toHaveBeenCalled();
     });
 
     it("should show error when lastError exists", () => {
         const errorStore = { ...mockErrorStore, lastError: "Test error" };
         mockUseErrorStore.mockReturnValue(errorStore);
-        
+
         render(<Settings onClose={mockOnClose} />);
-        
+
         expect(screen.getByText("⚠️ Test error")).toBeInTheDocument();
     });
 
     it("should not show error when no lastError", () => {
         render(<Settings onClose={mockOnClose} />);
-        
+
         expect(screen.queryByText(/⚠️/)).not.toBeInTheDocument();
     });
 
     it("should handle history limit changes", async () => {
         render(<Settings onClose={mockOnClose} />);
-        
+
         const input = screen.getByLabelText("Maximum number of history records to keep per site");
         fireEvent.change(input, { target: { value: "500" } });
-        
+
         expect(mockSettingsStore.updateHistoryLimitValue).toHaveBeenCalledWith(500);
     });
 
     it("should handle reset settings", () => {
         // Mock window.confirm to return true
         const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
-        
+
         render(<Settings onClose={mockOnClose} />);
-        
+
         const resetButton = screen.getByText("Reset to Defaults");
         fireEvent.click(resetButton);
-        
+
         expect(mockSettingsStore.resetSettings).toHaveBeenCalled();
-        
+
         confirmSpy.mockRestore();
     });
 
     it("should not reset settings when cancelled", () => {
         // Mock window.confirm to return false
         const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false);
-        
+
         render(<Settings onClose={mockOnClose} />);
-        
+
         const resetButton = screen.getByText("Reset to Defaults");
         fireEvent.click(resetButton);
-        
+
         expect(mockSettingsStore.resetSettings).not.toHaveBeenCalled();
-        
+
         confirmSpy.mockRestore();
     });
 
     it("should handle sync settings", async () => {
         render(<Settings onClose={mockOnClose} />);
-        
+
         const syncButton = screen.getByText("🔄 Sync Data");
         fireEvent.click(syncButton);
-        
+
         expect(mockSitesStore.fullSyncFromBackend).toHaveBeenCalled();
     });
 
     it("should handle SQLite backup download", () => {
         render(<Settings onClose={mockOnClose} />);
-        
+
         const downloadButton = screen.getByText("Download SQLite Backup");
         fireEvent.click(downloadButton);
-        
+
         expect(mockSitesStore.downloadSQLiteBackup).toHaveBeenCalled();
     });
 
     it("should handle theme changes", () => {
         render(<Settings onClose={mockOnClose} />);
-        
+
         const themeSelect = screen.getByLabelText("Select application theme");
         fireEvent.change(themeSelect, { target: { value: "dark" } });
-        
+
         expect(mockTheme.setTheme).toHaveBeenCalledWith("dark");
     });
 
     it("should display current settings values", () => {
         render(<Settings onClose={mockOnClose} />);
-        
+
         const historyInput = screen.getByLabelText("Maximum number of history records to keep per site");
         expect(historyInput).toHaveValue("1000");
     });
@@ -280,9 +280,9 @@ describe("Settings Component", () => {
             },
         };
         mockUseSettingsStore.mockReturnValue(settingsWithStringLimit);
-        
+
         render(<Settings onClose={mockOnClose} />);
-        
+
         const historyInput = screen.getByLabelText("Maximum number of history records to keep per site");
         expect(historyInput).toHaveValue("500");
     });
@@ -290,23 +290,23 @@ describe("Settings Component", () => {
     it("should apply dark theme styles when isDark is true", () => {
         const darkTheme = { ...mockTheme, isDark: true };
         mockUseTheme.mockReturnValue(darkTheme as any);
-        
+
         render(<Settings onClose={mockOnClose} />);
-        
+
         const container = screen.getByText("⚙️ Settings").closest(".modal-container");
         expect(container).toBeInTheDocument();
     });
 
     it("should handle component unmounting during async operations", () => {
         const { unmount } = render(<Settings onClose={mockOnClose} />);
-        
+
         // Trigger an async operation
         const syncButton = screen.getByText("🔄 Sync Data");
         fireEvent.click(syncButton);
-        
+
         // Unmount component
         unmount();
-        
+
         // Should not throw errors
         expect(true).toBe(true);
     });

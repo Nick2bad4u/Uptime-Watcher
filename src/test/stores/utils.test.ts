@@ -6,13 +6,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import logger from "../../services/logger";
-import {
-    createBaseStore,
-    createPersistConfig,
-    debounce,
-    logStoreAction,
-    waitForElectronAPI,
-} from "../../stores/utils";
+import { createBaseStore, createPersistConfig, debounce, logStoreAction, waitForElectronAPI } from "../../stores/utils";
 
 // Mock logger
 vi.mock("../../services/logger", () => ({

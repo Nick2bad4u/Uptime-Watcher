@@ -58,7 +58,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             // Should return a no-op cleanup function
             const cleanup = themeManager.onSystemThemeChange(() => {});
             expect(typeof cleanup).toBe("function");
-            
+
             // Cleanup function should not throw
             expect(() => cleanup()).not.toThrow();
 
@@ -75,7 +75,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             const mockCallback = vi.fn();
             const mockEventListener = vi.fn();
             const mockRemoveEventListener = vi.fn();
-            
+
             const mockMediaQuery = {
                 matches: false,
                 media: "(prefers-color-scheme: dark)",
@@ -91,18 +91,18 @@ describe("ThemeManager - Branch Coverage Completion", () => {
 
             // Setup the theme change listener
             const cleanup = themeManager.onSystemThemeChange(mockCallback);
-            
+
             // Verify addEventListener was called
             expect(mockEventListener).toHaveBeenCalledWith("change", expect.any(Function));
-            
+
             // Simulate a media query change event
             const handler = mockEventListener.mock.calls[0][1];
             const mockEvent = { matches: true } as MediaQueryListEvent;
             handler(mockEvent);
-            
+
             // Verify callback was called with correct value
             expect(mockCallback).toHaveBeenCalledWith(true);
-            
+
             // Test cleanup
             cleanup();
             expect(mockRemoveEventListener).toHaveBeenCalledWith("change", handler);
@@ -111,7 +111,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
         it("should handle theme change from light to dark", () => {
             const mockCallback = vi.fn();
             const mockEventListener = vi.fn();
-            
+
             const mockMediaQuery = {
                 matches: false,
                 media: "(prefers-color-scheme: dark)",
@@ -125,14 +125,14 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             });
 
             themeManager.onSystemThemeChange(mockCallback);
-            
+
             // Get the handler function that was registered
             const handler = mockEventListener.mock.calls[0][1];
-            
+
             // Simulate theme change to dark
             handler({ matches: true } as MediaQueryListEvent);
             expect(mockCallback).toHaveBeenCalledWith(true);
-            
+
             // Simulate theme change to light
             handler({ matches: false } as MediaQueryListEvent);
             expect(mockCallback).toHaveBeenCalledWith(false);
@@ -148,7 +148,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
                 contains: vi.fn(),
                 toggle: vi.fn(),
             };
-            
+
             const mockDocumentElementClassList = {
                 add: vi.fn(),
                 remove: vi.fn(),
@@ -162,9 +162,9 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             });
 
             Object.defineProperty(document, "documentElement", {
-                value: { 
+                value: {
                     classList: mockDocumentElementClassList,
-                    style: { setProperty: vi.fn(), removeProperty: vi.fn() }
+                    style: { setProperty: vi.fn(), removeProperty: vi.fn() },
                 },
                 writable: true,
             });
@@ -172,14 +172,14 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             // Test with dark theme
             const darkTheme = themeManager.getTheme("dark");
             themeManager.applyTheme(darkTheme);
-            
+
             // Verify dark class is added
             expect(mockDocumentElementClassList.add).toHaveBeenCalledWith("dark");
-            
+
             // Test with light theme
             const lightTheme = themeManager.getTheme("light");
             themeManager.applyTheme(lightTheme);
-            
+
             // Verify dark class is removed for light theme
             expect(mockDocumentElementClassList.remove).toHaveBeenCalledWith("dark");
         });
@@ -190,23 +190,23 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             // Test the conditional branches in applyThemeClasses that might be missed
             const mockRemove = vi.fn();
             const mockAdd = vi.fn();
-            
+
             Object.defineProperty(document, "body", {
                 value: { classList: { add: mockAdd, remove: mockRemove } },
                 writable: true,
             });
 
             Object.defineProperty(document, "documentElement", {
-                value: { 
+                value: {
                     classList: { add: vi.fn(), remove: vi.fn() },
-                    style: { setProperty: vi.fn() }
+                    style: { setProperty: vi.fn() },
                 },
                 writable: true,
             });
 
             // Apply multiple themes to test the remove logic for all theme types
             const themes = ["light", "dark", "high-contrast"] as const;
-            
+
             for (const themeName of themes) {
                 const theme = themeManager.getTheme(themeName);
                 themeManager.applyTheme(theme);
@@ -233,7 +233,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             });
 
             const cleanup = themeManager.onSystemThemeChange(() => {});
-            
+
             // Test that cleanup function actually calls removeEventListener
             cleanup();
             expect(mockRemoveEventListener).toHaveBeenCalled();

@@ -2,17 +2,17 @@
  * Universal Doc Downloader & Cleaner Template
  * -------------------------------------------
  * Easily configure all variables at the top!
- * 
+ *
  * HOW TO CONFIGURE:
  *   1. Set variables in the CONFIGURATION section below.
  *   2. Adjust the `rewriteLinks` and `cleanContent` functions if needed.
  *   3. Run: `node doc_downloader_template.js`
  */
 
-const { exec } = require("child_process");
-const fs = require("fs");
-const path = require("path");
-const crypto = require("crypto");
+import exec from "child_process";
+import fs from "node:fs";
+import path from "node:path";
+import crypto from "node:crypto";
 
 /* -------------------- CONFIGURATION -------------------- */
 
@@ -22,18 +22,19 @@ const DOC_NAME = "Example-Package";
 // Base URL for docs (no trailing slash)
 const BASE_URL = "https://raw.githubusercontent.com/exampleOrg/exampleRepo/refs/heads/master";
 
-// Array of doc/page names (relative, e.g. ["intro", "example"])
-// These should match the paths in your repo, relative to the base URL
-// If you have subdirectories, include them (e.g. "examples/example.js")
-
+// Array of doc/page names (relative to BASE_URL).
+// These should match the paths in your repo, relative to the base URL.
+// Examples:
+//   - "intro" (file in root, e.g. intro.md)
+//   - "README.md" (file in root with extension)
+//   - "examples/example.js" (file in subdirectory with extension)
+//   - "docs/guide/usage.md" (nested subdirectory)
+//   - "API.md" (for GitHub Wiki pages, append .md to the page name)
+//
 // You can download Github Wiki Pages by appending ".md" to the wiki page URL.
 // @example: If your wiki page URL is "https://github.com/TryGhost/node-sqlite3/wiki/API",
 // use "API.md" as the page name.
-const PAGES = [
-    "examples/example.js",
-    "examples/example2.html",
-    "README.md",
-];
+const PAGES = ["examples/example.js", "examples/example2.html", "README.md"];
 
 const INPUT_FORMAT = "gfm"; // Change to your input format if needed
 const OUTPUT_FORMAT = "gfm"; // Change to your desired output format
@@ -51,7 +52,7 @@ const OUTPUT_EXT = "md";
 // gfm is GitHub-Flavored Markdown, which is widely compatible
 // markdown is Pandoc's own Markdown format
 
-/** 
+/**
  * SECTION REMOVAL/STRIP OPTIONS:
  * - To remove everything from a marker onwards, add its string to REMOVE_FROM_MARKER (array, any string).
  * - To remove only lines that contain certain markers, add those to REMOVE_LINE_MARKERS (array).
@@ -74,7 +75,15 @@ const OUTPUT_EXT = "md";
 
 // add ".toLowerCase()" after DOC_NAME if you want case-insensitive folder names
 
-let OUTPUT_DIR = process.env.DOCS_OUTPUT_DIR || path.join(process.cwd(), SUBDIR_1, SUBDIR_2, DOC_NAME);
+// OUTPUT_DIR is set from the DOCS_OUTPUT_DIR environment variable if present; otherwise, it defaults to a path constructed from the current working directory and the configured subdirectories and DOC_NAME.
+let OUTPUT_DIR;
+if (process.env.DOCS_OUTPUT_DIR) {
+    OUTPUT_DIR = path.isAbsolute(process.env.DOCS_OUTPUT_DIR)
+        ? process.env.DOCS_OUTPUT_DIR
+        : path.resolve(process.cwd(), process.env.DOCS_OUTPUT_DIR);
+} else {
+    OUTPUT_DIR = path.join(process.cwd(), SUBDIR_1, SUBDIR_2, DOC_NAME);
+}
 OUTPUT_DIR = path.resolve(OUTPUT_DIR);
 
 // Log and hash file paths (auto-uses DOC_NAME)
@@ -89,16 +98,36 @@ const FILE_NAME_TEMPLATE = (page) => {
     return path.join(parsed.dir, `${parsed.name}.${OUTPUT_EXT}`);
 };
 
-const CMD_TEMPLATE = (url, outFile) => `pandoc --wrap=preserve "${url}" -f ${INPUT_FORMAT} -t ${OUTPUT_FORMAT} -o "${outFile}"`;
+const CMD_TEMPLATE = (url, outFile) =>
+    `pandoc --wrap=preserve "${url}" -f ${INPUT_FORMAT} -t ${OUTPUT_FORMAT} -o "${outFile}"`;
 
 /**
  * Rewrites relative Markdown links to absolute URLs for your documentation set.
- * Customize as needed for your doc set.
+ * Handles ./, ../, and subdirectory links.
+ * 
+ * Limitations:
+ * - Does not rewrite links containing anchors (#), query parameters (?), or non-standard formats.
+ * - Only rewrites links that start with ./ or ../ and do not contain # or ?.
+ * 
  * @param {string} content
  * @returns {string}
  */
 function rewriteLinks(content) {
-    return content.replace(/\(\.\/([\w-]+)\)/g, (_, page) => `(${BASE_URL}/${page})`);
+    // Replace links like [text](./page.md), [text](../dir/page.md), [text](./sub/page.md)
+    // but skip if they contain anchors or query params
+    return content.replace(/\((\.{1,2}\/[^\)\s]+)\)/g, (match, relPath) => {
+        if (relPath.includes("#") || relPath.includes("?")) {
+            // Skip rewriting links with anchors or query params
+            return match;
+        }
+        try {
+            const absUrl = new URL(relPath, BASE_URL + "/").toString();
+            return `(${absUrl})`;
+        } catch {
+            // If URL construction fails, return original
+            return match;
+        }
+    });
 }
 
 /**
@@ -118,7 +147,7 @@ function cleanContent(content) {
                 const idx = cleaned.indexOf(marker);
                 if (idx !== -1) {
                     // Find the start of the line for the marker
-                    const lineStart = cleaned.lastIndexOf('\n', idx) + 1;
+                    const lineStart = cleaned.lastIndexOf("\n", idx) + 1;
                     cleaned = cleaned.slice(0, lineStart);
                 }
             }
@@ -130,7 +159,7 @@ function cleanContent(content) {
                 const idx = cleaned.indexOf(marker);
                 if (idx !== -1) {
                     // Find the start of the line for the marker
-                    const lineStart = cleaned.lastIndexOf('\n', idx) + 1;
+                    const lineStart = cleaned.lastIndexOf("\n", idx) + 1;
                     cleaned = cleaned.slice(lineStart);
                 }
             }
@@ -139,9 +168,9 @@ function cleanContent(content) {
     switch (true) {
         case typeof REMOVE_LINE_MARKERS !== "undefined" && Array.isArray(REMOVE_LINE_MARKERS):
             cleaned = cleaned
-                .split('\n')
-                .filter(line => !REMOVE_LINE_MARKERS.some(marker => line.includes(marker)))
-                .join('\n')
+                .split("\n")
+                .filter((line) => !REMOVE_LINE_MARKERS.some((marker) => line.includes(marker)))
+                .join("\n")
                 .trimEnd();
             break;
     }
@@ -173,8 +202,19 @@ const newHashes = {};
 // Download and process a single doc page
 function downloadFile(cmd, filePath, logMsg, name) {
     return new Promise((resolve, reject) => {
+        // Sanitize filePath: must be inside OUTPUT_DIR
+        const resolvedPath = path.resolve(filePath);
+        if (!resolvedPath.startsWith(OUTPUT_DIR)) {
+            return reject(new Error("Unsafe file path detected: " + filePath));
+        }
+
+        // Basic validation: cmd must start with "pandoc"
+        if (typeof cmd !== "string" || !cmd.trim().startsWith("pandoc")) {
+            return reject(new Error("Unsafe or invalid command detected: " + cmd));
+        }
+
         // Ensure parent directory exists before running pandoc
-        const dir = path.dirname(filePath);
+        const dir = path.dirname(resolvedPath);
         if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
         exec(cmd, (err) => {
@@ -182,31 +222,27 @@ function downloadFile(cmd, filePath, logMsg, name) {
                 console.error(logMsg.replace("✅", "❌") + ` → ${err.message}`);
                 return reject(err);
             }
-            if (!fs.existsSync(filePath)) {
+            if (!fs.existsSync(resolvedPath)) {
                 console.error(logMsg.replace("✅", "❌") + " → File not created.");
-                return reject(new Error("File not created: " + filePath));
+                return reject(new Error("File not created: " + resolvedPath));
             }
             let content;
             try {
-                content = fs.readFileSync(filePath, "utf8");
+                content = fs.readFileSync(resolvedPath, "utf8");
             } catch (readErr) {
-                console.error(
-                    logMsg.replace("✅", "❌") + ` → Failed to read file: ${readErr.message}`
-                );
+                console.error(logMsg.replace("✅", "❌") + ` → Failed to read file: ${readErr.message}`);
                 return reject(readErr);
             }
             if (!content || content.trim().length === 0) {
                 console.error(logMsg.replace("✅", "❌") + " → File is empty.");
-                return reject(new Error("Downloaded file is empty: " + filePath));
+                return reject(new Error("Downloaded file is empty: " + resolvedPath));
             }
             try {
                 let processedContent = rewriteLinks(content);
-                    processedContent = cleanContent(processedContent);
-                fs.writeFileSync(filePath, processedContent);
+                processedContent = cleanContent(processedContent);
+                fs.writeFileSync(resolvedPath, processedContent);
             } catch (writeErr) {
-                console.error(
-                    logMsg.replace("✅", "❌") + ` → Failed to write file: ${writeErr.message}`
-                );
+                console.error(logMsg.replace("✅", "❌") + ` → Failed to write file: ${writeErr.message}`);
                 return reject(writeErr);
             }
             console.log(logMsg);
@@ -225,6 +261,16 @@ const pagePromises = PAGES.map((page) => {
     return downloadFile(cmd, filePath, `✅ Downloaded: ${page} → ${fileName}`, fileName);
 });
 
+/**
+ * @function main
+ * @async
+ * @description
+ * Main entry point for downloading and processing documentation files.
+ * Executes all page download promises in parallel, writes logs upon completion,
+ * and handles errors centrally by logging and re-throwing them after attempting to write the log.
+ * 
+ * @returns {Promise<void>} Resolves when all downloads and processing are complete.
+ */
 (async function main() {
     try {
         await Promise.all(pagePromises);
@@ -237,15 +283,30 @@ const pagePromises = PAGES.map((page) => {
     }
 })();
 
+/**
+ * @function writeLogIfComplete
+ * @description
+ * Writes a log entry and updates the hashes file if any files were successfully downloaded and changed.
+ * Only files that exist and were processed are considered.
+ * If no files were changed, no log entry is written.
+ */
 function writeLogIfComplete() {
-    const expectedCount = PAGES.length;
-    if (downloadedFiles.length !== expectedCount) return;
+    // Only consider files that actually exist and were processed
+    const successfulFiles = downloadedFiles.filter((name) => {
+        const filePath = path.join(OUTPUT_DIR, name);
+        return fs.existsSync(filePath);
+    });
+
+    if (successfulFiles.length === 0) {
+        console.warn("⚠️ No files were successfully downloaded. No log entry written.");
+        return;
+    }
 
     const timestamp = new Date().toISOString();
     let logEntry = `## 🕓 ${DOC_NAME} docs sync @ ${timestamp}\n`;
     let changedCount = 0;
 
-    downloadedFiles.forEach((name) => {
+    successfulFiles.forEach((name) => {
         const filePath = path.join(OUTPUT_DIR, name);
         const content = fs.readFileSync(filePath, "utf8");
         const hash = crypto.createHash("sha256").update(content).digest("hex");
@@ -385,3 +446,11 @@ function writeLogIfComplete() {
 // xwiki (XWiki markup)
 // zimwiki (ZimWiki markup)
 // the path of a custom Lua writer, see Custom readers and writers below
+
+// Export functions for modularity and testability
+module.exports = {
+    rewriteLinks,
+    cleanContent,
+    downloadFile,
+    writeLogIfComplete,
+};

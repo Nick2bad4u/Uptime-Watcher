@@ -21,7 +21,7 @@ describe("useErrorStore", () => {
             store.clearAllErrors();
             store.setLoading(false);
             // Clear all operation loading states by setting them to false
-            Object.keys(store.operationLoading).forEach(operation => {
+            Object.keys(store.operationLoading).forEach((operation) => {
                 store.setOperationLoading(operation, false);
             });
         });

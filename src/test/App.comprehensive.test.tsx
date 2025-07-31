@@ -137,31 +137,32 @@ describe("App Component - Comprehensive Coverage", () => {
         updateStatus: "idle" as const,
     };
 
-    const createMockTheme = (isDark = false) => ({
-        availableThemes: ["light", "dark"],
-        currentTheme: {
+    const createMockTheme = (isDark = false) =>
+        ({
+            availableThemes: ["light", "dark"],
+            currentTheme: {
+                isDark,
+                colors: {
+                    status: { up: "#green", down: "#red", pending: "#yellow" },
+                    success: "#green",
+                    error: "#red",
+                    warning: "#yellow",
+                },
+            },
+            getColor: vi.fn(),
+            getStatusColor: vi.fn(),
             isDark,
-            colors: {
-                status: { up: "#green", down: "#red", pending: "#yellow" },
-                success: "#green",
-                error: "#red", 
-                warning: "#yellow"
-            }
-        },
-        getColor: vi.fn(),
-        getStatusColor: vi.fn(),
-        isDark,
-        setTheme: vi.fn(),
-        systemTheme: "light",
-        themeManager: {},
-        themeName: "light",
-        themeVersion: 1,
-        toggleTheme: vi.fn(),
-    } as any);
+            setTheme: vi.fn(),
+            systemTheme: "light",
+            themeManager: {},
+            themeName: "light",
+            themeVersion: 1,
+            toggleTheme: vi.fn(),
+        }) as any;
 
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         // Reset all mocks to default state
         mockUseErrorStore.mockReturnValue(defaultErrorStore);
         mockUseSettingsStore.mockReturnValue(defaultSettingsStore);
@@ -173,7 +174,7 @@ describe("App Component - Comprehensive Coverage", () => {
         // Set up getState mocks
         defaultSitesStore.getState.mockReturnValue(defaultSitesStore);
         defaultSettingsStore.getState.mockReturnValue(defaultSettingsStore);
-        
+
         // Mock store static functions
         (mockUseSitesStore as any).getState = vi.fn().mockReturnValue(defaultSitesStore);
         (mockUseSettingsStore as any).getState = vi.fn().mockReturnValue(defaultSettingsStore);
@@ -192,18 +193,18 @@ describe("App Component - Comprehensive Coverage", () => {
 
         it("should apply dark theme class when isDark is true", () => {
             mockUseTheme.mockReturnValue(createMockTheme(true));
-            
+
             render(<App />);
-            
+
             const appContainer = document.querySelector(".app-container");
             expect(appContainer).toHaveClass("dark");
         });
 
         it("should not apply dark theme class when isDark is false", () => {
             mockUseTheme.mockReturnValue(createMockTheme(false));
-            
+
             render(<App />);
-            
+
             const appContainer = document.querySelector(".app-container");
             expect(appContainer).not.toHaveClass("dark");
         });
@@ -532,7 +533,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 ...defaultSitesStore,
                 initializeSites,
             };
-            
+
             const settingsStore = {
                 ...defaultSettingsStore,
                 initializeSettings,
@@ -551,7 +552,7 @@ describe("App Component - Comprehensive Coverage", () => {
 
         it("should set up cache sync on mount", async () => {
             const mockCacheSync = await import("../utils/cacheSync");
-            
+
             render(<App />);
 
             await waitFor(() => {
@@ -610,7 +611,7 @@ describe("App Component - Comprehensive Coverage", () => {
             vi.mocked(mockEnvironment.isDevelopment).mockReturnValue(true);
 
             const mockLogger = await import("../services/logger");
-            
+
             let statusUpdateCallback: any;
             const subscribeToStatusUpdates = vi.fn((callback) => {
                 statusUpdateCallback = callback;
@@ -646,7 +647,7 @@ describe("App Component - Comprehensive Coverage", () => {
     describe("Backend Focus Sync", () => {
         it("should call useBackendFocusSync with disabled state", async () => {
             const mockBackendFocusSync = await import("../hooks/useBackendFocusSync");
-            
+
             render(<App />);
 
             expect(mockBackendFocusSync.useBackendFocusSync).toHaveBeenCalledWith(false);
@@ -676,7 +677,7 @@ describe("App Component - Comprehensive Coverage", () => {
             render(<App />);
 
             // Wait a bit to ensure initialization completes
-            await new Promise(resolve => setTimeout(resolve, 50));
+            await new Promise((resolve) => setTimeout(resolve, 50));
 
             expect(mockLogger.default.app.started).not.toHaveBeenCalled();
         });

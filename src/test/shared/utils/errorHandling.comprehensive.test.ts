@@ -73,10 +73,7 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             const result = await withErrorHandling(mockOperation, mockStore);
 
             expect(result).toBe("success");
-            expect(mockConsole.warn).toHaveBeenCalledWith(
-                "Failed to clear error state:",
-                expect.any(Error)
-            );
+            expect(mockConsole.warn).toHaveBeenCalledWith("Failed to clear error state:", expect.any(Error));
         });
 
         it("should handle non-Error objects as error messages", async () => {
@@ -104,10 +101,7 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
 
             await expect(withErrorHandling(mockOperation, mockBackendContext)).rejects.toThrow("Backend error");
 
-            expect(mockBackendContext.logger.error).toHaveBeenCalledWith(
-                "Failed to test-operation",
-                testError
-            );
+            expect(mockBackendContext.logger.error).toHaveBeenCalledWith("Failed to test-operation", testError);
         });
 
         it("should handle backend context without operation name", async () => {
@@ -121,10 +115,7 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
 
             await expect(withErrorHandling(mockOperation, contextWithoutName)).rejects.toThrow("Backend error");
 
-            expect(contextWithoutName.logger.error).toHaveBeenCalledWith(
-                "Async operation failed",
-                testError
-            );
+            expect(contextWithoutName.logger.error).toHaveBeenCalledWith("Async operation failed", testError);
         });
     });
 
@@ -173,14 +164,8 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
 
             await expect(withErrorHandling(mockOperation, mockStore)).rejects.toThrow("Operation error");
 
-            expect(mockConsole.warn).toHaveBeenCalledWith(
-                "Failed to set error state:",
-                storeError
-            );
-            expect(mockConsole.error).toHaveBeenCalledWith(
-                "Original operation error:",
-                testError
-            );
+            expect(mockConsole.warn).toHaveBeenCalledWith("Failed to set error state:", storeError);
+            expect(mockConsole.error).toHaveBeenCalledWith("Original operation error:", testError);
         });
 
         it("should handle store setLoading(false) throwing in finally block", async () => {

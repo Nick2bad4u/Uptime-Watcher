@@ -42,7 +42,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
             expect(error1.message).toBe("Validation failed: ");
             expect(error1.errors).toEqual([]);
 
-            // Test with single error  
+            // Test with single error
             const error2 = new ValidationError(["Single error"]);
             expect(error2.message).toBe("Validation failed: Single error");
             expect(error2.errors).toEqual(["Single error"]);
@@ -117,7 +117,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
                     const isNullish = value == null;
                     const isNull = value === null;
                     const isUndefined = value === undefined;
-                    
+
                     // String conversions
                     const stringValue = String(value);
                     let jsonValue;
@@ -162,9 +162,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
             for (const error of errors) {
                 // Should handle any error type without throwing
                 expect(() => {
-                    const errorString = error instanceof Error 
-                        ? error.message 
-                        : String(error);
+                    const errorString = error instanceof Error ? error.message : String(error);
                     expect(typeof errorString).toBe("string");
                 }).not.toThrow();
             }
@@ -176,14 +174,25 @@ describe("Utility Files - Missing Branch Coverage", () => {
 
             const complexErrors = [
                 circularObject,
-                { getter: (() => { throw new Error("Getter error"); }) },
+                {
+                    getter: () => {
+                        throw new Error("Getter error");
+                    },
+                },
                 Object.create(null), // Object without prototype
                 { [Symbol.toStringTag]: "CustomError" },
             ];
 
             // Handle proxy separately since it throws when accessed
-            const proxyError = new Proxy({}, { get: () => { throw new Error("Proxy error"); } });
-            
+            const proxyError = new Proxy(
+                {},
+                {
+                    get: () => {
+                        throw new Error("Proxy error");
+                    },
+                }
+            );
+
             for (const error of complexErrors) {
                 expect(() => {
                     try {
@@ -194,7 +203,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
                     }
                 }).not.toThrow();
             }
-            
+
             // Test proxy separately and expect it to throw, then handle it
             expect(() => {
                 try {
@@ -221,26 +230,21 @@ describe("Utility Files - Missing Branch Coverage", () => {
                 Promise.resolve(undefined),
                 Promise.resolve(0),
                 Promise.resolve(false),
-                new Promise(resolve => setTimeout(() => resolve("delayed"), 1)),
+                new Promise((resolve) => setTimeout(() => resolve("delayed"), 1)),
             ];
 
             // Handle all promises
             const results = await Promise.allSettled(promises);
 
             expect(results).toHaveLength(promises.length);
-            expect(results.some(r => r.status === "fulfilled")).toBe(true);
-            expect(results.some(r => r.status === "rejected")).toBe(true);
+            expect(results.some((r) => r.status === "fulfilled")).toBe(true);
+            expect(results.some((r) => r.status === "rejected")).toBe(true);
         });
 
         it("should handle timeout scenarios", async () => {
-            const timeoutPromise = new Promise((_, reject) => 
-                setTimeout(() => reject(new Error("Timeout")), 10)
-            );
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 10));
 
-            const racePromise = Promise.race([
-                Promise.resolve("fast"),
-                timeoutPromise,
-            ]);
+            const racePromise = Promise.race([Promise.resolve("fast"), timeoutPromise]);
 
             await expect(racePromise).resolves.toBe("fast");
         });
@@ -296,9 +300,9 @@ describe("Utility Files - Missing Branch Coverage", () => {
                 expect(() => {
                     const length = array.length;
                     const filtered = array.filter(Boolean);
-                    const mapped = array.map(x => x);
+                    const mapped = array.map((x) => x);
                     const hasSome = array.some(Boolean);
-                    const hasAll = array.every(x => x != null);
+                    const hasAll = array.every((x) => x != null);
                     const spread = [...array];
 
                     // Use results to avoid unused variable warnings
@@ -345,14 +349,14 @@ describe("Utility Files - Missing Branch Coverage", () => {
 
     describe("Memory and Performance Edge Cases", () => {
         it("should handle memory intensive operations", () => {
-            // Test with large data structures  
+            // Test with large data structures
             const largeArray = Array.from({ length: 10_000 }, (_, i) => ({ id: i, data: `item-${i}` }));
-            const largeObject = Object.fromEntries(largeArray.map(item => [item.id, item.data]));
+            const largeObject = Object.fromEntries(largeArray.map((item) => [item.id, item.data]));
 
             expect(() => {
                 // Operations that might stress memory
-                const filtered = largeArray.filter(item => item.id % 2 === 0);
-                const mapped = largeArray.map(item => ({ ...item, processed: true }));
+                const filtered = largeArray.filter((item) => item.id % 2 === 0);
+                const mapped = largeArray.map((item) => ({ ...item, processed: true }));
                 const keyCount = Object.keys(largeObject).length;
                 const serialized = JSON.stringify(largeArray.slice(0, 100)); // Partial to avoid timeout
 
@@ -370,7 +374,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
         it("should handle rapid operations", () => {
             // Test rapid operations
             const start = Date.now();
-            
+
             for (let i = 0; i < 1000; i++) {
                 const random = Math.random();
                 const timestamp = Date.now();

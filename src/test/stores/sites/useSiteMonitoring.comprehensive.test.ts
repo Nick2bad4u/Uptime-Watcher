@@ -117,9 +117,7 @@ describe("useSiteMonitoring", () => {
 
             mockSiteService.checkSiteNow.mockRejectedValueOnce(error);
 
-            await expect(siteMonitoringActions.checkSiteNow(siteId, monitorId)).rejects.toThrow(
-                "Check site failed"
-            );
+            await expect(siteMonitoringActions.checkSiteNow(siteId, monitorId)).rejects.toThrow("Check site failed");
 
             expect(mockLogStoreAction).toHaveBeenCalledWith("SitesStore", "checkSiteNow", {
                 monitorId,
@@ -177,9 +175,7 @@ describe("useSiteMonitoring", () => {
 
             mockMonitoringService.startSiteMonitoring.mockRejectedValueOnce(error);
 
-            await expect(siteMonitoringActions.startSiteMonitoring(siteId)).rejects.toThrow(
-                "Start monitoring failed"
-            );
+            await expect(siteMonitoringActions.startSiteMonitoring(siteId)).rejects.toThrow("Start monitoring failed");
 
             expect(mockMonitoringService.startSiteMonitoring).toHaveBeenCalledWith(siteId);
         });
@@ -223,9 +219,9 @@ describe("useSiteMonitoring", () => {
 
             mockMonitoringService.startMonitoring.mockRejectedValueOnce(error);
 
-            await expect(
-                siteMonitoringActions.startSiteMonitorMonitoring(siteId, monitorId)
-            ).rejects.toThrow("Start monitor monitoring failed");
+            await expect(siteMonitoringActions.startSiteMonitorMonitoring(siteId, monitorId)).rejects.toThrow(
+                "Start monitor monitoring failed"
+            );
 
             expect(mockMonitoringService.startMonitoring).toHaveBeenCalledWith(siteId, monitorId);
         });
@@ -267,9 +263,7 @@ describe("useSiteMonitoring", () => {
 
             mockMonitoringService.stopSiteMonitoring.mockRejectedValueOnce(error);
 
-            await expect(siteMonitoringActions.stopSiteMonitoring(siteId)).rejects.toThrow(
-                "Stop monitoring failed"
-            );
+            await expect(siteMonitoringActions.stopSiteMonitoring(siteId)).rejects.toThrow("Stop monitoring failed");
 
             expect(mockMonitoringService.stopSiteMonitoring).toHaveBeenCalledWith(siteId);
         });
@@ -313,9 +307,9 @@ describe("useSiteMonitoring", () => {
 
             mockMonitoringService.stopMonitoring.mockRejectedValueOnce(error);
 
-            await expect(
-                siteMonitoringActions.stopSiteMonitorMonitoring(siteId, monitorId)
-            ).rejects.toThrow("Stop monitor monitoring failed");
+            await expect(siteMonitoringActions.stopSiteMonitorMonitoring(siteId, monitorId)).rejects.toThrow(
+                "Stop monitor monitoring failed"
+            );
 
             expect(mockMonitoringService.stopMonitoring).toHaveBeenCalledWith(siteId, monitorId);
         });

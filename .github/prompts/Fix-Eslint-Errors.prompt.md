@@ -31,4 +31,5 @@ Requirements:
 - Do not introduce hacks or workarounds to bypass linting rules.
 
 If Attachments are present:
+
 - They are specific lint errors or problematic code regions that require attention.

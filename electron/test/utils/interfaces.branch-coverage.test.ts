@@ -1,6 +1,6 @@
 /**
  * Branch coverage tests for interfaces.ts
- * 
+ *
  * This file currently has 0% coverage and needs basic test coverage.
  * Since interfaces.ts is likely a types-only file, we'll test any exposed
  * runtime functionality and document any parts that are compile-time only.
@@ -21,7 +21,7 @@ describe("interfaces.ts - Branch Coverage", () => {
             // Since this is likely a types-only file, we verify it imports successfully
             // and any runtime exports are available
             const interfaces = await import("../../utils/interfaces.js");
-            
+
             // Check that the module object exists
             expect(interfaces).toBeDefined();
             expect(typeof interfaces).toBe("object");

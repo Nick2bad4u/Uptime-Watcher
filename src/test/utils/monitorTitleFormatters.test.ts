@@ -340,7 +340,7 @@ describe("monitorTitleFormatters", () => {
         });
 
         it("should use registered custom formatter in formatTitleSuffix", () => {
-            const customFormatter: TitleSuffixFormatter = (monitor) => ` [${monitor.url || 'API Monitor'}]`;
+            const customFormatter: TitleSuffixFormatter = (monitor) => ` [${monitor.url || "API Monitor"}]`;
 
             registerTitleSuffixFormatter("api", customFormatter);
 
@@ -451,8 +451,7 @@ describe("monitorTitleFormatters", () => {
             // Manually set type to complex to test custom formatter
             (hostOnlyMonitor as any).type = "complex";
 
-            const noEndpointMonitor = createMockMonitor({
-            });
+            const noEndpointMonitor = createMockMonitor({});
             // Manually set type to complex to test custom formatter
             (noEndpointMonitor as any).type = "complex";
 
@@ -488,7 +487,7 @@ describe("monitorTitleFormatters", () => {
             expect(formatTitleSuffix(httpMonitor)).toBe(" (https://original.example.com)");
 
             // Verify custom formatter works for custom type
-            const customMonitor = createMockMonitor({ });
+            const customMonitor = createMockMonitor({});
             // Manually set type to custom to test custom formatter
             (customMonitor as any).type = "custom";
             expect(formatTitleSuffix(customMonitor)).toBe(" (Custom)");
@@ -509,7 +508,7 @@ describe("monitorTitleFormatters", () => {
                 }),
                 createMockMonitor({}),
             ];
-            
+
             // Manually set type for the unknown monitor to test edge case
             (monitors[2] as any).type = "unknown";
 
@@ -532,8 +531,7 @@ describe("monitorTitleFormatters", () => {
             // Manually set type to ping to test custom formatter
             (pingMonitorWithHost as any).type = "ping";
 
-            const pingMonitorWithoutHost = createMockMonitor({
-            });
+            const pingMonitorWithoutHost = createMockMonitor({});
             // Manually set type to ping to test custom formatter
             (pingMonitorWithoutHost as any).type = "ping";
 

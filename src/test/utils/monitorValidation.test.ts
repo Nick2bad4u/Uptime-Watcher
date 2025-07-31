@@ -218,8 +218,8 @@ describe("Monitor Validation Utilities", () => {
             const mockResult = {
                 errors: [],
                 success: true,
-                warnings: [] ,
-                metadata: {}
+                warnings: [],
+                metadata: {},
             };
             mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(mockResult);
 
@@ -288,8 +288,8 @@ describe("Monitor Validation Utilities", () => {
             const mockResult = {
                 errors: [],
                 success: true,
-                warnings: [] ,
-                metadata: {}
+                warnings: [],
+                metadata: {},
             };
             vi.mocked(sharedValidateMonitorData).mockReturnValue(mockResult);
 
@@ -442,8 +442,8 @@ describe("Monitor Validation Utilities", () => {
             const mockResult = {
                 errors: [],
                 success: true,
-                warnings: [] ,
-                metadata: {}
+                warnings: [],
+                metadata: {},
             };
             vi.mocked(sharedValidateMonitorField).mockReturnValue(mockResult);
 

@@ -7,13 +7,7 @@ import { render } from "@testing-library/react";
 import { vi } from "vitest";
 import "@testing-library/jest-dom";
 
-import {
-    StatusIndicator,
-    ThemedBadge,
-    ThemedInput,
-    ThemedProgress,
-    ThemedSelect,
-} from "../../theme/components";
+import { StatusIndicator, ThemedBadge, ThemedInput, ThemedProgress, ThemedSelect } from "../../theme/components";
 
 // Mock the theme hook
 const mockTheme = {
@@ -154,7 +148,7 @@ vi.mock("../../theme/useTheme", () => ({
         getStatusColor: vi.fn((status: string) => {
             const colors = {
                 up: "#28a745",
-                down: "#dc3545", 
+                down: "#dc3545",
                 pending: "#ffc107",
                 paused: "#6c757d",
             };
@@ -198,39 +192,39 @@ describe("Theme Components - Missing Coverage", () => {
     describe("StatusIndicator Component", () => {
         it("should render with default props", () => {
             render(<StatusIndicator status="up" />);
-            
-            const indicator = document.querySelector('.themed-status-indicator');
+
+            const indicator = document.querySelector(".themed-status-indicator");
             expect(indicator).toBeInTheDocument();
         });
 
         it("should render with custom className", () => {
             render(<StatusIndicator status="down" className="custom-class" />);
-            
-            const indicator = document.querySelector('.themed-status-indicator');
+
+            const indicator = document.querySelector(".themed-status-indicator");
             expect(indicator).toHaveClass("custom-class");
         });
 
         it("should render without text by default", () => {
             render(<StatusIndicator status="up" />);
-            
-            const text = document.querySelector('.themed-status-indicator__text');
+
+            const text = document.querySelector(".themed-status-indicator__text");
             expect(text).not.toBeInTheDocument();
         });
 
         it("should render with text when showText is true", () => {
             render(<StatusIndicator status="up" showText />);
-            
-            const text = document.querySelector('.themed-status-indicator__text');
+
+            const text = document.querySelector(".themed-status-indicator__text");
             expect(text).toBeInTheDocument();
             expect(text).toHaveTextContent("Up");
         });
 
         it("should render with different status values", () => {
             const statuses = ["up", "down", "pending", "paused"] as const;
-            
+
             statuses.forEach((status) => {
                 const { unmount } = render(<StatusIndicator status={status} showText />);
-                const text = document.querySelector('.themed-status-indicator__text');
+                const text = document.querySelector(".themed-status-indicator__text");
                 expect(text).toHaveTextContent(status.charAt(0).toUpperCase() + status.slice(1));
                 unmount();
             });
@@ -238,10 +232,10 @@ describe("Theme Components - Missing Coverage", () => {
 
         it("should show text and status together", () => {
             render(<StatusIndicator status="pending" showText />);
-            
-            const indicator = document.querySelector('.themed-status-indicator');
-            const text = document.querySelector('.themed-status-indicator__text');
-            
+
+            const indicator = document.querySelector(".themed-status-indicator");
+            const text = document.querySelector(".themed-status-indicator__text");
+
             expect(indicator).toBeInTheDocument();
             expect(text).toBeInTheDocument();
             expect(text).toHaveTextContent("Pending");
@@ -249,10 +243,10 @@ describe("Theme Components - Missing Coverage", () => {
 
         it("should render with different size variants", () => {
             const sizes = ["sm", "md", "lg"] as const;
-            
+
             sizes.forEach((size) => {
                 const { unmount } = render(<StatusIndicator status="up" size={size} />);
-                const indicator = document.querySelector('.themed-status-indicator');
+                const indicator = document.querySelector(".themed-status-indicator");
                 expect(indicator).toBeInTheDocument();
                 unmount();
             });
@@ -262,8 +256,8 @@ describe("Theme Components - Missing Coverage", () => {
     describe("Edge Cases and Conditional Branches", () => {
         it("should handle empty string className", () => {
             render(<StatusIndicator status="up" className="" />);
-            
-            const indicator = document.querySelector('.themed-status-indicator');
+
+            const indicator = document.querySelector(".themed-status-indicator");
             expect(indicator).toBeInTheDocument();
         });
     });
@@ -271,10 +265,10 @@ describe("Theme Components - Missing Coverage", () => {
     describe("ThemedBadge - Additional Coverage", () => {
         it("should render with all size variants", () => {
             const sizes = ["xs", "sm", "md", "lg"] as const;
-            
+
             sizes.forEach((size) => {
                 const { unmount } = render(<ThemedBadge size={size}>Test Badge</ThemedBadge>);
-                const badge = document.querySelector('.themed-badge');
+                const badge = document.querySelector(".themed-badge");
                 expect(badge).toBeInTheDocument();
                 unmount();
             });
@@ -282,10 +276,10 @@ describe("Theme Components - Missing Coverage", () => {
 
         it("should render with all variant types", () => {
             const variants = ["primary", "secondary", "success", "warning", "error", "info"] as const;
-            
+
             variants.forEach((variant) => {
                 const { unmount } = render(<ThemedBadge variant={variant}>Test Badge</ThemedBadge>);
-                const badge = document.querySelector('.themed-badge');
+                const badge = document.querySelector(".themed-badge");
                 expect(badge).toBeInTheDocument();
                 unmount();
             });
@@ -295,27 +289,27 @@ describe("Theme Components - Missing Coverage", () => {
     describe("ThemedInput - Additional Coverage", () => {
         it("should render with different types", () => {
             const types = ["text", "email", "password", "number"] as const;
-            
+
             types.forEach((type) => {
                 const { unmount } = render(<ThemedInput type={type} />);
-                const input = document.querySelector('input');
+                const input = document.querySelector("input");
                 expect(input).toBeInTheDocument();
-                expect(input).toHaveAttribute('type', type);
+                expect(input).toHaveAttribute("type", type);
                 unmount();
             });
         });
 
         it("should handle disabled state", () => {
             render(<ThemedInput disabled />);
-            
-            const input = document.querySelector('input');
+
+            const input = document.querySelector("input");
             expect(input).toBeDisabled();
         });
 
         it("should handle required state", () => {
             render(<ThemedInput required />);
-            
-            const input = document.querySelector('input');
+
+            const input = document.querySelector("input");
             expect(input).toBeRequired();
         });
     });
@@ -327,10 +321,10 @@ describe("Theme Components - Missing Coverage", () => {
                 { disabled: false, required: true },
                 { disabled: true, required: false },
             ];
-            
+
             combinations.forEach((props) => {
                 const { unmount } = render(<ThemedInput {...props} />);
-                const input = document.querySelector('input');
+                const input = document.querySelector("input");
                 expect(input).toBeInTheDocument();
                 unmount();
             });
@@ -340,29 +334,29 @@ describe("Theme Components - Missing Coverage", () => {
     describe("ThemedProgress - Coverage", () => {
         it("should render with default props", () => {
             render(<ThemedProgress value={50} />);
-            
-            const progress = document.querySelector('.themed-progress');
+
+            const progress = document.querySelector(".themed-progress");
             expect(progress).toBeInTheDocument();
         });
 
         it("should render with custom className", () => {
             render(<ThemedProgress value={75} className="custom-progress" />);
-            
-            const progress = document.querySelector('.themed-progress');
+
+            const progress = document.querySelector(".themed-progress");
             expect(progress).toHaveClass("custom-progress");
         });
 
         it("should handle edge values", () => {
             render(<ThemedProgress value={0} />);
-            
-            const progress = document.querySelector('.themed-progress');
+
+            const progress = document.querySelector(".themed-progress");
             expect(progress).toBeInTheDocument();
         });
 
         it("should handle max value", () => {
             render(<ThemedProgress value={100} max={100} />);
-            
-            const progress = document.querySelector('.themed-progress');
+
+            const progress = document.querySelector(".themed-progress");
             expect(progress).toBeInTheDocument();
         });
     });
@@ -375,8 +369,8 @@ describe("Theme Components - Missing Coverage", () => {
                     <option value="2">Option 2</option>
                 </ThemedSelect>
             );
-            
-            const select = document.querySelector('select');
+
+            const select = document.querySelector("select");
             expect(select).toBeInTheDocument();
         });
 
@@ -386,8 +380,8 @@ describe("Theme Components - Missing Coverage", () => {
                     <option value="1">Option 1</option>
                 </ThemedSelect>
             );
-            
-            const select = document.querySelector('select');
+
+            const select = document.querySelector("select");
             expect(select).toBeDisabled();
         });
 
@@ -397,8 +391,8 @@ describe("Theme Components - Missing Coverage", () => {
                     <option value="1">Option 1</option>
                 </ThemedSelect>
             );
-            
-            const select = document.querySelector('select');
+
+            const select = document.querySelector("select");
             expect(select).toBeRequired();
         });
     });

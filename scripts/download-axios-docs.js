@@ -61,13 +61,13 @@ function cleanContent(content) {
     const marker = "::::: sponsors_container";
     // 1. Remove everything from sponsors_container onward
     const idx = content.indexOf(marker);
-    let keepContent = idx === -1 ? content : content.slice(0, content.lastIndexOf('\n', idx) + 1);
+    let keepContent = idx === -1 ? content : content.slice(0, content.lastIndexOf("\n", idx) + 1);
 
     // 2. Remove any line that contains '::::::: body'
     keepContent = keepContent
-        .split('\n')
-        .filter(line => !line.includes('::::::: body'))
-        .join('\n')
+        .split("\n")
+        .filter((line) => !line.includes("::::::: body"))
+        .join("\n")
         .trimEnd();
 
     return keepContent;
@@ -101,9 +101,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
             try {
                 content = fs.readFileSync(filePath, "utf8");
             } catch (readErr) {
-                console.error(
-                    logMsg.replace("✅", "❌") + ` → Failed to read file: ${readErr.message}`
-                );
+                console.error(logMsg.replace("✅", "❌") + ` → Failed to read file: ${readErr.message}`);
                 return reject(readErr);
             }
             if (!content || content.trim().length === 0) {
@@ -116,9 +114,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
                 processedContent = cleanContent(processedContent);
                 fs.writeFileSync(filePath, processedContent);
             } catch (writeErr) {
-                console.error(
-                    logMsg.replace("✅", "❌") + ` → Failed to write file: ${writeErr.message}`
-                );
+                console.error(logMsg.replace("✅", "❌") + ` → Failed to write file: ${writeErr.message}`);
                 return reject(writeErr);
             }
             console.log(logMsg);

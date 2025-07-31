@@ -67,7 +67,7 @@ describe("PingMonitor", () => {
         it("should initialize with default configuration when no config provided", () => {
             const monitor = new PingMonitor();
             const config = monitor.getConfig();
-            
+
             expect(config.timeout).toBe(10_000); // DEFAULT_REQUEST_TIMEOUT
         });
 
@@ -77,7 +77,7 @@ describe("PingMonitor", () => {
             };
             const monitor = new PingMonitor(customConfig);
             const config = monitor.getConfig();
-            
+
             expect(config.timeout).toBe(15_000);
         });
 
@@ -87,7 +87,7 @@ describe("PingMonitor", () => {
             };
             const monitor = new PingMonitor(partialConfig);
             const config = monitor.getConfig();
-            
+
             expect(config.timeout).toBe(20_000);
         });
     });
@@ -103,10 +103,10 @@ describe("PingMonitor", () => {
             const newConfig: Partial<MonitorConfig> = {
                 timeout: 8000,
             };
-            
+
             pingMonitor.updateConfig(newConfig);
             const config = pingMonitor.getConfig();
-            
+
             expect(config.timeout).toBe(8000);
         });
 
@@ -114,10 +114,10 @@ describe("PingMonitor", () => {
             const partialUpdate: Partial<MonitorConfig> = {
                 timeout: 12_000,
             };
-            
+
             pingMonitor.updateConfig(partialUpdate);
             const config = pingMonitor.getConfig();
-            
+
             expect(config.timeout).toBe(12_000);
         });
     });
@@ -147,9 +147,9 @@ describe("PingMonitor", () => {
                 timeout: 5000,
                 retryAttempts: 2,
             });
-            
+
             const result = await pingMonitor.check(monitor);
-            
+
             expect(result).toEqual(successResult);
             expect(mockPerformPingCheckWithRetry).toHaveBeenCalledWith("google.com", 5000, 2);
         });
@@ -158,8 +158,10 @@ describe("PingMonitor", () => {
             const httpMonitor = createMockPingMonitor({
                 type: "http" as any,
             });
-            
-            await expect(pingMonitor.check(httpMonitor)).rejects.toThrow("PingMonitor cannot handle monitor type: http");
+
+            await expect(pingMonitor.check(httpMonitor)).rejects.toThrow(
+                "PingMonitor cannot handle monitor type: http"
+            );
             expect(mockPerformPingCheckWithRetry).not.toHaveBeenCalled();
         });
 
@@ -167,9 +169,9 @@ describe("PingMonitor", () => {
             const invalidMonitor = createMockPingMonitor({
                 host: "",
             });
-            
+
             const result = await pingMonitor.check(invalidMonitor);
-            
+
             expect(result.status).toBe("down");
             expect(result.error).toContain("Ping monitor missing valid host");
             expect(mockPerformPingCheckWithRetry).not.toHaveBeenCalled();
@@ -178,9 +180,9 @@ describe("PingMonitor", () => {
         it("should handle ping failure", async () => {
             mockPerformPingCheckWithRetry.mockResolvedValue(failureResult);
             const monitor = createMockPingMonitor();
-            
+
             const result = await pingMonitor.check(monitor);
-            
+
             expect(result).toEqual(failureResult);
             expect(result.status).toBe("down");
         });
@@ -191,9 +193,9 @@ describe("PingMonitor", () => {
                 timeout: 8000,
                 retryAttempts: 5,
             });
-            
+
             await pingMonitor.check(monitor);
-            
+
             expect(mockPerformPingCheckWithRetry).toHaveBeenCalledWith("test.example.com", 8000, 5);
         });
 
@@ -207,9 +209,9 @@ describe("PingMonitor", () => {
 
             for (const testCase of testCases) {
                 const monitor = createMockPingMonitor({ host: testCase.host });
-                
+
                 await pingMonitor.check(monitor);
-                
+
                 expect(mockPerformPingCheckWithRetry).toHaveBeenCalledWith(
                     testCase.host,
                     expect.any(Number),
@@ -221,9 +223,9 @@ describe("PingMonitor", () => {
         it("should propagate ping retry errors", async () => {
             const error = new Error("Network unreachable");
             mockPerformPingCheckWithRetry.mockRejectedValue(error);
-            
+
             const monitor = createMockPingMonitor();
-            
+
             await expect(pingMonitor.check(monitor)).rejects.toThrow("Network unreachable");
         });
     });
@@ -233,9 +235,9 @@ describe("PingMonitor", () => {
             const monitor = createMockPingMonitor({
                 timeout: undefined as any,
             });
-            
+
             await pingMonitor.check(monitor);
-            
+
             // Should use service default timeout
             expect(mockPerformPingCheckWithRetry).toHaveBeenCalledWith(
                 "example.com",
@@ -248,9 +250,9 @@ describe("PingMonitor", () => {
             const monitor = createMockPingMonitor({
                 retryAttempts: undefined as any,
             });
-            
+
             await pingMonitor.check(monitor);
-            
+
             // Should use service default retry attempts (from constants)
             expect(mockPerformPingCheckWithRetry).toHaveBeenCalledWith(
                 "example.com",
@@ -264,9 +266,9 @@ describe("PingMonitor", () => {
         it("should complete quickly for successful pings", async () => {
             const monitor = createMockPingMonitor();
             const startTime = Date.now();
-            
+
             await pingMonitor.check(monitor);
-            
+
             const duration = Date.now() - startTime;
             expect(duration).toBeLessThan(100); // Should be very fast since we're mocking
         });
@@ -275,20 +277,16 @@ describe("PingMonitor", () => {
             const monitor1 = createMockPingMonitor({ host: "host1.com" });
             const monitor2 = createMockPingMonitor({ host: "host2.com" });
             const monitor3 = createMockPingMonitor({ host: "host3.com" });
-            
-            const promises = [
-                pingMonitor.check(monitor1),
-                pingMonitor.check(monitor2),
-                pingMonitor.check(monitor3),
-            ];
-            
+
+            const promises = [pingMonitor.check(monitor1), pingMonitor.check(monitor2), pingMonitor.check(monitor3)];
+
             const results = await Promise.all(promises);
-            
+
             expect(results).toHaveLength(3);
-            
+
             // Debug: log what we got
             console.log("Concurrent results:", results);
-            
+
             for (const result of results) {
                 expect(result).toBeDefined();
                 expect(result.status).toBe("up");

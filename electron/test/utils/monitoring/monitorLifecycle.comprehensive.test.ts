@@ -11,7 +11,7 @@ import {
     stopAllMonitoring,
     stopMonitoringForSite,
     type MonitoringLifecycleConfig,
-    type MonitoringCallback
+    type MonitoringCallback,
 } from "../../../utils/monitoring/monitorLifecycle";
 import { MONITOR_STATUS, type MonitorStatus } from "../../../../shared/types";
 import { UptimeEvents } from "../../../events/eventTypes";
@@ -38,7 +38,11 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
     let mockSitesCache: StandardizedCache<Site>;
     let mockDatabase: any;
 
-    const createMockMonitor = (id: string, monitoring = false, status: MonitorStatus = MONITOR_STATUS.PENDING): Monitor => ({
+    const createMockMonitor = (
+        id: string,
+        monitoring = false,
+        status: MonitorStatus = MONITOR_STATUS.PENDING
+    ): Monitor => ({
         id,
         type: "http",
         url: "https://example.com",
@@ -48,36 +52,36 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
         timeout: 5000,
         retryAttempts: 3,
         responseTime: -1,
-        history: []
+        history: [],
     });
 
     const createMockSite = (identifier: string, monitors: Monitor[]): Site => ({
         identifier,
         name: "Test Site",
         monitoring: true,
-        monitors
+        monitors,
     });
 
     beforeEach(() => {
         // Create mocks
         mockDatabase = {} as any;
-        
+
         mockDatabaseService = {
-            getDatabase: vi.fn().mockReturnValue(mockDatabase)
+            getDatabase: vi.fn().mockReturnValue(mockDatabase),
         } as any;
 
         mockEventEmitter = new TypedEventBus<UptimeEvents>("test");
-        
+
         mockLogger = {
             debug: vi.fn(),
             info: vi.fn(),
             warn: vi.fn(),
-            error: vi.fn()
+            error: vi.fn(),
         };
 
         mockMonitorRepository = {
             updateInternal: vi.fn(),
-            findBySiteIdentifier: vi.fn().mockResolvedValue([])
+            findBySiteIdentifier: vi.fn().mockResolvedValue([]),
         } as any;
 
         mockMonitorScheduler = {
@@ -85,7 +89,7 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             stopSite: vi.fn(),
             startMonitor: vi.fn().mockReturnValue(true),
             stopMonitor: vi.fn().mockReturnValue(true),
-            stopAll: vi.fn()
+            stopAll: vi.fn(),
         } as any;
 
         mockSitesCache = new StandardizedCache<Site>({ name: "test-cache" });
@@ -96,7 +100,7 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             logger: mockLogger,
             monitorRepository: mockMonitorRepository,
             monitorScheduler: mockMonitorScheduler,
-            sites: mockSitesCache
+            sites: mockSitesCache,
         };
 
         // Mock withDatabaseOperation to execute the callback
@@ -108,7 +112,7 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
     describe("startAllMonitoring", () => {
         it("should return current state when monitoring is already running", async () => {
             const result = await startAllMonitoring(config, true);
-            
+
             expect(result).toBe(true);
             expect(mockLogger.debug).toHaveBeenCalledWith("Monitoring already running");
         });
@@ -133,22 +137,14 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             );
             expect(mockMonitorScheduler.startSite).toHaveBeenCalledWith(site1);
             expect(mockMonitorScheduler.startSite).toHaveBeenCalledWith(site2);
-            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(
-                mockDatabase,
-                "monitor1",
-                {
-                    monitoring: true,
-                    status: MONITOR_STATUS.PENDING
-                }
-            );
-            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(
-                mockDatabase,
-                "monitor2",
-                {
-                    monitoring: true,
-                    status: MONITOR_STATUS.PENDING
-                }
-            );
+            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(mockDatabase, "monitor1", {
+                monitoring: true,
+                status: MONITOR_STATUS.PENDING,
+            });
+            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(mockDatabase, "monitor2", {
+                monitoring: true,
+                status: MONITOR_STATUS.PENDING,
+            });
         });
 
         it("should handle monitors without IDs gracefully", async () => {
@@ -187,9 +183,7 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             const result = await startAllMonitoring(config, false);
 
             expect(result).toBe(true);
-            expect(mockLogger.info).toHaveBeenCalledWith(
-                "Starting monitoring with 0 sites (per-site intervals)"
-            );
+            expect(mockLogger.info).toHaveBeenCalledWith("Starting monitoring with 0 sites (per-site intervals)");
             expect(mockMonitorScheduler.startSite).not.toHaveBeenCalled();
         });
     });
@@ -211,14 +205,10 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             const result = await startMonitoringForSite(config, "site1", "monitor1");
 
             expect(result).toBe(true);
-            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(
-                mockDatabase,
-                "monitor1",
-                {
-                    monitoring: true,
-                    status: MONITOR_STATUS.PENDING
-                }
-            );
+            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(mockDatabase, "monitor1", {
+                monitoring: true,
+                status: MONITOR_STATUS.PENDING,
+            });
             expect(mockMonitorScheduler.startMonitor).toHaveBeenCalledWith("site1", monitor);
         });
 
@@ -245,9 +235,7 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             const result = await startMonitoringForSite(config, "site1", "nonexistent-monitor");
 
             expect(result).toBe(false);
-            expect(mockLogger.warn).toHaveBeenCalledWith(
-                "Monitor not found: site1:nonexistent-monitor"
-            );
+            expect(mockLogger.warn).toHaveBeenCalledWith("Monitor not found: site1:nonexistent-monitor");
         });
 
         it("should use callback for recursive operations", async () => {
@@ -282,22 +270,14 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
                 `Stopped all site monitoring intervals and set monitors to ${MONITOR_STATUS.PAUSED}`
             );
             expect(mockMonitorScheduler.stopAll).toHaveBeenCalledOnce();
-            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(
-                mockDatabase,
-                "monitor1",
-                {
-                    monitoring: false,
-                    status: MONITOR_STATUS.PAUSED
-                }
-            );
-            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(
-                mockDatabase,
-                "monitor2",
-                {
-                    monitoring: false,
-                    status: MONITOR_STATUS.PAUSED
-                }
-            );
+            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(mockDatabase, "monitor1", {
+                monitoring: false,
+                status: MONITOR_STATUS.PAUSED,
+            });
+            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(mockDatabase, "monitor2", {
+                monitoring: false,
+                status: MONITOR_STATUS.PAUSED,
+            });
         });
 
         it("should handle monitors without IDs gracefully", async () => {
@@ -350,14 +330,10 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
 
             expect(result).toBe(false);
             expect(mockMonitorRepository.updateInternal).toHaveBeenCalledTimes(1);
-            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(
-                mockDatabase,
-                "monitor1",
-                {
-                    monitoring: false,
-                    status: MONITOR_STATUS.PAUSED
-                }
-            );
+            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(mockDatabase, "monitor1", {
+                monitoring: false,
+                status: MONITOR_STATUS.PAUSED,
+            });
         });
     });
 
@@ -378,14 +354,10 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             const result = await stopMonitoringForSite(config, "site1", "monitor1");
 
             expect(result).toBe(true);
-            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(
-                mockDatabase,
-                "monitor1",
-                {
-                    monitoring: false,
-                    status: MONITOR_STATUS.PAUSED
-                }
-            );
+            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(mockDatabase, "monitor1", {
+                monitoring: false,
+                status: MONITOR_STATUS.PAUSED,
+            });
             expect(mockMonitorScheduler.stopMonitor).toHaveBeenCalledWith("site1", "monitor1");
         });
 
@@ -412,9 +384,7 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             const result = await stopMonitoringForSite(config, "site1", "nonexistent-monitor");
 
             expect(result).toBe(false);
-            expect(mockLogger.warn).toHaveBeenCalledWith(
-                "Monitor not found: site1:nonexistent-monitor"
-            );
+            expect(mockLogger.warn).toHaveBeenCalledWith("Monitor not found: site1:nonexistent-monitor");
         });
 
         it("should only stop monitors that are currently monitoring", async () => {
@@ -459,10 +429,7 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             const result = await stopMonitoringForSite(config, "site1", "monitor1");
 
             expect(result).toBe(false);
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to stop monitoring for site1:monitor1",
-                dbError
-            );
+            expect(mockLogger.error).toHaveBeenCalledWith("Failed to stop monitoring for site1:monitor1", dbError);
         });
     });
 
@@ -470,7 +437,7 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
         it("should handle undefined monitor properties gracefully", async () => {
             const monitor = {
                 type: "http",
-                url: "https://example.com"
+                url: "https://example.com",
             } as Monitor;
             const site = createMockSite("site1", [monitor]);
 
@@ -496,7 +463,7 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
 
         it("should handle database service returning null", async () => {
             mockDatabaseService.getDatabase = vi.fn().mockReturnValue(null);
-            
+
             const monitor = createMockMonitor("monitor1");
             const site = createMockSite("site1", [monitor]);
 
@@ -505,14 +472,10 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             const result = await startAllMonitoring(config, false);
 
             expect(result).toBe(true);
-            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(
-                null,
-                "monitor1",
-                {
-                    monitoring: true,
-                    status: MONITOR_STATUS.PENDING
-                }
-            );
+            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(null, "monitor1", {
+                monitoring: true,
+                status: MONITOR_STATUS.PENDING,
+            });
         });
 
         it("should handle concurrent operations", async () => {
@@ -526,10 +489,10 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             const [result1, result2, result3] = await Promise.all([
                 startAllMonitoring(config, false),
                 startMonitoringForSite(config, "site1"), // This returns false without callback
-                stopMonitoringForSite(config, "site1")    // This returns false without callback
+                stopMonitoringForSite(config, "site1"), // This returns false without callback
             ]);
 
-            expect(result1).toBe(true);  // startAllMonitoring should succeed
+            expect(result1).toBe(true); // startAllMonitoring should succeed
             expect(result2).toBe(false); // startMonitoringForSite without callback returns false
             expect(result3).toBe(false); // stopMonitoringForSite without callback returns false
         });

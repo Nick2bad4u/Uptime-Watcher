@@ -167,10 +167,12 @@ describe("Monitor UI Helpers", () => {
 
     describe("supportsAdvancedAnalytics", () => {
         it("should return true when monitor type supports advanced analytics", async () => {
-            vi.mocked(getMonitorTypeConfig).mockResolvedValue(createMockConfig({
-                type: "http",
-                uiConfig: { supportsAdvancedAnalytics: true },
-            }));
+            vi.mocked(getMonitorTypeConfig).mockResolvedValue(
+                createMockConfig({
+                    type: "http",
+                    uiConfig: { supportsAdvancedAnalytics: true },
+                })
+            );
 
             const result = await monitorUiHelpers.supportsAdvancedAnalytics("http");
 
@@ -178,10 +180,12 @@ describe("Monitor UI Helpers", () => {
         });
 
         it("should return false when monitor type doesn't support advanced analytics", async () => {
-            vi.mocked(getMonitorTypeConfig).mockResolvedValue(createMockConfig({
-                type: "http",
-                uiConfig: { supportsAdvancedAnalytics: false },
-            }));
+            vi.mocked(getMonitorTypeConfig).mockResolvedValue(
+                createMockConfig({
+                    type: "http",
+                    uiConfig: { supportsAdvancedAnalytics: false },
+                })
+            );
 
             const result = await monitorUiHelpers.supportsAdvancedAnalytics("http");
 
@@ -199,10 +203,12 @@ describe("Monitor UI Helpers", () => {
 
     describe("supportsResponseTime", () => {
         it("should return true when monitor type supports response time", async () => {
-            vi.mocked(getMonitorTypeConfig).mockResolvedValue(createMockConfig({
-                type: "http",
-                uiConfig: { supportsResponseTime: true },
-            }));
+            vi.mocked(getMonitorTypeConfig).mockResolvedValue(
+                createMockConfig({
+                    type: "http",
+                    uiConfig: { supportsResponseTime: true },
+                })
+            );
 
             const result = await monitorUiHelpers.supportsResponseTime("http");
 
@@ -210,10 +216,12 @@ describe("Monitor UI Helpers", () => {
         });
 
         it("should return false when monitor type doesn't support response time", async () => {
-            vi.mocked(getMonitorTypeConfig).mockResolvedValue(createMockConfig({
-                type: "http",
-                uiConfig: { supportsResponseTime: false },
-            }));
+            vi.mocked(getMonitorTypeConfig).mockResolvedValue(
+                createMockConfig({
+                    type: "http",
+                    uiConfig: { supportsResponseTime: false },
+                })
+            );
 
             const result = await monitorUiHelpers.supportsResponseTime("http");
 
@@ -231,10 +239,12 @@ describe("Monitor UI Helpers", () => {
 
     describe("shouldShowUrl", () => {
         it("should return true when monitor type should show URL", async () => {
-            vi.mocked(getMonitorTypeConfig).mockResolvedValue(createMockConfig({
-                type: "http",
-                uiConfig: { display: { showUrl: true } },
-            }));
+            vi.mocked(getMonitorTypeConfig).mockResolvedValue(
+                createMockConfig({
+                    type: "http",
+                    uiConfig: { display: { showUrl: true } },
+                })
+            );
 
             const result = await monitorUiHelpers.shouldShowUrl("http");
 
@@ -242,10 +252,12 @@ describe("Monitor UI Helpers", () => {
         });
 
         it("should return false when monitor type shouldn't show URL", async () => {
-            vi.mocked(getMonitorTypeConfig).mockResolvedValue(createMockConfig({
-                type: "http",
-                uiConfig: { display: { showUrl: false } },
-            }));
+            vi.mocked(getMonitorTypeConfig).mockResolvedValue(
+                createMockConfig({
+                    type: "http",
+                    uiConfig: { display: { showUrl: false } },
+                })
+            );
 
             const result = await monitorUiHelpers.shouldShowUrl("http");
 
@@ -309,7 +321,7 @@ describe("Monitor UI Helpers", () => {
 
         it("should handle invalid monitor types", async () => {
             const invalidType = "invalid-type" as any; // Cast to test edge case
-            
+
             // Mock to return undefined for invalid types (this is the default, but let's be explicit)
             vi.mocked(getMonitorTypeConfig).mockResolvedValue(undefined);
 

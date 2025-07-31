@@ -32,15 +32,15 @@ describe("Validation Error Paths and Edge Cases", () => {
                 if (typeof timeout !== "number") {
                     return 5000; // Default timeout
                 }
-                
+
                 if (timeout < 1000) {
                     return 1000; // Minimum timeout
                 }
-                
+
                 if (timeout > 60_000) {
                     return 60_000; // Maximum timeout
                 }
-                
+
                 return timeout;
             };
 
@@ -58,15 +58,15 @@ describe("Validation Error Paths and Edge Cases", () => {
                 if (typeof interval !== "number") {
                     return 30_000; // Default 30 seconds
                 }
-                
+
                 if (interval < 5000) {
                     return 5000; // Minimum 5 seconds
                 }
-                
+
                 if (interval > 3_600_000) {
                     return 3_600_000; // Maximum 1 hour
                 }
-                
+
                 return interval;
             };
 
@@ -80,9 +80,11 @@ describe("Validation Error Paths and Edge Cases", () => {
 
     describe("Status validation and mapping", () => {
         it("should test status mapping branches", () => {
-            const mapMonitorStatus = (status: string): { 
-                display: string; 
-                color: string; 
+            const mapMonitorStatus = (
+                status: string
+            ): {
+                display: string;
+                color: string;
                 severity: number;
             } => {
                 switch (status) {
@@ -139,7 +141,7 @@ describe("Validation Error Paths and Edge Cases", () => {
         it("should test number parsing with validation", () => {
             const parseNumber = (value: unknown, min?: number, max?: number): number | null => {
                 let num: number;
-                
+
                 if (typeof value === "number") {
                     num = value;
                 } else if (typeof value === "string") {
@@ -147,19 +149,19 @@ describe("Validation Error Paths and Edge Cases", () => {
                 } else {
                     return null;
                 }
-                
+
                 if (Number.isNaN(num)) {
                     return null;
                 }
-                
+
                 if (min !== undefined && num < min) {
                     return null;
                 }
-                
+
                 if (max !== undefined && num > max) {
                     return null;
                 }
-                
+
                 return num;
             };
 
@@ -180,20 +182,16 @@ describe("Validation Error Paths and Edge Cases", () => {
 
     describe("Array processing edge cases", () => {
         it("should test array filtering with type guards", () => {
-            const filterValidItems = <T>(
-                items: unknown[],
-                validator: (item: unknown) => item is T
-            ): T[] => {
+            const filterValidItems = <T>(items: unknown[], validator: (item: unknown) => item is T): T[] => {
                 if (!Array.isArray(items)) {
                     return [];
                 }
-                
+
                 return items.filter((item) => validator(item));
             };
 
             const isString = (value: unknown): value is string => typeof value === "string";
-            const isNumber = (value: unknown): value is number => 
-                typeof value === "number" && !Number.isNaN(value);
+            const isNumber = (value: unknown): value is number => typeof value === "number" && !Number.isNaN(value);
 
             const mixedArray = ["hello", 42, null, "world", 3.14, undefined, "test"];
 
@@ -208,16 +206,16 @@ describe("Validation Error Paths and Edge Cases", () => {
                 if (!Array.isArray(array) || array.length === 0) {
                     return [];
                 }
-                
+
                 if (size <= 0) {
                     return [array];
                 }
-                
+
                 const chunks: T[][] = [];
                 for (let i = 0; i < array.length; i += size) {
                     chunks.push(array.slice(i, i + size));
                 }
-                
+
                 return chunks;
             };
 
@@ -236,12 +234,12 @@ describe("Validation Error Paths and Edge Cases", () => {
                 if (input instanceof Date) {
                     return Number.isNaN(input.getTime()) ? null : input;
                 }
-                
+
                 if (typeof input === "string" || typeof input === "number") {
                     const date = new Date(input);
                     return Number.isNaN(date.getTime()) ? null : date;
                 }
-                
+
                 return null;
             };
 
@@ -263,19 +261,19 @@ describe("Validation Error Paths and Edge Cases", () => {
                 if (!Number.isFinite(ms) || ms < 0) {
                     return "Invalid";
                 }
-                
+
                 if (ms < 1000) {
                     return `${ms}ms`;
                 }
-                
+
                 if (ms < 60_000) {
                     return `${Math.round(ms / 1000)}s`;
                 }
-                
+
                 if (ms < 3_600_000) {
                     return `${Math.round(ms / 60_000)}m`;
                 }
-                
+
                 return `${Math.round(ms / 3_600_000)}h`;
             };
 
@@ -319,11 +317,11 @@ describe("Validation Error Paths and Edge Cases", () => {
             expect(mergeConfig(undefined)).toEqual({ timeout: 5000, retries: 3, enabled: true });
             expect(mergeConfig({})).toEqual({ timeout: 5000, retries: 3, enabled: true });
             expect(mergeConfig({ timeout: 1000 })).toEqual({ timeout: 1000, retries: 3, enabled: true });
-            expect(mergeConfig({ url: "https://example.com" })).toEqual({ 
-                timeout: 5000, 
-                retries: 3, 
-                enabled: true, 
-                url: "https://example.com" 
+            expect(mergeConfig({ url: "https://example.com" })).toEqual({
+                timeout: 5000,
+                retries: 3,
+                enabled: true,
+                url: "https://example.com",
             });
         });
     });

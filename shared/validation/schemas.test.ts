@@ -269,7 +269,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         it("should validate various valid URLs", () => {
             const validUrls = [
                 "https://example.com",
-                "https://sub.example.com",  
+                "https://sub.example.com",
                 "https://example.com/path",
                 "https://example.com/path?query=value",
                 "https://example.com/path#fragment",
@@ -1116,7 +1116,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             const result = validateMonitorData("http", {
                 get url() {
                     throw new Error("Custom error");
-                }
+                },
             });
             expect(result.success).toBe(false);
             expect(result.errors).toContain("Validation failed: Custom error");
@@ -1127,7 +1127,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             const result = validateSiteData({
                 get name() {
                     throw new Error("Site validation error");
-                }
+                },
             });
             expect(result.success).toBe(false);
             expect(result.errors).toContain("Validation failed: Site validation error");
@@ -1138,7 +1138,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             const result = validateMonitorField("http", "url", {
                 get valueOf() {
                     throw new Error("Field error");
-                }
+                },
             });
             expect(result.success).toBe(false);
             expect(result.errors[0]).toContain("Invalid input");

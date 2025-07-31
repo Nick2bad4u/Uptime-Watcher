@@ -16,7 +16,7 @@ import {
     isString,
     isValidPort,
     isValidTimestamp,
-    isValidUrl
+    isValidUrl,
 } from "../../utils/typeGuards";
 
 describe("Type Guards - Comprehensive Coverage", () => {
@@ -65,7 +65,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             const obj = Object.create(null); // Object without prototype
             obj.prop = "value";
             expect(hasProperties(obj, ["prop"])).toBe(true);
-            
+
             // Empty properties array
             expect(hasProperties({}, [])).toBe(true);
             expect(hasProperties(null, [])).toBe(false); // Still need valid object
@@ -133,7 +133,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isArray(["a", "b", "c"], isString)).toBe(true);
             expect(isArray([1, 2, 3], isNumber)).toBe(true);
             expect(isArray([], isString)).toBe(true); // Empty array passes any validator
-            
+
             // Mixed arrays should fail type-specific validators
             expect(isArray([1, "mixed"], isString)).toBe(false);
             expect(isArray(["mixed", 1], isNumber)).toBe(false);
@@ -141,9 +141,8 @@ describe("Type Guards - Comprehensive Coverage", () => {
         });
 
         it("should handle complex validators", () => {
-            const isPositiveNumber = (value: unknown): value is number => 
-                typeof value === "number" && value > 0;
-            
+            const isPositiveNumber = (value: unknown): value is number => typeof value === "number" && value > 0;
+
             expect(isArray([1, 2, 3], isPositiveNumber)).toBe(true);
             expect(isArray([0, 1, 2], isPositiveNumber)).toBe(false); // 0 is not positive
             expect(isArray([-1, 1, 2], isPositiveNumber)).toBe(false); // -1 is not positive
@@ -201,7 +200,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
         it("should handle edge cases", () => {
             // Date.prototype is a Date but invalid
             expect(isDate(Date.prototype)).toBe(false);
-            
+
             // Date-like objects should fail
             const dateLike = { getTime: () => Date.now() };
             expect(isDate(dateLike)).toBe(false);
@@ -234,7 +233,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
                     this.name = "CustomError";
                 }
             }
-            
+
             expect(isError(new CustomError())).toBe(true);
             expect(isError(new CustomError("custom message"))).toBe(true);
         });
@@ -243,9 +242,9 @@ describe("Type Guards - Comprehensive Coverage", () => {
             const errorLike = {
                 name: "Error",
                 message: "Something went wrong",
-                stack: "Error: Something went wrong\n    at ..."
+                stack: "Error: Something went wrong\n    at ...",
             };
-            
+
             expect(isError(errorLike)).toBe(false); // Not instanceof Error
         });
     });
@@ -293,7 +292,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
     describe("isFunction", () => {
         it("should return true for functions", () => {
             expect(isFunction(() => {})).toBe(true);
-            expect(isFunction(function() {})).toBe(true);
+            expect(isFunction(function () {})).toBe(true);
             expect(isFunction(async () => {})).toBe(true);
             expect(isFunction(function* () {})).toBe(true);
             expect(isFunction(console.log)).toBe(true);
@@ -398,7 +397,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
 
         it("should return false for functions", () => {
             expect(isNonNullObject(() => {})).toBe(false);
-            expect(isNonNullObject(function() {})).toBe(false);
+            expect(isNonNullObject(function () {})).toBe(false);
         });
     });
 
@@ -473,7 +472,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
 
         it("should return false for functions", () => {
             expect(isObject(() => {})).toBe(false);
-            expect(isObject(function() {})).toBe(false);
+            expect(isObject(function () {})).toBe(false);
         });
     });
 
@@ -681,7 +680,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
                 active: true,
                 created: new Date(),
                 tags: ["web", "api"],
-                config: { timeout: 5000 }
+                config: { timeout: 5000 },
             };
 
             if (hasProperties(data, ["id", "name", "port", "url", "active", "created", "tags", "config"])) {
@@ -702,13 +701,13 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(!isString(123) && isNumber(123) && isValidPort(123)).toBe(true);
             expect(isArray([]) && !isObject([]) && !isString([])).toBe(true);
             expect(!isArray({}) && isObject({}) && !isFunction({})).toBe(true);
-            
+
             const testFn = () => {};
             expect(isFunction(testFn) && !isObject(testFn) && !isString(testFn)).toBe(true);
-            
+
             const testDate = new Date();
             expect(isDate(testDate) && isObject(testDate) && !isString(testDate)).toBe(true);
-            
+
             expect(!isObject(null) && !isString(null) && !isNumber(null)).toBe(true);
         });
     });

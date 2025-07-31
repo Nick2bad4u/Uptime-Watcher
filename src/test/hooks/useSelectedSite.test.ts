@@ -28,7 +28,7 @@ describe("useSelectedSite", () => {
     const mockSites: Site[] = [
         {
             identifier: "site-1",
-            name: "Test Site 1", 
+            name: "Test Site 1",
             monitors: [],
             monitoring: false,
         },

@@ -353,13 +353,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         });
 
         it("should accept various valid host formats for ping", () => {
-            const validHosts = [
-                "example.com",
-                "subdomain.example.com",
-                "192.168.1.1",
-                "127.0.0.1",
-                "localhost",
-            ];
+            const validHosts = ["example.com", "subdomain.example.com", "192.168.1.1", "127.0.0.1", "localhost"];
 
             for (const host of validHosts) {
                 const monitor = {
@@ -712,10 +706,10 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         });
 
         it("should handle edge cases and internal function coverage", () => {
-            // Test validateFieldWithSchema with unknown field name 
+            // Test validateFieldWithSchema with unknown field name
             const result = validateMonitorField("http", "unknownField", "value");
             expect(result.success).toBe(false);
-            expect(result.errors.some(error => error.includes("Field validation failed"))).toBe(true);
+            expect(result.errors.some((error) => error.includes("Field validation failed"))).toBe(true);
         });
 
         it("should handle field validation for common base fields", () => {
@@ -1020,7 +1014,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 };
 
                 const result = validateMonitorData("http", incompleteData);
-                
+
                 // The validation should succeed because lastChecked is optional
                 expect(result.success).toBe(true);
                 expect(result.errors).toHaveLength(0);
@@ -1066,7 +1060,9 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 // This tests the final throw for unknown fields
                 const result = validateMonitorField("http", "nonExistentField", "value");
                 expect(result.success).toBe(false);
-                expect(result.errors.some(error => error.includes("Unknown field") || error.includes("nonExistentField"))).toBe(true);
+                expect(
+                    result.errors.some((error) => error.includes("Unknown field") || error.includes("nonExistentField"))
+                ).toBe(true);
             });
 
             it("should handle fields that exist in specific schema shape", () => {
@@ -1079,12 +1075,25 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             it("should handle base schema fields for different monitor types", () => {
                 // Test base schema fields work for all monitor types
                 const types = ["http", "port", "ping"];
-                const baseFields = ["id", "type", "checkInterval", "timeout", "retryAttempts", "monitoring", "status", "responseTime"];
-                
+                const baseFields = [
+                    "id",
+                    "type",
+                    "checkInterval",
+                    "timeout",
+                    "retryAttempts",
+                    "monitoring",
+                    "status",
+                    "responseTime",
+                ];
+
                 for (const fieldName of baseFields) {
                     for (const monitorType of types) {
                         try {
-                            const result = validateMonitorField(monitorType, fieldName, getValidValueForField(fieldName, monitorType));
+                            const result = validateMonitorField(
+                                monitorType,
+                                fieldName,
+                                getValidValueForField(fieldName, monitorType)
+                            );
                             expect(result.success).toBe(true);
                         } catch (error) {
                             // Some combinations might be invalid, that's OK for this test

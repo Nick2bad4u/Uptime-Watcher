@@ -324,7 +324,7 @@ describe("useMonitorFields Hook", () => {
                         ],
                         displayName: "Optional Only Monitor",
                         description: "Monitor with all optional fields",
-                    version: "1.0.0",
+                        version: "1.0.0",
                     },
                 ];
 

@@ -48,7 +48,7 @@ vi.mock("../../../../utils/logger", () => ({
 describe("pingRetry utilities", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         // Default operational hooks mock - just calls the function
         mockWithOperationalHooks.mockImplementation(async (fn) => {
             return fn();
@@ -161,9 +161,7 @@ describe("pingRetry utilities", () => {
         it("should handle non-Error exceptions", async () => {
             mockPing.promise.probe.mockRejectedValue("String error");
 
-            await expect(performSinglePingCheck("example.com", 5000)).rejects.toThrow(
-                "Ping failed: String error"
-            );
+            await expect(performSinglePingCheck("example.com", 5000)).rejects.toThrow("Ping failed: String error");
         });
 
         it("should use cross-platform ping options only", async () => {
@@ -172,7 +170,7 @@ describe("pingRetry utilities", () => {
             await performSinglePingCheck("example.com", 5000);
 
             const callArgs = mockPing.promise.probe.mock.calls[0][1];
-            
+
             // Verify only cross-platform options are used
             expect(callArgs).toEqual({
                 numeric: false,
@@ -206,14 +204,11 @@ describe("pingRetry utilities", () => {
 
             await performPingCheckWithRetry("example.com", 5000, 3);
 
-            expect(mockWithOperationalHooks).toHaveBeenCalledWith(
-                expect.any(Function),
-                {
-                    initialDelay: expect.any(Number),
-                    maxRetries: 3,
-                    operationName: "ping-check",
-                }
-            );
+            expect(mockWithOperationalHooks).toHaveBeenCalledWith(expect.any(Function), {
+                initialDelay: expect.any(Number),
+                maxRetries: 3,
+                operationName: "ping-check",
+            });
         });
 
         it("should return successful result on first attempt", async () => {
@@ -276,19 +271,13 @@ describe("pingRetry utilities", () => {
         it("should handle different host types", async () => {
             mockWithOperationalHooks.mockResolvedValue(mockSingleCheckResult);
 
-            const hostTypes = [
-                "google.com",
-                "192.168.1.1",
-                "localhost",
-                "2001:db8::1",
-                "subdomain.example.org",
-            ];
+            const hostTypes = ["google.com", "192.168.1.1", "localhost", "2001:db8::1", "subdomain.example.org"];
 
             for (const host of hostTypes) {
                 mockWithOperationalHooks.mockClear();
-                
+
                 await performPingCheckWithRetry(host, 5000, 2);
-                
+
                 expect(mockWithOperationalHooks).toHaveBeenCalledWith(
                     expect.any(Function),
                     expect.objectContaining({
@@ -318,14 +307,14 @@ describe("pingRetry utilities", () => {
             await performSinglePingCheck("example.com", 5000);
 
             const options = mockPing.promise.probe.mock.calls[0][1];
-            
+
             // Verify only supported cross-platform options
             const expectedOptions = {
                 numeric: false,
                 timeout: 5,
                 min_reply: 1,
             };
-            
+
             expect(options).toEqual(expectedOptions);
         });
 
@@ -341,7 +330,7 @@ describe("pingRetry utilities", () => {
             await performSinglePingCheck("example.com", 5000);
 
             const options = mockPing.promise.probe.mock.calls[0][1];
-            
+
             // Verify platform-specific options are not used
             expect(options).not.toHaveProperty("extra");
             expect(options).not.toHaveProperty("deadline");

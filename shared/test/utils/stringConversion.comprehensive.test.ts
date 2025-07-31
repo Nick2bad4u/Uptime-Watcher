@@ -40,12 +40,12 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
         it("should serialize simple objects", () => {
             expect(safeStringify({ a: 1 })).toBe('{"a":1}');
             expect(safeStringify({ name: "test", value: 42 })).toBe('{"name":"test","value":42}');
-            expect(safeStringify({})).toBe('{}');
+            expect(safeStringify({})).toBe("{}");
         });
 
         it("should serialize arrays", () => {
-            expect(safeStringify([1, 2, 3])).toBe('[1,2,3]');
-            expect(safeStringify([])).toBe('[]');
+            expect(safeStringify([1, 2, 3])).toBe("[1,2,3]");
+            expect(safeStringify([])).toBe("[]");
             expect(safeStringify(["a", "b"])).toBe('["a","b"]');
         });
 
@@ -84,18 +84,18 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             const nested = {
                 level1: {
                     level2: {
-                        value: "deep"
-                    }
-                }
+                        value: "deep",
+                    },
+                },
             };
             expect(safeStringify(nested)).toBe('{"level1":{"level2":{"value":"deep"}}}');
         });
 
         it("should handle objects with special properties", () => {
-            const obj = { 
+            const obj = {
                 toString: () => "custom",
                 valueOf: () => 42,
-                normalProp: "value"
+                normalProp: "value",
             };
             const result = safeStringify(obj);
             expect(result).toContain("normalProp");
@@ -123,7 +123,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             const obj = {};
             Object.defineProperty(obj, "hidden", {
                 value: "secret",
-                enumerable: false
+                enumerable: false,
             });
             const result = safeStringify(obj);
             expect(result).toBe("{}");
@@ -134,7 +134,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
                 get problematic() {
                     throw new Error("getter error");
                 },
-                safe: "value"
+                safe: "value",
             };
             // This might trigger the fallback
             const result = safeStringify(obj);
