@@ -12,7 +12,9 @@ export const DefaultErrorFallback: React.FC<{ error?: Error; onRetry: () => void
         <div className="mb-4 text-red-600">
             <h2 className="mb-2 text-lg font-semibold">Something went wrong</h2>
             <p className="text-sm">
-                {error?.message.trim() ? error.message : "An unexpected error occurred while loading this section."}
+                {error?.message && typeof error.message === "string" && error.message.trim()
+                    ? error.message
+                    : "An unexpected error occurred while loading this section."}
             </p>
         </div>
         <div className="flex gap-4">

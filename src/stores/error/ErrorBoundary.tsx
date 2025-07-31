@@ -31,6 +31,7 @@ export interface ErrorBoundaryProperties {
  *
  * @remarks
  * Tracks error and error info for rendering fallback UI and debugging.
+ * The retryCount is used to force re-mounting of children on retry.
  *
  * @public
  */
@@ -38,6 +39,7 @@ export interface ErrorBoundaryState {
     error?: Error | undefined;
     errorInfo?: React.ErrorInfo | undefined;
     hasError: boolean;
+    retryCount: number;
 }
 
 /**
@@ -60,6 +62,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProperties, Erro
         super(properties);
         this.state = {
             hasError: false,
+            retryCount: 0,
         };
     }
 
@@ -67,6 +70,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProperties, Erro
         return {
             error,
             hasError: true,
+            retryCount: 0,
         };
     }
 
@@ -83,14 +87,14 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProperties, Erro
     }
 
     handleRetry = () => {
-        this.setState({
+        this.setState((prevState) => ({
             error: undefined,
             errorInfo: undefined,
             hasError: false,
-        });
+            retryCount: prevState.retryCount + 1,
+        }));
     };
 
-    // eslint-disable-next-line sonarjs/function-return-type -- React component can return different node types
     override render() {
         if (this.state.hasError) {
             const FallbackComponent = this.props.fallback ?? DefaultErrorFallback;
@@ -102,7 +106,8 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProperties, Erro
             );
         }
 
-        return this.props.children;
+        // Use retryCount as key to force remounting after retry
+        return <div key={this.state.retryCount}>{this.props.children}</div>;
     }
 }
 

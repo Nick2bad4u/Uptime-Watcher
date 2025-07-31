@@ -138,6 +138,7 @@ flags:
             - "electron/test/**/*"
             - "electron/main.ts" # Entry point
 
+# @deprecated: https://docs.codecov.com/docs/github-checks
 github_checks:
     annotations: true
 
@@ -171,6 +172,7 @@ component_management:
               - electron/services/monitoring/**
               - electron/managers/MonitorManager.ts
               - src/stores/sites/useSiteMonitoring.ts
+              - shared/utils/monitoring/**
           statuses:
               - type: project
                 target: 95%
@@ -184,6 +186,7 @@ component_management:
           paths:
               - electron/services/database/**
               - electron/managers/DatabaseManager.ts
+              - shared/types/database.ts
           statuses:
               - type: project
                 target: 95%
@@ -213,6 +216,7 @@ component_management:
               - src/stores/sites/useSiteOperations.ts
               - src/stores/sites/useSiteSync.ts
               - src/stores/sites/useSitesState.ts
+              - shared/types/siteStatus.ts
           statuses:
               - type: project
                 target: 90%
@@ -226,6 +230,7 @@ component_management:
           paths:
               - electron/managers/ConfigurationManager.ts
               - src/stores/settings/**
+              - shared/types/events.ts
           statuses:
               - type: project
                 target: 90%
@@ -297,6 +302,7 @@ component_management:
               - src/stores/stats/**
               - src/stores/ui/**
               - src/stores/updates/**
+              - shared/utils/errorHandling.ts
           statuses:
               - type: project
                 target: 80%
@@ -311,6 +317,7 @@ component_management:
               - src/hooks/site/**
               - src/hooks/useBackendFocusSync.ts
               - src/hooks/useSelectedSite.ts
+              - shared/utils/typeGuards.ts
           statuses:
               - type: project
                 target: 80%
@@ -355,6 +362,7 @@ component_management:
           name: "🎨 Theme System"
           paths:
               - src/theme/**
+              - shared/utils/stringConversion.ts
           statuses:
               - type: project
                 target: 65%
@@ -382,6 +390,8 @@ component_management:
           paths:
               - electron/utils/**
               - electron/electronUtils.ts
+              - shared/utils/jsonSafety.ts
+              - shared/utils/objectSafety.ts
           statuses:
               - type: project
                 target: 90%
@@ -394,6 +404,7 @@ component_management:
           name: "🧰 Frontend Utilities"
           paths:
               - src/utils/**
+              - shared/utils/**
           statuses:
               - type: project
                 target: 90%
@@ -411,6 +422,7 @@ component_management:
               - electron/types.ts
               - src/stores/types.ts
               - src/theme/types.ts
+              - shared/types/**
           statuses:
               - type: project
                 target: 60%
@@ -440,6 +452,7 @@ component_management:
               - electron/managers/validators/**
               - src/stores/middleware/**
               - electron/events/**
+              - shared/validation/**
           statuses:
               - type: project
                 target: 85%
