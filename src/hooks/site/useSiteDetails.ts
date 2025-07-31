@@ -5,8 +5,13 @@
  * - Site data and monitor information
  * - UI state (active tab, loading states)
  * - Site operations (start/stop monitoring, check now, update settings)
- * - Local state management for editable fields
+ * - Derived state management for editable fields (computed during render)
  * - Integration with analytics data
+ *
+ * @remarks
+ * This hook uses modern React patterns with derived state computed during render
+ * instead of managing state in useEffect hooks. Changes are tracked using previous
+ * value comparison and user edit state to provide responsive UI feedback.
  */
 
 import { useCallback, useEffect, useState } from "react";

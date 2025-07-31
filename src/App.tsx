@@ -47,6 +47,7 @@ import { setupCacheSync } from "./utils/cacheSync";
  * @remarks
  * This is the primary entry point component that orchestrates the entire application
  * including state management, theming, error handling, and real-time updates.
+ * Uses deferred state updates via timeouts to comply with React best practices.
  *
  * @public
  *
@@ -105,7 +106,7 @@ function App() {
     useEffect((): (() => void) | undefined => {
         if (!isLoading) {
             // Use timeout to defer state update to avoid direct call in useEffect
-            const clearTimeoutId = setTimeout(clearLoadingOverlay, 0);
+            const clearTimeoutId = setTimeout(clearLoadingOverlay, UI_DELAYS.STATE_UPDATE_DEFER);
             return (): void => {
                 clearTimeout(clearTimeoutId);
             };

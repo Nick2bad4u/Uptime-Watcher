@@ -8,6 +8,7 @@
 import { isSiteStatus, type MonitorStatus, type SiteStatus } from "@shared/types";
 import { useCallback, useEffect, useState } from "react";
 
+import { UI_DELAYS } from "../constants";
 import { useSettingsStore } from "../stores/settings/useSettingsStore";
 import { themeManager } from "./ThemeManager";
 import { Theme, ThemeName } from "./types";
@@ -154,24 +155,25 @@ export function useTheme() {
     // Update theme when settings or systemTheme change
     useEffect(() => {
         // Use timeout to defer state update to avoid direct call in useEffect
-        const updateTimeoutId = setTimeout(updateCurrentTheme, 0);
+        const updateTimeoutId = setTimeout(updateCurrentTheme, UI_DELAYS.STATE_UPDATE_DEFER);
         return () => clearTimeout(updateTimeoutId);
     }, [settings.theme, systemTheme, updateCurrentTheme]);
 
     // Listen for system theme changes
     useEffect(() => {
         const timeoutIds: NodeJS.Timeout[] = [];
-        
+
         const cleanup = themeManager.onSystemThemeChange((isDark) => {
             const newSystemTheme = isDark ? "dark" : "light";
             // Use timeout to defer state update to avoid direct call in useEffect
-            const timeoutId = setTimeout(() => updateSystemTheme(newSystemTheme), 0);
+            const timeoutId = setTimeout(() => updateSystemTheme(newSystemTheme), UI_DELAYS.STATE_UPDATE_DEFER);
             timeoutIds.push(timeoutId);
         });
 
         // Set initial system theme using timeout
         const initialTheme = themeManager.getSystemThemePreference();
-        const initialTimeoutId = setTimeout(() => updateSystemTheme(initialTheme), 0);
+        // eslint-disable-next-line @eslint-react/web-api/no-leaked-timeout -- Timeout is properly cleaned up in the forEach loop below
+        const initialTimeoutId = setTimeout(() => updateSystemTheme(initialTheme), UI_DELAYS.STATE_UPDATE_DEFER);
         timeoutIds.push(initialTimeoutId);
 
         return () => {

@@ -9,6 +9,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { UI_DELAYS } from "../../constants";
 import logger from "../../services/logger";
 import { useTheme } from "../../theme/useTheme";
 
@@ -60,7 +61,7 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProper
                 hoverTimeoutReference.current = undefined;
             }
             // Use timeout to defer state update to avoid direct call in useEffect
-            const clearTimeoutId = setTimeout(clearOverlayVariables, 0);
+            const clearTimeoutId = setTimeout(clearOverlayVariables, UI_DELAYS.STATE_UPDATE_DEFER);
             return () => clearTimeout(clearTimeoutId);
         }
         return () => {};
@@ -120,7 +121,7 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProper
     useEffect(() => {
         if (hovered && linkReference.current) {
             // Use timeout to defer state update to avoid direct call in useEffect
-            const updateTimeoutId = setTimeout(updateOverlayPosition, 0);
+            const updateTimeoutId = setTimeout(updateOverlayPosition, UI_DELAYS.STATE_UPDATE_DEFER);
             return () => clearTimeout(updateTimeoutId);
         }
         return () => {};

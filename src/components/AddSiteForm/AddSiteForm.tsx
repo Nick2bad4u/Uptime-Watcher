@@ -128,7 +128,7 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
     useEffect(() => {
         if (!isLoading) {
             // Use timeout to defer state update to avoid direct call in useEffect
-            const clearTimeoutId = setTimeout(clearButtonLoading, 0);
+            const clearTimeoutId = setTimeout(clearButtonLoading, UI_DELAYS.STATE_UPDATE_DEFER);
             return () => clearTimeout(clearTimeoutId);
         }
 

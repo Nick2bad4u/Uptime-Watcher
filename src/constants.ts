@@ -240,6 +240,13 @@ export const UI_DELAYS = {
     LOADING_BUTTON: 100, // Delay before showing loading spinners (ms)
     /** Delay before showing loading overlay in milliseconds */
     LOADING_OVERLAY: 100, // Delay before showing loading overlay (ms)
+    /**
+     * Minimal delay to defer state updates in useEffect cleanup.
+     * @remarks
+     * Used to comply with React best practices by avoiding direct setState calls
+     * in useEffect. The 0ms delay defers execution to the next tick of the event loop.
+     */
+    STATE_UPDATE_DEFER: 0, // Defers state updates to next event loop tick (ms)
 } as const;
 
 /**
