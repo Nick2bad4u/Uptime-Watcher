@@ -55,7 +55,7 @@ const DATABASE_SERVICE_QUERIES = {
 export class DatabaseService {
     private static readonly instance: DatabaseService = new DatabaseService();
 
-    private _db: Database | undefined = undefined;
+    private db: Database | undefined = undefined;
 
     /**
      * Private constructor for singleton pattern.
@@ -105,11 +105,11 @@ export class DatabaseService {
      * ```
      */
     public close(): void {
-        if (this._db) {
+        if (this.db) {
             try {
                 // node-sqlite3-wasm completes all pending operations before closing
-                this._db.close();
-                this._db = undefined;
+                this.db.close();
+                this.db = undefined;
                 logger.info("[DatabaseService] Database connection closed safely");
             } catch (error) {
                 logger.error("[DatabaseService] Failed to close database", error);
@@ -176,10 +176,10 @@ export class DatabaseService {
      * ```
      */
     public getDatabase(): Database {
-        if (!this._db) {
+        if (!this.db) {
             throw new Error("Database not initialized. Call initialize() first.");
         }
-        return this._db;
+        return this.db;
     }
 
     /**
@@ -208,20 +208,20 @@ export class DatabaseService {
      * ```
      */
     public initialize(): Database {
-        if (this._db) {
-            return this._db;
+        if (this.db) {
+            return this.db;
         }
 
         try {
             const dbPath = path.join(app.getPath("userData"), DB_FILE_NAME);
             logger.info(`[DatabaseService] Initializing SQLite DB at: ${dbPath}`);
 
-            this._db = new Database(dbPath);
+            this.db = new Database(dbPath);
 
-            createDatabaseSchema(this._db);
+            createDatabaseSchema(this.db);
 
             logger.info("[DatabaseService] Database initialized successfully");
-            return this._db;
+            return this.db;
         } catch (error) {
             logger.error("[DatabaseService] Failed to initialize database", error);
             throw error;

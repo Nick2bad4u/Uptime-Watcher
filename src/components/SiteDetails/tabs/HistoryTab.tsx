@@ -85,7 +85,16 @@ export const HistoryTab = ({
 
     // Dropdown options: 25, 50, 100, All (clamped to backendLimit and available history)
     const maxShow = Math.min(backendLimit, historyLength);
-    const showOptions = [10, 25, 50, 100, 250, 500, 1000, 10_000].filter((opt) => opt <= maxShow);
+    const showOptions = [
+        10,
+        25,
+        50,
+        100,
+        250,
+        500,
+        1000,
+        10_000,
+    ].filter((opt) => opt <= maxShow);
 
     // Always include 'All' if there are fewer than backendLimit
     if (historyLength > 0 && historyLength <= backendLimit && !showOptions.includes(historyLength)) {
@@ -101,9 +110,15 @@ export const HistoryTab = ({
         }
     }
 
-    // Default to 50, but never more than backendLimit or available history
-    const defaultHistoryLimit = Math.min(50, backendLimit, Math.max(1, historyLength));
-    const [historyLimit, setHistoryLimit] = useState(defaultHistoryLimit);
+    // Track user's manual history limit selection
+    const [userHistoryLimit, setUserHistoryLimit] = useState<number>();
+
+    // Compute effective history limit - use user preference or auto-calculated value
+    const safeHistoryLength = selectedMonitor.history.length || 0;
+    const autoLimit = Math.min(50, backendLimit, Math.max(1, safeHistoryLength));
+
+    // Use user preference if set, otherwise use auto-calculated limit
+    const historyLimit = userHistoryLimit ?? autoLimit;
 
     // Ensure historyLimit is always valid
     const safeHistoryLimit =
@@ -121,12 +136,6 @@ export const HistoryTab = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally exclude selectedMonitor.history to prevent re-logging on history updates
     }, [selectedMonitor.id, selectedMonitor.type]);
-
-    useEffect(() => {
-        const safeHistoryLength = selectedMonitor.history.length || 0;
-        const newLimit = Math.min(50, backendLimit, Math.max(1, safeHistoryLength));
-        setHistoryLimit(newLimit);
-    }, [backendLimit, selectedMonitor.history]);
 
     const filteredHistoryRecords = selectedMonitor.history
         .filter((record: StatusHistory) => historyFilter === "all" || record.status === historyFilter)
@@ -185,7 +194,7 @@ export const HistoryTab = ({
                                     backendLimit,
                                     historyLength
                                 );
-                                setHistoryLimit(newLimit);
+                                setUserHistoryLimit(newLimit);
                                 logger.user.action("History limit changed", {
                                     monitorId: selectedMonitor.id,
                                     newLimit: newLimit,

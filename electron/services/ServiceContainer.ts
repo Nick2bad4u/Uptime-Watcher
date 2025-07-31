@@ -88,79 +88,78 @@ export class ServiceContainer {
      * Singleton instance of {@link AutoUpdaterService}.
      * @internal
      */
-    private _autoUpdaterService?: AutoUpdaterService;
+    private autoUpdaterService?: AutoUpdaterService;
+    private readonly config: ServiceContainerConfig;
     /**
      * Singleton instance of {@link ConfigurationManager}.
      * @internal
      */
-    private _configurationManager?: ConfigurationManager;
+    private configurationManager?: ConfigurationManager;
     /**
      * Singleton instance of {@link DatabaseManager}.
      * @internal
      */
-    private _databaseManager?: DatabaseManager;
+    private databaseManager?: DatabaseManager;
     /**
      * Singleton instance of {@link DatabaseService}.
      * @internal
      */
-    private _databaseService?: DatabaseService;
+    private databaseService?: DatabaseService;
     /**
      * Singleton instance of {@link HistoryRepository}.
      * @internal
      */
-    private _historyRepository?: HistoryRepository;
+    private historyRepository?: HistoryRepository;
     /**
      * Singleton instance of {@link IpcService}.
      * @internal
      */
-    private _ipcService?: IpcService;
+    private ipcService?: IpcService;
     /**
      * Singleton instance of {@link MonitorManager}.
      * @internal
      */
-    private _monitorManager?: MonitorManager;
+    private monitorManager?: MonitorManager;
     /**
      * Singleton instance of {@link MonitorRepository}.
      * @internal
      */
-    private _monitorRepository?: MonitorRepository;
+    private monitorRepository?: MonitorRepository;
     /**
      * Singleton instance of {@link NotificationService}.
      * @internal
      */
-    private _notificationService?: NotificationService;
+    private notificationService?: NotificationService;
     /**
      * Singleton instance of {@link SettingsRepository}.
      * @internal
      */
-    private _settingsRepository?: SettingsRepository;
+    private settingsRepository?: SettingsRepository;
     /**
      * Singleton instance of {@link SiteManager}.
      * @internal
      */
-    private _siteManager?: SiteManager;
+    private siteManager?: SiteManager;
     /**
      * Singleton instance of {@link SiteRepository}.
      * @internal
      */
-    private _siteRepository?: SiteRepository;
+    private siteRepository?: SiteRepository;
     /**
      * Singleton instance of {@link SiteService}.
      * @internal
      */
-    private _siteService?: SiteService;
+    private siteService?: SiteService;
     /**
      * Singleton instance of {@link UptimeOrchestrator}.
      * @internal
      */
-    private _uptimeOrchestrator?: UptimeOrchestrator;
+    private uptimeOrchestrator?: UptimeOrchestrator;
     /**
      * Singleton instance of {@link WindowService}.
      * @internal
      */
-    private _windowService?: WindowService;
-
-    private readonly config: ServiceContainerConfig;
+    private windowService?: WindowService;
 
     /**
      * Constructs a new {@link ServiceContainer}.
@@ -217,13 +216,13 @@ export class ServiceContainer {
      * @returns The {@link AutoUpdaterService} instance.
      */
     public getAutoUpdaterService(): AutoUpdaterService {
-        if (!this._autoUpdaterService) {
-            this._autoUpdaterService = new AutoUpdaterService();
+        if (!this.autoUpdaterService) {
+            this.autoUpdaterService = new AutoUpdaterService();
             if (this.config.enableDebugLogging) {
                 logger.debug("[ServiceContainer] Created AutoUpdaterService");
             }
         }
-        return this._autoUpdaterService;
+        return this.autoUpdaterService;
     }
 
     /**
@@ -232,13 +231,13 @@ export class ServiceContainer {
      * @returns The {@link ConfigurationManager} instance.
      */
     public getConfigurationManager(): ConfigurationManager {
-        if (!this._configurationManager) {
-            this._configurationManager = new ConfigurationManager();
+        if (!this.configurationManager) {
+            this.configurationManager = new ConfigurationManager();
             if (this.config.enableDebugLogging) {
                 logger.debug("[ServiceContainer] Created ConfigurationManager");
             }
         }
-        return this._configurationManager;
+        return this.configurationManager;
     }
 
     /**
@@ -250,9 +249,9 @@ export class ServiceContainer {
      * @returns The {@link DatabaseManager} instance.
      */
     public getDatabaseManager(): DatabaseManager {
-        if (!this._databaseManager) {
+        if (!this.databaseManager) {
             const databaseEventBus = new TypedEventBus<UptimeEvents>("DatabaseManagerEventBus");
-            this._databaseManager = new DatabaseManager({
+            this.databaseManager = new DatabaseManager({
                 configurationManager: this.getConfigurationManager(),
                 eventEmitter: databaseEventBus,
                 repositories: {
@@ -267,7 +266,7 @@ export class ServiceContainer {
                 logger.debug("[ServiceContainer] Created DatabaseManager with dependencies");
             }
         }
-        return this._databaseManager;
+        return this.databaseManager;
     }
 
     /**
@@ -276,8 +275,8 @@ export class ServiceContainer {
      * @returns The {@link DatabaseService} instance.
      */
     public getDatabaseService(): DatabaseService {
-        this._databaseService ??= DatabaseService.getInstance();
-        return this._databaseService;
+        this.databaseService ??= DatabaseService.getInstance();
+        return this.databaseService;
     }
 
     /**
@@ -286,15 +285,15 @@ export class ServiceContainer {
      * @returns The {@link HistoryRepository} instance.
      */
     public getHistoryRepository(): HistoryRepository {
-        if (!this._historyRepository) {
-            this._historyRepository = new HistoryRepository({
+        if (!this.historyRepository) {
+            this.historyRepository = new HistoryRepository({
                 databaseService: this.getDatabaseService(),
             });
             if (this.config.enableDebugLogging) {
                 logger.debug("[ServiceContainer] Created HistoryRepository");
             }
         }
-        return this._historyRepository;
+        return this.historyRepository;
     }
 
     /**
@@ -307,21 +306,21 @@ export class ServiceContainer {
      */
     public getInitializationStatus(): Record<string, boolean> {
         return {
-            AutoUpdaterService: this._autoUpdaterService !== undefined,
-            ConfigurationManager: this._configurationManager !== undefined,
-            DatabaseManager: this._databaseManager !== undefined,
-            DatabaseService: this._databaseService !== undefined,
-            HistoryRepository: this._historyRepository !== undefined,
-            IpcService: this._ipcService !== undefined,
-            MonitorManager: this._monitorManager !== undefined,
-            MonitorRepository: this._monitorRepository !== undefined,
-            NotificationService: this._notificationService !== undefined,
-            SettingsRepository: this._settingsRepository !== undefined,
-            SiteManager: this._siteManager !== undefined,
-            SiteRepository: this._siteRepository !== undefined,
-            SiteService: this._siteService !== undefined,
-            UptimeOrchestrator: this._uptimeOrchestrator !== undefined,
-            WindowService: this._windowService !== undefined,
+            AutoUpdaterService: this.autoUpdaterService !== undefined,
+            ConfigurationManager: this.configurationManager !== undefined,
+            DatabaseManager: this.databaseManager !== undefined,
+            DatabaseService: this.databaseService !== undefined,
+            HistoryRepository: this.historyRepository !== undefined,
+            IpcService: this.ipcService !== undefined,
+            MonitorManager: this.monitorManager !== undefined,
+            MonitorRepository: this.monitorRepository !== undefined,
+            NotificationService: this.notificationService !== undefined,
+            SettingsRepository: this.settingsRepository !== undefined,
+            SiteManager: this.siteManager !== undefined,
+            SiteRepository: this.siteRepository !== undefined,
+            SiteService: this.siteService !== undefined,
+            UptimeOrchestrator: this.uptimeOrchestrator !== undefined,
+            WindowService: this.windowService !== undefined,
         };
     }
 
@@ -337,21 +336,21 @@ export class ServiceContainer {
     public getInitializedServices(): { name: string; service: unknown }[] {
         const services: { name: string; service: unknown }[] = [];
         const serviceMap: Record<string, unknown> = {
-            AutoUpdaterService: this._autoUpdaterService,
-            ConfigurationManager: this._configurationManager,
-            DatabaseManager: this._databaseManager,
-            DatabaseService: this._databaseService,
-            HistoryRepository: this._historyRepository,
-            IpcService: this._ipcService,
-            MonitorManager: this._monitorManager,
-            MonitorRepository: this._monitorRepository,
-            NotificationService: this._notificationService,
-            SettingsRepository: this._settingsRepository,
-            SiteManager: this._siteManager,
-            SiteRepository: this._siteRepository,
-            SiteService: this._siteService,
-            UptimeOrchestrator: this._uptimeOrchestrator,
-            WindowService: this._windowService,
+            AutoUpdaterService: this.autoUpdaterService,
+            ConfigurationManager: this.configurationManager,
+            DatabaseManager: this.databaseManager,
+            DatabaseService: this.databaseService,
+            HistoryRepository: this.historyRepository,
+            IpcService: this.ipcService,
+            MonitorManager: this.monitorManager,
+            MonitorRepository: this.monitorRepository,
+            NotificationService: this.notificationService,
+            SettingsRepository: this.settingsRepository,
+            SiteManager: this.siteManager,
+            SiteRepository: this.siteRepository,
+            SiteService: this.siteService,
+            UptimeOrchestrator: this.uptimeOrchestrator,
+            WindowService: this.windowService,
         };
         for (const [serviceName, serviceInstance] of Object.entries(serviceMap)) {
             if (serviceInstance !== undefined) {
@@ -370,15 +369,15 @@ export class ServiceContainer {
      * @returns The {@link IpcService} instance.
      */
     public getIpcService(): IpcService {
-        if (!this._ipcService) {
+        if (!this.ipcService) {
             const orchestrator = this.getUptimeOrchestrator();
             const updater = this.getAutoUpdaterService();
-            this._ipcService = new IpcService(orchestrator, updater);
+            this.ipcService = new IpcService(orchestrator, updater);
             if (this.config.enableDebugLogging) {
                 logger.debug("[ServiceContainer] Created IpcService with dependencies");
             }
         }
-        return this._ipcService;
+        return this.ipcService;
     }
 
     /**
@@ -392,23 +391,23 @@ export class ServiceContainer {
      * @throws Error if {@link SiteManager} is not initialized when required.
      */
     public getMonitorManager(): MonitorManager {
-        if (!this._monitorManager) {
+        if (!this.monitorManager) {
             const monitorEventBus = new TypedEventBus<UptimeEvents>("MonitorManagerEventBus");
-            this._monitorManager = new MonitorManager({
+            this.monitorManager = new MonitorManager({
                 databaseService: this.getDatabaseService(),
                 eventEmitter: monitorEventBus,
                 getHistoryLimit: () => {
                     return this.getDatabaseManager().getHistoryLimit();
                 },
                 getSitesCache: () => {
-                    if (!this._siteManager) {
+                    if (!this.siteManager) {
                         throw new Error(
                             "Service dependency error: SiteManager not fully initialized. " +
                                 "This usually indicates a circular dependency or incorrect initialization order. " +
                                 "Ensure ServiceContainer.initialize() completes before accessing SiteManager functionality."
                         );
                     }
-                    return this._siteManager.getSitesCache();
+                    return this.siteManager.getSitesCache();
                 },
                 repositories: {
                     history: this.getHistoryRepository(),
@@ -422,7 +421,7 @@ export class ServiceContainer {
                 logger.debug("[ServiceContainer] Created MonitorManager with dependencies");
             }
         }
-        return this._monitorManager;
+        return this.monitorManager;
     }
 
     /**
@@ -431,15 +430,15 @@ export class ServiceContainer {
      * @returns The {@link MonitorRepository} instance.
      */
     public getMonitorRepository(): MonitorRepository {
-        if (!this._monitorRepository) {
-            this._monitorRepository = new MonitorRepository({
+        if (!this.monitorRepository) {
+            this.monitorRepository = new MonitorRepository({
                 databaseService: this.getDatabaseService(),
             });
             if (this.config.enableDebugLogging) {
                 logger.debug("[ServiceContainer] Created MonitorRepository");
             }
         }
-        return this._monitorRepository;
+        return this.monitorRepository;
     }
 
     /**
@@ -448,13 +447,13 @@ export class ServiceContainer {
      * @returns The {@link NotificationService} instance.
      */
     public getNotificationService(): NotificationService {
-        if (!this._notificationService) {
-            this._notificationService = new NotificationService(this.config.notificationConfig);
+        if (!this.notificationService) {
+            this.notificationService = new NotificationService(this.config.notificationConfig);
             if (this.config.enableDebugLogging) {
                 logger.debug("[ServiceContainer] Created NotificationService");
             }
         }
-        return this._notificationService;
+        return this.notificationService;
     }
 
     /**
@@ -463,15 +462,15 @@ export class ServiceContainer {
      * @returns The {@link SettingsRepository} instance.
      */
     public getSettingsRepository(): SettingsRepository {
-        if (!this._settingsRepository) {
-            this._settingsRepository = new SettingsRepository({
+        if (!this.settingsRepository) {
+            this.settingsRepository = new SettingsRepository({
                 databaseService: this.getDatabaseService(),
             });
             if (this.config.enableDebugLogging) {
                 logger.debug("[ServiceContainer] Created SettingsRepository");
             }
         }
-        return this._settingsRepository;
+        return this.settingsRepository;
     }
 
     /**
@@ -485,7 +484,7 @@ export class ServiceContainer {
      * @throws Error if setting the history limit fails.
      */
     public getSiteManager(): SiteManager {
-        if (!this._siteManager) {
+        if (!this.siteManager) {
             const monitoringOperations: IMonitoringOperations = {
                 /**
                  * Sets the history limit for monitor data retention.
@@ -545,7 +544,7 @@ export class ServiceContainer {
                 },
             };
             const siteEventBus = new TypedEventBus<UptimeEvents>("SiteManagerEventBus");
-            this._siteManager = new SiteManager({
+            this.siteManager = new SiteManager({
                 configurationManager: this.getConfigurationManager(),
                 databaseService: this.getDatabaseService(),
                 eventEmitter: siteEventBus,
@@ -560,7 +559,7 @@ export class ServiceContainer {
                 logger.debug("[ServiceContainer] Created SiteManager with dependencies");
             }
         }
-        return this._siteManager;
+        return this.siteManager;
     }
 
     /**
@@ -569,15 +568,15 @@ export class ServiceContainer {
      * @returns The {@link SiteRepository} instance.
      */
     public getSiteRepository(): SiteRepository {
-        if (!this._siteRepository) {
-            this._siteRepository = new SiteRepository({
+        if (!this.siteRepository) {
+            this.siteRepository = new SiteRepository({
                 databaseService: this.getDatabaseService(),
             });
             if (this.config.enableDebugLogging) {
                 logger.debug("[ServiceContainer] Created SiteRepository");
             }
         }
-        return this._siteRepository;
+        return this.siteRepository;
     }
 
     /**
@@ -586,8 +585,8 @@ export class ServiceContainer {
      * @returns The {@link SiteService} instance.
      */
     public getSiteService(): SiteService {
-        if (!this._siteService) {
-            this._siteService = new SiteService({
+        if (!this.siteService) {
+            this.siteService = new SiteService({
                 databaseService: this.getDatabaseService(),
                 historyRepository: this.getHistoryRepository(),
                 monitorRepository: this.getMonitorRepository(),
@@ -597,7 +596,7 @@ export class ServiceContainer {
                 logger.debug("[ServiceContainer] Created SiteService");
             }
         }
-        return this._siteService;
+        return this.siteService;
     }
 
     /**
@@ -609,8 +608,8 @@ export class ServiceContainer {
      * @returns The {@link UptimeOrchestrator} instance.
      */
     public getUptimeOrchestrator(): UptimeOrchestrator {
-        if (!this._uptimeOrchestrator) {
-            this._uptimeOrchestrator = new UptimeOrchestrator({
+        if (!this.uptimeOrchestrator) {
+            this.uptimeOrchestrator = new UptimeOrchestrator({
                 databaseManager: this.getDatabaseManager(),
                 monitorManager: this.getMonitorManager(),
                 siteManager: this.getSiteManager(),
@@ -619,7 +618,7 @@ export class ServiceContainer {
                 logger.debug("[ServiceContainer] Created UptimeOrchestrator with injected dependencies");
             }
         }
-        return this._uptimeOrchestrator;
+        return this.uptimeOrchestrator;
     }
 
     /**
@@ -628,13 +627,13 @@ export class ServiceContainer {
      * @returns The {@link WindowService} instance.
      */
     public getWindowService(): WindowService {
-        if (!this._windowService) {
-            this._windowService = new WindowService();
+        if (!this.windowService) {
+            this.windowService = new WindowService();
             if (this.config.enableDebugLogging) {
                 logger.debug("[ServiceContainer] Created WindowService");
             }
         }
-        return this._windowService;
+        return this.windowService;
     }
 
     /**
@@ -674,7 +673,7 @@ export class ServiceContainer {
      * @internal
      */
     private getMainOrchestrator(): null | UptimeOrchestrator {
-        return this._uptimeOrchestrator ?? null;
+        return this.uptimeOrchestrator ?? null;
     }
 
     /**

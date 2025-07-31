@@ -172,46 +172,41 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
 
     const isMonitoring = selectedMonitor ? selectedMonitor.monitoring !== false : false;
 
-    // Check interval state
-    const [localCheckInterval, setLocalCheckInterval] = useState<number>(
-        selectedMonitor?.checkInterval ?? DEFAULT_CHECK_INTERVAL
-    );
+    // Check interval state - track user edits separately from monitor defaults
+    const [userEditedCheckInterval, setUserEditedCheckInterval] = useState<number>();
     const [intervalChanged, setIntervalChanged] = useState(false);
+    const localCheckInterval = userEditedCheckInterval ?? selectedMonitor?.checkInterval ?? DEFAULT_CHECK_INTERVAL;
 
     // Timeout state (stored in seconds for UI, converted to ms when saving)
-    const [localTimeout, setLocalTimeout] = useState<number>(getTimeoutSeconds(selectedMonitor?.timeout));
+    const [userEditedTimeout, setUserEditedTimeout] = useState<number>();
     const [timeoutChanged, setTimeoutChanged] = useState(false);
+    const localTimeout = userEditedTimeout ?? getTimeoutSeconds(selectedMonitor?.timeout);
 
-    // Retry attempts state
-    const [localRetryAttempts, setLocalRetryAttempts] = useState<number>(
-        selectedMonitor?.retryAttempts ?? RETRY_CONSTRAINTS.DEFAULT
-    );
+    // Retry attempts state - track user edits separately from monitor defaults
+    const [userEditedRetryAttempts, setUserEditedRetryAttempts] = useState<number>();
     const [retryAttemptsChanged, setRetryAttemptsChanged] = useState(false);
+    const localRetryAttempts = userEditedRetryAttempts ?? selectedMonitor?.retryAttempts ?? RETRY_CONSTRAINTS.DEFAULT;
 
     // Site name state for settings
     const [localName, setLocalName] = useState(currentSite.name);
-    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-    // Update local state when monitor changes
-    useEffect(() => {
-        setLocalCheckInterval(selectedMonitor?.checkInterval ?? DEFAULT_CHECK_INTERVAL);
+    // Derived state: computed during render
+    const hasUnsavedChanges = localName !== currentSite.name;
+
+    // Reset user edits when monitor identity changes (using key pattern)
+    const monitorChangeKey = `${selectedMonitor?.id}-${currentSite.identifier}`;
+    const [lastMonitorKey, setLastMonitorKey] = useState(monitorChangeKey);
+
+    // Check if monitor changed and reset edits during render
+    if (monitorChangeKey !== lastMonitorKey) {
+        setLastMonitorKey(monitorChangeKey);
+        setUserEditedCheckInterval(undefined);
         setIntervalChanged(false);
-        setLocalTimeout(getTimeoutSeconds(selectedMonitor?.timeout));
+        setUserEditedTimeout(undefined);
         setTimeoutChanged(false);
-        setLocalRetryAttempts(selectedMonitor?.retryAttempts ?? RETRY_CONSTRAINTS.DEFAULT);
+        setUserEditedRetryAttempts(undefined);
         setRetryAttemptsChanged(false);
-    }, [
-        selectedMonitor?.checkInterval,
-        selectedMonitor?.timeout,
-        selectedMonitor?.retryAttempts,
-        selectedMonitor?.type,
-        currentSite.identifier,
-    ]);
-
-    // Track name changes
-    useEffect(() => {
-        setHasUnsavedChanges(localName !== currentSite.name);
-    }, [localName, currentSite.name]);
+    }
 
     // Handler for check now
     const handleCheckNow = useCallback(async () => {
@@ -235,7 +230,14 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
             undefined,
             false // Don't throw, handle gracefully
         );
-    }, [checkSiteNow, clearError, currentSite.identifier, currentSite.monitors, currentSite.name, selectedMonitorId]);
+    }, [
+        checkSiteNow,
+        clearError,
+        currentSite.identifier,
+        currentSite.monitors,
+        currentSite.name,
+        selectedMonitorId,
+    ]);
 
     // No auto-refresh - respect the monitor's configured interval
     // Users can manually click "Check Now" if they want immediate updates
@@ -303,7 +305,13 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
             undefined,
             false
         );
-    }, [currentSite.identifier, currentSite.name, selectedMonitor, clearError, removeMonitorFromSite]);
+    }, [
+        currentSite.identifier,
+        currentSite.name,
+        selectedMonitor,
+        clearError,
+        removeMonitorFromSite,
+    ]);
 
     // Site-level monitoring handlers
     const handleStartSiteMonitoring = useCallback(async () => {
@@ -323,7 +331,13 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
             undefined,
             false
         );
-    }, [currentSite.identifier, currentSite.monitors.length, startSiteMonitoring, modifySite, clearError]);
+    }, [
+        currentSite.identifier,
+        currentSite.monitors.length,
+        startSiteMonitoring,
+        modifySite,
+        clearError,
+    ]);
 
     const handleStopSiteMonitoring = useCallback(async () => {
         clearError();
@@ -342,7 +356,13 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
             undefined,
             false
         );
-    }, [currentSite.identifier, currentSite.monitors.length, stopSiteMonitoring, modifySite, clearError]);
+    }, [
+        currentSite.identifier,
+        currentSite.monitors.length,
+        stopSiteMonitoring,
+        modifySite,
+        clearError,
+    ]);
 
     // Monitoring handlers
     const handleStartMonitoring = useCallback(async () => {
@@ -380,7 +400,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
     // Interval change handlers
     const handleIntervalChange = useCallback(
         (e: React.ChangeEvent<HTMLSelectElement>) => {
-            setLocalCheckInterval(Number(e.target.value));
+            setUserEditedCheckInterval(Number(e.target.value));
             setIntervalChanged(Number(e.target.value) !== selectedMonitor?.checkInterval);
         },
         [selectedMonitor?.checkInterval]
@@ -423,7 +443,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
         (e: React.ChangeEvent<HTMLInputElement>) => {
             // Work directly with seconds in the UI
             const timeoutInSeconds = clampTimeoutSeconds(Number(e.target.value));
-            setLocalTimeout(timeoutInSeconds);
+            setUserEditedTimeout(timeoutInSeconds);
             // Compare against the monitor's timeout converted to seconds
             const currentTimeoutInSeconds = getTimeoutSeconds(selectedMonitor?.timeout);
             setTimeoutChanged(timeoutInSeconds !== currentTimeoutInSeconds);
@@ -468,7 +488,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
     const handleRetryAttemptsChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             const retryAttempts = Number(e.target.value);
-            setLocalRetryAttempts(retryAttempts);
+            setUserEditedRetryAttempts(retryAttempts);
             const currentRetryAttempts = selectedMonitor?.retryAttempts ?? 0;
             setRetryAttemptsChanged(retryAttempts !== currentRetryAttempts);
         },
@@ -525,14 +545,19 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
                     };
                     await modifySite(currentSite.identifier, updates);
                 }
-                setHasUnsavedChanges(false);
                 logger.user.action("Updated site name", { identifier: currentSite.identifier, name: localName.trim() });
             },
             "Save site name",
             undefined,
             false
         );
-    }, [hasUnsavedChanges, clearError, modifySite, currentSite.identifier, localName]);
+    }, [
+        hasUnsavedChanges,
+        clearError,
+        modifySite,
+        currentSite.identifier,
+        localName,
+    ]);
 
     // Use analytics hook
     const analytics = useSiteAnalytics(selectedMonitor, siteDetailsChartTimeRange);

@@ -617,12 +617,18 @@ export const MIDDLEWARE_STACKS = {
      * - Debug middleware (verbose logging)
      * - Detailed logging with event data
      */
-    development: () =>
-        composeMiddleware(
-            createErrorHandlingMiddleware({ continueOnError: true }),
-            createDebugMiddleware({ enabled: true, verbose: true }),
-            createLoggingMiddleware({ includeData: true, level: "debug" })
-        ),
+    development: () => {
+        try {
+            return composeMiddleware(
+                createErrorHandlingMiddleware({ continueOnError: true }),
+                createDebugMiddleware({ enabled: true, verbose: true }),
+                createLoggingMiddleware({ includeData: true, level: "debug" })
+            );
+        } catch (error) {
+            baseLogger.error("[MiddlewareStacks] Failed to create development stack", error);
+            return createLoggingMiddleware({ includeData: true, level: "debug" });
+        }
+    },
 
     /**
      * Production stack with metrics, rate limiting, and error handling.
@@ -636,13 +642,19 @@ export const MIDDLEWARE_STACKS = {
      * - Metrics tracking (counts and timing)
      * - Info-level logging (no data included)
      */
-    production: () =>
-        composeMiddleware(
-            createErrorHandlingMiddleware({ continueOnError: true }),
-            createRateLimitMiddleware({ burstLimit: 5, maxEventsPerSecond: 50 }),
-            createMetricsMiddleware({ trackCounts: true, trackTiming: true }),
-            createLoggingMiddleware({ includeData: false, level: "info" })
-        ),
+    production: () => {
+        try {
+            return composeMiddleware(
+                createErrorHandlingMiddleware({ continueOnError: true }),
+                createRateLimitMiddleware({ burstLimit: 5, maxEventsPerSecond: 50 }),
+                createMetricsMiddleware({ trackCounts: true, trackTiming: true }),
+                createLoggingMiddleware({ includeData: false, level: "info" })
+            );
+        } catch (error) {
+            baseLogger.error("[MiddlewareStacks] Failed to create production stack", error);
+            return createLoggingMiddleware({ includeData: false, level: "info" });
+        }
+    },
 
     /**
      * Testing stack with minimal overhead and strict error handling.
@@ -655,11 +667,17 @@ export const MIDDLEWARE_STACKS = {
      * - Warning-level logging (no data included)
      * - Minimal performance impact for fast test execution
      */
-    testing: () =>
-        composeMiddleware(
-            createErrorHandlingMiddleware({ continueOnError: false }),
-            createLoggingMiddleware({ includeData: false, level: "warn" })
-        ),
+    testing: () => {
+        try {
+            return composeMiddleware(
+                createErrorHandlingMiddleware({ continueOnError: false }),
+                createLoggingMiddleware({ includeData: false, level: "warn" })
+            );
+        } catch (error) {
+            baseLogger.error("[MiddlewareStacks] Failed to create testing stack", error);
+            return createLoggingMiddleware({ includeData: false, level: "warn" });
+        }
+    },
 };
 
 /**

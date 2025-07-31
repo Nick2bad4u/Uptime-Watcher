@@ -309,14 +309,14 @@ export class ChartConfigService {
  *
  * @example
  * ```typescript
- * const { barChartOptions, doughnutOptions, lineChartOptions } = useChartConfigs(theme, 100);
+ * const { barChartOptions, doughnutOptions, lineChartOptions } = createChartConfigs(theme, 100);
  * // Use with Chart.js components
  * <Bar data={chartData} options={barChartOptions} />
  * <Doughnut data={statusData} options={doughnutOptions} />
  * <Line data={timeSeriesData} options={lineChartOptions} />
  * ```
  */
-export function useChartConfigs(theme: Theme, totalChecks = 0) {
+export function createChartConfigs(theme: Theme, totalChecks = 0) {
     const chartService = new ChartConfigService(theme);
 
     return {

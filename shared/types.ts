@@ -135,7 +135,14 @@ export function isMonitorStatus(status: string): status is MonitorStatus {
 }
 
 export function isSiteStatus(status: string): status is SiteStatus {
-    return ["down", "mixed", "paused", "pending", "unknown", "up"].includes(status);
+    return [
+        "down",
+        "mixed",
+        "paused",
+        "pending",
+        "unknown",
+        "up",
+    ].includes(status);
 }
 
 /**

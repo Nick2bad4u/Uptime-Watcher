@@ -475,7 +475,7 @@ async function applySiteUpdateDirectly(
 
     if (siteIndex !== -1 && update.site && siteIndex >= 0 && siteIndex < currentSites.length) {
         // Update existing site with bounds checking
-        const updatedSites = [...currentSites];
+        const updatedSites = Array.from(currentSites);
         const siteToUpdate = update.site;
         // Safe assignment with bounds validation
         updatedSites.splice(siteIndex, 1, siteToUpdate);

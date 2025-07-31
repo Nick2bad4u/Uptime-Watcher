@@ -43,11 +43,11 @@ import { getNodeEnv } from "../../../shared/utils/environment";
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 
-// ESM equivalent of __dirname
+// ESM equivalent of currentDirectory
 // eslint-disable-next-line unicorn/prefer-import-meta-properties
-const __filename = fileURLToPath(import.meta.url);
+const currentFilename = fileURLToPath(import.meta.url);
 // eslint-disable-next-line unicorn/prefer-import-meta-properties
-const __dirname = path.dirname(__filename);
+const currentDirectory = path.dirname(currentFilename);
 
 /**
  * Service responsible for window management and lifecycle.
@@ -74,7 +74,7 @@ export class WindowService {
     } as const;
 
     /** Reference to the main application window (null if not created) */
-    private _mainWindow: BrowserWindow | null = null;
+    private mainWindow: BrowserWindow | null = null;
 
     /**
      * Create a new WindowService instance.
@@ -94,7 +94,7 @@ export class WindowService {
      */
     public closeMainWindow(): void {
         if (this.hasMainWindow()) {
-            this._mainWindow?.close();
+            this.mainWindow?.close();
         }
     }
 
@@ -115,7 +115,7 @@ export class WindowService {
      * event is fired to prevent visual flash.
      */
     public createMainWindow(): BrowserWindow {
-        this._mainWindow = new BrowserWindow({
+        this.mainWindow = new BrowserWindow({
             height: 800,
             minHeight: 600,
             minWidth: 800,
@@ -132,7 +132,7 @@ export class WindowService {
         this.loadContent();
         this.setupWindowEvents();
 
-        return this._mainWindow;
+        return this.mainWindow;
     }
 
     /**
@@ -148,7 +148,7 @@ export class WindowService {
      * @returns Main window instance or null if not created
      */
     public getMainWindow(): BrowserWindow | null {
-        return this._mainWindow;
+        return this.mainWindow;
     }
 
     /**
@@ -157,7 +157,7 @@ export class WindowService {
      * @returns True if main window is available for operations
      */
     public hasMainWindow(): boolean {
-        return this._mainWindow !== null && !this._mainWindow.isDestroyed();
+        return this.mainWindow !== null && !this.mainWindow.isDestroyed();
     }
 
     /**
@@ -169,7 +169,7 @@ export class WindowService {
     public sendToRenderer(channel: string, data?: unknown): void {
         if (this.hasMainWindow()) {
             logger.debug(`[WindowService] Sending to renderer: ${channel}`);
-            this._mainWindow?.webContents.send(channel, data);
+            this.mainWindow?.webContents.send(channel, data);
         } else {
             logger.warn(`[WindowService] Cannot send to renderer (no main window): ${channel}`);
         }
@@ -192,7 +192,7 @@ export class WindowService {
         // Use ternary for simple conditional path selection
         return isDev()
             ? path.join(process.cwd(), "dist-electron", preloadFileName) // Development: look in dist-electron directory
-            : path.join(__dirname, preloadFileName); // Production: relative to current directory
+            : path.join(currentDirectory, preloadFileName); // Production: relative to current directory
     }
 
     /**
@@ -222,7 +222,7 @@ export class WindowService {
      * - Window remains functional even if content loading fails
      */
     private loadContent(): void {
-        if (!this._mainWindow) {
+        if (!this.mainWindow) {
             logger.error("[WindowService] Cannot load content: main window not initialized");
             return;
         }
@@ -235,11 +235,11 @@ export class WindowService {
             void this.loadDevelopmentContent();
         } else {
             logger.debug("[WindowService] Production mode: loading from dist");
-            this._mainWindow.loadFile(path.join(__dirname, "../dist/index.html")).catch((error) => {
+            this.mainWindow.loadFile(path.join(currentDirectory, "../dist/index.html")).catch((error) => {
                 logger.error("[WindowService] Failed to load production file", {
                     error: error instanceof Error ? error.message : String(error),
-                    filePath: path.join(__dirname, "../dist/index.html"),
-                    windowState: this._mainWindow?.isDestroyed() ? "destroyed" : "active",
+                    filePath: path.join(currentDirectory, "../dist/index.html"),
+                    windowState: this.mainWindow?.isDestroyed() ? "destroyed" : "active",
                 });
             });
         }
@@ -277,21 +277,21 @@ export class WindowService {
         try {
             await this.waitForViteServer();
 
-            if (!this._mainWindow || this._mainWindow.isDestroyed()) {
+            if (!this.mainWindow || this.mainWindow.isDestroyed()) {
                 throw new Error("Main window was destroyed while waiting for Vite server");
             }
 
-            await this._mainWindow.loadURL(WindowService.VITE_SERVER_CONFIG.SERVER_URL);
+            await this.mainWindow.loadURL(WindowService.VITE_SERVER_CONFIG.SERVER_URL);
 
             // Delay opening DevTools to ensure renderer is ready
             setTimeout(() => {
-                if (this._mainWindow && !this._mainWindow.isDestroyed()) {
+                if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                     try {
-                        this._mainWindow.webContents.openDevTools();
+                        this.mainWindow.webContents.openDevTools();
                     } catch (error) {
                         logger.warn("[WindowService] Failed to open DevTools", {
                             error: error instanceof Error ? error.message : String(error),
-                            windowState: this._mainWindow.isDestroyed() ? "destroyed" : "active",
+                            windowState: this.mainWindow.isDestroyed() ? "destroyed" : "active",
                         });
                     }
                 }
@@ -301,7 +301,7 @@ export class WindowService {
                 environment: getNodeEnv(),
                 error: error instanceof Error ? error.message : String(error),
                 serverUrl: WindowService.VITE_SERVER_CONFIG.SERVER_URL,
-                windowState: this._mainWindow?.isDestroyed() ? "destroyed" : "active",
+                windowState: this.mainWindow?.isDestroyed() ? "destroyed" : "active",
             };
 
             logger.error("[WindowService] Failed to load development content", errorContext);
@@ -317,28 +317,28 @@ export class WindowService {
      * Handles window state changes, content loading events, and cleanup.
      */
     private setupWindowEvents(): void {
-        if (!this._mainWindow) return;
+        if (!this.mainWindow) return;
 
-        this._mainWindow.once("ready-to-show", () => {
+        this.mainWindow.once("ready-to-show", () => {
             logger.info("[WindowService] Main window ready to show");
-            this._mainWindow?.show();
+            this.mainWindow?.show();
         });
 
-        this._mainWindow.webContents.once("dom-ready", () => {
+        this.mainWindow.webContents.once("dom-ready", () => {
             logger.debug("[WindowService] DOM ready in renderer");
         });
 
-        this._mainWindow.webContents.once("did-finish-load", () => {
+        this.mainWindow.webContents.once("did-finish-load", () => {
             logger.debug("[WindowService] Renderer finished loading");
         });
 
-        this._mainWindow.webContents.on("did-fail-load", (_event, errorCode, errorDescription) => {
+        this.mainWindow.webContents.on("did-fail-load", (_event, errorCode, errorDescription) => {
             logger.error(`[WindowService] Failed to load renderer: ${errorCode} - ${errorDescription}`);
         });
 
-        this._mainWindow.on("closed", () => {
+        this.mainWindow.on("closed", () => {
             logger.info("[WindowService] Main window closed");
-            this._mainWindow = null;
+            this.mainWindow = null;
         });
     }
 

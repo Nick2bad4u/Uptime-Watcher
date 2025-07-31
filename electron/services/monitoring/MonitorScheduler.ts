@@ -63,7 +63,7 @@ export class MonitorScheduler {
      * @public
      */
     public getActiveMonitors(): string[] {
-        return [...this.intervals.keys()];
+        return Array.from(this.intervals.keys());
     }
 
     /**
@@ -321,7 +321,9 @@ export class MonitorScheduler {
             }
         } else {
             // Stop all monitors for this site
-            const siteIntervals = [...this.intervals.keys()].filter((key) => key.startsWith(`${siteIdentifier}|`));
+            const siteIntervals = Array.from(this.intervals.keys()).filter((key) =>
+                key.startsWith(`${siteIdentifier}|`)
+            );
             for (const intervalKey of siteIntervals) {
                 const parsed = this.parseIntervalKey(intervalKey);
                 if (parsed) {

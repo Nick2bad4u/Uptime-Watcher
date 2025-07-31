@@ -31,7 +31,7 @@
  * ```
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 /**
  * Theme styles interface for CSS-in-JS styling
@@ -70,41 +70,39 @@ export function useThemeStyles(isCollapsed = false): ThemeStyles {
         }
     });
 
-    // Use ref to store cleanup function to avoid linting issues
-    const cleanupRef = useRef<(() => void) | undefined>(undefined);
-
     // Set up media query listener for theme changes
     useEffect(() => {
         if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
             return; // Skip in SSR environments
         }
 
+        let mediaQuery: MediaQueryList | undefined;
+        let handleThemeChange: ((e: MediaQueryListEvent) => void) | undefined;
+
         try {
-            const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-            const handleThemeChange = (e: MediaQueryListEvent) => {
+            mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+            handleThemeChange = (e: MediaQueryListEvent) => {
                 setIsDarkMode(e.matches);
             };
 
             // Use modern addEventListener API
+            // eslint-disable-next-line @eslint-react/web-api/no-leaked-event-listener
             mediaQuery.addEventListener("change", handleThemeChange);
-
-            // Store cleanup function in ref
-            cleanupRef.current = () => {
-                mediaQuery.removeEventListener("change", handleThemeChange);
-            };
         } catch {
-            // Fallback if matchMedia throws an error - do nothing
-            cleanupRef.current = undefined;
+            // Fallback if matchMedia throws an error
+            mediaQuery = undefined;
+            handleThemeChange = undefined;
         }
-    }, []);
 
-    // Cleanup effect for component unmount
-    useEffect(() => {
-        return () => {
-            if (cleanupRef.current) {
-                cleanupRef.current();
+        // Use a cleanup variable to satisfy TypeScript
+        const cleanup = () => {
+            if (mediaQuery && handleThemeChange) {
+                mediaQuery.removeEventListener("change", handleThemeChange);
             }
         };
+
+        // eslint-disable-next-line consistent-return
+        return cleanup;
     }, []);
 
     const styles = useMemo<ThemeStyles>(() => {

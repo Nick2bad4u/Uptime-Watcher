@@ -38,7 +38,7 @@ export type { MonitorType } from "../../types";
  * @see {@link MonitorTypeRegistry.getAllTypes} for complete type list including dynamic types
  */
 export function getBaseMonitorTypes(): MonitorType[] {
-    return [...BASE_MONITOR_TYPES];
+    return Array.from(BASE_MONITOR_TYPES);
 }
 
 /**

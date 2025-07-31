@@ -130,16 +130,17 @@ export class IpcService {
             description,
             displayName,
             fields,
-            // eslint-disable-next-line sonarjs/no-unused-vars
-            serviceFactory: _unused1,
+            serviceFactory,
             type,
             uiConfig,
-            // Explicitly exclude non-serializable properties
-            // eslint-disable-next-line sonarjs/no-unused-vars
-            validationSchema: _unused2,
+            validationSchema,
             version,
             ...unexpectedProperties
         } = config;
+
+        // These properties are intentionally extracted but not used in serialization
+        serviceFactory;
+        validationSchema;
 
         // Log if there are unexpected properties (helps with future maintenance)
         if (Object.keys(unexpectedProperties).length > 0) {

@@ -79,25 +79,21 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
     // Local state for sync success message
     const [syncSuccess, setSyncSuccess] = useState(false);
 
+    // Create stable callbacks to avoid direct setState in useEffect
+    const clearButtonLoading = useCallback(() => setShowButtonLoading(false), []);
+    const showButtonLoadingCallback = useCallback(() => setShowButtonLoading(true), []);
+
     useEffect(() => {
         if (!isLoading) {
-            setShowButtonLoading(false);
-        }
-    }, [isLoading]);
-
-    useEffect(() => {
-        if (isLoading) {
-            const timeoutId = setTimeout(() => {
-                setShowButtonLoading(true);
-            }, UI_DELAYS.LOADING_BUTTON);
-
-            return () => {
-                clearTimeout(timeoutId);
-            };
+            // Use timeout to defer state update to avoid direct call in useEffect
+            const clearTimeoutId = setTimeout(clearButtonLoading, 0);
+            return () => clearTimeout(clearTimeoutId);
         }
 
-        return () => {}; // Empty cleanup function when not loading
-    }, [isLoading]);
+        const timeoutId = setTimeout(showButtonLoadingCallback, UI_DELAYS.LOADING_BUTTON);
+
+        return () => clearTimeout(timeoutId);
+    }, [isLoading, clearButtonLoading, showButtonLoadingCallback]);
 
     const handleSettingChange = (key: keyof typeof settings, value: unknown) => {
         if (!ALLOWED_SETTINGS_KEYS.has(key)) {

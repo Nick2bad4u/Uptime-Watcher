@@ -39,7 +39,13 @@ export const FALLBACK_MONITOR_TYPE_OPTIONS = [
  * @remarks
  * Monospace fonts prioritize consistent character width for code display.
  */
-export const FONT_FAMILY_MONO = ["SF Mono", "Monaco", "Inconsolata", "Roboto Mono", "monospace"];
+export const FONT_FAMILY_MONO = [
+    "SF Mono",
+    "Monaco",
+    "Inconsolata",
+    "Roboto Mono",
+    "monospace",
+];
 
 /**
  * Sans-serif font family constants for general UI text.
@@ -47,7 +53,14 @@ export const FONT_FAMILY_MONO = ["SF Mono", "Monaco", "Inconsolata", "Roboto Mon
  * @remarks
  * Prioritizes system fonts for optimal performance and native appearance.
  */
-export const FONT_FAMILY_SANS = ["Inter", "system-ui", "Avenir", "Helvetica", "Arial", "sans-serif"];
+export const FONT_FAMILY_SANS = [
+    "Inter",
+    "system-ui",
+    "Avenir",
+    "Helvetica",
+    "Arial",
+    "sans-serif",
+];
 
 /**
  * Interface for interval options used in dropdowns.

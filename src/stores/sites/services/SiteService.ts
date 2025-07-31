@@ -89,7 +89,12 @@ export const SiteService = {
      * This method should be called before any backend operation.
      */
     async initialize(): Promise<void> {
-        await waitForElectronAPI();
+        try {
+            await waitForElectronAPI();
+        } catch (error) {
+            console.error("Failed to initialize SiteService:", error);
+            throw error;
+        }
     },
 
     /**

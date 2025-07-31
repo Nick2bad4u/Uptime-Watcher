@@ -111,11 +111,12 @@ export function DynamicMonitorFields({ isLoading = false, monitorType, onChange,
                 if (!isCancelled) {
                     setConfig(configData);
                 }
-            } catch (error_) {
+            } catch (loadError) {
                 if (!isCancelled) {
-                    const errorMessage = error_ instanceof Error ? error_.message : "Failed to load monitor config";
+                    const errorMessage =
+                        loadError instanceof Error ? loadError.message : "Failed to load monitor config";
                     setError(errorMessage);
-                    logger.error("Failed to load monitor type config", ensureError(error_));
+                    logger.error("Failed to load monitor type config", ensureError(loadError));
                 }
             } finally {
                 if (!isCancelled) {

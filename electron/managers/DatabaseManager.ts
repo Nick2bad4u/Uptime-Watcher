@@ -343,7 +343,7 @@ export class DatabaseManager {
 
         // Then get them from cache - return actual site data from cache
         try {
-            const sites = [...this.siteCache.entries()].map(([, site]) => site);
+            const sites = Array.from(this.siteCache.entries(), ([, site]) => site);
 
             // Emit typed sites refreshed event
             await this.eventEmitter.emitTyped("internal:database:sites-refreshed", {
@@ -481,7 +481,7 @@ export class DatabaseManager {
         try {
             await this.eventEmitter.emitTyped("internal:database:update-sites-cache-requested", {
                 operation: "update-sites-cache-requested",
-                sites: [...this.siteCache.entries()].map(([, site]) => site),
+                sites: Array.from(this.siteCache.entries(), ([, site]) => site),
                 timestamp: Date.now(),
             });
         } catch (error) {

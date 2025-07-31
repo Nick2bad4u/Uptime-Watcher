@@ -514,6 +514,9 @@ export function ThemedBadge({
     );
 }
 
+// Default styles object to prevent infinite render loops
+const DEFAULT_THEMED_BOX_STYLE = {};
+
 export function ThemedBox({
     "aria-label": ariaLabel,
     as: Component = "div",
@@ -527,7 +530,7 @@ export function ThemedBox({
     role,
     rounded = "md",
     shadow,
-    style = {},
+    style = DEFAULT_THEMED_BOX_STYLE,
     surface = "base",
     tabIndex,
     variant = "primary",
@@ -587,7 +590,7 @@ export function ThemedButton({
     loading = false,
     onClick,
     size = "md",
-    style = {},
+    style = DEFAULT_THEMED_BOX_STYLE,
     title,
     type = "button",
     variant = "primary",
@@ -1027,7 +1030,7 @@ export function ThemedText({
     children,
     className = "",
     size = "base",
-    style = {},
+    style = DEFAULT_THEMED_BOX_STYLE,
     variant = "primary",
     weight = "normal",
 }: ThemedTextProperties) {

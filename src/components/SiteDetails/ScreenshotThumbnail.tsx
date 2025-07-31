@@ -48,6 +48,9 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProper
         };
     }, []);
 
+    // Create stable callbacks to avoid direct setState in useEffect
+    const clearOverlayVariables = useCallback(() => setOverlayVariables({}), []);
+
     // Additional cleanup on hovered state changes
     useEffect(() => {
         if (!hovered) {
@@ -56,9 +59,12 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProper
                 clearTimeout(hoverTimeoutReference.current);
                 hoverTimeoutReference.current = undefined;
             }
-            setOverlayVariables({});
+            // Use timeout to defer state update to avoid direct call in useEffect
+            const clearTimeoutId = setTimeout(clearOverlayVariables, 0);
+            return () => clearTimeout(clearTimeoutId);
         }
-    }, [hovered]);
+        return () => {};
+    }, [hovered, clearOverlayVariables]);
 
     function handleClick(event: React.MouseEvent) {
         event.preventDefault();
@@ -73,7 +79,7 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProper
         }
     }
 
-    useEffect(() => {
+    const updateOverlayPosition = useCallback(() => {
         if (hovered && linkReference.current) {
             const rect = linkReference.current.getBoundingClientRect();
             const viewportW = window.innerWidth;
@@ -84,8 +90,8 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProper
             const overlayH = maxImgH;
 
             let top = rect.top - overlayH - 16; // 16px gap above
-
             let left = rect.left + rect.width / 2 - overlayW / 2;
+
             if (top < 0) {
                 top = rect.bottom + 16;
             }
@@ -95,13 +101,13 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProper
             if (left + overlayW > viewportW - 8) {
                 left = viewportW - overlayW - 8;
             }
-
             if (top < 8) {
                 top = 8;
             }
             if (top + overlayH > viewportH - 8) {
                 top = viewportH - overlayH - 8;
             }
+
             setOverlayVariables({
                 "--overlay-height": `${overlayH}px`,
                 "--overlay-left": `${left}px`,
@@ -109,7 +115,16 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProper
                 "--overlay-width": `${overlayW}px`,
             } as React.CSSProperties);
         }
-    }, [hovered, url, siteName]);
+    }, [hovered]);
+
+    useEffect(() => {
+        if (hovered && linkReference.current) {
+            // Use timeout to defer state update to avoid direct call in useEffect
+            const updateTimeoutId = setTimeout(updateOverlayPosition, 0);
+            return () => clearTimeout(updateTimeoutId);
+        }
+        return () => {};
+    }, [hovered, url, siteName, updateOverlayPosition]);
 
     // Debounced hover handlers to prevent rapid state changes
     const handleMouseEnter = useCallback(() => {

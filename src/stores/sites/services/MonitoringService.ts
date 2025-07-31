@@ -40,7 +40,12 @@ export const MonitoringService = {
      * @throws Error if electron API cannot be initialized
      */
     async initialize(): Promise<void> {
-        await waitForElectronAPI();
+        try {
+            await waitForElectronAPI();
+        } catch (error) {
+            console.error("Failed to initialize MonitoringService:", error);
+            throw error;
+        }
     },
     /**
      * Start monitoring for a specific monitor

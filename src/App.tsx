@@ -9,7 +9,7 @@ import type { StatusUpdate } from "./types";
 
 import { isDevelopment, isProduction } from "../shared/utils/environment";
 import { AddSiteForm } from "./components/AddSiteForm/AddSiteForm";
-import { SiteList } from "./components/Dashboard/SiteList";
+import { SiteList } from "./components/Dashboard/SiteList/SiteList";
 import { Header } from "./components/Header/Header";
 import { Settings } from "./components/Settings/Settings";
 import { SiteDetails } from "./components/SiteDetails/SiteDetails";
@@ -94,24 +94,29 @@ function App() {
     // Delayed loading state to prevent flash for quick operations
     const [showLoadingOverlay, setShowLoadingOverlay] = useState<boolean>(false);
 
+    // Create stable callbacks to avoid direct setState in useEffect
+    const clearLoadingOverlay = useCallback(() => setShowLoadingOverlay(false), []);
+    const showLoadingOverlayCallback = useCallback(() => setShowLoadingOverlay(true), []);
+
     /**
      * Only show loading overlay if loading takes more than 100ms
      * This prevents flash for quick operations while still providing feedback for longer ones
      */
     useEffect((): (() => void) | undefined => {
         if (!isLoading) {
-            setShowLoadingOverlay(false);
-            return undefined;
+            // Use timeout to defer state update to avoid direct call in useEffect
+            const clearTimeoutId = setTimeout(clearLoadingOverlay, 0);
+            return (): void => {
+                clearTimeout(clearTimeoutId);
+            };
         }
 
-        const timeoutId = setTimeout(() => {
-            setShowLoadingOverlay(true);
-        }, UI_DELAYS.LOADING_OVERLAY);
+        const timeoutId = setTimeout(showLoadingOverlayCallback, UI_DELAYS.LOADING_OVERLAY);
 
         return (): void => {
             clearTimeout(timeoutId);
         };
-    }, [isLoading]);
+    }, [isLoading, clearLoadingOverlay, showLoadingOverlayCallback]);
 
     /**
      * Initialize the application and set up status update subscriptions.

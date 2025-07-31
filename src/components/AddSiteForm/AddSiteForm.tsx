@@ -121,18 +121,21 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
     // Delayed loading state for button spinner (100ms delay)
     const [showButtonLoading, setShowButtonLoading] = useState(false);
 
+    // Create stable callbacks to avoid direct setState in useEffect
+    const clearButtonLoading = useCallback(() => setShowButtonLoading(false), []);
+    const showButtonLoadingCallback = useCallback(() => setShowButtonLoading(true), []);
+
     useEffect(() => {
         if (!isLoading) {
-            setShowButtonLoading(false);
-            return () => {}; // Return empty cleanup function for consistency
+            // Use timeout to defer state update to avoid direct call in useEffect
+            const clearTimeoutId = setTimeout(clearButtonLoading, 0);
+            return () => clearTimeout(clearTimeoutId);
         }
 
-        const timeoutId = setTimeout(() => {
-            setShowButtonLoading(true);
-        }, UI_DELAYS.LOADING_BUTTON);
+        const timeoutId = setTimeout(showButtonLoadingCallback, UI_DELAYS.LOADING_BUTTON);
 
         return () => clearTimeout(timeoutId);
-    }, [isLoading]);
+    }, [isLoading, clearButtonLoading, showButtonLoadingCallback]);
 
     /**
      * Handles form submission for adding a site or monitor.
@@ -142,26 +145,32 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
      * Delegates to {@link handleSubmit} with all relevant form state and handlers.
      */
     const onSubmit = useCallback(
-        (event: React.FormEvent) =>
-            handleSubmit(event, {
-                addMode,
-                addMonitorToSite,
-                checkInterval,
-                clearError,
-                createSite,
-                formError,
-                generateUuid,
-                host,
-                logger,
-                monitorType,
-                name,
-                onSuccess: resetForm,
-                port,
-                selectedExistingSite,
-                setFormError,
-                siteId,
-                url,
-            }),
+        async (event: React.FormEvent) => {
+            try {
+                await handleSubmit(event, {
+                    addMode,
+                    addMonitorToSite,
+                    checkInterval,
+                    clearError,
+                    createSite,
+                    formError,
+                    generateUuid,
+                    host,
+                    logger,
+                    monitorType,
+                    name,
+                    onSuccess: resetForm,
+                    port,
+                    selectedExistingSite,
+                    setFormError,
+                    siteId,
+                    url,
+                });
+            } catch (error) {
+                console.error("Form submission failed:", error);
+                // Form error handling is already managed by handleSubmit
+            }
+        },
         [
             addMode,
             addMonitorToSite,

@@ -57,7 +57,7 @@ export const useErrorStore = create<ErrorStore>()((set, get) => ({
             };
             // Use destructuring to avoid dynamic delete
             // eslint-disable-next-line sonarjs/no-unused-vars
-            const { [store]: _unused, ...remainingErrors } = newStoreErrors;
+            const { [store]: _, ...remainingErrors } = newStoreErrors;
             return { storeErrors: remainingErrors };
         });
     },

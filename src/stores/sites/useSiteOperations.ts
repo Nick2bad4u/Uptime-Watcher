@@ -154,9 +154,15 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
         const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
+                // eslint-disable-next-line ex/no-unhandled
                 await handleSQLiteBackupDownload(async () => {
-                    const result = await SiteService.downloadSQLiteBackup();
-                    return new Uint8Array(result.buffer);
+                    try {
+                        const result = await SiteService.downloadSQLiteBackup();
+                        return new Uint8Array(result.buffer);
+                    } catch (error) {
+                        console.error("Failed to download SQLite backup:", error);
+                        throw error;
+                    }
                 });
             },
             {

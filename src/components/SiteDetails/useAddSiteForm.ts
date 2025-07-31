@@ -4,7 +4,7 @@
  * Supports real-time validation, automatic UUID generation, and error handling.
  */
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 import type { MonitorType } from "../../types";
 
@@ -103,13 +103,18 @@ export function useAddSiteForm(): AddSiteFormActions & AddSiteFormState {
     // Use monitor fields hook for dynamic validation
     const { getFields } = useMonitorFields();
 
-    // Reset fields when monitor type changes, but preserve them if they've been explicitly set
-    useEffect(() => {
-        setFormError(undefined);
+    // Track previous values to detect changes and auto-reset fields
+    const [prevMonitorType, setPrevMonitorType] = useState(monitorType);
+    const [prevAddMode, setPrevAddMode] = useState(addMode);
 
-        // Get current monitor type fields
-        const currentFields = getFields(monitorType);
-        const currentFieldNames = new Set(currentFields.map((field) => field.name));
+    // Compute effective field values based on monitor type during render
+    const currentFields = getFields(monitorType);
+    const currentFieldNames = new Set(currentFields.map((field) => field.name));
+
+    // Reset fields when monitor type changes
+    if (monitorType !== prevMonitorType) {
+        setPrevMonitorType(monitorType);
+        setFormError(undefined);
 
         // Reset fields that are not used by the current monitor type
         if (!currentFieldNames.has("url")) {
@@ -121,18 +126,20 @@ export function useAddSiteForm(): AddSiteFormActions & AddSiteFormState {
         if (!currentFieldNames.has("port")) {
             setPort("");
         }
-    }, [monitorType, getFields]);
+    }
 
-    // Reset name and siteId when switching to new site
-    useEffect(() => {
+    // Reset name and siteId when switching modes
+    if (addMode !== prevAddMode) {
+        setPrevAddMode(addMode);
+        setFormError(undefined);
+
         if (addMode === "new") {
             setName("");
             setSiteId(generateUuid());
         } else {
             setName("");
         }
-        setFormError(undefined);
-    }, [addMode]);
+    }
 
     // Simple validation function without logging - only used for submit button state
     const isFormValid = useCallback(() => {
@@ -163,7 +170,16 @@ export function useAddSiteForm(): AddSiteFormActions & AddSiteFormState {
         }
 
         return true;
-    }, [addMode, name, selectedExistingSite, monitorType, url, host, port, getFields]);
+    }, [
+        addMode,
+        name,
+        selectedExistingSite,
+        monitorType,
+        url,
+        host,
+        port,
+        getFields,
+    ]);
 
     // Reset form to initial state
     const resetForm = useCallback(() => {

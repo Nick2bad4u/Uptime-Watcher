@@ -124,7 +124,13 @@ export function useSiteActions(site: Site, monitor: Monitor | undefined): SiteAc
             setSelectedMonitorId(site.identifier, monitor.id);
         }
         setShowSiteDetails(true);
-    }, [monitor, setSelectedMonitorId, setSelectedSite, setShowSiteDetails, site]);
+    }, [
+        monitor,
+        setSelectedMonitorId,
+        setSelectedSite,
+        setShowSiteDetails,
+        site,
+    ]);
 
     return {
         handleCardClick,

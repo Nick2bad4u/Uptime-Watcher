@@ -66,7 +66,7 @@ export interface SiteAnalytics {
  */
 export function useChartData(monitor: Monitor, theme: Theme) {
     return useMemo(() => {
-        const sortedHistory = [...monitor.history].sort((a, b) => a.timestamp - b.timestamp);
+        const sortedHistory = Array.from(monitor.history).sort((a, b) => a.timestamp - b.timestamp);
 
         const lineChartData = {
             datasets: [
@@ -313,7 +313,7 @@ function calculateResponseMetrics(filteredHistory: StatusHistory[]): {
     const slowestResponse = responseTimes.length > 0 ? Math.max(...responseTimes) : 0;
 
     // Calculate percentiles
-    const sortedResponseTimes = [...responseTimes].sort((a, b) => a - b);
+    const sortedResponseTimes = Array.from(responseTimes).sort((a, b) => a - b);
     const getPercentile = (p: number): number => {
         // Ensure p is between 0 and 1
         const safeP = Math.max(0, Math.min(1, p));

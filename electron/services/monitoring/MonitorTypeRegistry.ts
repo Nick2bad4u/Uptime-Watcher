@@ -129,7 +129,7 @@ const monitorTypes = new Map<string, BaseMonitorConfig>();
  * @public
  */
 export function getAllMonitorTypeConfigs(): BaseMonitorConfig[] {
-    return [...monitorTypes.values()];
+    return Array.from(monitorTypes.values());
 }
 
 /**
@@ -171,7 +171,7 @@ export function getMonitorTypeConfig(type: string): BaseMonitorConfig | undefine
  * @public
  */
 export function getRegisteredMonitorTypes(): string[] {
-    return [...monitorTypes.keys()];
+    return Array.from(monitorTypes.keys());
 }
 
 /**

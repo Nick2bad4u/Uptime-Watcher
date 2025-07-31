@@ -298,7 +298,7 @@ class MigrationRegistry {
             if (visitedVersions.has(currentVersion)) {
                 throw new Error(
                     `Circular migration path detected for ${monitorType} at version ${currentVersion}. ` +
-                        `Visited versions: ${[...visitedVersions].join(" -> ")}`
+                        `Visited versions: ${Array.from(visitedVersions).join(" -> ")}`
                 );
             }
 

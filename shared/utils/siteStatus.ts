@@ -75,7 +75,7 @@ export function calculateSiteStatus(site: SiteForStatus): SiteStatus {
     }
 
     // Get unique statuses
-    const statuses = [...new Set(monitors.map((m) => m.status))];
+    const statuses = Array.from(new Set(monitors.map((m) => m.status)));
 
     // Single status - all monitors have the same status
     if (statuses.length === 1) {

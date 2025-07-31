@@ -78,8 +78,21 @@ export const useSettingsStore = create<SettingsStore>()(
                 const result = await withErrorHandling(
                     async () => {
                         // Fetch all available settings from backend
-                        const historyLimitResponse = await window.electronAPI.settings.getHistoryLimit();
-                        const historyLimit = extractIpcData<number>(historyLimitResponse); // Extract the actual number
+                        let historyLimitResponse;
+                        try {
+                            historyLimitResponse = await window.electronAPI.settings.getHistoryLimit();
+                        } catch (error) {
+                            console.error("Failed to get history limit from backend", error);
+                            throw error;
+                        }
+
+                        let historyLimit;
+                        try {
+                            historyLimit = extractIpcData<number>(historyLimitResponse); // Extract the actual number
+                        } catch (error) {
+                            console.error("Failed to extract history limit from response", error);
+                            throw error;
+                        }
 
                         // Update local state with backend values, keeping defaults for others
                         const updatedSettings = {
@@ -120,7 +133,13 @@ export const useSettingsStore = create<SettingsStore>()(
 
                         // Fetch the actual reset values from backend to ensure synchronization
                         const historyLimitResponse = await window.electronAPI.settings.getHistoryLimit();
-                        const historyLimit = extractIpcData<number>(historyLimitResponse);
+                        let historyLimit;
+                        try {
+                            historyLimit = extractIpcData<number>(historyLimitResponse);
+                        } catch (error) {
+                            console.error("Failed to extract history limit from reset response", error);
+                            throw error;
+                        }
 
                         // Update local state to match backend defaults
                         set({
@@ -157,7 +176,13 @@ export const useSettingsStore = create<SettingsStore>()(
                 const result = await withErrorHandling(
                     async () => {
                         const historyLimitResponse = await window.electronAPI.settings.getHistoryLimit();
-                        const historyLimit = extractIpcData<number>(historyLimitResponse);
+                        let historyLimit;
+                        try {
+                            historyLimit = extractIpcData<number>(historyLimitResponse);
+                        } catch (error) {
+                            console.error("Failed to extract history limit from refresh response", error);
+                            throw error;
+                        }
 
                         const currentSettings = get().settings;
                         const updatedSettings = {
@@ -197,7 +222,13 @@ export const useSettingsStore = create<SettingsStore>()(
 
                         // Verify the value from backend to ensure sync
                         const backendLimitResponse = await window.electronAPI.settings.getHistoryLimit();
-                        const backendLimit = extractIpcData<number>(backendLimitResponse);
+                        let backendLimit;
+                        try {
+                            backendLimit = extractIpcData<number>(backendLimitResponse);
+                        } catch (error) {
+                            console.error("Failed to extract backend limit from response", error);
+                            throw error;
+                        }
 
                         // Ensure we have a valid number from backend
                         const validBackendLimit =

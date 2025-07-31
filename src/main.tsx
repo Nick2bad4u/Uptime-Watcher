@@ -46,4 +46,9 @@ function initializeApp(): void {
 }
 
 // Initialize the application
-initializeApp();
+try {
+    initializeApp();
+} catch (error) {
+    console.error("Failed to initialize application:", error);
+    // Could show an error boundary or fallback UI here
+}

@@ -74,16 +74,16 @@ export function useMonitorTypes(): UseMonitorTypesResult {
             setError(undefined);
             const monitorOptions = await getMonitorTypeOptions();
             setOptions(monitorOptions);
-        } catch (error_) {
-            const errorMessage = error_ instanceof Error ? error_.message : "Failed to load monitor types";
+        } catch (loadError) {
+            const errorMessage = loadError instanceof Error ? loadError.message : "Failed to load monitor types";
             const contextualError = `Monitor types loading failed: ${errorMessage}. Using fallback options.`;
             setError(contextualError);
             logger.error(
                 "Failed to load monitor types from backend",
-                error_ instanceof Error ? error_ : new Error(String(error_))
+                loadError instanceof Error ? loadError : new Error(String(loadError))
             );
             // Use centralized fallback options to ensure consistency
-            setOptions([...FALLBACK_MONITOR_TYPE_OPTIONS]);
+            setOptions(Array.from(FALLBACK_MONITOR_TYPE_OPTIONS));
         } finally {
             setIsLoading(false);
         }

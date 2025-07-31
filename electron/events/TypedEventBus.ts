@@ -382,6 +382,7 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
      * @param middleware - Middleware function to register.
      * @throws Error when the maximum middleware limit is exceeded.
      */
+    // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
     use(middleware: EventMiddleware): void {
         if (this.middlewares.length >= this.maxMiddleware) {
             throw new Error(
@@ -430,7 +431,7 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
     private createEnhancedData<T>(data: T, metadata: EventMetadata): T & { _meta: EventMetadata } {
         // Handle arrays specially to preserve array nature
         if (Array.isArray(data)) {
-            const result = [...data];
+            const result = Array.from(data);
             // Use defineProperty to add non-enumerable _meta, preserving array immutability expectations
             Object.defineProperty(result, "_meta", {
                 configurable: false,
