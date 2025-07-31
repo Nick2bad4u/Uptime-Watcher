@@ -9,69 +9,6 @@ import "@testing-library/jest-dom";
 
 import { StatusIndicator, ThemedBadge, ThemedInput, ThemedProgress, ThemedSelect } from "../../theme/components";
 
-// Mock the theme hook
-const mockTheme = {
-    borderRadius: {
-        full: "50%",
-        lg: "8px",
-        md: "6px",
-        none: "0px",
-        sm: "4px",
-        xl: "12px",
-    },
-    colors: {
-        background: {
-            modal: "#ffffff",
-            primary: "#ffffff",
-            secondary: "#f8f9fa",
-            tertiary: "#e9ecef",
-        },
-        border: {
-            focus: "#007bff",
-            primary: "#dee2e6",
-            secondary: "#e9ecef",
-        },
-        error: "#dc3545",
-        primary: {
-            500: "#007bff",
-        },
-        status: {
-            down: "#dc3545",
-            mixed: "#ffc107",
-            paused: "#6c757d",
-            pending: "#007bff",
-            unknown: "#6c757d",
-            up: "#28a745",
-        },
-        success: "#28a745",
-        text: {
-            primary: "#212529",
-            secondary: "#6c757d",
-        },
-        warning: "#ffc107",
-    },
-    isDark: false,
-    name: "Light",
-    spacing: {
-        xs: "4px",
-        sm: "8px",
-        md: "16px",
-        lg: "24px",
-        xl: "32px",
-    },
-    typography: {
-        fontSize: {
-            xs: "12px",
-            sm: "14px",
-            base: "16px",
-            lg: "18px",
-        },
-        fontWeight: {
-            medium: "500",
-        },
-    },
-};
-
 // Mock theme hooks with factory function to avoid hoisting issues
 vi.mock("../../theme/useTheme", () => ({
     useTheme: vi.fn(() => ({

@@ -799,8 +799,8 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             const result = validateSiteData(siteData);
             expect(result.success).toBe(true);
             expect(result.errors).toHaveLength(0);
-            expect(result.metadata.monitorCount).toBe(1);
-            expect(result.metadata.siteIdentifier).toBe("test-site");
+            expect(result.metadata["monitorCount"]).toBe(1);
+            expect(result.metadata["siteIdentifier"]).toBe("test-site");
         });
 
         it("should return errors for invalid site data", () => {

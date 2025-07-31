@@ -26,7 +26,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
         });
 
         it("should return error for invalid JSON", () => {
-            const validator = (data: unknown): data is any => true;
+            const validator = (_data: unknown): _data is any => true;
             const result = safeJsonParse("invalid json", validator);
 
             expect(result.success).toBe(false);
@@ -89,12 +89,14 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             const result = safeJsonParseArray('[{"id":1},{"id":2}]', elementValidator);
             expect(result.success).toBe(true);
             expect(result.data).toHaveLength(2);
-            expect(result.data?.[0].id).toBe(1);
-            expect(result.data?.[1].id).toBe(2);
+            if (result.success && result.data) {
+                expect(result.data[0]!.id).toBe(1);
+                expect(result.data[1]!.id).toBe(2);
+            }
         });
 
         it("should return error for invalid JSON", () => {
-            const elementValidator = (data: unknown): data is any => true;
+            const elementValidator = (_data: unknown): _data is any => true;
             const result = safeJsonParseArray("invalid json", elementValidator);
 
             expect(result.success).toBe(false);
@@ -102,7 +104,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
         });
 
         it("should return error when parsed data is not an array", () => {
-            const elementValidator = (data: unknown): data is any => true;
+            const elementValidator = (_data: unknown): _data is any => true;
             const result = safeJsonParseArray('{"not":"array"}', elementValidator);
 
             expect(result.success).toBe(false);
@@ -120,7 +122,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
         });
 
         it("should handle empty arrays", () => {
-            const elementValidator = (data: unknown): data is any => true;
+            const elementValidator = (_data: unknown): _data is any => true;
             const result = safeJsonParseArray("[]", elementValidator);
 
             expect(result.success).toBe(true);

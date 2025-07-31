@@ -3,8 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-// eslint-disable-next-line unused-imports/no-unused-imports
-import type { Site, StatusUpdate } from "../../../../../shared/types";
+import type { Site } from "../../../../../shared/types";
 
 // Mock the error handling utility
 vi.mock("../../../../utils/errorHandling", () => ({

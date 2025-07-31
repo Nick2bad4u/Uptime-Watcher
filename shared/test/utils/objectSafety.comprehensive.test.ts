@@ -84,8 +84,8 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
         });
 
         it("should handle edge cases with validator", () => {
-            const alwaysFails = (value: unknown): value is string => false;
-            const alwaysPasses = (value: unknown): value is string => true;
+            const alwaysFails = (_value: unknown): _value is string => false;
+            const alwaysPasses = (_value: unknown): _value is string => true;
 
             expect(safeObjectAccess(testObj, "string", "fallback", alwaysFails)).toBe("fallback");
             expect(safeObjectAccess(testObj, "string", "fallback", alwaysPasses)).toBe("test");

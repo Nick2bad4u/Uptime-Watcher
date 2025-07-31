@@ -96,9 +96,9 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             expect(mockEventListener).toHaveBeenCalledWith("change", expect.any(Function));
 
             // Simulate a media query change event
-            const handler = mockEventListener.mock.calls[0][1];
+            const handler = mockEventListener.mock.calls[0]?.[1];
             const mockEvent = { matches: true } as MediaQueryListEvent;
-            handler(mockEvent);
+            handler?.(mockEvent);
 
             // Verify callback was called with correct value
             expect(mockCallback).toHaveBeenCalledWith(true);
@@ -127,10 +127,10 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             themeManager.onSystemThemeChange(mockCallback);
 
             // Get the handler function that was registered
-            const handler = mockEventListener.mock.calls[0][1];
+            const handler = mockEventListener.mock.calls[0]?.[1];
 
             // Simulate theme change to dark
-            handler({ matches: true } as MediaQueryListEvent);
+            handler?.({ matches: true } as MediaQueryListEvent);
             expect(mockCallback).toHaveBeenCalledWith(true);
 
             // Simulate theme change to light

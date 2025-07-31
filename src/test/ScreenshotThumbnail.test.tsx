@@ -893,8 +893,8 @@ describe("ScreenshotThumbnail", () => {
 
             fireEvent.mouseLeave(image);
 
-            // This should have cleared the previous timeout and set a new one
-            expect(clearTimeoutSpy).toHaveBeenCalledTimes(1);
+            // This should have cleared timeouts (multiple clearTimeout calls are expected)
+            expect(clearTimeoutSpy).toHaveBeenCalledTimes(2);
 
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();

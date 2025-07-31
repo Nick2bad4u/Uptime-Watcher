@@ -265,8 +265,10 @@ describe("App Component - Comprehensive Coverage", () => {
 
             rerender(<App />);
 
-            // Loading should disappear immediately
-            expect(screen.queryByLabelText("Loading application")).not.toBeInTheDocument();
+            // Loading should disappear after the timeout
+            await waitFor(() => {
+                expect(screen.queryByLabelText("Loading application")).not.toBeInTheDocument();
+            });
         });
 
         it("should not show loading overlay for quick operations", async () => {

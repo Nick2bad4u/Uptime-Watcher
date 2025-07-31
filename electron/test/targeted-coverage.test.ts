@@ -38,25 +38,25 @@ describe("Targeted Coverage for Missing Branches", () => {
             const { isDev } = await import("../electronUtils.js");
 
             // Test with different NODE_ENV values
-            const originalEnv = process.env.NODE_ENV;
+            const originalEnv = process.env["NODE_ENV"];
 
             // Test undefined NODE_ENV
-            delete process.env.NODE_ENV;
+            delete process.env["NODE_ENV"];
             expect(typeof isDev()).toBe("boolean");
 
             // Test empty string NODE_ENV
-            process.env.NODE_ENV = "";
+            process.env["NODE_ENV"] = "";
             expect(typeof isDev()).toBe("boolean");
 
             // Test other values
-            process.env.NODE_ENV = "staging";
+            process.env["NODE_ENV"] = "staging";
             expect(typeof isDev()).toBe("boolean");
 
-            process.env.NODE_ENV = "testing";
+            process.env["NODE_ENV"] = "testing";
             expect(typeof isDev()).toBe("boolean");
 
             // Restore
-            process.env.NODE_ENV = originalEnv;
+            process.env["NODE_ENV"] = originalEnv;
         });
     });
 

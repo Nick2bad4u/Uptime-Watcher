@@ -72,15 +72,15 @@ describe("useSettingsStore", () => {
         // Setup withErrorHandling to execute function properly
         mockWithErrorHandling.mockImplementation(async (fn, handlers) => {
             try {
-                handlers.setLoading?.(true);
-                handlers.clearError?.();
+                (handlers as any).setLoading?.(true);
+                (handlers as any).clearError?.();
                 const result = await fn();
                 return result;
             } catch (error) {
-                handlers.setError?.(error);
+                (handlers as any).setError?.(error);
                 throw error;
             } finally {
-                handlers.setLoading?.(false);
+                (handlers as any).setLoading?.(false);
             }
         });
     });
@@ -355,14 +355,14 @@ describe("useSettingsStore", () => {
             let loadingStatesDuringCall: boolean[] = [];
 
             mockWithErrorHandling.mockImplementation(async (fn, handlers) => {
-                handlers.setLoading?.(true);
+                (handlers as any).setLoading?.(true);
                 loadingStatesDuringCall.push(true);
 
                 try {
                     const result = await fn();
                     return result;
                 } finally {
-                    handlers.setLoading?.(false);
+                    (handlers as any).setLoading?.(false);
                     loadingStatesDuringCall.push(false);
                 }
             });

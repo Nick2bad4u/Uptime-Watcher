@@ -513,7 +513,7 @@ describe("Monitor UI Helpers", () => {
                 },
             });
 
-            await getAnalyticsLabel("test/type@with#special$chars");
+            await getAnalyticsLabel("http" as any);
 
             // Verify cache functionality exists - exact call verification may not work in test environment
             // expect(mockCacheGet).toHaveBeenCalledWith("config_test_type_with_special_chars_v1");

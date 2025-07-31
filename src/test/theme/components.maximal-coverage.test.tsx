@@ -3,9 +3,9 @@
  * Tests all theme component variants, props, and edge cases.
  */
 
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import {
     ThemedBox,
@@ -27,6 +27,7 @@ const mockOnChange = vi.fn();
 describe("Theme Components - Complete Coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        cleanup();
     });
 
     describe("ThemedBox Component", () => {
@@ -42,14 +43,17 @@ describe("Theme Components - Complete Coverage", () => {
             const surfaces = ["base", "elevated", "overlay"] as const;
 
             surfaces.forEach((surface) => {
-                render(
-                    <ThemedBox surface={surface} data-testid={`box-${surface}`}>
-                        {surface}
+                const { unmount } = render(
+                    <ThemedBox surface={surface}>
+                        Surface {surface}
                     </ThemedBox>
                 );
 
-                const box = screen.getByTestId(`box-${surface}`);
+                const box = screen.getByText(`Surface ${surface}`);
                 expect(box).toBeInTheDocument();
+                expect(box).toHaveClass("themed-box");
+                
+                unmount();
             });
         });
 
@@ -63,25 +67,28 @@ describe("Theme Components - Complete Coverage", () => {
             ] as const;
 
             paddings.forEach((padding) => {
-                render(
-                    <ThemedBox padding={padding} data-testid={`box-padding-${padding}`}>
+                const { unmount } = render(
+                    <ThemedBox padding={padding}>
                         Padding {padding}
                     </ThemedBox>
                 );
 
-                const box = screen.getByTestId(`box-padding-${padding}`);
+                const box = screen.getByText(`Padding ${padding}`);
                 expect(box).toBeInTheDocument();
+                expect(box).toHaveClass("themed-box");
+                
+                unmount();
             });
         });
 
         it("should handle click events", () => {
             render(
-                <ThemedBox onClick={mockOnClick} data-testid="clickable-box">
+                <ThemedBox onClick={mockOnClick}>
                     Clickable box
                 </ThemedBox>
             );
 
-            const box = screen.getByTestId("clickable-box");
+            const box = screen.getByText("Clickable box");
             fireEvent.click(box);
             expect(mockOnClick).toHaveBeenCalledTimes(1);
         });
@@ -90,14 +97,17 @@ describe("Theme Components - Complete Coverage", () => {
             const elements = ["div", "section", "article", "aside"] as const;
 
             elements.forEach((as) => {
-                render(
-                    <ThemedBox as={as} data-testid={`box-${as}`}>
+                const { unmount } = render(
+                    <ThemedBox as={as}>
                         Element {as}
                     </ThemedBox>
                 );
 
-                const box = screen.getByTestId(`box-${as}`);
+                const box = screen.getByText(`Element ${as}`);
                 expect(box).toBeInTheDocument();
+                expect(box.tagName.toLowerCase()).toBe(as);
+                
+                unmount();
             });
         });
 
@@ -105,14 +115,16 @@ describe("Theme Components - Complete Coverage", () => {
             const variants = ["primary", "secondary", "tertiary"] as const;
 
             variants.forEach((variant) => {
-                render(
-                    <ThemedBox variant={variant} data-testid={`box-${variant}`}>
+                const { unmount } = render(
+                    <ThemedBox variant={variant}>
                         Variant {variant}
                     </ThemedBox>
                 );
 
-                const box = screen.getByTestId(`box-${variant}`);
+                const box = screen.getByText(`Variant ${variant}`);
                 expect(box).toBeInTheDocument();
+                
+                unmount();
             });
         });
 
@@ -126,14 +138,16 @@ describe("Theme Components - Complete Coverage", () => {
             ] as const;
 
             roundedOptions.forEach((rounded) => {
-                render(
-                    <ThemedBox rounded={rounded} data-testid={`box-rounded-${rounded}`}>
+                const { unmount } = render(
+                    <ThemedBox rounded={rounded}>
                         Rounded {rounded}
                     </ThemedBox>
                 );
 
-                const box = screen.getByTestId(`box-rounded-${rounded}`);
+                const box = screen.getByText(`Rounded ${rounded}`);
                 expect(box).toBeInTheDocument();
+                
+                unmount();
             });
         });
 
@@ -147,25 +161,27 @@ describe("Theme Components - Complete Coverage", () => {
             ] as const;
 
             shadowOptions.forEach((shadow) => {
-                render(
-                    <ThemedBox shadow={shadow} data-testid={`box-shadow-${shadow}`}>
+                const { unmount } = render(
+                    <ThemedBox shadow={shadow}>
                         Shadow {shadow}
                     </ThemedBox>
                 );
 
-                const box = screen.getByTestId(`box-shadow-${shadow}`);
+                const box = screen.getByText(`Shadow ${shadow}`);
                 expect(box).toBeInTheDocument();
+                
+                unmount();
             });
         });
 
         it("should handle border prop", () => {
             render(
-                <ThemedBox border data-testid="bordered-box">
+                <ThemedBox border>
                     Bordered box
                 </ThemedBox>
             );
 
-            const box = screen.getByTestId("bordered-box");
+            const box = screen.getByText("Bordered box");
             expect(box).toBeInTheDocument();
         });
 
@@ -174,12 +190,12 @@ describe("Theme Components - Complete Coverage", () => {
             const mockMouseLeave = vi.fn();
 
             render(
-                <ThemedBox onMouseEnter={mockMouseEnter} onMouseLeave={mockMouseLeave} data-testid="mouse-box">
+                <ThemedBox onMouseEnter={mockMouseEnter} onMouseLeave={mockMouseLeave}>
                     Mouse events
                 </ThemedBox>
             );
 
-            const box = screen.getByTestId("mouse-box");
+            const box = screen.getByText("Mouse events");
             fireEvent.mouseEnter(box);
             expect(mockMouseEnter).toHaveBeenCalledTimes(1);
 
@@ -209,7 +225,7 @@ describe("Theme Components - Complete Coverage", () => {
             ] as const;
 
             variants.forEach((variant) => {
-                render(
+                const { unmount } = render(
                     <ThemedButton variant={variant} onClick={mockOnClick}>
                         {variant} Button
                     </ThemedButton>
@@ -217,6 +233,8 @@ describe("Theme Components - Complete Coverage", () => {
 
                 const button = screen.getByRole("button", { name: `${variant} Button` });
                 expect(button).toBeInTheDocument();
+                
+                unmount();
             });
         });
 
@@ -230,7 +248,7 @@ describe("Theme Components - Complete Coverage", () => {
             ] as const;
 
             sizes.forEach((size) => {
-                render(
+                const { unmount } = render(
                     <ThemedButton size={size} onClick={mockOnClick}>
                         {size} Button
                     </ThemedButton>
@@ -238,6 +256,8 @@ describe("Theme Components - Complete Coverage", () => {
 
                 const button = screen.getByRole("button", { name: `${size} Button` });
                 expect(button).toBeInTheDocument();
+                
+                unmount();
             });
         });
 
@@ -312,7 +332,7 @@ describe("Theme Components - Complete Coverage", () => {
             const types = ["button", "submit", "reset"] as const;
 
             types.forEach((type) => {
-                render(
+                const { unmount } = render(
                     <ThemedButton type={type} onClick={mockOnClick}>
                         {type} Button
                     </ThemedButton>
@@ -320,15 +340,17 @@ describe("Theme Components - Complete Coverage", () => {
 
                 const button = screen.getByRole("button", { name: `${type} Button` });
                 expect(button).toHaveAttribute("type", type);
+                
+                unmount();
             });
         });
     });
 
     describe("ThemedInput Component", () => {
         it("should render with default props", () => {
-            render(<ThemedInput data-testid="themed-input" />);
+            render(<ThemedInput />);
 
-            const input = screen.getByTestId("themed-input");
+            const input = screen.getByRole("textbox");
             expect(input).toBeInTheDocument();
             expect(input).toHaveAttribute("type", "text");
         });
@@ -336,31 +358,39 @@ describe("Theme Components - Complete Coverage", () => {
         it("should handle different input types", () => {
             const types = [
                 "text",
-                "email",
+                "email", 
                 "password",
-                "number",
                 "url",
             ] as const;
 
             types.forEach((type) => {
-                render(<ThemedInput type={type} data-testid={`input-${type}`} />);
+                const { unmount } = render(<ThemedInput type={type} placeholder={`${type} input`} />);
 
-                const input = screen.getByTestId(`input-${type}`);
+                const input = screen.getByPlaceholderText(`${type} input`);
                 expect(input).toHaveAttribute("type", type);
+                
+                unmount();
             });
         });
 
-        it("should handle disabled state", () => {
-            render(<ThemedInput disabled data-testid="disabled-input" />);
+        it("should handle number input type", () => {
+            render(<ThemedInput type="number" placeholder="number input" />);
 
-            const input = screen.getByTestId("disabled-input");
+            const input = screen.getByPlaceholderText("number input");
+            expect(input).toHaveAttribute("type", "number");
+        });
+
+        it("should handle disabled state", () => {
+            render(<ThemedInput disabled placeholder="disabled input" />);
+
+            const input = screen.getByPlaceholderText("disabled input");
             expect(input).toBeDisabled();
         });
 
         it("should handle value and onChange", () => {
-            render(<ThemedInput value="test value" onChange={mockOnChange} data-testid="controlled-input" />);
+            render(<ThemedInput value="test value" onChange={mockOnChange} placeholder="controlled input" />);
 
-            const input = screen.getByTestId("controlled-input") as HTMLInputElement;
+            const input = screen.getByPlaceholderText("controlled input") as HTMLInputElement;
             expect(input.value).toBe("test value");
 
             fireEvent.change(input, { target: { value: "new value" } });
@@ -368,26 +398,26 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should handle placeholder and required", () => {
-            render(<ThemedInput placeholder="Enter text" required data-testid="attr-input" />);
+            render(<ThemedInput placeholder="Enter text" required />);
 
-            const input = screen.getByTestId("attr-input");
+            const input = screen.getByPlaceholderText("Enter text");
             expect(input).toHaveAttribute("placeholder", "Enter text");
             expect(input).toHaveAttribute("required");
         });
 
         it("should handle min/max for number inputs", () => {
-            render(<ThemedInput type="number" min={1} max={100} step={0.1} data-testid="number-input" />);
+            render(<ThemedInput type="number" min={1} max={100} step={0.1} placeholder="number range" />);
 
-            const input = screen.getByTestId("number-input");
+            const input = screen.getByPlaceholderText("number range");
             expect(input).toHaveAttribute("min", "1");
             expect(input).toHaveAttribute("max", "100");
             expect(input).toHaveAttribute("step", "0.1");
         });
 
         it("should handle aria attributes", () => {
-            render(<ThemedInput aria-label="Search" aria-describedby="search-help" data-testid="aria-input" />);
+            render(<ThemedInput aria-label="Search" aria-describedby="search-help" />);
 
-            const input = screen.getByTestId("aria-input");
+            const input = screen.getByLabelText("Search");
             expect(input).toHaveAttribute("aria-label", "Search");
             expect(input).toHaveAttribute("aria-describedby", "search-help");
         });
@@ -415,10 +445,12 @@ describe("Theme Components - Complete Coverage", () => {
             ] as const;
 
             sizes.forEach((size) => {
-                render(<ThemedText size={size}>Size {size}</ThemedText>);
+                const { unmount } = render(<ThemedText size={size}>Size {size}</ThemedText>);
 
                 const text = screen.getByText(`Size ${size}`);
                 expect(text).toBeInTheDocument();
+                
+                unmount();
             });
         });
 
@@ -426,10 +458,12 @@ describe("Theme Components - Complete Coverage", () => {
             const weights = ["normal", "medium", "semibold", "bold"] as const;
 
             weights.forEach((weight) => {
-                render(<ThemedText weight={weight}>Weight {weight}</ThemedText>);
+                const { unmount } = render(<ThemedText weight={weight}>Weight {weight}</ThemedText>);
 
                 const text = screen.getByText(`Weight ${weight}`);
                 expect(text).toBeInTheDocument();
+                
+                unmount();
             });
         });
 
@@ -447,10 +481,12 @@ describe("Theme Components - Complete Coverage", () => {
             ] as const;
 
             variants.forEach((variant) => {
-                render(<ThemedText variant={variant}>Variant {variant}</ThemedText>);
+                const { unmount } = render(<ThemedText variant={variant}>Variant {variant}</ThemedText>);
 
                 const text = screen.getByText(`Variant ${variant}`);
                 expect(text).toBeInTheDocument();
+                
+                unmount();
             });
         });
 
@@ -458,10 +494,12 @@ describe("Theme Components - Complete Coverage", () => {
             const alignments = ["left", "center", "right", "justify"] as const;
 
             alignments.forEach((align) => {
-                render(<ThemedText align={align}>Align {align}</ThemedText>);
+                const { unmount } = render(<ThemedText align={align}>Align {align}</ThemedText>);
 
                 const text = screen.getByText(`Align ${align}`);
                 expect(text).toBeInTheDocument();
+                
+                unmount();
             });
         });
 
@@ -476,38 +514,38 @@ describe("Theme Components - Complete Coverage", () => {
 
     describe("ThemedCheckbox Component", () => {
         it("should render with default props", () => {
-            render(<ThemedCheckbox data-testid="themed-checkbox" onChange={mockOnChange} />);
+            render(<ThemedCheckbox onChange={mockOnChange} />);
 
-            const checkbox = screen.getByTestId("themed-checkbox");
+            const checkbox = screen.getByRole("checkbox");
             expect(checkbox).toBeInTheDocument();
             expect(checkbox).toHaveAttribute("type", "checkbox");
         });
 
         it("should handle checked state", () => {
-            render(<ThemedCheckbox checked onChange={mockOnChange} data-testid="checked-box" />);
+            render(<ThemedCheckbox checked onChange={mockOnChange} />);
 
-            const checkbox = screen.getByTestId("checked-box") as HTMLInputElement;
+            const checkbox = screen.getByRole("checkbox") as HTMLInputElement;
             expect(checkbox.checked).toBe(true);
         });
 
         it("should handle disabled state", () => {
-            render(<ThemedCheckbox disabled onChange={mockOnChange} data-testid="disabled-box" />);
+            render(<ThemedCheckbox disabled onChange={mockOnChange} />);
 
-            const checkbox = screen.getByTestId("disabled-box");
+            const checkbox = screen.getByRole("checkbox");
             expect(checkbox).toBeDisabled();
         });
 
         it("should handle required prop", () => {
-            render(<ThemedCheckbox required onChange={mockOnChange} data-testid="required-box" />);
+            render(<ThemedCheckbox required onChange={mockOnChange} />);
 
-            const checkbox = screen.getByTestId("required-box");
+            const checkbox = screen.getByRole("checkbox");
             expect(checkbox).toHaveAttribute("required");
         });
 
         it("should apply accessibility props", () => {
-            render(<ThemedCheckbox onChange={mockOnChange} aria-label="Accept terms" data-testid="a11y-box" />);
+            render(<ThemedCheckbox onChange={mockOnChange} aria-label="Accept terms" />);
 
-            const checkbox = screen.getByTestId("a11y-box");
+            const checkbox = screen.getByLabelText("Accept terms");
             expect(checkbox).toHaveAttribute("aria-label", "Accept terms");
         });
 
@@ -664,10 +702,12 @@ describe("Theme Components - Complete Coverage", () => {
             const variants = ["primary", "secondary", "tertiary"] as const;
 
             variants.forEach((variant) => {
-                render(<ThemedCard variant={variant}>Variant {variant}</ThemedCard>);
+                const { unmount } = render(<ThemedCard variant={variant}>Variant {variant}</ThemedCard>);
 
                 const cardText = screen.getByText(`Variant ${variant}`);
                 expect(cardText).toBeInTheDocument();
+                
+                unmount();
             });
         });
 
@@ -709,10 +749,12 @@ describe("Theme Components - Complete Coverage", () => {
             ] as const;
 
             variants.forEach((variant) => {
-                render(<ThemedBadge variant={variant}>{variant} Badge</ThemedBadge>);
+                const { unmount } = render(<ThemedBadge variant={variant}>{variant} Badge</ThemedBadge>);
 
                 const badge = screen.getByText(`${variant} Badge`);
                 expect(badge).toBeInTheDocument();
+                
+                unmount();
             });
         });
 
@@ -720,10 +762,12 @@ describe("Theme Components - Complete Coverage", () => {
             const sizes = ["xs", "sm", "md", "lg"] as const;
 
             sizes.forEach((size) => {
-                render(<ThemedBadge size={size}>{size} Badge</ThemedBadge>);
+                const { unmount } = render(<ThemedBadge size={size}>{size} Badge</ThemedBadge>);
 
                 const badge = screen.getByText(`${size} Badge`);
                 expect(badge).toBeInTheDocument();
+                
+                unmount();
             });
         });
 
@@ -752,10 +796,12 @@ describe("Theme Components - Complete Coverage", () => {
             const sizes = ["sm", "md", "lg"] as const;
 
             sizes.forEach((size) => {
-                const { container } = render(<StatusIndicator status="up" size={size} />);
+                const { container, unmount } = render(<StatusIndicator status="up" size={size} />);
 
                 const indicator = container.querySelector(".themed-status-indicator");
                 expect(indicator).toBeInTheDocument();
+                
+                unmount();
             });
         });
 
@@ -770,10 +816,12 @@ describe("Theme Components - Complete Coverage", () => {
             const statuses = ["up", "down", "unknown"] as const;
 
             statuses.forEach((status) => {
-                const { container } = render(<StatusIndicator status={status} />);
+                const { container, unmount } = render(<StatusIndicator status={status} />);
 
                 const indicator = container.querySelector(".themed-status-indicator");
                 expect(indicator).toBeInTheDocument();
+                
+                unmount();
             });
         });
     });
@@ -797,10 +845,12 @@ describe("Theme Components - Complete Coverage", () => {
             const statuses = ["up", "down", "unknown"] as const;
 
             statuses.forEach((status) => {
-                const { container } = render(<MiniChartBar status={status} timestamp={new Date()} />);
+                const { container, unmount } = render(<MiniChartBar status={status} timestamp={new Date()} />);
 
                 const bar = container.querySelector(".themed-mini-chart-bar");
                 expect(bar).toBeInTheDocument();
+                
+                unmount();
             });
         });
 
@@ -851,7 +901,7 @@ describe("Theme Components - Complete Coverage", () => {
                     <ThemedButton className="custom-btn" onClick={mockOnClick}>
                         Button
                     </ThemedButton>
-                    <ThemedInput className="custom-input" />
+                    <ThemedInput className="custom-input" placeholder="input" />
                     <ThemedText className="custom-text">Text</ThemedText>
                     <ThemedCard className="custom-card">Card</ThemedCard>
                     <ThemedBadge className="custom-badge">Badge</ThemedBadge>
@@ -860,7 +910,7 @@ describe("Theme Components - Complete Coverage", () => {
 
             expect(screen.getByText("Box")).toHaveClass("custom-box");
             expect(screen.getByRole("button")).toHaveClass("custom-btn");
-            expect(screen.getByRole("textbox")).toHaveClass("custom-input");
+            expect(screen.getByPlaceholderText("input")).toHaveClass("custom-input");
             expect(screen.getByText("Text")).toHaveClass("custom-text");
             expect(screen.getByText("Card").closest(".themed-card")).toHaveClass("custom-card");
             expect(screen.getByText("Badge")).toHaveClass("custom-badge");

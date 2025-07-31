@@ -143,7 +143,7 @@ describe("Settings Component", () => {
         isDark: false,
         setTheme: vi.fn(),
         availableThemes: ["light", "dark"] as ThemeName[],
-        getColor: vi.fn((path: string) => "#000"),
+        getColor: vi.fn((_path: string) => "#000"),
         getStatusColor: vi.fn(),
         systemTheme: "light" as ThemeName,
         themeManager: {},

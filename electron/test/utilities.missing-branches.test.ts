@@ -208,9 +208,11 @@ describe("Utility Files - Missing Branch Coverage", () => {
             expect(() => {
                 try {
                     JSON.stringify(proxyError);
+                    return "json-success";
                 } catch {
                     try {
                         String(proxyError);
+                        return "string-success";
                     } catch {
                         // Proxy access throws, which is expected
                         return "proxy-error-handled";

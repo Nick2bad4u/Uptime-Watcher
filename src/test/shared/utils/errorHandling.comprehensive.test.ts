@@ -242,15 +242,15 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
                 vi.fn().mockResolvedValue("fourth"),
             ];
 
-            const firstResult = await withErrorHandling(operations[0], mockStore);
+            const firstResult = await withErrorHandling(operations[0]!, mockStore);
             expect(firstResult).toBe("first");
 
-            const secondResult = await withErrorHandling(operations[1], mockStore);
+            const secondResult = await withErrorHandling(operations[1]!, mockStore);
             expect(secondResult).toBe("second");
 
-            await expect(withErrorHandling(operations[2], mockStore)).rejects.toThrow("third failed");
+            await expect(withErrorHandling(operations[2]!, mockStore)).rejects.toThrow("third failed");
 
-            const fourthResult = await withErrorHandling(operations[3], mockStore);
+            const fourthResult = await withErrorHandling(operations[3]!, mockStore);
             expect(fourthResult).toBe("fourth");
 
             // Verify that each operation properly managed loading state

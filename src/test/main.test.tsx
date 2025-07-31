@@ -87,11 +87,19 @@ describe("Main Entry Point", () => {
         expect(mockRender).toHaveBeenCalled();
     });
 
-    it("should throw error when root element not found", async () => {
+    it("should handle error when root element not found", async () => {
+        const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
         (document.getElementById as any).mockReturnValue(null);
 
-        // Expect the import to throw an error
-        await expect(import("../main")).rejects.toThrow("Root element not found");
+        // The import should succeed but log an error
+        await import("../main");
+        
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+            "Failed to initialize application:", 
+            expect.any(Error)
+        );
+        
+        consoleErrorSpy.mockRestore();
     });
 
     it("should use getElementById for root element lookup", async () => {
@@ -110,7 +118,7 @@ describe("Main Entry Point", () => {
 
         expect(mockRender).toHaveBeenCalledTimes(1);
         // The render call should include the App wrapped in StrictMode
-        const renderCall = mockRender.mock.calls[0][0];
+        const renderCall = mockRender.mock.calls[0]?.[0];
         expect(renderCall).toBeDefined();
     });
 });

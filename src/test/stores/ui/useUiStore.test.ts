@@ -642,28 +642,28 @@ describe("useUIStore", () => {
             ];
 
             booleanActions.forEach((action, index) => {
-                const getState = booleanStates[index];
+                const getState = booleanStates[index]!;
 
                 // Should start false
-                expect(getState()).toBe(false);
+                expect(getState!()).toBe(false);
 
                 // Set true
                 act(() => {
                     action(true);
                 });
-                expect(getState()).toBe(true);
+                expect(getState!()).toBe(true);
 
                 // Set false
                 act(() => {
                     action(false);
                 });
-                expect(getState()).toBe(false);
+                expect(getState!()).toBe(false);
 
                 // Set true again
                 act(() => {
                     action(true);
                 });
-                expect(getState()).toBe(true);
+                expect(getState!()).toBe(true);
             });
         });
     });

@@ -66,15 +66,15 @@ describe("useSiteMonitoring", () => {
         // Setup withErrorHandling to actually call functions and handle errors properly
         mockWithErrorHandling.mockImplementation(async (fn, handlers) => {
             try {
-                handlers.setLoading?.(true);
-                handlers.clearError?.();
+                (handlers as any).setLoading?.(true);
+                (handlers as any).clearError?.();
                 const result = await fn();
                 return result;
             } catch (error) {
-                handlers.setError?.(error);
+                (handlers as any).setError?.(error);
                 throw error;
             } finally {
-                handlers.setLoading?.(false);
+                (handlers as any).setLoading?.(false);
             }
         });
 
@@ -146,11 +146,11 @@ describe("useSiteMonitoring", () => {
 
             // Test the handlers
             const handlerCall = mockWithErrorHandling.mock.calls[0];
-            const handlers = handlerCall[1];
+            const handlers = handlerCall?.[1];
 
-            expect(handlers.setLoading).toBeDefined();
-            expect(handlers.clearError).toBeDefined();
-            expect(handlers.setError).toBeDefined();
+            expect((handlers as any).setLoading).toBeDefined();
+            expect((handlers as any).clearError).toBeDefined();
+            expect((handlers as any).setError).toBeDefined();
         });
     });
 
@@ -188,11 +188,11 @@ describe("useSiteMonitoring", () => {
             await siteMonitoringActions.startSiteMonitoring(siteId);
 
             const handlerCall = mockWithErrorHandling.mock.calls[0];
-            const handlers = handlerCall[1];
+            const handlers = handlerCall?.[1];
 
-            expect(handlers.setLoading).toBeDefined();
-            expect(handlers.clearError).toBeDefined();
-            expect(handlers.setError).toBeDefined();
+            expect((handlers as any).setLoading).toBeDefined();
+            expect((handlers as any).clearError).toBeDefined();
+            expect((handlers as any).setError).toBeDefined();
         });
     });
 
@@ -235,11 +235,11 @@ describe("useSiteMonitoring", () => {
             await siteMonitoringActions.startSiteMonitorMonitoring(siteId, monitorId);
 
             const handlerCall = mockWithErrorHandling.mock.calls[0];
-            const handlers = handlerCall[1];
+            const handlers = handlerCall?.[1];
 
-            expect(handlers.setLoading).toBeDefined();
-            expect(handlers.clearError).toBeDefined();
-            expect(handlers.setError).toBeDefined();
+            expect((handlers as any).setLoading).toBeDefined();
+            expect((handlers as any).clearError).toBeDefined();
+            expect((handlers as any).setError).toBeDefined();
         });
     });
 
@@ -276,11 +276,11 @@ describe("useSiteMonitoring", () => {
             await siteMonitoringActions.stopSiteMonitoring(siteId);
 
             const handlerCall = mockWithErrorHandling.mock.calls[0];
-            const handlers = handlerCall[1];
+            const handlers = handlerCall?.[1];
 
-            expect(handlers.setLoading).toBeDefined();
-            expect(handlers.clearError).toBeDefined();
-            expect(handlers.setError).toBeDefined();
+            expect((handlers as any).setLoading).toBeDefined();
+            expect((handlers as any).clearError).toBeDefined();
+            expect((handlers as any).setError).toBeDefined();
         });
     });
 
@@ -323,11 +323,11 @@ describe("useSiteMonitoring", () => {
             await siteMonitoringActions.stopSiteMonitorMonitoring(siteId, monitorId);
 
             const handlerCall = mockWithErrorHandling.mock.calls[0];
-            const handlers = handlerCall[1];
+            const handlers = handlerCall?.[1];
 
-            expect(handlers.setLoading).toBeDefined();
-            expect(handlers.clearError).toBeDefined();
-            expect(handlers.setError).toBeDefined();
+            expect((handlers as any).setLoading).toBeDefined();
+            expect((handlers as any).clearError).toBeDefined();
+            expect((handlers as any).setError).toBeDefined();
         });
     });
 
@@ -342,17 +342,17 @@ describe("useSiteMonitoring", () => {
             await siteMonitoringActions.checkSiteNow("site", "monitor");
 
             const handlerCall = mockWithErrorHandling.mock.calls[0];
-            const handlers = handlerCall[1];
+            const handlers = handlerCall?.[1];
 
             // Test all error store methods
-            expect(handlers.setLoading).toBeDefined();
-            expect(handlers.clearError).toBeDefined();
-            expect(handlers.setError).toBeDefined();
+            expect((handlers as any).setLoading).toBeDefined();
+            expect((handlers as any).clearError).toBeDefined();
+            expect((handlers as any).setError).toBeDefined();
 
             // Test that they can be called
-            handlers.setLoading(true);
-            handlers.clearError();
-            handlers.setError(new Error("test"));
+            (handlers as any).setLoading(true);
+            (handlers as any).clearError();
+            (handlers as any).setError(new Error("test"));
         });
     });
 

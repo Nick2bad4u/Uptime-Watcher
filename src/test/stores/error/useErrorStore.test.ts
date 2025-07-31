@@ -92,7 +92,7 @@ describe("useErrorStore", () => {
                 result.current.setStoreError("sites", errorMessage);
             });
 
-            expect(result.current.storeErrors.sites).toBe(errorMessage);
+            expect(result.current.storeErrors["sites"]).toBe(errorMessage);
         });
 
         it("should get store-specific errors", () => {
@@ -121,15 +121,15 @@ describe("useErrorStore", () => {
                 result.current.setStoreError("monitors", "Monitors error");
             });
 
-            expect(result.current.storeErrors.sites).toBe("Sites error");
-            expect(result.current.storeErrors.monitors).toBe("Monitors error");
+            expect(result.current.storeErrors["sites"]).toBe("Sites error");
+            expect(result.current.storeErrors["monitors"]).toBe("Monitors error");
 
             act(() => {
                 result.current.clearStoreError("sites");
             });
 
-            expect(result.current.storeErrors.sites).toBeUndefined();
-            expect(result.current.storeErrors.monitors).toBe("Monitors error");
+            expect(result.current.storeErrors["sites"]).toBeUndefined();
+            expect(result.current.storeErrors["monitors"]).toBe("Monitors error");
         });
 
         it("should handle multiple store errors", () => {
@@ -141,9 +141,9 @@ describe("useErrorStore", () => {
                 result.current.setStoreError("settings", "Settings error");
             });
 
-            expect(result.current.storeErrors.sites).toBe("Sites error");
-            expect(result.current.storeErrors.monitors).toBe("Monitors error");
-            expect(result.current.storeErrors.settings).toBe("Settings error");
+            expect(result.current.storeErrors["sites"]).toBe("Sites error");
+            expect(result.current.storeErrors["monitors"]).toBe("Monitors error");
+            expect(result.current.storeErrors["settings"]).toBe("Settings error");
         });
 
         it("should handle store error keys with special characters", () => {
@@ -239,7 +239,7 @@ describe("useErrorStore", () => {
             });
 
             expect(result.current.lastError).toBe("Global error");
-            expect(result.current.storeErrors.sites).toBe("Sites error");
+            expect(result.current.storeErrors["sites"]).toBe("Sites error");
 
             act(() => {
                 result.current.clearAllErrors();
@@ -261,7 +261,7 @@ describe("useErrorStore", () => {
                 result.current.clearStoreError("sites");
             });
 
-            expect(result.current.storeErrors.sites).toBeUndefined();
+            expect(result.current.storeErrors["sites"]).toBeUndefined();
             expect(result.current.getOperationLoading("fetchSites")).toBe(true);
         });
 
@@ -278,8 +278,8 @@ describe("useErrorStore", () => {
             });
 
             expect(result.current.lastError).toBe("Global error");
-            expect(result.current.storeErrors.sites).toBe("Sites error");
-            expect(result.current.storeErrors.monitors).toBe("Monitors error");
+            expect(result.current.storeErrors["sites"]).toBe("Sites error");
+            expect(result.current.storeErrors["monitors"]).toBe("Monitors error");
             expect(result.current.getOperationLoading("fetchSites")).toBe(true);
             expect(result.current.getOperationLoading("saveMonitor")).toBe(true);
             expect(result.current.isLoading).toBe(true);
@@ -408,7 +408,7 @@ describe("useErrorStore", () => {
             });
 
             expect(result.current.lastError).toBe("Persistent error");
-            expect(result.current.storeErrors.sites).toBe("Sites error");
+            expect(result.current.storeErrors["sites"]).toBe("Sites error");
             expect(result.current.getOperationLoading("fetchSites")).toBe(false);
         });
 
@@ -457,8 +457,8 @@ describe("useErrorStore", () => {
             });
 
             expect(result.current.lastError).toBeUndefined();
-            expect(result.current.storeErrors.sites).toBeUndefined();
-            expect(result.current.storeErrors.monitors).toBe("Monitors error");
+            expect(result.current.storeErrors["sites"]).toBeUndefined();
+            expect(result.current.storeErrors["monitors"]).toBe("Monitors error");
             expect(result.current.getOperationLoading("fetchSites")).toBe(true);
             expect(result.current.isLoading).toBe(true);
         });

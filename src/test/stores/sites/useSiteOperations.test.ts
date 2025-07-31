@@ -66,7 +66,7 @@ vi.mock("../../../stores/sites/utils/monitorOperations", () => ({
     normalizeMonitor: vi.fn((monitor) => monitor),
     updateMonitorInSite: vi.fn((site, monitorId, updates) => ({
         ...site,
-        monitors: site.monitors.map((m) => (m.id === monitorId ? { ...m, ...updates } : m)),
+        monitors: site.monitors.map((m: any) => (m.id === monitorId ? { ...m, ...updates } : m)),
     })),
 }));
 
