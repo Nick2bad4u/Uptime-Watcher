@@ -211,7 +211,9 @@ export class StandardizedCache<T> {
         }
 
         this.updateSize();
-        return entries[Symbol.iterator]();
+        // Workaround for ESLint plugin bug: avoid direct [Symbol.iterator]() call
+        const iteratorFn = entries[Symbol.iterator];
+        return iteratorFn.call(entries);
     }
 
     /**
