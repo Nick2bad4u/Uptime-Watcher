@@ -29,13 +29,13 @@ vi.mock("../utils", () => ({
             if (errorHandling?.setLoading) {
                 errorHandling.setLoading(true);
             }
-            
+
             const result = await fn();
-            
+
             if (errorHandling?.setLoading) {
                 errorHandling.setLoading(false);
             }
-            
+
             return result;
         } catch (error) {
             if (errorHandling?.setError) {
@@ -44,7 +44,7 @@ vi.mock("../utils", () => ({
             if (errorHandling?.setLoading) {
                 errorHandling.setLoading(false);
             }
-            
+
             throw error;
         }
     }),
@@ -75,10 +75,10 @@ import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 describe("useSettingsStore - Additional Coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         localStorage.clear();
         sessionStorage.clear();
-        
+
         mockGetHistoryLimit.mockResolvedValue({ success: true, data: 1000 });
         mockResetSettings.mockResolvedValue({ success: true });
         mockUpdateHistoryLimit.mockResolvedValue({ success: true });
@@ -86,7 +86,7 @@ describe("useSettingsStore - Additional Coverage", () => {
 
     it("should test basic functionality", async () => {
         const { result } = renderHook(() => useSettingsStore());
-        
+
         expect(result.current.settings).toBeDefined();
         expect(result.current.settings.theme).toBe("system");
     });

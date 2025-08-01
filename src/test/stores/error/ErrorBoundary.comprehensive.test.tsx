@@ -237,9 +237,7 @@ describe("ErrorBoundary", () => {
 });
 
 describe("withErrorBoundary HOC", () => {
-    const TestComponent = ({ message }: { message: string }) => (
-        <div data-testid="wrapped-component">{message}</div>
-    );
+    const TestComponent = ({ message }: { message: string }) => <div data-testid="wrapped-component">{message}</div>;
 
     it("should wrap component with error boundary", () => {
         const WrappedComponent = withErrorBoundary(TestComponent);
@@ -271,7 +269,7 @@ describe("withErrorBoundary HOC", () => {
             <div data-testid="wrapped-component">{message}</div>
         );
         TestComponentWithName.displayName = "TestComponent";
-        
+
         const WrappedComponent = withErrorBoundary(TestComponentWithName);
 
         expect(WrappedComponent.displayName).toBe("withErrorBoundary(TestComponent)");

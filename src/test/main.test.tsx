@@ -93,12 +93,9 @@ describe("Main Entry Point", () => {
 
         // The import should succeed but log an error
         await import("../main");
-        
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-            "Failed to initialize application:", 
-            expect.any(Error)
-        );
-        
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith("Failed to initialize application:", expect.any(Error));
+
         consoleErrorSpy.mockRestore();
     });
 

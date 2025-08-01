@@ -211,7 +211,7 @@ describe("DefaultErrorFallback", () => {
             render(<DefaultErrorFallback onRetry={mockOnRetry} />);
 
             const tryAgainButton = screen.getByText("Try Again");
-            
+
             await user.click(tryAgainButton);
             await user.click(tryAgainButton);
             await user.click(tryAgainButton);

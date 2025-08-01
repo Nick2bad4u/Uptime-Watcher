@@ -7,13 +7,7 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom";
 
 // Import the hooks directly
-import {
-    useTheme,
-    useAvailabilityColors,
-    useStatusColors,
-    useThemeClasses,
-    useThemeValue,
-} from "../../theme/useTheme";
+import { useTheme, useAvailabilityColors, useStatusColors, useThemeClasses, useThemeValue } from "../../theme/useTheme";
 
 // Mock window.electronAPI
 beforeEach(() => {
@@ -119,9 +113,7 @@ describe("useTheme Hooks - Working Tests", () => {
         });
 
         it("should extract complex values using selector", () => {
-            const { result } = renderHook(() => 
-                useThemeValue((theme) => theme.colors?.primary)
-            );
+            const { result } = renderHook(() => useThemeValue((theme) => theme.colors?.primary));
 
             // The selector returns the colors.primary which could be undefined, so test appropriately
             expect(result.current).toBeDefined();
@@ -135,7 +127,7 @@ describe("useTheme Hooks - Working Tests", () => {
             // Check that the hook returns an object with expected properties
             expect(result.current).toBeDefined();
             expect(typeof result.current).toBe("object");
-            
+
             // Check for function properties that should exist
             expect(result.current).toHaveProperty("getColor");
             expect(result.current).toHaveProperty("getStatusColor");

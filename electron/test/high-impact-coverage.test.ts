@@ -196,7 +196,7 @@ describe("High-Impact Branch Coverage Tests", () => {
                 if (jsonSafetyModule.safeJsonParse) {
                     // Test with validator (required parameter)
                     const validator = (data: unknown): data is string => typeof data === "string";
-                    
+
                     // Test invalid JSON
                     const invalidResult = jsonSafetyModule.safeJsonParse("{invalid json", validator);
                     expect(invalidResult.success).toBe(false);
@@ -473,27 +473,49 @@ describe("High-Impact Branch Coverage Tests", () => {
                     expect(siteStatusModule.calculateSiteStatus({ monitors: [] })).toBe("unknown");
 
                     // Test with single monitor
-                    expect(siteStatusModule.calculateSiteStatus({ monitors: [{ status: "up" as any, monitoring: true }] })).toBe("up");
-                    expect(siteStatusModule.calculateSiteStatus({ monitors: [{ status: "down" as any, monitoring: true }] })).toBe("down");
-                    expect(siteStatusModule.calculateSiteStatus({ monitors: [{ status: "pending" as any, monitoring: true }] })).toBe("pending");
+                    expect(
+                        siteStatusModule.calculateSiteStatus({ monitors: [{ status: "up" as any, monitoring: true }] })
+                    ).toBe("up");
+                    expect(
+                        siteStatusModule.calculateSiteStatus({
+                            monitors: [{ status: "down" as any, monitoring: true }],
+                        })
+                    ).toBe("down");
+                    expect(
+                        siteStatusModule.calculateSiteStatus({
+                            monitors: [{ status: "pending" as any, monitoring: true }],
+                        })
+                    ).toBe("pending");
 
                     // Test with multiple monitors - same status
                     expect(
-                        siteStatusModule.calculateSiteStatus({ monitors: [{ status: "up" as any, monitoring: true }, { status: "up" as any, monitoring: true }] })
+                        siteStatusModule.calculateSiteStatus({
+                            monitors: [
+                                { status: "up" as any, monitoring: true },
+                                { status: "up" as any, monitoring: true },
+                            ],
+                        })
                     ).toBe("up");
 
                     // Test with multiple monitors - different status
                     expect(
-                        siteStatusModule.calculateSiteStatus({ monitors: [{ status: "up" as any, monitoring: true }, { status: "down" as any, monitoring: true }] })
+                        siteStatusModule.calculateSiteStatus({
+                            monitors: [
+                                { status: "up" as any, monitoring: true },
+                                { status: "down" as any, monitoring: true },
+                            ],
+                        })
                     ).toBe("mixed");
 
                     // Test with multiple different statuses
                     expect(
-                        siteStatusModule.calculateSiteStatus({ monitors: [
-                            { status: "up" as any, monitoring: true },
-                            { status: "down" as any, monitoring: true },
-                            { status: "pending" as any, monitoring: true },
-                        ] })
+                        siteStatusModule.calculateSiteStatus({
+                            monitors: [
+                                { status: "up" as any, monitoring: true },
+                                { status: "down" as any, monitoring: true },
+                                { status: "pending" as any, monitoring: true },
+                            ],
+                        })
                     ).toBe("mixed");
                 }
 

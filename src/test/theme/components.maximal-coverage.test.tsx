@@ -43,16 +43,12 @@ describe("Theme Components - Complete Coverage", () => {
             const surfaces = ["base", "elevated", "overlay"] as const;
 
             surfaces.forEach((surface) => {
-                const { unmount } = render(
-                    <ThemedBox surface={surface}>
-                        Surface {surface}
-                    </ThemedBox>
-                );
+                const { unmount } = render(<ThemedBox surface={surface}>Surface {surface}</ThemedBox>);
 
                 const box = screen.getByText(`Surface ${surface}`);
                 expect(box).toBeInTheDocument();
                 expect(box).toHaveClass("themed-box");
-                
+
                 unmount();
             });
         });
@@ -67,26 +63,18 @@ describe("Theme Components - Complete Coverage", () => {
             ] as const;
 
             paddings.forEach((padding) => {
-                const { unmount } = render(
-                    <ThemedBox padding={padding}>
-                        Padding {padding}
-                    </ThemedBox>
-                );
+                const { unmount } = render(<ThemedBox padding={padding}>Padding {padding}</ThemedBox>);
 
                 const box = screen.getByText(`Padding ${padding}`);
                 expect(box).toBeInTheDocument();
                 expect(box).toHaveClass("themed-box");
-                
+
                 unmount();
             });
         });
 
         it("should handle click events", () => {
-            render(
-                <ThemedBox onClick={mockOnClick}>
-                    Clickable box
-                </ThemedBox>
-            );
+            render(<ThemedBox onClick={mockOnClick}>Clickable box</ThemedBox>);
 
             const box = screen.getByText("Clickable box");
             fireEvent.click(box);
@@ -97,16 +85,12 @@ describe("Theme Components - Complete Coverage", () => {
             const elements = ["div", "section", "article", "aside"] as const;
 
             elements.forEach((as) => {
-                const { unmount } = render(
-                    <ThemedBox as={as}>
-                        Element {as}
-                    </ThemedBox>
-                );
+                const { unmount } = render(<ThemedBox as={as}>Element {as}</ThemedBox>);
 
                 const box = screen.getByText(`Element ${as}`);
                 expect(box).toBeInTheDocument();
                 expect(box.tagName.toLowerCase()).toBe(as);
-                
+
                 unmount();
             });
         });
@@ -115,15 +99,11 @@ describe("Theme Components - Complete Coverage", () => {
             const variants = ["primary", "secondary", "tertiary"] as const;
 
             variants.forEach((variant) => {
-                const { unmount } = render(
-                    <ThemedBox variant={variant}>
-                        Variant {variant}
-                    </ThemedBox>
-                );
+                const { unmount } = render(<ThemedBox variant={variant}>Variant {variant}</ThemedBox>);
 
                 const box = screen.getByText(`Variant ${variant}`);
                 expect(box).toBeInTheDocument();
-                
+
                 unmount();
             });
         });
@@ -138,15 +118,11 @@ describe("Theme Components - Complete Coverage", () => {
             ] as const;
 
             roundedOptions.forEach((rounded) => {
-                const { unmount } = render(
-                    <ThemedBox rounded={rounded}>
-                        Rounded {rounded}
-                    </ThemedBox>
-                );
+                const { unmount } = render(<ThemedBox rounded={rounded}>Rounded {rounded}</ThemedBox>);
 
                 const box = screen.getByText(`Rounded ${rounded}`);
                 expect(box).toBeInTheDocument();
-                
+
                 unmount();
             });
         });
@@ -161,25 +137,17 @@ describe("Theme Components - Complete Coverage", () => {
             ] as const;
 
             shadowOptions.forEach((shadow) => {
-                const { unmount } = render(
-                    <ThemedBox shadow={shadow}>
-                        Shadow {shadow}
-                    </ThemedBox>
-                );
+                const { unmount } = render(<ThemedBox shadow={shadow}>Shadow {shadow}</ThemedBox>);
 
                 const box = screen.getByText(`Shadow ${shadow}`);
                 expect(box).toBeInTheDocument();
-                
+
                 unmount();
             });
         });
 
         it("should handle border prop", () => {
-            render(
-                <ThemedBox border>
-                    Bordered box
-                </ThemedBox>
-            );
+            render(<ThemedBox border>Bordered box</ThemedBox>);
 
             const box = screen.getByText("Bordered box");
             expect(box).toBeInTheDocument();
@@ -233,7 +201,7 @@ describe("Theme Components - Complete Coverage", () => {
 
                 const button = screen.getByRole("button", { name: `${variant} Button` });
                 expect(button).toBeInTheDocument();
-                
+
                 unmount();
             });
         });
@@ -256,7 +224,7 @@ describe("Theme Components - Complete Coverage", () => {
 
                 const button = screen.getByRole("button", { name: `${size} Button` });
                 expect(button).toBeInTheDocument();
-                
+
                 unmount();
             });
         });
@@ -340,7 +308,7 @@ describe("Theme Components - Complete Coverage", () => {
 
                 const button = screen.getByRole("button", { name: `${type} Button` });
                 expect(button).toHaveAttribute("type", type);
-                
+
                 unmount();
             });
         });
@@ -358,7 +326,7 @@ describe("Theme Components - Complete Coverage", () => {
         it("should handle different input types", () => {
             const types = [
                 "text",
-                "email", 
+                "email",
                 "password",
                 "url",
             ] as const;
@@ -368,7 +336,7 @@ describe("Theme Components - Complete Coverage", () => {
 
                 const input = screen.getByPlaceholderText(`${type} input`);
                 expect(input).toHaveAttribute("type", type);
-                
+
                 unmount();
             });
         });
@@ -449,7 +417,7 @@ describe("Theme Components - Complete Coverage", () => {
 
                 const text = screen.getByText(`Size ${size}`);
                 expect(text).toBeInTheDocument();
-                
+
                 unmount();
             });
         });
@@ -462,7 +430,7 @@ describe("Theme Components - Complete Coverage", () => {
 
                 const text = screen.getByText(`Weight ${weight}`);
                 expect(text).toBeInTheDocument();
-                
+
                 unmount();
             });
         });
@@ -485,7 +453,7 @@ describe("Theme Components - Complete Coverage", () => {
 
                 const text = screen.getByText(`Variant ${variant}`);
                 expect(text).toBeInTheDocument();
-                
+
                 unmount();
             });
         });
@@ -498,7 +466,7 @@ describe("Theme Components - Complete Coverage", () => {
 
                 const text = screen.getByText(`Align ${align}`);
                 expect(text).toBeInTheDocument();
-                
+
                 unmount();
             });
         });
@@ -706,7 +674,7 @@ describe("Theme Components - Complete Coverage", () => {
 
                 const cardText = screen.getByText(`Variant ${variant}`);
                 expect(cardText).toBeInTheDocument();
-                
+
                 unmount();
             });
         });
@@ -753,7 +721,7 @@ describe("Theme Components - Complete Coverage", () => {
 
                 const badge = screen.getByText(`${variant} Badge`);
                 expect(badge).toBeInTheDocument();
-                
+
                 unmount();
             });
         });
@@ -766,7 +734,7 @@ describe("Theme Components - Complete Coverage", () => {
 
                 const badge = screen.getByText(`${size} Badge`);
                 expect(badge).toBeInTheDocument();
-                
+
                 unmount();
             });
         });
@@ -800,7 +768,7 @@ describe("Theme Components - Complete Coverage", () => {
 
                 const indicator = container.querySelector(".themed-status-indicator");
                 expect(indicator).toBeInTheDocument();
-                
+
                 unmount();
             });
         });
@@ -820,7 +788,7 @@ describe("Theme Components - Complete Coverage", () => {
 
                 const indicator = container.querySelector(".themed-status-indicator");
                 expect(indicator).toBeInTheDocument();
-                
+
                 unmount();
             });
         });
@@ -849,7 +817,7 @@ describe("Theme Components - Complete Coverage", () => {
 
                 const bar = container.querySelector(".themed-mini-chart-bar");
                 expect(bar).toBeInTheDocument();
-                
+
                 unmount();
             });
         });

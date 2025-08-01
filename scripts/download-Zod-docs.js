@@ -34,7 +34,15 @@ const BASE_URL = "https://zod.dev";
 // You can download Github Wiki Pages by appending ".md" to the wiki page URL.
 // @example: If your wiki page URL is "https://github.com/TryGhost/node-sqlite3/wiki/API",
 // use "API.md" as the page name.
-const PAGES = ["basics", "api", "error-customization", "error-formatting", "metadata", "json-schema", "ecosystem"];
+const PAGES = [
+    "basics",
+    "api",
+    "error-customization",
+    "error-formatting",
+    "metadata",
+    "json-schema",
+    "ecosystem",
+];
 
 const INPUT_FORMAT = "markdown"; // Change to your input format if needed
 const OUTPUT_FORMAT = "gfm"; // Change to your desired output format
@@ -60,7 +68,7 @@ const OUTPUT_EXT = "md";
  */
 
 const REMOVE_FROM_MARKER = [
-    "<div class=\"flex-1\" role=\"none\">"
+    '<div class="flex-1" role="none">',
 ];
 
 // const REMOVE_LINE_MARKERS = [
@@ -68,7 +76,7 @@ const REMOVE_FROM_MARKER = [
 // ];
 
 const REMOVE_ABOVE_MARKER = [
-    "<h1 class=\"text-3xl font-semibold\">"
+    '<h1 class="text-3xl font-semibold">',
 ];
 
 /* --------- END CONFIGURATION (edit above only!) -------- */
