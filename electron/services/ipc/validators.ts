@@ -15,6 +15,69 @@ import type { IpcParameterValidator } from "./types";
 import { IpcValidators } from "./utils";
 
 /**
+ * Helper function to create validators for handlers expecting no parameters.
+ * 
+ * @returns A validator function that ensures no parameters are passed
+ */
+function createNoParamsValidator(): IpcParameterValidator {
+    return (params: unknown[]): null | string[] => {
+        return params.length === 0 ? null : ["No parameters expected"];
+    };
+}
+
+/**
+ * Helper function to create validators for handlers expecting a single string parameter.
+ * 
+ * @param paramName - Name of the parameter for error messages
+ * @returns A validator function that validates a single string parameter
+ */
+function createSingleStringValidator(paramName: string): IpcParameterValidator {
+    return (params: unknown[]): null | string[] => {
+        const errors: string[] = [];
+
+        if (params.length !== 1) {
+            errors.push("Expected exactly 1 parameter");
+        }
+
+        const error = IpcValidators.requiredString(params[0], paramName);
+        if (error) {
+            errors.push(error);
+        }
+
+        return errors.length > 0 ? errors : null;
+    };
+}
+
+/**
+ * Helper function to create validators for handlers expecting two string parameters.
+ * 
+ * @param firstParamName - Name of the first parameter for error messages
+ * @param secondParamName - Name of the second parameter for error messages
+ * @returns A validator function that validates two string parameters
+ */
+function createTwoStringValidator(firstParamName: string, secondParamName: string): IpcParameterValidator {
+    return (params: unknown[]): null | string[] => {
+        const errors: string[] = [];
+
+        if (params.length !== 2) {
+            errors.push("Expected exactly 2 parameters");
+        }
+
+        const firstError = IpcValidators.requiredString(params[0], firstParamName);
+        if (firstError) {
+            errors.push(firstError);
+        }
+
+        const secondError = IpcValidators.requiredString(params[1], secondParamName);
+        if (secondError) {
+            errors.push(secondError);
+        }
+
+        return errors.length > 0 ? errors : null;
+    };
+}
+
+/**
  * Parameter validators for site management IPC handlers.
  *
  * @remarks
@@ -53,66 +116,24 @@ export const SiteHandlerValidators = {
      *
      * @remarks
      * Expects no parameters.
-     *
-     * @param params - The parameters passed to the handler.
-     * @returns `null` if valid, or an array of error messages.
      */
-    getSites: ((params: unknown[]): null | string[] => {
-        return params.length === 0 ? null : ["No parameters expected"];
-    }) satisfies IpcParameterValidator,
+    getSites: createNoParamsValidator(),
 
     /**
      * Validates parameters for the "remove-monitor" IPC handler.
      *
      * @remarks
      * Expects two parameters: site identifier and monitor ID (both strings).
-     *
-     * @param params - The parameters passed to the handler.
-     * @returns `null` if valid, or an array of error messages.
      */
-    removeMonitor: ((params: unknown[]): null | string[] => {
-        const errors: string[] = [];
-
-        if (params.length !== 2) {
-            errors.push("Expected exactly 2 parameters");
-        }
-
-        const siteError = IpcValidators.requiredString(params[0], "siteIdentifier");
-        if (siteError) {
-            errors.push(siteError);
-        }
-
-        const monitorError = IpcValidators.requiredString(params[1], "monitorId");
-        if (monitorError) {
-            errors.push(monitorError);
-        }
-
-        return errors.length > 0 ? errors : null;
-    }) satisfies IpcParameterValidator,
+    removeMonitor: createTwoStringValidator("siteIdentifier", "monitorId"),
 
     /**
      * Validates parameters for the "remove-site" IPC handler.
      *
      * @remarks
      * Expects a single parameter: the site identifier (string).
-     *
-     * @param params - The parameters passed to the handler.
-     * @returns `null` if valid, or an array of error messages.
      */
-    removeSite: ((params: unknown[]): null | string[] => {
-        const errors: string[] = [];
-
-        if (params.length !== 1) {
-            errors.push("Expected exactly 1 parameter");
-        }
-
-        const identifierError = IpcValidators.requiredString(params[0], "identifier");
-        if (identifierError) {
-            errors.push(identifierError);
-        }
-
-        return errors.length > 0 ? errors : null;
-    }) satisfies IpcParameterValidator,
+    removeSite: createSingleStringValidator("identifier"),
 
     /**
      * Validates parameters for the "update-site" IPC handler.
@@ -231,13 +252,8 @@ export const MonitoringHandlerValidators = {
      *
      * @remarks
      * Expects no parameters.
-     *
-     * @param params - The parameters passed to the handler.
-     * @returns `null` if valid, or an array of error messages.
      */
-    stopMonitoring: ((params: unknown[]): null | string[] => {
-        return params.length === 0 ? null : ["No parameters expected"];
-    }) satisfies IpcParameterValidator,
+    stopMonitoring: createNoParamsValidator(),
 
     /**
      * Validates parameters for the "stop-monitoring-for-site" IPC handler.

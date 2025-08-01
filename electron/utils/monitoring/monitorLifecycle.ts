@@ -1,6 +1,15 @@
 /**
- * Monitor lifecycle management utilities.
+ * Traditional monitor lifecycle management utilities.
+ * 
+ * @remarks
+ * **Legacy Fallback System**: This module provides traditional monitor start/stop operations
+ * that serve as fallbacks when the enhanced monitoring system is unavailable. The enhanced 
+ * system with operation correlation and race condition prevention is preferred for all new 
+ * monitor lifecycle operations.
+ * 
  * Consolidates monitor starting and stopping operations for better organization.
+ * 
+ * @see {@link EnhancedMonitoringServices} for the preferred enhanced implementation
  */
 
 import type { Logger } from "../interfaces";
@@ -46,6 +55,8 @@ export interface MonitoringLifecycleConfig {
     monitorScheduler: MonitorScheduler;
     /** Cache containing site data with associated monitors */
     sites: StandardizedCache<Site>;
+    /** Service for site operations and cache management */
+    siteService?: { findByIdentifierWithDetails: (identifier: string) => Promise<Site | undefined> };
 }
 
 /**
@@ -341,6 +352,21 @@ async function startSpecificMonitor(
             config.eventEmitter,
             { identifier, monitorId }
         );
+
+        // Refresh the site cache to ensure the scheduler gets updated monitor state
+        if (config.siteService) {
+            try {
+                const freshSiteData = await config.siteService.findByIdentifierWithDetails(identifier);
+                if (freshSiteData) {
+                    config.sites.set(identifier, freshSiteData);
+                    config.logger.debug(`Refreshed site cache for ${identifier} after monitor start`);
+                }
+            } catch (error) {
+                config.logger.warn(`Failed to refresh site cache for ${identifier}`, error);
+                // Continue anyway - the scheduler might still work with stale data
+            }
+        }
+
         const started = config.monitorScheduler.startMonitor(identifier, monitor);
         if (started) {
             config.logger.debug(
@@ -395,6 +421,21 @@ async function stopSpecificMonitor(
             config.eventEmitter,
             { identifier, monitorId }
         );
+
+        // Refresh the site cache to ensure updated monitor state is reflected
+        if (config.siteService) {
+            try {
+                const freshSiteData = await config.siteService.findByIdentifierWithDetails(identifier);
+                if (freshSiteData) {
+                    config.sites.set(identifier, freshSiteData);
+                    config.logger.debug(`Refreshed site cache for ${identifier} after monitor stop`);
+                }
+            } catch (error) {
+                config.logger.warn(`Failed to refresh site cache for ${identifier}`, error);
+                // Continue anyway - the stop operation should still work
+            }
+        }
+
         const stopped = config.monitorScheduler.stopMonitor(identifier, monitorId);
         if (stopped) {
             config.logger.debug(

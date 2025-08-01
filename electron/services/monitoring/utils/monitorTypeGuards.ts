@@ -8,6 +8,7 @@
  */
 
 import { Site } from "../../../types";
+import { isNonEmptyString, isValidFQDN, isValidUrl } from "../../../../shared/validation/validatorUtils";
 
 /**
  * Safely extracts retry attempts from monitor configuration.
@@ -32,13 +33,17 @@ export function getMonitorTimeout(monitor: Site["monitors"][0], defaultTimeout: 
 }
 
 /**
- * Type guard to safely check if a monitor has a valid host.
+ * Type guard to safely check if a monitor has a valid host using validator.
  *
  * @param monitor - The monitor configuration to check
  * @returns True if the monitor has a valid host, false otherwise
  */
 export function hasValidHost(monitor: Site["monitors"][0]): monitor is Site["monitors"][0] & { host: string } {
-    return typeof monitor.host === "string" && monitor.host.trim().length > 0;
+    // Allow hostnames that are either FQDNs or could be valid IPs/hostnames
+    return isNonEmptyString(monitor.host) && (
+        isValidFQDN(monitor.host, { require_tld: false }) || 
+        /^[\w.-]+$/.test(monitor.host)
+    );
 }
 
 /**
@@ -74,11 +79,11 @@ export function hasValidTimeout(monitor: Site["monitors"][0]): monitor is Site["
 }
 
 /**
- * Type guard to safely check if a monitor has a valid URL.
+ * Type guard to safely check if a monitor has a valid URL using validator.
  *
  * @param monitor - The monitor configuration to check
  * @returns True if the monitor has a valid URL, false otherwise
  */
 export function hasValidUrl(monitor: Site["monitors"][0]): monitor is Site["monitors"][0] & { url: string } {
-    return typeof monitor.url === "string" && monitor.url.trim().length > 0;
+    return isValidUrl(monitor.url);
 }

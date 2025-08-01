@@ -16,11 +16,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { DEFAULT_CHECK_INTERVAL, RETRY_CONSTRAINTS } from "../../constants";
+import { ChartTimeRange, DEFAULT_CHECK_INTERVAL, RETRY_CONSTRAINTS } from "../../constants";
 import logger from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
-import { type ChartTimeRange } from "../../stores/types";
+import { safeInteger } from "../../../shared/validation/validatorUtils";
 import { useUIStore } from "../../stores/ui/useUiStore";
 import { Monitor, Site } from "../../types";
 import { withUtilityErrorHandling } from "../../utils/errorHandling";
@@ -405,8 +405,9 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
     // Interval change handlers
     const handleIntervalChange = useCallback(
         (e: React.ChangeEvent<HTMLSelectElement>) => {
-            setUserEditedCheckInterval(Number(e.target.value));
-            setIntervalChanged(Number(e.target.value) !== selectedMonitor?.checkInterval);
+            const newInterval = safeInteger(e.target.value, DEFAULT_CHECK_INTERVAL);
+            setUserEditedCheckInterval(newInterval);
+            setIntervalChanged(newInterval !== selectedMonitor?.checkInterval);
         },
         [selectedMonitor?.checkInterval]
     );
@@ -447,7 +448,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
     const handleTimeoutChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             // Work directly with seconds in the UI
-            const timeoutInSeconds = clampTimeoutSeconds(Number(e.target.value));
+            const timeoutInSeconds = clampTimeoutSeconds(safeInteger(e.target.value, 5));
             setUserEditedTimeout(timeoutInSeconds);
             // Compare against the monitor's timeout converted to seconds
             const currentTimeoutInSeconds = getTimeoutSeconds(selectedMonitor?.timeout);
@@ -492,7 +493,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
     // Retry attempts change handlers
     const handleRetryAttemptsChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
-            const retryAttempts = Number(e.target.value);
+            const retryAttempts = safeInteger(e.target.value, 3);
             setUserEditedRetryAttempts(retryAttempts);
             const currentRetryAttempts = selectedMonitor?.retryAttempts ?? 0;
             setRetryAttemptsChanged(retryAttempts !== currentRetryAttempts);

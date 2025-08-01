@@ -1,7 +1,13 @@
 /**
- * Monitor status checking utilities for individual monitor health verification.
+ * Traditional monitor status checking utilities for individual monitor health verification.
  *
  * @remarks
+ * @deprecated
+ * **Legacy Fallback System**: This is the traditional monitoring implementation that serves
+ * as a fallback when the enhanced monitoring system with operation correlation is unavailable.
+ * The enhanced system (`EnhancedMonitorChecker`) is preferred for all new operations as it
+ * provides race condition prevention and operation correlation.
+ * 
  * Provides comprehensive monitor checking capabilities with automatic status updates,
  * history tracking, and event emission. Extracted from UptimeMonitor for improved
  * modularity and maintainability with full transaction safety and error handling.
@@ -13,6 +19,7 @@
  *
  * @see {@link MonitorCheckConfig} for configuration options
  * @see {@link StatusUpdate} for result types
+ * @see {@link EnhancedMonitorChecker} for the preferred enhanced implementation
  *
  * @example
  * ```typescript

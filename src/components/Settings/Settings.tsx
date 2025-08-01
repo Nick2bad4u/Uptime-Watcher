@@ -12,6 +12,7 @@ import type { AppSettings } from "../../stores/types";
 
 import { DEFAULT_HISTORY_LIMIT, HISTORY_LIMIT_OPTIONS, UI_DELAYS } from "../../constants";
 import logger from "../../services/logger";
+import { safeInteger } from "@shared/validation/validatorUtils";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSettingsStore } from "../../stores/settings/useSettingsStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
@@ -108,11 +109,8 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
 
     const handleHistoryLimitChange = async (limit: number) => {
         try {
-            // Get the actual primitive value from settings
-            const oldLimit =
-                typeof settings.historyLimit === "number"
-                    ? settings.historyLimit
-                    : Number(settings.historyLimit) || DEFAULT_HISTORY_LIMIT;
+            // Get the actual primitive value from settings using safe conversion
+            const oldLimit = safeInteger(settings.historyLimit, DEFAULT_HISTORY_LIMIT, 1, 50_000);
 
             await updateHistoryLimitValue(limit);
 

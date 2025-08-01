@@ -22,6 +22,7 @@
  */
 
 import { Site } from "../../types";
+import { isNonEmptyString } from "../../../shared/validation/validatorUtils";
 import { ValidationResult } from "./interfaces";
 import { MonitorValidator } from "./MonitorValidator";
 
@@ -82,7 +83,7 @@ export class SiteValidator {
      */
     public shouldIncludeInExport(site: Site): boolean {
         // Business rule: Include all sites with valid identifiers
-        return Boolean(site.identifier && site.identifier.trim().length > 0);
+        return isNonEmptyString(site.identifier);
     }
 
     /**
@@ -140,13 +141,9 @@ export class SiteValidator {
     private validateSiteIdentifier(site: Site): string[] {
         const errors: string[] = [];
 
-        // First check for null/undefined values
-        if (!site.identifier && site.identifier !== "") {
+        // Use centralized validation for consistent behavior
+        if (!isNonEmptyString(site.identifier)) {
             errors.push("Site identifier must be a non-empty string");
-        } else if (typeof site.identifier === "string" && site.identifier.trim().length === 0) {
-            errors.push("Site identifier cannot be empty or whitespace only");
-        } else if (typeof site.identifier !== "string") {
-            errors.push("Site identifier must be a string value");
         }
 
         return errors;

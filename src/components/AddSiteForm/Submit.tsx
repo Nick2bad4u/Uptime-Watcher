@@ -224,6 +224,7 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
     const { checkInterval, generateUuid, host, monitorType, port, url } = properties;
 
     const monitor: Monitor = {
+        activeOperations: [],
         checkInterval,
         history: [] as Monitor["history"],
         id: generateUuid(),

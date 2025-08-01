@@ -5,6 +5,7 @@
 
 import { ipcMain } from "electron";
 
+import { isNonEmptyString } from "../../../shared/validation/validatorUtils";
 import type { IpcParameterValidator, IpcResponse, IpcValidationResponse } from "./types";
 
 import { isDev } from "../../electronUtils";
@@ -17,14 +18,14 @@ import { logger } from "../../utils/logger";
  */
 export const IpcValidators = {
     /**
-     * Validates an optional string parameter.
+     * Validates an optional string parameter using validator.
      *
      * @param value - Value to validate
      * @param paramName - Parameter name for error messages
      * @returns Error message or null if valid
      */
     optionalString: (value: unknown, paramName: string): null | string => {
-        if (value !== undefined && (typeof value !== "string" || value.trim().length === 0)) {
+        if (value !== undefined && !isNonEmptyString(value)) {
             return `${paramName} must be a non-empty string when provided`;
         }
         return null;
@@ -59,14 +60,14 @@ export const IpcValidators = {
     },
 
     /**
-     * Validates a required string parameter.
+     * Validates a required string parameter using validator.
      *
      * @param value - Value to validate
      * @param paramName - Parameter name for error messages
      * @returns Error message or null if valid
      */
     requiredString: (value: unknown, paramName: string): null | string => {
-        if (typeof value !== "string" || value.trim().length === 0) {
+        if (!isNonEmptyString(value)) {
             return `${paramName} must be a non-empty string`;
         }
         return null;

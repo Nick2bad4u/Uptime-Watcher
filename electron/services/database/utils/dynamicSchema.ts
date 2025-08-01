@@ -10,6 +10,7 @@
 import { safeGetRowProperty } from "../../../../shared/types/database";
 import { safeStringify } from "../../../../shared/utils/stringConversion";
 import { getAllMonitorTypeConfigs } from "../../monitoring/MonitorTypeRegistry";
+import { isValidIdentifierArray } from "../../../../shared/validation/validatorUtils";
 
 /**
  * Database field definition for dynamic monitor schema.
@@ -135,6 +136,7 @@ export function generateMonitorTableSchema(): string {
         next_check INTEGER,
         response_time INTEGER,
         last_error TEXT,
+        active_operations TEXT DEFAULT '[]',
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL
     `;
@@ -174,6 +176,7 @@ export function generateSqlParameters(): { columns: string[]; placeholders: stri
         "next_check",
         "response_time",
         "last_error",
+        "active_operations",
         "created_at",
         "updated_at",
     ];
@@ -230,6 +233,14 @@ export function mapMonitorToRow(monitor: Record<string, unknown>): Record<string
  */
 export function mapRowToMonitor(row: Record<string, unknown>): Record<string, unknown> {
     const monitor: Record<string, unknown> = {
+        activeOperations: (() => {
+            try {
+                const parsed: unknown = row["active_operations"] ? JSON.parse(String(row["active_operations"])) : [];
+                return isValidIdentifierArray(parsed) ? parsed : [];
+            } catch {
+                return [];
+            }
+        })(),
         checkInterval: Number(row["check_interval"]),
         createdAt: Number(row["created_at"]),
         enabled: row["enabled"] === 1, // Explicit SQLite boolean mapping
@@ -419,6 +430,9 @@ function mapDynamicFields(monitor: Record<string, unknown>, row: Record<string, 
  * @internal
  */
 function mapStandardFields(monitor: Record<string, unknown>, row: Record<string, unknown>): void {
+    if (monitor["activeOperations"] !== undefined) {
+        row["active_operations"] = JSON.stringify(monitor["activeOperations"] ?? []);
+    }
     if (monitor["checkInterval"] !== undefined) {
         row["check_interval"] = safeGetRowProperty(monitor, "checkInterval", 300_000);
     }

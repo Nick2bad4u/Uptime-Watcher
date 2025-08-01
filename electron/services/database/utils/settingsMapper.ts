@@ -5,6 +5,7 @@
 
 import { safeStringify } from "../../../../shared/utils/stringConversion";
 import { logger } from "../../../utils/logger";
+import { isNonEmptyString } from "../../../../shared/validation/validatorUtils";
 
 /**
  * Setting row type for database operations.
@@ -23,7 +24,7 @@ export interface SettingRow {
  * @public
  */
 export function isValidSettingRow(row: Record<string, unknown>): boolean {
-    return row["key"] !== undefined && row["key"] !== null && typeof row["key"] === "string" && row["key"].length > 0;
+    return isNonEmptyString(row["key"]);
 }
 
 /**
@@ -59,9 +60,9 @@ export function rowsToSettings(rows: Record<string, unknown>[]): SettingRow[] {
  */
 export function rowToSetting(row: Record<string, unknown>): SettingRow {
     try {
-        // Handle key (required field) with precise type checking
+        // Handle key (required field) with validator-based checking
         const key = row["key"];
-        if (key == null || typeof key !== "string" || key.length === 0) {
+        if (!isNonEmptyString(key)) {
             throw new Error(`[SettingsMapper] Invalid setting key: ${key}`);
         }
 
@@ -162,5 +163,5 @@ export function settingsToRecord(settings: SettingRow[]): Record<string, string>
  * @internal
  */
 function isValidSettingObject(setting: SettingRow): boolean {
-    return typeof setting.key === "string" && setting.key.length > 0;
+    return isNonEmptyString(setting.key);
 }

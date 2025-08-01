@@ -28,6 +28,7 @@ import { MonitorRepository } from "./database/MonitorRepository";
 import { SettingsRepository } from "./database/SettingsRepository";
 import { SiteRepository } from "./database/SiteRepository";
 import { IpcService } from "./ipc/IpcService";
+import { EnhancedMonitoringServiceFactory } from "./monitoring/EnhancedMonitoringServiceFactory";
 import { NotificationService } from "./notifications/NotificationService";
 import { SiteService } from "./site/SiteService";
 import { AutoUpdaterService } from "./updater/AutoUpdaterService";
@@ -393,29 +394,46 @@ export class ServiceContainer {
     public getMonitorManager(): MonitorManager {
         if (!this.monitorManager) {
             const monitorEventBus = new TypedEventBus<UptimeEvents>("MonitorManagerEventBus");
-            this.monitorManager = new MonitorManager({
-                databaseService: this.getDatabaseService(),
+
+            // Get sites cache function
+            const getSitesCache = () => {
+                if (!this.siteManager) {
+                    throw new Error(
+                        "Service dependency error: SiteManager not fully initialized. " +
+                            "This usually indicates a circular dependency or incorrect initialization order. " +
+                            "Ensure ServiceContainer.initialize() completes before accessing SiteManager functionality."
+                    );
+                }
+                return this.siteManager.getSitesCache();
+            };
+
+            // Create enhanced monitoring services
+            const enhancedServices = EnhancedMonitoringServiceFactory.create({
                 eventEmitter: monitorEventBus,
-                getHistoryLimit: () => {
-                    return this.getDatabaseManager().getHistoryLimit();
-                },
-                getSitesCache: () => {
-                    if (!this.siteManager) {
-                        throw new Error(
-                            "Service dependency error: SiteManager not fully initialized. " +
-                                "This usually indicates a circular dependency or incorrect initialization order. " +
-                                "Ensure ServiceContainer.initialize() completes before accessing SiteManager functionality."
-                        );
-                    }
-                    return this.siteManager.getSitesCache();
-                },
-                repositories: {
-                    history: this.getHistoryRepository(),
-                    monitor: this.getMonitorRepository(),
-                    site: this.getSiteRepository(),
-                },
-                siteService: this.getSiteService(),
+                getHistoryLimit: () => this.getDatabaseManager().getHistoryLimit(),
+                historyRepository: this.getHistoryRepository(),
+                monitorRepository: this.getMonitorRepository(),
+                siteRepository: this.getSiteRepository(),
+                sites: getSitesCache(),
             });
+
+            this.monitorManager = new MonitorManager(
+                {
+                    databaseService: this.getDatabaseService(),
+                    eventEmitter: monitorEventBus,
+                    getHistoryLimit: () => {
+                        return this.getDatabaseManager().getHistoryLimit();
+                    },
+                    getSitesCache,
+                    repositories: {
+                        history: this.getHistoryRepository(),
+                        monitor: this.getMonitorRepository(),
+                        site: this.getSiteRepository(),
+                    },
+                    siteService: this.getSiteService(),
+                },
+                enhancedServices
+            );
             this.setupEventForwarding(monitorEventBus, "MonitorManager");
             if (this.config.enableDebugLogging) {
                 logger.debug("[ServiceContainer] Created MonitorManager with dependencies");

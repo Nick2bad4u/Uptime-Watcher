@@ -12,6 +12,7 @@ import {
     type MonitorType,
     type Site,
 } from "@shared/types";
+import { isNonEmptyString, isValidUrl } from "@shared/validation/validatorUtils";
 
 // Re-export validateMonitor from shared types for convenience
 export { validateMonitor } from "@shared/types";
@@ -37,6 +38,7 @@ export function addMonitorToSite(site: Site, monitor: Monitor): Site {
  */
 export function createDefaultMonitor(overrides: Partial<Monitor> = {}): Monitor {
     return {
+        activeOperations: [],
         checkInterval: 300_000, // 5 minutes default
         history: [],
         id: overrides.id ?? crypto.randomUUID(),
@@ -70,6 +72,7 @@ export function findMonitorInSite(site: Site, monitorId: string): Monitor | unde
  */
 export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
     return {
+        activeOperations: Array.isArray(monitor.activeOperations) ? monitor.activeOperations : [],
         checkInterval: validatePositiveNumber(monitor.checkInterval, 300_000),
         history: Array.isArray(monitor.history) ? monitor.history : [],
         id: monitor.id ?? crypto.randomUUID(),
@@ -80,8 +83,8 @@ export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
         timeout: validatePositiveNumber(monitor.timeout, 5000),
         type: validateMonitorType(monitor.type),
         // Only add optional fields if they are explicitly provided and valid
-        ...(typeof monitor.url === "string" && monitor.url.length > 0 && { url: monitor.url }),
-        ...(typeof monitor.host === "string" && monitor.host.length > 0 && { host: monitor.host }),
+        ...(isValidUrl(monitor.url) && { url: monitor.url }),
+        ...(isNonEmptyString(monitor.host) && { host: monitor.host }),
         ...(typeof monitor.port === "number" && monitor.port > 0 && { port: monitor.port }),
         ...(monitor.lastChecked instanceof Date && { lastChecked: monitor.lastChecked }),
     };
