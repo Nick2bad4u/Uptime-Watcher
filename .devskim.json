@@ -15,26 +15,26 @@
         "BestPractice",
         "ManualReview"
     ],
-    "Confidences": ["High", "Medium"],
+    "Confidences": ["High", "Medium", "Low", "Informational"],
     "Globs": [
+        ".devskim.json",
+        ".vscode/settings.json",
         "**/.git/**",
-        "**/megalinter-reports/**",
-        "**/libs/**",
-        "**/node_modules/**",
+        "**/**.xml",
+        "**/build/**",
+        "**/coverage/**",
         "**/dist-electron/**",
         "**/dist/**",
-        "**/coverage/**",
-        "**/release/**",
-        "**/build/**",
+        "**/docs/TSDoc/**",
+        "**/libs/**",
+        "**/megalinter-reports/**",
+        "**/node_modules/**",
         "**/out/**",
+        "**/release/**",
+        "**/test-results/**",
         "**/test/**",
         "**/tests/**",
-        "**/test-results/**",
-        "coverage-results.json",
-        ".vscode/settings.json",
-        "**/docs/TSDoc/**",
-        ".devskim.json",
-        "**/**.xml"
+        "coverage-results.json"
     ],
     "Suppressions": [
         {
@@ -71,6 +71,18 @@
             "FilePattern": "electron/services/window/WindowService.ts",
             "LineNumber": 73,
             "RuleId": "DS162092"
+        },
+        {
+            "Justification": "Manual review: setTimeout is used to open DevTools in a controlled context, not with untrusted data.",
+            "FilePattern": "electron/services/window/WindowService.ts",
+            "LineNumber": 287,
+            "RuleId": "DS172411"
+        },
+        {
+            "Justification": "Manual review: setTimeout is used to abort a fetch after a fixed timeout, not with untrusted data.",
+            "FilePattern": "electron/services/window/WindowService.ts",
+            "LineNumber": 368,
+            "RuleId": "DS172411"
         },
         {
             "Justification": "Manual review: setTimeout is used to open DevTools in a controlled context, not with untrusted data.",

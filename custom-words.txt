@@ -36,9 +36,16 @@ constexpr
 copilotmd
 Copilotmd
 Cpath
+cpe
+CPE
+cpes
+cpu
 creatordate
+crt
 cstat
 Csvg
+cve
+cyclonedx
 defaultvalue
 Defaultvalue
 DEMB
@@ -52,6 +59,7 @@ edoi
 Eisenberg
 electronjs
 endfor
+epss
 eui
 EUI
 eventproperty
@@ -98,7 +106,10 @@ jcb
 jekyll
 jemoji
 jsonjson
+jvm
+JVM
 Kemboi
+kev
 keyline
 kics
 largeable
@@ -177,6 +188,7 @@ Sarhan
 sarif
 Sarif
 SARIF
+sbom
 scm
 Selecter
 Simplr
@@ -196,6 +208,7 @@ Subcomponents
 subdirs
 superlinter
 swiftshader
+SYFT
 tcp
 testid
 testonly
@@ -210,6 +223,8 @@ uage
 Unawaited
 uncategorized
 unhover
+unindexed
+UNINDEXED
 unmaximize
 unmemoized
 Unvalidated

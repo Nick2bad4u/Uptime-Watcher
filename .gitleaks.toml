@@ -117,21 +117,11 @@ disabledRules = ["generic-api-key"]
 # # Global allowlists have a higher order of precedence than rule-specific allowlists.
 # # If a commit listed in the `commits` field below is encountered then that commit will be skipped and no
 # # secrets will be detected for said commit. The same logic applies for regexes and paths.
-# [[allowlists]]
-# description = "global allow list"
-# commits = [ "commit-A", "commit-B", "commit-C"]
-# paths = [
-#   '''gitleaks\.toml''',
-#   '''(.*?)(jpg|gif|doc)'''
-# ]
-# # note: (global) regexTarget defaults to check the _Secret_ in the finding.
-# # Acceptable values for regexTarget are "match" and "line"
-# regexTarget = "match"
-# regexes = [
-#   '''219-09-9999''',
-#   '''078-05-1120''',
-#   '''(9[0-9]{2}|666)-\d{2}-\d{4}''',
-# ]
+[[allowlists]]
+description = "Ignore false positive in Chart.js usage.md (cubeToken)"
+paths = ['''docs/Packages/Chart\.js/getting-started/usage\.md''']
+regexTarget = "line"
+regexes = ['''cubeToken''']
 # # note: stopwords targets the extracted secret, not the entire regex match
 # # like 'regexes' does. (stopwords introduced in 8.8.0)
 # stopwords = [

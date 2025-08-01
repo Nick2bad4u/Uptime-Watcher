@@ -149,7 +149,6 @@ Use the feature request template and include:
 ### Updating Documentation
 
 - Update relevant docs when changing functionality
-- Follow the [Documentation Contribution Guide](docs/guides/Documentation-Contribution.md)
 - Ensure markdown passes linting (use markdownlint)
 
 ## 🔧 Development Tasks

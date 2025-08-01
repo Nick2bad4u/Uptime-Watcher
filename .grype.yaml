@@ -89,11 +89,11 @@ ignore: []
 #   - '/etc/**'
 #   - './out/**/*.json'
 # same as --exclude (env: GRYPE_EXCLUDE)
-exclude: []
+exclude: ["/docs/**", "/tests/**", "/node_modules/**", "/dist/**"]
 
 external-sources:
     # enable Grype searching network source for additional information (env: GRYPE_EXTERNAL_SOURCES_ENABLE)
-    enable: false
+    enable: true
 
     maven:
         # search for Maven artifacts by SHA1 (env: GRYPE_EXTERNAL_SOURCES_MAVEN_SEARCH_MAVEN_UPSTREAM)

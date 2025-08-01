@@ -1,4 +1,4 @@
-# FileAnalyzer.ps1
+﻿# FileAnalyzer.ps1
 param(
     [switch]$IncludeTests,
     [ValidateSet('Table','Json','Csv','Markdown')]

@@ -54,7 +54,7 @@ footer = """
 ## Contributors
 Thanks to all the [contributors](https://github.com/Nick2bad4u/Uptime-Watcher/graphs/contributors) for their hard work!
 ## License
-This project is licensed under the [MIT License](https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/LICENSE.md)
+This project is licensed under the [UnLicense](https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/LICENSE)
 *This changelog was automatically generated with [git-cliff](https://github.com/orhun/git-cliff).*
 """
 # Remove leading and trailing whitespace from the changelog content
@@ -64,14 +64,14 @@ render_always = true
 protect_breaking_commits = false
 postprocessors = [
   # { pattern = 'Uptime-Watcher', replace = "[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)" }, # replace repository URL
-  { pattern = 'merge branch', replace = "[chore] Merge Branch" },                                          # replace merge branch commit messages
-  { pattern = 'Merge branch', replace = "[chore] Merge Branch" },                                          # replace merge branch commit messages
+  { pattern = 'merge branch', replace = "[chore] Merge Branch" }, # replace merge branch commit messages
+  { pattern = 'Merge branch', replace = "[chore] Merge Branch" }, # replace merge branch commit messages
   { pattern = '\[dependency\]', replace = 'test' },
   # Clean up Dependabot messages - remove verbose table content
   { pattern = '\[dependency\] \[chore\] Bump the.*?with \d+ updates.*?(\n\n|\|.*?\|.*?\n)*', replace = "[dependency] Update dependencies" },
   { pattern = 'Bumps the npm-all group.*?with \d+ updates.*?(\n\n|\|.*?\|.*?\n)*', replace = "[dependency] Update npm dependencies" },
   { pattern = 'Bump the.*?group with \d+ updates.*?(\n\n|\|.*?\|.*?\n)*', replace = "[dependency] Update dependency group" },
-  
+
   # Clean up individual package bump messages
   { pattern = 'Bumps \[([^\]]+)\].*?from.*?to.*?(\n\n.*?)*', replace = "[dependency] Update $1" },
   { pattern = 'Bump ([a-zA-Z0-9@\-\/]+) from.*?to.*?(\n\n.*?)*', replace = "[dependency] Update $1" },
@@ -128,7 +128,7 @@ commit_parsers = [
   { message = "^👷.*\\[ci\\]", group = "<!-- 8 -->👷 CI/CD" },
   { message = "^🔧.*\\[build\\]", group = "<!-- 9 -->🔧 Build System" },
   { message = "^⏪.*\\[revert\\]", group = "<!-- 10 -->⏪ Reverts" },
-  
+
   # Fallback patterns for conventional commits without emojis
   { message = "^feat", group = "<!-- 0 -->✨ Features" },
   { message = "^fix", group = "<!-- 1 -->🛠️ Bug Fixes" },
@@ -140,11 +140,11 @@ commit_parsers = [
   { message = "^build", group = "<!-- 9 -->🔧 Build System" },
   { message = "^ci", group = "<!-- 8 -->👷 CI/CD" },
   { message = "^chore\\(release\\): prepare for", group = "<!-- 7 -->🧹 Chores" },
-  { message = "^chore\\(deps.*\\)", group = "<!-- 11 -->📦 Dependencies" },
+  { message = "^chore\\(deps\\.\\*\\)", group = "<!-- 11 -->📦 Dependencies" },
   { message = "^chore\\(pr\\)", group = "<!-- 7 -->🧹 Chores" },
   { message = "^chore\\(pull\\)", group = "<!-- 7 -->🧹 Chores" },
   { message = "^chore", group = "<!-- 7 -->🧹 Chores" },
-  
+
   # Dependency-related commits
   { message = "^\\[dependency\\]", group = "<!-- 11 -->📦 Dependencies" },
   { message = "^bump the.*group", group = "<!-- 11 -->📦 Dependencies" },
@@ -153,11 +153,11 @@ commit_parsers = [
   { message = "^Bump [a-zA-Z0-9@\\-\\/]+", group = "<!-- 11 -->📦 Dependencies" },
   { message = ".*npm-all.*", group = "<!-- 11 -->📦 Dependencies" },
   { message = ".*dependabot.*", group = "<!-- 11 -->📦 Dependencies" },
-  
+
   # Security-related (keep separate from general dependencies)
   { body = ".*security.*", group = "<!-- 12 -->🛡️ Security" },
   { message = ".*security.*", group = "<!-- 12 -->🛡️ Security" },
-  
+
   { message = "^revert", group = "<!-- 10 -->⏪ Reverts" },
   { message = "^Merge branch", group = "<!-- 13 -->🔀 Merge Commits" },
   { message = "^merge branch", group = "<!-- 13 -->🔀 Merge Commits" },

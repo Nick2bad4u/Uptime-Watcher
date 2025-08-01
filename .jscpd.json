@@ -13,17 +13,20 @@
     "minLines": 10,
     "mode": "strict",
     "ignore": [
-        "**/node_modules/**",
+        "**/.github/**",
         "**/.git/**",
         "**/*.md",
-        "**/libs/**",
-        "**/dist/**",
         "**/build/**",
         "**/coverage/**",
+        "**/dist/**",
         "**/docs/**",
+        "**/electron/test/**",
+        "**/libs/**",
+        "**/node_modules/**",
+        "**/scripts/**",
+        "**/src/test/**",
         "**/test/**",
         "**/tests/**",
-        "**/src/test/**",
-        "**/electron/test/**"
+        "**/vscode/**"
     ]
 }

@@ -20,7 +20,7 @@ param (
     [string]$OutputFile
 )
 
-function List-FilesBySubdirectory {
+function Get-FileBySubdirectory {
     param (
         [string]$Directory
     )
@@ -69,11 +69,11 @@ try {
 
     # Capture output if output file is specified
     if ($OutputFile) {
-        $output = List-FilesBySubdirectory -Directory $fullPath
+        $output = Get-FileBySubdirectory -Directory $fullPath
         $output | Out-File -FilePath $OutputFile -Encoding UTF8
         Write-Output "Results saved to: $OutputFile"
     } else {
-        List-FilesBySubdirectory -Directory $fullPath
+        Get-FileBySubdirectory -Directory $fullPath
     }
 
     Write-Output ""

@@ -1,4 +1,4 @@
-# Use Push-Location/Pop-Location for safe directory changes and error handling
+﻿# Use Push-Location/Pop-Location for safe directory changes and error handling
 
 # Determine repo root (parent of .github)
 $repoRoot = Resolve-Path "$PSScriptRoot\.."

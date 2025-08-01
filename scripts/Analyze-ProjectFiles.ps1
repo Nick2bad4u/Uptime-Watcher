@@ -1,4 +1,4 @@
-# Project File Analyzer - Displays file statistics for src/ and electron/ directories
+﻿# Project File Analyzer - Displays file statistics for src/ and electron/ directories
 # Features:
 # - Analyzes file sizes and line counts for TypeScript, JavaScript, and related files
 # - Excludes test files by default (use -IncludeTests to include them)

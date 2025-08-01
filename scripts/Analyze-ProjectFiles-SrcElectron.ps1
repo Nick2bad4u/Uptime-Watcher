@@ -1,4 +1,4 @@
-# Project File Analyzer - Focused on src/ and electron/ directories only
+﻿# Project File Analyzer - Focused on src/ and electron/ directories only
 # Features:
 # - Analyzes file sizes and line counts for TypeScript, JavaScript, and related files
 # - Recursively searches ONLY in src/ and electron/ directories by default
@@ -55,7 +55,7 @@ function Format-FileSize {
     }
 }
 
-function Get-FilteredFiles {
+function Get-FilteredFile {
     param(
         [string]$FolderPath,
         [bool]$IncludeTests
@@ -96,7 +96,7 @@ function Show-FolderAnalysis {
     }
 
     # Get filtered files
-    $files = Get-FilteredFiles -FolderPath $FolderPath -IncludeTests $IncludeTests
+    $files = Get-FilteredFile -FolderPath $FolderPath -IncludeTests $IncludeTests
 
     if ($files.Count -eq 0) {
         Write-Output "📁 No relevant files found in $FolderName" -ForegroundColor Yellow
@@ -244,8 +244,8 @@ Write-Output "🎯 PROJECT TOTALS (src + electron only)" -ForegroundColor $Color
 Write-Output "═══════════════════════════════════════════════════════════════════" -ForegroundColor $Colors.Border
 
 # Get all files from both directories
-$allSrcFiles = Get-FilteredFiles -FolderPath $srcPath -IncludeTests $IncludeTests
-$allElectronFiles = Get-FilteredFiles -FolderPath $electronPath -IncludeTests $IncludeTests
+$allSrcFiles = Get-FilteredFile -FolderPath $srcPath -IncludeTests $IncludeTests
+$allElectronFiles = Get-FilteredFile -FolderPath $electronPath -IncludeTests $IncludeTests
 $allFiles = $allSrcFiles + $allElectronFiles
 
 if ($allFiles.Count -gt 0) {
