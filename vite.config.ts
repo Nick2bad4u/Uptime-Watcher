@@ -153,13 +153,11 @@ export default defineConfig(() => {
         test: {
             coverage: {
                 exclude: [
-                    "**/docs/**",
                     "**/*.config.*",
                     "**/*.d.ts",
                     "**/dist/**", // Exclude any dist folder anywhere
+                    "**/docs/**",
                     "**/docs/**", // Exclude documentation files
-                    "**/index.ts", // Any other index files
-                    "**/index.ts", // Any other index files
                     "**/index.ts", // Exclude all barrel export files
                     "**/index.tsx", // Exclude JSX barrel export files
                     "**/node_modules/**",
@@ -169,42 +167,18 @@ export default defineConfig(() => {
                     "dist-electron/**",
                     "dist/**",
                     "electron/**", // Exclude all electron files from frontend coverage
-                    "electron/**/*.d.ts",
-                    "electron/**/*.spec.ts",
-                    "electron/**/*.test.ts",
-                    "electron/**/index.ts", // Explicit electron barrel files
-                    "electron/**/types.ts",
-                    "electron/components/**/index.ts", // Component barrel files
-                    "electron/dist/**",
-                    "electron/dist/**", // Explicitly exclude electron/dist
-                    "electron/hooks/**/index.ts", // Hook barrel files
-                    "electron/managers/**/index.ts", // Manager barrel files
-                    "electron/services/**/index.ts", // Service barrel files
-                    "electron/services/*/index.ts",
-                    "electron/test/**",
-                    "electron/test/dist/**", // Exclude compiled electron test files
-                    "electron/utils/**/index.ts", // Utility barrel files
-                    "index.ts", // Barrel export file at root
                     "index.ts", // Barrel export file at root
                     "release/**",
                     "scripts/**",
-                    "src/components/**/index.ts", // Component barrel files
-                    "src/components/index.ts", // Explicit barrel files
-                    "src/hooks/**/index.ts", // Hook barrel files
-                    "src/hooks/index.ts", // Explicit barrel files
-                    "src/stores/index.ts", // Explicit barrel files
-                    "src/stores/sites/services/index.ts", // Specific barrel files
-                    "src/stores/sites/utils/index.ts", // Specific barrel files
-                    "src/theme/types.ts", // Exclude theme types
-                    "src/types.ts", // Explicitly exclude main types file
-                    "src/utils/index.ts", // Explicit barrel files
+                    "report/**", // Exclude report files,
+                    "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
                 ],
                 ignoreEmptyLines: true, // Ignore empty lines in coverage reports
-                experimentalAstAwareRemapping: false, // Enable AST-aware remapping for better accuracy
+                experimentalAstAwareRemapping: true, // Enable AST-aware remapping for better accuracy
                 processingConcurrency: 2, // Reduce concurrency to avoid parsing conflicts
                 skipFull: false, // Don't skip full coverage collection
                 all: true, // Include all source files in coverage
-                provider: "v8" as const,
+                provider: "istanbul" as const,
                 reporter: ["text", "json", "lcov", "html"],
                 reportsDirectory: "./coverage",
                 thresholds: {
@@ -223,6 +197,7 @@ export default defineConfig(() => {
                 "**/dist-electron/**",
                 "electron/**",
                 "**/coverage/**",
+                "**/docs/**",
             ],
             globals: true, // Enable global test functions (describe, it, expect)
             include: [

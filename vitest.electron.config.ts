@@ -5,9 +5,26 @@ import viteConfig from "./vite.config";
 const myTestConfig = {
     clearMocks: true,
     coverage: {
-        include: [
-            "electron/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
-            "shared/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
+        exclude: [
+            "**/*.config.*",
+            "**/*.d.ts",
+            "**/dist/**", // Exclude any dist folder anywhere
+            "**/docs/**",
+            "**/docs/**", // Exclude documentation files
+            "**/index.ts", // Exclude all barrel export files
+            "**/index.tsx", // Exclude JSX barrel export files
+            "**/node_modules/**",
+            "**/types.ts", // Exclude type definition files
+            "**/types.tsx", // Exclude type definition files with JSX
+            "coverage/**",
+            "dist-electron/**",
+            "dist/**",
+            "src/**", // Exclude all src files from electron coverage
+            "index.ts", // Barrel export file at root
+            "release/**",
+            "scripts/**",
+            "report/**", // Exclude report files
+            "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
         ],
         reportsDirectory: "./coverage/electron",
     },
@@ -36,11 +53,11 @@ export default defineConfig((configEnv) => {
     const merged = mergeConfig(viteConfig(configEnv), defineConfig({}));
 
     // Smart merge for test config
-    merged['test'] = {
-        ...merged['test'], // preserve fields from extended config
+    merged["test"] = {
+        ...merged["test"], // preserve fields from extended config
         ...myTestConfig, // override only those you define
         coverage: {
-            ...merged['test']?.coverage, // preserve base coverage fields
+            ...merged["test"]?.coverage, // preserve base coverage fields
             ...myTestConfig.coverage, // override only those you define
         },
     };
