@@ -13,13 +13,21 @@
         "shared/**/*.test.ts",
         "shared/**/*.ts",
         "shared/**/*.tsx",
-        "shared/test/**/*",
+        "shared/test/**/*.ts",
+        "shared/test/**/*.tsx",
         "src/**/*.spec.ts",
         "src/**/*.test.ts",
         "src/**/*.ts",
         "src/**/*.tsx",
-        "src/test/**/*",
+        "src/test/**/*.ts",
+        "src/test/**/*.tsx",
         "tailwind.config.js",
-        "vitest.config.ts"
+        "vitest.config.ts",
+        "src/test/**/*.ts",
+        "src/test/**/*.tsx"
+    ],
+        "exclude": [
+        "electron/**/*.test.ts",
+        "electron/**/*.test.tsx"
     ]
 }
