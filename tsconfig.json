@@ -22,7 +22,8 @@
         ],
         "paths": {
             "@/*": ["src/*"],
-            "@shared/*": ["shared/*"]
+            "@shared/*": ["shared/*"],
+            "@electron/*": ["electron/*"]
         },
         "plugins": [
             {

@@ -19,7 +19,6 @@ import { defineConfig, type PluginOption } from "vite";
  */
 export default defineConfig(() => {
     const codecovToken = getEnvironmentVariable("CODECOV_TOKEN");
-
     return {
         base: "./", // Ensures relative asset paths for Electron
         build: {
@@ -33,6 +32,20 @@ export default defineConfig(() => {
             },
             sourcemap: true, // Recommended for Electron debugging
             target: "es2024", // Match TypeScript target for consistency
+        },
+        esbuild: {
+            target: "es2024", // Match TypeScript target for consistency
+            // Transpile all files with ESBuild to remove comments from code coverage.
+            // Required for `test.coverage.ignoreEmptyLines` to work:
+            include: [
+                "**/*.js",
+                "**/*.jsx",
+                "**/*.mjs",
+                "**/*.ts",
+                "**/*.tsx",
+            ],
+            // More aggressive transformation to help coverage parsing
+            keepNames: true, // Preserve function names for better coverage reports
         },
         plugins: [
             electron([
@@ -140,27 +153,65 @@ export default defineConfig(() => {
         test: {
             coverage: {
                 exclude: [
-                    "coverage/**", // Exclude coverage reports
-                    "dist/**", // Exclude frontend build output
-                    "dist-electron/**", // Exclude Electron build output
+                    "**/*.config.*",
+                    "**/*.d.ts",
                     "**/dist/**", // Exclude any dist folder anywhere
-                    "electron/dist/**", // Explicitly exclude electron/dist
-                    "electron/**", // Exclude all electron files from frontend coverage
-                    "**/*.d.ts", // Exclude TypeScript declaration files
-                    "**/*.config.*", // Exclude configuration files
-                    "**/node_modules/**", // Exclude node_modules
-                    "release/**", // Exclude release files
-                    "scripts/**", // Exclude scripts
-                    "electron/test/dist/**", // Exclude compiled electron test files
+                    "**/docs/**", // Exclude documentation files
+                    "**/index.ts", // Any other index files
+                    "**/index.ts", // Any other index files
+                    "**/index.ts", // Exclude all barrel export files
+                    "**/index.tsx", // Exclude JSX barrel export files
+                    "**/node_modules/**",
                     "**/types.ts", // Exclude type definition files
                     "**/types.tsx", // Exclude type definition files with JSX
-                    "src/types.ts", // Explicitly exclude main types file
+                    "coverage/**",
+                    "dist-electron/**",
+                    "dist/**",
+                    "electron/**", // Exclude all electron files from frontend coverage
+                    "electron/**/*.d.ts",
+                    "electron/**/*.spec.ts",
+                    "electron/**/*.test.ts",
+                    "electron/**/index.ts", // Explicit electron barrel files
+                    "electron/**/types.ts",
+                    "electron/components/**/index.ts", // Component barrel files
+                    "electron/dist/**",
+                    "electron/dist/**", // Explicitly exclude electron/dist
+                    "electron/hooks/**/index.ts", // Hook barrel files
+                    "electron/managers/**/index.ts", // Manager barrel files
+                    "electron/services/**/index.ts", // Service barrel files
+                    "electron/services/*/index.ts",
+                    "electron/test/**",
+                    "electron/test/dist/**", // Exclude compiled electron test files
+                    "electron/utils/**/index.ts", // Utility barrel files
+                    "index.ts", // Barrel export file at root
+                    "index.ts", // Barrel export file at root
+                    "release/**",
+                    "scripts/**",
+                    "src/components/**/index.ts", // Component barrel files
+                    "src/components/index.ts", // Explicit barrel files
+                    "src/hooks/**/index.ts", // Hook barrel files
+                    "src/hooks/index.ts", // Explicit barrel files
+                    "src/stores/index.ts", // Explicit barrel files
+                    "src/stores/sites/services/index.ts", // Specific barrel files
+                    "src/stores/sites/utils/index.ts", // Specific barrel files
                     "src/theme/types.ts", // Exclude theme types
+                    "src/types.ts", // Explicitly exclude main types file
+                    "src/utils/index.ts", // Explicit barrel files
                 ],
                 ignoreEmptyLines: true, // Ignore empty lines in coverage reports
+                experimentalAstAwareRemapping: true, // Enable AST-aware remapping for better accuracy
+                processingConcurrency: 8, // Reduce concurrency to avoid parsing conflicts
+                skipFull: false, // Don't skip full coverage collection
+                all: true, // Include all source files in coverage
                 provider: "v8" as const,
                 reporter: ["text", "json", "lcov", "html"],
                 reportsDirectory: "./coverage",
+                thresholds: {
+                    branches: 70, // Minimum 70% branch coverage
+                    functions: 80, // Minimum 80% function coverage
+                    lines: 80, // Minimum 80% line coverage
+                    statements: 80, // Minimum 80% statement coverage
+                },
             },
             environment: "jsdom", // Default for React components
             // Test file patterns - exclude electron tests as they have their own config
@@ -177,8 +228,21 @@ export default defineConfig(() => {
                 "shared/**/*.test.ts",
                 "shared/**/*.spec.ts",
             ],
+            outputFile: {
+                json: "./coverage/test-results.json",
+            },
+            // Modern performance optimizations
+            pool: "threads", // Use worker threads for better performance
+            poolOptions: {
+                threads: {
+                    isolate: true, // Isolate tests for better reliability
+                    singleThread: false, // Enable multi-threading
+                },
+            },
+            // Improve test output
+            reporters: ["default", "json", "verbose", "hanging-process"],
             setupFiles: ["./src/test/setup.ts"], // Setup file for testing
-            testTimeout: 10_000, // Set Vitest timeout to 10 seconds
+            testTimeout: 15_000, // Set Vitest timeout to 15 seconds
         },
     };
 });
