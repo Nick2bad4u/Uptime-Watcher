@@ -140,6 +140,7 @@ export default defineConfig(() => {
         test: {
             coverage: {
                 exclude: [
+                    "**/docs/**",
                     "coverage/**", // Exclude coverage reports
                     "dist/**", // Exclude frontend build output
                     "dist-electron/**", // Exclude Electron build output
@@ -166,6 +167,7 @@ export default defineConfig(() => {
             // Test file patterns - exclude electron tests as they have their own config
             exclude: [
                 "**/node_modules/**",
+                "**/docs/**",
                 "**/dist/**",
                 "**/dist-electron/**",
                 "electron/**",
