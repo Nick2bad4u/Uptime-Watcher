@@ -681,5 +681,8 @@
       }
     }
   },
-  "readme": "README.md"
+  "readme": "README.md",
+  "eslintConfig": {
+    "extends": "eslint.config.mjs"
+  }
 }

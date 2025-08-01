@@ -215,7 +215,7 @@ export default [
     {
         plugins: { html },
         files: ["**/*.html"],
-        ignores: ["docs/docusaurus/**"],
+        ignores: ["docs/docusaurus/**", "report/**"],
     },
 
     // Markdown files
