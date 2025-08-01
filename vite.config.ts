@@ -153,6 +153,7 @@ export default defineConfig(() => {
         test: {
             coverage: {
                 exclude: [
+                    "**/docs/**",
                     "**/*.config.*",
                     "**/*.d.ts",
                     "**/dist/**", // Exclude any dist folder anywhere
@@ -217,6 +218,7 @@ export default defineConfig(() => {
             // Test file patterns - exclude electron tests as they have their own config
             exclude: [
                 "**/node_modules/**",
+                "**/docs/**",
                 "**/dist/**",
                 "**/dist-electron/**",
                 "electron/**",
