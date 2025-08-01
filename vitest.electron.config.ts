@@ -36,11 +36,11 @@ export default defineConfig((configEnv) => {
     const merged = mergeConfig(viteConfig(configEnv), defineConfig({}));
 
     // Smart merge for test config
-    merged.test = {
-        ...merged.test, // preserve fields from extended config
+    merged['test'] = {
+        ...merged['test'], // preserve fields from extended config
         ...myTestConfig, // override only those you define
         coverage: {
-            ...merged.test?.coverage, // preserve base coverage fields
+            ...merged['test']?.coverage, // preserve base coverage fields
             ...myTestConfig.coverage, // override only those you define
         },
     };

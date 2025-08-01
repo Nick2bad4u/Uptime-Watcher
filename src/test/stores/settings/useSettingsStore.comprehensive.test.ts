@@ -281,7 +281,7 @@ describe("useSettingsStore", () => {
 
             // Set an initial value first
             act(() => {
-                result.current.updateSettings({ historyLimit: 300 });
+                result.current.updateSettings({ historyLimit: 1000 });
             });
 
             // Test that the function properly captures current state before starting
@@ -296,7 +296,7 @@ describe("useSettingsStore", () => {
             });
 
             // The error handler should revert to the value that was captured at the start (300)
-            expect(result.current.settings.historyLimit).toBe(300); // Reverted to previous value
+            expect(result.current.settings.historyLimit).toBe(1000); // Reverted to previous value
         });
     });
 

@@ -50,7 +50,7 @@ jobs:
                   mkdir -p coverage
                   # Clean any existing coverage to avoid conflicts
                   rm -f coverage/lcov.info
-                  npx vitest run --coverage --reporter=verbose --reporter=junit --outputFile=coverage/frontend-test-report.junit.xml
+                  npx vitest run --config vitest.config.ts --coverage --reporter=verbose --reporter=junit --outputFile=coverage/frontend-test-report.junit.xml
               continue-on-error: true
               env:
                   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

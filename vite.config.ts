@@ -199,8 +199,8 @@ export default defineConfig(() => {
                     "src/utils/index.ts", // Explicit barrel files
                 ],
                 ignoreEmptyLines: true, // Ignore empty lines in coverage reports
-                experimentalAstAwareRemapping: true, // Enable AST-aware remapping for better accuracy
-                processingConcurrency: 8, // Reduce concurrency to avoid parsing conflicts
+                experimentalAstAwareRemapping: false, // Enable AST-aware remapping for better accuracy
+                processingConcurrency: 2, // Reduce concurrency to avoid parsing conflicts
                 skipFull: false, // Don't skip full coverage collection
                 all: true, // Include all source files in coverage
                 provider: "v8" as const,
