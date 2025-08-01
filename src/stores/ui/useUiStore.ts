@@ -54,6 +54,10 @@ export const useUIStore = create<UIStore>()(
                 logStoreAction("UIStore", "setSelectedSite", { site });
                 set({ selectedSiteId: site ? site.identifier : undefined });
             },
+            setShowAddSiteModal: (show: boolean) => {
+                logStoreAction("UIStore", "setShowAddSiteModal", { show });
+                set({ showAddSiteModal: show });
+            },
             setShowAdvancedMetrics: (show: boolean) => {
                 logStoreAction("UIStore", "setShowAdvancedMetrics", { show });
                 set({ showAdvancedMetrics: show });
@@ -70,6 +74,7 @@ export const useUIStore = create<UIStore>()(
                 logStoreAction("UIStore", "setSiteDetailsChartTimeRange", { range });
                 set({ siteDetailsChartTimeRange: range });
             },
+            showAddSiteModal: false,
             showAdvancedMetrics: false,
             showSettings: false,
             showSiteDetails: false,

@@ -9,6 +9,7 @@ import React from "react";
 import logger from "../../services/logger";
 import { ThemedBox, ThemedButton, ThemedSelect, ThemedText } from "../../theme/components";
 import { Site } from "../../types";
+import { SiteMonitoringButton } from "../common/SiteMonitoringButton/SiteMonitoringButton";
 
 /**
  * Props for the SiteDetailsNavigation component.
@@ -165,35 +166,12 @@ export function SiteDetailsNavigation({
                 <div className="flex items-center gap-4">
                     {/* Site-level monitoring controls */}
                     <div className="flex items-center gap-2">
-                        {allMonitorsRunning ? (
-                            <ThemedButton
-                                aria-label="Stop All Monitoring"
-                                className="flex items-center gap-1"
-                                disabled={isLoading}
-                                onClick={() => {
-                                    void handleStopSiteMonitoring();
-                                }}
-                                size="sm"
-                                variant="error"
-                            >
-                                <span>⏹️</span>
-                                <span className="hidden text-xs sm:inline">Stop All</span>
-                            </ThemedButton>
-                        ) : (
-                            <ThemedButton
-                                aria-label="Start All Monitoring"
-                                className="flex items-center gap-1"
-                                disabled={isLoading}
-                                onClick={() => {
-                                    void handleStartSiteMonitoring();
-                                }}
-                                size="sm"
-                                variant="success"
-                            >
-                                <span>▶️</span>
-                                <span className="hidden text-xs sm:inline">Start All</span>
-                            </ThemedButton>
-                        )}
+                        <SiteMonitoringButton
+                            allMonitorsRunning={allMonitorsRunning}
+                            isLoading={isLoading}
+                            onStartSiteMonitoring={() => void handleStartSiteMonitoring()}
+                            onStopSiteMonitoring={() => void handleStopSiteMonitoring()}
+                        />
 
                         {/* Individual monitor controls */}
                         {isMonitoring ? (

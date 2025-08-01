@@ -10,10 +10,34 @@ The system currently supports:
 
 - **HTTP**: Website/API monitoring (`http`)
 - **Port**: TCP port connectivity monitoring (`port`)
+- **Ping**: Network connectivity monitoring (`ping`)
+
+## ⚡ Critical Requirements for ALL Monitor Types
+
+**Every monitor type MUST support these core fields:**
+
+| Field | Type | Range/Validation | Description |
+|-------|------|------------------|-------------|
+| `checkInterval` | `number` | 5000ms - 30 days | How often to check the monitor |
+| `retryAttempts` | `number` | 0 - 10 attempts | Number of retries on failure |
+| `timeout` | `number` | 1000ms - 300000ms | Request timeout duration |
+
+These are **not optional** - they are enforced by the validation schemas and used by the monitoring scheduler.
+
+## 📋 Implementation Order
+
+Follow this **exact order** to avoid dependency issues:
+
+1. **Add type definition** (`shared/types.ts`)
+2. **Create validation schema** (`shared/validation/schemas.ts`) 
+3. **Create monitor service class** (`electron/services/monitoring/`)
+4. **Register monitor type** (`MonitorTypeRegistry.ts`)
+5. **Export monitor class** (`index.ts`)
+6. **Create comprehensive tests**
 
 ## 🎯 Required Changes for New Monitor Type
 
-Based on analysis of the existing `http` and `port` monitor implementations, here are **ALL** the places you need to make changes:
+Based on analysis of the existing monitor implementations, here are **ALL** the places you need to make changes:
 
 ---
 
@@ -23,13 +47,15 @@ Based on analysis of the existing `http` and `port` monitor implementations, her
 
 #### `shared/types.ts`
 
-- **Location**: Line 18
-- **Change**: Add new type to `BASE_MONITOR_TYPES` constant
+- **Location**: Line 18 (BASE_MONITOR_TYPES constant)
+- **Change**: Add new type to the const array
 - **Example**:
 
 ```typescript
-export const BASE_MONITOR_TYPES = ["http", "port", "dns"] as const; // Add 'dns'
+export const BASE_MONITOR_TYPES = ["http", "port", "ping", "dns"] as const; // Add 'dns'
 ```
+
+**⚠️ Important**: This must be done FIRST as other files depend on this type definition.
 
 #### `shared/types/monitorTypes.ts`
 
@@ -52,21 +78,26 @@ export const BASE_MONITOR_TYPES = ["http", "port", "dns"] as const; // Add 'dns'
 
 #### `shared/validation/schemas.ts`
 
-- **Location**: Create new validation schema
-- **Change**: Add Zod schema for new monitor type
+- **Purpose**: Create Zod validation schema with REQUIRED core fields
+- **Location**: Add to `monitorSchemas` object
 - **Example**:
 
 ```typescript
 export const monitorSchemas = {
     http: z.object({...}),
     port: z.object({...}),
-    dns: z.object({
-        hostname: z.string().min(1),
+    ping: z.object({...}),
+    dns: baseMonitorSchema.extend({
+        type: z.literal("dns"),
+        hostname: z.string().min(1, "Hostname is required"),
         recordType: z.enum(['A', 'AAAA', 'MX', 'CNAME']),
         expectedValue: z.string().optional(),
+        // Core fields (checkInterval, retryAttempts, timeout) inherited from baseMonitorSchema
     }),
 };
 ```
+
+**⚠️ Critical**: Your schema MUST extend `baseMonitorSchema` which includes the required core fields (checkInterval, retryAttempts, timeout). Never create a schema from scratch.
 
 ---
 
@@ -81,89 +112,115 @@ export const monitorSchemas = {
   - `check(monitor: Monitor): Promise<MonitorCheckResult>`
   - `updateConfig(config: MonitorConfig): void`
   - `getType(): MonitorType`
-- **Example Structure**:
+
+**Template Structure**:
 
 ```typescript
+import { DEFAULT_RETRY_ATTEMPTS } from "./constants";
+import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
+import { getMonitorRetryAttempts, getMonitorTimeout } from "./utils/monitorTypeGuards";
+
 export class DnsMonitor implements IMonitorService {
- private config: MonitorConfig;
+    private config: MonitorConfig;
 
- constructor(config: MonitorConfig = {}) {
-  this.config = { ...config };
- }
+    constructor(config: MonitorConfig = {}) {
+        this.config = { 
+            timeout: DEFAULT_REQUEST_TIMEOUT, // Use consistent defaults
+            ...config 
+        };
+    }
 
- async check(monitor: Monitor): Promise<MonitorCheckResult> {
-  // Implementation specific to DNS monitoring
-  // Return MonitorCheckResult with status, responseTime, details
- }
+    async check(monitor: Monitor): Promise<MonitorCheckResult> {
+        // CRITICAL: Validate monitor type first
+        if (monitor.type !== "dns") {
+            throw new Error(`DnsMonitor cannot handle monitor type: ${monitor.type}`);
+        }
 
- updateConfig(config: MonitorConfig): void {
-  this.config = { ...this.config, ...config };
- }
+        // CRITICAL: Use utility functions for timeout and retries
+        const timeout = getMonitorTimeout(monitor, this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT);
+        const retryAttempts = getMonitorRetryAttempts(monitor, DEFAULT_RETRY_ATTEMPTS);
 
- getType(): MonitorType {
-  return "dns";
- }
+        // Implement DNS-specific checking logic here
+        // Return MonitorCheckResult with status, responseTime, details
+    }
+
+    updateConfig(config: MonitorConfig): void {
+        this.config = { ...this.config, ...config };
+    }
+
+    getType(): MonitorType {
+        return "dns";
+    }
 }
 ```
+
+**⚠️ Must Use**: Always use `getMonitorTimeout()` and `getMonitorRetryAttempts()` utilities to safely extract values with fallbacks.
 
 ### **🔹 Required Files to Modify:**
 
 #### `electron/services/monitoring/MonitorTypeRegistry.ts`
 
-- **Location**: Add registration call at bottom of file (around line 290)
-- **Change**: Register the new monitor type
-- **Example**:
+- **Location**: Add registration call at bottom of file (around line 400+)
+- **Change**: Register the new monitor type with complete configuration
+- **Template**:
 
 ```typescript
 registerMonitorType({
- type: "dns",
- displayName: "DNS (Domain Resolution)",
- description: "Monitors DNS resolution for domains",
- version: "1.0.0",
- serviceFactory: () => new DnsMonitor(),
- validationSchema: monitorSchemas.dns,
- fields: [
-  {
-   name: "hostname",
-   label: "Hostname",
-   type: "text",
-   required: true,
-   placeholder: "example.com",
-   helpText: "Enter the domain name to resolve",
-  },
-  {
-   name: "recordType",
-   label: "Record Type",
-   type: "select",
-   required: true,
-   options: [
-    { value: "A", label: "A Record" },
-    { value: "AAAA", label: "AAAA Record" },
-    { value: "MX", label: "MX Record" },
-    { value: "CNAME", label: "CNAME Record" },
-   ],
-  },
- ],
- uiConfig: {
-  supportsAdvancedAnalytics: true,
-  supportsResponseTime: true,
-  display: {
-   showAdvancedMetrics: true,
-   showUrl: false,
-  },
-  formatDetail: (details: string) => `Record: ${details}`,
-  formatTitleSuffix: (monitor: Record<string, unknown>) => {
-   const hostname = monitor.hostname as string;
-   const recordType = monitor.recordType as string;
-   return hostname ? ` (${hostname} ${recordType})` : "";
-  },
-  helpTexts: {
-   primary: "Enter the domain name to resolve",
-   secondary: "The monitor will check DNS resolution according to your monitoring interval",
-  },
- },
+    type: "dns",
+    displayName: "DNS (Domain Resolution)",
+    description: "Monitors DNS resolution for domains",
+    version: "1.0.0",
+    serviceFactory: () => new DnsMonitor(),
+    validationSchema: monitorSchemas.dns,
+    fields: [
+        {
+            name: "hostname",
+            label: "Hostname", 
+            type: "text",
+            required: true,
+            placeholder: "example.com",
+            helpText: "Enter the domain name to resolve",
+        },
+        {
+            name: "recordType",
+            label: "Record Type",
+            type: "select", 
+            required: true,
+            options: [
+                { value: "A", label: "A Record" },
+                { value: "AAAA", label: "AAAA Record" },
+                { value: "MX", label: "MX Record" },
+                { value: "CNAME", label: "CNAME Record" },
+            ],
+        },
+        // Note: checkInterval, retryAttempts, timeout fields are auto-generated
+    ],
+    uiConfig: {
+        supportsAdvancedAnalytics: true,
+        supportsResponseTime: true,
+        display: {
+            showAdvancedMetrics: true,
+            showUrl: false, // Set based on monitor type
+        },
+        formatDetail: (details: string) => `Record: ${details}`,
+        formatTitleSuffix: (monitor: Record<string, unknown>) => {
+            const hostname = monitor.hostname as string;
+            const recordType = monitor.recordType as string;
+            return hostname ? ` (${hostname} ${recordType})` : "";
+        },
+        helpTexts: {
+            primary: "Enter the domain name to resolve",
+            secondary: "The monitor will check DNS resolution according to your monitoring interval",
+        },
+    },
 });
 ```
+
+**UI Configuration Explained**:
+- `formatDetail`: How to display details in history/status
+- `formatTitleSuffix`: Suffix for charts and displays  
+- `helpTexts`: User guidance in forms
+- `display.showUrl`: Whether to show URL field (false for non-HTTP monitors)
 
 #### `electron/services/monitoring/index.ts`
 
@@ -258,35 +315,38 @@ export const DNS_RESOLVERS = ["8.8.8.8", "1.1.1.1"];
 
 ## 📋 **8. Implementation Checklist**
 
-### **🎯 Phase 1: Core Implementation**
+### **🎯 Phase 1: Core Implementation (Required Order)**
 
-- [ ] Add type to `BASE_MONITOR_TYPES` in `shared/types.ts`
-- [ ] Create validation schema in `shared/validation/schemas.ts`
-- [ ] Create monitor service class (e.g., `DnsMonitor.ts`)
-- [ ] Register monitor type in `MonitorTypeRegistry.ts`
-- [ ] Export monitor class in `electron/services/monitoring/index.ts`
+- [ ] **Step 1**: Add type to `BASE_MONITOR_TYPES` in `shared/types.ts`
+- [ ] **Step 2**: Create validation schema extending `baseMonitorSchema` in `shared/validation/schemas.ts`  
+- [ ] **Step 3**: Create monitor service class implementing `IMonitorService`
+- [ ] **Step 4**: Register monitor type in `MonitorTypeRegistry.ts` with complete configuration
+- [ ] **Step 5**: Export monitor class in `electron/services/monitoring/index.ts`
 
-### **🧪 Phase 2: Testing**
+### **🧪 Phase 2: Testing (Critical)**
 
-- [ ] Create comprehensive unit tests for monitor service
-- [ ] Add integration tests for new monitor type
-- [ ] Test validation schema edge cases
+- [ ] Create comprehensive unit tests for monitor service class
+- [ ] Test all required methods: `check()`, `updateConfig()`, `getType()`
+- [ ] Test timeout and retry behavior using monitor-specific values
+- [ ] Test error handling for invalid monitor configurations
 - [ ] Verify registry registration works correctly
+- [ ] Test validation schema with valid and invalid data
 
-### **✨ Phase 3: UI Polish (Optional)**
+### **✨ Phase 3: UI Verification (Integration)**
 
-- [ ] Add custom title formatters if needed
-- [ ] Add custom detail formatters if needed
-- [ ] Add monitor-specific help text and guidance
-- [ ] Test form validation and user experience
+- [ ] Verify new monitor type appears in form dropdown
+- [ ] Test form field generation from registry configuration
+- [ ] Verify validation works in UI (required fields, format validation)
+- [ ] Test monitor creation, editing, and deletion through UI
+- [ ] Verify title formatting and detail formatting work correctly
 
-### **📊 Phase 4: Quality Assurance**
+### **📊 Phase 4: End-to-End Testing (Final)**
 
 - [ ] Run full test suite (`npm run test`)
-- [ ] Test in development environment
-- [ ] Verify database migrations work correctly
-- [ ] Test monitor creation, editing, and deletion
-- [ ] Verify monitoring actually works end-to-end
+- [ ] Test in development environment with real data
+- [ ] Verify database schema adapts correctly for new monitor type
+- [ ] Test actual monitoring works (checks run and report results)
+- [ ] Verify monitoring scheduler handles new type correctly
 
 ---
 
@@ -365,95 +425,135 @@ interface MonitorFieldDefinition {
 
 ## 🚀 **Example: Adding a "DNS" Monitor Type**
 
-Here's a complete example of adding DNS monitoring:
+Here's a complete example following the **exact implementation order**:
 
-### 1. **Update Types**
-
-```typescript
-// shared/types.ts
-export const BASE_MONITOR_TYPES = ["http", "port", "dns"] as const;
-```
-
-### 2. **Add Validation Schema**
+### **Step 1: Update Types**
 
 ```typescript
-// shared/validation/schemas.ts
-dns: z.object({
- hostname: z.string().min(1, "Hostname is required"),
- recordType: z.enum(["A", "AAAA", "MX", "CNAME"]),
- expectedValue: z.string().optional(),
- timeout: z.number().min(1000).optional(),
-});
+// shared/types.ts - MUST BE FIRST
+export const BASE_MONITOR_TYPES = ["http", "port", "ping", "dns"] as const;
 ```
 
-### 3. **Create Monitor Service**
+### **Step 2: Add Validation Schema**
+
+```typescript
+// shared/validation/schemas.ts - MUST extend baseMonitorSchema
+export const monitorSchemas = {
+    // ... existing schemas
+    dns: baseMonitorSchema.extend({
+        type: z.literal("dns"),
+        hostname: z.string().min(1, "Hostname is required"),
+        recordType: z.enum(["A", "AAAA", "MX", "CNAME"]),
+        expectedValue: z.string().optional(),
+        // checkInterval, retryAttempts, timeout are inherited from baseMonitorSchema
+    }),
+};
+```
+
+### **Step 3: Create Monitor Service**
 
 ```typescript
 // electron/services/monitoring/DnsMonitor.ts
 import { lookup } from "dns/promises";
+import { DEFAULT_RETRY_ATTEMPTS, DEFAULT_REQUEST_TIMEOUT } from "./constants";
+import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
+import { getMonitorRetryAttempts, getMonitorTimeout } from "./utils/monitorTypeGuards";
 
 export class DnsMonitor implements IMonitorService {
- async check(monitor: Monitor): Promise<MonitorCheckResult> {
-  const startTime = performance.now();
+    private config: MonitorConfig;
 
-  try {
-   const result = await lookup(monitor.hostname || "");
-   const responseTime = Math.round(performance.now() - startTime);
+    constructor(config: MonitorConfig = {}) {
+        this.config = {
+            timeout: DEFAULT_REQUEST_TIMEOUT,
+            ...config,
+        };
+    }
 
-   return {
-    status: "up",
-    responseTime,
-    details: result.address,
-    timestamp: Date.now(),
-   };
-  } catch (error) {
-   const responseTime = Math.round(performance.now() - startTime);
-   return {
-    status: "down",
-    responseTime,
-    details: error.message,
-    timestamp: Date.now(),
-   };
-  }
- }
+    async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
+        if (monitor.type !== "dns") {
+            throw new Error(`DnsMonitor cannot handle monitor type: ${monitor.type}`);
+        }
 
- getType(): MonitorType {
-  return "dns";
- }
+        const startTime = performance.now();
+        const timeout = getMonitorTimeout(monitor, this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT);
+        const retryAttempts = getMonitorRetryAttempts(monitor, DEFAULT_RETRY_ATTEMPTS);
+
+        try {
+            const result = await lookup(monitor.hostname || "");
+            const responseTime = Math.round(performance.now() - startTime);
+
+            return {
+                status: "up",
+                responseTime,
+                details: result.address,
+                timestamp: Date.now(),
+            };
+        } catch (error) {
+            const responseTime = Math.round(performance.now() - startTime);
+            return {
+                status: "down",
+                responseTime,
+                details: error.message,
+                timestamp: Date.now(),
+            };
+        }
+    }
+
+    updateConfig(config: Partial<MonitorConfig>): void {
+        this.config = { ...this.config, ...config };
+    }
+
+    getType(): MonitorType {
+        return "dns";
+    }
 }
 ```
 
-### 4. **Register Monitor Type**
+### **Step 4: Register Monitor Type**
 
 ```typescript
-// In MonitorTypeRegistry.ts
+// In MonitorTypeRegistry.ts - ADD AT THE BOTTOM
 registerMonitorType({
- type: "dns",
- displayName: "DNS (Domain Resolution)",
- description: "Monitors DNS resolution for domains",
- version: "1.0.0",
- serviceFactory: () => new DnsMonitor(),
- validationSchema: monitorSchemas.dns,
- fields: [
-  {
-   name: "hostname",
-   label: "Hostname",
-   type: "text",
-   required: true,
-   placeholder: "example.com",
-  },
-  {
-   name: "recordType",
-   label: "Record Type",
-   type: "select",
-   required: true,
-   options: [
-    { value: "A", label: "A Record" },
-    { value: "AAAA", label: "AAAA Record" },
-   ],
-  },
- ],
+    type: "dns",
+    displayName: "DNS (Domain Resolution)",
+    description: "Monitors DNS resolution for domains",
+    version: "1.0.0",
+    serviceFactory: () => new DnsMonitor(),
+    validationSchema: monitorSchemas.dns,
+    fields: [
+        {
+            name: "hostname",
+            label: "Hostname",
+            type: "text",
+            required: true,
+            placeholder: "example.com",
+        },
+        {
+            name: "recordType", 
+            label: "Record Type",
+            type: "select",
+            required: true,
+            options: [
+                { value: "A", label: "A Record" },
+                { value: "AAAA", label: "AAAA Record" },
+            ],
+        },
+    ],
+    uiConfig: {
+        formatDetail: (details) => `Record: ${details}`,
+        formatTitleSuffix: (monitor) => {
+            const hostname = monitor.hostname as string;
+            return hostname ? ` (${hostname})` : "";
+        },
+    },
 });
+```
+
+### **Step 5: Export Monitor Class**
+
+```typescript
+// electron/services/monitoring/index.ts
+export { DnsMonitor } from "./DnsMonitor";
 ```
 
 ---
@@ -462,17 +562,25 @@ registerMonitorType({
 
 Adding a new monitor type requires:
 
-1. **3-5 file modifications** (types, schema, registry, export, tests)
-2. **1 new monitor service class**
-3. **Comprehensive testing**
-4. **Optional UI customizations**
+1. **5 file modifications** in exact order (types → schema → service → registry → export)
+2. **1 new monitor service class** implementing `IMonitorService`
+3. **Comprehensive testing** covering all scenarios
+4. **Proper field validation** extending `baseMonitorSchema`
+
+**⚠️ Critical Requirements:**
+- **ALL monitors MUST support**: `checkInterval`, `retryAttempts`, `timeout`
+- **MUST use utility functions**: `getMonitorTimeout()`, `getMonitorRetryAttempts()`
+- **MUST extend `baseMonitorSchema`** for validation
+- **MUST follow implementation order** to avoid dependency issues
 
 The system is designed to be extensible with minimal code changes thanks to:
 
-- ✅ Dynamic form generation
-- ✅ Registry-based type system
-- ✅ Automatic database schema adaptation
-- ✅ Type-safe validation pipeline
-- ✅ Pluggable monitor services
+- ✅ **Dynamic form generation** from registry configuration
+- ✅ **Registry-based type system** with complete UI integration
+- ✅ **Automatic database schema adaptation** for new fields
+- ✅ **Type-safe validation pipeline** with shared schemas  
+- ✅ **Pluggable monitor services** with consistent interface
 
 This architecture allows you to focus on implementing the core monitoring logic while the framework handles the integration automatically.
+
+**📌 Remember**: The three required fields (checkInterval, retryAttempts, timeout) are not suggestions - they are enforced by the scheduler and must be supported by every monitor type.

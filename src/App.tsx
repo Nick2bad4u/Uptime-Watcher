@@ -8,7 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { StatusUpdate } from "./types";
 
 import { isDevelopment, isProduction } from "../shared/utils/environment";
-import { AddSiteForm } from "./components/AddSiteForm/AddSiteForm";
+import { AddSiteModal } from "./components/AddSiteForm/AddSiteModal";
 import { SiteList } from "./components/Dashboard/SiteList/SiteList";
 import { Header } from "./components/Header/Header";
 import { Settings } from "./components/Settings/Settings";
@@ -17,7 +17,6 @@ import { UI_DELAYS } from "./constants";
 
 // UI Message constants for consistency and future localization
 const UI_MESSAGES = {
-    ADD_SITE_LABEL: "Add New Site",
     ERROR_CLOSE_BUTTON: "✕",
     LOADING: "Loading...",
     SITE_COUNT_LABEL: "Monitored Sites",
@@ -302,32 +301,21 @@ function App() {
                     <Header />
 
                     <main className="main-container">
-                        <div className="grid-layout">
-                            {/* Main content */}
-                            <div>
-                                <ThemedBox padding="md" rounded="lg" shadow="sm" surface="elevated">
-                                    <ThemedBox border className="border-b" padding="md" surface="base">
-                                        <ThemedText size="lg" weight="medium">
-                                            {UI_MESSAGES.SITE_COUNT_LABEL} ({sites.length})
-                                        </ThemedText>
-                                    </ThemedBox>
-                                    <div className="p-0">
-                                        <SiteList />
-                                    </div>
-                                </ThemedBox>
+                        {/* Full-width site list */}
+                        <ThemedBox padding="md" rounded="lg" shadow="sm" surface="elevated">
+                            <ThemedBox border className="border-b" padding="md" surface="base">
+                                <ThemedText size="lg" weight="medium">
+                                    {UI_MESSAGES.SITE_COUNT_LABEL} ({sites.length})
+                                </ThemedText>
+                            </ThemedBox>
+                            <div className="p-0">
+                                <SiteList />
                             </div>
-
-                            {/* Sidebar */}
-                            <div>
-                                <ThemedBox padding="lg" rounded="lg" shadow="sm" surface="elevated">
-                                    <ThemedText className="mb-4" size="lg" weight="medium">
-                                        {UI_MESSAGES.ADD_SITE_LABEL}
-                                    </ThemedText>
-                                    <AddSiteForm />
-                                </ThemedBox>
-                            </div>
-                        </div>
+                        </ThemedBox>
                     </main>
+
+                    {/* Add Site Modal */}
+                    <AddSiteModal />
 
                     {/* Settings Modal */}
                     {showSettings && <Settings onClose={handleCloseSettings} />}

@@ -58,7 +58,9 @@ export const SiteCard = React.memo(function SiteCard({ site }: SiteCardPropertie
         handleMonitorIdChange,
         // Action handlers
         handleStartMonitoring,
+        handleStartSiteMonitoring,
         handleStopMonitoring,
+        handleStopSiteMonitoring,
         // UI state
         isLoading,
         isMonitoring,
@@ -72,6 +74,10 @@ export const SiteCard = React.memo(function SiteCard({ site }: SiteCardPropertie
         uptime,
     } = useSite(site);
 
+    // Calculate if all monitors are running for the site monitoring button
+    const allMonitorsRunning =
+        latestSite.monitors.length > 0 && latestSite.monitors.every((monitor) => monitor.monitoring === true);
+
     return (
         <ThemedBox
             aria-label={`View details for ${latestSite.name}`}
@@ -83,13 +89,16 @@ export const SiteCard = React.memo(function SiteCard({ site }: SiteCardPropertie
             variant="secondary"
         >
             <SiteCardHeader
+                allMonitorsRunning={allMonitorsRunning}
                 hasMonitor={!!monitor}
                 isLoading={isLoading}
                 isMonitoring={isMonitoring}
                 onCheckNow={handleCheckNow}
                 onMonitorIdChange={handleMonitorIdChange}
                 onStartMonitoring={handleStartMonitoring}
+                onStartSiteMonitoring={handleStartSiteMonitoring}
                 onStopMonitoring={handleStopMonitoring}
+                onStopSiteMonitoring={handleStopSiteMonitoring}
                 selectedMonitorId={selectedMonitorId}
                 site={latestSite}
             />

@@ -7,29 +7,78 @@ import { Monitor, Site } from "../../types";
 import { ensureError } from "../../utils/errorHandling";
 
 /**
- * Result interface for the useSiteActions hook
+ * Result interface for the useSiteActions hook.
+ *
+ * @remarks
+ * Provides a complete set of action handlers for site operations,
+ * including individual monitor control and site-wide monitoring management.
+ * All handlers include proper error handling and user action logging.
  *
  * @public
  */
 export interface SiteActionsResult {
+    /** Handler for clicking on site card to show details */
     handleCardClick: () => void;
+    /** Handler for immediate status check of current monitor */
     handleCheckNow: () => void;
-    // Action handlers
+    /** Handler for starting monitoring on current monitor */
     handleStartMonitoring: () => void;
+    /** Handler for starting monitoring on all site monitors */
+    handleStartSiteMonitoring: () => void;
+    /** Handler for stopping monitoring on current monitor */
     handleStopMonitoring: () => void;
+    /** Handler for stopping monitoring on all site monitors */
+    handleStopSiteMonitoring: () => void;
 }
 
 /**
- * Hook to handle site-related actions like checking status and monitoring
- * Integrated with logger and state management for proper tracking
+ * Hook to handle site-related actions including monitoring control and navigation.
+ *
+ * @remarks
+ * This hook provides a comprehensive set of action handlers for site operations,
+ * including both individual monitor control and site-wide monitoring management.
+ * All operations are properly logged for debugging and analytics purposes.
+ *
+ * The hook integrates with the sites store for state management and includes
+ * proper error handling with user-friendly logging. All handlers are wrapped
+ * in useCallback for performance optimization.
+ *
+ * Monitoring operations support both individual monitor control (start/stop specific
+ * monitor) and site-wide control (start/stop all monitors for a site).
  *
  * @param site - The site object to act upon
- * @param monitor - The specific monitor to use for actions
- * @returns Object containing action handler functions
+ * @param monitor - The specific monitor to use for individual monitor actions
+ * @returns Object containing all available action handler functions
+ *
+ * @example
+ * ```tsx
+ * function SiteCard({ site }) {
+ *   const { monitor } = useSiteMonitor(site);
+ *   const {
+ *     handleStartSiteMonitoring,
+ *     handleStopSiteMonitoring,
+ *     handleCheckNow
+ *   } = useSiteActions(site, monitor);
+ *
+ *   return (
+ *     <div>
+ *       <button onClick={handleStartSiteMonitoring}>Start All</button>
+ *       <button onClick={handleStopSiteMonitoring}>Stop All</button>
+ *       <button onClick={handleCheckNow}>Check Now</button>
+ *     </div>
+ *   );
+ * }
+ * ```
  */
 export function useSiteActions(site: Site, monitor: Monitor | undefined): SiteActionsResult {
-    const { checkSiteNow, setSelectedMonitorId, startSiteMonitorMonitoring, stopSiteMonitorMonitoring } =
-        useSitesStore();
+    const {
+        checkSiteNow,
+        setSelectedMonitorId,
+        startSiteMonitoring,
+        startSiteMonitorMonitoring,
+        stopSiteMonitoring,
+        stopSiteMonitorMonitoring,
+    } = useSitesStore();
     const { setSelectedSite, setShowSiteDetails } = useUIStore();
 
     // Start monitoring the site with proper logging
@@ -77,6 +126,38 @@ export function useSiteActions(site: Site, monitor: Monitor | undefined): SiteAc
             logger.site.error(site.identifier, ensureError(error));
         }
     }, [monitor, site.identifier, site.name, stopSiteMonitorMonitoring]);
+
+    // Start monitoring for all monitors in the site with proper logging
+    const handleStartSiteMonitoring = useCallback(() => {
+        void (async () => {
+            try {
+                await startSiteMonitoring(site.identifier);
+                logger.user.action("Started site-wide monitoring", {
+                    monitorsCount: site.monitors.length,
+                    siteId: site.identifier,
+                    siteName: site.name,
+                });
+            } catch (error) {
+                logger.site.error(site.identifier, ensureError(error));
+            }
+        })();
+    }, [site.identifier, site.name, site.monitors.length, startSiteMonitoring]);
+
+    // Stop monitoring for all monitors in the site with proper logging
+    const handleStopSiteMonitoring = useCallback(() => {
+        void (async () => {
+            try {
+                await stopSiteMonitoring(site.identifier);
+                logger.user.action("Stopped site-wide monitoring", {
+                    monitorsCount: site.monitors.length,
+                    siteId: site.identifier,
+                    siteName: site.name,
+                });
+            } catch (error) {
+                logger.site.error(site.identifier, ensureError(error));
+            }
+        })();
+    }, [site.identifier, site.name, site.monitors.length, stopSiteMonitoring]);
 
     // Perform an immediate status check with enhanced logging
     const handleCheckNow = useCallback(() => {
@@ -136,6 +217,8 @@ export function useSiteActions(site: Site, monitor: Monitor | undefined): SiteAc
         handleCardClick,
         handleCheckNow,
         handleStartMonitoring,
+        handleStartSiteMonitoring,
         handleStopMonitoring,
+        handleStopSiteMonitoring,
     };
 }

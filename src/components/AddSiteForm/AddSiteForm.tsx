@@ -30,6 +30,15 @@ import { RadioGroup, SelectField, TextField } from "./FormFields";
 import { handleSubmit } from "./Submit";
 
 /**
+ * Props for the AddSiteForm component.
+ * @public
+ */
+export interface AddSiteFormProperties {
+    /** Optional callback to execute on successful form submission */
+    onSuccess?: () => void;
+}
+
+/**
  * Supported add modes for the form.
  * @public
  */
@@ -74,14 +83,15 @@ function isValidMonitorType(value: string): value is MonitorType {
  * - Uses Zustand stores for state and error management.
  * - Loads monitor types from backend and displays dynamic help text.
  *
+ * @param props - AddSiteForm component props
  * @returns The rendered AddSiteForm JSX element.
  *
  * @example
  * ```tsx
- * <AddSiteForm />
+ * <AddSiteForm onSuccess={() => console.log('Site added!')} />
  * ```
  */
-export const AddSiteForm = React.memo(function AddSiteForm() {
+export const AddSiteForm = React.memo(function AddSiteForm({ onSuccess }: AddSiteFormProperties) {
     // Combine store calls to avoid duplicates and improve performance
     const { clearError, isLoading, lastError } = useErrorStore();
     const { addMonitorToSite, createSite, sites } = useSitesStore();
@@ -117,6 +127,12 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
 
     // Get dynamic help text for the current monitor type
     const helpTexts = useDynamicHelpText(monitorType);
+
+    // Combined success callback that resets form and calls prop callback
+    const handleSuccess = useCallback(() => {
+        resetForm();
+        onSuccess?.();
+    }, [resetForm, onSuccess]);
 
     // Delayed loading state for button spinner (100ms delay)
     const [showButtonLoading, setShowButtonLoading] = useState(false);
@@ -159,7 +175,7 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
                     logger,
                     monitorType,
                     name,
-                    onSuccess: resetForm,
+                    onSuccess: handleSuccess,
                     port,
                     selectedExistingSite,
                     setFormError,
@@ -178,11 +194,11 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
             clearError,
             createSite,
             formError,
+            handleSuccess,
             host,
             monitorType,
             name,
             port,
-            resetForm,
             selectedExistingSite,
             setFormError,
             siteId,

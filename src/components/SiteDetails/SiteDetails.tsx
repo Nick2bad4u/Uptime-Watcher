@@ -33,7 +33,7 @@
  * @public
  */
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useSiteDetails } from "../../hooks/site/useSiteDetails";
 import { ChartConfigService } from "../../services/chartConfig";
@@ -87,6 +87,20 @@ export interface SiteDetailsProperties {
 export function SiteDetails({ onClose, site }: SiteDetailsProperties) {
     const { currentTheme } = useTheme();
     const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
+
+    // Add global escape key handler
+    useEffect(() => {
+        const handleGlobalKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") {
+                onClose();
+            }
+        };
+
+        document.addEventListener("keydown", handleGlobalKeyDown);
+        return () => {
+            document.removeEventListener("keydown", handleGlobalKeyDown);
+        };
+    }, [onClose]);
 
     // Use our custom hook to get all the data and functionality we need
     const {
@@ -196,16 +210,6 @@ export function SiteDetails({ onClose, site }: SiteDetailsProperties) {
         [analytics.upCount, analytics.downCount, currentTheme]
     );
 
-    /**
-     * Handle keyboard events for modal accessibility
-     * @param event - Keyboard event
-     */
-    const handleKeyDown = (event: React.KeyboardEvent) => {
-        if (event.key === "Escape") {
-            onClose();
-        }
-    };
-
     // Don't render if site doesn't exist
     if (!siteExists) {
         // eslint-disable-next-line unicorn/no-null -- React components can return null
@@ -218,7 +222,6 @@ export function SiteDetails({ onClose, site }: SiteDetailsProperties) {
                 aria-label="Close modal"
                 className="absolute inset-0 bg-transparent border-none cursor-pointer"
                 onClick={onClose}
-                onKeyDown={handleKeyDown}
                 type="button"
             />
             <dialog

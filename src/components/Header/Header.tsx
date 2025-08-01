@@ -42,7 +42,7 @@ import "./Header.css";
  */
 export function Header() {
     const { sites } = useSitesStore();
-    const { setShowSettings } = useUIStore();
+    const { setShowAddSiteModal, setShowSettings } = useUIStore();
     const { isDark, toggleTheme } = useTheme();
     const { getAvailabilityColor } = useAvailabilityColors();
 
@@ -229,6 +229,24 @@ export function Header() {
 
                     {/* Right: Controls */}
                     <div className="flex flex-wrap items-center gap-3">
+                        {/* Add Site Button */}
+                        <ThemedBox
+                            className="flex items-center header-controls-box"
+                            padding="xs"
+                            rounded="md"
+                            variant="tertiary"
+                        >
+                            <ThemedButton
+                                aria-label="Add new site"
+                                className="p-2 themed-button--icon"
+                                onClick={() => setShowAddSiteModal(true)}
+                                size="sm"
+                                variant="secondary"
+                            >
+                                ➕
+                            </ThemedButton>
+                        </ThemedBox>
+
                         {/* Theme Toggle */}
                         <ThemedBox
                             className="flex items-center header-controls-box"

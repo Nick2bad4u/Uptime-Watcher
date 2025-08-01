@@ -16,6 +16,8 @@ import { MonitorSelector } from "./components/MonitorSelector";
  * @public
  */
 export interface SiteCardHeaderProperties {
+    /** Whether all monitors are currently running */
+    allMonitorsRunning: boolean;
     /** Whether site has any monitors configured */
     hasMonitor: boolean;
     /** Whether any operation is currently loading */
@@ -28,8 +30,12 @@ export interface SiteCardHeaderProperties {
     onMonitorIdChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
     /** Handler for start monitoring button */
     onStartMonitoring: () => void;
+    /** Handler for start site monitoring button */
+    onStartSiteMonitoring: () => void;
     /** Handler for stop monitoring button */
     onStopMonitoring: () => void;
+    /** Handler for stop site monitoring button */
+    onStopSiteMonitoring: () => void;
     /** Currently selected monitor ID */
     selectedMonitorId: string;
     /** Site data to display */
@@ -54,13 +60,16 @@ export interface SiteCardHeaderProperties {
  * @returns JSX.Element containing site header with controls
  */
 export const SiteCardHeader = React.memo(function SiteCardHeader({
+    allMonitorsRunning,
     hasMonitor,
     isLoading,
     isMonitoring,
     onCheckNow,
     onMonitorIdChange,
     onStartMonitoring,
+    onStartSiteMonitoring,
     onStopMonitoring,
+    onStopSiteMonitoring,
     selectedMonitorId,
     site,
 }: SiteCardHeaderProperties) {
@@ -78,12 +87,15 @@ export const SiteCardHeader = React.memo(function SiteCardHeader({
                 />
 
                 <ActionButtonGroup
+                    allMonitorsRunning={allMonitorsRunning}
                     disabled={!hasMonitor}
                     isLoading={isLoading}
                     isMonitoring={isMonitoring}
                     onCheckNow={onCheckNow}
                     onStartMonitoring={onStartMonitoring}
+                    onStartSiteMonitoring={onStartSiteMonitoring}
                     onStopMonitoring={onStopMonitoring}
+                    onStopSiteMonitoring={onStopSiteMonitoring}
                 />
             </div>
         </div>

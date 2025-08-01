@@ -44,6 +44,13 @@ export interface UIStore {
     setSelectedSite: (site: Site | undefined) => void;
 
     /**
+     * Sets the visibility of the add site modal.
+     *
+     * @param show - Whether to show the add site modal.
+     */
+    setShowAddSiteModal: (show: boolean) => void;
+
+    /**
      * Sets the visibility of advanced metrics in the UI.
      *
      * @param show - Whether to show advanced metrics.
@@ -72,6 +79,11 @@ export interface UIStore {
      * @param range - The chart time range to select.
      */
     setSiteDetailsChartTimeRange: (range: ChartTimeRange) => void;
+
+    /**
+     * Whether the add site modal is currently open.
+     */
+    showAddSiteModal: boolean;
 
     /**
      * Whether advanced metrics are visible in the UI.
