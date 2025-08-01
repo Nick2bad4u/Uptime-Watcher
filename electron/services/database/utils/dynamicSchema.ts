@@ -9,8 +9,8 @@
 
 import { safeGetRowProperty } from "../../../../shared/types/database";
 import { safeStringify } from "../../../../shared/utils/stringConversion";
-import { getAllMonitorTypeConfigs } from "../../monitoring/MonitorTypeRegistry";
 import { isValidIdentifierArray } from "../../../../shared/validation/validatorUtils";
+import { getAllMonitorTypeConfigs } from "../../monitoring/MonitorTypeRegistry";
 
 /**
  * Database field definition for dynamic monitor schema.

@@ -6,13 +6,13 @@
  * Includes data synchronization and SQLite backup functionality.
  */
 
+import { safeInteger } from "@shared/validation/validatorUtils";
 import { useCallback, useEffect, useState } from "react";
 
 import type { AppSettings } from "../../stores/types";
 
 import { DEFAULT_HISTORY_LIMIT, HISTORY_LIMIT_OPTIONS, UI_DELAYS } from "../../constants";
 import logger from "../../services/logger";
-import { safeInteger } from "@shared/validation/validatorUtils";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSettingsStore } from "../../stores/settings/useSettingsStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";

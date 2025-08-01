@@ -21,8 +21,8 @@
  * ```
  */
 
-import { Site } from "../../types";
 import { isNonEmptyString } from "../../../shared/validation/validatorUtils";
+import { Site } from "../../types";
 import { ValidationResult } from "./interfaces";
 import { MonitorValidator } from "./MonitorValidator";
 

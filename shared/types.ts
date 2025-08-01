@@ -176,7 +176,7 @@ function isValidActiveOperations(activeOperations: unknown): activeOperations is
     if (!Array.isArray(activeOperations)) {
         return false;
     }
-    
+
     // Use more permissive validation since we import validator in the backend
     // For shared types, we'll keep the simple validation
     for (const op of activeOperations) {

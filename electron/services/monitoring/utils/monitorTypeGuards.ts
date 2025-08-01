@@ -7,8 +7,8 @@
  * This addresses the type safety issues identified in HttpMonitor and PortMonitor.
  */
 
-import { Site } from "../../../types";
 import { isNonEmptyString, isValidFQDN, isValidUrl } from "../../../../shared/validation/validatorUtils";
+import { Site } from "../../../types";
 
 /**
  * Safely extracts retry attempts from monitor configuration.
@@ -40,9 +40,9 @@ export function getMonitorTimeout(monitor: Site["monitors"][0], defaultTimeout: 
  */
 export function hasValidHost(monitor: Site["monitors"][0]): monitor is Site["monitors"][0] & { host: string } {
     // Allow hostnames that are either FQDNs or could be valid IPs/hostnames
-    return isNonEmptyString(monitor.host) && (
-        isValidFQDN(monitor.host, { require_tld: false }) || 
-        /^[\w.-]+$/.test(monitor.host)
+    return (
+        isNonEmptyString(monitor.host) &&
+        (isValidFQDN(monitor.host, { require_tld: false }) || /^[\w.-]+$/.test(monitor.host))
     );
 }
 

@@ -7,7 +7,7 @@
  * as a fallback when the enhanced monitoring system with operation correlation is unavailable.
  * The enhanced system (`EnhancedMonitorChecker`) is preferred for all new operations as it
  * provides race condition prevention and operation correlation.
- * 
+ *
  * Provides comprehensive monitor checking capabilities with automatic status updates,
  * history tracking, and event emission. Extracted from UptimeMonitor for improved
  * modularity and maintainability with full transaction safety and error handling.

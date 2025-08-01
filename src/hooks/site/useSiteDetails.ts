@@ -16,11 +16,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { safeInteger } from "../../../shared/validation/validatorUtils";
 import { ChartTimeRange, DEFAULT_CHECK_INTERVAL, RETRY_CONSTRAINTS } from "../../constants";
 import logger from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
-import { safeInteger } from "../../../shared/validation/validatorUtils";
 import { useUIStore } from "../../stores/ui/useUiStore";
 import { Monitor, Site } from "../../types";
 import { withUtilityErrorHandling } from "../../utils/errorHandling";

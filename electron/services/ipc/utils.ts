@@ -5,9 +5,9 @@
 
 import { ipcMain } from "electron";
 
-import { isNonEmptyString } from "../../../shared/validation/validatorUtils";
 import type { IpcParameterValidator, IpcResponse, IpcValidationResponse } from "./types";
 
+import { isNonEmptyString } from "../../../shared/validation/validatorUtils";
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 

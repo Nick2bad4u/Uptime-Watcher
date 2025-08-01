@@ -4,8 +4,8 @@
  */
 
 import { safeStringify } from "../../../../shared/utils/stringConversion";
-import { logger } from "../../../utils/logger";
 import { isNonEmptyString } from "../../../../shared/validation/validatorUtils";
+import { logger } from "../../../utils/logger";
 
 /**
  * Setting row type for database operations.

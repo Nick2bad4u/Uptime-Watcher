@@ -16,7 +16,7 @@ import { IpcValidators } from "./utils";
 
 /**
  * Helper function to create validators for handlers expecting no parameters.
- * 
+ *
  * @returns A validator function that ensures no parameters are passed
  */
 function createNoParamsValidator(): IpcParameterValidator {
@@ -27,7 +27,7 @@ function createNoParamsValidator(): IpcParameterValidator {
 
 /**
  * Helper function to create validators for handlers expecting a single string parameter.
- * 
+ *
  * @param paramName - Name of the parameter for error messages
  * @returns A validator function that validates a single string parameter
  */
@@ -50,7 +50,7 @@ function createSingleStringValidator(paramName: string): IpcParameterValidator {
 
 /**
  * Helper function to create validators for handlers expecting two string parameters.
- * 
+ *
  * @param firstParamName - Name of the first parameter for error messages
  * @param secondParamName - Name of the second parameter for error messages
  * @returns A validator function that validates two string parameters

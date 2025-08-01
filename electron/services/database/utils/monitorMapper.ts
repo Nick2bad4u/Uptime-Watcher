@@ -7,9 +7,9 @@
  * All mapping functions are type-safe and log errors with full context.
  */
 
+import { isValidIdentifierArray, safeInteger } from "../../../../shared/validation/validatorUtils";
 import { Site } from "../../../types";
 import { logger } from "../../../utils/logger";
-import { isValidIdentifierArray, safeInteger } from "../../../../shared/validation/validatorUtils";
 import { generateSqlParameters, mapMonitorToRow, mapRowToMonitor } from "./dynamicSchema";
 import { DbValue } from "./valueConverters";
 
@@ -268,7 +268,7 @@ function copyDynamicFields(monitor: Site["monitors"][0], dynamicMonitor: Record<
  * @param dynamicMonitor - Mapped monitor data
  * @param row - Original database row
  * @returns Base monitor object with validated fields
- * 
+ *
  * @see {@link safeInteger} - Safe integer conversion utility
  */
 function createBaseMonitor(dynamicMonitor: Record<string, unknown>, row: Record<string, unknown>): Site["monitors"][0] {
@@ -282,11 +282,7 @@ function createBaseMonitor(dynamicMonitor: Record<string, unknown>, row: Record<
                 ? String(dynamicMonitor["id"])
                 : "-1",
         monitoring: Boolean(dynamicMonitor["enabled"]),
-        responseTime: safeInteger(
-            dynamicMonitor["responseTime"] || row["responseTime"], 
-            -1, 
-            -1
-        ),
+        responseTime: safeInteger(dynamicMonitor["responseTime"] || row["responseTime"], -1, -1),
         retryAttempts: safeInteger(dynamicMonitor["retryAttempts"], 3, 0, 10),
         status: dynamicMonitor["status"] ? (dynamicMonitor["status"] as Site["monitors"][0]["status"]) : "down",
         timeout: safeInteger(dynamicMonitor["timeout"], 5000, 1000, 300_000),
@@ -304,7 +300,7 @@ function createBaseMonitor(dynamicMonitor: Record<string, unknown>, row: Record<
  *
  * @param row - Database row
  * @returns Array of validated operation IDs
- * 
+ *
  * @see {@link isValidIdentifierArray} - Validation function used
  */
 function parseActiveOperations(row: Record<string, unknown>): string[] {
@@ -314,7 +310,7 @@ function parseActiveOperations(row: Record<string, unknown>): string[] {
 
     try {
         const parsed: unknown = JSON.parse(row["active_operations"]);
-        
+
         if (isValidIdentifierArray(parsed)) {
             return parsed;
         } else {

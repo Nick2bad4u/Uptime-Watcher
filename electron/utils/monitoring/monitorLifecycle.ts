@@ -1,14 +1,14 @@
 /**
  * Traditional monitor lifecycle management utilities.
- * 
+ *
  * @remarks
  * **Legacy Fallback System**: This module provides traditional monitor start/stop operations
- * that serve as fallbacks when the enhanced monitoring system is unavailable. The enhanced 
- * system with operation correlation and race condition prevention is preferred for all new 
+ * that serve as fallbacks when the enhanced monitoring system is unavailable. The enhanced
+ * system with operation correlation and race condition prevention is preferred for all new
  * monitor lifecycle operations.
- * 
+ *
  * Consolidates monitor starting and stopping operations for better organization.
- * 
+ *
  * @see {@link EnhancedMonitoringServices} for the preferred enhanced implementation
  */
 
