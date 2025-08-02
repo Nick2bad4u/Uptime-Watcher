@@ -55,6 +55,11 @@ export interface ThemeStyles {
     urlStyle: React.CSSProperties;
 }
 
+/**
+ * Common transition easing for consistent animations
+ */
+const TRANSITION_EASING = "0.3s cubic-bezier(0.4, 0, 0.2, 1)";
+
 export function useThemeStyles(isCollapsed = false): ThemeStyles {
     // Use state to track theme changes for reactivity
     const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -105,98 +110,176 @@ export function useThemeStyles(isCollapsed = false): ThemeStyles {
         return cleanup;
     }, []);
 
-    const styles = useMemo<ThemeStyles>(() => {
-        const transitionEasing = "0.3s cubic-bezier(0.4, 0, 0.2, 1)";
-
-        return {
-            collapseButtonStyle: {
-                alignItems: "center",
-                backgroundColor: "transparent",
-                border: "none",
-                borderRadius: "0.375rem",
-                color: isDarkMode ? "#9ca3af" : "#6b7280",
-                cursor: "pointer",
-                display: "flex",
-                justifyContent: "center",
-                padding: "0.5rem",
-                transition: `all ${transitionEasing}`,
-            },
-            contentStyle: {
-                padding: isCollapsed ? "1rem 1.5rem" : "1.5rem",
-                position: "relative",
-                transition: `padding ${transitionEasing}`,
-                zIndex: 2,
-            },
-            headerStyle: {
-                background: isDarkMode
-                    ? "linear-gradient(120deg, rgba(37, 99, 235, 0.15) 0%, rgba(147, 51, 234, 0.15) 60%, rgba(31, 41, 55, 0.8) 100%)"
-                    : "linear-gradient(120deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 60%, rgba(249, 250, 251, 0.9) 100%)",
-                borderRadius: "0.75rem",
-                boxShadow: isDarkMode
-                    ? "0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2)"
-                    : "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-                color: isDarkMode ? "#f3f4f6" : "#111827",
-                height: isCollapsed ? "80px" : "auto",
-                marginBottom: "1.25rem",
-                minHeight: isCollapsed ? "80px" : "140px",
-                overflow: "hidden",
-                padding: "1.5rem",
-                position: "relative",
-                transition: `all ${transitionEasing}`,
-            },
-            metaStyle: {
-                alignItems: "center",
-                color: isDarkMode ? "#9ca3af" : "#6b7280",
-                display: "flex",
-                fontSize: "1rem",
-                fontWeight: 600,
-                gap: "0.75rem",
-                marginTop: "0.25rem",
-                opacity: 0.9,
-            },
-            overlayStyle: {
-                background: isDarkMode
-                    ? "linear-gradient(120deg, rgba(37, 99, 235, 0.05) 0%, rgba(147, 51, 234, 0.05) 60%, rgba(31, 41, 55, 0.1) 100%)"
-                    : "linear-gradient(120deg, rgba(59, 130, 246, 0.05) 0%, rgba(37, 99, 235, 0.05) 60%, rgba(249, 250, 251, 0.1) 100%)",
-                borderRadius: "0.75rem",
-                bottom: 0,
-                left: 0,
-                opacity: 0.85,
-                pointerEvents: "none",
-                position: "absolute",
-                right: 0,
-                top: 0,
-                transition: `background ${transitionEasing}, opacity ${transitionEasing}`,
-                zIndex: 1,
-            },
-            titleStyle: {
-                color: isDarkMode ? "#f3f4f6" : "#111827",
-                cursor: "default",
-                fontSize: "1.875rem",
-                fontWeight: 700,
-                letterSpacing: "0.01em",
-                lineHeight: 1.25,
-                margin: 0,
-                textShadow: isDarkMode
-                    ? "0 2px 12px rgba(59, 130, 246, 0.3), 0 1px 0 rgba(37, 99, 235, 0.3)"
-                    : "0 2px 12px rgba(59, 130, 246, 0.1), 0 1px 0 rgba(37, 99, 235, 0.1)",
-                transition: `all ${transitionEasing}`,
-            },
-            urlStyle: {
-                background: "none",
-                color: isDarkMode ? "#9ca3af" : "#6b7280",
-                fontSize: "1.125rem",
-                fontWeight: 600,
-                margin: 0,
-                maxWidth: "100%",
-                opacity: 1,
-                padding: 0,
-                textDecoration: "none",
-                transition: `color ${transitionEasing}, opacity ${transitionEasing}`,
-                wordBreak: "break-all",
-            },
-        };
-    }, [isCollapsed, isDarkMode]);
+    const styles = useMemo<ThemeStyles>(
+        () => ({
+            collapseButtonStyle: getCollapseButtonStyle(isDarkMode),
+            contentStyle: getContentStyle(isCollapsed),
+            headerStyle: getHeaderStyle(isCollapsed, isDarkMode),
+            metaStyle: getMetaStyle(isDarkMode),
+            overlayStyle: getOverlayStyle(isDarkMode),
+            titleStyle: getTitleStyle(isDarkMode),
+            urlStyle: getUrlStyle(isDarkMode),
+        }),
+        [isCollapsed, isDarkMode]
+    );
 
     return styles;
+}
+
+/**
+ * Generates collapse button styles based on theme
+ *
+ * @param isDarkMode - Whether dark mode is active
+ * @returns CSS properties for collapse button
+ */
+function getCollapseButtonStyle(isDarkMode: boolean): React.CSSProperties {
+    return {
+        alignItems: "center",
+        backgroundColor: "transparent",
+        border: "none",
+        borderRadius: "0.375rem",
+        color: isDarkMode ? "#9ca3af" : "#6b7280",
+        cursor: "pointer",
+        display: "flex",
+        justifyContent: "center",
+        padding: "0.5rem",
+        transition: `all ${TRANSITION_EASING}`,
+    };
+}
+
+/**
+ * Generates content area styles based on collapse state
+ *
+ * @param isCollapsed - Whether the component is collapsed
+ * @returns CSS properties for content area
+ */
+function getContentStyle(isCollapsed: boolean): React.CSSProperties {
+    return {
+        padding: isCollapsed ? "1rem 1.5rem" : "1.5rem",
+        position: "relative",
+        transition: `padding ${TRANSITION_EASING}`,
+        zIndex: 2,
+    };
+}
+
+/**
+ * Generates header styles based on theme and collapse state
+ *
+ * @param isCollapsed - Whether the component is collapsed
+ * @param isDarkMode - Whether dark mode is active
+ * @returns CSS properties for header section
+ */
+function getHeaderStyle(isCollapsed: boolean, isDarkMode: boolean): React.CSSProperties {
+    const darkGradient =
+        "linear-gradient(120deg, rgba(37, 99, 235, 0.15) 0%, rgba(147, 51, 234, 0.15) 60%, rgba(31, 41, 55, 0.8) 100%)";
+    const lightGradient =
+        "linear-gradient(120deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 60%, rgba(249, 250, 251, 0.9) 100%)";
+
+    const darkShadow = "0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2)";
+    const lightShadow = "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)";
+
+    return {
+        background: isDarkMode ? darkGradient : lightGradient,
+        borderRadius: "0.75rem",
+        boxShadow: isDarkMode ? darkShadow : lightShadow,
+        color: isDarkMode ? "#f3f4f6" : "#111827",
+        height: isCollapsed ? "80px" : "auto",
+        marginBottom: "1.25rem",
+        minHeight: isCollapsed ? "80px" : "140px",
+        overflow: "hidden",
+        padding: "1.5rem",
+        position: "relative",
+        transition: `all ${TRANSITION_EASING}`,
+    };
+}
+
+/**
+ * Generates metadata text styles based on theme
+ *
+ * @param isDarkMode - Whether dark mode is active
+ * @returns CSS properties for metadata text
+ */
+function getMetaStyle(isDarkMode: boolean): React.CSSProperties {
+    return {
+        alignItems: "center",
+        color: isDarkMode ? "#9ca3af" : "#6b7280",
+        display: "flex",
+        fontSize: "1rem",
+        fontWeight: 600,
+        gap: "0.75rem",
+        marginTop: "0.25rem",
+        opacity: 0.9,
+    };
+}
+
+/**
+ * Generates overlay/backdrop styles based on theme
+ *
+ * @param isDarkMode - Whether dark mode is active
+ * @returns CSS properties for overlay backdrop
+ */
+function getOverlayStyle(isDarkMode: boolean): React.CSSProperties {
+    const darkGradient =
+        "linear-gradient(120deg, rgba(37, 99, 235, 0.05) 0%, rgba(147, 51, 234, 0.05) 60%, rgba(31, 41, 55, 0.1) 100%)";
+    const lightGradient =
+        "linear-gradient(120deg, rgba(59, 130, 246, 0.05) 0%, rgba(37, 99, 235, 0.05) 60%, rgba(249, 250, 251, 0.1) 100%)";
+
+    return {
+        background: isDarkMode ? darkGradient : lightGradient,
+        borderRadius: "0.75rem",
+        bottom: 0,
+        left: 0,
+        opacity: 0.85,
+        pointerEvents: "none",
+        position: "absolute",
+        right: 0,
+        top: 0,
+        transition: `background ${TRANSITION_EASING}, opacity ${TRANSITION_EASING}`,
+        zIndex: 1,
+    };
+}
+
+/**
+ * Generates title text styles based on theme
+ *
+ * @param isDarkMode - Whether dark mode is active
+ * @returns CSS properties for title text
+ */
+function getTitleStyle(isDarkMode: boolean): React.CSSProperties {
+    const darkShadow = "0 2px 12px rgba(59, 130, 246, 0.3), 0 1px 0 rgba(37, 99, 235, 0.3)";
+    const lightShadow = "0 2px 12px rgba(59, 130, 246, 0.1), 0 1px 0 rgba(37, 99, 235, 0.1)";
+
+    return {
+        color: isDarkMode ? "#f3f4f6" : "#111827",
+        cursor: "default",
+        fontSize: "1.875rem",
+        fontWeight: 700,
+        letterSpacing: "0.01em",
+        lineHeight: 1.25,
+        margin: 0,
+        textShadow: isDarkMode ? darkShadow : lightShadow,
+        transition: `all ${TRANSITION_EASING}`,
+    };
+}
+
+/**
+ * Generates URL/link text styles based on theme
+ *
+ * @param isDarkMode - Whether dark mode is active
+ * @returns CSS properties for URL text
+ */
+function getUrlStyle(isDarkMode: boolean): React.CSSProperties {
+    return {
+        background: "none",
+        color: isDarkMode ? "#9ca3af" : "#6b7280",
+        fontSize: "1.125rem",
+        fontWeight: 600,
+        margin: 0,
+        maxWidth: "100%",
+        opacity: 1,
+        padding: 0,
+        textDecoration: "none",
+        transition: `color ${TRANSITION_EASING}, opacity ${TRANSITION_EASING}`,
+        wordBreak: "break-all",
+    };
 }

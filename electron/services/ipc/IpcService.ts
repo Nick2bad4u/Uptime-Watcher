@@ -15,6 +15,137 @@ import {
 } from "./validators";
 
 /**
+ * Utility functions for validating and processing monitor configuration properties.
+ */
+const ConfigPropertyValidator = {
+    /**
+     * Extracts and validates base properties from monitor configuration.
+     *
+     * @param config - The monitor configuration to process
+     * @returns Object containing base properties and any unexpected properties
+     */
+    extractAndValidateBaseProperties(config: ReturnType<typeof getAllMonitorTypeConfigs>[0]) {
+        const {
+            description,
+            displayName,
+            fields,
+            serviceFactory,
+            type,
+            uiConfig,
+            validationSchema,
+            version,
+            ...unexpectedProperties
+        } = config;
+
+        // Mark intentionally unused properties (for linting)
+        serviceFactory;
+        validationSchema;
+
+        return {
+            baseProperties: {
+                description,
+                displayName,
+                fields,
+                type,
+                uiConfig,
+                version,
+            },
+            unexpectedProperties,
+        };
+    },
+
+    /**
+     * Validates and logs unexpected properties in monitor configuration.
+     *
+     * @param unexpectedProperties - Record of unexpected properties found
+     * @param monitorType - The monitor type for logging context
+     */
+    validateAndLogUnexpectedProperties(unexpectedProperties: Record<string, unknown>, monitorType: string): void {
+        if (Object.keys(unexpectedProperties).length > 0) {
+            logger.warn("[IpcService] Unexpected properties in monitor config", {
+                type: monitorType,
+                unexpectedProperties: Object.keys(unexpectedProperties),
+            });
+        }
+    },
+};
+
+/**
+ * Utility functions for serializing UI configuration objects.
+ */
+const UiConfigSerializer = {
+    /**
+     * Serializes detail formats configuration for IPC transmission.
+     *
+     * @param detailFormats - The detail formats configuration to serialize
+     * @returns Serialized detail formats or undefined
+     */
+    serializeDetailFormats(detailFormats?: { analyticsLabel?: string }) {
+        return detailFormats
+            ? {
+                  analyticsLabel: detailFormats.analyticsLabel,
+                  // Note: historyDetail function is excluded (handled via IPC)
+                  // Note: formatDetail and formatTitleSuffix functions are excluded (handled via IPC)
+              }
+            : undefined;
+    },
+
+    /**
+     * Serializes display preferences for IPC transmission.
+     *
+     * @param display - The display configuration to serialize
+     * @returns Serialized display preferences or undefined
+     */
+    serializeDisplayPreferences(display?: { showAdvancedMetrics?: boolean; showUrl?: boolean }) {
+        return display
+            ? {
+                  showAdvancedMetrics: display.showAdvancedMetrics ?? false,
+                  showUrl: display.showUrl ?? false,
+              }
+            : undefined;
+    },
+
+    /**
+     * Serializes help texts configuration for IPC transmission.
+     *
+     * @param helpTexts - The help texts configuration to serialize
+     * @returns Serialized help texts or undefined
+     */
+    serializeHelpTexts(helpTexts?: { primary?: string; secondary?: string }) {
+        return helpTexts
+            ? {
+                  primary: helpTexts.primary,
+                  secondary: helpTexts.secondary,
+              }
+            : undefined;
+    },
+
+    /**
+     * Serializes complete UI configuration for IPC transmission.
+     *
+     * @param uiConfig - The UI configuration to serialize
+     * @returns Serialized UI configuration or undefined
+     */
+    serializeUiConfig(uiConfig?: {
+        detailFormats?: { analyticsLabel?: string };
+        display?: { showAdvancedMetrics?: boolean; showUrl?: boolean };
+        helpTexts?: { primary?: string; secondary?: string };
+        supportsAdvancedAnalytics?: boolean;
+        supportsResponseTime?: boolean;
+    }) {
+        return uiConfig
+            ? {
+                  detailFormats: this.serializeDetailFormats(uiConfig.detailFormats),
+                  display: this.serializeDisplayPreferences(uiConfig.display),
+                  helpTexts: this.serializeHelpTexts(uiConfig.helpTexts),
+                  supportsAdvancedAnalytics: uiConfig.supportsAdvancedAnalytics ?? false,
+                  supportsResponseTime: uiConfig.supportsResponseTime ?? false,
+              }
+            : undefined;
+    },
+};
+
+/**
  * Inter-Process Communication (IPC) service for Electron main-renderer communication.
  *
  * @remarks
@@ -125,72 +256,23 @@ export class IpcService {
      * @internal
      */
     private serializeMonitorTypeConfig(config: ReturnType<typeof getAllMonitorTypeConfigs>[0]) {
-        // Extract and validate base properties
-        const {
-            description,
-            displayName,
-            fields,
-            serviceFactory,
-            type,
-            uiConfig,
-            validationSchema,
-            version,
-            ...unexpectedProperties
-        } = config;
+        // Extract and validate properties using utility
+        const { baseProperties, unexpectedProperties } =
+            ConfigPropertyValidator.extractAndValidateBaseProperties(config);
 
-        // These properties are intentionally extracted but not used in serialization
-        serviceFactory;
-        validationSchema;
+        // Validate and log any unexpected properties
+        ConfigPropertyValidator.validateAndLogUnexpectedProperties(unexpectedProperties, baseProperties.type);
 
-        // Log if there are unexpected properties (helps with future maintenance)
-        if (Object.keys(unexpectedProperties).length > 0) {
-            logger.warn("[IpcService] Unexpected properties in monitor config", {
-                type,
-                unexpectedProperties: Object.keys(unexpectedProperties),
-            });
-        }
-
-        // Serialize UI configuration with comprehensive property handling
-        const serializedUiConfig = uiConfig
-            ? {
-                  // Detail formats (include all serializable data)
-                  detailFormats: uiConfig.detailFormats
-                      ? {
-                            analyticsLabel: uiConfig.detailFormats.analyticsLabel,
-                            // Note: historyDetail function is excluded (handled via IPC)
-                            // Note: formatDetail and formatTitleSuffix functions are excluded (handled via IPC)
-                        }
-                      : undefined,
-                  // Display preferences (preserve all flags)
-                  display: uiConfig.display
-                      ? {
-                            showAdvancedMetrics: uiConfig.display.showAdvancedMetrics ?? false,
-                            showUrl: uiConfig.display.showUrl ?? false,
-                        }
-                      : undefined,
-
-                  // Help texts (preserve original structure)
-                  helpTexts: uiConfig.helpTexts
-                      ? {
-                            primary: uiConfig.helpTexts.primary,
-                            secondary: uiConfig.helpTexts.secondary,
-                        }
-                      : undefined,
-
-                  supportsAdvancedAnalytics: uiConfig.supportsAdvancedAnalytics ?? false,
-
-                  // Feature support flags
-                  supportsResponseTime: uiConfig.supportsResponseTime ?? false,
-              }
-            : undefined;
+        // Serialize UI configuration using utility
+        const serializedUiConfig = UiConfigSerializer.serializeUiConfig(baseProperties.uiConfig);
 
         return {
-            description,
-            displayName,
-            fields, // Fields are always present in BaseMonitorConfig
-            type,
+            description: baseProperties.description,
+            displayName: baseProperties.displayName,
+            fields: baseProperties.fields, // Fields are always present in BaseMonitorConfig
+            type: baseProperties.type,
             uiConfig: serializedUiConfig,
-            version,
+            version: baseProperties.version,
         };
     }
 

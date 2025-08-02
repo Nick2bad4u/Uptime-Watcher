@@ -15,6 +15,31 @@ import type { IpcParameterValidator } from "./types";
 import { IpcValidators } from "./utils";
 
 /**
+ * Composes multiple validators into a single validator function.
+ *
+ * @param validators - Array of validator functions to combine
+ * @returns A validator function that runs all provided validators
+ *
+ * @remarks
+ * All validators are executed and their errors are collected.
+ * Returns null only if all validators pass, otherwise returns all error messages.
+ */
+function composeValidators(validators: IpcParameterValidator[]): IpcParameterValidator {
+    return (params: unknown[]): null | string[] => {
+        const allErrors: string[] = [];
+
+        for (const validator of validators) {
+            const errors = validator(params);
+            if (errors) {
+                allErrors.push(...errors);
+            }
+        }
+
+        return allErrors.length > 0 ? allErrors : null;
+    };
+}
+
+/**
  * Helper function to create validators for handlers expecting no parameters.
  *
  * @returns A validator function that ensures no parameters are passed
@@ -22,6 +47,20 @@ import { IpcValidators } from "./utils";
 function createNoParamsValidator(): IpcParameterValidator {
     return (params: unknown[]): null | string[] => {
         return params.length === 0 ? null : ["No parameters expected"];
+    };
+}
+
+/**
+ * Creates a validator that checks for an exact parameter count.
+ *
+ * @param expectedCount - The expected number of parameters
+ * @returns A validator function that validates parameter count
+ */
+function createParameterCountValidator(expectedCount: number): IpcParameterValidator {
+    return (params: unknown[]): null | string[] => {
+        return params.length === expectedCount
+            ? null
+            : [`Expected exactly ${expectedCount} parameter${expectedCount === 1 ? "" : "s"}`];
     };
 }
 
@@ -56,25 +95,23 @@ function createSingleStringValidator(paramName: string): IpcParameterValidator {
  * @returns A validator function that validates two string parameters
  */
 function createTwoStringValidator(firstParamName: string, secondParamName: string): IpcParameterValidator {
-    return (params: unknown[]): null | string[] => {
-        const errors: string[] = [];
-
-        if (params.length !== 2) {
-            errors.push("Expected exactly 2 parameters");
-        }
-
-        const firstError = IpcValidators.requiredString(params[0], firstParamName);
-        if (firstError) {
-            errors.push(firstError);
-        }
-
-        const secondError = IpcValidators.requiredString(params[1], secondParamName);
-        if (secondError) {
-            errors.push(secondError);
-        }
-
-        return errors.length > 0 ? errors : null;
+    // Create individual parameter validators
+    const firstStringValidator: IpcParameterValidator = (params: unknown[]): null | string[] => {
+        const error = IpcValidators.requiredString(params[0], firstParamName);
+        return error ? [error] : null;
     };
+
+    const secondStringValidator: IpcParameterValidator = (params: unknown[]): null | string[] => {
+        const error = IpcValidators.requiredString(params[1], secondParamName);
+        return error ? [error] : null;
+    };
+
+    // Compose all validators
+    return composeValidators([
+        createParameterCountValidator(2),
+        firstStringValidator,
+        secondStringValidator,
+    ]);
 }
 
 /**
