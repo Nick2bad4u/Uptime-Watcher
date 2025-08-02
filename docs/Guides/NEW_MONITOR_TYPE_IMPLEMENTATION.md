@@ -12,6 +12,67 @@ The system currently supports:
 - **Port**: TCP port connectivity monitoring (`port`)
 - **Ping**: Network connectivity monitoring (`ping`)
 
+## 🚀 Enhanced Monitoring System Integration
+
+**NEW REQUIREMENT**: All monitor types must integrate with the enhanced monitoring system that provides operation correlation and race condition prevention.
+
+### **🔹 MonitorCheckResult Interface Requirements**
+
+Your monitor service **MUST** return a result matching the `MonitorCheckResult` interface from `electron/services/monitoring/types.ts`:
+
+```typescript
+export interface MonitorCheckResult {
+    /** Human-readable details about the check result (REQUIRED) */
+    details?: string;
+    /** Technical error message for debugging (optional) */
+    error?: string;
+    /** Response time in milliseconds (REQUIRED) */
+    responseTime: number;
+    /** Check result status (REQUIRED) */
+    status: "up" | "down";
+}
+```
+
+### **🔹 Critical Details Field Requirement**
+
+**⚠️ BREAKING CHANGE**: The `details` field is now **essential** for proper history tracking:
+
+- **HTTP monitors**: Must include status codes (e.g., "HTTP 200 OK", "HTTP 404 Not Found")
+- **Port monitors**: Must include connection details (e.g., "Connection successful", "Connection refused")
+- **Ping monitors**: Must include response details (e.g., "Ping successful (25ms)", "Request timeout")
+
+**Example implementation:**
+```typescript
+// ✅ CORRECT - Provides meaningful details
+return {
+    status: "up",
+    responseTime: 150,
+    details: "HTTP 200 OK - Response received successfully"
+};
+
+// ❌ WRONG - Missing details will show "NULL" in history
+return {
+    status: "up", 
+    responseTime: 150
+};
+```
+
+### **🔹 Enhanced vs. Traditional Monitoring**
+
+The system now uses a **dual monitoring approach**:
+
+1. **Enhanced Monitoring (Primary)**: 
+   - Operation correlation and race condition prevention
+   - Used for both scheduled and manual checks when available
+   - Located: `electron/services/monitoring/EnhancedMonitorChecker.ts`
+
+2. **Traditional Monitoring (Fallback)**:
+   - Basic monitoring without correlation
+   - Used as fallback when enhanced monitoring fails
+   - Status: `@deprecated` but still required for reliability
+
+**Your monitor service works with both systems automatically** - no changes needed to your implementation.
+
 ## ⚡ Critical Requirements for ALL Monitor Types
 
 **Every monitor type MUST support these core fields:**
@@ -21,19 +82,66 @@ The system currently supports:
 | `checkInterval` | `number` | 5000ms - 30 days | How often to check the monitor |
 | `retryAttempts` | `number` | 0 - 10 attempts | Number of retries on failure |
 | `timeout` | `number` | 1000ms - 300000ms | Request timeout duration |
+| `details` | `string` | Non-empty string | **NEW**: Result details for history |
 
 These are **not optional** - they are enforced by the validation schemas and used by the monitoring scheduler.
 
-## 📋 Implementation Order
+## �️ Validation Best Practices
+
+**NEW: Use Validator Package for Consistent Validation**
+
+When implementing validation for new monitor types, use the centralized validation utilities:
+
+```typescript
+import { 
+    isNonEmptyString, 
+    isValidUrl, 
+    isValidFQDN,
+    isValidInteger,
+    safeInteger 
+} from "electron/utils/validation/validatorUtils";
+
+// Example validation for a web monitor
+function validateWebMonitor(monitor: WebMonitor): boolean {
+    return isValidUrl(monitor.url) && 
+           safeInteger(monitor.timeout, 5000, 1000, 300_000) > 0;
+}
+```
+
+**Benefits:**
+- ✅ **Consistent validation** across all monitor types
+- ✅ **Well-tested** validation using the validator.js package
+- ✅ **Type-safe** validation with proper TypeScript types
+- ✅ **Security-focused** validation patterns
+- ✅ **Enhanced monitoring compatibility** for operation correlation
+
+**Critical Validation Requirements:**
+
+1. **Details Field Validation**: 
+   - Must validate that `details` field will be populated in results
+   - Should provide meaningful, non-empty strings
+   - Must be human-readable for history display
+
+2. **Interface Compliance**:
+   - Must implement `IMonitorService` interface correctly
+   - Must return proper `MonitorCheckResult` with details field
+   - Must handle all error cases with appropriate details
+
+3. **Enhanced Monitoring Compatibility**:
+   - Results must work with both enhanced and traditional systems
+   - No interface violations or mixed logic
+   - Proper error handling and details propagation
+
+## �📋 Implementation Order
 
 Follow this **exact order** to avoid dependency issues:
 
 1. **Add type definition** (`shared/types.ts`)
-2. **Create validation schema** (`shared/validation/schemas.ts`) 
-3. **Create monitor service class** (`electron/services/monitoring/`)
+2. **Create validation schema** (`shared/validation/schemas.ts`) - **Use validator utilities**
+3. **Create monitor service class** (`electron/services/monitoring/`) - **Use validator type guards**
 4. **Register monitor type** (`MonitorTypeRegistry.ts`)
 5. **Export monitor class** (`index.ts`)
-6. **Create comprehensive tests**
+6. **Create comprehensive tests** - **Test validation edge cases**
 
 ## 🎯 Required Changes for New Monitor Type
 
@@ -268,16 +376,38 @@ The following components automatically support new monitor types through the reg
 - **Purpose**: Unit tests for the new monitor service
 - **Required Test Cases**:
   - Constructor and config management
-  - Successful DNS resolution
-  - Failed DNS resolution
-  - Timeout handling
-  - Error handling
-  - Response time measurement
+  - Successful DNS resolution with proper details
+  - Failed DNS resolution with error details
+  - Timeout handling with timeout details
+  - Error handling with meaningful error messages
+  - Response time measurement accuracy
+  - **NEW**: Details field validation and content
+  - **NEW**: Enhanced monitoring system compatibility
+  - **NEW**: Interface compliance verification
+
+**Critical Details Testing:**
+```typescript
+describe("DNS Monitor Details", () => {
+    it("should provide meaningful details for successful checks", async () => {
+        const result = await dnsMonitor.check(monitor);
+        expect(result.details).toBeDefined();
+        expect(result.details).toContain("DNS resolution successful");
+        expect(result.details).not.toBe("");
+    });
+
+    it("should provide error details for failed checks", async () => {
+        // Mock DNS failure
+        const result = await dnsMonitor.check(invalidMonitor);
+        expect(result.details).toBeDefined();
+        expect(result.details).toContain("DNS resolution failed");
+    });
+});
+```
 
 #### `electron/test/services/monitoring/types.test.ts`
 
 - **Location**: Add test case for new monitor type
-- **Change**: Verify interface compliance
+- **Change**: Verify interface compliance and details requirements
 
 #### `shared/test/validation/schemas.test.ts`
 
