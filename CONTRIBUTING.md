@@ -211,7 +211,7 @@ Contributors are recognized in:
 
 ## 📞 Getting Help
 
-- **Documentation**: Check the [docs](docs/README.md) first
+- **Documentation**: Check the [docs](README.md) first
 - **Discussions**: Use GitHub Discussions for questions
 - **Issues**: Create an issue for bugs or feature requests
 - **Chat**: Join our development discussions (if applicable)

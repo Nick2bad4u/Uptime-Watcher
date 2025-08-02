@@ -89,7 +89,7 @@ ignore: []
 #   - '/etc/**'
 #   - './out/**/*.json'
 # same as --exclude (env: GRYPE_EXCLUDE)
-exclude: ["/docs/**", "/tests/**", "/node_modules/**", "/dist/**"]
+exclude: ["./docs/**", "./tests/**", "./node_modules/**", "./dist/**"]
 
 external-sources:
     # enable Grype searching network source for additional information (env: GRYPE_EXTERNAL_SOURCES_ENABLE)

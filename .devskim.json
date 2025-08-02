@@ -15,7 +15,7 @@
         "BestPractice",
         "ManualReview"
     ],
-    "Confidences": ["High", "Medium", "Low", "Informational"],
+    "Confidences": ["High", "Medium", "Low"],
     "Globs": [
         ".devskim.json",
         ".vscode/settings.json",
