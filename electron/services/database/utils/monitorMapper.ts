@@ -282,7 +282,7 @@ function createBaseMonitor(dynamicMonitor: Record<string, unknown>, row: Record<
                 ? String(dynamicMonitor["id"])
                 : "-1",
         monitoring: Boolean(dynamicMonitor["enabled"]),
-        responseTime: safeInteger(dynamicMonitor["responseTime"] || row["responseTime"], -1, -1),
+        responseTime: safeInteger(dynamicMonitor["responseTime"] ?? row["responseTime"], -1, -1),
         retryAttempts: safeInteger(dynamicMonitor["retryAttempts"], 3, 0, 10),
         status: dynamicMonitor["status"] ? (dynamicMonitor["status"] as Site["monitors"][0]["status"]) : "down",
         timeout: safeInteger(dynamicMonitor["timeout"], 5000, 1000, 300_000),

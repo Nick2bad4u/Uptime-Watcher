@@ -15,7 +15,32 @@ import { Site } from "../../types";
 import { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import { monitorLogger as logger } from "../../utils/logger";
 import { MonitorRepository } from "../database/MonitorRepository";
-import { MonitorCheckResult, MonitorOperationRegistry } from "./MonitorOperationRegistry";
+import { MonitorOperationRegistry } from "./MonitorOperationRegistry";
+
+/**
+ * Unified monitor check result interface for status updates.
+ *
+ * @remarks
+ * This interface combines operation correlation fields with monitor check results.
+ * Used by the status update service to validate and apply status changes.
+ * Includes all fields from both registry and service interfaces.
+ */
+export interface StatusUpdateMonitorCheckResult {
+    /** Optional human-readable details */
+    details?: string;
+    /** Optional error message */
+    error?: string;
+    /** Monitor that was checked */
+    monitorId: string;
+    /** Links to operation for validation */
+    operationId: string;
+    /** Response time in milliseconds */
+    responseTime: number;
+    /** Check result status */
+    status: "down" | "up";
+    /** When check completed */
+    timestamp: Date;
+}
 
 /**
  * Service for conditionally updating monitor status based on operation correlation.
@@ -46,7 +71,7 @@ export class MonitorStatusUpdateService {
      * @param result - Check result with operation correlation
      * @returns Promise resolving to true if update was applied, false if ignored
      */
-    async updateMonitorStatus(result: MonitorCheckResult): Promise<boolean> {
+    async updateMonitorStatus(result: StatusUpdateMonitorCheckResult): Promise<boolean> {
         // Validate operation is still valid
         if (!this.operationRegistry.validateOperation(result.operationId)) {
             logger.debug(`Ignoring cancelled operation ${result.operationId}`);
@@ -72,7 +97,7 @@ export class MonitorStatusUpdateService {
             // Update status atomically
             const updates: Partial<Monitor> = {
                 lastChecked: result.timestamp,
-                responseTime: result.responseTime ?? 0,
+                responseTime: result.responseTime,
                 status: result.status === "up" ? "up" : "down",
             };
 

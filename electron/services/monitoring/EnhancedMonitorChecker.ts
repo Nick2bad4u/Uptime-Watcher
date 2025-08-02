@@ -15,12 +15,15 @@ import { HistoryRepository } from "../../services/database/HistoryRepository";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { SiteRepository } from "../../services/database/SiteRepository";
 import { HttpMonitor } from "../../services/monitoring/HttpMonitor";
-import { MonitorCheckResult, MonitorOperationRegistry } from "../../services/monitoring/MonitorOperationRegistry";
-import { MonitorStatusUpdateService } from "../../services/monitoring/MonitorStatusUpdateService";
+import { MonitorOperationRegistry } from "../../services/monitoring/MonitorOperationRegistry";
+import {
+    MonitorStatusUpdateService,
+    type StatusUpdateMonitorCheckResult,
+} from "../../services/monitoring/MonitorStatusUpdateService";
 import { OperationTimeoutManager } from "../../services/monitoring/OperationTimeoutManager";
 import { PingMonitor } from "../../services/monitoring/PingMonitor";
 import { PortMonitor } from "../../services/monitoring/PortMonitor";
-import { IMonitorService } from "../../services/monitoring/types";
+import { IMonitorService, type MonitorCheckResult as ServiceMonitorCheckResult } from "../../services/monitoring/types";
 import { Site as SiteType } from "../../types";
 import { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import { monitorLogger as logger } from "../../utils/logger";
@@ -90,7 +93,7 @@ export class EnhancedMonitorChecker {
 
         // For manual checks, don't use operation correlation
         if (isManualCheck) {
-            return this.performDirectCheck(site, monitor);
+            return this.performDirectCheck(site, monitor, true);
         }
 
         // Only proceed if monitor is currently monitoring
@@ -99,78 +102,7 @@ export class EnhancedMonitorChecker {
             return undefined;
         }
 
-        const operationId = await this.setupOperationCorrelation(monitor, monitorId);
-        if (!operationId) {
-            return undefined;
-        }
-
-        logger.info(`Checking monitor: site=${site.identifier}, id=${monitor.id}, operation=${operationId}`);
-
-        try {
-            // Perform the actual check
-            const checkResult = await this.executeMonitorCheck(monitor, operationId);
-
-            // Save history entry before updating status
-            await this.saveHistoryEntry(monitor, checkResult);
-
-            // Update status through the correlation service
-            const updated = await this.config.statusUpdateService.updateMonitorStatus(checkResult);
-
-            if (updated) {
-                // Get fresh monitor and site data for event emission
-                const freshMonitor = await this.config.monitorRepository.findByIdentifier(checkResult.monitorId);
-                if (!freshMonitor) {
-                    logger.warn(`Fresh monitor data not found for ${checkResult.monitorId}`);
-                    return undefined;
-                }
-
-                // Create status update for event emission
-                const statusUpdate: StatusUpdate = {
-                    details: checkResult.status === "up" ? "Monitor is responding" : "Monitor is not responding",
-                    monitorId: checkResult.monitorId,
-                    previousStatus: monitor.status,
-                    siteIdentifier: site.identifier,
-                    status: checkResult.status === "up" ? "up" : "down",
-                    timestamp: checkResult.timestamp.toISOString(),
-                };
-
-                // Emit proper typed events like the traditional monitoring system
-                await this.config.eventEmitter.emitTyped("monitor:status-changed", {
-                    monitor: freshMonitor,
-                    newStatus: checkResult.status,
-                    previousStatus: monitor.status,
-                    responseTime: checkResult.responseTime ?? 0,
-                    site: site,
-                    siteId: site.identifier,
-                    timestamp: checkResult.timestamp.getTime(),
-                });
-
-                // Emit monitor up/down events for status changes
-                if (checkResult.status === "up" && monitor.status !== "up") {
-                    await this.config.eventEmitter.emitTyped("monitor:up", {
-                        monitor: freshMonitor,
-                        site: site,
-                        siteId: site.identifier,
-                        timestamp: checkResult.timestamp.getTime(),
-                    });
-                } else if (checkResult.status === "down" && monitor.status !== "down") {
-                    await this.config.eventEmitter.emitTyped("monitor:down", {
-                        monitor: freshMonitor,
-                        site: site,
-                        siteId: site.identifier,
-                        timestamp: checkResult.timestamp.getTime(),
-                    });
-                }
-
-                return statusUpdate;
-            }
-        } catch (error) {
-            logger.error(`Monitor check failed for ${monitorId}`, error);
-            this.config.operationRegistry.completeOperation(operationId);
-            this.config.timeoutManager.clearTimeout(operationId);
-        }
-
-        return undefined;
+        return this.performCorrelatedCheck(site, monitor, monitorId);
     }
 
     /**
@@ -194,10 +126,11 @@ export class EnhancedMonitorChecker {
             logger.info(`Started monitoring for monitor ${monitorId} on site ${siteIdentifier}`);
 
             // Emit event
-            this.config.eventEmitter.emit("monitoringStarted", {
+            await this.config.eventEmitter.emitTyped("internal:monitor:started", {
+                identifier: siteIdentifier,
                 monitorId,
-                siteIdentifier,
-                timestamp: new Date().toISOString(),
+                operation: "started",
+                timestamp: Date.now(),
             });
 
             return true;
@@ -228,10 +161,12 @@ export class EnhancedMonitorChecker {
             logger.info(`Stopped monitoring for monitor ${monitorId} on site ${siteIdentifier}`);
 
             // Emit event
-            this.config.eventEmitter.emit("monitoringStopped", {
+            await this.config.eventEmitter.emitTyped("internal:monitor:stopped", {
+                identifier: siteIdentifier,
                 monitorId,
-                siteIdentifier,
-                timestamp: new Date().toISOString(),
+                operation: "stopped",
+                reason: "user",
+                timestamp: Date.now(),
             });
 
             return true;
@@ -242,39 +177,162 @@ export class EnhancedMonitorChecker {
     }
 
     /**
+     * Emit appropriate status change events based on monitor state transition.
+     *
+     * @param site - Site containing the monitor
+     * @param originalMonitor - Original monitor state
+     * @param freshMonitor - Fresh monitor data
+     * @param checkResult - Check result
+     * @internal
+     */
+    private async emitStatusChangeEvents(
+        site: Site,
+        originalMonitor: Site["monitors"][0],
+        freshMonitor: Site["monitors"][0],
+        checkResult: StatusUpdateMonitorCheckResult
+    ): Promise<void> {
+        const timestamp = checkResult.timestamp.getTime();
+
+        if (checkResult.status === "up" && originalMonitor.status !== "up") {
+            await this.config.eventEmitter.emitTyped("monitor:up", {
+                monitor: freshMonitor,
+                site: site,
+                siteId: site.identifier,
+                timestamp,
+            });
+        } else if (checkResult.status === "down" && originalMonitor.status !== "down") {
+            await this.config.eventEmitter.emitTyped("monitor:down", {
+                monitor: freshMonitor,
+                site: site,
+                siteId: site.identifier,
+                timestamp,
+            });
+        }
+    }
+
+    /**
      * Execute the actual monitor check operation.
      *
      * @param monitor - Monitor to check
      * @param operationId - Operation correlation ID
      * @returns Monitor check result with correlation
      */
-    private async executeMonitorCheck(monitor: Monitor, operationId: string): Promise<MonitorCheckResult> {
-        const startTime = Date.now();
-
+    private async executeMonitorCheck(monitor: Monitor, operationId: string): Promise<StatusUpdateMonitorCheckResult> {
         try {
-            // Perform the check based on monitor type
-            const isUp = await this.performTypeSpecificCheck(monitor);
-            const responseTime = Date.now() - startTime;
+            // Perform the check based on monitor type - now returns full result
+            const serviceResult = await this.performTypeSpecificCheck(monitor);
 
             return {
+                details: serviceResult.details ?? (serviceResult.status === "up" ? "Check successful" : "Check failed"),
                 monitorId: monitor.id,
                 operationId,
-                responseTime,
-                status: isUp ? "up" : "down",
+                responseTime: serviceResult.responseTime,
+                status: serviceResult.status,
                 timestamp: new Date(),
             };
         } catch (error) {
-            const responseTime = Date.now() - startTime;
             logger.error(`Monitor check failed for ${monitor.id}`, error);
 
             return {
+                details: error instanceof Error ? error.message : "Monitor check failed",
                 monitorId: monitor.id,
                 operationId,
-                responseTime,
+                responseTime: 0,
                 status: "down",
                 timestamp: new Date(),
             };
         }
+    }
+
+    /**
+     * Handle a successful monitor check and emit events.
+     *
+     * @param site - Site containing the monitor
+     * @param monitor - Original monitor state
+     * @param checkResult - Check result
+     * @returns Status update for event emission
+     * @internal
+     */
+    private async handleSuccessfulCheck(
+        site: Site,
+        monitor: Site["monitors"][0],
+        checkResult: StatusUpdateMonitorCheckResult
+    ): Promise<StatusUpdate | undefined> {
+        // Get fresh monitor and site data for event emission
+        const freshMonitor = await this.config.monitorRepository.findByIdentifier(checkResult.monitorId);
+        if (!freshMonitor) {
+            logger.warn(`Fresh monitor data not found for ${checkResult.monitorId}`);
+            return undefined;
+        }
+
+        // Create status update for event emission
+        const statusUpdate: StatusUpdate = {
+            details: checkResult.status === "up" ? "Monitor is responding" : "Monitor is not responding",
+            monitorId: checkResult.monitorId,
+            previousStatus: monitor.status,
+            siteIdentifier: site.identifier,
+            status: checkResult.status === "up" ? "up" : "down",
+            timestamp: checkResult.timestamp.toISOString(),
+        };
+
+        // Emit proper typed events like the traditional monitoring system
+        await this.config.eventEmitter.emitTyped("monitor:status-changed", {
+            monitor: freshMonitor,
+            newStatus: checkResult.status,
+            previousStatus: monitor.status,
+            responseTime: checkResult.responseTime,
+            site: site,
+            siteId: site.identifier,
+            timestamp: checkResult.timestamp.getTime(),
+        });
+
+        // Emit monitor up/down events for status changes
+        await this.emitStatusChangeEvents(site, monitor, freshMonitor, checkResult);
+
+        return statusUpdate;
+    }
+
+    /**
+     * Perform a correlated check with operation tracking.
+     *
+     * @param site - Site containing the monitor
+     * @param monitor - Monitor to check
+     * @param monitorId - Monitor ID
+     * @returns Status update if successful, undefined if failed
+     * @internal
+     */
+    private async performCorrelatedCheck(
+        site: Site,
+        monitor: Site["monitors"][0],
+        monitorId: string
+    ): Promise<StatusUpdate | undefined> {
+        const operationId = await this.setupOperationCorrelation(monitor, monitorId);
+        if (!operationId) {
+            return undefined;
+        }
+
+        logger.info(`Checking monitor: site=${site.identifier}, id=${monitor.id}, operation=${operationId}`);
+
+        try {
+            // Perform the actual check
+            const checkResult = await this.executeMonitorCheck(monitor, operationId);
+
+            // Save history entry before updating status
+            await this.saveHistoryEntry(monitor, checkResult);
+
+            // Update status through the correlation service
+            const updated = await this.config.statusUpdateService.updateMonitorStatus(checkResult);
+
+            if (updated) {
+                return await this.handleSuccessfulCheck(site, monitor, checkResult);
+            }
+        } catch (error) {
+            logger.error(`Monitor check failed for ${monitorId}`, error);
+            this.config.operationRegistry.completeOperation(operationId);
+            this.config.timeoutManager.clearTimeout(operationId);
+        }
+
+        return undefined;
     }
 
     /**
@@ -284,39 +342,54 @@ export class EnhancedMonitorChecker {
      * @param monitor - Monitor to check
      * @returns Status update if successful
      */
-    private async performDirectCheck(site: Site, monitor: Monitor): Promise<StatusUpdate | undefined> {
+    private async performDirectCheck(
+        site: Site,
+        monitor: Monitor,
+        isManualCheck = false
+    ): Promise<StatusUpdate | undefined> {
         try {
-            const startTime = Date.now();
-            const isUp = await this.performTypeSpecificCheck(monitor);
-            const responseTime = Date.now() - startTime;
+            const serviceResult = await this.performTypeSpecificCheck(monitor);
 
-            // Create a mock check result for history saving
-            const checkResult = {
+            // For manual checks on paused monitors, preserve the paused status
+            const finalStatus = isManualCheck && monitor.status === "paused" ? "paused" : serviceResult.status;
+
+            // Create an enhanced check result for history saving
+            const checkResult: StatusUpdateMonitorCheckResult = {
+                details: serviceResult.details ?? (serviceResult.status === "up" ? "Check successful" : "Check failed"),
                 monitorId: monitor.id,
                 operationId: "direct-check",
-                responseTime,
-                status: isUp ? ("up" as const) : ("down" as const),
+                responseTime: serviceResult.responseTime,
+                status: serviceResult.status, // Use actual result for history
                 timestamp: new Date(),
             };
 
-            // Save history entry for direct checks too
+            // Save history entry for direct checks too (always save actual result)
             await this.saveHistoryEntry(monitor, checkResult);
 
             const statusUpdate: StatusUpdate = {
-                details: isUp ? "Monitor is responding" : "Monitor is not responding",
+                details:
+                    serviceResult.details ??
+                    (serviceResult.status === "up" ? "Monitor is responding" : "Monitor is not responding"),
                 monitorId: monitor.id,
                 previousStatus: monitor.status,
                 siteIdentifier: site.identifier,
-                status: isUp ? "up" : "down",
+                status: finalStatus, // Use final status (might be "paused")
                 timestamp: checkResult.timestamp.toISOString(),
             };
 
             // Update monitor directly (bypass operation correlation for manual checks)
-            await this.config.monitorRepository.update(monitor.id, {
+            // For manual checks on paused monitors, don't update the status
+            const updateData: Partial<Monitor> = {
                 lastChecked: checkResult.timestamp,
-                responseTime,
-                status: isUp ? "up" : "down",
-            });
+                responseTime: serviceResult.responseTime,
+            };
+
+            // Only update status if not a manual check on a paused monitor
+            if (!(isManualCheck && monitor.status === "paused")) {
+                updateData.status = serviceResult.status;
+            }
+
+            await this.config.monitorRepository.update(monitor.id, updateData);
 
             // Get fresh monitor and site data for event emission
             const freshMonitor = await this.config.monitorRepository.findByIdentifier(monitor.id);
@@ -328,29 +401,32 @@ export class EnhancedMonitorChecker {
             // Emit proper typed events like the traditional monitoring system
             await this.config.eventEmitter.emitTyped("monitor:status-changed", {
                 monitor: freshMonitor,
-                newStatus: isUp ? "up" : "down",
+                newStatus: finalStatus, // Use final status
                 previousStatus: monitor.status,
-                responseTime: responseTime,
+                responseTime: serviceResult.responseTime,
                 site: site,
                 siteId: site.identifier,
                 timestamp: checkResult.timestamp.getTime(),
             });
 
             // Emit monitor up/down events for status changes
-            if (isUp && monitor.status !== "up") {
-                await this.config.eventEmitter.emitTyped("monitor:up", {
-                    monitor: freshMonitor,
-                    site: site,
-                    siteId: site.identifier,
-                    timestamp: checkResult.timestamp.getTime(),
-                });
-            } else if (!isUp && monitor.status !== "down") {
-                await this.config.eventEmitter.emitTyped("monitor:down", {
-                    monitor: freshMonitor,
-                    site: site,
-                    siteId: site.identifier,
-                    timestamp: checkResult.timestamp.getTime(),
-                });
+            // Don't emit up/down events for manual checks on paused monitors
+            if (!isManualCheck || monitor.status !== "paused") {
+                if (serviceResult.status === "up" && monitor.status !== "up") {
+                    await this.config.eventEmitter.emitTyped("monitor:up", {
+                        monitor: freshMonitor,
+                        site: site,
+                        siteId: site.identifier,
+                        timestamp: checkResult.timestamp.getTime(),
+                    });
+                } else if (serviceResult.status === "down" && monitor.status !== "down") {
+                    await this.config.eventEmitter.emitTyped("monitor:down", {
+                        monitor: freshMonitor,
+                        site: site,
+                        siteId: site.identifier,
+                        timestamp: checkResult.timestamp.getTime(),
+                    });
+                }
             }
 
             return statusUpdate;
@@ -364,9 +440,9 @@ export class EnhancedMonitorChecker {
      * Perform type-specific check based on monitor configuration.
      *
      * @param monitor - Monitor to check
-     * @returns Promise resolving to true if monitor is up, false if down
+     * @returns Promise resolving to monitor check result with details
      */
-    private async performTypeSpecificCheck(monitor: Monitor): Promise<boolean> {
+    private async performTypeSpecificCheck(monitor: Monitor): Promise<ServiceMonitorCheckResult> {
         let monitorService: IMonitorService;
 
         switch (monitor.type) {
@@ -384,16 +460,24 @@ export class EnhancedMonitorChecker {
             }
             default: {
                 logger.warn(`Unknown monitor type: ${monitor.type}`);
-                return false;
+                return {
+                    details: `Unknown monitor type: ${monitor.type}`,
+                    responseTime: 0,
+                    status: "down",
+                };
             }
         }
 
         try {
             const result = await monitorService.check(monitor);
-            return result.status === "up";
+            return result;
         } catch (error) {
             logger.error(`Monitor check failed for ${monitor.id}`, error);
-            return false;
+            return {
+                details: error instanceof Error ? error.message : "Monitor check failed",
+                responseTime: 0,
+                status: "down",
+            };
         }
     }
 
@@ -403,21 +487,21 @@ export class EnhancedMonitorChecker {
      * @param monitor - Monitor that was checked
      * @param checkResult - Result of the monitor check
      */
-    private async saveHistoryEntry(monitor: Monitor, checkResult: MonitorCheckResult): Promise<void> {
+    private async saveHistoryEntry(monitor: Monitor, checkResult: StatusUpdateMonitorCheckResult): Promise<void> {
         if (!monitor.id) {
             logger.warn("Cannot save history entry: monitor missing ID");
             return;
         }
 
         const historyEntry = {
-            responseTime: checkResult.responseTime ?? 0,
+            responseTime: checkResult.responseTime,
             status: checkResult.status === "up" ? ("up" as const) : ("down" as const),
             timestamp: checkResult.timestamp.getTime(),
         };
 
         try {
-            // The details field is optional for addEntry
-            await this.config.historyRepository.addEntry(monitor.id, historyEntry);
+            // Pass the details field from the check result to the history repository
+            await this.config.historyRepository.addEntry(monitor.id, historyEntry, checkResult.details);
 
             // Smart history pruning: Only prune when necessary to avoid performance overhead
             const historyLimit = this.config.getHistoryLimit();

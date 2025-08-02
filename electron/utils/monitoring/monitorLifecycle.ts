@@ -179,10 +179,14 @@ export async function stopAllMonitoring(config: MonitoringLifecycleConfig): Prom
                         () => {
                             const db = config.databaseService.getDatabase();
                             if (monitor.id) {
+                                // Update monitor status to paused
                                 config.monitorRepository.updateInternal(db, monitor.id, {
                                     monitoring: false,
                                     status: MONITOR_STATUS.PAUSED,
                                 });
+
+                                // Clear active operations when stopping monitoring
+                                config.monitorRepository.clearActiveOperationsInternal(db, monitor.id);
                             }
                             return Promise.resolve();
                         },
@@ -342,10 +346,16 @@ async function startSpecificMonitor(
         await withDatabaseOperation(
             () => {
                 const db = config.databaseService.getDatabase();
+
+                // Update monitor status to monitoring
                 config.monitorRepository.updateInternal(db, monitorId, {
                     monitoring: true,
                     status: MONITOR_STATUS.PENDING,
                 });
+
+                // Clear any stale active operations when starting monitoring
+                config.monitorRepository.clearActiveOperationsInternal(db, monitorId);
+
                 return Promise.resolve();
             },
             "monitor-start-specific",
@@ -411,10 +421,16 @@ async function stopSpecificMonitor(
         await withDatabaseOperation(
             () => {
                 const db = config.databaseService.getDatabase();
+
+                // Update monitor status to paused
                 config.monitorRepository.updateInternal(db, monitorId, {
                     monitoring: false,
                     status: MONITOR_STATUS.PAUSED,
                 });
+
+                // Clear active operations as part of stopping monitor
+                config.monitorRepository.clearActiveOperationsInternal(db, monitorId);
+
                 return Promise.resolve();
             },
             "monitor-stop-specific",

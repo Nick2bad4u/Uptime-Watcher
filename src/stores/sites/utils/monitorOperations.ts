@@ -1,6 +1,9 @@
 /**
  * Monitor operations utility for handling monitor-related operations.
- * Provides utilities for working with monitor data and configurations.
+ *
+ * @remarks
+ * Provides utilities for working with monitor data and configurations,
+ * including creation, validation, and manipulation of monitor objects.
  */
 
 import {
@@ -12,7 +15,7 @@ import {
     type MonitorType,
     type Site,
 } from "@shared/types";
-import { isNonEmptyString, isValidUrl } from "@shared/validation/validatorUtils";
+import { isNonEmptyString, isValidUrl, safeInteger } from "@shared/validation/validatorUtils";
 
 // Re-export validateMonitor from shared types for convenience
 export { validateMonitor } from "@shared/types";
@@ -73,14 +76,14 @@ export function findMonitorInSite(site: Site, monitorId: string): Monitor | unde
 export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
     return {
         activeOperations: Array.isArray(monitor.activeOperations) ? monitor.activeOperations : [],
-        checkInterval: validatePositiveNumber(monitor.checkInterval, 300_000),
+        checkInterval: safeInteger(monitor.checkInterval, 300_000, 5000),
         history: Array.isArray(monitor.history) ? monitor.history : [],
         id: monitor.id ?? crypto.randomUUID(),
         monitoring: monitor.monitoring ?? true,
         responseTime: typeof monitor.responseTime === "number" ? monitor.responseTime : -1,
-        retryAttempts: validateNonNegativeNumber(monitor.retryAttempts, 3),
+        retryAttempts: safeInteger(monitor.retryAttempts, 3, 0, 10),
         status: monitor.status && isMonitorStatus(monitor.status) ? monitor.status : DEFAULT_MONITOR_STATUS,
-        timeout: validatePositiveNumber(monitor.timeout, 5000),
+        timeout: safeInteger(monitor.timeout, 5000, 1000, 300_000),
         type: validateMonitorType(monitor.type),
         // Only add optional fields if they are explicitly provided and valid
         ...(isValidUrl(monitor.url) && { url: monitor.url }),
@@ -223,18 +226,4 @@ function validateMonitorType(type: unknown): MonitorType {
     return typeof type === "string" && BASE_MONITOR_TYPES.includes(type as MonitorType)
         ? (type as MonitorType)
         : BASE_MONITOR_TYPES[0];
-}
-
-/**
- * Validates and returns a non-negative number or default value
- */
-function validateNonNegativeNumber(value: unknown, defaultValue: number): number {
-    return typeof value === "number" && value >= 0 ? value : defaultValue;
-}
-
-/**
- * Validates and returns a positive number or default value
- */
-function validatePositiveNumber(value: unknown, defaultValue: number): number {
-    return typeof value === "number" && value > 0 ? value : defaultValue;
 }

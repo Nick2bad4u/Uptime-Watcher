@@ -425,8 +425,7 @@ export class MonitorManager {
      * @public
      */
     public async startMonitoringForSite(identifier: string, monitorId?: string): Promise<boolean> {
-        // For now, enhanced monitoring is only used for checks, not lifecycle management
-        // Fallback to traditional monitoring
+        // Proceed with traditional monitoring lifecycle which handles operation cleanup
         const result = await startMonitoringForSite(
             {
                 databaseService: this.dependencies.databaseService,
@@ -480,6 +479,7 @@ export class MonitorManager {
      * @public
      */
     public async stopMonitoring(): Promise<void> {
+        // Use traditional monitoring lifecycle which handles operation cleanup
         this.isMonitoring = await stopAllMonitoring({
             databaseService: this.dependencies.databaseService,
             eventEmitter: this.eventEmitter,
@@ -515,8 +515,7 @@ export class MonitorManager {
      * @public
      */
     public async stopMonitoringForSite(identifier: string, monitorId?: string): Promise<boolean> {
-        // For now, enhanced monitoring is only used for checks, not lifecycle management
-        // Fallback to traditional monitoring
+        // Proceed with traditional monitoring lifecycle which handles operation cleanup
         const result = await stopMonitoringForSite(
             {
                 databaseService: this.dependencies.databaseService,

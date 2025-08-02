@@ -145,6 +145,44 @@ export class MonitorRepository {
     }
 
     /**
+     * Clears all active operations for a monitor.
+     *
+     * @param monitorId - The ID of the monitor to clear operations for
+     * @returns Promise that resolves when all operations are cleared
+     * @throws Error if the database operation fails
+     *
+     * @remarks
+     * This method is used when a monitor is stopped or reset to ensure
+     * no stale operations remain active. Use only for standalone operations.
+     * For operations within existing transactions, use clearActiveOperationsInternal.
+     */
+    public async clearActiveOperations(monitorId: string): Promise<void> {
+        return withDatabaseOperation(async () => {
+            return this.databaseService.executeTransaction((db) => {
+                this.clearActiveOperationsInternal(db, monitorId);
+                return Promise.resolve();
+            });
+        }, "MonitorRepository.clearActiveOperations");
+    }
+
+    /**
+     * Internal method to clear all active operations for a monitor.
+     * Must be called within an active transaction.
+     *
+     * @param db - Database connection within active transaction
+     * @param monitorId - The ID of the monitor to clear operations for
+     * @public
+     */
+    public clearActiveOperationsInternal(db: Database, monitorId: string): void {
+        // Clear all active operations (internal call to avoid nested transaction)
+        this.updateInternal(db, monitorId, { activeOperations: [] });
+
+        if (isDev()) {
+            logger.debug(`[MonitorRepository] Cleared all active operations for monitor ${monitorId}`);
+        }
+    }
+
+    /**
      * Creates a new monitor for a site.
      *
      * @param siteIdentifier - The site identifier to associate the monitor with.
