@@ -11,6 +11,7 @@ This document captures the key lessons learned while implementing comprehensive 
 **❌ Initial Mistake**: Started implementing enhanced monitoring as a separate system without fully understanding how it would integrate with existing components.
 
 **✅ Correct Approach**: Map out the complete call chain and understand all integration points:
+
 - IPC Handlers → UptimeOrchestrator → MonitorManager → Traditional Lifecycle → Database
 - Enhanced monitoring integrates at MonitorManager level for checks
 - Operation cleanup integrates at Traditional Lifecycle level for start/stop
@@ -20,6 +21,7 @@ This document captures the key lessons learned while implementing comprehensive 
 ### 2. **Database Integration at the Right Transaction Level**
 
 **❌ Wrong Approach**: Creating new transaction methods that nest within existing transactions:
+
 ```typescript
 // This causes "cannot start a transaction within a transaction"
 public async clearActiveOperations(monitorId: string): Promise<void> {
@@ -32,14 +34,15 @@ public async clearActiveOperations(monitorId: string): Promise<void> {
 ```
 
 **✅ Correct Approach**: Integrate at the existing transaction level:
+
 ```typescript
 // In traditional lifecycle function:
 await withDatabaseOperation(() => {
-    const db = config.databaseService.getDatabase();
-    // Update monitor status
-    config.monitorRepository.updateInternal(db, monitorId, { monitoring: false });
-    // Clear operations in SAME transaction
-    config.monitorRepository.clearActiveOperationsInternal(db, monitorId);
+ const db = config.databaseService.getDatabase();
+ // Update monitor status
+ config.monitorRepository.updateInternal(db, monitorId, { monitoring: false });
+ // Clear operations in SAME transaction
+ config.monitorRepository.clearActiveOperationsInternal(db, monitorId);
 }, "monitor-stop-specific");
 ```
 
@@ -48,6 +51,7 @@ await withDatabaseOperation(() => {
 ### 3. **Avoid Mixed Logic and Hacky Fallbacks**
 
 **❌ Tempting Wrong Approach**: Using try/catch to handle nested transactions:
+
 ```typescript
 try {
     // Try new transaction approach
@@ -62,8 +66,9 @@ try {
 ```
 
 **✅ Correct Approach**: Identify the proper integration level and integrate cleanly there:
+
 - Enhanced monitoring for **check operations**
-- Traditional lifecycle for **start/stop operations**  
+- Traditional lifecycle for **start/stop operations**
 - Database transaction integration for **operation cleanup**
 
 **Key Learning**: If you need fallbacks or try/catch for "nested transaction" errors, you're integrating at the wrong level. Find the proper level instead.
@@ -71,6 +76,7 @@ try {
 ### 4. **Separate Concerns Properly**
 
 **Successful Architecture**:
+
 - **Enhanced Monitoring**: Operation correlation, race condition prevention during checks
 - **Traditional Lifecycle**: Monitor start/stop with integrated operation cleanup
 - **MonitorManager**: Clean delegation between enhanced/traditional based on operation type
@@ -91,6 +97,7 @@ try {
 **Wrong**: All database methods are async with their own transactions.
 
 **Right**: Provide both:
+
 - **External methods**: `async` with own transactions for standalone use
 - **Internal methods**: `sync` for use within existing transactions
 
@@ -99,6 +106,7 @@ try {
 **Wrong**: Creating new patterns for database operations, event handling, etc.
 
 **Right**: Follow existing patterns in the codebase:
+
 - Use `withDatabaseOperation` for database operations
 - Use `updateInternal` for within-transaction database updates
 - Use `TypedEventBus` for event emission
@@ -109,8 +117,9 @@ try {
 **Wrong**: Implementing all components (operation registry, timeout manager, status service, etc.) simultaneously without testing integration.
 
 **Right**: Implement core functionality first, then add enhancements:
+
 1. Basic operation correlation ✅
-2. Database integration ✅  
+2. Database integration ✅
 3. Traditional lifecycle integration ✅
 4. Enhanced monitoring integration ✅
 5. Timeout management ✅
@@ -119,6 +128,7 @@ try {
 ## 📋 **Implementation Checklist for Similar Features**
 
 ### Before Starting:
+
 - [ ] Map complete call chain and architecture
 - [ ] Identify all integration points
 - [ ] Understand existing transaction boundaries
@@ -126,6 +136,7 @@ try {
 - [ ] Plan integration at proper levels
 
 ### During Implementation:
+
 - [ ] Start with core functionality
 - [ ] Test integration at each level
 - [ ] Avoid creating parallel systems
@@ -133,18 +144,21 @@ try {
 - [ ] No hacky fallbacks or try/catch for architectural issues
 
 ### Database Integration:
+
 - [ ] Provide both external (async) and internal (sync) methods
 - [ ] Integrate at existing transaction boundaries
 - [ ] Never create nested transactions
 - [ ] Use existing `updateInternal` patterns
 
 ### Testing:
+
 - [ ] Run full test suite to ensure no regression
 - [ ] Test transaction boundaries specifically
 - [ ] Verify no nested transaction errors
 - [ ] Test enhanced and traditional paths
 
 ### Before Completion:
+
 - [ ] Remove any unused/fallback code
 - [ ] Ensure clean separation of concerns
 - [ ] Document integration points
@@ -153,21 +167,27 @@ try {
 ## 🎯 **Architectural Principles Learned**
 
 ### 1. **Integration Over Replacement**
+
 Don't replace existing systems - integrate with them at the proper level.
 
 ### 2. **Transaction Boundary Respect**
+
 Database operations must respect existing transaction boundaries, not create new ones.
 
 ### 3. **Clear Responsibility Separation**
+
 Each component has one clear responsibility:
+
 - Enhanced monitoring: Check-time operations
-- Traditional lifecycle: Start/stop operations  
+- Traditional lifecycle: Start/stop operations
 - Database layer: Transaction-aware data operations
 
 ### 4. **Minimal Viable Enhancement**
+
 Start with the minimal enhancement that solves the problem, then add sophistication.
 
 ### 5. **Existing Pattern Compliance**
+
 New features must follow existing architectural patterns, not create new ones.
 
 ## 📊 **Metrics for Success**
@@ -183,7 +203,7 @@ New features must follow existing architectural patterns, not create new ones.
 When adding new features to this system:
 
 1. **Always map the architecture first** - understand where the feature fits
-2. **Identify the proper integration level** - don't create new layers unnecessarily  
+2. **Identify the proper integration level** - don't create new layers unnecessarily
 3. **Respect transaction boundaries** - database integration at existing transaction level
 4. **Follow existing patterns** - don't invent new ways to do existing things
 5. **Test integration thoroughly** - especially database and transaction aspects
@@ -196,7 +216,7 @@ For features touching multiple architectural layers:
 - [ ] Does this follow existing architectural patterns?
 - [ ] Are database operations integrated at proper transaction boundaries?
 - [ ] Is there any mixed logic or hacky fallbacks?
-- [ ] Are concerns properly separated between components?  
+- [ ] Are concerns properly separated between components?
 - [ ] Do all tests pass without regression?
 - [ ] Are there any nested transaction issues?
 - [ ] Is the feature integrated at the proper level (not bolted on top)?
@@ -218,6 +238,7 @@ For features touching multiple architectural layers:
 **✅ Solutions Implemented**:
 
 1. **Unified Interface Approach**:
+
 ```typescript
 // Created combined interface for enhanced monitoring
 type EnhancedMonitorCheckResult = RegistryMonitorCheckResult & ServiceMonitorCheckResult;
@@ -226,26 +247,28 @@ type EnhancedMonitorCheckResult = RegistryMonitorCheckResult & ServiceMonitorChe
 ```
 
 2. **Proper Details Propagation**:
+
 ```typescript
 // Enhanced monitoring now correctly passes details to history
 await this.config.historyRepository.addEntry(monitor.id, historyEntry, checkResult.details);
 
 // Monitor services must provide meaningful details
 return {
-    status: "up",
-    responseTime: 150,
-    details: "HTTP 200 OK - Response received successfully" // Required!
+ status: "up",
+ responseTime: 150,
+ details: "HTTP 200 OK - Response received successfully", // Required!
 };
 ```
 
 3. **Paused Status Preservation**:
+
 ```typescript
 // For manual checks on paused monitors, preserve the paused status
 const finalStatus = isManualCheck && monitor.status === "paused" ? "paused" : serviceResult.status;
 
 // Only update status if not a manual check on a paused monitor
 if (!(isManualCheck && monitor.status === "paused")) {
-    updateData.status = serviceResult.status;
+ updateData.status = serviceResult.status;
 }
 ```
 
@@ -259,22 +282,24 @@ if (!(isManualCheck && monitor.status === "paused")) {
 ### **Prevention Strategies**:
 
 1. **Comprehensive Interface Testing**:
+
 ```typescript
 // Test that all expected fields are populated
 it("should populate details in history entries", async () => {
-    const result = await monitorService.check(monitor);
-    expect(result.details).toBeDefined();
-    expect(result.details).not.toEqual("NULL");
+ const result = await monitorService.check(monitor);
+ expect(result.details).toBeDefined();
+ expect(result.details).not.toEqual("NULL");
 });
 ```
 
 2. **Cross-System Feature Validation**:
+
 ```typescript
 // Ensure enhanced system matches traditional system behavior
 it("should preserve paused status during manual checks", async () => {
-    monitor.status = "paused";
-    const result = await enhancedChecker.checkMonitor(site, monitorId, true);
-    expect(result.status).toBe("paused");
+ monitor.status = "paused";
+ const result = await enhancedChecker.checkMonitor(site, monitorId, true);
+ expect(result.status).toBe("paused");
 });
 ```
 
