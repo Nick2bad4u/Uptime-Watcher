@@ -30,13 +30,7 @@ vi.mock("../../services/logger", () => ({
 // Mock the error handling utilities
 vi.mock("../../utils/errorHandling", () => ({
     ensureError: vi.fn((error) => (error instanceof Error ? error : new Error(String(error)))),
-    withUtilityErrorHandling: vi.fn(async (operation) => {
-        try {
-            return await operation();
-        } catch (error) {
-            throw error;
-        }
-    }),
+    withUtilityErrorHandling: vi.fn((operation) => operation()),
 }));
 
 describe("Fallback Utilities", () => {
