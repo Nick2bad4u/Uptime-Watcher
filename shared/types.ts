@@ -89,7 +89,7 @@ export const DEFAULT_MONITOR_STATUS: MonitorStatus = MONITOR_STATUS.PENDING;
 export const DEFAULT_SITE_STATUS: SiteStatus = "unknown";
 
 export interface Monitor {
-    activeOperations: string[];
+    activeOperations?: string[];
     checkInterval: number;
     history: StatusHistory[];
     host?: string;

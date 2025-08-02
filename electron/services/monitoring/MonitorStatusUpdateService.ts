@@ -102,7 +102,7 @@ export class MonitorStatusUpdateService {
             };
 
             // Remove operation from active operations
-            const updatedActiveOperations = monitor.activeOperations.filter((op) => op !== result.operationId);
+            const updatedActiveOperations = (monitor.activeOperations ?? []).filter((op) => op !== result.operationId);
             updates.activeOperations = updatedActiveOperations;
 
             await this.monitorRepository.update(result.monitorId, updates);

@@ -544,7 +544,7 @@ export class EnhancedMonitorChecker {
 
         // Add operation to monitor's active operations
         try {
-            const updatedActiveOperations = [...monitor.activeOperations, operationId];
+            const updatedActiveOperations = [...(monitor.activeOperations ?? []), operationId];
             await this.config.monitorRepository.update(monitorId, {
                 activeOperations: updatedActiveOperations,
             });

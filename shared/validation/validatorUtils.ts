@@ -171,7 +171,25 @@ export function isValidNumeric(value: unknown, options?: Parameters<typeof valid
  * @public
  */
 export function isValidUrl(value: unknown, options?: Parameters<typeof validator.isURL>[1]): value is string {
-    return typeof value === "string" && validator.isURL(value, options);
+    if (typeof value !== "string") {
+        return false;
+    }
+
+    // Default options to allow localhost
+    const urlOptions = {
+        allow_protocol_relative_urls: false,
+        allow_trailing_dot: false,
+        allow_underscores: false,
+        disallow_auth: false,
+        require_host: true,
+        require_port: false,
+        require_protocol: true,
+        require_tld: false, // Allow localhost without TLD
+        require_valid_protocol: true,
+        ...options,
+    };
+
+    return validator.isURL(value, urlOptions);
 }
 
 /**
