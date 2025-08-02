@@ -4,7 +4,7 @@
  * and navigating between different detail views.
  */
 
-import React from "react";
+import React, { useCallback } from "react";
 
 import logger from "../../services/logger";
 import { ThemedBox, ThemedButton, ThemedSelect, ThemedText } from "../../theme/components";
@@ -78,6 +78,15 @@ export function SiteDetailsNavigation({
             ...additionalData,
         });
     };
+
+    // Memoized handlers to prevent unnecessary re-renders of SiteMonitoringButton
+    const handleStartSiteMonitoringMemoized = useCallback(() => {
+        void handleStartSiteMonitoring();
+    }, [handleStartSiteMonitoring]);
+
+    const handleStopSiteMonitoringMemoized = useCallback(() => {
+        void handleStopSiteMonitoring();
+    }, [handleStopSiteMonitoring]);
 
     // Site-level monitoring state calculation
     const allMonitorsRunning =
@@ -169,8 +178,8 @@ export function SiteDetailsNavigation({
                         <SiteMonitoringButton
                             allMonitorsRunning={allMonitorsRunning}
                             isLoading={isLoading}
-                            onStartSiteMonitoring={() => void handleStartSiteMonitoring()}
-                            onStopSiteMonitoring={() => void handleStopSiteMonitoring()}
+                            onStartSiteMonitoring={handleStartSiteMonitoringMemoized}
+                            onStopSiteMonitoring={handleStopSiteMonitoringMemoized}
                         />
 
                         {/* Individual monitor controls */}

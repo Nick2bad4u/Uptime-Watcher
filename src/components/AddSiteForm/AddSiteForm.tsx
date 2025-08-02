@@ -128,6 +128,30 @@ export const AddSiteForm = React.memo(function AddSiteForm({ onSuccess }: AddSit
     // Get dynamic help text for the current monitor type
     const helpTexts = useDynamicHelpText(monitorType);
 
+    // Memoized handlers for form field changes
+    const handleMonitorTypeChange = useCallback(
+        (value: string) => {
+            if (isValidMonitorType(value)) {
+                setMonitorType(value);
+            } else {
+                logger.error(`Invalid monitor type value: ${value}`);
+            }
+        },
+        [setMonitorType]
+    );
+
+    const handleCheckIntervalChange = useCallback(
+        (value: string) => {
+            const numericValue = Number(value);
+            if (!Number.isNaN(numericValue)) {
+                setCheckInterval(numericValue);
+            } else {
+                logger.error(`Invalid check interval value: ${value}`);
+            }
+        },
+        [setCheckInterval]
+    );
+
     // Combined success callback that resets form and calls prop callback
     const handleSuccess = useCallback(() => {
         resetForm();
@@ -312,13 +336,7 @@ export const AddSiteForm = React.memo(function AddSiteForm({ onSuccess }: AddSit
                     disabled={isLoading || isLoadingMonitorTypes}
                     id="monitorType"
                     label="Monitor Type"
-                    onChange={(value) => {
-                        if (isValidMonitorType(value)) {
-                            setMonitorType(value);
-                        } else {
-                            logger.error(`Invalid monitor type value: ${value}`);
-                        }
-                    }}
+                    onChange={handleMonitorTypeChange}
                     options={monitorTypeOptions}
                     value={monitorType}
                 />
@@ -343,14 +361,7 @@ export const AddSiteForm = React.memo(function AddSiteForm({ onSuccess }: AddSit
                     disabled={isLoading}
                     id="checkInterval"
                     label="Check Interval"
-                    onChange={(value) => {
-                        const numericValue = Number(value);
-                        if (!Number.isNaN(numericValue)) {
-                            setCheckInterval(numericValue);
-                        } else {
-                            logger.error(`Invalid check interval value: ${value}`);
-                        }
-                    }}
+                    onChange={handleCheckIntervalChange}
                     options={checkIntervalOptions}
                     value={checkInterval}
                 />

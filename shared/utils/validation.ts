@@ -48,6 +48,11 @@ export function validateMonitorType(type: unknown): type is MonitorType {
  * Uses proper type guards to ensure runtime safety.
  */
 export function validateSite(site: Partial<Site>): site is Site {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (typeof site !== "object" || !site) {
+        return false;
+    }
+
     return (
         typeof site.identifier === "string" &&
         site.identifier.length > 0 &&
@@ -81,7 +86,7 @@ function isPartialMonitor(value: unknown): value is Partial<Monitor> {
  */
 function validateBasicMonitorFields(monitor: Partial<Monitor>, errors: string[]): void {
     if (!monitor.id) {
-        errors.push("Monitor ID is required");
+        errors.push("Monitor id is required");
     }
 
     if (!monitor.type) {
@@ -94,6 +99,25 @@ function validateBasicMonitorFields(monitor: Partial<Monitor>, errors: string[])
         errors.push("Monitor status is required");
     } else if (!isMonitorStatus(monitor.status)) {
         errors.push("Invalid monitor status");
+    }
+
+    // Validate numeric fields
+    if (
+        monitor.checkInterval !== undefined &&
+        (typeof monitor.checkInterval !== "number" || monitor.checkInterval < 1000)
+    ) {
+        errors.push("Check interval must be at least 1000ms");
+    }
+
+    if (monitor.timeout !== undefined && (typeof monitor.timeout !== "number" || monitor.timeout <= 0)) {
+        errors.push("Timeout must be a positive number");
+    }
+
+    if (
+        monitor.retryAttempts !== undefined &&
+        (typeof monitor.retryAttempts !== "number" || monitor.retryAttempts < 0 || monitor.retryAttempts > 10)
+    ) {
+        errors.push("Retry attempts must be between 0 and 10");
     }
 }
 

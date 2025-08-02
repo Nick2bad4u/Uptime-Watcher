@@ -10,7 +10,7 @@
  * @packageDocumentation
  */
 
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 
 import { useUIStore } from "../../stores/ui/useUiStore";
 import { ThemedBox, ThemedButton, ThemedText } from "../../theme/components";
@@ -43,14 +43,22 @@ export const AddSiteModal = React.memo(function AddSiteModal() {
         [handleClose]
     );
 
-    const handleEscapeKey = useCallback(
-        (event: React.KeyboardEvent) => {
-            if (event.key === "Escape") {
+    // Handle escape key for modal
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape" && showAddSiteModal) {
                 handleClose();
             }
-        },
-        [handleClose]
-    );
+        };
+
+        if (showAddSiteModal) {
+            document.addEventListener("keydown", handleKeyDown);
+        }
+
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [showAddSiteModal, handleClose]);
 
     if (!showAddSiteModal) {
         // eslint-disable-next-line react/jsx-no-useless-fragment
@@ -58,14 +66,12 @@ export const AddSiteModal = React.memo(function AddSiteModal() {
     }
 
     return (
+        /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
         <div
             className={`fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-opacity-30 ${
                 isDark ? "dark" : ""
             }`}
             onClick={handleBackdropClick}
-            onKeyDown={handleEscapeKey}
-            role="button"
-            tabIndex={0}
         >
             <ThemedBox
                 className="w-full max-w-2xl max-h-[90vh] overflow-y-auto m-4"
