@@ -4,22 +4,23 @@
 **Line:** 36:11-38:10  
 **Issue:** This 'catch' clause is useless because it just rethrows the caught exception  
 **Category:** Code Smell  
-**Severity:** Minor  
+**Severity:** Minor
 
 ## Analysis
 
 ### Context
+
 The code in question is on lines 36-38 of `fallbacks.test.ts` within a mock implementation:
 
 ```typescript
 vi.mock("../../utils/errorHandling", () => ({
-    withUtilityErrorHandling: vi.fn(async (operation) => {
-        try {
-            return await operation();
-        } catch (error) {
-            throw error;  // Line 36-38: catch and rethrow
-        }
-    }),
+ withUtilityErrorHandling: vi.fn(async (operation) => {
+  try {
+   return await operation();
+  } catch (error) {
+   throw error; // Line 36-38: catch and rethrow
+  }
+ }),
 }));
 ```
 
@@ -40,26 +41,29 @@ This is a legitimate code smell for the following reasons:
 ### Problem Analysis
 
 The current mock implementation:
+
 ```typescript
 vi.fn(async (operation) => {
-    try {
-        return await operation();
-    } catch (error) {
-        throw error;  // Unnecessary - error would propagate naturally
-    }
-})
+ try {
+  return await operation();
+ } catch (error) {
+  throw error; // Unnecessary - error would propagate naturally
+ }
+});
 ```
 
 Is functionally equivalent to:
+
 ```typescript
 vi.fn(async (operation) => {
-    return await operation();
-})
+ return await operation();
+});
 ```
 
 Or even simpler:
+
 ```typescript
-vi.fn((operation) => operation())
+vi.fn((operation) => operation());
 ```
 
 ### Recommended Fix
@@ -68,14 +72,15 @@ Simplify the mock to remove the useless try-catch:
 
 ```typescript
 vi.mock("../../utils/errorHandling", () => ({
-    ensureError: vi.fn((error) => (error instanceof Error ? error : new Error(String(error)))),
-    withUtilityErrorHandling: vi.fn((operation) => operation()),
+ ensureError: vi.fn((error) => (error instanceof Error ? error : new Error(String(error)))),
+ withUtilityErrorHandling: vi.fn((operation) => operation()),
 }));
 ```
 
 ### Project Context
 
 This is a test mock for the `withUtilityErrorHandling` utility. The mock should:
+
 - Simply pass through the operation call
 - Not add unnecessary error handling complexity
 - Keep the mock as simple as possible
@@ -91,6 +96,7 @@ The real `withUtilityErrorHandling` function likely has meaningful error handlin
 ### Additional Findings
 
 During review of this test file:
+
 - The mocks are well-structured overall
 - Good use of Vitest mocking patterns
 - Proper mock cleanup in beforeEach

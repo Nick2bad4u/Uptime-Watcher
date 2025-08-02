@@ -217,7 +217,7 @@ describe("Safe Conversions", () => {
             const before = Date.now();
             const result = safeParseTimestamp("invalid");
             const after = Date.now();
-            
+
             expect(result).toBeGreaterThanOrEqual(before);
             expect(result).toBeLessThanOrEqual(after);
         });

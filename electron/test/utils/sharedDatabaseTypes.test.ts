@@ -45,30 +45,36 @@ describe("Shared Database Types - Backend Coverage", () => {
             expect(isValidHistoryRow(undefined)).toBe(false);
             expect(isValidHistoryRow("string")).toBe(false);
             expect(isValidHistoryRow({})).toBe(false);
-            
+
             // Missing required fields
             expect(isValidHistoryRow({ monitorId: "test" })).toBe(false);
             expect(isValidHistoryRow({ status: "up" })).toBe(false);
             expect(isValidHistoryRow({ timestamp: Date.now() })).toBe(false);
-            
+
             // Invalid field types
-            expect(isValidHistoryRow({
-                monitorId: 123,
-                status: "up",
-                timestamp: Date.now(),
-            })).toBe(false);
-            
-            expect(isValidHistoryRow({
-                monitorId: "test",
-                status: "invalid",
-                timestamp: Date.now(),
-            })).toBe(false);
-            
-            expect(isValidHistoryRow({
-                monitorId: "test",
-                status: "up",
-                timestamp: "not-a-number",
-            })).toBe(false);
+            expect(
+                isValidHistoryRow({
+                    monitorId: 123,
+                    status: "up",
+                    timestamp: Date.now(),
+                })
+            ).toBe(false);
+
+            expect(
+                isValidHistoryRow({
+                    monitorId: "test",
+                    status: "invalid",
+                    timestamp: Date.now(),
+                })
+            ).toBe(false);
+
+            expect(
+                isValidHistoryRow({
+                    monitorId: "test",
+                    status: "up",
+                    timestamp: "not-a-number",
+                })
+            ).toBe(false);
         });
 
         it("should handle NaN timestamp", () => {
@@ -118,30 +124,36 @@ describe("Shared Database Types - Backend Coverage", () => {
             expect(isValidMonitorRow(undefined)).toBe(false);
             expect(isValidMonitorRow("string")).toBe(false);
             expect(isValidMonitorRow({})).toBe(false);
-            
+
             // Missing required fields
             expect(isValidMonitorRow({ id: 1 })).toBe(false);
             expect(isValidMonitorRow({ site_identifier: "test" })).toBe(false);
             expect(isValidMonitorRow({ type: "http" })).toBe(false);
-            
+
             // Invalid field types
-            expect(isValidMonitorRow({
-                id: true,
-                site_identifier: "test",
-                type: "http",
-            })).toBe(false);
-            
-            expect(isValidMonitorRow({
-                id: 1,
-                site_identifier: 123,
-                type: "http",
-            })).toBe(false);
-            
-            expect(isValidMonitorRow({
-                id: 1,
-                site_identifier: "test",
-                type: null,
-            })).toBe(false);
+            expect(
+                isValidMonitorRow({
+                    id: true,
+                    site_identifier: "test",
+                    type: "http",
+                })
+            ).toBe(false);
+
+            expect(
+                isValidMonitorRow({
+                    id: 1,
+                    site_identifier: 123,
+                    type: "http",
+                })
+            ).toBe(false);
+
+            expect(
+                isValidMonitorRow({
+                    id: 1,
+                    site_identifier: "test",
+                    type: null,
+                })
+            ).toBe(false);
         });
     });
 
@@ -169,7 +181,7 @@ describe("Shared Database Types - Backend Coverage", () => {
             expect(isValidSettingsRow(undefined)).toBe(false);
             expect(isValidSettingsRow("string")).toBe(false);
             expect(isValidSettingsRow({})).toBe(false);
-            
+
             // Missing or invalid key
             expect(isValidSettingsRow({ value: "test" })).toBe(false);
             expect(isValidSettingsRow({ key: undefined })).toBe(false);
@@ -204,7 +216,7 @@ describe("Shared Database Types - Backend Coverage", () => {
             expect(isValidSiteRow(undefined)).toBe(false);
             expect(isValidSiteRow("string")).toBe(false);
             expect(isValidSiteRow({})).toBe(false);
-            
+
             // Missing or invalid identifier
             expect(isValidSiteRow({ name: "Test" })).toBe(false);
             expect(isValidSiteRow({ identifier: undefined })).toBe(false);

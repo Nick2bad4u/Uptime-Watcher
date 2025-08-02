@@ -5,11 +5,12 @@
 **Issue:** Expected an assignment or function call and instead saw an expression  
 **Category:** Bug  
 **Severity:** Major  
-**Priority:** Medium  
+**Priority:** Medium
 
 ## Analysis
 
 ### Context
+
 The code in question is on lines 142-143 of `IpcService.ts`:
 
 ```typescript
@@ -29,12 +30,7 @@ This is not a valid issue for the following reasons:
 2. **Destructuring Pattern**: This is part of a destructuring assignment where certain properties are extracted to exclude them from the spread operator:
 
 ```typescript
-const {
-    uiConfig,
-    validationSchema,
-    version,
-    ...unexpectedProperties
-} = config;
+const { uiConfig, validationSchema, version, ...unexpectedProperties } = config;
 
 // These properties are intentionally extracted but not used in serialization
 serviceFactory;
@@ -48,6 +44,7 @@ validationSchema;
 ### Project Context
 
 In IPC communication between Electron main and renderer processes:
+
 - Some config properties should not be serialized (like function references)
 - Destructuring extracts these properties to exclude them from `...unexpectedProperties`
 - The standalone references document that these are intentionally not used
@@ -71,6 +68,7 @@ However, the current approach is valid and the comment makes the intent clear.
 ### Additional Findings
 
 During review of this file:
+
 - The IPC service follows proper patterns for Electron communication
 - Good separation between main and renderer process concerns
 - Appropriate error handling and logging throughout

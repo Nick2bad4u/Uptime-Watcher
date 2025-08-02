@@ -4,14 +4,16 @@
 **Lines:** 346:31-353:22, 315:31-321:22  
 **Issue:** This expression always results in a newly created object, but it is passed as a prop to the memo component 'SelectField'. Consider using `useCallback()` or `useMemo()`  
 **Category:** Performance (React)  
-**Severity:** Minor  
+**Severity:** Minor
 
 ## Analysis
 
 ### Context
+
 The issue refers to inline object creation in props passed to the memoized `SelectField` component:
 
 Line 315-321 (Monitor Type):
+
 ```tsx
 onChange={(value) => {
     if (isValidMonitorType(value)) {
@@ -23,6 +25,7 @@ onChange={(value) => {
 ```
 
 Line 346-353 (Check Interval):
+
 ```tsx
 onChange={(value) => {
     const numericValue = Number(value);
@@ -49,6 +52,7 @@ This is a legitimate performance concern for the following reasons:
 ### Problem Analysis
 
 The inline arrow functions are created on every render:
+
 - `(value) => { ... }` creates a new function reference each time
 - `SelectField` receives different function references on each render
 - `React.memo` comparison fails because functions are different objects
@@ -71,7 +75,7 @@ const handleMonitorTypeChange = useCallback((value: string) => {
     }
 }, []);
 
-// Check interval handler  
+// Check interval handler
 const handleCheckIntervalChange = useCallback((value: string) => {
     const numericValue = Number(value);
     if (!Number.isNaN(numericValue)) {
@@ -104,6 +108,7 @@ const handleCheckIntervalChange = useCallback((value: string) => {
 ### Project Context
 
 This form is part of the site creation workflow and optimizing its performance:
+
 - Improves responsiveness during user interaction
 - Reduces unnecessary component re-renders
 - Follows React performance best practices
@@ -119,6 +124,7 @@ This form is part of the site creation workflow and optimizing its performance:
 ### Additional Findings
 
 During review, similar patterns were found in other form handlers that could benefit from the same optimization. The form follows good practices otherwise:
+
 - Proper state management
 - Good error handling and validation
 - Consistent use of themed components

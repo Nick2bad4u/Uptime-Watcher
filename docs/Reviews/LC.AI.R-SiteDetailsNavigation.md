@@ -4,19 +4,20 @@
 **Lines:** 173:51-173:88, 172:52-172:90  
 **Issue:** This expression always results in a newly created object, but it is passed as a prop to the memo component 'SiteMonitoringButton'. Consider using `useCallback()` or `useMemo()`  
 **Category:** Performance (React)  
-**Severity:** Minor  
+**Severity:** Minor
 
 ## Analysis
 
 ### Context
+
 The issue refers to inline function creation in props passed to the memoized `SiteMonitoringButton` component on lines 172-173:
 
 ```tsx
 <SiteMonitoringButton
-    allMonitorsRunning={allMonitorsRunning}
-    isLoading={isLoading}
-    onStartSiteMonitoring={() => void handleStartSiteMonitoring()}  // Line 172
-    onStopSiteMonitoring={() => void handleStopSiteMonitoring()}    // Line 173
+ allMonitorsRunning={allMonitorsRunning}
+ isLoading={isLoading}
+ onStartSiteMonitoring={() => void handleStartSiteMonitoring()} // Line 172
+ onStopSiteMonitoring={() => void handleStopSiteMonitoring()} // Line 173
 />
 ```
 
@@ -33,6 +34,7 @@ Based on the error pattern, this is likely a legitimate performance concern simi
 ### Problem Analysis
 
 The issue likely involves:
+
 - Inline object creation in JSX props
 - Props passed to a memoized `SiteMonitoringButton` component
 - New object references created on each render
@@ -44,26 +46,30 @@ Use `useCallback` or `useMemo` to create stable references:
 
 ```tsx
 // For function props
-const handleAction = useCallback((param) => {
-    // handler logic
-}, [dependencies]);
+const handleAction = useCallback(
+ (param) => {
+  // handler logic
+ },
+ [dependencies]
+);
 
 // For object props
-const configObject = useMemo(() => ({
-    property1: value1,
-    property2: value2,
-}), [value1, value2]);
+const configObject = useMemo(
+ () => ({
+  property1: value1,
+  property2: value2,
+ }),
+ [value1, value2]
+);
 
 // Usage
-<SiteMonitoringButton
-    onAction={handleAction}
-    config={configObject}
-/>
+<SiteMonitoringButton onAction={handleAction} config={configObject} />;
 ```
 
 ### Project Context
 
 This component is part of the site details navigation system. Optimizing performance here:
+
 - Improves responsiveness in the site details view
 - Reduces unnecessary component re-renders
 - Follows React performance best practices
@@ -80,6 +86,7 @@ This component is part of the site details navigation system. Optimizing perform
 ### Additional Analysis Required
 
 Need to examine the actual code to:
+
 1. Identify the specific inline objects/functions
 2. Determine appropriate dependencies
 3. Choose between `useCallback` and `useMemo`

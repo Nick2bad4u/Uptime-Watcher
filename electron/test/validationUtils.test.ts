@@ -210,7 +210,7 @@ describe("Shared Validation Utils", () => {
                 url: "https://api.example.com",
                 timeout: "5000",
                 retries: "3",
-                tags: ["production", "api-health"]
+                tags: ["production", "api-health"],
             };
 
             expect(isValidIdentifier(monitorConfig.name)).toBe(true);
@@ -222,7 +222,7 @@ describe("Shared Validation Utils", () => {
             // Safe parsing
             const timeout = safeInteger(monitorConfig.timeout, 1000, 1000, 30_000);
             const retries = safeInteger(monitorConfig.retries, 1, 1, 10);
-            
+
             expect(timeout).toBe(5000);
             expect(retries).toBe(3);
         });

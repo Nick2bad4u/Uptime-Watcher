@@ -5,18 +5,19 @@
 **Issue:** Remove this use of the "void" operator  
 **Category:** Code Smell  
 **Severity:** Critical  
-**Priority:** High  
+**Priority:** High
 
 ## Analysis
 
 ### Context
+
 The code in question is on line 153 of `electron/main.ts`:
 
 ```typescript
 void app.whenReady().then(async () => {
-    // Wait a bit for the main window to be created and ready
-    await new Promise((resolve) => setTimeout(resolve, 1));
-    // ... rest of the code
+ // Wait a bit for the main window to be created and ready
+ await new Promise((resolve) => setTimeout(resolve, 1));
+ // ... rest of the code
 });
 ```
 
@@ -37,6 +38,7 @@ This is not a valid issue for the following reasons:
 ### Project Context
 
 In the context of an Electron main process, this pattern is appropriate because:
+
 - The `app.whenReady()` handler is setting up extensions in development mode
 - We don't need to wait for or handle the result at the application level
 - The void operator clearly communicates intent
@@ -48,6 +50,7 @@ In the context of an Electron main process, this pattern is appropriate because:
 ### Additional Findings
 
 During review of this file, no other significant issues were found. The code follows the established patterns in the codebase and properly handles:
+
 - Development vs production environment detection
 - Error handling for extension installation
 - Proper TSDoc documentation

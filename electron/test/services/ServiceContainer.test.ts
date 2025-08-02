@@ -43,7 +43,7 @@ describe("ServiceContainer", () => {
             // Test should access simpler services that don't require dependencies first
             expect(() => container.getDatabaseService()).not.toThrow();
             expect(() => container.getNotificationService()).not.toThrow();
-            
+
             // Complex services should work after initializing dependencies
             container.getSiteManager();
             expect(() => container.getUptimeOrchestrator()).not.toThrow();
@@ -62,7 +62,7 @@ describe("ServiceContainer", () => {
             const customContainer = ServiceContainer.getInstance(config);
             expect(() => customContainer.getDatabaseService()).not.toThrow();
             expect(() => customContainer.getNotificationService()).not.toThrow();
-            
+
             // Complex services should work after initializing dependencies
             customContainer.getSiteManager();
             expect(() => customContainer.getUptimeOrchestrator()).not.toThrow();
@@ -77,7 +77,7 @@ describe("ServiceContainer", () => {
             const customContainer = ServiceContainer.getInstance(config);
             expect(() => customContainer.getDatabaseService()).not.toThrow();
             expect(() => customContainer.getNotificationService()).not.toThrow();
-            
+
             // Complex services should work after initializing dependencies
             customContainer.getSiteManager();
             expect(() => customContainer.getUptimeOrchestrator()).not.toThrow();
@@ -95,7 +95,7 @@ describe("ServiceContainer", () => {
             const customContainer = ServiceContainer.getInstance(config);
             expect(() => customContainer.getDatabaseService()).not.toThrow();
             expect(() => customContainer.getNotificationService()).not.toThrow();
-            
+
             // Complex services should work after initializing dependencies
             customContainer.getSiteManager();
             expect(() => customContainer.getUptimeOrchestrator()).not.toThrow();
@@ -115,7 +115,7 @@ describe("ServiceContainer", () => {
         it("should get IPC service", () => {
             // First initialize the required dependency
             container.getSiteManager();
-            
+
             const service = container.getIpcService();
             expect(service).toBeDefined();
 
@@ -183,9 +183,9 @@ describe("ServiceContainer", () => {
         });
 
         it("should get monitor manager", () => {
-            // First initialize the required dependency  
+            // First initialize the required dependency
             container.getSiteManager();
-            
+
             const manager = container.getMonitorManager();
             expect(manager).toBeDefined();
 
@@ -248,7 +248,7 @@ describe("ServiceContainer", () => {
         it("should get uptime orchestrator", () => {
             // First initialize the required dependency
             container.getSiteManager();
-            
+
             const orchestrator = container.getUptimeOrchestrator();
             expect(orchestrator).toBeDefined();
 
@@ -260,7 +260,7 @@ describe("ServiceContainer", () => {
         it("should initialize orchestrator with proper dependencies", () => {
             // First initialize the required dependency
             container.getSiteManager();
-            
+
             const orchestrator = container.getUptimeOrchestrator();
             // Just verify orchestrator is created - mocking constructors would be complex
             expect(orchestrator).toBeDefined();
@@ -315,7 +315,7 @@ describe("ServiceContainer", () => {
 
             expect(notification).toBeDefined();
             expect(database).toBeDefined();
-            
+
             // Initialize dependency and then get complex services
             container.getSiteManager();
             const orchestrator = container.getUptimeOrchestrator();
@@ -325,7 +325,7 @@ describe("ServiceContainer", () => {
         it("should handle concurrent service requests", async () => {
             // Initialize dependency first
             container.getSiteManager();
-            
+
             // Simulate concurrent access to all services
             const services = await Promise.all([
                 Promise.resolve(container.getDatabaseService()),
@@ -346,7 +346,7 @@ describe("ServiceContainer", () => {
             const customContainer = ServiceContainer.getInstance(config);
             expect(() => customContainer.getDatabaseService()).not.toThrow();
             expect(() => customContainer.getNotificationService()).not.toThrow();
-            
+
             // Complex services should work after initializing dependencies
             customContainer.getSiteManager();
             expect(() => customContainer.getUptimeOrchestrator()).not.toThrow();
@@ -361,7 +361,7 @@ describe("ServiceContainer", () => {
             const customContainer = ServiceContainer.getInstance(config);
             expect(() => customContainer.getDatabaseService()).not.toThrow();
             expect(() => customContainer.getNotificationService()).not.toThrow();
-            
+
             // Complex services should work after initializing dependencies
             customContainer.getSiteManager();
             expect(() => customContainer.getUptimeOrchestrator()).not.toThrow();
@@ -420,7 +420,7 @@ describe("ServiceContainer", () => {
             for (const service of basicServices) {
                 expect(service).toBeDefined();
             }
-            
+
             // Test complex services - if they work without throwing, that's good too!
             // These services may have been fixed with the interface unification
             expect(() => container.getIpcService()).not.toThrow();

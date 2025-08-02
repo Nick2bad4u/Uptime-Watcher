@@ -29,7 +29,6 @@ Based on code analysis, the project follows these patterns:
 These are utility functions designed to be called from repository internal methods that are already within transaction contexts. Evidence:
 
 1. **HistoryRepository Pattern**:
-
    - `addEntryInternal()` calls `addHistoryEntry()`
    - `deleteAllInternal()` calls `deleteAllHistory()`
    - `deleteByMonitorIdInternal()` calls `deleteHistoryByMonitorId()`

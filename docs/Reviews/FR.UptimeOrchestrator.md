@@ -181,12 +181,10 @@ interface IManagerValidator {
 ### 📝 **Areas for Improvement:**
 
 1. **Missing `@throws` documentation** for several methods:
-
    - `removeMonitor()` - documents throws in remarks but not in `@throws` tag
    - `addSite()` - should document specific exception types
 
 2. **Event handler documentation** could be more detailed:
-
    - What events are emitted in response to each handler
    - Error handling behavior for each handler
 
@@ -208,13 +206,11 @@ interface IManagerValidator {
 ### ✅ Phase 1: Critical Bug Fixes - **COMPLETED**
 
 1. **Fixed race conditions in event handlers** ✅
-
    - Extracted async event handlers into proper methods (`handleUpdateSitesCacheRequest`, `handleDatabaseInitialized`, `handleGetSitesFromCacheRequest`)
    - Added proper error handling with structured logging
    - Replaced `void (async () => {})()` pattern with proper async method calls and `.catch()` handlers
 
 2. **Improved error recovery in removeMonitor** ✅
-
    - Implemented two-phase commit pattern for atomic operations
    - Added compensation logic when database removal fails
    - Enhanced error reporting with system error events for critical inconsistencies
@@ -228,7 +224,6 @@ interface IManagerValidator {
 ### ✅ TSDoc Improvements - **COMPLETED**
 
 1. **Added comprehensive `@throws` documentation** ✅
-
    - Updated `addSite()` with specific throw conditions
    - Updated `removeMonitor()` with detailed error scenarios
    - Updated `initialize()` with initialization failure cases

@@ -5,11 +5,7 @@
 import { describe, it, expect } from "vitest";
 
 import type { Monitor, Site } from "../../types";
-import {
-    getMonitorValidationErrors,
-    validateMonitorType,
-    validateSite,
-} from "../../utils/validation";
+import { getMonitorValidationErrors, validateMonitorType, validateSite } from "../../utils/validation";
 
 describe("Shared Validation Utilities", () => {
     describe("getMonitorValidationErrors", () => {

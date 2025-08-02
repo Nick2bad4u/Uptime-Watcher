@@ -168,13 +168,11 @@ This review covers 14 database-related files in the utilities and services direc
 ### **Common SOLID Violations:**
 
 1. **Dependency Inversion (DIP)** - 8 files affected
-
    - Hard-coded imports of utility functions
    - Direct dependencies on external services
    - Missing abstraction layers
 
 2. **Single Responsibility (SRP)** - 5 files affected
-
    - Mixed concerns in schema management
    - Data manipulation + query logic combined
    - Validation logic in repositories

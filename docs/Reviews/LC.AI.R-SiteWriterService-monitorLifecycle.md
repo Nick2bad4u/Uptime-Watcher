@@ -190,7 +190,6 @@ Reviewed 12 low-confidence AI claims across SiteWriterService.ts and monitorLife
 ### ✅ Phase 1: Critical Fixes (Transaction Safety) - COMPLETED
 
 1. **✅ Fixed Transaction Isolation**
-
    - Modified `updateMonitorsPreservingHistory` to accept DB transaction parameter
    - Updated method to use transaction DB instance directly instead of separate connection
    - Ensured all database operations within transaction use same connection
@@ -205,7 +204,6 @@ Reviewed 12 low-confidence AI claims across SiteWriterService.ts and monitorLife
 ### ✅ Phase 2: Documentation Improvements - COMPLETED
 
 3. **✅ Complete TSDoc Documentation**
-
    - Added comprehensive TSDoc for `createSite`, `updateSite`, `deleteSite` with proper @param, @returns, @throws, @remarks, and @example sections
    - Updated `startAllMonitoring` and `stopAllMonitoring` with detailed side effect documentation
    - Added examples for complex behaviors
@@ -219,7 +217,6 @@ Reviewed 12 low-confidence AI claims across SiteWriterService.ts and monitorLife
 ### ✅ Phase 3: Future-Proofing - COMPLETED
 
 5. **✅ Async Consistency**
-
    - Made monitor lifecycle callbacks properly structured for future async operations
    - Ensured all database operations are properly contained within withDatabaseOperation wrappers
    - **Result**: Code prepared for future async changes

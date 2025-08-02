@@ -167,7 +167,6 @@ interface IEnvironmentService {
    ```
 
 2. **Enhance complex method documentation**:
-
    - `validateMonitorConfiguration()` could explain caching strategy better
    - `shouldAutoStartMonitoring()` could document all business rules more clearly
 

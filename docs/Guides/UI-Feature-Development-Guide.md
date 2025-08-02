@@ -58,22 +58,23 @@ This document provides comprehensive guidelines for adding and modifying UI feat
 import { SiteConfigurationSchema } from "shared/validation/schemas";
 
 const validateSiteForm = (formData: FormData) => {
-    const result = SiteConfigurationSchema.safeParse(formData);
-    if (!result.success) {
-        return { isValid: false, errors: result.error.errors };
-    }
-    return { isValid: true, data: result.data };
+ const result = SiteConfigurationSchema.safeParse(formData);
+ if (!result.success) {
+  return { isValid: false, errors: result.error.errors };
+ }
+ return { isValid: true, data: result.data };
 };
 
 // ❌ Bad: Manual validation that differs from backend
 const validateSiteForm = (formData: FormData) => {
-    if (!formData.identifier || formData.identifier.length < 2) {
-        return { isValid: false, errors: ["ID too short"] };
-    }
+ if (!formData.identifier || formData.identifier.length < 2) {
+  return { isValid: false, errors: ["ID too short"] };
+ }
 };
 ```
 
 **Benefits of Shared Validation:**
+
 - ✅ **Consistent validation** between frontend and backend
 - ✅ **Well-tested** validation using Zod and validator.js
 - ✅ **Type-safe** with automatic TypeScript type inference
@@ -84,24 +85,27 @@ const validateSiteForm = (formData: FormData) => {
 ```typescript
 // Real-time form validation with shared schemas
 const useFormValidation = <T>(schema: ZodSchema<T>) => {
-    const [errors, setErrors] = useState<Record<string, string>>({});
-    
-    const validateField = useCallback((name: string, value: unknown) => {
-        const fieldResult = schema.shape[name]?.safeParse(value);
-        if (!fieldResult?.success) {
-            setErrors(prev => ({ 
-                ...prev, 
-                [name]: fieldResult.error.errors[0]?.message 
-            }));
-        } else {
-            setErrors(prev => {
-                const { [name]: _, ...rest } = prev;
-                return rest;
-            });
-        }
-    }, [schema]);
-    
-    return { errors, validateField };
+ const [errors, setErrors] = useState<Record<string, string>>({});
+
+ const validateField = useCallback(
+  (name: string, value: unknown) => {
+   const fieldResult = schema.shape[name]?.safeParse(value);
+   if (!fieldResult?.success) {
+    setErrors((prev) => ({
+     ...prev,
+     [name]: fieldResult.error.errors[0]?.message,
+    }));
+   } else {
+    setErrors((prev) => {
+     const { [name]: _, ...rest } = prev;
+     return rest;
+    });
+   }
+  },
+  [schema]
+ );
+
+ return { errors, validateField };
 };
 ```
 
@@ -142,65 +146,61 @@ Always follow this order to minimize breaking changes:
 
 ### Component Structure
 
-```tsx
+````tsx
 /**
  * Component description following TSDoc guidelines
- * 
+ *
  * @remarks
  * Detailed remarks about the component's purpose and behavior
- * 
+ *
  * @param props - Component props description
  * @returns JSX element description
- * 
+ *
  * @example
  * ```tsx
  * <MyComponent prop="value" />
  * ```
- * 
+ *
  * @public
  */
-export const MyComponent = React.memo(function MyComponent({
-    prop1,
-    prop2,
-}: MyComponentProperties) {
-    // State and hooks
-    const { state } = useAppropriateStore();
-    
-    // Event handlers with useCallback
-    const handleEvent = useCallback((event: React.MouseEvent) => {
-        event?.stopPropagation(); // Prevent event bubbling
-        // Handle event
-    }, [dependencies]);
-    
-    // Early returns
-    if (conditionalReturn) {
-        return <></>;
-    }
-    
-    // Main render
-    return (
-        <ThemedBox>
-            {/* Component content */}
-        </ThemedBox>
-    );
+export const MyComponent = React.memo(function MyComponent({ prop1, prop2 }: MyComponentProperties) {
+ // State and hooks
+ const { state } = useAppropriateStore();
+
+ // Event handlers with useCallback
+ const handleEvent = useCallback(
+  (event: React.MouseEvent) => {
+   event?.stopPropagation(); // Prevent event bubbling
+   // Handle event
+  },
+  [dependencies]
+ );
+
+ // Early returns
+ if (conditionalReturn) {
+  return <></>;
+ }
+
+ // Main render
+ return <ThemedBox>{/* Component content */}</ThemedBox>;
 });
-```
+````
 
 ### Props Interface
 
 ```tsx
 /**
  * Props for the MyComponent component.
- * 
+ *
  * @public
  */
 export interface MyComponentProperties {
-    /** Required prop description */
-    requiredProp: string;
-    /** Optional prop description */
-    optionalProp?: boolean;
-    /** Callback prop description */
-    onEvent: (value: string) => void;
+ /** Required prop description */
+ requiredProp: string;
+ /** Optional prop description */
+ optionalProp?: boolean;
+ /** Callback prop description */
+ onEvent: (value: string) => void;
 }
 ```
 
@@ -219,27 +219,27 @@ export interface MyComponentProperties {
 ```tsx
 // stores/domain/useDomainStore.ts
 export const useDomainStore = create<DomainStore>()(
-    persist(
-        (set, get) => ({
-            // State
-            data: [],
-            isLoading: false,
-            
-            // Actions
-            updateData: (newData) => {
-                logStoreAction("DomainStore", "updateData", { newData });
-                set({ data: newData });
-            },
-        }),
-        {
-            name: "domain-store",
-            partialize: (state) => ({
-                // Only persist non-transient state
-                data: state.data,
-                // Don't persist loading states or modals
-            }),
-        }
-    )
+ persist(
+  (set, get) => ({
+   // State
+   data: [],
+   isLoading: false,
+
+   // Actions
+   updateData: (newData) => {
+    logStoreAction("DomainStore", "updateData", { newData });
+    set({ data: newData });
+   },
+  }),
+  {
+   name: "domain-store",
+   partialize: (state) => ({
+    // Only persist non-transient state
+    data: state.data,
+    // Don't persist loading states or modals
+   }),
+  }
+ )
 );
 ```
 
@@ -256,14 +256,17 @@ export const useDomainStore = create<DomainStore>()(
 
 ```tsx
 // Correct: Prevents event bubbling to parent card
-const handleButtonClick = useCallback((event: React.MouseEvent) => {
-    event?.stopPropagation();
-    onAction();
-}, [onAction]);
+const handleButtonClick = useCallback(
+ (event: React.MouseEvent) => {
+  event?.stopPropagation();
+  onAction();
+ },
+ [onAction]
+);
 
 // Incorrect: Event bubbles up to parent card
 const handleButtonClick = useCallback(() => {
-    onAction();
+ onAction();
 }, [onAction]);
 ```
 
@@ -272,16 +275,16 @@ const handleButtonClick = useCallback(() => {
 ```tsx
 // Modal escape key handling
 useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-        if (event.key === "Escape") {
-            onClose();
-        }
-    };
-    
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-        document.removeEventListener("keydown", handleKeyDown);
-    };
+ const handleKeyDown = (event: KeyboardEvent) => {
+  if (event.key === "Escape") {
+   onClose();
+  }
+ };
+
+ document.addEventListener("keydown", handleKeyDown);
+ return () => {
+  document.removeEventListener("keydown", handleKeyDown);
+ };
 }, [onClose]);
 ```
 
@@ -291,48 +294,49 @@ useEffect(() => {
 
 ```tsx
 export const MyModal = React.memo(function MyModal() {
-    const { showModal, setShowModal } = useUIStore();
-    
-    const handleClose = useCallback(() => {
-        setShowModal(false);
-    }, [setShowModal]);
-    
-    const handleBackdropClick = useCallback((event: React.MouseEvent) => {
-        if (event.target === event.currentTarget) {
-            handleClose();
-        }
-    }, [handleClose]);
-    
-    // Global escape key handling
-    useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key === "Escape") {
-                handleClose();
-            }
-        };
-        
-        document.addEventListener("keydown", handleKeyDown);
-        return () => {
-            document.removeEventListener("keydown", handleKeyDown);
-        };
-    }, [handleClose]);
-    
-    if (!showModal) {
-        return <></>;
-    }
-    
-    return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black bg-opacity-30"
-            onClick={handleBackdropClick}
-            role="button"
-            tabIndex={0}
-        >
-            <ThemedBox className="w-full max-w-2xl">
-                {/* Modal content */}
-            </ThemedBox>
-        </div>
-    );
+ const { showModal, setShowModal } = useUIStore();
+
+ const handleClose = useCallback(() => {
+  setShowModal(false);
+ }, [setShowModal]);
+
+ const handleBackdropClick = useCallback(
+  (event: React.MouseEvent) => {
+   if (event.target === event.currentTarget) {
+    handleClose();
+   }
+  },
+  [handleClose]
+ );
+
+ // Global escape key handling
+ useEffect(() => {
+  const handleKeyDown = (event: KeyboardEvent) => {
+   if (event.key === "Escape") {
+    handleClose();
+   }
+  };
+
+  document.addEventListener("keydown", handleKeyDown);
+  return () => {
+   document.removeEventListener("keydown", handleKeyDown);
+  };
+ }, [handleClose]);
+
+ if (!showModal) {
+  return <></>;
+ }
+
+ return (
+  <div
+   className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black bg-opacity-30"
+   onClick={handleBackdropClick}
+   role="button"
+   tabIndex={0}
+  >
+   <ThemedBox className="w-full max-w-2xl">{/* Modal content */}</ThemedBox>
+  </div>
+ );
 });
 ```
 
@@ -349,6 +353,7 @@ export const MyModal = React.memo(function MyModal() {
 ### When to Extract Components
 
 Extract components when:
+
 - Same UI pattern is used in 2+ places
 - Component has complex logic that can be isolated
 - Component provides a specific, reusable behavior
@@ -359,46 +364,49 @@ Extract components when:
 ```tsx
 // components/common/ReusableButton/ReusableButton.tsx
 export interface ReusableButtonProperties {
-    /** Core functionality props */
-    onClick: () => void;
-    isLoading: boolean;
-    
-    /** Configuration props */
-    variant?: "primary" | "secondary";
-    compact?: boolean;
-    className?: string;
-    
-    /** Context-specific props */
-    label?: string;
-    icon?: string;
+ /** Core functionality props */
+ onClick: () => void;
+ isLoading: boolean;
+
+ /** Configuration props */
+ variant?: "primary" | "secondary";
+ compact?: boolean;
+ className?: string;
+
+ /** Context-specific props */
+ label?: string;
+ icon?: string;
 }
 
 export const ReusableButton = React.memo(function ReusableButton({
-    className = "",
-    compact = false,
-    icon,
-    isLoading,
-    label,
-    onClick,
-    variant = "primary",
+ className = "",
+ compact = false,
+ icon,
+ isLoading,
+ label,
+ onClick,
+ variant = "primary",
 }: ReusableButtonProperties) {
-    const handleClick = useCallback((event: React.MouseEvent) => {
-        event?.stopPropagation();
-        onClick();
-    }, [onClick]);
-    
-    return (
-        <ThemedButton
-            className={`flex items-center gap-1 ${className}`}
-            disabled={isLoading}
-            onClick={handleClick}
-            size="sm"
-            variant={variant}
-        >
-            {icon && <span>{icon}</span>}
-            {!compact && label && <span>{label}</span>}
-        </ThemedButton>
-    );
+ const handleClick = useCallback(
+  (event: React.MouseEvent) => {
+   event?.stopPropagation();
+   onClick();
+  },
+  [onClick]
+ );
+
+ return (
+  <ThemedButton
+   className={`flex items-center gap-1 ${className}`}
+   disabled={isLoading}
+   onClick={handleClick}
+   size="sm"
+   variant={variant}
+  >
+   {icon && <span>{icon}</span>}
+   {!compact && label && <span>{label}</span>}
+  </ThemedButton>
+ );
 });
 ```
 
@@ -410,12 +418,12 @@ import { ReusableButton } from "../common/ReusableButton/ReusableButton";
 
 // In parent component
 <ReusableButton
-    icon="🚀"
-    isLoading={isLoading}
-    label="Start Monitoring"
-    onClick={handleStartMonitoring}
-    variant="success"
-/>
+ icon="🚀"
+ isLoading={isLoading}
+ label="Start Monitoring"
+ onClick={handleStartMonitoring}
+ variant="success"
+/>;
 ```
 
 ## Testing Strategy
@@ -432,13 +440,13 @@ import { ReusableButton } from "../common/ReusableButton/ReusableButton";
 
 ```tsx
 // Test custom hooks with renderHook
-import { renderHook } from '@testing-library/react';
+import { renderHook } from "@testing-library/react";
 
-test('useSiteActions provides correct handlers', () => {
-    const { result } = renderHook(() => useSiteActions(mockSite, mockMonitor));
-    
-    expect(result.current.handleStartMonitoring).toBeDefined();
-    expect(result.current.handleStopMonitoring).toBeDefined();
+test("useSiteActions provides correct handlers", () => {
+ const { result } = renderHook(() => useSiteActions(mockSite, mockMonitor));
+
+ expect(result.current.handleStartMonitoring).toBeDefined();
+ expect(result.current.handleStopMonitoring).toBeDefined();
 });
 ```
 
@@ -448,25 +456,25 @@ test('useSiteActions provides correct handlers', () => {
 
 Follow the base tag guidelines in `docs/TSDoc/`:
 
-```tsx
+````tsx
 /**
  * Brief component description.
- * 
+ *
  * @remarks
  * Detailed explanation of component behavior, patterns used,
  * and any important implementation details.
- * 
+ *
  * @param props - Component props
  * @returns JSX element description
- * 
+ *
  * @example
  * ```tsx
  * <Component prop="value" />
  * ```
- * 
+ *
  * @public
  */
-```
+````
 
 ### Code Comments
 
@@ -536,12 +544,12 @@ const Component = () => {
 ```tsx
 // Wrong
 const handler = useCallback(() => {
-    doSomething(prop);
+ doSomething(prop);
 }, []); // Missing 'prop' dependency
 
 // Right
 const handler = useCallback(() => {
-    doSomething(prop);
+ doSomething(prop);
 }, [prop]);
 ```
 
@@ -554,17 +562,17 @@ const handler = useCallback(() => {
 ```tsx
 // Wrong
 try {
-    await riskyOperation();
+ await riskyOperation();
 } catch (error) {
-    console.log(error);
+ console.log(error);
 }
 
 // Right
 try {
-    await riskyOperation();
+ await riskyOperation();
 } catch (error) {
-    logger.error("Operation failed", ensureError(error));
-    throw error; // Re-throw after logging
+ logger.error("Operation failed", ensureError(error));
+ throw error; // Re-throw after logging
 }
 ```
 
@@ -575,7 +583,7 @@ try {
 Understanding the complete event flow is crucial for debugging real-time UI updates:
 
 ```text
-Enhanced/Traditional Monitoring → Event Bus → ServiceContainer → 
+Enhanced/Traditional Monitoring → Event Bus → ServiceContainer →
 UptimeOrchestrator → ApplicationService → IPC → Preload → Frontend
 ```
 
@@ -591,25 +599,28 @@ When UI doesn't update after backend operations:
 ### Common Event System Issues
 
 **❌ Wrong Event Names**
+
 ```typescript
 // Wrong - event doesn't exist in UptimeEvents
 eventEmitter.emit("statusUpdate", data);
 ```
 
 **✅ Correct Event Names**
+
 ```typescript
 // Right - use defined events
 await eventEmitter.emitTyped("monitor:status-changed", {
-    monitor: freshMonitor,
-    newStatus: "up",
-    previousStatus: "down",
-    site: site,
-    siteId: site.identifier,
-    timestamp: Date.now()
+ monitor: freshMonitor,
+ newStatus: "up",
+ previousStatus: "down",
+ site: site,
+ siteId: site.identifier,
+ timestamp: Date.now(),
 });
 ```
 
 **❌ Disconnected Event Buses**
+
 ```typescript
 // Wrong - using separate event bus that doesn't forward to main
 const separateEventBus = new TypedEventBus("MyService");
@@ -617,6 +628,7 @@ separateEventBus.emit("monitor:up", data); // Never reaches frontend
 ```
 
 **✅ Connected Event System**
+
 ```typescript
 // Right - use manager event bus with forwarding setup
 // ServiceContainer automatically forwards these events:
@@ -634,6 +646,7 @@ separateEventBus.emit("monitor:up", data); // Never reaches frontend
 ### Integration with Existing Systems
 
 **❌ Reinventing Services**
+
 ```typescript
 // Wrong - creating new placeholder implementations
 private performPortCheck(): Promise<boolean> {
@@ -643,6 +656,7 @@ private performPortCheck(): Promise<boolean> {
 ```
 
 **✅ Using Existing Services**
+
 ```typescript
 // Right - leverage existing monitor services
 private async performTypeSpecificCheck(monitor: Monitor): Promise<boolean> {
@@ -655,57 +669,62 @@ private async performTypeSpecificCheck(monitor: Monitor): Promise<boolean> {
 ### Code Quality and Security Guidelines
 
 **❌ Magic Numbers**
+
 ```typescript
 // Wrong - hardcoded values
 const timeoutMs = (monitor.timeout || 30) * 1000 + 5000;
 ```
 
 **✅ Named Constants**
+
 ```typescript
 // Right - use defined constants
 import { DEFAULT_MONITOR_TIMEOUT_SECONDS, MONITOR_TIMEOUT_BUFFER_MS } from "./constants";
-const timeoutMs = (monitor.timeout || DEFAULT_MONITOR_TIMEOUT_SECONDS) * SECONDS_TO_MS_MULTIPLIER + MONITOR_TIMEOUT_BUFFER_MS;
+const timeoutMs =
+ (monitor.timeout || DEFAULT_MONITOR_TIMEOUT_SECONDS) * SECONDS_TO_MS_MULTIPLIER + MONITOR_TIMEOUT_BUFFER_MS;
 ```
 
 **❌ Performance Issues in Validation**
+
 ```typescript
 // Wrong - every() doesn't short-circuit optimally
-return array.every(item => typeof item === "string");
+return array.every((item) => typeof item === "string");
 ```
 
 **✅ Optimized Validation**
+
 ```typescript
 // Right - early return for better performance
 for (const item of array) {
-    if (typeof item !== "string") return false;
+ if (typeof item !== "string") return false;
 }
 return true;
 ```
 
 **❌ Unsafe JSON Parsing**
+
 ```typescript
 // Wrong - no content validation
 const data = JSON.parse(dbValue);
 ```
 
 **✅ Secure JSON Parsing with Validation**
+
 ```typescript
 // Right - validate parsed content structure and safety
 try {
-    const parsed = JSON.parse(dbValue);
-    if (Array.isArray(parsed) && 
-        parsed.every(item => 
-            typeof item === "string" && 
-            !item.includes("{") && 
-            !item.includes("}")
-        )) {
-        return parsed;
-    }
-    logger.warn("Parsed data failed security validation");
-    return [];
+ const parsed = JSON.parse(dbValue);
+ if (
+  Array.isArray(parsed) &&
+  parsed.every((item) => typeof item === "string" && !item.includes("{") && !item.includes("}"))
+ ) {
+  return parsed;
+ }
+ logger.warn("Parsed data failed security validation");
+ return [];
 } catch (error) {
-    logger.warn("JSON parsing failed", error);
-    return [];
+ logger.warn("JSON parsing failed", error);
+ return [];
 }
 ```
 

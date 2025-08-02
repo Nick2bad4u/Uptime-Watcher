@@ -211,14 +211,12 @@ responseTime: z.number().min(-1), // -1 is sentinel for "never checked"
 ### ✅ Phase 1: Critical Type Safety Fixes - COMPLETED
 
 1. **✅ Fixed Port Validation Logic**
-
    - Removed falsy check that would incorrectly reject port 0
    - Simplified to use proper type checking: `typeof monitor.port !== "number"`
    - Clarified validation logic and improved error messages
    - **Result**: Cleaner, more understandable validation logic
 
 2. **✅ Removed Unsafe Type Assertions**
-
    - Added proper `isPartialMonitor` type guard function
    - Replaced unsafe `as Partial<Monitor>` assertion with type validation
    - Ensured runtime safety for all validation paths
@@ -233,14 +231,12 @@ responseTime: z.number().min(-1), // -1 is sentinel for "never checked"
 ### ✅ Phase 2: API Design Improvements - COMPLETED
 
 4. **✅ Standardized Return Values**
-
    - Changed `getMonitorSchema` to return `undefined` instead of `null`
    - Added proper TypeScript return type annotation
    - Updated all error handling to expect `undefined`
    - **Result**: Consistent TypeScript patterns throughout codebase
 
 5. **✅ Improved Function Naming**
-
    - Renamed `validateMonitorFields` to `getMonitorValidationErrors`
    - Updated function to better reflect its purpose (returns error array)
    - Enhanced TSDoc to clarify return type and behavior
@@ -255,14 +251,12 @@ responseTime: z.number().min(-1), // -1 is sentinel for "never checked"
 ### ✅ Phase 3: Architectural Improvements - COMPLETED
 
 7. **✅ Enhanced Schema Organization**
-
    - Added proper TypeScript return types for schema functions
    - Documented schema retrieval patterns and limitations
    - Enhanced error handling with structured approach
    - **Result**: Better type safety and clearer API boundaries
 
 8. **✅ Improved Error Handling**
-
    - Implemented structured error classification using Zod error codes
    - Enhanced warning vs error detection for optional fields
    - Added comprehensive error metadata for debugging

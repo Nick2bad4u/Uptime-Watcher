@@ -5,11 +5,12 @@
 **Issue:** Use `<input type="button">`, `<input type="image">`, `<input type="reset">`, `<input type="submit">`, or `<button>` instead of the "button" role to ensure accessibility across all devices  
 **Category:** Code Smell  
 **Severity:** Major  
-**Priority:** Medium  
+**Priority:** Medium
 
 ## Analysis
 
 ### Context
+
 The code in question is around line 61 of `AddSiteModal.tsx`:
 
 ```tsx
@@ -51,6 +52,7 @@ The current implementation uses a `div` with `role="button"` for the modal backd
 Replace the `div` with a `button` element or restructure to avoid making the backdrop itself a button:
 
 **Option 1: Use semantic button element**
+
 ```tsx
 <button
     type="button"
@@ -64,6 +66,7 @@ Replace the `div` with a `button` element or restructure to avoid making the bac
 ```
 
 **Option 2: Remove button behavior from backdrop (Recommended)**
+
 ```tsx
 <div
     className={`fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-opacity-30 ${
@@ -77,6 +80,7 @@ Replace the `div` with a `button` element or restructure to avoid making the bac
 ### Project Context
 
 This is part of the modal system for adding sites. The backdrop currently serves dual purposes:
+
 1. Visual backdrop for the modal
 2. Clickable area to close the modal
 
@@ -92,6 +96,7 @@ The accessibility issue arises from trying to make the backdrop itself a button.
 ### Additional Findings
 
 During review of this component:
+
 - Modal focus management could be improved
 - Consider using a dedicated modal library or implementing proper focus trapping
 - The modal should probably focus the first interactive element when opened

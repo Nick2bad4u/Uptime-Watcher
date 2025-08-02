@@ -5,11 +5,7 @@
 
 import { describe, expect, it } from "vitest";
 import type { Monitor, Site } from "../../../shared/types";
-import {
-    getMonitorValidationErrors,
-    validateMonitorType,
-    validateSite,
-} from "../../../shared/utils/validation";
+import { getMonitorValidationErrors, validateMonitorType, validateSite } from "../../../shared/utils/validation";
 
 describe("Shared Validation - Backend Coverage", () => {
     describe("getMonitorValidationErrors", () => {
