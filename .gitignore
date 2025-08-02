@@ -226,3 +226,4 @@ report/
 .github\copilot-instructions.md
 stylelintcache
 .cspellcache
+.prettier-cache

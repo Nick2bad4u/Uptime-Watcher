@@ -1,6 +1,12 @@
 {
-    "*.{js,jsx,ts,tsx}": ["eslint --fix"],
-    "*.{css,scss}": ["stylelint --fix"],
-    "*.md": ["markdownlint --fix"],
-    "*.{js,jsx,ts,tsx,css,scss,md,json,yaml,yml}": ["prettier --write"]
+    "*.md": [
+        "markdownlint --fix"
+    ],
+    "*.{js,jsx,ts,tsx,css,scss,md,json,yaml,yml}": [
+        "prettier --write --cache",
+        "eslint --fix --cache"
+    ],
+    "*.{css,scss}": [
+        "stylelint --fix --cache"
+    ]
 }

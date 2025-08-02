@@ -31,6 +31,8 @@ applyTo: "**"
 Critical Instructions:
 
 - Always READ the code before making changes. Understand the FULL context and flow.
+- Always "Super Think" aka "Deep Think" aka "Think Twice" before making changes. Consider the impact on the entire system.
+- Always intergrate new features or changes into the existing architecture and patterns.
 - Never make changes without understanding the full impact on the system.
 - Never take shortcuts or skip steps in the development process in an effort to "save time" or hurry.
 - Always stop and ask for clarification if unsure about any aspect of the code or architecture or how to proceed. NEVER GUESS.
