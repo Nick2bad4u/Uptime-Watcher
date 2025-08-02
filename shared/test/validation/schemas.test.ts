@@ -19,7 +19,7 @@ import {
     type PortMonitor,
     type Monitor,
     type Site,
-} from "../../shared/validation/schemas";
+} from "../../validation/schemas";
 
 describe("Validation Schemas - Comprehensive Coverage", () => {
     describe("baseMonitorSchema", () => {
