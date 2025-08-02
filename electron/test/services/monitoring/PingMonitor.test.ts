@@ -12,6 +12,7 @@ import type { MockedFunction } from "vitest";
 import { PingMonitor } from "../../../services/monitoring/PingMonitor";
 import { MonitorConfig, MonitorCheckResult } from "../../../services/monitoring/types";
 import { Site } from "../../../types";
+import { isNonEmptyString } from "../../../../shared/validation/validatorUtils";
 import * as pingRetryModule from "../../../services/monitoring/utils/pingRetry";
 
 // Mock the ping retry utility
@@ -23,7 +24,7 @@ const mockPerformPingCheckWithRetry = pingRetryModule.performPingCheckWithRetry 
 // Mock the monitor type guards
 vi.mock("../../../services/monitoring/utils/monitorTypeGuards", () => ({
     hasValidHost: vi.fn((monitor): boolean => {
-        return typeof monitor.host === "string" && monitor.host.length > 0;
+        return isNonEmptyString(monitor.host);
     }),
     getMonitorTimeout: vi.fn((monitor, defaultTimeout) => {
         return monitor.timeout || defaultTimeout;
@@ -40,6 +41,7 @@ describe("PingMonitor", () => {
     };
 
     const createMockPingMonitor = (overrides: Partial<Site["monitors"][0]> = {}): Site["monitors"][0] => ({
+        activeOperations: [],
         id: "test-ping-monitor",
         type: "ping",
         host: "example.com",

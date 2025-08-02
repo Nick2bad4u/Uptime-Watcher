@@ -27,6 +27,8 @@ vi.mock("../utils/logger", () => ({
     },
 }));
 
+import { safeInteger } from "../../shared/validation/validatorUtils";
+
 describe("Service Edge Cases - Missing Branch Coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -107,8 +109,8 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                     }
 
                     const enabled = Boolean(config.enabled);
-                    const timeout = Math.max(0, Number(config.timeout) || 5000);
-                    const retries = Math.max(0, Number(config.retries) || 3);
+                    const timeout = safeInteger(config.timeout, 5000, 1000, 300_000);
+                    const retries = safeInteger(config.retries, 3, 0, 10);
 
                     expect(typeof enabled).toBe("boolean");
                     expect(typeof timeout).toBe("number");

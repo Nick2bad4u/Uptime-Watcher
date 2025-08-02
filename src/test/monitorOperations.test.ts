@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-import type { Monitor, MonitorType, Site } from "@shared/types";
+import type { Monitor, MonitorType, Site } from "../../shared/types";
 
 import {
     createDefaultMonitor,
@@ -13,7 +13,7 @@ import {
     validateMonitorExists,
     monitorOperations,
 } from "../stores/sites/utils/monitorOperations";
-import { ERROR_MESSAGES } from "@shared/types";
+import { ERROR_MESSAGES } from "../../shared/types";
 
 // Mock crypto.randomUUID
 const mockUUID = "mock-uuid-123";
@@ -42,6 +42,7 @@ describe("monitorOperations", () => {
             const monitor = createDefaultMonitor();
 
             expect(monitor).toEqual({
+                activeOperations: [],
                 checkInterval: 300000,
                 history: [],
                 id: mockUUID,
@@ -74,6 +75,7 @@ describe("monitorOperations", () => {
             const monitor = createDefaultMonitor(overrides);
 
             expect(monitor).toEqual({
+                activeOperations: [],
                 checkInterval: 60000,
                 history: overrides.history,
                 host: "example.com",
@@ -97,6 +99,7 @@ describe("monitorOperations", () => {
             });
 
             expect(monitor).toEqual({
+                activeOperations: [],
                 checkInterval: 300000,
                 history: [],
                 id: mockUUID,
@@ -114,6 +117,7 @@ describe("monitorOperations", () => {
     describe("validateMonitor", () => {
         it("should return true for valid monitor", () => {
             const validMonitor: Monitor = {
+                activeOperations: [],
                 history: [],
                 id: "test-id",
                 monitoring: true,
@@ -260,6 +264,7 @@ describe("monitorOperations", () => {
 
             for (const status of statusValues) {
                 const monitor = {
+                    activeOperations: [],
                     checkInterval: 300000,
                     history: [],
                     id: "test-id",
@@ -280,6 +285,7 @@ describe("monitorOperations", () => {
             const result = normalizeMonitor({});
 
             expect(result).toEqual({
+                activeOperations: [],
                 checkInterval: 300000,
                 history: [],
                 id: mockUUID,
@@ -340,6 +346,7 @@ describe("monitorOperations", () => {
             const result = normalizeMonitor(partialMonitor);
 
             expect(result).toEqual({
+                activeOperations: [],
                 checkInterval: 60000,
                 history: [],
                 host: "example.com",
@@ -484,6 +491,7 @@ describe("monitorOperations", () => {
             const result = updateMonitorInSite(mockSite, "monitor-1", updates);
 
             expect(result.monitors[0]).toEqual({
+                activeOperations: [],
                 ...mockSite.monitors[0],
                 ...updates,
             });
@@ -515,6 +523,7 @@ describe("monitorOperations", () => {
             const result = updateMonitorInSite(mockSite, "monitor-1", updates);
 
             expect(result.monitors[0]).toEqual({
+                activeOperations: [],
                 ...mockSite.monitors[0],
                 responseTime: 250,
             });

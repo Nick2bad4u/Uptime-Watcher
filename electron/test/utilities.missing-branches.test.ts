@@ -6,6 +6,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { generateCorrelationId, ValidationError } from "../utils/correlation";
 import { logger } from "../utils/logger";
+import { safeInteger } from "../../shared/validation/validatorUtils";
 
 // Mock dependencies
 vi.mock("electron", () => ({
@@ -273,8 +274,8 @@ describe("Utility Files - Missing Branch Coverage", () => {
             for (const config of configs) {
                 expect(() => {
                     // Configuration processing
-                    const timeout = Number(config.timeout) || 5000;
-                    const retries = Math.max(0, Number(config.retries) || 3);
+                    const timeout = safeInteger(config.timeout, 5000, 1000, 300_000);
+                    const retries = safeInteger(config.retries, 3, 0, 10);
                     const enabled = Boolean(config.enabled);
 
                     expect(typeof timeout).toBe("number");

@@ -53,6 +53,7 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
         retryAttempts: 3,
         responseTime: -1,
         history: [],
+        activeOperations: [],
     });
 
     const createMockSite = (identifier: string, monitors: Monitor[]): Site => ({
@@ -81,6 +82,7 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
 
         mockMonitorRepository = {
             updateInternal: vi.fn(),
+            clearActiveOperationsInternal: vi.fn(),
             findBySiteIdentifier: vi.fn().mockResolvedValue([]),
         } as any;
 
@@ -209,6 +211,7 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: MONITOR_STATUS.PENDING,
             });
+            expect(mockMonitorRepository.clearActiveOperationsInternal).toHaveBeenCalledWith(mockDatabase, "monitor1");
             expect(mockMonitorScheduler.startMonitor).toHaveBeenCalledWith("site1", monitor);
         });
 
@@ -358,6 +361,7 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
                 monitoring: false,
                 status: MONITOR_STATUS.PAUSED,
             });
+            expect(mockMonitorRepository.clearActiveOperationsInternal).toHaveBeenCalledWith(mockDatabase, "monitor1");
             expect(mockMonitorScheduler.stopMonitor).toHaveBeenCalledWith("site1", "monitor1");
         });
 
