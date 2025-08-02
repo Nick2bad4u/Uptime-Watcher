@@ -15,15 +15,26 @@ describe("SiteCardHeader", () => {
     };
 
     const defaultProps = {
-        site: mockSite,
-        collapsed: false,
-        onToggleCollapse: vi.fn(),
-        onCheckNow: vi.fn(),
-        onStartMonitoring: vi.fn(),
-        onStopMonitoring: vi.fn(),
-        isLoading: false,
-        isMonitoring: false,
-        disabled: false,
+        display: {
+            isLoading: false,
+        },
+        interactions: {
+            onCheckNow: vi.fn(),
+            onMonitorIdChange: vi.fn(),
+            onStartMonitoring: vi.fn(),
+            onStartSiteMonitoring: vi.fn(),
+            onStopMonitoring: vi.fn(),
+            onStopSiteMonitoring: vi.fn(),
+        },
+        monitoring: {
+            allMonitorsRunning: false,
+            hasMonitor: false,
+            isMonitoring: false,
+            selectedMonitorId: "",
+        },
+        site: {
+            site: mockSite,
+        },
     };
 
     it("should render without crashing", () => {
@@ -37,9 +48,9 @@ describe("SiteCardHeader", () => {
 
     it("should handle basic props", () => {
         const props = { ...defaultProps };
-        expect(props.site.name).toBe("Test Site");
-        expect(props.collapsed).toBe(false);
-        expect(props.isLoading).toBe(false);
+        expect(props.site.site.name).toBe("Test Site");
+        expect(props.display.isLoading).toBe(false);
+        expect(props.monitoring.isMonitoring).toBe(false);
     });
 
     it("should handle different site states", () => {
@@ -50,9 +61,13 @@ describe("SiteCardHeader", () => {
         ];
 
         states.forEach((state) => {
-            const props = { ...defaultProps, ...state };
-            expect(props.isLoading).toBe(state.isLoading);
-            expect(props.isMonitoring).toBe(state.isMonitoring);
+            const props = {
+                ...defaultProps,
+                display: { ...defaultProps.display, isLoading: state.isLoading },
+                monitoring: { ...defaultProps.monitoring, isMonitoring: state.isMonitoring },
+            };
+            expect(props.display.isLoading).toBe(state.isLoading);
+            expect(props.monitoring.isMonitoring).toBe(state.isMonitoring);
         });
     });
 });

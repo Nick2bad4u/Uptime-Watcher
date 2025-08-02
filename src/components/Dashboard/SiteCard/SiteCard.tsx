@@ -89,18 +89,26 @@ export const SiteCard = React.memo(function SiteCard({ site }: SiteCardPropertie
             variant="secondary"
         >
             <SiteCardHeader
-                allMonitorsRunning={allMonitorsRunning}
-                hasMonitor={!!monitor}
-                isLoading={isLoading}
-                isMonitoring={isMonitoring}
-                onCheckNow={handleCheckNow}
-                onMonitorIdChange={handleMonitorIdChange}
-                onStartMonitoring={handleStartMonitoring}
-                onStartSiteMonitoring={handleStartSiteMonitoring}
-                onStopMonitoring={handleStopMonitoring}
-                onStopSiteMonitoring={handleStopSiteMonitoring}
-                selectedMonitorId={selectedMonitorId}
-                site={latestSite}
+                display={{
+                    isLoading,
+                }}
+                interactions={{
+                    onCheckNow: handleCheckNow,
+                    onMonitorIdChange: handleMonitorIdChange,
+                    onStartMonitoring: handleStartMonitoring,
+                    onStartSiteMonitoring: handleStartSiteMonitoring,
+                    onStopMonitoring: handleStopMonitoring,
+                    onStopSiteMonitoring: handleStopSiteMonitoring,
+                }}
+                monitoring={{
+                    allMonitorsRunning,
+                    hasMonitor: !!monitor,
+                    isMonitoring,
+                    selectedMonitorId,
+                }}
+                site={{
+                    site: latestSite,
+                }}
             />
 
             <SiteCardStatus selectedMonitorId={selectedMonitorId} status={status} />
