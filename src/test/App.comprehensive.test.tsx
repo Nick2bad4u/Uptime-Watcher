@@ -186,9 +186,8 @@ describe("App Component - Comprehensive Coverage", () => {
 
             expect(screen.getByTestId("header")).toBeInTheDocument();
             expect(screen.getByTestId("site-list")).toBeInTheDocument();
-            expect(screen.getByTestId("add-site-form")).toBeInTheDocument();
             expect(screen.getByText("Monitored Sites (0)")).toBeInTheDocument();
-            expect(screen.getByText("Add New Site")).toBeInTheDocument();
+            // AddSiteModal is conditionally rendered and not visible by default
         });
 
         it("should apply dark theme class when isDark is true", () => {

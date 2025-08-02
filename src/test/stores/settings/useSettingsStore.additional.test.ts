@@ -2,8 +2,7 @@
  * Additional test coverage for useSettingsStore to reach 100% coverage.
  */
 
-// eslint-disable-next-line unused-imports/no-unused-imports
-import { renderHook, act } from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 vi.mock("../../../types/ipc", () => ({

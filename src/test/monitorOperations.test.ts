@@ -532,7 +532,11 @@ describe("monitorOperations", () => {
         it("should handle empty updates", () => {
             const result = updateMonitorInSite(mockSite, "monitor-1", {});
 
-            expect(result.monitors[0]).toEqual(mockSite.monitors[0]);
+            // When empty updates are applied, normalizeMonitor still ensures all fields are present
+            expect(result.monitors[0]).toEqual({
+                ...mockSite.monitors[0],
+                activeOperations: [], // normalizeMonitor adds this field
+            });
         });
     });
 
