@@ -108,8 +108,8 @@
     "postinstall": "node ./scripts/download-sqlite3-wasm.mjs",
     "knip": "npx knip",
     "lint": "npx eslint --cache .",
-    "lint:all:check": "npx eslint --cache . --ext .js,.jsx,.ts,.tsx && npx eslint --cache '**/*.json' && npx eslint --cache '**/*.{yml,yaml}' --parser yaml-eslint-parser && npx eslint --cache '**/*.toml' --parser toml-eslint-parser && npx eslint --cache '**/*.html' --plugin html && npx stylelint src/ electron/ shared/ && npx prettier --check '**/*.{js,jsx,ts,tsx,css,scss,md,json}' && npx markdownlint '**/*.md' && npx markdown-link-check README.md && find . -name '*.md' -not -path './node_modules/*' -not -path './dist/*' | xargs npx markdown-link-check && npx cspell '**/*.{js,jsx,ts,tsx,md,css,scss,json}' --gitignore && npm audit && npx depcheck --ignores='@types/*,@testing-library/*,@vitest/*' && npx knip && npx sort-package-json --check && npx publint && npx are-the-types-wrong --pack . && npx @biomejs/biome check && npx jscpd --threshold 3 --reporters html,console --ignore '**/node_modules/**,**/dist/**,**/dist-electron/**' src/ && npx madge --circular --extensions ts,tsx,js,jsx src/ && npx leasot 'src/**/*.{js,jsx,ts,tsx}' --reporter markdown",
-    "lint:all:fix": "npx eslint --cache . --ext .js,.jsx,.ts,.tsx --fix && npx eslint --cache '**/*.json' --fix && npx eslint --cache '**/*.{yml,yaml}' --parser yaml-eslint-parser --fix && npx eslint --cache '**/*.toml' --parser toml-eslint-parser --fix && npx eslint --cache '**/*.html' --plugin html --fix && npx stylelint src/ electron/ shared/ --fix && npx prettier --write '**/*.{js,jsx,ts,tsx,css,scss,md,json}' && npx cspell '**/*.{js,jsx,ts,tsx,md,css,scss,json}' --gitignore --config .cspell.json --fix && npx sort-package-json && npx @biomejs/biome check --write",
+    "lint:all:check": "npx eslint --cache . --ext .js,.jsx,.ts,.tsx && npx eslint --cache '**/*.json' && npx eslint --cache '**/*.{yml,yaml}' --parser yaml-eslint-parser && npx eslint --cache '**/*.toml' --parser toml-eslint-parser && npx eslint --cache '**/*.html' --plugin html && npx stylelint --cache src/ electron/ shared/ && npx prettier --cache --cache-location=.prettier-cache --check '**/*.{js,jsx,ts,tsx,css,scss,md,json}' && npx markdownlint '**/*.md' && npx markdown-link-check README.md && find . -name '*.md' -not -path './node_modules/*' -not -path './dist/*' | xargs npx markdown-link-check && npx cspell '**/*.{js,jsx,ts,tsx,md,css,scss,json}' --gitignore && npm audit && npx depcheck --ignores='@types/*,@testing-library/*,@vitest/*' && npx knip && npx sort-package-json --check && npx publint && npx are-the-types-wrong --pack . && npx @biomejs/biome check && npx jscpd --threshold 3 --reporters html,console --ignore '**/node_modules/**,**/dist/**,**/dist-electron/**' src/ && npx madge --circular --extensions ts,tsx,js,jsx src/ && npx leasot 'src/**/*.{js,jsx,ts,tsx}' --reporter markdown",
+    "lint:all:fix": "npx eslint --cache . --ext .js,.jsx,.ts,.tsx --fix && npx eslint --cache '**/*.json' --fix && npx eslint --cache '**/*.{yml,yaml}' --parser yaml-eslint-parser --fix && npx eslint --cache '**/*.toml' --parser toml-eslint-parser --fix && npx eslint --cache '**/*.html' --plugin html --fix && npx stylelint --cache src/ electron/ shared/ --fix && npx prettier --cache --cache-location=.prettier-cache --write '**/*.{js,jsx,ts,tsx,css,scss,md,json}' && npx cspell '**/*.{js,jsx,ts,tsx,md,css,scss,json}' --gitignore --config .cspell.json --fix && npx sort-package-json && npx @biomejs/biome check --write",
     "lint:biome": "npx @biomejs/biome check",
     "lint:biome:fix": "npx @biomejs/biome check --fix",
     "lint:biome:write": "npx @biomejs/biome check --write",
@@ -122,8 +122,8 @@
     "lint:commit": "npx commitlint --from HEAD~1 --to HEAD --verbose",
     "lint:complexity": "npx eslint --cache . --ext .js,.jsx,.ts,.tsx --rule '{\"complexity\": [\"warn\", 10], \"max-lines-per-function\": [\"warn\", 50], \"max-depth\": [\"warn\", 3]}' --format @eslint/eslint-formatter-compact",
     "lint:complexity:report": "npx eslint --cache . --ext .js,.jsx,.ts,.tsx --rule '{\"complexity\": [\"warn\", 10], \"max-lines-per-function\": [\"warn\", 50], \"max-depth\": [\"warn\", 3]}' --format json --output-file complexity-report.json",
-    "lint:css": "npx stylelint --config stylelint.config.js --cache-strategy content --cache-location .\\stylelintcache --cache src/ electron/ shared/",
-    "lint:css-fix": "npx stylelint --config stylelint.config.js --cache-strategy content --cache-location .\\stylelintcache src/ electron/ shared/ --fix",
+    "lint:css": "npx stylelint --cache --config stylelint.config.js --cache-strategy content --cache-location .\\stylelintcache --cache src/ electron/ shared/",
+    "lint:css-fix": "npx stylelint --cache --config stylelint.config.js --cache-strategy content --cache-location .\\stylelintcache src/ electron/ shared/ --fix",
     "lint:current": "npx eslint --cache .",
     "lint:depcheck": "npx depcheck",
     "lint:deps": "npx depcheck && npx knip",
@@ -138,7 +138,7 @@
     "lint:exports": "npx ts-unused-exports src/main.tsx",
     "lint:exports:electron": "npx ts-unused-exports electron/main.ts",
     "lint:fix": "npx eslint --cache . --fix",
-    "lint:format": "npx prettier --check \"**/*.{js,jsx,ts,tsx,css,scss,md,json}\"",
+    "lint:format": "npx prettier --cache --cache-location=.prettier-cache --check \"**/*.{js,jsx,ts,tsx,css,scss,md,json}\"",
     "lint:full": "npm run lint:package && npm run lint:deps && npm run lint:security && npm run lint:js && npm run lint:ts && npm run lint:css && npm run lint:md && npm run lint:prettier && npm run lint:spell && npm run lint:json && npm run lint:duplicates && npm run lint:circular && npm run lint:markdown-links && npm run lint:knip",
     "lint:grype": "grype . -c .grype.yaml",
     "lint:html": "npx eslint --cache \"**/*.html\" --plugin html",
@@ -163,8 +163,10 @@
     "lint:package-sort": "npx sort-package-json",
     "lint:package-sort-check": "npx sort-package-json --check",
     "lint:pre-commit": "npm run lint:staged && npm run lint:quick",
-    "lint:prettier": "npx prettier --check \"**/*.{js,jsx,ts,tsx,css,scss,md,json}\"",
-    "lint:prettier-fix": "npx prettier --write \"**/*.{js,jsx,ts,tsx,css,scss,md,json}\"",
+    "lint:prettier": "npx prettier --cache --cache-location=.prettier-cache --check \"**/*.{js,jsx,ts,tsx,css,scss,md,json}\"",
+    "lint:prettier-fix": "npx prettier --cache --cache-location=.prettier-cache --write \"**/*.{js,jsx,ts,tsx,css,scss,md,json}\"",
+    "lint:pretty": "npx prettier . --cache --cache-location=.prettier-cache --write",
+    "lint:prettynow": "npx prettier . --cache --cache-location=.prettier-cache --write",
     "lint:publint": "npx publint",
     "lint:quick": "npm run lint:js && npm run lint:ts && npm run lint:prettier",
     "lint:resolve-audit": "npx resolve-audit --skip-dev",
@@ -259,6 +261,9 @@
     "type-check:test": "npm run check:all:test",
     "update-tsdoc": "node scripts/download-tsdoc-tags.js",
     "validate:components": "node ./scripts/validate-components.js"
+  },
+  "eslintConfig": {
+    "extends": "eslint.config.mjs"
   },
   "overrides": {
     "@codecov/vite-plugin": {
@@ -681,8 +686,5 @@
       }
     }
   },
-  "readme": "README.md",
-  "eslintConfig": {
-    "extends": "eslint.config.mjs"
-  }
+  "readme": "README.md"
 }
