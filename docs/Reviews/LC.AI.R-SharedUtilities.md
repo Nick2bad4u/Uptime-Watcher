@@ -119,11 +119,11 @@ export async function withErrorHandling<T>(
 
 ```typescript
 export function getEnvironment(): string {
- return typeof process === "undefined" ? "unknown" : (process.env.NODE_ENV ?? "unknown");
+ return typeof process === "undefined" ? "unknown" : process.env.NODE_ENV ?? "unknown";
 }
 
 export function getNodeEnv(): string {
- return typeof process === "undefined" ? "development" : (process.env.NODE_ENV ?? "development");
+ return typeof process === "undefined" ? "development" : process.env.NODE_ENV ?? "development";
 }
 ```
 
