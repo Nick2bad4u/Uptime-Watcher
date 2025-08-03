@@ -332,6 +332,69 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
         });
 
+        describe("Ping monitor validation", () => {
+            it("should return error for missing host", () => {
+                const monitor: Partial<Monitor> = {
+                    id: "test-id",
+                    type: "ping",
+                    status: "pending",
+                };
+
+                const errors = getMonitorValidationErrors(monitor);
+                expect(errors).toContain("Host is required for ping monitors");
+            });
+
+            it("should return error for non-string host", () => {
+                const monitor = {
+                    id: "test-id",
+                    type: "ping",
+                    host: 123,
+                    status: "pending",
+                } as unknown as Partial<Monitor>;
+
+                const errors = getMonitorValidationErrors(monitor);
+                expect(errors).toContain("Host is required for ping monitors");
+            });
+
+            it("should return error for empty host", () => {
+                const monitor: Partial<Monitor> = {
+                    id: "test-id",
+                    type: "ping",
+                    host: "",
+                    status: "pending",
+                };
+
+                const errors = getMonitorValidationErrors(monitor);
+                expect(errors).toContain("Host is required for ping monitors");
+            });
+
+            it("should not require port for ping monitors", () => {
+                const monitor: Partial<Monitor> = {
+                    id: "test-id",
+                    type: "ping",
+                    host: "example.com",
+                    status: "pending",
+                };
+
+                const errors = getMonitorValidationErrors(monitor);
+                // Should not contain any port-related errors
+                expect(errors.some((error) => error.includes("port"))).toBe(false);
+            });
+
+            it("should validate ping monitor with valid host", () => {
+                const monitor: Partial<Monitor> = {
+                    id: "test-id",
+                    type: "ping",
+                    host: "example.com",
+                    status: "pending",
+                };
+
+                const errors = getMonitorValidationErrors(monitor);
+                // Should not contain host-related errors for valid hosts
+                expect(errors.some((error) => error.includes("Host is required"))).toBe(false);
+            });
+        });
+
         describe("Multiple errors", () => {
             it.skip("should return multiple errors when multiple fields are invalid", () => {
                 const monitor: Partial<Monitor> = {
@@ -383,6 +446,10 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
 
         it("should return true for valid port type", () => {
             expect(validateMonitorType("port")).toBe(true);
+        });
+
+        it("should return true for valid ping type", () => {
+            expect(validateMonitorType("ping")).toBe(true);
         });
 
         it("should return false for invalid string type", () => {

@@ -1,0 +1,58 @@
+/**
+ * @fileoverview Tests for chart setup module to ensure Chart.js is properly configured.
+ */
+
+import { describe, it, expect } from "vitest";
+import { ChartJS, Bar, Doughnut, Line } from "../../services/chartSetup";
+import { Chart } from "chart.js";
+
+describe("Chart Setup", () => {
+    describe("Chart.js Registration", () => {
+        it("should export ChartJS", () => {
+            expect(ChartJS).toBeDefined();
+            expect(ChartJS).toBe(Chart);
+        });
+
+        it("should have registered components", () => {
+            // Check that Chart.js has been configured
+            expect(Chart.registry).toBeDefined();
+            expect(Chart.registry.controllers).toBeDefined();
+            expect(Chart.registry.elements).toBeDefined();
+            expect(Chart.registry.plugins).toBeDefined();
+            expect(Chart.registry.scales).toBeDefined();
+        });
+
+        it("should export react-chartjs-2 components", () => {
+            expect(Bar).toBeDefined();
+            expect(Doughnut).toBeDefined();
+            expect(Line).toBeDefined();
+        });
+
+        it("should have Chart.js components available", () => {
+            // Verify essential components are registered
+            expect(Chart.registry.controllers.get("line")).toBeDefined();
+            expect(Chart.registry.controllers.get("bar")).toBeDefined();
+            expect(Chart.registry.controllers.get("doughnut")).toBeDefined();
+        });
+
+        it("should have essential scales registered", () => {
+            expect(Chart.registry.scales.get("category")).toBeDefined();
+            expect(Chart.registry.scales.get("linear")).toBeDefined();
+            expect(Chart.registry.scales.get("time")).toBeDefined();
+        });
+
+        it("should have essential elements registered", () => {
+            expect(Chart.registry.elements.get("point")).toBeDefined();
+            expect(Chart.registry.elements.get("line")).toBeDefined();
+            expect(Chart.registry.elements.get("bar")).toBeDefined();
+            expect(Chart.registry.elements.get("arc")).toBeDefined();
+        });
+
+        it("should have essential plugins registered", () => {
+            expect(Chart.registry.plugins.get("title")).toBeDefined();
+            expect(Chart.registry.plugins.get("tooltip")).toBeDefined();
+            expect(Chart.registry.plugins.get("legend")).toBeDefined();
+            expect(Chart.registry.plugins.get("filler")).toBeDefined();
+        });
+    });
+});

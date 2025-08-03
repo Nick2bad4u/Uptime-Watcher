@@ -76,8 +76,8 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
         });
 
         it("should handle unknown types with fallback", () => {
-            // BigInt is an example of a type that's not explicitly handled
-            expect(safeStringify(BigInt(123))).toBe("[Unknown Type]");
+            // BigInt is now properly handled, so it returns the string representation
+            expect(safeStringify(BigInt(123))).toBe("123");
         });
 
         it("should handle nested objects", () => {

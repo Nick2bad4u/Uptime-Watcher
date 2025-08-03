@@ -369,6 +369,21 @@ describe("Fallback Utilities", () => {
                 expect(getMonitorDisplayIdentifier(monitor, "Custom Fallback")).toBe("Custom Fallback");
                 expect(getMonitorDisplayIdentifier(monitor, "http")).toBe("http");
             });
+
+            it("should handle monitor with no identifying properties (line 169 coverage)", () => {
+                // Create a monitor with no url, host, or port to hit the return undefined line
+                const monitor = {
+                    id: "1",
+                    type: "custom",
+                    checkInterval: 30000,
+                    timeout: 5000,
+                    retryAttempts: 3,
+                    // No url, host, or port properties
+                } as unknown as Monitor;
+
+                const result = getMonitorDisplayIdentifier(monitor, "Site Fallback");
+                expect(result).toBe("Site Fallback");
+            });
         });
 
         describe("Error handling", () => {

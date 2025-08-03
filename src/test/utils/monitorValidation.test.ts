@@ -192,14 +192,34 @@ describe("Monitor Validation Utilities", () => {
             const mockResult = {
                 errors: [],
                 success: true,
-                warnings: [],
-                // No warnings property
+                // No warnings property - this tests the ?? [] fallback
             };
             mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(mockResult);
 
             const result = await validateMonitorData("http", { url: "https://example.com" });
 
-            expect(result).toEqual(mockResult);
+            expect(result).toEqual({
+                errors: [],
+                success: true,
+                warnings: [], // Should default to empty array
+            });
+        });
+
+        it("should handle backend result with undefined warnings", async () => {
+            const mockResult = {
+                errors: [],
+                success: true,
+                warnings: undefined, // Explicitly undefined warnings
+            };
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(mockResult);
+
+            const result = await validateMonitorData("http", { url: "https://example.com" });
+
+            expect(result).toEqual({
+                errors: [],
+                success: true,
+                warnings: [], // Should default to empty array
+            });
         });
 
         it("should handle IPC errors with fallback", async () => {
@@ -608,6 +628,67 @@ describe("Monitor Validation Utilities", () => {
                     success: false,
                     warnings: [],
                 });
+            });
+        });
+
+        describe("Ping monitor form validation", () => {
+            it("should validate ping monitor with valid host", async () => {
+                const result = await validateMonitorFormData("ping", { host: "example.com" });
+
+                expect(result.success).toBe(true);
+                expect(result.errors).toEqual([]);
+                expect(sharedValidateMonitorField).toHaveBeenCalledWith("ping", "host", "example.com");
+            });
+
+            it("should require host for ping monitors", async () => {
+                const result = await validateMonitorFormData("ping", {});
+
+                expect(result).toEqual({
+                    errors: ["Host is required for ping monitors"],
+                    success: false,
+                    warnings: [],
+                });
+            });
+
+            it("should validate host type for ping monitors", async () => {
+                const result = await validateMonitorFormData("ping", { host: 123 });
+
+                expect(result).toEqual({
+                    errors: ["Host is required for ping monitors"],
+                    success: false,
+                    warnings: [],
+                });
+            });
+
+            it("should include host validation errors", async () => {
+                vi.mocked(sharedValidateMonitorField).mockReturnValue({
+                    errors: ["Host must be a valid hostname, IP address, or localhost"],
+                    success: false,
+                    warnings: [],
+                    metadata: {},
+                });
+
+                const result = await validateMonitorFormData("ping", { host: "invalid-host" });
+
+                expect(result).toEqual({
+                    errors: ["Host must be a valid hostname, IP address, or localhost"],
+                    success: false,
+                    warnings: [],
+                });
+            });
+
+            it("should validate different host formats", async () => {
+                // Test with IP address
+                await validateMonitorFormData("ping", { host: "192.168.1.1" });
+                expect(sharedValidateMonitorField).toHaveBeenCalledWith("ping", "host", "192.168.1.1");
+
+                // Test with localhost
+                await validateMonitorFormData("ping", { host: "localhost" });
+                expect(sharedValidateMonitorField).toHaveBeenCalledWith("ping", "host", "localhost");
+
+                // Test with FQDN
+                await validateMonitorFormData("ping", { host: "subdomain.example.com" });
+                expect(sharedValidateMonitorField).toHaveBeenCalledWith("ping", "host", "subdomain.example.com");
             });
         });
 
