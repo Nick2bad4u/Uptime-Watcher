@@ -80,7 +80,10 @@ describe("SiteService", () => {
                 },
             ];
 
-            mockElectronAPI.sites.getSites.mockResolvedValueOnce(mockSites);
+            mockElectronAPI.sites.getSites.mockResolvedValueOnce({
+                success: true,
+                data: mockSites,
+            });
 
             const sites = await SiteService.getSites();
 

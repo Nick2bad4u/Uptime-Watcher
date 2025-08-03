@@ -47,11 +47,6 @@ vi.mock("../../utils/monitoring/monitorLifecycle", () => ({
     stopMonitoringForSite: vi.fn(),
 }));
 
-vi.mock("../../utils/monitoring/monitorStatusChecker", () => ({
-    checkSiteManually: vi.fn(),
-    checkMonitor: vi.fn(),
-}));
-
 // Mock all the dependencies at the top level
 const mockSetCheckCallback = vi.fn();
 const mockGetActiveCount = vi.fn(() => 0);
@@ -79,6 +74,7 @@ vi.mock("../../utils/operationalHooks", () => ({
 describe("MonitorManager - Comprehensive Coverage", () => {
     let manager: MonitorManager;
     let mockDependencies: any;
+    let mockEnhancedServices: any;
     let mockSite: Site;
     let mockMonitor: Site["monitors"][0];
 
@@ -126,8 +122,19 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             },
             siteService: {},
         };
+        
+        mockEnhancedServices = {
+            checker: {
+                checkMonitor: vi.fn(),
+                startMonitoring: vi.fn(),
+                stopMonitoring: vi.fn(),
+            },
+            operationRegistry: {},
+            statusUpdateService: {},
+            timeoutManager: {},
+        } as any; // Type assertion to bypass strict typing for tests
 
-        manager = new MonitorManager(mockDependencies);
+        manager = new MonitorManager(mockDependencies, mockEnhancedServices);
     });
 
     describe("Constructor and Basic Methods", () => {
@@ -165,22 +172,15 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 timestamp: new Date().toISOString(),
             };
 
-            const { checkSiteManually } = await import("../../utils/monitoring/monitorStatusChecker");
-            vi.mocked(checkSiteManually).mockResolvedValue(mockStatusUpdate);
+            // Mock the enhanced checker to return the status update
+            vi.mocked(mockEnhancedServices.checker.checkMonitor).mockResolvedValue(mockStatusUpdate);
 
             const result = await manager.checkSiteManually("site-1", "monitor-1");
 
-            expect(checkSiteManually).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    databaseService: mockDependencies.databaseService,
-                    eventEmitter: mockDependencies.eventEmitter,
-                    historyLimit: 10,
-                    repositories: mockDependencies.repositories,
-                    sites: expect.any(Object),
-                    siteService: mockDependencies.siteService,
-                }),
-                "site-1",
-                "monitor-1"
+            expect(mockEnhancedServices.checker.checkMonitor).toHaveBeenCalledWith(
+                mockSite,
+                "monitor-1",
+                true // isManualCheck flag
             );
             expect(mockDependencies.eventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:monitor:manual-check-completed",
@@ -202,12 +202,17 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 timestamp: new Date().toISOString(),
             };
 
-            const { checkSiteManually } = await import("../../utils/monitoring/monitorStatusChecker");
-            vi.mocked(checkSiteManually).mockResolvedValue(mockStatusUpdate);
+            // Mock the enhanced checker to return the status update
+            vi.mocked(mockEnhancedServices.checker.checkMonitor).mockResolvedValue(mockStatusUpdate);
 
             const result = await manager.checkSiteManually("site-1");
 
-            expect(checkSiteManually).toHaveBeenCalledWith(expect.any(Object), "site-1", undefined);
+            // Should check the first monitor when no specific monitor ID provided
+            expect(mockEnhancedServices.checker.checkMonitor).toHaveBeenCalledWith(
+                mockSite,
+                "monitor-1",
+                true
+            );
             expect(mockDependencies.eventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:monitor:manual-check-completed",
                 expect.objectContaining({
@@ -220,18 +225,17 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         });
 
         it("should handle manual check returning null", async () => {
-            const { checkSiteManually } = await import("../../utils/monitoring/monitorStatusChecker");
-            vi.mocked(checkSiteManually).mockResolvedValue(undefined);
+            // Mock the enhanced checker to return undefined
+            vi.mocked(mockEnhancedServices.checker.checkMonitor).mockResolvedValue(undefined);
 
-            const result = await manager.checkSiteManually("site-1");
+            const result = await manager.checkSiteManually("site-1", "monitor-1");
 
-            expect(result).toBeUndefined();
-            expect(mockDependencies.eventEmitter.emitTyped).toHaveBeenCalledWith(
-                "internal:monitor:manual-check-completed",
-                expect.objectContaining({
-                    result: undefined,
-                })
+            expect(mockEnhancedServices.checker.checkMonitor).toHaveBeenCalledWith(
+                mockSite,
+                "monitor-1",
+                true
             );
+            expect(result).toBeUndefined();
         });
     });
 
@@ -577,8 +581,19 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 getAll: vi.fn(() => []),
             }));
 
+            const testEnhancedServices = {
+                checker: {
+                    checkMonitor: vi.fn(),
+                    startMonitoring: vi.fn(),
+                    stopMonitoring: vi.fn(),
+                },
+                operationRegistry: {},
+                statusUpdateService: {},
+                timeoutManager: {},
+            } as any;
+
             // Create a new manager instance with the updated cache
-            new MonitorManager(mockDependencies); // Don't need to store reference
+            new MonitorManager(mockDependencies, testEnhancedServices); // Don't need to store reference
 
             // Simulate a scheduled check by getting the callback and calling it
             const MonitorSchedulerMock = await import("../../services/monitoring/MonitorScheduler");

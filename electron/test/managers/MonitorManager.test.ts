@@ -4,6 +4,7 @@ import { vi } from "vitest";
 describe("MonitorManager", () => {
     let manager: MonitorManager;
     let dependencies: any;
+    let enhancedServices: any;
 
     beforeEach(() => {
         dependencies = {
@@ -20,7 +21,19 @@ describe("MonitorManager", () => {
             },
             siteService: {},
         };
-        manager = new MonitorManager(dependencies);
+        
+        enhancedServices = {
+            checker: {
+                checkMonitor: vi.fn(),
+                startMonitoring: vi.fn(),
+                stopMonitoring: vi.fn(),
+            },
+            operationRegistry: {},
+            statusUpdateService: {},
+            timeoutManager: {},
+        };
+        
+        manager = new MonitorManager(dependencies, enhancedServices);
     });
 
     it("should construct without error", () => {
@@ -36,10 +49,30 @@ describe("MonitorManager", () => {
     });
 
     it("should call checkSiteManually and emit event", async () => {
-        dependencies.getSitesCache = () => ({ get: () => ({ monitors: [] }) });
+        const mockSite = {
+            identifier: "site-1",
+            name: "Test Site",
+            monitoring: true,
+            monitors: [{ id: "monitor-1", type: "http", url: "https://test.com" }],
+        };
+        
+        const mockStatusUpdate = {
+            siteIdentifier: "site-1",
+            monitorId: "monitor-1",
+            status: "up",
+            timestamp: new Date().toISOString(),
+        };
+        
+        dependencies.getSitesCache = () => ({ get: () => mockSite });
         dependencies.eventEmitter.emitTyped = vi.fn();
-        const result = await manager.checkSiteManually("site-1");
+        
+        // Mock the enhanced checker to return a result
+        vi.mocked(enhancedServices.checker.checkMonitor).mockResolvedValue(mockStatusUpdate);
+        
+        const result = await manager.checkSiteManually("site-1", "monitor-1");
+        
+        expect(enhancedServices.checker.checkMonitor).toHaveBeenCalledWith(mockSite, "monitor-1", true);
         expect(dependencies.eventEmitter.emitTyped).toHaveBeenCalled();
-        expect(result).toBeUndefined();
+        expect(result).toEqual(mockStatusUpdate);
     });
 });

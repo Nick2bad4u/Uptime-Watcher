@@ -125,7 +125,10 @@ describe("useSettingsStore", () => {
 
     describe("initializeSettings", () => {
         it("should initialize settings from backend", async () => {
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(250);
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
+                success: true,
+                data: 250,
+            });
 
             await useSettingsStore.getState().initializeSettings();
 
@@ -189,7 +192,10 @@ describe("useSettingsStore", () => {
     describe("updateHistoryLimitValue", () => {
         it("should update history limit with backend sync", async () => {
             mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue(undefined);
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(300);
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
+                success: true,
+                data: 300,
+            });
 
             await useSettingsStore.getState().updateHistoryLimitValue(300);
 
