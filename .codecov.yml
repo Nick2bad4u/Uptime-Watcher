@@ -38,6 +38,13 @@ coverage:
                 threshold: 2%
                 paths:
                     - "electron/"
+            shared:
+                flags:
+                    - shared
+                target: 90% # High target for shared business logic
+                threshold: 2%
+                paths:
+                    - "shared/"
         patch:
             default:
                 target: 65% # Realistic for new code
@@ -57,6 +64,13 @@ coverage:
                 threshold: 10%
                 paths:
                     - "electron/"
+            shared:
+                flags:
+                    - shared
+                target: 80% # Shared code should be well tested
+                threshold: 10%
+                paths:
+                    - "shared/"
 
     ignore:
         # Build outputs and compiled files
@@ -137,6 +151,15 @@ flags:
             - "electron/**/*.spec.*"
             - "electron/test/**/*"
             - "electron/main.ts" # Entry point
+    shared:
+        paths:
+            - shared/
+        carryforward: false
+        ignore:
+            - "shared/**/*.test.*"
+            - "shared/**/*.spec.*"
+            - "shared/test/**/*"
+    # The shared flag covers all files in shared/ and is used for both status and component tracking. If you add new subfolders, update this path and the shared_core component above.
 
 # @deprecated: https://docs.codecov.com/docs/github-checks
 github_checks:
@@ -164,6 +187,19 @@ component_management:
               branches:
                   - "!main"
     individual_components:
+        # === SHARED CORE (Global Coverage for Shared Folder) ===
+        - component_id: shared_core
+          name: "🧩 Shared Core"
+          paths:
+              - shared/**
+          statuses:
+              - type: project
+                target: 90%
+                threshold: 2%
+              - type: patch
+                target: 80%
+                threshold: 7%
+
         # === CORE BUSINESS LOGIC (Highest Coverage Requirements) ===
 
         - component_id: monitoring_core
