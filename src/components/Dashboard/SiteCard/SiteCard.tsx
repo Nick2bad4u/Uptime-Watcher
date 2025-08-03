@@ -3,7 +3,7 @@
  * Composed of multiple sub-components for maintainability and reusability.
  */
 
-import React from "react";
+import React, { useMemo } from "react";
 
 import { useSite } from "../../../hooks/site/useSite";
 import { ThemedBox } from "../../../theme/components";
@@ -78,6 +78,50 @@ export const SiteCard = React.memo(function SiteCard({ site }: SiteCardPropertie
     const allMonitorsRunning =
         latestSite.monitors.length > 0 && latestSite.monitors.every((monitor) => monitor.monitoring === true);
 
+    // Memoize object props to prevent unnecessary re-renders
+    const displayProps = useMemo(
+        () => ({
+            isLoading,
+        }),
+        [isLoading]
+    );
+
+    const interactionProps = useMemo(
+        () => ({
+            onCheckNow: handleCheckNow,
+            onMonitorIdChange: handleMonitorIdChange,
+            onStartMonitoring: handleStartMonitoring,
+            onStartSiteMonitoring: handleStartSiteMonitoring,
+            onStopMonitoring: handleStopMonitoring,
+            onStopSiteMonitoring: handleStopSiteMonitoring,
+        }),
+        [
+            handleCheckNow,
+            handleMonitorIdChange,
+            handleStartMonitoring,
+            handleStartSiteMonitoring,
+            handleStopMonitoring,
+            handleStopSiteMonitoring,
+        ]
+    );
+
+    const monitoringProps = useMemo(
+        () => ({
+            allMonitorsRunning,
+            hasMonitor: !!monitor,
+            isMonitoring,
+            selectedMonitorId,
+        }),
+        [allMonitorsRunning, monitor, isMonitoring, selectedMonitorId]
+    );
+
+    const siteProps = useMemo(
+        () => ({
+            site: latestSite,
+        }),
+        [latestSite]
+    );
+
     return (
         <ThemedBox
             aria-label={`View details for ${latestSite.name}`}
@@ -89,26 +133,10 @@ export const SiteCard = React.memo(function SiteCard({ site }: SiteCardPropertie
             variant="secondary"
         >
             <SiteCardHeader
-                display={{
-                    isLoading,
-                }}
-                interactions={{
-                    onCheckNow: handleCheckNow,
-                    onMonitorIdChange: handleMonitorIdChange,
-                    onStartMonitoring: handleStartMonitoring,
-                    onStartSiteMonitoring: handleStartSiteMonitoring,
-                    onStopMonitoring: handleStopMonitoring,
-                    onStopSiteMonitoring: handleStopSiteMonitoring,
-                }}
-                monitoring={{
-                    allMonitorsRunning,
-                    hasMonitor: !!monitor,
-                    isMonitoring,
-                    selectedMonitorId,
-                }}
-                site={{
-                    site: latestSite,
-                }}
+                display={displayProps}
+                interactions={interactionProps}
+                monitoring={monitoringProps}
+                site={siteProps}
             />
 
             <SiteCardStatus selectedMonitorId={selectedMonitorId} status={status} />

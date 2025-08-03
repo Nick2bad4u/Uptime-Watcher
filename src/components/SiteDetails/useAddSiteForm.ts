@@ -77,6 +77,72 @@ export interface AddSiteFormState {
 /** Form operation mode */
 export type FormMode = "existing" | "new";
 
+// Helper functions for add site form logic (reduces function length by composition)
+const resetFieldsForMonitorType = (
+    currentFieldNames: Set<string>,
+    setters: {
+        setHost: (value: string) => void;
+        setPort: (value: string) => void;
+        setUrl: (value: string) => void;
+    }
+) => {
+    // Reset fields that are not used by the current monitor type
+    if (!currentFieldNames.has("url")) {
+        setters.setUrl("");
+    }
+    if (!currentFieldNames.has("host")) {
+        setters.setHost("");
+    }
+    if (!currentFieldNames.has("port")) {
+        setters.setPort("");
+    }
+};
+
+const resetFieldsForModeChange = (
+    addMode: FormMode,
+    setters: {
+        setName: (value: string) => void;
+        setSiteId: (value: string) => void;
+    }
+) => {
+    if (addMode === "new") {
+        setters.setName("");
+        setters.setSiteId(generateUuid());
+    } else {
+        setters.setName("");
+    }
+};
+
+const validateFormFields = (
+    addMode: FormMode,
+    name: string,
+    selectedExistingSite: string,
+    monitorType: MonitorType,
+    fieldValues: { host: string; port: string; url: string },
+    getFields: (type: MonitorType) => Array<{ name: string; required: boolean }>
+) => {
+    // Basic validation for mode and name
+    if (addMode === "new" && !name.trim()) {
+        return false;
+    }
+    if (addMode === "existing" && !selectedExistingSite) {
+        return false;
+    }
+
+    // Dynamic validation based on monitor type fields
+    const currentFields = getFields(monitorType);
+    for (const field of currentFields) {
+        if (field.required) {
+            const value = fieldValues[field.name as keyof typeof fieldValues] || "";
+            if (!value.trim()) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+};
+
 /**
  * Hook for managing add site form state and operations.
  *
@@ -121,61 +187,19 @@ export function useAddSiteForm(): AddSiteFormActions & AddSiteFormState {
     if (monitorType !== prevMonitorType) {
         setPrevMonitorType(monitorType);
         setFormError(undefined);
-
-        // Reset fields that are not used by the current monitor type
-        if (!currentFieldNames.has("url")) {
-            setUrl("");
-        }
-        if (!currentFieldNames.has("host")) {
-            setHost("");
-        }
-        if (!currentFieldNames.has("port")) {
-            setPort("");
-        }
+        resetFieldsForMonitorType(currentFieldNames, { setHost, setPort, setUrl });
     }
 
     // Reset name and siteId when switching modes
     if (addMode !== prevAddMode) {
         setPrevAddMode(addMode);
         setFormError(undefined);
-
-        if (addMode === "new") {
-            setName("");
-            setSiteId(generateUuid());
-        } else {
-            setName("");
-        }
+        resetFieldsForModeChange(addMode, { setName, setSiteId });
     }
 
     // Simple validation function without logging - only used for submit button state
     const isFormValid = useCallback(() => {
-        // Basic validation for mode and name
-        if (addMode === "new" && !name.trim()) {
-            return false;
-        }
-        if (addMode === "existing" && !selectedExistingSite) {
-            return false;
-        }
-
-        // Create field value mapping for dynamic access
-        const fieldValues = {
-            host,
-            port,
-            url,
-        };
-
-        // Dynamic validation based on monitor type fields
-        const currentFields = getFields(monitorType);
-        for (const field of currentFields) {
-            if (field.required) {
-                const value = fieldValues[field.name as keyof typeof fieldValues] || "";
-                if (!value.trim()) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return validateFormFields(addMode, name, selectedExistingSite, monitorType, { host, port, url }, getFields);
     }, [
         addMode,
         name,

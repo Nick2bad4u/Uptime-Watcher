@@ -170,6 +170,42 @@ export interface SiteRow extends BaseRow {
 }
 
 /**
+ * Validation utilities for database row type checking.
+ * Provides atomic validation functions that can be composed for complex validation.
+ *
+ * @internal
+ */
+const RowValidationUtils = {
+    /**
+     * Validates that a value is a non-null object.
+     */
+    isValidObject: (obj: unknown): obj is Record<string, unknown> => {
+        return typeof obj === "object" && obj !== null && !Array.isArray(obj);
+    },
+
+    /**
+     * Validates monitor status value.
+     */
+    isValidStatus: (value: unknown): value is "down" | "up" => {
+        return value === "up" || value === "down";
+    },
+
+    /**
+     * Validates timestamp as numeric value.
+     */
+    isValidTimestamp: (value: unknown): boolean => {
+        if (typeof value === "number") {
+            return !Number.isNaN(value);
+        }
+        if (typeof value === "string") {
+            const numValue = Number(value);
+            return !Number.isNaN(numValue);
+        }
+        return false;
+    },
+} as const;
+
+/**
  * Determines if an object conforms to the {@link HistoryRow} interface.
  *
  * @remarks
@@ -179,21 +215,22 @@ export interface SiteRow extends BaseRow {
  * @returns True if the object matches the {@link HistoryRow} structure; otherwise, false.
  */
 export function isValidHistoryRow(obj: unknown): obj is HistoryRow {
-    if (typeof obj !== "object" || obj === null) {
+    // Basic object validation
+    if (!RowValidationUtils.isValidObject(obj)) {
         return false;
     }
 
-    const row = obj as Record<string, unknown>;
+    // Explicit property and type checking
     return (
-        "monitorId" in row &&
-        "status" in row &&
-        "timestamp" in row &&
-        row["monitorId"] !== undefined &&
-        row["status"] !== undefined &&
-        row["timestamp"] !== undefined &&
-        typeof row["monitorId"] === "string" &&
-        (row["status"] === "up" || row["status"] === "down") &&
-        !Number.isNaN(Number(row["timestamp"]))
+        "monitorId" in obj &&
+        "status" in obj &&
+        "timestamp" in obj &&
+        obj["monitorId"] !== undefined &&
+        obj["status"] !== undefined &&
+        obj["timestamp"] !== undefined &&
+        typeof obj["monitorId"] === "string" &&
+        RowValidationUtils.isValidStatus(obj["status"]) &&
+        RowValidationUtils.isValidTimestamp(obj["timestamp"])
     );
 }
 
@@ -207,18 +244,22 @@ export function isValidHistoryRow(obj: unknown): obj is HistoryRow {
  * @returns True if the object matches the {@link MonitorRow} structure; otherwise, false.
  */
 export function isValidMonitorRow(obj: unknown): obj is MonitorRow {
-    if (typeof obj !== "object" || obj === null) {
+    // Basic object validation
+    if (!RowValidationUtils.isValidObject(obj)) {
         return false;
     }
 
-    const row = obj as Record<string, unknown>;
+    // Explicit property and type checking
     return (
-        "id" in row &&
-        (typeof row["id"] === "string" || typeof row["id"] === "number") &&
-        "site_identifier" in row &&
-        typeof row["site_identifier"] === "string" &&
-        "type" in row &&
-        typeof row["type"] === "string"
+        "id" in obj &&
+        "site_identifier" in obj &&
+        "type" in obj &&
+        obj["id"] !== undefined &&
+        obj["site_identifier"] !== undefined &&
+        obj["type"] !== undefined &&
+        (typeof obj["id"] === "string" || typeof obj["id"] === "number") &&
+        typeof obj["site_identifier"] === "string" &&
+        typeof obj["type"] === "string"
     );
 }
 

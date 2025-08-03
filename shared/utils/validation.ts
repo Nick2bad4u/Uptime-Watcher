@@ -32,9 +32,12 @@ export function getMonitorValidationErrors(monitor: Partial<Monitor>): string[] 
  *
  * @param type - Value to check as monitor type
  * @returns Type predicate indicating if the value is a valid MonitorType
+ *
+ * @remarks
+ * Supports all monitor types: HTTP, port, and ping monitors.
  */
 export function validateMonitorType(type: unknown): type is MonitorType {
-    return typeof type === "string" && (type === "http" || type === "port");
+    return typeof type === "string" && (type === "http" || type === "port" || type === "ping");
 }
 
 /**
@@ -138,6 +141,23 @@ function validateHttpMonitorFields(monitor: Partial<Monitor>, errors: string[]):
 }
 
 /**
+ * Validates ping monitor-specific fields.
+ *
+ * @remarks
+ * Checks that the host field is present and a string. Ping monitors only require a host field,
+ * unlike port monitors which also require a port number.
+ *
+ * @param monitor - Partial monitor object to validate.
+ * @param errors - Array to collect validation error messages.
+ * @internal
+ */
+function validatePingMonitorFields(monitor: Partial<Monitor>, errors: string[]): void {
+    if (!monitor.host || typeof monitor.host !== "string") {
+        errors.push("Host is required for ping monitors");
+    }
+}
+
+/**
  * Validates port monitor-specific fields.
  *
  * @remarks
@@ -160,16 +180,30 @@ function validatePortMonitorFields(monitor: Partial<Monitor>, errors: string[]):
  * Validates type-specific monitor fields by delegating to the appropriate field validator.
  *
  * @remarks
- * Calls the correct field validation function based on the monitor type ("http" or "port"). Adds error messages to the provided errors array for any missing or invalid fields.
+ * Calls the correct field validation function based on the monitor type ("http", "port", or "ping").
+ * Adds error messages to the provided errors array for any missing or invalid fields.
  *
  * @param monitor - Partial monitor object to validate.
  * @param errors - Array to collect validation error messages.
  * @internal
  */
 function validateTypeSpecificFields(monitor: Partial<Monitor>, errors: string[]): void {
-    if (monitor.type === "http") {
-        validateHttpMonitorFields(monitor, errors);
-    } else if (monitor.type === "port") {
-        validatePortMonitorFields(monitor, errors);
+    if (!monitor.type) {
+        return; // Type validation is handled separately in validateBasicMonitorFields
+    }
+
+    switch (monitor.type) {
+        case "http": {
+            validateHttpMonitorFields(monitor, errors);
+            break;
+        }
+        case "ping": {
+            validatePingMonitorFields(monitor, errors);
+            break;
+        }
+        case "port": {
+            validatePortMonitorFields(monitor, errors);
+            break;
+        }
     }
 }

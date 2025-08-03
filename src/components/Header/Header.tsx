@@ -18,7 +18,7 @@
  * Displays uptime statistics, theme toggle, and settings access.
  */
 
-import type { Monitor } from "@shared/types";
+import type { Monitor, Site } from "@shared/types";
 
 import { useMemo } from "react";
 
@@ -27,6 +27,63 @@ import { useUIStore } from "../../stores/ui/useUiStore";
 import { StatusIndicator, ThemedBox, ThemedButton, ThemedText } from "../../theme/components";
 import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
 import "./Header.css";
+
+// Helper functions for monitor counting (reduces complexity by composition)
+const initializeMonitorCounts = () => ({
+    down: 0,
+    paused: 0,
+    pending: 0,
+    total: 0,
+    up: 0,
+});
+
+const incrementCountByStatus = (counts: ReturnType<typeof initializeMonitorCounts>, status: string) => {
+    counts.total++;
+    switch (status) {
+        case "down": {
+            counts.down++;
+            break;
+        }
+        case "paused": {
+            counts.paused++;
+            break;
+        }
+        case "pending": {
+            counts.pending++;
+            break;
+        }
+        case "up": {
+            counts.up++;
+            break;
+        }
+    }
+};
+
+const countMonitorsInSite = (site: Site) => {
+    const counts = initializeMonitorCounts();
+    const monitors = (site.monitors as Monitor[] | null | undefined) ?? [];
+
+    for (const monitor of monitors) {
+        incrementCountByStatus(counts, monitor.status);
+    }
+
+    return counts;
+};
+
+const aggregateMonitorCounts = (sites: Site[]) => {
+    const totalCounts = initializeMonitorCounts();
+
+    for (const site of sites) {
+        const siteCounts = countMonitorsInSite(site);
+        totalCounts.down += siteCounts.down;
+        totalCounts.paused += siteCounts.paused;
+        totalCounts.pending += siteCounts.pending;
+        totalCounts.total += siteCounts.total;
+        totalCounts.up += siteCounts.up;
+    }
+
+    return totalCounts;
+};
 
 /**
  * Main header component for the application.
@@ -47,43 +104,7 @@ export function Header() {
     const { getAvailabilityColor } = useAvailabilityColors();
 
     // Count all monitors across all sites by status using functional approach
-    const monitorCounts = useMemo(() => {
-        const counts = {
-            down: 0,
-            paused: 0,
-            pending: 0,
-            total: 0,
-            up: 0,
-        };
-
-        for (const site of sites) {
-            // Safely handle cases where monitors might be null/undefined (runtime safety)
-            const monitors = (site.monitors as Monitor[] | null | undefined) ?? [];
-            for (const monitor of monitors) {
-                counts.total++;
-                switch (monitor.status) {
-                    case "down": {
-                        counts.down++;
-                        break;
-                    }
-                    case "paused": {
-                        counts.paused++;
-                        break;
-                    }
-                    case "pending": {
-                        counts.pending++;
-                        break;
-                    }
-                    case "up": {
-                        counts.up++;
-                        break;
-                    }
-                }
-            }
-        }
-
-        return counts;
-    }, [sites]);
+    const monitorCounts = useMemo(() => aggregateMonitorCounts(sites), [sites]);
 
     const {
         down: downMonitors,

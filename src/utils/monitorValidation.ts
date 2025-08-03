@@ -202,6 +202,89 @@ export async function validateMonitorFieldClientSide(
     );
 }
 
+// Helper functions for monitor form validation (reduces complexity by composition)
+const validateHttpMonitorFormData = (data: Record<string, unknown>) => {
+    const errors: string[] = [];
+
+    if (!data["url"] || typeof data["url"] !== "string") {
+        errors.push("URL is required for HTTP monitors");
+    } else {
+        // Validate URL field specifically
+        const urlResult = sharedValidateMonitorField("http", "url", data["url"]);
+        errors.push(...urlResult.errors);
+    }
+
+    return errors;
+};
+
+const validatePortMonitorFormData = (data: Record<string, unknown>) => {
+    const errors: string[] = [];
+
+    if (!data["host"] || typeof data["host"] !== "string") {
+        errors.push("Host is required for port monitors");
+    } else {
+        // Validate host field specifically
+        const hostResult = sharedValidateMonitorField("port", "host", data["host"]);
+        errors.push(...hostResult.errors);
+    }
+
+    if (!data["port"] || typeof data["port"] !== "number") {
+        errors.push("Port is required for port monitors");
+    } else {
+        // Validate port field specifically
+        const portResult = sharedValidateMonitorField("port", "port", data["port"]);
+        errors.push(...portResult.errors);
+    }
+
+    return errors;
+};
+
+/**
+ * Validates ping monitor form data by checking required host field.
+ *
+ * @param data - Form data to validate
+ * @returns Array of validation error messages
+ *
+ * @remarks
+ * Ping monitors require a host field that must be a valid hostname, IP address, or localhost.
+ * Uses shared validation to ensure consistency with backend validation rules.
+ */
+const validatePingMonitorFormData = (data: Record<string, unknown>) => {
+    const errors: string[] = [];
+
+    if (!data["host"] || typeof data["host"] !== "string") {
+        errors.push("Host is required for ping monitors");
+    } else {
+        // Validate host field specifically
+        const hostResult = sharedValidateMonitorField("ping", "host", data["host"]);
+        errors.push(...hostResult.errors);
+    }
+
+    return errors;
+};
+
+const validateMonitorFormDataByType = (type: MonitorType, data: Record<string, unknown>) => {
+    const errors: string[] = [];
+
+    // Validate type-specific required fields only
+    switch (type) {
+        case "http": {
+            errors.push(...validateHttpMonitorFormData(data));
+            break;
+        }
+        case "ping": {
+            errors.push(...validatePingMonitorFormData(data));
+            break;
+        }
+        case "port": {
+            errors.push(...validatePortMonitorFormData(data));
+            break;
+        }
+    }
+
+    return errors;
+};
+
 /**
  * Validate monitor form data with only the fields that are provided.
  * Used for form validation where not all monitor fields are available yet.
@@ -216,36 +299,7 @@ export async function validateMonitorFormData(
 ): Promise<ValidationResult> {
     return withUtilityErrorHandling(
         () => {
-            const errors: string[] = [];
-
-            // Validate type-specific required fields only
-            if (type === "http") {
-                if (!data["url"] || typeof data["url"] !== "string") {
-                    errors.push("URL is required for HTTP monitors");
-                } else {
-                    // Validate URL field specifically
-                    const urlResult = sharedValidateMonitorField(type, "url", data["url"]);
-                    errors.push(...urlResult.errors);
-                }
-            }
-
-            if (type === "port") {
-                if (!data["host"] || typeof data["host"] !== "string") {
-                    errors.push("Host is required for port monitors");
-                } else {
-                    // Validate host field specifically
-                    const hostResult = sharedValidateMonitorField(type, "host", data["host"]);
-                    errors.push(...hostResult.errors);
-                }
-
-                if (!data["port"] || typeof data["port"] !== "number") {
-                    errors.push("Port is required for port monitors");
-                } else {
-                    // Validate port field specifically
-                    const portResult = sharedValidateMonitorField(type, "port", data["port"]);
-                    errors.push(...portResult.errors);
-                }
-            }
+            const errors = validateMonitorFormDataByType(type, data);
 
             return Promise.resolve({
                 errors,

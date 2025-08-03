@@ -1057,7 +1057,7 @@ export function getEventPriority(eventName: keyof UptimeEvents): keyof typeof EV
  * @public
  */
 export function isEventOfCategory(eventName: keyof UptimeEvents, category: keyof typeof EVENT_CATEGORIES): boolean {
-    // Use a switch statement for safe category checking
+    // Type-safe category checking using switch statement
     switch (category) {
         case "CACHE": {
             return EVENT_CATEGORIES.CACHE.includes(eventName as never);

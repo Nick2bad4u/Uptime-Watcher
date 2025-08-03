@@ -13,6 +13,42 @@ import type { EventMiddleware } from "./TypedEventBus";
 import { isDevelopment } from "../../shared/utils/environment";
 import { logger as baseLogger } from "../utils/logger";
 
+// Helper functions for metrics middleware (reduces complexity by composition)
+type MetricsCallback = (metric: { name: string; type: "counter" | "timing"; value: number }) => void;
+
+const trackEventCount = (event: string, eventCounts: Map<string, number>, metricsCallback?: MetricsCallback) => {
+    const count = eventCounts.get(event) ?? 0;
+    const newCount = count + 1;
+    eventCounts.set(event, newCount);
+
+    if (metricsCallback) {
+        metricsCallback({
+            name: `events.${event}.count`,
+            type: "counter",
+            value: newCount,
+        });
+    }
+};
+
+const trackEventTiming = (
+    event: string,
+    duration: number,
+    eventTimings: Map<string, number[]>,
+    metricsCallback?: MetricsCallback
+) => {
+    const timings = eventTimings.get(event) ?? [];
+    timings.push(duration);
+    eventTimings.set(event, timings);
+
+    if (metricsCallback) {
+        metricsCallback({
+            name: `events.${event}.duration`,
+            type: "timing",
+            value: duration,
+        });
+    }
+};
+
 /**
  * Result type for event data validation.
  *
@@ -388,16 +424,7 @@ export function createMetricsMiddleware(options: {
 
         // Track event counts
         if (trackCounts) {
-            const count = eventCounts.get(event) ?? 0;
-            eventCounts.set(event, count + 1);
-
-            if (metricsCallback) {
-                metricsCallback({
-                    name: `events.${event}.count`,
-                    type: "counter",
-                    value: count + 1,
-                });
-            }
+            trackEventCount(event, eventCounts, metricsCallback);
         }
 
         await next();
@@ -405,17 +432,7 @@ export function createMetricsMiddleware(options: {
         // Track event timing
         if (trackTiming) {
             const duration = Date.now() - startTime;
-            const timings = eventTimings.get(event) ?? [];
-            timings.push(duration);
-            eventTimings.set(event, timings);
-
-            if (metricsCallback) {
-                metricsCallback({
-                    name: `events.${event}.duration`,
-                    type: "timing",
-                    value: duration,
-                });
-            }
+            trackEventTiming(event, duration, eventTimings, metricsCallback);
         }
     };
 }

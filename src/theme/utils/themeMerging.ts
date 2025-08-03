@@ -7,6 +7,61 @@
 
 import type { Theme } from "../types";
 
+// Helper functions for theme merging (reduces function length by composition)
+const mergeColors = (baseColors: Theme["colors"], overrideColors?: Partial<Theme["colors"]>) => ({
+    ...baseColors,
+    ...overrideColors,
+    background: {
+        ...baseColors.background,
+        ...overrideColors?.background,
+    },
+    border: {
+        ...baseColors.border,
+        ...overrideColors?.border,
+    },
+    hover: {
+        ...baseColors.hover,
+        ...overrideColors?.hover,
+    },
+    primary: {
+        ...baseColors.primary,
+        ...overrideColors?.primary,
+    },
+    status: {
+        ...baseColors.status,
+        ...overrideColors?.status,
+    },
+    surface: {
+        ...baseColors.surface,
+        ...overrideColors?.surface,
+    },
+    text: {
+        ...baseColors.text,
+        ...overrideColors?.text,
+    },
+});
+
+const mergeTypography = (baseTypography: Theme["typography"], overrideTypography?: Partial<Theme["typography"]>) => ({
+    ...baseTypography,
+    ...overrideTypography,
+    fontFamily: {
+        ...baseTypography.fontFamily,
+        ...overrideTypography?.fontFamily,
+    },
+    fontSize: {
+        ...baseTypography.fontSize,
+        ...overrideTypography?.fontSize,
+    },
+    fontWeight: {
+        ...baseTypography.fontWeight,
+        ...overrideTypography?.fontWeight,
+    },
+    lineHeight: {
+        ...baseTypography.lineHeight,
+        ...overrideTypography?.lineHeight,
+    },
+});
+
 /**
  * Deep merge themes with proper type safety and nested object handling.
  * Performs deep merging of nested objects like colors, typography, and spacing
@@ -40,38 +95,7 @@ export function deepMergeTheme(baseTheme: Theme, overrides: Partial<Theme>): The
             ...baseTheme.borderRadius,
             ...overrides.borderRadius,
         },
-        colors: {
-            ...baseTheme.colors,
-            ...overrides.colors,
-            background: {
-                ...baseTheme.colors.background,
-                ...overrides.colors?.background,
-            },
-            border: {
-                ...baseTheme.colors.border,
-                ...overrides.colors?.border,
-            },
-            hover: {
-                ...baseTheme.colors.hover,
-                ...overrides.colors?.hover,
-            },
-            primary: {
-                ...baseTheme.colors.primary,
-                ...overrides.colors?.primary,
-            },
-            status: {
-                ...baseTheme.colors.status,
-                ...overrides.colors?.status,
-            },
-            surface: {
-                ...baseTheme.colors.surface,
-                ...overrides.colors?.surface,
-            },
-            text: {
-                ...baseTheme.colors.text,
-                ...overrides.colors?.text,
-            },
-        },
+        colors: mergeColors(baseTheme.colors, overrides.colors),
         shadows: {
             ...baseTheme.shadows,
             ...overrides.shadows,
@@ -80,25 +104,6 @@ export function deepMergeTheme(baseTheme: Theme, overrides: Partial<Theme>): The
             ...baseTheme.spacing,
             ...overrides.spacing,
         },
-        typography: {
-            ...baseTheme.typography,
-            ...overrides.typography,
-            fontFamily: {
-                ...baseTheme.typography.fontFamily,
-                ...overrides.typography?.fontFamily,
-            },
-            fontSize: {
-                ...baseTheme.typography.fontSize,
-                ...overrides.typography?.fontSize,
-            },
-            fontWeight: {
-                ...baseTheme.typography.fontWeight,
-                ...overrides.typography?.fontWeight,
-            },
-            lineHeight: {
-                ...baseTheme.typography.lineHeight,
-                ...overrides.typography?.lineHeight,
-            },
-        },
+        typography: mergeTypography(baseTheme.typography, overrides.typography),
     };
 }

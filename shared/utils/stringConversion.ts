@@ -49,28 +49,39 @@ import { safeJsonStringifyWithFallback } from "./jsonSafety";
  * @see {@link safeJsonStringifyWithFallback}
  */
 export function safeStringify(value: unknown): string {
+    // Handle null/undefined early
     if (value === null || value === undefined) {
         return "";
     }
-    if (typeof value === "string") {
-        return value;
-    }
-    if (typeof value === "number" || typeof value === "boolean") {
-        return String(value);
-    }
-    if (typeof value === "object") {
-        // For objects, use safe JSON stringify with comprehensive fallback handling
-        return safeJsonStringifyWithFallback(value, "[Complex Object]");
-    }
 
-    // Handle remaining types (functions, symbols, etc.) without '[object Object]'
-    if (typeof value === "function") {
-        return "[Function]";
+    // Handle each type explicitly to avoid redundant condition warnings
+    switch (typeof value) {
+        case "bigint": {
+            return value.toString();
+        }
+        case "boolean": {
+            return String(value);
+        }
+        case "function": {
+            return "[Function]";
+        }
+        case "number": {
+            return String(value);
+        }
+        case "object": {
+            return safeJsonStringifyWithFallback(value, "[Complex Object]");
+        }
+        case "string": {
+            return value;
+        }
+        case "symbol": {
+            return value.toString();
+        }
+        case "undefined": {
+            return "";
+        }
+        default: {
+            return "[Unknown Type]";
+        }
     }
-    if (typeof value === "symbol") {
-        return value.toString();
-    }
-
-    // Final fallback for any other types
-    return "[Unknown Type]";
 }
