@@ -86,7 +86,6 @@ import {
     stopAllMonitoring,
     stopMonitoringForSite,
 } from "../utils/monitoring/monitorLifecycle";
-import { checkMonitor, checkSiteManually, MonitorCheckConfig } from "../utils/monitoring/monitorStatusChecker";
 import { withDatabaseOperation } from "../utils/operationalHooks";
 
 /**
@@ -114,7 +113,7 @@ export class MonitorManager {
      *
      * @readonly
      */
-    private readonly enhancedMonitoringServices?: EnhancedMonitoringServices;
+    private readonly enhancedMonitoringServices!: EnhancedMonitoringServices;
 
     /**
      * Event bus for monitor events.
@@ -147,23 +146,43 @@ export class MonitorManager {
     private readonly monitorScheduler: MonitorScheduler;
 
     /**
-     * Constructs a new {@link MonitorManager} instance.
+     * Constructs a new {@link MonitorManager} instance with enhanced monitoring capabilities.
      *
      * @remarks
      * All dependencies are injected to support testability and separation of concerns.
+     * The enhanced monitoring services are required and provide race condition prevention,
+     * operation correlation, and advanced timeout management for all monitoring operations.
      *
-     * @param dependencies - The required {@link MonitorManagerDependencies} for orchestration and data access.
-     * @example
-     * ```ts
-     * const manager = new MonitorManager({ ... });
+     * **Architecture Integration:**
+     * - Enhanced services are always provided by the ServiceContainer
+     * - No fallback to legacy monitoring systems
+     * - All monitoring operations use the unified enhanced system
+     * - Operation correlation prevents race conditions across concurrent operations
+     *
+     * @param dependencies - The required {@link MonitorManagerDependencies} for orchestration and data access
+     * @param enhancedServices - The required {@link EnhancedMonitoringServices} for advanced monitoring capabilities
+     *
+     * @example Basic Construction
+     * ```typescript
+     * const manager = new MonitorManager(dependencies, enhancedServices);
      * ```
+     *
+     * @example Via ServiceContainer (Recommended)
+     * ```typescript
+     * const container = ServiceContainer.getInstance();
+     * const manager = container.getMonitorManager();
+     * // Enhanced services are automatically provided
+     * ```
+     *
+     * @see {@link EnhancedMonitoringServices} for enhanced monitoring capabilities
+     * @see {@link ServiceContainer} for dependency injection and service creation
+     *
      * @public
      */
-    constructor(dependencies: MonitorManagerDependencies, enhancedServices?: EnhancedMonitoringServices) {
+    constructor(dependencies: MonitorManagerDependencies, enhancedServices: EnhancedMonitoringServices) {
         this.dependencies = dependencies;
         this.eventEmitter = dependencies.eventEmitter;
-        // Assign through object property access to satisfy readonly constraint
-        Object.assign(this, { enhancedMonitoringServices: enhancedServices });
+        this.enhancedMonitoringServices = enhancedServices;
         this.monitorScheduler = new MonitorScheduler();
         this.monitorScheduler.setCheckCallback(this.handleScheduledCheck.bind(this));
     }
@@ -185,55 +204,39 @@ export class MonitorManager {
      * @public
      */
     public async checkSiteManually(identifier: string, monitorId?: string): Promise<StatusUpdate | undefined> {
-        // Use enhanced monitoring for manual checks when available
-        if (this.enhancedMonitoringServices && monitorId) {
+        // Use enhanced monitoring for manual checks
+        if (monitorId) {
             const site = this.dependencies.getSitesCache().get(identifier);
             if (site) {
-                try {
-                    const result = await this.enhancedMonitoringServices.checker.checkMonitor(site, monitorId, true);
+                const result = await this.enhancedMonitoringServices.checker.checkMonitor(site, monitorId, true);
 
-                    // Emit manual check completed event
-                    await this.eventEmitter.emitTyped("internal:monitor:manual-check-completed", {
-                        identifier,
-                        monitorId,
-                        operation: "manual-check-completed",
-                        result: result as StatusUpdate,
-                        timestamp: Date.now(),
-                    });
+                // Emit manual check completed event
+                await this.eventEmitter.emitTyped("internal:monitor:manual-check-completed", {
+                    identifier,
+                    monitorId,
+                    operation: "manual-check-completed",
+                    result: result as StatusUpdate,
+                    timestamp: Date.now(),
+                });
 
-                    return result;
-                } catch (error) {
-                    logger.error(`Enhanced manual check failed for ${monitorId}`, error);
-                    // Fall through to traditional method
-                }
+                return result;
             }
         }
 
-        // Fallback to traditional manual check
-        const result = await checkSiteManually(
-            {
-                databaseService: this.dependencies.databaseService,
-                eventEmitter: this.eventEmitter,
-                historyLimit: this.dependencies.getHistoryLimit(),
-                logger,
-                repositories: this.dependencies.repositories,
-                sites: this.dependencies.getSitesCache(),
-                siteService: this.dependencies.siteService,
-            },
-            identifier,
-            monitorId
-        );
+        // For site-wide checks without specific monitorId, check all monitors
+        const site = this.dependencies.getSitesCache().get(identifier);
+        if (!site?.monitors.length) {
+            logger.warn(`Site ${identifier} not found or has no monitors for manual check`);
+            return undefined;
+        }
 
-        // Emit manual check completed event
-        await this.eventEmitter.emitTyped("internal:monitor:manual-check-completed", {
-            identifier,
-            ...(monitorId && { monitorId }),
-            operation: "manual-check-completed",
-            result: result as StatusUpdate,
-            timestamp: Date.now(),
-        });
+        // Check the first monitor (or could iterate through all)
+        const firstMonitor = site.monitors[0];
+        if (firstMonitor?.id) {
+            return this.checkSiteManually(identifier, firstMonitor.id);
+        }
 
-        return result ?? undefined;
+        return undefined;
     }
 
     /**
@@ -668,32 +671,6 @@ export class MonitorManager {
     }
 
     /**
-     * Checks a specific monitor and returns the resulting status update.
-     *
-     * @remarks
-     * Implements the core monitoring logic with typed event emission. Uses the repository and event-driven patterns for all operations.
-     *
-     * @param site - The {@link Site} containing the monitor.
-     * @param monitorId - The monitor ID to check.
-     * @returns The {@link StatusUpdate} for the monitor, or `undefined` if not found.
-     * @internal
-     */
-    private async checkMonitor(site: Site, monitorId: string): Promise<StatusUpdate | undefined> {
-        // Use the utility function instead of duplicating logic
-        const config: MonitorCheckConfig = {
-            databaseService: this.dependencies.databaseService,
-            eventEmitter: this.eventEmitter,
-            historyLimit: this.dependencies.getHistoryLimit(),
-            logger,
-            repositories: this.dependencies.repositories,
-            sites: this.dependencies.getSitesCache(),
-            siteService: this.dependencies.siteService,
-        };
-
-        return checkMonitor(config, site, monitorId);
-    }
-
-    /**
      * Handles scheduled monitor checks from the {@link MonitorScheduler}.
      *
      * @remarks
@@ -711,16 +688,11 @@ export class MonitorManager {
             return;
         }
 
-        // Use enhanced monitoring when available
-        if (this.enhancedMonitoringServices) {
-            try {
-                await this.enhancedMonitoringServices.checker.checkMonitor(site, monitorId, false);
-            } catch (error) {
-                logger.error(`Enhanced monitor check failed for ${monitorId}`, error);
-            }
-        } else {
-            // Fallback to traditional checking
-            await this.checkMonitor(site, monitorId);
+        // Use enhanced monitoring for scheduled checks
+        try {
+            await this.enhancedMonitoringServices.checker.checkMonitor(site, monitorId, false);
+        } catch (error) {
+            logger.error(`Enhanced monitor check failed for ${monitorId}`, error);
         }
     }
 

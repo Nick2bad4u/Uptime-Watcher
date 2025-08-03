@@ -408,7 +408,7 @@ export class ServiceContainer {
             };
 
             // Create enhanced monitoring services
-            const enhancedServices = EnhancedMonitoringServiceFactory.create({
+            const enhancedServices = EnhancedMonitoringServiceFactory.createServices({
                 eventEmitter: monitorEventBus,
                 getHistoryLimit: () => this.getDatabaseManager().getHistoryLimit(),
                 historyRepository: this.getHistoryRepository(),

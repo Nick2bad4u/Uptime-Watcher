@@ -38,8 +38,7 @@ export interface IpcResponse<T> {
  */
 export function extractIpcData<T>(response: unknown): T {
     if (!isIpcResponse<T>(response)) {
-        // Handle legacy format - return as-is if it's not an IPC response
-        return response as T;
+        throw new Error("Invalid IPC response format");
     }
 
     if (!response.success) {

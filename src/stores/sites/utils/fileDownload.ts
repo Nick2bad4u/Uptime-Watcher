@@ -95,7 +95,11 @@ export async function handleSQLiteBackupDownload(downloadFunction: () => Promise
     }
 
     // Create blob from the backup data
-    const blob = new Blob([backupData], { type: "application/x-sqlite3" });
+    // Create a new Uint8Array to ensure proper typing for Blob constructor
+    const blobData = new Uint8Array(backupData);
+    const blob = new Blob([blobData], {
+        type: "application/x-sqlite3",
+    });
 
     // Create object URL
     // URL.createObjectURL is always available in modern browsers

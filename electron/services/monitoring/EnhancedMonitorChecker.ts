@@ -1,11 +1,30 @@
 /**
- * Enhanced monitor status checker with operation correlation support.
+ * Enhanced monitor status checker with advanced operation correlation and race condition prevention.
  *
  * @remarks
- * Provides monitor checking with operation correlation to prevent race conditions.
- * Integrates with the operation registry and timeout management system.
+ * This class provides robust monitor checking capabilities with operation correlation to prevent race conditions
+ * in concurrent monitoring scenarios. It integrates with the operation registry and timeout management system
+ * to ensure safe, coordinated monitor operations across the application.
  *
- * @packageDocumentation
+ * Key features:
+ * - Operation correlation to prevent duplicate or conflicting checks
+ * - Race condition prevention through operation state tracking
+ * - Advanced timeout management with cleanup capabilities
+ * - Support for both manual and scheduled monitoring operations
+ * - Integration with status update service for safe concurrent updates
+ * - Comprehensive error handling and logging
+ *
+ * @example
+ * ```typescript
+ * const checker = new EnhancedMonitorChecker(config);
+ * const result = await checker.checkMonitor(site, monitorId, false);
+ * ```
+ *
+ * @see {@link MonitorOperationRegistry} for operation correlation details
+ * @see {@link MonitorStatusUpdateService} for status update safety
+ * @see {@link OperationTimeoutManager} for timeout management
+ *
+ * @public
  */
 
 import { Monitor, Site, StatusUpdate } from "../../../shared/types";
@@ -30,37 +49,170 @@ import { monitorLogger as logger } from "../../utils/logger";
 import { DEFAULT_MONITOR_TIMEOUT_SECONDS, MONITOR_TIMEOUT_BUFFER_MS, SECONDS_TO_MS_MULTIPLIER } from "./constants";
 
 /**
- * Configuration for enhanced monitor checking with operation correlation.
+ * Configuration interface for enhanced monitor checking with comprehensive service dependencies.
+ *
+ * @remarks
+ * This configuration object provides all necessary dependencies for the enhanced monitor checker
+ * to operate safely with operation correlation and race condition prevention. Each dependency
+ * serves a specific purpose in the monitoring operation lifecycle.
+ *
+ * @example
+ * ```typescript
+ * const config: EnhancedMonitorCheckConfig = {
+ *   eventEmitter: typedEventBus,
+ *   getHistoryLimit: () => 100,
+ *   historyRepository: historyRepo,
+ *   monitorRepository: monitorRepo,
+ *   operationRegistry: registry,
+ *   siteRepository: siteRepo,
+ *   sites: sitesCache,
+ *   statusUpdateService: updateService,
+ *   timeoutManager: timeoutMgr
+ * };
+ * ```
  *
  * @public
  */
 export interface EnhancedMonitorCheckConfig {
-    /** Event emitter for system-wide communication */
+    /**
+     * Event emitter for system-wide communication and monitor event propagation.
+     *
+     * @remarks
+     * Used to emit monitor status changes, operation events, and other monitoring-related notifications
+     * throughout the application.
+     */
     eventEmitter: TypedEventBus<UptimeEvents>;
-    /** Function to get the maximum number of history entries to keep */
+
+    /**
+     * Function to get the maximum number of history entries to keep for each monitor.
+     *
+     * @remarks
+     * This function provides the current history limit setting, which may change during runtime
+     * based on user configuration or system constraints.
+     *
+     * @returns The maximum number of status history entries to retain
+     */
     getHistoryLimit: () => number;
-    /** Repository for history operations */
+
+    /**
+     * Repository for history operations and status history management.
+     *
+     * @remarks
+     * Handles persistence and retrieval of monitor status history entries, including
+     * automatic pruning based on the configured history limit.
+     */
     historyRepository: HistoryRepository;
-    /** Repository for monitor operations */
+
+    /**
+     * Repository for monitor entity operations and status updates.
+     *
+     * @remarks
+     * Manages monitor entity persistence, updates monitor status and configuration,
+     * and handles monitor-related database operations.
+     */
     monitorRepository: MonitorRepository;
-    /** Operation registry for correlation */
+
+    /**
+     * Operation registry for correlation and race condition prevention.
+     *
+     * @remarks
+     * Tracks active monitor operations to prevent concurrent checks on the same monitor
+     * and provides operation correlation for debugging and state management.
+     */
     operationRegistry: MonitorOperationRegistry;
-    /** Repository for site operations */
+
+    /**
+     * Repository for site entity operations and site-monitor relationships.
+     *
+     * @remarks
+     * Handles site entity persistence and manages the relationship between sites
+     * and their associated monitors.
+     */
     siteRepository: SiteRepository;
-    /** Sites cache for quick access */
+
+    /**
+     * Sites cache for quick access to site and monitor data without database queries.
+     *
+     * @remarks
+     * Provides fast, in-memory access to site configurations and monitor definitions,
+     * reducing database load during frequent monitoring operations.
+     */
     sites: StandardizedCache<SiteType>;
-    /** Status update service for safe updates */
+
+    /**
+     * Status update service for safe concurrent status updates.
+     *
+     * @remarks
+     * Provides operation-aware status updates that prevent race conditions when multiple
+     * monitor checks might attempt to update the same monitor's status simultaneously.
+     */
     statusUpdateService: MonitorStatusUpdateService;
-    /** Timeout manager for operation cleanup */
+
+    /**
+     * Timeout manager for operation cleanup and resource management.
+     *
+     * @remarks
+     * Manages operation timeouts, cleanup procedures, and ensures resources are properly
+     * released when monitor operations complete or are cancelled.
+     */
     timeoutManager: OperationTimeoutManager;
 }
 
 /**
- * Enhanced monitor checker with operation correlation.
+ * Enhanced monitor checker with advanced operation correlation and race condition prevention.
  *
  * @remarks
- * Provides race condition-safe monitor checking by correlating operations
- * with their initiating state changes.
+ * This class is the core monitoring engine that provides robust, race condition-safe monitor checking
+ * capabilities. It coordinates with multiple service layers to ensure safe concurrent operations
+ * and maintains operation state throughout the monitoring lifecycle.
+ *
+ * **Key Features:**
+ * - **Operation Correlation**: Prevents duplicate operations on the same monitor
+ * - **Race Condition Prevention**: Ensures safe concurrent monitoring operations
+ * - **Advanced Timeout Management**: Handles operation timeouts with proper cleanup
+ * - **Status Update Safety**: Prevents conflicting status updates from concurrent checks
+ * - **Comprehensive Logging**: Detailed operation tracking for debugging and monitoring
+ *
+ * **Operation Lifecycle:**
+ * 1. Validate monitor and operation prerequisites
+ * 2. Register operation in correlation registry
+ * 3. Configure timeout management and cleanup
+ * 4. Execute monitor-specific checking logic
+ * 5. Process results and update status safely
+ * 6. Clean up resources and unregister operation
+ *
+ * **Supported Monitor Types:**
+ * - HTTP/HTTPS monitors with full request/response validation
+ * - Ping monitors with network connectivity testing
+ * - Port monitors with TCP/UDP connection testing
+ *
+ * @example Basic Usage
+ * ```typescript
+ * const checker = new EnhancedMonitorChecker(config);
+ *
+ * // Scheduled check with operation correlation
+ * const result = await checker.checkMonitor(site, monitorId, false);
+ *
+ * // Manual check (bypasses operation correlation)
+ * const manualResult = await checker.checkMonitor(site, monitorId, true);
+ * ```
+ *
+ * @example Error Handling
+ * ```typescript
+ * try {
+ *   const result = await checker.checkMonitor(site, monitorId);
+ *   if (result) {
+ *     console.log('Monitor check successful:', result.status);
+ *   }
+ * } catch (error) {
+ *   console.error('Monitor check failed:', error);
+ * }
+ * ```
+ *
+ * @see {@link MonitorOperationRegistry} for operation correlation details
+ * @see {@link MonitorStatusUpdateService} for status update safety mechanisms
+ * @see {@link OperationTimeoutManager} for timeout and cleanup management
+ * @see {@link EnhancedMonitorCheckConfig} for configuration requirements
  *
  * @public
  */
@@ -77,12 +229,69 @@ export class EnhancedMonitorChecker {
     }
 
     /**
-     * Check a monitor with operation correlation support.
+     * Performs a comprehensive monitor status check with advanced operation correlation.
      *
-     * @param site - Site containing the monitor
-     * @param monitorId - ID of monitor to check
-     * @param isManualCheck - Whether this is a manual check (optional)
-     * @returns Status update if successful, undefined if failed or cancelled
+     * @remarks
+     * This is the primary entry point for all monitor checking operations. The method provides
+     * two distinct operation modes: correlated checks for scheduled operations that prevent
+     * race conditions, and direct checks for manual operations that bypass correlation.
+     *
+     * **Operation Modes:**
+     *
+     * **Scheduled Checks (isManualCheck = false):**
+     * - Uses operation correlation to prevent duplicate checks
+     * - Validates monitor is actively monitoring before proceeding
+     * - Registers operation in correlation registry
+     * - Provides timeout management and automatic cleanup
+     * - Handles concurrent operation conflicts gracefully
+     *
+     * **Manual Checks (isManualCheck = true):**
+     * - Bypasses operation correlation for immediate execution
+     * - Ignores monitor monitoring state
+     * - Provides immediate feedback for user-initiated actions
+     * - Still benefits from enhanced error handling and logging
+     *
+     * **Error Handling:**
+     * - Validates monitor configuration before execution
+     * - Handles operation conflicts and duplicate registrations
+     * - Provides comprehensive error logging with operation context
+     * - Ensures proper resource cleanup on failures
+     *
+     * **Timeout Management:**
+     * - Applies monitor-specific or default timeout values
+     * - Includes buffer time for cleanup operations
+     * - Automatically cancels operations that exceed timeout
+     * - Releases resources and updates operation status
+     *
+     * @param site - The site object containing the monitor configuration
+     * @param monitorId - Unique identifier of the monitor to check
+     * @param isManualCheck - Whether this is a user-initiated manual check (default: false)
+     *
+     * @returns A promise that resolves to a StatusUpdate object if the check succeeds,
+     *          or undefined if the check fails, is cancelled, or encounters conflicts
+     *
+     * @throws Throws detailed errors for configuration issues, operation failures,
+     *         or system-level problems that prevent check execution
+     *
+     * @example Scheduled Monitor Check
+     * ```typescript
+     * const result = await checker.checkMonitor(site, 'monitor-123', false);
+     * if (result) {
+     *   console.log(`Monitor ${result.monitorId} status: ${result.status}`);
+     * }
+     * ```
+     *
+     * @example Manual Monitor Check
+     * ```typescript
+     * const result = await checker.checkMonitor(site, 'monitor-123', true);
+     * // Manual checks bypass operation correlation for immediate execution
+     * ```
+     *
+     * @see {@link MonitorOperationRegistry.registerOperation} for operation registration
+     * @see {@link OperationTimeoutManager.createTimeout} for timeout management
+     * @see {@link MonitorStatusUpdateService.updateStatus} for status update safety
+     *
+     * @public
      */
     async checkMonitor(site: Site, monitorId: string, isManualCheck = false): Promise<StatusUpdate | undefined> {
         const monitor = site.monitors.find((m) => String(m.id) === String(monitorId));
