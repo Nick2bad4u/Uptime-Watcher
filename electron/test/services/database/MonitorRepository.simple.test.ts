@@ -1,5 +1,5 @@
 /**
- * Simple tests to improve MonitorRepository coverage  
+ * Simple tests to improve MonitorRepository coverage
  */
 
 import { describe, expect, it, vi, beforeEach } from "vitest";
@@ -70,7 +70,7 @@ describe("MonitorRepository Coverage Tests", () => {
 
     it("should create repository instance with dependencies", async () => {
         const { MonitorRepository } = await import("../../../services/database/MonitorRepository");
-        
+
         const repository = new MonitorRepository({ databaseService: mockDatabaseService });
         expect(repository).toBeDefined();
         expect(repository).toBeInstanceOf(MonitorRepository);
@@ -78,7 +78,7 @@ describe("MonitorRepository Coverage Tests", () => {
 
     it("should handle create operations", async () => {
         const { MonitorRepository } = await import("../../../services/database/MonitorRepository");
-        
+
         try {
             const repository = new MonitorRepository({ databaseService: mockDatabaseService });
             // Just testing that we can call the method - types will be validated at runtime
@@ -92,7 +92,7 @@ describe("MonitorRepository Coverage Tests", () => {
 
     it("should handle findByIdentifier operations", async () => {
         const { MonitorRepository } = await import("../../../services/database/MonitorRepository");
-        
+
         try {
             const repository = new MonitorRepository({ databaseService: mockDatabaseService });
             await repository.findByIdentifier("test-id");
@@ -104,7 +104,7 @@ describe("MonitorRepository Coverage Tests", () => {
 
     it("should handle findBySiteIdentifier operations", async () => {
         const { MonitorRepository } = await import("../../../services/database/MonitorRepository");
-        
+
         try {
             const repository = new MonitorRepository({ databaseService: mockDatabaseService });
             await repository.findBySiteIdentifier("site-id");
@@ -116,7 +116,7 @@ describe("MonitorRepository Coverage Tests", () => {
 
     it("should handle update operations", async () => {
         const { MonitorRepository } = await import("../../../services/database/MonitorRepository");
-        
+
         try {
             const repository = new MonitorRepository({ databaseService: mockDatabaseService });
             await repository.update("test-id", { status: "up" });
@@ -128,7 +128,7 @@ describe("MonitorRepository Coverage Tests", () => {
 
     it("should handle delete operations", async () => {
         const { MonitorRepository } = await import("../../../services/database/MonitorRepository");
-        
+
         try {
             const repository = new MonitorRepository({ databaseService: mockDatabaseService });
             await repository.delete("test-id");
@@ -140,7 +140,7 @@ describe("MonitorRepository Coverage Tests", () => {
 
     it("should handle getAllMonitorIds operations", async () => {
         const { MonitorRepository } = await import("../../../services/database/MonitorRepository");
-        
+
         try {
             const repository = new MonitorRepository({ databaseService: mockDatabaseService });
             await repository.getAllMonitorIds();
@@ -152,7 +152,7 @@ describe("MonitorRepository Coverage Tests", () => {
 
     it("should handle bulkCreate operations", async () => {
         const { MonitorRepository } = await import("../../../services/database/MonitorRepository");
-        
+
         try {
             const repository = new MonitorRepository({ databaseService: mockDatabaseService });
             // Just testing that we can call the method - types will be validated at runtime
@@ -165,7 +165,7 @@ describe("MonitorRepository Coverage Tests", () => {
 
     it("should handle clearActiveOperations operations", async () => {
         const { MonitorRepository } = await import("../../../services/database/MonitorRepository");
-        
+
         try {
             const repository = new MonitorRepository({ databaseService: mockDatabaseService });
             await repository.clearActiveOperations("test-id");
@@ -177,7 +177,7 @@ describe("MonitorRepository Coverage Tests", () => {
 
     it("should handle deleteAll operations", async () => {
         const { MonitorRepository } = await import("../../../services/database/MonitorRepository");
-        
+
         try {
             const repository = new MonitorRepository({ databaseService: mockDatabaseService });
             await repository.deleteAll();
@@ -189,7 +189,7 @@ describe("MonitorRepository Coverage Tests", () => {
 
     it("should handle deleteBySiteIdentifier operations", async () => {
         const { MonitorRepository } = await import("../../../services/database/MonitorRepository");
-        
+
         try {
             const repository = new MonitorRepository({ databaseService: mockDatabaseService });
             await repository.deleteBySiteIdentifier("site-id");
@@ -201,7 +201,7 @@ describe("MonitorRepository Coverage Tests", () => {
 
     it("should handle error scenarios gracefully", async () => {
         const { MonitorRepository } = await import("../../../services/database/MonitorRepository");
-        
+
         try {
             const repository = new MonitorRepository({ databaseService: mockDatabaseService });
             // Try operations with invalid data
@@ -215,15 +215,15 @@ describe("MonitorRepository Coverage Tests", () => {
 
     it("should exercise SQL query building logic", async () => {
         const { MonitorRepository } = await import("../../../services/database/MonitorRepository");
-        
+
         try {
             const repository = new MonitorRepository({ databaseService: mockDatabaseService });
-            
+
             // These calls should exercise different SQL query paths
             await repository.findByIdentifier("test-id");
             await repository.findBySiteIdentifier("site-id");
             await repository.getAllMonitorIds();
-            
+
             expect(true).toBe(true);
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
@@ -232,7 +232,7 @@ describe("MonitorRepository Coverage Tests", () => {
 
     it("should handle clearActiveOperationsInternal", async () => {
         const { MonitorRepository } = await import("../../../services/database/MonitorRepository");
-        
+
         try {
             const repository = new MonitorRepository({ databaseService: mockDatabaseService });
             const mockDb = {
@@ -241,7 +241,7 @@ describe("MonitorRepository Coverage Tests", () => {
                     finalize: vi.fn(),
                 })),
             };
-            
+
             // This should exercise the internal method
             repository.clearActiveOperationsInternal(mockDb as any, "test-id");
             expect(true).toBe(true);

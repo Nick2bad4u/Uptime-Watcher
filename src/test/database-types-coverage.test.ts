@@ -601,9 +601,9 @@ describe("Shared Database Types - Complete Coverage", () => {
         });
 
         it("should return default value when property is undefined", () => {
-            const row = { 
+            const row = {
                 undefinedProp: undefined,
-                existingProp: "value"
+                existingProp: "value",
             };
 
             expect(safeGetRowProperty(row, "undefinedProp", "default")).toBe("default");
@@ -627,7 +627,7 @@ describe("Shared Database Types - Complete Coverage", () => {
         it("should handle special property names", () => {
             const row = {
                 "prop-with-dashes": "dash-value",
-                "prop_with_underscores": "underscore-value",
+                prop_with_underscores: "underscore-value",
                 "prop.with.dots": "dot-value",
                 "123numeric": "numeric-value",
             };
@@ -661,15 +661,15 @@ describe("Shared Database Types - Complete Coverage", () => {
     describe("RowValidationUtils.isValidObject internal function coverage", () => {
         it("should cover internal isValidObject validation through public functions", () => {
             // These tests ensure the internal RowValidationUtils functions are exercised
-            
+
             // Test the isValidObject check through different validation functions
             expect(isValidHistoryRow(null)).toBe(false); // tests isValidObject(null)
-            expect(isValidHistoryRow([])).toBe(false);   // tests isValidObject(array)
+            expect(isValidHistoryRow([])).toBe(false); // tests isValidObject(array)
             expect(isValidHistoryRow("string")).toBe(false); // tests isValidObject(string)
-            expect(isValidHistoryRow(123)).toBe(false);  // tests isValidObject(number)
-            
+            expect(isValidHistoryRow(123)).toBe(false); // tests isValidObject(number)
+
             // Valid object should pass isValidObject but may fail other validations
-            expect(isValidHistoryRow({})).toBe(false);   // tests isValidObject returns true but missing required fields
+            expect(isValidHistoryRow({})).toBe(false); // tests isValidObject returns true but missing required fields
         });
     });
 
@@ -684,7 +684,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(validUpRow)).toBe(true);
 
             const validDownRow = {
-                monitorId: "test", 
+                monitorId: "test",
                 status: "down",
                 timestamp: 12345,
             };
@@ -712,7 +712,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             // Valid numeric timestamps
             const validNumberRow = {
                 monitorId: "test",
-                status: "up", 
+                status: "up",
                 timestamp: 1640995200000,
             };
             expect(isValidHistoryRow(validNumberRow)).toBe(true);

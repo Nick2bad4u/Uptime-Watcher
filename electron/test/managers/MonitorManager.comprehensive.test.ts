@@ -122,7 +122,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             },
             siteService: {},
         };
-        
+
         mockEnhancedServices = {
             checker: {
                 checkMonitor: vi.fn(),
@@ -208,11 +208,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             const result = await manager.checkSiteManually("site-1");
 
             // Should check the first monitor when no specific monitor ID provided
-            expect(mockEnhancedServices.checker.checkMonitor).toHaveBeenCalledWith(
-                mockSite,
-                "monitor-1",
-                true
-            );
+            expect(mockEnhancedServices.checker.checkMonitor).toHaveBeenCalledWith(mockSite, "monitor-1", true);
             expect(mockDependencies.eventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:monitor:manual-check-completed",
                 expect.objectContaining({
@@ -230,11 +226,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
 
             const result = await manager.checkSiteManually("site-1", "monitor-1");
 
-            expect(mockEnhancedServices.checker.checkMonitor).toHaveBeenCalledWith(
-                mockSite,
-                "monitor-1",
-                true
-            );
+            expect(mockEnhancedServices.checker.checkMonitor).toHaveBeenCalledWith(mockSite, "monitor-1", true);
             expect(result).toBeUndefined();
         });
     });

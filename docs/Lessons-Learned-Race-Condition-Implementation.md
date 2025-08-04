@@ -265,37 +265,43 @@ This implementation provides a proven template for complexity reduction:
 
 Following the initial `useThemeStyles.ts` success, we applied the same functional composition approach to eliminate ALL remaining nags:
 
-#### **1. Validator Composition Pattern** 
+#### **1. Validator Composition Pattern**
+
 - **Applied to**: `electron/services/ipc/validators.ts` (complexity 19 → 2)
 - **Technique**: Created composable validator factories
 - **Impact**: Eliminated 71-line functions and 15+ repetitive inline validators
 - **Key Learning**: Factory functions can drastically reduce boilerplate
 
 #### **2. State Management Decomposition**
-- **Applied to**: `src/components/Header/Header.tsx` (complexity 9 → 2)  
+
+- **Applied to**: `src/components/Header/Header.tsx` (complexity 9 → 2)
 - **Technique**: Extracted monitor counting into focused functions
 - **Impact**: Simplified nested loops and switch statements
 - **Key Learning**: Data aggregation logic benefits from functional decomposition
 
 #### **3. Type-Specific Handler Pattern**
+
 - **Applied to**: `src/utils/monitorValidation.ts` (complexity 9 → 4)
 - **Technique**: Separate handlers for each monitor type
 - **Impact**: Eliminated complex conditional chains
 - **Key Learning**: Type-specific handlers scale better than generic conditionals
 
 #### **4. Event Processing Simplification**
+
 - **Applied to**: `electron/events/middleware.ts` (complexity 9 → 3)
 - **Technique**: Extracted tracking concerns into focused functions
 - **Impact**: Simplified async middleware with callbacks
 - **Key Learning**: Event-driven code benefits from concern separation
 
 #### **5. Object Merging Specialization**
+
 - **Applied to**: `src/theme/utils/themeMerging.ts` (70 lines → 18 lines)
 - **Technique**: Specialized merging functions for different object types
 - **Impact**: 76% reduction in function length
 - **Key Learning**: Deep object operations should be broken by concern
 
 #### **6. Form State Management Composition**
+
 - **Applied to**: `src/components/SiteDetails/useAddSiteForm.ts` (75 lines → 35 lines)
 - **Technique**: Extracted reset and validation logic
 - **Impact**: Simplified React hook state management
@@ -335,7 +341,7 @@ Following the initial `useThemeStyles.ts` success, we applied the same functiona
 
 1. **Identify**: Find high-complexity functions (>8) or long functions (>50 lines)
 2. **Analyze**: Understand the logical concerns within the function
-3. **Extract**: Pull logical units into focused helper functions  
+3. **Extract**: Pull logical units into focused helper functions
 4. **Compose**: Rebuild main function as composition of helpers
 5. **Test**: Verify identical behavior and improved testability
 6. **Measure**: Confirm complexity reduction and maintainability improvement

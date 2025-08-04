@@ -37,7 +37,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
                 stopSiteMonitorMonitoring: vi.fn(),
             };
 
-            Object.values(sitesStore).forEach(fn => {
+            Object.values(sitesStore).forEach((fn) => {
                 expect(typeof fn).toBe("function");
             });
 
@@ -314,7 +314,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
 
             // Simulate error when monitor is undefined
             const monitor = undefined;
-            
+
             if (!monitor) {
                 mockLogger.site.error(
                     site.identifier,
@@ -322,10 +322,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
                 );
             }
 
-            expect(mockLogger.site.error).toHaveBeenCalledWith(
-                site.identifier,
-                expect.any(Error)
-            );
+            expect(mockLogger.site.error).toHaveBeenCalledWith(site.identifier, expect.any(Error));
         });
 
         it("should handle action errors with try-catch", () => {
@@ -380,7 +377,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
                 },
             ];
 
-            actions.forEach(action => {
+            actions.forEach((action) => {
                 mockLogger.user.action(action.name, action.data);
                 expect(mockLogger.user.action).toHaveBeenCalledWith(action.name, action.data);
             });
@@ -414,7 +411,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
                 "setShowSiteDetails",
             ];
 
-            dependencies.forEach(dep => {
+            dependencies.forEach((dep) => {
                 expect(typeof dep).toBe("string");
             });
         });

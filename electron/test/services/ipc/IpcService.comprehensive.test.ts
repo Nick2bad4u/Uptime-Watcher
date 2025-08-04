@@ -175,49 +175,49 @@ describe("IpcService", () => {
     describe("Handler Setup", () => {
         it("should setup all handlers", () => {
             ipcService.setupHandlers();
-            
+
             // Verify that setup methods are called by checking if handlers are registered
             expect(ipcMain.handle).toHaveBeenCalled();
         });
 
         it("should setup site handlers", () => {
             ipcService.setupHandlers();
-            
+
             // Verify that site-related IPC handlers are set up
             expect(ipcMain.handle).toHaveBeenCalled();
         });
 
         it("should setup monitoring handlers", () => {
             ipcService.setupHandlers();
-            
+
             // Verify monitoring handlers are registered
             expect(ipcMain.handle).toHaveBeenCalled();
         });
 
         it("should setup data handlers", () => {
             ipcService.setupHandlers();
-            
+
             // Verify data handlers are registered
             expect(ipcMain.handle).toHaveBeenCalled();
         });
 
         it("should setup monitor type handlers", () => {
             ipcService.setupHandlers();
-            
+
             // Verify monitor type handlers are registered
             expect(ipcMain.handle).toHaveBeenCalled();
         });
 
         it("should setup system handlers", () => {
             ipcService.setupHandlers();
-            
+
             // Verify system handlers are registered
             expect(ipcMain.handle).toHaveBeenCalled();
         });
 
         it("should setup state sync handlers", () => {
             ipcService.setupHandlers();
-            
+
             // Verify state sync handlers are registered
             expect(ipcMain.handle).toHaveBeenCalled();
         });
@@ -227,20 +227,20 @@ describe("IpcService", () => {
         it("should remove all registered handlers on cleanup", () => {
             ipcService.setupHandlers();
             ipcService.cleanup();
-            
+
             expect(ipcMain.removeHandler).toHaveBeenCalled();
             expect(ipcMain.removeAllListeners).toHaveBeenCalledWith("quit-and-install");
         });
 
         it("should handle cleanup when no handlers are registered", () => {
             ipcService.cleanup();
-            
+
             expect(ipcMain.removeAllListeners).toHaveBeenCalledWith("quit-and-install");
         });
 
         it("should log cleanup operation", () => {
             ipcService.cleanup();
-            
+
             // Verify cleanup logging happens (mocked in beforeEach)
             expect(ipcService).toBeDefined();
         });
@@ -355,12 +355,12 @@ describe("IpcService", () => {
         it("should handle cleanup errors when they occur", () => {
             // Setup first
             ipcService.setupHandlers();
-            
+
             // Mock an error during cleanup
             vi.mocked(ipcMain.removeHandler).mockImplementationOnce(() => {
                 throw new Error("Cleanup failed");
             });
-            
+
             // Should throw during cleanup when an error occurs
             expect(() => ipcService.cleanup()).toThrow("Cleanup failed");
         });
@@ -369,19 +369,19 @@ describe("IpcService", () => {
     describe("Integration", () => {
         it("should properly integrate with UptimeOrchestrator", () => {
             ipcService.setupHandlers();
-            
+
             expect(mockUptimeOrchestrator).toBeDefined();
         });
 
         it("should properly integrate with AutoUpdaterService", () => {
             ipcService.setupHandlers();
-            
+
             expect(mockAutoUpdaterService).toBeDefined();
         });
 
         it("should register handlers in correct order", () => {
             ipcService.setupHandlers();
-            
+
             // Verify setup was called
             expect(ipcMain.handle).toHaveBeenCalled();
         });
@@ -391,14 +391,14 @@ describe("IpcService", () => {
         it("should track registered handlers for cleanup", () => {
             ipcService.setupHandlers();
             ipcService.cleanup();
-            
+
             expect(ipcMain.removeHandler).toHaveBeenCalled();
         });
 
         it("should handle multiple setup calls", () => {
             ipcService.setupHandlers();
             ipcService.setupHandlers();
-            
+
             expect(ipcMain.handle).toHaveBeenCalled();
         });
 
@@ -406,7 +406,7 @@ describe("IpcService", () => {
             ipcService.setupHandlers();
             ipcService.cleanup();
             ipcService.cleanup();
-            
+
             expect(ipcMain.removeAllListeners).toHaveBeenCalledWith("quit-and-install");
         });
     });
@@ -435,10 +435,10 @@ describe("IpcService", () => {
         it("should properly manage memory on setup and cleanup", () => {
             ipcService.setupHandlers();
             const _handlerCallsAfterSetup = vi.mocked(ipcMain.handle).mock.calls.length;
-            
+
             ipcService.cleanup();
             const removeCallsAfterCleanup = vi.mocked(ipcMain.removeHandler).mock.calls.length;
-            
+
             // Should have called removeHandler for each registered handler
             expect(removeCallsAfterCleanup).toBeGreaterThan(0);
         });
@@ -446,7 +446,7 @@ describe("IpcService", () => {
         it("should prevent memory leaks from handlers", () => {
             ipcService.setupHandlers();
             ipcService.cleanup();
-            
+
             expect(ipcMain.removeAllListeners).toHaveBeenCalledWith("quit-and-install");
         });
     });

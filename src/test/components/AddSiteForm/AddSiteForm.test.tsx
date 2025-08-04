@@ -89,32 +89,30 @@ vi.mock("../../../utils/data/generateUuid", () => ({
 
 // Mock FormFields components
 vi.mock("../../../components/AddSiteForm/FormFields", () => ({
-    RadioGroup: ({ children }: { children: React.ReactNode }) => (
-        <div data-testid="radio-group">{children}</div>
-    ),
-    SelectField: ({ children }: { children: React.ReactNode }) => (
-        <div data-testid="select-field">{children}</div>
-    ),
-    FormField: ({ children }: { children: React.ReactNode }) => (
-        <div data-testid="form-field">{children}</div>
-    ),
+    RadioGroup: ({ children }: { children: React.ReactNode }) => <div data-testid="radio-group">{children}</div>,
+    SelectField: ({ children }: { children: React.ReactNode }) => <div data-testid="select-field">{children}</div>,
+    FormField: ({ children }: { children: React.ReactNode }) => <div data-testid="form-field">{children}</div>,
 }));
 
 vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
-    DynamicMonitorFields: () => (
-        <div data-testid="dynamic-monitor-fields">Dynamic fields</div>
-    ),
+    DynamicMonitorFields: () => <div data-testid="dynamic-monitor-fields">Dynamic fields</div>,
 }));
 
 vi.mock("../../../theme/components", () => ({
     ThemedBox: ({ children, ...props }: any) => (
-        <div data-testid="themed-box" {...props}>{children}</div>
+        <div data-testid="themed-box" {...props}>
+            {children}
+        </div>
     ),
     ThemedButton: ({ children, ...props }: any) => (
-        <button data-testid="themed-button" {...props}>{children}</button>
+        <button data-testid="themed-button" {...props}>
+            {children}
+        </button>
     ),
     ThemedText: ({ children, ...props }: any) => (
-        <span data-testid="themed-text" {...props}>{children}</span>
+        <span data-testid="themed-text" {...props}>
+            {children}
+        </span>
     ),
 }));
 

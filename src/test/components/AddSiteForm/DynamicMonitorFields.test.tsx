@@ -43,7 +43,7 @@ describe("DynamicMonitorFields Component Tests", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         // Mock ThemedText component
         (ThemedText as any).mockImplementation(({ children, variant, className, ...props }: any) => (
             <span data-testid="themed-text" data-variant={variant} className={className} {...props}>
@@ -52,25 +52,28 @@ describe("DynamicMonitorFields Component Tests", () => {
         ));
 
         // Mock TextField component
-        (TextField as any).mockImplementation(({ 
-            id, value, onChange, disabled, label, required, type, placeholder, helpText, min, max 
-        }: any) => (
-            <div data-testid="text-field">
-                <label>{label}{required && "*"}</label>
-                <input
-                    id={id}
-                    type={type || "text"}
-                    value={value}
-                    onChange={(e) => onChange(e.target.value)}
-                    disabled={disabled}
-                    placeholder={placeholder}
-                    min={min}
-                    max={max}
-                    data-testid={`input-${id}`}
-                />
-                {helpText && <span data-testid="help-text">{helpText}</span>}
-            </div>
-        ));
+        (TextField as any).mockImplementation(
+            ({ id, value, onChange, disabled, label, required, type, placeholder, helpText, min, max }: any) => (
+                <div data-testid="text-field">
+                    <label>
+                        {label}
+                        {required && "*"}
+                    </label>
+                    <input
+                        id={id}
+                        type={type || "text"}
+                        value={value}
+                        onChange={(e) => onChange(e.target.value)}
+                        disabled={disabled}
+                        placeholder={placeholder}
+                        min={min}
+                        max={max}
+                        data-testid={`input-${id}`}
+                    />
+                    {helpText && <span data-testid="help-text">{helpText}</span>}
+                </div>
+            )
+        );
 
         // Mock ensureError
         mockEnsureError.mockImplementation((error: any) => error);
@@ -88,19 +91,13 @@ describe("DynamicMonitorFields Component Tests", () => {
             });
             mockGetMonitorTypeConfig.mockReturnValue(configPromise);
 
-            render(
-                <DynamicMonitorFields
-                    monitorType="http"
-                    onChange={{}}
-                    values={{}}
-                />
-            );
+            render(<DynamicMonitorFields monitorType="http" onChange={{}} values={{}} />);
 
             expect(screen.getByText("Loading monitor fields...")).toBeInTheDocument();
 
             // Resolve the promise to complete the test
             resolveConfig({
-                fields: []
+                fields: [],
             });
             await waitFor(() => {
                 expect(mockGetMonitorTypeConfig).toHaveBeenCalledWith("http");
@@ -114,20 +111,14 @@ describe("DynamicMonitorFields Component Tests", () => {
             });
             mockGetMonitorTypeConfig.mockReturnValue(configPromise);
 
-            const { unmount } = render(
-                <DynamicMonitorFields
-                    monitorType="http"
-                    onChange={{}}
-                    values={{}}
-                />
-            );
+            const { unmount } = render(<DynamicMonitorFields monitorType="http" onChange={{}} values={{}} />);
 
             // Unmount before config loads
             unmount();
 
             // Resolve config after unmount - should not cause state updates
             resolveConfig({
-                fields: []
+                fields: [],
             });
 
             // Test passes if no console warnings about state updates after unmount
@@ -140,13 +131,7 @@ describe("DynamicMonitorFields Component Tests", () => {
             const error = new Error("Failed to load config");
             mockGetMonitorTypeConfig.mockRejectedValue(error);
 
-            render(
-                <DynamicMonitorFields
-                    monitorType="http"
-                    onChange={{}}
-                    values={{}}
-                />
-            );
+            render(<DynamicMonitorFields monitorType="http" onChange={{}} values={{}} />);
 
             await waitFor(() => {
                 expect(screen.getByText("Error loading monitor fields: Failed to load config")).toBeInTheDocument();
@@ -159,16 +144,12 @@ describe("DynamicMonitorFields Component Tests", () => {
             const errorString = "String error";
             mockGetMonitorTypeConfig.mockRejectedValue(errorString);
 
-            render(
-                <DynamicMonitorFields
-                    monitorType="http"
-                    onChange={{}}
-                    values={{}}
-                />
-            );
+            render(<DynamicMonitorFields monitorType="http" onChange={{}} values={{}} />);
 
             await waitFor(() => {
-                expect(screen.getByText("Error loading monitor fields: Failed to load monitor config")).toBeInTheDocument();
+                expect(
+                    screen.getByText("Error loading monitor fields: Failed to load monitor config")
+                ).toBeInTheDocument();
             });
 
             expect(mockLogger.error).toHaveBeenCalledWith("Failed to load monitor type config", errorString);
@@ -177,13 +158,7 @@ describe("DynamicMonitorFields Component Tests", () => {
         it("should display error for unknown monitor type", async () => {
             mockGetMonitorTypeConfig.mockResolvedValue(null);
 
-            render(
-                <DynamicMonitorFields
-                    monitorType="unknown"
-                    onChange={{}}
-                    values={{}}
-                />
-            );
+            render(<DynamicMonitorFields monitorType="unknown" onChange={{}} values={{}} />);
 
             await waitFor(() => {
                 expect(screen.getByText("Unknown monitor type: unknown")).toBeInTheDocument();
@@ -193,13 +168,7 @@ describe("DynamicMonitorFields Component Tests", () => {
         it("should display error for undefined config", async () => {
             mockGetMonitorTypeConfig.mockResolvedValue(undefined);
 
-            render(
-                <DynamicMonitorFields
-                    monitorType="http"
-                    onChange={{}}
-                    values={{}}
-                />
-            );
+            render(<DynamicMonitorFields monitorType="http" onChange={{}} values={{}} />);
 
             await waitFor(() => {
                 expect(screen.getByText("Unknown monitor type: http")).toBeInTheDocument();
@@ -216,7 +185,7 @@ describe("DynamicMonitorFields Component Tests", () => {
                     type: "url",
                     required: true,
                     placeholder: "https://example.com",
-                    helpText: "Enter the URL to monitor"
+                    helpText: "Enter the URL to monitor",
                 },
                 {
                     name: "port",
@@ -224,15 +193,15 @@ describe("DynamicMonitorFields Component Tests", () => {
                     type: "number",
                     required: false,
                     min: 1,
-                    max: 65535
+                    max: 65535,
                 },
                 {
                     name: "host",
                     label: "Host",
                     type: "text",
-                    required: true
-                }
-            ]
+                    required: true,
+                },
+            ],
         };
 
         beforeEach(() => {
@@ -246,12 +215,12 @@ describe("DynamicMonitorFields Component Tests", () => {
                     onChange={{
                         url: vi.fn(),
                         port: vi.fn(),
-                        host: vi.fn()
+                        host: vi.fn(),
                     }}
                     values={{
                         url: "https://example.com",
                         port: 80,
-                        host: "example.com"
+                        host: "example.com",
                     }}
                 />
             );
@@ -268,13 +237,13 @@ describe("DynamicMonitorFields Component Tests", () => {
                 <DynamicMonitorFields
                     monitorType="http"
                     onChange={{
-                        url: vi.fn()
+                        url: vi.fn(),
                         // Missing port and host handlers
                     }}
                     values={{
                         url: "https://example.com",
                         port: 80,
-                        host: "example.com"
+                        host: "example.com",
                     }}
                 />
             );
@@ -292,10 +261,10 @@ describe("DynamicMonitorFields Component Tests", () => {
                     onChange={{
                         url: vi.fn(),
                         port: vi.fn(),
-                        host: vi.fn()
+                        host: vi.fn(),
                     }}
                     values={{
-                        url: "https://example.com"
+                        url: "https://example.com",
                         // Missing port and host values
                     }}
                 />
@@ -304,7 +273,7 @@ describe("DynamicMonitorFields Component Tests", () => {
             await waitFor(() => {
                 const portInput = screen.getByTestId("input-port");
                 const hostInput = screen.getByTestId("input-host");
-                
+
                 expect(portInput).toHaveValue(0); // number default (numeric value, not string)
                 expect(hostInput).toHaveValue(""); // string default
             });
@@ -318,12 +287,12 @@ describe("DynamicMonitorFields Component Tests", () => {
                     onChange={{
                         url: vi.fn(),
                         port: vi.fn(),
-                        host: vi.fn()
+                        host: vi.fn(),
                     }}
                     values={{
                         url: "https://example.com",
                         port: 80,
-                        host: "example.com"
+                        host: "example.com",
                     }}
                 />
             );
@@ -345,20 +314,14 @@ describe("DynamicMonitorFields Component Tests", () => {
                         name: "port",
                         label: "Port",
                         type: "number",
-                        required: true
-                    }
-                ]
+                        required: true,
+                    },
+                ],
             };
 
             mockGetMonitorTypeConfig.mockResolvedValue(mockConfig);
 
-            render(
-                <DynamicMonitorFields
-                    monitorType="http"
-                    onChange={{ port: mockOnChange }}
-                    values={{ port: 80 }}
-                />
-            );
+            render(<DynamicMonitorFields monitorType="http" onChange={{ port: mockOnChange }} values={{ port: 80 }} />);
 
             await waitFor(() => {
                 const portInput = screen.getByTestId("input-port");
@@ -376,20 +339,14 @@ describe("DynamicMonitorFields Component Tests", () => {
                         name: "port",
                         label: "Port",
                         type: "number",
-                        required: true
-                    }
-                ]
+                        required: true,
+                    },
+                ],
             };
 
             mockGetMonitorTypeConfig.mockResolvedValue(mockConfig);
 
-            render(
-                <DynamicMonitorFields
-                    monitorType="http"
-                    onChange={{ port: mockOnChange }}
-                    values={{ port: 80 }}
-                />
-            );
+            render(<DynamicMonitorFields monitorType="http" onChange={{ port: mockOnChange }} values={{ port: 80 }} />);
 
             await waitFor(() => {
                 const portInput = screen.getByTestId("input-port");
@@ -407,20 +364,14 @@ describe("DynamicMonitorFields Component Tests", () => {
                         name: "port",
                         label: "Port",
                         type: "number",
-                        required: true
-                    }
-                ]
+                        required: true,
+                    },
+                ],
             };
 
             mockGetMonitorTypeConfig.mockResolvedValue(mockConfig);
 
-            render(
-                <DynamicMonitorFields
-                    monitorType="http"
-                    onChange={{ port: mockOnChange }}
-                    values={{ port: 80 }}
-                />
-            );
+            render(<DynamicMonitorFields monitorType="http" onChange={{ port: mockOnChange }} values={{ port: 80 }} />);
 
             await waitFor(() => {
                 const portInput = screen.getByTestId("input-port");
@@ -440,9 +391,9 @@ describe("DynamicMonitorFields Component Tests", () => {
                         name: "host",
                         label: "Host",
                         type: "text",
-                        required: true
-                    }
-                ]
+                        required: true,
+                    },
+                ],
             };
 
             mockGetMonitorTypeConfig.mockResolvedValue(mockConfig);
@@ -471,9 +422,9 @@ describe("DynamicMonitorFields Component Tests", () => {
                         name: "url",
                         label: "URL",
                         type: "url",
-                        required: true
-                    }
-                ]
+                        required: true,
+                    },
+                ],
             };
 
             mockGetMonitorTypeConfig.mockResolvedValue(mockConfig);
@@ -501,9 +452,9 @@ describe("DynamicMonitorFields Component Tests", () => {
                         name: "unsupported",
                         label: "Unsupported Field",
                         type: "unknown",
-                        required: false
-                    }
-                ]
+                        required: false,
+                    },
+                ],
             };
 
             mockGetMonitorTypeConfig.mockResolvedValue(mockConfig);
@@ -530,9 +481,9 @@ describe("DynamicMonitorFields Component Tests", () => {
                         name: "testField",
                         label: "Test Field",
                         type: "text",
-                        required: false
-                    }
-                ]
+                        required: false,
+                    },
+                ],
             };
 
             mockGetMonitorTypeConfig.mockResolvedValue(mockConfig);
@@ -556,25 +507,13 @@ describe("DynamicMonitorFields Component Tests", () => {
 
     describe("Component Re-rendering", () => {
         it("should reload config when monitorType changes", async () => {
-            const { rerender } = render(
-                <DynamicMonitorFields
-                    monitorType="http"
-                    onChange={{}}
-                    values={{}}
-                />
-            );
+            const { rerender } = render(<DynamicMonitorFields monitorType="http" onChange={{}} values={{}} />);
 
             expect(mockGetMonitorTypeConfig).toHaveBeenCalledWith("http");
 
             mockGetMonitorTypeConfig.mockClear();
 
-            rerender(
-                <DynamicMonitorFields
-                    monitorType="port"
-                    onChange={{}}
-                    values={{}}
-                />
-            );
+            rerender(<DynamicMonitorFields monitorType="port" onChange={{}} values={{}} />);
 
             expect(mockGetMonitorTypeConfig).toHaveBeenCalledWith("port");
         });
@@ -592,9 +531,9 @@ describe("DynamicMonitorFields Component Tests", () => {
                         placeholder: "Enter a number",
                         helpText: "This is help text",
                         min: 1,
-                        max: 100
-                    }
-                ]
+                        max: 100,
+                    },
+                ],
             };
 
             mockGetMonitorTypeConfig.mockResolvedValue(mockConfig);
@@ -623,10 +562,10 @@ describe("DynamicMonitorFields Component Tests", () => {
                         name: "simpleField",
                         label: "Simple Field",
                         type: "text",
-                        required: false
+                        required: false,
                         // No helpText, placeholder, min, max
-                    }
-                ]
+                    },
+                ],
             };
 
             mockGetMonitorTypeConfig.mockResolvedValue(mockConfig);

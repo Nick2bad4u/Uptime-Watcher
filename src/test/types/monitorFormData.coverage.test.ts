@@ -41,7 +41,7 @@ describe("Monitor Form Data Types Coverage Tests", () => {
                 timeout: 10000,
             };
 
-            Object.values(numericFields).forEach(value => {
+            Object.values(numericFields).forEach((value) => {
                 expect(typeof value).toBe("number");
                 expect(value).toBeGreaterThan(0);
             });
@@ -359,9 +359,15 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             const sanitizeFormData = (data: any) => {
                 return {
                     type: typeof data.type === "string" ? data.type : undefined,
-                    checkInterval: typeof data.checkInterval === "number" && data.checkInterval > 0 ? data.checkInterval : undefined,
+                    checkInterval:
+                        typeof data.checkInterval === "number" && data.checkInterval > 0
+                            ? data.checkInterval
+                            : undefined,
                     monitoring: typeof data.monitoring === "boolean" ? data.monitoring : false,
-                    retryAttempts: typeof data.retryAttempts === "number" && data.retryAttempts >= 0 ? data.retryAttempts : undefined,
+                    retryAttempts:
+                        typeof data.retryAttempts === "number" && data.retryAttempts >= 0
+                            ? data.retryAttempts
+                            : undefined,
                     timeout: typeof data.timeout === "number" && data.timeout > 0 ? data.timeout : undefined,
                 };
             };

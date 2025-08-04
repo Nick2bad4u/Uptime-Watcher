@@ -1,5 +1,5 @@
 /**
- * Simple tests to improve ApplicationService coverage  
+ * Simple tests to improve ApplicationService coverage
  */
 
 import { describe, expect, it, vi, beforeEach } from "vitest";
@@ -74,7 +74,7 @@ describe("ApplicationService Coverage Tests", () => {
 
     it("should create service instance", async () => {
         const { ApplicationService } = await import("../../../services/application/ApplicationService");
-        
+
         const service = new ApplicationService();
         expect(service).toBeDefined();
         expect(service).toBeInstanceOf(ApplicationService);
@@ -82,7 +82,7 @@ describe("ApplicationService Coverage Tests", () => {
 
     it("should handle cleanup operations", async () => {
         const { ApplicationService } = await import("../../../services/application/ApplicationService");
-        
+
         try {
             const service = new ApplicationService();
             await service.cleanup();
@@ -95,10 +95,10 @@ describe("ApplicationService Coverage Tests", () => {
 
     it("should handle service container integration", async () => {
         const { ApplicationService } = await import("../../../services/application/ApplicationService");
-        
+
         try {
             const service = new ApplicationService();
-            
+
             // Test that constructor sets up service container properly
             expect(service).toBeDefined();
             expect(service).toBeInstanceOf(ApplicationService);
@@ -109,10 +109,10 @@ describe("ApplicationService Coverage Tests", () => {
 
     it("should handle app event listeners", async () => {
         const { ApplicationService } = await import("../../../services/application/ApplicationService");
-        
+
         try {
             const service = new ApplicationService();
-            
+
             // Test that event listeners are set up
             expect(service).toBeDefined();
         } catch (error) {
@@ -122,14 +122,13 @@ describe("ApplicationService Coverage Tests", () => {
 
     it("should handle different platform behaviors", async () => {
         const { ApplicationService } = await import("../../../services/application/ApplicationService");
-        
+
         try {
             const service = new ApplicationService();
-            
+
             // Test platform-specific logic
             expect(service).toBeDefined();
             expect(service).toBeInstanceOf(ApplicationService);
-            
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }
@@ -137,13 +136,12 @@ describe("ApplicationService Coverage Tests", () => {
 
     it("should handle error scenarios gracefully", async () => {
         const { ApplicationService } = await import("../../../services/application/ApplicationService");
-        
+
         try {
             const service = new ApplicationService();
-            
-            // Try operations that might fail  
+
+            // Try operations that might fail
             await service.cleanup();
-            
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }
@@ -151,15 +149,14 @@ describe("ApplicationService Coverage Tests", () => {
 
     it("should exercise constructor logic", async () => {
         const { ApplicationService } = await import("../../../services/application/ApplicationService");
-        
+
         try {
             // Test multiple instantiations to cover different paths
             const service1 = new ApplicationService();
             const service2 = new ApplicationService();
-            
+
             expect(service1).toBeDefined();
             expect(service2).toBeDefined();
-            
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }
@@ -167,14 +164,14 @@ describe("ApplicationService Coverage Tests", () => {
 
     it("should handle cleanup edge cases", async () => {
         const { ApplicationService } = await import("../../../services/application/ApplicationService");
-        
+
         try {
             const service = new ApplicationService();
-            
+
             // Test cleanup multiple times to test edge cases
             await service.cleanup();
             await service.cleanup(); // Should handle being called twice
-            
+
             expect(true).toBe(true);
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
@@ -183,16 +180,16 @@ describe("ApplicationService Coverage Tests", () => {
 
     it("should handle service coordination", async () => {
         const { ApplicationService } = await import("../../../services/application/ApplicationService");
-        
+
         try {
             const service = new ApplicationService();
-            
+
             // Test service coordination
             expect(service).toBeInstanceOf(ApplicationService);
-            
+
             // Try cleanup to test service interactions
             await service.cleanup();
-            
+
             expect(true).toBe(true);
         } catch (error) {
             expect(error).toBeInstanceOf(Error);

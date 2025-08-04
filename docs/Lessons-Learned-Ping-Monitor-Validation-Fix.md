@@ -15,34 +15,34 @@ During a routine validation review, discovered that **ping monitors were officia
 ```typescript
 // ❌ BEFORE: Incomplete validation system
 export function validateMonitorType(type: unknown): type is MonitorType {
-    return typeof type === "string" && (type === "http" || type === "port");
-    // ☝️ Missing "ping" support despite being in BASE_MONITOR_TYPES
+ return typeof type === "string" && (type === "http" || type === "port");
+ // ☝️ Missing "ping" support despite being in BASE_MONITOR_TYPES
 }
 
 const validateMonitorFormDataByType = (type: MonitorType, data: Record<string, unknown>) => {
-    switch (type) {
-        case "http": {
-            errors.push(...validateHttpMonitorFormData(data));
-            break;
-        }
-        case "ping": {
-            // Ping monitors might have specific validation rules in the future
-            break; // ☝️ Empty implementation!
-        }
-        case "port": {
-            errors.push(...validatePortMonitorFormData(data));
-            break;
-        }
-    }
+ switch (type) {
+  case "http": {
+   errors.push(...validateHttpMonitorFormData(data));
+   break;
+  }
+  case "ping": {
+   // Ping monitors might have specific validation rules in the future
+   break; // ☝️ Empty implementation!
+  }
+  case "port": {
+   errors.push(...validatePortMonitorFormData(data));
+   break;
+  }
+ }
 };
 
 function validateTypeSpecificFields(monitor: Partial<Monitor>, errors: string[]): void {
-    if (monitor.type === "http") {
-        validateHttpMonitorFields(monitor, errors);
-    } else if (monitor.type === "port") {
-        validatePortMonitorFields(monitor, errors);
-    }
-    // ☝️ No ping monitor validation at all
+ if (monitor.type === "http") {
+  validateHttpMonitorFields(monitor, errors);
+ } else if (monitor.type === "port") {
+  validatePortMonitorFields(monitor, errors);
+ }
+ // ☝️ No ping monitor validation at all
 }
 ```
 
@@ -72,17 +72,17 @@ function validateTypeSpecificFields(monitor: Partial<Monitor>, errors: string[])
  * Uses shared validation to ensure consistency with backend validation rules.
  */
 const validatePingMonitorFormData = (data: Record<string, unknown>) => {
-    const errors: string[] = [];
+ const errors: string[] = [];
 
-    if (!data["host"] || typeof data["host"] !== "string") {
-        errors.push("Host is required for ping monitors");
-    } else {
-        // Validate host field specifically
-        const hostResult = sharedValidateMonitorField("ping", "host", data["host"]);
-        errors.push(...hostResult.errors);
-    }
+ if (!data["host"] || typeof data["host"] !== "string") {
+  errors.push("Host is required for ping monitors");
+ } else {
+  // Validate host field specifically
+  const hostResult = sharedValidateMonitorField("ping", "host", data["host"]);
+  errors.push(...hostResult.errors);
+ }
 
-    return errors;
+ return errors;
 };
 ```
 
@@ -97,9 +97,9 @@ const validatePingMonitorFormData = (data: Record<string, unknown>) => {
  * unlike port monitors which also require a port number.
  */
 function validatePingMonitorFields(monitor: Partial<Monitor>, errors: string[]): void {
-    if (!monitor.host || typeof monitor.host !== "string") {
-        errors.push("Host is required for ping monitors");
-    }
+ if (!monitor.host || typeof monitor.host !== "string") {
+  errors.push("Host is required for ping monitors");
+ }
 }
 
 /**
@@ -109,7 +109,7 @@ function validatePingMonitorFields(monitor: Partial<Monitor>, errors: string[]):
  * Supports all monitor types: HTTP, port, and ping monitors.
  */
 export function validateMonitorType(type: unknown): type is MonitorType {
-    return typeof type === "string" && (type === "http" || type === "port" || type === "ping");
+ return typeof type === "string" && (type === "http" || type === "port" || type === "ping");
 }
 ```
 
@@ -119,19 +119,19 @@ Added **15 new tests** across frontend and shared validation:
 
 ```typescript
 describe("Ping monitor form validation", () => {
-    it("should validate ping monitor with valid host", async () => {
-        const result = await validateMonitorFormData("ping", { host: "example.com" });
-        expect(result.success).toBe(true);
-    });
+ it("should validate ping monitor with valid host", async () => {
+  const result = await validateMonitorFormData("ping", { host: "example.com" });
+  expect(result.success).toBe(true);
+ });
 
-    it("should require host for ping monitors", async () => {
-        const result = await validateMonitorFormData("ping", {});
-        expect(result.errors).toContain("Host is required for ping monitors");
-    });
+ it("should require host for ping monitors", async () => {
+  const result = await validateMonitorFormData("ping", {});
+  expect(result.errors).toContain("Host is required for ping monitors");
+ });
 
-    it("should validate different host formats", async () => {
-        // Tests for IP addresses, localhost, FQDNs
-    });
+ it("should validate different host formats", async () => {
+  // Tests for IP addresses, localhost, FQDNs
+ });
 });
 ```
 
@@ -142,15 +142,17 @@ describe("Ping monitor form validation", () => {
 ### **1. Validation Completeness is Critical**
 
 **Lesson**: When adding new monitor types, validation must be implemented immediately across **all layers**:
+
 - ✅ Schema definitions (`shared/validation/schemas.ts`)
 - ✅ Frontend form validation (`src/utils/monitorValidation.ts`)
-- ✅ Backend validation (`shared/utils/validation.ts`)  
+- ✅ Backend validation (`shared/utils/validation.ts`)
 - ✅ Type guards and utilities
 - ✅ Comprehensive test coverage
 
 ### **2. Type System vs. Runtime Reality**
 
 **Lesson**: TypeScript types can be "correct" while runtime validation is incomplete. Always verify:
+
 - Does the type system reflect actual capabilities?
 - Are all type union members supported in validation logic?
 - Is there a 1:1 mapping between types and validation functions?
@@ -162,7 +164,7 @@ describe("Ping monitor form validation", () => {
 ```typescript
 // ✅ PATTERN: Every monitor type needs these four implementations
 1. Schema definition: pingMonitorSchema
-2. Form validator: validatePingMonitorFormData()  
+2. Form validator: validatePingMonitorFormData()
 3. Shared validator: validatePingMonitorFields()
 4. Type guard: case "ping" in all switch statements
 ```
@@ -170,6 +172,7 @@ describe("Ping monitor form validation", () => {
 ### **4. Comments Can Hide Missing Implementation**
 
 **Warning**: Comments like `"might have specific validation rules in the future"` can mask incomplete implementation. Either:
+
 - ✅ Implement immediately
 - ✅ Add explicit TODO with tracking issue
 - ❌ Never leave empty cases with vague comments
@@ -196,10 +199,10 @@ it("should validate all monitor types from BASE_MONITOR_TYPES", () => {
 
 When adding new monitor types:
 
-- [ ] Add to `BASE_MONITOR_TYPES` 
+- [ ] Add to `BASE_MONITOR_TYPES`
 - [ ] Create Zod schema in `shared/validation/schemas.ts`
 - [ ] Add form validation function
-- [ ] Add shared validation function  
+- [ ] Add shared validation function
 - [ ] Update all switch statements
 - [ ] Update type guards
 - [ ] Add comprehensive tests
@@ -210,12 +213,12 @@ When adding new monitor types:
 ```typescript
 // Test to prevent future omissions
 describe("Monitor type completeness", () => {
-    it("should have validation for all BASE_MONITOR_TYPES", () => {
-        BASE_MONITOR_TYPES.forEach(type => {
-            expect(() => validateMonitorType(type)).not.toThrow();
-            expect(validateMonitorType(type)).toBe(true);
-        });
-    });
+ it("should have validation for all BASE_MONITOR_TYPES", () => {
+  BASE_MONITOR_TYPES.forEach((type) => {
+   expect(() => validateMonitorType(type)).not.toThrow();
+   expect(validateMonitorType(type)).toBe(true);
+  });
+ });
 });
 ```
 
@@ -230,14 +233,14 @@ describe("Monitor type completeness", () => {
 
 ## **Impact & Resolution Summary**
 
-| Aspect | Before | After |
-|--------|--------|-------|
-| **Ping Type Validation** | ❌ None | ✅ Complete |
-| **validateMonitorType()** | ❌ Missing ping | ✅ Supports all types |
-| **Form Validation** | ❌ Empty case | ✅ Host validation |
-| **Shared Validation** | ❌ No function | ✅ validatePingMonitorFields() |
-| **Test Coverage** | ❌ 0 ping tests | ✅ 15 new tests |
-| **Type Safety** | ❌ Runtime mismatch | ✅ Consistent |
+| Aspect                    | Before              | After                          |
+| ------------------------- | ------------------- | ------------------------------ |
+| **Ping Type Validation**  | ❌ None             | ✅ Complete                    |
+| **validateMonitorType()** | ❌ Missing ping     | ✅ Supports all types          |
+| **Form Validation**       | ❌ Empty case       | ✅ Host validation             |
+| **Shared Validation**     | ❌ No function      | ✅ validatePingMonitorFields() |
+| **Test Coverage**         | ❌ 0 ping tests     | ✅ 15 new tests                |
+| **Type Safety**           | ❌ Runtime mismatch | ✅ Consistent                  |
 
 **Result**: Ping monitors now have robust, consistent validation across all system layers, preventing potential runtime errors and security issues.
 

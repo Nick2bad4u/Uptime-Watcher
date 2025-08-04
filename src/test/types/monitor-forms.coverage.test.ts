@@ -44,7 +44,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
                 followRedirects: true,
                 headers: {
                     "User-Agent": "Uptime-Watcher",
-                    "Accept": "application/json",
+                    Accept: "application/json",
                 },
                 method: "GET" as const,
                 url: "https://example.com",
@@ -65,9 +65,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
         });
 
         it("should validate HTTP methods", () => {
-            const validMethods = ["DELETE", "GET", "HEAD", "POST", "PUT"];
-            
-            validMethods.forEach(method => {
+            const validMethods = [
+                "DELETE",
+                "GET",
+                "HEAD",
+                "POST",
+                "PUT",
+            ];
+
+            validMethods.forEach((method) => {
                 const httpFields = {
                     url: "https://example.com",
                     method: method as any,
@@ -90,7 +96,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
 
         it("should handle headers as key-value pairs", () => {
             const headers = {
-                "Authorization": "Bearer token123",
+                Authorization: "Bearer token123",
                 "Content-Type": "application/json",
                 "X-Custom-Header": "custom-value",
             };
@@ -178,8 +184,8 @@ describe("Monitor Forms Types Coverage Tests", () => {
     describe("Type Integration", () => {
         it("should work with MonitorType from shared types", () => {
             const monitorTypes = ["http", "port"];
-            
-            monitorTypes.forEach(type => {
+
+            monitorTypes.forEach((type) => {
                 expect(typeof type).toBe("string");
                 expect(["http", "port"].includes(type)).toBe(true);
             });
@@ -212,7 +218,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
                 expectedStatusCode: 200,
             };
 
-            Object.values(numberFields).forEach(value => {
+            Object.values(numberFields).forEach((value) => {
                 expect(typeof value).toBe("number");
                 expect(value).toBeGreaterThan(0);
             });
@@ -225,7 +231,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
                 method: "GET",
             };
 
-            Object.values(stringFields).forEach(value => {
+            Object.values(stringFields).forEach((value) => {
                 expect(typeof value).toBe("string");
                 expect(value.length).toBeGreaterThan(0);
             });
@@ -237,7 +243,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
                 enabled: false,
             };
 
-            Object.values(booleanFields).forEach(value => {
+            Object.values(booleanFields).forEach((value) => {
                 expect(typeof value).toBe("boolean");
             });
         });
@@ -253,7 +259,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
                 name: "Optional name",
             };
 
-            requiredFields.forEach(field => {
+            requiredFields.forEach((field) => {
                 expect(formData).toHaveProperty(field);
                 expect(formData[field as keyof typeof formData]).toBeDefined();
             });
@@ -286,9 +292,9 @@ describe("Monitor Forms Types Coverage Tests", () => {
 
         it("should handle multiple headers", () => {
             const multipleHeaders = {
-                "Authorization": "Bearer token",
+                Authorization: "Bearer token",
                 "Content-Type": "application/json",
-                "Accept": "application/json",
+                Accept: "application/json",
                 "User-Agent": "Uptime-Watcher/1.0",
             };
 
@@ -315,19 +321,37 @@ describe("Monitor Forms Types Coverage Tests", () => {
 
     describe("Method Validation", () => {
         it("should validate all HTTP methods", () => {
-            const httpMethods = ["DELETE", "GET", "HEAD", "POST", "PUT"];
-            
-            httpMethods.forEach(method => {
-                const isValid = ["DELETE", "GET", "HEAD", "POST", "PUT"].includes(method);
+            const httpMethods = [
+                "DELETE",
+                "GET",
+                "HEAD",
+                "POST",
+                "PUT",
+            ];
+
+            httpMethods.forEach((method) => {
+                const isValid = [
+                    "DELETE",
+                    "GET",
+                    "HEAD",
+                    "POST",
+                    "PUT",
+                ].includes(method);
                 expect(isValid).toBe(true);
             });
         });
 
         it("should reject invalid HTTP methods", () => {
             const invalidMethods = ["PATCH", "OPTIONS", "TRACE", "CONNECT"];
-            
-            invalidMethods.forEach(method => {
-                const isValid = ["DELETE", "GET", "HEAD", "POST", "PUT"].includes(method);
+
+            invalidMethods.forEach((method) => {
+                const isValid = [
+                    "DELETE",
+                    "GET",
+                    "HEAD",
+                    "POST",
+                    "PUT",
+                ].includes(method);
                 expect(isValid).toBe(false);
             });
         });

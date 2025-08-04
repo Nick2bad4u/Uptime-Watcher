@@ -79,7 +79,7 @@ describe("AddSiteForm Module Tests", () => {
     it("should import the component without errors", async () => {
         // Just importing the module exercises the component
         const { AddSiteForm } = await import("../../../components/AddSiteForm/AddSiteForm");
-        
+
         // Test AddSiteForm component
         expect(AddSiteForm).toBeDefined();
     });

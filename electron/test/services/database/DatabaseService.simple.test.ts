@@ -48,17 +48,17 @@ describe("DatabaseService Coverage Tests", () => {
 
     it("should create singleton instance", async () => {
         const { DatabaseService } = await import("../../../services/database/DatabaseService");
-        
+
         const instance1 = DatabaseService.getInstance();
         const instance2 = DatabaseService.getInstance();
-        
+
         expect(instance1).toBe(instance2);
         expect(instance1).toBeDefined();
     });
 
     it("should handle initialization", async () => {
         const { DatabaseService } = await import("../../../services/database/DatabaseService");
-        
+
         try {
             const instance = DatabaseService.getInstance();
             await instance.initialize();
@@ -71,7 +71,7 @@ describe("DatabaseService Coverage Tests", () => {
 
     it("should handle database operations", async () => {
         const { DatabaseService } = await import("../../../services/database/DatabaseService");
-        
+
         try {
             const instance = DatabaseService.getInstance();
             const db = instance.getDatabase();
@@ -84,7 +84,7 @@ describe("DatabaseService Coverage Tests", () => {
 
     it("should handle transaction operations", async () => {
         const { DatabaseService } = await import("../../../services/database/DatabaseService");
-        
+
         try {
             const instance = DatabaseService.getInstance();
             await instance.executeTransaction(() => {
@@ -100,7 +100,7 @@ describe("DatabaseService Coverage Tests", () => {
 
     it("should handle cleanup operations", async () => {
         const { DatabaseService } = await import("../../../services/database/DatabaseService");
-        
+
         try {
             const instance = DatabaseService.getInstance();
             instance.close();
@@ -120,7 +120,7 @@ describe("DatabaseService Coverage Tests", () => {
 
     it("should handle database path generation", async () => {
         const { DatabaseService } = await import("../../../services/database/DatabaseService");
-        
+
         try {
             const instance = DatabaseService.getInstance();
             // This should exercise path generation logic
@@ -132,7 +132,7 @@ describe("DatabaseService Coverage Tests", () => {
 
     it("should handle error scenarios", async () => {
         const { DatabaseService } = await import("../../../services/database/DatabaseService");
-        
+
         try {
             const instance = DatabaseService.getInstance();
             // Try to use database without initialization

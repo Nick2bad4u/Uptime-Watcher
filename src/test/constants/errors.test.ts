@@ -27,7 +27,7 @@ describe("Error Constants", () => {
             // This test verifies the constant exports exist and are accessible
             expect(ERROR_MESSAGES).toBeDefined();
             expect(typeof ERROR_MESSAGES).toBe("object");
-            
+
             // Verify we can't modify the object structure (readonly nature)
             // The `as const` assertion prevents TypeScript compilation if we try to modify
             expect(Object.isFrozen(ERROR_MESSAGES)).toBe(false); // as const doesn't freeze at runtime
@@ -35,7 +35,7 @@ describe("Error Constants", () => {
         });
 
         it("should have string values for all properties", () => {
-            Object.values(ERROR_MESSAGES).forEach(message => {
+            Object.values(ERROR_MESSAGES).forEach((message) => {
                 expect(typeof message).toBe("string");
                 expect(message.length).toBeGreaterThan(0);
             });

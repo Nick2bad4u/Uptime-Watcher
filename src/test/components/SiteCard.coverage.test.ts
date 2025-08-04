@@ -43,7 +43,7 @@ describe("SiteCard Component Coverage Tests", () => {
                 onStopSiteMonitoring: vi.fn(),
             };
 
-            Object.values(interactionProps).forEach(prop => {
+            Object.values(interactionProps).forEach((prop) => {
                 expect(typeof prop).toBe("function");
             });
 
@@ -125,14 +125,17 @@ describe("SiteCard Component Coverage Tests", () => {
                 monitors: [],
             };
 
-            const allRunning1 = siteWithAllRunning.monitors.length > 0 && 
+            const allRunning1 =
+                siteWithAllRunning.monitors.length > 0 &&
                 siteWithAllRunning.monitors.every((m: any) => m.monitoring === true);
-            const allRunning2 = siteWithSomeRunning.monitors.length > 0 && 
+            const allRunning2 =
+                siteWithSomeRunning.monitors.length > 0 &&
                 siteWithSomeRunning.monitors.every((m: any) => m.monitoring === true);
-            const allRunning3 = siteWithNoneRunning.monitors.length > 0 && 
+            const allRunning3 =
+                siteWithNoneRunning.monitors.length > 0 &&
                 siteWithNoneRunning.monitors.every((m: any) => m.monitoring === true);
-            const allRunning4 = emptyMonitors.monitors.length > 0 && 
-                emptyMonitors.monitors.every((m: any) => m.monitoring === true);
+            const allRunning4 =
+                emptyMonitors.monitors.length > 0 && emptyMonitors.monitors.every((m: any) => m.monitoring === true);
 
             expect(allRunning1).toBe(true);
             expect(allRunning2).toBe(false);
@@ -244,13 +247,13 @@ describe("SiteCard Component Coverage Tests", () => {
         it("should compose multiple sub-components", () => {
             const subComponents = [
                 "SiteCardHeader",
-                "SiteCardStatus", 
+                "SiteCardStatus",
                 "SiteCardMetrics",
                 "SiteCardHistory",
                 "SiteCardFooter",
             ];
 
-            subComponents.forEach(component => {
+            subComponents.forEach((component) => {
                 expect(typeof component).toBe("string");
                 expect(component.startsWith("SiteCard")).toBe(true);
             });
@@ -357,9 +360,17 @@ describe("SiteCard Component Coverage Tests", () => {
 
     describe("SiteCard Performance", () => {
         it("should handle response time metrics", () => {
-            const responseTimes = [50, 100, 150, 200, 250, 500, 1000];
-            
-            responseTimes.forEach(time => {
+            const responseTimes = [
+                50,
+                100,
+                150,
+                200,
+                250,
+                500,
+                1000,
+            ];
+
+            responseTimes.forEach((time) => {
                 expect(typeof time).toBe("number");
                 expect(time).toBeGreaterThan(0);
             });
@@ -369,9 +380,15 @@ describe("SiteCard Component Coverage Tests", () => {
         });
 
         it("should handle uptime calculations", () => {
-            const uptimeValues = [95.5, 99.9, 100, 0, 50.0];
-            
-            uptimeValues.forEach(uptime => {
+            const uptimeValues = [
+                95.5,
+                99.9,
+                100,
+                0,
+                50.0,
+            ];
+
+            uptimeValues.forEach((uptime) => {
                 expect(typeof uptime).toBe("number");
                 expect(uptime).toBeGreaterThanOrEqual(0);
                 expect(uptime).toBeLessThanOrEqual(100);
@@ -402,7 +419,7 @@ describe("SiteCard Component Coverage Tests", () => {
                 handleMonitorIdChange: vi.fn(),
             };
 
-            Object.values(clickHandlers).forEach(handler => {
+            Object.values(clickHandlers).forEach((handler) => {
                 expect(typeof handler).toBe("function");
             });
 

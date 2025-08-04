@@ -123,9 +123,7 @@ vi.mock("../../../components/AddSiteForm/FormFields", () => ({
 
 vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
     DynamicMonitorFields: ({ monitorType }: { monitorType: string }) => (
-        <div data-testid="dynamic-monitor-fields">
-            Dynamic fields for {monitorType}
-        </div>
+        <div data-testid="dynamic-monitor-fields">Dynamic fields for {monitorType}</div>
     ),
 }));
 
@@ -155,14 +153,14 @@ describe("AddSiteForm Component", () => {
     describe("Basic Rendering", () => {
         it("should render the form without errors", () => {
             render(<AddSiteForm />);
-            
+
             expect(screen.getByTestId("themed-box")).toBeInTheDocument();
             expect(screen.getByTestId("radio-group")).toBeInTheDocument();
         });
 
         it("should render all required form elements", () => {
             render(<AddSiteForm />);
-            
+
             // Check for main form elements
             expect(screen.getByTestId("radio-group")).toBeInTheDocument();
             expect(screen.getAllByTestId("select-field")[0]).toBeInTheDocument();
@@ -171,7 +169,7 @@ describe("AddSiteForm Component", () => {
 
         it("should render submit button", () => {
             render(<AddSiteForm />);
-            
+
             const submitButton = screen.getByTestId("themed-button");
             expect(submitButton).toBeInTheDocument();
         });
@@ -180,17 +178,17 @@ describe("AddSiteForm Component", () => {
     describe("Form Interaction", () => {
         it("should handle form field changes", () => {
             render(<AddSiteForm />);
-            
+
             const selectFields = screen.getAllByRole("combobox");
             fireEvent.change(selectFields[0], { target: { value: "port" } });
-            
+
             // Verify the form field interaction
             expect(selectFields[0]).toBeInTheDocument();
         });
 
         it("should handle monitor type changes", () => {
             render(<AddSiteForm />);
-            
+
             const dynamicFields = screen.getByTestId("dynamic-monitor-fields");
             expect(dynamicFields).toHaveTextContent("Dynamic fields");
         });
@@ -198,10 +196,10 @@ describe("AddSiteForm Component", () => {
         it("should handle form submission", async () => {
             const onSuccess = vi.fn();
             render(<AddSiteForm onSuccess={onSuccess} />);
-            
+
             const submitButton = screen.getByTestId("themed-button");
             fireEvent.click(submitButton);
-            
+
             await waitFor(() => {
                 expect(submitButton).toBeInTheDocument();
             });
@@ -212,13 +210,13 @@ describe("AddSiteForm Component", () => {
         it("should handle onSuccess callback", () => {
             const onSuccess = vi.fn();
             render(<AddSiteForm onSuccess={onSuccess} />);
-            
+
             expect(screen.getByTestId("themed-box")).toBeInTheDocument();
         });
 
         it("should work without onSuccess callback", () => {
             render(<AddSiteForm />);
-            
+
             expect(screen.getByTestId("themed-box")).toBeInTheDocument();
         });
     });
@@ -226,21 +224,21 @@ describe("AddSiteForm Component", () => {
     describe("State Management Integration", () => {
         it("should integrate with error store", () => {
             render(<AddSiteForm />);
-            
+
             // Test that error store integration works
             expect(screen.getByTestId("themed-box")).toBeInTheDocument();
         });
 
         it("should integrate with sites store", () => {
             render(<AddSiteForm />);
-            
+
             // Test that sites store integration works
             expect(screen.getByTestId("themed-box")).toBeInTheDocument();
         });
 
         it("should integrate with form hooks", () => {
             render(<AddSiteForm />);
-            
+
             // Test that form hooks integration works
             expect(screen.getByTestId("themed-box")).toBeInTheDocument();
         });
@@ -249,17 +247,17 @@ describe("AddSiteForm Component", () => {
     describe("Theme Integration", () => {
         it("should apply theme styling", () => {
             render(<AddSiteForm />);
-            
+
             const themedBox = screen.getByTestId("themed-box");
             expect(themedBox).toBeInTheDocument();
-            
+
             const themedButton = screen.getByTestId("themed-button");
             expect(themedButton).toBeInTheDocument();
         });
 
         it("should handle theme changes", () => {
             render(<AddSiteForm />);
-            
+
             // Test theme integration
             expect(screen.getAllByTestId("themed-text")[0]).toBeInTheDocument();
         });
@@ -269,13 +267,13 @@ describe("AddSiteForm Component", () => {
         it("should handle component errors gracefully", () => {
             // Test error boundaries and error handling
             render(<AddSiteForm />);
-            
+
             expect(screen.getByTestId("themed-box")).toBeInTheDocument();
         });
 
         it("should display validation errors", () => {
             render(<AddSiteForm />);
-            
+
             // Test validation error display
             expect(screen.getByTestId("themed-box")).toBeInTheDocument();
         });
@@ -284,7 +282,7 @@ describe("AddSiteForm Component", () => {
     describe("Accessibility", () => {
         it("should have proper form labels", () => {
             render(<AddSiteForm />);
-            
+
             // Check for accessibility labels
             expect(screen.getByTestId("radio-group")).toBeInTheDocument();
             expect(screen.getAllByTestId("select-field")[0]).toBeInTheDocument();
@@ -292,7 +290,7 @@ describe("AddSiteForm Component", () => {
 
         it("should support keyboard navigation", () => {
             render(<AddSiteForm />);
-            
+
             const submitButton = screen.getByTestId("themed-button");
             expect(submitButton).toBeInTheDocument();
         });
@@ -301,19 +299,19 @@ describe("AddSiteForm Component", () => {
     describe("Edge Cases", () => {
         it("should handle empty form data", () => {
             render(<AddSiteForm />);
-            
+
             expect(screen.getByTestId("themed-box")).toBeInTheDocument();
         });
 
         it("should handle missing monitor types", () => {
             render(<AddSiteForm />);
-            
+
             expect(screen.getByTestId("dynamic-monitor-fields")).toBeInTheDocument();
         });
 
         it("should handle loading states", () => {
             render(<AddSiteForm />);
-            
+
             expect(screen.getByTestId("themed-box")).toBeInTheDocument();
         });
     });

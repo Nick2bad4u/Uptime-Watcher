@@ -11,7 +11,7 @@ describe("Settings Component Coverage Tests", () => {
             const props = { onClose };
 
             expect(typeof props.onClose).toBe("function");
-            
+
             props.onClose();
             expect(props.onClose).toHaveBeenCalled();
         });
@@ -43,11 +43,11 @@ describe("Settings Component Coverage Tests", () => {
                 "notAllowed",
             ];
 
-            validKeys.forEach(key => {
+            validKeys.forEach((key) => {
                 expect(ALLOWED_SETTINGS_KEYS.has(key as any)).toBe(true);
             });
 
-            invalidKeys.forEach(key => {
+            invalidKeys.forEach((key) => {
                 expect(ALLOWED_SETTINGS_KEYS.has(key as any)).toBe(false);
             });
         });
@@ -144,7 +144,7 @@ describe("Settings Component Coverage Tests", () => {
 
         it("should handle loading state transitions", () => {
             const setShowButtonLoading = vi.fn();
-            
+
             // Simulate loading state changes
             setShowButtonLoading(true);
             setShowButtonLoading(false);
@@ -156,7 +156,7 @@ describe("Settings Component Coverage Tests", () => {
         it("should handle timeout cleanup", () => {
             const clearTimeout = vi.fn();
             const setTimeout = vi.fn(() => 123);
-            
+
             // Simulate effect cleanup
             const cleanup = () => {
                 clearTimeout(123);
@@ -170,7 +170,7 @@ describe("Settings Component Coverage Tests", () => {
     describe("Sync Success State", () => {
         it("should handle sync success state", () => {
             const setSyncSuccess = vi.fn();
-            
+
             setSyncSuccess(true);
             setSyncSuccess(false);
 
@@ -223,7 +223,14 @@ describe("Settings Component Coverage Tests", () => {
 
     describe("History Limit Handling", () => {
         it("should handle history limit options", () => {
-            const HISTORY_LIMIT_OPTIONS = [25, 50, 100, 250, 500, 1000];
+            const HISTORY_LIMIT_OPTIONS = [
+                25,
+                50,
+                100,
+                250,
+                500,
+                1000,
+            ];
             const DEFAULT_HISTORY_LIMIT = 100;
 
             expect(Array.isArray(HISTORY_LIMIT_OPTIONS)).toBe(true);
@@ -231,7 +238,7 @@ describe("Settings Component Coverage Tests", () => {
             expect(typeof DEFAULT_HISTORY_LIMIT).toBe("number");
             expect(HISTORY_LIMIT_OPTIONS.includes(DEFAULT_HISTORY_LIMIT)).toBe(true);
 
-            HISTORY_LIMIT_OPTIONS.forEach(limit => {
+            HISTORY_LIMIT_OPTIONS.forEach((limit) => {
                 expect(typeof limit).toBe("number");
                 expect(limit).toBeGreaterThan(0);
             });
@@ -263,8 +270,8 @@ describe("Settings Component Coverage Tests", () => {
     describe("Theme Handling", () => {
         it("should handle theme names", () => {
             const themeNames = ["light", "dark", "system"];
-            
-            themeNames.forEach(theme => {
+
+            themeNames.forEach((theme) => {
                 expect(typeof theme).toBe("string");
                 expect(["light", "dark", "system"].includes(theme)).toBe(true);
             });
@@ -272,9 +279,9 @@ describe("Settings Component Coverage Tests", () => {
 
         it("should handle theme selection", () => {
             const setTheme = vi.fn();
-            
+
             const themes = ["light", "dark", "system"];
-            themes.forEach(theme => {
+            themes.forEach((theme) => {
                 setTheme(theme);
                 expect(setTheme).toHaveBeenCalledWith(theme);
             });
@@ -314,7 +321,7 @@ describe("Settings Component Coverage Tests", () => {
     describe("Data Operations", () => {
         it("should handle SQLite backup operations", () => {
             const downloadSQLiteBackup = vi.fn().mockResolvedValue(undefined);
-            
+
             const handleBackup = async () => {
                 await downloadSQLiteBackup();
             };
@@ -325,7 +332,7 @@ describe("Settings Component Coverage Tests", () => {
 
         it("should handle full sync operations", () => {
             const fullSyncFromBackend = vi.fn().mockResolvedValue(undefined);
-            
+
             const handleSync = async () => {
                 await fullSyncFromBackend();
             };
@@ -336,7 +343,7 @@ describe("Settings Component Coverage Tests", () => {
 
         it("should handle settings reset", () => {
             const resetSettings = vi.fn();
-            
+
             resetSettings();
             expect(resetSettings).toHaveBeenCalled();
         });
@@ -443,8 +450,8 @@ describe("Settings Component Coverage Tests", () => {
 
             expect(Array.isArray(features)).toBe(true);
             expect(features.length).toBe(9);
-            
-            features.forEach(feature => {
+
+            features.forEach((feature) => {
                 expect(typeof feature).toBe("string");
                 expect(feature.length).toBeGreaterThan(0);
             });
@@ -462,7 +469,7 @@ describe("Settings Component Coverage Tests", () => {
                 "ThemedText",
             ];
 
-            themedComponents.forEach(component => {
+            themedComponents.forEach((component) => {
                 expect(typeof component).toBe("string");
                 expect(component.startsWith("Themed") || component === "StatusIndicator").toBe(true);
             });
@@ -472,16 +479,16 @@ describe("Settings Component Coverage Tests", () => {
     describe("Event Handling", () => {
         it("should handle close event", () => {
             const onClose = vi.fn();
-            
+
             // Simulate close button click
             onClose();
-            
+
             expect(onClose).toHaveBeenCalled();
         });
 
         it("should handle setting changes", () => {
             const updateSettings = vi.fn();
-            
+
             const settingChanges = [
                 { key: "theme", value: "dark" },
                 { key: "notifications", value: false },
@@ -521,7 +528,7 @@ describe("Settings Component Coverage Tests", () => {
                 validation: true,
             };
 
-            Object.values(architectureElements).forEach(element => {
+            Object.values(architectureElements).forEach((element) => {
                 expect(element).toBe(true);
             });
         });

@@ -10,18 +10,18 @@ describe("AddSiteForm Component Coverage Tests", () => {
             const validModes = ["existing", "new"];
             const invalidModes = ["invalid", "", "other"];
 
-            validModes.forEach(mode => {
+            validModes.forEach((mode) => {
                 expect(validModes.includes(mode)).toBe(true);
             });
 
-            invalidModes.forEach(mode => {
+            invalidModes.forEach((mode) => {
                 expect(validModes.includes(mode)).toBe(false);
             });
         });
 
         it("should validate monitor types", () => {
             const baseMonitorTypes = ["http", "port"];
-            
+
             expect(baseMonitorTypes.includes("http")).toBe(true);
             expect(baseMonitorTypes.includes("port")).toBe(true);
             expect(baseMonitorTypes.includes("invalid")).toBe(false);
@@ -38,7 +38,7 @@ describe("AddSiteForm Component Coverage Tests", () => {
             testCases.forEach(({ value, expected, isValid }) => {
                 const numericValue = Number(value);
                 const valid = !Number.isNaN(numericValue);
-                
+
                 expect(numericValue).toBe(expected);
                 expect(valid).toBe(isValid);
             });
@@ -143,8 +143,8 @@ describe("AddSiteForm Component Coverage Tests", () => {
             expect(monitorTypes.isLoading).toBe(false);
             expect(Array.isArray(monitorTypes.options)).toBe(true);
             expect(monitorTypes.options).toHaveLength(2);
-            
-            monitorTypes.options.forEach(option => {
+
+            monitorTypes.options.forEach((option) => {
                 expect(option).toHaveProperty("value");
                 expect(option).toHaveProperty("label");
             });
@@ -235,7 +235,7 @@ describe("AddSiteForm Component Coverage Tests", () => {
                 showButtonLoading: false,
             };
 
-            Object.values(loadingStates).forEach(state => {
+            Object.values(loadingStates).forEach((state) => {
                 expect(typeof state).toBe("boolean");
             });
         });
@@ -257,11 +257,11 @@ describe("AddSiteForm Component Coverage Tests", () => {
     describe("Constants", () => {
         it("should use correct check intervals", () => {
             const CHECK_INTERVALS = [5000, 10000, 30000, 60000];
-            
+
             expect(Array.isArray(CHECK_INTERVALS)).toBe(true);
             expect(CHECK_INTERVALS.length).toBeGreaterThan(0);
-            
-            CHECK_INTERVALS.forEach(interval => {
+
+            CHECK_INTERVALS.forEach((interval) => {
                 expect(typeof interval).toBe("number");
                 expect(interval).toBeGreaterThan(0);
             });
@@ -287,7 +287,7 @@ describe("AddSiteForm Component Coverage Tests", () => {
             };
 
             expect(typeof props.onSuccess).toBe("function");
-            
+
             // Test calling the callback
             props.onSuccess();
             expect(props.onSuccess).toHaveBeenCalled();
@@ -321,7 +321,7 @@ describe("AddSiteForm Component Coverage Tests", () => {
     describe("Effect Cleanup", () => {
         it("should handle timeout cleanup", () => {
             const mockClearTimeout = vi.fn();
-            
+
             const cleanup = () => {
                 mockClearTimeout();
             };
