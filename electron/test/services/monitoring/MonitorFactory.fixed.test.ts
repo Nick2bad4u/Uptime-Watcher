@@ -67,7 +67,7 @@ describe('MonitorFactory - Fixed', () => {
 
     describe('updateConfig', () => {
         it('should update config for all monitors', () => {
-            const newConfig = { timeout: 10000, userAgent: 'Updated-Agent/1.0' };
+            const newConfig = { timeout: 10_000, userAgent: 'Updated-Agent/1.0' };
             expect(() => MonitorFactory.updateConfig(newConfig)).not.toThrow();
         });
     });

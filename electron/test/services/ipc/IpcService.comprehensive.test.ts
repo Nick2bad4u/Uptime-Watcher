@@ -85,7 +85,7 @@ vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({
 
 vi.mock("../../../services/ipc/utils", () => ({
     createValidationResponse: vi.fn((success, data, error) => ({ success, data, error })),
-    registerStandardizedIpcHandler: vi.fn((channel, handler, validator, registeredHandlers) => {
+    registerStandardizedIpcHandler: vi.fn((channel, handler, _validator, registeredHandlers) => {
         registeredHandlers.add(channel);
         // Mock the actual IPC registration
         ipcMain.handle(channel, handler);
@@ -434,7 +434,7 @@ describe("IpcService", () => {
     describe("Resource Management", () => {
         it("should properly manage memory on setup and cleanup", () => {
             ipcService.setupHandlers();
-            const handlerCallsAfterSetup = vi.mocked(ipcMain.handle).mock.calls.length;
+            const _handlerCallsAfterSetup = vi.mocked(ipcMain.handle).mock.calls.length;
             
             ipcService.cleanup();
             const removeCallsAfterCleanup = vi.mocked(ipcMain.removeHandler).mock.calls.length;
