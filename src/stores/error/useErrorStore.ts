@@ -63,12 +63,12 @@ export const useErrorStore = create<ErrorStore>()((set, get) => ({
     },
     getOperationLoading: (operation: string) => {
         const loading = get().operationLoading;
-        // eslint-disable-next-line security/detect-object-injection
+
         return loading[operation] ?? false;
     },
     getStoreError: (store: string) => {
         const errors = get().storeErrors;
-        // eslint-disable-next-line security/detect-object-injection
+
         return errors[store];
     },
     // State

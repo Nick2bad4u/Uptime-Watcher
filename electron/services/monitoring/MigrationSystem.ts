@@ -381,9 +381,8 @@ class MigrationRegistry {
         const versionB = b.split(".").map(Number);
 
         for (let i = 0; i < Math.max(versionA.length, versionB.length); i++) {
-            // eslint-disable-next-line security/detect-object-injection
             const partA = versionA[i] ?? 0;
-            // eslint-disable-next-line security/detect-object-injection
+
             const partB = versionB[i] ?? 0;
 
             if (partA < partB) return -1;

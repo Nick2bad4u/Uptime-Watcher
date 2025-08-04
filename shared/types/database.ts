@@ -58,6 +58,10 @@ export interface HistoryRow extends BaseRow {
  */
 export interface MonitorRow extends BaseRow {
     /**
+     * JSON string containing an array of active operation identifiers.
+     */
+    active_operations?: string;
+    /**
      * Interval between checks, in seconds.
      */
     check_interval?: number;
@@ -330,9 +334,7 @@ export function isValidSiteRow(obj: unknown): obj is SiteRow {
  * ```
  */
 export function safeGetRowProperty<T>(row: Record<string, unknown>, property: string, defaultValue: T): T {
-    // eslint-disable-next-line security/detect-object-injection -- property is from validated database schema
     if (property in row && row[property] !== undefined) {
-        // eslint-disable-next-line security/detect-object-injection -- property is from validated database schema
         return row[property] as T;
     }
     return defaultValue;

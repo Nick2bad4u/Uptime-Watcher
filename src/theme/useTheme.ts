@@ -234,7 +234,6 @@ export function useTheme() {
         let value: unknown = currentTheme.colors;
         for (const key of keys) {
             if (value && typeof value === "object" && Object.hasOwn(value, key)) {
-                // eslint-disable-next-line security/detect-object-injection -- Object.hasOwn ensures safety
                 value = (value as Record<string, unknown>)[key];
             } else {
                 value = undefined;
@@ -261,7 +260,6 @@ export function useTheme() {
     const getStatusColor = (status: SiteStatus): string => {
         // Validate status using shared type guard
         if (isSiteStatus(status)) {
-            // eslint-disable-next-line security/detect-object-injection -- currentTheme.colors.status is validated against SiteStatus type
             return currentTheme.colors.status[status];
         }
         // Use theme-aware fallback instead of hard-coded black

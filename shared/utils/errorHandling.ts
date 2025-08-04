@@ -185,7 +185,7 @@ function safeStoreOperation(storeOperation: () => void, operationName: string, o
     } catch (error) {
         // Use basic console for shared utilities to avoid dependencies
         // This is acceptable in shared utilities that can't import loggers
-        console.warn(`Failed to ${operationName}:`, error);
+        console.warn("Store operation failed for:", operationName, error);
         if (originalError) {
             console.error("Original operation error:", originalError);
         }

@@ -3,6 +3,8 @@
  * Provides consistent data transformation between database rows and Site objects.
  */
 
+import type { SiteRow as DatabaseSiteRow } from "../../../../shared/types/database";
+
 import { safeStringify } from "../../../../shared/utils/stringConversion";
 import { logger } from "../../../utils/logger";
 
@@ -48,13 +50,8 @@ export interface SiteRow {
  *
  * @public
  */
-export function isValidSiteRow(row: Record<string, unknown>): boolean {
-    return (
-        row["identifier"] !== undefined &&
-        row["identifier"] !== null &&
-        typeof row["identifier"] === "string" &&
-        row["identifier"].trim().length > 0
-    );
+export function isValidSiteRow(row: DatabaseSiteRow): boolean {
+    return row.identifier !== undefined && typeof row.identifier === "string" && row.identifier.trim().length > 0;
 }
 
 /**
@@ -72,7 +69,7 @@ export function isValidSiteRow(row: Record<string, unknown>): boolean {
  *
  * @public
  */
-export function rowsToSites(rows: Record<string, unknown>[]): SiteRow[] {
+export function rowsToSites(rows: DatabaseSiteRow[]): SiteRow[] {
     return rows.map((row) => rowToSite(row));
 }
 
@@ -91,7 +88,7 @@ export function rowsToSites(rows: Record<string, unknown>[]): SiteRow[] {
  *
  * @public
  */
-export function rowToSite(row: Record<string, unknown>): SiteRow {
+export function rowToSite(row: DatabaseSiteRow): SiteRow {
     try {
         // Validate that we have a valid identifier
         if (!isValidSiteRow(row)) {
@@ -99,20 +96,20 @@ export function rowToSite(row: Record<string, unknown>): SiteRow {
         }
 
         // Handle identifier (required field) - we know it's valid from validation above
-        const identifier = safeStringify(row["identifier"]);
+        const identifier = safeStringify(row.identifier);
 
         const site: SiteRow = {
             identifier,
         };
 
         // Handle optional name field
-        if (row["name"] !== undefined && row["name"] !== null) {
-            site.name = safeStringify(row["name"]);
+        if (row.name !== undefined) {
+            site.name = safeStringify(row.name);
         }
 
         // Handle optional monitoring field
-        if (row["monitoring"] !== undefined && row["monitoring"] !== null) {
-            site.monitoring = Boolean(row["monitoring"]);
+        if (row.monitoring !== undefined) {
+            site.monitoring = Boolean(row.monitoring);
         }
 
         return site;

@@ -7,8 +7,10 @@
  * All mapping functions are type-safe and log errors with full context.
  */
 
+import type { MonitorRow as DatabaseMonitorRow } from "../../../../shared/types/database";
+import type { Monitor, Site } from "../../../types";
+
 import { isValidIdentifierArray, safeInteger } from "../../../../shared/validation/validatorUtils";
-import { Site } from "../../../types";
 import { logger } from "../../../utils/logger";
 import { generateSqlParameters, mapMonitorToRow, mapRowToMonitor } from "./dynamicSchema";
 import { DbValue } from "./valueConverters";
@@ -22,37 +24,6 @@ import { DbValue } from "./valueConverters";
  *
  * @public
  */
-export interface MonitorRow {
-    /** Active operation IDs as JSON string */
-    activeOperations: string;
-    /** The interval (in ms) between checks. */
-    checkInterval: number;
-    /** The creation timestamp (ms since epoch). */
-    createdAt: number;
-    /** Whether the monitor is enabled for checking. */
-    enabled: boolean;
-    /** Unique identifier for the monitor. */
-    id: string;
-    /** The last time this monitor was checked, if available. */
-    lastChecked?: Date;
-    /** The last error message, if any. */
-    lastError?: string;
-    /** The last recorded response time in ms, if available. */
-    responseTime?: number;
-    /** Number of retry attempts for failed checks. */
-    retryAttempts: number;
-    /** The identifier of the site this monitor belongs to. */
-    siteIdentifier: string;
-    /** The current status of the monitor ("up" or "down"). */
-    status: Site["monitors"][0]["status"];
-    /** The timeout (in ms) for checks. */
-    timeout: number;
-    /** The monitor type (e.g., "http"). */
-    type: Site["monitors"][0]["type"];
-    /** The last updated timestamp (ms since epoch). */
-    updatedAt: number;
-}
-
 /**
  * Builds a parameter array for inserting or updating a monitor in the database.
  *
@@ -87,14 +58,13 @@ export function buildMonitorParameters(siteIdentifier: string, monitor: Site["mo
             updatedAt: Date.now(),
         };
 
-        const row = mapMonitorToRow(monitorWithMetadata);
+        const row = mapMonitorToRow(monitorWithMetadata as Monitor);
         const { columns } = generateSqlParameters();
 
         // Return values in the same order as columns
         // eslint-disable-next-line sonarjs/function-return-type -- Returns DbValue which can be different types
         return columns.map((column): DbValue => {
-            // eslint-disable-next-line security/detect-object-injection
-            const value = row[column];
+            const value = (row as unknown as Record<string, unknown>)[column];
             if (value === undefined || value === null) {
                 return null;
             }
@@ -149,7 +119,7 @@ export function isValidMonitorRow(row: Record<string, unknown>): boolean {
  * @see {@link rowToMonitor}
  * @public
  */
-export function rowsToMonitors(rows: Record<string, unknown>[]): Site["monitors"] {
+export function rowsToMonitors(rows: DatabaseMonitorRow[]): Site["monitors"] {
     return rows.map((row) => rowToMonitor(row));
 }
 
@@ -174,17 +144,17 @@ export function rowsToMonitors(rows: Record<string, unknown>[]): Site["monitors"
  * @see {@link mapRowToMonitor}
  * @public
  */
-export function rowToMonitor(row: Record<string, unknown>): Site["monitors"][0] {
+export function rowToMonitor(row: DatabaseMonitorRow): Site["monitors"][0] {
     try {
         const dynamicMonitor = mapRowToMonitor(row);
-        const monitor = createBaseMonitor(dynamicMonitor, row);
+        const monitor = createBaseMonitor(dynamicMonitor);
 
         // Parse activeOperations with security validation
         monitor.activeOperations = parseActiveOperations(row);
 
         // Add lastChecked if available
-        if (dynamicMonitor["lastChecked"]) {
-            monitor.lastChecked = new Date(Number(dynamicMonitor["lastChecked"]));
+        if (dynamicMonitor.lastChecked) {
+            monitor.lastChecked = dynamicMonitor.lastChecked;
         }
 
         // Copy all dynamic fields (monitor type specific fields)
@@ -216,7 +186,7 @@ export function rowToMonitor(row: Record<string, unknown>): Site["monitors"][0] 
  * @see {@link rowToMonitor}
  * @public
  */
-export function rowToMonitorOrUndefined(row: Record<string, unknown> | undefined): Site["monitors"][0] | undefined {
+export function rowToMonitorOrUndefined(row: DatabaseMonitorRow | undefined): Site["monitors"][0] | undefined {
     if (!row) {
         return undefined;
     }
@@ -230,14 +200,16 @@ export function rowToMonitorOrUndefined(row: Record<string, unknown> | undefined
  * @param monitor - Base monitor object
  * @param dynamicMonitor - Dynamic monitor data
  */
-function copyDynamicFields(monitor: Site["monitors"][0], dynamicMonitor: Record<string, unknown>): void {
+function copyDynamicFields(monitor: Site["monitors"][0], dynamicMonitor: Monitor): void {
     const excludedFields = new Set([
         "checkInterval",
         "createdAt",
         "enabled",
+        "history",
         "id",
         "lastChecked",
         "lastError",
+        "monitoring",
         "name",
         "nextCheck",
         "responseTime",
@@ -249,10 +221,11 @@ function copyDynamicFields(monitor: Site["monitors"][0], dynamicMonitor: Record<
         "updatedAt",
     ]);
 
+    // Copy monitor-type specific fields
     for (const [key, value] of Object.entries(dynamicMonitor)) {
         if (!excludedFields.has(key)) {
-            // eslint-disable-next-line security/detect-object-injection
-            (monitor as unknown as Record<string, unknown>)[key] = value;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment -- Dynamic field assignment required for monitor type system. Key is validated from dynamicMonitor which comes from typed database mapping.
+            (monitor as any)[key] = value;
         }
     }
 }
@@ -265,28 +238,27 @@ function copyDynamicFields(monitor: Site["monitors"][0], dynamicMonitor: Record<
  * Replaces manual Number() conversions with validator-based safeInteger() function
  * to prevent invalid data from reaching the application layer.
  *
- * @param dynamicMonitor - Mapped monitor data
- * @param row - Original database row
+ * @param dynamicMonitor - Mapped monitor data from database
  * @returns Base monitor object with validated fields
  *
  * @see {@link safeInteger} - Safe integer conversion utility
  */
-function createBaseMonitor(dynamicMonitor: Record<string, unknown>, row: Record<string, unknown>): Site["monitors"][0] {
+function createBaseMonitor(dynamicMonitor: Monitor): Site["monitors"][0] {
     return {
-        activeOperations: [],
-        checkInterval: safeInteger(dynamicMonitor["checkInterval"], 300_000, 5000),
+        activeOperations: dynamicMonitor.activeOperations ?? [],
+        checkInterval: safeInteger(dynamicMonitor.checkInterval, 300_000, 5000),
         history: [], // History will be loaded separately
-        id:
-            dynamicMonitor["id"] &&
-            (typeof dynamicMonitor["id"] === "string" || typeof dynamicMonitor["id"] === "number")
-                ? String(dynamicMonitor["id"])
-                : "-1",
-        monitoring: Boolean(dynamicMonitor["enabled"]),
-        responseTime: safeInteger(dynamicMonitor["responseTime"] ?? row["responseTime"], -1, -1),
-        retryAttempts: safeInteger(dynamicMonitor["retryAttempts"], 3, 0, 10),
-        status: dynamicMonitor["status"] ? (dynamicMonitor["status"] as Site["monitors"][0]["status"]) : "down",
-        timeout: safeInteger(dynamicMonitor["timeout"], 5000, 1000, 300_000),
-        type: dynamicMonitor["type"] ? (dynamicMonitor["type"] as Site["monitors"][0]["type"]) : "http",
+        id: String(dynamicMonitor.id || "-1"),
+        monitoring: dynamicMonitor.monitoring,
+        responseTime: safeInteger(dynamicMonitor.responseTime, -1, -1),
+        retryAttempts: safeInteger(dynamicMonitor.retryAttempts, 3, 0, 10),
+        status: dynamicMonitor.status,
+        timeout: safeInteger(dynamicMonitor.timeout, 5000, 1000, 300_000),
+        type: dynamicMonitor.type,
+        // Include optional fields if present
+        ...(dynamicMonitor.host && { host: dynamicMonitor.host }),
+        ...(dynamicMonitor.port && { port: dynamicMonitor.port }),
+        ...(dynamicMonitor.url && { url: dynamicMonitor.url }),
     };
 }
 
@@ -303,13 +275,13 @@ function createBaseMonitor(dynamicMonitor: Record<string, unknown>, row: Record<
  *
  * @see {@link isValidIdentifierArray} - Validation function used
  */
-function parseActiveOperations(row: Record<string, unknown>): string[] {
-    if (!row["active_operations"] || typeof row["active_operations"] !== "string") {
+function parseActiveOperations(row: DatabaseMonitorRow): string[] {
+    if (!row.active_operations || typeof row.active_operations !== "string") {
         return [];
     }
 
     try {
-        const parsed: unknown = JSON.parse(row["active_operations"]);
+        const parsed: unknown = JSON.parse(String(row.active_operations));
 
         if (isValidIdentifierArray(parsed)) {
             return parsed;

@@ -13,9 +13,10 @@
  */
 
 import { BASE_MONITOR_TYPES, type MonitorType } from "@shared/types";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback } from "react";
 
-import { CHECK_INTERVALS, UI_DELAYS } from "../../constants";
+import { CHECK_INTERVALS } from "../../constants";
+import { useDelayedButtonLoading } from "../../hooks/useDelayedButtonLoading";
 import { useDynamicHelpText } from "../../hooks/useDynamicHelpText";
 import { useMonitorTypes } from "../../hooks/useMonitorTypes";
 import logger from "../../services/logger";
@@ -158,24 +159,8 @@ export const AddSiteForm = React.memo(function AddSiteForm({ onSuccess }: AddSit
         onSuccess?.();
     }, [resetForm, onSuccess]);
 
-    // Delayed loading state for button spinner (100ms delay)
-    const [showButtonLoading, setShowButtonLoading] = useState(false);
-
-    // Create stable callbacks to avoid direct setState in useEffect
-    const clearButtonLoading = useCallback(() => setShowButtonLoading(false), []);
-    const showButtonLoadingCallback = useCallback(() => setShowButtonLoading(true), []);
-
-    useEffect(() => {
-        if (!isLoading) {
-            // Use timeout to defer state update to avoid direct call in useEffect
-            const clearTimeoutId = setTimeout(clearButtonLoading, UI_DELAYS.STATE_UPDATE_DEFER);
-            return () => clearTimeout(clearTimeoutId);
-        }
-
-        const timeoutId = setTimeout(showButtonLoadingCallback, UI_DELAYS.LOADING_BUTTON);
-
-        return () => clearTimeout(timeoutId);
-    }, [isLoading, clearButtonLoading, showButtonLoadingCallback]);
+    // Delayed loading state for button spinner (managed by custom hook)
+    const showButtonLoading = useDelayedButtonLoading(isLoading);
 
     /**
      * Handles form submission for adding a site or monitor.

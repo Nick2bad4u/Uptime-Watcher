@@ -168,9 +168,7 @@ export function isValidMonitorFormData(data: unknown): data is MonitorFormData {
  * @returns Property value or default
  */
 export function safeGetFormProperty<T>(data: DynamicFormData, property: string, defaultValue: T): T {
-    // eslint-disable-next-line security/detect-object-injection -- property is validated for form data
     if (property in data && data[property] !== undefined) {
-        // eslint-disable-next-line security/detect-object-injection -- property is validated for form data
         return data[property] as T;
     }
     return defaultValue;
@@ -184,6 +182,5 @@ export function safeGetFormProperty<T>(data: DynamicFormData, property: string, 
  * @param value - Value to set
  */
 export function safeSetFormProperty<T>(data: DynamicFormData, property: string, value: T): void {
-    // eslint-disable-next-line security/detect-object-injection -- property is validated for form data
     data[property] = value;
 }

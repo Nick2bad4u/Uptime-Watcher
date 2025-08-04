@@ -3,7 +3,7 @@
  * These utilities eliminate hardcoded monitor type checks throughout the frontend.
  */
 
-import type { MonitorType } from "@shared/types";
+import type { Monitor, MonitorType } from "@shared/types";
 
 import { safeExtractIpcData } from "../types/ipc";
 import { AppCaches } from "./cache";
@@ -96,10 +96,7 @@ export async function formatMonitorDetail(monitorType: MonitorType, details: str
  * const suffix = await formatMonitorTitleSuffix("port", { host: "localhost", port: 80 }); // " (localhost:80)"
  * ```
  */
-export async function formatMonitorTitleSuffix(
-    monitorType: MonitorType,
-    monitor: Record<string, unknown>
-): Promise<string> {
+export async function formatMonitorTitleSuffix(monitorType: MonitorType, monitor: Monitor): Promise<string> {
     return withUtilityErrorHandling(
         async () => {
             // Validate electronAPI availability before calling
@@ -108,7 +105,10 @@ export async function formatMonitorTitleSuffix(
             }
 
             // Use the IPC method to format on the backend where functions are available
-            const response = await window.electronAPI.monitorTypes.formatMonitorTitleSuffix(monitorType, monitor);
+            const response = await window.electronAPI.monitorTypes.formatMonitorTitleSuffix(
+                monitorType,
+                monitor as unknown as Record<string, unknown>
+            );
             return safeExtractIpcData(response, "");
         },
         `Format monitor title suffix for ${monitorType}`,

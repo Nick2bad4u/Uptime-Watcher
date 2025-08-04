@@ -38,7 +38,6 @@ function getLogTransport<K extends keyof LogTransports>(transportName: K): LogTr
     const transports = log.transports as unknown as Record<string, unknown>;
 
     if (transportName in transports) {
-        // eslint-disable-next-line security/detect-object-injection -- transportName is from known LogTransports keys
         return transports[transportName] as LogTransports[K];
     }
 

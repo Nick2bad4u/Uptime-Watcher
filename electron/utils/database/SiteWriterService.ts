@@ -22,6 +22,8 @@
 
 import { Database } from "node-sqlite3-wasm";
 
+import type { MonitorRow } from "../../../shared/types/database";
+
 import { DatabaseService } from "../../services/database/DatabaseService";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { SiteRepository } from "../../services/database/SiteRepository";
@@ -539,10 +541,7 @@ export class SiteWriterService {
     private updateMonitorsPreservingHistory(db: Database, siteIdentifier: string, newMonitors: Site["monitors"]): void {
         // Fetch existing monitors using the transaction database instance
         // This ensures consistent reads within the transaction boundary
-        const monitorRows = db.all(SITE_WRITER_QUERIES.SELECT_MONITORS_BY_SITE, [siteIdentifier]) as Record<
-            string,
-            unknown
-        >[];
+        const monitorRows = db.all(SITE_WRITER_QUERIES.SELECT_MONITORS_BY_SITE, [siteIdentifier]) as MonitorRow[];
 
         // Convert rows to monitor objects using the imported mapper
         const existingMonitors = rowsToMonitors(monitorRows);

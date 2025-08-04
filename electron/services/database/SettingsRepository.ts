@@ -1,5 +1,7 @@
 import { Database } from "node-sqlite3-wasm";
 
+import type { SettingsRow as DatabaseSettingsRow } from "../../../shared/types/database";
+
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
@@ -216,7 +218,7 @@ export class SettingsRepository {
     public async get(key: string): Promise<string | undefined> {
         return withDatabaseOperation(() => {
             const db = this.getDb();
-            const result = db.get(SETTINGS_QUERIES.SELECT_VALUE_BY_KEY, [key]) as Record<string, unknown> | undefined;
+            const result = db.get(SETTINGS_QUERIES.SELECT_VALUE_BY_KEY, [key]) as DatabaseSettingsRow | undefined;
             return Promise.resolve(rowToSettingValue(result));
         }, `get-setting-${key}`);
     }
@@ -236,7 +238,7 @@ export class SettingsRepository {
     public async getAll(): Promise<Record<string, string>> {
         return withDatabaseOperation(() => {
             const db = this.getDb();
-            const settings = db.all(SETTINGS_QUERIES.SELECT_ALL) as Record<string, unknown>[];
+            const settings = db.all(SETTINGS_QUERIES.SELECT_ALL) as DatabaseSettingsRow[];
             const settingRows = rowsToSettings(settings);
             return Promise.resolve(settingsToRecord(settingRows));
         }, "settings-get-all");

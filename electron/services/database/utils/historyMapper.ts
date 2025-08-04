@@ -9,7 +9,9 @@
  * @public
  */
 
-import { StatusHistory } from "../../../types";
+import type { StatusHistory } from "../../../../shared/types";
+import type { HistoryRow as DatabaseHistoryRow } from "../../../../shared/types/database";
+
 import { logger } from "../../../utils/logger";
 
 /**
@@ -54,7 +56,7 @@ export interface HistoryRow {
  *
  * @public
  */
-export function historyEntryToRow(monitorId: string, entry: StatusHistory, details?: string): Record<string, unknown> {
+export function historyEntryToRow(monitorId: string, entry: StatusHistory, details?: string): DatabaseHistoryRow {
     return {
         monitorId,
         responseTime: entry.responseTime,
@@ -80,14 +82,14 @@ export function historyEntryToRow(monitorId: string, entry: StatusHistory, detai
  *
  * @public
  */
-export function isValidHistoryRow(row: Record<string, unknown>): boolean {
+export function isValidHistoryRow(row: DatabaseHistoryRow): boolean {
     return (
-        row["monitorId"] !== undefined &&
-        row["status"] !== undefined &&
-        row["timestamp"] !== undefined &&
-        typeof row["monitorId"] === "string" &&
-        (row["status"] === "up" || row["status"] === "down") &&
-        !Number.isNaN(Number(row["timestamp"]))
+        row.monitorId !== undefined &&
+        row.status !== undefined &&
+        row.timestamp !== undefined &&
+        typeof row.monitorId === "string" &&
+        (row.status === "up" || row.status === "down") &&
+        !Number.isNaN(Number(row.timestamp))
     );
 }
 
@@ -107,7 +109,7 @@ export function isValidHistoryRow(row: Record<string, unknown>): boolean {
  *
  * @public
  */
-export function rowsToHistoryEntries(rows: Record<string, unknown>[]): StatusHistory[] {
+export function rowsToHistoryEntries(rows: DatabaseHistoryRow[]): StatusHistory[] {
     return rows.map((row) => rowToHistoryEntry(row));
 }
 
@@ -129,24 +131,23 @@ export function rowsToHistoryEntries(rows: Record<string, unknown>[]): StatusHis
  *
  * @public
  */
-export function rowToHistoryEntry(row: Record<string, unknown>): StatusHistory {
+export function rowToHistoryEntry(row: DatabaseHistoryRow): StatusHistory {
     try {
         return {
-            ...(row["details"] !== undefined &&
-                row["details"] !== null && {
-                    details: typeof row["details"] === "string" ? row["details"] : JSON.stringify(row["details"]),
-                }),
-            responseTime: safeNumber(row["responseTime"], 0),
-            status: validateStatus(row["status"]),
-            timestamp: safeNumber(row["timestamp"], Date.now()),
+            ...(row.details !== undefined && {
+                details: typeof row.details === "string" ? row.details : JSON.stringify(row.details),
+            }),
+            responseTime: safeNumber(row.responseTime, 0),
+            status: validateStatus(row.status),
+            timestamp: safeNumber(row.timestamp, Date.now()),
         };
     } catch (error) {
         logger.error("[HistoryMapper] Failed to map database row to history entry", {
             error,
-            responseTime: row["responseTime"],
+            responseTime: row.responseTime,
             row,
-            status: row["status"],
-            timestamp: row["timestamp"],
+            status: row.status,
+            timestamp: row.timestamp,
         });
         throw error;
     }
@@ -168,7 +169,7 @@ export function rowToHistoryEntry(row: Record<string, unknown>): StatusHistory {
  *
  * @public
  */
-export function rowToHistoryEntryOrUndefined(row: Record<string, unknown> | undefined): StatusHistory | undefined {
+export function rowToHistoryEntryOrUndefined(row: DatabaseHistoryRow | undefined): StatusHistory | undefined {
     if (!row) {
         return undefined;
     }

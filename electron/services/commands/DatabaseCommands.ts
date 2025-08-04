@@ -185,7 +185,7 @@ export class DatabaseCommandExecutor {
                 await command.rollback();
             } catch (rollbackError) {
                 // Log rollback failure but don't mask original error
-                console.error(`Rollback failed for command ${command.getDescription()}:`, rollbackError);
+                console.error("Rollback failed for command:", command.getDescription(), rollbackError);
             }
             throw error;
         }
@@ -207,7 +207,6 @@ export class DatabaseCommandExecutor {
         // Rollback in reverse order
         for (let i = this.executedCommands.length - 1; i >= 0; i--) {
             try {
-                // eslint-disable-next-line security/detect-object-injection
                 const command = this.executedCommands[i];
                 if (command != null) {
                     await command.rollback();

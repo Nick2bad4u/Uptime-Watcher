@@ -120,7 +120,7 @@ export class ThemeManager {
     getTheme(name: ThemeName): Theme {
         if (name === "system") {
             const systemPreference = this.getSystemThemePreference();
-            // eslint-disable-next-line security/detect-object-injection -- always light or dark
+
             return themes[systemPreference];
         }
 

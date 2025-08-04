@@ -10,8 +10,10 @@
  */
 import { Database } from "node-sqlite3-wasm";
 
+import type { MonitorRow } from "../../../shared/types/database";
+import type { Monitor, Site } from "../../types";
+
 import { isDev } from "../../electronUtils";
-import { Site } from "../../types";
 import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
 import { DatabaseService } from "./DatabaseService";
@@ -408,7 +410,7 @@ export class MonitorRepository {
         return withDatabaseOperation(
             () => {
                 const db = this.getDb();
-                const row = db.get(MONITOR_QUERIES.SELECT_BY_ID, [monitorId]) as Record<string, unknown> | undefined;
+                const row = db.get(MONITOR_QUERIES.SELECT_BY_ID, [monitorId]) as MonitorRow | undefined;
 
                 return Promise.resolve(rowToMonitorOrUndefined(row));
             },
@@ -434,7 +436,7 @@ export class MonitorRepository {
     public async findBySiteIdentifier(siteIdentifier: string): Promise<Site["monitors"]> {
         return withDatabaseOperation(() => {
             const db = this.getDb();
-            const monitorRows = db.all(MONITOR_QUERIES.SELECT_BY_SITE, [siteIdentifier]) as Record<string, unknown>[];
+            const monitorRows = db.all(MONITOR_QUERIES.SELECT_BY_SITE, [siteIdentifier]) as MonitorRow[];
 
             return Promise.resolve(rowsToMonitors(monitorRows));
         }, `find-monitors-by-site-${siteIdentifier}`);
@@ -504,13 +506,16 @@ export class MonitorRepository {
         }
 
         // Use dynamic row mapping to convert camelCase to snake_case
-        const row = mapMonitorToRow(monitor as Record<string, unknown>);
+        const row = mapMonitorToRow(monitor as Monitor);
 
         if (isDev()) {
             logger.debug(`[MonitorRepository] mapMonitorToRow result:`, row);
         }
 
-        const { updateFields, updateValues } = this.buildUpdateFieldsAndValues(row, monitor);
+        const { updateFields, updateValues } = this.buildUpdateFieldsAndValues(
+            row as unknown as Record<string, unknown>,
+            monitor
+        );
 
         if (updateFields.length === 0) {
             if (isDev()) {

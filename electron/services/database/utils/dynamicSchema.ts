@@ -7,10 +7,107 @@
  * @public
  */
 
+import type { Monitor, MonitorStatus, MonitorType } from "../../../../shared/types";
+import type { MonitorRow } from "../../../../shared/types/database";
+
 import { safeGetRowProperty } from "../../../../shared/types/database";
 import { safeStringify } from "../../../../shared/utils/stringConversion";
 import { isValidIdentifierArray } from "../../../../shared/validation/validatorUtils";
 import { getAllMonitorTypeConfigs } from "../../monitoring/MonitorTypeRegistry";
+
+/**
+ * Field mapping configuration for transforming monitor fields to database columns.
+ *
+ * @internal
+ */
+interface FieldMapping {
+    /** Database column name */
+    dbField: string;
+    /** Default value if field is undefined */
+    defaultValue: unknown;
+    /** Monitor object field name */
+    sourceField: string;
+    /** Optional transformation function */
+    transform?: (value: unknown, monitor: Record<string, unknown>) => unknown;
+}
+
+/**
+ * Configuration for standard field mappings between monitor objects and database rows.
+ *
+ * @internal
+ */
+const STANDARD_FIELD_MAPPINGS: FieldMapping[] = [
+    {
+        dbField: "active_operations",
+        defaultValue: "[]",
+        sourceField: "activeOperations",
+        transform: (value) => {
+            const activeOps = Array.isArray(value) ? value : [];
+            return JSON.stringify(activeOps);
+        },
+    },
+    {
+        dbField: "check_interval",
+        defaultValue: 300_000,
+        sourceField: "checkInterval",
+    },
+    {
+        dbField: "created_at",
+        defaultValue: Date.now(),
+        sourceField: "createdAt",
+    },
+    {
+        dbField: "last_checked",
+        defaultValue: null,
+        sourceField: "lastChecked",
+        transform: convertLastCheckedField,
+    },
+    {
+        dbField: "last_error",
+        defaultValue: null,
+        sourceField: "lastError",
+    },
+    {
+        dbField: "next_check",
+        defaultValue: null,
+        sourceField: "nextCheck",
+    },
+    {
+        dbField: "response_time",
+        defaultValue: -1,
+        sourceField: "responseTime",
+    },
+    {
+        dbField: "retry_attempts",
+        defaultValue: 3,
+        sourceField: "retryAttempts",
+    },
+    {
+        dbField: "site_identifier",
+        defaultValue: "",
+        sourceField: "siteIdentifier",
+    },
+    {
+        dbField: "status",
+        defaultValue: "pending",
+        sourceField: "status",
+    },
+    {
+        dbField: "timeout",
+        defaultValue: 10_000,
+        sourceField: "timeout",
+    },
+    {
+        dbField: "type",
+        defaultValue: "http",
+        sourceField: "type",
+    },
+    {
+        dbField: "updated_at",
+        defaultValue: Date.now(),
+        sourceField: "updatedAt",
+    },
+];
 
 /**
  * Database field definition for dynamic monitor schema.
@@ -204,16 +301,17 @@ export function generateSqlParameters(): { columns: string[]; placeholders: stri
  * const row = mapMonitorToRow(monitor);
  * ```
  */
-export function mapMonitorToRow(monitor: Record<string, unknown>): Record<string, unknown> {
+export function mapMonitorToRow(monitor: Monitor): MonitorRow {
+    const monitorRecord = monitor as unknown as Record<string, unknown>;
     const row: Record<string, unknown> = {};
 
     // Map standard fields first
-    mapStandardFields(monitor, row);
+    mapStandardFields(monitorRecord, row);
 
     // Map dynamic monitor type-specific fields
-    mapDynamicFields(monitor, row);
+    mapDynamicFields(monitorRecord, row);
 
-    return row;
+    return row as MonitorRow;
 }
 
 /**
@@ -231,38 +329,47 @@ export function mapMonitorToRow(monitor: Record<string, unknown>): Record<string
  * const monitor = mapRowToMonitor(row);
  * ```
  */
-export function mapRowToMonitor(row: Record<string, unknown>): Record<string, unknown> {
-    const monitor: Record<string, unknown> = {
-        activeOperations: (() => {
-            try {
-                const parsed: unknown = row["active_operations"] ? JSON.parse(String(row["active_operations"])) : [];
-                return isValidIdentifierArray(parsed) ? parsed : [];
-            } catch {
-                return [];
-            }
-        })(),
-        checkInterval: Number(row["check_interval"]),
-        createdAt: Number(row["created_at"]),
-        enabled: row["enabled"] === 1, // Explicit SQLite boolean mapping
-        id: Number(row["id"]),
-        lastChecked: row["last_checked"] ? Number(row["last_checked"]) : undefined,
-        lastError: row["last_error"] ? safeStringifyError(row["last_error"]) : undefined,
-        monitoring: row["enabled"] === 1, // Map enabled -> monitoring for frontend consistency
-        nextCheck: row["next_check"] ? Number(row["next_check"]) : undefined,
-        responseTime: row["response_time"] ? Number(row["response_time"]) : undefined,
-        retryAttempts: Number(row["retry_attempts"]),
-        siteIdentifier: String(row["site_identifier"]),
-        status: row["status"] as "down" | "paused" | "pending" | "up",
-        timeout: Number(row["timeout"]),
-        type: String(row["type"]),
-        updatedAt: Number(row["updated_at"]),
+export function mapRowToMonitor(row: MonitorRow): Monitor {
+    // Parse activeOperations safely
+    const activeOperations = (() => {
+        if (!row.active_operations || typeof row.active_operations !== "string") {
+            return [];
+        }
+        try {
+            const parsed: unknown = JSON.parse(row.active_operations);
+            return isValidIdentifierArray(parsed) ? parsed : [];
+        } catch {
+            return [];
+        }
+    })();
+
+    // Create the base monitor object with proper type safety
+    const monitor: Monitor = {
+        activeOperations,
+        checkInterval: row.check_interval ?? 300_000,
+        history: [], // History will be loaded separately
+        id: String(row.id ?? 0),
+        monitoring: (row.enabled ?? 0) === 1, // Map enabled -> monitoring for frontend consistency
+        responseTime: row.response_time ?? -1,
+        retryAttempts: row.retry_attempts ?? 3,
+        status: (row.status as MonitorStatus | undefined) ?? "down",
+        timeout: row.timeout ?? 5000,
+        type: (row.type as MonitorType | undefined) ?? "http",
+        // Add conditional fields based on monitor type
+        ...(row.host && { host: row.host }),
+        ...(row.port && { port: row.port }),
+        ...(row.url && { url: row.url }),
+        // Only add lastChecked if it exists to avoid undefined assignment with exactOptionalPropertyTypes
+        ...(row.last_checked && { lastChecked: new Date(row.last_checked) }),
     };
 
     // Dynamically map monitor type specific fields
     const fieldDefs = generateDatabaseFieldDefinitions();
     for (const fieldDef of fieldDefs) {
-        if (row[fieldDef.columnName] !== undefined && row[fieldDef.columnName] !== null) {
-            monitor[fieldDef.sourceField] = convertFromDatabase(row[fieldDef.columnName], fieldDef.sqlType);
+        const value = row[fieldDef.columnName as keyof MonitorRow];
+        if (value != null) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- Dynamic field assignment required for extensible monitor type system. fieldDef.sourceField is validated by generateDatabaseFieldDefinitions() from monitor type registry.
+            (monitor as any)[fieldDef.sourceField] = convertFromDatabase(value, fieldDef.sqlType);
         }
     }
 
@@ -423,98 +530,28 @@ function mapDynamicFields(monitor: Record<string, unknown>, row: Record<string, 
  * Maps standard monitor fields from a monitor object to a database row.
  *
  * @remarks
- * Used internally to populate a database row with standard monitor fields, applying defaults as needed.
+ * Uses a configuration-driven approach to map fields, reducing complexity and improving maintainability.
  *
  * @param monitor - Monitor object to map.
  * @param row - Database row object to populate.
  * @internal
  */
 function mapStandardFields(monitor: Record<string, unknown>, row: Record<string, unknown>): void {
-    if (monitor["activeOperations"] !== undefined) {
-        // Ensure activeOperations is an array before stringifying
-        const activeOps = monitor["activeOperations"];
-        const safeActiveOps = Array.isArray(activeOps) ? activeOps : [];
-        row["active_operations"] = JSON.stringify(safeActiveOps);
-    }
-    if (monitor["checkInterval"] !== undefined) {
-        row["check_interval"] = safeGetRowProperty(monitor, "checkInterval", 300_000);
-    }
-    if (monitor["createdAt"] !== undefined) {
-        row["created_at"] = safeGetRowProperty(monitor, "createdAt", Date.now());
-    }
+    // Handle enabled/monitoring fields specially since they map to the same db field
     if (monitor["monitoring"] !== undefined || monitor["enabled"] !== undefined) {
         row["enabled"] = convertEnabledField(monitor);
     }
-    if (monitor["lastChecked"] !== undefined) {
-        row["last_checked"] = convertLastCheckedField(monitor["lastChecked"]);
-    }
-    if (monitor["lastError"] !== undefined) {
-        row["last_error"] = safeGetRowProperty(monitor, "lastError", null);
-    }
-    if (monitor["nextCheck"] !== undefined) {
-        row["next_check"] = safeGetRowProperty(monitor, "nextCheck", null);
-    }
-    if (monitor["responseTime"] !== undefined) {
-        row["response_time"] = safeGetRowProperty(monitor, "responseTime", -1);
-    }
-    if (monitor["retryAttempts"] !== undefined) {
-        row["retry_attempts"] = safeGetRowProperty(monitor, "retryAttempts", 3);
-    }
-    if (monitor["siteIdentifier"] !== undefined) {
-        row["site_identifier"] = safeGetRowProperty(monitor, "siteIdentifier", "");
-    }
-    if (monitor["status"] !== undefined) {
-        row["status"] = safeGetRowProperty(monitor, "status", "pending");
-    }
-    if (monitor["timeout"] !== undefined) {
-        row["timeout"] = safeGetRowProperty(monitor, "timeout", 10_000);
-    }
-    if (monitor["type"] !== undefined) {
-        row["type"] = safeGetRowProperty(monitor, "type", "http");
-    }
-    if (monitor["updatedAt"] !== undefined) {
-        row["updated_at"] = safeGetRowProperty(monitor, "updatedAt", Date.now());
-    }
-}
 
-/**
- * Safely converts an error value to a string for database storage.
- *
- * @remarks
- * Handles Error objects, strings, and generic objects. Provides fallback serialization for unknown types. Used internally for error field mapping.
- *
- * @param value - Error value to serialize.
- * @returns String representation of the error.
- * @example
- * ```typescript
- * const errorStr = safeStringifyError(errorObj);
- * ```
- * @internal
- */
-function safeStringifyError(value: unknown): string {
-    if (typeof value === "string") {
-        return value;
-    }
+    // Process all other standard field mappings
+    for (const mapping of STANDARD_FIELD_MAPPINGS) {
+        if (monitor[mapping.sourceField] !== undefined) {
+            const value = mapping.transform
+                ? mapping.transform(monitor[mapping.sourceField], monitor)
+                : safeGetRowProperty(monitor, mapping.sourceField, mapping.defaultValue);
 
-    if (value instanceof Error) {
-        return JSON.stringify({
-            message: value.message,
-            name: value.name,
-            stack: value.stack,
-        });
-    }
-
-    if (typeof value === "object" && value !== null) {
-        try {
-            const result = JSON.stringify(value);
-            // Handle empty object case
-            return result === "{}" ? "[Empty Object]" : result;
-        } catch {
-            return "[Non-Serializable Object]";
+            row[mapping.dbField] = value;
         }
     }
-
-    return String(value);
 }
 
 /**

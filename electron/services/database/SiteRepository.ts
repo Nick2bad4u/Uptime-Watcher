@@ -1,5 +1,7 @@
 import { Database } from "node-sqlite3-wasm";
 
+import type { SiteRow as DatabaseSiteRow } from "../../../shared/types/database";
+
 import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
 import { DatabaseService } from "./DatabaseService";
@@ -275,7 +277,7 @@ export class SiteRepository {
     public async exportAll(): Promise<SiteRow[]> {
         return withDatabaseOperation(() => {
             const db = this.getDb();
-            const siteRows = db.all(SITE_QUERIES.SELECT_ALL) as Record<string, unknown>[];
+            const siteRows = db.all(SITE_QUERIES.SELECT_ALL) as DatabaseSiteRow[];
             return Promise.resolve(rowsToSites(siteRows));
         }, "site-export-all");
     }
@@ -296,7 +298,7 @@ export class SiteRepository {
     public async findAll(): Promise<SiteRow[]> {
         return withDatabaseOperation(() => {
             const db = this.getDb();
-            const siteRows = db.all(SITE_QUERIES.SELECT_ALL) as Record<string, unknown>[];
+            const siteRows = db.all(SITE_QUERIES.SELECT_ALL) as DatabaseSiteRow[];
             return Promise.resolve(rowsToSites(siteRows));
         }, "find-all-sites");
     }
@@ -318,9 +320,7 @@ export class SiteRepository {
                 const db = this.getDb();
 
                 try {
-                    const siteRow = db.get(SITE_QUERIES.SELECT_BY_ID, [identifier]) as
-                        | Record<string, unknown>
-                        | undefined;
+                    const siteRow = db.get(SITE_QUERIES.SELECT_BY_ID, [identifier]) as DatabaseSiteRow | undefined;
 
                     const result: SiteRow | undefined = siteRow ? rowToSite(siteRow) : undefined;
                     return Promise.resolve(result);

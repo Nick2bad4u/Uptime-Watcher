@@ -50,6 +50,127 @@ export interface CacheInvalidatedEventData {
 }
 
 /**
+ * Payload for database connection events.
+ *
+ * @remarks
+ * Used to track database connection state changes.
+ * Important for monitoring database availability and connection health.
+ *
+ * @example
+ * ```typescript
+ * const event: DatabaseConnectionEventData = {
+ *   state: "connected",
+ *   connectionId: "conn_123"
+ * };
+ * ```
+ */
+export interface DatabaseConnectionEventData {
+    /** Unique identifier for the connection */
+    connectionId?: string;
+    /** Additional context about the connection state */
+    details?: string;
+    /** Current connection state */
+    state: "connected" | "connecting" | "disconnected" | "error";
+    /** Timestamp when the state change occurred */
+    timestamp: number;
+}
+
+/**
+ * Payload for database error events.
+ *
+ * @remarks
+ * Used to communicate database operation errors with detailed context.
+ * Provides structured error information for debugging and monitoring.
+ *
+ * @example
+ * ```typescript
+ * const event: DatabaseErrorEventData = {
+ *   error: new Error("Connection timeout"),
+ *   operation: "query",
+ *   table: "monitors"
+ * };
+ * ```
+ */
+export interface DatabaseErrorEventData {
+    /** The actual error that occurred */
+    error: Error;
+    /** The database operation that failed */
+    operation: DatabaseOperation;
+    /** SQL parameters that were used (optional for debugging) */
+    parameters?: unknown[];
+    /** The database table involved (optional) */
+    table?: string;
+    /** Timestamp when the error occurred */
+    timestamp: number;
+}
+
+/**
+ * Database operation types used in event payloads.
+ *
+ * @public
+ */
+export type DatabaseOperation = "connect" | "create" | "delete" | "insert" | "query" | "update";
+
+/**
+ * Payload for database retry events.
+ *
+ * @remarks
+ * Used to track retry attempts for failed database operations.
+ * Helps with monitoring and debugging database reliability.
+ *
+ * @example
+ * ```typescript
+ * const event: DatabaseRetryEventData = {
+ *   attempt: 2,
+ *   maxAttempts: 3,
+ *   operation: "query",
+ *   delay: 1000
+ * };
+ * ```
+ */
+export interface DatabaseRetryEventData {
+    /** Current attempt number (1-based) */
+    attempt: number;
+    /** Delay before this retry attempt in milliseconds */
+    delay: number;
+    /** Maximum number of attempts allowed */
+    maxAttempts: number;
+    /** The database operation being retried */
+    operation: DatabaseOperation;
+    /** Timestamp when the retry was initiated */
+    timestamp: number;
+}
+
+/**
+ * Payload for database success events.
+ *
+ * @remarks
+ * Used to track successful database operations for monitoring and performance analysis.
+ * Provides metrics about operation performance and cache utilization.
+ *
+ * @example
+ * ```typescript
+ * const event: DatabaseSuccessEventData = {
+ *   operation: "query",
+ *   duration: 45,
+ *   cacheHit: true
+ * };
+ * ```
+ */
+export interface DatabaseSuccessEventData {
+    /** Whether this operation was served from cache */
+    cacheHit?: boolean;
+    /** Duration of the operation in milliseconds */
+    duration?: number;
+    /** The database operation that succeeded */
+    operation: DatabaseOperation;
+    /** Number of rows affected/returned */
+    rowCount?: number;
+    /** Timestamp when the operation completed */
+    timestamp: number;
+}
+
+/**
  * Payload for events when a monitor goes down (unavailable).
  *
  * @remarks

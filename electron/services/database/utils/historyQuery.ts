@@ -1,5 +1,7 @@
 import { Database } from "node-sqlite3-wasm";
 
+import type { HistoryRow as DatabaseHistoryRow } from "../../../../shared/types/database";
+
 import { StatusHistory } from "../../../types";
 import { logger } from "../../../utils/logger";
 import { rowToHistoryEntry } from "./historyMapper";
@@ -48,10 +50,7 @@ const HISTORY_QUERY_QUERIES = {
  */
 export function findHistoryByMonitorId(db: Database, monitorId: string): StatusHistory[] {
     try {
-        const historyRows = db.all(HISTORY_QUERY_QUERIES.SELECT_ALL_BY_MONITOR, [monitorId]) as Record<
-            string,
-            unknown
-        >[];
+        const historyRows = db.all(HISTORY_QUERY_QUERIES.SELECT_ALL_BY_MONITOR, [monitorId]) as DatabaseHistoryRow[];
 
         return historyRows.map((row) => rowToHistoryEntry(row));
     } catch (error) {
@@ -111,7 +110,7 @@ export function getHistoryCount(db: Database, monitorId: string): number {
 export function getLatestHistoryEntry(db: Database, monitorId: string): StatusHistory | undefined {
     try {
         const row = db.get(HISTORY_QUERY_QUERIES.SELECT_LATEST_BY_MONITOR, [monitorId]) as
-            | Record<string, unknown>
+            | DatabaseHistoryRow
             | undefined;
 
         if (!row) {

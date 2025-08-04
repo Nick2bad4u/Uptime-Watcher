@@ -3,6 +3,8 @@
  * Provides consistent data transformation between database rows and Settings objects.
  */
 
+import type { SettingsRow as DatabaseSettingsRow } from "../../../../shared/types/database";
+
 import { safeStringify } from "../../../../shared/utils/stringConversion";
 import { isNonEmptyString } from "../../../../shared/validation/validatorUtils";
 import { logger } from "../../../utils/logger";
@@ -23,8 +25,8 @@ export interface SettingRow {
  *
  * @public
  */
-export function isValidSettingRow(row: Record<string, unknown>): boolean {
-    return isNonEmptyString(row["key"]);
+export function isValidSettingRow(row: DatabaseSettingsRow): boolean {
+    return isNonEmptyString(row.key);
 }
 
 /**
@@ -39,7 +41,7 @@ export function isValidSettingRow(row: Record<string, unknown>): boolean {
  *
  * @public
  */
-export function rowsToSettings(rows: Record<string, unknown>[]): SettingRow[] {
+export function rowsToSettings(rows: DatabaseSettingsRow[]): SettingRow[] {
     return rows.filter((row) => isValidSettingRow(row)).map((row) => rowToSetting(row));
 }
 
@@ -58,20 +60,20 @@ export function rowsToSettings(rows: Record<string, unknown>[]): SettingRow[] {
  *
  * @public
  */
-export function rowToSetting(row: Record<string, unknown>): SettingRow {
+export function rowToSetting(row: DatabaseSettingsRow): SettingRow {
     try {
         // Handle key (required field) with validator-based checking
-        const key = row["key"];
+        const key = row.key;
         if (!isNonEmptyString(key)) {
             throw new Error(`[SettingsMapper] Invalid setting key: ${key}`);
         }
 
         // Handle value (required field)
-        const value = row["value"];
+        const value = row.value;
 
         const setting: SettingRow = {
             key,
-            value: value !== undefined && value !== null ? safeStringify(value) : "",
+            value: value ? safeStringify(value) : "",
         };
 
         return setting;
@@ -108,12 +110,12 @@ export function rowToSetting(row: Record<string, unknown>): SettingRow {
  *
  * @public
  */
-export function rowToSettingValue(row: Record<string, unknown> | undefined): string | undefined {
-    if (row?.["value"] == null) {
+export function rowToSettingValue(row: DatabaseSettingsRow | undefined): string | undefined {
+    if (row?.value == null) {
         return undefined;
     }
 
-    const value = safeStringify(row["value"]);
+    const value = safeStringify(row.value);
     return value;
 }
 

@@ -4,6 +4,7 @@
  */
 
 import type { Monitor, MonitorType } from "@shared/types";
+import type { HttpFormData, MonitorFormData, PingFormData, PortFormData } from "@shared/types/formData";
 
 // Import shared validation functions for client-side validation
 import {
@@ -42,7 +43,7 @@ export interface ValidationResult {
  * @param fields - Field values to merge with defaults
  * @returns Monitor creation data with type-specific fields and guaranteed required fields
  */
-export function createMonitorObject(type: MonitorType, fields: Record<string, unknown>): MonitorCreationData {
+export function createMonitorObject(type: MonitorType, fields: Partial<MonitorFormData>): MonitorCreationData {
     const monitor: MonitorCreationData = {
         history: [],
         monitoring: true,
@@ -64,7 +65,10 @@ export function createMonitorObject(type: MonitorType, fields: Record<string, un
  * @param data - Monitor data to validate
  * @returns Promise resolving to validation result
  */
-export async function validateMonitorData(type: MonitorType, data: Record<string, unknown>): Promise<ValidationResult> {
+export async function validateMonitorData(
+    type: MonitorType,
+    data: Partial<MonitorFormData>
+): Promise<ValidationResult> {
     return withUtilityErrorHandling(
         async () => {
             // Use IPC to validate via backend registry
@@ -98,7 +102,7 @@ export async function validateMonitorData(type: MonitorType, data: Record<string
  */
 export async function validateMonitorDataClientSide(
     type: MonitorType,
-    data: Record<string, unknown>
+    data: Partial<MonitorFormData>
 ): Promise<ValidationResult> {
     return withUtilityErrorHandling(
         () => {
@@ -203,36 +207,36 @@ export async function validateMonitorFieldClientSide(
 }
 
 // Helper functions for monitor form validation (reduces complexity by composition)
-const validateHttpMonitorFormData = (data: Record<string, unknown>) => {
+const validateHttpMonitorFormData = (data: Partial<HttpFormData>) => {
     const errors: string[] = [];
 
-    if (!data["url"] || typeof data["url"] !== "string") {
+    if (!data.url || typeof data.url !== "string") {
         errors.push("URL is required for HTTP monitors");
     } else {
         // Validate URL field specifically
-        const urlResult = sharedValidateMonitorField("http", "url", data["url"]);
+        const urlResult = sharedValidateMonitorField("http", "url", data.url);
         errors.push(...urlResult.errors);
     }
 
     return errors;
 };
 
-const validatePortMonitorFormData = (data: Record<string, unknown>) => {
+const validatePortMonitorFormData = (data: Partial<PortFormData>) => {
     const errors: string[] = [];
 
-    if (!data["host"] || typeof data["host"] !== "string") {
+    if (!data.host || typeof data.host !== "string") {
         errors.push("Host is required for port monitors");
     } else {
         // Validate host field specifically
-        const hostResult = sharedValidateMonitorField("port", "host", data["host"]);
+        const hostResult = sharedValidateMonitorField("port", "host", data.host);
         errors.push(...hostResult.errors);
     }
 
-    if (!data["port"] || typeof data["port"] !== "number") {
+    if (!data.port || typeof data.port !== "number") {
         errors.push("Port is required for port monitors");
     } else {
         // Validate port field specifically
-        const portResult = sharedValidateMonitorField("port", "port", data["port"]);
+        const portResult = sharedValidateMonitorField("port", "port", data.port);
         errors.push(...portResult.errors);
     }
 
@@ -249,35 +253,35 @@ const validatePortMonitorFormData = (data: Record<string, unknown>) => {
  * Ping monitors require a host field that must be a valid hostname, IP address, or localhost.
  * Uses shared validation to ensure consistency with backend validation rules.
  */
-const validatePingMonitorFormData = (data: Record<string, unknown>) => {
+const validatePingMonitorFormData = (data: Partial<PingFormData>) => {
     const errors: string[] = [];
 
-    if (!data["host"] || typeof data["host"] !== "string") {
+    if (!data.host || typeof data.host !== "string") {
         errors.push("Host is required for ping monitors");
     } else {
         // Validate host field specifically
-        const hostResult = sharedValidateMonitorField("ping", "host", data["host"]);
+        const hostResult = sharedValidateMonitorField("ping", "host", data.host);
         errors.push(...hostResult.errors);
     }
 
     return errors;
 };
 
-const validateMonitorFormDataByType = (type: MonitorType, data: Record<string, unknown>) => {
+const validateMonitorFormDataByType = (type: MonitorType, data: Partial<MonitorFormData>) => {
     const errors: string[] = [];
 
     // Validate type-specific required fields only
     switch (type) {
         case "http": {
-            errors.push(...validateHttpMonitorFormData(data));
+            errors.push(...validateHttpMonitorFormData(data as Partial<HttpFormData>));
             break;
         }
         case "ping": {
-            errors.push(...validatePingMonitorFormData(data));
+            errors.push(...validatePingMonitorFormData(data as Partial<PingFormData>));
             break;
         }
         case "port": {
-            errors.push(...validatePortMonitorFormData(data));
+            errors.push(...validatePortMonitorFormData(data as Partial<PortFormData>));
             break;
         }
     }
@@ -295,7 +299,7 @@ const validateMonitorFormDataByType = (type: MonitorType, data: Record<string, u
  */
 export async function validateMonitorFormData(
     type: MonitorType,
-    data: Record<string, unknown>
+    data: Partial<MonitorFormData>
 ): Promise<ValidationResult> {
     return withUtilityErrorHandling(
         () => {

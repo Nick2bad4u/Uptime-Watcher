@@ -243,7 +243,7 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
     for (const [key, value] of Object.entries(monitorData)) {
         if (key !== "type") {
             // Skip the type field as it's already set
-            // eslint-disable-next-line security/detect-object-injection -- key comes from trusted monitor config
+
             (monitor as unknown as Record<string, unknown>)[key] = value;
         }
     }

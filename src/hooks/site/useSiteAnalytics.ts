@@ -255,7 +255,6 @@ function calculateDowntimePeriods(filteredHistory: StatusHistory[]): DowntimePer
 
     // Process in reverse chronological order (newest to oldest)
     for (let i = filteredHistory.length - 1; i >= 0; i--) {
-        // eslint-disable-next-line security/detect-object-injection -- i is a safe numeric index within array bounds
         const record = filteredHistory[i];
         if (!record) {
             continue; // Skip if record is undefined
@@ -323,7 +322,7 @@ function calculateResponseMetrics(filteredHistory: StatusHistory[]): {
         }
         const index = Math.floor(arrayLength * safeP);
         const safeIndex = Math.max(0, Math.min(index, arrayLength - 1));
-        // eslint-disable-next-line security/detect-object-injection -- safeIndex is validated and sanitized
+
         return sortedResponseTimes[safeIndex] ?? 0;
     };
 
@@ -344,7 +343,7 @@ function filterHistoryByTimeRange(history: StatusHistory[], timeRange: TimePerio
     // Sanitize timeRange to prevent object injection
     const allowedTimeRanges = Object.keys(TIME_PERIOD_LABELS) as TimePeriod[];
     const safeTimeRange = allowedTimeRanges.includes(timeRange) ? timeRange : "24h";
-    // eslint-disable-next-line security/detect-object-injection -- false positive: safeTimeRange is validated against allowedTimeRanges
+
     const cutoff = now - CHART_TIME_PERIODS[safeTimeRange];
     return history.filter((record) => record.timestamp >= cutoff);
 }

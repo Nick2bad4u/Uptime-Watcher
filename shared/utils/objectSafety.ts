@@ -42,7 +42,7 @@ export function safeObjectAccess<T>(
 
     // Cast obj to Record type after validation for safe property access
     const typedObj = obj as Record<PropertyKey, unknown>;
-    // eslint-disable-next-line security/detect-object-injection -- Safe object property access with validation
+
     const value = typedObj[key];
 
     if (validator) {
@@ -84,7 +84,7 @@ export function safeObjectIteration(
         }
     } catch (error) {
         // Use basic console for shared utilities to avoid dependencies
-        console.error(`${context} failed:`, error);
+        console.error("Object iteration failed for context:", context, error);
     }
 }
 
@@ -111,7 +111,6 @@ export function safeObjectOmit<T extends Record<PropertyKey, unknown>, K extends
     };
 
     for (const key of keys) {
-        // eslint-disable-next-line security/detect-object-injection -- Safe deletion of known keys
         delete result[key];
     }
 
@@ -140,7 +139,6 @@ export function safeObjectPick<T extends Record<PropertyKey, unknown>, K extends
 
     for (const key of keys) {
         if (Object.hasOwn(obj, key)) {
-            // eslint-disable-next-line security/detect-object-injection -- Safe assignment of known keys
             result[key] = obj[key];
         }
     }

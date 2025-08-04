@@ -52,7 +52,7 @@ export const createSitesStateActions = (
     },
     getSelectedMonitorId: (siteId: string) => {
         const ids = get().selectedMonitorIds;
-        // eslint-disable-next-line security/detect-object-injection
+
         return ids[siteId];
     },
     getSelectedSite: (): Site | undefined => {

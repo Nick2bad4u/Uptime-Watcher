@@ -103,7 +103,7 @@ export function useMonitorFields(): UseMonitorFieldsResult {
             // ESLint disable justification: monitorType is a string parameter from function args,
             // not user input. It's used to access a Record with string keys that we control.
             // This is safe since fieldConfigs is populated from backend config with known types.
-            // eslint-disable-next-line security/detect-object-injection
+
             return fieldConfigs[monitorType] ?? [];
         },
         [fieldConfigs]

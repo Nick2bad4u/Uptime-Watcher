@@ -7,11 +7,12 @@
  */
 
 import { safeInteger } from "@shared/validation/validatorUtils";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 import type { AppSettings } from "../../stores/types";
 
-import { DEFAULT_HISTORY_LIMIT, HISTORY_LIMIT_OPTIONS, UI_DELAYS } from "../../constants";
+import { DEFAULT_HISTORY_LIMIT, HISTORY_LIMIT_OPTIONS } from "../../constants";
+import { useDelayedButtonLoading } from "../../hooks/useDelayedButtonLoading";
 import logger from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSettingsStore } from "../../stores/settings/useSettingsStore";
@@ -75,33 +76,17 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
 
     const { availableThemes, isDark, setTheme } = useTheme();
 
-    // Delayed loading state for button spinners (100ms delay)
-    const [showButtonLoading, setShowButtonLoading] = useState(false);
+    // Delayed loading state for button spinners (managed by custom hook)
+    const showButtonLoading = useDelayedButtonLoading(isLoading);
     // Local state for sync success message
     const [syncSuccess, setSyncSuccess] = useState(false);
-
-    // Create stable callbacks to avoid direct setState in useEffect
-    const clearButtonLoading = useCallback(() => setShowButtonLoading(false), []);
-    const showButtonLoadingCallback = useCallback(() => setShowButtonLoading(true), []);
-
-    useEffect(() => {
-        if (!isLoading) {
-            // Use timeout to defer state update to avoid direct call in useEffect
-            const clearTimeoutId = setTimeout(clearButtonLoading, UI_DELAYS.STATE_UPDATE_DEFER);
-            return () => clearTimeout(clearTimeoutId);
-        }
-
-        const timeoutId = setTimeout(showButtonLoadingCallback, UI_DELAYS.LOADING_BUTTON);
-
-        return () => clearTimeout(timeoutId);
-    }, [isLoading, clearButtonLoading, showButtonLoadingCallback]);
 
     const handleSettingChange = (key: keyof typeof settings, value: unknown) => {
         if (!ALLOWED_SETTINGS_KEYS.has(key)) {
             logger.warn("Attempted to update invalid settings key", key);
             return;
         }
-        // eslint-disable-next-line security/detect-object-injection
+
         const oldValue = settings[key];
         updateSettings({ [key]: value });
         logger.user.settingsChange(key, oldValue, value);
@@ -157,7 +142,6 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
     }, [fullSyncFromBackend, setError]);
 
     const handleDownloadSQLite = async () => {
-        setShowButtonLoading(true);
         clearError();
         try {
             await downloadSQLiteBackup();
@@ -171,8 +155,6 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
                         : String(error)
                 }`
             );
-        } finally {
-            setShowButtonLoading(false);
         }
     };
 

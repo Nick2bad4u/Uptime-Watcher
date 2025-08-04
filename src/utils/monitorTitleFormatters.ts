@@ -68,7 +68,6 @@ export function formatTitleSuffix(monitor: Monitor): string {
  * @public
  */
 export function getTitleSuffixFormatter(monitorType: string): TitleSuffixFormatter | undefined {
-    // eslint-disable-next-line security/detect-object-injection
     return titleSuffixFormatters[monitorType];
 }
 
@@ -90,6 +89,5 @@ export function getTitleSuffixFormatter(monitorType: string): TitleSuffixFormatt
  * ```
  */
 export function registerTitleSuffixFormatter(monitorType: string, formatter: TitleSuffixFormatter): void {
-    // eslint-disable-next-line security/detect-object-injection
     titleSuffixFormatters[monitorType] = formatter;
 }
