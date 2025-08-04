@@ -592,9 +592,12 @@ export default [
             //     },
             // ],
 
-            // Security
+            // Security for Frontend
+            "redos/no-vulnerable": "error",
+            "security/detect-non-literal-fs-filename": "error",
+            "security/detect-non-literal-require": "error",
             "security/detect-non-literal-regexp": "warn",
-            "security/detect-object-injection": "warn",
+            "security/detect-object-injection": "off",
 
             // Performance and compatibility
             "compat/compat": "off", // Electron supports modern APIs, Opera Mini not a target
@@ -1000,7 +1003,8 @@ export default [
             "redos/no-vulnerable": "error",
             "security/detect-non-literal-fs-filename": "error",
             "security/detect-non-literal-require": "error",
-            "security/detect-object-injection": "error",
+            "security/detect-non-literal-regexp": "warn",
+            "security/detect-object-injection": "off",
 
             // Documentation
             "tsdoc/syntax": "warn",

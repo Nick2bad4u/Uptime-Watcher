@@ -52,7 +52,7 @@ jobs:
               run: npm install --force
 
             - name: Install dependencies
-              run: npm install prism-react-renderer && npm install @docusaurus/preset-classic
+              run: npm install prism-react-renderer @docusaurus/preset-classic @docusaurus/core @docusaurus/module-type-aliases @docusaurus/tsconfig @docusaurus/types --force
 
             - name: Generate TypeDoc API documentation
               run: |
