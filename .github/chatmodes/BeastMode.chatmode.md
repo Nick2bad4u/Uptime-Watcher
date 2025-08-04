@@ -1,5 +1,5 @@
 ---
-description: GPT-4.1 - Beast Mode 3.1
+description: Beast Mode 3.1
 tools: ["All Tools"]
 ---
 
