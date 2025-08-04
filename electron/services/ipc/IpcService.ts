@@ -25,21 +25,24 @@ const ConfigPropertyValidator = {
      * @returns Object containing base properties and any unexpected properties
      */
     extractAndValidateBaseProperties(config: ReturnType<typeof getAllMonitorTypeConfigs>[0]) {
-        const {
-            description,
-            displayName,
-            fields,
-            serviceFactory,
-            type,
-            uiConfig,
-            validationSchema,
-            version,
-            ...unexpectedProperties
-        } = config;
+        // Extract serializable properties, excluding non-serializable ones
+        const { description, displayName, fields, type, uiConfig, version } = config;
 
-        // Mark intentionally unused properties (for linting)
-        serviceFactory;
-        validationSchema;
+        // Get unexpected properties by filtering out known properties
+        const knownProperties = new Set([
+            "description",
+            "displayName",
+            "fields",
+            "serviceFactory", // Not serializable - functions
+            "type",
+            "uiConfig",
+            "validationSchema", // Not serializable - Zod schemas
+            "version",
+        ]);
+
+        const unexpectedProperties = Object.fromEntries(
+            Object.entries(config).filter(([key]) => !knownProperties.has(key))
+        );
 
         return {
             baseProperties: {

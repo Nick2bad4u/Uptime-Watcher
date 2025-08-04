@@ -4,6 +4,7 @@
  * and site-level actions.
  */
 
+import { useCallback, useMemo } from "react";
 import { FiSettings } from "react-icons/fi";
 import { MdDomain, MdMonitorHeart, MdOutlineFactCheck, MdSpeed } from "react-icons/md";
 
@@ -128,18 +129,27 @@ export function SiteOverviewTab({
     /**
      * Get response time color based on value
      */
-    const getResponseTimeColor = (responseTime: number): string => {
-        if (responseTime <= 200) {
-            return currentTheme.colors.success;
-        }
-        if (responseTime <= 1000) {
-            return currentTheme.colors.warning;
-        }
-        return currentTheme.colors.error;
-    };
+    const getResponseTimeColor = useCallback(
+        (responseTime: number): string => {
+            if (responseTime <= 200) {
+                return currentTheme.colors.success;
+            }
+            if (responseTime <= 1000) {
+                return currentTheme.colors.warning;
+            }
+            return currentTheme.colors.error;
+        },
+        [currentTheme.colors.success, currentTheme.colors.warning, currentTheme.colors.error]
+    );
 
     const iconColors = getIconColors();
     const uptimeVariant = getUptimeVariant(uptime);
+
+    // Memoize the response time text style to avoid inline object creation
+    const responseTimeTextStyle = useMemo(
+        () => ({ color: getResponseTimeColor(avgResponseTime) }),
+        [avgResponseTime, getResponseTimeColor]
+    );
 
     return (
         <div className="space-y-6" data-testid="site-overview-tab">
@@ -198,7 +208,7 @@ export function SiteOverviewTab({
                     title="Avg Response"
                 >
                     <div className="flex flex-col items-center">
-                        <ThemedText size="xl" style={{ color: getResponseTimeColor(avgResponseTime) }} weight="bold">
+                        <ThemedText size="xl" style={responseTimeTextStyle} weight="bold">
                             {formatResponseTime(avgResponseTime)}
                         </ThemedText>
                         <ThemedText size="xs" variant="secondary">

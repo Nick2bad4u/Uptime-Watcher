@@ -78,48 +78,44 @@ export const SiteCard = React.memo(function SiteCard({ site }: SiteCardPropertie
     const allMonitorsRunning =
         latestSite.monitors.length > 0 && latestSite.monitors.every((monitor) => monitor.monitoring === true);
 
-    // Memoize object props to prevent unnecessary re-renders
-    const displayProps = useMemo(
+    // Memoize the complete props object to prevent unnecessary re-renders
+    const siteCardHeaderProps = useMemo(
         () => ({
-            isLoading,
-        }),
-        [isLoading]
-    );
-
-    const interactionProps = useMemo(
-        () => ({
-            onCheckNow: handleCheckNow,
-            onMonitorIdChange: handleMonitorIdChange,
-            onStartMonitoring: handleStartMonitoring,
-            onStartSiteMonitoring: handleStartSiteMonitoring,
-            onStopMonitoring: handleStopMonitoring,
-            onStopSiteMonitoring: handleStopSiteMonitoring,
+            display: {
+                isLoading,
+            },
+            interactions: {
+                onCheckNow: handleCheckNow,
+                onMonitorIdChange: handleMonitorIdChange,
+                onStartMonitoring: handleStartMonitoring,
+                onStartSiteMonitoring: handleStartSiteMonitoring,
+                onStopMonitoring: handleStopMonitoring,
+                onStopSiteMonitoring: handleStopSiteMonitoring,
+            },
+            monitoring: {
+                allMonitorsRunning,
+                hasMonitor: !!monitor,
+                isMonitoring,
+                selectedMonitorId,
+            },
+            site: {
+                site: latestSite,
+            },
         }),
         [
+            isLoading,
             handleCheckNow,
             handleMonitorIdChange,
             handleStartMonitoring,
             handleStartSiteMonitoring,
             handleStopMonitoring,
             handleStopSiteMonitoring,
-        ]
-    );
-
-    const monitoringProps = useMemo(
-        () => ({
             allMonitorsRunning,
-            hasMonitor: !!monitor,
+            monitor,
             isMonitoring,
             selectedMonitorId,
-        }),
-        [allMonitorsRunning, monitor, isMonitoring, selectedMonitorId]
-    );
-
-    const siteProps = useMemo(
-        () => ({
-            site: latestSite,
-        }),
-        [latestSite]
+            latestSite,
+        ]
     );
 
     return (
@@ -132,12 +128,7 @@ export const SiteCard = React.memo(function SiteCard({ site }: SiteCardPropertie
             shadow="sm"
             variant="secondary"
         >
-            <SiteCardHeader
-                display={displayProps}
-                interactions={interactionProps}
-                monitoring={monitoringProps}
-                site={siteProps}
-            />
+            <SiteCardHeader {...siteCardHeaderProps} />
 
             <SiteCardStatus selectedMonitorId={selectedMonitorId} status={status} />
 

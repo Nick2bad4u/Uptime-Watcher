@@ -431,7 +431,10 @@ function mapDynamicFields(monitor: Record<string, unknown>, row: Record<string, 
  */
 function mapStandardFields(monitor: Record<string, unknown>, row: Record<string, unknown>): void {
     if (monitor["activeOperations"] !== undefined) {
-        row["active_operations"] = JSON.stringify(monitor["activeOperations"] ?? []);
+        // Ensure activeOperations is an array before stringifying
+        const activeOps = monitor["activeOperations"];
+        const safeActiveOps = Array.isArray(activeOps) ? activeOps : [];
+        row["active_operations"] = JSON.stringify(safeActiveOps);
     }
     if (monitor["checkInterval"] !== undefined) {
         row["check_interval"] = safeGetRowProperty(monitor, "checkInterval", 300_000);
