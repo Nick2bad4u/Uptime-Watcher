@@ -20,7 +20,7 @@ graph TD
     F --> G[IpcValidationResponse]
     G --> H[Frontend ValidationResult]
     H --> I[UI State Update]
-    
+
     E --> J[ConfigurationManager Cache]
     J --> K[TypedCache<CacheValue>]
 ```
@@ -63,25 +63,25 @@ graph TD
 ### **1. Inline Import Elimination** ✅
 
 **Problem**: Inconsistent coding style with inline imports
+
 ```typescript
 // ❌ BEFORE: Inline imports that don't match project style
-export type CacheValue = 
-    | import("../../src/utils/monitorTypeHelper").MonitorTypeConfig
-    | import("./validation").BaseValidationResult;
+export type CacheValue =
+ | import("../../src/utils/monitorTypeHelper").MonitorTypeConfig
+ | import("./validation").BaseValidationResult;
 
 formatMonitorTitleSuffix: (type: string, monitor: import("../shared/types").Monitor) => Promise<string>;
 ```
 
 **Solution**: Proper import statements
+
 ```typescript
 // ✅ AFTER: Clean import statements at top of file
 import type { MonitorTypeConfig } from "../../src/utils/monitorTypeHelper";
 import type { BaseValidationResult } from "./validation";
 import type { Monitor } from "@shared/types";
 
-export type CacheValue = 
-    | MonitorTypeConfig
-    | BaseValidationResult;
+export type CacheValue = MonitorTypeConfig | BaseValidationResult;
 
 formatMonitorTitleSuffix: (type: string, monitor: Monitor) => Promise<string>;
 ```
@@ -89,44 +89,43 @@ formatMonitorTitleSuffix: (type: string, monitor: Monitor) => Promise<string>;
 ### **2. Interface Redundancy Resolution** ✅
 
 **Problem**: IpcValidationResponse extended IpcResponse but redefined all properties
+
 ```typescript
 // ❌ BEFORE: Redundant property definitions
 export interface IpcValidationResponse extends IpcResponse<ValidationResult> {
-    errors: string[];           // Already in IpcResponse
-    isValid: boolean;          // Already in IpcResponse  
-    metadata: Record<string, unknown>; // Already in IpcResponse
-    warnings: string[];        // Already in IpcResponse
+ errors: string[]; // Already in IpcResponse
+ isValid: boolean; // Already in IpcResponse
+ metadata: Record<string, unknown>; // Already in IpcResponse
+ warnings: string[]; // Already in IpcResponse
 }
 ```
 
 **Solution**: Simplified interface hierarchy
+
 ```typescript
 // ✅ AFTER: Clean inheritance with required properties only
 export interface IpcValidationResponse extends IpcResponse<ValidationResult> {
-    /** List of validation errors (required for validation responses) */
-    errors: string[];
-    /** Whether validation passed (required for validation responses) */
-    isValid: boolean;
+ /** List of validation errors (required for validation responses) */
+ errors: string[];
+ /** Whether validation passed (required for validation responses) */
+ isValid: boolean;
 }
 ```
 
 ### **3. Type Union Optimization** ✅
 
 **Problem**: Overly broad `unknown[]` in cache types
+
 ```typescript
 // ❌ BEFORE: Too broad typing
-export type CacheValue =
-    | ConfigValue
-    | unknown[]; // Too broad, no type safety
+export type CacheValue = ConfigValue | unknown[]; // Too broad, no type safety
 ```
 
 **Solution**: Specific array types
+
 ```typescript
 // ✅ AFTER: Specific, type-safe arrays
-export type CacheValue =
-    | ConfigValue
-    | MonitorTypeConfigArray
-    | ValidationResultArray;
+export type CacheValue = ConfigValue | MonitorTypeConfigArray | ValidationResultArray;
 
 export type MonitorTypeConfigArray = MonitorTypeConfig[];
 export type ValidationResultArray = BaseValidationResult[];
@@ -139,8 +138,9 @@ export type ValidationResultArray = BaseValidationResult[];
 ### **1. Validation Property Inconsistency**
 
 **Discovery**: Mixed usage of `success` vs `isValid` properties across validation system
+
 - **Frontend**: Expected `isValid` from unified validation system
-- **Backend**: Some functions still returned `success` 
+- **Backend**: Some functions still returned `success`
 - **IPC Layer**: Mixed property usage causing type errors
 
 **Resolution**: Systematic replacement of all `success` → `isValid` across 16+ files
@@ -148,23 +148,26 @@ export type ValidationResultArray = BaseValidationResult[];
 ### **2. Cross-Boundary Type Misalignment**
 
 **Discovery**: electronAPI type definitions in src/types.ts used outdated return types
+
 ```typescript
 // ❌ BEFORE: Outdated return type
-validateMonitorData: () => Promise<{ errors: string[]; success: boolean; }>;
+validateMonitorData: () => Promise<{ errors: string[]; success: boolean }>;
 
 // ✅ AFTER: Updated to unified validation system
-validateMonitorData: () => Promise<{
-    data?: unknown;
-    errors: string[];
-    isValid: boolean;
-    metadata?: Record<string, unknown>;
-    warnings?: string[];
-}>;
+validateMonitorData: () =>
+ Promise<{
+  data?: unknown;
+  errors: string[];
+  isValid: boolean;
+  metadata?: Record<string, unknown>;
+  warnings?: string[];
+ }>;
 ```
 
 ### **3. Interface Conflict Detection**
 
 **Discovery**: No duplicate interfaces found, but potential for conflicts identified
+
 - **Pattern**: Multiple files could define similar interfaces
 - **Risk**: Import ambiguity and runtime type errors
 - **Mitigation**: Centralized validation types in shared/types/validation.ts
@@ -174,16 +177,19 @@ validateMonitorData: () => Promise<{
 ## 📈 **Performance & Maintainability Impact**
 
 ### **Type Checking Performance**
+
 - **Reduced**: Inline import resolution overhead
 - **Improved**: TypeScript compilation speed with explicit imports
 - **Enhanced**: IDE performance with better type caching
 
 ### **Code Maintainability**
+
 - **Eliminated**: 8 duplicate ValidationResult interfaces
 - **Centralized**: Single source of truth for validation contracts
 - **Simplified**: Clear inheritance hierarchy for IPC responses
 
 ### **Developer Experience**
+
 - **Better**: IDE autocomplete with specific types vs unknown
 - **Clearer**: Import dependencies visible at file top
 - **Safer**: Compile-time validation of property access
@@ -195,17 +201,18 @@ validateMonitorData: () => Promise<{
 ### **New Lesson: Interface Design Patterns**
 
 **Insight**: Interface inheritance can create unintended redundancy
+
 ```typescript
 // ❌ ANTI-PATTERN: Redundant property redefinition
 interface Child extends Parent {
-    // Don't redefine properties that Parent already has
-    sameProperty: string; // Redundant if Parent.sameProperty exists
+ // Don't redefine properties that Parent already has
+ sameProperty: string; // Redundant if Parent.sameProperty exists
 }
 
 // ✅ PATTERN: Extend only with new requirements
 interface Child extends Parent {
-    // Only add required properties not in Parent
-    requiredProperty: string; // Only if validation requires it
+ // Only add required properties not in Parent
+ requiredProperty: string; // Only if validation requires it
 }
 ```
 
@@ -217,7 +224,7 @@ interface Child extends Parent {
 ```typescript
 // ✅ PATTERN: Consistent type flow
 // 1. Shared types define core contracts
-// 2. Domain types extend shared types  
+// 2. Domain types extend shared types
 // 3. IPC types bridge main/renderer
 // 4. API types expose to frontend
 ```
@@ -245,17 +252,18 @@ src/types/             # Frontend types
 ### **2. Import/Export Standards**
 
 **Preferred Patterns**:
+
 ```typescript
 // ✅ GOOD: Explicit imports at top
 import type { ValidationResult } from "@shared/types/validation";
 import type { Monitor } from "@shared/types";
 
-// ✅ GOOD: Centralized exports  
+// ✅ GOOD: Centralized exports
 export * from "./validation";
 export * from "./monitoring";
 
 // ❌ AVOID: Inline imports
-import("../../../some/deep/path").SomeType
+import("../../../some/deep/path").SomeType;
 
 // ❌ AVOID: Mixed import styles in same file
 ```
@@ -265,23 +273,23 @@ import("../../../some/deep/path").SomeType
 ```typescript
 // ✅ PATTERN: Composition over deep inheritance
 interface BaseResponse {
-    isValid: boolean;
-    timestamp: number;
+ isValid: boolean;
+ timestamp: number;
 }
 
 interface ValidationResponse {
-    errors: string[];
-    warnings?: string[];
+ errors: string[];
+ warnings?: string[];
 }
 
 interface IpcValidationResponse extends BaseResponse, ValidationResponse {
-    // Only IPC-specific additions here
+ // Only IPC-specific additions here
 }
 
 // ❌ ANTI-PATTERN: Deep inheritance with property redefinition
 interface IpcValidationResponse extends IpcResponse<ValidationResult> {
-    errors: string[];    // Redundant if base has this
-    isValid: boolean;   // Redundant if base has this
+ errors: string[]; // Redundant if base has this
+ isValid: boolean; // Redundant if base has this
 }
 ```
 
@@ -290,19 +298,16 @@ interface IpcValidationResponse extends IpcResponse<ValidationResult> {
 ```typescript
 // ✅ RECOMMENDED: Type-level tests
 type AssertValidationResultShape = ValidationResult extends {
-    errors: string[];
-    isValid: boolean;
-    warnings?: string[];
-} ? true : never;
+ errors: string[];
+ isValid: boolean;
+ warnings?: string[];
+}
+ ? true
+ : never;
 
 // ✅ RECOMMENDED: Runtime type guards
 function isValidationResult(obj: unknown): obj is ValidationResult {
-    return (
-        typeof obj === "object" &&
-        obj !== null &&
-        "errors" in obj &&
-        "isValid" in obj
-    );
+ return typeof obj === "object" && obj !== null && "errors" in obj && "isValid" in obj;
 }
 ```
 
@@ -311,22 +316,19 @@ function isValidationResult(obj: unknown): obj is ValidationResult {
 ```typescript
 // ✅ PATTERN: Extensible union types
 export type CacheValue =
-    | ConfigValue
-    | ErrorInfo
-    | MonitorTypeConfig
-    | BaseValidationResult
-    | MonitorData
-    | MonitorTypeConfigArray
-    | UIState
-    | ValidationResultArray
-    // Future additions go here with specific types
-    | NewDomainType; // Not Record<string, unknown>
+ | ConfigValue
+ | ErrorInfo
+ | MonitorTypeConfig
+ | BaseValidationResult
+ | MonitorData
+ | MonitorTypeConfigArray
+ | UIState
+ | ValidationResultArray
+ // Future additions go here with specific types
+ | NewDomainType; // Not Record<string, unknown>
 
 // ✅ PATTERN: Array-specific types
-export type ValidArrayTypes = 
-    | MonitorTypeConfig[]
-    | BaseValidationResult[]
-    | Monitor[];
+export type ValidArrayTypes = MonitorTypeConfig[] | BaseValidationResult[] | Monitor[];
 ```
 
 ---
@@ -334,6 +336,7 @@ export type ValidArrayTypes =
 ## 🔮 **Future Typing System Improvements**
 
 ### **1. Branded Types for IDs**
+
 ```typescript
 // Prevent ID mixing across domains
 type SiteId = string & { readonly _brand: "SiteId" };
@@ -341,6 +344,7 @@ type MonitorId = string & { readonly _brand: "MonitorId" };
 ```
 
 ### **2. Template Literal Types for Event Names**
+
 ```typescript
 // Type-safe event handling
 type MonitorEvent = `monitor-${string}`;
@@ -349,17 +353,20 @@ type ValidEventName = MonitorEvent | SiteEvent;
 ```
 
 ### **3. Conditional Types for API Responses**
+
 ```typescript
 // Dynamic response typing based on success state
-type ApiResponse<T> = {
+type ApiResponse<T> =
+ | {
     isValid: true;
     data: T;
     errors?: never;
-} | {
+   }
+ | {
     isValid: false;
     data?: never;
     errors: string[];
-};
+   };
 ```
 
 ---
@@ -379,16 +386,19 @@ type ApiResponse<T> = {
 ## 📋 **Action Items for Development Team**
 
 ### **Immediate (Next Sprint)**
+
 1. Review and approve new type definition patterns
 2. Update development guidelines with new standards
 3. Create type definition templates for new features
 
 ### **Short Term (Next Month)**
+
 1. Implement branded types for ID safety
 2. Add type-level tests for critical interfaces
 3. Create automated type checking in CI/CD
 
 ### **Long Term (Next Quarter)**
+
 1. Consider migration to more advanced TypeScript features
 2. Evaluate typing system performance impact
 3. Plan for TypeScript version upgrades
@@ -397,4 +407,4 @@ type ApiResponse<T> = {
 
 **Status**: ✅ **COMPREHENSIVE TYPE SAFETY IMPLEMENTATION COMPLETE**
 
-*This analysis represents the culmination of systematic type safety improvements across the Uptime Watcher application, establishing a robust foundation for future development.*
+_This analysis represents the culmination of systematic type safety improvements across the Uptime Watcher application, establishing a robust foundation for future development._

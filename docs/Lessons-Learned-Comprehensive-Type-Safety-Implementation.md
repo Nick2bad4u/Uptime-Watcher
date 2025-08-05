@@ -68,19 +68,19 @@ During final analysis and cleanup, discovered critical **interface design patter
 ```typescript
 // ❌ ANTI-PATTERN: Interface redundancy with inheritance
 export interface IpcValidationResponse extends IpcResponse<ValidationResult> {
-    errors: string[];           // Redundant - already in IpcResponse
-    isValid: boolean;          // Redundant - already in IpcResponse  
-    metadata: Record<string, unknown>; // Redundant - already in IpcResponse
-    warnings: string[];        // Redundant - already in IpcResponse
+ errors: string[]; // Redundant - already in IpcResponse
+ isValid: boolean; // Redundant - already in IpcResponse
+ metadata: Record<string, unknown>; // Redundant - already in IpcResponse
+ warnings: string[]; // Redundant - already in IpcResponse
 }
 
 // ✅ BEST PRACTICE: Clean inheritance with only required additions
 export interface IpcValidationResponse extends IpcResponse<ValidationResult> {
-    /** List of validation errors (required for validation responses) */
-    errors: string[];
-    /** Whether validation passed (required for validation responses) */
-    isValid: boolean;
-    // Only redefine properties that are required to be non-optional
+ /** List of validation errors (required for validation responses) */
+ errors: string[];
+ /** Whether validation passed (required for validation responses) */
+ isValid: boolean;
+ // Only redefine properties that are required to be non-optional
 }
 ```
 
@@ -91,8 +91,8 @@ export interface IpcValidationResponse extends IpcResponse<ValidationResult> {
 ```typescript
 // ❌ PROJECT STYLE VIOLATION: Inline imports
 export type CacheValue =
-    | import("../../src/utils/monitorTypeHelper").MonitorTypeConfig
-    | import("./validation").BaseValidationResult;
+ | import("../../src/utils/monitorTypeHelper").MonitorTypeConfig
+ | import("./validation").BaseValidationResult;
 
 formatMonitorTitleSuffix: (type: string, monitor: import("../shared/types").Monitor) => Promise<string>;
 
@@ -112,7 +112,7 @@ formatMonitorTitleSuffix: (type: string, monitor: Monitor) => Promise<string>;
 ```typescript
 // ✅ COMPLETE DATA PATH TYPE SAFETY:
 // 1. Frontend Form → ValidationResult (isValid)
-// 2. IPC Layer → IpcResponse<ValidationResult> (isValid) 
+// 2. IPC Layer → IpcResponse<ValidationResult> (isValid)
 // 3. Backend Logic → ValidationResult (isValid)
 // 4. Cache Storage → CacheValue includes ValidationResult
 
