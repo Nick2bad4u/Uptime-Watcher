@@ -6,7 +6,7 @@
  * - UI state (active tab, loading states)
  * - Site operations (start/stop monitoring, check now, update settings)
  * - Derived state management for editable fields (computed during render)
- * - Integration with analytics data
+ * - Integration with analytics
  *
  * @remarks
  * This hook uses modern React patterns with derived state computed during render

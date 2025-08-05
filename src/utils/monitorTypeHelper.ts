@@ -5,7 +5,8 @@
 
 import type { MonitorFieldDefinition } from "@shared/types";
 
-import { safeExtractIpcData } from "../types/ipc";
+import "../types"; // Import global type declarations
+import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { AppCaches } from "./cache";
 import { withUtilityErrorHandling } from "./errorHandling";
 
@@ -80,11 +81,17 @@ export async function getAvailableMonitorTypes(): Promise<MonitorTypeConfig[]> {
         return cached;
     }
 
-    // Fetch from backend and cache
+    // Fetch from store instead of direct IPC call
     const types = await withUtilityErrorHandling(
         async () => {
-            const response = await window.electronAPI.monitorTypes.getMonitorTypes();
-            return safeExtractIpcData(response, []);
+            const store = useMonitorTypesStore.getState();
+
+            // Ensure types are loaded
+            if (!store.isLoaded) {
+                await store.loadMonitorTypes();
+            }
+
+            return useMonitorTypesStore.getState().monitorTypes;
         },
         "Fetch monitor types from backend",
         []

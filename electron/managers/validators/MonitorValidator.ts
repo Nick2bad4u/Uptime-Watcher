@@ -76,7 +76,7 @@ export class MonitorValidator {
         const errors = this.validateMonitorTypeSpecific(monitor);
         return {
             errors,
-            isValid: errors.length === 0,
+            success: errors.length === 0,
         };
     }
 

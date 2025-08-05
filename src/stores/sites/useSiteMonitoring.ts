@@ -7,8 +7,6 @@
 
 import { useErrorStore } from "../error/useErrorStore";
 import { logStoreAction, withErrorHandling } from "../utils";
-import { MonitoringService } from "./services/MonitoringService";
-import { SiteService } from "./services/SiteService";
 
 export interface SiteMonitoringActions {
     /** Check a site now */
@@ -40,7 +38,7 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
         const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
-                await SiteService.checkSiteNow(siteId, monitorId);
+                await window.electronAPI.sites.checkSiteNow(siteId, monitorId);
                 // Backend will emit 'monitor:status-changed', which will trigger incremental update
             },
             {
@@ -56,7 +54,7 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
         const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
-                await MonitoringService.startSiteMonitoring(siteId);
+                await window.electronAPI.monitoring.startMonitoringForSite(siteId);
                 // No need for manual sync - StatusUpdateHandler will update UI via events
             },
             {
@@ -72,7 +70,7 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
         const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
-                await MonitoringService.startMonitoring(siteId, monitorId);
+                await window.electronAPI.monitoring.startMonitoringForSite(siteId, monitorId);
                 // No need for manual sync - StatusUpdateHandler will update UI via events
             },
             {
@@ -88,7 +86,7 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
         const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
-                await MonitoringService.stopSiteMonitoring(siteId);
+                await window.electronAPI.monitoring.stopMonitoringForSite(siteId);
                 // No need for manual sync - StatusUpdateHandler will update UI via events
             },
             {
@@ -104,7 +102,7 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
         const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
-                await MonitoringService.stopMonitoring(siteId, monitorId);
+                await window.electronAPI.monitoring.stopMonitoringForSite(siteId, monitorId);
                 // No need for manual sync - StatusUpdateHandler will update UI via events
             },
             {

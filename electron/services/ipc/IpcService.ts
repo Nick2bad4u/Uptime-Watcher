@@ -1,6 +1,6 @@
 import { BrowserWindow, ipcMain } from "electron";
 
-import { Site } from "../../types";
+import { type Monitor, Site } from "../../types";
 import { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import { logger } from "../../utils/logger";
 import { getAllMonitorTypeConfigs, getMonitorTypeConfig, validateMonitorData } from "../monitoring/MonitorTypeRegistry";
@@ -415,7 +415,7 @@ export class IpcService {
      * @remarks
      * Handles retrieval of monitor type configs, formatting, and validation. All handlers are registered with unique channel names and are tracked for cleanup.
      *
-     * @returns For `validate-monitor-data`, returns a {@link MonitorValidationResult} object.
+     * @returns For `validate-monitor-data`, returns a {@link ValidationResult} object.
      *
      * @example
      * ```typescript
@@ -468,7 +468,7 @@ export class IpcService {
             "format-monitor-title-suffix",
             (...args: unknown[]) => {
                 const monitorType = args[0] as string;
-                const monitor = args[1] as Record<string, unknown>;
+                const monitor = args[1] as Monitor;
 
                 const config = getMonitorTypeConfig(monitorType.trim());
                 if (!config) {
@@ -496,7 +496,7 @@ export class IpcService {
                 // Use the validation function from the registry
                 const result = validateMonitorData(monitorType.trim(), data);
 
-                // Return in the expected validation format for backward compatibility
+                // Return the validation result directly - map success to success parameter
                 return createValidationResponse(result.success, result.errors, result.warnings, result.metadata);
             },
             MonitorTypeHandlerValidators.validateMonitorData,

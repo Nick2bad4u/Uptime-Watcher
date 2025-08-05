@@ -31,6 +31,7 @@ export const TRANSITION_ALL = "all 0.2s ease-in-out";
 export const FALLBACK_MONITOR_TYPE_OPTIONS = [
     { label: "HTTP (Website/API)", value: "http" },
     { label: "Port (Host/Port)", value: "port" },
+    { label: "Ping (Host)", value: "ping" },
 ] as const;
 
 /**

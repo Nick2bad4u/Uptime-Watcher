@@ -70,6 +70,9 @@ export type MonitorFormFields = HttpMonitorFields | PingMonitorFields | PortMoni
 
 /**
  * Monitor validation result with specific error types
+ *
+ * @deprecated Use ValidationResult from unified validation system instead
+ * @see {@link ValidationResult} in shared/types/validation.ts
  */
 export interface MonitorValidationResult {
     /** Array of error messages */

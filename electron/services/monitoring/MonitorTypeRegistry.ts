@@ -11,7 +11,7 @@ import { z } from "zod";
 
 import type { MonitorType } from "./monitorTypes";
 
-import { MONITOR_STATUS, type MonitorFieldDefinition } from "../../../shared/types";
+import { type Monitor, MONITOR_STATUS, type MonitorFieldDefinition } from "../../../shared/types";
 // Import shared validation schemas
 import { withErrorHandling } from "../../../shared/utils/errorHandling";
 import { monitorSchemas, validateMonitorData as sharedValidateMonitorData } from "../../../shared/validation/schemas";
@@ -69,7 +69,7 @@ export interface BaseMonitorConfig {
         /** Function to format detail display in history (e.g., "Port: 80", "Response Code: 200") */
         formatDetail?: (details: string) => string;
         /** Function to format title suffix for history charts (e.g., " (https://example.com)") */
-        formatTitleSuffix?: (monitor: Record<string, unknown>) => string;
+        formatTitleSuffix?: (monitor: Monitor) => string;
         /** Help text for form fields */
         helpTexts?: {
             primary?: string;
@@ -228,9 +228,9 @@ export function validateMonitorData(
     return {
         data: result.data,
         errors: result.errors,
-        metadata: result.metadata,
+        metadata: result.metadata ?? {},
         success: result.success,
-        warnings: result.warnings,
+        warnings: result.warnings ?? [],
     };
 }
 
@@ -301,9 +301,11 @@ registerMonitorType({
             showUrl: true,
         },
         formatDetail: (details: string) => `Response Code: ${details}`,
-        formatTitleSuffix: (monitor: Record<string, unknown>) => {
-            const url = monitor["url"] as string;
-            return url ? ` (${url})` : "";
+        formatTitleSuffix: (monitor: Monitor) => {
+            if (monitor.type === "http") {
+                return monitor.url ? ` (${monitor.url})` : "";
+            }
+            return "";
         },
         helpTexts: {
             primary: "Enter the full URL including http:// or https://",
@@ -351,10 +353,11 @@ registerMonitorType({
             showUrl: false,
         },
         formatDetail: (details: string) => `Port: ${details}`,
-        formatTitleSuffix: (monitor: Record<string, unknown>) => {
-            const host = monitor["host"] as string;
-            const port = monitor["port"] as number;
-            return host && port ? ` (${host}:${port})` : "";
+        formatTitleSuffix: (monitor: Monitor) => {
+            if (monitor.type === "port") {
+                return monitor.host && monitor.port ? ` (${monitor.host}:${monitor.port})` : "";
+            }
+            return "";
         },
         helpTexts: {
             primary: "Enter a valid host (domain or IP)",
@@ -392,9 +395,11 @@ registerMonitorType({
             showUrl: false,
         },
         formatDetail: (details: string) => `Ping: ${details}`,
-        formatTitleSuffix: (monitor: Record<string, unknown>) => {
-            const host = monitor["host"] as string;
-            return host ? ` (${host})` : "";
+        formatTitleSuffix: (monitor: Monitor) => {
+            if (monitor.type === "ping") {
+                return monitor.host ? ` (${monitor.host})` : "";
+            }
+            return "";
         },
         helpTexts: {
             primary: "Enter a valid host (domain or IP)",

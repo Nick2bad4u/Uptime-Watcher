@@ -9,10 +9,9 @@ import { ERROR_MESSAGES, type Monitor, type MonitorType, type Site } from "@shar
 
 import { isDevelopment } from "../../../shared/utils/environment";
 import logger from "../../services/logger";
+import { safeExtractIpcData } from "../../types/ipc";
 import { useErrorStore } from "../error/useErrorStore";
 import { logStoreAction, withErrorHandling } from "../utils";
-import { MonitoringService } from "./services/MonitoringService";
-import { SiteService } from "./services/SiteService";
 import { handleSQLiteBackupDownload } from "./utils/fileDownload";
 import { normalizeMonitor, updateMonitorInSite } from "./utils/monitorOperations";
 
@@ -67,7 +66,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
 
                 // Allow multiple monitors of the same type
                 const updatedMonitors = [...site.monitors, monitor];
-                await SiteService.updateSite(siteId, { monitors: updatedMonitors });
+                await window.electronAPI.sites.updateSite(siteId, { monitors: updatedMonitors });
                 await deps.syncSitesFromBackend();
             },
             {
@@ -106,7 +105,8 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                     name: siteData.name ?? "Unnamed Site", // Provide default name
                 };
 
-                const newSite = await SiteService.addSite(completeSite);
+                const response = await window.electronAPI.sites.addSite(completeSite);
+                const newSite = safeExtractIpcData(response, completeSite);
                 deps.addSite(newSite);
             },
             {
@@ -128,7 +128,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 if (site?.monitors) {
                     for (const monitor of site.monitors) {
                         try {
-                            await MonitoringService.stopMonitoring(identifier, monitor.id);
+                            await window.electronAPI.monitoring.stopMonitoringForSite(identifier, monitor.id);
                         } catch (error) {
                             // Log but do not block deletion if stopping fails
                             if (isDevelopment()) {
@@ -140,7 +140,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                         }
                     }
                 }
-                await SiteService.removeSite(identifier);
+                await window.electronAPI.sites.removeSite(identifier);
                 deps.removeSite(identifier);
             },
             {
@@ -157,7 +157,8 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 // eslint-disable-next-line ex/no-unhandled
                 await handleSQLiteBackupDownload(async () => {
                     try {
-                        const result = await SiteService.downloadSQLiteBackup();
+                        const response = await window.electronAPI.data.downloadSQLiteBackup();
+                        const result = safeExtractIpcData(response, { buffer: new ArrayBuffer(0) });
                         return new Uint8Array(result.buffer);
                     } catch (error) {
                         console.error("Failed to download SQLite backup:", error);
@@ -181,7 +182,8 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
         const errorStore = useErrorStore.getState();
         const result = await withErrorHandling(
             async () => {
-                const sites = await SiteService.getSites();
+                const response = await window.electronAPI.sites.getSites();
+                const sites = safeExtractIpcData<Site[]>(response, []);
                 deps.setSites(sites);
                 return {
                     message: `Successfully loaded ${sites.length} sites`,
@@ -210,7 +212,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
         const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
-                await SiteService.updateSite(identifier, updates);
+                await window.electronAPI.sites.updateSite(identifier, updates);
                 await deps.syncSitesFromBackend();
             },
             {
@@ -239,7 +241,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
 
                 // Stop monitoring for this specific monitor first
                 try {
-                    await MonitoringService.stopMonitoring(siteId, monitorId);
+                    await window.electronAPI.monitoring.stopMonitoringForSite(siteId, monitorId);
                 } catch (error) {
                     // Log but do not block removal if stopping fails
                     if (isDevelopment()) {
@@ -251,7 +253,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 }
 
                 // Remove the monitor via backend
-                await SiteService.removeMonitor(siteId, monitorId);
+                await window.electronAPI.sites.removeMonitor(siteId, monitorId);
 
                 // Refresh site data from backend
                 await deps.syncSitesFromBackend();
@@ -281,7 +283,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 }
 
                 const updatedSite = updateMonitorInSite(site, monitorId, updates);
-                await SiteService.updateSite(siteId, { monitors: updatedSite.monitors });
+                await window.electronAPI.sites.updateSite(siteId, { monitors: updatedSite.monitors });
                 await deps.syncSitesFromBackend();
             },
             {
@@ -309,7 +311,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 }
 
                 const updatedSite = updateMonitorInSite(site, monitorId, updates);
-                await SiteService.updateSite(siteId, { monitors: updatedSite.monitors });
+                await window.electronAPI.sites.updateSite(siteId, { monitors: updatedSite.monitors });
                 await deps.syncSitesFromBackend();
             },
             {
@@ -331,7 +333,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 }
 
                 const updatedSite = updateMonitorInSite(site, monitorId, { checkInterval: interval });
-                await SiteService.updateSite(siteId, { monitors: updatedSite.monitors });
+                await window.electronAPI.sites.updateSite(siteId, { monitors: updatedSite.monitors });
                 await deps.syncSitesFromBackend();
             },
             {

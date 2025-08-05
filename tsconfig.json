@@ -80,6 +80,7 @@
         "**/dist-electron/**",
         "**/dist",
         "**/dist/**",
+        "**/docs/**",
         "**/node_modules",
         "**/node_modules/@types/**",
         "**/node_modules/@typescript-eslint/**",

@@ -25,6 +25,14 @@ export interface UIStore {
     activeSiteDetailsTab: string;
 
     /**
+     * Opens an external URL using the system's default browser.
+     *
+     * @param url - The URL to open externally.
+     * @param context - Optional context for logging purposes.
+     */
+    openExternal: (url: string, context?: { siteName?: string }) => void;
+
+    /**
      * The identifier of the currently selected site.
      */
     selectedSiteId: string | undefined;

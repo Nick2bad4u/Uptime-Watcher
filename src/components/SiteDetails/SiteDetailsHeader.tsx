@@ -8,7 +8,7 @@
 import { MdExpandLess, MdExpandMore } from "react-icons/md";
 
 import { useThemeStyles } from "../../hooks/useThemeStyles";
-import logger from "../../services/logger";
+import { useUIStore } from "../../stores/ui/useUiStore";
 import { StatusIndicator, ThemedBadge, ThemedBox, ThemedText } from "../../theme/components";
 import { Monitor, Site } from "../../types";
 import { isValidUrl, safeGetHostname } from "../../utils/monitoring/dataValidation";
@@ -48,6 +48,7 @@ export function SiteDetailsHeader({
 }: SiteDetailsHeaderProperties) {
     // Use theme-aware styles
     const styles = useThemeStyles(isCollapsed);
+    const { openExternal } = useUIStore();
 
     // Get validated URL for screenshot component
     let screenshotUrl = "";
@@ -82,21 +83,7 @@ export function SiteDetailsHeader({
                                     onClick={(event) => {
                                         event.preventDefault();
                                         const url = selectedMonitor.url ?? "";
-                                        logger.user.action("External URL opened from site details", {
-                                            siteId: site.identifier,
-                                            siteName: site.name,
-                                            url: url,
-                                        });
-                                        const electronAPI = (
-                                            window.electronAPI as unknown as {
-                                                electronAPI?: { openExternal: (url: string) => void };
-                                            }
-                                        ).electronAPI;
-                                        if (hasOpenExternal(electronAPI)) {
-                                            electronAPI.openExternal(url);
-                                        } else {
-                                            window.open(url, "_blank");
-                                        }
+                                        openExternal(url, { siteName: site.name });
                                     }}
                                     rel="noopener noreferrer"
                                     tabIndex={0}
@@ -140,14 +127,6 @@ export function SiteDetailsHeader({
 
 /**
  * Type guard to check if the window.electronAPI has openExternal method.
- *
- * @param api - The API object to check
- * @returns True if the API has openExternal method, false otherwise
- */
-function hasOpenExternal(api: unknown): api is { openExternal: (url: string) => void } {
-    return typeof (api as { openExternal?: unknown }).openExternal === "function";
-}
-
 /**
  * Enhanced monitoring status display component for the site details header.
  *

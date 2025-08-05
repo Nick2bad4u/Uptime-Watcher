@@ -3,6 +3,7 @@
  * Centralizes business logic for configuration decisions and caches validation results.
  */
 
+import type { ConfigValue } from "../../shared/types/configTypes";
 import type { ValidationResult } from "./validators/interfaces";
 
 import { CACHE_SIZE_LIMITS, CACHE_TTL, DEFAULT_CHECK_INTERVAL, DEFAULT_HISTORY_LIMIT } from "../constants";
@@ -60,11 +61,12 @@ export class ConfigurationManager {
      *
      * @remarks
      * Used to store and retrieve configuration values for improved performance.
+     * Now uses ConfigValue type for better type safety.
      *
      * @readonly
      * @internal
      */
-    private readonly configCache: StandardizedCache<unknown>;
+    private readonly configCache: StandardizedCache<ConfigValue>;
 
     /**
      * Monitor validator instance for monitor-specific validation.
@@ -117,7 +119,7 @@ export class ConfigurationManager {
             name: "validation-results",
         });
 
-        this.configCache = new StandardizedCache<unknown>({
+        this.configCache = new StandardizedCache<ConfigValue>({
             defaultTTL: CACHE_TTL.CONFIGURATION_VALUES,
             enableStats: true,
             maxSize: CACHE_SIZE_LIMITS.CONFIGURATION_VALUES,
@@ -147,7 +149,7 @@ export class ConfigurationManager {
      * ```
      */
     public getCacheStats(): {
-        configuration: ReturnType<StandardizedCache<unknown>["getStats"]>;
+        configuration: ReturnType<StandardizedCache<ConfigValue>["getStats"]>;
         validation: ReturnType<StandardizedCache<ValidationResult>["getStats"]>;
     } {
         return {
@@ -270,7 +272,6 @@ export class ConfigurationManager {
      *
      * @remarks
      * Delegates to {@link MonitorValidator.validateMonitorConfiguration} and caches results for performance.
-     * Marked as `async` for forward compatibility with future asynchronous validator implementations.
      */
     public async validateMonitorConfiguration(monitor: Site["monitors"][0]): Promise<ValidationResult> {
         // Create stable cache key using deterministic JSON serialization
@@ -297,7 +298,7 @@ export class ConfigurationManager {
             return cached;
         }
 
-        // Perform validation (await for forward compatibility)
+        // Perform validation
         const result = await Promise.resolve(this.monitorValidator.validateMonitorConfiguration(monitor));
 
         // Cache the result
@@ -314,7 +315,6 @@ export class ConfigurationManager {
      *
      * @remarks
      * Delegates to {@link SiteValidator.validateSiteConfiguration} and caches results for performance.
-     * Marked as `async` for forward compatibility with future asynchronous validator implementations.
      */
     public async validateSiteConfiguration(site: Site): Promise<ValidationResult> {
         // Create stable cache key using deterministic JSON serialization
@@ -333,7 +333,7 @@ export class ConfigurationManager {
             return cached;
         }
 
-        // Perform validation (await for forward compatibility)
+        // Perform validation
         const result = await Promise.resolve(this.siteValidator.validateSiteConfiguration(site));
 
         // Cache the result

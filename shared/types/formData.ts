@@ -189,14 +189,8 @@ export interface SiteFormData {
  *
  * @public
  */
-export interface ValidationResult {
-    /** Array of validation error messages */
-    errors: string[];
-    /** Field-specific errors */
-    fieldErrors?: Record<string, string[]>;
-    /** Whether the validation passed */
-    isValid: boolean;
-}
+// Import from unified validation system
+export type { FormValidationResult as ValidationResult } from "./validation";
 
 /**
  * Type guard to check if form data is for HTTP monitors.

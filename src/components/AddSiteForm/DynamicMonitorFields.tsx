@@ -12,12 +12,11 @@
 
 import type { MonitorFieldDefinition } from "@shared/types";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 
 import logger from "../../services/logger";
+import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore";
 import { ThemedText } from "../../theme/components";
-import { ensureError } from "../../utils/errorHandling";
-import { getMonitorTypeConfig, type MonitorTypeConfig } from "../../utils/monitorTypeHelper";
 import { TextField } from "./FormFields";
 
 /**
@@ -95,49 +94,24 @@ export interface DynamicMonitorFieldsProps {
  * ```
  */
 export function DynamicMonitorFields({ isLoading = false, monitorType, onChange, values }: DynamicMonitorFieldsProps) {
-    const [config, setConfig] = useState<MonitorTypeConfig | undefined>();
-    const [isLoadingConfig, setIsLoadingConfig] = useState(true);
-    const [error, setError] = useState<string | undefined>();
+    const { isLoaded, lastError, loadMonitorTypes, monitorTypes } = useMonitorTypesStore();
 
-    // Load monitor type configuration from backend
+    // Find the config for the current monitor type
+    const config = monitorTypes.find((type) => type.type === monitorType);
+
+    // Load monitor types when component mounts
     useEffect(() => {
-        let isCancelled = false;
+        if (!isLoaded && !lastError) {
+            void loadMonitorTypes();
+        }
+    }, [isLoaded, lastError, loadMonitorTypes]);
 
-        const loadConfig = async () => {
-            try {
-                setIsLoadingConfig(true);
-                setError(undefined);
-                const configData = await getMonitorTypeConfig(monitorType);
-                if (!isCancelled) {
-                    setConfig(configData);
-                }
-            } catch (loadError) {
-                if (!isCancelled) {
-                    const errorMessage =
-                        loadError instanceof Error ? loadError.message : "Failed to load monitor config";
-                    setError(errorMessage);
-                    logger.error("Failed to load monitor type config", ensureError(loadError));
-                }
-            } finally {
-                if (!isCancelled) {
-                    setIsLoadingConfig(false);
-                }
-            }
-        };
-
-        void loadConfig();
-
-        return () => {
-            isCancelled = true;
-        };
-    }, [monitorType]);
-
-    if (isLoadingConfig) {
+    if (!isLoaded) {
         return <ThemedText variant="secondary">Loading monitor fields...</ThemedText>;
     }
 
-    if (error) {
-        return <ThemedText variant="error">Error loading monitor fields: {error}</ThemedText>;
+    if (lastError) {
+        return <ThemedText variant="error">Error loading monitor fields: {lastError}</ThemedText>;
     }
 
     if (!config) {

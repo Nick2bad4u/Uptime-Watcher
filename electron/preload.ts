@@ -480,7 +480,7 @@ const monitorTypesAPI = {
      * @param monitor - Monitor data
      * @returns Promise resolving to formatted title suffix
      */
-    formatMonitorTitleSuffix: (type: string, monitor: Record<string, unknown>) =>
+    formatMonitorTitleSuffix: (type: string, monitor: import("../shared/types").Monitor) =>
         ipcRenderer.invoke("format-monitor-title-suffix", type, monitor),
 
     /**

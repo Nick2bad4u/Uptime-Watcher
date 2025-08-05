@@ -3,6 +3,8 @@
  * Provides type-safe caching with TTL support and proper cleanup.
  */
 
+import type { CacheValue } from "../../shared/types/configTypes";
+
 /**
  * Configuration options for cache instances.
  *
@@ -183,14 +185,14 @@ export class TypedCache<K, V> {
  * Provides pre-configured cache instances for different application domains.
  */
 export const AppCaches = {
-    /** General purpose cache */
-    general: new TypedCache<string, unknown>({ maxSize: 200, ttl: 2 * 60 * 1000 }), // 2 minutes
+    /** General purpose cache for common values */
+    general: new TypedCache<string, CacheValue>({ maxSize: 200, ttl: 2 * 60 * 1000 }), // 2 minutes
 
-    /** Monitor type configurations */
-    monitorTypes: new TypedCache<string, unknown>({ maxSize: 50, ttl: 5 * 60 * 1000 }), // 5 minutes
+    /** Monitor type configurations and related data */
+    monitorTypes: new TypedCache<string, CacheValue>({ maxSize: 50, ttl: 5 * 60 * 1000 }), // 5 minutes
 
-    /** UI helper data */
-    uiHelpers: new TypedCache<string, unknown>({ maxSize: 100, ttl: 10 * 60 * 1000 }), // 10 minutes
+    /** UI helper data and component state */
+    uiHelpers: new TypedCache<string, CacheValue>({ maxSize: 100, ttl: 10 * 60 * 1000 }), // 10 minutes
 } as const;
 
 /**

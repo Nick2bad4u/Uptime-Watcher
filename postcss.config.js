@@ -8,7 +8,7 @@
 module.exports = {
     plugins: {
         "@tailwindcss/postcss": {},
-        autoprefixer: {},
+        "autoprefixer": {},
         "postcss-assets": {
             basePath: "./src", // Set to your source directory if needed
             cachebuster: true, // Enable cache busting for assets
@@ -22,5 +22,6 @@ module.exports = {
             clearReportedMessages: true,
             throwError: false,
         },
+        tailwindcss: { config: './tailwind.config.js' },
     },
 };

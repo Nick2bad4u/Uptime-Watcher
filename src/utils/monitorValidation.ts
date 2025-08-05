@@ -5,6 +5,7 @@
 
 import type { Monitor, MonitorType } from "@shared/types";
 import type { HttpFormData, MonitorFormData, PingFormData, PortFormData } from "@shared/types/formData";
+import type { ValidationResult } from "@shared/types/validation";
 
 // Import shared validation functions for client-side validation
 import {
@@ -12,6 +13,7 @@ import {
     validateMonitorField as sharedValidateMonitorField,
 } from "@shared/validation/schemas";
 
+import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { withUtilityErrorHandling } from "./errorHandling";
 
 /**
@@ -22,18 +24,6 @@ export interface MonitorCreationData
     extends Pick<Monitor, "history" | "monitoring" | "responseTime" | "retryAttempts" | "status" | "timeout" | "type"> {
     /** Additional fields provided during creation */
     [key: string]: unknown;
-}
-
-/**
- * Standard validation result interface for consistency across all validation functions.
- */
-export interface ValidationResult {
-    /** Array of error messages, empty if validation passes */
-    errors: string[];
-    /** Whether validation was successful */
-    success: boolean;
-    /** Array of warning messages (non-blocking issues) */
-    warnings: string[];
 }
 
 /**
@@ -71,21 +61,16 @@ export async function validateMonitorData(
 ): Promise<ValidationResult> {
     return withUtilityErrorHandling(
         async () => {
-            // Use IPC to validate via backend registry
-            const result = await window.electronAPI.monitorTypes.validateMonitorData(type, data);
+            // Use store method instead of direct IPC call
+            const store = useMonitorTypesStore.getState();
+            const result = await store.validateMonitorData(type, data);
 
-            // Handle the advanced validation result format and standardize
-            // Backend may or may not include warnings, so we provide empty array as fallback
-            const backendResult = result as { errors: string[]; success: boolean; warnings?: string[] };
-            return {
-                errors: backendResult.errors,
-                success: backendResult.success,
-                warnings: backendResult.warnings ?? [],
-            };
+            return result;
         },
         "Monitor data validation",
         {
             errors: ["Validation failed - unable to connect to backend"],
+            metadata: {},
             success: false,
             warnings: [],
         }
@@ -112,7 +97,7 @@ export async function validateMonitorDataClientSide(
             return Promise.resolve({
                 errors: result.errors,
                 success: result.success,
-                warnings: result.warnings,
+                warnings: result.warnings ?? [],
             });
         },
         "Client-side monitor data validation",
@@ -191,9 +176,9 @@ export async function validateMonitorFieldClientSide(
 
             return Promise.resolve({
                 errors: result.errors,
-                metadata: result.metadata,
+                metadata: result.metadata ?? {},
                 success: result.success,
-                warnings: result.warnings,
+                warnings: result.warnings ?? [],
             });
         },
         `Client-side field validation for ${fieldName}`,

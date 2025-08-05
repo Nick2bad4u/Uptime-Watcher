@@ -116,7 +116,7 @@ export class SiteValidator {
 
         return {
             errors,
-            isValid: errors.length === 0,
+            success: errors.length === 0,
         };
     }
 
@@ -178,7 +178,7 @@ export class SiteValidator {
         // Validate each monitor
         for (const [index, monitor] of site.monitors.entries()) {
             const monitorValidation = this.monitorValidator.validateMonitorConfiguration(monitor);
-            if (!monitorValidation.isValid) {
+            if (!monitorValidation.success) {
                 // Include monitor identifier in error message if available for easier debugging
                 const monitorId = monitor.id ? ` (${monitor.id})` : "";
                 errors.push(

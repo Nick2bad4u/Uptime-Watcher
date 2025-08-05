@@ -25,7 +25,7 @@ export * from "./types/monitor-forms";
 export * from "@shared/types";
 
 // Import types for global declarations
-import type { Site, StatusUpdate } from "@shared/types";
+import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type {
     CacheInvalidatedEventData,
     MonitorDownEventData,
@@ -175,22 +175,40 @@ declare global {
                  * @remarks Format monitor detail using backend registry.
                  * @param type - The monitor type.
                  * @param details - The monitor details as a string.
-                 * @returns A promise resolving to the formatted detail string.
+                 * @returns A promise resolving to an IPC response containing the formatted detail string.
                  */
-                formatMonitorDetail: (type: string, details: string) => Promise<string>;
+                formatMonitorDetail: (
+                    type: string,
+                    details: string
+                ) => Promise<{
+                    data?: string;
+                    error?: string;
+                    metadata?: Record<string, unknown>;
+                    success: boolean;
+                    warnings?: string[];
+                }>;
                 /**
                  * @remarks Format monitor title suffix using backend registry.
                  * @param type - The monitor type.
                  * @param monitor - The monitor data.
-                 * @returns A promise resolving to the formatted title suffix.
+                 * @returns A promise resolving to an IPC response containing the formatted title suffix.
                  */
-                formatMonitorTitleSuffix: (type: string, monitor: Record<string, unknown>) => Promise<string>;
+                formatMonitorTitleSuffix: (
+                    type: string,
+                    monitor: Monitor
+                ) => Promise<{
+                    data?: string;
+                    error?: string;
+                    metadata?: Record<string, unknown>;
+                    success: boolean;
+                    warnings?: string[];
+                }>;
                 /**
                  * @remarks Get all available monitor type configurations.
-                 * @returns A promise resolving to an array of monitor type definitions.
+                 * @returns A promise resolving to an IPC response containing monitor type definitions.
                  */
-                getMonitorTypes: () => Promise<
-                    {
+                getMonitorTypes: () => Promise<{
+                    data?: {
                         description: string;
                         displayName: string;
                         fields: {
@@ -205,8 +223,12 @@ declare global {
                         }[];
                         type: string;
                         version: string;
-                    }[]
-                >;
+                    }[];
+                    error?: string;
+                    metadata?: Record<string, unknown>;
+                    success: boolean;
+                    warnings?: string[];
+                }>;
                 /**
                  * @remarks Validate monitor data using backend registry.
                  * @param type - The monitor type.
@@ -217,8 +239,11 @@ declare global {
                     type: string,
                     data: unknown
                 ) => Promise<{
+                    data?: unknown;
                     errors: string[];
+                    metadata?: Record<string, unknown>;
                     success: boolean;
+                    warnings?: string[];
                 }>;
             };
 
@@ -228,9 +253,15 @@ declare global {
             settings: {
                 /**
                  * @remarks Get current history retention limit.
-                 * @returns A promise resolving to the history limit.
+                 * @returns A promise resolving to an IPC response containing the history limit.
                  */
-                getHistoryLimit: () => Promise<number>;
+                getHistoryLimit: () => Promise<{
+                    data?: number;
+                    error?: string;
+                    metadata?: Record<string, unknown>;
+                    success: boolean;
+                    warnings?: string[];
+                }>;
                 /**
                  * @remarks Reset all application settings to their default values.
                  * @returns A promise that resolves when all settings have been reset.

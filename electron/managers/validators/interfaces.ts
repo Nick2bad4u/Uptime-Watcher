@@ -9,32 +9,17 @@
  * ```typescript
  * const result: ValidationResult = {
  *   errors: [],
- *   isValid: true
+ *   success: true
  * };
  * // or
  * const result: ValidationResult = {
  *   errors: ["Field is required"],
- *   isValid: false
+ *   success: false
  * };
  * ```
+ * Base validation interface.
  *
  * @public
  */
-export interface ValidationResult {
-    /**
-     * An array of validation error messages.
-     *
-     * @remarks
-     * If validation passes, this array will be empty. If validation fails, it contains one or more error messages describing each failure.
-     */
-    errors: string[];
-    /**
-     * Indicates whether the validation passed.
-     *
-     * @remarks
-     * `true` if validation passed (no errors), `false` if any errors were found.
-     *
-     * @defaultValue false
-     */
-    isValid: boolean;
-}
+// Import from unified validation system
+export type { BaseValidationResult as ValidationResult } from "../../../shared/types/validation";

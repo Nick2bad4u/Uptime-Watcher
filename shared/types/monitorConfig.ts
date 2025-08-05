@@ -194,16 +194,8 @@ export interface MonitorConfigTemplate {
  *
  * @public
  */
-export interface MonitorConfigValidationResult {
-    /** Array of configuration error messages */
-    errors: string[];
-    /** Field-specific validation errors */
-    fieldErrors?: Record<string, string[]>;
-    /** Whether the configuration is valid */
-    isValid: boolean;
-    /** Warning messages (non-blocking) */
-    warnings?: string[];
-}
+// Import from unified validation system
+export type { MonitorConfigValidationResult } from "./validation";
 
 /**
  * Configuration interface for ping monitors.

@@ -5,10 +5,9 @@
  * @returns Object containing field accessor functions and loading state
  *
  * @remarks
- * This hook fetches monitor field definitions from the backend registry via IPC
- * and provides utilities to query field configurations for different monitor types.
- * It handles loading states and errors gracefully, maintaining field access even
- * when backend communication fails.
+ * This hook integrates with the monitor types store to provide field configurations
+ * for dynamic form generation. It maintains backward compatibility with existing
+ * utility functions while leveraging centralized state management.
  *
  * Field definitions include validation rules, UI hints, and metadata needed
  * for dynamic form generation and validation.
@@ -39,12 +38,9 @@
 
 import type { MonitorFieldDefinition } from "@shared/types";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 
-import type { MonitorTypeConfig } from "../utils/monitorTypeHelper";
-
-import logger from "../services/logger";
-import { safeExtractIpcData } from "../types/ipc";
+import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 
 /**
  * Result interface for the useMonitorFields hook
@@ -65,45 +61,17 @@ export interface UseMonitorFieldsResult {
 }
 
 export function useMonitorFields(): UseMonitorFieldsResult {
-    const [fieldConfigs, setFieldConfigs] = useState<Record<string, MonitorFieldDefinition[]>>({});
-    const [isLoaded, setIsLoaded] = useState(false);
-    const [error, setError] = useState<string | undefined>();
+    const { fieldConfigs, isLoaded, lastError, loadMonitorTypes } = useMonitorTypesStore();
 
     useEffect(() => {
-        const loadFieldConfigs = async () => {
-            try {
-                setError(undefined);
-                const response = await window.electronAPI.monitorTypes.getMonitorTypes();
-                const configs = safeExtractIpcData<MonitorTypeConfig[]>(response, []);
-                const fieldMap: Record<string, MonitorFieldDefinition[]> = {};
-
-                for (const config of configs) {
-                    fieldMap[config.type] = config.fields;
-                }
-
-                setFieldConfigs(fieldMap);
-                setIsLoaded(true);
-            } catch (error) {
-                const errorMessage =
-                    error instanceof Error ? error.message : "Failed to load monitor field configurations";
-                setError(errorMessage);
-                logger.error(
-                    "Failed to load monitor field configurations",
-                    error instanceof Error ? error : new Error(String(error))
-                );
-                setIsLoaded(true); // Set loaded even on error to prevent infinite loading
-            }
-        };
-
-        void loadFieldConfigs();
-    }, []);
+        // Load monitor types when hook is first used
+        if (!isLoaded && !lastError) {
+            void loadMonitorTypes();
+        }
+    }, [isLoaded, lastError, loadMonitorTypes]);
 
     const getFields = useCallback(
         (monitorType: string): MonitorFieldDefinition[] => {
-            // ESLint disable justification: monitorType is a string parameter from function args,
-            // not user input. It's used to access a Record with string keys that we control.
-            // This is safe since fieldConfigs is populated from backend config with known types.
-
             return fieldConfigs[monitorType] ?? [];
         },
         [fieldConfigs]
@@ -127,7 +95,7 @@ export function useMonitorFields(): UseMonitorFieldsResult {
     );
 
     return {
-        error,
+        error: lastError,
         getFields,
         getRequiredFields,
         isFieldRequired,

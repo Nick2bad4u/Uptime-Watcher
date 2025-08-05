@@ -1,75 +1,190 @@
 /**
  * Site synchronization operations module.
- * Handles syncing data from backend and status update subscriptions.
  *
- * Uses centralized error store for consistent error handling across the application.
+ * @remarks
+ * Provides comprehensive site synchronization functionality including:
+ * - Full backend synchronization
+ * - Real-time status updates via event subscriptions
+ * - Sync status monitoring and reporting
+ * - Centralized error handling through the error store
+ *
+ * All operations are designed to work with the Zustand-based sites store and
+ * maintain consistency between frontend state and backend data.
+ *
+ * @packageDocumentation
  */
 
 import type { Site, StatusUpdate } from "../../types";
 
 import logger from "../../services/logger";
+import { safeExtractIpcData } from "../../types/ipc";
 import { ensureError } from "../../utils/errorHandling";
 import { useErrorStore } from "../error/useErrorStore";
 import { logStoreAction, withErrorHandling } from "../utils";
 import { SiteService } from "./services/SiteService";
 import { StatusUpdateManager } from "./utils/statusUpdateHandler";
 
+/**
+ * Site synchronization actions interface.
+ *
+ * @remarks
+ * Defines all available site synchronization operations that can be performed.
+ * These actions are designed to work within the Zustand store architecture
+ * and provide consistent error handling and logging.
+ *
+ * @public
+ */
 export interface SiteSyncActions {
     /**
-     * Full sync from backend.
-     * Triggers a complete synchronization of all sites from the backend.
+     * Performs a complete synchronization from the backend.
+     *
+     * @remarks
+     * Triggers a full sync operation that updates all local site data
+     * with the latest information from the backend. This is typically
+     * used during application startup or when recovering from errors.
+     *
+     * @returns Promise that resolves when synchronization is complete
      */
     fullSyncFromBackend: () => Promise<void>;
+
     /**
-     * Get sync status.
-     * Retrieves current synchronization status including last sync time and site count.
+     * Retrieves current synchronization status from the backend.
+     *
+     * @remarks
+     * Provides detailed information about the sync state including:
+     * - Last synchronization timestamp
+     * - Current site count
+     * - Overall synchronization status
+     * - Success/failure indicators
+     *
+     * Uses `safeExtractIpcData` to handle IPC response safely.
+     *
+     * @returns Promise resolving to sync status information
      */
     getSyncStatus: () => Promise<{
+        /** Timestamp of last successful sync, undefined if never synced */
         lastSync: null | number | undefined;
+        /** Current number of sites in the backend */
         siteCount: number;
+        /** Whether the status retrieval was successful */
         success: boolean;
+        /** Whether frontend and backend are synchronized */
         synchronized: boolean;
     }>;
+
     /**
-     * Subscribe to status updates.
-     * Establishes subscription to monitor status change events from backend.
-     * Uses shared status update manager to handle race conditions and fallback logic.
+     * Establishes subscription to real-time status updates.
+     *
+     * @remarks
+     * Sets up event listeners for monitor status changes from the backend.
+     * Uses the shared StatusUpdateManager to handle:
+     * - Race condition prevention
+     * - Fallback mechanisms
+     * - Efficient incremental updates
+     *
+     * @param callback - Function to call when status updates are received
+     * @returns Subscription result with success indicators
      */
     subscribeToStatusUpdates: (callback: (update: StatusUpdate) => void) => {
+        /** Human-readable description of the operation */
         message: string;
+        /** Whether subscription was successful */
         subscribed: boolean;
+        /** Overall operation success status */
         success: boolean;
     };
+
     /**
-     * Subscribe to sync events.
-     * Establishes subscription to backend sync events for bulk updates and single site changes.
+     * Establishes subscription to backend synchronization events.
+     *
+     * @remarks
+     * Listens for various sync events including:
+     * - Bulk synchronization events
+     * - Individual site updates
+     * - Site deletions
+     *
+     * Automatically handles different event types and triggers
+     * appropriate local state updates.
+     *
+     * @returns Cleanup function to remove event listeners
      */
     subscribeToSyncEvents: () => () => void;
+
     /**
-     * Sync sites from backend.
-     * Retrieves latest sites data from backend and updates local store state.
-     * Handles error cases and provides centralized error logging.
+     * Synchronizes all sites from the backend.
+     *
+     * @remarks
+     * Fetches the latest site data from the backend and updates
+     * the local store state. Includes comprehensive error handling
+     * and logging for debugging purposes.
+     *
+     * This is the core synchronization method used by other
+     * sync operations.
+     *
+     * @returns Promise that resolves when sync is complete
      */
     syncSitesFromBackend: () => Promise<void>;
+
     /**
-     * Unsubscribe from status updates.
-     * Cleanly removes status update subscription and cleans up event listeners.
+     * Removes subscription to status updates.
+     *
+     * @remarks
+     * Cleanly unsubscribes from status update events and releases
+     * associated resources. Should be called when components unmount
+     * or when status updates are no longer needed.
+     *
+     * @returns Unsubscription result with success indicators
      */
     unsubscribeFromStatusUpdates: () => {
+        /** Human-readable description of the operation */
         message: string;
+        /** Overall operation success status */
         success: boolean;
+        /** Whether unsubscription was successful */
         unsubscribed: boolean;
     };
 }
 
+/**
+ * Dependencies required for site synchronization operations.
+ *
+ * @remarks
+ * These dependencies are injected into the sync actions to maintain
+ * separation of concerns and enable easier testing. The dependencies
+ * provide access to the site state without direct coupling to the
+ * Zustand store implementation.
+ *
+ * @public
+ */
 export interface SiteSyncDependencies {
+    /** Function to get current sites from the store */
     getSites: () => Site[];
+    /** Function to update sites in the store */
     setSites: (sites: Site[]) => void;
 }
 
 // Create a shared status update manager instance - will be initialized when first used
 let statusUpdateManager: StatusUpdateManager | undefined;
 
+/**
+ * Creates site synchronization actions with injected dependencies.
+ *
+ * @remarks
+ * Factory function that creates all site synchronization actions with proper
+ * dependency injection. This pattern allows for easier testing and maintains
+ * separation of concerns between the sync logic and store state management.
+ *
+ * The created actions handle:
+ * - Full backend synchronization
+ * - Real-time status updates via WebSocket-like events
+ * - Sync status monitoring and reporting
+ * - Error handling and recovery
+ *
+ * @param deps - Dependencies required for synchronization operations
+ * @returns Complete set of synchronization actions
+ *
+ * @public
+ */
 export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActions => {
     const actions: SiteSyncActions = {
         fullSyncFromBackend: async () => {
@@ -85,7 +200,13 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
                 return await withErrorHandling(
                     async () => {
                         // eslint-disable-next-line n/no-sync -- Method name contains 'sync' but is not a synchronous file operation
-                        const status = await window.electronAPI.stateSync.getSyncStatus();
+                        const response = await window.electronAPI.stateSync.getSyncStatus();
+                        const status = safeExtractIpcData(response, {
+                            lastSync: undefined,
+                            siteCount: 0,
+                            success: false,
+                            synchronized: false,
+                        });
                         logStoreAction("SitesStore", "getSyncStatus", {
                             message: "Sync status retrieved",
                             siteCount: status.siteCount,

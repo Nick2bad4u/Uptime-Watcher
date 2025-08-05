@@ -9,7 +9,8 @@
  * @packageDocumentation
  */
 
-import type { Monitor, MonitorType } from "../../types";
+import type { Monitor, MonitorType } from "@shared/types";
+
 import type { AddSiteFormActions, AddSiteFormState } from "../SiteDetails/useAddSiteForm";
 
 import { DEFAULT_REQUEST_TIMEOUT, RETRY_CONSTRAINTS } from "../../constants";
@@ -192,37 +193,56 @@ async function addToExistingSite(properties: FormSubmitProperties, monitor: Moni
  * @param formData - Form data containing field values
  * @returns Monitor data object with type-specific fields
  */
+/**
+ * Creates monitor-specific data based on the monitor type.
+ * Uses type-safe object construction instead of dynamic property assignment.
+ */
 function buildMonitorData(
     monitorType: MonitorType,
     formData: { host: string; port: string; url: string }
-): Record<string, unknown> {
-    const monitorData: Record<string, unknown> = {
+): Partial<Monitor> {
+    const baseData = {
         type: monitorType,
     };
 
-    // Build type-specific fields based on monitor type
-    if (monitorType === "http") {
-        monitorData["url"] = formData["url"].trim();
+    // Build type-specific fields using discriminated unions
+    switch (monitorType) {
+        case "http": {
+            return {
+                ...baseData,
+                url: formData.url.trim(),
+            };
+        }
+        case "ping": {
+            return {
+                ...baseData,
+                host: formData.host.trim(),
+            };
+        }
+        case "port": {
+            return {
+                ...baseData,
+                host: formData.host.trim(),
+                port: Number(formData.port),
+            };
+        }
+        default: {
+            return baseData;
+        }
     }
-
-    if (monitorType === "ping") {
-        monitorData["host"] = formData["host"].trim();
-    }
-
-    if (monitorType === "port") {
-        monitorData["host"] = formData["host"].trim();
-        monitorData["port"] = Number(formData["port"]);
-    }
-
-    return monitorData;
 }
 
 /**
  * Creates a monitor object based on the form data.
+ * Uses type-safe property assignment instead of dynamic field copying.
  */
 function createMonitor(properties: FormSubmitProperties): Monitor {
     const { checkInterval, generateUuid, host, monitorType, port, url } = properties;
 
+    // Get type-specific monitor data
+    const specificData = buildMonitorData(monitorType, { host, port, url });
+
+    // Create monitor with all required fields and type-specific data
     const monitor: Monitor = {
         activeOperations: [],
         checkInterval,
@@ -234,19 +254,9 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
         status: "pending" as const,
         timeout: DEFAULT_REQUEST_TIMEOUT, // Explicit default timeout
         type: monitorType,
+        // Type-safe spread of monitor-specific properties
+        ...specificData,
     };
-
-    // Add type-specific fields dynamically using monitor config
-    const monitorData = buildMonitorData(monitorType, { host, port, url });
-
-    // Copy the type-specific fields to the monitor object
-    for (const [key, value] of Object.entries(monitorData)) {
-        if (key !== "type") {
-            // Skip the type field as it's already set
-
-            (monitor as unknown as Record<string, unknown>)[key] = value;
-        }
-    }
 
     return monitor;
 }

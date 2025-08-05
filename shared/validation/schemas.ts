@@ -222,28 +222,8 @@ export type Site = z.infer<typeof siteSchema>;
  * @remarks
  * Contains the validated data (if successful), errors, warnings, and metadata.
  */
-export interface ValidationResult {
-    /**
-     * The validated data, if validation succeeded.
-     */
-    data?: unknown;
-    /**
-     * Array of validation error messages.
-     */
-    errors: string[];
-    /**
-     * Metadata about the validation process (e.g., monitor type, field name).
-     */
-    metadata: Record<string, unknown>;
-    /**
-     * Indicates whether validation was successful.
-     */
-    success: boolean;
-    /**
-     * Array of validation warnings (e.g., optional fields missing).
-     */
-    warnings: string[];
-}
+// Import from unified validation system
+import type { ValidationResult } from "../types/validation";
 
 /**
  * Validates monitor data using the appropriate Zod schema.

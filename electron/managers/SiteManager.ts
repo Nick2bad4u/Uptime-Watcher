@@ -731,7 +731,7 @@ export class SiteManager {
     private async validateSite(site: Site): Promise<void> {
         const validationResult = await this.configurationManager.validateSiteConfiguration(site);
 
-        if (!validationResult.isValid) {
+        if (!validationResult.success) {
             throw new Error(
                 `Site validation failed for '${site.identifier}': ${this.formatValidationErrors(validationResult.errors)}`
             );

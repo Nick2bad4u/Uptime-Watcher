@@ -5,7 +5,7 @@
 
 import type { Monitor, MonitorType } from "@shared/types";
 
-import { safeExtractIpcData } from "../types/ipc";
+import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { AppCaches } from "./cache";
 import { withUtilityErrorHandling } from "./errorHandling";
 import { getAvailableMonitorTypes, getMonitorTypeConfig, type MonitorTypeConfig } from "./monitorTypeHelper";
@@ -69,14 +69,10 @@ export function clearConfigCache(): void {
 export async function formatMonitorDetail(monitorType: MonitorType, details: string): Promise<string> {
     return withUtilityErrorHandling(
         async () => {
-            // Validate electronAPI availability before calling
-            if (!isElectronApiAvailable()) {
-                throw new Error("ElectronAPI not available for monitor detail formatting");
-            }
+            // Use store method instead of direct IPC call
+            const store = useMonitorTypesStore.getState();
 
-            // Use the IPC method to format on the backend where functions are available
-            const response = await window.electronAPI.monitorTypes.formatMonitorDetail(monitorType, details);
-            return safeExtractIpcData(response, details);
+            return store.formatMonitorDetail(monitorType, details);
         },
         `Format monitor detail for ${monitorType}`,
         details
@@ -99,17 +95,10 @@ export async function formatMonitorDetail(monitorType: MonitorType, details: str
 export async function formatMonitorTitleSuffix(monitorType: MonitorType, monitor: Monitor): Promise<string> {
     return withUtilityErrorHandling(
         async () => {
-            // Validate electronAPI availability before calling
-            if (!isElectronApiAvailable()) {
-                throw new Error("ElectronAPI not available for monitor title suffix formatting");
-            }
+            // Use store method instead of direct IPC call
+            const store = useMonitorTypesStore.getState();
 
-            // Use the IPC method to format on the backend where functions are available
-            const response = await window.electronAPI.monitorTypes.formatMonitorTitleSuffix(
-                monitorType,
-                monitor as unknown as Record<string, unknown>
-            );
-            return safeExtractIpcData(response, "");
+            return store.formatMonitorTitleSuffix(monitorType, monitor);
         },
         `Format monitor title suffix for ${monitorType}`,
         ""
@@ -287,16 +276,4 @@ async function getConfig(monitorType: MonitorType): Promise<MonitorTypeConfig | 
 /**
  * Validate that electronAPI is available and properly configured.
  * Prevents runtime errors when preload context is missing.
- *
- * @returns Whether electronAPI is available and has required methods
  */
-function isElectronApiAvailable(): boolean {
-    return (
-        typeof window !== "undefined" &&
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        window.electronAPI &&
-        typeof window.electronAPI.monitorTypes === "object" &&
-        typeof window.electronAPI.monitorTypes.formatMonitorDetail === "function" &&
-        typeof window.electronAPI.monitorTypes.formatMonitorTitleSuffix === "function"
-    );
-}

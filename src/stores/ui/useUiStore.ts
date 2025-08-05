@@ -37,6 +37,7 @@ import { persist } from "zustand/middleware";
 import type { ChartTimeRange } from "../types";
 import type { UIStore } from "./types";
 
+import logger from "../../services/logger";
 import { logStoreAction } from "../utils";
 
 export const useUIStore = create<UIStore>()(
@@ -44,8 +45,20 @@ export const useUIStore = create<UIStore>()(
         (set) => ({
             // State
             activeSiteDetailsTab: "site-overview",
-            selectedSiteId: undefined,
             // Actions
+            openExternal: (url: string, context?: { siteName?: string }) => {
+                logStoreAction("UIStore", "openExternal", { context, url });
+
+                // Log user action for analytics
+                logger.user.action("External URL opened", {
+                    url,
+                    ...(context && { siteName: context.siteName }),
+                });
+
+                // Use electronAPI to open external URL
+                window.electronAPI.system.openExternal(url);
+            },
+            selectedSiteId: undefined,
             setActiveSiteDetailsTab: (tab: string) => {
                 logStoreAction("UIStore", "setActiveSiteDetailsTab", { tab });
                 set({ activeSiteDetailsTab: tab });

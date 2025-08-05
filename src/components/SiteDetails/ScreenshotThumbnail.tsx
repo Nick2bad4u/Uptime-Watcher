@@ -10,7 +10,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { UI_DELAYS } from "../../constants";
-import logger from "../../services/logger";
+import { useUIStore } from "../../stores/ui/useUiStore";
 import { useTheme } from "../../theme/useTheme";
 
 /**
@@ -32,6 +32,7 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProper
     const portalReference = useRef<HTMLDivElement>(null);
     const hoverTimeoutReference = useRef<NodeJS.Timeout | undefined>(undefined);
     const { themeName } = useTheme();
+    const { openExternal } = useUIStore();
     const screenshotUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`;
 
     // Clean up portal overlay on unmount and state changes
@@ -69,15 +70,7 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProper
 
     function handleClick(event: React.MouseEvent) {
         event.preventDefault();
-        logger.user.action("External URL opened from screenshot thumbnail", {
-            siteName: siteName,
-            url: url,
-        });
-        if (hasOpenExternal(window.electronAPI)) {
-            window.electronAPI.openExternal(url);
-        } else {
-            window.open(url, "_blank", "noopener");
-        }
+        openExternal(url, { siteName });
     }
 
     const updateOverlayPosition = useCallback(() => {
@@ -229,6 +222,3 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProper
  * @param api - The API object to check
  * @returns True if the API has openExternal method
  */
-function hasOpenExternal(api: unknown): api is { openExternal: (url: string) => void } {
-    return typeof (api as { openExternal?: unknown }).openExternal === "function";
-}

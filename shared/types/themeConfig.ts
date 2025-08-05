@@ -376,16 +376,8 @@ export interface ThemeOverride {
  *
  * @public
  */
-export interface ThemeValidationResult {
-    /** Array of validation error messages */
-    errors: string[];
-    /** Field-specific validation errors */
-    fieldErrors?: Record<string, string[]>;
-    /** Whether the theme configuration is valid */
-    isValid: boolean;
-    /** Warning messages (non-blocking) */
-    warnings?: string[];
-}
+// Import from unified validation system
+export type { ThemeValidationResult } from "./validation";
 
 /**
  * Typography configuration interface.

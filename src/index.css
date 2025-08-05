@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+/* https://github.com/reslear/tailwind-scrollbar-hide */
+@import "tailwind-scrollbar-hide/v4";
+
+/* https://github.com/Wombosvideo/tw-animate-css */
+@import "tw-animate-css";
+
+/* https://github.com/tailwindlabs/tailwindcss-typography */
+@plugin "@tailwindcss/typography";
+
+/* https://github.com/tailwindlabs/tailwindcss-forms */
+@plugin "@tailwindcss/forms";
+
 :root {
     /* Define gray color palette for compatibility */
     --color-gray-50: oklch(98.4% 0.003 247.858deg);

@@ -3,6 +3,8 @@
  * All IPC handlers should return responses following this structure.
  */
 
+import type { ValidationResult } from "../../../shared/types/validation";
+
 /**
  * Parameters for IPC handler wrapper configuration.
  *
@@ -69,17 +71,12 @@ export interface IpcResponse<T = unknown> {
  *
  * @remarks
  * Extends the base IpcResponse pattern for monitor validation-specific operations.
- * Maintains backward compatibility with existing validation code.
  *
  * @public
  */
-export interface IpcValidationResponse extends IpcResponse<unknown> {
-    /** List of validation errors */
+export interface IpcValidationResponse extends IpcResponse<ValidationResult> {
+    /** List of validation errors (required for validation responses) */
     errors: string[];
-    /** Additional metadata from validation */
-    metadata: Record<string, unknown>;
-    /** Whether validation passed */
+    /** Whether validation passed (required for validation responses) */
     success: boolean;
-    /** Non-blocking validation warnings */
-    warnings: string[];
 }

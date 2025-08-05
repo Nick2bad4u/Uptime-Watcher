@@ -41,6 +41,7 @@ Critical Instructions:
 - Plan your changes carefully. Consider how they will affect the overall architecture, state management, and event flows and if they align with the existing patterns.
 - Never Make "temporary" fixes or hacks. If something is broken, fix it properly or discuss a proper solution.
 - Never create backwards compatibility code/wrappers/hacks without strict approval first.
+- Always fix formatting issues with `npm run lint:fix` if needed, but focus on code structure and logic first.
 
 ⚠️ **Absolute Prohibitions**:
 
