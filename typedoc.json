@@ -1,4 +1,5 @@
 {
+    "$schema": "https://typedoc.org/schema.json",
     "entryPoints": ["src/**/*.*", "shared/**/*.*"],
     "out": "docs/docusaurus/docs/app",
     "docsPath": "docs/docusaurus/docs/app",

@@ -1,5 +1,4 @@
 {
-    "exclude": [
-        "electron-app/index.html"
-    ]
+    "$schema": "https://www.schemastore.org/djlint.json",
+    "exclude": "electron-app/index.html"
 }

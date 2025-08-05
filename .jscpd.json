@@ -1,4 +1,5 @@
 {
+    "$schema": "https://www.schemastore.org/jscpd.json",
     "threshold": 3,
     "reporters": [
         "html",

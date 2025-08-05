@@ -9,5 +9,6 @@
  */
 // eslint-disable-next-line unicorn/prefer-module
 module.exports = {
+    "$schema": "https://www.schemastore.org/commitlintrc.json",
     extends: ["@commitlint/config-conventional"],
 };

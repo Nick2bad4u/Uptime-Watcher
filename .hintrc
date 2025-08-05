@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/webhintio/hint/refs/heads/main/packages/hint/src/lib/config/config-schema.json",
   "extends": [
     "development"
   ],

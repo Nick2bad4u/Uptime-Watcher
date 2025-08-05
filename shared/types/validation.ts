@@ -71,6 +71,29 @@ export interface ThemeValidationResult extends BaseValidationResult {
 }
 
 /**
+ * Common metadata fields included in validation results.
+ *
+ * @remarks
+ * Provides type safety for commonly used metadata fields while allowing additional arbitrary fields.
+ *
+ * @public
+ */
+export interface ValidationMetadata {
+    /** Additional arbitrary metadata */
+    [key: string]: unknown;
+    /** The specific field being validated */
+    fieldName?: string;
+    /** Number of monitors when validating site data */
+    monitorCount?: number;
+    /** The monitor type being validated */
+    monitorType?: string;
+    /** Site identifier when validating site data */
+    siteIdentifier?: string;
+    /** Size of the validated data in bytes/characters */
+    validatedDataSize?: number;
+}
+
+/**
  * Enhanced validation result with metadata and data.
  *
  * @remarks
@@ -83,7 +106,7 @@ export interface ValidationResult extends BaseValidationResult {
     /** The validated data, if validation succeeded */
     data?: unknown;
     /** Metadata about the validation process */
-    metadata?: Record<string, unknown>;
+    metadata?: ValidationMetadata;
 }
 
 /**
@@ -95,7 +118,7 @@ export interface ValidationResult extends BaseValidationResult {
  *
  * @public
  */
-export function createFailureResult(errors: string[], metadata?: Record<string, unknown>): ValidationResult {
+export function createFailureResult(errors: string[], metadata?: ValidationMetadata): ValidationResult {
     return {
         errors,
         metadata: metadata ?? {},

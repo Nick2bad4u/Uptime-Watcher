@@ -6,6 +6,7 @@
  */
 
 module.exports = {
+    "$schema": "https://www.schemastore.org/postcssrc.json",
     plugins: {
         "@tailwindcss/postcss": {},
         autoprefixer: {},

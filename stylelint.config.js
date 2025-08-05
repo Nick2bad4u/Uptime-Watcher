@@ -10,6 +10,7 @@
 /* eslint-disable unicorn/prefer-module -- Needed for Stylelint */
 
 module.exports = {
+    "$schema": "https://www.schemastore.org/stylelintrc.json",
     extends: [
         "stylelint-config-standard",
         "@stylistic/stylelint-config",

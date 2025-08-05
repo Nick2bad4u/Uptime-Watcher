@@ -1,4 +1,5 @@
 {
+  "$schema": "https://www.schemastore.org/package.json",
   "name": "uptime-watcher",
   "version": "10.0.0",
   "description": "An Electron app to monitor website uptime status",
@@ -315,6 +316,7 @@
     "@playwright/test": "^1.54.2",
     "@putout/eslint": "^4.1.0",
     "@putout/eslint-flat": "^3.0.1",
+    "@secretlint/secretlint-rule-preset-recommend": "^10.2.2",
     "@styled/typescript-styled-plugin": "^1.0.1",
     "@stylistic/eslint-plugin": "^5.2.2",
     "@stylistic/stylelint-config": "^3.0.1",
@@ -452,6 +454,7 @@
     "putout": "^40.4.3",
     "react-refresh": "^0.17.0",
     "rollup-plugin-visualizer": "^6.0.3",
+    "secretlint": "^10.2.2",
     "sort-package-json": "^3.4.0",
     "stylelint": "^16.23.0",
     "stylelint-config-alphabetical-order": "^1.0.0",

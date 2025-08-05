@@ -1,0 +1,403 @@
+{
+  "unused_files": [
+    "shared/types/monitorTypes.ts",
+    "shared/types/themeConfig.ts",
+    "src/types/events.ts",
+    "src/types/monitorFormData.ts",
+    "electron/utils/database/databaseInitializer.ts"
+  ],
+  "unresolved_imports": [
+    "eslint-config-eslint.config.mjs",
+    "package.json"
+  ],
+  "unused_exports": [
+    {
+      "name": "generateBackupFileName",
+      "type": "function",
+      "location": "src/stores/sites/utils/fileDownload.ts:66:17"
+    },
+    {
+      "name": "isComputedSiteStatus",
+      "type": "function",
+      "location": "shared/types.ts:130:17"
+    },
+    {
+      "name": "ThemedTooltip",
+      "type": "function",
+      "location": "src/theme/components.tsx:1055:17"
+    },
+    {
+      "name": "highContrastTheme",
+      "location": "src/theme/themes.ts:254:14"
+    },
+    {
+      "name": "createMonitorWithTypeGuards",
+      "type": "function",
+      "location": "electron/services/monitoring/MonitorTypeRegistry.ts:451:17"
+    },
+    {
+      "name": "isValidMonitorTypeGuard",
+      "type": "function",
+      "location": "electron/services/monitoring/MonitorTypeRegistry.ts:490:17"
+    },
+    {
+      "name": "migrateMonitorType",
+      "type": "function",
+      "location": "electron/services/monitoring/MonitorTypeRegistry.ts:531:23"
+    },
+    {
+      "name": "bulkInsertHistory",
+      "type": "function",
+      "group": "historyManipulation",
+      "location": "electron/services/database/utils/historyManipulation.ts:92:17"
+    },
+    {
+      "name": "getDefaultMonitorFields",
+      "type": "function",
+      "location": "src/types/monitor-forms.ts:126:17"
+    },
+    {
+      "name": "isHttpMonitorFields",
+      "type": "function",
+      "location": "src/types/monitor-forms.ts:178:17"
+    },
+    {
+      "name": "isPingMonitorFields",
+      "type": "function",
+      "location": "src/types/monitor-forms.ts:192:17"
+    },
+    {
+      "name": "isPortMonitorFields",
+      "type": "function",
+      "location": "src/types/monitor-forms.ts:206:17"
+    },
+    {
+      "name": "generateDatabaseFieldDefinitions",
+      "type": "function",
+      "location": "electron/services/database/utils/dynamicSchema.ts:177:17"
+    },
+    {
+      "name": "hasValidRetryAttempts",
+      "type": "function",
+      "location": "electron/services/monitoring/utils/monitorTypeGuards.ts:65:17"
+    },
+    {
+      "name": "hasValidTimeout",
+      "type": "function",
+      "location": "electron/services/monitoring/utils/monitorTypeGuards.ts:77:17"
+    }
+  ],
+  "unused_exported_types": [
+    {
+      "name": "SafeJsonResult",
+      "type": "interface",
+      "location": "shared/utils/jsonSafety.ts:9:18"
+    },
+    {
+      "name": "FileDownloadOptions",
+      "type": "interface",
+      "location": "src/stores/sites/utils/fileDownload.ts:14:18"
+    },
+    {
+      "name": "BaseRow",
+      "type": "interface",
+      "location": "shared/types/database.ts:15:18"
+    },
+    {
+      "name": "BadgeSize",
+      "type": "type",
+      "location": "src/theme/components.tsx:22:13"
+    },
+    {
+      "name": "BadgeVariant",
+      "type": "type",
+      "location": "src/theme/components.tsx:23:13"
+    },
+    {
+      "name": "BoxElement",
+      "type": "type",
+      "location": "src/theme/components.tsx:24:13"
+    },
+    {
+      "name": "BoxPadding",
+      "type": "type",
+      "location": "src/theme/components.tsx:25:13"
+    },
+    {
+      "name": "BoxRounded",
+      "type": "type",
+      "location": "src/theme/components.tsx:26:13"
+    },
+    {
+      "name": "BoxShadow",
+      "type": "type",
+      "location": "src/theme/components.tsx:27:13"
+    },
+    {
+      "name": "BoxSurface",
+      "type": "type",
+      "location": "src/theme/components.tsx:29:13"
+    },
+    {
+      "name": "BoxVariant",
+      "type": "type",
+      "location": "src/theme/components.tsx:31:13"
+    },
+    {
+      "name": "ButtonSize",
+      "type": "type",
+      "location": "src/theme/components.tsx:32:13"
+    },
+    {
+      "name": "ButtonVariant",
+      "type": "type",
+      "location": "src/theme/components.tsx:33:13"
+    },
+    {
+      "name": "TextAlign",
+      "type": "type",
+      "location": "src/theme/components.tsx:43:13"
+    },
+    {
+      "name": "TextSize",
+      "type": "type",
+      "location": "src/theme/components.tsx:44:13"
+    },
+    {
+      "name": "TextVariant",
+      "type": "type",
+      "location": "src/theme/components.tsx:46:13"
+    },
+    {
+      "name": "TextWeight",
+      "type": "type",
+      "location": "src/theme/components.tsx:56:13"
+    },
+    {
+      "name": "StoreActions",
+      "type": "type",
+      "location": "src/stores/types.ts:78:13"
+    },
+    {
+      "name": "StoreState",
+      "type": "type",
+      "location": "src/stores/types.ts:103:13"
+    },
+    {
+      "name": "ERROR_MESSAGES",
+      "type": "type",
+      "location": "src/stores/types.ts:140:14"
+    },
+    {
+      "name": "Monitor",
+      "type": "type",
+      "location": "src/stores/types.ts:140:30"
+    },
+    {
+      "name": "MonitorType",
+      "type": "type",
+      "location": "src/stores/types.ts:140:39"
+    },
+    {
+      "name": "Site",
+      "type": "type",
+      "location": "src/stores/types.ts:140:52"
+    },
+    {
+      "name": "StatusUpdate",
+      "type": "type",
+      "location": "src/stores/types.ts:140:58"
+    },
+    {
+      "name": "ValidationResult",
+      "type": "type",
+      "location": "electron/managers/ConfigurationManager.ts:17:14"
+    },
+    {
+      "name": "DataImportExportConfig",
+      "type": "interface",
+      "location": "electron/utils/database/DataImportExportService.ts:25:18"
+    },
+    {
+      "name": "ImportSite",
+      "type": "interface",
+      "location": "electron/utils/database/DataImportExportService.ts:42:18"
+    },
+    {
+      "name": "DataBackupConfig",
+      "type": "interface",
+      "location": "electron/utils/database/DataBackupService.ts:20:18"
+    },
+    {
+      "name": "OperationalHooksConfig",
+      "type": "interface",
+      "group": "operationalHooks",
+      "location": "electron/utils/operationalHooks.ts:13:18"
+    },
+    {
+      "name": "SitesActions",
+      "type": "interface",
+      "location": "src/stores/sites/types.ts:7:18"
+    },
+    {
+      "name": "SitesState",
+      "type": "interface",
+      "location": "src/stores/sites/types.ts:71:18"
+    },
+    {
+      "name": "IntervalOption",
+      "type": "interface",
+      "location": "src/constants.ts:72:18"
+    },
+    {
+      "name": "MonitorUIConfig",
+      "type": "interface",
+      "location": "electron/services/monitoring/MonitorTypeRegistry.ts:90:18"
+    },
+    {
+      "name": "UpdateStatus",
+      "type": "type",
+      "location": "electron/services/updater/AutoUpdaterService.ts:13:13"
+    },
+    {
+      "name": "UpdateStatusData",
+      "type": "interface",
+      "location": "electron/services/updater/AutoUpdaterService.ts:18:18"
+    },
+    {
+      "name": "MonitorServiceResult",
+      "type": "interface",
+      "location": "electron/services/monitoring/MonitorFactory.ts:14:18"
+    },
+    {
+      "name": "CacheConfig",
+      "type": "interface",
+      "location": "electron/utils/cache/StandardizedCache.ts:15:18"
+    },
+    {
+      "name": "CacheEntry",
+      "type": "interface",
+      "location": "electron/utils/cache/StandardizedCache.ts:31:18"
+    },
+    {
+      "name": "CacheStats",
+      "type": "interface",
+      "location": "electron/utils/cache/StandardizedCache.ts:45:18"
+    },
+    {
+      "name": "MonitorTypesStore",
+      "type": "type",
+      "location": "src/stores/monitor/useMonitorTypesStore.ts:189:13"
+    },
+    {
+      "name": "SelectOption",
+      "type": "interface",
+      "location": "src/components/AddSiteForm/FormFields.tsx:238:18"
+    },
+    {
+      "name": "RadioOption",
+      "type": "interface",
+      "location": "src/components/AddSiteForm/FormFields.tsx:338:18"
+    },
+    {
+      "name": "SiteMonitoringActions",
+      "type": "interface",
+      "location": "src/stores/sites/useSiteMonitoring.ts:11:18"
+    },
+    {
+      "name": "SiteOperationsActions",
+      "type": "interface",
+      "location": "src/stores/sites/useSiteOperations.ts:18:18"
+    },
+    {
+      "name": "SitesState",
+      "type": "interface",
+      "location": "src/stores/sites/useSitesState.ts:10:18"
+    },
+    {
+      "name": "SitesStateActions",
+      "type": "interface",
+      "location": "src/stores/sites/useSitesState.ts:19:18"
+    },
+    {
+      "name": "SitesStateStore",
+      "type": "type",
+      "location": "src/stores/sites/useSitesState.ts:36:13"
+    },
+    {
+      "name": "DatabaseConnectionEventData",
+      "type": "interface",
+      "location": "shared/types/events.ts:67:18"
+    },
+    {
+      "name": "DatabaseErrorEventData",
+      "type": "interface",
+      "location": "shared/types/events.ts:94:18"
+    },
+    {
+      "name": "DatabaseRetryEventData",
+      "type": "interface",
+      "location": "shared/types/events.ts:131:18"
+    },
+    {
+      "name": "DatabaseSuccessEventData",
+      "type": "interface",
+      "location": "shared/types/events.ts:160:18"
+    },
+    {
+      "name": "BaseMonitorFields",
+      "type": "interface",
+      "location": "src/types/monitor-forms.ts:11:18"
+    },
+    {
+      "name": "HttpMonitorFields",
+      "type": "interface",
+      "location": "src/types/monitor-forms.ts:25:18"
+    },
+    {
+      "name": "MonitorFieldChangeHandlers",
+      "type": "interface",
+      "location": "src/types/monitor-forms.ts:41:18"
+    },
+    {
+      "name": "MonitorFieldValues",
+      "type": "interface",
+      "location": "src/types/monitor-forms.ts:55:18"
+    },
+    {
+      "name": "MonitorFormFields",
+      "type": "type",
+      "location": "src/types/monitor-forms.ts:69:13"
+    },
+    {
+      "name": "MonitorValidationResult",
+      "type": "interface",
+      "location": "src/types/monitor-forms.ts:77:18"
+    },
+    {
+      "name": "PingMonitorFields",
+      "type": "interface",
+      "location": "src/types/monitor-forms.ts:98:18"
+    },
+    {
+      "name": "PortMonitorFields",
+      "type": "interface",
+      "location": "src/types/monitor-forms.ts:106:18"
+    },
+    {
+      "name": "SettingRow",
+      "type": "interface",
+      "location": "electron/services/database/utils/settingsMapper.ts:15:18"
+    },
+    {
+      "name": "FormMode",
+      "type": "type",
+      "location": "src/components/SiteDetails/useAddSiteForm.ts:78:13"
+    },
+    {
+      "name": "UpdateInfo",
+      "type": "interface",
+      "location": "src/stores/updates/types.ts:11:18"
+    }
+  ]
+}
