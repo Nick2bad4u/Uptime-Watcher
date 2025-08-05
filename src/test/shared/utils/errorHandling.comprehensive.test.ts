@@ -73,7 +73,7 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             const result = await withErrorHandling(mockOperation, mockStore);
 
             expect(result).toBe("success");
-            expect(mockConsole.warn).toHaveBeenCalledWith("Failed to clear error state:", expect.any(Error));
+            expect(mockConsole.warn).toHaveBeenCalledWith("Store operation failed for:", "clear error state", expect.any(Error));
         });
 
         it("should handle non-Error objects as error messages", async () => {
@@ -164,7 +164,7 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
 
             await expect(withErrorHandling(mockOperation, mockStore)).rejects.toThrow("Operation error");
 
-            expect(mockConsole.warn).toHaveBeenCalledWith("Failed to set error state:", storeError);
+            expect(mockConsole.warn).toHaveBeenCalledWith("Store operation failed for:", "set error state", storeError);
             expect(mockConsole.error).toHaveBeenCalledWith("Original operation error:", testError);
         });
 
@@ -183,7 +183,8 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
 
             expect(result).toBe("success");
             expect(mockConsole.warn).toHaveBeenCalledWith(
-                "Failed to clear loading state in finally block:",
+                "Store operation failed for:",
+                "clear loading state in finally block",
                 finallyError
             );
         });

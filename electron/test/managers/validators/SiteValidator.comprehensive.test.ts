@@ -93,7 +93,7 @@ describe("SiteValidator - Comprehensive Coverage", () => {
 
             const result = siteValidator.validateSiteConfiguration(site);
 
-            expect(result.isValid).toBe(true);
+            expect(result.success).toBe(true);
             expect(result.errors).toEqual([]);
         });
 
@@ -107,7 +107,7 @@ describe("SiteValidator - Comprehensive Coverage", () => {
 
             const result = siteValidator.validateSiteConfiguration(site);
 
-            expect(result.isValid).toBe(false);
+            expect(result.success).toBe(false);
             expect(result.errors).toContain("Site monitors must be an array");
         });
     });

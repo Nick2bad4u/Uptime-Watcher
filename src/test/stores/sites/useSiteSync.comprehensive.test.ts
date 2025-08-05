@@ -19,12 +19,12 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
 
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
-    withErrorHandling: vi.fn((operation) => {
+    withErrorHandling: vi.fn(async (operation) => {
         try {
-            return operation();
+            return await operation();
         } catch (error) {
             console.warn("Mocked error in withErrorHandling:", error);
-            return Promise.reject(error);
+            throw error;
         }
     }),
 }));
@@ -40,6 +40,10 @@ vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
         subscribe: vi.fn(),
         unsubscribe: vi.fn(),
     })),
+}));
+
+vi.mock("../../../types/ipc", () => ({
+    safeExtractIpcData: vi.fn((response, fallback) => response ?? fallback),
 }));
 
 // Mock window.electronAPI

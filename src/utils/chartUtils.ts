@@ -5,7 +5,10 @@
  * @packageDocumentation
  */
 
-import { hasScales } from "@shared/types/chartConfig";
+import { hasScales as hasScalesInternal } from "@shared/types/chartConfig";
+
+// Re-export hasScales for convenience
+export { hasScales } from "@shared/types/chartConfig";
 
 /**
  * Safely get nested property from scale configuration.
@@ -43,7 +46,7 @@ export function getNestedScaleProperty(config: unknown, axis: "x" | "y", path: s
  * @returns Scale configuration or undefined
  */
 export function getScaleConfig(config: unknown, axis: "x" | "y"): Record<string, unknown> | undefined {
-    if (!hasScales(config)) {
+    if (!hasScalesInternal(config)) {
         return undefined;
     }
 

@@ -653,7 +653,10 @@ export class SiteManager {
      * @returns Formatted error string.
      * @internal
      */
-    private formatValidationErrors(errors: string[]): string {
+    private formatValidationErrors(errors: string[] | undefined): string {
+        if (!errors || errors.length === 0) {
+            return "";
+        }
         if (errors.length === 1) {
             // Ensure fallback to empty string if errors[0] is undefined
             return errors[0] ?? "";

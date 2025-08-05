@@ -147,7 +147,11 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             safeObjectIteration(testObj, errorCallback);
 
             expect(errorCallback).toHaveBeenCalled();
-            expect(consoleSpy).toHaveBeenCalledWith("Safe object iteration failed:", expect.any(Error));
+            expect(consoleSpy).toHaveBeenCalledWith(
+                "Object iteration failed for context:",
+                "Safe object iteration",
+                expect.any(Error)
+            );
 
             consoleSpy.mockRestore();
         });
@@ -160,7 +164,11 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
 
             safeObjectIteration(testObj, errorCallback, "Custom error context");
 
-            expect(consoleSpy).toHaveBeenCalledWith("Custom error context failed:", expect.any(Error));
+            expect(consoleSpy).toHaveBeenCalledWith(
+                "Object iteration failed for context:",
+                "Custom error context",
+                expect.any(Error)
+            );
 
             consoleSpy.mockRestore();
         });

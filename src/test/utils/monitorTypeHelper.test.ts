@@ -15,6 +15,19 @@ import {
     type MonitorTypeConfig,
 } from "../../utils/monitorTypeHelper";
 
+// Mock the monitor types store
+const mockMonitorTypesStore = {
+    monitorTypes: [] as MonitorTypeConfig[],
+    isLoaded: false,
+    loadMonitorTypes: vi.fn(),
+};
+
+vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
+    useMonitorTypesStore: {
+        getState: vi.fn(() => mockMonitorTypesStore),
+    },
+}));
+
 // Mock dependencies
 vi.mock("../../utils/cache", () => ({
     AppCaches: {
@@ -132,6 +145,9 @@ describe("monitorTypeHelper", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        // Reset mock store state
+        mockMonitorTypesStore.monitorTypes = [];
+        mockMonitorTypesStore.isLoaded = false;
     });
 
     afterEach(() => {
@@ -167,18 +183,17 @@ describe("monitorTypeHelper", () => {
 
         it("should fetch from backend when cache is empty", async () => {
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
+            
+            // Configure mock store to return the expected monitor types
+            mockMonitorTypesStore.monitorTypes = mockMonitorTypes;
+            mockMonitorTypesStore.isLoaded = true;
+            
             vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(async (fn) => await fn());
-            vi.mocked(ipcTypes.safeExtractIpcData).mockReturnValue(mockMonitorTypes);
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
-                success: true,
-                data: mockMonitorTypes,
-            });
 
             const result = await getAvailableMonitorTypes();
 
             expect(result).toEqual(mockMonitorTypes);
             expect(AppCaches.monitorTypes.get).toHaveBeenCalledWith("all-monitor-types");
-            expect(mockElectronAPI.monitorTypes.getMonitorTypes).toHaveBeenCalledTimes(1);
             expect(AppCaches.monitorTypes.set).toHaveBeenCalledWith("all-monitor-types", mockMonitorTypes);
         });
 
@@ -196,12 +211,12 @@ describe("monitorTypeHelper", () => {
 
         it("should cache fetched data for subsequent calls", async () => {
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
+            
+            // Configure mock store to return the expected monitor types
+            mockMonitorTypesStore.monitorTypes = mockMonitorTypes;
+            mockMonitorTypesStore.isLoaded = true;
+            
             vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(async (fn) => await fn());
-            vi.mocked(ipcTypes.safeExtractIpcData).mockReturnValue(mockMonitorTypes);
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
-                success: true,
-                data: mockMonitorTypes,
-            });
 
             await getAvailableMonitorTypes();
 
@@ -212,6 +227,11 @@ describe("monitorTypeHelper", () => {
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
             vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(async (fn) => await fn());
             vi.mocked(ipcTypes.safeExtractIpcData).mockReturnValue([]);
+            
+            // Configure the mock store to return empty data
+            mockMonitorTypesStore.monitorTypes = [];
+            mockMonitorTypesStore.isLoaded = true;
+            
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
                 success: true,
                 data: [],
@@ -225,17 +245,16 @@ describe("monitorTypeHelper", () => {
 
         it("should handle invalid cache data gracefully", async () => {
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(null);
+            
+            // Configure mock store to return the expected monitor types
+            mockMonitorTypesStore.monitorTypes = mockMonitorTypes;
+            mockMonitorTypesStore.isLoaded = true;
+            
             vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(async (fn) => await fn());
-            vi.mocked(ipcTypes.safeExtractIpcData).mockReturnValue(mockMonitorTypes);
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
-                success: true,
-                data: mockMonitorTypes,
-            });
 
             const result = await getAvailableMonitorTypes();
 
             expect(result).toEqual(mockMonitorTypes);
-            expect(mockElectronAPI.monitorTypes.getMonitorTypes).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -433,20 +452,26 @@ describe("monitorTypeHelper", () => {
         });
     });
 
-    describe("IPC integration", () => {
-        it("should call electronAPI with correct method", async () => {
+    describe("Store integration", () => {
+        it("should use monitor types store correctly", async () => {
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
-            vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(async (fn) => await fn());
-            vi.mocked(ipcTypes.safeExtractIpcData).mockReturnValue(mockMonitorTypes);
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
-                success: true,
-                data: mockMonitorTypes,
+            
+            // Configure mock store to simulate unloaded state initially
+            mockMonitorTypesStore.monitorTypes = [];
+            mockMonitorTypesStore.isLoaded = false;
+            
+            const loadMonitorTypesMock = vi.fn().mockImplementation(() => {
+                // Simulate loading completing
+                mockMonitorTypesStore.monitorTypes = mockMonitorTypes;
+                mockMonitorTypesStore.isLoaded = true;
             });
+            mockMonitorTypesStore.loadMonitorTypes = loadMonitorTypesMock;
+            
+            vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(async (fn) => await fn());
 
             await getAvailableMonitorTypes();
 
-            expect(mockElectronAPI.monitorTypes.getMonitorTypes).toHaveBeenCalledTimes(1);
-            expect(ipcTypes.safeExtractIpcData).toHaveBeenCalledWith({ success: true, data: mockMonitorTypes }, []);
+            expect(loadMonitorTypesMock).toHaveBeenCalledTimes(1);
         });
     });
 });

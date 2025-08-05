@@ -17,7 +17,7 @@ describe("SiteManager", () => {
 
         mockDependencies = {
             configurationManager: {
-                validateSiteConfiguration: vi.fn().mockResolvedValue({ isValid: true }),
+                validateSiteConfiguration: vi.fn().mockResolvedValue({ success: true }),
             },
             databaseService: {
                 executeTransaction: vi.fn(),

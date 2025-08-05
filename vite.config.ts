@@ -137,9 +137,9 @@ export default defineConfig(() => {
         ],
         resolve: {
             alias: {
-                "@": path.resolve(import.meta.dirname, "src"),
-                "@electron": path.resolve(import.meta.dirname, "electron"),
-                "@shared": path.resolve(import.meta.dirname, "shared"),
+                "@": path.resolve(import.meta.dirname, "./src"),
+                "@electron": path.resolve(import.meta.dirname, "./electron"),
+                "@shared": path.resolve(import.meta.dirname, "./shared"),
             },
         },
         server: {

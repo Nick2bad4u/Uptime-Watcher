@@ -32,7 +32,9 @@ vi.mock("../theme/useTheme", () => ({
 
 // Mock window.electronAPI
 const mockElectronAPI = {
-    openExternal: vi.fn().mockResolvedValue(undefined),
+    system: {
+        openExternal: vi.fn().mockResolvedValue(undefined),
+    },
 };
 
 Object.defineProperty(window, "electronAPI", {
@@ -149,13 +151,13 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         });
 
         // Verify logger was called with correct action
-        expect(logger.user.action).toHaveBeenCalledWith("External URL opened from screenshot thumbnail", {
+        expect(logger.user.action).toHaveBeenCalledWith("External URL opened", {
             siteName: "Test Site",
             url: "https://test.com",
         });
 
         // Verify electronAPI was called
-        expect(mockElectronAPI.openExternal).toHaveBeenCalledWith("https://test.com");
+        expect(mockElectronAPI.system.openExternal).toHaveBeenCalledWith("https://test.com");
     });
 
     it("should handle rapid hover/unhover cycles", () => {

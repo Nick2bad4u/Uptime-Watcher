@@ -57,6 +57,60 @@ const mockElectronAPI = {
         stopMonitoring: vi.fn().mockResolvedValue(undefined),
         stopMonitoringForSite: vi.fn().mockResolvedValue(undefined),
     },
+    monitorTypes: {
+        formatMonitorDetail: vi.fn().mockResolvedValue({
+            success: true,
+            data: "Mock formatted detail",
+        }),
+        getMonitorTypes: vi.fn().mockResolvedValue({
+            success: true,
+            data: [
+                {
+                    type: "http",
+                    fields: [
+                        {
+                            id: "url",
+                            label: "URL",
+                            type: "url",
+                            required: true,
+                            placeholder: "https://example.com",
+                        },
+                        {
+                            id: "port",
+                            label: "Port",
+                            type: "number",
+                            required: false,
+                            min: 1,
+                            max: 65535,
+                        },
+                    ],
+                },
+                {
+                    type: "port",
+                    fields: [
+                        {
+                            id: "host",
+                            label: "Host",
+                            type: "text",
+                            required: true,
+                        },
+                        {
+                            id: "port",
+                            label: "Port",
+                            type: "number",
+                            required: true,
+                            min: 1,
+                            max: 65535,
+                        },
+                    ],
+                },
+            ],
+        }),
+        validateMonitorData: vi.fn().mockResolvedValue({
+            success: true,
+            errors: [],
+        }),
+    },
     settings: {
         getHistoryLimit: vi.fn().mockResolvedValue(1000),
         updateHistoryLimit: vi.fn().mockResolvedValue(undefined),
@@ -69,10 +123,24 @@ const mockElectronAPI = {
         }),
         checkSiteNow: vi.fn().mockResolvedValue(undefined),
         getSites: vi.fn().mockResolvedValue([]),
+        removeMonitor: vi.fn().mockResolvedValue(undefined),
         removeSite: vi.fn().mockResolvedValue(undefined),
         updateSite: vi.fn().mockResolvedValue(undefined),
     },
+    stateSync: {
+        getSyncStatus: vi.fn().mockResolvedValue({
+            success: true,
+            siteCount: 0,
+            lastSync: undefined,
+            synchronized: false,
+        }),
+        onStateSyncEvent: vi.fn((_callback) => {
+            // Mock implementation - return cleanup function
+            return vi.fn(); // Mock cleanup function
+        }),
+    },
     system: {
+        openExternal: vi.fn().mockResolvedValue(undefined),
         quitAndInstall: vi.fn(),
     },
 };

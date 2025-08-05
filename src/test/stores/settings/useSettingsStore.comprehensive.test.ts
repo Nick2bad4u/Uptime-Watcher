@@ -8,6 +8,7 @@ import { act, renderHook } from "@testing-library/react";
 // Mock extractIpcData
 vi.mock("../../../types/ipc", () => ({
     extractIpcData: vi.fn(),
+    safeExtractIpcData: vi.fn(),
 }));
 
 // Mock error store
@@ -30,11 +31,12 @@ vi.mock("../../../stores/utils", () => ({
 }));
 
 // Import mocked modules to get references
-import { extractIpcData } from "../../../types/ipc";
+import { extractIpcData, safeExtractIpcData } from "../../../types/ipc";
 import { logStoreAction, withErrorHandling } from "../../../stores/utils";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 
 const mockExtractIpcData = vi.mocked(extractIpcData);
+const mockSafeExtractIpcData = vi.mocked(safeExtractIpcData);
 const mockLogStoreAction = vi.mocked(logStoreAction);
 const mockWithErrorHandling = vi.mocked(withErrorHandling);
 
@@ -68,6 +70,13 @@ describe("useSettingsStore", () => {
         mockElectronAPI.settings.resetSettings.mockResolvedValue({ data: true });
 
         mockExtractIpcData.mockImplementation((response: any) => response.data);
+        mockSafeExtractIpcData.mockImplementation((response: any, fallback: any) => {
+            try {
+                return response?.data ?? fallback;
+            } catch {
+                return fallback;
+            }
+        });
 
         // Setup withErrorHandling to execute function properly
         mockWithErrorHandling.mockImplementation(async (fn, handlers) => {
@@ -175,7 +184,7 @@ describe("useSettingsStore", () => {
             });
 
             expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalled();
-            expect(mockExtractIpcData).toHaveBeenCalled();
+            expect(mockSafeExtractIpcData).toHaveBeenCalled();
             expect(result.current.settings.historyLimit).toBe(500);
         });
 
@@ -225,7 +234,7 @@ describe("useSettingsStore", () => {
             });
 
             expect(mockElectronAPI.settings.updateHistoryLimit).toHaveBeenCalledWith(2000);
-            expect(mockExtractIpcData).toHaveBeenCalled();
+            expect(mockSafeExtractIpcData).toHaveBeenCalled();
             expect(result.current.settings.historyLimit).toBe(2000);
             expect(mockLogStoreAction).toHaveBeenCalledWith("SettingsStore", "updateHistoryLimitValue", {
                 limit: 2000,
@@ -335,18 +344,25 @@ describe("useSettingsStore", () => {
             expect(result.current.settings.historyLimit).toBeGreaterThan(0);
         });
 
-        it("should handle extractIpcData errors", async () => {
-            mockExtractIpcData.mockImplementationOnce(() => {
-                throw new Error("IPC extraction failed");
+        it("should handle safeExtractIpcData errors gracefully", async () => {
+            // Reset the mock first
+            mockElectronAPI.settings.getHistoryLimit.mockReset();
+            
+            // Make the electronAPI call fail to return an error response
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({ 
+                success: false,
+                error: "Backend error",
+                data: undefined
             });
 
             const { result } = renderHook(() => useSettingsStore());
 
-            await expect(
-                act(async () => {
-                    await result.current.initializeSettings();
-                })
-            ).rejects.toThrow("IPC extraction failed");
+            await act(async () => {
+                await result.current.initializeSettings();
+            });
+
+            // Should use the fallback value (DEFAULT_HISTORY_LIMIT = 500)
+            expect(result.current.settings.historyLimit).toBe(500);
         });
     });
 

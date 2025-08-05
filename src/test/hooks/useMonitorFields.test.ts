@@ -13,6 +13,18 @@ import type { MonitorFieldDefinition } from "../../../shared/types";
 import { useMonitorFields } from "../../hooks/useMonitorFields";
 import type { MonitorTypeConfig } from "../../utils/monitorTypeHelper";
 
+// Mock the monitor types store
+const mockMonitorTypesStore = {
+    fieldConfigs: {} as Record<string, MonitorFieldDefinition[]>,
+    isLoaded: true,
+    lastError: undefined as string | undefined,
+    loadMonitorTypes: vi.fn(),
+};
+
+vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
+    useMonitorTypesStore: vi.fn(() => mockMonitorTypesStore),
+}));
+
 // Mock the logger module
 vi.mock("../../services/logger", () => ({
     default: {
@@ -88,10 +100,17 @@ Object.defineProperty(window, "electronAPI", {
 describe("useMonitorFields Hook", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        // Reset mock store state - default to loaded for most tests
+        mockMonitorTypesStore.fieldConfigs = {};
+        mockMonitorTypesStore.isLoaded = true;
+        mockMonitorTypesStore.lastError = undefined;
     });
 
     describe("Basic functionality", () => {
         it("should return initial loading state", () => {
+            // Set up mock to simulate loading state
+            mockMonitorTypesStore.isLoaded = false;
+            
             // Make the IPC call never resolve
             mockElectronAPI.monitorTypes.getMonitorTypes.mockImplementation(() => new Promise(() => {}));
 
@@ -122,46 +141,27 @@ describe("useMonitorFields Hook", () => {
                 },
             ];
 
-            const mockConfigs: MonitorTypeConfig[] = [
+            const pingFieldDefinitions: MonitorFieldDefinition[] = [
                 {
-                    type: "http",
-                    fields: mockFieldDefinitions,
-                    displayName: "HTTP Monitor",
-                    description: "Monitor HTTP endpoints",
-                    version: "1.0.0",
-                },
-                {
-                    type: "ping",
-                    fields: [
-                        {
-                            name: "host",
-                            type: "text",
-                            required: true,
-                            label: "Host",
-                            placeholder: "Enter hostname or IP",
-                        },
-                    ],
-                    displayName: "Ping Monitor",
-                    description: "Monitor host availability",
-                    version: "1.0.0",
+                    name: "host",
+                    type: "text",
+                    required: true,
+                    label: "Host",
+                    placeholder: "Enter hostname or IP",
                 },
             ];
 
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
-                success: true,
-                data: mockConfigs,
-            });
-
-            const { safeExtractIpcData } = await import("../../types/ipc");
-            vi.mocked(safeExtractIpcData).mockReturnValue(mockConfigs);
+            // Configure the mock store with field configurations
+            mockMonitorTypesStore.fieldConfigs = {
+                http: mockFieldDefinitions,
+                ping: pingFieldDefinitions,
+            };
+            mockMonitorTypesStore.isLoaded = true;
 
             const { result } = renderHook(() => useMonitorFields());
 
-            // Wait for loading to complete
-            await waitFor(() => {
-                expect(result.current.isLoaded).toBe(true);
-            });
-
+            // Since the store is already loaded, should immediately be available
+            expect(result.current.isLoaded).toBe(true);
             expect(result.current.error).toBeUndefined();
             expect(result.current.getFields("http")).toEqual(mockFieldDefinitions);
             expect(result.current.getFields("ping")).toHaveLength(1);
@@ -169,6 +169,10 @@ describe("useMonitorFields Hook", () => {
         });
 
         it("should handle empty configurations", async () => {
+            // Configure the mock store to have empty field configurations
+            mockMonitorTypesStore.fieldConfigs = {};
+            mockMonitorTypesStore.isLoaded = true;
+            
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
                 success: true,
                 data: [],
@@ -239,6 +243,13 @@ describe("useMonitorFields Hook", () => {
                     version: "1.0.0",
                 },
             ];
+
+            // Configure the mock store with field configurations
+            mockMonitorTypesStore.fieldConfigs = {
+                http: mockConfigs[0].fields,
+                tcp: mockConfigs[1].fields,
+            };
+            mockMonitorTypesStore.isLoaded = true;
 
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
                 success: true,
@@ -379,88 +390,87 @@ describe("useMonitorFields Hook", () => {
 
     describe("Error handling", () => {
         it("should handle IPC errors", async () => {
-            const error = new Error("IPC communication failed");
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockRejectedValue(error);
+            // Configure mock store to have an error
+            mockMonitorTypesStore.lastError = "IPC communication failed";
+            mockMonitorTypesStore.isLoaded = true;
+            mockMonitorTypesStore.fieldConfigs = {};
 
             const { result } = renderHook(() => useMonitorFields());
 
-            await waitFor(() => {
-                expect(result.current.isLoaded).toBe(true);
-            });
-
+            expect(result.current.isLoaded).toBe(true);
             expect(result.current.error).toBe("IPC communication failed");
             expect(result.current.getFields("http")).toEqual([]);
         });
 
         it("should handle non-Error objects", async () => {
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockRejectedValue("String error");
+            // Configure mock store to have an error
+            mockMonitorTypesStore.lastError = "Failed to load monitor field configurations";
+            mockMonitorTypesStore.isLoaded = true;
+            mockMonitorTypesStore.fieldConfigs = {};
 
             const { result } = renderHook(() => useMonitorFields());
 
-            await waitFor(() => {
-                expect(result.current.isLoaded).toBe(true);
-            });
-
+            expect(result.current.isLoaded).toBe(true);
             expect(result.current.error).toBe("Failed to load monitor field configurations");
             expect(result.current.getFields("http")).toEqual([]);
         });
 
         it("should handle null/undefined errors", async () => {
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockRejectedValue(null);
+            // Configure mock store to have an error
+            mockMonitorTypesStore.lastError = "Failed to load monitor field configurations";
+            mockMonitorTypesStore.isLoaded = true;
+            mockMonitorTypesStore.fieldConfigs = {};
 
             const { result } = renderHook(() => useMonitorFields());
 
-            await waitFor(() => {
-                expect(result.current.isLoaded).toBe(true);
-            });
-
+            expect(result.current.isLoaded).toBe(true);
             expect(result.current.error).toBe("Failed to load monitor field configurations");
         });
 
         it("should set isLoaded to true even on error", async () => {
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockRejectedValue(new Error("Test error"));
+            // Configure mock store to have an error but still be loaded
+            mockMonitorTypesStore.lastError = "Some error occurred";
+            mockMonitorTypesStore.isLoaded = true;
+            mockMonitorTypesStore.fieldConfigs = {};
 
             const { result } = renderHook(() => useMonitorFields());
-
-            await waitFor(() => {
-                expect(result.current.isLoaded).toBe(true);
-            });
 
             expect(result.current.error).toBeDefined();
             expect(result.current.isLoaded).toBe(true); // Should be true to prevent infinite loading
         });
     });
 
-    describe("IPC data extraction", () => {
-        it("should use safeExtractIpcData with correct defaults", async () => {
-            const mockResponse = { success: true, data: [] };
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(mockResponse);
+    describe("Store integration", () => {
+        it("should use monitor types store for field configurations", async () => {
+            const mockFieldDefinitions: MonitorFieldDefinition[] = [
+                {
+                    name: "url",
+                    type: "text",
+                    required: true,
+                    label: "URL",
+                    placeholder: "Enter URL to monitor",
+                },
+            ];
 
-            const { safeExtractIpcData } = await import("../../types/ipc");
-            const mockExtract = vi.mocked(safeExtractIpcData);
-            mockExtract.mockReturnValue([]);
-
-            renderHook(() => useMonitorFields());
-
-            await waitFor(() => {
-                expect(mockExtract).toHaveBeenCalledWith(mockResponse, []);
-            });
-        });
-
-        it("should handle malformed IPC responses gracefully", async () => {
-            const malformedResponse = { success: false, error: "Something went wrong" };
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(malformedResponse);
-
-            const { safeExtractIpcData } = await import("../../types/ipc");
-            const mockExtract = vi.mocked(safeExtractIpcData);
-            mockExtract.mockReturnValue([]); // Fallback to empty array
+            // Configure mock store
+            mockMonitorTypesStore.fieldConfigs = { http: mockFieldDefinitions };
+            mockMonitorTypesStore.isLoaded = true;
 
             const { result } = renderHook(() => useMonitorFields());
 
-            await waitFor(() => {
-                expect(result.current.isLoaded).toBe(true);
-            });
+            expect(result.current.isLoaded).toBe(true);
+            expect(result.current.error).toBeUndefined();
+            expect(result.current.getFields("http")).toEqual(mockFieldDefinitions);
+        });
 
+        it("should handle empty store gracefully", async () => {
+            // Configure empty store
+            mockMonitorTypesStore.fieldConfigs = {};
+            mockMonitorTypesStore.isLoaded = true;
+
+            const { result } = renderHook(() => useMonitorFields());
+
+            expect(result.current.isLoaded).toBe(true);
             expect(result.current.error).toBeUndefined();
             expect(result.current.getFields("any-type")).toEqual([]);
         });

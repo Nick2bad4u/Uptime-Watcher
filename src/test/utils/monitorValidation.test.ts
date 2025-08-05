@@ -162,7 +162,9 @@ describe("Monitor Validation Utilities", () => {
             const result = await validateMonitorData("http", { url: "https://example.com" });
 
             expect(result).toEqual({
+                data: undefined,
                 errors: [],
+                metadata: {},
                 success: true,
                 warnings: ["Minor issue"],
             });
@@ -182,7 +184,9 @@ describe("Monitor Validation Utilities", () => {
             const result = await validateMonitorData("http", { url: "invalid-url" });
 
             expect(result).toEqual({
+                data: undefined,
                 errors: ["URL is invalid"],
+                metadata: {},
                 success: false,
                 warnings: [],
             });
@@ -199,7 +203,9 @@ describe("Monitor Validation Utilities", () => {
             const result = await validateMonitorData("http", { url: "https://example.com" });
 
             expect(result).toEqual({
+                data: undefined,
                 errors: [],
+                metadata: {},
                 success: true,
                 warnings: [], // Should default to empty array
             });
@@ -216,7 +222,9 @@ describe("Monitor Validation Utilities", () => {
             const result = await validateMonitorData("http", { url: "https://example.com" });
 
             expect(result).toEqual({
+                data: undefined,
                 errors: [],
+                metadata: {},
                 success: true,
                 warnings: [], // Should default to empty array
             });
@@ -229,6 +237,7 @@ describe("Monitor Validation Utilities", () => {
 
             expect(result).toEqual({
                 errors: ["Validation failed - unable to connect to backend"],
+                metadata: {},
                 success: false,
                 warnings: [],
             });

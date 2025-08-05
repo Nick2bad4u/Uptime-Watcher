@@ -62,12 +62,12 @@ describe("ConfigurationManager", () => {
         // Create mock instances
         mockMonitorValidator = {
             shouldApplyDefaultInterval: vi.fn(() => true),
-            validateMonitorConfiguration: vi.fn(() => ({ isValid: true, errors: [] })),
+            validateMonitorConfiguration: vi.fn(() => ({ success: true, errors: [] })),
         };
 
         mockSiteValidator = {
             shouldIncludeInExport: vi.fn(() => true),
-            validateSiteConfiguration: vi.fn(() => ({ isValid: true, errors: [] })),
+            validateSiteConfiguration: vi.fn(() => ({ success: true, errors: [] })),
         };
 
         // Mock the constructor calls
@@ -247,7 +247,7 @@ describe("ConfigurationManager", () => {
     describe("validateMonitorConfiguration", () => {
         it("should validate monitor and cache result", async () => {
             const monitor = createMockMonitor();
-            const expectedResult: ValidationResult = { isValid: true, errors: [] };
+            const expectedResult: ValidationResult = { success: true, errors: [] };
             mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(expectedResult);
 
             const result = await configManager.validateMonitorConfiguration(monitor);
@@ -258,7 +258,7 @@ describe("ConfigurationManager", () => {
 
         it("should return cached result on second call", async () => {
             const monitor = createMockMonitor();
-            const expectedResult: ValidationResult = { isValid: true, errors: [] };
+            const expectedResult: ValidationResult = { success: true, errors: [] };
             mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(expectedResult);
 
             // First call
@@ -274,8 +274,8 @@ describe("ConfigurationManager", () => {
         it("should validate different monitors separately", async () => {
             const monitor1 = createMockMonitor({ id: "monitor-1" });
             const monitor2 = createMockMonitor({ id: "monitor-2" });
-            const result1: ValidationResult = { isValid: true, errors: [] };
-            const result2: ValidationResult = { isValid: false, errors: ["error"] };
+            const result1: ValidationResult = { success: true, errors: [] };
+            const result2: ValidationResult = { success: false, errors: ["error"] };
 
             mockMonitorValidator.validateMonitorConfiguration.mockReturnValueOnce(result1).mockReturnValueOnce(result2);
 
@@ -291,7 +291,7 @@ describe("ConfigurationManager", () => {
             const monitor = createMockMonitor({
                 // Optional properties are omitted to test undefined handling
             });
-            const expectedResult: ValidationResult = { isValid: true, errors: [] };
+            const expectedResult: ValidationResult = { success: true, errors: [] };
             mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(expectedResult);
 
             const result = await configManager.validateMonitorConfiguration(monitor);
@@ -302,7 +302,7 @@ describe("ConfigurationManager", () => {
         it("should handle monitors with lastChecked date", async () => {
             const lastChecked = new Date("2023-01-01T00:00:00Z");
             const monitor = createMockMonitor({ lastChecked });
-            const expectedResult: ValidationResult = { isValid: true, errors: [] };
+            const expectedResult: ValidationResult = { success: true, errors: [] };
             mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(expectedResult);
 
             const result = await configManager.validateMonitorConfiguration(monitor);
@@ -318,7 +318,7 @@ describe("ConfigurationManager", () => {
             (monitor as any).port = null;
             (monitor as any).lastChecked = null;
 
-            const expectedResult: ValidationResult = { isValid: true, errors: [] };
+            const expectedResult: ValidationResult = { success: true, errors: [] };
             mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(expectedResult);
 
             const result = await configManager.validateMonitorConfiguration(monitor);
@@ -333,7 +333,7 @@ describe("ConfigurationManager", () => {
                 port: 80,
                 // url is omitted since it's not needed for port monitors
             });
-            const expectedResult: ValidationResult = { isValid: true, errors: [] };
+            const expectedResult: ValidationResult = { success: true, errors: [] };
             mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(expectedResult);
 
             const result = await configManager.validateMonitorConfiguration(monitor);
@@ -345,7 +345,7 @@ describe("ConfigurationManager", () => {
     describe("validateSiteConfiguration", () => {
         it("should validate site and cache result", async () => {
             const site = createMockSite();
-            const expectedResult: ValidationResult = { isValid: true, errors: [] };
+            const expectedResult: ValidationResult = { success: true, errors: [] };
             mockSiteValidator.validateSiteConfiguration.mockReturnValue(expectedResult);
 
             const result = await configManager.validateSiteConfiguration(site);
@@ -356,7 +356,7 @@ describe("ConfigurationManager", () => {
 
         it("should return cached result on second call", async () => {
             const site = createMockSite();
-            const expectedResult: ValidationResult = { isValid: true, errors: [] };
+            const expectedResult: ValidationResult = { success: true, errors: [] };
             mockSiteValidator.validateSiteConfiguration.mockReturnValue(expectedResult);
 
             // First call
@@ -372,8 +372,8 @@ describe("ConfigurationManager", () => {
         it("should validate different sites separately", async () => {
             const site1 = createMockSite({ identifier: "site-1" });
             const site2 = createMockSite({ identifier: "site-2" });
-            const result1: ValidationResult = { isValid: true, errors: [] };
-            const result2: ValidationResult = { isValid: false, errors: ["error"] };
+            const result1: ValidationResult = { success: true, errors: [] };
+            const result2: ValidationResult = { success: false, errors: ["error"] };
 
             mockSiteValidator.validateSiteConfiguration.mockReturnValueOnce(result1).mockReturnValueOnce(result2);
 
@@ -387,7 +387,7 @@ describe("ConfigurationManager", () => {
 
         it("should handle sites with no monitors", async () => {
             const site = createMockSite({ monitors: [] });
-            const expectedResult: ValidationResult = { isValid: true, errors: [] };
+            const expectedResult: ValidationResult = { success: true, errors: [] };
             mockSiteValidator.validateSiteConfiguration.mockReturnValue(expectedResult);
 
             const result = await configManager.validateSiteConfiguration(site);
@@ -403,7 +403,7 @@ describe("ConfigurationManager", () => {
                     createMockMonitor({ id: "monitor-3" }),
                 ],
             });
-            const expectedResult: ValidationResult = { isValid: true, errors: [] };
+            const expectedResult: ValidationResult = { success: true, errors: [] };
             mockSiteValidator.validateSiteConfiguration.mockReturnValue(expectedResult);
 
             const result = await configManager.validateSiteConfiguration(site);
@@ -413,7 +413,7 @@ describe("ConfigurationManager", () => {
 
         it("should handle sites with monitoring disabled", async () => {
             const site = createMockSite({ monitoring: false });
-            const expectedResult: ValidationResult = { isValid: true, errors: [] };
+            const expectedResult: ValidationResult = { success: true, errors: [] };
             mockSiteValidator.validateSiteConfiguration.mockReturnValue(expectedResult);
 
             const result = await configManager.validateSiteConfiguration(site);
@@ -425,7 +425,7 @@ describe("ConfigurationManager", () => {
     describe("Cache behavior", () => {
         it("should use cache after clearing and re-validating", async () => {
             const monitor = createMockMonitor();
-            const expectedResult: ValidationResult = { isValid: true, errors: [] };
+            const expectedResult: ValidationResult = { success: true, errors: [] };
             mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(expectedResult);
 
             // First validation
@@ -442,7 +442,7 @@ describe("ConfigurationManager", () => {
 
         it("should track cache statistics correctly", async () => {
             const monitor = createMockMonitor();
-            const expectedResult: ValidationResult = { isValid: true, errors: [] };
+            const expectedResult: ValidationResult = { success: true, errors: [] };
             mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(expectedResult);
 
             const initialStats = configManager.getCacheStats();
@@ -521,7 +521,7 @@ describe("ConfigurationManager", () => {
                 ],
             });
 
-            const expectedResult: ValidationResult = { isValid: true, errors: [] };
+            const expectedResult: ValidationResult = { success: true, errors: [] };
             mockSiteValidator.validateSiteConfiguration.mockReturnValue(expectedResult);
 
             const result = await configManager.validateSiteConfiguration(complexSite);

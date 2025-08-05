@@ -6,7 +6,8 @@ import { renderHook } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 vi.mock("../../../types/ipc", () => ({
-    extractIpcData: vi.fn().mockReturnValue(1000),
+    extractIpcData: vi.fn(),
+    safeExtractIpcData: vi.fn(),
 }));
 
 vi.mock("../error/useErrorStore", () => ({

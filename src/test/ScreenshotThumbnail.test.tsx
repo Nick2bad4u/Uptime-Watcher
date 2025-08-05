@@ -44,7 +44,9 @@ Element.prototype.setAttribute = function (name: string, value: string) {
 // Mock window properties
 const mockWindowOpen = vi.fn();
 const mockElectronAPI = {
-    openExternal: vi.fn(),
+    system: {
+        openExternal: vi.fn(),
+    },
 };
 
 // Create a mock for getBoundingClientRect
@@ -173,12 +175,12 @@ describe("ScreenshotThumbnail", () => {
             const link = screen.getByRole("link");
             await user.click(link);
 
-            expect(logger.user.action).toHaveBeenCalledWith("External URL opened from screenshot thumbnail", {
+            expect(logger.user.action).toHaveBeenCalledWith("External URL opened", {
                 siteName: "Example Site",
                 url: "https://example.com",
             });
 
-            expect(mockElectronAPI.openExternal).toHaveBeenCalledWith("https://example.com");
+            expect(mockElectronAPI.system.openExternal).toHaveBeenCalledWith("https://example.com");
             expect(mockWindowOpen).not.toHaveBeenCalled();
         });
 
@@ -200,9 +202,12 @@ describe("ScreenshotThumbnail", () => {
         });
 
         it("should handle electronAPI without openExternal method", () => {
-            // Mock electronAPI without openExternal method
+            // Mock electronAPI without system.openExternal
             Object.defineProperty(window, "electronAPI", {
-                value: { someOtherMethod: vi.fn() },
+                value: { 
+                    system: { someOtherMethod: vi.fn() }, // system exists but no openExternal
+                    someOtherMethod: vi.fn() 
+                },
                 writable: true,
             });
 
@@ -603,7 +608,9 @@ describe("ScreenshotThumbnail", () => {
     describe("Type Guard Functionality", () => {
         it("should use electronAPI when openExternal is available", () => {
             const apiWithOpenExternal = {
-                openExternal: vi.fn(),
+                system: {
+                    openExternal: vi.fn(),
+                },
             };
 
             Object.defineProperty(window, "electronAPI", {
@@ -620,7 +627,7 @@ describe("ScreenshotThumbnail", () => {
             fireEvent.click(link);
 
             // If hasOpenExternal works correctly, electronAPI.openExternal should be called
-            expect(apiWithOpenExternal.openExternal).toHaveBeenCalledWith("https://example.com");
+            expect(apiWithOpenExternal.system.openExternal).toHaveBeenCalledWith("https://example.com");
         });
 
         it("should fallback to window.open when openExternal is not available", () => {

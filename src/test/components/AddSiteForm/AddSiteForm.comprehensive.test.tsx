@@ -68,6 +68,15 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
         resetForm: vi.fn(),
         isValid: true,
         validationErrors: {},
+        // Add missing methods from the hook
+        monitorType: "http",
+        setMonitorType: vi.fn(),
+        checkInterval: 60000,
+        setCheckInterval: vi.fn(),
+        addMode: "new",
+        setAddMode: vi.fn(),
+        selectedSite: null,
+        setSelectedSite: vi.fn(),
     })),
 }));
 

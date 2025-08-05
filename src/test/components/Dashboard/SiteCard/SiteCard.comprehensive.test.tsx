@@ -41,11 +41,6 @@ vi.mock("../SiteCardFooter", () => ({
     SiteCardFooter: () => <div data-testid="site-card-footer">Site Footer</div>,
 }));
 
-// Mock the theme components
-vi.mock("../../../../theme/components", () => ({
-    ThemedBox: ({ children }: { children: React.ReactNode }) => <div data-testid="themed-box">{children}</div>,
-}));
-
 // Mock the hooks
 vi.mock("../../../../hooks/site/useSite", () => ({
     useSite: vi.fn(() => {
@@ -148,11 +143,15 @@ describe("SiteCard Component", () => {
         render(<SiteCard site={mockSite} />);
 
         expect(screen.getByTestId("themed-box")).toBeInTheDocument();
-        expect(screen.getByTestId("site-card-header")).toBeInTheDocument();
-        expect(screen.getByTestId("site-card-status")).toBeInTheDocument();
-        expect(screen.getByTestId("site-card-history")).toBeInTheDocument();
-        expect(screen.getByTestId("site-card-metrics")).toBeInTheDocument();
-        expect(screen.getByTestId("site-card-footer")).toBeInTheDocument();
+        // Check for site name
+        expect(screen.getByText("Test Site")).toBeInTheDocument();
+        // Check for monitor selector
+        expect(screen.getByRole("combobox")).toBeInTheDocument();
+        // Check for action buttons
+        expect(screen.getByLabelText("Check Now")).toBeInTheDocument();
+        // Check for metrics grid
+        expect(screen.getByText("Status")).toBeInTheDocument();
+        expect(screen.getByText("Uptime")).toBeInTheDocument();
     });
 
     it("should handle site with no monitors", () => {
@@ -163,7 +162,7 @@ describe("SiteCard Component", () => {
 
         render(<SiteCard site={siteWithoutMonitors} />);
 
-        expect(screen.getByTestId("site-card-header")).toBeInTheDocument();
+        expect(screen.getByText("Test Site")).toBeInTheDocument();
     });
 
     it("should handle site with multiple monitors", () => {
@@ -173,23 +172,20 @@ describe("SiteCard Component", () => {
                 mockSite.monitors[0],
                 {
                     id: "monitor-2",
-                    type: "port",
-                    host: "example.com",
-                    port: 80,
-                    status: "down",
-                    responseTime: -1,
-                    monitoring: true,
-                    checkInterval: 30000,
-                    timeout: 5000,
-                    retryAttempts: 3,
+                    type: "http" as const,
+                    url: "https://api.example.com",
+                    status: "down" as const,
+                    responseTime: 5000,
                     history: [],
-                    activeOperations: [],
+                    monitoring: false,
+                    timeout: 10000,
+                    retryAttempts: 3,
                 },
             ],
         };
 
         render(<SiteCard site={siteWithMultipleMonitors} />);
 
-        expect(screen.getByTestId("site-card-header")).toBeInTheDocument();
+        expect(screen.getByText("Test Site")).toBeInTheDocument();
     });
 });

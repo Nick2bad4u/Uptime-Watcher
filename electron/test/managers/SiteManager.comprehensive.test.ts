@@ -162,7 +162,7 @@ describe("SiteManager - Comprehensive", () => {
 
         mockDeps = {
             configurationManager: {
-                validateSiteConfiguration: vi.fn().mockResolvedValue({ isValid: true, errors: [] }),
+                validateSiteConfiguration: vi.fn().mockResolvedValue({ success: true, errors: [] }),
             },
             databaseService: {
                 executeTransaction: vi.fn().mockImplementation(async (fn) => fn()),
@@ -234,7 +234,7 @@ describe("SiteManager - Comprehensive", () => {
 
         it("should handle validation errors", async () => {
             vi.mocked(mockDeps.configurationManager.validateSiteConfiguration).mockResolvedValue({
-                isValid: false,
+                success: false,
                 errors: ["Invalid URL", "Missing name"],
             });
 
@@ -245,7 +245,7 @@ describe("SiteManager - Comprehensive", () => {
 
         it("should handle single validation error", async () => {
             vi.mocked(mockDeps.configurationManager.validateSiteConfiguration).mockResolvedValue({
-                isValid: false,
+                success: false,
                 errors: ["Invalid URL"],
             });
 
@@ -256,7 +256,7 @@ describe("SiteManager - Comprehensive", () => {
 
         it("should handle empty validation errors array", async () => {
             vi.mocked(mockDeps.configurationManager.validateSiteConfiguration).mockResolvedValue({
-                isValid: false,
+                success: false,
                 errors: [undefined as any],
             });
 
@@ -511,7 +511,7 @@ describe("SiteManager - Comprehensive", () => {
             const mockCache = siteManager["sitesCache"];
             vi.mocked(mockCache.get).mockReturnValue(mockSite);
             vi.mocked(mockDeps.configurationManager.validateSiteConfiguration).mockResolvedValue({
-                isValid: false,
+                success: false,
                 errors: ["Invalid update"],
             });
 
@@ -786,7 +786,7 @@ describe("SiteManager - Comprehensive", () => {
 
         it("should throw error for invalid site", async () => {
             vi.mocked(mockDeps.configurationManager.validateSiteConfiguration).mockResolvedValue({
-                isValid: false,
+                success: false,
                 errors: ["Invalid site"],
             });
 

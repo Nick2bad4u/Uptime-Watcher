@@ -362,7 +362,8 @@ export function hasScales(config: unknown): config is { scales: ChartScalesConfi
         typeof config === "object" &&
         config !== null &&
         "scales" in config &&
-        typeof (config as Record<string, unknown>)["scales"] === "object"
+        typeof (config as Record<string, unknown>)["scales"] === "object" &&
+        (config as Record<string, unknown>)["scales"] !== null
     );
 }
 

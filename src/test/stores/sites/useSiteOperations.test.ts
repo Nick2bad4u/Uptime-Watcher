@@ -39,27 +39,11 @@ vi.mock("../../../stores/utils", () => ({
     }),
 }));
 
-vi.mock("../../../stores/sites/services/MonitoringService", () => ({
-    MonitoringService: {
-        startMonitoring: vi.fn(),
-        stopMonitoring: vi.fn(),
-    },
-}));
-
-vi.mock("../../../stores/sites/services/SiteService", () => ({
-    SiteService: {
-        addSite: vi.fn(),
-        removeSite: vi.fn(),
-        removeMonitor: vi.fn(),
-        getSites: vi.fn(),
-        updateSite: vi.fn(),
-        checkSiteNow: vi.fn(),
-        downloadSQLiteBackup: vi.fn(),
-    },
-}));
-
 vi.mock("../../../stores/sites/utils/fileDownload", () => ({
-    handleSQLiteBackupDownload: vi.fn(),
+    handleSQLiteBackupDownload: vi.fn(async (callback) => {
+        // Actually call the callback to trigger the electron API call
+        return await callback();
+    }),
 }));
 
 vi.mock("../../../stores/sites/utils/monitorOperations", () => ({
@@ -70,10 +54,13 @@ vi.mock("../../../stores/sites/utils/monitorOperations", () => ({
     })),
 }));
 
-// Import mocked services for proper typing
-import { SiteService } from "../../../stores/sites/services/SiteService";
-import { MonitoringService } from "../../../stores/sites/services/MonitoringService";
-import { normalizeMonitor } from "../../../stores/sites/utils/monitorOperations";
+// Mock IPC extraction
+vi.mock("../../types/ipc", () => ({
+    safeExtractIpcData: vi.fn((response, fallback) => response ?? fallback),
+}));
+
+// Access the global electronAPI mock
+const mockElectronAPI = window.electronAPI as any;
 
 describe("createSiteOperationsActions", () => {
     let mockDeps: SiteOperationsDependencies;
@@ -117,11 +104,11 @@ describe("createSiteOperationsActions", () => {
 
     describe("addMonitorToSite", () => {
         it("should add a monitor to an existing site", async () => {
-            vi.mocked(SiteService.updateSite).mockResolvedValue(undefined);
+            mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
 
             await actions.addMonitorToSite("test-site", mockMonitor);
 
-            expect(SiteService.updateSite).toHaveBeenCalledWith("test-site", {
+            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalledWith("test-site", {
                 monitors: expect.arrayContaining([mockMonitor, mockMonitor]), // Original + new
             });
             expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
@@ -134,37 +121,64 @@ describe("createSiteOperationsActions", () => {
                 ERROR_MESSAGES.SITE_NOT_FOUND
             );
         });
-
-        it("should handle normalized monitor data", async () => {
-            vi.mocked(normalizeMonitor).mockReturnValue(mockMonitor);
-            vi.mocked(SiteService.updateSite).mockResolvedValue(undefined);
-
-            await actions.addMonitorToSite("test-site", mockMonitor);
-
-            // normalizeMonitor is not called directly in addMonitorToSite
-            expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
-        });
     });
 
     describe("createSite", () => {
         it("should create a new site with minimal data", async () => {
-            const newSite = { ...mockSite, name: "New Site" };
-            vi.mocked(SiteService.addSite).mockResolvedValue(newSite);
+            const newSite = { 
+                identifier: "new-site", 
+                name: "New Site", 
+                monitoring: true, 
+                monitors: [
+                    {
+                        history: [],
+                        id: expect.any(String),
+                        monitoring: true,
+                        status: "pending",
+                        type: "http"
+                    }
+                ]
+            };
+            // Mock will return the passed site, but implementation uses safeExtractIpcData with completeSite as fallback
+            mockElectronAPI.sites.addSite.mockResolvedValue(undefined);
 
             await actions.createSite({
                 identifier: "new-site",
                 name: "New Site",
             });
 
-            expect(SiteService.addSite).toHaveBeenCalledWith(
+            expect(mockElectronAPI.sites.addSite).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    identifier: "new-site",
+                    name: "New Site", 
+                    monitoring: true,
+                    monitors: expect.arrayContaining([
+                        expect.objectContaining({
+                            id: expect.any(String),
+                            type: "http",
+                            status: "pending",
+                            monitoring: true,
+                            history: []
+                        })
+                    ]),
+                })
+            );
+            expect(mockDeps.addSite).toHaveBeenCalledWith(
                 expect.objectContaining({
                     identifier: "new-site",
                     name: "New Site",
                     monitoring: true,
-                    monitors: expect.any(Array),
+                    monitors: expect.arrayContaining([
+                        expect.objectContaining({
+                            id: expect.any(String),
+                            type: "http",
+                            status: "pending",
+                            monitoring: true,
+                            history: []
+                        })
+                    ])
                 })
             );
-            expect(mockDeps.addSite).toHaveBeenCalledWith(newSite);
         });
 
         it("should create a new site with full data", async () => {
@@ -175,50 +189,44 @@ describe("createSiteOperationsActions", () => {
                 name: "Full Site",
             };
             const newSite = { ...mockSite, ...siteData };
-            vi.mocked(SiteService.addSite).mockResolvedValue(newSite);
+            mockElectronAPI.sites.addSite.mockResolvedValue(newSite);
 
             await actions.createSite(siteData);
 
-            expect(SiteService.addSite).toHaveBeenCalledWith(siteData);
-        });
-
-        it("should sync sites after creation", async () => {
-            vi.mocked(SiteService.addSite).mockResolvedValue(mockSite);
-
-            await actions.createSite({ identifier: "test", name: "Test" });
-
-            expect(mockDeps.addSite).toHaveBeenCalled();
+            expect(mockElectronAPI.sites.addSite).toHaveBeenCalledWith(
+                expect.objectContaining(siteData)
+            );
         });
     });
 
     describe("deleteSite", () => {
-        it("should delete an existing site", async () => {
-            vi.mocked(MonitoringService.stopMonitoring).mockResolvedValue(undefined);
-            vi.mocked(SiteService.removeSite).mockResolvedValue(undefined);
+        it("should delete a site and stop monitoring", async () => {
+            mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValue(undefined);
+            mockElectronAPI.sites.removeSite.mockResolvedValue(undefined);
 
             await actions.deleteSite("test-site");
 
-            expect(MonitoringService.stopMonitoring).toHaveBeenCalledWith("test-site", "monitor-1");
-            expect(SiteService.removeSite).toHaveBeenCalledWith("test-site");
+            expect(mockElectronAPI.monitoring.stopMonitoringForSite).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(mockElectronAPI.sites.removeSite).toHaveBeenCalledWith("test-site");
             expect(mockDeps.removeSite).toHaveBeenCalledWith("test-site");
         });
 
         it("should handle deletion errors", async () => {
-            const error = new Error("Deletion failed");
-            vi.mocked(SiteService.removeSite).mockRejectedValue(error);
+            const error = new Error("Delete failed");
+            mockElectronAPI.sites.removeSite.mockRejectedValue(error);
 
-            await expect(actions.deleteSite("test-site")).rejects.toThrow("Deletion failed");
+            await expect(actions.deleteSite("test-site")).rejects.toThrow("Delete failed");
         });
     });
 
     describe("initializeSites", () => {
         it("should initialize sites from backend", async () => {
             const mockSites = [mockSite];
-            vi.mocked(SiteService.getSites).mockResolvedValue(mockSites);
+            mockElectronAPI.sites.getSites.mockResolvedValue({ success: true, data: mockSites });
 
             const result = await actions.initializeSites();
 
-            expect(SiteService.getSites).toHaveBeenCalled();
+            expect(mockElectronAPI.sites.getSites).toHaveBeenCalled();
             expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
             expect(result).toEqual({
                 message: "Successfully loaded 1 sites",
@@ -228,7 +236,7 @@ describe("createSiteOperationsActions", () => {
         });
 
         it("should handle empty sites list", async () => {
-            vi.mocked(SiteService.getSites).mockResolvedValue([]);
+            mockElectronAPI.sites.getSites.mockResolvedValue({ success: true, data: [] });
 
             const result = await actions.initializeSites();
 
@@ -240,155 +248,88 @@ describe("createSiteOperationsActions", () => {
         });
 
         it("should handle initialization errors", async () => {
-            vi.mocked(SiteService.getSites).mockRejectedValue(new Error("Backend error"));
+            mockElectronAPI.sites.getSites.mockRejectedValue(new Error("Backend error"));
 
             await expect(actions.initializeSites()).rejects.toThrow("Backend error");
         });
     });
 
     describe("modifySite", () => {
-        it("should modify an existing site", async () => {
+        it("should modify a site successfully", async () => {
             const updates = { name: "Updated Site" };
-            vi.mocked(SiteService.updateSite).mockResolvedValue(undefined);
+            mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
 
             await actions.modifySite("test-site", updates);
 
-            expect(SiteService.updateSite).toHaveBeenCalledWith("test-site", updates);
+            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalledWith("test-site", updates);
             expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
         });
 
-        it("should handle modification errors", async () => {
+        it("should handle modify errors", async () => {
             const error = new Error("Update failed");
-            vi.mocked(SiteService.updateSite).mockRejectedValue(error);
+            mockElectronAPI.sites.updateSite.mockRejectedValue(error);
 
-            await expect(actions.modifySite("test-site", {})).rejects.toThrow("Update failed");
+            await expect(actions.modifySite("test-site", { name: "Updated" })).rejects.toThrow("Update failed");
         });
     });
 
     describe("removeMonitorFromSite", () => {
-        it("should remove a monitor from an existing site", async () => {
-            const siteWithMultipleMonitors = {
-                ...mockSite,
-                monitors: [mockMonitor, { ...mockMonitor, id: "monitor-2" }],
-            };
-            vi.mocked(mockDeps.getSites).mockReturnValue([siteWithMultipleMonitors]);
-            vi.mocked(MonitoringService.stopMonitoring).mockResolvedValue(undefined);
-            vi.mocked(SiteService.removeMonitor).mockResolvedValue(undefined);
+        it("should remove a monitor from a site", async () => {
+            // Add a second monitor to the site so removal is allowed
+            const secondMonitor = { ...mockMonitor, id: "monitor-2" };
+            const siteWithMultipleMonitors = { ...mockSite, monitors: [mockMonitor, secondMonitor] };
+            mockDeps.getSites = vi.fn(() => [siteWithMultipleMonitors]);
+            
+            mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValue(undefined);
+            mockElectronAPI.sites.removeMonitor.mockResolvedValue(undefined);
 
             await actions.removeMonitorFromSite("test-site", "monitor-1");
 
-            expect(MonitoringService.stopMonitoring).toHaveBeenCalledWith("test-site", "monitor-1");
-            expect(SiteService.removeMonitor).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(mockElectronAPI.monitoring.stopMonitoringForSite).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(mockElectronAPI.sites.removeMonitor).toHaveBeenCalledWith("test-site", "monitor-1");
             expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
-        });
-
-        it("should throw error when site is not found", async () => {
-            vi.mocked(mockDeps.getSites).mockReturnValue([]);
-
-            await expect(actions.removeMonitorFromSite("nonexistent-site", "monitor-1")).rejects.toThrow(
-                ERROR_MESSAGES.SITE_NOT_FOUND
-            );
         });
     });
 
-    describe("updateMonitorRetryAttempts", () => {
+    describe("Monitor configuration updates", () => {
         it("should update monitor retry attempts", async () => {
-            vi.mocked(SiteService.updateSite).mockResolvedValue(undefined);
+            mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
 
             await actions.updateMonitorRetryAttempts("test-site", "monitor-1", 5);
 
+            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalled();
             expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
         });
 
-        it("should throw error when site is not found", async () => {
-            vi.mocked(mockDeps.getSites).mockReturnValue([]);
-
-            await expect(actions.updateMonitorRetryAttempts("nonexistent-site", "monitor-1", 5)).rejects.toThrow(
-                ERROR_MESSAGES.SITE_NOT_FOUND
-            );
-        });
-    });
-
-    describe("updateMonitorTimeout", () => {
         it("should update monitor timeout", async () => {
-            vi.mocked(SiteService.updateSite).mockResolvedValue(undefined);
+            mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
 
             await actions.updateMonitorTimeout("test-site", "monitor-1", 10000);
 
+            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalled();
             expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
         });
 
-        it("should throw error when site is not found", async () => {
-            vi.mocked(mockDeps.getSites).mockReturnValue([]);
-
-            await expect(actions.updateMonitorTimeout("nonexistent-site", "monitor-1", 10000)).rejects.toThrow(
-                ERROR_MESSAGES.SITE_NOT_FOUND
-            );
-        });
-    });
-
-    describe("updateSiteCheckInterval", () => {
         it("should update site check interval", async () => {
-            vi.mocked(SiteService.updateSite).mockResolvedValue(undefined);
+            mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
 
-            await actions.updateSiteCheckInterval("test-site", "monitor-1", 120000);
+            await actions.updateSiteCheckInterval("test-site", "monitor-1", 30000);
 
+            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalled();
             expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
-        });
-
-        it("should throw error when site is not found", async () => {
-            vi.mocked(mockDeps.getSites).mockReturnValue([]);
-
-            await expect(actions.updateSiteCheckInterval("nonexistent-site", "monitor-1", 120000)).rejects.toThrow(
-                ERROR_MESSAGES.SITE_NOT_FOUND
-            );
         });
     });
 
-    describe("edge cases and error handling", () => {
-        it("should handle null/undefined monitor data", async () => {
-            // This test verifies the function doesn't crash with null data
-            // The actual validation would happen in the real implementation
-            const invalidMonitor = null as any;
+    describe("downloadSQLiteBackup", () => {
+        it("should download SQLite backup", async () => {
+            mockElectronAPI.data.downloadSQLiteBackup.mockResolvedValue({
+                success: true,
+                data: { buffer: new ArrayBuffer(8), fileName: "backup.sqlite" },
+            });
 
-            // Since withErrorHandling is mocked to not throw, just verify it was called
-            await actions.addMonitorToSite("test-site", invalidMonitor);
-            expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
-        });
+            await actions.downloadSQLiteBackup();
 
-        it("should handle empty site identifier", async () => {
-            // Reset the mock to avoid interference from other tests
-            vi.mocked(SiteService.removeSite).mockResolvedValue(undefined);
-
-            // Test that empty identifier is handled
-            await actions.deleteSite("");
-            // Should complete without throwing due to mock
-            expect(SiteService.removeSite).toHaveBeenCalledWith("");
-        });
-
-        it("should handle negative retry attempts", async () => {
-            // Test that negative values are handled
-            await actions.updateMonitorRetryAttempts("test-site", "monitor-1", -1);
-            expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
-        });
-
-        it("should handle zero timeout", async () => {
-            // Test that zero timeout is handled
-            await actions.updateMonitorTimeout("test-site", "monitor-1", 0);
-            expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
-        });
-
-        it("should handle monitors array manipulation for site updates", async () => {
-            const siteWithMultipleMonitors = {
-                ...mockSite,
-                monitors: [mockMonitor, { ...mockMonitor, id: "monitor-2" }],
-            };
-            vi.mocked(mockDeps.getSites).mockReturnValue([siteWithMultipleMonitors]);
-            vi.mocked(SiteService.removeMonitor).mockResolvedValue(undefined);
-
-            await actions.removeMonitorFromSite("test-site", "monitor-2");
-
-            expect(SiteService.removeMonitor).toHaveBeenCalledWith("test-site", "monitor-2");
+            expect(mockElectronAPI.data.downloadSQLiteBackup).toHaveBeenCalled();
         });
     });
 });

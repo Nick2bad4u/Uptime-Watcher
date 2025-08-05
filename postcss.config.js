@@ -22,6 +22,5 @@ module.exports = {
             clearReportedMessages: true,
             throwError: false,
         },
-        tailwindcss: { config: "./tailwind.config.js" },
     },
 };
