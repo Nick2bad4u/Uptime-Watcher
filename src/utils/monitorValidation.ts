@@ -7,6 +7,9 @@ import type { Monitor, MonitorType } from "@shared/types";
 import type { HttpFormData, MonitorFormData, PingFormData, PortFormData } from "@shared/types/formData";
 import type { ValidationResult } from "@shared/types/validation";
 
+// Re-export ValidationResult for convenience
+export type { ValidationResult } from "@shared/types/validation";
+
 // Import shared validation functions for client-side validation
 import {
     validateMonitorData as sharedValidateMonitorData,

@@ -434,7 +434,6 @@ describe("IpcService", () => {
     describe("Resource Management", () => {
         it("should properly manage memory on setup and cleanup", () => {
             ipcService.setupHandlers();
-            const _handlerCallsAfterSetup = vi.mocked(ipcMain.handle).mock.calls.length;
 
             ipcService.cleanup();
             const removeCallsAfterCleanup = vi.mocked(ipcMain.removeHandler).mock.calls.length;

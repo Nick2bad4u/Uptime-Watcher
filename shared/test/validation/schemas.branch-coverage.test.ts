@@ -146,7 +146,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             expect(result.success).toBe(true);
             expect(result.metadata).toHaveProperty("monitorType", "http");
             expect(result.metadata).toHaveProperty("validatedDataSize");
-            expect(typeof result.metadata["validatedDataSize"]).toBe("number");
+            expect(typeof result.metadata!["validatedDataSize"]).toBe("number");
         });
 
         it("should include metadata for site validation", () => {

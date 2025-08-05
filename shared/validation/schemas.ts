@@ -225,6 +225,9 @@ export type Site = z.infer<typeof siteSchema>;
 // Import from unified validation system
 import type { ValidationResult } from "../types/validation";
 
+// Re-export ValidationResult for consumers of this module
+export type { ValidationResult } from "../types/validation";
+
 /**
  * Validates monitor data using the appropriate Zod schema.
  *

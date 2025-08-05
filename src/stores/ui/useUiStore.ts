@@ -56,6 +56,7 @@ export const useUIStore = create<UIStore>()(
                 });
 
                 // Use electronAPI to open external URL
+                // In an Electron app, this is guaranteed to be available
                 window.electronAPI.system.openExternal(url);
             },
             selectedSiteId: undefined,

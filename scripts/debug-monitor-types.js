@@ -17,7 +17,7 @@
         }
 
         // Try the safeExtractIpcData function
-        const { safeExtractIpcData } = await import("./src/types/ipc.js");
+        const { safeExtractIpcData } = await import("../src/types/ipc.js");
         const extractedData = safeExtractIpcData(response, []);
         console.log("Extracted data:", extractedData);
     } catch (error) {
