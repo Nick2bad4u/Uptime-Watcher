@@ -10,6 +10,7 @@
 import type { MonitorRow as DatabaseMonitorRow } from "../../../../shared/types/database";
 import type { Monitor, Site } from "../../../types";
 
+import { LOG_TEMPLATES } from "../../../../shared/utils/logTemplates";
 import { isValidIdentifierArray, safeInteger } from "../../../../shared/validation/validatorUtils";
 import { logger } from "../../../utils/logger";
 import { generateSqlParameters, mapMonitorToRow, mapRowToMonitor } from "./dynamicSchema";
@@ -71,7 +72,7 @@ export function buildMonitorParameters(siteIdentifier: string, monitor: Site["mo
             return value as DbValue;
         });
     } catch (error) {
-        logger.error("[MonitorMapper] Failed to build monitor parameters", { error, monitor, siteIdentifier });
+        logger.error(LOG_TEMPLATES.errors.MONITOR_MAPPER_FAILED, { error, monitor, siteIdentifier });
         throw error;
     }
 }
@@ -162,7 +163,7 @@ export function rowToMonitor(row: DatabaseMonitorRow): Site["monitors"][0] {
 
         return monitor;
     } catch (error) {
-        logger.error("[MonitorMapper] Failed to map database row to monitor", { error, row });
+        logger.error(LOG_TEMPLATES.errors.MONITOR_MAPPER_FAILED, { error, row });
         throw error;
     }
 }
@@ -286,11 +287,11 @@ function parseActiveOperations(row: DatabaseMonitorRow): string[] {
         if (isValidIdentifierArray(parsed)) {
             return parsed;
         } else {
-            logger.warn("active_operations contains invalid or unsafe data, using empty array", { parsed });
+            logger.warn(LOG_TEMPLATES.warnings.MONITOR_ACTIVE_OPERATIONS_INVALID, { parsed });
             return [];
         }
     } catch (error) {
-        logger.warn("Failed to parse active_operations, using empty array", error);
+        logger.warn(LOG_TEMPLATES.warnings.MONITOR_ACTIVE_OPERATIONS_PARSE_FAILED, error);
         return [];
     }
 }

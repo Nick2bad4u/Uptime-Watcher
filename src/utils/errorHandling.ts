@@ -3,6 +3,8 @@
  * Provides consistent error handling for utility functions that don't need store management.
  */
 
+import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
+
 import logger from "../services/logger";
 
 /**
@@ -44,7 +46,7 @@ export async function withUtilityErrorHandling<T>(
         }
 
         if (fallbackValue === undefined) {
-            throw new Error(`${operationName} failed and no fallback value provided`);
+            throw new Error(ERROR_CATALOG.system.OPERATION_FAILED_NO_FALLBACK);
         }
 
         return fallbackValue;

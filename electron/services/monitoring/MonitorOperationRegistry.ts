@@ -9,6 +9,7 @@
  * @packageDocumentation
  */
 
+import { interpolateLogTemplate, LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
 import { monitorLogger as logger } from "../../utils/logger";
 
 /**
@@ -79,7 +80,9 @@ export class MonitorOperationRegistry {
         }
 
         if (cancelledCount > 0) {
-            logger.debug(`Cancelled ${cancelledCount} operations for monitor ${monitorId}`);
+            logger.debug(
+                interpolateLogTemplate(LOG_TEMPLATES.debug.OPERATION_CANCELLED, { count: cancelledCount, monitorId })
+            );
         }
     }
 
@@ -92,7 +95,12 @@ export class MonitorOperationRegistry {
         const operation = this.activeOperations.get(operationId);
         if (operation) {
             this.activeOperations.delete(operationId);
-            logger.debug(`Completed operation ${operationId} for monitor ${operation.monitorId}`);
+            logger.debug(
+                interpolateLogTemplate(LOG_TEMPLATES.debug.OPERATION_COMPLETED, {
+                    monitorId: operation.monitorId,
+                    operationId,
+                })
+            );
         }
     }
 

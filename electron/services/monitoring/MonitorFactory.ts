@@ -1,3 +1,4 @@
+import { interpolateLogTemplate, LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
 import { MonitorType } from "../../types";
 import { logger } from "../../utils/logger";
 import { getMonitorServiceFactory, getRegisteredMonitorTypes, isValidMonitorType } from "./MonitorTypeRegistry";
@@ -189,7 +190,10 @@ export class MonitorFactory {
                 configurationError = error instanceof Error ? error.message : String(error);
 
                 // Log but don't throw for backward compatibility
-                logger.warn(`Failed to update config for monitor type ${type}`, { error });
+                logger.warn(
+                    interpolateLogTemplate(LOG_TEMPLATES.warnings.MONITOR_CONFIG_UPDATE_FAILED_TYPE, { type }),
+                    { error }
+                );
             }
         } else if (config) {
             // Config was provided but not applied (existing instance, no force)
@@ -230,7 +234,7 @@ export class MonitorFactory {
                 instance.updateConfig(config);
             } catch (error) {
                 // Log and continue; do not throw from config update
-                logger.warn("Failed to update config for monitor instance", { error });
+                logger.warn(LOG_TEMPLATES.warnings.MONITOR_CONFIG_UPDATE_FAILED_INSTANCE, { error });
             }
         }
     }

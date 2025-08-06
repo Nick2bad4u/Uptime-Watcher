@@ -23,6 +23,7 @@
 
 import { AxiosInstance, AxiosResponse } from "axios";
 
+import { interpolateLogTemplate, LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
 import { DEFAULT_REQUEST_TIMEOUT, RETRY_BACKOFF, USER_AGENT } from "../../constants";
 import { isDev } from "../../electronUtils";
 import { Site } from "../../types";
@@ -303,7 +304,13 @@ export class HttpMonitor implements IMonitorService {
         const responseTime = response.responseTime ?? 0;
 
         if (isDev()) {
-            logger.debug(`[HttpMonitor] URL ${url} responded with status ${response.status} in ${responseTime}ms`);
+            logger.debug(
+                interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_RESPONSE_TIME, {
+                    responseTime,
+                    status: response.status,
+                    url,
+                })
+            );
         }
 
         // Determine status based on HTTP status code

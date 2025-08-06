@@ -25,8 +25,11 @@
 
 import { EventEmitter } from "node:events";
 
+import { createTemplateLogger, LOG_TEMPLATES } from "../../shared/utils/logTemplates";
 import { generateCorrelationId } from "../utils/correlation";
-import { logger } from "../utils/logger";
+import { logger as baseLogger } from "../utils/logger";
+
+const logger = createTemplateLogger(baseLogger);
 
 /**
  * Diagnostic information about a {@link TypedEventBus} instance.
@@ -155,7 +158,10 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
         // Set max listeners to prevent warnings in development
         this.setMaxListeners(50);
 
-        logger.debug(`[TypedEventBus:${this.busId}] Created new event bus (max middleware: ${this.maxMiddleware})`);
+        logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_CREATED, {
+            busId: this.busId,
+            maxMiddleware: this.maxMiddleware,
+        });
     }
 
     /**
@@ -168,7 +174,10 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
     clearMiddleware(): void {
         const count = this.middlewares.length;
         this.middlewares.length = 0;
-        logger.debug(`[TypedEventBus:${this.busId}] Cleared ${count} middleware functions`);
+        logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_CLEARED, {
+            busId: this.busId,
+            count,
+        });
     }
 
     /**
@@ -217,7 +226,11 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
         const correlationId = generateCorrelationId();
         const eventName = event as string;
 
-        logger.debug(`[TypedEventBus:${this.busId}] Starting emission of '${eventName}' [${correlationId}]`);
+        logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_EMISSION_START, {
+            busId: this.busId,
+            correlationId,
+            eventName,
+        });
 
         try {
             // Process through middleware chain
@@ -233,9 +246,17 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
 
             this.emit(eventName, enhancedData);
 
-            logger.debug(`[TypedEventBus:${this.busId}] Successfully emitted '${eventName}' [${correlationId}]`);
+            logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_EMISSION_SUCCESS, {
+                busId: this.busId,
+                correlationId,
+                eventName,
+            });
         } catch (error) {
-            logger.error(`[TypedEventBus:${this.busId}] Failed to emit '${eventName}' [${correlationId}]`, error);
+            logger.error(LOG_TEMPLATES.errors.EVENT_BUS_EMISSION_FAILED, {
+                busId: this.busId,
+                correlationId,
+                eventName,
+            });
             throw error;
         }
     }
@@ -294,7 +315,10 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
             this.removeAllListeners(eventName);
         }
 
-        logger.debug(`[TypedEventBus:${this.busId}] Removed listener(s) for '${eventName}'`);
+        logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_LISTENER_REMOVED, {
+            busId: this.busId,
+            eventName,
+        });
         return this;
     }
 
@@ -323,7 +347,10 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
         const eventName = event as string;
         this.once(eventName, listener);
 
-        logger.debug(`[TypedEventBus:${this.busId}] Registered one-time listener for '${eventName}'`);
+        logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_ONE_TIME_LISTENER, {
+            busId: this.busId,
+            eventName,
+        });
         return this;
     }
 
@@ -346,7 +373,10 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
         const eventName = event as string;
         this.on(eventName, listener);
 
-        logger.debug(`[TypedEventBus:${this.busId}] Registered listener for '${eventName}'`);
+        logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_LISTENER_REGISTERED, {
+            busId: this.busId,
+            eventName,
+        });
         return this;
     }
 
@@ -363,7 +393,10 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
         const index = this.middlewares.indexOf(middleware);
         if (index !== -1) {
             this.middlewares.splice(index, 1);
-            logger.debug(`[TypedEventBus:${this.busId}] Removed middleware (remaining: ${this.middlewares.length})`);
+            logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_MIDDLEWARE_REMOVED, {
+                busId: this.busId,
+                count: this.middlewares.length,
+            });
             return true;
         }
         return false;
@@ -489,7 +522,8 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
                     try {
                         await middleware(eventName, data, () => processNext(currentIndex + 1));
                     } catch (error) {
-                        logger.error(
+                        // Use base logger directly for error objects since template logger doesn't support error objects
+                        baseLogger.error(
                             `[TypedEventBus:${this.busId}] Middleware error for '${eventName}' [${correlationId}]`,
                             error
                         );

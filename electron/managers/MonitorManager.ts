@@ -70,6 +70,7 @@ export interface MonitorManagerDependencies {
     siteService: SiteService;
 }
 
+import { interpolateLogTemplate, LOG_TEMPLATES } from "../../shared/utils/logTemplates";
 import { DatabaseService } from "../services/database/DatabaseService";
 import { HistoryRepository } from "../services/database/HistoryRepository";
 import { MonitorRepository } from "../services/database/MonitorRepository";
@@ -226,7 +227,7 @@ export class MonitorManager {
         // For site-wide checks without specific monitorId, check all monitors
         const site = this.dependencies.getSitesCache().get(identifier);
         if (!site?.monitors.length) {
-            logger.warn(`Site ${identifier} not found or has no monitors for manual check`);
+            logger.warn(interpolateLogTemplate(LOG_TEMPLATES.warnings.SITE_NOT_FOUND_MANUAL, { identifier }));
             return undefined;
         }
 
@@ -324,13 +325,22 @@ export class MonitorManager {
      * @public
      */
     public async setupNewMonitors(site: Site, newMonitorIds: string[]): Promise<void> {
-        logger.debug(`[MonitorManager] Setting up ${newMonitorIds.length} new monitors for site: ${site.identifier}`);
+        logger.debug(
+            interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_MANAGER_SETUP_MONITORS, {
+                count: newMonitorIds.length,
+                identifier: site.identifier,
+            })
+        );
 
         // Filter to only the new monitors
         const newMonitors = site.monitors.filter((m) => m.id && newMonitorIds.includes(m.id));
 
         if (newMonitors.length === 0) {
-            logger.debug(`[MonitorManager] No valid new monitors found for site: ${site.identifier}`);
+            logger.debug(
+                interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_MANAGER_VALID_MONITORS, {
+                    identifier: site.identifier,
+                })
+            );
             return;
         }
 
@@ -448,7 +458,12 @@ export class MonitorManager {
                     return this.startMonitoringForSite(recursiveId, recursiveMonitorId);
                 } else {
                     // Prevent infinite recursion by using direct scheduler call
-                    logger.warn(`[MonitorManager] Preventing recursive call for ${identifier}/${monitorId ?? "all"}`);
+                    logger.warn(
+                        interpolateLogTemplate(LOG_TEMPLATES.warnings.RECURSIVE_CALL_PREVENTED, {
+                            identifier,
+                            monitorId: monitorId ?? "all",
+                        })
+                    );
                     return false;
                 }
             }
@@ -538,7 +553,12 @@ export class MonitorManager {
                     return this.stopMonitoringForSite(recursiveId, recursiveMonitorId);
                 } else {
                     // Prevent infinite recursion by using direct scheduler call
-                    logger.warn(`[MonitorManager] Preventing recursive call for ${identifier}/${monitorId ?? "all"}`);
+                    logger.warn(
+                        interpolateLogTemplate(LOG_TEMPLATES.warnings.RECURSIVE_CALL_PREVENTED, {
+                            identifier,
+                            monitorId: monitorId ?? "all",
+                        })
+                    );
                     return false;
                 }
             }
@@ -570,7 +590,11 @@ export class MonitorManager {
      * @internal
      */
     private async applyDefaultIntervals(site: Site): Promise<void> {
-        logger.debug(`[MonitorManager] Applying default intervals for site: ${site.identifier}`);
+        logger.debug(
+            interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_MANAGER_INTERVALS_SETTING, {
+                identifier: site.identifier,
+            })
+        );
 
         for (const monitor of site.monitors) {
             if (monitor.id && this.shouldApplyDefaultInterval(monitor)) {
@@ -591,12 +615,19 @@ export class MonitorManager {
                 );
 
                 logger.debug(
-                    `[MonitorManager] Applied default interval ${DEFAULT_CHECK_INTERVAL}ms for monitor: ${monitor.id}`
+                    interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_INTERVALS_APPLIED, {
+                        interval: DEFAULT_CHECK_INTERVAL / 1000,
+                        monitorId: monitor.id,
+                    })
                 );
             }
         }
 
-        logger.info(`[MonitorManager] Completed applying default intervals for site: ${site.identifier}`);
+        logger.info(
+            interpolateLogTemplate(LOG_TEMPLATES.services.MONITOR_MANAGER_APPLYING_INTERVALS, {
+                identifier: site.identifier,
+            })
+        );
     }
 
     /**
@@ -624,11 +655,19 @@ export class MonitorManager {
 
         // Only process sites that have monitors
         if (site.monitors.length === 0) {
-            logger.debug(`[MonitorManager] No monitors found for site: ${site.identifier}`);
+            logger.debug(
+                interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_MANAGER_NO_MONITORS_FOUND, {
+                    identifier: site.identifier,
+                })
+            );
             return;
         }
 
-        logger.debug(`[MonitorManager] Auto-starting monitoring for site: ${site.identifier}`);
+        logger.debug(
+            interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_MANAGER_AUTO_STARTING_SITE, {
+                identifier: site.identifier,
+            })
+        );
 
         // Start only monitors that have monitoring enabled (respecting individual monitor states)
         for (const monitor of site.monitors) {
@@ -641,11 +680,19 @@ export class MonitorManager {
                     );
                 }
             } else if (monitor.id && !monitor.monitoring) {
-                logger.debug(`[MonitorManager] Skipping monitor ${monitor.id} - individual monitoring disabled`);
+                logger.debug(
+                    interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_MANAGER_SKIP_INDIVIDUAL, {
+                        monitorId: monitor.id,
+                    })
+                );
             }
         }
 
-        logger.info(`[MonitorManager] Completed auto-starting monitoring for site: ${site.identifier}`);
+        logger.info(
+            interpolateLogTemplate(LOG_TEMPLATES.services.MONITOR_MANAGER_AUTO_STARTING, {
+                identifier: site.identifier,
+            })
+        );
     }
 
     /**
@@ -663,9 +710,15 @@ export class MonitorManager {
         for (const monitor of newMonitors) {
             if (monitor.id && monitor.monitoring) {
                 await this.startMonitoringForSite(site.identifier, monitor.id);
-                logger.debug(`[MonitorManager] Auto-started monitoring for new monitor: ${monitor.id}`);
+                logger.debug(
+                    interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_AUTO_STARTED, { monitorId: monitor.id })
+                );
             } else if (monitor.id && !monitor.monitoring) {
-                logger.debug(`[MonitorManager] Skipping new monitor ${monitor.id} - individual monitoring disabled`);
+                logger.debug(
+                    interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_MANAGER_SKIP_NEW_INDIVIDUAL, {
+                        monitorId: monitor.id,
+                    })
+                );
             }
         }
     }
@@ -684,7 +737,7 @@ export class MonitorManager {
     private async handleScheduledCheck(siteIdentifier: string, monitorId: string): Promise<void> {
         const site = this.dependencies.getSitesCache().get(siteIdentifier);
         if (!site) {
-            logger.warn(`Site ${siteIdentifier} not found in cache for scheduled check`);
+            logger.warn(interpolateLogTemplate(LOG_TEMPLATES.warnings.SITE_NOT_FOUND_SCHEDULED, { siteIdentifier }));
             return;
         }
 
@@ -692,7 +745,10 @@ export class MonitorManager {
         try {
             await this.enhancedMonitoringServices.checker.checkMonitor(site, monitorId, false);
         } catch (error) {
-            logger.error(`Enhanced monitor check failed for ${monitorId}`, error);
+            logger.error(
+                interpolateLogTemplate(LOG_TEMPLATES.errors.MONITOR_CHECK_ENHANCED_FAILED, { monitorId }),
+                error
+            );
         }
     }
 
@@ -723,7 +779,11 @@ export class MonitorManager {
         // Auto-start monitoring for new monitors if appropriate
         // Note: Initial checks are handled by MonitorScheduler when monitoring starts
         if (site.monitoring === false) {
-            logger.debug(`[MonitorManager] Skipping auto-start for new monitors - site monitoring disabled`);
+            logger.debug(
+                interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_MANAGER_SKIP_AUTO_START, {
+                    identifier: site.identifier,
+                })
+            );
         } else {
             await this.autoStartNewMonitors(site, newMonitors);
         }

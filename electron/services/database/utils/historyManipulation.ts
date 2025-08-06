@@ -1,5 +1,6 @@
 import { Database } from "node-sqlite3-wasm";
 
+import { interpolateLogTemplate, LOG_TEMPLATES } from "../../../../shared/utils/logTemplates";
 import { isDev } from "../../../electronUtils";
 import { StatusHistory } from "../../../types";
 import { logger } from "../../../utils/logger";
@@ -60,11 +61,11 @@ export function addHistoryEntry(db: Database, monitorId: string, entry: StatusHi
 
         if (isDev()) {
             logger.debug(
-                `[HistoryManipulation] Added history entry: monitor_id=${monitorId}, status=${entry.status}, responseTime=${entry.responseTime}, timestamp=${entry.timestamp}`
+                interpolateLogTemplate(LOG_TEMPLATES.debug.HISTORY_ENTRY_ADDED, { monitorId, status: entry.status })
             );
         }
     } catch (error) {
-        logger.error(`[HistoryManipulation] Failed to add history entry for monitor: ${monitorId}`, error);
+        logger.error(interpolateLogTemplate(LOG_TEMPLATES.errors.HISTORY_ADD_FAILED, { monitorId }), error);
         throw error;
     }
 }
@@ -114,13 +115,16 @@ export function bulkInsertHistory(
             }
 
             logger.info(
-                `[HistoryManipulation] Bulk inserted ${historyEntries.length} history entries for monitor: ${monitorId}`
+                interpolateLogTemplate(LOG_TEMPLATES.services.HISTORY_BULK_INSERT, {
+                    count: historyEntries.length,
+                    monitorId,
+                })
             );
         } finally {
             stmt.finalize();
         }
     } catch (error) {
-        logger.error(`[HistoryManipulation] Failed to bulk insert history for monitor: ${monitorId}`, error);
+        logger.error(interpolateLogTemplate(LOG_TEMPLATES.errors.HISTORY_BULK_INSERT_FAILED, { monitorId }), error);
         throw error;
     }
 }
@@ -173,7 +177,7 @@ export function deleteHistoryByMonitorId(db: Database, monitorId: string): void 
             logger.debug(`[HistoryManipulation] Deleted history for monitor: ${monitorId}`);
         }
     } catch (error) {
-        logger.error(`[HistoryManipulation] Failed to delete history for monitor: ${monitorId}`, error);
+        logger.error(interpolateLogTemplate(LOG_TEMPLATES.errors.HISTORY_PRUNE_FAILED, { monitorId }), error);
         throw error;
     }
 }
@@ -226,7 +230,7 @@ export function pruneHistoryForMonitor(db: Database, monitorId: string, limit: n
             }
         }
     } catch (error) {
-        logger.error(`[HistoryManipulation] Failed to prune history for monitor: ${monitorId}`, error);
+        logger.error(interpolateLogTemplate(LOG_TEMPLATES.errors.HISTORY_PRUNE_FAILED, { monitorId }), error);
         throw error;
     }
 }

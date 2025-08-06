@@ -2,6 +2,7 @@ import { Database } from "node-sqlite3-wasm";
 
 import type { HistoryRow as DatabaseHistoryRow } from "../../../../shared/types/database";
 
+import { interpolateLogTemplate, LOG_TEMPLATES } from "../../../../shared/utils/logTemplates";
 import { StatusHistory } from "../../../types";
 import { logger } from "../../../utils/logger";
 import { rowToHistoryEntry } from "./historyMapper";
@@ -54,7 +55,10 @@ export function findHistoryByMonitorId(db: Database, monitorId: string): StatusH
 
         return historyRows.map((row) => rowToHistoryEntry(row));
     } catch (error) {
-        logger.error(`[HistoryQuery] Failed to fetch history for monitor: ${monitorId}`, error); /* v8 ignore next */
+        logger.error(
+            interpolateLogTemplate(LOG_TEMPLATES.errors.HISTORY_FETCH_FAILED, { monitorId }),
+            error
+        ); /* v8 ignore next */
         throw error;
     }
 }
@@ -119,7 +123,7 @@ export function getLatestHistoryEntry(db: Database, monitorId: string): StatusHi
 
         return rowToHistoryEntry(row);
     } catch (error) {
-        logger.error(`[HistoryQuery] Failed to get latest history entry for monitor: ${monitorId}`, error);
+        logger.error(interpolateLogTemplate(LOG_TEMPLATES.errors.HISTORY_LATEST_FETCH_FAILED, { monitorId }), error);
         throw error;
     }
 }

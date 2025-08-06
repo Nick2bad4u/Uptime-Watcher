@@ -1,5 +1,6 @@
 import { Notification } from "electron";
 
+import { LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
 import { Site } from "../../types";
 import { logger } from "../../utils/logger";
 
@@ -164,7 +165,7 @@ export class NotificationService {
 
             logger.info(`[NotificationService] Notification sent for monitor down: ${site.name} (${monitorType})`);
         } else {
-            logger.warn("[NotificationService] Notifications not supported on this platform");
+            logger.warn(LOG_TEMPLATES.warnings.NOTIFICATIONS_UNSUPPORTED);
         }
     }
 
@@ -221,7 +222,7 @@ export class NotificationService {
 
             logger.info(`[NotificationService] Notification sent for monitor restored: ${site.name} (${monitorType})`);
         } else {
-            logger.warn("[NotificationService] Notifications not supported on this platform");
+            logger.warn(LOG_TEMPLATES.warnings.NOTIFICATIONS_UNSUPPORTED);
         }
     }
 

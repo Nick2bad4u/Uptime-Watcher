@@ -7,6 +7,8 @@
  * in this format.
  */
 
+import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
+
 /**
  * Standardized IPC response format.
  *
@@ -38,11 +40,11 @@ export interface IpcResponse<T> {
  */
 export function extractIpcData<T>(response: unknown): T {
     if (!isIpcResponse<T>(response)) {
-        throw new Error("Invalid IPC response format");
+        throw new Error(ERROR_CATALOG.ipc.INVALID_RESPONSE_FORMAT);
     }
 
     if (!response.success) {
-        throw new Error(response.error ?? "Operation failed");
+        throw new Error(response.error ?? ERROR_CATALOG.ipc.IPC_OPERATION_FAILED);
     }
 
     return response.data as T;

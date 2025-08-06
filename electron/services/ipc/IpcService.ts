@@ -1,5 +1,6 @@
 import { BrowserWindow, ipcMain } from "electron";
 
+import { LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
 import { type Monitor, Site } from "../../types";
 import { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import { logger } from "../../utils/logger";
@@ -216,7 +217,7 @@ export class IpcService {
      * @public
      */
     public cleanup(): void {
-        logger.info("[IpcService] Cleaning up IPC handlers");
+        logger.info(LOG_TEMPLATES.services.IPC_SERVICE_CLEANUP);
         for (const channel of this.registeredIpcHandlers) {
             ipcMain.removeHandler(channel);
         }
@@ -449,7 +450,7 @@ export class IpcService {
 
                 const config = getMonitorTypeConfig(monitorType.trim());
                 if (!config) {
-                    logger.warn("[IpcService] Unknown monitor type for detail formatting", { monitorType });
+                    logger.warn(LOG_TEMPLATES.warnings.MONITOR_TYPE_UNKNOWN_DETAIL, { monitorType });
                     return details; // Return original details if type is unknown
                 }
 
@@ -472,7 +473,7 @@ export class IpcService {
 
                 const config = getMonitorTypeConfig(monitorType.trim());
                 if (!config) {
-                    logger.warn("[IpcService] Unknown monitor type for title suffix formatting", { monitorType });
+                    logger.warn(LOG_TEMPLATES.warnings.MONITOR_TYPE_UNKNOWN_TITLE, { monitorType });
                     return ""; // Return empty string if type is unknown
                 }
 
@@ -628,7 +629,7 @@ export class IpcService {
     private setupSystemHandlers(): void {
         this.registeredIpcHandlers.add("quit-and-install");
         ipcMain.on("quit-and-install", () => {
-            logger.info("[IpcService] Handling quit-and-install");
+            logger.info(LOG_TEMPLATES.services.UPDATER_QUIT_INSTALL);
             this.autoUpdaterService.quitAndInstall();
         });
     }

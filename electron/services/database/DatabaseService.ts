@@ -3,6 +3,7 @@ import { Database } from "node-sqlite3-wasm";
 // eslint-disable-next-line unicorn/import-style -- Need namespace import for both sync and async usage
 import * as path from "node:path";
 
+import { LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
 import { DB_FILE_NAME } from "../../constants";
 import { logger } from "../../utils/logger";
 import { createDatabaseSchema } from "./utils/databaseSchema";
@@ -110,9 +111,9 @@ export class DatabaseService {
                 // node-sqlite3-wasm completes all pending operations before closing
                 this.db.close();
                 this.db = undefined;
-                logger.info("[DatabaseService] Database connection closed safely");
+                logger.info(LOG_TEMPLATES.services.DATABASE_CONNECTION_CLOSED);
             } catch (error) {
-                logger.error("[DatabaseService] Failed to close database", error);
+                logger.error(LOG_TEMPLATES.errors.DATABASE_SCHEMA_FAILED, error);
                 throw error;
             }
         }
@@ -220,10 +221,10 @@ export class DatabaseService {
 
             createDatabaseSchema(this.db);
 
-            logger.info("[DatabaseService] Database initialized successfully");
+            logger.info(LOG_TEMPLATES.services.DATABASE_INITIALIZED);
             return this.db;
         } catch (error) {
-            logger.error("[DatabaseService] Failed to initialize database", error);
+            logger.error(LOG_TEMPLATES.errors.DATABASE_SCHEMA_FAILED, error);
             throw error;
         }
     }

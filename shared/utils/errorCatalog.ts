@@ -143,6 +143,9 @@ export const VALIDATION_ERRORS = {
     /** Error when URL format is invalid */
     URL_INVALID: "URL format is invalid",
 
+    /** Error when validation fails for an event */
+    VALIDATION_FAILED: "Validation failed",
+
     /** Error when value is out of allowed range */
     VALUE_OUT_OF_RANGE: "Value is out of allowed range",
 } as const;
@@ -172,14 +175,8 @@ export const SYSTEM_ERRORS = {
     /** Generic internal server error */
     INTERNAL_ERROR: "An internal error occurred",
 
-    /** Template: Error when invalid format is detected */
-    INVALID_FORMAT: "Invalid {type} format: {value}",
-
-    /** Template: Error when invalid identifier is provided */
-    INVALID_IDENTIFIER: "Invalid site identifier: {identifier}",
-
-    /** Template: Error when invalid status is provided */
-    INVALID_STATUS: "Invalid monitor status: {status}",
+    /** Error when operation fails and no fallback value provided */
+    OPERATION_FAILED_NO_FALLBACK: "Operation failed and no fallback value provided",
 
     /** Error when operation is not permitted */
     OPERATION_NOT_PERMITTED: "Operation not permitted",
@@ -189,15 +186,6 @@ export const SYSTEM_ERRORS = {
 
     /** Error when service is unavailable */
     SERVICE_UNAVAILABLE: "Service temporarily unavailable",
-
-    /** Template: Error when unknown field is encountered */
-    UNKNOWN_FIELD: "Unknown field: {fieldName}",
-
-    /** Template: Error when unsupported type is used */
-    UNSUPPORTED_TYPE: "Unsupported {category} type: {type}. Available types: {availableTypes}",
-
-    /** Template: Error when validator fails for an event */
-    VALIDATOR_ERROR: "Validator error for event '{event}': {error}",
 } as const;
 
 /**
@@ -266,6 +254,9 @@ export const DATABASE_ERRORS = {
     /** Error when duplicate entry is detected */
     DUPLICATE_ENTRY: "Duplicate entry detected",
 
+    /** Error when import data format is invalid */
+    IMPORT_DATA_INVALID: "Invalid import data format",
+
     /** Error when data migration fails */
     MIGRATION_FAILED: "Data migration failed",
 
@@ -283,6 +274,26 @@ export const DATABASE_ERRORS = {
 } as const;
 
 /**
+ * IPC (Inter-Process Communication) error messages.
+ *
+ * @remarks
+ * Error messages for IPC operations, validation, and communication between
+ * main and renderer processes.
+ *
+ * @public
+ */
+export const IPC_ERRORS = {
+    /** Error when IPC response format is invalid */
+    INVALID_RESPONSE_FORMAT: "Invalid IPC response format",
+
+    /** Error when IPC operation fails */
+    IPC_OPERATION_FAILED: "Operation failed",
+
+    /** Error when IPC validation fails */
+    VALIDATION_FAILED: "IPC validation failed",
+} as const;
+
+/**
  * Comprehensive error message catalog organized by domain.
  *
  * @remarks
@@ -294,6 +305,7 @@ export const DATABASE_ERRORS = {
  */
 export const ERROR_CATALOG = {
     database: DATABASE_ERRORS,
+    ipc: IPC_ERRORS,
     monitors: MONITOR_ERRORS,
     network: NETWORK_ERRORS,
     sites: SITE_ERRORS,
@@ -312,6 +324,7 @@ export const ERROR_CATALOG = {
  */
 export type ErrorMessage =
     | (typeof DATABASE_ERRORS)[keyof typeof DATABASE_ERRORS]
+    | (typeof IPC_ERRORS)[keyof typeof IPC_ERRORS]
     | (typeof MONITOR_ERRORS)[keyof typeof MONITOR_ERRORS]
     | (typeof NETWORK_ERRORS)[keyof typeof NETWORK_ERRORS]
     | (typeof SITE_ERRORS)[keyof typeof SITE_ERRORS]

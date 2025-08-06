@@ -11,6 +11,7 @@
  */
 
 import { Monitor } from "../../../shared/types";
+import { interpolateLogTemplate, LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
 import { Site } from "../../types";
 import { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import { monitorLogger as logger } from "../../utils/logger";
@@ -82,14 +83,22 @@ export class MonitorStatusUpdateService {
             // Get current monitor state
             const monitor = await this.monitorRepository.findByIdentifier(result.monitorId);
             if (!monitor) {
-                logger.warn(`Monitor ${result.monitorId} not found, ignoring result`);
+                logger.warn(
+                    interpolateLogTemplate(LOG_TEMPLATES.warnings.MONITOR_NOT_FOUND_CACHE, {
+                        monitorId: result.monitorId,
+                    })
+                );
                 this.operationRegistry.completeOperation(result.operationId);
                 return false;
             }
 
             // Only update if monitor is still actively monitoring
             if (!monitor.monitoring) {
-                logger.debug(`Monitor ${result.monitorId} no longer monitoring, ignoring result`);
+                logger.debug(
+                    interpolateLogTemplate(LOG_TEMPLATES.warnings.MONITOR_NOT_MONITORING, {
+                        monitorId: result.monitorId,
+                    })
+                );
                 this.operationRegistry.completeOperation(result.operationId);
                 return false;
             }
@@ -139,7 +148,7 @@ export class MonitorStatusUpdateService {
             // Get fresh monitor data from database
             const freshMonitor = await this.monitorRepository.findByIdentifier(monitorId);
             if (!freshMonitor) {
-                logger.warn(`Fresh monitor data not found for ${monitorId}`);
+                logger.warn(interpolateLogTemplate(LOG_TEMPLATES.warnings.MONITOR_FRESH_DATA_MISSING, { monitorId }));
                 return;
             }
 

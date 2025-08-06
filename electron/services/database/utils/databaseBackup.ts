@@ -1,3 +1,4 @@
+import { LOG_TEMPLATES } from "../../../../shared/utils/logTemplates";
 import { BACKUP_DB_FILE_NAME } from "../../../constants";
 import { logger } from "../../../utils/logger";
 
@@ -100,7 +101,7 @@ export async function createDatabaseBackup(
         const buffer = await fs.readFile(dbPath);
         const createdAt = Date.now();
 
-        logger.info("[DatabaseBackup] Database backup created successfully", {
+        logger.info(LOG_TEMPLATES.services.DATABASE_BACKUP_CREATED, {
             createdAt,
             dbPath,
             fileName,
@@ -117,7 +118,7 @@ export async function createDatabaseBackup(
             },
         };
     } catch (error) {
-        logger.error("[DatabaseBackup] Failed to create database backup", {
+        logger.error(LOG_TEMPLATES.errors.DATABASE_BACKUP_FAILED, {
             dbPath,
             error: error instanceof Error ? error.message : String(error),
             fileName,

@@ -12,6 +12,7 @@
 import type { StatusHistory } from "../../../../shared/types";
 import type { HistoryRow as DatabaseHistoryRow } from "../../../../shared/types/database";
 
+import { LOG_TEMPLATES } from "../../../../shared/utils/logTemplates";
 import { logger } from "../../../utils/logger";
 
 /**
@@ -142,7 +143,7 @@ export function rowToHistoryEntry(row: DatabaseHistoryRow): StatusHistory {
             timestamp: safeNumber(row.timestamp, Date.now()),
         };
     } catch (error) {
-        logger.error("[HistoryMapper] Failed to map database row to history entry", {
+        logger.error(LOG_TEMPLATES.errors.HISTORY_MAPPER_FAILED, {
             error,
             responseTime: row.responseTime,
             row,
@@ -211,6 +212,6 @@ function safeNumber(value: unknown, fallback: number = 0): number {
  */
 function validateStatus(status: unknown): StatusHistory["status"] {
     if (status === "up" || status === "down") return status;
-    logger.warn("[HistoryMapper] Invalid status value, defaulting to 'down'", { status });
+    logger.warn(LOG_TEMPLATES.warnings.HISTORY_INVALID_STATUS, { status });
     return "down";
 }

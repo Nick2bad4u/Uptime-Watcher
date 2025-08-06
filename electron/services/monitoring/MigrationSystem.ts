@@ -7,6 +7,7 @@
  * @public
  */
 
+import { interpolateLogTemplate, LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
 import { logger } from "../../utils/logger";
 import { MAX_LOG_DATA_LENGTH, MAX_MIGRATION_STEPS } from "./constants";
 
@@ -177,7 +178,13 @@ class MigrationOrchestrator {
 
             for (const migration of migrationPath) {
                 try {
-                    logger.info(`Applying migration: ${monitorType} ${migration.fromVersion} → ${migration.toVersion}`);
+                    logger.info(
+                        interpolateLogTemplate(LOG_TEMPLATES.services.MIGRATION_APPLYING, {
+                            fromVersion: migration.fromVersion,
+                            monitorType,
+                            toVersion: migration.toVersion,
+                        })
+                    );
 
                     currentData = await migration.transform(currentData);
                     appliedMigrations.push(`${migration.fromVersion}_to_${migration.toVersion}`);
@@ -356,7 +363,13 @@ class MigrationRegistry {
         // Sort by version
         rules.sort((a, b) => this.compareVersions(a.fromVersion, b.fromVersion));
 
-        logger.info(`Registered migration for ${monitorType}: ${rule.fromVersion} → ${rule.toVersion}`);
+        logger.info(
+            interpolateLogTemplate(LOG_TEMPLATES.services.MIGRATION_REGISTERED, {
+                fromVersion: rule.fromVersion,
+                monitorType,
+                toVersion: rule.toVersion,
+            })
+        );
     }
 
     /**

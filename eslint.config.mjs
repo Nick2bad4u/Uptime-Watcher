@@ -137,6 +137,7 @@ export default [
             "docs/Packages/**",
             "docs/Reviews/**",
             "node_modules/**",
+            "docs/Logger-Error-report.md",
             "release/",
             "test/themeTypes.test.tsx",
             "test/types.test.tsx",

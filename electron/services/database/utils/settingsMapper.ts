@@ -5,6 +5,7 @@
 
 import type { SettingsRow as DatabaseSettingsRow } from "../../../../shared/types/database";
 
+import { LOG_TEMPLATES } from "../../../../shared/utils/logTemplates";
 import { safeStringify } from "../../../../shared/utils/stringConversion";
 import { isNonEmptyString } from "../../../../shared/validation/validatorUtils";
 import { logger } from "../../../utils/logger";
@@ -78,7 +79,7 @@ export function rowToSetting(row: DatabaseSettingsRow): SettingRow {
 
         return setting;
     } catch (error) {
-        logger.error("[SettingsMapper:rowToSetting] Failed to map database row to setting", {
+        logger.error(LOG_TEMPLATES.errors.SETTINGS_MAPPER_FAILED, {
             error,
             functionName: "rowToSetting",
             row,

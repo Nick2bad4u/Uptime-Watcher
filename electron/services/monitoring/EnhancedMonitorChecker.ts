@@ -28,6 +28,7 @@
  */
 
 import { Monitor, Site, StatusUpdate } from "../../../shared/types";
+import { interpolateLogTemplate, LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
 import { UptimeEvents } from "../../events/eventTypes";
 import { TypedEventBus } from "../../events/TypedEventBus";
 import { HistoryRepository } from "../../services/database/HistoryRepository";
@@ -332,7 +333,7 @@ export class EnhancedMonitorChecker {
                 monitoring: true,
             });
 
-            logger.info(`Started monitoring for monitor ${monitorId} on site ${siteIdentifier}`);
+            logger.info(interpolateLogTemplate(LOG_TEMPLATES.services.MONITOR_STARTED, { monitorId, siteIdentifier }));
 
             // Emit event
             await this.config.eventEmitter.emitTyped("internal:monitor:started", {
@@ -367,7 +368,7 @@ export class EnhancedMonitorChecker {
                 monitoring: false,
             });
 
-            logger.info(`Stopped monitoring for monitor ${monitorId} on site ${siteIdentifier}`);
+            logger.info(interpolateLogTemplate(LOG_TEMPLATES.services.MONITOR_STOPPED, { monitorId, siteIdentifier }));
 
             // Emit event
             await this.config.eventEmitter.emitTyped("internal:monitor:stopped", {
@@ -520,7 +521,13 @@ export class EnhancedMonitorChecker {
             return undefined;
         }
 
-        logger.info(`Checking monitor: site=${site.identifier}, id=${monitor.id}, operation=${operationId}`);
+        logger.info(
+            interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_CHECK_START, {
+                monitorId: monitor.id,
+                operationId,
+                siteIdentifier: site.identifier,
+            })
+        );
 
         try {
             // Perform the actual check
@@ -668,7 +675,11 @@ export class EnhancedMonitorChecker {
                 break;
             }
             default: {
-                logger.warn(`Unknown monitor type: ${monitor.type}`);
+                logger.warn(
+                    interpolateLogTemplate(LOG_TEMPLATES.warnings.MONITOR_TYPE_UNKNOWN_CHECK, {
+                        monitorType: monitor.type,
+                    })
+                );
                 return {
                     details: `Unknown monitor type: ${monitor.type}`,
                     responseTime: 0,

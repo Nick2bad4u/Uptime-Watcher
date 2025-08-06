@@ -11,7 +11,6 @@
 import type { EventMiddleware } from "./TypedEventBus";
 
 import { isDevelopment } from "../../shared/utils/environment";
-import { ERROR_CATALOG, formatErrorMessage } from "../../shared/utils/errorCatalog";
 import { logger as baseLogger } from "../utils/logger";
 
 // Helper functions for metrics middleware (reduces complexity by composition)
@@ -577,12 +576,7 @@ export function createValidationMiddleware<T extends Record<string, unknown>>(
                 error: wrappedError,
                 event,
             });
-            throw new Error(
-                formatErrorMessage(ERROR_CATALOG.system.VALIDATOR_ERROR, {
-                    error: wrappedError.message,
-                    event,
-                })
-            );
+            throw new Error(`Validator error for event '${event}': ${wrappedError.message}`);
         }
 
         await next();

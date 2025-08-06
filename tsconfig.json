@@ -1,5 +1,8 @@
 {
     "$schema": "https://www.schemastore.org/tsconfig.json",
+    "typeAcquisition": {
+        "enable": true
+    },
     "compilerOptions": {
         "baseUrl": ".",
         "jsx": "react-jsx",
@@ -24,9 +27,15 @@
             "ESNext"
         ],
         "paths": {
-            "@/*": ["src/*"],
-            "@shared/*": ["shared/*"],
-            "@electron/*": ["electron/*"]
+            "@/*": [
+                "src/*"
+            ],
+            "@shared/*": [
+                "shared/*"
+            ],
+            "@electron/*": [
+                "electron/*"
+            ]
         },
         "plugins": [
             {
@@ -84,6 +93,7 @@
         "strictPropertyInitialization": true,
         "useDefineForClassFields": true,
         "useUnknownInCatchVariables": true,
+        "noUncheckedSideEffectImports": true,
         "pretty": true
     },
     "exclude": [

@@ -43,6 +43,7 @@
  * @packageDocumentation
  */
 
+import { interpolateLogTemplate, LOG_TEMPLATES } from "../../shared/utils/logTemplates";
 import { UptimeEvents } from "../events/eventTypes";
 import { TypedEventBus } from "../events/TypedEventBus";
 import { DatabaseService } from "../services/database/DatabaseService";
@@ -214,7 +215,7 @@ export class SiteManager {
             },
         });
 
-        logger.info("[SiteManager] Initialized with StandardizedCache");
+        logger.info(LOG_TEMPLATES.services.SITE_MANAGER_INITIALIZED_WITH_CACHE);
     }
 
     /**
@@ -253,7 +254,12 @@ export class SiteManager {
             timestamp: Date.now(),
         });
 
-        logger.info(`Site added successfully: ${site.identifier} (${site.name || "unnamed"})`);
+        logger.info(
+            interpolateLogTemplate(LOG_TEMPLATES.services.SITE_ADDED_SUCCESS, {
+                identifier: site.identifier,
+                name: site.name || "unnamed",
+            })
+        );
         return site;
     }
 
@@ -282,12 +288,12 @@ export class SiteManager {
                     timestamp: Date.now(),
                 })
                 .catch((error) => {
-                    logger.debug(`[SiteManager] Failed to emit cache miss event`, error);
+                    logger.debug(LOG_TEMPLATES.debug.SITE_CACHE_MISS_ERROR, error);
                 });
 
             // Trigger background loading without blocking
             this.loadSiteInBackground(identifier).catch((error) => {
-                logger.debug(`[SiteManager] Background loading error ignored`, error);
+                logger.debug(LOG_TEMPLATES.debug.SITE_LOADING_ERROR_IGNORED, error);
             });
         }
 
@@ -359,12 +365,14 @@ export class SiteManager {
      */
     public async initialize(): Promise<void> {
         try {
-            logger.info("[SiteManager] Initializing - loading sites into cache");
+            logger.info(LOG_TEMPLATES.services.SITE_MANAGER_LOADING_CACHE);
             const sites = await this.siteRepositoryService.getSitesFromDatabase();
             await this.updateSitesCache(sites);
-            logger.info(`[SiteManager] Initialized with ${sites.length} sites in cache`);
+            logger.info(
+                interpolateLogTemplate(LOG_TEMPLATES.services.SITE_MANAGER_INITIALIZED, { count: sites.length })
+            );
         } catch (error) {
-            logger.error("[SiteManager] Failed to initialize cache", error);
+            logger.error(LOG_TEMPLATES.errors.SITE_INITIALIZATION_FAILED, error);
             throw error;
         }
     }
@@ -413,13 +421,21 @@ export class SiteManager {
                         timestamp: Date.now(),
                     });
 
-                    logger.info(`[SiteManager] Monitor ${monitorId} removed from site ${siteIdentifier}`);
+                    logger.info(
+                        interpolateLogTemplate(LOG_TEMPLATES.services.MONITOR_REMOVED_FROM_SITE, {
+                            monitorId,
+                            siteIdentifier,
+                        })
+                    );
                 }
             }
 
             return success;
         } catch (error) {
-            logger.error(`[SiteManager] Failed to remove monitor ${monitorId} from site ${siteIdentifier}`, error);
+            logger.error(
+                interpolateLogTemplate(LOG_TEMPLATES.errors.SITE_MONITOR_REMOVAL_FAILED, { monitorId, siteIdentifier }),
+                error
+            );
             throw error;
         }
     }
@@ -602,7 +618,7 @@ export class SiteManager {
                 }
                 // Execute but don't await the promise
                 this.monitoringOperations.setHistoryLimit(limit).catch((error) => {
-                    logger.error("[SiteManager] Failed to set history limit", error);
+                    logger.error(LOG_TEMPLATES.errors.SITE_HISTORY_LIMIT_FAILED, error);
                 });
             },
             setupNewMonitors: async (site: Site, newMonitorIds: string[]) => {
@@ -676,7 +692,7 @@ export class SiteManager {
      */
     private async loadSiteInBackground(identifier: string): Promise<void> {
         try {
-            logger.debug(`[SiteManager] Loading site in background: ${identifier}`);
+            logger.debug(interpolateLogTemplate(LOG_TEMPLATES.debug.BACKGROUND_LOAD_START, { identifier }));
 
             const sites = await this.siteRepositoryService.getSitesFromDatabase();
             const site = sites.find((s) => s.identifier === identifier);
@@ -690,9 +706,9 @@ export class SiteManager {
                     timestamp: Date.now(),
                 });
 
-                logger.debug(`[SiteManager] Background site load completed: ${identifier}`);
+                logger.debug(interpolateLogTemplate(LOG_TEMPLATES.debug.BACKGROUND_LOAD_COMPLETE, { identifier }));
             } else {
-                logger.debug(`[SiteManager] Site not found during background load: ${identifier}`);
+                logger.debug(interpolateLogTemplate(LOG_TEMPLATES.debug.SITE_BACKGROUND_LOAD_FAILED, { identifier }));
 
                 // Emit not found event for observability
                 await this.eventEmitter.emitTyped("site:cache-miss", {
@@ -704,7 +720,10 @@ export class SiteManager {
             }
         } catch (error) {
             // Emit error event for observability while maintaining non-blocking behavior
-            logger.debug(`[SiteManager] Background site load failed for ${identifier}`, error);
+            logger.debug(
+                interpolateLogTemplate(LOG_TEMPLATES.errors.SITE_BACKGROUND_LOAD_FAILED, { identifier }),
+                error
+            );
 
             try {
                 await this.eventEmitter.emitTyped("site:cache-miss", {
@@ -715,7 +734,7 @@ export class SiteManager {
                 });
             } catch (emitError) {
                 // Even emit failures shouldn't crash background operations
-                logger.debug(`[SiteManager] Failed to emit background load error event`, emitError);
+                logger.debug(LOG_TEMPLATES.errors.SITE_BACKGROUND_LOAD_EMIT_ERROR, emitError);
             }
         }
     }

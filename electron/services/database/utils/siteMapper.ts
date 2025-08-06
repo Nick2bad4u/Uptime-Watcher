@@ -5,6 +5,7 @@
 
 import type { SiteRow as DatabaseSiteRow } from "../../../../shared/types/database";
 
+import { LOG_TEMPLATES } from "../../../../shared/utils/logTemplates";
 import { safeStringify } from "../../../../shared/utils/stringConversion";
 import { logger } from "../../../utils/logger";
 
@@ -115,7 +116,7 @@ export function rowToSite(row: DatabaseSiteRow): SiteRow {
         return site;
     } catch (error) {
         const errorType = error instanceof Error ? error.constructor.name : "Unknown";
-        logger.error("[SiteMapper.rowToSite] Failed to map database row to site", {
+        logger.error(LOG_TEMPLATES.errors.SITE_MAPPER_FAILED, {
             error,
             errorType,
             functionName: "rowToSite",

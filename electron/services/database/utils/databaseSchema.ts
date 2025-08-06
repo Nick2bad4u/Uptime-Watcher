@@ -1,5 +1,6 @@
 import { Database } from "node-sqlite3-wasm";
 
+import { LOG_TEMPLATES } from "../../../../shared/utils/logTemplates";
 import { logger } from "../../../utils/logger";
 import { getRegisteredMonitorTypes } from "../../monitoring/MonitorTypeRegistry";
 import { generateMonitorTableSchema } from "./dynamicSchema";
@@ -93,9 +94,9 @@ export function createDatabaseIndexes(db: Database): void {
         // Index on history timestamp for time-based queries
         db.run(SCHEMA_QUERIES.CREATE_INDEX_HISTORY_TIMESTAMP);
 
-        logger.debug("[DatabaseSchema] All indexes created successfully");
+        logger.debug(LOG_TEMPLATES.services.DATABASE_INDEXES_CREATED);
     } catch (error) {
-        logger.error("[DatabaseSchema] Failed to create indexes", error);
+        logger.error(LOG_TEMPLATES.errors.DATABASE_INDEXES_FAILED, error);
         throw error;
     }
 }
@@ -120,13 +121,13 @@ export function createDatabaseSchema(db: Database): void {
             setupMonitorTypeValidation();
 
             db.run(SCHEMA_QUERIES.COMMIT);
-            logger.info("[DatabaseSchema] Database schema created successfully");
+            logger.info(LOG_TEMPLATES.services.DATABASE_SCHEMA_CREATED);
         } catch (error) {
             db.run(SCHEMA_QUERIES.ROLLBACK);
             throw error;
         }
     } catch (error) {
-        logger.error("[DatabaseSchema] Failed to create database schema", error);
+        logger.error(LOG_TEMPLATES.errors.DATABASE_SCHEMA_FAILED, error);
         throw error;
     }
 }
@@ -171,9 +172,9 @@ export function createDatabaseTables(db: Database): void {
         // Logs table
         db.run(SCHEMA_QUERIES.CREATE_TABLE_LOGS);
 
-        logger.info("[DatabaseSchema] All tables created successfully");
+        logger.info(LOG_TEMPLATES.services.DATABASE_TABLES_CREATED);
     } catch (error) {
-        logger.error("[DatabaseSchema] Failed to create tables", error);
+        logger.error(LOG_TEMPLATES.errors.DATABASE_TABLES_FAILED, error);
         throw error;
     }
 }
@@ -194,9 +195,9 @@ export function setupMonitorTypeValidation(): void {
         const validTypes = getRegisteredMonitorTypes();
 
         if (validTypes.length === 0) {
-            logger.warn("[DatabaseSchema] No monitor types registered - validation will allow any type");
+            logger.warn(LOG_TEMPLATES.warnings.DATABASE_MONITOR_VALIDATION_MISSING);
         } else {
-            logger.info("[DatabaseSchema] Monitor type validation initialized", {
+            logger.info(LOG_TEMPLATES.services.DATABASE_MONITOR_VALIDATION_INITIALIZED, {
                 count: validTypes.length,
                 validTypes,
             });
@@ -212,12 +213,12 @@ export function setupMonitorTypeValidation(): void {
         //   SELECT RAISE(ABORT, 'Invalid monitor type');
         // END;
 
-        logger.info("[DatabaseSchema] Monitor type validation framework ready");
+        logger.info(LOG_TEMPLATES.services.DATABASE_MONITOR_VALIDATION_READY);
     } catch (error) {
-        logger.error("[DatabaseSchema] Failed to setup monitor type validation", error);
+        logger.error(LOG_TEMPLATES.errors.DATABASE_VALIDATION_SETUP_FAILED, error);
         // Don't throw here - this is a non-critical enhancement
         // The application should still work without validation
-        logger.warn("[DatabaseSchema] Continuing without monitor type validation");
+        logger.warn(LOG_TEMPLATES.warnings.DATABASE_MONITOR_VALIDATION_CONTINUE);
     }
 }
 

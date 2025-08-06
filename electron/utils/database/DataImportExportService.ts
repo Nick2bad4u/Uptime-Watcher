@@ -7,6 +7,7 @@
 
 import { Database } from "node-sqlite3-wasm";
 
+import { ERROR_CATALOG } from "../../../shared/utils/errorCatalog";
 import { safeJsonParse, safeJsonStringifyWithFallback } from "../../../shared/utils/jsonSafety";
 import { UptimeEvents } from "../../events/eventTypes";
 import { TypedEventBus } from "../../events/TypedEventBus";
@@ -115,7 +116,9 @@ export class DataImportExportService {
             const parseResult = safeJsonParse(jsonData, isImportData);
 
             if (!parseResult.success || !parseResult.data) {
-                throw new Error(`Invalid import data format: ${parseResult.error ?? "Unknown parsing error"}`);
+                throw new Error(
+                    `${ERROR_CATALOG.database.IMPORT_DATA_INVALID}: ${parseResult.error ?? "Unknown parsing error"}`
+                );
             }
 
             const validatedData = parseResult.data;
