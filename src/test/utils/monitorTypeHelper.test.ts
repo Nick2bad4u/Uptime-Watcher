@@ -177,7 +177,7 @@ describe("monitorTypeHelper", () => {
             const result = await getAvailableMonitorTypes();
 
             expect(result).toEqual(mockMonitorTypes);
-            expect(AppCaches.monitorTypes.get).toHaveBeenCalledWith("all-monitor-types");
+            expect(AppCaches.monitorTypes.get).toHaveBeenCalledWith("config:all-monitor-types");
             expect(mockElectronAPI.monitorTypes.getMonitorTypes).not.toHaveBeenCalled();
         });
 
@@ -193,8 +193,8 @@ describe("monitorTypeHelper", () => {
             const result = await getAvailableMonitorTypes();
 
             expect(result).toEqual(mockMonitorTypes);
-            expect(AppCaches.monitorTypes.get).toHaveBeenCalledWith("all-monitor-types");
-            expect(AppCaches.monitorTypes.set).toHaveBeenCalledWith("all-monitor-types", mockMonitorTypes);
+            expect(AppCaches.monitorTypes.get).toHaveBeenCalledWith("config:all-monitor-types");
+            expect(AppCaches.monitorTypes.set).toHaveBeenCalledWith("config:all-monitor-types", mockMonitorTypes);
         });
 
         it("should handle backend fetch errors gracefully", async () => {
@@ -206,7 +206,7 @@ describe("monitorTypeHelper", () => {
             const result = await getAvailableMonitorTypes();
 
             expect(result).toEqual(fallbackValue);
-            expect(AppCaches.monitorTypes.set).toHaveBeenCalledWith("all-monitor-types", fallbackValue);
+            expect(AppCaches.monitorTypes.set).toHaveBeenCalledWith("config:all-monitor-types", fallbackValue);
         });
 
         it("should cache fetched data for subsequent calls", async () => {
@@ -220,7 +220,7 @@ describe("monitorTypeHelper", () => {
 
             await getAvailableMonitorTypes();
 
-            expect(AppCaches.monitorTypes.set).toHaveBeenCalledWith("all-monitor-types", mockMonitorTypes);
+            expect(AppCaches.monitorTypes.set).toHaveBeenCalledWith("config:all-monitor-types", mockMonitorTypes);
         });
 
         it("should handle empty response from backend", async () => {
@@ -240,7 +240,7 @@ describe("monitorTypeHelper", () => {
             const result = await getAvailableMonitorTypes();
 
             expect(result).toEqual([]);
-            expect(AppCaches.monitorTypes.set).toHaveBeenCalledWith("all-monitor-types", []);
+            expect(AppCaches.monitorTypes.set).toHaveBeenCalledWith("config:all-monitor-types", []);
         });
 
         it("should handle invalid cache data gracefully", async () => {

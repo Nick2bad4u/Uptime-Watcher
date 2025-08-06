@@ -266,14 +266,16 @@ describe("useSettingsStore", () => {
 
         it("should handle backend update errors", async () => {
             const error = new Error("Update failed");
-            mockElectronAPI.settings.updateHistoryLimit.mockRejectedValue(error);
-
+            
             const { result } = renderHook(() => useSettingsStore());
 
-            // Set initial value
+            // Set initial value BEFORE setting up the error mock
             await act(async () => {
                 result.current.updateSettings({ historyLimit: 200 });
             });
+
+            // Now mock the error AFTER setting initial state
+            mockElectronAPI.settings.updateHistoryLimit.mockRejectedValue(error);
 
             // Attempt update that will fail
             await act(async () => {

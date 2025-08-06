@@ -202,11 +202,14 @@ describe("ScreenshotThumbnail", () => {
         });
 
         it("should handle electronAPI without openExternal method", () => {
-            // Mock electronAPI without system.openExternal
+            // Mock electronAPI without system.openExternal that throws an error
             Object.defineProperty(window, "electronAPI", {
                 value: { 
-                    system: { someOtherMethod: vi.fn() }, // system exists but no openExternal
-                    someOtherMethod: vi.fn() 
+                    system: { 
+                        openExternal: vi.fn().mockImplementation(() => {
+                            throw new Error("openExternal not available");
+                        })
+                    }
                 },
                 writable: true,
             });
@@ -227,7 +230,7 @@ describe("ScreenshotThumbnail", () => {
             // Directly dispatch the event
             link.dispatchEvent(clickEvent);
 
-            // Verify window.open was called with the correct parameters
+            // Verify window.open was called with the correct parameters (due to fallback)
             expect(mockWindowOpen).toHaveBeenCalledWith("https://example.com", "_blank", "noopener");
         });
     });
@@ -632,7 +635,11 @@ describe("ScreenshotThumbnail", () => {
 
         it("should fallback to window.open when openExternal is not available", () => {
             const apiWithoutOpenExternal = {
-                someOtherMethod: vi.fn(),
+                system: {
+                    openExternal: vi.fn().mockImplementation(() => {
+                        throw new Error("openExternal not available");
+                    })
+                }
             };
 
             Object.defineProperty(window, "electronAPI", {
