@@ -1,4 +1,5 @@
 {
+    "$schema": "https://www.schemastore.org/markdown-link-check.json",
     "ignorePatterns": [
         {
             "pattern": "^.*CHANGELOG.*$"

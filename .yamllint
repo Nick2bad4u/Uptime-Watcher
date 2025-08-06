@@ -1,4 +1,5 @@
 ---
+$schema: "https://www.schemastore.org/yamllint.json"
 extends: default
 ignore: |
     node_modules

@@ -1,4 +1,5 @@
 ---
+# Schema: https://raw.githubusercontent.com/megalinter/megalinter/main/megalinter/descriptors/schemas/megalinter-configuration.jsonschema.json
 ACTION_ACTIONLINT_CONFIG_FILE: ActionLintConfig.yaml
 CONFIG_REPORTER: true
 COPYPASTE_JSCPD_CONFIG_FILE: .jscpd.json

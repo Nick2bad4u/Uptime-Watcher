@@ -9,13 +9,14 @@
 import {
     BASE_MONITOR_TYPES,
     DEFAULT_MONITOR_STATUS,
-    ERROR_MESSAGES,
     isMonitorStatus,
     type Monitor,
     type MonitorType,
     type Site,
 } from "@shared/types";
 import { isNonEmptyString, isValidUrl, safeInteger } from "@shared/validation/validatorUtils";
+
+import { ERROR_CATALOG } from "../../../../shared/utils/errorCatalog";
 
 // Re-export validateMonitor from shared types for convenience
 export { validateMonitor } from "@shared/types";
@@ -127,7 +128,7 @@ export function removeMonitorFromSite(site: Site, monitorId: string): Site {
 export function updateMonitorInSite(site: Site, monitorId: string, updates: Partial<Monitor>): Site {
     const monitorExists = site.monitors.some((monitor) => monitor.id === monitorId);
     if (!monitorExists) {
-        throw new Error(ERROR_MESSAGES.MONITOR_NOT_FOUND);
+        throw new Error(ERROR_CATALOG.monitors.NOT_FOUND);
     }
 
     const updatedMonitors = site.monitors.map((monitor) => {
@@ -159,12 +160,12 @@ export function updateMonitorInSite(site: Site, monitorId: string, updates: Part
  */
 export function validateMonitorExists(site: Site | undefined, monitorId: string): void {
     if (!site) {
-        throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
+        throw new Error(ERROR_CATALOG.sites.NOT_FOUND);
     }
 
     const monitor = findMonitorInSite(site, monitorId);
     if (!monitor) {
-        throw new Error(ERROR_MESSAGES.MONITOR_NOT_FOUND);
+        throw new Error(ERROR_CATALOG.monitors.NOT_FOUND);
     }
 }
 

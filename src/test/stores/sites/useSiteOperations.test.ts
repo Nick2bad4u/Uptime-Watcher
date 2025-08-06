@@ -5,7 +5,8 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ERROR_MESSAGES, type Monitor, type Site } from "../../../../shared/types";
+import { type Monitor, type Site } from "../../../../shared/types";
+import { ERROR_CATALOG } from "../../../../shared/utils/errorCatalog";
 
 import { createSiteOperationsActions, type SiteOperationsDependencies } from "../../../stores/sites/useSiteOperations";
 
@@ -118,7 +119,7 @@ describe("createSiteOperationsActions", () => {
             vi.mocked(mockDeps.getSites).mockReturnValue([]);
 
             await expect(actions.addMonitorToSite("nonexistent-site", mockMonitor)).rejects.toThrow(
-                ERROR_MESSAGES.SITE_NOT_FOUND
+                ERROR_CATALOG.sites.NOT_FOUND
             );
         });
     });

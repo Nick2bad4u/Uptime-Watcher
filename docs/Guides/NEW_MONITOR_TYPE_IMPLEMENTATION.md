@@ -22,39 +22,53 @@ Your monitor service **MUST** return a result matching the `MonitorCheckResult` 
 
 ```typescript
 export interface MonitorCheckResult {
- /** Optional human-readable details about the check result */
- details?: string;
- /** Optional technical error message for debugging */
- error?: string;
- /** Response time in milliseconds (REQUIRED) */
- responseTime: number;
- /** Check result status (REQUIRED) */
- status: "up" | "down";
+    /** Optional human-readable details about the check result */
+    details?: string;
+    
+    /** Optional error message if the check failed */
+    error?: string;
+    
+    /** Response time in milliseconds (required) */
+    responseTime: number;
+    
+    /** Status outcome of the check */
+    status: "up" | "down";
 }
 ```
 
-### **🔹 Critical Details Field Requirement**
+### **🔹 Critical Implementation Requirements**
 
-**⚠️ IMPORTANT**: The `details` field should be populated for proper history tracking:
+**⚠️ IMPORTANT - Required Fields:**
 
-- **HTTP monitors**: Must include status codes (e.g., "HTTP 200 OK", "HTTP 404 Not Found")
-- **Port monitors**: Must include connection details (e.g., "Connection successful", "Connection refused")
-- **Ping monitors**: Must include response details (e.g., "Ping successful (25ms)", "Request timeout")
+- **`responseTime: number`** - **REQUIRED** field representing response time in milliseconds
+- **`status: "up" | "down"`** - **REQUIRED** status outcome 
+- **`details?: string`** - **RECOMMENDED** for proper history tracking
+- **`error?: string`** - **OPTIONAL** for technical error information
 
 **Example implementation:**
 
 ```typescript
-// ✅ CORRECT - Provides meaningful details
+// ✅ CORRECT - Complete implementation
 return {
- status: "up",
- responseTime: 150,
- details: "HTTP 200 OK - Response received successfully",
+    status: "up",
+    responseTime: 150, // Required - actual response time in ms
+    details: "HTTP 200 OK - Response received successfully", // Recommended for history
+    error: undefined // Optional - only if there's a technical error to report
 };
 
-// ❌ WRONG - Missing details will show "NULL" in history
+// ✅ CORRECT - Minimal valid implementation  
 return {
- status: "up",
- responseTime: 150,
+    status: "down",
+    responseTime: 5000, // Required - timeout value when failed
+    details: "Connection timeout", // Recommended
+    error: "ECONNREFUSED" // Optional technical details
+};
+
+// ❌ WRONG - Missing required responseTime
+return {
+    status: "up",
+    details: "HTTP 200 OK"
+    // Missing responseTime - will cause TypeScript compilation error
 };
 ```
 
@@ -62,11 +76,12 @@ return {
 
 The system uses the **unified enhanced monitoring architecture**:
 
-- **Enhanced Monitoring**: Comprehensive monitoring with operation correlation and race condition prevention
-- **Used for**: All scheduled and manual health checks
+- **Enhanced Monitoring**: The only monitoring system with operation correlation and race condition prevention
+- **Used for**: All scheduled and manual health checks  
 - **Location**: `electron/services/monitoring/` directory
+- **No Fallbacks**: Legacy monitoring systems have been completely removed
 
-**Your monitor service integrates seamlessly with the enhanced monitoring infrastructure.**
+**Your monitor service integrates seamlessly with the enhanced monitoring infrastructure through the `IMonitorService` interface.**
 
 ## ⚡ Critical Requirements for ALL Monitor Types
 

@@ -1,40 +1,14 @@
 {
-    "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/packages/cspell-types/cspell.schema.json",
+    "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+    "language": "en",
     "version": "0.2",
-    "ignorePaths": [
-        "node_modules",
-        "dist",
-        "dist-electron",
-        "**CHANGELOG.md",
-        "release"
-    ],
-    "dictionaryDefinitions": [
-        {
-            "name": "Uptime-Watcher Project Dictionary",
-            "path": "custom-words.txt",
-            "addWords": true,
-            "scope": "workspace",
-            "description": "Words used in the Uptime-Watcher project"
-        },
-        {
-            "name": "Uptime-Watcher User Dictionary",
-            "path": "custom-words.txt",
-            "addWords": true,
-            "scope": "user",
-            "description": "Words used in the Uptime-Watcher project"
-        },
-        {
-            "name": "Uptime-Watcher Folder Dictionary",
-            "path": "custom-words.txt",
-            "addWords": true,
-            "scope": "folder",
-            "description": "Words used in the Uptime-Watcher project"
-        }
-    ],
+    "cache": {
+        "cacheFormat": "universal",
+        "cacheLocation": ".cspellcache",
+        "cacheStrategy": "metadata",
+        "useCache": true
+    },
     "dictionaries": [
-        "Uptime-Watcher Project Dictionary",
-        "Uptime-Watcher User Dictionary",
-        "Uptime-Watcher Folder Dictionary",
         "aws",
         "bash",
         "companies",
@@ -47,8 +21,8 @@
         "gaming-terms",
         "git",
         "google",
-        "html",
         "html-symbol-entities",
+        "html",
         "java",
         "javascript",
         "lorem-ipsum",
@@ -59,9 +33,46 @@
         "powershell",
         "public-licenses",
         "softwareTerms",
-        "typescript"
+        "typescript",
+        "Uptime-Watcher Folder Dictionary",
+        "Uptime-Watcher Project Dictionary",
+        "Uptime-Watcher User Dictionary"
     ],
-    "words": [],
+    "dictionaryDefinitions": [
+        {
+            "description": "Words used in the Uptime-Watcher project",
+            "name": "Uptime-Watcher Project Dictionary",
+            "path": "custom-words.txt",
+            "scope": "workspace",
+            "addWords": true
+        },
+        {
+            "description": "Words used in the Uptime-Watcher project",
+            "name": "Uptime-Watcher User Dictionary",
+            "path": "custom-words.txt",
+            "scope": "user",
+            "addWords": true
+        },
+        {
+            "description": "Words used in the Uptime-Watcher project",
+            "name": "Uptime-Watcher Folder Dictionary",
+            "path": "custom-words.txt",
+            "scope": "folder",
+            "addWords": true
+        }
+    ],
+    "ignorePaths": [
+        "**CHANGELOG.md",
+        "dist-electron",
+        "dist",
+        "docs",
+        "node_modules",
+        "release"
+    ],
     "ignoreWords": [],
-    "import": []
+    "import": [],
+    "words": [],
+    "allowCompoundWords": true,
+    "numSuggestions": 10,
+    "suggestionsTimeout": 800
 }

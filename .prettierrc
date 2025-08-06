@@ -7,6 +7,7 @@
     "endOfLine": "auto",
     "htmlWhitespaceSensitivity": "css",
     "jsxSingleQuote": false,
+    "insertPragma": false,
     "plugins": [
         "prettier-plugin-jsdoc",
         "prettier-plugin-tailwindcss",
@@ -29,14 +30,12 @@
         {
             "files": "*.css",
             "options": {
-                "parser": "css",
                 "printWidth": 120
             }
         },
         {
             "files": "*.user.css",
             "options": {
-                "parser": "css",
                 "printWidth": 120
             }
         },

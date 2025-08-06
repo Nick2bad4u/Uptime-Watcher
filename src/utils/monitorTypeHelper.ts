@@ -5,6 +5,7 @@
 
 import type { MonitorFieldDefinition } from "@shared/types";
 
+import { CacheKeys } from "../../shared/utils/cacheKeys";
 import "../types"; // Import global type declarations
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { AppCaches } from "./cache";
@@ -73,7 +74,7 @@ export function clearMonitorTypeCache(): void {
  * Falls back to empty array on error to prevent UI breakage.
  */
 export async function getAvailableMonitorTypes(): Promise<MonitorTypeConfig[]> {
-    const cacheKey = "all-monitor-types";
+    const cacheKey = CacheKeys.config.byName("all-monitor-types");
 
     // Try cache first
     const cached = AppCaches.monitorTypes.get(cacheKey) as MonitorTypeConfig[] | undefined;

@@ -67,16 +67,16 @@ const logger = {
     // Log application lifecycle events
     app: {
         error: (context: string, error: Error) => {
-            logger.error(`Application error in ${context}`, error); /* v8 ignore next */
+            logger.error(`Application error in ${context}`, error);
         },
         performance: (operation: string, duration: number) => {
-            logger.debug(`Performance: ${operation} took ${duration}ms`); /* v8 ignore next */
+            logger.debug(`Performance: ${operation} took ${duration}ms`);
         },
         started: () => {
-            logger.info("Application started"); /* v8 ignore next */
+            logger.info("Application started");
         },
         stopped: () => {
-            logger.info("Application stopped"); /* v8 ignore next */
+            logger.info("Application stopped");
         },
     },
     // Debug level - for development debugging
@@ -141,48 +141,46 @@ const logger = {
     // Log site monitoring events
     site: {
         added: (identifier: string) => {
-            logger.info(`Site added: ${identifier}`); /* v8 ignore next */
+            logger.info(`Site added: ${identifier}`);
         },
         check: (identifier: string, status: string, responseTime?: number) => {
             const timeInfo = responseTime ? ` (${responseTime}ms)` : "";
-            logger.info(`Site check: ${identifier} - Status: ${status}${timeInfo}`); /* v8 ignore next */
+            logger.info(`Site check: ${identifier} - Status: ${status}${timeInfo}`);
         },
         error: (identifier: string, error: Error | string) => {
             if (typeof error === "string") {
-                logger.error(`Site check error: ${identifier} - ${error}`); /* v8 ignore next */
+                logger.error(`Site check error: ${identifier} - ${error}`);
             } else {
-                logger.error(`Site check error: ${identifier}`, error); /* v8 ignore next */
+                logger.error(`Site check error: ${identifier}`, error);
             }
         },
         removed: (identifier: string) => {
-            logger.info(`Site removed: ${identifier}`); /* v8 ignore next */
+            logger.info(`Site removed: ${identifier}`);
         },
         statusChange: (identifier: string, oldStatus: string, newStatus: string) => {
-            logger.info(`Site status change: ${identifier} - ${oldStatus} -> ${newStatus}`); /* v8 ignore next */
+            logger.info(`Site status change: ${identifier} - ${oldStatus} -> ${newStatus}`);
         },
     },
     // Log system/electron events
     system: {
         notification: (title: string, body: string) => {
-            logger.debug(`Notification sent: ${title} - ${body}`); /* v8 ignore next */
+            logger.debug(`Notification sent: ${title} - ${body}`);
         },
         tray: (action: string) => {
-            logger.debug(`Tray action: ${action}`); /* v8 ignore next */
+            logger.debug(`Tray action: ${action}`);
         },
         window: (action: string, windowName?: string) => {
             const nameInfo = windowName ? ` (${windowName})` : "";
-            logger.debug(`Window ${action}${nameInfo}`); /* v8 ignore next */
+            logger.debug(`Window ${action}${nameInfo}`);
         },
     },
     // Log user actions
     user: {
         action: (action: string, details?: unknown) => {
-            logger.info(`User action: ${action}`, details ?? ""); /* v8 ignore next */
+            logger.info(`User action: ${action}`, details ?? "");
         },
         settingsChange: (setting: string, oldValue: unknown, newValue: unknown) => {
-            /* v8 ignore next */ logger.info(
-                `Settings change: ${setting} - ${String(oldValue)} -> ${String(newValue)}`
-            );
+            logger.info(`Settings change: ${setting} - ${String(oldValue)} -> ${String(newValue)}`);
         },
     },
     // Verbose level - very detailed debugging

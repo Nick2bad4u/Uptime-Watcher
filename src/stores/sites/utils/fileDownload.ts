@@ -84,7 +84,6 @@ export function generateBackupFileName(prefix = "backup", extension = "sqlite"):
  * ```
  */
 /* eslint-disable n/no-unsupported-features/node-builtins -- URL.createObjectURL is always available in modern browsers in Node */
-
 export async function handleSQLiteBackupDownload(downloadFunction: () => Promise<Uint8Array>): Promise<void> {
     // Get the backup data
     const backupData = await downloadFunction();

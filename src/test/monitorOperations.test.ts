@@ -13,7 +13,7 @@ import {
     validateMonitorExists,
     monitorOperations,
 } from "../stores/sites/utils/monitorOperations";
-import { ERROR_MESSAGES } from "../../shared/types";
+import { ERROR_CATALOG } from "../../shared/utils/errorCatalog";
 
 // Mock crypto.randomUUID
 const mockUUID = "mock-uuid-123";
@@ -732,7 +732,7 @@ describe("monitorOperations", () => {
         it("should throw error for undefined site", () => {
             expect(() => {
                 validateMonitorExists(undefined, "monitor-1");
-            }).toThrow(ERROR_MESSAGES.SITE_NOT_FOUND);
+            }).toThrow(ERROR_CATALOG.sites.NOT_FOUND);
         });
 
         it("should throw error for non-existent monitor", () => {

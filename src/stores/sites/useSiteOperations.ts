@@ -5,9 +5,10 @@
  * Uses centralized error store for consistent error handling across the application.
  */
 
-import { ERROR_MESSAGES, type Monitor, type MonitorType, type Site } from "@shared/types";
+import { type Monitor, type MonitorType, type Site } from "@shared/types";
 
 import { isDevelopment } from "../../../shared/utils/environment";
+import { ERROR_CATALOG } from "../../../shared/utils/errorCatalog";
 import logger from "../../services/logger";
 import { safeExtractIpcData } from "../../types/ipc";
 import { useErrorStore } from "../error/useErrorStore";
@@ -61,7 +62,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 // Get the current site
                 const site = deps.getSites().find((s) => s.identifier === siteId);
                 if (!site) {
-                    throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
+                    throw new Error(ERROR_CATALOG.sites.NOT_FOUND);
                 }
 
                 // Allow multiple monitors of the same type
@@ -231,12 +232,12 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 // Get the current site
                 const site = deps.getSites().find((s) => s.identifier === siteId);
                 if (!site) {
-                    throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
+                    throw new Error(ERROR_CATALOG.sites.NOT_FOUND);
                 }
 
                 // Check if this is the only monitor - prevent removal if so
                 if (site.monitors.length <= 1) {
-                    throw new Error(ERROR_MESSAGES.CANNOT_REMOVE_LAST_MONITOR);
+                    throw new Error(ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST);
                 }
 
                 // Stop monitoring for this specific monitor first
@@ -273,7 +274,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
             async () => {
                 const site = deps.getSites().find((s) => s.identifier === siteId);
                 if (!site) {
-                    throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
+                    throw new Error(ERROR_CATALOG.sites.NOT_FOUND);
                 }
 
                 // Only update if retryAttempts is defined
@@ -301,7 +302,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
             async () => {
                 const site = deps.getSites().find((s) => s.identifier === siteId);
                 if (!site) {
-                    throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
+                    throw new Error(ERROR_CATALOG.sites.NOT_FOUND);
                 }
 
                 // Only update if timeout is defined
@@ -329,7 +330,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
             async () => {
                 const site = deps.getSites().find((s) => s.identifier === siteId);
                 if (!site) {
-                    throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
+                    throw new Error(ERROR_CATALOG.sites.NOT_FOUND);
                 }
 
                 const updatedSite = updateMonitorInSite(site, monitorId, { checkInterval: interval });

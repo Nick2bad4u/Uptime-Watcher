@@ -6,6 +6,7 @@
 import type { ConfigValue } from "../../shared/types/configTypes";
 import type { ValidationResult } from "./validators/interfaces";
 
+import { CacheKeys } from "../../shared/utils/cacheKeys";
 import { CACHE_SIZE_LIMITS, CACHE_TTL, DEFAULT_CHECK_INTERVAL, DEFAULT_HISTORY_LIMIT } from "../constants";
 import { isDev } from "../electronUtils";
 import { Site } from "../types";
@@ -290,7 +291,7 @@ export class ConfigurationManager {
             url: monitor.url ?? "",
         };
 
-        const cacheKey = `monitor:${JSON.stringify(monitorForKey)}`;
+        const cacheKey = CacheKeys.validation.byType("monitor", JSON.stringify(monitorForKey));
 
         // Check cache first
         const cached = this.validationCache.get(cacheKey);
@@ -325,7 +326,7 @@ export class ConfigurationManager {
             name: site.name,
         };
 
-        const cacheKey = `site:${JSON.stringify(siteForKey)}`;
+        const cacheKey = CacheKeys.validation.byType("site", JSON.stringify(siteForKey));
 
         // Check cache first
         const cached = this.validationCache.get(cacheKey);

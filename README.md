@@ -16,12 +16,14 @@ An Electron desktop application for monitoring website uptime status with real-t
 
 ## Tech Stack
 
-- **Frontend**: React + TypeScript + Tailwind CSS
-- **Desktop Framework**: Electron
-- **State Management**: Zustand
-- **Database**: LowDB (JSON file-based)
-- **HTTP Client**: Axios
-- **Build Tool**: Vite
+- **Frontend**: React + TypeScript + Tailwind CSS + Vite
+- **Desktop Framework**: Electron (main + renderer processes)
+- **State Management**: Zustand (domain-specific stores)
+- **Database**: SQLite with node-sqlite3-wasm
+- **IPC Communication**: Type-safe Electron contextBridge
+- **Event System**: Custom TypedEventBus with middleware
+- **Testing**: Vitest (dual configuration for frontend + backend)
+- **Build Tools**: Vite + TypeScript + Electron Builder
 
 ## Getting Started
 
@@ -51,6 +53,8 @@ npm install
 npm run electron-dev
 ```
 
+> **New Developer?** Check out our [Quick Start Guide](./docs/DEVELOPER-QUICK-START.md) for a comprehensive setup guide.
+
 ### Building for Production
 
 ```bash
@@ -76,11 +80,30 @@ npm run dist
 
 ## Architecture
 
-The application follows a clean separation between:
+The application follows a sophisticated service-oriented architecture with:
 
-- **Main Process**: Handles app lifecycle, uptime monitoring, and notifications
-- **Renderer Process**: React-based UI with real-time updates
-- **IPC Communication**: Secure communication between main and renderer processes
-- **Database Layer**: SQLite-based storage for persistence
+- **Main Process (Electron)**: Service container with dependency injection
+- **Renderer Process (React)**: Component-based UI with Zustand state management  
+- **IPC Communication**: Type-safe communication via contextBridge
+- **Database Layer**: Repository pattern with SQLite and transaction safety
+- **Event System**: TypedEventBus for cross-service communication
+- **Monitoring System**: Enhanced monitoring with operation correlation and race condition prevention
+
+### Key Features
+- 🏗️ **Service-Oriented Architecture**: Modular, testable service design
+- 🔒 **Type Safety**: Strict TypeScript with comprehensive interfaces
+- 📊 **Enhanced Monitoring**: Race condition prevention and operation correlation
+- 🗃️ **Repository Pattern**: Transactional database operations
+- 🎯 **Event-Driven**: Reactive communication between services
+- 📚 **Comprehensive Documentation**: ADRs, guides, and code templates
+
+### Documentation
+- 🤖 **[AI Context Guide](./docs/AI-CONTEXT.md)** - Quick onboarding for AI assistants
+- 🚀 **[Developer Quick Start](./docs/DEVELOPER-QUICK-START.md)** - Get started in minutes
+- 📚 **[Complete Documentation Index](./docs/DOCUMENTATION-INDEX.md)** - All documentation organized by role and topic
+- 🏗️ **[Architecture Documentation](./docs/Architecture/)** - ADRs, patterns, and templates
+- 📖 **[API Reference](./docs/API-DOCUMENTATION.md)** - IPC interfaces and communication patterns
+- 🔧 **[Troubleshooting Guide](./docs/TROUBLESHOOTING.md)** - Common issues and solutions
+- 🛠️ **[Environment Setup](./docs/ENVIRONMENT-SETUP.md)** - Complete development environment guide
 
 ![Repository Stats](https://raw.githubusercontent.com/nick2bad4u/Uptime-Watcher/metrics/metrics.repository.svg)

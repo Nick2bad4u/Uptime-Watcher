@@ -101,6 +101,8 @@ import * as cssPlugin from "eslint-plugin-css";
 // Don't use
 // eslint-plugin-import -- Replaced by import-x
 
+// Schema: https://www.schemastore.org/eslintrc.json
+
 const __dirname = import.meta.dirname;
 
 export default [

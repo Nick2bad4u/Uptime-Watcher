@@ -104,12 +104,81 @@ export interface Monitor {
     type: MonitorType;
     url?: string;
 }
+/**
+ * Field definition for dynamic form generation.
+ *
+ * @remarks
+ * Used for monitor type configuration in both frontend and backend. Defines the structure of fields for dynamic forms and monitor configuration.
+ *
+ * @public
+ */
+export interface MonitorFieldDefinition {
+    /** Help text for the field */
+    helpText?: string;
+    /** Display label for the field */
+    label: string;
+    /** Max value for number fields */
+    max?: number;
+    /** Min value for number fields */
+    min?: number;
+    /** Field name (matches monitor property) */
+    name: string;
+    /** Placeholder text */
+    placeholder?: string;
+    /** Whether field is required */
+    required: boolean;
+    /** Input type for form rendering */
+    type: "number" | "text" | "url";
+}
+/**
+ * Field definition for dynamic form generation.
+ *
+ * @remarks
+ * Used for monitor type configuration in both frontend and backend. Defines the structure of fields for dynamic forms and monitor configuration.
+ *
+ * @public
+ */
+export interface MonitorFieldDefinition {
+    /** Help text for the field */
+    helpText?: string;
+    /** Display label for the field */
+    label: string;
+    /** Max value for number fields */
+    max?: number;
+    /** Min value for number fields */
+    min?: number;
+    /** Field name (matches monitor property) */
+    name: string;
+    /** Placeholder text */
+    placeholder?: string;
+    /** Whether field is required */
+    required: boolean;
+    /** Input type for form rendering */
+    type: "number" | "text" | "url";
+}
+
 export interface Site {
     identifier: string;
     monitoring: boolean;
     monitors: Monitor[];
     name: string;
 }
+
+/**
+ * Minimal Site interface for status calculations.
+ *
+ * @remarks
+ * Allows utilities to work with both frontend and backend Site types. Used for status calculations and summary operations.
+ *
+ * @public
+ */
+export interface SiteForStatus {
+    monitors: Array<{
+        monitoring: boolean;
+        status: MonitorStatus;
+    }>;
+}
+
 export interface StatusHistory {
     details?: string;
     responseTime: number;
@@ -185,58 +254,4 @@ function isValidActiveOperations(activeOperations: unknown): activeOperations is
         }
     }
     return true;
-}
-
-export const ERROR_MESSAGES = {
-    CANNOT_REMOVE_LAST_MONITOR: "Cannot remove the last monitor from a site. Use site removal instead.",
-    FAILED_TO_ADD_MONITOR: "Failed to add monitor",
-    FAILED_TO_ADD_SITE: "Failed to add site",
-    FAILED_TO_CHECK_SITE: "Failed to check site",
-    FAILED_TO_DELETE_SITE: "Failed to delete site",
-    FAILED_TO_UPDATE_INTERVAL: "Failed to update check interval",
-    FAILED_TO_UPDATE_SITE: "Failed to update site",
-    MONITOR_NOT_FOUND: "Monitor not found",
-    SITE_NOT_FOUND: "Site not found",
-} as const;
-
-/**
- * Field definition for dynamic form generation.
- *
- * @remarks
- * Used for monitor type configuration in both frontend and backend. Defines the structure of fields for dynamic forms and monitor configuration.
- *
- * @public
- */
-export interface MonitorFieldDefinition {
-    /** Help text for the field */
-    helpText?: string;
-    /** Display label for the field */
-    label: string;
-    /** Max value for number fields */
-    max?: number;
-    /** Min value for number fields */
-    min?: number;
-    /** Field name (matches monitor property) */
-    name: string;
-    /** Placeholder text */
-    placeholder?: string;
-    /** Whether field is required */
-    required: boolean;
-    /** Input type for form rendering */
-    type: "number" | "text" | "url";
-}
-
-/**
- * Minimal Site interface for status calculations.
- *
- * @remarks
- * Allows utilities to work with both frontend and backend Site types. Used for status calculations and summary operations.
- *
- * @public
- */
-export interface SiteForStatus {
-    monitors: Array<{
-        monitoring: boolean;
-        status: MonitorStatus;
-    }>;
 }

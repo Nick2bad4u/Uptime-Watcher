@@ -5,6 +5,7 @@
 
 import type { Monitor, MonitorType } from "@shared/types";
 
+import { CacheKeys } from "../../shared/utils/cacheKeys";
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { AppCaches } from "./cache";
 import { withUtilityErrorHandling } from "./errorHandling";
@@ -239,24 +240,10 @@ export async function supportsResponseTime(monitorType: MonitorType): Promise<bo
 }
 
 /**
- * Generate a robust cache key for monitor type configurations.
- * Sanitizes input to prevent collisions and includes context.
- *
- * @param prefix - Cache key prefix
- * @param monitorType - Monitor type identifier
- * @returns Sanitized cache key
- */
-function generateCacheKey(prefix: string, monitorType: MonitorType): string {
-    // Sanitize monitor type to prevent key collisions
-    const sanitizedType = monitorType.replaceAll(/[^\w-]/g, "_");
-    return `${prefix}_${sanitizedType}_v1`;
-}
-
-/**
  * Get monitor type configuration with caching
  */
 async function getConfig(monitorType: MonitorType): Promise<MonitorTypeConfig | undefined> {
-    const cacheKey = generateCacheKey("config", monitorType);
+    const cacheKey = CacheKeys.config.byName(`monitor-config-${monitorType}`);
 
     // Try to get from cache first
     const cached = AppCaches.uiHelpers.get(cacheKey) as MonitorTypeConfig | undefined;

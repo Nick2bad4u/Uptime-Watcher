@@ -55,21 +55,21 @@ This document provides comprehensive guidelines for adding and modifying UI feat
 
 ```typescript
 // ✅ Good: Use shared validation schemas
-import { SiteConfigurationSchema } from "shared/validation/schemas";
+import { httpMonitorSchema, baseMonitorSchema } from "shared/validation/schemas";
 
 const validateSiteForm = (formData: FormData) => {
- const result = SiteConfigurationSchema.safeParse(formData);
- if (!result.success) {
-  return { isValid: false, errors: result.error.errors };
- }
- return { isValid: true, data: result.data };
+    const result = httpMonitorSchema.safeParse(formData);
+    if (!result.success) {
+        return { isValid: false, errors: result.error.errors };
+    }
+    return { isValid: true, data: result.data };
 };
 
 // ❌ Bad: Manual validation that differs from backend
 const validateSiteForm = (formData: FormData) => {
- if (!formData.identifier || formData.identifier.length < 2) {
-  return { isValid: false, errors: ["ID too short"] };
- }
+    if (!formData.identifier || formData.identifier.length < 2) {
+        return { isValid: false, errors: ["ID too short"] };
+    }
 };
 ```
 
@@ -84,28 +84,37 @@ const validateSiteForm = (formData: FormData) => {
 
 ```typescript
 // Real-time form validation with shared schemas
-const useFormValidation = <T>(schema: ZodSchema<T>) => {
- const [errors, setErrors] = useState<Record<string, string>>({});
+import { z } from 'zod';
 
- const validateField = useCallback(
-  (name: string, value: unknown) => {
-   const fieldResult = schema.shape[name]?.safeParse(value);
-   if (!fieldResult?.success) {
-    setErrors((prev) => ({
-     ...prev,
-     [name]: fieldResult.error.errors[0]?.message,
-    }));
-   } else {
-    setErrors((prev) => {
-     const { [name]: _, ...rest } = prev;
-     return rest;
-    });
-   }
-  },
-  [schema]
- );
-
- return { errors, validateField };
+const useFormValidation = <T>(schema: z.ZodSchema<T>) => {
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    
+    const validateField = useCallback(
+        (name: string, value: unknown) => {
+            try {
+                // Extract field schema from the main schema
+                const fieldSchema = (schema as any).shape[name];
+                if (fieldSchema) {
+                    fieldSchema.parse(value);
+                    // Clear error if validation passes
+                    setErrors((prev) => {
+                        const { [name]: _, ...rest } = prev;
+                        return rest;
+                    });
+                }
+            } catch (error) {
+                if (error instanceof z.ZodError) {
+                    setErrors((prev) => ({
+                        ...prev,
+                        [name]: error.errors[0]?.message || 'Invalid value',
+                    }));
+                }
+            }
+        },
+        [schema]
+    );
+    
+    return { errors, validateField };
 };
 ```
 
@@ -213,6 +222,84 @@ export interface MyComponentProperties {
 - **Stop event propagation**: Add `event?.stopPropagation()` in button click handlers within cards
 
 ## State Management
+
+### Modular Zustand Store Architecture
+
+The application uses a **modular composition pattern** for Zustand stores to separate concerns and improve testability:
+
+```typescript
+// ✅ Good: Modular store composition
+import { create } from "zustand";
+
+export const useSitesStore = create<SitesStore>()((set, get) => {
+    // Create state actions
+    const stateActions = createSitesStateActions(set, get);
+    
+    // Shared functions between modules
+    const getSites = () => get().sites;
+    
+    // Create specialized action modules
+    const syncActions = createSiteSyncActions({
+        getSites,
+        setSites: stateActions.setSites,
+    });
+    
+    const monitoringActions = createSiteMonitoringActions();
+    const operationsActions = createSiteOperationsActions({
+        addSite: stateActions.addSite,
+        getSites,
+        removeSite: stateActions.removeSite,
+        setSites: stateActions.setSites,
+        syncSitesFromBackend: syncActions.syncSitesFromBackend,
+    });
+    
+    return {
+        // Initial state
+        ...initialSitesState,
+        // Composed actions from modules
+        ...stateActions,
+        ...operationsActions,
+        ...monitoringActions,
+        ...syncActions,
+    };
+});
+```
+
+### Store Module Structure
+
+Each store module has clear responsibilities:
+
+- **State Module** (`useSitesState`): Core state management and data manipulation
+- **Operations Module** (`useSiteOperations`): CRUD operations for entities
+- **Monitoring Module** (`useSiteMonitoring`): Monitoring lifecycle and status management  
+- **Sync Module** (`useSiteSync`): Backend synchronization and data consistency
+
+### Error Handling in Stores
+
+```typescript
+// ✅ Good: Consistent error handling with withErrorHandling
+import { withErrorHandling } from '@shared/utils/errorHandling';
+import { useErrorStore } from '../error/useErrorStore';
+
+export const createSiteOperationsActions = (deps: SiteOperationsDependencies) => ({
+    createSite: async (siteData) => {
+        const errorStore = useErrorStore.getState();
+        await withErrorHandling(
+            async () => {
+                // Perform operation
+                const site = await window.electronAPI.sites.addSite(siteData);
+                await deps.syncSitesFromBackend();
+                return site;
+            },
+            {
+                clearError: () => errorStore.clearStoreError("sites-operations"),
+                setError: (error) => errorStore.setStoreError("sites-operations", error),
+                setLoading: (loading) => errorStore.setOperationLoading("createSite", loading),
+            }
+        );
+    },
+});
+```
 
 ### Store Organization
 

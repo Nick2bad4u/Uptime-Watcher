@@ -125,7 +125,6 @@ export type UpdateStatus = "available" | "checking" | "downloaded" | "downloadin
  * statements and provides consistency in type usage across components.
  *
  * The re-exported types include:
- * - ERROR_MESSAGES: Centralized error message constants
  * - Monitor: Individual monitoring configuration interface
  * - MonitorType: Enumeration of supported monitor types
  * - Site: Complete site configuration with monitors
@@ -137,4 +136,4 @@ export type UpdateStatus = "available" | "checking" | "downloaded" | "downloadin
  * // Instead of multiple imports from @shared/types
  * ```
  */
-export type { ERROR_MESSAGES, Monitor, MonitorType, Site, StatusUpdate } from "@shared/types";
+export type { Monitor, MonitorType, Site, StatusUpdate } from "@shared/types";
