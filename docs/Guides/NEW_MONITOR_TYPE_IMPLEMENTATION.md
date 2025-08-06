@@ -22,9 +22,9 @@ Your monitor service **MUST** return a result matching the `MonitorCheckResult` 
 
 ```typescript
 export interface MonitorCheckResult {
- /** Human-readable details about the check result (REQUIRED) */
+ /** Optional human-readable details about the check result */
  details?: string;
- /** Technical error message for debugging (optional) */
+ /** Optional technical error message for debugging */
  error?: string;
  /** Response time in milliseconds (REQUIRED) */
  responseTime: number;
@@ -35,7 +35,7 @@ export interface MonitorCheckResult {
 
 ### **🔹 Critical Details Field Requirement**
 
-**⚠️ BREAKING CHANGE**: The `details` field is now **essential** for proper history tracking:
+**⚠️ IMPORTANT**: The `details` field should be populated for proper history tracking:
 
 - **HTTP monitors**: Must include status codes (e.g., "HTTP 200 OK", "HTTP 404 Not Found")
 - **Port monitors**: Must include connection details (e.g., "Connection successful", "Connection refused")
@@ -58,34 +58,28 @@ return {
 };
 ```
 
-### **🔹 Enhanced vs. Traditional Monitoring**
+### **🔹 Enhanced Monitoring System**
 
-The system now uses a **dual monitoring approach**:
+The system uses the **unified enhanced monitoring architecture**:
 
-1. **Enhanced Monitoring (Primary)**:
-   - Operation correlation and race condition prevention
-   - Used for both scheduled and manual checks when available
-   - Located: `electron/services/monitoring/EnhancedMonitorChecker.ts`
+- **Enhanced Monitoring**: Comprehensive monitoring with operation correlation and race condition prevention
+- **Used for**: All scheduled and manual health checks
+- **Location**: `electron/services/monitoring/` directory
 
-2. **Traditional Monitoring (Fallback)**:
-   - Basic monitoring without correlation
-   - Used as fallback when enhanced monitoring fails
-   - Status: `@deprecated` but still required for reliability
-
-**Your monitor service works with both systems automatically** - no changes needed to your implementation.
+**Your monitor service integrates seamlessly with the enhanced monitoring infrastructure.**
 
 ## ⚡ Critical Requirements for ALL Monitor Types
 
-**Every monitor type MUST support these core fields:**
+**Core required fields for every monitor type:**
 
-| Field           | Type     | Range/Validation  | Description                         |
-| --------------- | -------- | ----------------- | ----------------------------------- |
-| `checkInterval` | `number` | 5000ms - 30 days  | How often to check the monitor      |
-| `retryAttempts` | `number` | 0 - 10 attempts   | Number of retries on failure        |
-| `timeout`       | `number` | 1000ms - 300000ms | Request timeout duration            |
-| `details`       | `string` | Non-empty string  | **NEW**: Result details for history |
+| Field           | Type     | Range/Validation  | Description                    |
+| --------------- | -------- | ----------------- | ------------------------------ |
+| `checkInterval` | `number` | 5000ms - 30 days  | Check frequency                |
+| `retryAttempts` | `number` | 0 - 10 attempts   | Retry attempts on failure      |
+| `timeout`       | `number` | 1000ms - 300000ms | Request timeout                |
+| `details`       | `string` | Non-empty string  | Result details for history     |
 
-These are **not optional** - they are enforced by the validation schemas and used by the monitoring scheduler.
+These fields are enforced by validation schemas and used by the monitoring scheduler.
 
 ## �️ Validation Best Practices
 

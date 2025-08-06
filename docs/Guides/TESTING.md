@@ -8,8 +8,9 @@ This project uses Vitest for testing with separate configurations for frontend (
 
 The project has two separate Vitest configurations:
 
-1. **Frontend Tests** (`vite.config.ts`):
+1. **Frontend Tests** (`vitest.config.ts`):
    - Tests React components in `src/` directory
+   - Merges configuration from `vite.config.ts`
    - Uses jsdom environment
    - Coverage reports to `./coverage/`
 
@@ -20,7 +21,7 @@ The project has two separate Vitest configurations:
 
 ### Files Created/Modified
 
-1. **`vite.config.ts`** - Vitest configuration for frontend with coverage settings
+1. **`vitest.config.ts`** - Vitest configuration for frontend tests (merges with vite.config.ts)
 2. **`vitest.electron.config.ts`** - Vitest configuration for Electron backend
 3. **`codecov.yml`** - Codecov configuration for multi-flag reporting
 4. **`src/test/setup.ts`** - Test setup file for React components
