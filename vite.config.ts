@@ -11,7 +11,7 @@ import { ViteMcp } from "vite-plugin-mcp";
 import { getEnvVar as getEnvironmentVariable } from "./shared/utils/environment";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import { visualizer } from "rollup-plugin-visualizer";
-import { defineConfig, type PluginOption } from "vite";
+import { defineConfig, type PluginOption, type UserConfigFnObject } from "vite";
 
 /**
  * Vite configuration object.
@@ -35,6 +35,8 @@ export default defineConfig(() => {
         },
         esbuild: {
             target: "es2024", // Match TypeScript target for consistency
+
+
             // Transpile all files with ESBuild to remove comments from code coverage.
             // Required for `test.coverage.ignoreEmptyLines` to work:
             include: [
@@ -75,7 +77,6 @@ export default defineConfig(() => {
             react({
                 // Enable Fast Refresh for better development experience
                 // Includes .js, .jsx, .ts, .tsx by default
-
                 // Use automatic JSX runtime (default, but explicit for clarity)
                 jsxRuntime: "automatic",
 
@@ -189,6 +190,7 @@ export default defineConfig(() => {
                 },
             },
             environment: "jsdom", // Default for React components
+
             // Test file patterns - exclude electron tests as they have their own config
             exclude: [
                 "**/node_modules/**",
@@ -219,7 +221,7 @@ export default defineConfig(() => {
             // Improve test output
             reporters: ["default", "json", "verbose", "hanging-process"],
             setupFiles: ["./src/test/setup.ts"], // Setup file for testing
-            testTimeout: 15_000, // Set Vitest timeout to 15 seconds
+            testTimeout: 15000, // Set Vitest timeout to 15 seconds
         },
     };
-});
+}) satisfies UserConfigFnObject as UserConfigFnObject;

@@ -134,6 +134,7 @@ export default [
             "dist-electron/",
             "dist/",
             "docs/docusaurus/**",
+            "docs/Archive/**",
             "docs/Packages/**",
             "docs/Reviews/**",
             "node_modules/**",
