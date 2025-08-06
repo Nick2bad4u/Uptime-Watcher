@@ -518,7 +518,7 @@ class VersionManager {
  *
  * @public
  */
-export const migrationRegistry = new MigrationRegistry();
+export const migrationRegistry: MigrationRegistry = new MigrationRegistry();
 
 /**
  * Singleton manager for monitor type version tracking.
@@ -528,7 +528,7 @@ export const migrationRegistry = new MigrationRegistry();
  *
  * @public
  */
-export const versionManager = new VersionManager();
+export const versionManager: VersionManager = new VersionManager();
 
 /**
  * Factory for creating migration orchestrator instances.

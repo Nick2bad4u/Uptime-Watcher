@@ -37,7 +37,7 @@ export interface HistoryChartProps {
  * @param props - HistoryChart component props
  * @returns JSX element containing the history chart, or null if no data (following React conventions for conditional rendering)
  */
-export const HistoryChart = React.memo(function HistoryChart({
+export const HistoryChart: React.NamedExoticComponent<HistoryChartProps> = React.memo(function HistoryChart({
     className = "",
     history,
     maxItems = 120,

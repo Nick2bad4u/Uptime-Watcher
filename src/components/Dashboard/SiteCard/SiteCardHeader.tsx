@@ -98,7 +98,7 @@ export interface SiteInfo {
  * @param props - SiteCardHeader component props
  * @returns JSX.Element containing site header with controls
  */
-export const SiteCardHeader = React.memo(function SiteCardHeader({
+export const SiteCardHeader: React.NamedExoticComponent<SiteCardHeaderProps> = React.memo(function SiteCardHeader({
     display,
     interactions,
     monitoring,

@@ -38,6 +38,18 @@ export type MonitorStatus = "down" | "paused" | "pending" | "up";
 export const BASE_MONITOR_TYPES = ["http", "port", "ping"] as const;
 
 /**
+ * Interface for monitor status constants.
+ *
+ * @public
+ */
+export interface MonitorStatusConstants {
+    DOWN: "down";
+    PAUSED: "paused";
+    PENDING: "pending";
+    UP: "up";
+}
+
+/**
  * Type representing all supported monitor types.
  *
  * @remarks
@@ -65,7 +77,7 @@ export type SiteStatus = "mixed" | "unknown" | MonitorStatus;
  *
  * @public
  */
-export const MONITOR_STATUS = {
+export const MONITOR_STATUS: MonitorStatusConstants = {
     DOWN: "down" as const,
     PAUSED: "paused" as const,
     PENDING: "pending" as const,

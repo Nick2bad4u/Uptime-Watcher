@@ -47,49 +47,51 @@ export interface MonitorSelectorProperties {
  * />
  * ```
  */
-export const MonitorSelector = React.memo(function MonitorSelector({
-    className = "min-w-[80px]",
-    monitors,
-    onChange,
-    selectedMonitorId,
-}: MonitorSelectorProperties) {
-    // Memoize event handlers to prevent recreation on every render
-    const handleClick = useCallback((event: React.MouseEvent) => {
-        event.stopPropagation();
-    }, []);
+export const MonitorSelector: React.NamedExoticComponent<MonitorSelectorProperties> = React.memo(
+    function MonitorSelector({
+        className = "min-w-[80px]",
+        monitors,
+        onChange,
+        selectedMonitorId,
+    }: MonitorSelectorProperties) {
+        // Memoize event handlers to prevent recreation on every render
+        const handleClick = useCallback((event: React.MouseEvent) => {
+            event.stopPropagation();
+        }, []);
 
-    const handleMouseDown = useCallback((event: React.MouseEvent) => {
-        event.stopPropagation();
-    }, []);
+        const handleMouseDown = useCallback((event: React.MouseEvent) => {
+            event.stopPropagation();
+        }, []);
 
-    // Memoize the option formatting to avoid recalculation
-    const formatMonitorOption = useCallback((monitor: Monitor) => {
-        const monitorLabel = monitor.type.toUpperCase();
-        const getDetail = () => {
-            if (monitor.port) {
-                return `: ${monitor.port}`;
-            }
-            if (monitor.url) {
-                return `: ${monitor.url}`;
-            }
-            return "";
-        };
-        return `${monitorLabel}${getDetail()}`;
-    }, []);
+        // Memoize the option formatting to avoid recalculation
+        const formatMonitorOption = useCallback((monitor: Monitor) => {
+            const monitorLabel = monitor.type.toUpperCase();
+            const getDetail = () => {
+                if (monitor.port) {
+                    return `: ${monitor.port}`;
+                }
+                if (monitor.url) {
+                    return `: ${monitor.url}`;
+                }
+                return "";
+            };
+            return `${monitorLabel}${getDetail()}`;
+        }, []);
 
-    return (
-        <ThemedSelect
-            className={className}
-            onChange={onChange}
-            onClick={handleClick}
-            onMouseDown={handleMouseDown}
-            value={selectedMonitorId}
-        >
-            {monitors.map((monitor) => (
-                <option key={monitor.id} value={monitor.id}>
-                    {formatMonitorOption(monitor)}
-                </option>
-            ))}
-        </ThemedSelect>
-    );
-});
+        return (
+            <ThemedSelect
+                className={className}
+                onChange={onChange}
+                onClick={handleClick}
+                onMouseDown={handleMouseDown}
+                value={selectedMonitorId}
+            >
+                {monitors.map((monitor) => (
+                    <option key={monitor.id} value={monitor.id}>
+                        {formatMonitorOption(monitor)}
+                    </option>
+                ))}
+            </ThemedSelect>
+        );
+    }
+);

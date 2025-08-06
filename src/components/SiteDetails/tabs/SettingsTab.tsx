@@ -3,6 +3,8 @@
  * Provides interface for modifying site settings, intervals, and performing site management actions.
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import React, { useEffect, useState } from "react";
 import { FiSave, FiTrash2 } from "react-icons/fi";
 import { MdDangerous, MdInfoOutline, MdSettings, MdTimer } from "react-icons/md";
@@ -109,7 +111,7 @@ export function SettingsTab({
     selectedMonitor,
     setLocalName,
     timeoutChanged,
-}: SettingsTabProperties) {
+}: SettingsTabProperties): JSX.Element {
     const { currentTheme } = useTheme();
 
     // Icon colors configuration

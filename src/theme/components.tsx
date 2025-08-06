@@ -10,14 +10,15 @@
  */
 
 import type { MonitorStatus, SiteStatus } from "@shared/types";
+import type { JSX } from "react/jsx-runtime";
 
 import React from "react";
 
 import { ARIA_LABEL, TRANSITION_ALL } from "../constants";
 import { getStatusIcon } from "../utils/status";
 import { formatResponseTime } from "../utils/time";
-import { useTheme, useThemeClasses } from "./useTheme";
 import "./components.css";
+import { useTheme, useThemeClasses } from "./useTheme";
 
 export type BadgeSize = "lg" | "md" | "sm" | "xs";
 export type BadgeVariant = "error" | "info" | "primary" | "secondary" | "success" | "warning";
@@ -294,7 +295,7 @@ export interface ThemeProviderProperties {
     readonly children: React.ReactNode;
 }
 
-export function MiniChartBar({ className = "", responseTime, status, timestamp }: MiniChartBarProperties) {
+export function MiniChartBar({ className = "", responseTime, status, timestamp }: MiniChartBarProperties): JSX.Element {
     const { currentTheme, getStatusColor } = useTheme();
 
     const styles: React.CSSProperties = {
@@ -312,7 +313,12 @@ export function MiniChartBar({ className = "", responseTime, status, timestamp }
     );
 }
 
-export function StatusIndicator({ className = "", showText = false, size = "md", status }: StatusIndicatorProperties) {
+export function StatusIndicator({
+    className = "",
+    showText = false,
+    size = "md",
+    status,
+}: StatusIndicatorProperties): JSX.Element {
     const { currentTheme, getStatusColor } = useTheme();
 
     const getSizeStyles = () => {
@@ -400,7 +406,7 @@ export function ThemedBadge({
     iconColor,
     size = "sm",
     variant = "primary",
-}: ThemedBadgeProperties) {
+}: ThemedBadgeProperties): JSX.Element {
     const { currentTheme } = useTheme();
 
     const getVariantStyles = () => {
@@ -534,7 +540,21 @@ export function ThemedBox({
     surface = "base",
     tabIndex,
     variant = "primary",
-}: ThemedBoxProperties) {
+}: ThemedBoxProperties): React.DetailedReactHTMLElement<
+    {
+        "aria-label"?: string;
+        className: string;
+        onClick: ((e: React.MouseEvent<HTMLElement>) => void) | undefined;
+        onKeyDown?: (e: React.KeyboardEvent) => void;
+        onMouseEnter: (() => void) | undefined;
+        onMouseLeave: (() => void) | undefined;
+        role?: string;
+        style: React.CSSProperties;
+        tabIndex?: number;
+        type?: "button";
+    },
+    HTMLElement
+> {
     const classNames = [
         CSS_CLASSES.THEMED_BOX,
         `themed-box--background-${variant}`,
@@ -594,7 +614,7 @@ export function ThemedButton({
     title,
     type = "button",
     variant = "primary",
-}: ThemedButtonProperties) {
+}: ThemedButtonProperties): JSX.Element {
     const classNames = [
         CSS_CLASSES.THEMED_BUTTON,
         `themed-button--${variant}`,
@@ -674,7 +694,7 @@ export function ThemedCard({
     subtitle,
     title,
     variant = "primary",
-}: ThemedCardProperties) {
+}: ThemedCardProperties): JSX.Element {
     const { currentTheme } = useTheme();
 
     const cardStyles: React.CSSProperties = {
@@ -747,7 +767,7 @@ export function ThemedCheckbox({
     disabled = false,
     onChange,
     required = false,
-}: ThemedCheckboxProperties) {
+}: ThemedCheckboxProperties): JSX.Element {
     return (
         <input
             type="checkbox"
@@ -771,7 +791,7 @@ export function ThemedIconButton({
     size = "md",
     tooltip,
     variant = "ghost",
-}: ThemedIconButtonProperties) {
+}: ThemedIconButtonProperties): JSX.Element {
     const getSize = () => {
         switch (size) {
             case "lg": {
@@ -833,7 +853,7 @@ export function ThemedInput({
     step,
     type = "text",
     value,
-}: ThemedInputProperties) {
+}: ThemedInputProperties): JSX.Element {
     const { currentTheme } = useTheme();
     const { getBackgroundClass, getBorderClass, getTextClass } = useThemeClasses();
 
@@ -880,7 +900,7 @@ export function ThemedProgress({
     size = "md",
     value,
     variant = "primary",
-}: ThemedProgressProperties) {
+}: ThemedProgressProperties): JSX.Element {
     const { currentTheme } = useTheme();
 
     const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
@@ -986,7 +1006,7 @@ export function ThemedSelect({
     required = false,
     title,
     value,
-}: ThemedSelectProperties) {
+}: ThemedSelectProperties): JSX.Element {
     const { currentTheme } = useTheme();
     const { getBackgroundClass, getBorderClass, getTextClass } = useThemeClasses();
 
@@ -1033,7 +1053,7 @@ export function ThemedText({
     style = DEFAULT_THEMED_BOX_STYLE,
     variant = "primary",
     weight = "normal",
-}: ThemedTextProperties) {
+}: ThemedTextProperties): JSX.Element {
     const classNames = [
         CSS_CLASSES.THEMED_TEXT,
         `themed-text--${variant}`,
@@ -1052,7 +1072,7 @@ export function ThemedText({
     );
 }
 
-export function ThemedTooltip({ children, className = "", content }: ThemedTooltipProperties) {
+export function ThemedTooltip({ children, className = "", content }: ThemedTooltipProperties): JSX.Element {
     return (
         <div className={`themed-tooltip ${className}`} title={content}>
             {children}
@@ -1061,7 +1081,7 @@ export function ThemedTooltip({ children, className = "", content }: ThemedToolt
 }
 
 // eslint-disable-next-line sonarjs/function-return-type -- React component returns children as-is
-export function ThemeProvider({ children }: ThemeProviderProperties) {
+export function ThemeProvider({ children }: ThemeProviderProperties): React.ReactNode {
     // Initialize theme system on mount to ensure theme context is available
     useTheme();
 

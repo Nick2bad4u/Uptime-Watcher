@@ -270,9 +270,21 @@ export const WARNING_LOGS = {
 } as const;
 
 /**
+ * Interface for the log templates catalog structure.
+ *
+ * @public
+ */
+export interface LogTemplatesInterface {
+    readonly debug: typeof DEBUG_LOGS;
+    readonly errors: typeof ERROR_LOGS;
+    readonly services: typeof SERVICE_LOGS;
+    readonly warnings: typeof WARNING_LOGS;
+}
+
+/**
  * Complete log templates catalog.
  */
-export const LOG_TEMPLATES = {
+export const LOG_TEMPLATES: LogTemplatesInterface = {
     debug: DEBUG_LOGS,
     errors: ERROR_LOGS,
     services: SERVICE_LOGS,
@@ -316,19 +328,19 @@ interface Logger {
  */
 export function createTemplateLogger(baseLogger: Logger) {
     return {
-        debug: (message: string, variables?: Record<string, number | string>) => {
+        debug: (message: string, variables?: Record<string, number | string>): void => {
             const interpolated = variables ? interpolateLogTemplate(message, variables) : message;
             baseLogger.debug(interpolated, variables);
         },
-        error: (message: string, variables?: Record<string, number | string>) => {
+        error: (message: string, variables?: Record<string, number | string>): void => {
             const interpolated = variables ? interpolateLogTemplate(message, variables) : message;
             baseLogger.error(interpolated, variables);
         },
-        info: (message: string, variables?: Record<string, number | string>) => {
+        info: (message: string, variables?: Record<string, number | string>): void => {
             const interpolated = variables ? interpolateLogTemplate(message, variables) : message;
             baseLogger.info(interpolated, variables);
         },
-        warn: (message: string, variables?: Record<string, number | string>) => {
+        warn: (message: string, variables?: Record<string, number | string>): void => {
             const interpolated = variables ? interpolateLogTemplate(message, variables) : message;
             baseLogger.warn(interpolated, variables);
         },

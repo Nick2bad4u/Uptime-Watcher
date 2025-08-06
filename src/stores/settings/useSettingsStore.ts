@@ -31,8 +31,8 @@
  * @public
  */
 
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create, type StoreApi, type UseBoundStore } from "zustand";
+import { persist, type PersistOptions } from "zustand/middleware";
 
 import type { AppSettings } from "../types";
 import type { SettingsStore } from "./types";
@@ -69,7 +69,35 @@ const syncSettingsAfterRehydration = (state: SettingsStore | undefined) => {
     }
 };
 
-export const useSettingsStore = create<SettingsStore>()(
+export const useSettingsStore: UseBoundStore<
+    Omit<StoreApi<SettingsStore>, "persist"> & {
+        persist: {
+            clearStorage: () => void;
+            getOptions: () => Partial<
+                PersistOptions<
+                    SettingsStore,
+                    {
+                        settings: AppSettings;
+                    }
+                >
+            >;
+            hasHydrated: () => boolean;
+            onFinishHydration: (fn: (state: SettingsStore) => void) => () => void;
+            onHydrate: (fn: (state: SettingsStore) => void) => () => void;
+            rehydrate: () => Promise<void> | void;
+            setOptions: (
+                options: Partial<
+                    PersistOptions<
+                        SettingsStore,
+                        {
+                            settings: AppSettings;
+                        }
+                    >
+                >
+            ) => void;
+        };
+    }
+> = create<SettingsStore>()(
     persist(
         (set, get) => ({
             // Actions

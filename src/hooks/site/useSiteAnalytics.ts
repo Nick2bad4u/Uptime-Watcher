@@ -14,6 +14,28 @@ import { CHART_TIME_PERIODS } from "../../constants";
 import { Monitor, StatusHistory } from "../../types";
 import { TIME_PERIOD_LABELS, type TimePeriod } from "../../utils/time";
 
+/** Chart data structure for line charts */
+export interface ChartData {
+    lineChartData: {
+        datasets: {
+            backgroundColor: string;
+            borderColor: string;
+            borderWidth: number;
+            data: {
+                x: number;
+                y: number;
+            }[];
+            fill: boolean;
+            label: string;
+            pointBackgroundColor: string[];
+            pointBorderColor: string[];
+            pointHoverRadius: number;
+            pointRadius: number;
+            tension: number;
+        }[];
+    };
+}
+
 /** Represents a period of downtime with start, end, and duration */
 export interface DowntimePeriod {
     /** Duration of downtime in milliseconds */
@@ -64,7 +86,7 @@ export interface SiteAnalytics {
  * Hook for generating chart data
  * Separates data preparation from component logic
  */
-export function useChartData(monitor: Monitor, theme: Theme) {
+export function useChartData(monitor: Monitor, theme: Theme): ChartData {
     return useMemo(() => {
         const sortedHistory = Array.from(monitor.history).sort((a, b) => a.timestamp - b.timestamp);
 

@@ -28,7 +28,7 @@ import { ThemedText } from "../../../theme/components";
  * container to have the Tailwind 'group' class applied. The parent SiteCard
  * component provides this styling context.
  */
-export const SiteCardFooter = React.memo(function SiteCardFooter() {
+export const SiteCardFooter: React.NamedExoticComponent<object> = React.memo(function SiteCardFooter() {
     return (
         <div className="pt-2 mt-2 border-t">
             <ThemedText

@@ -5,6 +5,8 @@
  * in a visually appealing header with gradient background and accent styling.
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import { MdExpandLess, MdExpandMore } from "react-icons/md";
 
 import { useThemeStyles } from "../../hooks/useThemeStyles";
@@ -45,7 +47,7 @@ export function SiteDetailsHeader({
     onToggleCollapse,
     selectedMonitor,
     site,
-}: SiteDetailsHeaderProperties) {
+}: SiteDetailsHeaderProperties): JSX.Element {
     // Use theme-aware styles
     const styles = useThemeStyles(isCollapsed);
     const { openExternal } = useUIStore();

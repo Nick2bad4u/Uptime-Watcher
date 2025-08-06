@@ -33,7 +33,7 @@ import { useSitesStore } from "../stores/sites/useSitesStore";
  * }
  * ```
  */
-export function useBackendFocusSync(enabled = false) {
+export function useBackendFocusSync(enabled = false): void {
     // Use selector to avoid unnecessary re-renders when other store state changes
     const fullSyncFromBackend = useSitesStore((state) => state.fullSyncFromBackend);
 

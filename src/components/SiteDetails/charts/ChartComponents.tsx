@@ -11,7 +11,9 @@
  * - Each component is typed for its specific chart type (line, doughnut, bar)
  */
 
-import { memo } from "react";
+import type { JSX } from "react/jsx-runtime";
+
+import { memo, type MemoExoticComponent } from "react";
 
 import { ResponseTimeChartData, StatusBarChartData, UptimeChartData } from "../../../services/chartConfig";
 import { Bar, ChartOptions, Doughnut, Line } from "../../../services/chartSetup";
@@ -26,11 +28,11 @@ import { Bar, ChartOptions, Doughnut, Line } from "../../../services/chartSetup"
  * @param options - Chart.js compatible options configuration for line charts
  * @returns Memoized line chart component
  */
-export const ResponseTimeChart = memo(
-    ({ data, options }: { data: ResponseTimeChartData; options: ChartOptions<"line"> }) => (
-        <Line data={data} options={options} />
-    )
-);
+export const ResponseTimeChart: MemoExoticComponent<
+    ({ data, options }: { data: ResponseTimeChartData; options: ChartOptions<"line"> }) => JSX.Element
+> = memo(({ data, options }: { data: ResponseTimeChartData; options: ChartOptions<"line"> }) => (
+    <Line data={data} options={options} />
+));
 
 /**
  * Uptime distribution doughnut chart component with memoization for performance optimization.
@@ -42,7 +44,9 @@ export const ResponseTimeChart = memo(
  * @param options - Chart.js compatible options configuration for doughnut charts
  * @returns Memoized doughnut chart component
  */
-export const UptimeChart = memo(({ data, options }: { data: UptimeChartData; options: ChartOptions<"doughnut"> }) => (
+export const UptimeChart: MemoExoticComponent<
+    ({ data, options }: { data: UptimeChartData; options: ChartOptions<"doughnut"> }) => JSX.Element
+> = memo(({ data, options }: { data: UptimeChartData; options: ChartOptions<"doughnut"> }) => (
     <Doughnut data={data} options={options} />
 ));
 
@@ -56,7 +60,9 @@ export const UptimeChart = memo(({ data, options }: { data: UptimeChartData; opt
  * @param options - Chart.js compatible options configuration for bar charts
  * @returns Memoized bar chart component
  */
-export const StatusChart = memo(({ data, options }: { data: StatusBarChartData; options: ChartOptions<"bar"> }) => (
+export const StatusChart: MemoExoticComponent<
+    ({ data, options }: { data: StatusBarChartData; options: ChartOptions<"bar"> }) => JSX.Element
+> = memo(({ data, options }: { data: StatusBarChartData; options: ChartOptions<"bar"> }) => (
     <Bar data={data} options={options} />
 ));
 

@@ -32,6 +32,14 @@ interface FieldMapping {
 }
 
 /**
+ * Interface for SQL parameters generation result.
+ */
+interface SqlParameters {
+    columns: string[];
+    placeholders: string;
+}
+
+/**
  * Configuration for standard field mappings between monitor objects and database rows.
  *
  * @internal
@@ -260,7 +268,7 @@ ${staticFields}${dynamicFields ? ",\n" + dynamicFields : ""}
  * const { columns, placeholders } = generateSqlParameters();
  * ```
  */
-export function generateSqlParameters(): { columns: string[]; placeholders: string } {
+export function generateSqlParameters(): SqlParameters {
     const staticColumns = [
         "site_identifier",
         "type",

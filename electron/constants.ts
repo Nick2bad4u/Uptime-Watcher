@@ -9,6 +9,30 @@
  */
 
 /**
+ * Interface for cache size limits configuration.
+ */
+interface CacheSizeLimitsConfig {
+    readonly CONFIGURATION_VALUES: number;
+    readonly VALIDATION_RESULTS: number;
+}
+
+/**
+ * Interface for cache TTL configuration.
+ */
+interface CacheTtlConfig {
+    readonly CONFIGURATION_VALUES: number;
+    readonly VALIDATION_RESULTS: number;
+}
+
+/**
+ * Interface for retry backoff configuration.
+ */
+interface RetryBackoffConfig {
+    readonly INITIAL_DELAY: number;
+    readonly MAX_DELAY: number;
+}
+
+/**
  * Default timeout for HTTP requests in milliseconds.
  *
  * @remarks
@@ -55,7 +79,7 @@ export const USER_AGENT = "Uptime-Watcher/1.0";
  * }
  * ```
  */
-export const RETRY_BACKOFF = Object.freeze({
+export const RETRY_BACKOFF: RetryBackoffConfig = Object.freeze({
     /** Initial delay in milliseconds before first retry. */
     INITIAL_DELAY: 500,
     /** Maximum delay in milliseconds between retries. */
@@ -79,7 +103,7 @@ export const DEFAULT_HISTORY_LIMIT = 500;
  * Used by ConfigurationManager and other backend services to provide consistent
  * cache expiration behavior.
  */
-export const CACHE_TTL = Object.freeze({
+export const CACHE_TTL: CacheTtlConfig = Object.freeze({
     /** TTL for configuration values cache (30 minutes). */
     CONFIGURATION_VALUES: 1_800_000,
     /** TTL for validation results cache (5 minutes). */
@@ -93,7 +117,7 @@ export const CACHE_TTL = Object.freeze({
  * Used by ConfigurationManager and other backend services to provide consistent
  * cache size constraints.
  */
-export const CACHE_SIZE_LIMITS = Object.freeze({
+export const CACHE_SIZE_LIMITS: CacheSizeLimitsConfig = Object.freeze({
     /** Maximum entries for configuration values cache. */
     CONFIGURATION_VALUES: 50,
     /** Maximum entries for validation results cache. */

@@ -43,7 +43,7 @@ export interface SiteCardStatusProperties {
  *
  * @see StatusBadge For the underlying status display component
  */
-export const SiteCardStatus = React.memo(function SiteCardStatus({
+export const SiteCardStatus: React.NamedExoticComponent<SiteCardStatusProperties> = React.memo(function SiteCardStatus({
     selectedMonitorId,
     status,
 }: SiteCardStatusProperties) {

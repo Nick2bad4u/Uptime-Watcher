@@ -33,19 +33,21 @@
  * @public
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import { useEffect, useMemo, useState } from "react";
 
 import { useSiteDetails } from "../../hooks/site/useSiteDetails";
-import { ChartConfigService } from "../../services/chartConfig";
 // Import from centralized chart setup
 import "../../services/chartSetup";
+import { ChartConfigService } from "../../services/chartConfig";
 import { ThemedBox } from "../../theme/components";
 import { useTheme } from "../../theme/useTheme";
 import { Site } from "../../types";
 import { parseUptimeValue } from "../../utils/monitoring/dataValidation";
 import { formatStatusWithIcon } from "../../utils/status";
-import { formatDuration, formatFullTimestamp, formatResponseTime } from "../../utils/time";
 import "./SiteDetails.css";
+import { formatDuration, formatFullTimestamp, formatResponseTime } from "../../utils/time";
 import { SiteDetailsHeader } from "./SiteDetailsHeader";
 import { SiteDetailsNavigation } from "./SiteDetailsNavigation";
 import { AnalyticsTab } from "./tabs/AnalyticsTab";
@@ -84,7 +86,7 @@ export interface SiteDetailsProperties {
  * />
  * ```
  */
-export function SiteDetails({ onClose, site }: SiteDetailsProperties) {
+export function SiteDetails({ onClose, site }: SiteDetailsProperties): JSX.Element | null {
     const { currentTheme } = useTheme();
     const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
 

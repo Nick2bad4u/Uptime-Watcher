@@ -95,47 +95,49 @@ export interface SiteMonitoringButtonProperties {
  * />
  * ```
  */
-export const SiteMonitoringButton = React.memo(function SiteMonitoringButton({
-    allMonitorsRunning,
-    className = "",
-    compact = false,
-    isLoading,
-    onStartSiteMonitoring,
-    onStopSiteMonitoring,
-}: SiteMonitoringButtonProperties) {
-    if (allMonitorsRunning) {
+export const SiteMonitoringButton: React.NamedExoticComponent<SiteMonitoringButtonProperties> = React.memo(
+    function SiteMonitoringButton({
+        allMonitorsRunning,
+        className = "",
+        compact = false,
+        isLoading,
+        onStartSiteMonitoring,
+        onStopSiteMonitoring,
+    }: SiteMonitoringButtonProperties) {
+        if (allMonitorsRunning) {
+            return (
+                <ThemedButton
+                    aria-label="Stop All Monitoring"
+                    className={`flex items-center gap-1 ${className}`}
+                    disabled={isLoading}
+                    onClick={(event) => {
+                        event?.stopPropagation();
+                        onStopSiteMonitoring();
+                    }}
+                    size="sm"
+                    variant="error"
+                >
+                    <span>⏹️</span>
+                    {!compact && <span className="hidden text-xs sm:inline">Stop All</span>}
+                </ThemedButton>
+            );
+        }
+
         return (
             <ThemedButton
-                aria-label="Stop All Monitoring"
+                aria-label="Start All Monitoring"
                 className={`flex items-center gap-1 ${className}`}
                 disabled={isLoading}
                 onClick={(event) => {
                     event?.stopPropagation();
-                    onStopSiteMonitoring();
+                    onStartSiteMonitoring();
                 }}
                 size="sm"
-                variant="error"
+                variant="success"
             >
-                <span>⏹️</span>
-                {!compact && <span className="hidden text-xs sm:inline">Stop All</span>}
+                <span>▶️</span>
+                {!compact && <span className="hidden text-xs sm:inline">Start All</span>}
             </ThemedButton>
         );
     }
-
-    return (
-        <ThemedButton
-            aria-label="Start All Monitoring"
-            className={`flex items-center gap-1 ${className}`}
-            disabled={isLoading}
-            onClick={(event) => {
-                event?.stopPropagation();
-                onStartSiteMonitoring();
-            }}
-            size="sm"
-            variant="success"
-        >
-            <span>▶️</span>
-            {!compact && <span className="hidden text-xs sm:inline">Start All</span>}
-        </ThemedButton>
-    );
-});
+);

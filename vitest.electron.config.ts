@@ -1,5 +1,6 @@
 import { defineConfig, mergeConfig } from "vitest/config";
 import viteConfig from "./vite.config";
+import { type UserConfigFnObject } from "vite";
 
 // Your overriding test config
 const myTestConfig = {
@@ -63,4 +64,4 @@ export default defineConfig((configEnv) => {
     };
 
     return merged;
-});
+}) satisfies UserConfigFnObject as UserConfigFnObject;

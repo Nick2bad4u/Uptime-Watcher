@@ -4,13 +4,53 @@
  */
 
 import matchers from '@testing-library/jest-dom/matchers'
-import { expect, vi } from "vitest";
+import { expect, vi, type Mock } from "vitest";
 
 // Extend Vitest's expect with jest-dom matchers
 expect.extend(matchers);
 
 // Global test configuration and mocks
-const mockElectronAPI = {
+const mockElectronAPI: {
+    data: {
+        downloadSQLiteBackup: Mock<(...args: any[]) => any>;
+        exportData: Mock<(...args: any[]) => any>;
+        importData: Mock<(...args: any[]) => any>;
+    }; events: {
+        onMonitorStatusChanged: Mock<(_callback: any) => Mock<(...args: any[]) => any>>;
+        onMonitorUp: Mock<(_callback: any) => Mock<(...args: any[]) => any>>;
+        onMonitorDown: Mock<(_callback: any) => Mock<(...args: any[]) => any>>;
+        onMonitoringStarted: Mock<(_callback: any) => Mock<(...args: any[]) => any>>;
+        onMonitoringStopped: Mock<(_callback: any) => Mock<(...args: any[]) => any>>;
+        onTestEvent: Mock<(_callback: any) => Mock<(...args: any[]) => any>>;
+        onUpdateStatus: Mock<(_callback: any) => Mock<(...args: any[]) => any>>;
+        removeAllListeners: Mock<(...args: any[]) => any>;
+    }; monitoring: {
+        startMonitoring: Mock<(...args: any[]) => any>;
+        startMonitoringForSite: Mock<(...args: any[]) => any>;
+        stopMonitoring: Mock<(...args: any[]) => any>;
+        stopMonitoringForSite: Mock<(...args: any[]) => any>;
+    }; monitorTypes: {
+        formatMonitorDetail: Mock<(...args: any[]) => any>;
+        getMonitorTypes: Mock<(...args: any[]) => any>;
+        validateMonitorData: Mock<(...args: any[]) => any>;
+    }; settings: {
+        getHistoryLimit: Mock<(...args: any[]) => any>;
+        updateHistoryLimit: Mock<(...args: any[]) => any>;
+    }; sites: {
+        addSite: Mock<(...args: any[]) => any>;
+        checkSiteNow: Mock<(...args: any[]) => any>;
+        getSites: Mock<(...args: any[]) => any>;
+        removeMonitor: Mock<(...args: any[]) => any>;
+        removeSite: Mock<(...args: any[]) => any>;
+        updateSite: Mock<(...args: any[]) => any>;
+    }; stateSync: {
+        getSyncStatus: Mock<(...args: any[]) => any>;
+        onStateSyncEvent: Mock<(_callback: any) => Mock<(...args: any[]) => any>>;
+    }; system: {
+        openExternal: Mock<(...args: any[]) => any>;
+        quitAndInstall: Mock<(...args: any[]) => any>;
+    };
+} = {
     data: {
         downloadSQLiteBackup: vi.fn().mockResolvedValue({
             buffer: new ArrayBuffer(8),
@@ -20,31 +60,31 @@ const mockElectronAPI = {
         importData: vi.fn().mockResolvedValue(true),
     },
     events: {
-        onMonitorStatusChanged: vi.fn((_callback) => {
+        onMonitorStatusChanged: vi.fn((_callback: any): Mock<(...args: any[]) => any> => {
             // Mock implementation - return cleanup function
             return vi.fn(); // Mock cleanup function
         }),
-        onMonitorUp: vi.fn((_callback) => {
+        onMonitorUp: vi.fn((_callback: any): Mock<(...args: any[]) => any> => {
             // Mock implementation - return cleanup function
             return vi.fn(); // Mock cleanup function
         }),
-        onMonitorDown: vi.fn((_callback) => {
+        onMonitorDown: vi.fn((_callback: any): Mock<(...args: any[]) => any> => {
             // Mock implementation - return cleanup function
             return vi.fn(); // Mock cleanup function
         }),
-        onMonitoringStarted: vi.fn((_callback) => {
+        onMonitoringStarted: vi.fn((_callback: any): Mock<(...args: any[]) => any> => {
             // Mock implementation - return cleanup function
             return vi.fn(); // Mock cleanup function
         }),
-        onMonitoringStopped: vi.fn((_callback) => {
+        onMonitoringStopped: vi.fn((_callback: any): Mock<(...args: any[]) => any> => {
             // Mock implementation - return cleanup function
             return vi.fn(); // Mock cleanup function
         }),
-        onTestEvent: vi.fn((_callback) => {
+        onTestEvent: vi.fn((_callback: any): Mock<(...args: any[]) => any> => {
             // Mock implementation - return cleanup function
             return vi.fn(); // Mock cleanup function
         }),
-        onUpdateStatus: vi.fn((_callback) => {
+        onUpdateStatus: vi.fn((_callback: any): Mock<(...args: any[]) => any> => {
             // Mock implementation - return cleanup function
             return vi.fn(); // Mock cleanup function
         }),
@@ -133,7 +173,7 @@ const mockElectronAPI = {
             lastSync: undefined,
             synchronized: false,
         }),
-        onStateSyncEvent: vi.fn((_callback) => {
+        onStateSyncEvent: vi.fn((_callback: any): Mock<(...args: any[]) => any> => {
             // Mock implementation - return cleanup function
             return vi.fn(); // Mock cleanup function
         }),

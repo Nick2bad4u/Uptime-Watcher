@@ -11,6 +11,7 @@
  */
 
 import type { MonitorFieldDefinition } from "@shared/types";
+import type { JSX } from "react/jsx-runtime";
 
 import { useCallback, useEffect } from "react";
 
@@ -93,7 +94,12 @@ export interface DynamicMonitorFieldsProps {
  * />
  * ```
  */
-export function DynamicMonitorFields({ isLoading = false, monitorType, onChange, values }: DynamicMonitorFieldsProps) {
+export function DynamicMonitorFields({
+    isLoading = false,
+    monitorType,
+    onChange,
+    values,
+}: DynamicMonitorFieldsProps): JSX.Element {
     const { isLoaded, lastError, loadMonitorTypes, monitorTypes } = useMonitorTypesStore();
 
     // Find the config for the current monitor type

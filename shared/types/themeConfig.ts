@@ -161,6 +161,111 @@ export interface ComponentConfig {
 }
 
 /**
+ * Interface for default theme configuration values.
+ *
+ * @public
+ */
+export interface DefaultThemeConfig {
+    /** Default animation configuration */
+    readonly animation: {
+        duration: {
+            fast: string;
+            normal: string;
+            slow: string;
+        };
+        easing: {
+            easeIn: string;
+            easeInOut: string;
+            easeOut: string;
+            linear: string;
+        };
+    };
+    /** Default border radius configuration */
+    readonly borderRadius: {
+        full: string;
+        lg: string;
+        md: string;
+        none: string;
+        sm: string;
+        xl: string;
+    };
+    /** Default component configuration */
+    readonly components: {
+        button: {
+            borderRadius: string;
+            fontSize: string;
+            fontWeight: number;
+            padding: string;
+        };
+        card: {
+            borderRadius: string;
+            padding: string;
+            shadow: string;
+        };
+        input: {
+            borderRadius: string;
+            fontSize: string;
+            padding: string;
+        };
+        modal: {
+            backdropColor: string;
+            borderRadius: string;
+            shadow: string;
+        };
+    };
+    /** Default shadow configuration */
+    readonly shadows: {
+        lg: string;
+        md: string;
+        none: string;
+        sm: string;
+        xl: string;
+    };
+    /** Default spacing configuration */
+    readonly spacing: {
+        lg: string;
+        md: string;
+        sm: string;
+        xl: string;
+        xs: string;
+        xxl: string;
+        xxs: string;
+    };
+    /** Default typography configuration */
+    readonly typography: {
+        fontFamily: {
+            body: string;
+            heading: string;
+            mono: string;
+        };
+        fontSize: {
+            body: string;
+            caption: string;
+            h1: string;
+            h2: string;
+            h3: string;
+            h4: string;
+            h5: string;
+            h6: string;
+            large: string;
+            small: string;
+        };
+        fontWeight: {
+            bold: number;
+            light: number;
+            medium: number;
+            normal: number;
+            semibold: number;
+        };
+        lineHeight: {
+            body: string;
+            heading: string;
+            tight: string;
+        };
+    };
+}
+
+/**
  * Hover state color configuration interface.
  *
  * @remarks
@@ -344,6 +449,17 @@ export interface ThemeConfigWithModes {
 export type ThemeMode = "dark" | "light";
 
 /**
+ * Theme validation result interface.
+ *
+ * @remarks
+ * Used to return validation results for theme configurations.
+ *
+ * @public
+ */
+// Import from unified validation system
+export type { ThemeValidationResult } from "./validation";
+
+/**
  * Theme override configuration interface.
  *
  * @remarks
@@ -367,17 +483,6 @@ export interface ThemeOverride {
     /** Typography overrides */
     typography?: Partial<TypographyConfig>;
 }
-
-/**
- * Theme validation result interface.
- *
- * @remarks
- * Used to return validation results for theme configurations.
- *
- * @public
- */
-// Import from unified validation system
-export type { ThemeValidationResult } from "./validation";
 
 /**
  * Typography configuration interface.
@@ -487,7 +592,7 @@ export function isThemeConfig(obj: unknown): obj is ThemeConfig {
  *
  * @public
  */
-export const DEFAULT_THEME_CONFIG = {
+export const DEFAULT_THEME_CONFIG: DefaultThemeConfig = {
     /** Default animation configuration */
     animation: {
         duration: {

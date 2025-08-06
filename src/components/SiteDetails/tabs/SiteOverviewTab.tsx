@@ -4,6 +4,8 @@
  * and site-level actions.
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import { useCallback, useMemo } from "react";
 import { FiSettings } from "react-icons/fi";
 import { MdDomain, MdMonitorHeart, MdOutlineFactCheck, MdSpeed } from "react-icons/md";
@@ -68,7 +70,7 @@ export function SiteOverviewTab({
     site,
     totalChecks,
     uptime,
-}: SiteOverviewTabProperties) {
+}: SiteOverviewTabProperties): JSX.Element {
     const { getAvailabilityColor, getAvailabilityVariant } = useAvailabilityColors();
     const { currentTheme } = useTheme();
 

@@ -32,7 +32,7 @@
  * @packageDocumentation
  */
 
-import { create } from "zustand";
+import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 import type { SitesStore } from "./types";
 
@@ -52,7 +52,7 @@ import { createSiteSyncActions } from "./useSiteSync";
  * @returns Complete sites store with all actions and state
  * @public
  */
-export const useSitesStore = create<SitesStore>()((
+export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> = create<SitesStore>()((
     set: (function_: (state: SitesStore) => Partial<SitesStore>) => void,
     get: () => SitesStore
 ) => {

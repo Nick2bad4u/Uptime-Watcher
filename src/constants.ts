@@ -40,7 +40,7 @@ export const FALLBACK_MONITOR_TYPE_OPTIONS = [
  * @remarks
  * Monospace fonts prioritize consistent character width for code display.
  */
-export const FONT_FAMILY_MONO = [
+export const FONT_FAMILY_MONO: string[] = [
     "SF Mono",
     "Monaco",
     "Inconsolata",
@@ -54,7 +54,7 @@ export const FONT_FAMILY_MONO = [
  * @remarks
  * Prioritizes system fonts for optimal performance and native appearance.
  */
-export const FONT_FAMILY_SANS = [
+export const FONT_FAMILY_SANS: string[] = [
     "Inter",
     "system-ui",
     "Avenir",
@@ -251,13 +251,29 @@ export const UI_DELAYS = {
 } as const;
 
 /**
+ * Interface for chart time periods.
+ */
+export interface ChartTimePeriods {
+    /** 1 hour in milliseconds */
+    readonly "1h": number;
+    /** 7 days in milliseconds */
+    readonly "7d": number;
+    /** 12 hours in milliseconds */
+    readonly "12h": number;
+    /** 24 hours in milliseconds */
+    readonly "24h": number;
+    /** 30 days in milliseconds */
+    readonly "30d": number;
+}
+
+/**
  * Chart time periods for analytics components.
  *
  * @remarks
  * Defines standard time periods in milliseconds for data visualization
  * and historical analysis components.
  */
-export const CHART_TIME_PERIODS = {
+export const CHART_TIME_PERIODS: ChartTimePeriods = {
     /** 1 hour in milliseconds */
     "1h": 60 * 60 * 1000,
     /** 7 days in milliseconds */

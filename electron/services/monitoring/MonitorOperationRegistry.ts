@@ -171,4 +171,4 @@ export class MonitorOperationRegistry {
  *
  * @public
  */
-export const operationRegistry = new MonitorOperationRegistry();
+export const operationRegistry: MonitorOperationRegistry = new MonitorOperationRegistry();

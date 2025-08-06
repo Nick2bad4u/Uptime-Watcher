@@ -23,8 +23,50 @@
  * @packageDocumentation
  */
 
+import type {
+    BarControllerChartOptions,
+    CoreChartOptions,
+    DatasetChartOptions,
+    DoughnutControllerChartOptions,
+    ElementChartOptions,
+    LineControllerChartOptions,
+    PluginChartOptions,
+    ScaleChartOptions,
+} from "chart.js";
+import type { _DeepPartialObject } from "node_modules/chart.js/dist/types/utils";
+
 import { Theme } from "../theme/types";
 import { ChartData, ChartOptions } from "./chartSetup";
+
+/**
+ * Interface for chart configuration return type.
+ */
+export interface ChartConfigs {
+    barChartOptions: _DeepPartialObject<
+        BarControllerChartOptions &
+            CoreChartOptions<"bar"> &
+            DatasetChartOptions<"bar"> &
+            ElementChartOptions<"bar"> &
+            PluginChartOptions<"bar"> &
+            ScaleChartOptions<"bar">
+    >;
+    doughnutOptions: _DeepPartialObject<
+        CoreChartOptions<"doughnut"> &
+            DatasetChartOptions<"doughnut"> &
+            DoughnutControllerChartOptions &
+            ElementChartOptions<"doughnut"> &
+            PluginChartOptions<"doughnut"> &
+            ScaleChartOptions<"doughnut">
+    >;
+    lineChartOptions: _DeepPartialObject<
+        CoreChartOptions<"line"> &
+            DatasetChartOptions<"line"> &
+            ElementChartOptions<"line"> &
+            LineControllerChartOptions &
+            PluginChartOptions<"line"> &
+            ScaleChartOptions<"line">
+    >;
+}
 
 /**
  * Response time line chart data structure
@@ -41,6 +83,10 @@ export interface ResponseTimeChartData extends ChartData<"line"> {
 }
 
 /**
+ * Type definitions for chart data to avoid manual type casting
+ */
+
+/**
  * Status distribution bar chart data structure
  */
 export interface StatusBarChartData extends ChartData<"bar"> {
@@ -53,10 +99,6 @@ export interface StatusBarChartData extends ChartData<"bar"> {
     }[];
     labels: string[];
 }
-
-/**
- * Type definitions for chart data to avoid manual type casting
- */
 
 /**
  * Uptime status doughnut chart data structure
@@ -316,7 +358,7 @@ export class ChartConfigService {
  * <Line data={timeSeriesData} options={lineChartOptions} />
  * ```
  */
-export function createChartConfigs(theme: Theme, totalChecks = 0) {
+export function createChartConfigs(theme: Theme, totalChecks = 0): ChartConfigs {
     const chartService = new ChartConfigService(theme);
 
     return {

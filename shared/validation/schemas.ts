@@ -10,6 +10,15 @@
 import validator from "validator";
 import { z } from "zod";
 
+import type {
+    BaseMonitorSchemaType,
+    HttpMonitorSchemaType,
+    MonitorSchemaType,
+    PingMonitorSchemaType,
+    PortMonitorSchemaType,
+    SiteSchemaType,
+} from "../types/schemaTypes";
+
 /**
  * Validation constraints for monitor fields.
  *
@@ -37,7 +46,7 @@ const VALIDATION_CONSTRAINTS = {
  * @remarks
  * This schema is extended by type-specific monitor schemas.
  */
-export const baseMonitorSchema = z.object({
+export const baseMonitorSchema: BaseMonitorSchemaType = z.object({
     checkInterval: z
         .number()
         .min(VALIDATION_CONSTRAINTS.CHECK_INTERVAL.MIN, "Check interval must be at least 5 seconds")
@@ -71,7 +80,7 @@ export const baseMonitorSchema = z.object({
  * @remarks
  * Extends {@link baseMonitorSchema} and adds the `url` field with robust validation.
  */
-export const httpMonitorSchema = baseMonitorSchema.extend({
+export const httpMonitorSchema: HttpMonitorSchemaType = baseMonitorSchema.extend({
     type: z.literal("http"),
     url: z.string().refine((val) => {
         // Use validator.js for robust URL validation
@@ -95,7 +104,7 @@ export const httpMonitorSchema = baseMonitorSchema.extend({
  * @remarks
  * Extends {@link baseMonitorSchema} and adds `host` and `port` fields with strict validation.
  */
-export const portMonitorSchema = baseMonitorSchema.extend({
+export const portMonitorSchema: PortMonitorSchemaType = baseMonitorSchema.extend({
     host: z.string().refine((val) => {
         // Use validator.js for robust host validation
         if (validator.isIP(val)) {
@@ -126,7 +135,7 @@ export const portMonitorSchema = baseMonitorSchema.extend({
  * @remarks
  * Extends {@link baseMonitorSchema} and adds `host` field with strict validation.
  */
-export const pingMonitorSchema = baseMonitorSchema.extend({
+export const pingMonitorSchema: PingMonitorSchemaType = baseMonitorSchema.extend({
     host: z.string().refine((val) => {
         // Use validator.js for robust host validation
         if (validator.isIP(val)) {
@@ -154,7 +163,11 @@ export const pingMonitorSchema = baseMonitorSchema.extend({
  * @remarks
  * Supports HTTP, port, and ping monitors.
  */
-export const monitorSchema = z.discriminatedUnion("type", [httpMonitorSchema, portMonitorSchema, pingMonitorSchema]);
+export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
+    httpMonitorSchema,
+    portMonitorSchema,
+    pingMonitorSchema,
+]);
 
 /**
  * Zod schema for site data.
@@ -162,7 +175,7 @@ export const monitorSchema = z.discriminatedUnion("type", [httpMonitorSchema, po
  * @remarks
  * Validates site identifier, name, monitoring flag, and an array of monitors.
  */
-export const siteSchema = z.object({
+export const siteSchema: SiteSchemaType = z.object({
     identifier: z.string().min(1, "Site identifier is required").max(100, "Site identifier too long"),
     monitoring: z.boolean(),
     monitors: z.array(monitorSchema).min(1, "At least one monitor is required"),
@@ -170,12 +183,21 @@ export const siteSchema = z.object({
 });
 
 /**
+ * Interface for monitor schemas by type.
+ */
+export interface MonitorSchemas {
+    readonly http: typeof httpMonitorSchema;
+    readonly ping: typeof pingMonitorSchema;
+    readonly port: typeof portMonitorSchema;
+}
+
+/**
  * Organized monitor schemas by type.
  *
  * @remarks
  * Useful for dynamic schema selection.
  */
-export const monitorSchemas = {
+export const monitorSchemas: MonitorSchemas = {
     http: httpMonitorSchema,
     ping: pingMonitorSchema,
     port: portMonitorSchema,

@@ -48,7 +48,9 @@ export interface SiteCardProperties {
  * @param props - SiteCard component props
  * @returns JSX.Element containing the complete site monitoring card
  */
-export const SiteCard = React.memo(function SiteCard({ site }: SiteCardProperties) {
+export const SiteCard: React.NamedExoticComponent<SiteCardProperties> = React.memo(function SiteCard({
+    site,
+}: SiteCardProperties) {
     // Use our custom hook to get all the data and functionality we need
     const {
         checkCount,

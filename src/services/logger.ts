@@ -12,7 +12,71 @@
  * @packageDocumentation
  */
 
+import type { RendererLogger } from "electron-log";
+
 import log from "electron-log/renderer";
+
+/**
+ * Interface for the logger configuration.
+ */
+interface LoggerInterface {
+    // Log application lifecycle events
+    app: {
+        error: (context: string, error: Error) => void;
+        performance: (operation: string, duration: number) => void;
+        started: () => void;
+        stopped: () => void;
+    };
+    // Debug level - for development debugging
+    debug: (message: string, ...args: unknown[]) => void;
+    // Error level - errors that should be investigated
+    error: (message: string, error?: Error, ...args: unknown[]) => void;
+    // Info level - general application flow
+    info: (message: string, ...args: unknown[]) => void;
+    /**
+     * Raw access to the underlying electron-log instance.
+     *
+     * @remarks
+     * Use with caution! Direct access bypasses the application's
+     * logging conventions and structured format. Only use for advanced
+     * scenarios where the standard logger methods are insufficient.
+     *
+     * @example
+     * ```typescript
+     * // Only use when absolutely necessary
+     * logger.raw.transports.file.level = "warn";
+     * ```
+     */
+    raw: RendererLogger & {
+        default: RendererLogger;
+    };
+    // Silly level - extremely detailed debugging
+    silly: (message: string, ...args: unknown[]) => void;
+    // Specialized logging methods for common scenarios
+    // Log site monitoring events
+    site: {
+        added: (identifier: string) => void;
+        check: (identifier: string, status: string, responseTime?: number) => void;
+        error: (identifier: string, error: Error | string) => void;
+        removed: (identifier: string) => void;
+        statusChange: (identifier: string, oldStatus: string, newStatus: string) => void;
+    };
+    // Log system/electron events
+    system: {
+        notification: (title: string, body: string) => void;
+        tray: (action: string) => void;
+        window: (action: string, windowName?: string) => void;
+    };
+    // Log user actions
+    user: {
+        action: (action: string, details?: unknown) => void;
+        settingsChange: (setting: string, oldValue: unknown, newValue: unknown) => void;
+    };
+    // Verbose level - very detailed debugging
+    verbose: (message: string, ...args: unknown[]) => void;
+    // Warn level - something unexpected but not an error
+    warn: (message: string, ...args: unknown[]) => void;
+}
 
 /**
  * Type-safe access to log transports.
@@ -63,24 +127,24 @@ if (fileTransport && typeof window !== "undefined") {
 }
 
 // Create logger with app context
-const logger = {
+const logger: LoggerInterface = {
     // Log application lifecycle events
     app: {
-        error: (context: string, error: Error) => {
+        error: (context: string, error: Error): void => {
             logger.error(`Application error in ${context}`, error);
         },
-        performance: (operation: string, duration: number) => {
+        performance: (operation: string, duration: number): void => {
             logger.debug(`Performance: ${operation} took ${duration}ms`);
         },
-        started: () => {
+        started: (): void => {
             logger.info("Application started");
         },
-        stopped: () => {
+        stopped: (): void => {
             logger.info("Application stopped");
         },
     },
     // Debug level - for development debugging
-    debug: (message: string, ...args: unknown[]) => {
+    debug: (message: string, ...args: unknown[]): void => {
         if (args.length > 0) {
             log.debug(`[UPTIME-WATCHER] ${message}`, ...args);
         } else {
@@ -88,7 +152,7 @@ const logger = {
         }
     },
     // Error level - errors that should be investigated
-    error: (message: string, error?: Error, ...args: unknown[]) => {
+    error: (message: string, error?: Error, ...args: unknown[]): void => {
         if (error instanceof Error) {
             const errorData = {
                 message: error.message,
@@ -107,7 +171,7 @@ const logger = {
         }
     },
     // Info level - general application flow
-    info: (message: string, ...args: unknown[]) => {
+    info: (message: string, ...args: unknown[]): void => {
         if (args.length > 0) {
             log.info(`[UPTIME-WATCHER] ${message}`, ...args);
         } else {
@@ -130,7 +194,7 @@ const logger = {
      */
     raw: log,
     // Silly level - extremely detailed debugging
-    silly: (message: string, ...args: unknown[]) => {
+    silly: (message: string, ...args: unknown[]): void => {
         if (args.length > 0) {
             log.silly(`[UPTIME-WATCHER] ${message}`, ...args);
         } else {
@@ -140,51 +204,51 @@ const logger = {
     // Specialized logging methods for common scenarios
     // Log site monitoring events
     site: {
-        added: (identifier: string) => {
+        added: (identifier: string): void => {
             logger.info(`Site added: ${identifier}`);
         },
-        check: (identifier: string, status: string, responseTime?: number) => {
+        check: (identifier: string, status: string, responseTime?: number): void => {
             const timeInfo = responseTime ? ` (${responseTime}ms)` : "";
             logger.info(`Site check: ${identifier} - Status: ${status}${timeInfo}`);
         },
-        error: (identifier: string, error: Error | string) => {
+        error: (identifier: string, error: Error | string): void => {
             if (typeof error === "string") {
                 logger.error(`Site check error: ${identifier} - ${error}`);
             } else {
                 logger.error(`Site check error: ${identifier}`, error);
             }
         },
-        removed: (identifier: string) => {
+        removed: (identifier: string): void => {
             logger.info(`Site removed: ${identifier}`);
         },
-        statusChange: (identifier: string, oldStatus: string, newStatus: string) => {
+        statusChange: (identifier: string, oldStatus: string, newStatus: string): void => {
             logger.info(`Site status change: ${identifier} - ${oldStatus} -> ${newStatus}`);
         },
     },
     // Log system/electron events
     system: {
-        notification: (title: string, body: string) => {
+        notification: (title: string, body: string): void => {
             logger.debug(`Notification sent: ${title} - ${body}`);
         },
-        tray: (action: string) => {
+        tray: (action: string): void => {
             logger.debug(`Tray action: ${action}`);
         },
-        window: (action: string, windowName?: string) => {
+        window: (action: string, windowName?: string): void => {
             const nameInfo = windowName ? ` (${windowName})` : "";
             logger.debug(`Window ${action}${nameInfo}`);
         },
     },
     // Log user actions
     user: {
-        action: (action: string, details?: unknown) => {
+        action: (action: string, details?: unknown): void => {
             logger.info(`User action: ${action}`, details ?? "");
         },
-        settingsChange: (setting: string, oldValue: unknown, newValue: unknown) => {
+        settingsChange: (setting: string, oldValue: unknown, newValue: unknown): void => {
             logger.info(`Settings change: ${setting} - ${String(oldValue)} -> ${String(newValue)}`);
         },
     },
     // Verbose level - very detailed debugging
-    verbose: (message: string, ...args: unknown[]) => {
+    verbose: (message: string, ...args: unknown[]): void => {
         if (args.length > 0) {
             log.verbose(`[UPTIME-WATCHER] ${message}`, ...args);
         } else {
@@ -192,7 +256,7 @@ const logger = {
         }
     },
     // Warn level - something unexpected but not an error
-    warn: (message: string, ...args: unknown[]) => {
+    warn: (message: string, ...args: unknown[]): void => {
         if (args.length > 0) {
             log.warn(`[UPTIME-WATCHER] ${message}`, ...args);
         } else {

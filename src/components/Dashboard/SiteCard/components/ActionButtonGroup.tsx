@@ -62,90 +62,92 @@ export interface ActionButtonGroupProperties {
  * />
  * ```
  */
-export const ActionButtonGroup = React.memo(function ActionButtonGroup({
-    allMonitorsRunning,
-    disabled,
-    isLoading,
-    isMonitoring,
-    onCheckNow,
-    onStartMonitoring,
-    onStartSiteMonitoring,
-    onStopMonitoring,
-    onStopSiteMonitoring,
-}: ActionButtonGroupProperties) {
-    // Create individual wrapped handlers for each button with event propagation control
-    const handleCheckNowClick = useCallback(
-        (event?: React.MouseEvent<HTMLButtonElement>) => {
-            event?.stopPropagation();
-            onCheckNow();
-        },
-        [onCheckNow]
-    );
+export const ActionButtonGroup: React.NamedExoticComponent<ActionButtonGroupProperties> = React.memo(
+    function ActionButtonGroup({
+        allMonitorsRunning,
+        disabled,
+        isLoading,
+        isMonitoring,
+        onCheckNow,
+        onStartMonitoring,
+        onStartSiteMonitoring,
+        onStopMonitoring,
+        onStopSiteMonitoring,
+    }: ActionButtonGroupProperties) {
+        // Create individual wrapped handlers for each button with event propagation control
+        const handleCheckNowClick = useCallback(
+            (event?: React.MouseEvent<HTMLButtonElement>) => {
+                event?.stopPropagation();
+                onCheckNow();
+            },
+            [onCheckNow]
+        );
 
-    const handleStartMonitoringClick = useCallback(
-        (event?: React.MouseEvent<HTMLButtonElement>) => {
-            event?.stopPropagation();
-            onStartMonitoring();
-        },
-        [onStartMonitoring]
-    );
+        const handleStartMonitoringClick = useCallback(
+            (event?: React.MouseEvent<HTMLButtonElement>) => {
+                event?.stopPropagation();
+                onStartMonitoring();
+            },
+            [onStartMonitoring]
+        );
 
-    const handleStopMonitoringClick = useCallback(
-        (event?: React.MouseEvent<HTMLButtonElement>) => {
-            event?.stopPropagation();
-            onStopMonitoring();
-        },
-        [onStopMonitoring]
-    );
+        const handleStopMonitoringClick = useCallback(
+            (event?: React.MouseEvent<HTMLButtonElement>) => {
+                event?.stopPropagation();
+                onStopMonitoring();
+            },
+            [onStopMonitoring]
+        );
 
-    return (
-        <div className="flex items-center gap-2">
-            <ThemedButton
-                aria-label="Check Now"
-                className="min-w-[32px]"
-                disabled={isLoading || disabled}
-                onClick={handleCheckNowClick}
-                size="sm"
-                variant="ghost"
-            >
-                {/* Using emoji icon consistent with project's status icon system */}
-                <span>🔄</span>
-            </ThemedButton>
-
-            <SiteMonitoringButton
-                allMonitorsRunning={allMonitorsRunning}
-                className="min-w-[32px]"
-                compact
-                isLoading={isLoading || disabled}
-                onStartSiteMonitoring={onStartSiteMonitoring}
-                onStopSiteMonitoring={onStopSiteMonitoring}
-            />
-
-            {isMonitoring ? (
+        return (
+            <div className="flex items-center gap-2">
                 <ThemedButton
-                    aria-label="Stop Monitoring"
+                    aria-label="Check Now"
                     className="min-w-[32px]"
                     disabled={isLoading || disabled}
-                    onClick={handleStopMonitoringClick}
+                    onClick={handleCheckNowClick}
                     size="sm"
-                    variant="error"
+                    variant="ghost"
                 >
                     {/* Using emoji icon consistent with project's status icon system */}
-                    ⏸️
+                    <span>🔄</span>
                 </ThemedButton>
-            ) : (
-                <ThemedButton
-                    aria-label="Start Monitoring"
+
+                <SiteMonitoringButton
+                    allMonitorsRunning={allMonitorsRunning}
                     className="min-w-[32px]"
-                    disabled={isLoading || disabled}
-                    onClick={handleStartMonitoringClick}
-                    size="sm"
-                    variant="success"
-                >
-                    {/* Using emoji icon consistent with project's status icon system */}
-                    ▶️
-                </ThemedButton>
-            )}
-        </div>
-    );
-});
+                    compact
+                    isLoading={isLoading || disabled}
+                    onStartSiteMonitoring={onStartSiteMonitoring}
+                    onStopSiteMonitoring={onStopSiteMonitoring}
+                />
+
+                {isMonitoring ? (
+                    <ThemedButton
+                        aria-label="Stop Monitoring"
+                        className="min-w-[32px]"
+                        disabled={isLoading || disabled}
+                        onClick={handleStopMonitoringClick}
+                        size="sm"
+                        variant="error"
+                    >
+                        {/* Using emoji icon consistent with project's status icon system */}
+                        ⏸️
+                    </ThemedButton>
+                ) : (
+                    <ThemedButton
+                        aria-label="Start Monitoring"
+                        className="min-w-[32px]"
+                        disabled={isLoading || disabled}
+                        onClick={handleStartMonitoringClick}
+                        size="sm"
+                        variant="success"
+                    >
+                        {/* Using emoji icon consistent with project's status icon system */}
+                        ▶️
+                    </ThemedButton>
+                )}
+            </div>
+        );
+    }
+);

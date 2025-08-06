@@ -19,14 +19,15 @@
  */
 
 import type { Monitor, Site } from "@shared/types";
+import type { JSX } from "react/jsx-runtime";
 
 import { useMemo } from "react";
 
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { useUIStore } from "../../stores/ui/useUiStore";
 import { StatusIndicator, ThemedBox, ThemedButton, ThemedText } from "../../theme/components";
-import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
 import "./Header.css";
+import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
 
 // Helper functions for monitor counting (reduces complexity by composition)
 const initializeMonitorCounts = () => ({
@@ -97,7 +98,7 @@ const aggregateMonitorCounts = (sites: Site[]) => {
  *
  * @returns JSX element containing the application header
  */
-export function Header() {
+export function Header(): JSX.Element {
     const { sites } = useSitesStore();
     const { setShowAddSiteModal, setShowSettings } = useUIStore();
     const { isDark, toggleTheme } = useTheme();

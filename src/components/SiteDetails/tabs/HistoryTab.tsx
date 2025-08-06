@@ -3,6 +3,8 @@
  * Provides filtering, pagination, and detailed history records view.
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import { useEffect, useRef, useState } from "react";
 import { FiFilter, FiInbox } from "react-icons/fi";
 import { MdHistory } from "react-icons/md";
@@ -63,7 +65,7 @@ export const HistoryTab = ({
     formatResponseTime,
     formatStatusWithIcon,
     selectedMonitor,
-}: HistoryTabProperties) => {
+}: HistoryTabProperties): JSX.Element => {
     const { settings } = useSettingsStore();
     const { currentTheme } = useTheme();
     const [historyFilter, setHistoryFilter] = useState<"all" | "down" | "up">("all");

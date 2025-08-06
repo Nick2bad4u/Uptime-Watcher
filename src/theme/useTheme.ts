@@ -10,15 +10,80 @@ import { useCallback, useEffect, useState } from "react";
 
 import { UI_DELAYS } from "../constants";
 import { useSettingsStore } from "../stores/settings/useSettingsStore";
-import { themeManager } from "./ThemeManager";
+import { themeManager, type ThemeManager } from "./ThemeManager";
 import { Theme, ThemeName } from "./types";
 
-// Hook for availability-based colors
-export function useAvailabilityColors(): {
+/**
+ * Interface for useAvailabilityColors hook return type.
+ */
+interface UseAvailabilityColorsReturn {
     getAvailabilityColor: (percentage: number) => string;
     getAvailabilityDescription: (percentage: number) => string;
     getAvailabilityVariant: (percentage: number) => "danger" | "success" | "warning";
-} {
+}
+
+/**
+ * Interface for useStatusColors hook return type.
+ */
+interface UseStatusColorsReturn {
+    down: string;
+    pending: string;
+    unknown: string;
+    up: string;
+}
+
+/**
+ * Interface for useThemeClasses hook return type.
+ */
+interface UseThemeClassesReturn {
+    getBackgroundClass: (variant?: "primary" | "secondary" | "tertiary") => {
+        backgroundColor: string;
+    };
+    getBorderClass: (variant?: "focus" | "primary" | "secondary") => {
+        borderColor: string;
+    };
+    getColor: (path: string) => string;
+    getStatusClass: (status: MonitorStatus | SiteStatus) => {
+        color: string;
+    };
+    getSurfaceClass: (variant?: "base" | "elevated" | "overlay") => {
+        backgroundColor: string;
+    };
+    getTextClass: (variant?: "inverse" | "primary" | "secondary" | "tertiary") => {
+        color: string;
+    };
+}
+
+/**
+ * Interface for useTheme hook return type.
+ */
+interface UseThemeReturn {
+    /** Array of all available theme names */
+    availableThemes: ThemeName[];
+    /** Current active theme object */
+    currentTheme: Theme;
+    /** Get color value from dot-notation path */
+    getColor: (path: string) => string;
+    /** Get status-specific color */
+    getStatusColor: (status: SiteStatus) => string;
+    /** Whether current theme is dark mode */
+    isDark: boolean;
+    /** Change active theme */
+    setTheme: (themeName: ThemeName) => void;
+    /** Current system theme preference */
+    systemTheme: "dark" | "light";
+    /** ThemeManager instance for advanced operations */
+    themeManager: ThemeManager;
+    /** Current theme name */
+    themeName: ThemeName;
+    /** Theme version for forcing re-renders */
+    themeVersion: number;
+    /** Toggle between light and dark themes */
+    toggleTheme: () => void;
+}
+
+// Hook for availability-based colors
+export function useAvailabilityColors(): UseAvailabilityColorsReturn {
     const { currentTheme } = useTheme();
 
     const getAvailabilityColor = (percentage: number): string => {
@@ -86,12 +151,7 @@ export function useAvailabilityColors(): {
  * Hook for accessing theme-aware status colors.
  * @returns Object containing status colors from the current theme
  */
-export function useStatusColors(): {
-    down: string;
-    pending: string;
-    unknown: string;
-    up: string;
-} {
+export function useStatusColors(): UseStatusColorsReturn {
     const { currentTheme } = useTheme();
 
     return {
@@ -128,7 +188,7 @@ export function useStatusColors(): {
  *
  * @returns Object containing theme state, setters, and utility functions
  */
-export function useTheme() {
+export function useTheme(): UseThemeReturn {
     const { settings, updateSettings } = useSettingsStore();
     const [systemTheme, setSystemTheme] = useState<"dark" | "light">("light");
     const [themeVersion, setThemeVersion] = useState(0); // Force re-renders
@@ -196,7 +256,7 @@ export function useTheme() {
      * setTheme("system"); // Use system preference
      * ```
      */
-    const setTheme = (themeName: ThemeName) => {
+    const setTheme = (themeName: ThemeName): void => {
         updateSettings({ theme: themeName });
     };
 
@@ -212,7 +272,7 @@ export function useTheme() {
      * toggleTheme(); // Dark theme → Light theme
      * ```
      */
-    const toggleTheme = () => {
+    const toggleTheme = (): void => {
         const newTheme = currentTheme.isDark ? "light" : "dark";
         setTheme(newTheme);
     };
@@ -306,7 +366,7 @@ export function useTheme() {
  * Provides utility functions for generating dynamic CSS classes based on the current theme.
  * @returns Object with methods for generating background, text, and status classes
  */
-export function useThemeClasses() {
+export function useThemeClasses(): UseThemeClassesReturn {
     const { getColor } = useTheme();
 
     const getBackgroundClass = (variant: "primary" | "secondary" | "tertiary" = "primary") => {

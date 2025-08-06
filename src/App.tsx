@@ -27,6 +27,8 @@ const UI_MESSAGES = {
     UPDATE_ERROR_FALLBACK: "Update failed.",
     UPDATE_RESTART_BUTTON: "Restart Now",
 } as const;
+import type { JSX } from "react/jsx-runtime";
+
 import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
 import { useSelectedSite } from "./hooks/useSelectedSite";
 import logger from "./services/logger";
@@ -73,7 +75,7 @@ import { setupCacheSync } from "./utils/cacheSync";
  *
  * @returns The main App component JSX
  */
-function App() {
+function App(): JSX.Element {
     // Error store
     const { clearError, isLoading, lastError } = useErrorStore();
 

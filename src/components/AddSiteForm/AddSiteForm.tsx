@@ -92,7 +92,9 @@ function isValidMonitorType(value: string): value is MonitorType {
  * <AddSiteForm onSuccess={() => console.log('Site added!')} />
  * ```
  */
-export const AddSiteForm = React.memo(function AddSiteForm({ onSuccess }: AddSiteFormProperties) {
+export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> = React.memo(function AddSiteForm({
+    onSuccess,
+}: AddSiteFormProperties) {
     // Combine store calls to avoid duplicates and improve performance
     const { clearError, isLoading, lastError } = useErrorStore();
     const { addMonitorToSite, createSite, sites } = useSitesStore();

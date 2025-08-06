@@ -26,7 +26,7 @@ import { AddSiteForm } from "./AddSiteForm";
  *
  * @returns JSX element containing the modal dialog with AddSiteForm
  */
-export const AddSiteModal = React.memo(function AddSiteModal() {
+export const AddSiteModal: React.NamedExoticComponent<object> = React.memo(function AddSiteModal() {
     const { isDark } = useTheme();
     const { setShowAddSiteModal, showAddSiteModal } = useUIStore();
 

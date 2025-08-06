@@ -78,7 +78,7 @@ export interface FormFieldProperties {
  * @param props - {@link FormFieldProperties}
  * @returns JSX element containing labeled form field with error/help text.
  */
-export const FormField = React.memo(function FormField({
+export const FormField: React.NamedExoticComponent<FormFieldProperties> = React.memo(function FormField({
     children,
     error,
     helpText,
@@ -162,7 +162,7 @@ export interface TextFieldProperties {
  * />
  * ```
  */
-export const TextField = React.memo(function TextField({
+export const TextField: React.NamedExoticComponent<TextFieldProperties> = React.memo(function TextField({
     disabled = false,
     error,
     helpText,
@@ -262,7 +262,7 @@ export interface SelectOption {
  * />
  * ```
  */
-export const SelectField = React.memo(function SelectField({
+export const SelectField: React.NamedExoticComponent<SelectFieldProperties> = React.memo(function SelectField({
     disabled = false,
     error,
     helpText,
@@ -367,7 +367,7 @@ export interface RadioOption {
  * />
  * ```
  */
-export const RadioGroup = React.memo(function RadioGroup({
+export const RadioGroup: React.NamedExoticComponent<RadioGroupProperties> = React.memo(function RadioGroup({
     disabled = false,
     error,
     helpText,

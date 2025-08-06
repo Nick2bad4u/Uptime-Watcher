@@ -4,6 +4,8 @@
  * consistent UI behavior across different monitor types.
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import React, { useEffect, useState } from "react";
 
 import type { MonitorType } from "../../types";
@@ -80,7 +82,7 @@ export function ConditionalResponseTime({
     return supportsResponseTime ? children : fallback;
 }
 
-export function DetailLabel({ details, fallback = details, monitorType }: DetailLabelProps) {
+export function DetailLabel({ details, fallback = details, monitorType }: DetailLabelProps): JSX.Element {
     const [formattedLabel, setFormattedLabel] = useState<string>(fallback);
 
     useEffect(() => {

@@ -6,6 +6,8 @@
  * Includes data synchronization and SQLite backup functionality.
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import { safeInteger } from "@shared/validation/validatorUtils";
 import { useCallback, useState } from "react";
 
@@ -69,7 +71,7 @@ export interface SettingsProperties {
  * @returns JSX element containing the settings interface
  */
 
-export function Settings({ onClose }: Readonly<SettingsProperties>) {
+export function Settings({ onClose }: Readonly<SettingsProperties>): JSX.Element {
     const { clearError, isLoading, lastError, setError } = useErrorStore();
     const { resetSettings, settings, updateHistoryLimitValue, updateSettings } = useSettingsStore();
     const { downloadSQLiteBackup, fullSyncFromBackend } = useSitesStore();

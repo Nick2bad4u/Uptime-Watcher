@@ -35,15 +35,50 @@
  * @public
  */
 
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create, type StoreApi, type UseBoundStore } from "zustand";
+import { persist, type PersistOptions } from "zustand/middleware";
 
 import type { UpdateStatus } from "../types";
-import type { UpdatesStore } from "./types";
+import type { UpdateInfo, UpdatesStore } from "./types";
 
 import { logStoreAction } from "../utils";
 
-export const useUpdatesStore = create<UpdatesStore>()(
+/**
+ * Interface for the updates store with persistence capabilities.
+ */
+type UpdatesStoreWithPersist = UseBoundStore<
+    Omit<StoreApi<UpdatesStore>, "persist"> & {
+        persist: {
+            clearStorage: () => void;
+            getOptions: () => Partial<
+                PersistOptions<
+                    UpdatesStore,
+                    {
+                        updateInfo: undefined | UpdateInfo;
+                        updateStatus: UpdateStatus;
+                    }
+                >
+            >;
+            hasHydrated: () => boolean;
+            onFinishHydration: (fn: (state: UpdatesStore) => void) => () => void;
+            onHydrate: (fn: (state: UpdatesStore) => void) => () => void;
+            rehydrate: () => Promise<void> | void;
+            setOptions: (
+                options: Partial<
+                    PersistOptions<
+                        UpdatesStore,
+                        {
+                            updateInfo: undefined | UpdateInfo;
+                            updateStatus: UpdateStatus;
+                        }
+                    >
+                >
+            ) => void;
+        };
+    }
+>;
+
+export const useUpdatesStore: UpdatesStoreWithPersist = create<UpdatesStore>()(
     persist(
         (set) => ({
             // Actions

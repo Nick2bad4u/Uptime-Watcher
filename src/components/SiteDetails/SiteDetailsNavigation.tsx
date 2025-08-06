@@ -4,6 +4,8 @@
  * and navigating between different detail views.
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import React, { useCallback } from "react";
 
 import logger from "../../services/logger";
@@ -64,7 +66,7 @@ export function SiteDetailsNavigation({
     isMonitoring,
     selectedMonitorId,
     setActiveSiteDetailsTab,
-}: SiteDetailsNavigationProperties) {
+}: SiteDetailsNavigationProperties): JSX.Element {
     /**
      * Logs tab change events for analytics and debugging purposes.
      *

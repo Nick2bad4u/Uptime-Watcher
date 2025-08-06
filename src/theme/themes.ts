@@ -353,6 +353,15 @@ export const highContrastTheme: Theme = createTheme({
 });
 
 /**
+ * Interface for the themes collection.
+ */
+export interface Themes {
+    readonly dark: Theme;
+    readonly "high-contrast": Theme;
+    readonly light: Theme;
+}
+
+/**
  * Collection of all available themes in the application.
  *
  * @remarks
@@ -371,7 +380,7 @@ export const highContrastTheme: Theme = createTheme({
  * const themeNames = Object.keys(themes);
  * ```
  */
-export const themes = {
+export const themes: Themes = {
     dark: darkTheme,
     "high-contrast": highContrastTheme,
     light: lightTheme,

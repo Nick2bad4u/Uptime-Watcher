@@ -50,7 +50,11 @@ export interface MetricCardProperties {
  * @param props - MetricCard component props
  * @returns JSX.Element containing the metric display
  */
-export const MetricCard = React.memo(function MetricCard({ className = "", label, value }: MetricCardProperties) {
+export const MetricCard: React.NamedExoticComponent<MetricCardProperties> = React.memo(function MetricCard({
+    className = "",
+    label,
+    value,
+}: MetricCardProperties) {
     return (
         <div className={`flex flex-col items-center text-center ${className}`}>
             <ThemedText className="block mb-1" size="xs" variant="secondary">

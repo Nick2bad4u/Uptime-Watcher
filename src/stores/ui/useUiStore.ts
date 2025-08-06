@@ -31,8 +31,8 @@
 
 import type { Site } from "@shared/types";
 
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create, type StoreApi, type UseBoundStore } from "zustand";
+import { persist, type PersistOptions } from "zustand/middleware";
 
 import type { ChartTimeRange } from "../types";
 import type { UIStore } from "./types";
@@ -40,7 +40,44 @@ import type { UIStore } from "./types";
 import logger from "../../services/logger";
 import { logStoreAction } from "../utils";
 
-export const useUIStore = create<UIStore>()(
+/**
+ * Interface for the UI store with persistence capabilities.
+ */
+type UIStoreWithPersist = UseBoundStore<
+    Omit<StoreApi<UIStore>, "persist"> & {
+        persist: {
+            clearStorage: () => void;
+            getOptions: () => Partial<
+                PersistOptions<
+                    UIStore,
+                    {
+                        activeSiteDetailsTab: string;
+                        showAdvancedMetrics: boolean;
+                        siteDetailsChartTimeRange: ChartTimeRange;
+                    }
+                >
+            >;
+            hasHydrated: () => boolean;
+            onFinishHydration: (fn: (state: UIStore) => void) => () => void;
+            onHydrate: (fn: (state: UIStore) => void) => () => void;
+            rehydrate: () => Promise<void> | void;
+            setOptions: (
+                options: Partial<
+                    PersistOptions<
+                        UIStore,
+                        {
+                            activeSiteDetailsTab: string;
+                            showAdvancedMetrics: boolean;
+                            siteDetailsChartTimeRange: ChartTimeRange;
+                        }
+                    >
+                >
+            ) => void;
+        };
+    }
+>;
+
+export const useUIStore: UIStoreWithPersist = create<UIStore>()(
     persist(
         (set) => ({
             // State

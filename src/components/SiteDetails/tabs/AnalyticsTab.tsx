@@ -3,6 +3,8 @@
  * Displays advanced metrics, charts, and performance analysis for site monitoring.
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import { FiActivity, FiBarChart2, FiTrendingUp } from "react-icons/fi";
 import { MdAnalytics, MdPieChart, MdSpeed, MdTrendingUp } from "react-icons/md";
 
@@ -132,7 +134,7 @@ export function AnalyticsTab({
     upCount,
     uptime,
     uptimeChartData,
-}: AnalyticsTabProperties) {
+}: AnalyticsTabProperties): JSX.Element {
     const { getAvailabilityColor: getColor, getAvailabilityVariant: getVariant } = useAvailabilityColors();
     const { currentTheme } = useTheme();
 

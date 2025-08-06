@@ -48,7 +48,7 @@ export interface SiteCardHistoryProperties {
  * />
  * ```
  */
-export const SiteCardHistory = React.memo(
+export const SiteCardHistory: React.NamedExoticComponent<SiteCardHistoryProperties> = React.memo(
     function SiteCardHistory({ filteredHistory, monitor }: SiteCardHistoryProperties) {
         // Get monitor type configurations
         const { options } = useMonitorTypes();

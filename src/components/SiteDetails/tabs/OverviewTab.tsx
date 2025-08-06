@@ -3,6 +3,8 @@
  * Displays key metrics, statistics, and actions for a monitored site.
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import { FaListOl } from "react-icons/fa";
 import { FiTrash2 } from "react-icons/fi";
 import { MdAccessTime, MdBolt, MdOutlineFactCheck, MdSpeed } from "react-icons/md";
@@ -100,7 +102,7 @@ export const OverviewTab = ({
     timeoutChanged,
     totalChecks,
     uptime,
-}: OverviewTabProperties) => {
+}: OverviewTabProperties): JSX.Element => {
     const { getAvailabilityColor, getAvailabilityVariant } = useAvailabilityColors();
     const { currentTheme } = useTheme();
 

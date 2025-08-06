@@ -7,6 +7,8 @@
  * @public
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import React from "react";
 
 import { DefaultErrorFallback } from "../../components/error/DefaultErrorFallback";
@@ -43,6 +45,16 @@ export interface ErrorBoundaryState {
 }
 
 /**
+ * Interface for the wrapped component returned by withErrorBoundary.
+ */
+interface WrappedErrorBoundaryComponent<P extends object> {
+    (properties: P): JSX.Element;
+    // Set display name for better debugging experience in React DevTools
+    // This helps developers identify wrapped components in the component tree
+    displayName: string;
+}
+
+/**
  * Error boundary component for wrapping store-connected components.
  *
  * @remarks
@@ -74,7 +86,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProperties, Erro
         };
     }
 
-    override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    override componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
         logger.error("Store Error Boundary caught an error", error);
 
         this.setState({
@@ -86,7 +98,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProperties, Erro
         this.props.onError?.(error, errorInfo);
     }
 
-    handleRetry = () => {
+    handleRetry = (): void => {
         this.setState((prevState) => ({
             error: undefined,
             errorInfo: undefined,
@@ -95,7 +107,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProperties, Erro
         }));
     };
 
-    override render() {
+    override render(): JSX.Element {
         if (this.state.hasError) {
             const FallbackComponent = this.props.fallback ?? DefaultErrorFallback;
             return (
@@ -130,7 +142,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProperties, Erro
 export const withErrorBoundary = <P extends object>(
     Component: React.ComponentType<P>,
     fallback?: React.ComponentType<{ error?: Error; onRetry: () => void }>
-) => {
+): WrappedErrorBoundaryComponent<P> => {
     const WrappedComponent = (properties: P) => (
         <ErrorBoundary {...(fallback ? { fallback } : {})}>
             <Component {...properties} />

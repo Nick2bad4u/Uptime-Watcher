@@ -18,6 +18,18 @@ export interface CacheOptions {
 }
 
 /**
+ * Interface for application cache collection.
+ */
+interface AppCachesInterface {
+    /** General purpose cache for common values */
+    readonly general: TypedCache<string, CacheValue>;
+    /** Monitor type configurations and related data */
+    readonly monitorTypes: TypedCache<string, CacheValue>;
+    /** UI helper data and component state */
+    readonly uiHelpers: TypedCache<string, CacheValue>;
+}
+
+/**
  * Internal cache entry structure with metadata.
  *
  * @internal
@@ -184,7 +196,7 @@ export class TypedCache<K, V> {
  * Predefined caches for common use cases.
  * Provides pre-configured cache instances for different application domains.
  */
-export const AppCaches = {
+export const AppCaches: AppCachesInterface = {
     /** General purpose cache for common values */
     general: new TypedCache<string, CacheValue>({ maxSize: 200, ttl: 2 * 60 * 1000 }), // 2 minutes
 
@@ -200,7 +212,13 @@ export const AppCaches = {
  * Iterates through all predefined caches and removes expired items.
  */
 export function cleanupAllCaches(): void {
-    for (const cache of Object.values(AppCaches)) {
+    const caches: TypedCache<string, CacheValue>[] = [
+        AppCaches.general,
+        AppCaches.monitorTypes,
+        AppCaches.uiHelpers,
+    ];
+
+    for (const cache of caches) {
         cache.cleanup();
     }
 }
@@ -210,7 +228,13 @@ export function cleanupAllCaches(): void {
  * Removes all entries from all predefined cache instances.
  */
 export function clearAllCaches(): void {
-    for (const cache of Object.values(AppCaches)) {
+    const caches: TypedCache<string, CacheValue>[] = [
+        AppCaches.general,
+        AppCaches.monitorTypes,
+        AppCaches.uiHelpers,
+    ];
+
+    for (const cache of caches) {
         cache.clear();
     }
 }

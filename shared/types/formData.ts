@@ -52,6 +52,49 @@ export interface BaseFormData {
 }
 
 /**
+ * Interface for default form data values.
+ *
+ * @public
+ */
+export interface DefaultFormData {
+    /** Default values for HTTP monitors */
+    readonly http: {
+        checkInterval: number;
+        enabled: true;
+        expectedStatusCode: number;
+        followRedirects: true;
+        method: "GET";
+        retryAttempts: number;
+        timeout: number;
+        type: "http";
+        url: string;
+    };
+    /** Default values for ping monitors */
+    readonly ping: {
+        checkInterval: number;
+        enabled: true;
+        host: string;
+        maxPacketLoss: number;
+        packetCount: number;
+        packetSize: number;
+        retryAttempts: number;
+        timeout: number;
+        type: "ping";
+    };
+    /** Default values for port monitors */
+    readonly port: {
+        checkInterval: number;
+        connectionTimeout: number;
+        enabled: true;
+        host: string;
+        port: number;
+        retryAttempts: number;
+        timeout: number;
+        type: "port";
+    };
+}
+
+/**
  * Form mode enum for add site form.
  *
  * @remarks
@@ -165,6 +208,17 @@ export interface PortFormData extends BaseFormData {
 }
 
 /**
+ * Validation result interface for form validation.
+ *
+ * @remarks
+ * Used to return validation results with success status and error details.
+ *
+ * @public
+ */
+// Import from unified validation system
+export type { FormValidationResult as ValidationResult } from "./validation";
+
+/**
  * Complete site form data including site information and monitor configuration.
  *
  * @remarks
@@ -180,17 +234,6 @@ export interface SiteFormData {
     /** The human-readable name for the site */
     name: string;
 }
-
-/**
- * Validation result interface for form validation.
- *
- * @remarks
- * Used to return validation results with success status and error details.
- *
- * @public
- */
-// Import from unified validation system
-export type { FormValidationResult as ValidationResult } from "./validation";
 
 /**
  * Type guard to check if form data is for HTTP monitors.
@@ -233,7 +276,7 @@ export function isPortFormData(formData: MonitorFormData): formData is PortFormD
  *
  * @public
  */
-export const DEFAULT_FORM_DATA = {
+export const DEFAULT_FORM_DATA: DefaultFormData = {
     /** Default values for HTTP monitors */
     http: {
         checkInterval: 300_000, // 5 minutes

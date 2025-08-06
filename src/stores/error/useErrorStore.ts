@@ -30,13 +30,13 @@
  * @public
  */
 
-import { create } from "zustand";
+import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 import type { ErrorStore } from "./types";
 
 import { logStoreAction } from "../shared/utils";
 
-export const useErrorStore = create<ErrorStore>()((set, get) => ({
+export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> = create<ErrorStore>()((set, get) => ({
     // Actions
     clearAllErrors: () => {
         logStoreAction("ErrorStore", "clearAllErrors");

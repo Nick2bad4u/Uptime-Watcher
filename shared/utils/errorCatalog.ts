@@ -294,6 +294,21 @@ export const IPC_ERRORS = {
 } as const;
 
 /**
+ * Interface for the error catalog structure.
+ *
+ * @public
+ */
+export interface ErrorCatalogInterface {
+    readonly database: typeof DATABASE_ERRORS;
+    readonly ipc: typeof IPC_ERRORS;
+    readonly monitors: typeof MONITOR_ERRORS;
+    readonly network: typeof NETWORK_ERRORS;
+    readonly sites: typeof SITE_ERRORS;
+    readonly system: typeof SYSTEM_ERRORS;
+    readonly validation: typeof VALIDATION_ERRORS;
+}
+
+/**
  * Comprehensive error message catalog organized by domain.
  *
  * @remarks
@@ -303,7 +318,7 @@ export const IPC_ERRORS = {
  *
  * @public
  */
-export const ERROR_CATALOG = {
+export const ERROR_CATALOG: ErrorCatalogInterface = {
     database: DATABASE_ERRORS,
     ipc: IPC_ERRORS,
     monitors: MONITOR_ERRORS,
@@ -386,6 +401,8 @@ export function formatErrorMessage(template: string, params: Record<string, numb
  * @public
  */
 export function isKnownErrorMessage(message: string): message is ErrorMessage {
-    const allMessages = Object.values(ERROR_CATALOG).flatMap((category) => Object.values(category));
+    const allMessages = Object.values(ERROR_CATALOG).flatMap((category) =>
+        Object.values(category as Record<string, string>)
+    );
     return allMessages.includes(message as ErrorMessage);
 }

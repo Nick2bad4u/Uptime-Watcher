@@ -16,6 +16,16 @@ import { logger as baseLogger } from "../utils/logger";
 // Helper functions for metrics middleware (reduces complexity by composition)
 type MetricsCallback = (metric: { name: string; type: "counter" | "timing"; value: number }) => void;
 
+/**
+ * Interface for middleware stack functions.
+ */
+interface MiddlewareStacks {
+    custom: (middlewares: EventMiddleware[]) => EventMiddleware;
+    development: () => EventMiddleware;
+    production: () => EventMiddleware;
+    testing: () => EventMiddleware;
+}
+
 const trackEventCount = (event: string, eventCounts: Map<string, number>, metricsCallback?: MetricsCallback) => {
     const count = eventCounts.get(event) ?? 0;
     const newCount = count + 1;
@@ -605,7 +615,7 @@ export function createValidationMiddleware<T extends Record<string, unknown>>(
  * eventBus.use(customStack);
  * ```
  */
-export const MIDDLEWARE_STACKS = {
+export const MIDDLEWARE_STACKS: MiddlewareStacks = {
     /**
      * Custom stack builder that composes multiple middleware functions.
      *
@@ -621,7 +631,7 @@ export const MIDDLEWARE_STACKS = {
      * ]);
      * ```
      */
-    custom: (middlewares: EventMiddleware[]) => composeMiddleware(...middlewares),
+    custom: (middlewares: EventMiddleware[]): EventMiddleware => composeMiddleware(...middlewares),
 
     /**
      * Development stack with comprehensive debugging, verbose logging, and error handling.
@@ -634,7 +644,7 @@ export const MIDDLEWARE_STACKS = {
      * - Debug middleware (verbose logging)
      * - Detailed logging with event data
      */
-    development: () => {
+    development: (): EventMiddleware => {
         try {
             return composeMiddleware(
                 createErrorHandlingMiddleware({ continueOnError: true }),
@@ -659,7 +669,7 @@ export const MIDDLEWARE_STACKS = {
      * - Metrics tracking (counts and timing)
      * - Info-level logging (no data included)
      */
-    production: () => {
+    production: (): EventMiddleware => {
         try {
             return composeMiddleware(
                 createErrorHandlingMiddleware({ continueOnError: true }),
@@ -684,7 +694,7 @@ export const MIDDLEWARE_STACKS = {
      * - Warning-level logging (no data included)
      * - Minimal performance impact for fast test execution
      */
-    testing: () => {
+    testing: (): EventMiddleware => {
         try {
             return composeMiddleware(
                 createErrorHandlingMiddleware({ continueOnError: false }),

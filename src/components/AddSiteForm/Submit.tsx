@@ -89,7 +89,7 @@ export interface StoreActions {
  * };
  * ```
  */
-export async function handleSubmit(event: React.FormEvent, properties: FormSubmitProperties) {
+export async function handleSubmit(event: React.FormEvent, properties: FormSubmitProperties): Promise<void> {
     const {
         addMode,
         checkInterval,

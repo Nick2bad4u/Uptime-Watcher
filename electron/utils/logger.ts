@@ -6,6 +6,16 @@
 import log from "electron-log/main";
 
 /**
+ * Interface for logger instance methods.
+ */
+interface Logger {
+    debug: (message: string, ...args: unknown[]) => void;
+    error: (message: string, error?: unknown, ...args: unknown[]) => void;
+    info: (message: string, ...args: unknown[]) => void;
+    warn: (message: string, ...args: unknown[]) => void;
+}
+
+/**
  * Creates a logger with a specific prefix for categorization.
  *
  * @param prefix - The prefix to use for log messages (e.g., "MONITOR", "DB")
@@ -16,18 +26,18 @@ import log from "electron-log/main";
  * both the error message and stack trace for comprehensive debugging information.
  * Non-Error objects are logged as-is for additional context.
  */
-function createLogger(prefix: string) {
+function createLogger(prefix: string): Logger {
     return {
-        debug: (message: string, ...args: unknown[]) => log.debug(`[${prefix}] ${message}`, ...args),
-        error: (message: string, error?: unknown, ...args: unknown[]) => {
+        debug: (message: string, ...args: unknown[]): void => log.debug(`[${prefix}] ${message}`, ...args),
+        error: (message: string, error?: unknown, ...args: unknown[]): void => {
             if (error instanceof Error) {
                 log.error(`[${prefix}] ${message}`, { message: error.message, stack: error.stack }, ...args);
             } else {
                 log.error(`[${prefix}] ${message}`, error, ...args);
             }
         },
-        info: (message: string, ...args: unknown[]) => log.info(`[${prefix}] ${message}`, ...args),
-        warn: (message: string, ...args: unknown[]) => log.warn(`[${prefix}] ${message}`, ...args),
+        info: (message: string, ...args: unknown[]): void => log.info(`[${prefix}] ${message}`, ...args),
+        warn: (message: string, ...args: unknown[]): void => log.warn(`[${prefix}] ${message}`, ...args),
     };
 }
 
@@ -35,16 +45,16 @@ function createLogger(prefix: string) {
  * Main backend logger for general application operations.
  * Uses "BACKEND" prefix to distinguish from specialized loggers.
  */
-export const logger = createLogger("BACKEND");
+export const logger: Logger = createLogger("BACKEND");
 
 /**
  * Database-specific logger for database operations and queries.
  * Uses "DB" prefix for clear categorization of database-related logs.
  */
-export const dbLogger = createLogger("DB");
+export const dbLogger: Logger = createLogger("DB");
 
 /**
  * Monitor-specific logger for monitoring operations and health checks.
  * Uses "MONITOR" prefix for clear categorization of monitoring-related logs.
  */
-export const monitorLogger = createLogger("MONITOR");
+export const monitorLogger: Logger = createLogger("MONITOR");

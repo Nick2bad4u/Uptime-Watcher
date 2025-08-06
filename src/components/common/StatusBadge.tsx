@@ -44,7 +44,7 @@ export interface StatusBadgeProperties {
  * @param props - StatusBadge component props
  * @returns JSX element containing status indicator and text
  */
-export const StatusBadge = React.memo(function StatusBadge({
+export const StatusBadge: React.NamedExoticComponent<StatusBadgeProperties> = React.memo(function StatusBadge({
     className = "",
     formatter,
     label,

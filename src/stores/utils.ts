@@ -134,7 +134,7 @@ export const debounce = <T extends unknown[]>(
  *
  * @public
  */
-export const logStoreAction = (storeName: string, actionName: string, data?: unknown) => {
+export const logStoreAction = (storeName: string, actionName: string, data?: unknown): void => {
     if (isDevelopment()) {
         if (data !== undefined) {
             logger.info(`[${storeName}] ${actionName}`, data);

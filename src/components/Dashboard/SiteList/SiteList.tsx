@@ -5,6 +5,8 @@
  * when no sites have been added. Applies theme-aware styling with dividers.
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import { useSitesStore } from "../../../stores/sites/useSitesStore";
 import { useTheme } from "../../../theme/useTheme";
 import { SiteCard } from "../SiteCard/SiteCard";
@@ -31,7 +33,7 @@ import { EmptyState } from "./EmptyState";
  * }
  * ```
  */
-export function SiteList() {
+export function SiteList(): JSX.Element {
     const { sites } = useSitesStore();
     const { isDark } = useTheme();
 

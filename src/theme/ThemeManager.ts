@@ -379,4 +379,4 @@ export class ThemeManager {
  *
  * @public
  */
-export const themeManager = ThemeManager.getInstance();
+export const themeManager: ThemeManager = ThemeManager.getInstance();

@@ -15,6 +15,58 @@ import type { IpcParameterValidator } from "./types";
 import { IpcValidators } from "./utils";
 
 /**
+ * Interface for data handler validators.
+ */
+interface DataHandlerValidatorsInterface {
+    downloadSqliteBackup: IpcParameterValidator;
+    exportData: IpcParameterValidator;
+    getHistoryLimit: IpcParameterValidator;
+    importData: IpcParameterValidator;
+    resetSettings: IpcParameterValidator;
+    updateHistoryLimit: IpcParameterValidator;
+}
+
+/**
+ * Interface for monitoring handler validators.
+ */
+interface MonitoringHandlerValidatorsInterface {
+    checkSiteNow: IpcParameterValidator;
+    startMonitoring: IpcParameterValidator;
+    startMonitoringForSite: IpcParameterValidator;
+    stopMonitoring: IpcParameterValidator;
+    stopMonitoringForSite: IpcParameterValidator;
+}
+
+/**
+ * Interface for monitor type handler validators.
+ */
+interface MonitorTypeHandlerValidatorsInterface {
+    formatMonitorDetail: IpcParameterValidator;
+    formatMonitorTitleSuffix: IpcParameterValidator;
+    getMonitorTypes: IpcParameterValidator;
+    validateMonitorData: IpcParameterValidator;
+}
+
+/**
+ * Interface for site handler validators.
+ */
+interface SiteHandlerValidatorsInterface {
+    addSite: IpcParameterValidator;
+    getSites: IpcParameterValidator;
+    removeMonitor: IpcParameterValidator;
+    removeSite: IpcParameterValidator;
+    updateSite: IpcParameterValidator;
+}
+
+/**
+ * Interface for state sync handler validators.
+ */
+interface StateSyncHandlerValidatorsInterface {
+    getSyncStatus: IpcParameterValidator;
+    requestFullSync: IpcParameterValidator;
+}
+
+/**
  * Helper function to create validators for handlers expecting no parameters.
  *
  * @returns A validator function that ensures no parameters are passed
@@ -219,7 +271,7 @@ function createTwoStringValidator(firstParamName: string, secondParamName: strin
  *
  * @public
  */
-export const SiteHandlerValidators = {
+export const SiteHandlerValidators: SiteHandlerValidatorsInterface = {
     /**
      * Validates parameters for the "add-site" IPC handler.
      *
@@ -269,7 +321,7 @@ export const SiteHandlerValidators = {
  *
  * @public
  */
-export const MonitoringHandlerValidators = {
+export const MonitoringHandlerValidators: MonitoringHandlerValidatorsInterface = {
     /**
      * Validates parameters for the "check-site-now" IPC handler.
      *
@@ -319,7 +371,7 @@ export const MonitoringHandlerValidators = {
  *
  * @public
  */
-export const DataHandlerValidators = {
+export const DataHandlerValidators: DataHandlerValidatorsInterface = {
     /**
      * Validates parameters for the "download-sqlite-backup" IPC handler.
      *
@@ -377,7 +429,7 @@ export const DataHandlerValidators = {
  *
  * @public
  */
-export const MonitorTypeHandlerValidators = {
+export const MonitorTypeHandlerValidators: MonitorTypeHandlerValidatorsInterface = {
     /**
      * Validates parameters for the "format-monitor-detail" IPC handler.
      *
@@ -420,7 +472,7 @@ export const MonitorTypeHandlerValidators = {
  *
  * @public
  */
-export const StateSyncHandlerValidators = {
+export const StateSyncHandlerValidators: StateSyncHandlerValidatorsInterface = {
     /**
      * Validates parameters for the "get-sync-status" IPC handler.
      *

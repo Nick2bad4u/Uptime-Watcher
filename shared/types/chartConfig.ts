@@ -333,6 +333,36 @@ export interface CompleteChartConfig {
 }
 
 /**
+ * Interface for default chart themes configuration.
+ *
+ * @remarks
+ * Defines the structure for the DEFAULT_CHART_THEMES constant,
+ * supporting both dark and light theme configurations.
+ *
+ * @public
+ */
+export interface DefaultChartThemes {
+    /** Dark theme configuration */
+    readonly dark: {
+        backgroundColors: string[];
+        borderColors: string[];
+        gridColor: string;
+        textColor: string;
+        tooltipBackgroundColor: string;
+        tooltipTextColor: string;
+    };
+    /** Light theme configuration */
+    readonly light: {
+        backgroundColors: string[];
+        borderColors: string[];
+        gridColor: string;
+        textColor: string;
+        tooltipBackgroundColor: string;
+        tooltipTextColor: string;
+    };
+}
+
+/**
  * Type guard to check if an object has plugins configuration.
  *
  * @param config - Object to check
@@ -372,7 +402,7 @@ export function hasScales(config: unknown): config is { scales: ChartScalesConfi
  *
  * @public
  */
-export const DEFAULT_CHART_THEMES = {
+export const DEFAULT_CHART_THEMES: DefaultChartThemes = {
     /** Dark theme configuration */
     dark: {
         backgroundColors: [

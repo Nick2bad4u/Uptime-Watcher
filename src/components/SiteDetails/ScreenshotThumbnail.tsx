@@ -6,6 +6,8 @@
  * React portals for the overlay positioning.
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -25,7 +27,7 @@ export interface ScreenshotThumbnailProperties {
     readonly url: string;
 }
 
-export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProperties) {
+export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProperties): JSX.Element {
     const [hovered, setHovered] = useState(false);
     const [overlayVariables, setOverlayVariables] = useState<React.CSSProperties>({});
     const linkReference = useRef<HTMLAnchorElement>(null);
