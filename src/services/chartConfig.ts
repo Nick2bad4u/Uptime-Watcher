@@ -23,18 +23,6 @@
  * @packageDocumentation
  */
 
-import type {
-    BarControllerChartOptions,
-    CoreChartOptions,
-    DatasetChartOptions,
-    DoughnutControllerChartOptions,
-    ElementChartOptions,
-    LineControllerChartOptions,
-    PluginChartOptions,
-    ScaleChartOptions,
-} from "chart.js";
-import type { _DeepPartialObject } from "node_modules/chart.js/dist/types/utils";
-
 import { Theme } from "../theme/types";
 import { ChartData, ChartOptions } from "./chartSetup";
 
@@ -42,30 +30,9 @@ import { ChartData, ChartOptions } from "./chartSetup";
  * Interface for chart configuration return type.
  */
 export interface ChartConfigs {
-    barChartOptions: _DeepPartialObject<
-        BarControllerChartOptions &
-            CoreChartOptions<"bar"> &
-            DatasetChartOptions<"bar"> &
-            ElementChartOptions<"bar"> &
-            PluginChartOptions<"bar"> &
-            ScaleChartOptions<"bar">
-    >;
-    doughnutOptions: _DeepPartialObject<
-        CoreChartOptions<"doughnut"> &
-            DatasetChartOptions<"doughnut"> &
-            DoughnutControllerChartOptions &
-            ElementChartOptions<"doughnut"> &
-            PluginChartOptions<"doughnut"> &
-            ScaleChartOptions<"doughnut">
-    >;
-    lineChartOptions: _DeepPartialObject<
-        CoreChartOptions<"line"> &
-            DatasetChartOptions<"line"> &
-            ElementChartOptions<"line"> &
-            LineControllerChartOptions &
-            PluginChartOptions<"line"> &
-            ScaleChartOptions<"line">
-    >;
+    barChartOptions: ChartOptions<"bar">;
+    doughnutOptions: ChartOptions<"doughnut">;
+    lineChartOptions: ChartOptions<"line">;
 }
 
 /**
