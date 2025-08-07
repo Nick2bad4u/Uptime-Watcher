@@ -128,11 +128,13 @@ function validateWebMonitor(monitor: WebMonitor): boolean {
 **Critical Validation Requirements:**
 
 1. **Details Field Validation**:
+
    - Must validate that `details` field will be populated in results
    - Should provide meaningful, non-empty strings
    - Must be human-readable for history display
 
 2. **Interface Compliance**:
+
    - Must implement `IMonitorService` interface correctly
    - Must return proper `MonitorCheckResult` with details field
    - Must handle all error cases with appropriate details

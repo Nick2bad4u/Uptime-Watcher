@@ -94,7 +94,7 @@ const styles = useMemo<ThemeStyles>(() => ({
 
 ```typescript
 // BEFORE: Complex inline validation logic
-unexpectedProperties: (Object.keys(unexpectedProperties),
+unexpectedProperties: Object.keys(unexpectedProperties),
  // AFTER: Extract validation utilities
  class ConfigValidator {
   static validateExpectedProperties(config: unknown, expectedKeys: string[]): ValidationResult {
@@ -104,7 +104,7 @@ unexpectedProperties: (Object.keys(unexpectedProperties),
   static formatUnexpectedProperties(unexpected: Record<string, unknown>): string[] {
    // Simple, focused formatting
   }
- });
+ };
 ```
 
 **Implementation Plan:**
@@ -267,11 +267,13 @@ export const isValidMonitorRow = (obj: unknown): obj is MonitorRow =>
 #### Phase 1: Infrastructure (Week 1-2)
 
 1. **Create Validation Utilities**
+
    - Build composable validator functions
    - Create validation result types
    - Add comprehensive validator tests
 
 2. **Create Theme Utilities**
+
    - Extract theme generation utilities
    - Create theme composition helpers
    - Build theme testing utilities
@@ -284,6 +286,7 @@ export const isValidMonitorRow = (obj: unknown): obj is MonitorRow =>
 #### Phase 2: High Priority Fixes (Week 3-4)
 
 1. **Address Cyclomatic Complexity ≥13**
+
    - Refactor `useThemeStyles` hook system
    - Simplify IPC validation logic
    - Break down complex validator functions
@@ -296,6 +299,7 @@ export const isValidMonitorRow = (obj: unknown): obj is MonitorRow =>
 #### Phase 3: Medium Priority Fixes (Week 5-6)
 
 1. **Parameter Reduction**
+
    - Group SiteCardHeader parameters
    - Create configuration objects
    - Update component interfaces
@@ -308,6 +312,7 @@ export const isValidMonitorRow = (obj: unknown): obj is MonitorRow =>
 #### Phase 4: File Organization (Week 7)
 
 1. **Split Large Files**
+
    - Reorganize test files by domain
    - Split component files logically
    - Create focused utility modules

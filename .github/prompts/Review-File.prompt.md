@@ -11,20 +11,24 @@ Review the attached or referenced file for the following:
 ## SOLID Principles
 
 - **Single Responsibility Principle (SRP):**
+
   - Ensure each class/module/function has only one responsibility and one reason to change.
   - Identify mixed responsibilities and suggest refactoring.
 
 - **Open-Closed Principle (OCP):**
+
   - Code should be open for extension but closed for modification.
   - Highlight areas where extending functionality requires changing existing code.
   - Propose abstractions or patterns (e.g., strategy, inheritance, composition).
 
 - **Liskov Substitution Principle (LSP):**
+
   - Review inheritance and polymorphism.
   - Ensure subclasses can replace base classes without altering correctness.
   - Point out violations and provide fixes.
 
 - **Interface Segregation Principle (ISP):**
+
   - Check interfaces and APIs.
   - Ensure clients are not forced to depend on unused methods.
   - Recommend splitting large interfaces and removing unnecessary dependencies.

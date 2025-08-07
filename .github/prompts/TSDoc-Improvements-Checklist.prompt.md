@@ -25,6 +25,7 @@ Use proper linking where available, and ensure that all TSDoc comments are clear
 
 - **Key Tag Emphasis:**  
   Pay special attention to the following tags. Add them wherever appropriate:
+
   - `@remarks` — Supplementary notes or important clarifications about the API.
   - `@param` — Document all function and method parameters, specifying their purpose and expected types. (DONT USE `@property`)
   - `@returns` — Clearly describe the return value of functions and methods.
@@ -33,6 +34,7 @@ Use proper linking where available, and ensure that all TSDoc comments are clear
 
 - **Additional Tags:**  
   Where relevant, incorporate these tags for completeness and clarity:
+
   - `@typeParam`, `@deprecated`, `@see`, `@defaultValue`, `@decorator`, `@privateRemarks`, and modifier tags such as `@public`, `@internal`, `@readonly`, etc.
 
 - **Maintainability and Readability:**  
