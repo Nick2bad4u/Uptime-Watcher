@@ -13,17 +13,6 @@
  * These types are used for form validation and UI state management
  * in monitor creation and editing workflows.
  */
-export * from "./types/monitor-forms";
-
-/**
- * @public
- * @remarks Re-export all shared domain types for frontend consumption.
- * @remarks
- * Provides a unified import for all core domain types (Site, Monitor, etc.),
- * ensuring consistency with backend type definitions.
- */
-export * from "@shared/types";
-
 // Import types for global declarations
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type {
@@ -34,6 +23,17 @@ import type {
     TestEventData,
     UpdateStatusEventData,
 } from "@shared/types/events";
+
+export * from "./types/monitor-forms";
+
+/**
+ * @public
+ * @remarks Re-export all shared domain types for frontend consumption.
+ * @remarks
+ * Provides a unified import for all core domain types (Site, Monitor, etc.),
+ * ensuring consistency with backend type definitions.
+ */
+export * from "@shared/types";
 
 /**
  * @public
@@ -208,10 +208,10 @@ declare global {
                  * @returns A promise resolving to an IPC response containing monitor type definitions.
                  */
                 getMonitorTypes: () => Promise<{
-                    data?: {
+                    data?: Array<{
                         description: string;
                         displayName: string;
-                        fields: {
+                        fields: Array<{
                             helpText?: string;
                             label: string;
                             max?: number;
@@ -220,10 +220,10 @@ declare global {
                             placeholder?: string;
                             required: boolean;
                             type: "number" | "text" | "url";
-                        }[];
+                        }>;
                         type: string;
                         version: string;
-                    }[];
+                    }>;
                     error?: string;
                     metadata?: Record<string, unknown>;
                     success: boolean;

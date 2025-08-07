@@ -142,32 +142,6 @@ export interface MonitorFieldDefinition {
     /** Input type for form rendering */
     type: "number" | "text" | "url";
 }
-/**
- * Field definition for dynamic form generation.
- *
- * @remarks
- * Used for monitor type configuration in both frontend and backend. Defines the structure of fields for dynamic forms and monitor configuration.
- *
- * @public
- */
-export interface MonitorFieldDefinition {
-    /** Help text for the field */
-    helpText?: string;
-    /** Display label for the field */
-    label: string;
-    /** Max value for number fields */
-    max?: number;
-    /** Min value for number fields */
-    min?: number;
-    /** Field name (matches monitor property) */
-    name: string;
-    /** Placeholder text */
-    placeholder?: string;
-    /** Whether field is required */
-    required: boolean;
-    /** Input type for form rendering */
-    type: "number" | "text" | "url";
-}
 
 export interface Site {
     identifier: string;

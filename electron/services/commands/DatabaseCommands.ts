@@ -402,7 +402,7 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
  * @public
  */
 export class LoadSitesCommand extends DatabaseCommand<Site[]> {
-    private readonly originalCacheState: Map<string, Site> = new Map();
+    private readonly originalCacheState = new Map<string, Site>();
 
     public async execute(): Promise<Site[]> {
         // Backup current cache state

@@ -82,7 +82,7 @@ export function ConditionalResponseTime({
     return supportsResponseTime ? children : fallback;
 }
 
-export function DetailLabel({ details, fallback = details, monitorType }: DetailLabelProps): JSX.Element {
+export const DetailLabel = ({ details, fallback = details, monitorType }: DetailLabelProps): JSX.Element => {
     const [formattedLabel, setFormattedLabel] = useState<string>(fallback);
 
     useEffect(() => {

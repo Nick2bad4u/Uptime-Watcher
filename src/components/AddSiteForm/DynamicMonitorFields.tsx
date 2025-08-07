@@ -94,12 +94,12 @@ export interface DynamicMonitorFieldsProps {
  * />
  * ```
  */
-export function DynamicMonitorFields({
+export const DynamicMonitorFields = ({
     isLoading = false,
     monitorType,
     onChange,
     values,
-}: DynamicMonitorFieldsProps): JSX.Element {
+}: DynamicMonitorFieldsProps): JSX.Element => {
     const { isLoaded, lastError, loadMonitorTypes, monitorTypes } = useMonitorTypesStore();
 
     // Find the config for the current monitor type
@@ -175,7 +175,7 @@ export function DynamicMonitorFields({
  * />
  * ```
  */
-function DynamicField({ disabled = false, field, onChange, value }: DynamicFieldProps) {
+const DynamicField = ({ disabled = false, field, onChange, value }: DynamicFieldProps) => {
     const handleChange = useCallback(
         (newValue: number | string) => {
             onChange(newValue);

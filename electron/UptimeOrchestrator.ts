@@ -649,21 +649,33 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      */
     private setupDatabaseEventHandlers(): void {
         this.on("internal:database:update-sites-cache-requested", (data: UpdateSitesCacheRequestData) => {
-            this.handleUpdateSitesCacheRequest(data).catch((error) => {
-                logger.error("[UptimeOrchestrator] Error handling update-sites-cache-requested:", error);
-            });
+            void (async () => {
+                try {
+                    await this.handleUpdateSitesCacheRequest(data);
+                } catch (error) {
+                    logger.error("[UptimeOrchestrator] Error handling update-sites-cache-requested:", error);
+                }
+            })();
         });
 
         this.on("internal:database:get-sites-from-cache-requested", () => {
-            this.handleGetSitesFromCacheRequest().catch((error) => {
-                logger.error("[UptimeOrchestrator] Error handling get-sites-from-cache-requested:", error);
-            });
+            void (async () => {
+                try {
+                    await this.handleGetSitesFromCacheRequest();
+                } catch (error) {
+                    logger.error("[UptimeOrchestrator] Error handling get-sites-from-cache-requested:", error);
+                }
+            })();
         });
 
         this.on("internal:database:initialized", () => {
-            this.handleDatabaseInitialized().catch((error) => {
-                logger.error("[UptimeOrchestrator] Error handling internal:database:initialized:", error);
-            });
+            void (async () => {
+                try {
+                    await this.handleDatabaseInitialized();
+                } catch (error) {
+                    logger.error("[UptimeOrchestrator] Error handling internal:database:initialized:", error);
+                }
+            })();
         });
     }
 
@@ -674,6 +686,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         this.on("internal:site:added", (data: SiteEventData & { _meta?: unknown }) => {
             void (async () => {
                 // Extract original data without _meta to prevent conflicts
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const { _meta, ...originalData } = data;
                 await this.emitTyped("site:added", {
                     site: originalData.site,
@@ -686,6 +699,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         this.on("internal:site:removed", (data: SiteEventData & { _meta?: unknown }) => {
             void (async () => {
                 // Extract original data without _meta to prevent conflicts
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const { _meta, ...originalData } = data;
                 await this.emitTyped("site:removed", {
                     cascade: true,
@@ -699,6 +713,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         this.on("internal:site:updated", (data: SiteEventData & { _meta?: unknown; previousSite?: Site }) => {
             void (async () => {
                 // Extract original data without _meta to prevent conflicts
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const { _meta, ...originalData } = data;
                 await this.emitTyped("site:updated", {
                     previousSite: originalData.previousSite ?? originalData.site,

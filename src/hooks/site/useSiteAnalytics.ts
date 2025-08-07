@@ -17,14 +17,14 @@ import { TIME_PERIOD_LABELS, type TimePeriod } from "../../utils/time";
 /** Chart data structure for line charts */
 export interface ChartData {
     lineChartData: {
-        datasets: {
+        datasets: Array<{
             backgroundColor: string;
             borderColor: string;
             borderWidth: number;
-            data: {
+            data: Array<{
                 x: number;
                 y: number;
-            }[];
+            }>;
             fill: boolean;
             label: string;
             pointBackgroundColor: string[];
@@ -32,7 +32,7 @@ export interface ChartData {
             pointHoverRadius: number;
             pointRadius: number;
             tension: number;
-        }[];
+        }>;
     };
 }
 

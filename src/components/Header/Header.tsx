@@ -98,7 +98,7 @@ const aggregateMonitorCounts = (sites: Site[]) => {
  *
  * @returns JSX element containing the application header
  */
-export function Header(): JSX.Element {
+export const Header = (): JSX.Element => {
     const { sites } = useSitesStore();
     const { setShowAddSiteModal, setShowSettings } = useUIStore();
     const { isDark, toggleTheme } = useTheme();
@@ -143,7 +143,7 @@ export function Header(): JSX.Element {
                             {/* Overall Health Badge */}
                             {totalMonitors > 0 && (
                                 <div
-                                    className={`flex items-center space-x-2 px-3 py-1 rounded-md group transition-all duration-200 health-badge`}
+                                    className="flex items-center space-x-2 px-3 py-1 rounded-md group transition-all duration-200 health-badge"
                                     data-health-color={getAvailabilityColor(uptimePercentage)}
                                 >
                                     <div

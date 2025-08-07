@@ -141,9 +141,13 @@ export class ApplicationService {
      */
     private setupApplication(): void {
         app.on("ready", () => {
-            this.onAppReady().catch((error) => {
-                logger.error(LOG_TEMPLATES.errors.APPLICATION_INITIALIZATION_ERROR, error);
-            });
+            void (async () => {
+                try {
+                    await this.onAppReady();
+                } catch (error) {
+                    logger.error(LOG_TEMPLATES.errors.APPLICATION_INITIALIZATION_ERROR, error);
+                }
+            })();
         });
 
         app.on("window-all-closed", () => {
@@ -185,9 +189,13 @@ export class ApplicationService {
         });
 
         autoUpdater.initialize();
-        autoUpdater.checkForUpdates().catch((error) => {
-            logger.error(LOG_TEMPLATES.errors.APPLICATION_UPDATE_CHECK_ERROR, error);
-        });
+        void (async () => {
+            try {
+                await autoUpdater.checkForUpdates();
+            } catch (error) {
+                logger.error(LOG_TEMPLATES.errors.APPLICATION_UPDATE_CHECK_ERROR, error);
+            }
+        })();
     }
 
     /**

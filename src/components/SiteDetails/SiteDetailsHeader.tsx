@@ -42,12 +42,12 @@ export interface SiteDetailsHeaderProperties {
  * @param props - Component props containing site data and control handlers
  * @returns JSX element containing the site details header
  */
-export function SiteDetailsHeader({
+export const SiteDetailsHeader = ({
     isCollapsed,
     onToggleCollapse,
     selectedMonitor,
     site,
-}: SiteDetailsHeaderProperties): JSX.Element {
+}: SiteDetailsHeaderProperties): JSX.Element => {
     // Use theme-aware styles
     const styles = useThemeStyles(isCollapsed);
     const { openExternal } = useUIStore();
@@ -77,7 +77,7 @@ export function SiteDetailsHeader({
                                 {site.name}
                             </ThemedText>
                             {/* Show clickable URL for HTTP monitors that have a URL */}
-                            {!isCollapsed && selectedMonitor?.type === "http" && selectedMonitor.url && (
+                            {!isCollapsed && selectedMonitor?.type === "http" && selectedMonitor.url ? (
                                 <a
                                     aria-label={`Open ${selectedMonitor.url} in browser`}
                                     className="truncate site-details-url"
@@ -93,7 +93,7 @@ export function SiteDetailsHeader({
                                 >
                                     {selectedMonitor.url}
                                 </a>
-                            )}
+                            ) : null}
                             {/* Fallback if no monitor is available */}
                             {!isCollapsed && !selectedMonitor && (
                                 <ThemedText size="base" variant="warning">
@@ -105,7 +105,7 @@ export function SiteDetailsHeader({
                     {/* Right side: Monitoring Status Display and Collapse Button */}
                     <div className="flex items-center self-start flex-shrink-0 gap-2">
                         {!isCollapsed && <MonitoringStatusDisplay monitors={site.monitors} />}
-                        {onToggleCollapse && (
+                        {onToggleCollapse ? (
                             <button
                                 aria-label={isCollapsed ? "Expand header" : "Collapse header"}
                                 onClick={onToggleCollapse}
@@ -119,7 +119,7 @@ export function SiteDetailsHeader({
                                     <MdExpandLess className="w-5 h-5 themed-text-secondary" />
                                 )}
                             </button>
-                        )}
+                        ) : null}
                     </div>
                 </div>
             </div>
@@ -139,7 +139,7 @@ export function SiteDetailsHeader({
  * @param monitors - Array of monitors to display status for
  * @returns JSX element with enhanced monitoring status indicators
  */
-function MonitoringStatusDisplay({ monitors }: { readonly monitors: Monitor[] }) {
+const MonitoringStatusDisplay = ({ monitors }: { readonly monitors: Monitor[] }) => {
     if (monitors.length === 0) {
         return (
             <ThemedBox data-testid="monitoring-status-display" padding="sm" rounded="md" variant="secondary">
@@ -194,16 +194,16 @@ function MonitoringStatusDisplay({ monitors }: { readonly monitors: Monitor[] })
                             </ThemedBadge>
                             <ThemedText className="flex-1 min-w-0" size="xs" variant="secondary">
                                 {/* Display appropriate connection info based on monitor type */}
-                                {monitor.type === "http" && monitor.url && (
+                                {monitor.type === "http" && monitor.url ? (
                                     <span className="block truncate">
                                         {safeGetHostname(monitor.url) || monitor.url}
                                     </span>
-                                )}
-                                {monitor.type === "port" && monitor.host && monitor.port && (
+                                ) : null}
+                                {monitor.type === "port" && monitor.host && monitor.port ? (
                                     <span className="block truncate">
                                         {monitor.host}:{monitor.port}
                                     </span>
-                                )}
+                                ) : null}
                             </ThemedText>
                         </div>
                     ))}

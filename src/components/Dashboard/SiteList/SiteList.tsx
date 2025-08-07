@@ -33,7 +33,7 @@ import { EmptyState } from "./EmptyState";
  * }
  * ```
  */
-export function SiteList(): JSX.Element {
+export const SiteList = (): JSX.Element => {
     const { sites } = useSitesStore();
     const { isDark } = useTheme();
 

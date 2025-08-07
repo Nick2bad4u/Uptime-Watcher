@@ -61,7 +61,7 @@ export interface SiteOverviewTabProperties {
  * @param props - Component props
  * @returns JSX element containing the site overview
  */
-export function SiteOverviewTab({
+export const SiteOverviewTab = ({
     avgResponseTime,
     handleRemoveSite,
     handleStartSiteMonitoring,
@@ -70,7 +70,7 @@ export function SiteOverviewTab({
     site,
     totalChecks,
     uptime,
-}: SiteOverviewTabProperties): JSX.Element {
+}: SiteOverviewTabProperties): JSX.Element => {
     const { getAvailabilityColor, getAvailabilityVariant } = useAvailabilityColors();
     const { currentTheme } = useTheme();
 
@@ -178,6 +178,7 @@ export function SiteOverviewTab({
                         <ThemedText size="xl" weight="bold">
                             {runningMonitors.length}/{site.monitors.length}
                         </ThemedText>
+
                         <ThemedText size="xs" variant="secondary">
                             Active
                         </ThemedText>
@@ -197,6 +198,7 @@ export function SiteOverviewTab({
                         value={uptime}
                         variant={uptimeVariant}
                     />
+
                     <ThemedBadge className="mt-2" size="sm" variant={uptimeVariant}>
                         {uptime.toFixed(2)}%
                     </ThemedBadge>
@@ -213,6 +215,7 @@ export function SiteOverviewTab({
                         <ThemedText size="xl" style={responseTimeTextStyle} weight="bold">
                             {formatResponseTime(avgResponseTime)}
                         </ThemedText>
+
                         <ThemedText size="xs" variant="secondary">
                             {totalChecks} checks
                         </ThemedText>
@@ -227,13 +230,16 @@ export function SiteOverviewTab({
                         <ThemedText className="text-center" size="xl" variant="primary" weight="bold">
                             {site.name}
                         </ThemedText>
+
                         <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
                             <ThemedText variant="secondary">
                                 <strong>ID:</strong> {site.identifier}
                             </ThemedText>
+
                             <ThemedText variant="secondary">
                                 <strong>Name:</strong> {site.name}
                             </ThemedText>
+
                             <ThemedText variant="secondary">
                                 <strong>Monitors:</strong> {site.monitors.length}
                             </ThemedText>
@@ -249,13 +255,16 @@ export function SiteOverviewTab({
                         <ThemedText size="lg" variant="primary" weight="semibold">
                             Individual Monitors
                         </ThemedText>
+
                         <div className="flex flex-wrap items-center gap-4 text-sm">
                             <ThemedText variant="secondary">
                                 <strong>Total:</strong> {site.monitors.length}
                             </ThemedText>
+
                             <ThemedText variant="secondary">
                                 <strong>Running:</strong> {runningMonitors.length}
                             </ThemedText>
+
                             <ThemedText variant="secondary">
                                 <strong>Stopped:</strong> {site.monitors.length - runningMonitors.length}
                             </ThemedText>
@@ -276,14 +285,17 @@ export function SiteOverviewTab({
                                 >
                                     <div className="flex flex-col">
                                         <ThemedText weight="medium">{monitor.type.toUpperCase()} Monitor</ThemedText>
+
                                         <ThemedText size="sm" variant="secondary">
                                             {monitor.url ??
                                                 (monitor.host ? `${monitor.host}:${monitor.port}` : monitor.id)}
                                         </ThemedText>
+
                                         <ThemedText size="xs" variant="tertiary">
                                             Every {formatDuration(monitor.checkInterval)}
                                         </ThemedText>
                                     </div>
+
                                     <div className="flex items-center gap-2">
                                         <ThemedBadge size="sm" variant={getMonitorBadgeVariant(monitor)}>
                                             {getMonitorStatusText(monitor)}
@@ -328,6 +340,7 @@ export function SiteOverviewTab({
                             ▶️ Start All Monitoring
                         </ThemedButton>
                     )}
+
                     <ThemedButton
                         className="flex items-center gap-1"
                         disabled={isLoading}

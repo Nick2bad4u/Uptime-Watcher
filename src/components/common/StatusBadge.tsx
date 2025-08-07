@@ -16,20 +16,20 @@ import { StatusIndicator, ThemedText } from "../../theme/components";
  */
 export interface StatusBadgeProperties {
     /** Additional CSS classes */
-    className?: string;
+    readonly className?: string;
     /** Optional custom formatter for label and status display */
-    formatter?: (label: string, status: MonitorStatus) => string;
+    readonly formatter?: (label: string, status: MonitorStatus) => string;
     /**
      * Label text to display (expected to be localized by caller)
      * @example "Status", "Current State", "Monitor Status"
      */
-    label: string;
+    readonly label: string;
     /** Whether to show the status icon */
-    showIcon?: boolean;
+    readonly showIcon?: boolean;
     /** Text size (affects both text and icon sizing) */
-    size?: "2xl" | "3xl" | "4xl" | "base" | "lg" | "sm" | "xl" | "xs";
+    readonly size?: "2xl" | "3xl" | "4xl" | "base" | "lg" | "sm" | "xl" | "xs";
     /** Current status to display */
-    status: MonitorStatus;
+    readonly status: MonitorStatus;
 }
 
 /**
@@ -86,7 +86,7 @@ export const StatusBadge: React.NamedExoticComponent<StatusBadgeProperties> = Re
 
     return (
         <div className={`flex items-center gap-3 ${className}`}>
-            {showIcon && <StatusIndicator size={getIndicatorSize(size)} status={status} />}
+            {showIcon ? <StatusIndicator size={getIndicatorSize(size)} status={status} /> : null}
             <ThemedText size={size} variant="secondary">
                 {displayText}
             </ThemedText>

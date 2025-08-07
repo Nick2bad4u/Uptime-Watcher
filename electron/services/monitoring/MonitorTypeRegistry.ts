@@ -539,60 +539,64 @@ export async function migrateMonitorType(
     errors: string[];
     success: boolean;
 }> {
-    return withErrorHandling(
-        async () => {
-            // Validate the monitor type using internal validation
-            const validationResult = validateMonitorTypeInternal(monitorType);
-            if (!validationResult.success) {
+    try {
+        return await withErrorHandling(
+            async () => {
+                // Validate the monitor type using internal validation
+                const validationResult = validateMonitorTypeInternal(monitorType);
+                if (!validationResult.success) {
+                    return {
+                        appliedMigrations: [],
+                        errors: [validationResult.error ?? "Invalid monitor type"],
+                        success: false,
+                    };
+                }
+
+                logger.info(`Migrating monitor type ${monitorType} from ${fromVersion} to ${toVersion}`);
+
+                // Check if migration is needed
+                if (fromVersion === toVersion) {
+                    return {
+                        appliedMigrations: [],
+                        errors: [],
+                        success: true,
+                        ...(data && { data }),
+                    };
+                }
+
+                // If no data provided, just return success for version bump
+                if (!data) {
+                    return {
+                        appliedMigrations: [`${monitorType}_${fromVersion}_to_${toVersion}`],
+                        errors: [],
+                        success: true,
+                    };
+                }
+
+                // Use the migration orchestrator for data migration
+                const migrationOrchestrator = createMigrationOrchestrator();
+
+                const migrationResult = await migrationOrchestrator.migrateMonitorData(
+                    monitorType,
+                    data,
+                    fromVersion,
+                    toVersion
+                );
+
                 return {
-                    appliedMigrations: [],
-                    errors: [validationResult.error ?? "Invalid monitor type"],
-                    success: false,
+                    appliedMigrations: migrationResult.appliedMigrations,
+                    errors: migrationResult.errors,
+                    success: migrationResult.success,
+                    ...(migrationResult.data && { data: migrationResult.data }),
                 };
-            }
-
-            logger.info(`Migrating monitor type ${monitorType} from ${fromVersion} to ${toVersion}`);
-
-            // Check if migration is needed
-            if (fromVersion === toVersion) {
-                return {
-                    appliedMigrations: [],
-                    errors: [],
-                    success: true,
-                    ...(data && { data }),
-                };
-            }
-
-            // If no data provided, just return success for version bump
-            if (!data) {
-                return {
-                    appliedMigrations: [`${monitorType}_${fromVersion}_to_${toVersion}`],
-                    errors: [],
-                    success: true,
-                };
-            }
-
-            // Use the migration orchestrator for data migration
-            const migrationOrchestrator = createMigrationOrchestrator();
-
-            const migrationResult = await migrationOrchestrator.migrateMonitorData(
-                monitorType,
-                data,
-                fromVersion,
-                toVersion
-            );
-
-            return {
-                appliedMigrations: migrationResult.appliedMigrations,
-                errors: migrationResult.errors,
-                success: migrationResult.success,
-                ...(migrationResult.data && { data: migrationResult.data }),
-            };
-        },
-        { logger, operationName: "Monitor migration" }
-    ).catch((error) => ({
-        appliedMigrations: [],
-        errors: [`Migration failed: ${error instanceof Error ? error.message : String(error)}`],
-        success: false,
-    }));
+            },
+            { logger, operationName: "Monitor migration" }
+        );
+    } catch (error) {
+        return {
+            appliedMigrations: [],
+            errors: [`Migration failed: ${error instanceof Error ? error.message : String(error)}`],
+            success: false,
+        };
+    }
 }

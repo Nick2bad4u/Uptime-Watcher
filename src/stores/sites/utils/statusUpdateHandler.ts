@@ -96,7 +96,7 @@ interface MonitorStatusChangedEvent {
  * @public
  */
 export class StatusUpdateManager {
-    private cleanupFunctions: (() => void)[] = [];
+    private cleanupFunctions: Array<() => void> = [];
     private readonly fullSyncFromBackend: () => Promise<void>;
     private readonly getSites: () => Site[];
     private isListenerAttached = false;

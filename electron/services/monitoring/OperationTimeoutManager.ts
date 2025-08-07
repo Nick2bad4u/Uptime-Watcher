@@ -22,7 +22,7 @@ import { MonitorOperationRegistry } from "./MonitorOperationRegistry";
  * @public
  */
 export class OperationTimeoutManager {
-    private readonly timeouts: Map<string, NodeJS.Timeout> = new Map();
+    private readonly timeouts = new Map<string, NodeJS.Timeout>();
 
     /**
      * Creates a new OperationTimeoutManager.

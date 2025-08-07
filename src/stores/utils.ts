@@ -185,7 +185,7 @@ export async function waitForElectronAPI(maxAttempts = 50, baseDelay = 100): Pro
         }
 
         // Wait with exponential backoff
-        const delay = Math.min(baseDelay * Math.pow(1.5, attempt), 2000);
+        const delay = Math.min(baseDelay * 1.5 ** attempt, 2000);
         await new Promise((resolve) => setTimeout(resolve, delay));
     }
 

@@ -211,6 +211,7 @@ export default defineConfig(() => {
                     "**/node_modules/**",
                     "**/types.ts", // Exclude type definition files
                     "**/types.tsx", // Exclude type definition files with JSX
+                    "src/test/**",
                     "coverage/**",
                     "dist-electron/**",
                     "dist/**",

@@ -39,14 +39,14 @@ export interface ChartConfigs {
  * Response time line chart data structure
  */
 export interface ResponseTimeChartData extends ChartData<"line"> {
-    datasets: {
+    datasets: Array<{
         backgroundColor: string;
         borderColor: string;
-        data: (null | number)[];
+        data: Array<null | number>;
         fill: boolean;
         label: string;
         tension: number;
-    }[];
+    }>;
 }
 
 /**
@@ -57,13 +57,13 @@ export interface ResponseTimeChartData extends ChartData<"line"> {
  * Status distribution bar chart data structure
  */
 export interface StatusBarChartData extends ChartData<"bar"> {
-    datasets: {
+    datasets: Array<{
         backgroundColor: string[];
         borderColor: string[];
         borderWidth: number;
         data: number[];
         label: string;
-    }[];
+    }>;
     labels: string[];
 }
 
@@ -71,12 +71,12 @@ export interface StatusBarChartData extends ChartData<"bar"> {
  * Uptime status doughnut chart data structure
  */
 export interface UptimeChartData extends ChartData<"doughnut"> {
-    datasets: {
+    datasets: Array<{
         backgroundColor: string[];
         borderColor: string[];
         borderWidth: number;
         data: number[];
-    }[];
+    }>;
     labels: string[];
 }
 

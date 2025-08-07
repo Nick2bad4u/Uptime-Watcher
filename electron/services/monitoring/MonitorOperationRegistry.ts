@@ -63,7 +63,7 @@ export interface MonitorCheckResult {
  * @public
  */
 export class MonitorOperationRegistry {
-    private readonly activeOperations: Map<string, MonitorCheckOperation> = new Map();
+    private readonly activeOperations = new Map<string, MonitorCheckOperation>();
 
     /**
      * Cancel all operations for a specific monitor.

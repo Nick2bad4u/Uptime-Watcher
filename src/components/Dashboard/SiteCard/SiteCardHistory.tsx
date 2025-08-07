@@ -20,9 +20,9 @@ const MAX_HISTORY_ITEMS = 60;
  */
 export interface SiteCardHistoryProperties {
     /** Filtered history data for visualization */
-    filteredHistory: StatusHistory[];
+    readonly filteredHistory: StatusHistory[];
     /** Monitor data containing type and configuration */
-    monitor: Monitor | undefined;
+    readonly monitor: Monitor | undefined;
 }
 
 /**

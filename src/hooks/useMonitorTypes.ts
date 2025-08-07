@@ -53,7 +53,7 @@ export interface UseMonitorTypesResult {
     /** Whether monitor types are currently loading */
     isLoading: boolean;
     /** Monitor type options for form select fields */
-    options: { label: string; value: string }[];
+    options: Array<{ label: string; value: string }>;
     /** Refresh monitor types from backend */
     refresh: () => Promise<void>;
 }
@@ -64,7 +64,7 @@ export interface UseMonitorTypesResult {
  * @returns Monitor type options and loading state
  */
 export function useMonitorTypes(): UseMonitorTypesResult {
-    const [options, setOptions] = useState<{ label: string; value: string }[]>([]);
+    const [options, setOptions] = useState<Array<{ label: string; value: string }>>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | undefined>();
 

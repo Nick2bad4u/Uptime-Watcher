@@ -41,17 +41,17 @@ import { ThemedButton } from "../../../theme/components";
  */
 export interface SiteMonitoringButtonProperties {
     /** Whether all monitors are currently running - determines button state */
-    allMonitorsRunning: boolean;
+    readonly allMonitorsRunning: boolean;
     /** Additional CSS classes to apply to the button */
-    className?: string;
+    readonly className?: string;
     /** Whether to show compact text (for smaller spaces) */
-    compact?: boolean;
+    readonly compact?: boolean;
     /** Whether any operation is currently loading - disables button */
-    isLoading: boolean;
+    readonly isLoading: boolean;
     /** Handler for starting site-level monitoring */
-    onStartSiteMonitoring: () => void;
+    readonly onStartSiteMonitoring: () => void;
     /** Handler for stopping site-level monitoring */
-    onStopSiteMonitoring: () => void;
+    readonly onStopSiteMonitoring: () => void;
 }
 
 /**

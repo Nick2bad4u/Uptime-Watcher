@@ -21,7 +21,7 @@ import { SiteCardStatus } from "./SiteCardStatus";
  */
 export interface SiteCardProperties {
     /** Site data to display */
-    site: Site;
+    readonly site: Site;
 }
 
 /**

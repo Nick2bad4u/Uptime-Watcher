@@ -212,7 +212,7 @@ export const AppCaches: AppCachesInterface = {
  * Iterates through all predefined caches and removes expired items.
  */
 export function cleanupAllCaches(): void {
-    const caches: TypedCache<string, CacheValue>[] = [
+    const caches: Array<TypedCache<string, CacheValue>> = [
         AppCaches.general,
         AppCaches.monitorTypes,
         AppCaches.uiHelpers,
@@ -228,7 +228,7 @@ export function cleanupAllCaches(): void {
  * Removes all entries from all predefined cache instances.
  */
 export function clearAllCaches(): void {
-    const caches: TypedCache<string, CacheValue>[] = [
+    const caches: Array<TypedCache<string, CacheValue>> = [
         AppCaches.general,
         AppCaches.monitorTypes,
         AppCaches.uiHelpers,

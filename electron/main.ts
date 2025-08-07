@@ -58,7 +58,7 @@ log.initialize({ preload: true });
 type ElectronLogLevel = "debug" | "error" | "info" | "silly" | "verbose" | "warn";
 
 const ELECTRON_LOG_FILE = "uptime-watcher-main.log" as const;
-const LOG_FILE_MAX_SIZE = 1024 * 1024 * 5; // 5MB max file size
+const LOG_FILE_MAX_SIZE = 1024 ** 2 * 5; // 5MB max file size
 const LOG_FILE_FORMAT: string = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";
 const LOG_CONSOLE_FORMAT: string = "[{h}:{i}:{s}.{ms}] [{level}] {text}";
 
@@ -150,7 +150,8 @@ if (process.versions.electron) {
      * // Extensions are installed automatically in development mode.
      * ```
      */
-    void app.whenReady().then(async () => {
+    void (async () => {
+        await app.whenReady();
         // Wait a bit for the main window to be created and ready
         await new Promise((resolve) => setTimeout(resolve, 1));
 
@@ -167,5 +168,5 @@ if (process.versions.electron) {
             }
         }
         return []; // No extensions in production
-    });
+    })();
 }

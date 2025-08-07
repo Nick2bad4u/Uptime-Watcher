@@ -275,7 +275,7 @@ export interface ChartTimePeriods {
  */
 export const CHART_TIME_PERIODS: ChartTimePeriods = {
     /** 1 hour in milliseconds */
-    "1h": 60 * 60 * 1000,
+    "1h": 60 ** 2 * 1000,
     /** 7 days in milliseconds */
     "7d": 7 * 24 * 60 * 60 * 1000,
     /** 12 hours in milliseconds */

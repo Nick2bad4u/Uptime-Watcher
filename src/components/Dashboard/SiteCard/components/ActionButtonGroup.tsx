@@ -16,23 +16,23 @@ import { SiteMonitoringButton } from "../../../common/SiteMonitoringButton/SiteM
  */
 export interface ActionButtonGroupProperties {
     /** Whether all monitors are currently running */
-    allMonitorsRunning: boolean;
+    readonly allMonitorsRunning: boolean;
     /** Whether all buttons should be disabled */
-    disabled: boolean;
+    readonly disabled: boolean;
     /** Whether any operation is currently loading */
-    isLoading: boolean;
+    readonly isLoading: boolean;
     /** Whether monitoring is currently active */
-    isMonitoring: boolean;
+    readonly isMonitoring: boolean;
     /** Callback function to trigger immediate site check */
-    onCheckNow: () => void;
+    readonly onCheckNow: () => void;
     /** Callback function to start monitoring */
-    onStartMonitoring: () => void;
+    readonly onStartMonitoring: () => void;
     /** Callback function to start site-wide monitoring */
-    onStartSiteMonitoring: () => void;
+    readonly onStartSiteMonitoring: () => void;
     /** Callback function to stop monitoring */
-    onStopMonitoring: () => void;
+    readonly onStopMonitoring: () => void;
     /** Callback function to stop site-wide monitoring */
-    onStopSiteMonitoring: () => void;
+    readonly onStopSiteMonitoring: () => void;
 }
 
 /**

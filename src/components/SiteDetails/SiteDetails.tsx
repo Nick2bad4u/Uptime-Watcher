@@ -38,7 +38,7 @@ import type { JSX } from "react/jsx-runtime";
 import { useEffect, useMemo, useState } from "react";
 
 import { useSiteDetails } from "../../hooks/site/useSiteDetails";
-// Import from centralized chart setup
+// eslint-disable-next-line import-x/no-unassigned-import -- Chart.js initialization
 import "../../services/chartSetup";
 import { ChartConfigService } from "../../services/chartConfig";
 import { ThemedBox } from "../../theme/components";
@@ -86,7 +86,7 @@ export interface SiteDetailsProperties {
  * />
  * ```
  */
-export function SiteDetails({ onClose, site }: SiteDetailsProperties): JSX.Element | null {
+export const SiteDetails = ({ onClose, site }: SiteDetailsProperties): JSX.Element | null => {
     const { currentTheme } = useTheme();
     const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
 
@@ -150,6 +150,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProperties): JSX.Eleme
         siteDetailsChartTimeRange,
         siteExists,
         timeoutChanged,
+        // eslint-disable-next-line ex/no-unhandled -- site prop is guaranteed to be valid by parent component
     } = useSiteDetails({ site });
 
     // Create chart config service instance
@@ -214,7 +215,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProperties): JSX.Eleme
 
     // Don't render if site doesn't exist
     if (!siteExists) {
-        // eslint-disable-next-line unicorn/no-null -- React components can return null
+         
         return null;
     }
 
@@ -278,7 +279,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProperties): JSX.Eleme
                             />
                         )}
 
-                        {activeSiteDetailsTab === "monitor-overview" && selectedMonitor && (
+                        {activeSiteDetailsTab === "monitor-overview" && selectedMonitor ? (
                             <OverviewTab
                                 avgResponseTime={analytics.avgResponseTime}
                                 fastestResponse={analytics.fastestResponse}
@@ -301,9 +302,9 @@ export function SiteDetails({ onClose, site }: SiteDetailsProperties): JSX.Eleme
                                 totalChecks={analytics.totalChecks}
                                 uptime={analytics.uptime}
                             />
-                        )}
+                        ) : null}
 
-                        {activeSiteDetailsTab === `${selectedMonitorId}-analytics` && selectedMonitor && (
+                        {activeSiteDetailsTab === `${selectedMonitorId}-analytics` && selectedMonitor ? (
                             <AnalyticsTab
                                 avgResponseTime={analytics.avgResponseTime}
                                 barChartData={barChartData}
@@ -331,18 +332,18 @@ export function SiteDetails({ onClose, site }: SiteDetailsProperties): JSX.Eleme
                                 uptime={analytics.uptime}
                                 uptimeChartData={doughnutChartData}
                             />
-                        )}
+                        ) : null}
 
-                        {activeSiteDetailsTab === "history" && selectedMonitor && (
+                        {activeSiteDetailsTab === "history" && selectedMonitor ? (
                             <HistoryTab
                                 formatFullTimestamp={formatFullTimestamp}
                                 formatResponseTime={formatResponseTime}
                                 formatStatusWithIcon={formatStatusWithIcon}
                                 selectedMonitor={selectedMonitor}
                             />
-                        )}
+                        ) : null}
 
-                        {activeSiteDetailsTab === "settings" && selectedMonitor && (
+                        {activeSiteDetailsTab === "settings" && selectedMonitor ? (
                             <SettingsTab
                                 currentSite={currentSite}
                                 handleIntervalChange={handleIntervalChange}
@@ -367,7 +368,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProperties): JSX.Eleme
                                 setLocalName={setLocalName}
                                 timeoutChanged={timeoutChanged}
                             />
-                        )}
+                        ) : null}
                     </ThemedBox>
                 </ThemedBox>
             </dialog>

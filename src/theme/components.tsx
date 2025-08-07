@@ -295,7 +295,7 @@ export interface ThemeProviderProperties {
     readonly children: React.ReactNode;
 }
 
-export function MiniChartBar({ className = "", responseTime, status, timestamp }: MiniChartBarProperties): JSX.Element {
+export const MiniChartBar = ({ className = "", responseTime, status, timestamp }: MiniChartBarProperties): JSX.Element => {
     const { currentTheme, getStatusColor } = useTheme();
 
     const styles: React.CSSProperties = {
@@ -313,12 +313,12 @@ export function MiniChartBar({ className = "", responseTime, status, timestamp }
     );
 }
 
-export function StatusIndicator({
+export const StatusIndicator = ({
     className = "",
     showText = false,
     size = "md",
     status,
-}: StatusIndicatorProperties): JSX.Element {
+}: StatusIndicatorProperties): JSX.Element => {
     const { currentTheme, getStatusColor } = useTheme();
 
     const getSizeStyles = () => {
@@ -390,23 +390,23 @@ export function StatusIndicator({
             ) : (
                 <div className="themed-status-indicator__dot" style={indicatorStyle} />
             )}
-            {showText && (
+            {showText ? (
                 <span className="themed-status-indicator__text" style={textStyle}>
                     {status.charAt(0).toUpperCase() + status.slice(1)}
                 </span>
-            )}
+            ) : null}
         </div>
     );
 }
 
-export function ThemedBadge({
+export const ThemedBadge = ({
     children,
     className = "",
     icon,
     iconColor,
     size = "sm",
     variant = "primary",
-}: ThemedBadgeProperties): JSX.Element {
+}: ThemedBadgeProperties): JSX.Element => {
     const { currentTheme } = useTheme();
 
     const getVariantStyles = () => {
@@ -510,11 +510,11 @@ export function ThemedBadge({
             className={`themed-badge themed-badge--${variant} themed-badge--${size} ${className}`}
             style={badgeStyles}
         >
-            {icon && (
+            {icon ? (
                 <span style={{ fontSize: "0.9em", lineHeight: "1" }}>
                     {renderColoredIcon(icon, iconColor ?? variant)}
                 </span>
-            )}
+            ) : null}
             {children}
         </span>
     );
@@ -523,7 +523,7 @@ export function ThemedBadge({
 // Default styles object to prevent infinite render loops
 const DEFAULT_THEMED_BOX_STYLE = {};
 
-export function ThemedBox({
+export const ThemedBox = ({
     "aria-label": ariaLabel,
     as: Component = "div",
     border = false,
@@ -554,7 +554,7 @@ export function ThemedBox({
         type?: "button";
     },
     HTMLElement
-> {
+> => {
     const classNames = [
         CSS_CLASSES.THEMED_BOX,
         `themed-box--background-${variant}`,
@@ -598,7 +598,7 @@ export function ThemedBox({
     return React.createElement(Component, elementProperties, children);
 }
 
-export function ThemedButton({
+export const ThemedButton = ({
     "aria-label": ariaLabel,
     children,
     className = "",
@@ -614,7 +614,7 @@ export function ThemedButton({
     title,
     type = "button",
     variant = "primary",
-}: ThemedButtonProperties): JSX.Element {
+}: ThemedButtonProperties): JSX.Element => {
     const classNames = [
         CSS_CLASSES.THEMED_BUTTON,
         `themed-button--${variant}`,
@@ -671,6 +671,7 @@ export function ThemedButton({
             onClick={(e) => onClick?.(e)}
             style={style}
             title={title}
+            // eslint-disable-next-line react/button-has-type -- Type is correctly typed with default value
             type={type}
         >
             {renderContent()}
@@ -678,7 +679,7 @@ export function ThemedButton({
     );
 }
 
-export function ThemedCard({
+export const ThemedCard = ({
     children,
     className = "",
     clickable = false,
@@ -694,7 +695,7 @@ export function ThemedCard({
     subtitle,
     title,
     variant = "primary",
-}: ThemedCardProperties): JSX.Element {
+}: ThemedCardProperties): JSX.Element => {
     const { currentTheme } = useTheme();
 
     const cardStyles: React.CSSProperties = {
@@ -717,7 +718,7 @@ export function ThemedCard({
             {...(onMouseEnter && { onMouseEnter })}
             {...(onMouseLeave && { onMouseLeave })}
         >
-            {(title ?? subtitle ?? icon) && (
+            {(title ?? subtitle ?? icon) ? (
                 <div
                     className="themed-card__header"
                     style={{
@@ -727,7 +728,7 @@ export function ThemedCard({
                         marginBottom: currentTheme.spacing.md,
                     }}
                 >
-                    {icon && (
+                    {icon ? (
                         <span
                             style={{
                                 alignItems: "center",
@@ -738,21 +739,21 @@ export function ThemedCard({
                         >
                             {renderColoredIcon(icon, iconColor ?? "primary")}
                         </span>
-                    )}
+                    ) : null}
                     <div style={{ flex: 1 }}>
-                        {title && (
+                        {title ? (
                             <ThemedText size="lg" variant="primary" weight="semibold">
                                 {title}
                             </ThemedText>
-                        )}
-                        {subtitle && (
+                        ) : null}
+                        {subtitle ? (
                             <ThemedText size="sm" variant="secondary">
                                 {subtitle}
                             </ThemedText>
-                        )}
+                        ) : null}
                     </div>
                 </div>
-            )}
+            ) : null}
             <div className="themed-card__content">{children}</div>
         </ThemedBox>
     );
@@ -760,14 +761,14 @@ export function ThemedCard({
 
 // Enhanced components with better visual feedback and icons
 
-export function ThemedCheckbox({
+export const ThemedCheckbox = ({
     [ARIA_LABEL]: ariaLabel,
     checked,
     className = "",
     disabled = false,
     onChange,
     required = false,
-}: ThemedCheckboxProperties): JSX.Element {
+}: ThemedCheckboxProperties): JSX.Element => {
     return (
         <input
             type="checkbox"
@@ -781,7 +782,7 @@ export function ThemedCheckbox({
     );
 }
 
-export function ThemedIconButton({
+export const ThemedIconButton = ({
     className = "",
     disabled = false,
     icon,
@@ -791,7 +792,7 @@ export function ThemedIconButton({
     size = "md",
     tooltip,
     variant = "ghost",
-}: ThemedIconButtonProperties): JSX.Element {
+}: ThemedIconButtonProperties): JSX.Element => {
     const getSize = () => {
         switch (size) {
             case "lg": {
@@ -839,7 +840,7 @@ export function ThemedIconButton({
     );
 }
 
-export function ThemedInput({
+export const ThemedInput = ({
     "aria-describedby": ariaDescribedBy,
     [ARIA_LABEL]: ariaLabel,
     className = "",
@@ -853,7 +854,7 @@ export function ThemedInput({
     step,
     type = "text",
     value,
-}: ThemedInputProperties): JSX.Element {
+}: ThemedInputProperties): JSX.Element => {
     const { currentTheme } = useTheme();
     const { getBackgroundClass, getBorderClass, getTextClass } = useThemeClasses();
 
@@ -892,7 +893,7 @@ export function ThemedInput({
     );
 }
 
-export function ThemedProgress({
+export const ThemedProgress = ({
     className = "",
     label,
     max = 100,
@@ -900,7 +901,7 @@ export function ThemedProgress({
     size = "md",
     value,
     variant = "primary",
-}: ThemedProgressProperties): JSX.Element {
+}: ThemedProgressProperties): JSX.Element => {
     const { currentTheme } = useTheme();
 
     const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
@@ -964,7 +965,7 @@ export function ThemedProgress({
 
     return (
         <div className={`themed-progress ${className}`}>
-            {(showLabel || label) && (
+            {showLabel || label ? (
                 <div
                     style={{
                         alignItems: "center",
@@ -973,18 +974,18 @@ export function ThemedProgress({
                         marginBottom: currentTheme.spacing.xs,
                     }}
                 >
-                    {label && (
+                    {label ? (
                         <ThemedText size="sm" variant="secondary">
                             {label}
                         </ThemedText>
-                    )}
-                    {showLabel && (
+                    ) : null}
+                    {showLabel ? (
                         <ThemedText size="sm" variant="secondary">
                             {percentage.toFixed(1)}%
                         </ThemedText>
-                    )}
+                    ) : null}
                 </div>
-            )}
+            ) : null}
             <progress max={max} style={{ left: "-9999px", position: "absolute", top: "-9999px" }} value={value} />
             <div aria-hidden="true" style={containerStyles}>
                 <div style={progressStyles} />
@@ -993,7 +994,7 @@ export function ThemedProgress({
     );
 }
 
-export function ThemedSelect({
+export const ThemedSelect = ({
     "aria-describedby": ariaDescribedBy,
     [ARIA_LABEL]: ariaLabel,
     children,
@@ -1006,7 +1007,7 @@ export function ThemedSelect({
     required = false,
     title,
     value,
-}: ThemedSelectProperties): JSX.Element {
+}: ThemedSelectProperties): JSX.Element => {
     const { currentTheme } = useTheme();
     const { getBackgroundClass, getBorderClass, getTextClass } = useThemeClasses();
 
@@ -1045,7 +1046,7 @@ export function ThemedSelect({
     );
 }
 
-export function ThemedText({
+export const ThemedText = ({
     align = "left",
     children,
     className = "",
@@ -1053,7 +1054,7 @@ export function ThemedText({
     style = DEFAULT_THEMED_BOX_STYLE,
     variant = "primary",
     weight = "normal",
-}: ThemedTextProperties): JSX.Element {
+}: ThemedTextProperties): JSX.Element => {
     const classNames = [
         CSS_CLASSES.THEMED_TEXT,
         `themed-text--${variant}`,
@@ -1072,7 +1073,7 @@ export function ThemedText({
     );
 }
 
-export function ThemedTooltip({ children, className = "", content }: ThemedTooltipProperties): JSX.Element {
+export const ThemedTooltip = ({ children, className = "", content }: ThemedTooltipProperties): JSX.Element => {
     return (
         <div className={`themed-tooltip ${className}`} title={content}>
             {children}

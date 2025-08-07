@@ -15,13 +15,13 @@ import { Monitor } from "../../../../types";
  */
 export interface MonitorSelectorProperties {
     /** Optional CSS classes for custom styling */
-    className?: string;
+    readonly className?: string;
     /** Array of available monitors to choose from */
-    monitors: Monitor[];
+    readonly monitors: Monitor[];
     /** Callback function for selection change events */
-    onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+    readonly onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
     /** ID of the currently selected monitor */
-    selectedMonitorId: string;
+    readonly selectedMonitorId: string;
 }
 
 /**

@@ -146,7 +146,7 @@ export const HistoryTab = ({
     // Helper to render details with label using dynamic formatting
     function renderDetails(record: StatusHistory) {
         if (!record.details) {
-            // eslint-disable-next-line unicorn/no-null -- React components can return null
+             
             return null;
         }
 

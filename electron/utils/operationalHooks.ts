@@ -176,7 +176,7 @@ export async function withOperationalHooks<T>(
  */
 function calculateDelay(attempt: number, initialDelay: number, backoff: "exponential" | "linear"): number {
     if (backoff === "exponential") {
-        return initialDelay * Math.pow(2, attempt - 1);
+        return initialDelay * 2 ** (attempt - 1);
     }
     return initialDelay * attempt;
 }

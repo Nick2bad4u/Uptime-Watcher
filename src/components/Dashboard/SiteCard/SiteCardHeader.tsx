@@ -63,13 +63,13 @@ export interface MonitoringConfig {
  */
 export interface SiteCardHeaderProps {
     /** Display and UI options */
-    display: DisplayOptions;
+    readonly display: DisplayOptions;
     /** User interaction handlers */
-    interactions: InteractionHandlers;
+    readonly interactions: InteractionHandlers;
     /** Monitoring configuration and state */
-    monitoring: MonitoringConfig;
+    readonly monitoring: MonitoringConfig;
     /** Site information */
-    site: SiteInfo;
+    readonly site: SiteInfo;
 }
 
 /**

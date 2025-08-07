@@ -32,63 +32,62 @@ export interface MonitorServiceResult {
  * @example
  * ```typescript
  * // Retrieve a monitor service instance for HTTP
- * const httpMonitor = MonitorFactory.getMonitor("http", { timeout: 5000 });
+ * const httpMonitor = getMonitor("http", { timeout: 5000 });
  * // Update configuration for all monitor services
- * MonitorFactory.updateConfig({ timeout: 10000 });
+ * updateMonitorConfig({ timeout: 10000 });
  * // Clear all cached monitor service instances
- * MonitorFactory.clearCache();
+ * clearMonitorFactoryCache();
  * ```
  *
  * @public
  */
-export class MonitorFactory {
-    /**
-     * Cache of monitor service instances, keyed by monitor type string.
-     *
-     * @remarks
-     * Implements the singleton pattern: only one instance per monitor type is created and reused.
-     *
-     * @internal
-     * @readonly
-     */
-    private static readonly serviceInstances = new Map<string, IMonitorService>();
+/**
+ * Cache of monitor service instances, keyed by monitor type string.
+ *
+ * @remarks
+ * Implements the singleton pattern: only one instance per monitor type is created and reused.
+ *
+ * @internal
+ * @readonly
+ */
+const serviceInstances = new Map<string, IMonitorService>();
 
-    /**
-     * Clears all cached monitor service instances.
-     *
-     * @remarks
-     * Useful for testing, reloading configuration, or resetting the monitor service state.
-     * After calling this method, new service instances will be created on demand.
-     *
-     * @example
-     * ```typescript
-     * MonitorFactory.clearCache();
-     * ```
-     *
-     * @public
-     */
-    public static clearCache(): void {
-        this.serviceInstances.clear();
-    }
+/**
+ * Clears all cached monitor service instances.
+ *
+ * @remarks
+ * Useful for testing, reloading configuration, or resetting the monitor service state.
+ * After calling this method, new service instances will be created on demand.
+ *
+ * @example
+ * ```typescript
+ * clearMonitorFactoryCache();
+ * ```
+ *
+ * @public
+ */
+export function clearMonitorFactoryCache(): void {
+    serviceInstances.clear();
+}
 
-    /**
-     * Retrieves all available monitor types from the registry.
-     *
-     * @remarks
-     * This method returns all monitor types currently registered in the system, including both built-in and dynamically registered types.
-     *
-     * @returns An array of registered monitor type strings.
-     *
-     * @example
-     * ```typescript
-     * const types = MonitorFactory.getAvailableTypes();
-     * ```
-     *
-     * @public
-     */
-    public static getAvailableTypes(): string[] {
-        return getRegisteredMonitorTypes();
-    }
+/**
+ * Retrieves all available monitor types from the registry.
+ *
+ * @remarks
+ * This method returns all monitor types currently registered in the system, including both built-in and dynamically registered types.
+ *
+ * @returns An array of registered monitor type strings.
+ *
+ * @example
+ * ```typescript
+ * const types = getAvailableMonitorTypes();
+ * ```
+ *
+ * @public
+ */
+export function getAvailableMonitorTypes(): string[] {
+    return getRegisteredMonitorTypes();
+}
 
     /**
      * Retrieves the monitor service instance for a given monitor type, creating it if necessary.
@@ -109,7 +108,7 @@ export class MonitorFactory {
      *
      * @example
      * ```typescript
-     * const monitor = MonitorFactory.getMonitor("http", { timeout: 5000 });
+     * const monitor = getMonitor("http", { timeout: 5000 });
      * ```
      *
      * @see {@link IMonitorService}
@@ -119,10 +118,10 @@ export class MonitorFactory {
      * @see {@link getMonitorWithResult} for version that returns configuration status
      * @public
      */
-    public static getMonitor(type: MonitorType, config?: MonitorConfig, forceConfigUpdate = false): IMonitorService {
-        const result = this.getMonitorWithResult(type, config, forceConfigUpdate);
-        return result.instance;
-    }
+export function getMonitor(type: MonitorType, config?: MonitorConfig, forceConfigUpdate = false): IMonitorService {
+    const result = getMonitorWithResult(type, config, forceConfigUpdate);
+    return result.instance;
+}
 
     /**
      * Retrieves the monitor service instance with configuration application status.
@@ -140,7 +139,7 @@ export class MonitorFactory {
      *
      * @example
      * ```typescript
-     * const result = MonitorFactory.getMonitorWithResult("http", { timeout: 5000 });
+     * const result = getMonitorWithResult("http", { timeout: 5000 });
      * if (!result.configurationApplied && result.configurationError) {
      *   console.warn("Config failed:", result.configurationError);
      * }
@@ -148,11 +147,11 @@ export class MonitorFactory {
      *
      * @public
      */
-    public static getMonitorWithResult(
-        type: MonitorType,
-        config?: MonitorConfig,
-        forceConfigUpdate = false
-    ): MonitorServiceResult {
+export function getMonitorWithResult(
+    type: MonitorType,
+    config?: MonitorConfig,
+    forceConfigUpdate = false
+): MonitorServiceResult {
         // Validate monitor type using registry
         if (!isValidMonitorType(type)) {
             const availableTypes = getRegisteredMonitorTypes().join(", ");
@@ -170,10 +169,10 @@ export class MonitorFactory {
         }
 
         // Get or create service instance
-        let instance = this.serviceInstances.get(type);
+        let instance = serviceInstances.get(type);
         if (!instance) {
             instance = factory();
-            this.serviceInstances.set(type, instance);
+            serviceInstances.set(type, instance);
         }
 
         // Track configuration application status
@@ -181,7 +180,7 @@ export class MonitorFactory {
         let configurationError: string | undefined;
 
         // Apply configuration if provided and either forcing update or instance is new
-        if (config && (forceConfigUpdate || this.serviceInstances.get(type) === instance)) {
+        if (config && (forceConfigUpdate || serviceInstances.get(type) === instance)) {
             try {
                 instance.updateConfig(config);
                 // configurationApplied remains true
@@ -221,21 +220,20 @@ export class MonitorFactory {
      *
      * @example
      * ```typescript
-     * MonitorFactory.updateConfig({ timeout: 10000 });
+     * updateMonitorConfig({ timeout: 10000 });
      * ```
      *
      * @see {@link MonitorConfig}
      * @public
      */
-    public static updateConfig(config: MonitorConfig): void {
-        // Update config for all initialized monitor instances
-        for (const instance of this.serviceInstances.values()) {
-            try {
-                instance.updateConfig(config);
-            } catch (error) {
-                // Log and continue; do not throw from config update
-                logger.warn(LOG_TEMPLATES.warnings.MONITOR_CONFIG_UPDATE_FAILED_INSTANCE, { error });
-            }
+export function updateMonitorConfig(config: MonitorConfig): void {
+    // Update config for all initialized monitor instances
+    for (const instance of serviceInstances.values()) {
+        try {
+            instance.updateConfig(config);
+        } catch (error) {
+            // Log and continue; do not throw from config update
+            logger.warn(LOG_TEMPLATES.warnings.MONITOR_CONFIG_UPDATE_FAILED_INSTANCE, { error });
         }
     }
 }

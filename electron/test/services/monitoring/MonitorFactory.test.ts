@@ -3,7 +3,12 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { MonitorFactory } from "../../../services/monitoring/MonitorFactory";
+import { 
+    getMonitor, 
+    getAvailableMonitorTypes, 
+    clearMonitorFactoryCache, 
+    updateMonitorConfig 
+} from "../../../services/monitoring/MonitorFactory";
 import { MonitorConfig } from "../../../services/monitoring/types";
 
 describe("MonitorFactory - Fixed", () => {
@@ -19,36 +24,36 @@ describe("MonitorFactory - Fixed", () => {
 
     describe("getMonitor", () => {
         it("should get a ping monitor", () => {
-            const monitor = MonitorFactory.getMonitor("ping", mockMonitorConfig);
+            const monitor = getMonitor("ping", mockMonitorConfig);
             expect(monitor).toBeDefined();
             expect(typeof monitor.check).toBe("function");
         });
 
         it("should get an http monitor", () => {
-            const monitor = MonitorFactory.getMonitor("http", mockMonitorConfig);
+            const monitor = getMonitor("http", mockMonitorConfig);
             expect(monitor).toBeDefined();
             expect(typeof monitor.check).toBe("function");
         });
 
         it("should get a port monitor", () => {
-            const monitor = MonitorFactory.getMonitor("port", mockMonitorConfig);
+            const monitor = getMonitor("port", mockMonitorConfig);
             expect(monitor).toBeDefined();
             expect(typeof monitor.check).toBe("function");
         });
 
         it("should handle invalid monitor type", () => {
-            expect(() => MonitorFactory.getMonitor("invalid" as any, mockMonitorConfig)).toThrow();
+            expect(() => getMonitor("invalid" as any, mockMonitorConfig)).toThrow();
         });
 
         it("should get monitor with configuration", () => {
-            const monitor = MonitorFactory.getMonitor("ping", mockMonitorConfig);
+            const monitor = getMonitor("ping", mockMonitorConfig);
             expect(monitor).toBeDefined();
         });
     });
 
     describe("getAvailableTypes", () => {
         it("should return available monitor types", () => {
-            const types = MonitorFactory.getAvailableTypes();
+            const types = getAvailableMonitorTypes();
             expect(types).toContain("ping");
             expect(types).toContain("http");
             expect(types).toContain("port");
@@ -58,17 +63,17 @@ describe("MonitorFactory - Fixed", () => {
     describe("clearCache", () => {
         it("should clear monitor cache", () => {
             // Get a monitor to populate cache
-            MonitorFactory.getMonitor("ping", mockMonitorConfig);
+            getMonitor("ping", mockMonitorConfig);
 
             // Clear cache should not throw
-            expect(() => MonitorFactory.clearCache()).not.toThrow();
+            expect(() => clearMonitorFactoryCache()).not.toThrow();
         });
     });
 
     describe("updateConfig", () => {
         it("should update config for all monitors", () => {
             const newConfig = { timeout: 10_000, userAgent: "Updated-Agent/1.0" };
-            expect(() => MonitorFactory.updateConfig(newConfig)).not.toThrow();
+            expect(() => updateMonitorConfig(newConfig)).not.toThrow();
         });
     });
 });

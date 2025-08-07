@@ -55,9 +55,10 @@ export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> = create<ErrorSt
             const newStoreErrors = {
                 ...state.storeErrors,
             };
-            // Use destructuring to avoid dynamic delete
-            // eslint-disable-next-line sonarjs/no-unused-vars
-            const { [store]: _, ...remainingErrors } = newStoreErrors;
+            // Filter out the specified store error
+            const remainingErrors = Object.fromEntries(
+                Object.entries(newStoreErrors).filter(([key]) => key !== store)
+            );
             return { storeErrors: remainingErrors };
         });
     },

@@ -106,15 +106,9 @@ export function safeObjectOmit<T extends Record<PropertyKey, unknown>, K extends
     obj: T,
     keys: readonly K[]
 ): Omit<T, K> {
-    const result = {
-        ...obj,
-    };
-
-    for (const key of keys) {
-        delete result[key];
-    }
-
-    return result;
+    const keysToOmit = new Set(keys);
+    const entries = Object.entries(obj).filter(([key]) => !keysToOmit.has(key as K));
+    return Object.fromEntries(entries) as Omit<T, K>;
 }
 
 /**

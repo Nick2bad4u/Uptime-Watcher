@@ -71,7 +71,7 @@ export interface SettingsProperties {
  * @returns JSX element containing the settings interface
  */
 
-export function Settings({ onClose }: Readonly<SettingsProperties>): JSX.Element {
+export const Settings = ({ onClose }: Readonly<SettingsProperties>): JSX.Element => {
     const { clearError, isLoading, lastError, setError } = useErrorStore();
     const { resetSettings, settings, updateHistoryLimitValue, updateSettings } = useSettingsStore();
     const { downloadSQLiteBackup, fullSyncFromBackend } = useSitesStore();
@@ -176,7 +176,7 @@ export function Settings({ onClose }: Readonly<SettingsProperties>): JSX.Element
                 </ThemedBox>
 
                 {/* Error Display */}
-                {lastError && (
+                {lastError ? (
                     <ThemedBox
                         className={`error-alert ${isDark ? "dark" : ""}`}
                         padding="md"
@@ -201,15 +201,15 @@ export function Settings({ onClose }: Readonly<SettingsProperties>): JSX.Element
                             </ThemedButton>
                         </div>
                     </ThemedBox>
-                )}
+                ) : null}
                 {/* Sync Success Display */}
-                {syncSuccess && !lastError && (
+                {syncSuccess && !lastError ? (
                     <ThemedBox className="success-alert" padding="md" rounded="md" surface="base">
                         <ThemedText size="sm" variant="success">
                             ✅ Data synced from database.
                         </ThemedText>
                     </ThemedBox>
-                )}
+                ) : null}
 
                 {/* Content */}
                 <ThemedBox className="space-y-6" padding="lg" surface="base">

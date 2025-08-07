@@ -54,7 +54,7 @@ export interface SiteDetailsNavigationProperties {
  * @param props - Component props for navigation and control
  * @returns JSX element containing navigation controls
  */
-export function SiteDetailsNavigation({
+export const SiteDetailsNavigation = ({
     activeSiteDetailsTab,
     currentSite,
     handleMonitorIdChange,
@@ -66,7 +66,7 @@ export function SiteDetailsNavigation({
     isMonitoring,
     selectedMonitorId,
     setActiveSiteDetailsTab,
-}: SiteDetailsNavigationProperties): JSX.Element {
+}: SiteDetailsNavigationProperties): JSX.Element => {
     /**
      * Logs tab change events for analytics and debugging purposes.
      *

@@ -311,13 +311,7 @@ export interface MonitorUpEventData {
  * };
  * ```
  */
-export interface TestEventData {
-    /**
-     * Arbitrary test data payload.
-     * @remarks Keys and value types are not restricted.
-     */
-    [key: string]: unknown;
-}
+export type TestEventData = Record<string, unknown>;
 
 /**
  * Payload for update status change events.

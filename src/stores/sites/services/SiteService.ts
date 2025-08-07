@@ -44,8 +44,7 @@ export const SiteService = {
      */
     async checkSiteNow(siteId: string, monitorId: string): Promise<void> {
         await this.initialize();
-        const response = await window.electronAPI.sites.checkSiteNow(siteId, monitorId);
-        safeExtractIpcData<void>(response, undefined as void);
+        await window.electronAPI.sites.checkSiteNow(siteId, monitorId);
     },
 
     /**
@@ -111,8 +110,7 @@ export const SiteService = {
      */
     async removeMonitor(siteIdentifier: string, monitorId: string): Promise<void> {
         await this.initialize();
-        const response = await window.electronAPI.sites.removeMonitor(siteIdentifier, monitorId);
-        safeExtractIpcData<void>(response, undefined as void);
+        await window.electronAPI.sites.removeMonitor(siteIdentifier, monitorId);
     },
 
     /**
@@ -128,8 +126,7 @@ export const SiteService = {
      */
     async removeSite(identifier: string): Promise<void> {
         await this.initialize();
-        const response = await window.electronAPI.sites.removeSite(identifier);
-        safeExtractIpcData<void>(response, undefined as void);
+        await window.electronAPI.sites.removeSite(identifier);
     },
 
     /**
@@ -146,7 +143,6 @@ export const SiteService = {
      */
     async updateSite(identifier: string, updates: Partial<Site>): Promise<void> {
         await this.initialize();
-        const response = await window.electronAPI.sites.updateSite(identifier, updates);
-        safeExtractIpcData<void>(response, undefined as void);
+        await window.electronAPI.sites.updateSite(identifier, updates);
     },
 };

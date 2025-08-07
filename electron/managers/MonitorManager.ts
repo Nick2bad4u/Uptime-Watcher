@@ -6,10 +6,29 @@
  *
  * @public
  */
+
+import { interpolateLogTemplate, LOG_TEMPLATES } from "../../shared/utils/logTemplates";
 import { DEFAULT_CHECK_INTERVAL } from "../constants";
 import { isDev } from "../electronUtils";
 import { UptimeEvents } from "../events/eventTypes";
 import { TypedEventBus } from "../events/TypedEventBus";
+import { DatabaseService } from "../services/database/DatabaseService";
+import { HistoryRepository } from "../services/database/HistoryRepository";
+import { MonitorRepository } from "../services/database/MonitorRepository";
+import { SiteRepository } from "../services/database/SiteRepository";
+import { EnhancedMonitoringServices } from "../services/monitoring/EnhancedMonitoringServiceFactory";
+import { MonitorScheduler } from "../services/monitoring/MonitorScheduler";
+import { SiteService } from "../services/site/SiteService";
+import { Site, StatusUpdate } from "../types";
+import { StandardizedCache } from "../utils/cache/StandardizedCache";
+import { logger } from "../utils/logger";
+import {
+    startAllMonitoring,
+    startMonitoringForSite,
+    stopAllMonitoring,
+    stopMonitoringForSite,
+} from "../utils/monitoring/monitorLifecycle";
+import { withDatabaseOperation } from "../utils/operationalHooks";
 
 /**
  * Defines the dependencies required by {@link MonitorManager} for orchestration and data access.
@@ -69,25 +88,6 @@ export interface MonitorManagerDependencies {
      */
     siteService: SiteService;
 }
-
-import { interpolateLogTemplate, LOG_TEMPLATES } from "../../shared/utils/logTemplates";
-import { DatabaseService } from "../services/database/DatabaseService";
-import { HistoryRepository } from "../services/database/HistoryRepository";
-import { MonitorRepository } from "../services/database/MonitorRepository";
-import { SiteRepository } from "../services/database/SiteRepository";
-import { EnhancedMonitoringServices } from "../services/monitoring/EnhancedMonitoringServiceFactory";
-import { MonitorScheduler } from "../services/monitoring/MonitorScheduler";
-import { SiteService } from "../services/site/SiteService";
-import { Site, StatusUpdate } from "../types";
-import { StandardizedCache } from "../utils/cache/StandardizedCache";
-import { logger } from "../utils/logger";
-import {
-    startAllMonitoring,
-    startMonitoringForSite,
-    stopAllMonitoring,
-    stopMonitoringForSite,
-} from "../utils/monitoring/monitorLifecycle";
-import { withDatabaseOperation } from "../utils/operationalHooks";
 
 /**
  * Main class for orchestrating monitor scheduling, status checks, and event-driven updates.

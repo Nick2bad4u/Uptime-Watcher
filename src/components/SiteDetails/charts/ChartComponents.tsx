@@ -30,7 +30,7 @@ import { Bar, ChartOptions, Doughnut, Line } from "../../../services/chartSetup"
  */
 export const ResponseTimeChart: MemoExoticComponent<
     ({ data, options }: { data: ResponseTimeChartData; options: ChartOptions<"line"> }) => JSX.Element
-> = memo(({ data, options }: { data: ResponseTimeChartData; options: ChartOptions<"line"> }) => (
+> = memo(({ data, options }: { readonly data: ResponseTimeChartData; readonly options: ChartOptions<"line"> }) => (
     <Line data={data} options={options} />
 ));
 
@@ -46,7 +46,7 @@ export const ResponseTimeChart: MemoExoticComponent<
  */
 export const UptimeChart: MemoExoticComponent<
     ({ data, options }: { data: UptimeChartData; options: ChartOptions<"doughnut"> }) => JSX.Element
-> = memo(({ data, options }: { data: UptimeChartData; options: ChartOptions<"doughnut"> }) => (
+> = memo(({ data, options }: { readonly data: UptimeChartData; readonly options: ChartOptions<"doughnut"> }) => (
     <Doughnut data={data} options={options} />
 ));
 
@@ -62,7 +62,7 @@ export const UptimeChart: MemoExoticComponent<
  */
 export const StatusChart: MemoExoticComponent<
     ({ data, options }: { data: StatusBarChartData; options: ChartOptions<"bar"> }) => JSX.Element
-> = memo(({ data, options }: { data: StatusBarChartData; options: ChartOptions<"bar"> }) => (
+> = memo(({ data, options }: { readonly data: StatusBarChartData; readonly options: ChartOptions<"bar"> }) => (
     <Bar data={data} options={options} />
 ));
 

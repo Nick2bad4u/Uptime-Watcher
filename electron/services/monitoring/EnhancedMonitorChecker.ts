@@ -31,23 +31,20 @@ import { Monitor, Site, StatusUpdate } from "../../../shared/types";
 import { interpolateLogTemplate, LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
 import { UptimeEvents } from "../../events/eventTypes";
 import { TypedEventBus } from "../../events/TypedEventBus";
-import { HistoryRepository } from "../../services/database/HistoryRepository";
-import { MonitorRepository } from "../../services/database/MonitorRepository";
-import { SiteRepository } from "../../services/database/SiteRepository";
-import { HttpMonitor } from "../../services/monitoring/HttpMonitor";
-import { MonitorOperationRegistry } from "../../services/monitoring/MonitorOperationRegistry";
-import {
-    MonitorStatusUpdateService,
-    type StatusUpdateMonitorCheckResult,
-} from "../../services/monitoring/MonitorStatusUpdateService";
-import { OperationTimeoutManager } from "../../services/monitoring/OperationTimeoutManager";
-import { PingMonitor } from "../../services/monitoring/PingMonitor";
-import { PortMonitor } from "../../services/monitoring/PortMonitor";
-import { IMonitorService, type MonitorCheckResult as ServiceMonitorCheckResult } from "../../services/monitoring/types";
 import { Site as SiteType } from "../../types";
 import { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import { monitorLogger as logger } from "../../utils/logger";
+import { HistoryRepository } from "../database/HistoryRepository";
+import { MonitorRepository } from "../database/MonitorRepository";
+import { SiteRepository } from "../database/SiteRepository";
 import { DEFAULT_MONITOR_TIMEOUT_SECONDS, MONITOR_TIMEOUT_BUFFER_MS, SECONDS_TO_MS_MULTIPLIER } from "./constants";
+import { HttpMonitor } from "./HttpMonitor";
+import { MonitorOperationRegistry } from "./MonitorOperationRegistry";
+import { MonitorStatusUpdateService, type StatusUpdateMonitorCheckResult } from "./MonitorStatusUpdateService";
+import { OperationTimeoutManager } from "./OperationTimeoutManager";
+import { PingMonitor } from "./PingMonitor";
+import { PortMonitor } from "./PortMonitor";
+import { IMonitorService, type MonitorCheckResult as ServiceMonitorCheckResult } from "./types";
 
 /**
  * Configuration interface for enhanced monitor checking with comprehensive service dependencies.

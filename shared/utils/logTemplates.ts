@@ -364,7 +364,8 @@ export function createTemplateLogger(baseLogger: Logger) {
  * ```
  */
 export function interpolateLogTemplate(template: string, variables: Record<string, number | string>): string {
-    return template.replaceAll(/\{(\w+)\}/gu, (match, key) => {
+    // eslint-disable-next-line regexp/prefer-named-capture-group, regexp/require-unicode-sets-regexp, regexp/strict -- Conflicting rules: strict wants escaped braces, unicorn/better-regex wants unescaped
+    return template.replaceAll(/{([$_a-z][\w$]*)}/gi, (match, key) => {
         const value = variables[key as keyof typeof variables];
         return value === undefined ? match : String(value);
     });

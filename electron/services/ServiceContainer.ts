@@ -729,9 +729,13 @@ export class ServiceContainer {
             managerEventBus.on(eventType, (data: unknown) => {
                 const mainOrchestrator = this.getMainOrchestrator();
                 if (mainOrchestrator) {
-                    mainOrchestrator.emitTyped(eventType, data as UptimeEvents[typeof eventType]).catch((error) => {
-                        logger.error(`[ServiceContainer] Error forwarding ${eventType} from ${managerName}:`, error);
-                    });
+                    void (async () => {
+                        try {
+                            await mainOrchestrator.emitTyped(eventType, data as UptimeEvents[typeof eventType]);
+                        } catch (error) {
+                            logger.error(`[ServiceContainer] Error forwarding ${eventType} from ${managerName}:`, error);
+                        }
+                    })();
                     if (this.config.enableDebugLogging) {
                         logger.debug(
                             `[ServiceContainer] Forwarded ${eventType} from ${managerName} to main orchestrator`

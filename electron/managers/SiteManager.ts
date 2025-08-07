@@ -280,21 +280,27 @@ export class SiteManager {
 
         if (!site) {
             // Emit cache miss event
-            this.eventEmitter
-                .emitTyped("site:cache-miss", {
-                    backgroundLoading: true,
-                    identifier,
-                    operation: "cache-lookup",
-                    timestamp: Date.now(),
-                })
-                .catch((error) => {
+            void (async () => {
+                try {
+                    await this.eventEmitter.emitTyped("site:cache-miss", {
+                        backgroundLoading: true,
+                        identifier,
+                        operation: "cache-lookup",
+                        timestamp: Date.now(),
+                    });
+                } catch (error) {
                     logger.debug(LOG_TEMPLATES.debug.SITE_CACHE_MISS_ERROR, error);
-                });
+                }
+            })();
 
             // Trigger background loading without blocking
-            this.loadSiteInBackground(identifier).catch((error) => {
-                logger.debug(LOG_TEMPLATES.debug.SITE_LOADING_ERROR_IGNORED, error);
-            });
+            void (async () => {
+                try {
+                    await this.loadSiteInBackground(identifier);
+                } catch (error) {
+                    logger.debug(LOG_TEMPLATES.debug.SITE_LOADING_ERROR_IGNORED, error);
+                }
+            })();
         }
 
         return site;
@@ -616,10 +622,15 @@ export class SiteManager {
                 if (!this.monitoringOperations) {
                     throw new Error("MonitoringOperations not available but required for setHistoryLimit");
                 }
+                const operations = this.monitoringOperations;
                 // Execute but don't await the promise
-                this.monitoringOperations.setHistoryLimit(limit).catch((error) => {
-                    logger.error(LOG_TEMPLATES.errors.SITE_HISTORY_LIMIT_FAILED, error);
-                });
+                void (async () => {
+                    try {
+                        await operations.setHistoryLimit(limit);
+                    } catch (error) {
+                        logger.error(LOG_TEMPLATES.errors.SITE_HISTORY_LIMIT_FAILED, error);
+                    }
+                })();
             },
             setupNewMonitors: async (site: Site, newMonitorIds: string[]) => {
                 if (!this.monitoringOperations) {

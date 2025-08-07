@@ -14,11 +14,11 @@ import { ThemedText } from "../../../../theme/components";
  */
 export interface MetricCardProperties {
     /** Optional CSS classes for custom styling */
-    className?: string;
+    readonly className?: string;
     /** Label text describing the metric */
-    label: string;
+    readonly label: string;
     /** Value to display (string or number) */
-    value: number | string;
+    readonly value: number | string;
 }
 
 /**

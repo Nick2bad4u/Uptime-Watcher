@@ -255,7 +255,7 @@ export const OverviewTab = ({
                                 );
                             })}
                         </ThemedSelect>
-                        {intervalChanged && (
+                        {intervalChanged ? (
                             <ThemedButton
                                 disabled={isLoading}
                                 onClick={() => void handleSaveInterval()}
@@ -264,7 +264,7 @@ export const OverviewTab = ({
                             >
                                 Save
                             </ThemedButton>
-                        )}
+                        ) : null}
                     </div>
 
                     {/* Timeout Control */}
@@ -286,7 +286,7 @@ export const OverviewTab = ({
                         <ThemedText size="xs" variant="secondary">
                             s
                         </ThemedText>
-                        {timeoutChanged && (
+                        {timeoutChanged ? (
                             <ThemedButton
                                 disabled={isLoading}
                                 onClick={() => void handleSaveTimeout()}
@@ -295,7 +295,7 @@ export const OverviewTab = ({
                             >
                                 Save
                             </ThemedButton>
-                        )}
+                        ) : null}
                     </div>
 
                     {/* Check Now Button */}

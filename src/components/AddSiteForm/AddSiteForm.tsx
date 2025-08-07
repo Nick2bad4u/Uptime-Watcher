@@ -36,7 +36,7 @@ import { handleSubmit } from "./Submit";
  */
 export interface AddSiteFormProperties {
     /** Optional callback to execute on successful form submission */
-    onSuccess?: () => void;
+    readonly onSuccess?: () => void;
 }
 
 /**
@@ -364,7 +364,7 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> = Re
                 </ThemedButton>
 
                 {/* Error Message */}
-                {(lastError ?? formError) && (
+                {(lastError ?? formError) ? (
                     <ThemedBox
                         className={`error-alert ${isDark ? "dark" : ""}`}
                         padding="md"
@@ -385,22 +385,22 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> = Re
                             </ThemedButton>
                         </div>
                     </ThemedBox>
-                )}
+                ) : null}
 
                 <div className="space-y-1">
                     <ThemedText size="xs" variant="tertiary">
                         • {addMode === "new" ? "Site name is required" : "Select a site to add the monitor to"}
                     </ThemedText>
-                    {helpTexts.primary && (
+                    {helpTexts.primary ? (
                         <ThemedText size="xs" variant="tertiary">
                             • {helpTexts.primary}
                         </ThemedText>
-                    )}
-                    {helpTexts.secondary && (
+                    ) : null}
+                    {helpTexts.secondary ? (
                         <ThemedText size="xs" variant="tertiary">
                             • {helpTexts.secondary}
                         </ThemedText>
-                    )}
+                    ) : null}
                     <ThemedText size="xs" variant="tertiary">
                         • The monitor will be checked according to your monitoring interval
                     </ThemedText>

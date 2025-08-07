@@ -17,7 +17,7 @@
     "jsdocPreferCodeFences": true,
     "tailwindStylesheet": "./src/index.css",
     "multilineArraysWrapThreshold": 4,
-    "printWidth": 120,
+    "printWidth": 80,
     "proseWrap": "preserve",
     "quoteProps": "as-needed",
     "semi": true,
@@ -30,13 +30,13 @@
         {
             "files": "*.css",
             "options": {
-                "printWidth": 120
+                "printWidth": 80
             }
         },
         {
             "files": "*.user.css",
             "options": {
-                "printWidth": 120
+                "printWidth": 80
             }
         },
         {
@@ -48,13 +48,13 @@
         {
             "files": "*.html",
             "options": {
-                "printWidth": 120
+                "printWidth": 80
             }
         },
         {
             "files": "*.user.js",
             "options": {
-                "printWidth": 120
+                "printWidth": 80
             }
         },
         {

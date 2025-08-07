@@ -108,7 +108,7 @@ export interface AnalyticsTabProperties {
  * @param props - Component props containing metrics and chart configurations
  * @returns JSX element displaying analytics interface
  */
-export function AnalyticsTab({
+export const AnalyticsTab = ({
     avgResponseTime,
     barChartData,
     barChartOptions,
@@ -134,7 +134,7 @@ export function AnalyticsTab({
     upCount,
     uptime,
     uptimeChartData,
-}: AnalyticsTabProperties): JSX.Element {
+}: AnalyticsTabProperties): JSX.Element => {
     const { getAvailabilityColor: getColor, getAvailabilityVariant: getVariant } = useAvailabilityColors();
     const { currentTheme } = useTheme();
 
@@ -334,7 +334,7 @@ export function AnalyticsTab({
                             </div>
                         </div>
 
-                        {showAdvancedMetrics && (
+                        {showAdvancedMetrics ? (
                             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-primary/20">
                                 <div className="flex flex-col items-center text-center">
                                     <ThemedText className="mb-2" size="sm" variant="secondary">
@@ -365,7 +365,7 @@ export function AnalyticsTab({
                                     </ThemedText>
                                 </div>
                             </div>
-                        )}
+                        ) : null}
                     </div>
                 </ThemedCard>
             </ConditionalResponseTime>

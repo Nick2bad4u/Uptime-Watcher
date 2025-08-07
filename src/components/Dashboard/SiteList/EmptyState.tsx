@@ -21,7 +21,7 @@ import { ThemedBox, ThemedText } from "../../../theme/components";
  * }
  * ```
  */
-export function EmptyState(): JSX.Element {
+export const EmptyState = (): JSX.Element => {
     return (
         <ThemedBox className="text-center" padding="xl" surface="base">
             {/* empty-state-icon class provides styling from src/theme/components.css */}

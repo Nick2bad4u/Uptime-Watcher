@@ -16,9 +16,9 @@ import { StatusBadge } from "../../common/StatusBadge";
  */
 export interface SiteCardStatusProperties {
     /** ID of the currently selected monitor */
-    selectedMonitorId: string;
+    readonly selectedMonitorId: string;
     /** Current status of the monitor */
-    status: MonitorStatus;
+    readonly status: MonitorStatus;
 }
 
 /**

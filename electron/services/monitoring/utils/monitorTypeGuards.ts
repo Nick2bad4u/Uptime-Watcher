@@ -42,7 +42,7 @@ export function hasValidHost(monitor: Site["monitors"][0]): monitor is Site["mon
     // Allow hostnames that are either FQDNs or could be valid IPs/hostnames
     return (
         isNonEmptyString(monitor.host) &&
-        (isValidFQDN(monitor.host, { require_tld: false }) || /^[\w.-]+$/.test(monitor.host))
+        (isValidFQDN(monitor.host, { require_tld: false }) || /^[\w.\-]+$/v.test(monitor.host))
     );
 }
 

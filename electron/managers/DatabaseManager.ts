@@ -251,14 +251,17 @@ export class DatabaseManager {
      * @returns A promise resolving to a boolean indicating success.
      */
     public async importData(data: string): Promise<boolean> {
-        return withErrorHandling(
-            async () => {
-                const command = new ImportDataCommand(this.serviceFactory, this.eventEmitter, this.siteCache, data);
-                await this.commandExecutor.execute(command);
-                return true;
-            },
-            { logger: monitorLogger, operationName: "import data" }
-        ).catch(async (_error) => {
+        try {
+            await withErrorHandling(
+                async () => {
+                    const command = new ImportDataCommand(this.serviceFactory, this.eventEmitter, this.siteCache, data);
+                    await this.commandExecutor.execute(command);
+                    return true;
+                },
+                { logger: monitorLogger, operationName: "import data" }
+            );
+            return true;
+        } catch {
             // Emit typed data imported event with failure
             try {
                 await this.eventEmitter.emitTyped("internal:database:data-imported", {
@@ -272,7 +275,7 @@ export class DatabaseManager {
 
             // withErrorHandling already logged the error, so we just return false
             return false;
-        });
+        }
     }
 
     /**

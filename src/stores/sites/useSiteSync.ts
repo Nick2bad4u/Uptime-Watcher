@@ -275,9 +275,13 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
                     case "delete":
                     case "update": {
                         // For single site updates, trigger a full sync
-                        actions.syncSitesFromBackend().catch((error: unknown) => {
-                            logStoreAction("SitesStore", "error", { error });
-                        });
+                        void (async () => {
+                            try {
+                                await actions.syncSitesFromBackend();
+                            } catch (error: unknown) {
+                                logStoreAction("SitesStore", "error", { error });
+                            }
+                        })();
                         break;
                     }
                 }

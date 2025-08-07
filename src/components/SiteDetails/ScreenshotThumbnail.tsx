@@ -27,7 +27,7 @@ export interface ScreenshotThumbnailProperties {
     readonly url: string;
 }
 
-export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProperties): JSX.Element {
+export const ScreenshotThumbnail = ({ siteName, url }: ScreenshotThumbnailProperties): JSX.Element => {
     const [hovered, setHovered] = useState(false);
     const [overlayVariables, setOverlayVariables] = useState<React.CSSProperties>({});
     const linkReference = useRef<HTMLAnchorElement>(null);
@@ -186,24 +186,25 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProper
                 />
                 <span className="site-details-thumbnail-caption">Preview: {siteName}</span>
             </a>
-            {hovered &&
-                createPortal(
-                    <div
-                        className={`site-details-thumbnail-portal-overlay theme-${themeName}`}
-                        ref={portalReference}
-                        style={overlayVariables}
-                    >
-                        <div className="site-details-thumbnail-portal-img-wrapper">
-                            <img
-                                alt={`Large screenshot of ${siteName}`}
-                                className="site-details-thumbnail-img-portal"
-                                loading="lazy"
-                                src={screenshotUrl}
-                            />
-                        </div>
-                    </div>,
-                    document.body
-                )}
+            {hovered
+                ? createPortal(
+                      <div
+                          className={`site-details-thumbnail-portal-overlay theme-${themeName}`}
+                          ref={portalReference}
+                          style={overlayVariables}
+                      >
+                          <div className="site-details-thumbnail-portal-img-wrapper">
+                              <img
+                                  alt={`Large screenshot of ${siteName}`}
+                                  className="site-details-thumbnail-img-portal"
+                                  loading="lazy"
+                                  src={screenshotUrl}
+                              />
+                          </div>
+                      </div>,
+                      document.body
+                  )
+                : null}
         </>
     );
 }

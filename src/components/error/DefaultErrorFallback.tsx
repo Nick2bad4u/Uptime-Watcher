@@ -7,7 +7,10 @@ import type React from "react";
 /**
  * Default fallback component for error boundary
  */
-export const DefaultErrorFallback: React.FC<{ error?: Error; onRetry: () => void }> = ({ error, onRetry }) => (
+export const DefaultErrorFallback: React.FC<{ readonly error?: Error; readonly onRetry: () => void }> = ({
+    error,
+    onRetry,
+}) => (
     <div className="flex flex-col items-center justify-center p-8 border border-red-200 rounded-lg bg-red-50">
         <div className="mb-4 text-red-600">
             <h2 className="mb-2 text-lg font-semibold">Something went wrong</h2>

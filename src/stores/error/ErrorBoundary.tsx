@@ -23,23 +23,25 @@ import logger from "../../services/logger";
  * @public
  */
 export interface ErrorBoundaryProperties {
-    children: React.ReactNode;
-    fallback?: React.ComponentType<{ error?: Error; onRetry: () => void }>;
-    onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
+    readonly children: React.ReactNode;
+    readonly fallback?: React.ComponentType<{
+        error?: Error;
+        onRetry: () => void;
+    }>;
+    readonly onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
 }
 
 /**
  * State for the {@link ErrorBoundary} component.
  *
  * @remarks
- * Tracks error and error info for rendering fallback UI and debugging.
+ * Tracks error state for rendering fallback UI.
  * The retryCount is used to force re-mounting of children on retry.
  *
  * @public
  */
 export interface ErrorBoundaryState {
     error?: Error | undefined;
-    errorInfo?: React.ErrorInfo | undefined;
     hasError: boolean;
     retryCount: number;
 }
@@ -69,7 +71,12 @@ interface WrappedErrorBoundaryComponent<P extends object> {
  *
  * @public
  */
-export class ErrorBoundary extends React.Component<ErrorBoundaryProperties, ErrorBoundaryState> {
+// eslint-disable-next-line react/require-optimization -- ErrorBoundary should always re-render on error state changes
+export class ErrorBoundary extends React.Component<
+    ErrorBoundaryProperties,
+    ErrorBoundaryState
+> {
+    // eslint-disable-next-line react/sort-comp -- Constructor needs to be before lifecycle methods
     constructor(properties: ErrorBoundaryProperties) {
         super(properties);
         this.state = {
@@ -91,35 +98,37 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProperties, Erro
 
         this.setState({
             error,
-            errorInfo,
         });
 
         // Call the onError prop if provided
-        this.props.onError?.(error, errorInfo);
+        const { onError } = this.props;
+        onError?.(error, errorInfo);
     }
 
     handleRetry = (): void => {
         this.setState((prevState) => ({
             error: undefined,
-            errorInfo: undefined,
             hasError: false,
             retryCount: prevState.retryCount + 1,
         }));
     };
 
     override render(): JSX.Element {
-        if (this.state.hasError) {
-            const FallbackComponent = this.props.fallback ?? DefaultErrorFallback;
+        const { error, hasError, retryCount } = this.state;
+        const { children, fallback } = this.props;
+
+        if (hasError) {
+            const FallbackComponent = fallback ?? DefaultErrorFallback;
             return (
                 <FallbackComponent
-                    {...(this.state.error ? { error: this.state.error } : {})}
+                    {...(error ? { error } : {})}
                     onRetry={this.handleRetry}
                 />
             );
         }
 
         // Use retryCount as key to force remounting after retry
-        return <div key={this.state.retryCount}>{this.props.children}</div>;
+        return <div key={retryCount}>{children}</div>;
     }
 }
 

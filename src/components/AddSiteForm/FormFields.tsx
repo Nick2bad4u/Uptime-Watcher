@@ -55,17 +55,17 @@ const getAriaDescribedBy = (id: string, error?: string, helpText?: string): stri
  */
 export interface FormFieldProperties {
     /** Form input element(s) to wrap */
-    children: React.ReactNode;
+    readonly children: React.ReactNode;
     /** Error message to display */
-    error?: string;
+    readonly error?: string;
     /** Help text to show below the field */
-    helpText?: string;
+    readonly helpText?: string;
     /** Unique ID for the form field */
-    id: string;
+    readonly id: string;
     /** Label text to display */
-    label: string;
+    readonly label: string;
     /** Whether the field is required */
-    required?: boolean;
+    readonly required?: boolean;
 }
 
 /**
@@ -90,24 +90,24 @@ export const FormField: React.NamedExoticComponent<FormFieldProperties> = React.
         <div>
             <label className="block mb-1" htmlFor={id}>
                 <ThemedText size="sm" variant="secondary" weight="medium">
-                    {label} {required && "*"}
+                    {label} {required ? "*" : null}
                 </ThemedText>
             </label>
             {children}
-            {error && (
+            {error ? (
                 <div id={`${id}-error`}>
                     <ThemedText className="mt-1" size="xs" variant="error">
                         {error}
                     </ThemedText>
                 </div>
-            )}
-            {helpText && !error && (
+            ) : null}
+            {helpText && !error ? (
                 <div id={`${id}-help`}>
                     <ThemedText className="mt-1" size="xs" variant="tertiary">
                         {helpText}
                     </ThemedText>
                 </div>
-            )}
+            ) : null}
         </div>
     );
 });
@@ -117,29 +117,29 @@ export const FormField: React.NamedExoticComponent<FormFieldProperties> = React.
  */
 export interface TextFieldProperties {
     /** Whether the field is disabled */
-    disabled?: boolean;
+    readonly disabled?: boolean;
     /** Error message to display */
-    error?: string;
+    readonly error?: string;
     /** Help text to show below the field */
-    helpText?: string;
+    readonly helpText?: string;
     /** Unique ID for the input field */
-    id: string;
+    readonly id: string;
     /** Label text to display */
-    label: string;
+    readonly label: string;
     /** Maximum value for number inputs */
-    max?: number;
+    readonly max?: number;
     /** Minimum value for number inputs */
-    min?: number;
+    readonly min?: number;
     /** Callback when value changes */
-    onChange: (value: string) => void;
+    readonly onChange: (value: string) => void;
     /** Placeholder text for the input */
-    placeholder?: string;
+    readonly placeholder?: string;
     /** Whether the field is required */
-    required?: boolean;
+    readonly required?: boolean;
     /** Input type (text, url, or number) */
-    type?: "number" | "text" | "url";
+    readonly type?: "number" | "text" | "url";
     /** Current field value */
-    value: string;
+    readonly value: string;
 }
 
 /**
@@ -211,25 +211,25 @@ export const TextField: React.NamedExoticComponent<TextFieldProperties> = React.
  */
 export interface SelectFieldProperties {
     /** Whether the field is disabled */
-    disabled?: boolean;
+    readonly disabled?: boolean;
     /** Error message to display */
-    error?: string;
+    readonly error?: string;
     /** Help text to show below the field */
-    helpText?: string;
+    readonly helpText?: string;
     /** Unique ID for the select field */
-    id: string;
+    readonly id: string;
     /** Label text to display */
-    label: string;
+    readonly label: string;
     /** Callback when selection changes */
-    onChange: (value: string) => void;
+    readonly onChange: (value: string) => void;
     /** Array of options to display in dropdown */
-    options: SelectOption[];
+    readonly options: SelectOption[];
     /** Placeholder text for empty selection */
-    placeholder?: string;
+    readonly placeholder?: string;
     /** Whether the field is required */
-    required?: boolean;
+    readonly required?: boolean;
     /** Current selected value */
-    value: number | string;
+    readonly value: number | string;
 }
 
 /**
@@ -295,7 +295,7 @@ export const SelectField: React.NamedExoticComponent<SelectFieldProperties> = Re
                 title={createAriaLabel(label, required)}
                 value={value}
             >
-                {placeholder && <option value="">{placeholder}</option>}
+                {placeholder ? <option value="">{placeholder}</option> : null}
                 {options.map((option) => (
                     <option key={option.value} value={option.value}>
                         {option.label}
@@ -311,25 +311,25 @@ export const SelectField: React.NamedExoticComponent<SelectFieldProperties> = Re
  */
 export interface RadioGroupProperties {
     /** Whether the radio group is disabled */
-    disabled?: boolean;
+    readonly disabled?: boolean;
     /** Error message to display */
-    error?: string;
+    readonly error?: string;
     /** Help text to show below the field */
-    helpText?: string;
+    readonly helpText?: string;
     /** Unique ID for the radio group */
-    id: string;
+    readonly id: string;
     /** Label text to display */
-    label: string;
+    readonly label: string;
     /** Name attribute for radio inputs (should be unique) */
-    name: string;
+    readonly name: string;
     /** Callback when selection changes */
-    onChange: (value: string) => void;
+    readonly onChange: (value: string) => void;
     /** Array of radio options to display */
-    options: RadioOption[];
+    readonly options: RadioOption[];
     /** Whether a selection is required */
-    required?: boolean;
+    readonly required?: boolean;
     /** Currently selected value */
-    value: string;
+    readonly value: string;
 }
 
 /**

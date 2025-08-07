@@ -6,6 +6,13 @@
 import "@testing-library/jest-dom";
 import { vi, type Mock } from "vitest";
 
+// Mock ResizeObserver for Chart.js testing
+global.ResizeObserver = vi.fn().mockImplementation(() => ({
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn(),
+}));
+
 // Global test configuration and mocks
 const mockElectronAPI: {
     data: {

@@ -95,17 +95,19 @@ export async function performPingCheckWithRetry(
         });
     }
 
-    return withOperationalHooks(async () => performSinglePingCheck(host, timeout), {
-        initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
-        maxRetries,
-        operationName: "ping-check",
-    }).catch((error) =>
-        handlePingCheckError(error, {
+    try {
+        return await withOperationalHooks(async () => performSinglePingCheck(host, timeout), {
+            initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
+            maxRetries,
+            operationName: "ping-check",
+        });
+    } catch (error) {
+        return handlePingCheckError(error, {
             host,
             maxRetries,
             timeout,
-        })
-    );
+        });
+    }
 }
 
 /**

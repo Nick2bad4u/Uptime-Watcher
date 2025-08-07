@@ -14,13 +14,13 @@ import { MetricCard } from "./components/MetricCard";
  */
 export interface SiteCardMetricsProperties {
     /** Total number of checks performed */
-    checkCount: number;
+    readonly checkCount: number;
     /** Average response time in milliseconds */
-    responseTime?: number;
+    readonly responseTime?: number;
     /** Current status of the site */
-    status: string;
+    readonly status: string;
     /** Uptime percentage (0-100) */
-    uptime: number;
+    readonly uptime: number;
 }
 
 /**

@@ -44,35 +44,23 @@ export interface ErrorHandlingFrontendStore {
  */
 
 /**
- * Handle async operations with frontend store integration.
+ * Handle async operations with frontend store or backend context integration.
  *
  * @typeParam T - The return type of the async operation
  * @param operation - Async operation to execute with error handling
- * @param store - Frontend store with error and loading state management
+ * @param storeOrContext - Either frontend store with error/loading state management or backend context with logger
  * @returns Promise resolving to operation result
  *
  * @remarks
- * Automatically manages loading state and error state in the provided store.
- * Clears error state before operation, sets loading during execution,
- * and handles error state on failure while preserving the original error.
- */
-export async function withErrorHandling<T>(operation: () => Promise<T>, store: ErrorHandlingFrontendStore): Promise<T>;
-
-/**
- * Handle async operations with backend logging integration.
- *
- * @typeParam T - The return type of the async operation
- * @param operation - Async operation to execute with error handling
- * @param context - Backend context with logger and optional operation name
- * @returns Promise resolving to operation result
- *
- * @remarks
- * Logs operation failures using the provided logger with contextual information.
- * Preserves original error for upstream handling while ensuring proper logging.
+ * - For frontend stores: Automatically manages loading state and error state in the provided store.
+ *   Clears error state before operation, sets loading during execution,
+ *   and handles error state on failure while preserving the original error.
+ * - For backend contexts: Logs operation failures using the provided logger with contextual information.
+ *   Preserves original error for upstream handling while ensuring proper logging.
  */
 export async function withErrorHandling<T>(
     operation: () => Promise<T>,
-    context: ErrorHandlingBackendContext
+    storeOrContext: ErrorHandlingBackendContext | ErrorHandlingFrontendStore
 ): Promise<T>;
 
 /**

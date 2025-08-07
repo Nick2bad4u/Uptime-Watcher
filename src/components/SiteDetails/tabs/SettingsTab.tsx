@@ -90,7 +90,7 @@ export interface SettingsTabProperties {
  * @param props - Component props containing site data and handlers
  * @returns JSX element displaying settings interface
  */
-export function SettingsTab({
+export const SettingsTab = ({
     currentSite,
     handleIntervalChange,
     handleRemoveSite,
@@ -111,7 +111,7 @@ export function SettingsTab({
     selectedMonitor,
     setLocalName,
     timeoutChanged,
-}: SettingsTabProperties): JSX.Element {
+}: SettingsTabProperties): JSX.Element => {
     const { currentTheme } = useTheme();
 
     // Icon colors configuration
@@ -201,11 +201,11 @@ export function SettingsTab({
                                 Save
                             </ThemedButton>
                         </div>
-                        {hasUnsavedChanges && (
+                        {hasUnsavedChanges ? (
                             <ThemedBadge size="sm" variant="warning">
                                 ⚠️ Unsaved changes
                             </ThemedBadge>
-                        )}
+                        ) : null}
                     </div>
 
                     {/* Site Identifier */}

@@ -6,6 +6,7 @@
 import type { MonitorFieldDefinition } from "@shared/types";
 
 import { CacheKeys } from "../../shared/utils/cacheKeys";
+// eslint-disable-next-line import-x/no-unassigned-import -- Global type declarations
 import "../types"; // Import global type declarations
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { AppCaches } from "./cache";
@@ -129,7 +130,7 @@ export async function getMonitorTypeConfig(type: string): Promise<MonitorTypeCon
  * This format is suitable for use with form select components and dropdown menus.
  * The options are derived from all available monitor types from the backend.
  */
-export async function getMonitorTypeOptions(): Promise<{ label: string; value: string }[]> {
+export async function getMonitorTypeOptions(): Promise<Array<{ label: string; value: string }>> {
     const configs = await getAvailableMonitorTypes();
     return configs.map((config) => ({
         label: config.displayName,

@@ -18,6 +18,14 @@ import type {
     PortMonitorSchemaType,
     SiteSchemaType,
 } from "../types/schemaTypes";
+/**
+ * Result object returned by validation functions.
+ *
+ * @remarks
+ * Contains the validated data (if successful), errors, warnings, and metadata.
+ */
+// Import from unified validation system
+import type { ValidationResult } from "../types/validation";
 
 /**
  * Validation constraints for monitor fields.
@@ -237,15 +245,6 @@ export type PortMonitor = z.infer<typeof portMonitorSchema>;
  * @see {@link siteSchema}
  */
 export type Site = z.infer<typeof siteSchema>;
-
-/**
- * Result object returned by validation functions.
- *
- * @remarks
- * Contains the validated data (if successful), errors, warnings, and metadata.
- */
-// Import from unified validation system
-import type { ValidationResult } from "../types/validation";
 
 // Re-export ValidationResult for consumers of this module
 export type { ValidationResult } from "../types/validation";

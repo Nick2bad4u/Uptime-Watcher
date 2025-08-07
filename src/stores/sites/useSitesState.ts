@@ -68,8 +68,10 @@ export const createSitesStateActions = (
             // Remove the monitor selection for the removed site
             const currentMonitorIds = state.selectedMonitorIds;
 
-            // eslint-disable-next-line sonarjs/no-unused-vars
-            const { [identifier]: _, ...remainingMonitorIds } = currentMonitorIds;
+            // Filter out the monitor selection for the removed site
+            const remainingMonitorIds = Object.fromEntries(
+                Object.entries(currentMonitorIds).filter(([key]) => key !== identifier)
+            );
             return {
                 selectedMonitorIds: remainingMonitorIds,
                 selectedSiteId: state.selectedSiteId === identifier ? undefined : state.selectedSiteId,

@@ -23,6 +23,8 @@ import {
     Tooltip,
 } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
+// Side-effect import for Chart.js date adapter
+// eslint-disable-next-line import-x/no-unassigned-import
 import "chartjs-adapter-date-fns";
 
 // Register all required Chart.js components centrally

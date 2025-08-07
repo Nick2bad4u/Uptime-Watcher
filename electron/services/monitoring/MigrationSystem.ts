@@ -423,7 +423,8 @@ class MigrationRegistry {
         }
 
         // Basic semantic version validation: x.y.z where x, y, z are non-negative integers
-        const versionPattern = /^\d+\.\d+\.\d+(?:-[\da-z-]+)?(?:\+[\da-z-]+)?$/i;
+        // eslint-disable-next-line security/detect-unsafe-regex, regexp/require-unicode-sets-regexp -- Simple semver pattern, safe for our use case
+        const versionPattern = /^\d+\.\d+\.\d+(?:-[\da-z\-]+)?(?:\+[\da-z\-]+)?$/i;
         if (!versionPattern.test(version)) {
             throw new Error(
                 `${parameterName} "${version}" is not a valid semantic version. Expected format: x.y.z (e.g., "1.0.0")`

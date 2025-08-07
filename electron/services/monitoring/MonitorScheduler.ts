@@ -206,9 +206,13 @@ export class MonitorScheduler {
 
         // Perform immediate check when starting (without waiting for interval)
         if (this.onCheckCallback) {
-            this.performImmediateCheck(siteIdentifier, monitor.id).catch((error) => {
-                logger.error(`[MonitorScheduler] Error during immediate check for ${intervalKey}`, error);
-            });
+            void (async () => {
+                try {
+                    await this.performImmediateCheck(siteIdentifier, monitor.id);
+                } catch (error) {
+                    logger.error(`[MonitorScheduler] Error during immediate check for ${intervalKey}`, error);
+                }
+            })();
         }
 
         if (isDev()) {

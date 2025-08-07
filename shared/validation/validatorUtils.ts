@@ -90,6 +90,7 @@ export function isValidIdentifier(value: unknown): value is string {
     }
 
     // Allow alphanumeric characters, hyphens, and underscores
+    // eslint-disable-next-line regexp/require-unicode-sets-regexp -- Character class not compatible with 'v' flag
     return validator.isAlphanumeric(value.replaceAll(/[_-]/g, ""));
 }
 

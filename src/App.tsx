@@ -3,6 +3,8 @@
  * Manages global state, modals, notifications, and renders the main application layout.
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import { useCallback, useEffect, useState } from "react";
 
 import type { StatusUpdate } from "./types";
@@ -14,6 +16,18 @@ import { Header } from "./components/Header/Header";
 import { Settings } from "./components/Settings/Settings";
 import { SiteDetails } from "./components/SiteDetails/SiteDetails";
 import { UI_DELAYS } from "./constants";
+import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
+import { useSelectedSite } from "./hooks/useSelectedSite";
+import logger from "./services/logger";
+import { ErrorBoundary } from "./stores/error/ErrorBoundary";
+import { useErrorStore } from "./stores/error/useErrorStore";
+import { useSettingsStore } from "./stores/settings/useSettingsStore";
+import { useSitesStore } from "./stores/sites/useSitesStore";
+import { useUIStore } from "./stores/ui/useUiStore";
+import { useUpdatesStore } from "./stores/updates/useUpdatesStore";
+import { ThemedBox, ThemedButton, ThemedText, ThemeProvider } from "./theme/components";
+import { useTheme } from "./theme/useTheme";
+import { setupCacheSync } from "./utils/cacheSync";
 
 // UI Message constants for consistency and future localization
 const UI_MESSAGES = {
@@ -27,20 +41,6 @@ const UI_MESSAGES = {
     UPDATE_ERROR_FALLBACK: "Update failed.",
     UPDATE_RESTART_BUTTON: "Restart Now",
 } as const;
-import type { JSX } from "react/jsx-runtime";
-
-import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
-import { useSelectedSite } from "./hooks/useSelectedSite";
-import logger from "./services/logger";
-import { ErrorBoundary } from "./stores/error/ErrorBoundary";
-import { useErrorStore } from "./stores/error/useErrorStore";
-import { useSettingsStore } from "./stores/settings/useSettingsStore";
-import { useSitesStore } from "./stores/sites/useSitesStore";
-import { useUIStore } from "./stores/ui/useUiStore";
-import { useUpdatesStore } from "./stores/updates/useUpdatesStore";
-import { ThemedBox, ThemedButton, ThemedText, ThemeProvider } from "./theme/components";
-import { useTheme } from "./theme/useTheme";
-import { setupCacheSync } from "./utils/cacheSync";
 
 /**
  * Main application component that serves as the root of the Uptime Watcher app.
@@ -75,7 +75,7 @@ import { setupCacheSync } from "./utils/cacheSync";
  *
  * @returns The main App component JSX
  */
-function App(): JSX.Element {
+const App = (): JSX.Element => {
     // Error store
     const { clearError, isLoading, lastError } = useErrorStore();
 
@@ -198,7 +198,7 @@ function App(): JSX.Element {
             <ThemeProvider>
                 <div className={`app-container ${isDark ? "dark" : ""}`}>
                     {/* Global Loading Overlay */}
-                    {showLoadingOverlay && (
+                    {showLoadingOverlay ? (
                         <output aria-label="Loading application" aria-live="polite" className="loading-overlay">
                             <ThemedBox padding="lg" rounded="lg" shadow="xl" surface="elevated">
                                 <div className="loading-content">
@@ -209,10 +209,10 @@ function App(): JSX.Element {
                                 </div>
                             </ThemedBox>
                         </output>
-                    )}
+                    ) : null}
 
                     {/* Global Error Notification */}
-                    {lastError && (
+                    {lastError ? (
                         <div aria-live="assertive" className="fixed top-0 left-0 right-0 z-50" role="alert">
                             <ThemedBox className="error-alert" padding="md" surface="elevated">
                                 <div className="flex items-center justify-between">
@@ -233,7 +233,7 @@ function App(): JSX.Element {
                                 </div>
                             </ThemedBox>
                         </div>
-                    )}
+                    ) : null}
 
                     {/* Update Notification */}
                     {(updateStatus === "available" ||
@@ -320,12 +320,12 @@ function App(): JSX.Element {
                     <AddSiteModal />
 
                     {/* Settings Modal */}
-                    {showSettings && <Settings onClose={handleCloseSettings} />}
+                    {showSettings ? <Settings onClose={handleCloseSettings} /> : null}
 
                     {/* Site Details Modal */}
-                    {showSiteDetails && selectedSite && (
+                    {showSiteDetails && selectedSite ? (
                         <SiteDetails onClose={handleCloseSiteDetails} site={selectedSite} />
-                    )}
+                    ) : null}
                 </div>
             </ThemeProvider>
         </ErrorBoundary>

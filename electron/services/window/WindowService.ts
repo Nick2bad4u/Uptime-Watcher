@@ -235,13 +235,19 @@ export class WindowService {
             void this.loadDevelopmentContent();
         } else {
             logger.debug("[WindowService] Production mode: loading from dist");
-            this.mainWindow.loadFile(path.join(currentDirectory, "../dist/index.html")).catch((error) => {
-                logger.error("[WindowService] Failed to load production file", {
-                    error: error instanceof Error ? error.message : String(error),
-                    filePath: path.join(currentDirectory, "../dist/index.html"),
-                    windowState: this.mainWindow?.isDestroyed() ? "destroyed" : "active",
-                });
-            });
+            void (async () => {
+                try {
+                    if (this.mainWindow) {
+                        await this.mainWindow.loadFile(path.join(currentDirectory, "../dist/index.html"));
+                    }
+                } catch (error) {
+                    logger.error("[WindowService] Failed to load production file", {
+                        error: error instanceof Error ? error.message : String(error),
+                        filePath: path.join(currentDirectory, "../dist/index.html"),
+                        windowState: this.mainWindow?.isDestroyed() ? "destroyed" : "active",
+                    });
+                }
+            })();
         }
     }
 
@@ -389,7 +395,7 @@ export class WindowService {
             if (attempt < MAX_RETRIES - 1) {
                 // Don't wait after the last attempt
                 // Calculate exponential backoff delay with jitter
-                const exponentialDelay = Math.min(BASE_DELAY * Math.pow(2, attempt), MAX_DELAY);
+                const exponentialDelay = Math.min(BASE_DELAY * 2 ** attempt, MAX_DELAY);
                 // Using crypto for better randomness would be overkill for jitter - Math.random is sufficient
                 // eslint-disable-next-line sonarjs/pseudo-random -- dev only
                 const jitter = Math.random() * 200; // Add up to 200ms jitter

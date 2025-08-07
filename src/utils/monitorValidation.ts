@@ -7,9 +7,6 @@ import type { Monitor, MonitorType } from "@shared/types";
 import type { HttpFormData, MonitorFormData, PingFormData, PortFormData } from "@shared/types/formData";
 import type { ValidationResult } from "@shared/types/validation";
 
-// Re-export ValidationResult for convenience
-export type { ValidationResult } from "@shared/types/validation";
-
 // Import shared validation functions for client-side validation
 import {
     validateMonitorData as sharedValidateMonitorData,
@@ -19,15 +16,16 @@ import {
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { withUtilityErrorHandling } from "./errorHandling";
 
+// Re-export ValidationResult for convenience
+export type { ValidationResult } from "@shared/types/validation";
+
 /**
  * Required fields for monitor creation, ensuring type safety.
  * Prevents runtime errors by guaranteeing essential properties are present.
  */
 export interface MonitorCreationData
-    extends Pick<Monitor, "history" | "monitoring" | "responseTime" | "retryAttempts" | "status" | "timeout" | "type"> {
-    /** Additional fields provided during creation */
-    [key: string]: unknown;
-}
+    extends Pick<Monitor, "history" | "monitoring" | "responseTime" | "retryAttempts" | "status" | "timeout" | "type">,
+        Record<string, unknown> {}
 
 /**
  * Create monitor object with proper field mapping and type safety.
