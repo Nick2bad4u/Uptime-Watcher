@@ -157,7 +157,12 @@ export class ChartConfigService {
                     callbacks: {
                         label: (context) => {
                             const percentage =
-                                totalChecks > 0 ? ((context.parsed / totalChecks) * 100).toFixed(1) : "0";
+                                totalChecks > 0
+                                    ? (
+                                          (context.parsed / totalChecks) *
+                                          100
+                                      ).toFixed(1)
+                                    : "0";
                             return `${context.label}: ${context.parsed} (${percentage}%)`;
                         },
                     },
@@ -247,7 +252,9 @@ export class ChartConfigService {
                     labels: {
                         color: this.theme.colors.text.primary,
                         font: {
-                            family: this.theme.typography.fontFamily.sans.join(", "),
+                            family: this.theme.typography.fontFamily.sans.join(
+                                ", "
+                            ),
                             size: 12,
                         },
                     },
@@ -325,7 +332,10 @@ export class ChartConfigService {
  * <Line data={timeSeriesData} options={lineChartOptions} />
  * ```
  */
-export function createChartConfigs(theme: Theme, totalChecks = 0): ChartConfigs {
+export function createChartConfigs(
+    theme: Theme,
+    totalChecks = 0
+): ChartConfigs {
     const chartService = new ChartConfigService(theme);
 
     return {

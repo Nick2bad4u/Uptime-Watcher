@@ -85,7 +85,9 @@ export class WindowService {
      */
     constructor() {
         if (isDev()) {
-            logger.debug("[WindowService] Created WindowService in development mode");
+            logger.debug(
+                "[WindowService] Created WindowService in development mode"
+            );
         }
     }
 
@@ -171,7 +173,9 @@ export class WindowService {
             logger.debug(`[WindowService] Sending to renderer: ${channel}`);
             this.mainWindow?.webContents.send(channel, data);
         } else {
-            logger.warn(`[WindowService] Cannot send to renderer (no main window): ${channel}`);
+            logger.warn(
+                `[WindowService] Cannot send to renderer (no main window): ${channel}`
+            );
         }
     }
 
@@ -223,12 +227,16 @@ export class WindowService {
      */
     private loadContent(): void {
         if (!this.mainWindow) {
-            logger.error("[WindowService] Cannot load content: main window not initialized");
+            logger.error(
+                "[WindowService] Cannot load content: main window not initialized"
+            );
             return;
         }
 
         if (isDev()) {
-            logger.debug("[WindowService] Development mode: waiting for Vite dev server");
+            logger.debug(
+                "[WindowService] Development mode: waiting for Vite dev server"
+            );
             logger.debug("[WindowService] NODE_ENV:", getNodeEnv());
             // Load from Vite dev server
             // Wait for Vite server before loading content
@@ -238,14 +246,27 @@ export class WindowService {
             void (async () => {
                 try {
                     if (this.mainWindow) {
-                        await this.mainWindow.loadFile(path.join(currentDirectory, "../dist/index.html"));
+                        await this.mainWindow.loadFile(
+                            path.join(currentDirectory, "../dist/index.html")
+                        );
                     }
                 } catch (error) {
-                    logger.error("[WindowService] Failed to load production file", {
-                        error: error instanceof Error ? error.message : String(error),
-                        filePath: path.join(currentDirectory, "../dist/index.html"),
-                        windowState: this.mainWindow?.isDestroyed() ? "destroyed" : "active",
-                    });
+                    logger.error(
+                        "[WindowService] Failed to load production file",
+                        {
+                            error:
+                                error instanceof Error
+                                    ? error.message
+                                    : String(error),
+                            filePath: path.join(
+                                currentDirectory,
+                                "../dist/index.html"
+                            ),
+                            windowState: this.mainWindow?.isDestroyed()
+                                ? "destroyed"
+                                : "active",
+                        }
+                    );
                 }
             })();
         }
@@ -284,10 +305,14 @@ export class WindowService {
             await this.waitForViteServer();
 
             if (!this.mainWindow || this.mainWindow.isDestroyed()) {
-                throw new Error("Main window was destroyed while waiting for Vite server");
+                throw new Error(
+                    "Main window was destroyed while waiting for Vite server"
+                );
             }
 
-            await this.mainWindow.loadURL(WindowService.VITE_SERVER_CONFIG.SERVER_URL);
+            await this.mainWindow.loadURL(
+                WindowService.VITE_SERVER_CONFIG.SERVER_URL
+            );
 
             // Delay opening DevTools to ensure renderer is ready
             setTimeout(() => {
@@ -296,8 +321,13 @@ export class WindowService {
                         this.mainWindow.webContents.openDevTools();
                     } catch (error) {
                         logger.warn("[WindowService] Failed to open DevTools", {
-                            error: error instanceof Error ? error.message : String(error),
-                            windowState: this.mainWindow.isDestroyed() ? "destroyed" : "active",
+                            error:
+                                error instanceof Error
+                                    ? error.message
+                                    : String(error),
+                            windowState: this.mainWindow.isDestroyed()
+                                ? "destroyed"
+                                : "active",
                         });
                     }
                 }
@@ -307,10 +337,15 @@ export class WindowService {
                 environment: getNodeEnv(),
                 error: error instanceof Error ? error.message : String(error),
                 serverUrl: WindowService.VITE_SERVER_CONFIG.SERVER_URL,
-                windowState: this.mainWindow?.isDestroyed() ? "destroyed" : "active",
+                windowState: this.mainWindow?.isDestroyed()
+                    ? "destroyed"
+                    : "active",
             };
 
-            logger.error("[WindowService] Failed to load development content", errorContext);
+            logger.error(
+                "[WindowService] Failed to load development content",
+                errorContext
+            );
             throw error; // Re-throw to allow caller to handle
         }
     }
@@ -338,9 +373,14 @@ export class WindowService {
             logger.debug("[WindowService] Renderer finished loading");
         });
 
-        this.mainWindow.webContents.on("did-fail-load", (_event, errorCode, errorDescription) => {
-            logger.error(`[WindowService] Failed to load renderer: ${errorCode} - ${errorDescription}`);
-        });
+        this.mainWindow.webContents.on(
+            "did-fail-load",
+            (_event, errorCode, errorDescription) => {
+                logger.error(
+                    `[WindowService] Failed to load renderer: ${errorCode} - ${errorDescription}`
+                );
+            }
+        );
 
         this.mainWindow.on("closed", () => {
             logger.info("[WindowService] Main window closed");
@@ -365,13 +405,22 @@ export class WindowService {
      * being patient for slower startup scenarios.
      */
     private async waitForViteServer(): Promise<void> {
-        const { BASE_DELAY, FETCH_TIMEOUT, MAX_DELAY, MAX_RETRIES, SERVER_URL } = WindowService.VITE_SERVER_CONFIG;
+        const {
+            BASE_DELAY,
+            FETCH_TIMEOUT,
+            MAX_DELAY,
+            MAX_RETRIES,
+            SERVER_URL,
+        } = WindowService.VITE_SERVER_CONFIG;
 
         for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
             try {
                 // Create AbortController for fetch timeout
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+                const timeoutId = setTimeout(
+                    () => controller.abort(),
+                    FETCH_TIMEOUT
+                );
 
                 const response = await fetch(SERVER_URL, {
                     signal: controller.signal,
@@ -385,7 +434,10 @@ export class WindowService {
                 }
             } catch (error) {
                 // Log only significant errors or last attempt
-                if (attempt === MAX_RETRIES - 1 || !(error instanceof Error && error.name === "AbortError")) {
+                if (
+                    attempt === MAX_RETRIES - 1 ||
+                    !(error instanceof Error && error.name === "AbortError")
+                ) {
                     logger.debug(
                         `[WindowService] Vite server not ready (attempt ${attempt + 1}/${MAX_RETRIES}): ${error instanceof Error ? error.message : "Unknown error"}`
                     );
@@ -395,7 +447,10 @@ export class WindowService {
             if (attempt < MAX_RETRIES - 1) {
                 // Don't wait after the last attempt
                 // Calculate exponential backoff delay with jitter
-                const exponentialDelay = Math.min(BASE_DELAY * 2 ** attempt, MAX_DELAY);
+                const exponentialDelay = Math.min(
+                    BASE_DELAY * 2 ** attempt,
+                    MAX_DELAY
+                );
                 // Using crypto for better randomness would be overkill for jitter - Math.random is sufficient
                 // eslint-disable-next-line sonarjs/pseudo-random -- dev only
                 const jitter = Math.random() * 200; // Add up to 200ms jitter
@@ -408,6 +463,8 @@ export class WindowService {
             }
         }
 
-        throw new Error(`Vite dev server did not become available after ${MAX_RETRIES} attempts`);
+        throw new Error(
+            `Vite dev server did not become available after ${MAX_RETRIES} attempts`
+        );
     }
 }

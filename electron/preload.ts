@@ -65,7 +65,8 @@ const siteAPI = {
      * @param identifier - Unique site identifier
      * @returns Promise resolving when site is completely removed
      */
-    removeSite: (identifier: string) => ipcRenderer.invoke("remove-site", identifier),
+    removeSite: (identifier: string) =>
+        ipcRenderer.invoke("remove-site", identifier),
 
     /**
      * Update site properties (name, monitoring status, etc.).
@@ -74,7 +75,8 @@ const siteAPI = {
      * @param updates - Partial site object with properties to update
      * @returns Promise resolving when update is complete
      */
-    updateSite: (identifier: string, updates: Partial<Site>) => ipcRenderer.invoke("update-site", identifier, updates),
+    updateSite: (identifier: string, updates: Partial<Site>) =>
+        ipcRenderer.invoke("update-site", identifier, updates),
 };
 
 /**
@@ -141,8 +143,14 @@ const dataAPI = {
      * // Save blob as file with fileName
      * ```
      */
-    downloadSQLiteBackup: async (): Promise<{ buffer: ArrayBuffer; fileName: string }> => {
-        return ipcRenderer.invoke("download-sqlite-backup") as Promise<{ buffer: ArrayBuffer; fileName: string }>;
+    downloadSQLiteBackup: async (): Promise<{
+        buffer: ArrayBuffer;
+        fileName: string;
+    }> => {
+        return ipcRenderer.invoke("download-sqlite-backup") as Promise<{
+            buffer: ArrayBuffer;
+            fileName: string;
+        }>;
     },
 
     /**
@@ -199,7 +207,8 @@ const settingsAPI = {
      * This operation will immediately prune history records that exceed the new limit
      * across all monitors to free up storage space.
      */
-    updateHistoryLimit: (limit: number) => ipcRenderer.invoke("update-history-limit", limit),
+    updateHistoryLimit: (limit: number) =>
+        ipcRenderer.invoke("update-history-limit", limit),
 };
 
 /**
@@ -234,8 +243,13 @@ const eventsAPI = {
      * cleanup();
      * ```
      */
-    onCacheInvalidated: (callback: (data: CacheInvalidatedEventData) => void) => {
-        const handler = (_: Electron.IpcRendererEvent, data: CacheInvalidatedEventData) => {
+    onCacheInvalidated: (
+        callback: (data: CacheInvalidatedEventData) => void
+    ) => {
+        const handler = (
+            _: Electron.IpcRendererEvent,
+            data: CacheInvalidatedEventData
+        ) => {
             callback(data);
         };
         ipcRenderer.on("cache:invalidated", handler);
@@ -252,7 +266,10 @@ const eventsAPI = {
      * Called when a monitor detects a failure.
      */
     onMonitorDown: (callback: (data: MonitorDownEventData) => void) => {
-        const handler = (_: Electron.IpcRendererEvent, data: MonitorDownEventData) => {
+        const handler = (
+            _: Electron.IpcRendererEvent,
+            data: MonitorDownEventData
+        ) => {
             callback(data);
         };
         ipcRenderer.on("monitor:down", handler);
@@ -268,8 +285,13 @@ const eventsAPI = {
      * @remarks
      * Called when a monitor begins actively monitoring a site.
      */
-    onMonitoringStarted: (callback: (data: MonitoringControlEventData) => void) => {
-        const handler = (_: Electron.IpcRendererEvent, data: MonitoringControlEventData) => {
+    onMonitoringStarted: (
+        callback: (data: MonitoringControlEventData) => void
+    ) => {
+        const handler = (
+            _: Electron.IpcRendererEvent,
+            data: MonitoringControlEventData
+        ) => {
             callback(data);
         };
         ipcRenderer.on("monitoring:started", handler);
@@ -285,8 +307,13 @@ const eventsAPI = {
      * @remarks
      * Called when a monitor stops actively monitoring a site.
      */
-    onMonitoringStopped: (callback: (data: MonitoringControlEventData) => void) => {
-        const handler = (_: Electron.IpcRendererEvent, data: MonitoringControlEventData) => {
+    onMonitoringStopped: (
+        callback: (data: MonitoringControlEventData) => void
+    ) => {
+        const handler = (
+            _: Electron.IpcRendererEvent,
+            data: MonitoringControlEventData
+        ) => {
             callback(data);
         };
         ipcRenderer.on("monitoring:stopped", handler);
@@ -308,7 +335,8 @@ const eventsAPI = {
             callback(data);
         };
         ipcRenderer.on("monitor:status-changed", handler);
-        return () => ipcRenderer.removeListener("monitor:status-changed", handler);
+        return () =>
+            ipcRenderer.removeListener("monitor:status-changed", handler);
     },
 
     /**
@@ -321,7 +349,10 @@ const eventsAPI = {
      * Called when a monitor recovers from a down state.
      */
     onMonitorUp: (callback: (data: MonitorUpEventData) => void) => {
-        const handler = (_: Electron.IpcRendererEvent, data: MonitorUpEventData) => {
+        const handler = (
+            _: Electron.IpcRendererEvent,
+            data: MonitorUpEventData
+        ) => {
             callback(data);
         };
         ipcRenderer.on("monitor:up", handler);
@@ -355,7 +386,10 @@ const eventsAPI = {
      * Receives events about application updates (checking, downloading, ready to install).
      */
     onUpdateStatus: (callback: (data: UpdateStatusEventData) => void) => {
-        const handler = (_: Electron.IpcRendererEvent, data: UpdateStatusEventData) => {
+        const handler = (
+            _: Electron.IpcRendererEvent,
+            data: UpdateStatusEventData
+        ) => {
             callback(data);
         };
         ipcRenderer.on("update-status", handler);
@@ -441,7 +475,10 @@ const stateSyncAPI = {
             timestamp?: number;
         }) => void
     ) => {
-        const handler = (_event: Electron.IpcRendererEvent, eventData: Parameters<typeof callback>[0]) => {
+        const handler = (
+            _event: Electron.IpcRendererEvent,
+            eventData: Parameters<typeof callback>[0]
+        ) => {
             callback(eventData);
         };
         ipcRenderer.on("state-sync-event", handler);
@@ -453,7 +490,8 @@ const stateSyncAPI = {
      *
      * @returns Promise resolving when sync is complete
      */
-    requestFullSync: (): Promise<{ siteCount: number; success: boolean }> => ipcRenderer.invoke("request-full-sync"),
+    requestFullSync: (): Promise<{ siteCount: number; success: boolean }> =>
+        ipcRenderer.invoke("request-full-sync"),
 };
 
 /**
@@ -471,7 +509,8 @@ const monitorTypesAPI = {
      * @param details - Detail value to format
      * @returns Promise resolving to formatted detail string
      */
-    formatMonitorDetail: (type: string, details: string) => ipcRenderer.invoke("format-monitor-detail", type, details),
+    formatMonitorDetail: (type: string, details: string) =>
+        ipcRenderer.invoke("format-monitor-detail", type, details),
 
     /**
      * Format monitor title suffix using backend registry.
@@ -480,8 +519,10 @@ const monitorTypesAPI = {
      * @param monitor - Monitor data
      * @returns Promise resolving to formatted title suffix
      */
-    formatMonitorTitleSuffix: (type: string, monitor: import("../shared/types").Monitor) =>
-        ipcRenderer.invoke("format-monitor-title-suffix", type, monitor),
+    formatMonitorTitleSuffix: (
+        type: string,
+        monitor: import("../shared/types").Monitor
+    ) => ipcRenderer.invoke("format-monitor-title-suffix", type, monitor),
 
     /**
      * Get all available monitor types from backend registry.
@@ -497,7 +538,8 @@ const monitorTypesAPI = {
      * @param data - Monitor data to validate
      * @returns Promise resolving to validation result
      */
-    validateMonitorData: (type: string, data: unknown) => ipcRenderer.invoke("validate-monitor-data", type, data),
+    validateMonitorData: (type: string, data: unknown) =>
+        ipcRenderer.invoke("validate-monitor-data", type, data),
 };
 
 /**

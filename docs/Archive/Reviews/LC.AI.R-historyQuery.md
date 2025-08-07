@@ -136,7 +136,10 @@ catch (error) {
 Include parameter validation for robustness:
 
 ```typescript
-export function findHistoryByMonitorId(db: Database, monitorId: string): StatusHistory[] {
+export function findHistoryByMonitorId(
+ db: Database,
+ monitorId: string
+): StatusHistory[] {
  if (!monitorId || typeof monitorId !== "string") {
   throw new Error("[HistoryQuery] monitorId must be a non-empty string");
  }

@@ -118,7 +118,10 @@ export interface ValidationResult extends BaseValidationResult {
  *
  * @public
  */
-export function createFailureResult(errors: string[], metadata?: ValidationMetadata): ValidationResult {
+export function createFailureResult(
+    errors: string[],
+    metadata?: ValidationMetadata
+): ValidationResult {
     return {
         errors,
         metadata: metadata ?? {},
@@ -136,7 +139,10 @@ export function createFailureResult(errors: string[], metadata?: ValidationMetad
  *
  * @public
  */
-export function createSuccessResult(data?: unknown, warnings?: string[]): ValidationResult {
+export function createSuccessResult(
+    data?: unknown,
+    warnings?: string[]
+): ValidationResult {
     const result: ValidationResult = {
         data,
         errors: [],
@@ -159,7 +165,9 @@ export function createSuccessResult(data?: unknown, warnings?: string[]): Valida
  *
  * @public
  */
-export function isValidationResult(result: unknown): result is BaseValidationResult {
+export function isValidationResult(
+    result: unknown
+): result is BaseValidationResult {
     return (
         typeof result === "object" &&
         result !== null &&

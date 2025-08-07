@@ -3,7 +3,11 @@
  * Centralizes the logic for converting between seconds (UI) and milliseconds (backend).
  */
 
-import { DEFAULT_REQUEST_TIMEOUT_SECONDS, TIMEOUT_CONSTRAINTS, TIMEOUT_CONSTRAINTS_MS } from "../constants";
+import {
+    DEFAULT_REQUEST_TIMEOUT_SECONDS,
+    TIMEOUT_CONSTRAINTS,
+    TIMEOUT_CONSTRAINTS_MS,
+} from "../constants";
 
 /**
  * Clamp timeout to valid range in milliseconds.
@@ -11,7 +15,10 @@ import { DEFAULT_REQUEST_TIMEOUT_SECONDS, TIMEOUT_CONSTRAINTS, TIMEOUT_CONSTRAIN
  * @returns Clamped timeout in milliseconds
  */
 export function clampTimeoutMs(timeoutMs: number): number {
-    return Math.max(TIMEOUT_CONSTRAINTS_MS.MIN, Math.min(TIMEOUT_CONSTRAINTS_MS.MAX, timeoutMs));
+    return Math.max(
+        TIMEOUT_CONSTRAINTS_MS.MIN,
+        Math.min(TIMEOUT_CONSTRAINTS_MS.MAX, timeoutMs)
+    );
 }
 
 /**
@@ -20,7 +27,10 @@ export function clampTimeoutMs(timeoutMs: number): number {
  * @returns Clamped timeout in seconds
  */
 export function clampTimeoutSeconds(timeoutSeconds: number): number {
-    return Math.max(TIMEOUT_CONSTRAINTS.MIN, Math.min(TIMEOUT_CONSTRAINTS.MAX, timeoutSeconds));
+    return Math.max(
+        TIMEOUT_CONSTRAINTS.MIN,
+        Math.min(TIMEOUT_CONSTRAINTS.MAX, timeoutSeconds)
+    );
 }
 
 /**
@@ -29,7 +39,9 @@ export function clampTimeoutSeconds(timeoutSeconds: number): number {
  * @returns Timeout in seconds
  */
 export function getTimeoutSeconds(monitorTimeout?: number): number {
-    return monitorTimeout ? timeoutMsToSeconds(monitorTimeout) : DEFAULT_REQUEST_TIMEOUT_SECONDS;
+    return monitorTimeout
+        ? timeoutMsToSeconds(monitorTimeout)
+        : DEFAULT_REQUEST_TIMEOUT_SECONDS;
 }
 
 /**
@@ -38,7 +50,10 @@ export function getTimeoutSeconds(monitorTimeout?: number): number {
  * @returns True if valid, false otherwise
  */
 export function isValidTimeoutMs(timeoutMs: number): boolean {
-    return timeoutMs >= TIMEOUT_CONSTRAINTS_MS.MIN && timeoutMs <= TIMEOUT_CONSTRAINTS_MS.MAX;
+    return (
+        timeoutMs >= TIMEOUT_CONSTRAINTS_MS.MIN &&
+        timeoutMs <= TIMEOUT_CONSTRAINTS_MS.MAX
+    );
 }
 
 /**
@@ -47,7 +62,10 @@ export function isValidTimeoutMs(timeoutMs: number): boolean {
  * @returns True if valid, false otherwise
  */
 export function isValidTimeoutSeconds(timeoutSeconds: number): boolean {
-    return timeoutSeconds >= TIMEOUT_CONSTRAINTS.MIN && timeoutSeconds <= TIMEOUT_CONSTRAINTS.MAX;
+    return (
+        timeoutSeconds >= TIMEOUT_CONSTRAINTS.MIN &&
+        timeoutSeconds <= TIMEOUT_CONSTRAINTS.MAX
+    );
 }
 
 /**

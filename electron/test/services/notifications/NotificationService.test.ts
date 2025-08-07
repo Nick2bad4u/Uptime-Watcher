@@ -6,7 +6,10 @@
 import { Notification } from "electron";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
-import { NotificationService, NotificationConfig } from "../../../services/notifications/NotificationService";
+import {
+    NotificationService,
+    NotificationConfig,
+} from "../../../services/notifications/NotificationService";
 import { Site } from "../../../types";
 
 // Mock Electron modules
@@ -115,7 +118,10 @@ describe("NotificationService", () => {
         });
 
         it("should handle missing monitor gracefully", () => {
-            notificationService.notifyMonitorDown(mockSite, "non-existent-monitor");
+            notificationService.notifyMonitorDown(
+                mockSite,
+                "non-existent-monitor"
+            );
 
             expect(Notification).not.toHaveBeenCalled();
             expect(mockNotification.show).not.toHaveBeenCalled();
@@ -126,7 +132,9 @@ describe("NotificationService", () => {
 
             expect(Notification).not.toHaveBeenCalled();
             expect(mockNotification.show).not.toHaveBeenCalled();
-            expect(logger.error).toHaveBeenCalledWith("[NotificationService] Cannot notify down: monitorId is invalid");
+            expect(logger.error).toHaveBeenCalledWith(
+                "[NotificationService] Cannot notify down: monitorId is invalid"
+            );
         });
 
         it("should handle unsupported notifications gracefully", () => {
@@ -135,7 +143,9 @@ describe("NotificationService", () => {
             notificationService.notifyMonitorDown(mockSite, "monitor-1");
 
             expect(Notification).not.toHaveBeenCalled();
-            expect(logger.warn).toHaveBeenCalledWith("Notifications not supported on this platform");
+            expect(logger.warn).toHaveBeenCalledWith(
+                "Notifications not supported on this platform"
+            );
         });
     });
 
@@ -181,7 +191,10 @@ describe("NotificationService", () => {
         });
 
         it("should handle missing monitor gracefully", () => {
-            notificationService.notifyMonitorUp(mockSite, "non-existent-monitor");
+            notificationService.notifyMonitorUp(
+                mockSite,
+                "non-existent-monitor"
+            );
 
             expect(Notification).not.toHaveBeenCalled();
             expect(mockNotification.show).not.toHaveBeenCalled();
@@ -193,7 +206,9 @@ describe("NotificationService", () => {
             notificationService.notifyMonitorUp(mockSite, "monitor-1");
 
             expect(Notification).not.toHaveBeenCalled();
-            expect(logger.warn).toHaveBeenCalledWith("Notifications not supported on this platform");
+            expect(logger.warn).toHaveBeenCalledWith(
+                "Notifications not supported on this platform"
+            );
         });
     });
 

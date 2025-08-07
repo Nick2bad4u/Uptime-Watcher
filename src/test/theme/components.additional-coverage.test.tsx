@@ -7,7 +7,13 @@ import { render } from "@testing-library/react";
 import { vi } from "vitest";
 import "@testing-library/jest-dom";
 
-import { StatusIndicator, ThemedBadge, ThemedInput, ThemedProgress, ThemedSelect } from "../../theme/components";
+import {
+    StatusIndicator,
+    ThemedBadge,
+    ThemedInput,
+    ThemedProgress,
+    ThemedSelect,
+} from "../../theme/components";
 
 // Mock theme hooks with factory function to avoid hoisting issues
 vi.mock("../../theme/useTheme", () => ({
@@ -130,28 +136,36 @@ describe("Theme Components - Missing Coverage", () => {
         it("should render with default props", () => {
             render(<StatusIndicator status="up" />);
 
-            const indicator = document.querySelector(".themed-status-indicator");
+            const indicator = document.querySelector(
+                ".themed-status-indicator"
+            );
             expect(indicator).toBeInTheDocument();
         });
 
         it("should render with custom className", () => {
             render(<StatusIndicator status="down" className="custom-class" />);
 
-            const indicator = document.querySelector(".themed-status-indicator");
+            const indicator = document.querySelector(
+                ".themed-status-indicator"
+            );
             expect(indicator).toHaveClass("custom-class");
         });
 
         it("should render without text by default", () => {
             render(<StatusIndicator status="up" />);
 
-            const text = document.querySelector(".themed-status-indicator__text");
+            const text = document.querySelector(
+                ".themed-status-indicator__text"
+            );
             expect(text).not.toBeInTheDocument();
         });
 
         it("should render with text when showText is true", () => {
             render(<StatusIndicator status="up" showText />);
 
-            const text = document.querySelector(".themed-status-indicator__text");
+            const text = document.querySelector(
+                ".themed-status-indicator__text"
+            );
             expect(text).toBeInTheDocument();
             expect(text).toHaveTextContent("Up");
         });
@@ -160,9 +174,15 @@ describe("Theme Components - Missing Coverage", () => {
             const statuses = ["up", "down", "pending", "paused"] as const;
 
             statuses.forEach((status) => {
-                const { unmount } = render(<StatusIndicator status={status} showText />);
-                const text = document.querySelector(".themed-status-indicator__text");
-                expect(text).toHaveTextContent(status.charAt(0).toUpperCase() + status.slice(1));
+                const { unmount } = render(
+                    <StatusIndicator status={status} showText />
+                );
+                const text = document.querySelector(
+                    ".themed-status-indicator__text"
+                );
+                expect(text).toHaveTextContent(
+                    status.charAt(0).toUpperCase() + status.slice(1)
+                );
                 unmount();
             });
         });
@@ -170,8 +190,12 @@ describe("Theme Components - Missing Coverage", () => {
         it("should show text and status together", () => {
             render(<StatusIndicator status="pending" showText />);
 
-            const indicator = document.querySelector(".themed-status-indicator");
-            const text = document.querySelector(".themed-status-indicator__text");
+            const indicator = document.querySelector(
+                ".themed-status-indicator"
+            );
+            const text = document.querySelector(
+                ".themed-status-indicator__text"
+            );
 
             expect(indicator).toBeInTheDocument();
             expect(text).toBeInTheDocument();
@@ -182,8 +206,12 @@ describe("Theme Components - Missing Coverage", () => {
             const sizes = ["sm", "md", "lg"] as const;
 
             sizes.forEach((size) => {
-                const { unmount } = render(<StatusIndicator status="up" size={size} />);
-                const indicator = document.querySelector(".themed-status-indicator");
+                const { unmount } = render(
+                    <StatusIndicator status="up" size={size} />
+                );
+                const indicator = document.querySelector(
+                    ".themed-status-indicator"
+                );
                 expect(indicator).toBeInTheDocument();
                 unmount();
             });
@@ -194,7 +222,9 @@ describe("Theme Components - Missing Coverage", () => {
         it("should handle empty string className", () => {
             render(<StatusIndicator status="up" className="" />);
 
-            const indicator = document.querySelector(".themed-status-indicator");
+            const indicator = document.querySelector(
+                ".themed-status-indicator"
+            );
             expect(indicator).toBeInTheDocument();
         });
     });
@@ -204,7 +234,9 @@ describe("Theme Components - Missing Coverage", () => {
             const sizes = ["xs", "sm", "md", "lg"] as const;
 
             sizes.forEach((size) => {
-                const { unmount } = render(<ThemedBadge size={size}>Test Badge</ThemedBadge>);
+                const { unmount } = render(
+                    <ThemedBadge size={size}>Test Badge</ThemedBadge>
+                );
                 const badge = document.querySelector(".themed-badge");
                 expect(badge).toBeInTheDocument();
                 unmount();
@@ -222,7 +254,9 @@ describe("Theme Components - Missing Coverage", () => {
             ] as const;
 
             variants.forEach((variant) => {
-                const { unmount } = render(<ThemedBadge variant={variant}>Test Badge</ThemedBadge>);
+                const { unmount } = render(
+                    <ThemedBadge variant={variant}>Test Badge</ThemedBadge>
+                );
                 const badge = document.querySelector(".themed-badge");
                 expect(badge).toBeInTheDocument();
                 unmount();

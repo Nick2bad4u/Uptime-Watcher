@@ -43,7 +43,10 @@
  * @packageDocumentation
  */
 
-import { interpolateLogTemplate, LOG_TEMPLATES } from "../../shared/utils/logTemplates";
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "../../shared/utils/logTemplates";
 import { UptimeEvents } from "../events/eventTypes";
 import { TypedEventBus } from "../events/TypedEventBus";
 import { DatabaseService } from "../services/database/DatabaseService";
@@ -89,14 +92,20 @@ export interface IMonitoringOperations {
      * @param monitorId - The monitor ID to start monitoring for.
      * @returns A promise that resolves to true if monitoring started, false otherwise.
      */
-    startMonitoringForSite: (identifier: string, monitorId: string) => Promise<boolean>;
+    startMonitoringForSite: (
+        identifier: string,
+        monitorId: string
+    ) => Promise<boolean>;
     /**
      * Stop monitoring for a specific site and monitor.
      * @param identifier - The site identifier.
      * @param monitorId - The monitor ID to stop monitoring for.
      * @returns A promise that resolves to true if monitoring stopped, false otherwise.
      */
-    stopMonitoringForSite: (identifier: string, monitorId: string) => Promise<boolean>;
+    stopMonitoringForSite: (
+        identifier: string,
+        monitorId: string
+    ) => Promise<boolean>;
 }
 
 /**
@@ -289,7 +298,10 @@ export class SiteManager {
                         timestamp: Date.now(),
                     });
                 } catch (error) {
-                    logger.debug(LOG_TEMPLATES.debug.SITE_CACHE_MISS_ERROR, error);
+                    logger.debug(
+                        LOG_TEMPLATES.debug.SITE_CACHE_MISS_ERROR,
+                        error
+                    );
                 }
             })();
 
@@ -298,7 +310,10 @@ export class SiteManager {
                 try {
                     await this.loadSiteInBackground(identifier);
                 } catch (error) {
-                    logger.debug(LOG_TEMPLATES.debug.SITE_LOADING_ERROR_IGNORED, error);
+                    logger.debug(
+                        LOG_TEMPLATES.debug.SITE_LOADING_ERROR_IGNORED,
+                        error
+                    );
                 }
             })();
         }
@@ -372,13 +387,20 @@ export class SiteManager {
     public async initialize(): Promise<void> {
         try {
             logger.info(LOG_TEMPLATES.services.SITE_MANAGER_LOADING_CACHE);
-            const sites = await this.siteRepositoryService.getSitesFromDatabase();
+            const sites =
+                await this.siteRepositoryService.getSitesFromDatabase();
             await this.updateSitesCache(sites);
             logger.info(
-                interpolateLogTemplate(LOG_TEMPLATES.services.SITE_MANAGER_INITIALIZED, { count: sites.length })
+                interpolateLogTemplate(
+                    LOG_TEMPLATES.services.SITE_MANAGER_INITIALIZED,
+                    { count: sites.length }
+                )
             );
         } catch (error) {
-            logger.error(LOG_TEMPLATES.errors.SITE_INITIALIZATION_FAILED, error);
+            logger.error(
+                LOG_TEMPLATES.errors.SITE_INITIALIZATION_FAILED,
+                error
+            );
             throw error;
         }
     }
@@ -395,14 +417,18 @@ export class SiteManager {
      * const success = await siteManager.removeMonitor("site_123", "monitor_456");
      * ```
      */
-    public async removeMonitor(siteIdentifier: string, monitorId: string): Promise<boolean> {
+    public async removeMonitor(
+        siteIdentifier: string,
+        monitorId: string
+    ): Promise<boolean> {
         try {
             // Remove the monitor from the database using transaction
             const success = await this.executeMonitorDeletion(monitorId);
 
             if (success) {
                 // Refresh the cache by getting all sites (to ensure proper site structure)
-                const allSites = await this.siteRepositoryService.getSitesFromDatabase();
+                const allSites =
+                    await this.siteRepositoryService.getSitesFromDatabase();
 
                 // Update cache
                 await this.updateSitesCache(allSites);
@@ -420,18 +446,24 @@ export class SiteManager {
                     });
 
                     // Emit sync event for state consistency
-                    await this.eventEmitter.emitTyped("sites:state-synchronized", {
-                        action: "update" as const,
-                        siteIdentifier: siteIdentifier,
-                        source: "database" as const,
-                        timestamp: Date.now(),
-                    });
+                    await this.eventEmitter.emitTyped(
+                        "sites:state-synchronized",
+                        {
+                            action: "update" as const,
+                            siteIdentifier: siteIdentifier,
+                            source: "database" as const,
+                            timestamp: Date.now(),
+                        }
+                    );
 
                     logger.info(
-                        interpolateLogTemplate(LOG_TEMPLATES.services.MONITOR_REMOVED_FROM_SITE, {
-                            monitorId,
-                            siteIdentifier,
-                        })
+                        interpolateLogTemplate(
+                            LOG_TEMPLATES.services.MONITOR_REMOVED_FROM_SITE,
+                            {
+                                monitorId,
+                                siteIdentifier,
+                            }
+                        )
                     );
                 }
             }
@@ -439,7 +471,10 @@ export class SiteManager {
             return success;
         } catch (error) {
             logger.error(
-                interpolateLogTemplate(LOG_TEMPLATES.errors.SITE_MONITOR_REMOVAL_FAILED, { monitorId, siteIdentifier }),
+                interpolateLogTemplate(
+                    LOG_TEMPLATES.errors.SITE_MONITOR_REMOVAL_FAILED,
+                    { monitorId, siteIdentifier }
+                ),
                 error
             );
             throw error;
@@ -462,7 +497,10 @@ export class SiteManager {
         const siteToRemove = this.sitesCache.get(identifier);
         const siteName = siteToRemove?.name ?? "Unknown";
 
-        const result = await this.siteWriterService.deleteSite(this.sitesCache, identifier);
+        const result = await this.siteWriterService.deleteSite(
+            this.sitesCache,
+            identifier
+        );
 
         if (result) {
             // Emit typed site removed event with accurate site name
@@ -497,7 +535,10 @@ export class SiteManager {
      * const updatedSite = await siteManager.updateSite("site_123", { name: "New Name" });
      * ```
      */
-    public async updateSite(identifier: string, updates: Partial<Site>): Promise<Site> {
+    public async updateSite(
+        identifier: string,
+        updates: Partial<Site>
+    ): Promise<Site> {
         // Get original site before update for monitoring comparison
         const originalSite = this.sitesCache.get(identifier);
         if (!originalSite) {
@@ -515,7 +556,11 @@ export class SiteManager {
         const monitoringConfig = this.createMonitoringConfig();
 
         // Perform the update using SiteWriterService directly
-        const updatedSite = await this.siteWriterService.updateSite(this.sitesCache, identifier, updates);
+        const updatedSite = await this.siteWriterService.updateSite(
+            this.sitesCache,
+            identifier,
+            updates
+        );
 
         // Handle monitoring changes if monitors were updated (replaces orchestrator logic)
         if (updates.monitors) {
@@ -527,21 +572,30 @@ export class SiteManager {
             );
 
             // Detect and setup new monitors to ensure consistency with new site behavior
-            const newMonitorIds = this.siteWriterService.detectNewMonitors(originalSite.monitors, updates.monitors);
+            const newMonitorIds = this.siteWriterService.detectNewMonitors(
+                originalSite.monitors,
+                updates.monitors
+            );
             if (newMonitorIds.length > 0) {
-                await monitoringConfig.setupNewMonitors(updatedSite, newMonitorIds);
+                await monitoringConfig.setupNewMonitors(
+                    updatedSite,
+                    newMonitorIds
+                );
             }
         }
 
         // Refresh the entire cache from database to ensure we have the latest monitor IDs
         // This is especially important when monitors are added/updated
-        const freshSites = await this.siteRepositoryService.getSitesFromDatabase();
+        const freshSites =
+            await this.siteRepositoryService.getSitesFromDatabase();
         await this.updateSitesCache(freshSites);
 
         // Get the refreshed site for the event
         const refreshedSite = this.sitesCache.get(identifier);
         if (!refreshedSite) {
-            throw new Error(`Site with identifier ${identifier} not found in cache after refresh`);
+            throw new Error(
+                `Site with identifier ${identifier} not found in cache after refresh`
+            );
         }
 
         // Emit typed site updated event
@@ -620,7 +674,9 @@ export class SiteManager {
         return {
             setHistoryLimit: (limit: number) => {
                 if (!this.monitoringOperations) {
-                    throw new Error("MonitoringOperations not available but required for setHistoryLimit");
+                    throw new Error(
+                        "MonitoringOperations not available but required for setHistoryLimit"
+                    );
                 }
                 const operations = this.monitoringOperations;
                 // Execute but don't await the promise
@@ -628,27 +684,45 @@ export class SiteManager {
                     try {
                         await operations.setHistoryLimit(limit);
                     } catch (error) {
-                        logger.error(LOG_TEMPLATES.errors.SITE_HISTORY_LIMIT_FAILED, error);
+                        logger.error(
+                            LOG_TEMPLATES.errors.SITE_HISTORY_LIMIT_FAILED,
+                            error
+                        );
                     }
                 })();
             },
             setupNewMonitors: async (site: Site, newMonitorIds: string[]) => {
                 if (!this.monitoringOperations) {
-                    throw new Error("MonitoringOperations not available but required for setupNewMonitors");
+                    throw new Error(
+                        "MonitoringOperations not available but required for setupNewMonitors"
+                    );
                 }
-                await this.monitoringOperations.setupNewMonitors(site, newMonitorIds);
+                await this.monitoringOperations.setupNewMonitors(
+                    site,
+                    newMonitorIds
+                );
             },
             startMonitoring: async (identifier: string, monitorId: string) => {
                 if (!this.monitoringOperations) {
-                    throw new Error("MonitoringOperations not available but required for startMonitoring");
+                    throw new Error(
+                        "MonitoringOperations not available but required for startMonitoring"
+                    );
                 }
-                return this.monitoringOperations.startMonitoringForSite(identifier, monitorId);
+                return this.monitoringOperations.startMonitoringForSite(
+                    identifier,
+                    monitorId
+                );
             },
             stopMonitoring: async (identifier: string, monitorId: string) => {
                 if (!this.monitoringOperations) {
-                    throw new Error("MonitoringOperations not available but required for stopMonitoring");
+                    throw new Error(
+                        "MonitoringOperations not available but required for stopMonitoring"
+                    );
                 }
-                return this.monitoringOperations.stopMonitoringForSite(identifier, monitorId);
+                return this.monitoringOperations.stopMonitoringForSite(
+                    identifier,
+                    monitorId
+                );
             },
         };
     }
@@ -703,9 +777,15 @@ export class SiteManager {
      */
     private async loadSiteInBackground(identifier: string): Promise<void> {
         try {
-            logger.debug(interpolateLogTemplate(LOG_TEMPLATES.debug.BACKGROUND_LOAD_START, { identifier }));
+            logger.debug(
+                interpolateLogTemplate(
+                    LOG_TEMPLATES.debug.BACKGROUND_LOAD_START,
+                    { identifier }
+                )
+            );
 
-            const sites = await this.siteRepositoryService.getSitesFromDatabase();
+            const sites =
+                await this.siteRepositoryService.getSitesFromDatabase();
             const site = sites.find((s) => s.identifier === identifier);
 
             if (site) {
@@ -717,9 +797,19 @@ export class SiteManager {
                     timestamp: Date.now(),
                 });
 
-                logger.debug(interpolateLogTemplate(LOG_TEMPLATES.debug.BACKGROUND_LOAD_COMPLETE, { identifier }));
+                logger.debug(
+                    interpolateLogTemplate(
+                        LOG_TEMPLATES.debug.BACKGROUND_LOAD_COMPLETE,
+                        { identifier }
+                    )
+                );
             } else {
-                logger.debug(interpolateLogTemplate(LOG_TEMPLATES.debug.SITE_BACKGROUND_LOAD_FAILED, { identifier }));
+                logger.debug(
+                    interpolateLogTemplate(
+                        LOG_TEMPLATES.debug.SITE_BACKGROUND_LOAD_FAILED,
+                        { identifier }
+                    )
+                );
 
                 // Emit not found event for observability
                 await this.eventEmitter.emitTyped("site:cache-miss", {
@@ -732,7 +822,10 @@ export class SiteManager {
         } catch (error) {
             // Emit error event for observability while maintaining non-blocking behavior
             logger.debug(
-                interpolateLogTemplate(LOG_TEMPLATES.errors.SITE_BACKGROUND_LOAD_FAILED, { identifier }),
+                interpolateLogTemplate(
+                    LOG_TEMPLATES.errors.SITE_BACKGROUND_LOAD_FAILED,
+                    { identifier }
+                ),
                 error
             );
 
@@ -745,7 +838,10 @@ export class SiteManager {
                 });
             } catch (emitError) {
                 // Even emit failures shouldn't crash background operations
-                logger.debug(LOG_TEMPLATES.errors.SITE_BACKGROUND_LOAD_EMIT_ERROR, emitError);
+                logger.debug(
+                    LOG_TEMPLATES.errors.SITE_BACKGROUND_LOAD_EMIT_ERROR,
+                    emitError
+                );
             }
         }
     }
@@ -762,7 +858,8 @@ export class SiteManager {
      * @internal
      */
     private async validateSite(site: Site): Promise<void> {
-        const validationResult = await this.configurationManager.validateSiteConfiguration(site);
+        const validationResult =
+            await this.configurationManager.validateSiteConfiguration(site);
 
         if (!validationResult.success) {
             throw new Error(

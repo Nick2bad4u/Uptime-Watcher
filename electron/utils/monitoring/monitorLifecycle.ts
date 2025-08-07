@@ -37,7 +37,10 @@ import { withDatabaseOperation } from "../operationalHooks";
  * operations (when monitorId is undefined). Error handling should be managed
  * within the callback implementation.
  */
-export type MonitoringCallback = (identifier: string, monitorId?: string) => Promise<boolean>;
+export type MonitoringCallback = (
+    identifier: string,
+    monitorId?: string
+) => Promise<boolean>;
 
 /**
  * Configuration object for monitoring lifecycle functions.
@@ -56,7 +59,11 @@ export interface MonitoringLifecycleConfig {
     /** Cache containing site data with associated monitors */
     sites: StandardizedCache<Site>;
     /** Service for site operations and cache management */
-    siteService?: { findByIdentifierWithDetails: (identifier: string) => Promise<Site | undefined> };
+    siteService?: {
+        findByIdentifierWithDetails: (
+            identifier: string
+        ) => Promise<Site | undefined>;
+    };
 }
 
 /**
@@ -76,13 +83,18 @@ export interface MonitoringLifecycleConfig {
  * initialized for monitoring startup, providing a clear signal that the system
  * is transitioning to an active monitoring state.
  */
-export async function startAllMonitoring(config: MonitoringLifecycleConfig, isMonitoring: boolean): Promise<boolean> {
+export async function startAllMonitoring(
+    config: MonitoringLifecycleConfig,
+    isMonitoring: boolean
+): Promise<boolean> {
     if (isMonitoring) {
         config.logger.debug("Monitoring already running");
         return isMonitoring;
     }
 
-    config.logger.info(`Starting monitoring with ${config.sites.size} sites (per-site intervals)`);
+    config.logger.info(
+        `Starting monitoring with ${config.sites.size} sites (per-site intervals)`
+    );
 
     // Set all monitors to pending status and enable monitoring
     // Note: Intentionally sets all monitors to "pending" regardless of previous state
@@ -96,10 +108,14 @@ export async function startAllMonitoring(config: MonitoringLifecycleConfig, isMo
                         () => {
                             const db = config.databaseService.getDatabase();
                             if (monitor.id) {
-                                config.monitorRepository.updateInternal(db, monitor.id, {
-                                    monitoring: true,
-                                    status: MONITOR_STATUS.PENDING,
-                                });
+                                config.monitorRepository.updateInternal(
+                                    db,
+                                    monitor.id,
+                                    {
+                                        monitoring: true,
+                                        status: MONITOR_STATUS.PENDING,
+                                    }
+                                );
                             }
                             return Promise.resolve();
                         },
@@ -118,7 +134,9 @@ export async function startAllMonitoring(config: MonitoringLifecycleConfig, isMo
         config.monitorScheduler.startSite(site);
     }
 
-    config.logger.info(`Started all monitoring operations and set monitors to ${MONITOR_STATUS.PENDING}`);
+    config.logger.info(
+        `Started all monitoring operations and set monitors to ${MONITOR_STATUS.PENDING}`
+    );
     return true;
 }
 
@@ -164,7 +182,9 @@ export async function startMonitoringForSite(
  * has been stopped system-wide, providing a clear signal that the system is
  * transitioning to an inactive monitoring state.
  */
-export async function stopAllMonitoring(config: MonitoringLifecycleConfig): Promise<boolean> {
+export async function stopAllMonitoring(
+    config: MonitoringLifecycleConfig
+): Promise<boolean> {
     config.monitorScheduler.stopAll();
 
     // Set all monitors to paused status
@@ -180,13 +200,20 @@ export async function stopAllMonitoring(config: MonitoringLifecycleConfig): Prom
                             const db = config.databaseService.getDatabase();
                             if (monitor.id) {
                                 // Update monitor status to paused
-                                config.monitorRepository.updateInternal(db, monitor.id, {
-                                    monitoring: false,
-                                    status: MONITOR_STATUS.PAUSED,
-                                });
+                                config.monitorRepository.updateInternal(
+                                    db,
+                                    monitor.id,
+                                    {
+                                        monitoring: false,
+                                        status: MONITOR_STATUS.PAUSED,
+                                    }
+                                );
 
                                 // Clear active operations when stopping monitoring
-                                config.monitorRepository.clearActiveOperationsInternal(db, monitor.id);
+                                config.monitorRepository.clearActiveOperationsInternal(
+                                    db,
+                                    monitor.id
+                                );
                             }
                             return Promise.resolve();
                         },
@@ -204,7 +231,9 @@ export async function stopAllMonitoring(config: MonitoringLifecycleConfig): Prom
         }
     }
 
-    config.logger.info(`Stopped all site monitoring intervals and set monitors to ${MONITOR_STATUS.PAUSED}`);
+    config.logger.info(
+        `Stopped all site monitoring intervals and set monitors to ${MONITOR_STATUS.PAUSED}`
+    );
     return false;
 }
 
@@ -225,7 +254,9 @@ export async function stopMonitoringForSite(
 ): Promise<boolean> {
     const site = config.sites.get(identifier);
     if (!site) {
-        config.logger.warn(`Site not found for stopping monitoring: ${identifier}`);
+        config.logger.warn(
+            `Site not found for stopping monitoring: ${identifier}`
+        );
         return false;
     }
 
@@ -298,7 +329,10 @@ async function processAllSiteMonitors(
                 results.push(result);
             } catch (error) {
                 // Log error but continue processing other monitors
-                config.logger.error(`Failed to process monitor ${monitor.id}:`, error);
+                config.logger.error(
+                    `Failed to process monitor ${monitor.id}:`,
+                    error
+                );
                 results.push(false);
             }
         }
@@ -354,7 +388,10 @@ async function startSpecificMonitor(
                 });
 
                 // Clear any stale active operations when starting monitoring
-                config.monitorRepository.clearActiveOperationsInternal(db, monitorId);
+                config.monitorRepository.clearActiveOperationsInternal(
+                    db,
+                    monitorId
+                );
 
                 return Promise.resolve();
             },
@@ -366,18 +403,29 @@ async function startSpecificMonitor(
         // Refresh the site cache to ensure the scheduler gets updated monitor state
         if (config.siteService) {
             try {
-                const freshSiteData = await config.siteService.findByIdentifierWithDetails(identifier);
+                const freshSiteData =
+                    await config.siteService.findByIdentifierWithDetails(
+                        identifier
+                    );
                 if (freshSiteData) {
                     config.sites.set(identifier, freshSiteData);
-                    config.logger.debug(`Refreshed site cache for ${identifier} after monitor start`);
+                    config.logger.debug(
+                        `Refreshed site cache for ${identifier} after monitor start`
+                    );
                 }
             } catch (error) {
-                config.logger.warn(`Failed to refresh site cache for ${identifier}`, error);
+                config.logger.warn(
+                    `Failed to refresh site cache for ${identifier}`,
+                    error
+                );
                 // Continue anyway - the scheduler might still work with stale data
             }
         }
 
-        const started = config.monitorScheduler.startMonitor(identifier, monitor);
+        const started = config.monitorScheduler.startMonitor(
+            identifier,
+            monitor
+        );
         if (started) {
             config.logger.debug(
                 `Started monitoring for ${identifier}:${monitorId} - status set to ${MONITOR_STATUS.PENDING}`
@@ -385,7 +433,10 @@ async function startSpecificMonitor(
         }
         return started;
     } catch (error) {
-        config.logger.error(`Failed to start monitoring for ${identifier}:${monitorId}`, error);
+        config.logger.error(
+            `Failed to start monitoring for ${identifier}:${monitorId}`,
+            error
+        );
         return false;
     }
 }
@@ -429,7 +480,10 @@ async function stopSpecificMonitor(
                 });
 
                 // Clear active operations as part of stopping monitor
-                config.monitorRepository.clearActiveOperationsInternal(db, monitorId);
+                config.monitorRepository.clearActiveOperationsInternal(
+                    db,
+                    monitorId
+                );
 
                 return Promise.resolve();
             },
@@ -441,18 +495,29 @@ async function stopSpecificMonitor(
         // Refresh the site cache to ensure updated monitor state is reflected
         if (config.siteService) {
             try {
-                const freshSiteData = await config.siteService.findByIdentifierWithDetails(identifier);
+                const freshSiteData =
+                    await config.siteService.findByIdentifierWithDetails(
+                        identifier
+                    );
                 if (freshSiteData) {
                     config.sites.set(identifier, freshSiteData);
-                    config.logger.debug(`Refreshed site cache for ${identifier} after monitor stop`);
+                    config.logger.debug(
+                        `Refreshed site cache for ${identifier} after monitor stop`
+                    );
                 }
             } catch (error) {
-                config.logger.warn(`Failed to refresh site cache for ${identifier}`, error);
+                config.logger.warn(
+                    `Failed to refresh site cache for ${identifier}`,
+                    error
+                );
                 // Continue anyway - the stop operation should still work
             }
         }
 
-        const stopped = config.monitorScheduler.stopMonitor(identifier, monitorId);
+        const stopped = config.monitorScheduler.stopMonitor(
+            identifier,
+            monitorId
+        );
         if (stopped) {
             config.logger.debug(
                 `Stopped monitoring for ${identifier}:${monitorId} - status set to ${MONITOR_STATUS.PAUSED}`
@@ -460,7 +525,10 @@ async function stopSpecificMonitor(
         }
         return stopped;
     } catch (error) {
-        config.logger.error(`Failed to stop monitoring for ${identifier}:${monitorId}`, error);
+        config.logger.error(
+            `Failed to stop monitoring for ${identifier}:${monitorId}`,
+            error
+        );
         return false;
     }
 }
@@ -488,7 +556,9 @@ function validateCheckInterval(
     // This includes undefined, null, 0, and empty string
     // Note: 0 is intentionally invalid as it would cause infinite polling
     if (!monitor.checkInterval) {
-        config.logger.warn(`Monitor ${identifier}:${monitor.id} has no valid check interval set`);
+        config.logger.warn(
+            `Monitor ${identifier}:${monitor.id} has no valid check interval set`
+        );
         return false;
     }
     return true;

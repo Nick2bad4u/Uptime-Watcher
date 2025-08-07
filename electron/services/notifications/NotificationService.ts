@@ -138,7 +138,9 @@ export class NotificationService {
 
         // Validate monitor ID
         if (!monitorId) {
-            logger.error("[NotificationService] Cannot notify down: monitorId is invalid");
+            logger.error(
+                "[NotificationService] Cannot notify down: monitorId is invalid"
+            );
             return;
         }
 
@@ -154,7 +156,9 @@ export class NotificationService {
 
         const monitorType = monitor.type;
 
-        logger.warn(`[NotificationService] Monitor down alert: ${site.name} [${monitorType}]`);
+        logger.warn(
+            `[NotificationService] Monitor down alert: ${site.name} [${monitorType}]`
+        );
 
         if (Notification.isSupported()) {
             new Notification({
@@ -163,7 +167,9 @@ export class NotificationService {
                 urgency: "critical",
             }).show();
 
-            logger.info(`[NotificationService] Notification sent for monitor down: ${site.name} (${monitorType})`);
+            logger.info(
+                `[NotificationService] Notification sent for monitor down: ${site.name} (${monitorType})`
+            );
         } else {
             logger.warn(LOG_TEMPLATES.warnings.NOTIFICATIONS_UNSUPPORTED);
         }
@@ -195,7 +201,9 @@ export class NotificationService {
 
         // Validate monitor ID
         if (!monitorId) {
-            logger.error("[NotificationService] Cannot notify up: monitorId is invalid");
+            logger.error(
+                "[NotificationService] Cannot notify up: monitorId is invalid"
+            );
             return;
         }
 
@@ -211,7 +219,9 @@ export class NotificationService {
 
         const monitorType = monitor.type;
 
-        logger.info(`[NotificationService] Monitor restored: ${site.name} [${monitorType}]`);
+        logger.info(
+            `[NotificationService] Monitor restored: ${site.name} [${monitorType}]`
+        );
 
         if (Notification.isSupported()) {
             new Notification({
@@ -220,7 +230,9 @@ export class NotificationService {
                 urgency: "normal",
             }).show();
 
-            logger.info(`[NotificationService] Notification sent for monitor restored: ${site.name} (${monitorType})`);
+            logger.info(
+                `[NotificationService] Notification sent for monitor restored: ${site.name} (${monitorType})`
+            );
         } else {
             logger.warn(LOG_TEMPLATES.warnings.NOTIFICATIONS_UNSUPPORTED);
         }
@@ -258,6 +270,9 @@ export class NotificationService {
             ...this.config,
             ...config,
         };
-        logger.debug("[NotificationService] Configuration updated", this.config);
+        logger.debug(
+            "[NotificationService] Configuration updated",
+            this.config
+        );
     }
 }

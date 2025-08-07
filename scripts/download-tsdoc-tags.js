@@ -72,7 +72,8 @@ const extraPages = [
 
 const baseGitHubUrl =
     "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/tags";
-let outputDir = process.env.TSDOC_OUTPUT_DIR || path.join(process.cwd(), "docs", "TSDoc");
+let outputDir =
+    process.env.TSDOC_OUTPUT_DIR || path.join(process.cwd(), "docs", "TSDoc");
 // Normalize and resolve the output directory for cross-platform compatibility
 outputDir = path.resolve(outputDir);
 const logFile = path.join(outputDir, "TSDoc-Download-Log.md");
@@ -122,8 +123,14 @@ const newHashes = {};
  * @returns {string} The content with rewritten links.
  */
 function rewriteLinks(content) {
-    content = content.replace(/\(\.\.\/spec\/([\w-]+)\.md\)/g, (_, page) => `(${tsdocDomain}/spec/${page}/)`);
-    content = content.replace(/\(\.\.\/tags\/([\w-]+)\.md\)/g, (_, tag) => `(${tsdocDomain}/tags/${tag}/)`);
+    content = content.replace(
+        /\(\.\.\/spec\/([\w-]+)\.md\)/g,
+        (_, page) => `(${tsdocDomain}/spec/${page}/)`
+    );
+    content = content.replace(
+        /\(\.\.\/tags\/([\w-]+)\.md\)/g,
+        (_, tag) => `(${tsdocDomain}/tags/${tag}/)`
+    );
     return content;
 }
 
@@ -132,11 +139,17 @@ function downloadFile(cmd, filePath, logMsg, name) {
     return new Promise((resolve, reject) => {
         exec(cmd, (err) => {
             if (err) {
-                console.error(logMsg.replace("✅", "❌").replace("📘", "❌") + ` → ${err.message}`);
+                console.error(
+                    logMsg.replace("✅", "❌").replace("📘", "❌") +
+                        ` → ${err.message}`
+                );
                 return reject(err);
             }
             if (!fs.existsSync(filePath)) {
-                console.error(logMsg.replace("✅", "❌").replace("📘", "❌") + " → File not created.");
+                console.error(
+                    logMsg.replace("✅", "❌").replace("📘", "❌") +
+                        " → File not created."
+                );
                 return reject(new Error("File not created: " + filePath));
             }
             let content;
@@ -144,19 +157,26 @@ function downloadFile(cmd, filePath, logMsg, name) {
                 content = fs.readFileSync(filePath, "utf8");
             } catch (readErr) {
                 console.error(
-                    logMsg.replace("✅", "❌").replace("📘", "❌") + ` → Failed to read file: ${readErr.message}`
+                    logMsg.replace("✅", "❌").replace("📘", "❌") +
+                        ` → Failed to read file: ${readErr.message}`
                 );
                 return reject(readErr);
             }
             if (!content || content.trim().length === 0) {
-                console.error(logMsg.replace("✅", "❌").replace("📘", "❌") + " → File is empty.");
-                return reject(new Error("Downloaded file is empty: " + filePath));
+                console.error(
+                    logMsg.replace("✅", "❌").replace("📘", "❌") +
+                        " → File is empty."
+                );
+                return reject(
+                    new Error("Downloaded file is empty: " + filePath)
+                );
             }
             try {
                 fs.writeFileSync(filePath, rewriteLinks(content));
             } catch (writeErr) {
                 console.error(
-                    logMsg.replace("✅", "❌").replace("📘", "❌") + ` → Failed to write file: ${writeErr.message}`
+                    logMsg.replace("✅", "❌").replace("📘", "❌") +
+                        ` → Failed to write file: ${writeErr.message}`
                 );
                 return reject(writeErr);
             }
@@ -172,7 +192,12 @@ const tagPromises = tags.map((tag) => {
     const fileName = `TSDoc-Tag-${tag.charAt(0).toUpperCase() + tag.slice(1)}.md`;
     const filePath = path.join(outputDir, fileName);
     const cmd = `curl -sSL "${url}" -o "${filePath}"`;
-    return downloadFile(cmd, filePath, `✅ Downloaded: ${tag} → ${fileName}`, fileName);
+    return downloadFile(
+        cmd,
+        filePath,
+        `✅ Downloaded: ${tag} → ${fileName}`,
+        fileName
+    );
 });
 const extraPagePromises = extraPages.map(({ url, fileName }) => {
     const filePath = path.join(outputDir, fileName);

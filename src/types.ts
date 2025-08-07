@@ -64,7 +64,10 @@ declare global {
                  * @remarks Download SQLite database backup as binary data.
                  * @returns A promise resolving to an object containing the backup buffer and file name.
                  */
-                downloadSQLiteBackup: () => Promise<{ buffer: ArrayBuffer; fileName: string }>;
+                downloadSQLiteBackup: () => Promise<{
+                    buffer: ArrayBuffer;
+                    fileName: string;
+                }>;
                 /**
                  * @remarks Export all application data as a JSON string.
                  * @returns A promise resolving to the exported data as a string.
@@ -87,49 +90,65 @@ declare global {
                  * @param callback - Function to invoke on cache invalidation.
                  * @returns A function to remove the listener.
                  */
-                onCacheInvalidated: (callback: (data: CacheInvalidatedEventData) => void) => () => void;
+                onCacheInvalidated: (
+                    callback: (data: CacheInvalidatedEventData) => void
+                ) => () => void;
                 /**
                  * @remarks Register callback for monitor down events.
                  * @param callback - Function to invoke when a monitor is down.
                  * @returns A function to remove the listener.
                  */
-                onMonitorDown: (callback: (data: MonitorDownEventData) => void) => () => void;
+                onMonitorDown: (
+                    callback: (data: MonitorDownEventData) => void
+                ) => () => void;
                 /**
                  * @remarks Register callback for monitoring started events.
                  * @param callback - Function to invoke when monitoring starts.
                  * @returns A function to remove the listener.
                  */
-                onMonitoringStarted: (callback: (data: MonitoringControlEventData) => void) => () => void;
+                onMonitoringStarted: (
+                    callback: (data: MonitoringControlEventData) => void
+                ) => () => void;
                 /**
                  * @remarks Register callback for monitoring stopped events.
                  * @param callback - Function to invoke when monitoring stops.
                  * @returns A function to remove the listener.
                  */
-                onMonitoringStopped: (callback: (data: MonitoringControlEventData) => void) => () => void;
+                onMonitoringStopped: (
+                    callback: (data: MonitoringControlEventData) => void
+                ) => () => void;
                 /**
                  * @remarks Register callback for monitor status changes.
                  * @param callback - Function to invoke on status update.
                  * @returns A function to remove the listener.
                  */
-                onMonitorStatusChanged: (callback: (update: StatusUpdate) => void) => () => void;
+                onMonitorStatusChanged: (
+                    callback: (update: StatusUpdate) => void
+                ) => () => void;
                 /**
                  * @remarks Register callback for monitor up events.
                  * @param callback - Function to invoke when a monitor is up.
                  * @returns A function to remove the listener.
                  */
-                onMonitorUp: (callback: (data: MonitorUpEventData) => void) => () => void;
+                onMonitorUp: (
+                    callback: (data: MonitorUpEventData) => void
+                ) => () => void;
                 /**
                  * @remarks Register callback for test events (development/debugging).
                  * @param callback - Function to invoke on test event.
                  * @returns A function to remove the listener.
                  */
-                onTestEvent: (callback: (data: TestEventData) => void) => () => void;
+                onTestEvent: (
+                    callback: (data: TestEventData) => void
+                ) => () => void;
                 /**
                  * @remarks Register callback for application update status events.
                  * @param callback - Function to invoke on update status event.
                  * @returns A function to remove the listener.
                  */
-                onUpdateStatus: (callback: (data: UpdateStatusEventData) => void) => () => void;
+                onUpdateStatus: (
+                    callback: (data: UpdateStatusEventData) => void
+                ) => () => void;
                 /**
                  * @remarks Remove all listeners for a specific event.
                  * @param event - The event name.
@@ -152,7 +171,10 @@ declare global {
                  * @param monitorId - Optional monitor identifier.
                  * @returns A promise that resolves when monitoring has started.
                  */
-                startMonitoringForSite: (siteId: string, monitorId?: string) => Promise<void>;
+                startMonitoringForSite: (
+                    siteId: string,
+                    monitorId?: string
+                ) => Promise<void>;
                 /**
                  * @remarks Stop monitoring for all sites.
                  * @returns A promise that resolves when monitoring has stopped.
@@ -164,7 +186,10 @@ declare global {
                  * @param monitorId - Optional monitor identifier.
                  * @returns A promise that resolves when monitoring has stopped.
                  */
-                stopMonitoringForSite: (siteId: string, monitorId?: string) => Promise<void>;
+                stopMonitoringForSite: (
+                    siteId: string,
+                    monitorId?: string
+                ) => Promise<void>;
             };
 
             /**
@@ -291,7 +316,10 @@ declare global {
                  * @param monitorId - The monitor identifier.
                  * @returns A promise that resolves when the check is complete.
                  */
-                checkSiteNow: (siteId: string, monitorId: string) => Promise<void>;
+                checkSiteNow: (
+                    siteId: string,
+                    monitorId: string
+                ) => Promise<void>;
                 /**
                  * @remarks Retrieve all configured sites with their monitors.
                  * @returns A promise resolving to an array of sites.
@@ -303,7 +331,10 @@ declare global {
                  * @param monitorId - The monitor identifier.
                  * @returns A promise that resolves when the monitor is removed.
                  */
-                removeMonitor: (siteIdentifier: string, monitorId: string) => Promise<void>;
+                removeMonitor: (
+                    siteIdentifier: string,
+                    monitorId: string
+                ) => Promise<void>;
                 /**
                  * @remarks Remove a site and all its monitors.
                  * @param id - The site identifier.
@@ -316,7 +347,10 @@ declare global {
                  * @param updates - Partial site updates.
                  * @returns A promise that resolves when the update is complete.
                  */
-                updateSite: (id: string, updates: Partial<Site>) => Promise<void>;
+                updateSite: (
+                    id: string,
+                    updates: Partial<Site>
+                ) => Promise<void>;
             };
 
             /**
@@ -351,7 +385,10 @@ declare global {
                  * @remarks Manually request full state synchronization.
                  * @returns A promise resolving to the sync result.
                  */
-                requestFullSync: () => Promise<{ siteCount: number; success: boolean }>;
+                requestFullSync: () => Promise<{
+                    siteCount: number;
+                    success: boolean;
+                }>;
             };
 
             /**

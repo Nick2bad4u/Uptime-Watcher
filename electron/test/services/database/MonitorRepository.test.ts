@@ -27,7 +27,9 @@ describe("MonitorRepository", () => {
             }),
         };
 
-        repository = new MonitorRepository({ databaseService: mockDatabaseService });
+        repository = new MonitorRepository({
+            databaseService: mockDatabaseService,
+        });
     });
 
     describe("findBySiteIdentifier", () => {
@@ -60,7 +62,9 @@ describe("MonitorRepository", () => {
                 throw new Error("Database error");
             });
 
-            await expect(repository.findBySiteIdentifier("site1")).rejects.toThrow("Database error");
+            await expect(
+                repository.findBySiteIdentifier("site1")
+            ).rejects.toThrow("Database error");
         });
     });
 

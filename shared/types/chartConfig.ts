@@ -370,7 +370,9 @@ export interface DefaultChartThemes {
  *
  * @public
  */
-export function hasPlugins(config: unknown): config is { plugins: ChartPluginsConfig } {
+export function hasPlugins(
+    config: unknown
+): config is { plugins: ChartPluginsConfig } {
     return (
         typeof config === "object" &&
         config !== null &&
@@ -387,7 +389,9 @@ export function hasPlugins(config: unknown): config is { plugins: ChartPluginsCo
  *
  * @public
  */
-export function hasScales(config: unknown): config is { scales: ChartScalesConfig } {
+export function hasScales(
+    config: unknown
+): config is { scales: ChartScalesConfig } {
     return (
         typeof config === "object" &&
         config !== null &&

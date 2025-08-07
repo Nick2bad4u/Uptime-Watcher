@@ -209,7 +209,9 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
         it("should return valid timestamps", () => {
             const validTimestamp = Date.now() - 1000;
             expect(safeParseTimestamp(validTimestamp)).toBe(validTimestamp);
-            expect(safeParseTimestamp(validTimestamp.toString())).toBe(validTimestamp);
+            expect(safeParseTimestamp(validTimestamp.toString())).toBe(
+                validTimestamp
+            );
         });
 
         it("should return current time as default when no default provided", () => {
@@ -221,7 +223,9 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
 
         it("should use custom default", () => {
             const customDefault = 123_456_789;
-            expect(safeParseTimestamp("invalid", customDefault)).toBe(customDefault);
+            expect(safeParseTimestamp("invalid", customDefault)).toBe(
+                customDefault
+            );
             expect(safeParseTimestamp("0", customDefault)).toBe(customDefault);
         });
 

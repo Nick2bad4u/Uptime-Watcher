@@ -26,7 +26,12 @@ Reviewed 25+ low-confidence AI claims across validation system files. **18 claim
 **Analysis:**
 
 ```typescript
-if (!monitor.port || typeof monitor.port !== "number" || monitor.port < 1 || monitor.port > 65_535) {
+if (
+ !monitor.port ||
+ typeof monitor.port !== "number" ||
+ monitor.port < 1 ||
+ monitor.port > 65_535
+) {
  errors.push("Valid port number (1-65535) is required for port monitors");
 }
 ```
@@ -47,7 +52,9 @@ if (!monitor.port || typeof monitor.port !== "number" || monitor.port < 1 || mon
 **Analysis:**
 
 ```typescript
-site.monitors.every((monitor: unknown) => validateMonitor(monitor as Partial<Monitor>));
+site.monitors.every((monitor: unknown) =>
+ validateMonitor(monitor as Partial<Monitor>)
+);
 ```
 
 - **Issue**: Type assertion without validation hides potential runtime errors

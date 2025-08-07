@@ -80,13 +80,16 @@ The UptimeOrchestrator is a well-architected coordination layer that follows man
 **Issue:** Async event handlers with `void` wrapper can create race conditions
 
 ```typescript
-this.on("internal:database:update-sites-cache-requested", (data: UpdateSitesCacheRequestData) => {
- void (async () => {
-  // This could race with other operations
-  await this.siteManager.updateSitesCache(data.sites);
-  // ... more async operations
- })();
-});
+this.on(
+ "internal:database:update-sites-cache-requested",
+ (data: UpdateSitesCacheRequestData) => {
+  void (async () => {
+   // This could race with other operations
+   await this.siteManager.updateSitesCache(data.sites);
+   // ... more async operations
+  })();
+ }
+);
 ```
 
 **Impact:** High - Could lead to inconsistent state

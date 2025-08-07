@@ -33,9 +33,17 @@ import { MonitorCheckResult } from "../types";
  * @see {@link MonitorCheckResult}
  * @public
  */
-export function createErrorResult(error: string, responseTime: number, correlationId?: string): MonitorCheckResult {
+export function createErrorResult(
+    error: string,
+    responseTime: number,
+    correlationId?: string
+): MonitorCheckResult {
     if (correlationId && isDev()) {
-        logger.debug(`[HttpMonitor] Creating error result`, { correlationId, error, responseTime });
+        logger.debug(`[HttpMonitor] Creating error result`, {
+            correlationId,
+            error,
+            responseTime,
+        });
     }
 
     return {
@@ -78,7 +86,10 @@ export function handleAxiosError(
 
     if (isDev()) {
         const logData = correlationId ? { correlationId, error } : { error };
-        logger.debug(`[HttpMonitor] Network error for ${url}: ${errorMessage}`, logData);
+        logger.debug(
+            `[HttpMonitor] Network error for ${url}: ${errorMessage}`,
+            logData
+        );
     }
 
     return createErrorResult(errorMessage, responseTime, correlationId);
@@ -103,16 +114,29 @@ export function handleAxiosError(
  * @see {@link MonitorCheckResult}
  * @public
  */
-export function handleCheckError(error: unknown, url: string, correlationId?: string): MonitorCheckResult {
-    const responseTime = axios.isAxiosError(error) && error.responseTime ? error.responseTime : 0;
+export function handleCheckError(
+    error: unknown,
+    url: string,
+    correlationId?: string
+): MonitorCheckResult {
+    const responseTime =
+        axios.isAxiosError(error) && error.responseTime
+            ? error.responseTime
+            : 0;
 
     if (axios.isAxiosError(error)) {
-        return handleAxiosError(error as AxiosError, url, responseTime, correlationId);
+        return handleAxiosError(
+            error as AxiosError,
+            url,
+            responseTime,
+            correlationId
+        );
     }
 
     // Non-Axios errors (shouldn't happen, but defensive programming)
     // "Unknown error" fallback handles cases where thrown value isn't an Error instance
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
 
     const logData = correlationId ? { correlationId, error } : { error };
     logger.error(`[HttpMonitor] Unexpected error checking ${url}`, logData);

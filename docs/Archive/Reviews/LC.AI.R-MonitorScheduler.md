@@ -60,7 +60,9 @@ Critical startup errors are hidden.
 **Analysis**: Line 174 uses string operations for key parsing:
 
 ```typescript
-const siteIntervals = [...this.intervals.keys()].filter((key) => key.startsWith(`${siteIdentifier}|`));
+const siteIntervals = [...this.intervals.keys()].filter((key) =>
+ key.startsWith(`${siteIdentifier}|`)
+);
 ```
 
 This is brittle if key format changes.  
@@ -283,7 +285,10 @@ export class MonitorScheduler {
   * @param monitorId - Unique identifier for the monitor
   * @returns Promise that resolves when check completes
   */
- private onCheckCallback?: (siteIdentifier: string, monitorId: string) => Promise<void>;
+ private onCheckCallback?: (
+  siteIdentifier: string,
+  monitorId: string
+ ) => Promise<void>;
 
  /**
   * Restart monitoring for a specific monitor.
@@ -300,7 +305,10 @@ export class MonitorScheduler {
   * - true: Monitor was successfully stopped and restarted
   * - false: Monitor has no ID and cannot be monitored
   */
- public restartMonitor(siteIdentifier: string, monitor: Site["monitors"][0]): boolean {
+ public restartMonitor(
+  siteIdentifier: string,
+  monitor: Site["monitors"][0]
+ ): boolean {
   // ... implementation
  }
 

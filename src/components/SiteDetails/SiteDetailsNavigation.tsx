@@ -9,7 +9,12 @@ import type { JSX } from "react/jsx-runtime";
 import React, { useCallback } from "react";
 
 import logger from "../../services/logger";
-import { ThemedBox, ThemedButton, ThemedSelect, ThemedText } from "../../theme/components";
+import {
+    ThemedBox,
+    ThemedButton,
+    ThemedSelect,
+    ThemedText,
+} from "../../theme/components";
 import { Site } from "../../types";
 import { SiteMonitoringButton } from "../common/SiteMonitoringButton/SiteMonitoringButton";
 
@@ -25,7 +30,9 @@ export interface SiteDetailsNavigationProperties {
     /** The site object being displayed */
     readonly currentSite: Site;
     /** Handler for monitor selection changes */
-    readonly handleMonitorIdChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+    readonly handleMonitorIdChange: (
+        event: React.ChangeEvent<HTMLSelectElement>
+    ) => void;
     /** Handler for starting monitoring */
     readonly handleStartMonitoring: () => Promise<void>;
     /** Handler for starting site-level monitoring */
@@ -73,7 +80,10 @@ export const SiteDetailsNavigation = ({
      * @param tab - The tab name being changed to
      * @param additionalData - Optional additional data to include in the log
      */
-    const logTabChange = (tab: string, additionalData?: Record<string, unknown>) => {
+    const logTabChange = (
+        tab: string,
+        additionalData?: Record<string, unknown>
+    ) => {
         logger.user.action("Site details tab changed", {
             siteId: currentSite.identifier,
             tab,
@@ -92,18 +102,27 @@ export const SiteDetailsNavigation = ({
 
     // Site-level monitoring state calculation
     const allMonitorsRunning =
-        currentSite.monitors.length > 0 && currentSite.monitors.every((monitor) => monitor.monitoring === true);
+        currentSite.monitors.length > 0 &&
+        currentSite.monitors.every((monitor) => monitor.monitoring === true);
 
     // Find selected monitor to get its type for better labeling
-    const selectedMonitor = currentSite.monitors.find((monitor) => monitor.id === selectedMonitorId);
-    const monitorTypeLabel = selectedMonitor ? selectedMonitor.type.toUpperCase() : "ANALYTICS";
+    const selectedMonitor = currentSite.monitors.find(
+        (monitor) => monitor.id === selectedMonitorId
+    );
+    const monitorTypeLabel = selectedMonitor
+        ? selectedMonitor.type.toUpperCase()
+        : "ANALYTICS";
 
     // Button variant constants
     const BUTTON_VARIANT_PRIMARY = "primary";
     const BUTTON_VARIANT_SECONDARY = "secondary";
 
     return (
-        <ThemedBox className="space-y-4 border-b" padding="lg" variant="secondary">
+        <ThemedBox
+            className="space-y-4 border-b"
+            padding="lg"
+            variant="secondary"
+        >
             {/* Tab Navigation and Monitor Selection */}
             <div className="flex flex-wrap items-center justify-between gap-4">
                 {/* Tab navigation buttons (left) */}
@@ -115,7 +134,9 @@ export const SiteDetailsNavigation = ({
                         }}
                         size="sm"
                         variant={
-                            activeSiteDetailsTab === "site-overview" ? BUTTON_VARIANT_PRIMARY : BUTTON_VARIANT_SECONDARY
+                            activeSiteDetailsTab === "site-overview"
+                                ? BUTTON_VARIANT_PRIMARY
+                                : BUTTON_VARIANT_SECONDARY
                         }
                     >
                         🏠 Site Overview
@@ -137,12 +158,17 @@ export const SiteDetailsNavigation = ({
                     {/* Render analytics tab for selected monitor type only */}
                     <ThemedButton
                         onClick={() => {
-                            setActiveSiteDetailsTab(`${selectedMonitorId}-analytics`);
-                            logTabChange("analytics", { monitorId: selectedMonitorId });
+                            setActiveSiteDetailsTab(
+                                `${selectedMonitorId}-analytics`
+                            );
+                            logTabChange("analytics", {
+                                monitorId: selectedMonitorId,
+                            });
                         }}
                         size="sm"
                         variant={
-                            activeSiteDetailsTab === `${selectedMonitorId}-analytics`
+                            activeSiteDetailsTab ===
+                            `${selectedMonitorId}-analytics`
                                 ? BUTTON_VARIANT_PRIMARY
                                 : BUTTON_VARIANT_SECONDARY
                         }
@@ -155,7 +181,11 @@ export const SiteDetailsNavigation = ({
                             logTabChange("history");
                         }}
                         size="sm"
-                        variant={activeSiteDetailsTab === "history" ? BUTTON_VARIANT_PRIMARY : BUTTON_VARIANT_SECONDARY}
+                        variant={
+                            activeSiteDetailsTab === "history"
+                                ? BUTTON_VARIANT_PRIMARY
+                                : BUTTON_VARIANT_SECONDARY
+                        }
                     >
                         📜 History
                     </ThemedButton>
@@ -166,7 +196,9 @@ export const SiteDetailsNavigation = ({
                         }}
                         size="sm"
                         variant={
-                            activeSiteDetailsTab === "settings" ? BUTTON_VARIANT_PRIMARY : BUTTON_VARIANT_SECONDARY
+                            activeSiteDetailsTab === "settings"
+                                ? BUTTON_VARIANT_PRIMARY
+                                : BUTTON_VARIANT_SECONDARY
                         }
                     >
                         ⚙️ Settings
@@ -180,8 +212,12 @@ export const SiteDetailsNavigation = ({
                         <SiteMonitoringButton
                             allMonitorsRunning={allMonitorsRunning}
                             isLoading={isLoading}
-                            onStartSiteMonitoring={handleStartSiteMonitoringMemoized}
-                            onStopSiteMonitoring={handleStopSiteMonitoringMemoized}
+                            onStartSiteMonitoring={
+                                handleStartSiteMonitoringMemoized
+                            }
+                            onStopSiteMonitoring={
+                                handleStopSiteMonitoringMemoized
+                            }
                         />
 
                         {/* Individual monitor controls */}
@@ -196,7 +232,9 @@ export const SiteDetailsNavigation = ({
                                 variant="warning"
                             >
                                 <span>⏸️</span>
-                                <span className="hidden text-xs sm:inline">Stop</span>
+                                <span className="hidden text-xs sm:inline">
+                                    Stop
+                                </span>
                             </ThemedButton>
                         ) : (
                             <ThemedButton
@@ -209,7 +247,9 @@ export const SiteDetailsNavigation = ({
                                 variant="success"
                             >
                                 <span>▶️</span>
-                                <span className="hidden text-xs sm:inline">Start</span>
+                                <span className="hidden text-xs sm:inline">
+                                    Start
+                                </span>
                             </ThemedButton>
                         )}
                     </div>
@@ -219,7 +259,10 @@ export const SiteDetailsNavigation = ({
                         <ThemedText size="sm" variant="secondary">
                             Monitor:
                         </ThemedText>
-                        <ThemedSelect onChange={handleMonitorIdChange} value={selectedMonitorId}>
+                        <ThemedSelect
+                            onChange={handleMonitorIdChange}
+                            value={selectedMonitorId}
+                        >
                             {currentSite.monitors.map((monitor) => (
                                 <option key={monitor.id} value={monitor.id}>
                                     {monitor.type.toUpperCase()}
@@ -231,4 +274,4 @@ export const SiteDetailsNavigation = ({
             </div>
         </ThemedBox>
     );
-}
+};

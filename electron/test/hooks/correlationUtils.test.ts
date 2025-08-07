@@ -4,7 +4,10 @@
 
 import { describe, it, expect } from "vitest";
 
-import { generateCorrelationId, ValidationError } from "../../utils/correlation";
+import {
+    generateCorrelationId,
+    ValidationError,
+} from "../../utils/correlation";
 
 describe("correlationUtils", () => {
     describe("generateCorrelationId", () => {
@@ -43,7 +46,9 @@ describe("correlationUtils", () => {
             expect(error).toBeInstanceOf(Error);
             expect(error.name).toBe("ValidationError");
             expect(error.errors).toEqual(errors);
-            expect(error.message).toBe("Validation failed: Field is required, Invalid format");
+            expect(error.message).toBe(
+                "Validation failed: Field is required, Invalid format"
+            );
         });
 
         it("should handle single error message", () => {

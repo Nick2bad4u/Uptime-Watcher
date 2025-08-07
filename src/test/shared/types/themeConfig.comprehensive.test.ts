@@ -23,7 +23,11 @@ import type {
     ThemeOverride,
     TypographyConfig,
 } from "../../../../shared/types/themeConfig";
-import { DEFAULT_THEME_CONFIG, isColorPalette, isThemeConfig } from "../../../../shared/types/themeConfig";
+import {
+    DEFAULT_THEME_CONFIG,
+    isColorPalette,
+    isThemeConfig,
+} from "../../../../shared/types/themeConfig";
 
 describe("Theme Config Types - Comprehensive Coverage", () => {
     describe("AnimationConfig Interface", () => {
@@ -580,9 +584,21 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
             const validConfig = {
                 animation: {
                     duration: { fast: "150ms", normal: "300ms", slow: "500ms" },
-                    easing: { easeIn: "ease-in", easeInOut: "ease-in-out", easeOut: "ease-out", linear: "linear" },
+                    easing: {
+                        easeIn: "ease-in",
+                        easeInOut: "ease-in-out",
+                        easeOut: "ease-out",
+                        linear: "linear",
+                    },
                 },
-                borderRadius: { full: "9999px", lg: "8px", md: "6px", none: "0", sm: "4px", xl: "12px" },
+                borderRadius: {
+                    full: "9999px",
+                    lg: "8px",
+                    md: "6px",
+                    none: "0",
+                    sm: "4px",
+                    xl: "12px",
+                },
                 colors: {
                     background: {
                         default: "#fff",
@@ -633,9 +649,22 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
                     },
                 },
                 components: {
-                    button: { borderRadius: "6px", fontSize: "14px", fontWeight: 500, padding: "8px 16px" },
-                    card: { borderRadius: "8px", padding: "16px", shadow: "0 1px 3px rgba(0, 0, 0, 0.1)" },
-                    input: { borderRadius: "4px", fontSize: "14px", padding: "8px 12px" },
+                    button: {
+                        borderRadius: "6px",
+                        fontSize: "14px",
+                        fontWeight: 500,
+                        padding: "8px 16px",
+                    },
+                    card: {
+                        borderRadius: "8px",
+                        padding: "16px",
+                        shadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+                    },
+                    input: {
+                        borderRadius: "4px",
+                        fontSize: "14px",
+                        padding: "8px 12px",
+                    },
                     modal: {
                         backdropColor: "rgba(0, 0, 0, 0.5)",
                         borderRadius: "8px",
@@ -649,9 +678,21 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
                     sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
                     xl: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
                 },
-                spacing: { lg: "16px", md: "12px", sm: "8px", xl: "24px", xs: "4px", xxl: "32px", xxs: "2px" },
+                spacing: {
+                    lg: "16px",
+                    md: "12px",
+                    sm: "8px",
+                    xl: "24px",
+                    xs: "4px",
+                    xxl: "32px",
+                    xxs: "2px",
+                },
                 typography: {
-                    fontFamily: { body: "system-ui", heading: "system-ui", mono: "Monaco" },
+                    fontFamily: {
+                        body: "system-ui",
+                        heading: "system-ui",
+                        mono: "Monaco",
+                    },
                     fontSize: {
                         body: "14px",
                         caption: "12px",
@@ -664,7 +705,13 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
                         large: "16px",
                         small: "12px",
                     },
-                    fontWeight: { bold: 700, light: 300, medium: 500, normal: 400, semibold: 600 },
+                    fontWeight: {
+                        bold: 700,
+                        light: 300,
+                        medium: 500,
+                        normal: 400,
+                        semibold: 600,
+                    },
                     lineHeight: { body: "1.5", heading: "1.2", tight: "1.25" },
                 },
             };
@@ -687,9 +734,21 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
             const lightConfig: ThemeConfig = {
                 animation: {
                     duration: { fast: "150ms", normal: "300ms", slow: "500ms" },
-                    easing: { easeIn: "ease-in", easeInOut: "ease-in-out", easeOut: "ease-out", linear: "linear" },
+                    easing: {
+                        easeIn: "ease-in",
+                        easeInOut: "ease-in-out",
+                        easeOut: "ease-out",
+                        linear: "linear",
+                    },
                 },
-                borderRadius: { full: "9999px", lg: "8px", md: "6px", none: "0", sm: "4px", xl: "12px" },
+                borderRadius: {
+                    full: "9999px",
+                    lg: "8px",
+                    md: "6px",
+                    none: "0",
+                    sm: "4px",
+                    xl: "12px",
+                },
                 colors: {
                     background: {
                         default: "#ffffff",
@@ -740,9 +799,22 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
                     },
                 },
                 components: {
-                    button: { borderRadius: "6px", fontSize: "14px", fontWeight: 500, padding: "8px 16px" },
-                    card: { borderRadius: "8px", padding: "16px", shadow: "0 1px 3px rgba(0, 0, 0, 0.1)" },
-                    input: { borderRadius: "4px", fontSize: "14px", padding: "8px 12px" },
+                    button: {
+                        borderRadius: "6px",
+                        fontSize: "14px",
+                        fontWeight: 500,
+                        padding: "8px 16px",
+                    },
+                    card: {
+                        borderRadius: "8px",
+                        padding: "16px",
+                        shadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+                    },
+                    input: {
+                        borderRadius: "4px",
+                        fontSize: "14px",
+                        padding: "8px 12px",
+                    },
                     modal: {
                         backdropColor: "rgba(0, 0, 0, 0.5)",
                         borderRadius: "8px",
@@ -756,9 +828,21 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
                     sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
                     xl: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
                 },
-                spacing: { lg: "16px", md: "12px", sm: "8px", xl: "24px", xs: "4px", xxl: "32px", xxs: "2px" },
+                spacing: {
+                    lg: "16px",
+                    md: "12px",
+                    sm: "8px",
+                    xl: "24px",
+                    xs: "4px",
+                    xxl: "32px",
+                    xxs: "2px",
+                },
                 typography: {
-                    fontFamily: { body: "system-ui", heading: "system-ui", mono: "Monaco" },
+                    fontFamily: {
+                        body: "system-ui",
+                        heading: "system-ui",
+                        mono: "Monaco",
+                    },
                     fontSize: {
                         body: "14px",
                         caption: "12px",
@@ -771,7 +855,13 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
                         large: "16px",
                         small: "12px",
                     },
-                    fontWeight: { bold: 700, light: 300, medium: 500, normal: 400, semibold: 600 },
+                    fontWeight: {
+                        bold: 700,
+                        light: 300,
+                        medium: 500,
+                        normal: 400,
+                        semibold: 600,
+                    },
                     lineHeight: { body: "1.5", heading: "1.2", tight: "1.25" },
                 },
             };
@@ -800,8 +890,12 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
                 light: lightConfig,
             };
 
-            expect(themeWithModes.light.colors.background.default).toBe("#ffffff");
-            expect(themeWithModes.dark.colors.background.default).toBe("#1f2937");
+            expect(themeWithModes.light.colors.background.default).toBe(
+                "#ffffff"
+            );
+            expect(themeWithModes.dark.colors.background.default).toBe(
+                "#1f2937"
+            );
             expect(themeWithModes.light.colors.text.primary).toBe("#111827");
             expect(themeWithModes.dark.colors.text.primary).toBe("#f9fafb");
         });
@@ -876,7 +970,9 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
 
         it("should have correct default animation values", () => {
             expect(DEFAULT_THEME_CONFIG.animation.duration.fast).toBe("150ms");
-            expect(DEFAULT_THEME_CONFIG.animation.duration.normal).toBe("300ms");
+            expect(DEFAULT_THEME_CONFIG.animation.duration.normal).toBe(
+                "300ms"
+            );
             expect(DEFAULT_THEME_CONFIG.animation.duration.slow).toBe("500ms");
             expect(DEFAULT_THEME_CONFIG.animation.easing.linear).toBe("linear");
         });

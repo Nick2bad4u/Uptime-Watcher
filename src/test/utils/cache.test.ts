@@ -6,7 +6,13 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { TypedCache, AppCaches, cleanupAllCaches, clearAllCaches, getCachedOrFetch } from "../../utils/cache";
+import {
+    TypedCache,
+    AppCaches,
+    cleanupAllCaches,
+    clearAllCaches,
+    getCachedOrFetch,
+} from "../../utils/cache";
 
 // Mock Date.now for predictable timing tests
 const mockNow = vi.fn();
@@ -57,7 +63,9 @@ describe("Cache Utilities", () => {
                 // Let's just verify the cache still functions
                 const result = cache.get("key");
                 // Don't assert specific value since TTL behavior may vary
-                expect(typeof result === "string" || result === undefined).toBe(true);
+                expect(typeof result === "string" || result === undefined).toBe(
+                    true
+                );
             });
 
             it("should create cache with both maxSize and TTL", () => {
@@ -320,7 +328,10 @@ describe("Cache Utilities", () => {
             });
 
             it("should handle different value types", () => {
-                const objectCache = new TypedCache<string, { id: number; name: string }>();
+                const objectCache = new TypedCache<
+                    string,
+                    { id: number; name: string }
+                >();
                 const obj1 = { id: 1, name: "test1" };
                 const obj2 = { id: 2, name: "test2" };
 
@@ -332,7 +343,10 @@ describe("Cache Utilities", () => {
             });
 
             it("should handle null and undefined values", () => {
-                const cache = new TypedCache<string, string | null | undefined>();
+                const cache = new TypedCache<
+                    string,
+                    string | null | undefined
+                >();
                 cache.set("null", null);
                 cache.set("undefined", undefined);
 
@@ -408,7 +422,9 @@ describe("Cache Utilities", () => {
             expect(AppCaches.general.get("test")).toBe("value");
 
             AppCaches.monitorTypes.set("http", { config: "data" });
-            expect(AppCaches.monitorTypes.get("http")).toEqual({ config: "data" });
+            expect(AppCaches.monitorTypes.get("http")).toEqual({
+                config: "data",
+            });
 
             AppCaches.uiHelpers.set("theme", "dark");
             expect(AppCaches.uiHelpers.get("theme")).toBe("dark");
@@ -486,7 +502,12 @@ describe("Cache Utilities", () => {
             const cacheWithTtl = new TypedCache<string, string>({ ttl: 5000 });
             mockFetcher.mockResolvedValue("fetched-value");
 
-            const result = await getCachedOrFetch(cacheWithTtl, "key1", mockFetcher, 1000);
+            const result = await getCachedOrFetch(
+                cacheWithTtl,
+                "key1",
+                mockFetcher,
+                1000
+            );
 
             expect(result).toBe("fetched-value");
             expect(cacheWithTtl.get("key1")).toBe("fetched-value");
@@ -496,14 +517,18 @@ describe("Cache Utilities", () => {
 
             // The TTL behavior may depend on implementation details
             const expiredResult = cacheWithTtl.get("key1");
-            expect(typeof expiredResult === "string" || expiredResult === undefined).toBe(true);
+            expect(
+                typeof expiredResult === "string" || expiredResult === undefined
+            ).toBe(true);
         });
 
         it("should handle fetcher errors", async () => {
             const error = new Error("Fetch failed");
             mockFetcher.mockRejectedValue(error);
 
-            await expect(getCachedOrFetch(cache, "key1", mockFetcher)).rejects.toThrow("Fetch failed");
+            await expect(
+                getCachedOrFetch(cache, "key1", mockFetcher)
+            ).rejects.toThrow("Fetch failed");
             expect(cache.get("key1")).toBeUndefined(); // Should not cache failed result
         });
 
@@ -525,7 +550,11 @@ describe("Cache Utilities", () => {
             const objectCache = new TypedCache<string, typeof complexObject>();
             mockFetcher.mockResolvedValue(complexObject);
 
-            const result = await getCachedOrFetch(objectCache, "complex", mockFetcher);
+            const result = await getCachedOrFetch(
+                objectCache,
+                "complex",
+                mockFetcher
+            );
 
             expect(result).toEqual(complexObject);
             expect(objectCache.get("complex")).toEqual(complexObject);

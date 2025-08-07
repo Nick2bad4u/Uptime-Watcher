@@ -186,7 +186,9 @@ export class ServiceContainer {
      * @param config - Optional configuration for the container.
      * @returns The singleton {@link ServiceContainer} instance.
      */
-    public static getInstance(config?: ServiceContainerConfig): ServiceContainer {
+    public static getInstance(
+        config?: ServiceContainerConfig
+    ): ServiceContainer {
         ServiceContainer.instance ??= new ServiceContainer(config ?? {});
         return ServiceContainer.instance;
     }
@@ -251,7 +253,9 @@ export class ServiceContainer {
      */
     public getDatabaseManager(): DatabaseManager {
         if (!this.databaseManager) {
-            const databaseEventBus = new TypedEventBus<UptimeEvents>("DatabaseManagerEventBus");
+            const databaseEventBus = new TypedEventBus<UptimeEvents>(
+                "DatabaseManagerEventBus"
+            );
             this.databaseManager = new DatabaseManager({
                 configurationManager: this.getConfigurationManager(),
                 eventEmitter: databaseEventBus,
@@ -264,7 +268,9 @@ export class ServiceContainer {
                 },
             });
             if (this.config.enableDebugLogging) {
-                logger.debug("[ServiceContainer] Created DatabaseManager with dependencies");
+                logger.debug(
+                    "[ServiceContainer] Created DatabaseManager with dependencies"
+                );
             }
         }
         return this.databaseManager;
@@ -353,7 +359,9 @@ export class ServiceContainer {
             UptimeOrchestrator: this.uptimeOrchestrator,
             WindowService: this.windowService,
         };
-        for (const [serviceName, serviceInstance] of Object.entries(serviceMap)) {
+        for (const [serviceName, serviceInstance] of Object.entries(
+            serviceMap
+        )) {
             if (serviceInstance !== undefined) {
                 services.push({ name: serviceName, service: serviceInstance });
             }
@@ -375,7 +383,9 @@ export class ServiceContainer {
             const updater = this.getAutoUpdaterService();
             this.ipcService = new IpcService(orchestrator, updater);
             if (this.config.enableDebugLogging) {
-                logger.debug("[ServiceContainer] Created IpcService with dependencies");
+                logger.debug(
+                    "[ServiceContainer] Created IpcService with dependencies"
+                );
             }
         }
         return this.ipcService;
@@ -393,7 +403,9 @@ export class ServiceContainer {
      */
     public getMonitorManager(): MonitorManager {
         if (!this.monitorManager) {
-            const monitorEventBus = new TypedEventBus<UptimeEvents>("MonitorManagerEventBus");
+            const monitorEventBus = new TypedEventBus<UptimeEvents>(
+                "MonitorManagerEventBus"
+            );
 
             // Get sites cache function
             const getSitesCache = () => {
@@ -408,14 +420,16 @@ export class ServiceContainer {
             };
 
             // Create enhanced monitoring services
-            const enhancedServices = EnhancedMonitoringServiceFactory.createServices({
-                eventEmitter: monitorEventBus,
-                getHistoryLimit: () => this.getDatabaseManager().getHistoryLimit(),
-                historyRepository: this.getHistoryRepository(),
-                monitorRepository: this.getMonitorRepository(),
-                siteRepository: this.getSiteRepository(),
-                sites: getSitesCache(),
-            });
+            const enhancedServices =
+                EnhancedMonitoringServiceFactory.createServices({
+                    eventEmitter: monitorEventBus,
+                    getHistoryLimit: () =>
+                        this.getDatabaseManager().getHistoryLimit(),
+                    historyRepository: this.getHistoryRepository(),
+                    monitorRepository: this.getMonitorRepository(),
+                    siteRepository: this.getSiteRepository(),
+                    sites: getSitesCache(),
+                });
 
             this.monitorManager = new MonitorManager(
                 {
@@ -436,7 +450,9 @@ export class ServiceContainer {
             );
             this.setupEventForwarding(monitorEventBus, "MonitorManager");
             if (this.config.enableDebugLogging) {
-                logger.debug("[ServiceContainer] Created MonitorManager with dependencies");
+                logger.debug(
+                    "[ServiceContainer] Created MonitorManager with dependencies"
+                );
             }
         }
         return this.monitorManager;
@@ -466,7 +482,9 @@ export class ServiceContainer {
      */
     public getNotificationService(): NotificationService {
         if (!this.notificationService) {
-            this.notificationService = new NotificationService(this.config.notificationConfig);
+            this.notificationService = new NotificationService(
+                this.config.notificationConfig
+            );
             if (this.config.enableDebugLogging) {
                 logger.debug("[ServiceContainer] Created NotificationService");
             }
@@ -518,12 +536,20 @@ export class ServiceContainer {
                     try {
                         const databaseManager = this.getDatabaseManager();
                         await databaseManager.setHistoryLimit(limit);
-                        logger.debug(`[ServiceContainer] History limit set to ${limit} via DatabaseManager`);
+                        logger.debug(
+                            `[ServiceContainer] History limit set to ${limit} via DatabaseManager`
+                        );
                     } catch (error) {
-                        logger.error("[ServiceContainer] Failed to set history limit", {
-                            error: error instanceof Error ? error.message : String(error),
-                            limit,
-                        });
+                        logger.error(
+                            "[ServiceContainer] Failed to set history limit",
+                            {
+                                error:
+                                    error instanceof Error
+                                        ? error.message
+                                        : String(error),
+                                limit,
+                            }
+                        );
                         throw error;
                     }
                 },
@@ -534,7 +560,10 @@ export class ServiceContainer {
                  * @param newMonitorIds - Array of monitor IDs to set up.
                  * @returns Promise that resolves when setup is complete.
                  */
-                setupNewMonitors: async (site: Site, newMonitorIds: string[]): Promise<void> => {
+                setupNewMonitors: async (
+                    site: Site,
+                    newMonitorIds: string[]
+                ): Promise<void> => {
                     const monitorManager = this.getMonitorManager();
                     return monitorManager.setupNewMonitors(site, newMonitorIds);
                 },
@@ -545,9 +574,15 @@ export class ServiceContainer {
                  * @param monitorId - The monitor ID.
                  * @returns Promise resolving to true if monitoring started, false otherwise.
                  */
-                startMonitoringForSite: async (identifier: string, monitorId: string): Promise<boolean> => {
+                startMonitoringForSite: async (
+                    identifier: string,
+                    monitorId: string
+                ): Promise<boolean> => {
                     const monitorManager = this.getMonitorManager();
-                    return monitorManager.startMonitoringForSite(identifier, monitorId);
+                    return monitorManager.startMonitoringForSite(
+                        identifier,
+                        monitorId
+                    );
                 },
                 /**
                  * Stops monitoring for a site and monitor ID.
@@ -556,12 +591,20 @@ export class ServiceContainer {
                  * @param monitorId - The monitor ID.
                  * @returns Promise resolving to true if monitoring stopped, false otherwise.
                  */
-                stopMonitoringForSite: async (identifier: string, monitorId: string): Promise<boolean> => {
+                stopMonitoringForSite: async (
+                    identifier: string,
+                    monitorId: string
+                ): Promise<boolean> => {
                     const monitorManager = this.getMonitorManager();
-                    return monitorManager.stopMonitoringForSite(identifier, monitorId);
+                    return monitorManager.stopMonitoringForSite(
+                        identifier,
+                        monitorId
+                    );
                 },
             };
-            const siteEventBus = new TypedEventBus<UptimeEvents>("SiteManagerEventBus");
+            const siteEventBus = new TypedEventBus<UptimeEvents>(
+                "SiteManagerEventBus"
+            );
             this.siteManager = new SiteManager({
                 configurationManager: this.getConfigurationManager(),
                 databaseService: this.getDatabaseService(),
@@ -574,7 +617,9 @@ export class ServiceContainer {
             });
             this.setupEventForwarding(siteEventBus, "SiteManager");
             if (this.config.enableDebugLogging) {
-                logger.debug("[ServiceContainer] Created SiteManager with dependencies");
+                logger.debug(
+                    "[ServiceContainer] Created SiteManager with dependencies"
+                );
             }
         }
         return this.siteManager;
@@ -633,7 +678,9 @@ export class ServiceContainer {
                 siteManager: this.getSiteManager(),
             });
             if (this.config.enableDebugLogging) {
-                logger.debug("[ServiceContainer] Created UptimeOrchestrator with injected dependencies");
+                logger.debug(
+                    "[ServiceContainer] Created UptimeOrchestrator with injected dependencies"
+                );
             }
         }
         return this.uptimeOrchestrator;
@@ -703,7 +750,10 @@ export class ServiceContainer {
      * @param managerEventBus - The {@link TypedEventBus} to forward events from.
      * @param managerName - The name of the manager for logging.
      */
-    private setupEventForwarding(managerEventBus: TypedEventBus<UptimeEvents>, managerName: string): void {
+    private setupEventForwarding(
+        managerEventBus: TypedEventBus<UptimeEvents>,
+        managerName: string
+    ): void {
         const eventsToForward = [
             "monitor:status-changed",
             "monitor:up",
@@ -731,9 +781,15 @@ export class ServiceContainer {
                 if (mainOrchestrator) {
                     void (async () => {
                         try {
-                            await mainOrchestrator.emitTyped(eventType, data as UptimeEvents[typeof eventType]);
+                            await mainOrchestrator.emitTyped(
+                                eventType,
+                                data as UptimeEvents[typeof eventType]
+                            );
                         } catch (error) {
-                            logger.error(`[ServiceContainer] Error forwarding ${eventType} from ${managerName}:`, error);
+                            logger.error(
+                                `[ServiceContainer] Error forwarding ${eventType} from ${managerName}:`,
+                                error
+                            );
                         }
                     })();
                     if (this.config.enableDebugLogging) {

@@ -27,7 +27,11 @@ export async function initDatabase(
 ): Promise<void> {
     try {
         databaseService.initialize();
-        await withDatabaseOperation(loadSitesCallback, "loadSites", eventEmitter);
+        await withDatabaseOperation(
+            loadSitesCallback,
+            "loadSites",
+            eventEmitter
+        );
     } catch (error) {
         logger.error("Failed to initialize database", error);
         await eventEmitter.emitTyped("database:error", {

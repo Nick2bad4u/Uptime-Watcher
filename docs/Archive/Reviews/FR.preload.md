@@ -150,7 +150,10 @@ interface EventSubscription {
  isActive(): boolean;
 }
 
-const createEventSubscription = (channel: string, handler: Function): EventSubscription => {
+const createEventSubscription = (
+ channel: string,
+ handler: Function
+): EventSubscription => {
  ipcRenderer.on(channel, handler);
  let active = true;
 

@@ -8,7 +8,10 @@
  * @packageDocumentation
  */
 
-import { interpolateLogTemplate, LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "../../../shared/utils/logTemplates";
 import { monitorLogger as logger } from "../../utils/logger";
 import { MonitorOperationRegistry } from "./MonitorOperationRegistry";
 
@@ -58,7 +61,10 @@ export class OperationTimeoutManager {
 
         this.timeouts.set(operationId, timeout);
         logger.debug(
-            interpolateLogTemplate(LOG_TEMPLATES.debug.OPERATION_TIMEOUT_SCHEDULED, { operationId, timeoutMs })
+            interpolateLogTemplate(
+                LOG_TEMPLATES.debug.OPERATION_TIMEOUT_SCHEDULED,
+                { operationId, timeoutMs }
+            )
         );
     }
 
@@ -70,7 +76,12 @@ export class OperationTimeoutManager {
     private handleTimeout(operationId: string): void {
         const operation = this.operationRegistry.getOperation(operationId);
         if (operation && !operation.cancelled) {
-            logger.warn(interpolateLogTemplate(LOG_TEMPLATES.warnings.OPERATION_TIMEOUT, { operationId }));
+            logger.warn(
+                interpolateLogTemplate(
+                    LOG_TEMPLATES.warnings.OPERATION_TIMEOUT,
+                    { operationId }
+                )
+            );
             this.operationRegistry.cancelOperations(operation.monitorId);
         }
 

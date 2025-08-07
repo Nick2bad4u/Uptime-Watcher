@@ -71,7 +71,10 @@ Reviewed 24 low-confidence AI claims across shared utility files. **18 claims ar
 **Analysis:**
 
 ```typescript
-export async function withErrorHandling<T>(operation: () => Promise<T>, store: ErrorHandlingFrontendStore): Promise<T>;
+export async function withErrorHandling<T>(
+ operation: () => Promise<T>,
+ store: ErrorHandlingFrontendStore
+): Promise<T>;
 export async function withErrorHandling<T>(
  operation: () => Promise<T>,
  context: ErrorHandlingBackendContext
@@ -119,11 +122,15 @@ export async function withErrorHandling<T>(
 
 ```typescript
 export function getEnvironment(): string {
- return typeof process === "undefined" ? "unknown" : (process.env.NODE_ENV ?? "unknown");
+ return typeof process === "undefined"
+  ? "unknown"
+  : (process.env.NODE_ENV ?? "unknown");
 }
 
 export function getNodeEnv(): string {
- return typeof process === "undefined" ? "development" : (process.env.NODE_ENV ?? "development");
+ return typeof process === "undefined"
+  ? "development"
+  : (process.env.NODE_ENV ?? "development");
 }
 ```
 

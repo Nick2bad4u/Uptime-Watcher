@@ -70,7 +70,10 @@ export interface SiteActionsResult {
  * }
  * ```
  */
-export function useSiteActions(site: Site, monitor: Monitor | undefined): SiteActionsResult {
+export function useSiteActions(
+    site: Site,
+    monitor: Monitor | undefined
+): SiteActionsResult {
     const {
         checkSiteNow,
         setSelectedMonitorId,
@@ -86,7 +89,11 @@ export function useSiteActions(site: Site, monitor: Monitor | undefined): SiteAc
         if (!monitor) {
             logger.site.error(
                 site.identifier,
-                ensureError(new Error("Attempted to start monitoring without valid monitor"))
+                ensureError(
+                    new Error(
+                        "Attempted to start monitoring without valid monitor"
+                    )
+                )
             );
             return;
         }
@@ -109,7 +116,11 @@ export function useSiteActions(site: Site, monitor: Monitor | undefined): SiteAc
         if (!monitor) {
             logger.site.error(
                 site.identifier,
-                ensureError(new Error("Attempted to stop monitoring without valid monitor"))
+                ensureError(
+                    new Error(
+                        "Attempted to stop monitoring without valid monitor"
+                    )
+                )
             );
             return;
         }
@@ -162,7 +173,12 @@ export function useSiteActions(site: Site, monitor: Monitor | undefined): SiteAc
     // Perform an immediate status check with enhanced logging
     const handleCheckNow = useCallback(() => {
         if (!monitor) {
-            logger.site.error(site.identifier, ensureError(new Error("Attempted to check site without valid monitor")));
+            logger.site.error(
+                site.identifier,
+                ensureError(
+                    new Error("Attempted to check site without valid monitor")
+                )
+            );
             return;
         }
 

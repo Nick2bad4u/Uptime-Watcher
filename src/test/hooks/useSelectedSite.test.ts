@@ -101,7 +101,9 @@ describe("useSelectedSite", () => {
 
     describe("Store selector behavior", () => {
         it("should call useUIStore with correct selector", () => {
-            mockUseUIStore.mockImplementation((selector: any) => selector({ selectedSiteId: "site-1" }));
+            mockUseUIStore.mockImplementation((selector: any) =>
+                selector({ selectedSiteId: "site-1" })
+            );
             mockUseSitesStore.mockReturnValue(mockSites);
 
             renderHook(() => useSelectedSite());
@@ -111,11 +113,15 @@ describe("useSelectedSite", () => {
 
         it("should call useSitesStore with correct selector", () => {
             mockUseUIStore.mockReturnValue("site-1");
-            mockUseSitesStore.mockImplementation((selector: any) => selector({ sites: mockSites }));
+            mockUseSitesStore.mockImplementation((selector: any) =>
+                selector({ sites: mockSites })
+            );
 
             renderHook(() => useSelectedSite());
 
-            expect(mockUseSitesStore).toHaveBeenCalledWith(expect.any(Function));
+            expect(mockUseSitesStore).toHaveBeenCalledWith(
+                expect.any(Function)
+            );
         });
     });
 
@@ -161,9 +167,24 @@ describe("useSelectedSite", () => {
     describe("Edge cases", () => {
         it("should handle sites with similar identifiers", () => {
             const sitesWithSimilarIds: Site[] = [
-                { identifier: "site", name: "Test Site 1", monitors: [], monitoring: true },
-                { identifier: "site-1", name: "Test Site 2", monitors: [], monitoring: true },
-                { identifier: "site-10", name: "Test Site 3", monitors: [], monitoring: false },
+                {
+                    identifier: "site",
+                    name: "Test Site 1",
+                    monitors: [],
+                    monitoring: true,
+                },
+                {
+                    identifier: "site-1",
+                    name: "Test Site 2",
+                    monitors: [],
+                    monitoring: true,
+                },
+                {
+                    identifier: "site-10",
+                    name: "Test Site 3",
+                    monitors: [],
+                    monitoring: false,
+                },
             ];
 
             mockUseUIStore.mockReturnValue("site-1");
@@ -177,8 +198,18 @@ describe("useSelectedSite", () => {
 
         it("should handle duplicate site identifiers (returns first match)", () => {
             const sitesWithDuplicates: Site[] = [
-                { identifier: "duplicate", name: "First Duplicate", monitors: [], monitoring: true },
-                { identifier: "duplicate", name: "Second Duplicate", monitors: [], monitoring: false },
+                {
+                    identifier: "duplicate",
+                    name: "First Duplicate",
+                    monitors: [],
+                    monitoring: true,
+                },
+                {
+                    identifier: "duplicate",
+                    name: "Second Duplicate",
+                    monitors: [],
+                    monitoring: false,
+                },
             ];
 
             mockUseUIStore.mockReturnValue("duplicate");
@@ -248,7 +279,9 @@ describe("useSelectedSite", () => {
 
             // Update sites array with modified site
             const updatedSites = mockSites.map((site) =>
-                site.identifier === "site-1" ? { ...site, name: "Updated Test Site 1" } : site
+                site.identifier === "site-1"
+                    ? { ...site, name: "Updated Test Site 1" }
+                    : site
             );
             mockUseSitesStore.mockReturnValue(updatedSites);
             rerender();

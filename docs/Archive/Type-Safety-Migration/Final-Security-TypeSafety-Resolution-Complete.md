@@ -80,7 +80,10 @@ export function isThemeConfig(obj: unknown): obj is ThemeConfig {
 ```typescript
 // ❌ INSUFFICIENT: Basic disable without security context
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic field assignment from database schema
-(monitor as any)[fieldDef.sourceField] = convertFromDatabase(value, fieldDef.sqlType);
+(monitor as any)[fieldDef.sourceField] = convertFromDatabase(
+ value,
+ fieldDef.sqlType
+);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, security/detect-object-injection -- Dynamic field assignment from monitor type
 (monitor as any)[key] = value;
@@ -91,7 +94,10 @@ export function isThemeConfig(obj: unknown): obj is ThemeConfig {
 ```typescript
 // ✅ COMPREHENSIVE: Detailed security justification with validation context
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- Dynamic field assignment required for extensible monitor type system. fieldDef.sourceField is validated by generateDatabaseFieldDefinitions() from monitor type registry.
-(monitor as any)[fieldDef.sourceField] = convertFromDatabase(value, fieldDef.sqlType);
+(monitor as any)[fieldDef.sourceField] = convertFromDatabase(
+ value,
+ fieldDef.sqlType
+);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, security/detect-object-injection -- Dynamic field assignment required for monitor type system. Key is validated from dynamicMonitor which comes from typed database mapping.
 (monitor as any)[key] = value;
@@ -190,7 +196,10 @@ export function isColorPalette(obj: unknown): obj is ColorPalette {
 const fieldDefs = generateDatabaseFieldDefinitions(); // Validated source
 for (const fieldDef of fieldDefs) {
  // fieldDef.sourceField is pre-validated by type registry
- (monitor as any)[fieldDef.sourceField] = convertFromDatabase(value, fieldDef.sqlType);
+ (monitor as any)[fieldDef.sourceField] = convertFromDatabase(
+  value,
+  fieldDef.sqlType
+ );
 }
 ```
 

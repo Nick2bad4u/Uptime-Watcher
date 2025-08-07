@@ -52,4 +52,4 @@ export const SiteList = (): JSX.Element => {
             ))}
         </div>
     );
-}
+};

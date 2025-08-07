@@ -15,8 +15,17 @@ import type { JSX } from "react/jsx-runtime";
 
 import { memo, type MemoExoticComponent } from "react";
 
-import { ResponseTimeChartData, StatusBarChartData, UptimeChartData } from "../../../services/chartConfig";
-import { Bar, ChartOptions, Doughnut, Line } from "../../../services/chartSetup";
+import {
+    ResponseTimeChartData,
+    StatusBarChartData,
+    UptimeChartData,
+} from "../../../services/chartConfig";
+import {
+    Bar,
+    ChartOptions,
+    Doughnut,
+    Line,
+} from "../../../services/chartSetup";
 
 /**
  * Response time line chart component with memoization for performance optimization.
@@ -29,10 +38,22 @@ import { Bar, ChartOptions, Doughnut, Line } from "../../../services/chartSetup"
  * @returns Memoized line chart component
  */
 export const ResponseTimeChart: MemoExoticComponent<
-    ({ data, options }: { data: ResponseTimeChartData; options: ChartOptions<"line"> }) => JSX.Element
-> = memo(({ data, options }: { readonly data: ResponseTimeChartData; readonly options: ChartOptions<"line"> }) => (
-    <Line data={data} options={options} />
-));
+    ({
+        data,
+        options,
+    }: {
+        data: ResponseTimeChartData;
+        options: ChartOptions<"line">;
+    }) => JSX.Element
+> = memo(
+    ({
+        data,
+        options,
+    }: {
+        readonly data: ResponseTimeChartData;
+        readonly options: ChartOptions<"line">;
+    }) => <Line data={data} options={options} />
+);
 
 /**
  * Uptime distribution doughnut chart component with memoization for performance optimization.
@@ -45,10 +66,22 @@ export const ResponseTimeChart: MemoExoticComponent<
  * @returns Memoized doughnut chart component
  */
 export const UptimeChart: MemoExoticComponent<
-    ({ data, options }: { data: UptimeChartData; options: ChartOptions<"doughnut"> }) => JSX.Element
-> = memo(({ data, options }: { readonly data: UptimeChartData; readonly options: ChartOptions<"doughnut"> }) => (
-    <Doughnut data={data} options={options} />
-));
+    ({
+        data,
+        options,
+    }: {
+        data: UptimeChartData;
+        options: ChartOptions<"doughnut">;
+    }) => JSX.Element
+> = memo(
+    ({
+        data,
+        options,
+    }: {
+        readonly data: UptimeChartData;
+        readonly options: ChartOptions<"doughnut">;
+    }) => <Doughnut data={data} options={options} />
+);
 
 /**
  * Status distribution bar chart component with memoization for performance optimization.
@@ -61,10 +94,22 @@ export const UptimeChart: MemoExoticComponent<
  * @returns Memoized bar chart component
  */
 export const StatusChart: MemoExoticComponent<
-    ({ data, options }: { data: StatusBarChartData; options: ChartOptions<"bar"> }) => JSX.Element
-> = memo(({ data, options }: { readonly data: StatusBarChartData; readonly options: ChartOptions<"bar"> }) => (
-    <Bar data={data} options={options} />
-));
+    ({
+        data,
+        options,
+    }: {
+        data: StatusBarChartData;
+        options: ChartOptions<"bar">;
+    }) => JSX.Element
+> = memo(
+    ({
+        data,
+        options,
+    }: {
+        readonly data: StatusBarChartData;
+        readonly options: ChartOptions<"bar">;
+    }) => <Bar data={data} options={options} />
+);
 
 // Set display names for better debugging and React DevTools experience
 // These names appear in React DevTools and error stack traces for easier debugging

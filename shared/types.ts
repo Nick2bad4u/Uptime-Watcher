@@ -182,7 +182,9 @@ export interface StatusUpdate {
     timestamp: string;
 }
 
-export function isComputedSiteStatus(status: string): status is "mixed" | "unknown" {
+export function isComputedSiteStatus(
+    status: string
+): status is "mixed" | "unknown" {
     return ["mixed", "unknown"].includes(status);
 }
 
@@ -227,7 +229,9 @@ export function validateMonitor(monitor: Partial<Monitor>): monitor is Monitor {
  * @param activeOperations - Array to validate
  * @returns True if all elements are valid identifiers
  */
-function isValidActiveOperations(activeOperations: unknown): activeOperations is string[] {
+function isValidActiveOperations(
+    activeOperations: unknown
+): activeOperations is string[] {
     if (!Array.isArray(activeOperations)) {
         return false;
     }

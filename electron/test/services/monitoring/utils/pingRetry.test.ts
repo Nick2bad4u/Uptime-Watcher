@@ -10,7 +10,10 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import type { MockedFunction } from "vitest";
 import * as ping from "ping";
 
-import { performPingCheckWithRetry, performSinglePingCheck } from "../../../../services/monitoring/utils/pingRetry";
+import {
+    performPingCheckWithRetry,
+    performSinglePingCheck,
+} from "../../../../services/monitoring/utils/pingRetry";
 import { MonitorCheckResult } from "../../../../services/monitoring/types";
 import * as operationalHooksModule from "../../../../utils/operationalHooks";
 import * as errorHandlingModule from "../../../../services/monitoring/utils/pingErrorHandling";
@@ -21,15 +24,17 @@ const mockPing = ping as any;
 
 // Mock operational hooks
 vi.mock("../../../../utils/operationalHooks");
-const mockWithOperationalHooks = operationalHooksModule.withOperationalHooks as MockedFunction<
-    typeof operationalHooksModule.withOperationalHooks
->;
+const mockWithOperationalHooks =
+    operationalHooksModule.withOperationalHooks as MockedFunction<
+        typeof operationalHooksModule.withOperationalHooks
+    >;
 
 // Mock error handling
 vi.mock("../../../../services/monitoring/utils/pingErrorHandling");
-const mockHandlePingCheckError = errorHandlingModule.handlePingCheckError as MockedFunction<
-    typeof errorHandlingModule.handlePingCheckError
->;
+const mockHandlePingCheckError =
+    errorHandlingModule.handlePingCheckError as MockedFunction<
+        typeof errorHandlingModule.handlePingCheckError
+    >;
 
 // Mock electron utils and logger
 vi.mock("../../../../electronUtils", () => ({
@@ -101,7 +106,10 @@ describe("pingRetry utilities", () => {
         it("should handle unreachable host", async () => {
             mockPing.promise.probe.mockResolvedValue(failedPingResult);
 
-            const result = await performSinglePingCheck("unreachable.com", 3000);
+            const result = await performSinglePingCheck(
+                "unreachable.com",
+                3000
+            );
 
             expect(result.status).toBe("down");
             expect(result.details).toBe("Host unreachable");
@@ -122,7 +130,9 @@ describe("pingRetry utilities", () => {
 
             expect(result.status).toBe("up");
             expect(result.responseTime).toBeGreaterThanOrEqual(0);
-            expect(result.responseTime).toBeLessThanOrEqual(endTime - startTime + 10); // Allow 10ms tolerance
+            expect(result.responseTime).toBeLessThanOrEqual(
+                endTime - startTime + 10
+            ); // Allow 10ms tolerance
         });
 
         it("should convert timeout from milliseconds to seconds", async () => {
@@ -153,15 +163,17 @@ describe("pingRetry utilities", () => {
             const pingError = new Error("Network unreachable");
             mockPing.promise.probe.mockRejectedValue(pingError);
 
-            await expect(performSinglePingCheck("example.com", 5000)).rejects.toThrow(
-                "Ping failed: Network unreachable"
-            );
+            await expect(
+                performSinglePingCheck("example.com", 5000)
+            ).rejects.toThrow("Ping failed: Network unreachable");
         });
 
         it("should handle non-Error exceptions", async () => {
             mockPing.promise.probe.mockRejectedValue("String error");
 
-            await expect(performSinglePingCheck("example.com", 5000)).rejects.toThrow("Ping failed: String error");
+            await expect(
+                performSinglePingCheck("example.com", 5000)
+            ).rejects.toThrow("Ping failed: String error");
         });
 
         it("should use cross-platform ping options only", async () => {
@@ -204,17 +216,24 @@ describe("pingRetry utilities", () => {
 
             await performPingCheckWithRetry("example.com", 5000, 3);
 
-            expect(mockWithOperationalHooks).toHaveBeenCalledWith(expect.any(Function), {
-                initialDelay: expect.any(Number),
-                maxRetries: 3,
-                operationName: "ping-check",
-            });
+            expect(mockWithOperationalHooks).toHaveBeenCalledWith(
+                expect.any(Function),
+                {
+                    initialDelay: expect.any(Number),
+                    maxRetries: 3,
+                    operationName: "ping-check",
+                }
+            );
         });
 
         it("should return successful result on first attempt", async () => {
             mockWithOperationalHooks.mockResolvedValue(mockSingleCheckResult);
 
-            const result = await performPingCheckWithRetry("google.com", 5000, 3);
+            const result = await performPingCheckWithRetry(
+                "google.com",
+                5000,
+                3
+            );
 
             expect(result).toEqual(mockSingleCheckResult);
         });
@@ -231,7 +250,11 @@ describe("pingRetry utilities", () => {
             mockWithOperationalHooks.mockRejectedValue(error);
             mockHandlePingCheckError.mockReturnValue(errorResult);
 
-            const result = await performPingCheckWithRetry("unreachable.com", 3000, 2);
+            const result = await performPingCheckWithRetry(
+                "unreachable.com",
+                3000,
+                2
+            );
 
             expect(result).toEqual(errorResult);
             expect(mockHandlePingCheckError).toHaveBeenCalledWith(error, {
@@ -244,7 +267,11 @@ describe("pingRetry utilities", () => {
         it("should handle zero retries (single attempt only)", async () => {
             mockWithOperationalHooks.mockResolvedValue(mockSingleCheckResult);
 
-            const result = await performPingCheckWithRetry("example.com", 5000, 0);
+            const result = await performPingCheckWithRetry(
+                "example.com",
+                5000,
+                0
+            );
 
             expect(result).toEqual(mockSingleCheckResult);
             expect(mockWithOperationalHooks).toHaveBeenCalledWith(
@@ -356,13 +383,17 @@ describe("pingRetry utilities", () => {
         it("should handle ping library returning null", async () => {
             mockPing.promise.probe.mockResolvedValue(null);
 
-            await expect(performSinglePingCheck("example.com", 5000)).rejects.toThrow();
+            await expect(
+                performSinglePingCheck("example.com", 5000)
+            ).rejects.toThrow();
         });
 
         it("should handle ping library returning undefined", async () => {
             mockPing.promise.probe.mockResolvedValue(undefined);
 
-            await expect(performSinglePingCheck("example.com", 5000)).rejects.toThrow();
+            await expect(
+                performSinglePingCheck("example.com", 5000)
+            ).rejects.toThrow();
         });
 
         it("should handle malformed ping result", async () => {

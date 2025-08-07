@@ -48,7 +48,9 @@ describe("useSiteStats Edge Cases", () => {
                 return record;
             });
 
-            const { result } = renderHook(() => useSiteStats(problematicHistory));
+            const { result } = renderHook(() =>
+                useSiteStats(problematicHistory)
+            );
 
             // Verify that the calculation works even with proxy access
             expect(result.current.averageResponseTime).toBe(150); // (100+200)/2 = 150
@@ -65,7 +67,9 @@ describe("useSiteStats Edge Cases", () => {
             ];
 
             // Freeze objects to test defensive programming
-            const frozenHistory = history.map((record) => Object.freeze({ ...record }));
+            const frozenHistory = history.map((record) =>
+                Object.freeze({ ...record })
+            );
 
             const { result } = renderHook(() => useSiteStats(frozenHistory));
 

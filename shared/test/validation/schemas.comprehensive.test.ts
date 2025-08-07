@@ -668,7 +668,10 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 lastChecked: undefined, // Explicitly undefined
             };
 
-            const result = validateMonitorData("http", dataWithUndefinedOptional);
+            const result = validateMonitorData(
+                "http",
+                dataWithUndefinedOptional
+            );
             expect(result.success).toBe(true);
         });
 
@@ -695,7 +698,11 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
 
     describe("validateMonitorField", () => {
         it("should validate individual field successfully", () => {
-            const result = validateMonitorField("http", "url", "https://example.com");
+            const result = validateMonitorField(
+                "http",
+                "url",
+                "https://example.com"
+            );
             expect(result.success).toBe(true);
             expect(result.errors).toHaveLength(0);
         });
@@ -707,7 +714,11 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         });
 
         it("should return error for unknown monitor type", () => {
-            const result = validateMonitorField("unknown", "url", "https://example.com");
+            const result = validateMonitorField(
+                "unknown",
+                "url",
+                "https://example.com"
+            );
             expect(result.success).toBe(false);
             expect(result.errors).toContain("Unknown monitor type: unknown");
         });
@@ -720,9 +731,17 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
 
         it("should handle edge cases and internal function coverage", () => {
             // Test validateFieldWithSchema with unknown field name
-            const result = validateMonitorField("http", "unknownField", "value");
+            const result = validateMonitorField(
+                "http",
+                "unknownField",
+                "value"
+            );
             expect(result.success).toBe(false);
-            expect(result.errors.some((error) => error.includes("Field validation failed"))).toBe(true);
+            expect(
+                result.errors.some((error) =>
+                    error.includes("Field validation failed")
+                )
+            ).toBe(true);
         });
 
         it("should handle field validation for common base fields", () => {
@@ -1004,8 +1023,12 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 lastChecked: new Date(),
             };
 
-            expect(() => httpMonitorSchema.parse(monitorWithoutDate)).not.toThrow();
-            expect(() => httpMonitorSchema.parse(monitorWithDate)).not.toThrow();
+            expect(() =>
+                httpMonitorSchema.parse(monitorWithoutDate)
+            ).not.toThrow();
+            expect(() =>
+                httpMonitorSchema.parse(monitorWithDate)
+            ).not.toThrow();
         });
     });
 
@@ -1049,7 +1072,10 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     lastChecked: undefined, // Explicitly undefined to test the optional field branch
                 };
 
-                const result = validateMonitorData("http", dataWithUndefinedOptional);
+                const result = validateMonitorData(
+                    "http",
+                    dataWithUndefinedOptional
+                );
                 expect(result.success).toBe(true);
             });
         });
@@ -1059,7 +1085,11 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 // This test targets line 484 - fallback to base schema for common fields
                 // We'll test a field that exists in base schema but might not be directly accessible in type-specific schema shape
                 try {
-                    const result = validateMonitorField("http", "responseTime", 100);
+                    const result = validateMonitorField(
+                        "http",
+                        "responseTime",
+                        100
+                    );
                     expect(result.success).toBe(true);
                     expect(result.data).toHaveProperty("responseTime", 100);
                 } catch (error) {
@@ -1071,18 +1101,33 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
 
             it("should throw error for completely unknown fields", () => {
                 // This tests the final throw for unknown fields
-                const result = validateMonitorField("http", "nonExistentField", "value");
+                const result = validateMonitorField(
+                    "http",
+                    "nonExistentField",
+                    "value"
+                );
                 expect(result.success).toBe(false);
                 expect(
-                    result.errors.some((error) => error.includes("Unknown field") || error.includes("nonExistentField"))
+                    result.errors.some(
+                        (error) =>
+                            error.includes("Unknown field") ||
+                            error.includes("nonExistentField")
+                    )
                 ).toBe(true);
             });
 
             it("should handle fields that exist in specific schema shape", () => {
                 // Test that URL field works for HTTP monitors (exists in httpMonitorSchema.shape)
-                const result = validateMonitorField("http", "url", "https://example.com");
+                const result = validateMonitorField(
+                    "http",
+                    "url",
+                    "https://example.com"
+                );
                 expect(result.success).toBe(true);
-                expect(result.data).toHaveProperty("url", "https://example.com");
+                expect(result.data).toHaveProperty(
+                    "url",
+                    "https://example.com"
+                );
             });
 
             it("should handle base schema fields for different monitor types", () => {
@@ -1110,13 +1155,19 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                             expect(result.success).toBe(true);
                         } catch (error) {
                             // Some combinations might be invalid, that's OK for this test
-                            console.log(`Field ${fieldName} for type ${monitorType} threw:`, error);
+                            console.log(
+                                `Field ${fieldName} for type ${monitorType} threw:`,
+                                error
+                            );
                         }
                     }
                 }
             });
 
-            function getValidValueForField(fieldName: string, monitorType: string): unknown {
+            function getValidValueForField(
+                fieldName: string,
+                monitorType: string
+            ): unknown {
                 const validValues: Record<string, unknown> = {
                     id: "test-id",
                     type: monitorType,
@@ -1138,13 +1189,21 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             it("should handle unknown monitor type in validateMonitorData", () => {
                 const result = validateMonitorData("unknown-type", {});
                 expect(result.success).toBe(false);
-                expect(result.errors).toContain("Unknown monitor type: unknown-type");
+                expect(result.errors).toContain(
+                    "Unknown monitor type: unknown-type"
+                );
             });
 
             it("should handle unknown monitor type in validateMonitorField", () => {
-                const result = validateMonitorField("unknown-type", "id", "test");
+                const result = validateMonitorField(
+                    "unknown-type",
+                    "id",
+                    "test"
+                );
                 expect(result.success).toBe(false);
-                expect(result.errors).toContain("Unknown monitor type: unknown-type");
+                expect(result.errors).toContain(
+                    "Unknown monitor type: unknown-type"
+                );
             });
 
             it("should handle non-Error objects in error handling", () => {

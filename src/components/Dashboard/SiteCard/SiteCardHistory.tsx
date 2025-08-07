@@ -48,40 +48,55 @@ export interface SiteCardHistoryProperties {
  * />
  * ```
  */
-export const SiteCardHistory: React.NamedExoticComponent<SiteCardHistoryProperties> = React.memo(
-    function SiteCardHistory({ filteredHistory, monitor }: SiteCardHistoryProperties) {
-        // Get monitor type configurations
-        const { options } = useMonitorTypes();
+export const SiteCardHistory: React.NamedExoticComponent<SiteCardHistoryProperties> =
+    React.memo(
+        function SiteCardHistory({
+            filteredHistory,
+            monitor,
+        }: SiteCardHistoryProperties) {
+            // Get monitor type configurations
+            const { options } = useMonitorTypes();
 
-        // Memoize the history title calculation with optimized dependencies
-        const historyTitle = useMemo(() => {
-            if (!monitor) {
-                return "No Monitor Selected";
-            }
+            // Memoize the history title calculation with optimized dependencies
+            const historyTitle = useMemo(() => {
+                if (!monitor) {
+                    return "No Monitor Selected";
+                }
 
-            // Get display name from monitor type options
-            const monitorTypeOption = options.find((option) => option.value === monitor.type);
-            const displayName = monitorTypeOption?.label ?? monitor.type;
+                // Get display name from monitor type options
+                const monitorTypeOption = options.find(
+                    (option) => option.value === monitor.type
+                );
+                const displayName = monitorTypeOption?.label ?? monitor.type;
 
-            // Get type-specific suffix using dynamic formatter
-            const suffix = formatTitleSuffix(monitor);
+                // Get type-specific suffix using dynamic formatter
+                const suffix = formatTitleSuffix(monitor);
 
-            return `${displayName} History${suffix}`;
-        }, [monitor, options]);
+                return `${displayName} History${suffix}`;
+            }, [monitor, options]);
 
-        return <HistoryChart history={filteredHistory} maxItems={MAX_HISTORY_ITEMS} title={historyTitle} />;
-    },
-    (previousProperties, nextProperties) => {
-        return areHistoryPropsEqual(previousProperties, nextProperties);
-    }
-);
+            return (
+                <HistoryChart
+                    history={filteredHistory}
+                    maxItems={MAX_HISTORY_ITEMS}
+                    title={historyTitle}
+                />
+            );
+        },
+        (previousProperties, nextProperties) => {
+            return areHistoryPropsEqual(previousProperties, nextProperties);
+        }
+    );
 
 /**
  * Compare SiteCardHistory props to determine if re-render is needed.
  * Broken into smaller functions to reduce complexity.
  */
 
-function areHistoryPropsEqual(previous: SiteCardHistoryProperties, next: SiteCardHistoryProperties): boolean {
+function areHistoryPropsEqual(
+    previous: SiteCardHistoryProperties,
+    next: SiteCardHistoryProperties
+): boolean {
     // Compare history arrays
     if (previous.filteredHistory.length !== next.filteredHistory.length) {
         return false;
@@ -101,7 +116,10 @@ function areHistoryPropsEqual(previous: SiteCardHistoryProperties, next: SiteCar
     if (prevMonitor === undefined || nextMonitor === undefined) {
         return false;
     }
-    if (prevMonitor.id !== nextMonitor.id || prevMonitor.type !== nextMonitor.type) {
+    if (
+        prevMonitor.id !== nextMonitor.id ||
+        prevMonitor.type !== nextMonitor.type
+    ) {
         return false;
     }
     return !(

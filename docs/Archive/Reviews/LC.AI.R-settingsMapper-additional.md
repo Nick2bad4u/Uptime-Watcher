@@ -29,7 +29,9 @@ From the attached file, I can see that settingsMapper.ts has already been signif
 Looking at the attached code:
 
 ```typescript
-export function settingsToRecord(settings: SettingRow[]): Record<string, string> {
+export function settingsToRecord(
+ settings: SettingRow[]
+): Record<string, string> {
  const result: Record<string, string> = {};
 
  for (const setting of settings) {
@@ -66,7 +68,10 @@ The casting is indeed awkward because:
 **Analysis**: Current error logging in `rowToSetting()`:
 
 ```typescript
-logger.error("[SettingsMapper] Failed to map database row to setting", { error, row });
+logger.error("[SettingsMapper] Failed to map database row to setting", {
+ error,
+ row,
+});
 ```
 
 Missing:

@@ -74,7 +74,9 @@ export class SiteService {
      * @throws Error when any deletion operation fails.
      * @public
      */
-    public async deleteSiteWithRelatedData(identifier: string): Promise<boolean> {
+    public async deleteSiteWithRelatedData(
+        identifier: string
+    ): Promise<boolean> {
         return withErrorHandling(
             async () => {
                 // Validate input
@@ -83,39 +85,59 @@ export class SiteService {
                 }
 
                 return this.databaseService.executeTransaction(async () => {
-                    logger.debug(`[SiteService] Starting deletion of site ${identifier} with related data`);
+                    logger.debug(
+                        `[SiteService] Starting deletion of site ${identifier} with related data`
+                    );
 
                     // First get monitors to delete their history
-                    const monitors = await this.monitorRepository.findBySiteIdentifier(identifier);
-                    logger.debug(`[SiteService] Found ${monitors.length} monitors to delete for site ${identifier}`);
+                    const monitors =
+                        await this.monitorRepository.findBySiteIdentifier(
+                            identifier
+                        );
+                    logger.debug(
+                        `[SiteService] Found ${monitors.length} monitors to delete for site ${identifier}`
+                    );
 
                     // Delete history for each monitor
                     for (const monitor of monitors) {
                         try {
-                            await this.historyRepository.deleteByMonitorId(monitor.id);
+                            await this.historyRepository.deleteByMonitorId(
+                                monitor.id
+                            );
                         } catch (error) {
                             throw new Error(
                                 `Failed to delete history for monitor ${monitor.id} in site ${identifier}: ${error}`
                             );
                         }
                     }
-                    logger.debug(`[SiteService] Deleted history for ${monitors.length} monitors`);
+                    logger.debug(
+                        `[SiteService] Deleted history for ${monitors.length} monitors`
+                    );
 
                     // Delete monitors for the site
                     try {
-                        await this.monitorRepository.deleteBySiteIdentifier(identifier);
+                        await this.monitorRepository.deleteBySiteIdentifier(
+                            identifier
+                        );
                     } catch (error) {
-                        throw new Error(`Failed to delete monitors for site ${identifier}: ${error}`);
+                        throw new Error(
+                            `Failed to delete monitors for site ${identifier}: ${error}`
+                        );
                     }
-                    logger.debug(`[SiteService] Deleted monitors for site ${identifier}`);
+                    logger.debug(
+                        `[SiteService] Deleted monitors for site ${identifier}`
+                    );
 
                     // Finally delete the site itself
-                    const siteDeleted = await this.siteRepository.delete(identifier);
+                    const siteDeleted =
+                        await this.siteRepository.delete(identifier);
                     if (!siteDeleted) {
                         throw new Error(`Failed to delete site ${identifier}`);
                     }
 
-                    logger.info(`[SiteService] Successfully deleted site ${identifier} with all related data`);
+                    logger.info(
+                        `[SiteService] Successfully deleted site ${identifier} with all related data`
+                    );
                     return true;
                 });
             },
@@ -136,7 +158,9 @@ export class SiteService {
      * @returns Promise resolving to the site with details, or undefined if not found.
      * @public
      */
-    public async findByIdentifierWithDetails(identifier: string): Promise<Site | undefined> {
+    public async findByIdentifierWithDetails(
+        identifier: string
+    ): Promise<Site | undefined> {
         return withErrorHandling(
             async () => {
                 // Validate input
@@ -145,19 +169,26 @@ export class SiteService {
                 }
 
                 // First get the site data
-                const siteRow = await this.siteRepository.findByIdentifier(identifier);
+                const siteRow =
+                    await this.siteRepository.findByIdentifier(identifier);
                 if (!siteRow) {
                     logger.debug(`[SiteService] Site not found: ${identifier}`);
                     return;
                 }
 
                 // Then get monitors for this site
-                const monitors = await this.monitorRepository.findBySiteIdentifier(identifier);
+                const monitors =
+                    await this.monitorRepository.findBySiteIdentifier(
+                        identifier
+                    );
 
                 // Fetch monitor history in parallel for better performance
                 if (monitors.length > 0) {
                     const historyPromises = monitors.map(async (monitor) => {
-                        monitor.history = await this.historyRepository.findByMonitorId(monitor.id);
+                        monitor.history =
+                            await this.historyRepository.findByMonitorId(
+                                monitor.id
+                            );
                         return monitor;
                     });
                     await Promise.all(historyPromises);
@@ -171,7 +202,9 @@ export class SiteService {
                     name: this.getDisplayName(siteRow.name),
                 };
 
-                logger.debug(`[SiteService] Found site ${identifier} with ${monitors.length} monitors`);
+                logger.debug(
+                    `[SiteService] Found site ${identifier} with ${monitors.length} monitors`
+                );
                 return site;
             },
             {
@@ -195,19 +228,29 @@ export class SiteService {
             async () => {
                 // Get all site rows
                 const siteRows = await this.siteRepository.findAll();
-                logger.debug(`[SiteService] Loading details for ${siteRows.length} sites`);
+                logger.debug(
+                    `[SiteService] Loading details for ${siteRows.length} sites`
+                );
 
                 // Process sites in parallel for better performance
                 const sites = await Promise.all(
                     siteRows.map(async (siteRow) => {
-                        const monitors = await this.monitorRepository.findBySiteIdentifier(siteRow.identifier);
+                        const monitors =
+                            await this.monitorRepository.findBySiteIdentifier(
+                                siteRow.identifier
+                            );
 
                         // Fetch monitor history in parallel
                         if (monitors.length > 0) {
-                            const historyPromises = monitors.map(async (monitor) => {
-                                monitor.history = await this.historyRepository.findByMonitorId(monitor.id);
-                                return monitor;
-                            });
+                            const historyPromises = monitors.map(
+                                async (monitor) => {
+                                    monitor.history =
+                                        await this.historyRepository.findByMonitorId(
+                                            monitor.id
+                                        );
+                                    return monitor;
+                                }
+                            );
                             await Promise.all(historyPromises);
                         }
 
@@ -220,7 +263,9 @@ export class SiteService {
                     })
                 );
 
-                logger.info(`[SiteService] Loaded ${sites.length} sites with complete details`);
+                logger.info(
+                    `[SiteService] Loaded ${sites.length} sites with complete details`
+                );
                 return sites;
             },
             {

@@ -65,7 +65,9 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
 
         // Trigger hover to create timeout and portal
         act(() => {
-            thumbnail.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+            thumbnail.dispatchEvent(
+                new MouseEvent("mouseenter", { bubbles: true })
+            );
         });
 
         // Advance time to allow state changes
@@ -100,7 +102,9 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
 
         // Test the timeout creation path
         act(() => {
-            thumbnail.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+            thumbnail.dispatchEvent(
+                new MouseEvent("mouseenter", { bubbles: true })
+            );
 
             // This should create a timeout (stored in hoverTimeoutRef.current)
             // When component unmounts, it should clear this timeout (lines 60-61)
@@ -122,7 +126,9 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
 
         // Trigger hover to potentially create portal
         act(() => {
-            thumbnail.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+            thumbnail.dispatchEvent(
+                new MouseEvent("mouseenter", { bubbles: true })
+            );
             vi.advanceTimersByTime(500); // Advance past hover delay
         });
 
@@ -157,7 +163,9 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         });
 
         // Verify electronAPI was called
-        expect(mockElectronAPI.system.openExternal).toHaveBeenCalledWith("https://test.com");
+        expect(mockElectronAPI.system.openExternal).toHaveBeenCalledWith(
+            "https://test.com"
+        );
     });
 
     it("should handle rapid hover/unhover cycles", () => {
@@ -172,10 +180,18 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
 
         // Rapid hover/unhover to test timeout handling
         act(() => {
-            thumbnail.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
-            thumbnail.dispatchEvent(new MouseEvent("mouseleave", { bubbles: true }));
-            thumbnail.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
-            thumbnail.dispatchEvent(new MouseEvent("mouseleave", { bubbles: true }));
+            thumbnail.dispatchEvent(
+                new MouseEvent("mouseenter", { bubbles: true })
+            );
+            thumbnail.dispatchEvent(
+                new MouseEvent("mouseleave", { bubbles: true })
+            );
+            thumbnail.dispatchEvent(
+                new MouseEvent("mouseenter", { bubbles: true })
+            );
+            thumbnail.dispatchEvent(
+                new MouseEvent("mouseleave", { bubbles: true })
+            );
 
             // Advance timers to trigger any pending timeouts
             vi.advanceTimersByTime(1000);

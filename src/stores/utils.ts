@@ -36,11 +36,15 @@ import { BaseStore } from "./types";
  */
 export const createBaseStore = <T extends BaseStore>(
     set: (partial: Partial<T>) => void
-): Pick<T, "clearError" | "isLoading" | "lastError" | "setError" | "setLoading"> => ({
+): Pick<
+    T,
+    "clearError" | "isLoading" | "lastError" | "setError" | "setLoading"
+> => ({
     clearError: () => set({ lastError: undefined } as Partial<T>),
     isLoading: false,
     lastError: undefined,
-    setError: (error: string | undefined) => set({ lastError: error } as Partial<T>),
+    setError: (error: string | undefined) =>
+        set({ lastError: error } as Partial<T>),
     setLoading: (loading: boolean) => set({ isLoading: loading } as Partial<T>),
 });
 
@@ -71,7 +75,10 @@ export { withErrorHandling } from "@shared/utils/errorHandling";
  *
  * @public
  */
-export const createPersistConfig = <T>(name: string, partialize?: (state: T) => Partial<T>) => ({
+export const createPersistConfig = <T>(
+    name: string,
+    partialize?: (state: T) => Partial<T>
+) => ({
     name: `uptime-watcher-${name}`,
     partialize: partialize as ((state: T) => Partial<T>) | undefined,
 });
@@ -134,7 +141,11 @@ export const debounce = <T extends unknown[]>(
  *
  * @public
  */
-export const logStoreAction = (storeName: string, actionName: string, data?: unknown): void => {
+export const logStoreAction = (
+    storeName: string,
+    actionName: string,
+    data?: unknown
+): void => {
     if (isDevelopment()) {
         if (data !== undefined) {
             logger.info(`[${storeName}] ${actionName}`, data);
@@ -173,8 +184,14 @@ export const logStoreAction = (storeName: string, actionName: string, data?: unk
  *
  * @public
  */
-export async function waitForElectronAPI(maxAttempts = 50, baseDelay = 100): Promise<void> {
-    for (const attempt of Array.from({ length: maxAttempts }, (_, index) => index)) {
+export async function waitForElectronAPI(
+    maxAttempts = 50,
+    baseDelay = 100
+): Promise<void> {
+    for (const attempt of Array.from(
+        { length: maxAttempts },
+        (_, index) => index
+    )) {
         try {
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             if (typeof window.electronAPI?.sites?.getSites === "function") {

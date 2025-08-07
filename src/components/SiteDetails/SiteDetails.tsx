@@ -47,7 +47,11 @@ import { Site } from "../../types";
 import { parseUptimeValue } from "../../utils/monitoring/dataValidation";
 import { formatStatusWithIcon } from "../../utils/status";
 import "./SiteDetails.css";
-import { formatDuration, formatFullTimestamp, formatResponseTime } from "../../utils/time";
+import {
+    formatDuration,
+    formatFullTimestamp,
+    formatResponseTime,
+} from "../../utils/time";
 import { SiteDetailsHeader } from "./SiteDetailsHeader";
 import { SiteDetailsNavigation } from "./SiteDetailsNavigation";
 import { AnalyticsTab } from "./tabs/AnalyticsTab";
@@ -86,7 +90,10 @@ export interface SiteDetailsProperties {
  * />
  * ```
  */
-export const SiteDetails = ({ onClose, site }: SiteDetailsProperties): JSX.Element | null => {
+export const SiteDetails = ({
+    onClose,
+    site,
+}: SiteDetailsProperties): JSX.Element | null => {
     const { currentTheme } = useTheme();
     const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
 
@@ -154,11 +161,20 @@ export const SiteDetails = ({ onClose, site }: SiteDetailsProperties): JSX.Eleme
     } = useSiteDetails({ site });
 
     // Create chart config service instance
-    const chartConfig = useMemo(() => new ChartConfigService(currentTheme), [currentTheme]);
+    const chartConfig = useMemo(
+        () => new ChartConfigService(currentTheme),
+        [currentTheme]
+    );
 
     // Chart configurations using the service
-    const lineChartOptions = useMemo(() => chartConfig.getLineChartConfig(), [chartConfig]);
-    const barChartOptions = useMemo(() => chartConfig.getBarChartConfig(), [chartConfig]);
+    const lineChartOptions = useMemo(
+        () => chartConfig.getLineChartConfig(),
+        [chartConfig]
+    );
+    const barChartOptions = useMemo(
+        () => chartConfig.getBarChartConfig(),
+        [chartConfig]
+    );
     const doughnutOptions = useMemo(
         () => chartConfig.getDoughnutChartConfig(analytics.totalChecks),
         [chartConfig, analytics.totalChecks]
@@ -186,8 +202,14 @@ export const SiteDetails = ({ onClose, site }: SiteDetailsProperties): JSX.Eleme
         () => ({
             datasets: [
                 {
-                    backgroundColor: [currentTheme.colors.success, currentTheme.colors.error],
-                    borderColor: [currentTheme.colors.success, currentTheme.colors.error],
+                    backgroundColor: [
+                        currentTheme.colors.success,
+                        currentTheme.colors.error,
+                    ],
+                    borderColor: [
+                        currentTheme.colors.success,
+                        currentTheme.colors.error,
+                    ],
                     borderWidth: 1,
                     data: [analytics.upCount, analytics.downCount],
                     label: "Status Distribution",
@@ -202,8 +224,14 @@ export const SiteDetails = ({ onClose, site }: SiteDetailsProperties): JSX.Eleme
         () => ({
             datasets: [
                 {
-                    backgroundColor: [currentTheme.colors.success, currentTheme.colors.error],
-                    borderColor: [currentTheme.colors.success, currentTheme.colors.error],
+                    backgroundColor: [
+                        currentTheme.colors.success,
+                        currentTheme.colors.error,
+                    ],
+                    borderColor: [
+                        currentTheme.colors.success,
+                        currentTheme.colors.error,
+                    ],
                     borderWidth: 1,
                     data: [analytics.upCount, analytics.downCount],
                 },
@@ -215,7 +243,6 @@ export const SiteDetails = ({ onClose, site }: SiteDetailsProperties): JSX.Eleme
 
     // Don't render if site doesn't exist
     if (!siteExists) {
-         
         return null;
     }
 
@@ -243,7 +270,9 @@ export const SiteDetails = ({ onClose, site }: SiteDetailsProperties): JSX.Eleme
                         site={currentSite}
                         {...(selectedMonitor ? { selectedMonitor } : {})}
                         isCollapsed={isHeaderCollapsed}
-                        onToggleCollapse={() => setIsHeaderCollapsed(!isHeaderCollapsed)}
+                        onToggleCollapse={() =>
+                            setIsHeaderCollapsed(!isHeaderCollapsed)
+                        }
                     />
 
                     <SiteDetailsNavigation
@@ -270,8 +299,12 @@ export const SiteDetails = ({ onClose, site }: SiteDetailsProperties): JSX.Eleme
                             <SiteOverviewTab
                                 avgResponseTime={analytics.avgResponseTime}
                                 handleRemoveSite={handleRemoveSite}
-                                handleStartSiteMonitoring={handleStartSiteMonitoring}
-                                handleStopSiteMonitoring={handleStopSiteMonitoring}
+                                handleStartSiteMonitoring={
+                                    handleStartSiteMonitoring
+                                }
+                                handleStopSiteMonitoring={
+                                    handleStopSiteMonitoring
+                                }
                                 isLoading={isLoading}
                                 site={currentSite}
                                 totalChecks={analytics.totalChecks}
@@ -279,7 +312,8 @@ export const SiteDetails = ({ onClose, site }: SiteDetailsProperties): JSX.Eleme
                             />
                         )}
 
-                        {activeSiteDetailsTab === "monitor-overview" && selectedMonitor ? (
+                        {activeSiteDetailsTab === "monitor-overview" &&
+                        selectedMonitor ? (
                             <OverviewTab
                                 avgResponseTime={analytics.avgResponseTime}
                                 fastestResponse={analytics.fastestResponse}
@@ -304,7 +338,9 @@ export const SiteDetails = ({ onClose, site }: SiteDetailsProperties): JSX.Eleme
                             />
                         ) : null}
 
-                        {activeSiteDetailsTab === `${selectedMonitorId}-analytics` && selectedMonitor ? (
+                        {activeSiteDetailsTab ===
+                            `${selectedMonitorId}-analytics` &&
+                        selectedMonitor ? (
                             <AnalyticsTab
                                 avgResponseTime={analytics.avgResponseTime}
                                 barChartData={barChartData}
@@ -314,7 +350,9 @@ export const SiteDetails = ({ onClose, site }: SiteDetailsProperties): JSX.Eleme
                                 downtimePeriods={analytics.downtimePeriods}
                                 formatDuration={formatDuration}
                                 formatResponseTime={formatResponseTime}
-                                getAvailabilityDescription={getAvailabilityDescription}
+                                getAvailabilityDescription={
+                                    getAvailabilityDescription
+                                }
                                 lineChartData={lineChartData}
                                 lineChartOptions={lineChartOptions}
                                 monitorType={selectedMonitor.type}
@@ -323,9 +361,13 @@ export const SiteDetails = ({ onClose, site }: SiteDetailsProperties): JSX.Eleme
                                 p95={analytics.p95}
                                 p99={analytics.p99}
                                 setShowAdvancedMetrics={setShowAdvancedMetrics}
-                                setSiteDetailsChartTimeRange={setSiteDetailsChartTimeRange}
+                                setSiteDetailsChartTimeRange={
+                                    setSiteDetailsChartTimeRange
+                                }
                                 showAdvancedMetrics={showAdvancedMetrics}
-                                siteDetailsChartTimeRange={siteDetailsChartTimeRange}
+                                siteDetailsChartTimeRange={
+                                    siteDetailsChartTimeRange
+                                }
                                 totalChecks={analytics.totalChecks}
                                 totalDowntime={analytics.totalDowntime}
                                 upCount={analytics.upCount}
@@ -334,7 +376,8 @@ export const SiteDetails = ({ onClose, site }: SiteDetailsProperties): JSX.Eleme
                             />
                         ) : null}
 
-                        {activeSiteDetailsTab === "history" && selectedMonitor ? (
+                        {activeSiteDetailsTab === "history" &&
+                        selectedMonitor ? (
                             <HistoryTab
                                 formatFullTimestamp={formatFullTimestamp}
                                 formatResponseTime={formatResponseTime}
@@ -343,17 +386,22 @@ export const SiteDetails = ({ onClose, site }: SiteDetailsProperties): JSX.Eleme
                             />
                         ) : null}
 
-                        {activeSiteDetailsTab === "settings" && selectedMonitor ? (
+                        {activeSiteDetailsTab === "settings" &&
+                        selectedMonitor ? (
                             <SettingsTab
                                 currentSite={currentSite}
                                 handleIntervalChange={handleIntervalChange}
                                 handleRemoveSite={handleRemoveSite}
-                                handleRetryAttemptsChange={handleRetryAttemptsChange}
+                                handleRetryAttemptsChange={
+                                    handleRetryAttemptsChange
+                                }
                                 handleSaveInterval={() => {
                                     void handleSaveInterval();
                                 }}
                                 handleSaveName={handleSaveName}
-                                handleSaveRetryAttempts={handleSaveRetryAttempts}
+                                handleSaveRetryAttempts={
+                                    handleSaveRetryAttempts
+                                }
                                 handleSaveTimeout={handleSaveTimeout}
                                 handleTimeoutChange={handleTimeoutChange}
                                 hasUnsavedChanges={hasUnsavedChanges}
@@ -374,7 +422,7 @@ export const SiteDetails = ({ onClose, site }: SiteDetailsProperties): JSX.Eleme
             </dialog>
         </div>
     );
-}
+};
 
 /**
  * Gets a descriptive label for availability percentage.

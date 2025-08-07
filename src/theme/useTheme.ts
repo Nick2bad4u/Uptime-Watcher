@@ -5,7 +5,11 @@
 
 /* eslint-disable unicorn/consistent-function-scoping -- Hook functions must remain inside hooks for context access */
 
-import { isSiteStatus, type MonitorStatus, type SiteStatus } from "@shared/types";
+import {
+    isSiteStatus,
+    type MonitorStatus,
+    type SiteStatus,
+} from "@shared/types";
 import { useCallback, useEffect, useState } from "react";
 
 import { UI_DELAYS } from "../constants";
@@ -19,7 +23,9 @@ import { Theme, ThemeName } from "./types";
 interface UseAvailabilityColorsReturn {
     getAvailabilityColor: (percentage: number) => string;
     getAvailabilityDescription: (percentage: number) => string;
-    getAvailabilityVariant: (percentage: number) => "danger" | "success" | "warning";
+    getAvailabilityVariant: (
+        percentage: number
+    ) => "danger" | "success" | "warning";
 }
 
 /**
@@ -49,7 +55,9 @@ interface UseThemeClassesReturn {
     getSurfaceClass: (variant?: "base" | "elevated" | "overlay") => {
         backgroundColor: string;
     };
-    getTextClass: (variant?: "inverse" | "primary" | "secondary" | "tertiary") => {
+    getTextClass: (
+        variant?: "inverse" | "primary" | "secondary" | "tertiary"
+    ) => {
         color: string;
     };
 }
@@ -108,7 +116,9 @@ export function useAvailabilityColors(): UseAvailabilityColorsReturn {
         }
     };
 
-    const getAvailabilityVariant = (percentage: number): "danger" | "success" | "warning" => {
+    const getAvailabilityVariant = (
+        percentage: number
+    ): "danger" | "success" | "warning" => {
         const clampedPercentage = Math.max(0, Math.min(100, percentage));
 
         if (clampedPercentage >= 95) {
@@ -208,14 +218,20 @@ export function useTheme(): UseThemeReturn {
         setThemeVersion((previous) => previous + 1); // Force re-render of all themed components
     }, [getCurrentTheme]);
 
-    const updateSystemTheme = useCallback((newSystemTheme: "dark" | "light") => {
-        setSystemTheme(newSystemTheme);
-    }, []);
+    const updateSystemTheme = useCallback(
+        (newSystemTheme: "dark" | "light") => {
+            setSystemTheme(newSystemTheme);
+        },
+        []
+    );
 
     // Update theme when settings or systemTheme change
     useEffect(() => {
         // Use timeout to defer state update to avoid direct call in useEffect
-        const updateTimeoutId = setTimeout(updateCurrentTheme, UI_DELAYS.STATE_UPDATE_DEFER);
+        const updateTimeoutId = setTimeout(
+            updateCurrentTheme,
+            UI_DELAYS.STATE_UPDATE_DEFER
+        );
         return () => clearTimeout(updateTimeoutId);
     }, [settings.theme, systemTheme, updateCurrentTheme]);
 
@@ -226,14 +242,20 @@ export function useTheme(): UseThemeReturn {
         const cleanup = themeManager.onSystemThemeChange((isDark) => {
             const newSystemTheme = isDark ? "dark" : "light";
             // Use timeout to defer state update to avoid direct call in useEffect
-            const timeoutId = setTimeout(() => updateSystemTheme(newSystemTheme), UI_DELAYS.STATE_UPDATE_DEFER);
+            const timeoutId = setTimeout(
+                () => updateSystemTheme(newSystemTheme),
+                UI_DELAYS.STATE_UPDATE_DEFER
+            );
             timeoutIds.push(timeoutId);
         });
 
         // Set initial system theme using timeout
         const initialTheme = themeManager.getSystemThemePreference();
         // eslint-disable-next-line @eslint-react/web-api/no-leaked-timeout -- Timeout is properly cleaned up in the forEach loop below
-        const initialTimeoutId = setTimeout(() => updateSystemTheme(initialTheme), UI_DELAYS.STATE_UPDATE_DEFER);
+        const initialTimeoutId = setTimeout(
+            () => updateSystemTheme(initialTheme),
+            UI_DELAYS.STATE_UPDATE_DEFER
+        );
         timeoutIds.push(initialTimeoutId);
 
         return () => {
@@ -293,7 +315,11 @@ export function useTheme(): UseThemeReturn {
         const keys = path.split(".");
         let value: unknown = currentTheme.colors;
         for (const key of keys) {
-            if (value && typeof value === "object" && Object.hasOwn(value, key)) {
+            if (
+                value &&
+                typeof value === "object" &&
+                Object.hasOwn(value, key)
+            ) {
                 value = (value as Record<string, unknown>)[key];
             } else {
                 value = undefined;
@@ -302,7 +328,9 @@ export function useTheme(): UseThemeReturn {
         }
 
         // Use theme-aware fallback instead of hard-coded black
-        return typeof value === "string" ? value : currentTheme.colors.text.primary;
+        return typeof value === "string"
+            ? value
+            : currentTheme.colors.text.primary;
     };
 
     /**
@@ -369,25 +397,33 @@ export function useTheme(): UseThemeReturn {
 export function useThemeClasses(): UseThemeClassesReturn {
     const { getColor } = useTheme();
 
-    const getBackgroundClass = (variant: "primary" | "secondary" | "tertiary" = "primary") => {
+    const getBackgroundClass = (
+        variant: "primary" | "secondary" | "tertiary" = "primary"
+    ) => {
         return {
             backgroundColor: `var(--color-background-${variant})`,
         };
     };
 
-    const getTextClass = (variant: "inverse" | "primary" | "secondary" | "tertiary" = "primary") => {
+    const getTextClass = (
+        variant: "inverse" | "primary" | "secondary" | "tertiary" = "primary"
+    ) => {
         return {
             color: `var(--color-text-${variant})`,
         };
     };
 
-    const getBorderClass = (variant: "focus" | "primary" | "secondary" = "primary") => {
+    const getBorderClass = (
+        variant: "focus" | "primary" | "secondary" = "primary"
+    ) => {
         return {
             borderColor: `var(--color-border-${variant})`,
         };
     };
 
-    const getSurfaceClass = (variant: "base" | "elevated" | "overlay" = "base") => {
+    const getSurfaceClass = (
+        variant: "base" | "elevated" | "overlay" = "base"
+    ) => {
         return {
             backgroundColor: `var(--color-surface-${variant})`,
         };

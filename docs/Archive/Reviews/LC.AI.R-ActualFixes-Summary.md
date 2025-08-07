@@ -71,8 +71,10 @@ const jitter = Math.random() * 200;
 **Before:**
 
 ```typescript
-if (this._databaseService) services.push({ name: "DatabaseService", service: this._databaseService });
-if (this._windowService) services.push({ name: "WindowService", service: this._windowService });
+if (this._databaseService)
+ services.push({ name: "DatabaseService", service: this._databaseService });
+if (this._windowService)
+ services.push({ name: "WindowService", service: this._windowService });
 // ... manual listing continues
 ```
 

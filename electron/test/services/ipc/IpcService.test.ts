@@ -68,12 +68,17 @@ const {
             displayName: "HTTP Monitor",
             description: "Monitor HTTP endpoints",
             version: "1.0.0",
-            fields: [{ name: "url", type: "string", label: "URL", required: true }],
+            fields: [
+                { name: "url", type: "string", label: "URL", required: true },
+            ],
             uiConfig: {
                 display: { showUrl: true, showAdvancedMetrics: false },
                 supportsResponseTime: true,
                 supportsAdvancedAnalytics: false,
-                helpTexts: { primary: "Monitor HTTP endpoints", secondary: "Check website availability" },
+                helpTexts: {
+                    primary: "Monitor HTTP endpoints",
+                    secondary: "Check website availability",
+                },
             },
             serviceFactory: vi.fn(),
             validationSchema: {},
@@ -87,7 +92,10 @@ const {
         return null;
     });
 
-    const mockValidateMonitorData = vi.fn(() => ({ success: true, errors: [] }));
+    const mockValidateMonitorData = vi.fn(() => ({
+        success: true,
+        errors: [],
+    }));
 
     return {
         mockUptimeOrchestrator,
@@ -118,7 +126,10 @@ vi.mock("../monitoring/MonitorTypeRegistry", () => ({
 }));
 
 vi.mock("./", () => ({
-    createValidationResponse: vi.fn((success, errors = []) => ({ success, errors })),
+    createValidationResponse: vi.fn((success, errors = []) => ({
+        success,
+        errors,
+    })),
     registerStandardizedIpcHandler: vi.fn((channel, handler, _validators) => {
         mockIpcMain.handle(channel, handler);
     }),
@@ -134,7 +145,10 @@ describe("IpcService", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        ipcService = new IpcService(mockUptimeOrchestrator as any, mockAutoUpdaterService as any);
+        ipcService = new IpcService(
+            mockUptimeOrchestrator as any,
+            mockAutoUpdaterService as any
+        );
     });
 
     afterEach(() => {
@@ -161,7 +175,9 @@ describe("IpcService", () => {
             ipcService.setupHandlers();
 
             // Verify site-related handlers are registered
-            const handleCalls = mockIpcMain.handle.mock.calls.map((call) => call[0]);
+            const handleCalls = mockIpcMain.handle.mock.calls.map(
+                (call) => call[0]
+            );
             expect(handleCalls).toContain("add-site");
             expect(handleCalls).toContain("get-sites");
             expect(handleCalls).toContain("remove-site");
@@ -171,7 +187,9 @@ describe("IpcService", () => {
         it("should setup monitoring handlers", () => {
             ipcService.setupHandlers();
 
-            const handleCalls = mockIpcMain.handle.mock.calls.map((call) => call[0]);
+            const handleCalls = mockIpcMain.handle.mock.calls.map(
+                (call) => call[0]
+            );
             expect(handleCalls).toContain("start-monitoring");
             expect(handleCalls).toContain("stop-monitoring");
             expect(handleCalls).toContain("check-site-now");
@@ -180,7 +198,9 @@ describe("IpcService", () => {
         it("should setup monitor type handlers", () => {
             ipcService.setupHandlers();
 
-            const handleCalls = mockIpcMain.handle.mock.calls.map((call) => call[0]);
+            const handleCalls = mockIpcMain.handle.mock.calls.map(
+                (call) => call[0]
+            );
             expect(handleCalls).toContain("get-monitor-types");
             expect(handleCalls).toContain("format-monitor-detail");
             expect(handleCalls).toContain("format-monitor-title-suffix");
@@ -189,7 +209,9 @@ describe("IpcService", () => {
         it("should setup data handlers", () => {
             ipcService.setupHandlers();
 
-            const handleCalls = mockIpcMain.handle.mock.calls.map((call) => call[0]);
+            const handleCalls = mockIpcMain.handle.mock.calls.map(
+                (call) => call[0]
+            );
             expect(handleCalls).toContain("download-sqlite-backup");
             expect(handleCalls).toContain("export-data");
             expect(handleCalls).toContain("import-data");
@@ -207,7 +229,9 @@ describe("IpcService", () => {
         it("should setup state sync handlers", () => {
             ipcService.setupHandlers();
 
-            const handleCalls = mockIpcMain.handle.mock.calls.map((call) => call[0]);
+            const handleCalls = mockIpcMain.handle.mock.calls.map(
+                (call) => call[0]
+            );
             expect(handleCalls).toContain("get-history-limit");
             expect(handleCalls).toContain("update-history-limit");
         });
@@ -223,13 +247,17 @@ describe("IpcService", () => {
             ipcService.cleanup();
 
             expect(mockIpcMain.removeHandler).toHaveBeenCalledTimes(23);
-            expect(mockIpcMain.removeAllListeners).toHaveBeenCalledWith("quit-and-install");
+            expect(mockIpcMain.removeAllListeners).toHaveBeenCalledWith(
+                "quit-and-install"
+            );
         });
 
         it("should handle cleanup when no handlers are registered", () => {
             ipcService.cleanup();
 
-            expect(mockIpcMain.removeAllListeners).toHaveBeenCalledWith("quit-and-install");
+            expect(mockIpcMain.removeAllListeners).toHaveBeenCalledWith(
+                "quit-and-install"
+            );
         });
     });
 
@@ -250,7 +278,9 @@ describe("IpcService", () => {
 
             ipcService.setupHandlers();
 
-            const getAllHandler = mockIpcMain.handle.mock.calls.find((call) => call[0] === "monitor-types:get")?.[1];
+            const getAllHandler = mockIpcMain.handle.mock.calls.find(
+                (call) => call[0] === "monitor-types:get"
+            )?.[1];
 
             if (getAllHandler) {
                 const result = getAllHandler({}, "tcp");
@@ -275,15 +305,20 @@ describe("IpcService", () => {
 
             ipcService.setupHandlers();
 
-            const getAllHandler = mockIpcMain.handle.mock.calls.find((call) => call[0] === "monitor-types:get")?.[1];
+            const getAllHandler = mockIpcMain.handle.mock.calls.find(
+                (call) => call[0] === "monitor-types:get"
+            )?.[1];
 
             if (getAllHandler) {
                 getAllHandler({}, "http");
 
-                expect(mockLogger.warn).toHaveBeenCalledWith("[IpcService] Unexpected properties in monitor config", {
-                    type: "http",
-                    unexpectedProperties: ["unexpectedProperty"],
-                });
+                expect(mockLogger.warn).toHaveBeenCalledWith(
+                    "[IpcService] Unexpected properties in monitor config",
+                    {
+                        type: "http",
+                        unexpectedProperties: ["unexpectedProperty"],
+                    }
+                );
             }
         });
     });
@@ -302,9 +337,13 @@ describe("IpcService", () => {
                     monitoring: false,
                 },
             ];
-            vi.mocked(mockUptimeOrchestrator.getSites).mockResolvedValue(mockSites);
+            vi.mocked(mockUptimeOrchestrator.getSites).mockResolvedValue(
+                mockSites
+            );
 
-            const getHandler = mockIpcMain.handle.mock.calls.find((call) => call[0] === "sites:get")?.[1];
+            const getHandler = mockIpcMain.handle.mock.calls.find(
+                (call) => call[0] === "sites:get"
+            )?.[1];
 
             if (getHandler) {
                 const result = await getHandler();
@@ -314,7 +353,9 @@ describe("IpcService", () => {
         });
 
         it("should handle monitor-types:get requests", () => {
-            const getHandler = mockIpcMain.handle.mock.calls.find((call) => call[0] === "monitor-types:get-all")?.[1];
+            const getHandler = mockIpcMain.handle.mock.calls.find(
+                (call) => call[0] === "monitor-types:get-all"
+            )?.[1];
 
             if (getHandler) {
                 const result = getHandler({}, "http");
@@ -326,12 +367,25 @@ describe("IpcService", () => {
                         displayName: "HTTP Monitor",
                         description: "Monitor HTTP endpoints",
                         version: "1.0.0",
-                        fields: [{ name: "url", type: "string", label: "URL", required: true }],
+                        fields: [
+                            {
+                                name: "url",
+                                type: "string",
+                                label: "URL",
+                                required: true,
+                            },
+                        ],
                         uiConfig: {
-                            display: { showUrl: true, showAdvancedMetrics: false },
+                            display: {
+                                showUrl: true,
+                                showAdvancedMetrics: false,
+                            },
                             supportsResponseTime: true,
                             supportsAdvancedAnalytics: false,
-                            helpTexts: { primary: "Monitor HTTP endpoints", secondary: "Check website availability" },
+                            helpTexts: {
+                                primary: "Monitor HTTP endpoints",
+                                secondary: "Check website availability",
+                            },
                         },
                     },
                 });
@@ -345,10 +399,14 @@ describe("IpcService", () => {
             )?.[1];
 
             if (validateHandler) {
-                const result = validateHandler({}, "http", { url: "https://example.com" });
+                const result = validateHandler({}, "http", {
+                    url: "https://example.com",
+                });
 
                 expect(result).toEqual({ success: true, errors: [] });
-                expect(mockValidateMonitorData).toHaveBeenCalledWith("http", { url: "https://example.com" });
+                expect(mockValidateMonitorData).toHaveBeenCalledWith("http", {
+                    url: "https://example.com",
+                });
             }
         });
 
@@ -362,7 +420,9 @@ describe("IpcService", () => {
             if (checkUpdatesHandler) {
                 const result = await checkUpdatesHandler();
                 expect(result).toEqual({ success: true, data: null });
-                expect(mockAutoUpdaterService.checkForUpdates).toHaveBeenCalled();
+                expect(
+                    mockAutoUpdaterService.checkForUpdates
+                ).toHaveBeenCalled();
             }
         });
 
@@ -375,7 +435,9 @@ describe("IpcService", () => {
 
             if (quitAndInstallListener) {
                 quitAndInstallListener();
-                expect(mockAutoUpdaterService.quitAndInstall).toHaveBeenCalled();
+                expect(
+                    mockAutoUpdaterService.quitAndInstall
+                ).toHaveBeenCalled();
             }
         });
 
@@ -391,9 +453,13 @@ describe("IpcService", () => {
         });
 
         it("should handle errors in handlers gracefully", async () => {
-            vi.mocked(mockUptimeOrchestrator.getSites).mockRejectedValue(new Error("Database error"));
+            vi.mocked(mockUptimeOrchestrator.getSites).mockRejectedValue(
+                new Error("Database error")
+            );
 
-            const getHandler = mockIpcMain.handle.mock.calls.find((call) => call[0] === "sites:get")?.[1];
+            const getHandler = mockIpcMain.handle.mock.calls.find(
+                (call) => call[0] === "sites:get"
+            )?.[1];
 
             if (getHandler) {
                 await expect(getHandler()).rejects.toThrow("Database error");
@@ -407,7 +473,9 @@ describe("IpcService", () => {
 
             ipcService.setupHandlers();
 
-            const getHandler = mockIpcMain.handle.mock.calls.find((call) => call[0] === "monitor-types:get")?.[1];
+            const getHandler = mockIpcMain.handle.mock.calls.find(
+                (call) => call[0] === "monitor-types:get"
+            )?.[1];
 
             if (getHandler) {
                 const result = getHandler({}, "nonexistent");
@@ -431,7 +499,10 @@ describe("IpcService", () => {
                         display: { showUrl: true, showAdvancedMetrics: true },
                         supportsResponseTime: true,
                         supportsAdvancedAnalytics: true,
-                        helpTexts: { primary: "Primary help", secondary: "Secondary help" },
+                        helpTexts: {
+                            primary: "Primary help",
+                            secondary: "Secondary help",
+                        },
                         detailFormats: { analyticsLabel: "Analytics" },
                     } as any,
                     serviceFactory: vi.fn(),
@@ -452,7 +523,10 @@ describe("IpcService", () => {
                     display: { showUrl: true, showAdvancedMetrics: true },
                     supportsResponseTime: true,
                     supportsAdvancedAnalytics: true,
-                    helpTexts: { primary: "Primary help", secondary: "Secondary help" },
+                    helpTexts: {
+                        primary: "Primary help",
+                        secondary: "Secondary help",
+                    },
                     detailFormats: { analyticsLabel: "Analytics" },
                 });
             }

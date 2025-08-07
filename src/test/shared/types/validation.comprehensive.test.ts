@@ -106,7 +106,10 @@ describe("Validation Types and Utilities", () => {
         });
 
         it("should create a success result with warnings", () => {
-            const warnings = ["Minor formatting issue", "Deprecated field used"];
+            const warnings = [
+                "Minor formatting issue",
+                "Deprecated field used",
+            ];
             const result = createSuccessResult(undefined, warnings);
 
             expect(result).toEqual({
@@ -234,7 +237,9 @@ describe("Validation Types and Utilities", () => {
 
         it("should handle arrays", () => {
             expect(isValidationResult([])).toBe(false);
-            expect(isValidationResult([{ errors: [], success: true }])).toBe(false);
+            expect(isValidationResult([{ errors: [], success: true }])).toBe(
+                false
+            );
         });
 
         it("should handle nested objects", () => {

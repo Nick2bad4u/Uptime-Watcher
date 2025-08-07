@@ -148,7 +148,8 @@ export const useExampleStore = create<ExampleStore>()(
     logStoreAction("ExampleStore", "removeItem", { id });
     set((state) => ({
      items: state.items.filter((item) => item.id !== id),
-     selectedItemId: state.selectedItemId === id ? undefined : state.selectedItemId,
+     selectedItemId:
+      state.selectedItemId === id ? undefined : state.selectedItemId,
     }));
    },
 
@@ -267,7 +268,10 @@ For stores with complex state that benefit from modular composition:
 import { create } from "zustand";
 import type { ExampleStore } from "./types";
 
-import { createExampleStateActions, initialExampleState } from "./useExampleState";
+import {
+ createExampleStateActions,
+ initialExampleState,
+} from "./useExampleState";
 import { createExampleOperationsActions } from "./useExampleOperations";
 import { createExampleSyncActions } from "./useExampleSync";
 
@@ -367,7 +371,10 @@ export interface ExampleStateModule {
  *
  * @public
  */
-export const initialExampleState: Pick<ExampleStateModule, "items" | "selectedItemId" | "lastUpdated"> = {
+export const initialExampleState: Pick<
+ ExampleStateModule,
+ "items" | "selectedItemId" | "lastUpdated"
+> = {
  items: [],
  selectedItemId: undefined,
  lastUpdated: undefined,
@@ -407,7 +414,8 @@ export function createExampleStateActions(
    logStoreAction("ExampleStore", "removeItem", { id });
    set((state) => ({
     items: state.items.filter((item) => item.id !== id),
-    selectedItemId: state.selectedItemId === id ? undefined : state.selectedItemId,
+    selectedItemId:
+     state.selectedItemId === id ? undefined : state.selectedItemId,
     lastUpdated: Date.now(),
    }));
   },
@@ -415,7 +423,9 @@ export function createExampleStateActions(
   updateItem: (id: string, updates: Partial<ExampleItem>) => {
    logStoreAction("ExampleStore", "updateItem", { id, updates });
    set((state) => ({
-    items: state.items.map((item) => (item.id === id ? { ...item, ...updates } : item)),
+    items: state.items.map((item) =>
+     item.id === id ? { ...item, ...updates } : item
+    ),
     lastUpdated: Date.now(),
    }));
   },
@@ -570,7 +580,9 @@ describe("useExampleStore", () => {
 
  describe("Error Handling", () => {
   it("should handle fetchItems errors gracefully", async () => {
-   window.electronAPI.example.getItems = vi.fn().mockRejectedValue(new Error("Fetch failed"));
+   window.electronAPI.example.getItems = vi
+    .fn()
+    .mockRejectedValue(new Error("Fetch failed"));
 
    const { result } = renderHook(() => useExampleStore());
 

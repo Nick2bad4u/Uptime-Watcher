@@ -127,7 +127,9 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 set({ showSiteDetails: show });
             },
             setSiteDetailsChartTimeRange: (range: ChartTimeRange) => {
-                logStoreAction("UIStore", "setSiteDetailsChartTimeRange", { range });
+                logStoreAction("UIStore", "setSiteDetailsChartTimeRange", {
+                    range,
+                });
                 set({ siteDetailsChartTimeRange: range });
             },
             showAddSiteModal: false,

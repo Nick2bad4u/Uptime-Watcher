@@ -45,10 +45,16 @@
 
 ```typescript
 // In performImmediateCheck - doesn't re-throw
-logger.error(`[MonitorScheduler] Error during immediate check for ${intervalKey}`, error);
+logger.error(
+ `[MonitorScheduler] Error during immediate check for ${intervalKey}`,
+ error
+);
 
 // In startMonitor callback - doesn't re-throw
-logger.error(`[MonitorScheduler] Error during scheduled check for ${intervalKey}`, error);
+logger.error(
+ `[MonitorScheduler] Error during scheduled check for ${intervalKey}`,
+ error
+);
 ```
 
 **Issue**: Errors in callbacks are logged but not reported to calling code
@@ -61,7 +67,9 @@ logger.error(`[MonitorScheduler] Error during scheduled check for ${intervalKey}
 
 ```typescript
 if (checkInterval < MIN_INTERVAL) {
- logger.warn(`Check interval ${checkInterval}ms is very short, minimum recommended: ${MIN_INTERVAL}ms`);
+ logger.warn(
+  `Check interval ${checkInterval}ms is very short, minimum recommended: ${MIN_INTERVAL}ms`
+ );
 }
 ```
 

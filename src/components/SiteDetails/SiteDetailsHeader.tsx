@@ -11,9 +11,17 @@ import { MdExpandLess, MdExpandMore } from "react-icons/md";
 
 import { useThemeStyles } from "../../hooks/useThemeStyles";
 import { useUIStore } from "../../stores/ui/useUiStore";
-import { StatusIndicator, ThemedBadge, ThemedBox, ThemedText } from "../../theme/components";
+import {
+    StatusIndicator,
+    ThemedBadge,
+    ThemedBox,
+    ThemedText,
+} from "../../theme/components";
 import { Monitor, Site } from "../../types";
-import { isValidUrl, safeGetHostname } from "../../utils/monitoring/dataValidation";
+import {
+    isValidUrl,
+    safeGetHostname,
+} from "../../utils/monitoring/dataValidation";
 import { ScreenshotThumbnail } from "./ScreenshotThumbnail";
 
 /**
@@ -55,7 +63,9 @@ export const SiteDetailsHeader = ({
     // Get validated URL for screenshot component
     let screenshotUrl = "";
     if (selectedMonitor?.type === "http" && selectedMonitor.url) {
-        screenshotUrl = isValidUrl(selectedMonitor.url) ? selectedMonitor.url : "";
+        screenshotUrl = isValidUrl(selectedMonitor.url)
+            ? selectedMonitor.url
+            : "";
     }
 
     return (
@@ -68,16 +78,30 @@ export const SiteDetailsHeader = ({
                     {/* Left side: Screenshot, Status, and Site Info */}
                     <div className="flex items-center flex-1 min-w-0 gap-4">
                         {/* Website Screenshot Thumbnail - Only show URL for HTTP monitors */}
-                        {!isCollapsed && <ScreenshotThumbnail siteName={site.name} url={screenshotUrl} />}
+                        {!isCollapsed && (
+                            <ScreenshotThumbnail
+                                siteName={site.name}
+                                url={screenshotUrl}
+                            />
+                        )}
                         <div className="site-details-status-indicator">
-                            <StatusIndicator size="lg" status={selectedMonitor?.status ?? "unknown"} />
+                            <StatusIndicator
+                                size="lg"
+                                status={selectedMonitor?.status ?? "unknown"}
+                            />
                         </div>
                         <div className="flex-1 min-w-0">
-                            <ThemedText className="truncate site-details-title" size="2xl" weight="bold">
+                            <ThemedText
+                                className="truncate site-details-title"
+                                size="2xl"
+                                weight="bold"
+                            >
                                 {site.name}
                             </ThemedText>
                             {/* Show clickable URL for HTTP monitors that have a URL */}
-                            {!isCollapsed && selectedMonitor?.type === "http" && selectedMonitor.url ? (
+                            {!isCollapsed &&
+                            selectedMonitor?.type === "http" &&
+                            selectedMonitor.url ? (
                                 <a
                                     aria-label={`Open ${selectedMonitor.url} in browser`}
                                     className="truncate site-details-url"
@@ -85,7 +109,9 @@ export const SiteDetailsHeader = ({
                                     onClick={(event) => {
                                         event.preventDefault();
                                         const url = selectedMonitor.url ?? "";
-                                        openExternal(url, { siteName: site.name });
+                                        openExternal(url, {
+                                            siteName: site.name,
+                                        });
                                     }}
                                     rel="noopener noreferrer"
                                     tabIndex={0}
@@ -104,13 +130,23 @@ export const SiteDetailsHeader = ({
                     </div>
                     {/* Right side: Monitoring Status Display and Collapse Button */}
                     <div className="flex items-center self-start flex-shrink-0 gap-2">
-                        {!isCollapsed && <MonitoringStatusDisplay monitors={site.monitors} />}
+                        {!isCollapsed && (
+                            <MonitoringStatusDisplay monitors={site.monitors} />
+                        )}
                         {onToggleCollapse ? (
                             <button
-                                aria-label={isCollapsed ? "Expand header" : "Collapse header"}
+                                aria-label={
+                                    isCollapsed
+                                        ? "Expand header"
+                                        : "Collapse header"
+                                }
                                 onClick={onToggleCollapse}
                                 style={styles.collapseButtonStyle}
-                                title={isCollapsed ? "Expand header" : "Collapse header"}
+                                title={
+                                    isCollapsed
+                                        ? "Expand header"
+                                        : "Collapse header"
+                                }
                                 type="button"
                             >
                                 {isCollapsed ? (
@@ -125,7 +161,7 @@ export const SiteDetailsHeader = ({
             </div>
         </div>
     );
-}
+};
 
 /**
  * Type guard to check if the window.electronAPI has openExternal method.
@@ -139,10 +175,19 @@ export const SiteDetailsHeader = ({
  * @param monitors - Array of monitors to display status for
  * @returns JSX element with enhanced monitoring status indicators
  */
-const MonitoringStatusDisplay = ({ monitors }: { readonly monitors: Monitor[] }) => {
+const MonitoringStatusDisplay = ({
+    monitors,
+}: {
+    readonly monitors: Monitor[];
+}) => {
     if (monitors.length === 0) {
         return (
-            <ThemedBox data-testid="monitoring-status-display" padding="sm" rounded="md" variant="secondary">
+            <ThemedBox
+                data-testid="monitoring-status-display"
+                padding="sm"
+                rounded="md"
+                variant="secondary"
+            >
                 <ThemedText size="sm" variant="secondary">
                     No monitors configured
                 </ThemedText>
@@ -150,7 +195,9 @@ const MonitoringStatusDisplay = ({ monitors }: { readonly monitors: Monitor[] })
         );
     }
 
-    const runningCount = monitors.filter((monitor) => monitor.monitoring === true).length;
+    const runningCount = monitors.filter(
+        (monitor) => monitor.monitoring === true
+    ).length;
     const totalCount = monitors.length;
 
     return (
@@ -168,7 +215,10 @@ const MonitoringStatusDisplay = ({ monitors }: { readonly monitors: Monitor[] })
                     <ThemedText size="sm" variant="primary" weight="semibold">
                         Monitor Status
                     </ThemedText>
-                    <ThemedBadge size="sm" variant={runningCount > 0 ? "success" : "secondary"}>
+                    <ThemedBadge
+                        size="sm"
+                        variant={runningCount > 0 ? "success" : "secondary"}
+                    >
                         {runningCount}/{totalCount} active
                     </ThemedBadge>
                 </div>
@@ -179,11 +229,18 @@ const MonitoringStatusDisplay = ({ monitors }: { readonly monitors: Monitor[] })
                             data-testid={`monitor-status-${monitor.id}`}
                             key={monitor.id}
                         >
-                            <ThemedBadge size="xs" variant={monitor.monitoring ? "success" : "secondary"}>
+                            <ThemedBadge
+                                size="xs"
+                                variant={
+                                    monitor.monitoring ? "success" : "secondary"
+                                }
+                            >
                                 <div className="flex items-center gap-1">
                                     <div
                                         className={`w-2 h-2 rounded-full ${
-                                            monitor.monitoring ? "themed-status-up" : "themed-status-paused"
+                                            monitor.monitoring
+                                                ? "themed-status-up"
+                                                : "themed-status-paused"
                                         }`}
                                         title={`${monitor.type.toUpperCase()}: ${monitor.monitoring ? "Running" : "Stopped"}`}
                                     />
@@ -192,14 +249,21 @@ const MonitoringStatusDisplay = ({ monitors }: { readonly monitors: Monitor[] })
                                     </ThemedText>
                                 </div>
                             </ThemedBadge>
-                            <ThemedText className="flex-1 min-w-0" size="xs" variant="secondary">
+                            <ThemedText
+                                className="flex-1 min-w-0"
+                                size="xs"
+                                variant="secondary"
+                            >
                                 {/* Display appropriate connection info based on monitor type */}
                                 {monitor.type === "http" && monitor.url ? (
                                     <span className="block truncate">
-                                        {safeGetHostname(monitor.url) || monitor.url}
+                                        {safeGetHostname(monitor.url) ||
+                                            monitor.url}
                                     </span>
                                 ) : null}
-                                {monitor.type === "port" && monitor.host && monitor.port ? (
+                                {monitor.type === "port" &&
+                                monitor.host &&
+                                monitor.port ? (
                                     <span className="block truncate">
                                         {monitor.host}:{monitor.port}
                                     </span>
@@ -211,4 +275,4 @@ const MonitoringStatusDisplay = ({ monitors }: { readonly monitors: Monitor[] })
             </div>
         </ThemedBox>
     );
-}
+};

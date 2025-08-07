@@ -3,11 +3,11 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { 
-    getMonitor, 
-    getAvailableMonitorTypes, 
-    clearMonitorFactoryCache, 
-    updateMonitorConfig 
+import {
+    getMonitor,
+    getAvailableMonitorTypes,
+    clearMonitorFactoryCache,
+    updateMonitorConfig,
 } from "../../../services/monitoring/MonitorFactory";
 import { MonitorConfig } from "../../../services/monitoring/types";
 
@@ -42,7 +42,9 @@ describe("MonitorFactory - Fixed", () => {
         });
 
         it("should handle invalid monitor type", () => {
-            expect(() => getMonitor("invalid" as any, mockMonitorConfig)).toThrow();
+            expect(() =>
+                getMonitor("invalid" as any, mockMonitorConfig)
+            ).toThrow();
         });
 
         it("should get monitor with configuration", () => {
@@ -72,7 +74,10 @@ describe("MonitorFactory - Fixed", () => {
 
     describe("updateConfig", () => {
         it("should update config for all monitors", () => {
-            const newConfig = { timeout: 10_000, userAgent: "Updated-Agent/1.0" };
+            const newConfig = {
+                timeout: 10_000,
+                userAgent: "Updated-Agent/1.0",
+            };
             expect(() => updateMonitorConfig(newConfig)).not.toThrow();
         });
     });

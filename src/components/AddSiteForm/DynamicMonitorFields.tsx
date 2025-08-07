@@ -100,7 +100,8 @@ export const DynamicMonitorFields = ({
     onChange,
     values,
 }: DynamicMonitorFieldsProps): JSX.Element => {
-    const { isLoaded, lastError, loadMonitorTypes, monitorTypes } = useMonitorTypesStore();
+    const { isLoaded, lastError, loadMonitorTypes, monitorTypes } =
+        useMonitorTypesStore();
 
     // Find the config for the current monitor type
     const config = monitorTypes.find((type) => type.type === monitorType);
@@ -113,15 +114,27 @@ export const DynamicMonitorFields = ({
     }, [isLoaded, lastError, loadMonitorTypes]);
 
     if (!isLoaded) {
-        return <ThemedText variant="secondary">Loading monitor fields...</ThemedText>;
+        return (
+            <ThemedText variant="secondary">
+                Loading monitor fields...
+            </ThemedText>
+        );
     }
 
     if (lastError) {
-        return <ThemedText variant="error">Error loading monitor fields: {lastError}</ThemedText>;
+        return (
+            <ThemedText variant="error">
+                Error loading monitor fields: {lastError}
+            </ThemedText>
+        );
     }
 
     if (!config) {
-        return <ThemedText variant="error">Unknown monitor type: {monitorType}</ThemedText>;
+        return (
+            <ThemedText variant="error">
+                Unknown monitor type: {monitorType}
+            </ThemedText>
+        );
     }
 
     return (
@@ -129,7 +142,9 @@ export const DynamicMonitorFields = ({
             {config.fields.map((field) => {
                 const fieldOnChange = onChange[field.name];
                 if (!fieldOnChange) {
-                    logger.error(`Missing onChange handler for field: ${field.name}`);
+                    logger.error(
+                        `Missing onChange handler for field: ${field.name}`
+                    );
                 }
 
                 const fieldValue = values[field.name];
@@ -143,7 +158,9 @@ export const DynamicMonitorFields = ({
                         onChange={
                             fieldOnChange ??
                             (() => {
-                                logger.warn(`No onChange handler provided for field: ${field.name}`);
+                                logger.warn(
+                                    `No onChange handler provided for field: ${field.name}`
+                                );
                             })
                         }
                         value={fieldValue ?? defaultValue}
@@ -152,7 +169,7 @@ export const DynamicMonitorFields = ({
             })}
         </div>
     );
-}
+};
 
 /**
  * Renders a single form field based on its definition.
@@ -175,7 +192,12 @@ export const DynamicMonitorFields = ({
  * />
  * ```
  */
-const DynamicField = ({ disabled = false, field, onChange, value }: DynamicFieldProps) => {
+const DynamicField = ({
+    disabled = false,
+    field,
+    onChange,
+    value,
+}: DynamicFieldProps) => {
     const handleChange = useCallback(
         (newValue: number | string) => {
             onChange(newValue);
@@ -213,7 +235,9 @@ const DynamicField = ({ disabled = false, field, onChange, value }: DynamicField
                     {...(field.max !== undefined && { max: field.max })}
                     {...(field.min !== undefined && { min: field.min })}
                     onChange={handleNumericChange}
-                    {...(field.placeholder && { placeholder: field.placeholder })}
+                    {...(field.placeholder && {
+                        placeholder: field.placeholder,
+                    })}
                     required={field.required}
                     type="number"
                     value={String(value)}
@@ -230,7 +254,9 @@ const DynamicField = ({ disabled = false, field, onChange, value }: DynamicField
                     id={field.name}
                     label={field.label}
                     onChange={handleStringChange}
-                    {...(field.placeholder && { placeholder: field.placeholder })}
+                    {...(field.placeholder && {
+                        placeholder: field.placeholder,
+                    })}
                     required={field.required}
                     type={field.type}
                     value={String(value)}
@@ -239,7 +265,11 @@ const DynamicField = ({ disabled = false, field, onChange, value }: DynamicField
         }
 
         default: {
-            return <ThemedText variant="error">Unsupported field type: {field.type}</ThemedText>;
+            return (
+                <ThemedText variant="error">
+                    Unsupported field type: {field.type}
+                </ThemedText>
+            );
         }
     }
-}
+};

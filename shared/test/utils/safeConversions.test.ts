@@ -23,7 +23,9 @@ describe("Safe Conversions", () => {
             expect(safeNumberConversion(123)).toBe(123);
             expect(safeNumberConversion(0)).toBe(0);
             expect(safeNumberConversion(-45.67)).toBe(-45.67);
-            expect(safeNumberConversion(Number.MAX_SAFE_INTEGER)).toBe(Number.MAX_SAFE_INTEGER);
+            expect(safeNumberConversion(Number.MAX_SAFE_INTEGER)).toBe(
+                Number.MAX_SAFE_INTEGER
+            );
         });
 
         it("should convert valid string numbers", () => {
@@ -224,7 +226,9 @@ describe("Safe Conversions", () => {
 
         it("should use custom default", () => {
             const customDefault = 1_000_000;
-            expect(safeParseTimestamp("invalid", customDefault)).toBe(customDefault);
+            expect(safeParseTimestamp("invalid", customDefault)).toBe(
+                customDefault
+            );
             expect(safeParseTimestamp(null, customDefault)).toBe(customDefault);
         });
     });

@@ -10,7 +10,9 @@ import type { Site, StatusHistory } from "../../../types";
 // Mock the MonitorTypeRegistry module
 vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({
     getRegisteredMonitorTypes: vi.fn(() => ["http", "port"]),
-    isValidMonitorType: vi.fn((type: string) => ["http", "port"].includes(type)),
+    isValidMonitorType: vi.fn((type: string) =>
+        ["http", "port"].includes(type)
+    ),
     validateMonitorData: vi.fn((type: string, data: any) => {
         if (type === "http" && data.url && data.url.startsWith("https://")) {
             return {
@@ -47,7 +49,9 @@ vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({
     }),
 }));
 
-const createMockMonitor = (overrides: Partial<Site["monitors"][0]> = {}): Site["monitors"][0] => {
+const createMockMonitor = (
+    overrides: Partial<Site["monitors"][0]> = {}
+): Site["monitors"][0] => {
     const history: StatusHistory[] = [];
     return {
         id: "test",
@@ -161,7 +165,12 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
         });
 
         it("should handle monitors with all status types", () => {
-            const statuses: Array<Site["monitors"][0]["status"]> = ["pending", "up", "down", "paused"];
+            const statuses: Array<Site["monitors"][0]["status"]> = [
+                "pending",
+                "up",
+                "down",
+                "paused",
+            ];
 
             for (const status of statuses) {
                 const monitor = createMockMonitor({
@@ -224,7 +233,8 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             const validHttpMonitor = createMockMonitor();
 
             // This calls validateMonitorTypeSpecific internally
-            const result = validator.validateMonitorConfiguration(validHttpMonitor);
+            const result =
+                validator.validateMonitorConfiguration(validHttpMonitor);
             expect(result.success).toBe(true);
         });
 
@@ -234,7 +244,8 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             });
             delete (invalidMonitor as any).url; // Remove URL for invalid monitor
 
-            const result = validator.validateMonitorConfiguration(invalidMonitor);
+            const result =
+                validator.validateMonitorConfiguration(invalidMonitor);
             expect(result.success).toBe(false);
             expect(result.errors[0]).toContain("http, port");
         });
@@ -257,7 +268,8 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
                 metadata: {},
             });
 
-            const result = validator.validateMonitorConfiguration(monitorWithBadData);
+            const result =
+                validator.validateMonitorConfiguration(monitorWithBadData);
             expect(result.success).toBe(false);
             expect(result.errors).toContain("Custom validation error");
         });
@@ -285,7 +297,8 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
                 history: [],
             } as any;
 
-            const result = validator.validateMonitorConfiguration(nullPropsMonitor);
+            const result =
+                validator.validateMonitorConfiguration(nullPropsMonitor);
             expect(result.success).toBe(false);
             expect(result.errors.length).toBeGreaterThan(0);
         });
@@ -299,7 +312,8 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             });
 
             // Should still validate through our validator, though registry might reject
-            const result = validator.validateMonitorConfiguration(extremeMonitor);
+            const result =
+                validator.validateMonitorConfiguration(extremeMonitor);
             // Don't assert on result since it depends on registry validation
             expect(result).toHaveProperty("success");
             expect(result).toHaveProperty("errors");

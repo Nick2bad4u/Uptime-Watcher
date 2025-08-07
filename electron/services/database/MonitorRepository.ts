@@ -18,7 +18,11 @@ import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
 import { DatabaseService } from "./DatabaseService";
 import { generateSqlParameters, mapMonitorToRow } from "./utils/dynamicSchema";
-import { buildMonitorParameters, rowsToMonitors, rowToMonitorOrUndefined } from "./utils/monitorMapper";
+import {
+    buildMonitorParameters,
+    rowsToMonitors,
+    rowToMonitorOrUndefined,
+} from "./utils/monitorMapper";
 import { DbValue } from "./utils/valueConverters";
 
 /**
@@ -59,7 +63,8 @@ const MONITOR_QUERIES = {
     SELECT_BY_ID: "SELECT * FROM monitors WHERE id = ?",
     SELECT_BY_SITE: "SELECT * FROM monitors WHERE site_identifier = ?",
     SELECT_IDS_BY_SITE: "SELECT id FROM monitors WHERE site_identifier = ?",
-    UPDATE_STATUS: "UPDATE monitors SET status = ?, responseTime = ?, lastChecked = ? WHERE id = ?",
+    UPDATE_STATUS:
+        "UPDATE monitors SET status = ?, responseTime = ?, lastChecked = ? WHERE id = ?",
 } as const;
 
 /**
@@ -102,7 +107,10 @@ export class MonitorRepository {
      * await repo.bulkCreate("site-123", monitorsArray);
      * ```
      */
-    public async bulkCreate(siteIdentifier: string, monitors: Site["monitors"][0][]): Promise<Site["monitors"][0][]> {
+    public async bulkCreate(
+        siteIdentifier: string,
+        monitors: Site["monitors"][0][]
+    ): Promise<Site["monitors"][0][]> {
         return withDatabaseOperation(
             async () => {
                 // Use executeTransaction for atomic bulk create operation
@@ -118,14 +126,18 @@ export class MonitorRepository {
 
                         // Enhanced type safety validation
                         if (!insertResult || typeof insertResult !== "object") {
-                            throw new Error("Failed to create monitor: invalid database response");
+                            throw new Error(
+                                "Failed to create monitor: invalid database response"
+                            );
                         }
                         if (
                             !("id" in insertResult) ||
                             typeof insertResult["id"] !== "number" ||
                             insertResult["id"] <= 0
                         ) {
-                            throw new Error("Failed to create monitor: invalid or missing ID in database response");
+                            throw new Error(
+                                "Failed to create monitor: invalid or missing ID in database response"
+                            );
                         }
 
                         const newMonitor = {
@@ -137,7 +149,9 @@ export class MonitorRepository {
                     return Promise.resolve();
                 });
 
-                logger.info(`[MonitorRepository] Bulk created ${monitors.length} monitors for site: ${siteIdentifier}`);
+                logger.info(
+                    `[MonitorRepository] Bulk created ${monitors.length} monitors for site: ${siteIdentifier}`
+                );
                 return createdMonitors;
             },
             "monitor-bulk-create",
@@ -175,12 +189,17 @@ export class MonitorRepository {
      * @param monitorId - The ID of the monitor to clear operations for
      * @public
      */
-    public clearActiveOperationsInternal(db: Database, monitorId: string): void {
+    public clearActiveOperationsInternal(
+        db: Database,
+        monitorId: string
+    ): void {
         // Clear all active operations (internal call to avoid nested transaction)
         this.updateInternal(db, monitorId, { activeOperations: [] });
 
         if (isDev()) {
-            logger.debug(`[MonitorRepository] Cleared all active operations for monitor ${monitorId}`);
+            logger.debug(
+                `[MonitorRepository] Cleared all active operations for monitor ${monitorId}`
+            );
         }
     }
 
@@ -198,11 +217,16 @@ export class MonitorRepository {
      * const id = await repo.create("site-123", monitorObj);
      * ```
      */
-    public async create(siteIdentifier: string, monitor: Omit<Site["monitors"][0], "id">): Promise<string> {
+    public async create(
+        siteIdentifier: string,
+        monitor: Omit<Site["monitors"][0], "id">
+    ): Promise<string> {
         return withDatabaseOperation(
             async () => {
                 return this.databaseService.executeTransaction((db) => {
-                    return Promise.resolve(this.createInternal(db, siteIdentifier, monitor));
+                    return Promise.resolve(
+                        this.createInternal(db, siteIdentifier, monitor)
+                    );
                 });
             },
             "monitor-create",
@@ -222,20 +246,35 @@ export class MonitorRepository {
      * @remarks
      * Must be called within an active transaction context.
      */
-    public createInternal(db: Database, siteIdentifier: string, monitor: Omit<Site["monitors"][0], "id">): string {
+    public createInternal(
+        db: Database,
+        siteIdentifier: string,
+        monitor: Omit<Site["monitors"][0], "id">
+    ): string {
         // Generate dynamic SQL and parameters
         const { columns, placeholders } = generateSqlParameters();
-        const parameters = buildMonitorParameters(siteIdentifier, monitor as Site["monitors"][0]);
+        const parameters = buildMonitorParameters(
+            siteIdentifier,
+            monitor as Site["monitors"][0]
+        );
 
         const insertSql = `INSERT INTO monitors (${columns.join(", ")}) VALUES (${placeholders}) RETURNING id`;
 
-        const insertResult = db.get(insertSql, parameters) as Record<string, unknown> | undefined;
+        const insertResult = db.get(insertSql, parameters) as
+            | Record<string, unknown>
+            | undefined;
 
         // Enhanced type safety validation
         if (!insertResult || typeof insertResult !== "object") {
-            throw new Error(`Failed to create monitor for site ${siteIdentifier}: invalid database response`);
+            throw new Error(
+                `Failed to create monitor for site ${siteIdentifier}: invalid database response`
+            );
         }
-        if (!("id" in insertResult) || typeof insertResult["id"] !== "number" || insertResult["id"] <= 0) {
+        if (
+            !("id" in insertResult) ||
+            typeof insertResult["id"] !== "number" ||
+            insertResult["id"] <= 0
+        ) {
             throw new Error(
                 `Failed to create monitor for site ${siteIdentifier}: invalid or missing ID in database response`
             );
@@ -271,10 +310,14 @@ export class MonitorRepository {
 
                     if (result) {
                         if (isDev()) {
-                            logger.debug(`[MonitorRepository] Deleted monitor with id: ${monitorId}`);
+                            logger.debug(
+                                `[MonitorRepository] Deleted monitor with id: ${monitorId}`
+                            );
                         }
                     } else {
-                        logger.warn(`[MonitorRepository] Monitor not found for deletion: ${monitorId}`);
+                        logger.warn(
+                            `[MonitorRepository] Monitor not found for deletion: ${monitorId}`
+                        );
                     }
 
                     return Promise.resolve(result);
@@ -340,7 +383,9 @@ export class MonitorRepository {
                     this.deleteBySiteIdentifierInternal(db, siteIdentifier);
 
                     if (isDev()) {
-                        logger.debug(`[MonitorRepository] Deleted all monitors for site: ${siteIdentifier}`);
+                        logger.debug(
+                            `[MonitorRepository] Deleted all monitors for site: ${siteIdentifier}`
+                        );
                     }
                     return Promise.resolve();
                 });
@@ -360,9 +405,14 @@ export class MonitorRepository {
      * @remarks
      * Deletes all history for monitors before deleting monitors.
      */
-    public deleteBySiteIdentifierInternal(db: Database, siteIdentifier: string): void {
+    public deleteBySiteIdentifierInternal(
+        db: Database,
+        siteIdentifier: string
+    ): void {
         // Get all monitor IDs for this site
-        const monitorRows = db.all(MONITOR_QUERIES.SELECT_IDS_BY_SITE, [siteIdentifier]) as {
+        const monitorRows = db.all(MONITOR_QUERIES.SELECT_IDS_BY_SITE, [
+            siteIdentifier,
+        ]) as {
             id: number;
         }[];
 
@@ -406,11 +456,15 @@ export class MonitorRepository {
      * const monitor = await repo.findByIdentifier("monitor-123");
      * ```
      */
-    public async findByIdentifier(monitorId: string): Promise<Site["monitors"][0] | undefined> {
+    public async findByIdentifier(
+        monitorId: string
+    ): Promise<Site["monitors"][0] | undefined> {
         return withDatabaseOperation(
             () => {
                 const db = this.getDb();
-                const row = db.get(MONITOR_QUERIES.SELECT_BY_ID, [monitorId]) as MonitorRow | undefined;
+                const row = db.get(MONITOR_QUERIES.SELECT_BY_ID, [
+                    monitorId,
+                ]) as MonitorRow | undefined;
 
                 return Promise.resolve(rowToMonitorOrUndefined(row));
             },
@@ -433,10 +487,14 @@ export class MonitorRepository {
      * const monitors = await repo.findBySiteIdentifier("site-123");
      * ```
      */
-    public async findBySiteIdentifier(siteIdentifier: string): Promise<Site["monitors"]> {
+    public async findBySiteIdentifier(
+        siteIdentifier: string
+    ): Promise<Site["monitors"]> {
         return withDatabaseOperation(() => {
             const db = this.getDb();
-            const monitorRows = db.all(MONITOR_QUERIES.SELECT_BY_SITE, [siteIdentifier]) as MonitorRow[];
+            const monitorRows = db.all(MONITOR_QUERIES.SELECT_BY_SITE, [
+                siteIdentifier,
+            ]) as MonitorRow[];
 
             return Promise.resolve(rowsToMonitors(monitorRows));
         }, `find-monitors-by-site-${siteIdentifier}`);
@@ -457,7 +515,9 @@ export class MonitorRepository {
     public async getAllMonitorIds(): Promise<{ id: number }[]> {
         return withDatabaseOperation(() => {
             const db = this.getDb();
-            const rows = db.all(MONITOR_QUERIES.SELECT_ALL_IDS) as { id: number }[];
+            const rows = db.all(MONITOR_QUERIES.SELECT_ALL_IDS) as {
+                id: number;
+            }[];
             return Promise.resolve(rows);
         }, "monitor-get-all-ids");
     }
@@ -476,7 +536,10 @@ export class MonitorRepository {
      * await repo.update("monitor-123", { checkInterval: 60000 });
      * ```
      */
-    public async update(monitorId: string, monitor: Partial<Site["monitors"][0]>): Promise<void> {
+    public async update(
+        monitorId: string,
+        monitor: Partial<Site["monitors"][0]>
+    ): Promise<void> {
         return withDatabaseOperation(
             async () => {
                 return this.databaseService.executeTransaction((db) => {
@@ -500,9 +563,16 @@ export class MonitorRepository {
      * @remarks
      * Only provided fields are updated. Converts camelCase to snake_case for DB columns. Use this method only when already within a transaction context.
      */
-    public updateInternal(db: Database, monitorId: string, monitor: Partial<Site["monitors"][0]>): void {
+    public updateInternal(
+        db: Database,
+        monitorId: string,
+        monitor: Partial<Site["monitors"][0]>
+    ): void {
         if (isDev()) {
-            logger.debug(`[MonitorRepository] updateInternal called with monitorId: ${monitorId}, monitor:`, monitor);
+            logger.debug(
+                `[MonitorRepository] updateInternal called with monitorId: ${monitorId}, monitor:`,
+                monitor
+            );
         }
 
         // Use dynamic row mapping to convert camelCase to snake_case
@@ -519,7 +589,9 @@ export class MonitorRepository {
 
         if (updateFields.length === 0) {
             if (isDev()) {
-                logger.debug(`[MonitorRepository] No fields to update for monitor: ${monitorId} (internal)`);
+                logger.debug(
+                    `[MonitorRepository] No fields to update for monitor: ${monitorId} (internal)`
+                );
             }
             return;
         }
@@ -573,7 +645,10 @@ export class MonitorRepository {
      * @remarks
      * Strings and numbers are passed through. Booleans are converted to 1/0. Other types are skipped.
      */
-    private convertValueForDatabase(key: string, value: unknown): DbValue | null {
+    private convertValueForDatabase(
+        key: string,
+        value: unknown
+    ): DbValue | null {
         if (typeof value === "string" || typeof value === "number") {
             return value;
         }
@@ -582,7 +657,10 @@ export class MonitorRepository {
         }
 
         if (isDev()) {
-            logger.warn(`[MonitorRepository] Skipping non-primitive field ${key} with value:`, value);
+            logger.warn(
+                `[MonitorRepository] Skipping non-primitive field ${key} with value:`,
+                value
+            );
         }
         return null;
     }
@@ -598,18 +676,28 @@ export class MonitorRepository {
      * @remarks
      * Executes the SQL update statement for the monitor.
      */
-    private executeUpdateQuery(db: Database, updateFields: string[], updateValues: DbValue[], monitorId: string): void {
+    private executeUpdateQuery(
+        db: Database,
+        updateFields: string[],
+        updateValues: DbValue[],
+        monitorId: string
+    ): void {
         updateValues.push(monitorId);
         const sql = `UPDATE monitors SET ${updateFields.join(", ")} WHERE id = ?`;
 
         if (isDev()) {
-            logger.debug(`[MonitorRepository] Executing SQL: ${sql} with values:`, updateValues);
+            logger.debug(
+                `[MonitorRepository] Executing SQL: ${sql} with values:`,
+                updateValues
+            );
         }
 
         db.run(sql, updateValues);
 
         if (isDev()) {
-            logger.debug(`[MonitorRepository] Updated monitor with id: ${monitorId} (internal)`);
+            logger.debug(
+                `[MonitorRepository] Updated monitor with id: ${monitorId} (internal)`
+            );
         }
     }
 
@@ -634,10 +722,19 @@ export class MonitorRepository {
      * @remarks
      * The 'enabled' field is derived from 'monitoring' state. If neither is provided, skip 'enabled'.
      */
-    private shouldSkipMonitoringFields(key: string, monitor: Partial<Site["monitors"][0]>): boolean {
-        if (key === "enabled" && !("monitoring" in monitor) && !("enabled" in monitor)) {
+    private shouldSkipMonitoringFields(
+        key: string,
+        monitor: Partial<Site["monitors"][0]>
+    ): boolean {
+        if (
+            key === "enabled" &&
+            !("monitoring" in monitor) &&
+            !("enabled" in monitor)
+        ) {
             if (isDev()) {
-                logger.debug(`[MonitorRepository] Skipping 'enabled' field - monitoring state not provided in update`);
+                logger.debug(
+                    `[MonitorRepository] Skipping 'enabled' field - monitoring state not provided in update`
+                );
             }
             return true;
         }

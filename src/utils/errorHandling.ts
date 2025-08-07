@@ -44,7 +44,9 @@ export async function withUtilityErrorHandling<T>(
         }
 
         if (fallbackValue === undefined) {
-            throw new Error(`${operationName} failed and no fallback value provided`);
+            throw new Error(
+                `${operationName} failed and no fallback value provided`
+            );
         }
 
         return fallbackValue;

@@ -76,7 +76,11 @@ Reviewed 9 low confidence AI claims for errorHandling.ts. **7 claims are VALID**
 ### 1. **Add Correlation ID Support**
 
 ```typescript
-export function createErrorResult(error: string, responseTime: number, correlationId?: string): MonitorCheckResult {
+export function createErrorResult(
+ error: string,
+ responseTime: number,
+ correlationId?: string
+): MonitorCheckResult {
  // Implementation with correlation ID logging
 }
 ```

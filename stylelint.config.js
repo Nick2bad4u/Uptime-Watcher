@@ -18,7 +18,11 @@ module.exports = {
         "stylelint-config-recess-order",
         "stylelint-prettier/recommended",
     ],
-    plugins: ["stylelint-plugin-defensive-css", "stylelint-use-nesting", "stylelint-prettier"],
+    plugins: [
+        "stylelint-plugin-defensive-css",
+        "stylelint-use-nesting",
+        "stylelint-prettier",
+    ],
     rules: {
         "@stylistic/declaration-colon-newline-after": null,
         "@stylistic/indentation": null,

@@ -80,7 +80,9 @@ export async function withErrorHandling<T>(
     storeOrContext: ErrorHandlingBackendContext | ErrorHandlingFrontendStore
 ): Promise<T> {
     // Check if it's a frontend store (has setError, clearError, setLoading methods)
-    return "setError" in storeOrContext && "clearError" in storeOrContext && "setLoading" in storeOrContext
+    return "setError" in storeOrContext &&
+        "clearError" in storeOrContext &&
+        "setLoading" in storeOrContext
         ? handleFrontendOperation(operation, storeOrContext)
         : handleBackendOperation(operation, storeOrContext);
 }
@@ -110,7 +112,12 @@ async function handleBackendOperation<T>(
         const result = await operation();
         return result;
     } catch (error) {
-        logger.error(operationName ? `Failed to ${operationName}` : "Async operation failed", error);
+        logger.error(
+            operationName
+                ? `Failed to ${operationName}`
+                : "Async operation failed",
+            error
+        );
         throw error;
     }
 }
@@ -133,7 +140,10 @@ async function handleBackendOperation<T>(
  * - Ensures loading state is always cleared in finally block
  * Uses safe store operations to prevent state management errors from breaking the operation.
  */
-async function handleFrontendOperation<T>(operation: () => Promise<T>, store: ErrorHandlingFrontendStore): Promise<T> {
+async function handleFrontendOperation<T>(
+    operation: () => Promise<T>,
+    store: ErrorHandlingFrontendStore
+): Promise<T> {
     // Prepare store state
     safeStoreOperation(() => store.clearError(), "clear error state");
     safeStoreOperation(() => store.setLoading(true), "set loading state");
@@ -143,12 +153,20 @@ async function handleFrontendOperation<T>(operation: () => Promise<T>, store: Er
         return result;
     } catch (error) {
         // Handle operation error
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        safeStoreOperation(() => store.setError(errorMessage), "set error state", error);
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
+        safeStoreOperation(
+            () => store.setError(errorMessage),
+            "set error state",
+            error
+        );
         throw error;
     } finally {
         // Always clear loading state
-        safeStoreOperation(() => store.setLoading(false), "clear loading state in finally block");
+        safeStoreOperation(
+            () => store.setLoading(false),
+            "clear loading state in finally block"
+        );
     }
 }
 
@@ -167,7 +185,11 @@ async function handleFrontendOperation<T>(operation: () => Promise<T>, store: Er
  *
  * @internal
  */
-function safeStoreOperation(storeOperation: () => void, operationName: string, originalError?: unknown): void {
+function safeStoreOperation(
+    storeOperation: () => void,
+    operationName: string,
+    originalError?: unknown
+): void {
     try {
         storeOperation();
     } catch (error) {

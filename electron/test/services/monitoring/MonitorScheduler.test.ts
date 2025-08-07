@@ -1,4 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from "vitest";
+import {
+    afterEach,
+    beforeEach,
+    describe,
+    expect,
+    it,
+    vi,
+    type Mock,
+} from "vitest";
 
 import { DEFAULT_CHECK_INTERVAL } from "../../../constants";
 import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler";
@@ -118,7 +126,10 @@ describe("MonitorScheduler", () => {
             // Fast-forward time by the monitor's check interval
             await vi.advanceTimersByTimeAsync(mockMonitor.checkInterval);
 
-            expect(mockCheckCallback).toHaveBeenCalledWith("site-1", "monitor-1");
+            expect(mockCheckCallback).toHaveBeenCalledWith(
+                "site-1",
+                "monitor-1"
+            );
         });
 
         it.skip("should use default check interval when monitor interval not specified", async () => {
@@ -133,7 +144,10 @@ describe("MonitorScheduler", () => {
             // Fast-forward time by the default check interval
             await vi.advanceTimersByTimeAsync(DEFAULT_CHECK_INTERVAL);
 
-            expect(mockCheckCallback).toHaveBeenCalledWith("site-1", "monitor-1");
+            expect(mockCheckCallback).toHaveBeenCalledWith(
+                "site-1",
+                "monitor-1"
+            );
         });
 
         it("should stop existing interval before starting new one", () => {
@@ -141,11 +155,13 @@ describe("MonitorScheduler", () => {
 
             // Start monitoring first time
             scheduler.startMonitor("site-1", mockMonitor);
-            const firstIntervalId = scheduler["intervals"].get("site-1|monitor-1");
+            const firstIntervalId =
+                scheduler["intervals"].get("site-1|monitor-1");
 
             // Start monitoring again for same monitor
             scheduler.startMonitor("site-1", mockMonitor);
-            const secondIntervalId = scheduler["intervals"].get("site-1|monitor-1");
+            const secondIntervalId =
+                scheduler["intervals"].get("site-1|monitor-1");
 
             expect(firstIntervalId).not.toBe(secondIntervalId);
         });
@@ -162,7 +178,9 @@ describe("MonitorScheduler", () => {
         });
 
         it("should handle callback errors gracefully", async () => {
-            const errorCallback = vi.fn().mockRejectedValue(new Error("Callback error"));
+            const errorCallback = vi
+                .fn()
+                .mockRejectedValue(new Error("Callback error"));
             scheduler.setCheckCallback(errorCallback);
 
             scheduler.startMonitor("site-1", mockMonitor);
@@ -210,7 +228,9 @@ describe("MonitorScheduler", () => {
 
             scheduler.stopMonitor("site-1", "monitor-1");
 
-            expect(logger.debug).toHaveBeenCalledWith("[MonitorScheduler] Stopped monitoring for site-1|monitor-1");
+            expect(logger.debug).toHaveBeenCalledWith(
+                "[MonitorScheduler] Stopped monitoring for site-1|monitor-1"
+            );
         });
     });
 
@@ -274,7 +294,9 @@ describe("MonitorScheduler", () => {
             scheduler.stopAll();
 
             expect(scheduler["intervals"].size).toBe(0);
-            expect(logger.info).toHaveBeenCalledWith("[MonitorScheduler] Stopped all monitoring intervals");
+            expect(logger.info).toHaveBeenCalledWith(
+                "[MonitorScheduler] Stopped all monitoring intervals"
+            );
         });
 
         it("should handle empty intervals map gracefully", () => {
@@ -385,7 +407,10 @@ describe("MonitorScheduler", () => {
             const monitorWithoutId = { ...mockMonitor };
             delete (monitorWithoutId as any).id;
 
-            const result = scheduler.restartMonitor("site-1", monitorWithoutId as Site["monitors"][0]);
+            const result = scheduler.restartMonitor(
+                "site-1",
+                monitorWithoutId as Site["monitors"][0]
+            );
 
             expect(result).toBe(false);
         });

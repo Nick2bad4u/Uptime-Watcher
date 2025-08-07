@@ -58,23 +58,33 @@ describe("SettingsRepository Coverage Tests", () => {
     });
 
     it("should import the repository without errors", async () => {
-        const { SettingsRepository } = await import("../../../services/database/SettingsRepository");
+        const { SettingsRepository } = await import(
+            "../../../services/database/SettingsRepository"
+        );
         expect(SettingsRepository).toBeDefined();
     });
 
     it("should create repository instance with dependencies", async () => {
-        const { SettingsRepository } = await import("../../../services/database/SettingsRepository");
+        const { SettingsRepository } = await import(
+            "../../../services/database/SettingsRepository"
+        );
 
-        const repository = new SettingsRepository({ databaseService: mockDatabaseService });
+        const repository = new SettingsRepository({
+            databaseService: mockDatabaseService,
+        });
         expect(repository).toBeDefined();
         expect(repository).toBeInstanceOf(SettingsRepository);
     });
 
     it("should handle get operations", async () => {
-        const { SettingsRepository } = await import("../../../services/database/SettingsRepository");
+        const { SettingsRepository } = await import(
+            "../../../services/database/SettingsRepository"
+        );
 
         try {
-            const repository = new SettingsRepository({ databaseService: mockDatabaseService });
+            const repository = new SettingsRepository({
+                databaseService: mockDatabaseService,
+            });
             await repository.get("test-setting");
             expect(true).toBe(true); // Test passes if no error thrown
         } catch (error) {
@@ -84,10 +94,14 @@ describe("SettingsRepository Coverage Tests", () => {
     });
 
     it("should handle set operations", async () => {
-        const { SettingsRepository } = await import("../../../services/database/SettingsRepository");
+        const { SettingsRepository } = await import(
+            "../../../services/database/SettingsRepository"
+        );
 
         try {
-            const repository = new SettingsRepository({ databaseService: mockDatabaseService });
+            const repository = new SettingsRepository({
+                databaseService: mockDatabaseService,
+            });
             await repository.set("test-setting", "test-value");
             expect(true).toBe(true);
         } catch (error) {
@@ -96,10 +110,14 @@ describe("SettingsRepository Coverage Tests", () => {
     });
 
     it("should handle delete operations", async () => {
-        const { SettingsRepository } = await import("../../../services/database/SettingsRepository");
+        const { SettingsRepository } = await import(
+            "../../../services/database/SettingsRepository"
+        );
 
         try {
-            const repository = new SettingsRepository({ databaseService: mockDatabaseService });
+            const repository = new SettingsRepository({
+                databaseService: mockDatabaseService,
+            });
             await repository.delete("test-setting");
             expect(true).toBe(true);
         } catch (error) {
@@ -108,10 +126,14 @@ describe("SettingsRepository Coverage Tests", () => {
     });
 
     it("should handle getAll operations", async () => {
-        const { SettingsRepository } = await import("../../../services/database/SettingsRepository");
+        const { SettingsRepository } = await import(
+            "../../../services/database/SettingsRepository"
+        );
 
         try {
-            const repository = new SettingsRepository({ databaseService: mockDatabaseService });
+            const repository = new SettingsRepository({
+                databaseService: mockDatabaseService,
+            });
             await repository.getAll();
             expect(true).toBe(true);
         } catch (error) {
@@ -120,11 +142,18 @@ describe("SettingsRepository Coverage Tests", () => {
     });
 
     it("should handle bulkInsert operations", async () => {
-        const { SettingsRepository } = await import("../../../services/database/SettingsRepository");
+        const { SettingsRepository } = await import(
+            "../../../services/database/SettingsRepository"
+        );
 
         try {
-            const repository = new SettingsRepository({ databaseService: mockDatabaseService });
-            await repository.bulkInsert({ setting1: "value1", setting2: "value2" });
+            const repository = new SettingsRepository({
+                databaseService: mockDatabaseService,
+            });
+            await repository.bulkInsert({
+                setting1: "value1",
+                setting2: "value2",
+            });
             expect(true).toBe(true);
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
@@ -132,10 +161,14 @@ describe("SettingsRepository Coverage Tests", () => {
     });
 
     it("should handle deleteAll operations", async () => {
-        const { SettingsRepository } = await import("../../../services/database/SettingsRepository");
+        const { SettingsRepository } = await import(
+            "../../../services/database/SettingsRepository"
+        );
 
         try {
-            const repository = new SettingsRepository({ databaseService: mockDatabaseService });
+            const repository = new SettingsRepository({
+                databaseService: mockDatabaseService,
+            });
             await repository.deleteAll();
             expect(true).toBe(true);
         } catch (error) {
@@ -144,10 +177,14 @@ describe("SettingsRepository Coverage Tests", () => {
     });
 
     it("should handle error scenarios gracefully", async () => {
-        const { SettingsRepository } = await import("../../../services/database/SettingsRepository");
+        const { SettingsRepository } = await import(
+            "../../../services/database/SettingsRepository"
+        );
 
         try {
-            const repository = new SettingsRepository({ databaseService: mockDatabaseService });
+            const repository = new SettingsRepository({
+                databaseService: mockDatabaseService,
+            });
             // Try operations with invalid data
             await repository.get("");
             await repository.set("", "");
@@ -158,10 +195,14 @@ describe("SettingsRepository Coverage Tests", () => {
     });
 
     it("should exercise SQL query building logic", async () => {
-        const { SettingsRepository } = await import("../../../services/database/SettingsRepository");
+        const { SettingsRepository } = await import(
+            "../../../services/database/SettingsRepository"
+        );
 
         try {
-            const repository = new SettingsRepository({ databaseService: mockDatabaseService });
+            const repository = new SettingsRepository({
+                databaseService: mockDatabaseService,
+            });
 
             // These calls should exercise different SQL query paths
             await repository.get("test-setting");
@@ -175,10 +216,14 @@ describe("SettingsRepository Coverage Tests", () => {
     });
 
     it("should handle mapper integration", async () => {
-        const { SettingsRepository } = await import("../../../services/database/SettingsRepository");
+        const { SettingsRepository } = await import(
+            "../../../services/database/SettingsRepository"
+        );
 
         try {
-            const repository = new SettingsRepository({ databaseService: mockDatabaseService });
+            const repository = new SettingsRepository({
+                databaseService: mockDatabaseService,
+            });
 
             // Test operations that should use the mapper
             await repository.set("test-setting", "some-value");

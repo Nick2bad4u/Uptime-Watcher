@@ -25,7 +25,10 @@
 
 import { EventEmitter } from "node:events";
 
-import { createTemplateLogger, LOG_TEMPLATES } from "../../shared/utils/logTemplates";
+import {
+    createTemplateLogger,
+    LOG_TEMPLATES,
+} from "../../shared/utils/logTemplates";
 import { generateCorrelationId } from "../utils/correlation";
 import { logger as baseLogger } from "../utils/logger";
 
@@ -119,7 +122,9 @@ export type EventMiddleware<T = unknown> = (
  * @public
  */
 // eslint-disable-next-line unicorn/prefer-event-target -- Required for Node.js EventEmitter compatibility
-export class TypedEventBus<EventMap extends Record<string, unknown>> extends EventEmitter {
+export class TypedEventBus<
+    EventMap extends Record<string, unknown>,
+> extends EventEmitter {
     private readonly busId: string;
     private readonly maxMiddleware: number;
     private readonly middlewares: EventMiddleware[] = [];
@@ -151,7 +156,9 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
 
         const maxMiddleware = options?.maxMiddleware ?? 20;
         if (maxMiddleware <= 0) {
-            throw new Error(`maxMiddleware must be positive, got ${maxMiddleware}`);
+            throw new Error(
+                `maxMiddleware must be positive, got ${maxMiddleware}`
+            );
         }
         this.maxMiddleware = maxMiddleware;
 
@@ -222,7 +229,10 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
      * @returns A promise that resolves when the event has been emitted.
      * @throws Error when middleware processing fails.
      */
-    async emitTyped<K extends keyof EventMap>(event: K, data: EventMap[K]): Promise<void> {
+    async emitTyped<K extends keyof EventMap>(
+        event: K,
+        data: EventMap[K]
+    ): Promise<void> {
         const correlationId = generateCorrelationId();
         const eventName = event as string;
 
@@ -283,7 +293,12 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
             maxMiddleware: this.maxMiddleware,
             middlewareCount: this.middlewares.length,
             middlewareUtilization:
-                this.maxMiddleware > 0 ? Math.min((this.middlewares.length / this.maxMiddleware) * 100, 100) : 0,
+                this.maxMiddleware > 0
+                    ? Math.min(
+                          (this.middlewares.length / this.maxMiddleware) * 100,
+                          100
+                      )
+                    : 0,
         };
     }
 
@@ -461,7 +476,10 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
      * @param metadata - Metadata to add.
      * @returns Enhanced data with `_meta` property.
      */
-    private createEnhancedData<T>(data: T, metadata: EventMetadata): T & { _meta: EventMetadata } {
+    private createEnhancedData<T>(
+        data: T,
+        metadata: EventMetadata
+    ): T & { _meta: EventMetadata } {
         // Handle arrays specially to preserve array nature
         if (Array.isArray(data)) {
             const result = Array.from(data);
@@ -493,7 +511,9 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
         }
 
         // Handle primitives
-        return { _meta: metadata, value: data } as unknown as T & { _meta: EventMetadata };
+        return { _meta: metadata, value: data } as unknown as T & {
+            _meta: EventMetadata;
+        };
     }
 
     /**
@@ -509,7 +529,11 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
      * @returns A promise that resolves when all middleware have completed.
      * @throws Error if any middleware in the chain throws.
      */
-    private async processMiddleware(eventName: string, data: unknown, correlationId: string): Promise<void> {
+    private async processMiddleware(
+        eventName: string,
+        data: unknown,
+        correlationId: string
+    ): Promise<void> {
         if (this.middlewares.length === 0) {
             return;
         }
@@ -520,7 +544,9 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
 
                 if (middleware) {
                     try {
-                        await middleware(eventName, data, () => processNext(currentIndex + 1));
+                        await middleware(eventName, data, () =>
+                            processNext(currentIndex + 1)
+                        );
                     } catch (error) {
                         // Use base logger directly for error objects since template logger doesn't support error objects
                         baseLogger.error(

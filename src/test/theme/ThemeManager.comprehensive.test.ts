@@ -234,7 +234,10 @@ describe("ThemeManager", () => {
                 name: "custom-light",
             } as any;
 
-            const customTheme = themeManager.createCustomTheme(baseTheme, overrides);
+            const customTheme = themeManager.createCustomTheme(
+                baseTheme,
+                overrides
+            );
 
             expect(customTheme).toBeDefined();
             expect(customTheme.name).toBe("custom-light");
@@ -247,7 +250,10 @@ describe("ThemeManager", () => {
                 isDark: false,
             } as any;
 
-            const customTheme = themeManager.createCustomTheme(baseTheme, overrides);
+            const customTheme = themeManager.createCustomTheme(
+                baseTheme,
+                overrides
+            );
 
             expect(customTheme.isDark).toBe(false);
             expect(customTheme.colors).toEqual(baseTheme.colors); // Should preserve unmodified properties
@@ -267,7 +273,10 @@ describe("ThemeManager", () => {
                 isDark: true,
             } as any;
 
-            const customTheme = themeManager.createCustomTheme(baseTheme, overrides);
+            const customTheme = themeManager.createCustomTheme(
+                baseTheme,
+                overrides
+            );
 
             expect(customTheme.name).toBe("custom-theme");
             expect(customTheme.isDark).toBe(true);
@@ -324,8 +333,12 @@ describe("ThemeManager", () => {
                 borderRadius: {},
             } as any;
 
-            expect(() => themeManager.applyTheme(incompleteTheme)).not.toThrow();
-            expect(() => themeManager.generateCSSVariables(incompleteTheme)).not.toThrow();
+            expect(() =>
+                themeManager.applyTheme(incompleteTheme)
+            ).not.toThrow();
+            expect(() =>
+                themeManager.generateCSSVariables(incompleteTheme)
+            ).not.toThrow();
         });
 
         it("should handle null/undefined values gracefully", () => {

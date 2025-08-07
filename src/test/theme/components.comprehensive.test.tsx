@@ -133,7 +133,9 @@ describe("Theme Components - Comprehensive Coverage", () => {
             ] as const;
 
             sizes.forEach((size) => {
-                const { unmount } = render(<ThemedButton {...defaultProps} size={size} />);
+                const { unmount } = render(
+                    <ThemedButton {...defaultProps} size={size} />
+                );
                 expect(screen.getByRole("button")).toBeInTheDocument();
                 unmount();
             });
@@ -152,7 +154,9 @@ describe("Theme Components - Comprehensive Coverage", () => {
             ] as const;
 
             variants.forEach((variant) => {
-                const { unmount } = render(<ThemedButton {...defaultProps} variant={variant} />);
+                const { unmount } = render(
+                    <ThemedButton {...defaultProps} variant={variant} />
+                );
                 expect(screen.getByRole("button")).toBeInTheDocument();
                 unmount();
             });
@@ -162,8 +166,13 @@ describe("Theme Components - Comprehensive Coverage", () => {
             const types = ["button", "submit", "reset"] as const;
 
             types.forEach((type) => {
-                const { unmount } = render(<ThemedButton {...defaultProps} type={type} />);
-                expect(screen.getByRole("button")).toHaveAttribute("type", type);
+                const { unmount } = render(
+                    <ThemedButton {...defaultProps} type={type} />
+                );
+                expect(screen.getByRole("button")).toHaveAttribute(
+                    "type",
+                    type
+                );
                 unmount();
             });
         });
@@ -183,7 +192,11 @@ describe("Theme Components - Comprehensive Coverage", () => {
 
             ["left", "right"].forEach((position) => {
                 const { unmount } = render(
-                    <ThemedButton {...defaultProps} icon={icon} iconPosition={position as "left" | "right"} />
+                    <ThemedButton
+                        {...defaultProps}
+                        icon={icon}
+                        iconPosition={position as "left" | "right"}
+                    />
                 );
                 expect(screen.getByTestId("button-icon")).toBeInTheDocument();
                 unmount();
@@ -234,7 +247,13 @@ describe("Theme Components - Comprehensive Coverage", () => {
         });
 
         it("should render with title and subtitle", () => {
-            render(<ThemedCard {...defaultProps} title="Card Title" subtitle="Card Subtitle" />);
+            render(
+                <ThemedCard
+                    {...defaultProps}
+                    title="Card Title"
+                    subtitle="Card Subtitle"
+                />
+            );
 
             expect(screen.getByText("Card Title")).toBeInTheDocument();
             expect(screen.getByText("Card Subtitle")).toBeInTheDocument();
@@ -242,7 +261,13 @@ describe("Theme Components - Comprehensive Coverage", () => {
 
         it("should handle clickable state", () => {
             const onClick = vi.fn();
-            render(<ThemedCard {...defaultProps} clickable={true} onClick={onClick} />);
+            render(
+                <ThemedCard
+                    {...defaultProps}
+                    clickable={true}
+                    onClick={onClick}
+                />
+            );
 
             fireEvent.click(screen.getByText("Card Content"));
             expect(onClick).toHaveBeenCalledTimes(1);
@@ -271,7 +296,9 @@ describe("Theme Components - Comprehensive Coverage", () => {
 
         it("should render with icon", () => {
             const icon = <span data-testid="card-icon">Icon</span>;
-            render(<ThemedCard {...defaultProps} icon={icon} iconColor="#00ff00" />);
+            render(
+                <ThemedCard {...defaultProps} icon={icon} iconColor="#00ff00" />
+            );
 
             expect(screen.getByTestId("card-icon")).toBeInTheDocument();
         });
@@ -326,7 +353,13 @@ describe("Theme Components - Comprehensive Coverage", () => {
         });
 
         it("should apply accessibility props", () => {
-            render(<ThemedCheckbox {...defaultProps} aria-label="Test Checkbox" className="custom-checkbox" />);
+            render(
+                <ThemedCheckbox
+                    {...defaultProps}
+                    aria-label="Test Checkbox"
+                    className="custom-checkbox"
+                />
+            );
 
             const checkbox = screen.getByRole("checkbox");
             expect(checkbox).toHaveAttribute("aria-label", "Test Checkbox");
@@ -355,7 +388,9 @@ describe("Theme Components - Comprehensive Coverage", () => {
             ] as const;
 
             sizes.forEach((size) => {
-                const { unmount } = render(<ThemedIconButton {...defaultProps} size={size} />);
+                const { unmount } = render(
+                    <ThemedIconButton {...defaultProps} size={size} />
+                );
                 expect(screen.getByRole("button")).toBeInTheDocument();
                 unmount();
             });
@@ -374,7 +409,9 @@ describe("Theme Components - Comprehensive Coverage", () => {
             ] as const;
 
             variants.forEach((variant) => {
-                const { unmount } = render(<ThemedIconButton {...defaultProps} variant={variant} />);
+                const { unmount } = render(
+                    <ThemedIconButton {...defaultProps} variant={variant} />
+                );
                 expect(screen.getByRole("button")).toBeInTheDocument();
                 unmount();
             });
@@ -408,7 +445,9 @@ describe("Theme Components - Comprehensive Coverage", () => {
                 />
             );
 
-            expect(screen.getByRole("button")).toHaveClass("custom-icon-button");
+            expect(screen.getByRole("button")).toHaveClass(
+                "custom-icon-button"
+            );
         });
     });
 
@@ -420,7 +459,9 @@ describe("Theme Components - Comprehensive Coverage", () => {
                 </ThemeProvider>
             );
 
-            expect(screen.getByText("Theme Provider Content")).toBeInTheDocument();
+            expect(
+                screen.getByText("Theme Provider Content")
+            ).toBeInTheDocument();
         });
 
         it("should handle multiple children", () => {
@@ -446,7 +487,9 @@ describe("Theme Components - Comprehensive Coverage", () => {
         it("should handle invalid enum values gracefully", () => {
             // Test components with invalid enum values to ensure default cases work
             expect(() => {
-                render(<ThemedButton size={"invalid" as any}>Button</ThemedButton>);
+                render(
+                    <ThemedButton size={"invalid" as any}>Button</ThemedButton>
+                );
             }).not.toThrow();
         });
     });

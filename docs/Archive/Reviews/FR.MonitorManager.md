@@ -125,7 +125,11 @@ for (const monitor of site.monitors) {
 interface IMonitoringService {
  startAllMonitoring(config: MonitoringConfig): Promise<boolean>;
  stopAllMonitoring(config: MonitoringConfig): Promise<boolean>;
- checkSiteManually(config: CheckConfig, identifier: string, monitorId?: string): Promise<StatusUpdate>;
+ checkSiteManually(
+  config: CheckConfig,
+  identifier: string,
+  monitorId?: string
+ ): Promise<StatusUpdate>;
 }
 ```
 
@@ -283,7 +287,9 @@ async (recursiveId: string, recursiveMonitorId?: string) => {
  if (recursiveId !== identifier || recursiveMonitorId !== monitorId) {
   return this.startMonitoringForSite(recursiveId, recursiveMonitorId);
  } else {
-  logger.warn(`[MonitorManager] Preventing recursive call for ${identifier}/${monitorId ?? "all"}`);
+  logger.warn(
+   `[MonitorManager] Preventing recursive call for ${identifier}/${monitorId ?? "all"}`
+  );
   return false;
  }
 };

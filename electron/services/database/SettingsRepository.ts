@@ -6,7 +6,11 @@ import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
 import { DatabaseService } from "./DatabaseService";
-import { rowsToSettings, rowToSettingValue, settingsToRecord } from "./utils/settingsMapper";
+import {
+    rowsToSettings,
+    rowToSettingValue,
+    settingsToRecord,
+} from "./utils/settingsMapper";
 
 /**
  * Defines the dependencies required by the SettingsRepository for managing application settings persistence.
@@ -37,7 +41,8 @@ export interface SettingsRepositoryDependencies {
 const SETTINGS_QUERIES = {
     DELETE_ALL: "DELETE FROM settings",
     DELETE_BY_KEY: "DELETE FROM settings WHERE key = ?",
-    INSERT_OR_REPLACE: "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
+    INSERT_OR_REPLACE:
+        "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
     SELECT_ALL: "SELECT * FROM settings",
     SELECT_VALUE_BY_KEY: "SELECT value FROM settings WHERE key = ?",
 } as const;
@@ -113,7 +118,10 @@ export class SettingsRepository {
      *
      * **Performance**: Uses prepared statements for optimal bulk insert performance.
      */
-    public bulkInsertInternal(db: Database, settings: Record<string, string>): void {
+    public bulkInsertInternal(
+        db: Database,
+        settings: Record<string, string>
+    ): void {
         const entries = Object.entries(settings);
         if (entries.length === 0) {
             return;
@@ -127,7 +135,9 @@ export class SettingsRepository {
                 stmt.run([key, String(value)]);
             }
 
-            logger.info(`[SettingsRepository] Bulk inserted ${entries.length} settings (internal)`);
+            logger.info(
+                `[SettingsRepository] Bulk inserted ${entries.length} settings (internal)`
+            );
         } finally {
             stmt.finalize();
         }
@@ -200,7 +210,9 @@ export class SettingsRepository {
     public deleteInternal(db: Database, key: string): void {
         db.run(SETTINGS_QUERIES.DELETE_BY_KEY, [key]);
         if (isDev()) {
-            logger.debug(`[SettingsRepository] Deleted setting (internal): ${key}`);
+            logger.debug(
+                `[SettingsRepository] Deleted setting (internal): ${key}`
+            );
         }
     }
 
@@ -218,7 +230,9 @@ export class SettingsRepository {
     public async get(key: string): Promise<string | undefined> {
         return withDatabaseOperation(() => {
             const db = this.getDb();
-            const result = db.get(SETTINGS_QUERIES.SELECT_VALUE_BY_KEY, [key]) as DatabaseSettingsRow | undefined;
+            const result = db.get(SETTINGS_QUERIES.SELECT_VALUE_BY_KEY, [
+                key,
+            ]) as DatabaseSettingsRow | undefined;
             return Promise.resolve(rowToSettingValue(result));
         }, `get-setting-${key}`);
     }
@@ -238,7 +252,9 @@ export class SettingsRepository {
     public async getAll(): Promise<Record<string, string>> {
         return withDatabaseOperation(() => {
             const db = this.getDb();
-            const settings = db.all(SETTINGS_QUERIES.SELECT_ALL) as DatabaseSettingsRow[];
+            const settings = db.all(
+                SETTINGS_QUERIES.SELECT_ALL
+            ) as DatabaseSettingsRow[];
             const settingRows = rowsToSettings(settings);
             return Promise.resolve(settingsToRecord(settingRows));
         }, "settings-get-all");
@@ -282,7 +298,9 @@ export class SettingsRepository {
     public setInternal(db: Database, key: string, value: string): void {
         db.run(SETTINGS_QUERIES.INSERT_OR_REPLACE, [key, value]);
         if (isDev()) {
-            logger.debug(`[SettingsRepository] Set setting (internal): ${key} = ${value}`);
+            logger.debug(
+                `[SettingsRepository] Set setting (internal): ${key} = ${value}`
+            );
         }
     }
 

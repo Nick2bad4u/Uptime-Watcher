@@ -14,11 +14,17 @@ export interface SiteMonitoringActions {
     /** Start monitoring for all monitors of a site */
     startSiteMonitoring: (siteId: string) => Promise<void>;
     /** Start monitoring for a site monitor */
-    startSiteMonitorMonitoring: (siteId: string, monitorId: string) => Promise<void>;
+    startSiteMonitorMonitoring: (
+        siteId: string,
+        monitorId: string
+    ) => Promise<void>;
     /** Stop monitoring for all monitors of a site */
     stopSiteMonitoring: (siteId: string) => Promise<void>;
     /** Stop monitoring for a site monitor */
-    stopSiteMonitorMonitoring: (siteId: string, monitorId: string) => Promise<void>;
+    stopSiteMonitorMonitoring: (
+        siteId: string,
+        monitorId: string
+    ) => Promise<void>;
 }
 
 /**
@@ -42,9 +48,12 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
                 // Backend will emit 'monitor:status-changed', which will trigger incremental update
             },
             {
-                clearError: () => errorStore.clearStoreError("sites-monitoring"),
-                setError: (error) => errorStore.setStoreError("sites-monitoring", error),
-                setLoading: (loading) => errorStore.setOperationLoading("checkSiteNow", loading),
+                clearError: () =>
+                    errorStore.clearStoreError("sites-monitoring"),
+                setError: (error) =>
+                    errorStore.setStoreError("sites-monitoring", error),
+                setLoading: (loading) =>
+                    errorStore.setOperationLoading("checkSiteNow", loading),
             }
         );
     },
@@ -54,29 +63,49 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
         const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
-                await window.electronAPI.monitoring.startMonitoringForSite(siteId);
+                await window.electronAPI.monitoring.startMonitoringForSite(
+                    siteId
+                );
                 // No need for manual sync - StatusUpdateHandler will update UI via events
             },
             {
-                clearError: () => errorStore.clearStoreError("sites-monitoring"),
-                setError: (error) => errorStore.setStoreError("sites-monitoring", error),
-                setLoading: (loading) => errorStore.setOperationLoading("startSiteMonitoring", loading),
+                clearError: () =>
+                    errorStore.clearStoreError("sites-monitoring"),
+                setError: (error) =>
+                    errorStore.setStoreError("sites-monitoring", error),
+                setLoading: (loading) =>
+                    errorStore.setOperationLoading(
+                        "startSiteMonitoring",
+                        loading
+                    ),
             }
         );
     },
     startSiteMonitorMonitoring: async (siteId: string, monitorId: string) => {
-        logStoreAction("SitesStore", "startSiteMonitorMonitoring", { monitorId, siteId });
+        logStoreAction("SitesStore", "startSiteMonitorMonitoring", {
+            monitorId,
+            siteId,
+        });
 
         const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
-                await window.electronAPI.monitoring.startMonitoringForSite(siteId, monitorId);
+                await window.electronAPI.monitoring.startMonitoringForSite(
+                    siteId,
+                    monitorId
+                );
                 // No need for manual sync - StatusUpdateHandler will update UI via events
             },
             {
-                clearError: () => errorStore.clearStoreError("sites-monitoring"),
-                setError: (error) => errorStore.setStoreError("sites-monitoring", error),
-                setLoading: (loading) => errorStore.setOperationLoading("startSiteMonitorMonitoring", loading),
+                clearError: () =>
+                    errorStore.clearStoreError("sites-monitoring"),
+                setError: (error) =>
+                    errorStore.setStoreError("sites-monitoring", error),
+                setLoading: (loading) =>
+                    errorStore.setOperationLoading(
+                        "startSiteMonitorMonitoring",
+                        loading
+                    ),
             }
         );
     },
@@ -86,29 +115,49 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
         const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
-                await window.electronAPI.monitoring.stopMonitoringForSite(siteId);
+                await window.electronAPI.monitoring.stopMonitoringForSite(
+                    siteId
+                );
                 // No need for manual sync - StatusUpdateHandler will update UI via events
             },
             {
-                clearError: () => errorStore.clearStoreError("sites-monitoring"),
-                setError: (error) => errorStore.setStoreError("sites-monitoring", error),
-                setLoading: (loading) => errorStore.setOperationLoading("stopSiteMonitoring", loading),
+                clearError: () =>
+                    errorStore.clearStoreError("sites-monitoring"),
+                setError: (error) =>
+                    errorStore.setStoreError("sites-monitoring", error),
+                setLoading: (loading) =>
+                    errorStore.setOperationLoading(
+                        "stopSiteMonitoring",
+                        loading
+                    ),
             }
         );
     },
     stopSiteMonitorMonitoring: async (siteId: string, monitorId: string) => {
-        logStoreAction("SitesStore", "stopSiteMonitorMonitoring", { monitorId, siteId });
+        logStoreAction("SitesStore", "stopSiteMonitorMonitoring", {
+            monitorId,
+            siteId,
+        });
 
         const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
-                await window.electronAPI.monitoring.stopMonitoringForSite(siteId, monitorId);
+                await window.electronAPI.monitoring.stopMonitoringForSite(
+                    siteId,
+                    monitorId
+                );
                 // No need for manual sync - StatusUpdateHandler will update UI via events
             },
             {
-                clearError: () => errorStore.clearStoreError("sites-monitoring"),
-                setError: (error) => errorStore.setStoreError("sites-monitoring", error),
-                setLoading: (loading) => errorStore.setOperationLoading("stopSiteMonitorMonitoring", loading),
+                clearError: () =>
+                    errorStore.clearStoreError("sites-monitoring"),
+                setError: (error) =>
+                    errorStore.setStoreError("sites-monitoring", error),
+                setLoading: (loading) =>
+                    errorStore.setOperationLoading(
+                        "stopSiteMonitorMonitoring",
+                        loading
+                    ),
             }
         );
     },

@@ -102,12 +102,14 @@ export function safeObjectIteration(
  * // Type: { id: number; name: string; email: string; }
  * ```
  */
-export function safeObjectOmit<T extends Record<PropertyKey, unknown>, K extends keyof T>(
-    obj: T,
-    keys: readonly K[]
-): Omit<T, K> {
+export function safeObjectOmit<
+    T extends Record<PropertyKey, unknown>,
+    K extends keyof T,
+>(obj: T, keys: readonly K[]): Omit<T, K> {
     const keysToOmit = new Set(keys);
-    const entries = Object.entries(obj).filter(([key]) => !keysToOmit.has(key as K));
+    const entries = Object.entries(obj).filter(
+        ([key]) => !keysToOmit.has(key as K)
+    );
     return Object.fromEntries(entries) as Omit<T, K>;
 }
 
@@ -125,10 +127,10 @@ export function safeObjectOmit<T extends Record<PropertyKey, unknown>, K extends
  * // Type: { id: number; name: string; email: string; }
  * ```
  */
-export function safeObjectPick<T extends Record<PropertyKey, unknown>, K extends keyof T>(
-    obj: T,
-    keys: readonly K[]
-): Pick<T, K> {
+export function safeObjectPick<
+    T extends Record<PropertyKey, unknown>,
+    K extends keyof T,
+>(obj: T, keys: readonly K[]): Pick<T, K> {
     const result = {} as Pick<T, K>;
 
     for (const key of keys) {
@@ -159,7 +161,9 @@ export function safeObjectPick<T extends Record<PropertyKey, unknown>, K extends
  * // Type: ["timeout" | "retries", number][]
  * ```
  */
-export function typedObjectEntries<T extends Record<PropertyKey, unknown>>(obj: T): Array<[keyof T, T[keyof T]]> {
+export function typedObjectEntries<T extends Record<PropertyKey, unknown>>(
+    obj: T
+): Array<[keyof T, T[keyof T]]> {
     return Object.entries(obj) as Array<[keyof T, T[keyof T]]>;
 }
 
@@ -183,7 +187,9 @@ export function typedObjectEntries<T extends Record<PropertyKey, unknown>>(obj: 
  * // Type: ("timeout" | "retries")[]
  * ```
  */
-export function typedObjectKeys<T extends Record<PropertyKey, unknown>>(obj: T): Array<keyof T> {
+export function typedObjectKeys<T extends Record<PropertyKey, unknown>>(
+    obj: T
+): Array<keyof T> {
     return Object.keys(obj) as Array<keyof T>;
 }
 
@@ -207,6 +213,8 @@ export function typedObjectKeys<T extends Record<PropertyKey, unknown>>(obj: T):
  * // Type: number[]
  * ```
  */
-export function typedObjectValues<T extends Record<PropertyKey, unknown>>(obj: T): Array<T[keyof T]> {
+export function typedObjectValues<T extends Record<PropertyKey, unknown>>(
+    obj: T
+): Array<T[keyof T]> {
     return Object.values(obj) as Array<T[keyof T]>;
 }

@@ -64,7 +64,10 @@ export function useThemeStyles(isCollapsed = false): ThemeStyles {
     // Use state to track theme changes for reactivity
     const [isDarkMode, setIsDarkMode] = useState(() => {
         // SSR-safe initialization
-        if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+        if (
+            typeof window === "undefined" ||
+            typeof window.matchMedia !== "function"
+        ) {
             return false; // Default to light mode for SSR
         }
         try {
@@ -77,7 +80,10 @@ export function useThemeStyles(isCollapsed = false): ThemeStyles {
 
     // Set up media query listener for theme changes
     useEffect(() => {
-        if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+        if (
+            typeof window === "undefined" ||
+            typeof window.matchMedia !== "function"
+        ) {
             return; // Skip in SSR environments
         }
 
@@ -169,14 +175,19 @@ function getContentStyle(isCollapsed: boolean): React.CSSProperties {
  * @param isDarkMode - Whether dark mode is active
  * @returns CSS properties for header section
  */
-function getHeaderStyle(isCollapsed: boolean, isDarkMode: boolean): React.CSSProperties {
+function getHeaderStyle(
+    isCollapsed: boolean,
+    isDarkMode: boolean
+): React.CSSProperties {
     const darkGradient =
         "linear-gradient(120deg, rgba(37, 99, 235, 0.15) 0%, rgba(147, 51, 234, 0.15) 60%, rgba(31, 41, 55, 0.8) 100%)";
     const lightGradient =
         "linear-gradient(120deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 60%, rgba(249, 250, 251, 0.9) 100%)";
 
-    const darkShadow = "0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2)";
-    const lightShadow = "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)";
+    const darkShadow =
+        "0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2)";
+    const lightShadow =
+        "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)";
 
     return {
         background: isDarkMode ? darkGradient : lightGradient,
@@ -246,8 +257,10 @@ function getOverlayStyle(isDarkMode: boolean): React.CSSProperties {
  * @returns CSS properties for title text
  */
 function getTitleStyle(isDarkMode: boolean): React.CSSProperties {
-    const darkShadow = "0 2px 12px rgba(59, 130, 246, 0.3), 0 1px 0 rgba(37, 99, 235, 0.3)";
-    const lightShadow = "0 2px 12px rgba(59, 130, 246, 0.1), 0 1px 0 rgba(37, 99, 235, 0.1)";
+    const darkShadow =
+        "0 2px 12px rgba(59, 130, 246, 0.3), 0 1px 0 rgba(37, 99, 235, 0.3)";
+    const lightShadow =
+        "0 2px 12px rgba(59, 130, 246, 0.1), 0 1px 0 rgba(37, 99, 235, 0.1)";
 
     return {
         color: isDarkMode ? "#f3f4f6" : "#111827",

@@ -130,9 +130,14 @@ describe("Header Component", () => {
             render(<Header />);
 
             expect(screen.getByText("Up")).toBeInTheDocument();
-            expect(screen.getByText("Up").parentElement?.parentElement?.textContent).toContain("3");
+            expect(
+                screen.getByText("Up").parentElement?.parentElement?.textContent
+            ).toContain("3");
             expect(screen.getByText("Down")).toBeInTheDocument();
-            expect(screen.getByText("Down").parentElement?.parentElement?.textContent).toContain("0");
+            expect(
+                screen.getByText("Down").parentElement?.parentElement
+                    ?.textContent
+            ).toContain("0");
             expect(screen.getByText("100%")).toBeInTheDocument(); // Health percentage
             expect(screen.getByText("Total")).toBeInTheDocument();
         });
@@ -424,9 +429,15 @@ describe("Header Component", () => {
         it("should have proper CSS classes for styling", () => {
             const { container } = render(<Header />);
 
-            expect(container.querySelector(".header-container")).toBeInTheDocument();
-            expect(container.querySelector(".header-title-box")).toBeInTheDocument();
-            expect(container.querySelector(".header-status-summary-box")).toBeInTheDocument();
+            expect(
+                container.querySelector(".header-container")
+            ).toBeInTheDocument();
+            expect(
+                container.querySelector(".header-title-box")
+            ).toBeInTheDocument();
+            expect(
+                container.querySelector(".header-status-summary-box")
+            ).toBeInTheDocument();
         });
     });
 

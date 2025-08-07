@@ -118,7 +118,12 @@ export interface ThemeColors {
 }
 
 /** Available theme names in the application */
-export type ThemeName = "custom" | "dark" | "high-contrast" | "light" | "system";
+export type ThemeName =
+    | "custom"
+    | "dark"
+    | "high-contrast"
+    | "light"
+    | "system";
 
 /**
  * Shadow system interface for elevation and depth.

@@ -125,7 +125,9 @@ const SCHEMA_DEFINITIONS: Record<string, TableSchema> = {
       name TEXT,
       monitoring INTEGER DEFAULT 1
     )`,
-  indexes: ["CREATE INDEX IF NOT EXISTS idx_sites_monitoring ON sites(monitoring)"],
+  indexes: [
+   "CREATE INDEX IF NOT EXISTS idx_sites_monitoring ON sites(monitoring)",
+  ],
  },
  // ... other tables
 };

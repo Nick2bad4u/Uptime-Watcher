@@ -11,7 +11,8 @@ DISABLE_LINTERS:
     - JAVASCRIPT_PRETTIER
     - JSON_PRETTIER
     - YAML_PRETTIER
-EXCLUDED_DIRECTORIES: [libs, tests, screenshots, node_modules, icons, docs, dist-electron]
+EXCLUDED_DIRECTORIES:
+    [libs, tests, screenshots, node_modules, icons, docs, dist-electron]
 FILEIO_REPORTER: true
 GITHUB_COMMENT_REPORTER: true
 GITHUB_STATUS_REPORTER: true

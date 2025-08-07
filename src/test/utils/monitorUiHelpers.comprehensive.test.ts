@@ -9,7 +9,9 @@ import type { Mock } from "vitest";
 
 // Mock dependencies
 vi.mock("../types/ipc", () => ({
-    safeExtractIpcData: vi.fn((response, fallback) => (response.success ? response.data : fallback)),
+    safeExtractIpcData: vi.fn((response, fallback) =>
+        response.success ? response.data : fallback
+    ),
 }));
 
 const mockCacheGet = vi.fn();
@@ -76,11 +78,15 @@ describe("Monitor UI Helpers", () => {
 
     describe("allSupportsAdvancedAnalytics", () => {
         it("should return true when all monitor types support advanced analytics", async () => {
-            const { allSupportsAdvancedAnalytics } = await import("../../utils/monitorUiHelpers");
+            const { allSupportsAdvancedAnalytics } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             // Mock supportsAdvancedAnalytics to return true for all types
             vi.doMock("../../utils/monitorUiHelpers", async () => {
-                const actual = await vi.importActual("../../utils/monitorUiHelpers");
+                const actual = await vi.importActual(
+                    "../../utils/monitorUiHelpers"
+                );
                 return {
                     ...actual,
                     supportsAdvancedAnalytics: vi.fn().mockResolvedValue(true),
@@ -92,14 +98,18 @@ describe("Monitor UI Helpers", () => {
         });
 
         it("should return false when any monitor type doesn't support advanced analytics", async () => {
-            const { allSupportsAdvancedAnalytics } = await import("../../utils/monitorUiHelpers");
+            const { allSupportsAdvancedAnalytics } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             const result = await allSupportsAdvancedAnalytics(["http", "port"]);
             expect(result).toBe(false);
         });
 
         it("should return true for empty array", async () => {
-            const { allSupportsAdvancedAnalytics } = await import("../../utils/monitorUiHelpers");
+            const { allSupportsAdvancedAnalytics } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             const result = await allSupportsAdvancedAnalytics([]);
             expect(result).toBe(true); // Empty array means all elements satisfy the condition (vacuous truth)
@@ -108,14 +118,18 @@ describe("Monitor UI Helpers", () => {
 
     describe("allSupportsResponseTime", () => {
         it("should return false as fallback when checking response time support", async () => {
-            const { allSupportsResponseTime } = await import("../../utils/monitorUiHelpers");
+            const { allSupportsResponseTime } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             const result = await allSupportsResponseTime(["http", "port"]);
             expect(result).toBe(false); // Default fallback
         });
 
         it("should handle empty array", async () => {
-            const { allSupportsResponseTime } = await import("../../utils/monitorUiHelpers");
+            const { allSupportsResponseTime } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             const result = await allSupportsResponseTime([]);
             expect(result).toBe(true); // Empty array means all elements satisfy the condition (vacuous truth)
@@ -124,7 +138,9 @@ describe("Monitor UI Helpers", () => {
 
     describe("clearConfigCache", () => {
         it("should call cache clear method", async () => {
-            const { clearConfigCache } = await import("../../utils/monitorUiHelpers");
+            const { clearConfigCache } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             clearConfigCache();
 
@@ -135,7 +151,9 @@ describe("Monitor UI Helpers", () => {
 
     describe("formatMonitorDetail", () => {
         it("should format monitor detail when electronAPI is available", async () => {
-            const { formatMonitorDetail } = await import("../../utils/monitorUiHelpers");
+            const { formatMonitorDetail } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             mockElectronAPI.monitorTypes.formatMonitorDetail.mockResolvedValue({
                 success: true,
@@ -144,11 +162,15 @@ describe("Monitor UI Helpers", () => {
 
             const result = await formatMonitorDetail("http", "200");
             expect(result).toBe("Response Code: 200");
-            expect(mockElectronAPI.monitorTypes.formatMonitorDetail).toHaveBeenCalledWith("http", "200");
+            expect(
+                mockElectronAPI.monitorTypes.formatMonitorDetail
+            ).toHaveBeenCalledWith("http", "200");
         });
 
         it("should return fallback when electronAPI is not available", async () => {
-            const { formatMonitorDetail } = await import("../../utils/monitorUiHelpers");
+            const { formatMonitorDetail } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             globalThis.window = {} as any;
 
@@ -157,7 +179,9 @@ describe("Monitor UI Helpers", () => {
         });
 
         it("should handle API errors gracefully", async () => {
-            const { formatMonitorDetail } = await import("../../utils/monitorUiHelpers");
+            const { formatMonitorDetail } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             mockElectronAPI.monitorTypes.formatMonitorDetail.mockResolvedValue({
                 success: false,
@@ -171,42 +195,60 @@ describe("Monitor UI Helpers", () => {
 
     describe("formatMonitorTitleSuffix", () => {
         it("should format monitor title suffix when electronAPI is available", async () => {
-            const { formatMonitorTitleSuffix } = await import("../../utils/monitorUiHelpers");
+            const { formatMonitorTitleSuffix } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
-            mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockResolvedValue({
-                success: true,
-                data: " (https://example.com)",
+            mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockResolvedValue(
+                {
+                    success: true,
+                    data: " (https://example.com)",
+                }
+            );
+
+            const result = await formatMonitorTitleSuffix("http", {
+                url: "https://example.com",
             });
-
-            const result = await formatMonitorTitleSuffix("http", { url: "https://example.com" });
             expect(result).toBe(" (https://example.com)");
         });
 
         it("should return empty string when electronAPI is not available", async () => {
-            const { formatMonitorTitleSuffix } = await import("../../utils/monitorUiHelpers");
+            const { formatMonitorTitleSuffix } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             globalThis.window = {} as any;
 
-            const result = await formatMonitorTitleSuffix("http", { url: "https://example.com" });
+            const result = await formatMonitorTitleSuffix("http", {
+                url: "https://example.com",
+            });
             expect(result).toBe(""); // Fallback to empty string
         });
 
         it("should handle API errors gracefully", async () => {
-            const { formatMonitorTitleSuffix } = await import("../../utils/monitorUiHelpers");
+            const { formatMonitorTitleSuffix } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
-            mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockResolvedValue({
-                success: false,
-                error: "API Error",
+            mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockResolvedValue(
+                {
+                    success: false,
+                    error: "API Error",
+                }
+            );
+
+            const result = await formatMonitorTitleSuffix("http", {
+                url: "https://example.com",
             });
-
-            const result = await formatMonitorTitleSuffix("http", { url: "https://example.com" });
             expect(result).toBe(""); // Fallback to empty string
         });
     });
 
     describe("getAnalyticsLabel", () => {
         it("should return analytics label from config", async () => {
-            const { getAnalyticsLabel } = await import("../../utils/monitorUiHelpers");
+            const { getAnalyticsLabel } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             mockCacheGet.mockReturnValue({
                 uiConfig: {
@@ -222,7 +264,9 @@ describe("Monitor UI Helpers", () => {
         });
 
         it("should return fallback when config not available", async () => {
-            const { getAnalyticsLabel } = await import("../../utils/monitorUiHelpers");
+            const { getAnalyticsLabel } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             mockCacheGet.mockReturnValue(undefined);
 
@@ -231,7 +275,9 @@ describe("Monitor UI Helpers", () => {
         });
 
         it("should handle missing uiConfig gracefully", async () => {
-            const { getAnalyticsLabel } = await import("../../utils/monitorUiHelpers");
+            const { getAnalyticsLabel } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             mockCacheGet.mockReturnValue({});
 
@@ -242,28 +288,40 @@ describe("Monitor UI Helpers", () => {
 
     describe("getDefaultMonitorId", () => {
         it("should return first monitor ID from array", async () => {
-            const { getDefaultMonitorId } = await import("../../utils/monitorUiHelpers");
+            const { getDefaultMonitorId } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
-            const result = getDefaultMonitorId(["monitor-1", "monitor-2", "monitor-3"]);
+            const result = getDefaultMonitorId([
+                "monitor-1",
+                "monitor-2",
+                "monitor-3",
+            ]);
             expect(result).toBe("monitor-1");
         });
 
         it("should return empty string for empty array", async () => {
-            const { getDefaultMonitorId } = await import("../../utils/monitorUiHelpers");
+            const { getDefaultMonitorId } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             const result = getDefaultMonitorId([]);
             expect(result).toBe("");
         });
 
         it("should return single element from single-element array", async () => {
-            const { getDefaultMonitorId } = await import("../../utils/monitorUiHelpers");
+            const { getDefaultMonitorId } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             const result = getDefaultMonitorId(["only-monitor"]);
             expect(result).toBe("only-monitor");
         });
 
         it("should handle array with empty string", async () => {
-            const { getDefaultMonitorId } = await import("../../utils/monitorUiHelpers");
+            const { getDefaultMonitorId } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             const result = getDefaultMonitorId([""]);
             expect(result).toBe("");
@@ -272,7 +330,9 @@ describe("Monitor UI Helpers", () => {
 
     describe("getMonitorHelpTexts", () => {
         it("should return help texts from config", async () => {
-            const { getMonitorHelpTexts } = await import("../../utils/monitorUiHelpers");
+            const { getMonitorHelpTexts } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             mockCacheGet.mockReturnValue({
                 uiConfig: {
@@ -289,7 +349,9 @@ describe("Monitor UI Helpers", () => {
         });
 
         it("should return empty object when config not available", async () => {
-            const { getMonitorHelpTexts } = await import("../../utils/monitorUiHelpers");
+            const { getMonitorHelpTexts } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             mockCacheGet.mockReturnValue(undefined);
 
@@ -300,7 +362,9 @@ describe("Monitor UI Helpers", () => {
 
     describe("getTypesWithFeature", () => {
         it("should return types that support response time", async () => {
-            const { getTypesWithFeature } = await import("../../utils/monitorUiHelpers");
+            const { getTypesWithFeature } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             (getAvailableMonitorTypes as Mock).mockResolvedValue([
                 { type: "http", uiConfig: { supportsResponseTime: true } },
@@ -313,11 +377,16 @@ describe("Monitor UI Helpers", () => {
         });
 
         it("should return types that support advanced analytics", async () => {
-            const { getTypesWithFeature } = await import("../../utils/monitorUiHelpers");
+            const { getTypesWithFeature } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             (getAvailableMonitorTypes as Mock).mockResolvedValue([
                 { type: "http", uiConfig: { supportsAdvancedAnalytics: true } },
-                { type: "port", uiConfig: { supportsAdvancedAnalytics: false } },
+                {
+                    type: "port",
+                    uiConfig: { supportsAdvancedAnalytics: false },
+                },
             ]);
 
             const result = await getTypesWithFeature("advancedAnalytics");
@@ -326,7 +395,9 @@ describe("Monitor UI Helpers", () => {
         });
 
         it("should return empty array when no types support feature", async () => {
-            const { getTypesWithFeature } = await import("../../utils/monitorUiHelpers");
+            const { getTypesWithFeature } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             (getAvailableMonitorTypes as Mock).mockResolvedValue([
                 { type: "http", uiConfig: { supportsResponseTime: false } },
@@ -338,9 +409,14 @@ describe("Monitor UI Helpers", () => {
         });
 
         it("should handle missing uiConfig gracefully", async () => {
-            const { getTypesWithFeature } = await import("../../utils/monitorUiHelpers");
+            const { getTypesWithFeature } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
-            (getAvailableMonitorTypes as Mock).mockResolvedValue([{ type: "http" }, { type: "port", uiConfig: {} }]);
+            (getAvailableMonitorTypes as Mock).mockResolvedValue([
+                { type: "http" },
+                { type: "port", uiConfig: {} },
+            ]);
 
             const result = await getTypesWithFeature("responseTime");
             expect(result).toEqual([]);
@@ -349,7 +425,9 @@ describe("Monitor UI Helpers", () => {
 
     describe("shouldShowUrl", () => {
         it("should return true when config shows URL", async () => {
-            const { shouldShowUrl } = await import("../../utils/monitorUiHelpers");
+            const { shouldShowUrl } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             mockCacheGet.mockReturnValue({
                 uiConfig: {
@@ -365,7 +443,9 @@ describe("Monitor UI Helpers", () => {
         });
 
         it("should return false when config doesn't show URL", async () => {
-            const { shouldShowUrl } = await import("../../utils/monitorUiHelpers");
+            const { shouldShowUrl } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             mockCacheGet.mockReturnValue({
                 uiConfig: {
@@ -380,7 +460,9 @@ describe("Monitor UI Helpers", () => {
         });
 
         it("should return false when config not available", async () => {
-            const { shouldShowUrl } = await import("../../utils/monitorUiHelpers");
+            const { shouldShowUrl } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             mockCacheGet.mockReturnValue(undefined);
 
@@ -391,7 +473,9 @@ describe("Monitor UI Helpers", () => {
 
     describe("supportsAdvancedAnalytics", () => {
         it("should return true when config supports advanced analytics", async () => {
-            const { supportsAdvancedAnalytics } = await import("../../utils/monitorUiHelpers");
+            const { supportsAdvancedAnalytics } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             mockCacheGet.mockReturnValue({
                 uiConfig: {
@@ -404,7 +488,9 @@ describe("Monitor UI Helpers", () => {
         });
 
         it("should return false when config doesn't support advanced analytics", async () => {
-            const { supportsAdvancedAnalytics } = await import("../../utils/monitorUiHelpers");
+            const { supportsAdvancedAnalytics } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             mockCacheGet.mockReturnValue({
                 uiConfig: {
@@ -420,7 +506,9 @@ describe("Monitor UI Helpers", () => {
 
     describe("supportsResponseTime", () => {
         it("should return true when config supports response time", async () => {
-            const { supportsResponseTime } = await import("../../utils/monitorUiHelpers");
+            const { supportsResponseTime } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             mockCacheGet.mockReturnValue({
                 uiConfig: {
@@ -434,7 +522,9 @@ describe("Monitor UI Helpers", () => {
         });
 
         it("should return false when config doesn't support response time", async () => {
-            const { supportsResponseTime } = await import("../../utils/monitorUiHelpers");
+            const { supportsResponseTime } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             mockCacheGet.mockReturnValue({
                 uiConfig: {
@@ -449,7 +539,9 @@ describe("Monitor UI Helpers", () => {
 
     describe("Edge cases and error handling", () => {
         it("should handle electronAPI with missing methods", async () => {
-            const { formatMonitorDetail } = await import("../../utils/monitorUiHelpers");
+            const { formatMonitorDetail } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             globalThis.window = {
                 electronAPI: {
@@ -462,7 +554,9 @@ describe("Monitor UI Helpers", () => {
         });
 
         it("should handle window without electronAPI", async () => {
-            const { formatMonitorDetail } = await import("../../utils/monitorUiHelpers");
+            const { formatMonitorDetail } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             globalThis.window = {} as any;
 
@@ -471,7 +565,9 @@ describe("Monitor UI Helpers", () => {
         });
 
         it("should handle cache operations", async () => {
-            const { getAnalyticsLabel } = await import("../../utils/monitorUiHelpers");
+            const { getAnalyticsLabel } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             // First call - cache miss
             mockCacheGet.mockReturnValueOnce(undefined);
@@ -503,7 +599,9 @@ describe("Monitor UI Helpers", () => {
         });
 
         it("should sanitize cache keys", async () => {
-            const { getAnalyticsLabel } = await import("../../utils/monitorUiHelpers");
+            const { getAnalyticsLabel } = await import(
+                "../../utils/monitorUiHelpers"
+            );
 
             mockCacheGet.mockReturnValue({
                 uiConfig: {

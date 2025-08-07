@@ -3,7 +3,15 @@
  * Comprehensive coverage for screenshot thumbnail functionality.
  */
 
-import { render, screen, fireEvent, waitFor, cleanup, act, createEvent } from "@testing-library/react";
+import {
+    render,
+    screen,
+    fireEvent,
+    waitFor,
+    cleanup,
+    act,
+    createEvent,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
@@ -34,7 +42,11 @@ HTMLAnchorElement.prototype.click = vi.fn();
 // Mock the anchor element href setter to use hash URLs to prevent JSDOM navigation errors
 const originalSetAttribute = Element.prototype.setAttribute;
 Element.prototype.setAttribute = function (name: string, value: string) {
-    if (this instanceof HTMLAnchorElement && name === "href" && value.startsWith("http")) {
+    if (
+        this instanceof HTMLAnchorElement &&
+        name === "href" &&
+        value.startsWith("http")
+    ) {
         // Use a hash URL instead of the actual URL to prevent JSDOM navigation
         return originalSetAttribute.call(this, name, "#");
     }
@@ -79,7 +91,9 @@ describe("ScreenshotThumbnail", () => {
         });
 
         // Mock ElementInternals for the anchor element
-        Element.prototype.getBoundingClientRect = vi.fn().mockImplementation(() => createMockBoundingClientRect());
+        Element.prototype.getBoundingClientRect = vi
+            .fn()
+            .mockImplementation(() => createMockBoundingClientRect());
 
         // Mock location methods to prevent navigation errors in JSDOM
         Object.defineProperty(window, "location", {
@@ -111,7 +125,9 @@ describe("ScreenshotThumbnail", () => {
         });
 
         // Mock getBoundingClientRect
-        Element.prototype.getBoundingClientRect = vi.fn(() => createMockBoundingClientRect());
+        Element.prototype.getBoundingClientRect = vi.fn(() =>
+            createMockBoundingClientRect()
+        );
     });
 
     afterEach(() => {
@@ -123,7 +139,9 @@ describe("ScreenshotThumbnail", () => {
         it("should render thumbnail link and image", () => {
             render(<ScreenshotThumbnail {...defaultProps} />);
 
-            const link = screen.getByRole("link", { name: "Open https://example.com in browser" });
+            const link = screen.getByRole("link", {
+                name: "Open https://example.com in browser",
+            });
             expect(link).toBeInTheDocument();
             // Note: href is mocked to "#" to prevent JSDOM navigation errors
             expect(link).toHaveAttribute("href", "#");
@@ -175,12 +193,17 @@ describe("ScreenshotThumbnail", () => {
             const link = screen.getByRole("link");
             await user.click(link);
 
-            expect(logger.user.action).toHaveBeenCalledWith("External URL opened", {
-                siteName: "Example Site",
-                url: "https://example.com",
-            });
+            expect(logger.user.action).toHaveBeenCalledWith(
+                "External URL opened",
+                {
+                    siteName: "Example Site",
+                    url: "https://example.com",
+                }
+            );
 
-            expect(mockElectronAPI.system.openExternal).toHaveBeenCalledWith("https://example.com");
+            expect(mockElectronAPI.system.openExternal).toHaveBeenCalledWith(
+                "https://example.com"
+            );
             expect(mockWindowOpen).not.toHaveBeenCalled();
         });
 
@@ -192,7 +215,9 @@ describe("ScreenshotThumbnail", () => {
             // Create a click event with preventDefault spy
             const clickEvent = createEvent.click(link);
             const preventDefaultSpy = vi.fn();
-            Object.defineProperty(clickEvent, "preventDefault", { value: preventDefaultSpy });
+            Object.defineProperty(clickEvent, "preventDefault", {
+                value: preventDefaultSpy,
+            });
 
             // Directly dispatch the event to the link
             link.dispatchEvent(clickEvent);
@@ -225,13 +250,19 @@ describe("ScreenshotThumbnail", () => {
 
             // Create a click event with preventDefault
             const clickEvent = createEvent.click(link);
-            Object.defineProperty(clickEvent, "preventDefault", { value: vi.fn() });
+            Object.defineProperty(clickEvent, "preventDefault", {
+                value: vi.fn(),
+            });
 
             // Directly dispatch the event
             link.dispatchEvent(clickEvent);
 
             // Verify window.open was called with the correct parameters (due to fallback)
-            expect(mockWindowOpen).toHaveBeenCalledWith("https://example.com", "_blank", "noopener");
+            expect(mockWindowOpen).toHaveBeenCalledWith(
+                "https://example.com",
+                "_blank",
+                "noopener"
+            );
         });
     });
 
@@ -251,13 +282,20 @@ describe("ScreenshotThumbnail", () => {
 
             // Check that the overlay appears
             await waitFor(() => {
-                const overlay = document.querySelector(".site-details-thumbnail-portal-overlay");
+                const overlay = document.querySelector(
+                    ".site-details-thumbnail-portal-overlay"
+                );
                 expect(overlay).toBeInTheDocument();
             });
 
-            const overlayImage = document.querySelector(".site-details-thumbnail-img-portal");
+            const overlayImage = document.querySelector(
+                ".site-details-thumbnail-img-portal"
+            );
             expect(overlayImage).toBeInTheDocument();
-            expect(overlayImage).toHaveAttribute("alt", "Large screenshot of Example Site");
+            expect(overlayImage).toHaveAttribute(
+                "alt",
+                "Large screenshot of Example Site"
+            );
         });
 
         it("should hide overlay on unhover", async () => {
@@ -269,13 +307,21 @@ describe("ScreenshotThumbnail", () => {
             // Show overlay
             await user.hover(link);
             await waitFor(() => {
-                expect(document.querySelector(".site-details-thumbnail-portal-overlay")).toBeInTheDocument();
+                expect(
+                    document.querySelector(
+                        ".site-details-thumbnail-portal-overlay"
+                    )
+                ).toBeInTheDocument();
             });
 
             // Hide overlay
             await user.unhover(link);
             await waitFor(() => {
-                expect(document.querySelector(".site-details-thumbnail-portal-overlay")).not.toBeInTheDocument();
+                expect(
+                    document.querySelector(
+                        ".site-details-thumbnail-portal-overlay"
+                    )
+                ).not.toBeInTheDocument();
             });
         });
 
@@ -286,7 +332,9 @@ describe("ScreenshotThumbnail", () => {
             fireEvent.focus(link);
 
             await waitFor(() => {
-                const overlay = document.querySelector(".site-details-thumbnail-portal-overlay");
+                const overlay = document.querySelector(
+                    ".site-details-thumbnail-portal-overlay"
+                );
                 expect(overlay).toBeInTheDocument();
             });
         });
@@ -299,13 +347,21 @@ describe("ScreenshotThumbnail", () => {
             // Show overlay
             fireEvent.focus(link);
             await waitFor(() => {
-                expect(document.querySelector(".site-details-thumbnail-portal-overlay")).toBeInTheDocument();
+                expect(
+                    document.querySelector(
+                        ".site-details-thumbnail-portal-overlay"
+                    )
+                ).toBeInTheDocument();
             });
 
             // Hide overlay
             fireEvent.blur(link);
             await waitFor(() => {
-                expect(document.querySelector(".site-details-thumbnail-portal-overlay")).not.toBeInTheDocument();
+                expect(
+                    document.querySelector(
+                        ".site-details-thumbnail-portal-overlay"
+                    )
+                ).not.toBeInTheDocument();
             });
         });
 
@@ -317,7 +373,9 @@ describe("ScreenshotThumbnail", () => {
             await user.hover(link);
 
             await waitFor(() => {
-                const overlay = document.querySelector(".site-details-thumbnail-portal-overlay");
+                const overlay = document.querySelector(
+                    ".site-details-thumbnail-portal-overlay"
+                );
                 expect(overlay).toHaveClass("theme-dark");
             });
         });
@@ -336,7 +394,9 @@ describe("ScreenshotThumbnail", () => {
 
             // After all cycles, ensure no portals remain
             await waitFor(() => {
-                const overlays = document.querySelectorAll(".site-details-thumbnail-portal-overlay");
+                const overlays = document.querySelectorAll(
+                    ".site-details-thumbnail-portal-overlay"
+                );
                 expect(overlays).toHaveLength(0);
             });
         });
@@ -354,7 +414,9 @@ describe("ScreenshotThumbnail", () => {
 
             // After all cycles, ensure no portals remain
             await waitFor(() => {
-                const overlays = document.querySelectorAll(".site-details-thumbnail-portal-overlay");
+                const overlays = document.querySelectorAll(
+                    ".site-details-thumbnail-portal-overlay"
+                );
                 expect(overlays).toHaveLength(0);
             });
         });
@@ -373,7 +435,9 @@ describe("ScreenshotThumbnail", () => {
 
             // Should have no portals at the end
             await waitFor(() => {
-                const overlays = document.querySelectorAll(".site-details-thumbnail-portal-overlay");
+                const overlays = document.querySelectorAll(
+                    ".site-details-thumbnail-portal-overlay"
+                );
                 expect(overlays).toHaveLength(0);
             });
         });
@@ -391,14 +455,18 @@ describe("ScreenshotThumbnail", () => {
 
             // Should only have one portal
             await waitFor(() => {
-                const overlays = document.querySelectorAll(".site-details-thumbnail-portal-overlay");
+                const overlays = document.querySelectorAll(
+                    ".site-details-thumbnail-portal-overlay"
+                );
                 expect(overlays).toHaveLength(1);
             });
 
             // Clean up
             await user.unhover(link);
             await waitFor(() => {
-                const overlays = document.querySelectorAll(".site-details-thumbnail-portal-overlay");
+                const overlays = document.querySelectorAll(
+                    ".site-details-thumbnail-portal-overlay"
+                );
                 expect(overlays).toHaveLength(0);
             });
         });
@@ -415,21 +483,27 @@ describe("ScreenshotThumbnail", () => {
 
             // Should not crash and should clean up properly
             await waitFor(() => {
-                const overlays = document.querySelectorAll(".site-details-thumbnail-portal-overlay");
+                const overlays = document.querySelectorAll(
+                    ".site-details-thumbnail-portal-overlay"
+                );
                 expect(overlays).toHaveLength(0);
             });
         });
 
         it("should clean up portal when component unmounts during hover", async () => {
             const user = userEvent.setup();
-            const { unmount } = render(<ScreenshotThumbnail {...defaultProps} />);
+            const { unmount } = render(
+                <ScreenshotThumbnail {...defaultProps} />
+            );
 
             const link = screen.getByRole("link");
             await user.hover(link);
 
             // Verify portal exists
             await waitFor(() => {
-                const overlays = document.querySelectorAll(".site-details-thumbnail-portal-overlay");
+                const overlays = document.querySelectorAll(
+                    ".site-details-thumbnail-portal-overlay"
+                );
                 expect(overlays).toHaveLength(1);
             });
 
@@ -438,7 +512,9 @@ describe("ScreenshotThumbnail", () => {
 
             // Portal should be cleaned up
             await waitFor(() => {
-                const overlays = document.querySelectorAll(".site-details-thumbnail-portal-overlay");
+                const overlays = document.querySelectorAll(
+                    ".site-details-thumbnail-portal-overlay"
+                );
                 expect(overlays).toHaveLength(0);
             });
         });
@@ -452,7 +528,9 @@ describe("ScreenshotThumbnail", () => {
 
             // Verify portal exists
             await waitFor(() => {
-                const overlay = document.querySelector(".site-details-thumbnail-portal-overlay");
+                const overlay = document.querySelector(
+                    ".site-details-thumbnail-portal-overlay"
+                );
                 expect(overlay).toBeInTheDocument();
             });
 
@@ -469,20 +547,25 @@ describe("ScreenshotThumbnail", () => {
 
             // Portal should still exist and be functional
             await waitFor(() => {
-                const overlay = document.querySelector(".site-details-thumbnail-portal-overlay");
+                const overlay = document.querySelector(
+                    ".site-details-thumbnail-portal-overlay"
+                );
                 expect(overlay).toBeInTheDocument();
             });
 
             // Clean up
             await user.unhover(link);
             await waitFor(() => {
-                const overlays = document.querySelectorAll(".site-details-thumbnail-portal-overlay");
+                const overlays = document.querySelectorAll(
+                    ".site-details-thumbnail-portal-overlay"
+                );
                 expect(overlays).toHaveLength(0);
             });
         });
 
         // Helper function to create delay
-        const createDelay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+        const createDelay = (ms: number) =>
+            new Promise((resolve) => setTimeout(resolve, ms));
 
         it("should debounce mouse leave to prevent flickering", async () => {
             const user = userEvent.setup({ delay: null });
@@ -493,7 +576,9 @@ describe("ScreenshotThumbnail", () => {
             // Hover to show overlay
             await user.hover(link);
             await waitFor(() => {
-                const overlays = document.querySelectorAll(".site-details-thumbnail-portal-overlay");
+                const overlays = document.querySelectorAll(
+                    ".site-details-thumbnail-portal-overlay"
+                );
                 expect(overlays).toHaveLength(1);
             });
 
@@ -502,7 +587,9 @@ describe("ScreenshotThumbnail", () => {
             await user.hover(link);
 
             // Should still have overlay (debounce should prevent hiding)
-            const overlays = document.querySelectorAll(".site-details-thumbnail-portal-overlay");
+            const overlays = document.querySelectorAll(
+                ".site-details-thumbnail-portal-overlay"
+            );
             expect(overlays).toHaveLength(1);
 
             // Final unhover should hide after timeout
@@ -514,31 +601,44 @@ describe("ScreenshotThumbnail", () => {
             });
 
             await waitFor(() => {
-                const overlaysAfter = document.querySelectorAll(".site-details-thumbnail-portal-overlay");
+                const overlaysAfter = document.querySelectorAll(
+                    ".site-details-thumbnail-portal-overlay"
+                );
                 expect(overlaysAfter).toHaveLength(0);
             });
         });
 
         it("should clean up portal when URL prop changes during hover", async () => {
             const user = userEvent.setup();
-            const { rerender } = render(<ScreenshotThumbnail {...defaultProps} />);
+            const { rerender } = render(
+                <ScreenshotThumbnail {...defaultProps} />
+            );
 
             const link = screen.getByRole("link");
             await user.hover(link);
 
             // Verify portal exists
             await waitFor(() => {
-                const overlays = document.querySelectorAll(".site-details-thumbnail-portal-overlay");
+                const overlays = document.querySelectorAll(
+                    ".site-details-thumbnail-portal-overlay"
+                );
                 expect(overlays).toHaveLength(1);
             });
 
             // Change URL prop
-            rerender(<ScreenshotThumbnail {...defaultProps} url="https://newurl.com" />);
+            rerender(
+                <ScreenshotThumbnail
+                    {...defaultProps}
+                    url="https://newurl.com"
+                />
+            );
 
             // Portal should still be manageable
             await user.unhover(link);
             await waitFor(() => {
-                const overlays = document.querySelectorAll(".site-details-thumbnail-portal-overlay");
+                const overlays = document.querySelectorAll(
+                    ".site-details-thumbnail-portal-overlay"
+                );
                 expect(overlays).toHaveLength(0);
             });
         });
@@ -580,7 +680,10 @@ describe("ScreenshotThumbnail", () => {
             render(<ScreenshotThumbnail {...defaultProps} />);
 
             const link = screen.getByRole("link");
-            expect(link).toHaveAttribute("aria-label", "Open https://example.com in browser");
+            expect(link).toHaveAttribute(
+                "aria-label",
+                "Open https://example.com in browser"
+            );
         });
 
         it("should be focusable", () => {
@@ -594,7 +697,9 @@ describe("ScreenshotThumbnail", () => {
             const user = userEvent.setup();
             render(<ScreenshotThumbnail {...defaultProps} />);
 
-            const thumbnailImage = screen.getByAltText("Screenshot of Example Site");
+            const thumbnailImage = screen.getByAltText(
+                "Screenshot of Example Site"
+            );
             expect(thumbnailImage).toBeInTheDocument();
 
             // Show overlay to test large image alt text
@@ -602,8 +707,13 @@ describe("ScreenshotThumbnail", () => {
             await user.hover(link);
 
             await waitFor(() => {
-                const overlayImage = document.querySelector(".site-details-thumbnail-img-portal");
-                expect(overlayImage).toHaveAttribute("alt", "Large screenshot of Example Site");
+                const overlayImage = document.querySelector(
+                    ".site-details-thumbnail-img-portal"
+                );
+                expect(overlayImage).toHaveAttribute(
+                    "alt",
+                    "Large screenshot of Example Site"
+                );
             });
         });
     });
@@ -630,7 +740,9 @@ describe("ScreenshotThumbnail", () => {
             fireEvent.click(link);
 
             // If hasOpenExternal works correctly, electronAPI.openExternal should be called
-            expect(apiWithOpenExternal.system.openExternal).toHaveBeenCalledWith("https://example.com");
+            expect(
+                apiWithOpenExternal.system.openExternal
+            ).toHaveBeenCalledWith("https://example.com");
         });
 
         it("should fallback to window.open when openExternal is not available", () => {
@@ -657,7 +769,11 @@ describe("ScreenshotThumbnail", () => {
             fireEvent(link, clickEvent);
 
             // Should fall back to window.open
-            expect(mockWindowOpen).toHaveBeenCalledWith("https://example.com", "_blank", "noopener");
+            expect(mockWindowOpen).toHaveBeenCalledWith(
+                "https://example.com",
+                "_blank",
+                "noopener"
+            );
         });
     });
 
@@ -666,7 +782,12 @@ describe("ScreenshotThumbnail", () => {
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
 
-            const { unmount } = render(<ScreenshotThumbnail url="https://example.com" siteName="Test Site" />);
+            const { unmount } = render(
+                <ScreenshotThumbnail
+                    url="https://example.com"
+                    siteName="Test Site"
+                />
+            );
 
             const link = screen.getByRole("link");
 
@@ -683,7 +804,9 @@ describe("ScreenshotThumbnail", () => {
             unmount();
 
             // The cleanup should happen through the useEffect cleanup
-            expect(() => screen.queryByAltText("Screenshot of Test Site")).not.toThrow();
+            expect(() =>
+                screen.queryByAltText("Screenshot of Test Site")
+            ).not.toThrow();
 
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();
@@ -693,7 +816,12 @@ describe("ScreenshotThumbnail", () => {
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
 
-            render(<ScreenshotThumbnail url="https://example.com" siteName="Test Site" />);
+            render(
+                <ScreenshotThumbnail
+                    url="https://example.com"
+                    siteName="Test Site"
+                />
+            );
             const image = screen.getByAltText("Screenshot of Test Site");
 
             // First hover then leave to create timeout
@@ -718,7 +846,12 @@ describe("ScreenshotThumbnail", () => {
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
 
-            render(<ScreenshotThumbnail url="https://example.com" siteName="Test Site" />);
+            render(
+                <ScreenshotThumbnail
+                    url="https://example.com"
+                    siteName="Test Site"
+                />
+            );
             const image = screen.getByAltText("Screenshot of Test Site");
 
             // First hover then leave to create timeout
@@ -742,7 +875,12 @@ describe("ScreenshotThumbnail", () => {
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
 
-            render(<ScreenshotThumbnail url="https://example.com" siteName="Test Site" />);
+            render(
+                <ScreenshotThumbnail
+                    url="https://example.com"
+                    siteName="Test Site"
+                />
+            );
             const image = screen.getByAltText("Screenshot of Test Site");
 
             // First hover then leave to create timeout
@@ -766,7 +904,12 @@ describe("ScreenshotThumbnail", () => {
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
 
-            render(<ScreenshotThumbnail url="https://example.com" siteName="Test Site" />);
+            render(
+                <ScreenshotThumbnail
+                    url="https://example.com"
+                    siteName="Test Site"
+                />
+            );
             const image = screen.getByAltText("Screenshot of Test Site");
 
             // First mouse enter/leave to create initial timeout
@@ -792,7 +935,12 @@ describe("ScreenshotThumbnail", () => {
         it("should test useEffect cleanup behavior (lines 59-60, 65-66)", () => {
             // This test verifies that the useEffect cleanup function exists and can handle
             // the case where timeout and portal refs have values during cleanup
-            const { unmount } = render(<ScreenshotThumbnail url="https://example.com" siteName="Test Site" />);
+            const { unmount } = render(
+                <ScreenshotThumbnail
+                    url="https://example.com"
+                    siteName="Test Site"
+                />
+            );
 
             const image = screen.getByAltText("Screenshot of Test Site");
 
@@ -801,21 +949,30 @@ describe("ScreenshotThumbnail", () => {
             fireEvent.mouseEnter(image); // Creates portal
 
             // Verify portal exists
-            expect(document.querySelector(".site-details-thumbnail-portal-overlay")).toBeInTheDocument();
+            expect(
+                document.querySelector(".site-details-thumbnail-portal-overlay")
+            ).toBeInTheDocument();
 
             // Unmount component to trigger useEffect cleanup
             // The cleanup will handle the portal cleanup (lines 65-66)
             unmount();
 
             // Verify portal is cleaned up after unmount
-            expect(document.querySelector(".site-details-thumbnail-portal-overlay")).not.toBeInTheDocument();
+            expect(
+                document.querySelector(".site-details-thumbnail-portal-overlay")
+            ).not.toBeInTheDocument();
         });
 
         it("should test handleMouseEnter timeout clearing when timeout exists", () => {
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
 
-            render(<ScreenshotThumbnail url="https://example.com" siteName="Test Site" />);
+            render(
+                <ScreenshotThumbnail
+                    url="https://example.com"
+                    siteName="Test Site"
+                />
+            );
             const image = screen.getByAltText("Screenshot of Test Site");
 
             // Create timeout with mouse leave
@@ -841,7 +998,12 @@ describe("ScreenshotThumbnail", () => {
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
 
-            render(<ScreenshotThumbnail url="https://example.com" siteName="Test Site" />);
+            render(
+                <ScreenshotThumbnail
+                    url="https://example.com"
+                    siteName="Test Site"
+                />
+            );
             const link = screen.getByRole("link");
 
             // Create timeout with mouse leave
@@ -866,7 +1028,12 @@ describe("ScreenshotThumbnail", () => {
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
 
-            render(<ScreenshotThumbnail url="https://example.com" siteName="Test Site" />);
+            render(
+                <ScreenshotThumbnail
+                    url="https://example.com"
+                    siteName="Test Site"
+                />
+            );
             const link = screen.getByRole("link");
 
             // Create timeout with mouse leave
@@ -891,7 +1058,12 @@ describe("ScreenshotThumbnail", () => {
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
 
-            render(<ScreenshotThumbnail url="https://example.com" siteName="Test Site" />);
+            render(
+                <ScreenshotThumbnail
+                    url="https://example.com"
+                    siteName="Test Site"
+                />
+            );
             const image = screen.getByAltText("Screenshot of Test Site");
 
             // First trigger mouseEnter then mouseLeave to create a timeout
@@ -931,17 +1103,30 @@ describe("ScreenshotThumbnail", () => {
             };
             Element.prototype.getBoundingClientRect = vi.fn(() => mockRect1);
 
-            Object.defineProperty(window, "innerWidth", { value: 1920, writable: true });
-            Object.defineProperty(window, "innerHeight", { value: 1080, writable: true });
+            Object.defineProperty(window, "innerWidth", {
+                value: 1920,
+                writable: true,
+            });
+            Object.defineProperty(window, "innerHeight", {
+                value: 1080,
+                writable: true,
+            });
 
-            const { unmount } = render(<ScreenshotThumbnail url="https://example.com" siteName="Test Site 1" />);
+            const { unmount } = render(
+                <ScreenshotThumbnail
+                    url="https://example.com"
+                    siteName="Test Site 1"
+                />
+            );
             const image = screen.getByAltText("Screenshot of Test Site 1");
 
             // Hover to trigger overlay
 
             fireEvent.mouseEnter(image);
 
-            const overlay = document.querySelector(".site-details-thumbnail-portal-overlay");
+            const overlay = document.querySelector(
+                ".site-details-thumbnail-portal-overlay"
+            );
             expect(overlay).toBeInTheDocument();
 
             unmount();
@@ -963,7 +1148,10 @@ describe("ScreenshotThumbnail", () => {
             Element.prototype.getBoundingClientRect = vi.fn(() => mockRect2);
 
             const { unmount: unmount2 } = render(
-                <ScreenshotThumbnail url="https://example.com" siteName="Test Site 2" />
+                <ScreenshotThumbnail
+                    url="https://example.com"
+                    siteName="Test Site 2"
+                />
             );
             const image2 = screen.getByAltText("Screenshot of Test Site 2");
 
@@ -971,20 +1159,29 @@ describe("ScreenshotThumbnail", () => {
 
             fireEvent.mouseEnter(image2);
 
-            const overlay2 = document.querySelector(".site-details-thumbnail-portal-overlay");
+            const overlay2 = document.querySelector(
+                ".site-details-thumbnail-portal-overlay"
+            );
             expect(overlay2).toBeInTheDocument();
 
             unmount2();
 
             // Restore defaults
-            Element.prototype.getBoundingClientRect = vi.fn(() => createMockBoundingClientRect());
+            Element.prototype.getBoundingClientRect = vi.fn(() =>
+                createMockBoundingClientRect()
+            );
         });
 
         it("should handle all event combinations that can clear timeouts", () => {
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
 
-            render(<ScreenshotThumbnail url="https://example.com" siteName="Test Site" />);
+            render(
+                <ScreenshotThumbnail
+                    url="https://example.com"
+                    siteName="Test Site"
+                />
+            );
             const link = screen.getByRole("link");
 
             // Test sequence: enter -> leave -> enter (should clear timeout)
@@ -1026,7 +1223,12 @@ describe("ScreenshotThumbnail", () => {
             // The cleanup function captures the initial undefined values of the refs,
             // not their current values at cleanup time
 
-            const { unmount } = render(<ScreenshotThumbnail url="https://example.com" siteName="Test Site" />);
+            const { unmount } = render(
+                <ScreenshotThumbnail
+                    url="https://example.com"
+                    siteName="Test Site"
+                />
+            );
 
             // The component should still unmount cleanly even though the cleanup
             // doesn't actually clear the current timeout/portal refs due to closure

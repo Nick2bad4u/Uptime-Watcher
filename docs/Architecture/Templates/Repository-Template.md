@@ -190,7 +190,10 @@ export class ExampleRepository {
   * await repo.update("123", { name: "Updated Name", createdAt: Date.now() });
   * ```
   */
- public async update(id: string, data: Partial<Omit<ExampleRow, "id">>): Promise<void> {
+ public async update(
+  id: string,
+  data: Partial<Omit<ExampleRow, "id">>
+ ): Promise<void> {
   return withDatabaseOperation(async () => {
    return this.databaseService.executeTransaction((db) => {
     this.updateInternal(db, id, data);
@@ -208,9 +211,15 @@ export class ExampleRepository {
   * @remarks
   * Must be called within an active transaction context.
   */
- public updateInternal(db: Database, id: string, data: Partial<Omit<ExampleRow, "id">>): void {
+ public updateInternal(
+  db: Database,
+  id: string,
+  data: Partial<Omit<ExampleRow, "id">>
+ ): void {
   // Build dynamic update query based on provided fields
-  const fields = Object.keys(data).filter((key) => data[key as keyof typeof data] !== undefined);
+  const fields = Object.keys(data).filter(
+   (key) => data[key as keyof typeof data] !== undefined
+  );
   const setClause = fields.map((field) => `${field} = ?`).join(", ");
   const values = fields.map((field) => data[field as keyof typeof data]);
 
@@ -328,7 +337,9 @@ export class ExampleRepository {
    for (const record of records) {
     stmt.run([record.id, record.name, record.createdAt]);
    }
-   logger.debug(`[ExampleRepository] Bulk inserted ${records.length} [ENTITY] records (internal)`);
+   logger.debug(
+    `[ExampleRepository] Bulk inserted ${records.length} [ENTITY] records (internal)`
+   );
   } finally {
    stmt.finalize();
   }
@@ -402,11 +413,14 @@ describe("ExampleRepository", () => {
    await repository.create(data);
 
    expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
-   expect(mockDatabase.run).toHaveBeenCalledWith(expect.stringContaining("INSERT"), [
-    data.id,
-    data.name,
-    data.createdAt,
-   ]);
+   expect(mockDatabase.run).toHaveBeenCalledWith(
+    expect.stringContaining("INSERT"),
+    [
+     data.id,
+     data.name,
+     data.createdAt,
+    ]
+   );
   });
  });
 

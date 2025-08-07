@@ -10,16 +10,20 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import type { MockedFunction } from "vitest";
 
 import { PingMonitor } from "../../../services/monitoring/PingMonitor";
-import { MonitorConfig, MonitorCheckResult } from "../../../services/monitoring/types";
+import {
+    MonitorConfig,
+    MonitorCheckResult,
+} from "../../../services/monitoring/types";
 import { Site } from "../../../types";
 import { isNonEmptyString } from "../../../../shared/validation/validatorUtils";
 import * as pingRetryModule from "../../../services/monitoring/utils/pingRetry";
 
 // Mock the ping retry utility
 vi.mock("../../../services/monitoring/utils/pingRetry");
-const mockPerformPingCheckWithRetry = pingRetryModule.performPingCheckWithRetry as MockedFunction<
-    typeof pingRetryModule.performPingCheckWithRetry
->;
+const mockPerformPingCheckWithRetry =
+    pingRetryModule.performPingCheckWithRetry as MockedFunction<
+        typeof pingRetryModule.performPingCheckWithRetry
+    >;
 
 // Mock the monitor type guards
 vi.mock("../../../services/monitoring/utils/monitorTypeGuards", () => ({
@@ -40,7 +44,9 @@ describe("PingMonitor", () => {
         timeout: 5000,
     };
 
-    const createMockPingMonitor = (overrides: Partial<Site["monitors"][0]> = {}): Site["monitors"][0] => ({
+    const createMockPingMonitor = (
+        overrides: Partial<Site["monitors"][0]> = {}
+    ): Site["monitors"][0] => ({
         activeOperations: [],
         id: "test-ping-monitor",
         type: "ping",
@@ -153,7 +159,11 @@ describe("PingMonitor", () => {
             const result = await pingMonitor.check(monitor);
 
             expect(result).toEqual(successResult);
-            expect(mockPerformPingCheckWithRetry).toHaveBeenCalledWith("google.com", 5000, 2);
+            expect(mockPerformPingCheckWithRetry).toHaveBeenCalledWith(
+                "google.com",
+                5000,
+                2
+            );
         });
 
         it("should reject non-ping monitor types", async () => {
@@ -198,7 +208,11 @@ describe("PingMonitor", () => {
 
             await pingMonitor.check(monitor);
 
-            expect(mockPerformPingCheckWithRetry).toHaveBeenCalledWith("test.example.com", 8000, 5);
+            expect(mockPerformPingCheckWithRetry).toHaveBeenCalledWith(
+                "test.example.com",
+                8000,
+                5
+            );
         });
 
         it("should handle different host types", async () => {
@@ -228,7 +242,9 @@ describe("PingMonitor", () => {
 
             const monitor = createMockPingMonitor();
 
-            await expect(pingMonitor.check(monitor)).rejects.toThrow("Network unreachable");
+            await expect(pingMonitor.check(monitor)).rejects.toThrow(
+                "Network unreachable"
+            );
         });
     });
 
@@ -280,7 +296,11 @@ describe("PingMonitor", () => {
             const monitor2 = createMockPingMonitor({ host: "host2.com" });
             const monitor3 = createMockPingMonitor({ host: "host3.com" });
 
-            const promises = [pingMonitor.check(monitor1), pingMonitor.check(monitor2), pingMonitor.check(monitor3)];
+            const promises = [
+                pingMonitor.check(monitor1),
+                pingMonitor.check(monitor2),
+                pingMonitor.check(monitor3),
+            ];
 
             const results = await Promise.all(promises);
 

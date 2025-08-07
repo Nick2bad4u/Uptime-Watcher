@@ -31,43 +31,75 @@ describe("DefaultErrorFallback", () => {
         it("should render error fallback with default message when no error provided", () => {
             render(<DefaultErrorFallback onRetry={mockOnRetry} />);
 
-            expect(screen.getByText("Something went wrong")).toBeInTheDocument();
-            expect(screen.getByText("An unexpected error occurred while loading this section.")).toBeInTheDocument();
+            expect(
+                screen.getByText("Something went wrong")
+            ).toBeInTheDocument();
+            expect(
+                screen.getByText(
+                    "An unexpected error occurred while loading this section."
+                )
+            ).toBeInTheDocument();
             expect(screen.getByText("Try Again")).toBeInTheDocument();
             expect(screen.getByText("Reload Page")).toBeInTheDocument();
         });
 
         it("should render error message when error is provided", () => {
             const error = new Error("Custom error message");
-            render(<DefaultErrorFallback error={error} onRetry={mockOnRetry} />);
+            render(
+                <DefaultErrorFallback error={error} onRetry={mockOnRetry} />
+            );
 
-            expect(screen.getByText("Something went wrong")).toBeInTheDocument();
-            expect(screen.getByText("Custom error message")).toBeInTheDocument();
+            expect(
+                screen.getByText("Something went wrong")
+            ).toBeInTheDocument();
+            expect(
+                screen.getByText("Custom error message")
+            ).toBeInTheDocument();
             expect(screen.getByText("Try Again")).toBeInTheDocument();
             expect(screen.getByText("Reload Page")).toBeInTheDocument();
         });
 
         it("should display default message when error message is empty", () => {
             const error = new Error("");
-            render(<DefaultErrorFallback error={error} onRetry={mockOnRetry} />);
+            render(
+                <DefaultErrorFallback error={error} onRetry={mockOnRetry} />
+            );
 
-            expect(screen.getByText("Something went wrong")).toBeInTheDocument();
-            expect(screen.getByText("An unexpected error occurred while loading this section.")).toBeInTheDocument();
+            expect(
+                screen.getByText("Something went wrong")
+            ).toBeInTheDocument();
+            expect(
+                screen.getByText(
+                    "An unexpected error occurred while loading this section."
+                )
+            ).toBeInTheDocument();
         });
 
         it("should display default message when error message is only whitespace", () => {
             const error = new Error("   \t\n   ");
-            render(<DefaultErrorFallback error={error} onRetry={mockOnRetry} />);
+            render(
+                <DefaultErrorFallback error={error} onRetry={mockOnRetry} />
+            );
 
-            expect(screen.getByText("Something went wrong")).toBeInTheDocument();
-            expect(screen.getByText("An unexpected error occurred while loading this section.")).toBeInTheDocument();
+            expect(
+                screen.getByText("Something went wrong")
+            ).toBeInTheDocument();
+            expect(
+                screen.getByText(
+                    "An unexpected error occurred while loading this section."
+                )
+            ).toBeInTheDocument();
         });
 
         it("should trim error message whitespace", () => {
             const error = new Error("  Error with whitespace  ");
-            render(<DefaultErrorFallback error={error} onRetry={mockOnRetry} />);
+            render(
+                <DefaultErrorFallback error={error} onRetry={mockOnRetry} />
+            );
 
-            expect(screen.getByText("Error with whitespace")).toBeInTheDocument();
+            expect(
+                screen.getByText("Error with whitespace")
+            ).toBeInTheDocument();
         });
     });
 
@@ -105,7 +137,9 @@ describe("DefaultErrorFallback", () => {
 
     describe("CSS Classes and Styling", () => {
         it("should have correct CSS classes for layout and styling", () => {
-            const { container } = render(<DefaultErrorFallback onRetry={mockOnRetry} />);
+            const { container } = render(
+                <DefaultErrorFallback onRetry={mockOnRetry} />
+            );
 
             const mainDiv = container.firstChild as HTMLElement;
             expect(mainDiv).toHaveClass(
@@ -163,8 +197,12 @@ describe("DefaultErrorFallback", () => {
         it("should have clickable buttons", () => {
             render(<DefaultErrorFallback onRetry={mockOnRetry} />);
 
-            const tryAgainButton = screen.getByRole("button", { name: "Try Again" });
-            const reloadButton = screen.getByRole("button", { name: "Reload Page" });
+            const tryAgainButton = screen.getByRole("button", {
+                name: "Try Again",
+            });
+            const reloadButton = screen.getByRole("button", {
+                name: "Reload Page",
+            });
 
             expect(tryAgainButton).toBeInTheDocument();
             expect(reloadButton).toBeInTheDocument();
@@ -174,24 +212,38 @@ describe("DefaultErrorFallback", () => {
     describe("Error Object Variations", () => {
         it("should handle error with non-string message property", () => {
             const error = { message: 123 } as any;
-            render(<DefaultErrorFallback error={error} onRetry={mockOnRetry} />);
+            render(
+                <DefaultErrorFallback error={error} onRetry={mockOnRetry} />
+            );
 
             // Should still render without crashing
-            expect(screen.getByText("Something went wrong")).toBeInTheDocument();
+            expect(
+                screen.getByText("Something went wrong")
+            ).toBeInTheDocument();
         });
 
         it("should handle error without message property", () => {
             const error = {} as Error;
-            render(<DefaultErrorFallback error={error} onRetry={mockOnRetry} />);
+            render(
+                <DefaultErrorFallback error={error} onRetry={mockOnRetry} />
+            );
 
-            expect(screen.getByText("Something went wrong")).toBeInTheDocument();
-            expect(screen.getByText("An unexpected error occurred while loading this section.")).toBeInTheDocument();
+            expect(
+                screen.getByText("Something went wrong")
+            ).toBeInTheDocument();
+            expect(
+                screen.getByText(
+                    "An unexpected error occurred while loading this section."
+                )
+            ).toBeInTheDocument();
         });
 
         it("should handle very long error messages", () => {
             const longMessage = "A".repeat(1000);
             const error = new Error(longMessage);
-            render(<DefaultErrorFallback error={error} onRetry={mockOnRetry} />);
+            render(
+                <DefaultErrorFallback error={error} onRetry={mockOnRetry} />
+            );
 
             expect(screen.getByText(longMessage)).toBeInTheDocument();
         });
@@ -199,7 +251,9 @@ describe("DefaultErrorFallback", () => {
         it("should handle error messages with special characters", () => {
             const specialMessage = "Error with special chars: <>&\"'";
             const error = new Error(specialMessage);
-            render(<DefaultErrorFallback error={error} onRetry={mockOnRetry} />);
+            render(
+                <DefaultErrorFallback error={error} onRetry={mockOnRetry} />
+            );
 
             expect(screen.getByText(specialMessage)).toBeInTheDocument();
         });

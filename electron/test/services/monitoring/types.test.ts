@@ -5,7 +5,11 @@
 
 import { describe, expect, it } from "vitest";
 
-import type { IMonitorService, MonitorCheckResult, MonitorConfig } from "../../../services/monitoring/types";
+import type {
+    IMonitorService,
+    MonitorCheckResult,
+    MonitorConfig,
+} from "../../../services/monitoring/types";
 
 describe("Monitoring Types", () => {
     describe("MonitorCheckResult", () => {

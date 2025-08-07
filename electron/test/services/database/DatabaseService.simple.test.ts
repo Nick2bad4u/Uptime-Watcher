@@ -47,7 +47,9 @@ describe("DatabaseService Coverage Tests", () => {
     });
 
     it("should create singleton instance", async () => {
-        const { DatabaseService } = await import("../../../services/database/DatabaseService");
+        const { DatabaseService } = await import(
+            "../../../services/database/DatabaseService"
+        );
 
         const instance1 = DatabaseService.getInstance();
         const instance2 = DatabaseService.getInstance();
@@ -57,7 +59,9 @@ describe("DatabaseService Coverage Tests", () => {
     });
 
     it("should handle initialization", async () => {
-        const { DatabaseService } = await import("../../../services/database/DatabaseService");
+        const { DatabaseService } = await import(
+            "../../../services/database/DatabaseService"
+        );
 
         try {
             const instance = DatabaseService.getInstance();
@@ -70,7 +74,9 @@ describe("DatabaseService Coverage Tests", () => {
     });
 
     it("should handle database operations", async () => {
-        const { DatabaseService } = await import("../../../services/database/DatabaseService");
+        const { DatabaseService } = await import(
+            "../../../services/database/DatabaseService"
+        );
 
         try {
             const instance = DatabaseService.getInstance();
@@ -83,7 +89,9 @@ describe("DatabaseService Coverage Tests", () => {
     });
 
     it("should handle transaction operations", async () => {
-        const { DatabaseService } = await import("../../../services/database/DatabaseService");
+        const { DatabaseService } = await import(
+            "../../../services/database/DatabaseService"
+        );
 
         try {
             const instance = DatabaseService.getInstance();
@@ -99,7 +107,9 @@ describe("DatabaseService Coverage Tests", () => {
     });
 
     it("should handle cleanup operations", async () => {
-        const { DatabaseService } = await import("../../../services/database/DatabaseService");
+        const { DatabaseService } = await import(
+            "../../../services/database/DatabaseService"
+        );
 
         try {
             const instance = DatabaseService.getInstance();
@@ -113,13 +123,17 @@ describe("DatabaseService Coverage Tests", () => {
 
     it("should have proper constants defined", async () => {
         // This will import the file and exercise any top-level code
-        const module = await import("../../../services/database/DatabaseService");
+        const module = await import(
+            "../../../services/database/DatabaseService"
+        );
         expect(module).toBeDefined();
         expect(module.DatabaseService).toBeDefined();
     });
 
     it("should handle database path generation", async () => {
-        const { DatabaseService } = await import("../../../services/database/DatabaseService");
+        const { DatabaseService } = await import(
+            "../../../services/database/DatabaseService"
+        );
 
         try {
             const instance = DatabaseService.getInstance();
@@ -131,7 +145,9 @@ describe("DatabaseService Coverage Tests", () => {
     });
 
     it("should handle error scenarios", async () => {
-        const { DatabaseService } = await import("../../../services/database/DatabaseService");
+        const { DatabaseService } = await import(
+            "../../../services/database/DatabaseService"
+        );
 
         try {
             const instance = DatabaseService.getInstance();

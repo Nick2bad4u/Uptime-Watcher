@@ -17,7 +17,9 @@ describe("SiteManager", () => {
 
         mockDependencies = {
             configurationManager: {
-                validateSiteConfiguration: vi.fn().mockResolvedValue({ success: true }),
+                validateSiteConfiguration: vi
+                    .fn()
+                    .mockResolvedValue({ success: true }),
             },
             databaseService: {
                 executeTransaction: vi.fn(),
@@ -85,14 +87,20 @@ describe("SiteManager", () => {
                 ],
             };
 
-            mockDependencies.databaseService.executeTransaction.mockImplementation(async (fn: any) => {
-                return await fn();
-            });
+            mockDependencies.databaseService.executeTransaction.mockImplementation(
+                async (fn: any) => {
+                    return await fn();
+                }
+            );
 
             const result = await manager.addSite(newSite);
 
-            expect(mockDependencies.siteRepository.upsertInternal).toHaveBeenCalled();
-            expect(mockDependencies.eventEmitter.emitTyped).toHaveBeenCalledWith(
+            expect(
+                mockDependencies.siteRepository.upsertInternal
+            ).toHaveBeenCalled();
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).toHaveBeenCalledWith(
                 "site:added",
                 expect.objectContaining({
                     site: expect.objectContaining({
@@ -116,7 +124,9 @@ describe("SiteManager", () => {
                 new Error("Database transaction failed")
             );
 
-            await expect(manager.addSite(newSite)).rejects.toThrow("Database transaction failed");
+            await expect(manager.addSite(newSite)).rejects.toThrow(
+                "Database transaction failed"
+            );
         });
     });
 
@@ -132,7 +142,10 @@ describe("SiteManager", () => {
             ];
 
             // Mock the siteRepositoryService method directly
-            vi.spyOn(manager["siteRepositoryService"], "getSitesFromDatabase").mockResolvedValue(cachedSites);
+            vi.spyOn(
+                manager["siteRepositoryService"],
+                "getSitesFromDatabase"
+            ).mockResolvedValue(cachedSites);
 
             const result = await manager.getSites();
 
@@ -140,10 +153,20 @@ describe("SiteManager", () => {
         });
 
         it("should fetch from database when cache is empty", async () => {
-            const dbSites = [{ identifier: "site1", name: "Site 1", monitoring: true, monitors: [] }];
+            const dbSites = [
+                {
+                    identifier: "site1",
+                    name: "Site 1",
+                    monitoring: true,
+                    monitors: [],
+                },
+            ];
 
             // Mock the siteRepositoryService method directly
-            vi.spyOn(manager["siteRepositoryService"], "getSitesFromDatabase").mockResolvedValue(dbSites);
+            vi.spyOn(
+                manager["siteRepositoryService"],
+                "getSitesFromDatabase"
+            ).mockResolvedValue(dbSites);
 
             const result = await manager.getSites();
 
@@ -155,25 +178,34 @@ describe("SiteManager", () => {
     describe("removeSite", () => {
         it("should remove an existing site", async () => {
             // Mock the siteWriterService.deleteSite method directly
-            const mockDeleteSite = vi.spyOn(manager["siteWriterService"], "deleteSite").mockResolvedValue(true);
+            const mockDeleteSite = vi
+                .spyOn(manager["siteWriterService"], "deleteSite")
+                .mockResolvedValue(true);
 
             mockDependencies.siteRepository.delete.mockResolvedValue(true);
-            mockDependencies.databaseService.executeTransaction.mockImplementation(async (fn: any) => {
-                const mockDb = { prepare: vi.fn(), run: vi.fn() };
-                return await fn(mockDb);
-            });
+            mockDependencies.databaseService.executeTransaction.mockImplementation(
+                async (fn: any) => {
+                    const mockDb = { prepare: vi.fn(), run: vi.fn() };
+                    return await fn(mockDb);
+                }
+            );
 
             const result = await manager.removeSite("site1");
 
-            expect(mockDeleteSite).toHaveBeenCalledWith(expect.anything(), "site1");
+            expect(mockDeleteSite).toHaveBeenCalledWith(
+                expect.anything(),
+                "site1"
+            );
             expect(result).toBe(true);
         });
 
         it("should return false when site not found", async () => {
             mockDependencies.siteRepository.delete.mockResolvedValue(false);
-            mockDependencies.databaseService.executeTransaction.mockImplementation(async (fn: any) => {
-                return await fn();
-            });
+            mockDependencies.databaseService.executeTransaction.mockImplementation(
+                async (fn: any) => {
+                    return await fn();
+                }
+            );
 
             const result = await manager.removeSite("nonexistent");
 
@@ -225,7 +257,9 @@ describe("SiteManager", () => {
             });
 
             // Mock the siteWriterService.updateSite method
-            const mockUpdateSite = vi.spyOn(manager["siteWriterService"], "updateSite").mockResolvedValue(updatedSite);
+            const mockUpdateSite = vi
+                .spyOn(manager["siteWriterService"], "updateSite")
+                .mockResolvedValue(updatedSite);
 
             // Mock the siteRepositoryService.getSitesFromDatabase method
             const mockGetSitesFromDatabase = vi
@@ -235,13 +269,19 @@ describe("SiteManager", () => {
             // Mock the updateSitesCache method
             vi.spyOn(manager, "updateSitesCache").mockResolvedValue(undefined);
 
-            mockDependencies.databaseService.executeTransaction.mockImplementation(async (fn: any) => {
-                return await fn();
-            });
+            mockDependencies.databaseService.executeTransaction.mockImplementation(
+                async (fn: any) => {
+                    return await fn();
+                }
+            );
 
             const result = await manager.updateSite("site1", updates);
 
-            expect(mockUpdateSite).toHaveBeenCalledWith(mockCache, "site1", updates);
+            expect(mockUpdateSite).toHaveBeenCalledWith(
+                mockCache,
+                "site1",
+                updates
+            );
             expect(mockGetSitesFromDatabase).toHaveBeenCalled();
             expect(result).toEqual(updatedSite);
         });
@@ -249,14 +289,18 @@ describe("SiteManager", () => {
 
     describe("removeMonitor", () => {
         it("should remove a monitor from a site", async () => {
-            mockDependencies.databaseService.executeTransaction.mockImplementation(async (fn: any) => {
-                return await fn();
-            });
-            mockDependencies.monitorRepository.findByIdentifier = vi.fn().mockResolvedValue({
-                id: "mon1",
-                type: "http",
-                url: "https://example.com",
-            });
+            mockDependencies.databaseService.executeTransaction.mockImplementation(
+                async (fn: any) => {
+                    return await fn();
+                }
+            );
+            mockDependencies.monitorRepository.findByIdentifier = vi
+                .fn()
+                .mockResolvedValue({
+                    id: "mon1",
+                    type: "http",
+                    url: "https://example.com",
+                });
 
             // Mock the getSitesFromDatabase method that will be called during removeMonitor
             const mockSites = [
@@ -270,7 +314,10 @@ describe("SiteManager", () => {
 
             // Since siteRepositoryService is private, I need to mock it differently
             // Let me spy on the getSitesFromDatabase method on the manager instance
-            vi.spyOn(manager["siteRepositoryService"], "getSitesFromDatabase").mockResolvedValue(mockSites);
+            vi.spyOn(
+                manager["siteRepositoryService"],
+                "getSitesFromDatabase"
+            ).mockResolvedValue(mockSites);
 
             const result = await manager.removeMonitor("site1", "mon1");
 

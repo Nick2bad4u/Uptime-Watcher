@@ -23,7 +23,9 @@ const createMockMediaQuery = (matches: boolean) => ({
 // Setup window.matchMedia mock before any tests run
 Object.defineProperty(window, "matchMedia", {
     writable: true,
-    value: vi.fn().mockImplementation((_query: string) => createMockMediaQuery(false)),
+    value: vi
+        .fn()
+        .mockImplementation((_query: string) => createMockMediaQuery(false)),
 });
 
 describe("useThemeStyles Hook", () => {
@@ -32,7 +34,8 @@ describe("useThemeStyles Hook", () => {
 
     beforeEach(() => {
         // Save original matchMedia if it exists
-        originalMatchMedia = (globalThis as any).window?.matchMedia || window.matchMedia;
+        originalMatchMedia =
+            (globalThis as any).window?.matchMedia || window.matchMedia;
 
         mockMediaQuery = createMockMediaQuery(false);
         Object.defineProperty(window, "matchMedia", {
@@ -61,7 +64,9 @@ describe("useThemeStyles Hook", () => {
         it("should return light mode styles when collapsed=false", () => {
             const { result } = renderHook(() => useThemeStyles(false));
 
-            expect(result.current.headerStyle.background).toContain("rgba(59, 130, 246, 0.1)");
+            expect(result.current.headerStyle.background).toContain(
+                "rgba(59, 130, 246, 0.1)"
+            );
             expect(result.current.headerStyle.color).toBe("#111827");
             expect(result.current.headerStyle.height).toBe("auto");
             expect(result.current.headerStyle.minHeight).toBe("140px");
@@ -82,7 +87,9 @@ describe("useThemeStyles Hook", () => {
 
             // Header styles
             expect(result.current.headerStyle.color).toBe("#111827");
-            expect(result.current.headerStyle.background).toContain("rgba(59, 130, 246, 0.1)");
+            expect(result.current.headerStyle.background).toContain(
+                "rgba(59, 130, 246, 0.1)"
+            );
 
             // Title styles
             expect(result.current.titleStyle.color).toBe("#111827");
@@ -95,14 +102,20 @@ describe("useThemeStyles Hook", () => {
             expect(result.current.collapseButtonStyle.color).toBe("#6b7280");
 
             // Overlay styles
-            expect(result.current.overlayStyle.background).toContain("rgba(59, 130, 246, 0.05)");
+            expect(result.current.overlayStyle.background).toContain(
+                "rgba(59, 130, 246, 0.05)"
+            );
         });
 
         it("should have proper light mode shadows and effects", () => {
             const { result } = renderHook(() => useThemeStyles());
 
-            expect(result.current.headerStyle.boxShadow).toContain("rgba(0, 0, 0, 0.1)");
-            expect(result.current.titleStyle.textShadow).toContain("rgba(59, 130, 246, 0.1)");
+            expect(result.current.headerStyle.boxShadow).toContain(
+                "rgba(0, 0, 0, 0.1)"
+            );
+            expect(result.current.titleStyle.textShadow).toContain(
+                "rgba(59, 130, 246, 0.1)"
+            );
         });
     });
 
@@ -115,7 +128,9 @@ describe("useThemeStyles Hook", () => {
         it("should return dark mode styles when collapsed=false", () => {
             const { result } = renderHook(() => useThemeStyles(false));
 
-            expect(result.current.headerStyle.background).toContain("rgba(37, 99, 235, 0.15)");
+            expect(result.current.headerStyle.background).toContain(
+                "rgba(37, 99, 235, 0.15)"
+            );
             expect(result.current.headerStyle.color).toBe("#f3f4f6");
             expect(result.current.titleStyle.color).toBe("#f3f4f6");
             expect(result.current.contentStyle.padding).toBe("1.5rem");
@@ -134,7 +149,9 @@ describe("useThemeStyles Hook", () => {
 
             // Header styles
             expect(result.current.headerStyle.color).toBe("#f3f4f6");
-            expect(result.current.headerStyle.background).toContain("rgba(37, 99, 235, 0.15)");
+            expect(result.current.headerStyle.background).toContain(
+                "rgba(37, 99, 235, 0.15)"
+            );
 
             // Title styles
             expect(result.current.titleStyle.color).toBe("#f3f4f6");
@@ -147,14 +164,20 @@ describe("useThemeStyles Hook", () => {
             expect(result.current.collapseButtonStyle.color).toBe("#9ca3af");
 
             // Overlay styles
-            expect(result.current.overlayStyle.background).toContain("rgba(37, 99, 235, 0.05)");
+            expect(result.current.overlayStyle.background).toContain(
+                "rgba(37, 99, 235, 0.05)"
+            );
         });
 
         it("should have proper dark mode shadows and effects", () => {
             const { result } = renderHook(() => useThemeStyles());
 
-            expect(result.current.headerStyle.boxShadow).toContain("rgba(0, 0, 0, 0.4)");
-            expect(result.current.titleStyle.textShadow).toContain("rgba(59, 130, 246, 0.3)");
+            expect(result.current.headerStyle.boxShadow).toContain(
+                "rgba(0, 0, 0, 0.4)"
+            );
+            expect(result.current.titleStyle.textShadow).toContain(
+                "rgba(59, 130, 246, 0.3)"
+            );
         });
     });
 
@@ -211,19 +234,28 @@ describe("useThemeStyles Hook", () => {
             const { unmount } = renderHook(() => useThemeStyles());
 
             // Should register event listener
-            expect(mockMediaQuery.addEventListener).toHaveBeenCalledWith("change", expect.any(Function));
+            expect(mockMediaQuery.addEventListener).toHaveBeenCalledWith(
+                "change",
+                expect.any(Function)
+            );
 
             // Should cleanup on unmount
             unmount();
-            expect(mockMediaQuery.removeEventListener).toHaveBeenCalledWith("change", expect.any(Function));
+            expect(mockMediaQuery.removeEventListener).toHaveBeenCalledWith(
+                "change",
+                expect.any(Function)
+            );
         });
     });
 
     describe("Collapsed State Behavior", () => {
         it("should handle collapsed state changes properly", () => {
-            const { result, rerender } = renderHook(({ collapsed }) => useThemeStyles(collapsed), {
-                initialProps: { collapsed: false },
-            });
+            const { result, rerender } = renderHook(
+                ({ collapsed }) => useThemeStyles(collapsed),
+                {
+                    initialProps: { collapsed: false },
+                }
+            );
 
             // Initially not collapsed
             expect(result.current.headerStyle.height).toBe("auto");
@@ -305,12 +337,24 @@ describe("useThemeStyles Hook", () => {
             // Check that transition properties are consistent
             // This test validates the theme animation timing
 
-            expect(result.current.collapseButtonStyle.transition).toMatch(/all.*0\.3s cubic-bezier/);
-            expect(result.current.contentStyle.transition).toMatch(/padding.*0\.3s cubic-bezier/);
-            expect(result.current.headerStyle.transition).toMatch(/all.*0\.3s cubic-bezier/);
-            expect(result.current.overlayStyle.transition).toMatch(/background.*0\.3s cubic-bezier/);
-            expect(result.current.titleStyle.transition).toMatch(/all.*0\.3s cubic-bezier/);
-            expect(result.current.urlStyle.transition).toMatch(/color.*0\.3s cubic-bezier/);
+            expect(result.current.collapseButtonStyle.transition).toMatch(
+                /all.*0\.3s cubic-bezier/
+            );
+            expect(result.current.contentStyle.transition).toMatch(
+                /padding.*0\.3s cubic-bezier/
+            );
+            expect(result.current.headerStyle.transition).toMatch(
+                /all.*0\.3s cubic-bezier/
+            );
+            expect(result.current.overlayStyle.transition).toMatch(
+                /background.*0\.3s cubic-bezier/
+            );
+            expect(result.current.titleStyle.transition).toMatch(
+                /all.*0\.3s cubic-bezier/
+            );
+            expect(result.current.urlStyle.transition).toMatch(
+                /color.*0\.3s cubic-bezier/
+            );
         });
 
         it("should have proper accessibility and usability properties", () => {
@@ -319,7 +363,9 @@ describe("useThemeStyles Hook", () => {
             // Button should be accessible
             expect(result.current.collapseButtonStyle.cursor).toBe("pointer");
             expect(result.current.collapseButtonStyle.border).toBe("none");
-            expect(result.current.collapseButtonStyle.backgroundColor).toBe("transparent");
+            expect(result.current.collapseButtonStyle.backgroundColor).toBe(
+                "transparent"
+            );
 
             // URL should handle long text
             expect(result.current.urlStyle.wordBreak).toBe("break-all");
@@ -336,7 +382,9 @@ describe("useThemeStyles Hook", () => {
         it("should have proper border radius consistency", () => {
             const { result } = renderHook(() => useThemeStyles());
 
-            expect(result.current.collapseButtonStyle.borderRadius).toBe("0.375rem");
+            expect(result.current.collapseButtonStyle.borderRadius).toBe(
+                "0.375rem"
+            );
             expect(result.current.headerStyle.borderRadius).toBe("0.75rem");
             expect(result.current.overlayStyle.borderRadius).toBe("0.75rem");
         });
@@ -344,9 +392,12 @@ describe("useThemeStyles Hook", () => {
 
     describe("Performance and Memoization", () => {
         it("should memoize styles properly to prevent unnecessary re-renders", () => {
-            const { result, rerender } = renderHook(({ collapsed }) => useThemeStyles(collapsed), {
-                initialProps: { collapsed: false },
-            });
+            const { result, rerender } = renderHook(
+                ({ collapsed }) => useThemeStyles(collapsed),
+                {
+                    initialProps: { collapsed: false },
+                }
+            );
 
             const initialStyles = result.current;
 
@@ -360,9 +411,12 @@ describe("useThemeStyles Hook", () => {
         });
 
         it("should handle rapid state changes efficiently", () => {
-            const { result, rerender } = renderHook(({ collapsed }) => useThemeStyles(collapsed), {
-                initialProps: { collapsed: false },
-            });
+            const { result, rerender } = renderHook(
+                ({ collapsed }) => useThemeStyles(collapsed),
+                {
+                    initialProps: { collapsed: false },
+                }
+            );
 
             // Rapid state changes
             for (let i = 0; i < 10; i++) {
@@ -390,8 +444,12 @@ describe("useThemeStyles Hook", () => {
         });
 
         it("should handle edge case values gracefully", () => {
-            const { result: undefinedResult } = renderHook(() => useThemeStyles(undefined as any));
-            const { result: nullResult } = renderHook(() => useThemeStyles(null as any));
+            const { result: undefinedResult } = renderHook(() =>
+                useThemeStyles(undefined as any)
+            );
+            const { result: nullResult } = renderHook(() =>
+                useThemeStyles(null as any)
+            );
 
             // Should handle falsy values properly (default to false)
             expect(undefinedResult.current.headerStyle.height).toBe("auto");

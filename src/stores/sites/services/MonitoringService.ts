@@ -61,7 +61,10 @@ export const MonitoringService = {
      */
     async startMonitoring(siteId: string, monitorId: string): Promise<void> {
         await this.initialize();
-        return window.electronAPI.monitoring.startMonitoringForSite(siteId, monitorId);
+        return window.electronAPI.monitoring.startMonitoringForSite(
+            siteId,
+            monitorId
+        );
     },
     /**
      * Start monitoring for all monitors of a site
@@ -97,7 +100,10 @@ export const MonitoringService = {
      */
     async stopMonitoring(siteId: string, monitorId: string): Promise<void> {
         await this.initialize();
-        return window.electronAPI.monitoring.stopMonitoringForSite(siteId, monitorId);
+        return window.electronAPI.monitoring.stopMonitoringForSite(
+            siteId,
+            monitorId
+        );
     },
     /**
      * Stop monitoring for all monitors of a site

@@ -14,11 +14,15 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
                 try {
                     throw error;
                 } catch (error_) {
-                    return error_ instanceof Error ? error_.message : String(error_);
+                    return error_ instanceof Error
+                        ? error_.message
+                        : String(error_);
                 }
             };
 
-            expect(testErrorHandling(new Error("Test error"))).toBe("Test error");
+            expect(testErrorHandling(new Error("Test error"))).toBe(
+                "Test error"
+            );
             expect(testErrorHandling("String error")).toBe("String error");
             expect(testErrorHandling(123)).toBe("123");
             expect(testErrorHandling(null)).toBe("null");
@@ -92,7 +96,9 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
         });
 
         it("should test nested conditionals", () => {
-            const processValue = (value: unknown): { type: string; isValid: boolean } => {
+            const processValue = (
+                value: unknown
+            ): { type: string; isValid: boolean } => {
                 if (value === null || value === undefined) {
                     return { type: "empty", isValid: false };
                 }
@@ -108,25 +114,48 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
                 return { type: "other", isValid: false };
             };
 
-            expect(processValue(null)).toEqual({ type: "empty", isValid: false });
-            expect(processValue(undefined)).toEqual({ type: "empty", isValid: false });
-            expect(processValue("hello")).toEqual({ type: "string", isValid: true });
-            expect(processValue("")).toEqual({ type: "string", isValid: false });
+            expect(processValue(null)).toEqual({
+                type: "empty",
+                isValid: false,
+            });
+            expect(processValue(undefined)).toEqual({
+                type: "empty",
+                isValid: false,
+            });
+            expect(processValue("hello")).toEqual({
+                type: "string",
+                isValid: true,
+            });
+            expect(processValue("")).toEqual({
+                type: "string",
+                isValid: false,
+            });
             expect(processValue(42)).toEqual({ type: "number", isValid: true });
-            expect(processValue(Number.NaN)).toEqual({ type: "number", isValid: false });
+            expect(processValue(Number.NaN)).toEqual({
+                type: "number",
+                isValid: false,
+            });
             expect(processValue({})).toEqual({ type: "other", isValid: false });
         });
 
         it("should test logical operator branches", () => {
-            const safeAccess = (obj: any, key: string, fallback: string = "default"): string => {
-                return obj && typeof obj === "object" && key in obj ? obj[key] : fallback;
+            const safeAccess = (
+                obj: any,
+                key: string,
+                fallback: string = "default"
+            ): string => {
+                return obj && typeof obj === "object" && key in obj
+                    ? obj[key]
+                    : fallback;
             };
 
             expect(safeAccess({ test: "value" }, "test")).toBe("value");
             expect(safeAccess({}, "test")).toBe("default");
             expect(safeAccess(null, "test")).toBe("default");
             expect(safeAccess("not-object", "test")).toBe("default");
-            expect(safeAccess({ other: "value" }, "test", "custom")).toBe("custom");
+            expect(safeAccess({ other: "value" }, "test", "custom")).toBe(
+                "custom"
+            );
         });
     });
 
@@ -152,7 +181,9 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
         });
 
         it("should test object validation branches", () => {
-            const validateObject = (obj: unknown): { valid: boolean; reason: string } => {
+            const validateObject = (
+                obj: unknown
+            ): { valid: boolean; reason: string } => {
                 if (obj === null) {
                     return { valid: false, reason: "null" };
                 }
@@ -172,23 +203,47 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
                 return { valid: true, reason: "valid" };
             };
 
-            expect(validateObject(null)).toEqual({ valid: false, reason: "null" });
-            expect(validateObject(undefined)).toEqual({ valid: false, reason: "undefined" });
-            expect(validateObject("string")).toEqual({ valid: false, reason: "not-object" });
-            expect(validateObject(123)).toEqual({ valid: false, reason: "not-object" });
-            expect(validateObject([])).toEqual({ valid: false, reason: "array" });
-            expect(validateObject({})).toEqual({ valid: true, reason: "valid" });
+            expect(validateObject(null)).toEqual({
+                valid: false,
+                reason: "null",
+            });
+            expect(validateObject(undefined)).toEqual({
+                valid: false,
+                reason: "undefined",
+            });
+            expect(validateObject("string")).toEqual({
+                valid: false,
+                reason: "not-object",
+            });
+            expect(validateObject(123)).toEqual({
+                valid: false,
+                reason: "not-object",
+            });
+            expect(validateObject([])).toEqual({
+                valid: false,
+                reason: "array",
+            });
+            expect(validateObject({})).toEqual({
+                valid: true,
+                reason: "valid",
+            });
         });
     });
 
     describe("Type guard patterns", () => {
         it("should test common type guard branches", () => {
             const isStringArray = (value: unknown): value is string[] => {
-                return Array.isArray(value) && value.every((item) => typeof item === "string");
+                return (
+                    Array.isArray(value) &&
+                    value.every((item) => typeof item === "string")
+                );
             };
 
             const isNumberArray = (value: unknown): value is number[] => {
-                return Array.isArray(value) && value.every((item) => typeof item === "number");
+                return (
+                    Array.isArray(value) &&
+                    value.every((item) => typeof item === "number")
+                );
             };
 
             expect(isStringArray(["a", "b", "c"])).toBe(true);
@@ -206,19 +261,33 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
 
     describe("Fallback value patterns", () => {
         it("should test fallback logic branches", () => {
-            const getWithFallback = <T>(obj: Record<string, unknown>, key: string, fallback: T): T => {
+            const getWithFallback = <T>(
+                obj: Record<string, unknown>,
+                key: string,
+                fallback: T
+            ): T => {
                 const value = obj[key];
-                return value !== undefined && value !== null ? (value as T) : fallback;
+                return value !== undefined && value !== null
+                    ? (value as T)
+                    : fallback;
             };
 
-            const testObj = { a: "value", b: null, c: undefined, d: 0, e: false };
+            const testObj = {
+                a: "value",
+                b: null,
+                c: undefined,
+                d: 0,
+                e: false,
+            };
 
             expect(getWithFallback(testObj, "a", "fallback")).toBe("value");
             expect(getWithFallback(testObj, "b", "fallback")).toBe("fallback");
             expect(getWithFallback(testObj, "c", "fallback")).toBe("fallback");
             expect(getWithFallback(testObj, "d", "fallback")).toBe(0);
             expect(getWithFallback(testObj, "e", "fallback")).toBe(false);
-            expect(getWithFallback(testObj, "missing", "fallback")).toBe("fallback");
+            expect(getWithFallback(testObj, "missing", "fallback")).toBe(
+                "fallback"
+            );
         });
     });
 });

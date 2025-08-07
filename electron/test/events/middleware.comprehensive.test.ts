@@ -40,7 +40,10 @@ describe("middleware.ts - Additional Coverage", () => {
     describe("createLoggingMiddleware - Additional Branch Coverage", () => {
         it("should log at warn level", async () => {
             const next = vi.fn();
-            const mw = createLoggingMiddleware({ level: "warn", includeData: true });
+            const mw = createLoggingMiddleware({
+                level: "warn",
+                includeData: true,
+            });
             await mw("test:event", { data: "test" }, next);
 
             expect(mockLogger.warn).toHaveBeenCalledWith(
@@ -55,7 +58,10 @@ describe("middleware.ts - Additional Coverage", () => {
 
         it("should log at error level", async () => {
             const next = vi.fn();
-            const mw = createLoggingMiddleware({ level: "error", includeData: false });
+            const mw = createLoggingMiddleware({
+                level: "error",
+                includeData: false,
+            });
             await mw("error:event", { error: "something" }, next);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
@@ -69,7 +75,10 @@ describe("middleware.ts - Additional Coverage", () => {
 
         it("should handle complex data with circular references in logging", async () => {
             const next = vi.fn();
-            const mw = createLoggingMiddleware({ level: "debug", includeData: true });
+            const mw = createLoggingMiddleware({
+                level: "debug",
+                includeData: true,
+            });
 
             // Create object with circular reference
             const circularObj: any = { name: "test" };
@@ -89,7 +98,10 @@ describe("middleware.ts - Additional Coverage", () => {
 
         it("should handle non-serializable data types in logging", async () => {
             const next = vi.fn();
-            const mw = createLoggingMiddleware({ level: "info", includeData: true });
+            const mw = createLoggingMiddleware({
+                level: "info",
+                includeData: true,
+            });
 
             // Test with function (non-serializable)
             const functionData = () => "test";
@@ -111,16 +123,23 @@ describe("middleware.ts - Additional Coverage", () => {
         it("should handle validation result with isValid false and error message", async () => {
             const next = vi.fn();
             const validators = {
-                "test:event": () => ({ isValid: false, error: "Custom validation error" }),
+                "test:event": () => ({
+                    isValid: false,
+                    error: "Custom validation error",
+                }),
             };
             const mw = createValidationMiddleware(validators);
 
-            await expect(mw("test:event", { data: "invalid" }, next)).rejects.toThrow(
+            await expect(
+                mw("test:event", { data: "invalid" }, next)
+            ).rejects.toThrow(
                 "Validation failed for event 'test:event': Custom validation error"
             );
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                expect.stringContaining("Validation failed for event 'test:event': Custom validation error"),
+                expect.stringContaining(
+                    "Validation failed for event 'test:event': Custom validation error"
+                ),
                 expect.objectContaining({
                     event: "test:event",
                     data: { data: "invalid" },
@@ -136,12 +155,16 @@ describe("middleware.ts - Additional Coverage", () => {
             };
             const mw = createValidationMiddleware(validators);
 
-            await expect(mw("test:event", { data: "invalid" }, next)).rejects.toThrow(
+            await expect(
+                mw("test:event", { data: "invalid" }, next)
+            ).rejects.toThrow(
                 "Validation failed for event 'test:event': Validation failed"
             );
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                expect.stringContaining("Validation failed for event 'test:event': Validation failed"),
+                expect.stringContaining(
+                    "Validation failed for event 'test:event': Validation failed"
+                ),
                 expect.objectContaining({
                     event: "test:event",
                     data: { data: "invalid" },
@@ -159,12 +182,16 @@ describe("middleware.ts - Additional Coverage", () => {
             };
             const mw = createValidationMiddleware(validators);
 
-            await expect(mw("test:event", { data: "test" }, next)).rejects.toThrow(
+            await expect(
+                mw("test:event", { data: "test" }, next)
+            ).rejects.toThrow(
                 "Validator error for event 'test:event': String error"
             );
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                expect.stringContaining("Validator threw unexpected error for event 'test:event'"),
+                expect.stringContaining(
+                    "Validator threw unexpected error for event 'test:event'"
+                ),
                 expect.objectContaining({
                     event: "test:event",
                     data: { data: "test" },
@@ -183,9 +210,9 @@ describe("middleware.ts - Additional Coverage", () => {
             };
             const mw = createValidationMiddleware(validators);
 
-            await expect(mw("test:event", { data: "test" }, next)).rejects.toThrow(
-                "Validation failed for custom reason"
-            );
+            await expect(
+                mw("test:event", { data: "test" }, next)
+            ).rejects.toThrow("Validation failed for custom reason");
 
             expect(next).not.toHaveBeenCalled();
         });
@@ -218,7 +245,9 @@ describe("middleware.ts - Additional Coverage", () => {
             );
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                expect.stringContaining("Validation failed for event 'test:event'"),
+                expect.stringContaining(
+                    "Validation failed for event 'test:event'"
+                ),
                 expect.objectContaining({
                     event: "test:event",
                     data: "[Circular Reference or Non-Serializable Object]",
@@ -247,7 +276,9 @@ describe("middleware.ts - Additional Coverage", () => {
 
             // Should log completion with timing
             expect(mockLogger.debug).toHaveBeenCalledWith(
-                expect.stringMatching(/Completed event 'verbose:event' in \d+ms/)
+                expect.stringMatching(
+                    /Completed event 'verbose:event' in \d+ms/
+                )
             );
 
             expect(next).toHaveBeenCalled();
@@ -260,7 +291,9 @@ describe("middleware.ts - Additional Coverage", () => {
             await mw("simple:event", { detail: "test" }, next);
 
             // Should log without data
-            expect(mockLogger.debug).toHaveBeenCalledWith("[EventBus:Debug] Processing event 'simple:event'");
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                "[EventBus:Debug] Processing event 'simple:event'"
+            );
 
             // Should still log completion with timing
             expect(mockLogger.debug).toHaveBeenCalledWith(
@@ -271,7 +304,9 @@ describe("middleware.ts - Additional Coverage", () => {
         });
 
         it("should use isDevelopment() when enabled is not specified", async () => {
-            const { isDevelopment } = await import("../../../shared/utils/environment");
+            const { isDevelopment } = await import(
+                "../../../shared/utils/environment"
+            );
             vi.mocked(isDevelopment).mockReturnValue(true);
 
             const next = vi.fn();
@@ -287,7 +322,10 @@ describe("middleware.ts - Additional Coverage", () => {
     describe("safeSerialize Edge Cases", () => {
         it("should handle null and undefined correctly", async () => {
             const next = vi.fn();
-            const mw = createLoggingMiddleware({ level: "debug", includeData: true });
+            const mw = createLoggingMiddleware({
+                level: "debug",
+                includeData: true,
+            });
 
             await mw("null:event", null, next);
             await mw("undefined:event", undefined, next);
@@ -311,7 +349,10 @@ describe("middleware.ts - Additional Coverage", () => {
 
         it("should handle primitive types correctly", async () => {
             const next = vi.fn();
-            const mw = createLoggingMiddleware({ level: "debug", includeData: true });
+            const mw = createLoggingMiddleware({
+                level: "debug",
+                includeData: true,
+            });
 
             await mw("string:event", "test string", next);
             await mw("number:event", 42, next);
@@ -344,30 +385,42 @@ describe("middleware.ts - Additional Coverage", () => {
 
         it("should handle symbols and other exotic types", async () => {
             const next = vi.fn();
-            const mw = createLoggingMiddleware({ level: "debug", includeData: true });
+            const mw = createLoggingMiddleware({
+                level: "debug",
+                includeData: true,
+            });
 
             const symbolData = Symbol("test");
 
             await mw("symbol:event", symbolData, next);
 
-            expect(mockLogger.debug).toHaveBeenCalledWith("[EventBus] Event emitted", {
-                event: "symbol:event",
-                data: symbolData, // Use the exact same symbol reference
-            });
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                "[EventBus] Event emitted",
+                {
+                    event: "symbol:event",
+                    data: symbolData, // Use the exact same symbol reference
+                }
+            );
         });
 
         it("should handle BigInt and other special types", async () => {
             const next = vi.fn();
-            const mw = createLoggingMiddleware({ level: "debug", includeData: true });
+            const mw = createLoggingMiddleware({
+                level: "debug",
+                includeData: true,
+            });
 
             const bigintData = BigInt(123);
 
             await mw("bigint:event", bigintData, next);
 
-            expect(mockLogger.debug).toHaveBeenCalledWith("[EventBus] Event emitted", {
-                event: "bigint:event",
-                data: bigintData, // Use the exact same BigInt reference
-            });
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                "[EventBus] Event emitted",
+                {
+                    event: "bigint:event",
+                    data: bigintData, // Use the exact same BigInt reference
+                }
+            );
         });
     });
 
@@ -379,7 +432,10 @@ describe("middleware.ts - Additional Coverage", () => {
             };
             const secondMiddleware = vi.fn();
 
-            const composed = composeMiddleware(blockingMiddleware, secondMiddleware);
+            const composed = composeMiddleware(
+                blockingMiddleware,
+                secondMiddleware
+            );
 
             await composed("test:event", {}, next);
 
@@ -391,25 +447,41 @@ describe("middleware.ts - Additional Coverage", () => {
             const executionOrder: string[] = [];
             const next = vi.fn();
 
-            const asyncMiddleware1 = async (_e: string, _d: unknown, next: () => void) => {
+            const asyncMiddleware1 = async (
+                _e: string,
+                _d: unknown,
+                next: () => void
+            ) => {
                 executionOrder.push("start-1");
                 await new Promise((resolve) => setTimeout(resolve, 1));
                 executionOrder.push("end-1");
                 await next();
             };
 
-            const asyncMiddleware2 = async (_e: string, _d: unknown, next: () => void) => {
+            const asyncMiddleware2 = async (
+                _e: string,
+                _d: unknown,
+                next: () => void
+            ) => {
                 executionOrder.push("start-2");
                 await new Promise((resolve) => setTimeout(resolve, 1));
                 executionOrder.push("end-2");
                 await next();
             };
 
-            const composed = composeMiddleware(asyncMiddleware1, asyncMiddleware2);
+            const composed = composeMiddleware(
+                asyncMiddleware1,
+                asyncMiddleware2
+            );
 
             await composed("test:event", {}, next);
 
-            expect(executionOrder).toEqual(["start-1", "end-1", "start-2", "end-2"]);
+            expect(executionOrder).toEqual([
+                "start-1",
+                "end-1",
+                "start-2",
+                "end-2",
+            ]);
             expect(next).toHaveBeenCalled();
         });
     });
@@ -435,7 +507,9 @@ describe("middleware.ts - Additional Coverage", () => {
                 {}
             );
             expect(mockLogger.error).toHaveBeenCalledWith(
-                expect.stringContaining("Middleware error in event 'test:event'"),
+                expect.stringContaining(
+                    "Middleware error in event 'test:event'"
+                ),
                 expect.objectContaining({
                     error: expect.any(Error),
                     event: "test:event",
@@ -448,13 +522,17 @@ describe("middleware.ts - Additional Coverage", () => {
                 throw new Error("Test error");
             });
 
-            const mw = createErrorHandlingMiddleware({ continueOnError: false });
+            const mw = createErrorHandlingMiddleware({
+                continueOnError: false,
+            });
 
             // Create circular reference data
             const circularData: any = { name: "test" };
             circularData.self = circularData;
 
-            await expect(mw("test:event", circularData, next)).rejects.toThrow("Test error");
+            await expect(mw("test:event", circularData, next)).rejects.toThrow(
+                "Test error"
+            );
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "[EventBus] Middleware error for event 'test:event'",

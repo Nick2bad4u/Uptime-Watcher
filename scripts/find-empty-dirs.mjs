@@ -44,7 +44,10 @@ async function safeReadDir(dir) {
     try {
         return await readdir(dir);
     } catch (err) {
-        console.warn(`Error reading directory ${dir}:`, err && err.message ? err.message : err);
+        console.warn(
+            `Error reading directory ${dir}:`,
+            err && err.message ? err.message : err
+        );
         return [];
     }
 }
@@ -105,6 +108,9 @@ async function main() {
     }
 }
 main().catch((err) => {
-    console.error("An error occurred while running the find-empty-dirs script:", err);
+    console.error(
+        "An error occurred while running the find-empty-dirs script:",
+        err
+    );
     process.exit(1);
 });

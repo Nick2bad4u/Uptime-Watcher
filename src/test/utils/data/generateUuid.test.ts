@@ -36,7 +36,9 @@ describe("generateUuid", () => {
 
     describe("Native crypto.randomUUID Behavior", () => {
         it("should use crypto.randomUUID when available", () => {
-            const mockRandomUUID = vi.fn().mockReturnValue("550e8400-e29b-41d4-a716-446655440000");
+            const mockRandomUUID = vi
+                .fn()
+                .mockReturnValue("550e8400-e29b-41d4-a716-446655440000");
 
             // Mock crypto object
             global.crypto = {
@@ -170,7 +172,9 @@ describe("generateUuid", () => {
             const originalCrypto = global.crypto;
             global.crypto = undefined as any;
 
-            const mockNow = vi.spyOn(Date, "now").mockReturnValue(9999999999999);
+            const mockNow = vi
+                .spyOn(Date, "now")
+                .mockReturnValue(9999999999999);
 
             const result = generateUuid();
 

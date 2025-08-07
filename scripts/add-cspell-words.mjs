@@ -15,7 +15,9 @@ const __dirname = path.dirname(__filename);
 // Allow custom words file path via CLI argument or environment variable, fallback to default
 // By default, resolve custom-words.txt relative to the project root (two directories up from this script)
 const CUSTOM_WORDS_FILE = path.resolve(
-    process.argv[2] || process.env.CUSTOM_WORDS_FILE || path.join(__dirname, "..", "custom-words.txt")
+    process.argv[2] ||
+        process.env.CUSTOM_WORDS_FILE ||
+        path.join(__dirname, "..", "custom-words.txt")
 );
 
 // 1. Read current custom words into a Set
@@ -75,7 +77,9 @@ if (foundWords.size > 0) {
     // Prepare new words block
     const newWordsBlock = Array.from(foundWords).join("\n");
     // Write back, ensuring only a single trailing newline in the file
-    const updatedContent = [fileContent, newWordsBlock].filter(Boolean).join("\n").trimEnd() + "\n";
+    const updatedContent =
+        [fileContent, newWordsBlock].filter(Boolean).join("\n").trimEnd() +
+        "\n";
     fs.writeFileSync(CUSTOM_WORDS_FILE, updatedContent);
     console.log(`Added ${foundWords.size} new words to ${CUSTOM_WORDS_FILE}`);
 } else {

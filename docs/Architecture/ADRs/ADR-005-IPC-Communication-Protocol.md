@@ -93,13 +93,16 @@ The preload script exposes a type-safe API to the renderer:
 // preload.ts
 const electronAPI = {
  sites: {
-  addSite: (data: SiteCreationData): Promise<Site> => ipcRenderer.invoke("sites:add", data),
+  addSite: (data: SiteCreationData): Promise<Site> =>
+   ipcRenderer.invoke("sites:add", data),
   getSites: (): Promise<Site[]> => ipcRenderer.invoke("sites:get-all"),
-  removeSite: (identifier: string): Promise<void> => ipcRenderer.invoke("sites:remove", { identifier }),
+  removeSite: (identifier: string): Promise<void> =>
+   ipcRenderer.invoke("sites:remove", { identifier }),
  },
  events: {
   onMonitorStatusChanged: (callback: (data: MonitorStatusData) => void) => {
-   const wrappedCallback = (_event: any, data: MonitorStatusData) => callback(data);
+   const wrappedCallback = (_event: any, data: MonitorStatusData) =>
+    callback(data);
    ipcRenderer.on("monitor:status-changed", wrappedCallback);
    return () => ipcRenderer.off("monitor:status-changed", wrappedCallback);
   },
@@ -134,7 +137,12 @@ All IPC operations include validation and consistent error handling:
 ```typescript
 // Validation functions for each domain
 export function isSiteCreationData(data: unknown): data is SiteCreationData {
- return typeof data === "object" && data !== null && "name" in data && typeof (data as any).name === "string";
+ return (
+  typeof data === "object" &&
+  data !== null &&
+  "name" in data &&
+  typeof (data as any).name === "string"
+ );
 }
 
 // Error responses maintain consistent format

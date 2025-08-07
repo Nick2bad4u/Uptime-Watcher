@@ -66,7 +66,10 @@ export interface MonitorFieldValues {
 /**
  * Union type for all monitor field types
  */
-export type MonitorFormFields = HttpMonitorFields | PingMonitorFields | PortMonitorFields;
+export type MonitorFormFields =
+    | HttpMonitorFields
+    | PingMonitorFields
+    | PortMonitorFields;
 
 /**
  * Monitor validation result with specific error types
@@ -175,7 +178,9 @@ export function getDefaultMonitorFields(type: MonitorType): MonitorFormFields {
  * Checks for presence of required HTTP properties and absence of port/ping-specific ones
  * to provide more robust type detection and prevent false positives.
  */
-export function isHttpMonitorFields(fields: MonitorFormFields): fields is HttpMonitorFields {
+export function isHttpMonitorFields(
+    fields: MonitorFormFields
+): fields is HttpMonitorFields {
     return "url" in fields && !("host" in fields);
 }
 
@@ -189,8 +194,15 @@ export function isHttpMonitorFields(fields: MonitorFormFields): fields is HttpMo
  * Validates presence of host property and absence of port property to distinguish
  * from port monitors which also have a host field.
  */
-export function isPingMonitorFields(fields: MonitorFormFields): fields is PingMonitorFields {
-    return "host" in fields && !("port" in fields) && !("url" in fields) && typeof fields.host === "string";
+export function isPingMonitorFields(
+    fields: MonitorFormFields
+): fields is PingMonitorFields {
+    return (
+        "host" in fields &&
+        !("port" in fields) &&
+        !("url" in fields) &&
+        typeof fields.host === "string"
+    );
 }
 
 /**
@@ -203,6 +215,13 @@ export function isPingMonitorFields(fields: MonitorFormFields): fields is PingMo
  * Validates both presence and types of required properties to ensure
  * runtime type safety and prevent incorrect type assumptions.
  */
-export function isPortMonitorFields(fields: MonitorFormFields): fields is PortMonitorFields {
-    return "host" in fields && "port" in fields && typeof fields.host === "string" && typeof fields.port === "number";
+export function isPortMonitorFields(
+    fields: MonitorFormFields
+): fields is PortMonitorFields {
+    return (
+        "host" in fields &&
+        "port" in fields &&
+        typeof fields.host === "string" &&
+        typeof fields.port === "number"
+    );
 }

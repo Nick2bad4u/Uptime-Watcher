@@ -46,8 +46,13 @@ export interface SiteCardMetricsProperties {
  * />
  * ```
  */
-export const SiteCardMetrics: React.NamedExoticComponent<SiteCardMetricsProperties> = React.memo(
-    function SiteCardMetrics({ checkCount, responseTime, status, uptime }: SiteCardMetricsProperties) {
+export const SiteCardMetrics: React.NamedExoticComponent<SiteCardMetricsProperties> =
+    React.memo(function SiteCardMetrics({
+        checkCount,
+        responseTime,
+        status,
+        uptime,
+    }: SiteCardMetricsProperties) {
         // Memoize the computed values to avoid recalculation on every render
         const metrics = useMemo(
             () => [
@@ -61,7 +66,8 @@ export const SiteCardMetrics: React.NamedExoticComponent<SiteCardMetricsProperti
                 },
                 {
                     label: "Response",
-                    value: responseTime === undefined ? "-" : `${responseTime} ms`,
+                    value:
+                        responseTime === undefined ? "-" : `${responseTime} ms`,
                 },
                 {
                     label: "Checks",
@@ -74,9 +80,12 @@ export const SiteCardMetrics: React.NamedExoticComponent<SiteCardMetricsProperti
         return (
             <div className="grid grid-cols-4 gap-4 mb-4">
                 {metrics.map((metric) => (
-                    <MetricCard key={metric.label} label={metric.label} value={metric.value} />
+                    <MetricCard
+                        key={metric.label}
+                        label={metric.label}
+                        value={metric.value}
+                    />
                 ))}
             </div>
         );
-    }
-);
+    });

@@ -109,7 +109,13 @@ export interface DatabaseErrorEventData {
  *
  * @public
  */
-export type DatabaseOperation = "connect" | "create" | "delete" | "insert" | "query" | "update";
+export type DatabaseOperation =
+    | "connect"
+    | "create"
+    | "delete"
+    | "insert"
+    | "query"
+    | "update";
 
 /**
  * Payload for database retry events.
@@ -338,5 +344,11 @@ export interface UpdateStatusEventData {
      * The current update status.
      * @remarks Can be 'available', 'checking', 'downloaded', 'downloading', 'error', or 'idle'.
      */
-    status: "available" | "checking" | "downloaded" | "downloading" | "error" | "idle";
+    status:
+        | "available"
+        | "checking"
+        | "downloaded"
+        | "downloading"
+        | "error"
+        | "idle";
 }

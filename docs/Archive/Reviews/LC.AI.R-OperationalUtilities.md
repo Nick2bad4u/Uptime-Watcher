@@ -100,7 +100,13 @@ function generateOperationId(): string {
 **Analysis:**
 
 ```typescript
-const { context = {}, emitEvents = true, eventEmitter, maxRetries = 3, operationName } = config;
+const {
+ context = {},
+ emitEvents = true,
+ eventEmitter,
+ maxRetries = 3,
+ operationName,
+} = config;
 ```
 
 - **Issue**: Not all defaults from the interface are applied in destructuring

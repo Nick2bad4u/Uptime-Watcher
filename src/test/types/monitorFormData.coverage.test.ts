@@ -156,9 +156,14 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             const validateFormData = (data: any) => {
                 const validations = {
                     hasType: typeof data.type === "string",
-                    hasValidCheckInterval: typeof data.checkInterval === "number" && data.checkInterval > 0,
-                    hasValidTimeout: typeof data.timeout === "number" && data.timeout > 0,
-                    hasValidRetryAttempts: typeof data.retryAttempts === "number" && data.retryAttempts >= 0,
+                    hasValidCheckInterval:
+                        typeof data.checkInterval === "number" &&
+                        data.checkInterval > 0,
+                    hasValidTimeout:
+                        typeof data.timeout === "number" && data.timeout > 0,
+                    hasValidRetryAttempts:
+                        typeof data.retryAttempts === "number" &&
+                        data.retryAttempts >= 0,
                     hasValidMonitoring: typeof data.monitoring === "boolean",
                 };
 
@@ -192,9 +197,13 @@ describe("Monitor Form Data Types Coverage Tests", () => {
 
             const validations = {
                 hasValidType: typeof invalidData.type === "string",
-                hasValidCheckInterval: typeof invalidData.checkInterval === "number" && invalidData.checkInterval > 0,
+                hasValidCheckInterval:
+                    typeof invalidData.checkInterval === "number" &&
+                    invalidData.checkInterval > 0,
                 hasValidTimeout: typeof invalidData.timeout === "number",
-                hasValidRetryAttempts: typeof invalidData.retryAttempts === "number" && invalidData.retryAttempts >= 0,
+                hasValidRetryAttempts:
+                    typeof invalidData.retryAttempts === "number" &&
+                    invalidData.retryAttempts >= 0,
                 hasValidMonitoring: typeof invalidData.monitoring === "boolean",
             };
 
@@ -316,7 +325,10 @@ describe("Monitor Form Data Types Coverage Tests", () => {
                 timeout: { min: 1000, max: 30000 }, // 1 to 30 seconds
             };
 
-            const testValue = (value: number, range: { min: number; max: number }) => {
+            const testValue = (
+                value: number,
+                range: { min: number; max: number }
+            ) => {
                 return value >= range.min && value <= range.max;
             };
 
@@ -360,15 +372,23 @@ describe("Monitor Form Data Types Coverage Tests", () => {
                 return {
                     type: typeof data.type === "string" ? data.type : undefined,
                     checkInterval:
-                        typeof data.checkInterval === "number" && data.checkInterval > 0
+                        typeof data.checkInterval === "number" &&
+                        data.checkInterval > 0
                             ? data.checkInterval
                             : undefined,
-                    monitoring: typeof data.monitoring === "boolean" ? data.monitoring : false,
+                    monitoring:
+                        typeof data.monitoring === "boolean"
+                            ? data.monitoring
+                            : false,
                     retryAttempts:
-                        typeof data.retryAttempts === "number" && data.retryAttempts >= 0
+                        typeof data.retryAttempts === "number" &&
+                        data.retryAttempts >= 0
                             ? data.retryAttempts
                             : undefined,
-                    timeout: typeof data.timeout === "number" && data.timeout > 0 ? data.timeout : undefined,
+                    timeout:
+                        typeof data.timeout === "number" && data.timeout > 0
+                            ? data.timeout
+                            : undefined,
                 };
             };
 

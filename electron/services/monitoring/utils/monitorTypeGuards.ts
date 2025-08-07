@@ -7,7 +7,11 @@
  * This addresses the type safety issues identified in HttpMonitor and PortMonitor.
  */
 
-import { isNonEmptyString, isValidFQDN, isValidUrl } from "../../../../shared/validation/validatorUtils";
+import {
+    isNonEmptyString,
+    isValidFQDN,
+    isValidUrl,
+} from "../../../../shared/validation/validatorUtils";
 import { Site } from "../../../types";
 
 /**
@@ -17,8 +21,13 @@ import { Site } from "../../../types";
  * @param defaultRetryAttempts - Default retry attempts to use if monitor doesn't have them
  * @returns The retry attempts value to use
  */
-export function getMonitorRetryAttempts(monitor: Site["monitors"][0], defaultRetryAttempts: number): number {
-    return hasValidRetryAttempts(monitor) ? monitor.retryAttempts : defaultRetryAttempts;
+export function getMonitorRetryAttempts(
+    monitor: Site["monitors"][0],
+    defaultRetryAttempts: number
+): number {
+    return hasValidRetryAttempts(monitor)
+        ? monitor.retryAttempts
+        : defaultRetryAttempts;
 }
 
 /**
@@ -28,7 +37,10 @@ export function getMonitorRetryAttempts(monitor: Site["monitors"][0], defaultRet
  * @param defaultTimeout - Default timeout to use if monitor doesn't have one
  * @returns The timeout value to use
  */
-export function getMonitorTimeout(monitor: Site["monitors"][0], defaultTimeout: number): number {
+export function getMonitorTimeout(
+    monitor: Site["monitors"][0],
+    defaultTimeout: number
+): number {
     return hasValidTimeout(monitor) ? monitor.timeout : defaultTimeout;
 }
 
@@ -38,11 +50,14 @@ export function getMonitorTimeout(monitor: Site["monitors"][0], defaultTimeout: 
  * @param monitor - The monitor configuration to check
  * @returns True if the monitor has a valid host, false otherwise
  */
-export function hasValidHost(monitor: Site["monitors"][0]): monitor is Site["monitors"][0] & { host: string } {
+export function hasValidHost(
+    monitor: Site["monitors"][0]
+): monitor is Site["monitors"][0] & { host: string } {
     // Allow hostnames that are either FQDNs or could be valid IPs/hostnames
     return (
         isNonEmptyString(monitor.host) &&
-        (isValidFQDN(monitor.host, { require_tld: false }) || /^[\w.\-]+$/v.test(monitor.host))
+        (isValidFQDN(monitor.host, { require_tld: false }) ||
+            /^[\w.\-]+$/v.test(monitor.host))
     );
 }
 
@@ -52,8 +67,14 @@ export function hasValidHost(monitor: Site["monitors"][0]): monitor is Site["mon
  * @param monitor - The monitor configuration to check
  * @returns True if the monitor has a valid port, false otherwise
  */
-export function hasValidPort(monitor: Site["monitors"][0]): monitor is Site["monitors"][0] & { port: number } {
-    return typeof monitor.port === "number" && monitor.port >= 1 && monitor.port <= 65_535;
+export function hasValidPort(
+    monitor: Site["monitors"][0]
+): monitor is Site["monitors"][0] & { port: number } {
+    return (
+        typeof monitor.port === "number" &&
+        monitor.port >= 1 &&
+        monitor.port <= 65_535
+    );
 }
 
 /**
@@ -65,7 +86,9 @@ export function hasValidPort(monitor: Site["monitors"][0]): monitor is Site["mon
 export function hasValidRetryAttempts(
     monitor: Site["monitors"][0]
 ): monitor is Site["monitors"][0] & { retryAttempts: number } {
-    return typeof monitor.retryAttempts === "number" && monitor.retryAttempts >= 0;
+    return (
+        typeof monitor.retryAttempts === "number" && monitor.retryAttempts >= 0
+    );
 }
 
 /**
@@ -74,7 +97,9 @@ export function hasValidRetryAttempts(
  * @param monitor - The monitor configuration to check
  * @returns True if the monitor has a valid timeout, false otherwise
  */
-export function hasValidTimeout(monitor: Site["monitors"][0]): monitor is Site["monitors"][0] & { timeout: number } {
+export function hasValidTimeout(
+    monitor: Site["monitors"][0]
+): monitor is Site["monitors"][0] & { timeout: number } {
     return typeof monitor.timeout === "number" && monitor.timeout > 0;
 }
 
@@ -84,6 +109,8 @@ export function hasValidTimeout(monitor: Site["monitors"][0]): monitor is Site["
  * @param monitor - The monitor configuration to check
  * @returns True if the monitor has a valid URL, false otherwise
  */
-export function hasValidUrl(monitor: Site["monitors"][0]): monitor is Site["monitors"][0] & { url: string } {
+export function hasValidUrl(
+    monitor: Site["monitors"][0]
+): monitor is Site["monitors"][0] & { url: string } {
     return isValidUrl(monitor.url);
 }

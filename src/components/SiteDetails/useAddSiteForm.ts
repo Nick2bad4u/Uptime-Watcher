@@ -133,7 +133,8 @@ const validateFormFields = (
     const currentFields = getFields(monitorType);
     for (const field of currentFields) {
         if (field.required) {
-            const value = fieldValues[field.name as keyof typeof fieldValues] || "";
+            const value =
+                fieldValues[field.name as keyof typeof fieldValues] || "";
             if (!value.trim()) {
                 return false;
             }
@@ -187,7 +188,11 @@ export function useAddSiteForm(): AddSiteFormActions & AddSiteFormState {
     if (monitorType !== prevMonitorType) {
         setPrevMonitorType(monitorType);
         setFormError(undefined);
-        resetFieldsForMonitorType(currentFieldNames, { setHost, setPort, setUrl });
+        resetFieldsForMonitorType(currentFieldNames, {
+            setHost,
+            setPort,
+            setUrl,
+        });
     }
 
     // Reset name and siteId when switching modes
@@ -199,7 +204,14 @@ export function useAddSiteForm(): AddSiteFormActions & AddSiteFormState {
 
     // Simple validation function without logging - only used for submit button state
     const isFormValid = useCallback(() => {
-        return validateFormFields(addMode, name, selectedExistingSite, monitorType, { host, port, url }, getFields);
+        return validateFormFields(
+            addMode,
+            name,
+            selectedExistingSite,
+            monitorType,
+            { host, port, url },
+            getFields
+        );
     }, [
         addMode,
         name,

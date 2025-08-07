@@ -32,7 +32,12 @@ import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
 import { MonitorType, Site } from "../../types";
 import { DEFAULT_RETRY_ATTEMPTS } from "./constants";
 import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
-import { getMonitorRetryAttempts, getMonitorTimeout, hasValidHost, hasValidPort } from "./utils/monitorTypeGuards";
+import {
+    getMonitorRetryAttempts,
+    getMonitorTimeout,
+    hasValidHost,
+    hasValidPort,
+} from "./utils/monitorTypeGuards";
 import { performPortCheckWithRetry } from "./utils/portRetry";
 
 /**
@@ -86,9 +91,13 @@ export class PortMonitor implements IMonitorService {
      * falling back to the service default. Response time includes the full
      * connection establishment time for accurate performance metrics.
      */
-    public async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
+    public async check(
+        monitor: Site["monitors"][0]
+    ): Promise<MonitorCheckResult> {
         if (monitor.type !== "port") {
-            throw new Error(`PortMonitor cannot handle monitor type: ${monitor.type}`);
+            throw new Error(
+                `PortMonitor cannot handle monitor type: ${monitor.type}`
+            );
         }
 
         if (!hasValidHost(monitor) || !hasValidPort(monitor)) {
@@ -101,10 +110,21 @@ export class PortMonitor implements IMonitorService {
         }
 
         // Use type-safe utility functions instead of type assertions
-        const timeout = getMonitorTimeout(monitor, this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT);
-        const retryAttempts = getMonitorRetryAttempts(monitor, DEFAULT_RETRY_ATTEMPTS);
+        const timeout = getMonitorTimeout(
+            monitor,
+            this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT
+        );
+        const retryAttempts = getMonitorRetryAttempts(
+            monitor,
+            DEFAULT_RETRY_ATTEMPTS
+        );
 
-        return performPortCheckWithRetry(monitor.host, monitor.port, timeout, retryAttempts);
+        return performPortCheckWithRetry(
+            monitor.host,
+            monitor.port,
+            timeout,
+            retryAttempts
+        );
     }
 
     /**
@@ -157,7 +177,10 @@ export class PortMonitor implements IMonitorService {
      */
     public updateConfig(config: Partial<MonitorConfig>): void {
         // Basic validation of config properties - only validate relevant ones for port monitoring
-        if (config.timeout !== undefined && (typeof config.timeout !== "number" || config.timeout <= 0)) {
+        if (
+            config.timeout !== undefined &&
+            (typeof config.timeout !== "number" || config.timeout <= 0)
+        ) {
             throw new Error("Invalid timeout: must be a positive number");
         }
 

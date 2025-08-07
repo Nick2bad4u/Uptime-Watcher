@@ -39,7 +39,9 @@ vi.mock("../../../services/logger", () => ({
 }));
 
 vi.mock("../../../utils/errorHandling", () => ({
-    ensureError: vi.fn((error) => (error instanceof Error ? error : new Error(String(error)))),
+    ensureError: vi.fn((error) =>
+        error instanceof Error ? error : new Error(String(error))
+    ),
 }));
 
 // Import after mocks
@@ -160,12 +162,16 @@ describe("Settings Component", () => {
         mockUseSitesStore.mockReturnValue(mockSitesStore);
         mockUseTheme.mockReturnValue(mockTheme as any);
         mockUseThemeClasses.mockReturnValue({
-            getBackgroundClass: vi.fn().mockReturnValue({ backgroundColor: "#fff" }),
+            getBackgroundClass: vi
+                .fn()
+                .mockReturnValue({ backgroundColor: "#fff" }),
             getBorderClass: vi.fn().mockReturnValue({ borderColor: "#ccc" }),
             getTextClass: vi.fn().mockReturnValue({ color: "#000" }),
             getColor: vi.fn().mockReturnValue("#000"),
             getStatusClass: vi.fn().mockReturnValue({ color: "#000" }),
-            getSurfaceClass: vi.fn().mockReturnValue({ backgroundColor: "#fff" }),
+            getSurfaceClass: vi
+                .fn()
+                .mockReturnValue({ backgroundColor: "#fff" }),
         } as any);
     });
 
@@ -203,10 +209,14 @@ describe("Settings Component", () => {
     it("should handle history limit changes", async () => {
         render(<Settings onClose={mockOnClose} />);
 
-        const input = screen.getByLabelText("Maximum number of history records to keep per site");
+        const input = screen.getByLabelText(
+            "Maximum number of history records to keep per site"
+        );
         fireEvent.change(input, { target: { value: "500" } });
 
-        expect(mockSettingsStore.updateHistoryLimitValue).toHaveBeenCalledWith(500);
+        expect(mockSettingsStore.updateHistoryLimitValue).toHaveBeenCalledWith(
+            500
+        );
     });
 
     it("should handle reset settings", () => {
@@ -267,7 +277,9 @@ describe("Settings Component", () => {
     it("should display current settings values", () => {
         render(<Settings onClose={mockOnClose} />);
 
-        const historyInput = screen.getByLabelText("Maximum number of history records to keep per site");
+        const historyInput = screen.getByLabelText(
+            "Maximum number of history records to keep per site"
+        );
         expect(historyInput).toHaveValue("1000");
     });
 
@@ -283,7 +295,9 @@ describe("Settings Component", () => {
 
         render(<Settings onClose={mockOnClose} />);
 
-        const historyInput = screen.getByLabelText("Maximum number of history records to keep per site");
+        const historyInput = screen.getByLabelText(
+            "Maximum number of history records to keep per site"
+        );
         expect(historyInput).toHaveValue("500");
     });
 
@@ -293,7 +307,9 @@ describe("Settings Component", () => {
 
         render(<Settings onClose={mockOnClose} />);
 
-        const container = screen.getByText("⚙️ Settings").closest(".modal-container");
+        const container = screen
+            .getByText("⚙️ Settings")
+            .closest(".modal-container");
         expect(container).toBeInTheDocument();
     });
 

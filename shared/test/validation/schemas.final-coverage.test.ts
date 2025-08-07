@@ -4,7 +4,11 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { validateMonitorData, validateMonitorField, validateSiteData } from "../../validation/schemas";
+import {
+    validateMonitorData,
+    validateMonitorField,
+    validateSiteData,
+} from "../../validation/schemas";
 
 describe("Validation Schemas - Final Branch Coverage", () => {
     describe("Warning generation (line 312)", () => {
@@ -74,16 +78,32 @@ describe("Validation Schemas - Final Branch Coverage", () => {
     describe("Field validation error handling (line 484)", () => {
         it("should throw error for completely unknown field in validateFieldWithSchema", () => {
             // Test with a field that doesn't exist in any schema
-            const result = validateMonitorField("http", "completelyUnknownFieldName", "value");
+            const result = validateMonitorField(
+                "http",
+                "completelyUnknownFieldName",
+                "value"
+            );
             expect(result.success).toBe(false);
-            expect(result.errors.some((error) => error.includes("Field validation failed"))).toBe(true);
+            expect(
+                result.errors.some((error) =>
+                    error.includes("Field validation failed")
+                )
+            ).toBe(true);
         });
 
         it("should handle unknown field in both specific and base schemas", () => {
             // Test with field that exists in neither the specific nor base schema
-            const result = validateMonitorField("port", "nonExistentField", "value");
+            const result = validateMonitorField(
+                "port",
+                "nonExistentField",
+                "value"
+            );
             expect(result.success).toBe(false);
-            expect(result.errors.some((error) => error.includes("Field validation failed"))).toBe(true);
+            expect(
+                result.errors.some((error) =>
+                    error.includes("Field validation failed")
+                )
+            ).toBe(true);
         });
     });
 
@@ -104,7 +124,12 @@ describe("Validation Schemas - Final Branch Coverage", () => {
 
         it("should test complete error handling paths", () => {
             // Test with various invalid types to exercise all error paths
-            const testCases = [BigInt(123), function () {}, new Date("invalid"), /regex/];
+            const testCases = [
+                BigInt(123),
+                function () {},
+                new Date("invalid"),
+                /regex/,
+            ];
 
             for (const testCase of testCases) {
                 const result = validateMonitorData("http", testCase);
@@ -123,7 +148,11 @@ describe("Validation Schemas - Final Branch Coverage", () => {
             ];
 
             for (const testCase of edgeCases) {
-                const result = validateMonitorField(testCase.type, testCase.field, testCase.value);
+                const result = validateMonitorField(
+                    testCase.type,
+                    testCase.field,
+                    testCase.value
+                );
                 expect(result.success).toBe(false);
             }
         });
@@ -137,7 +166,9 @@ describe("Validation Schemas - Final Branch Coverage", () => {
                 const result = validateMonitorData(type, {});
                 if (type === "unknown") {
                     expect(result.success).toBe(false);
-                    expect(result.errors).toContain(`Unknown monitor type: ${type}`);
+                    expect(result.errors).toContain(
+                        `Unknown monitor type: ${type}`
+                    );
                 } else {
                     expect(result.success).toBe(false);
                     expect(result.errors.length).toBeGreaterThan(0);
@@ -185,7 +216,11 @@ describe("Validation Schemas - Final Branch Coverage", () => {
                     }
                 }
 
-                const validResult = validateMonitorField(test.type, test.field, validValue);
+                const validResult = validateMonitorField(
+                    test.type,
+                    test.field,
+                    validValue
+                );
                 if (!validResult.success) {
                     console.log(
                         `Failed validation for ${test.type}.${test.field} with value:`,
@@ -224,7 +259,11 @@ describe("Validation Schemas - Final Branch Coverage", () => {
                     }
                 }
 
-                const invalidResult = validateMonitorField(test.type, test.field, invalidValue);
+                const invalidResult = validateMonitorField(
+                    test.type,
+                    test.field,
+                    invalidValue
+                );
                 expect(invalidResult.success).toBe(false);
             }
         });

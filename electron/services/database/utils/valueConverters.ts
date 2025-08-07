@@ -117,7 +117,9 @@ export function addStringField(
  *
  * @public
  */
-export function convertDateForDb(value: Date | null | string | undefined): null | string {
+export function convertDateForDb(
+    value: Date | null | string | undefined
+): null | string {
     if (!value) {
         return null;
     }

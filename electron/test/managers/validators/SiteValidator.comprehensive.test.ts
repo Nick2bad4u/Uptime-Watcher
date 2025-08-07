@@ -25,7 +25,9 @@ describe("SiteValidator - Comprehensive Coverage", () => {
         };
 
         // Mock the MonitorValidator constructor
-        (MonitorValidator as any).mockImplementation(() => mockMonitorValidator);
+        (MonitorValidator as any).mockImplementation(
+            () => mockMonitorValidator
+        );
 
         siteValidator = new SiteValidator();
     });
@@ -86,10 +88,12 @@ describe("SiteValidator - Comprehensive Coverage", () => {
             };
 
             // Mock monitor validation to return valid
-            mockMonitorValidator.validateMonitorConfiguration = vi.fn().mockReturnValue({
-                isValid: true,
-                errors: [],
-            });
+            mockMonitorValidator.validateMonitorConfiguration = vi
+                .fn()
+                .mockReturnValue({
+                    isValid: true,
+                    errors: [],
+                });
 
             const result = siteValidator.validateSiteConfiguration(site);
 

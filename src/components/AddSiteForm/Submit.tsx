@@ -11,13 +11,19 @@
 
 import type { Monitor, MonitorType } from "@shared/types";
 
-import type { AddSiteFormActions, AddSiteFormState } from "../SiteDetails/useAddSiteForm";
+import type {
+    AddSiteFormActions,
+    AddSiteFormState,
+} from "../SiteDetails/useAddSiteForm";
 
 import { DEFAULT_REQUEST_TIMEOUT, RETRY_CONSTRAINTS } from "../../constants";
 import { type Logger } from "../../services/logger";
 import { withUtilityErrorHandling } from "../../utils/errorHandling";
 import { truncateForLogging } from "../../utils/fallbacks";
-import { validateMonitorFieldClientSide, validateMonitorFormData } from "../../utils/monitorValidation";
+import {
+    validateMonitorFieldClientSide,
+    validateMonitorFormData,
+} from "../../utils/monitorValidation";
 
 /**
  * Properties interface for form submission handling.
@@ -89,7 +95,10 @@ export interface StoreActions {
  * };
  * ```
  */
-export async function handleSubmit(event: React.FormEvent, properties: FormSubmitProperties): Promise<void> {
+export async function handleSubmit(
+    event: React.FormEvent,
+    properties: FormSubmitProperties
+): Promise<void> {
     const {
         addMode,
         checkInterval,
@@ -167,7 +176,10 @@ export async function handleSubmit(event: React.FormEvent, properties: FormSubmi
 /**
  * Adds monitor to existing site.
  */
-async function addToExistingSite(properties: FormSubmitProperties, monitor: Monitor): Promise<void> {
+async function addToExistingSite(
+    properties: FormSubmitProperties,
+    monitor: Monitor
+): Promise<void> {
     const { addMonitorToSite, logger, selectedExistingSite } = properties;
 
     await addMonitorToSite(selectedExistingSite, monitor);
@@ -237,7 +249,8 @@ function buildMonitorData(
  * Uses type-safe property assignment instead of dynamic field copying.
  */
 function createMonitor(properties: FormSubmitProperties): Monitor {
-    const { checkInterval, generateUuid, host, monitorType, port, url } = properties;
+    const { checkInterval, generateUuid, host, monitorType, port, url } =
+        properties;
 
     // Get type-specific monitor data
     const specificData = buildMonitorData(monitorType, { host, port, url });
@@ -264,7 +277,10 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
 /**
  * Performs the actual submission based on add mode.
  */
-async function performSubmission(properties: FormSubmitProperties, monitor: Monitor): Promise<void> {
+async function performSubmission(
+    properties: FormSubmitProperties,
+    monitor: Monitor
+): Promise<void> {
     const { addMode, logger } = properties;
 
     if (addMode === "new") {
@@ -275,13 +291,18 @@ async function performSubmission(properties: FormSubmitProperties, monitor: Moni
 
     const { selectedExistingSite, siteId } = properties;
     const identifier = addMode === "new" ? siteId : selectedExistingSite;
-    logger.info(`Successfully ${addMode === "new" ? "created site" : "added monitor"}: ${identifier}`);
+    logger.info(
+        `Successfully ${addMode === "new" ? "created site" : "added monitor"}: ${identifier}`
+    );
 }
 
 /**
  * Submits a new site with monitor.
  */
-async function submitNewSite(properties: FormSubmitProperties, monitor: Monitor): Promise<void> {
+async function submitNewSite(
+    properties: FormSubmitProperties,
+    monitor: Monitor
+): Promise<void> {
     const { createSite, logger, name, siteId } = properties;
 
     const trimmedName = name.trim();
@@ -309,7 +330,11 @@ async function submitNewSite(properties: FormSubmitProperties, monitor: Monitor)
  * @param selectedExistingSite - Selected existing site identifier
  * @returns Array of validation error messages
  */
-function validateAddMode(addMode: "existing" | "new", name: string, selectedExistingSite: string): string[] {
+function validateAddMode(
+    addMode: "existing" | "new",
+    name: string,
+    selectedExistingSite: string
+): string[] {
     const errors: string[] = [];
 
     if (addMode === "new" && !name.trim()) {
@@ -332,7 +357,11 @@ function validateAddMode(addMode: "existing" | "new", name: string, selectedExis
 async function validateCheckInterval(checkInterval: number): Promise<string[]> {
     return withUtilityErrorHandling(
         async () => {
-            const validationResult = await validateMonitorFieldClientSide("http", "checkInterval", checkInterval);
+            const validationResult = await validateMonitorFieldClientSide(
+                "http",
+                "checkInterval",
+                checkInterval
+            );
             return validationResult.success ? [] : validationResult.errors;
         },
         "Validate check interval",

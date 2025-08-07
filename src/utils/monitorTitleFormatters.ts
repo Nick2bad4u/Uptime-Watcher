@@ -67,7 +67,9 @@ export function formatTitleSuffix(monitor: Monitor): string {
  *
  * @public
  */
-export function getTitleSuffixFormatter(monitorType: string): TitleSuffixFormatter | undefined {
+export function getTitleSuffixFormatter(
+    monitorType: string
+): TitleSuffixFormatter | undefined {
     return titleSuffixFormatters[monitorType];
 }
 
@@ -88,6 +90,9 @@ export function getTitleSuffixFormatter(monitorType: string): TitleSuffixFormatt
  * registerTitleSuffixFormatter("custom", (monitor) => ` (${monitor.customField})`);
  * ```
  */
-export function registerTitleSuffixFormatter(monitorType: string, formatter: TitleSuffixFormatter): void {
+export function registerTitleSuffixFormatter(
+    monitorType: string,
+    formatter: TitleSuffixFormatter
+): void {
     titleSuffixFormatters[monitorType] = formatter;
 }

@@ -127,8 +127,10 @@ describe("Type Guards - Comprehensive Coverage", () => {
         });
 
         it("should validate array items when validator is provided", () => {
-            const isString = (value: unknown): value is string => typeof value === "string";
-            const isNumber = (value: unknown): value is number => typeof value === "number";
+            const isString = (value: unknown): value is string =>
+                typeof value === "string";
+            const isNumber = (value: unknown): value is number =>
+                typeof value === "number";
 
             expect(isArray(["a", "b", "c"], isString)).toBe(true);
             expect(isArray([1, 2, 3], isNumber)).toBe(true);
@@ -141,7 +143,8 @@ describe("Type Guards - Comprehensive Coverage", () => {
         });
 
         it("should handle complex validators", () => {
-            const isPositiveNumber = (value: unknown): value is number => typeof value === "number" && value > 0;
+            const isPositiveNumber = (value: unknown): value is number =>
+                typeof value === "number" && value > 0;
 
             expect(isArray([1, 2, 3], isPositiveNumber)).toBe(true);
             expect(isArray([0, 1, 2], isPositiveNumber)).toBe(false); // 0 is not positive
@@ -633,7 +636,9 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isValidUrl("https://www.example.com")).toBe(true);
             expect(isValidUrl("https://example.com/path")).toBe(true);
             expect(isValidUrl("https://example.com:8080")).toBe(true);
-            expect(isValidUrl("https://example.com/path?query=value")).toBe(true);
+            expect(isValidUrl("https://example.com/path?query=value")).toBe(
+                true
+            );
             expect(isValidUrl("https://example.com/path#fragment")).toBe(true);
             expect(isValidUrl("ftp://files.example.com")).toBe(true);
             expect(isValidUrl("file:///path/to/file")).toBe(true);
@@ -708,18 +713,28 @@ describe("Type Guards - Comprehensive Coverage", () => {
 
         it("should handle mixed type validation scenarios", () => {
             // Test complex scenarios without using eval
-            expect(isString("123") && !isNumber("123") && !isValidPort("123")).toBe(true);
-            expect(!isString(123) && isNumber(123) && isValidPort(123)).toBe(true);
+            expect(
+                isString("123") && !isNumber("123") && !isValidPort("123")
+            ).toBe(true);
+            expect(!isString(123) && isNumber(123) && isValidPort(123)).toBe(
+                true
+            );
             expect(isArray([]) && !isObject([]) && !isString([])).toBe(true);
             expect(!isArray({}) && isObject({}) && !isFunction({})).toBe(true);
 
             const testFn = () => {};
-            expect(isFunction(testFn) && !isObject(testFn) && !isString(testFn)).toBe(true);
+            expect(
+                isFunction(testFn) && !isObject(testFn) && !isString(testFn)
+            ).toBe(true);
 
             const testDate = new Date();
-            expect(isDate(testDate) && isObject(testDate) && !isString(testDate)).toBe(true);
+            expect(
+                isDate(testDate) && isObject(testDate) && !isString(testDate)
+            ).toBe(true);
 
-            expect(!isObject(null) && !isString(null) && !isNumber(null)).toBe(true);
+            expect(!isObject(null) && !isString(null) && !isNumber(null)).toBe(
+                true
+            );
         });
     });
 });

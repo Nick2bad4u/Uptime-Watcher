@@ -1,10 +1,17 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { AnalyticsTab, type AnalyticsTabProperties } from "../../../../components/SiteDetails/tabs/AnalyticsTab";
+import {
+    AnalyticsTab,
+    type AnalyticsTabProperties,
+} from "../../../../components/SiteDetails/tabs/AnalyticsTab";
 import { CHART_TIME_RANGES } from "../../../../constants";
 import type { DowntimePeriod } from "../../../../hooks/site/useSiteAnalytics";
-import type { ResponseTimeChartData, StatusBarChartData, UptimeChartData } from "../../../../services/chartConfig";
+import type {
+    ResponseTimeChartData,
+    StatusBarChartData,
+    UptimeChartData,
+} from "../../../../services/chartConfig";
 import type { ChartOptions } from "../../../../services/chartSetup";
 
 // Mock all external dependencies
@@ -44,7 +51,11 @@ vi.mock("../../../../theme/components", () => ({
     ThemedBadge: ({ children, variant, ...props }: any) => {
         const { iconColor, hoverable, showLabel, ...cleanProps } = props;
         return (
-            <span data-testid="themed-badge" data-variant={variant} {...cleanProps}>
+            <span
+                data-testid="themed-badge"
+                data-variant={variant}
+                {...cleanProps}
+            >
                 {children}
             </span>
         );
@@ -52,7 +63,12 @@ vi.mock("../../../../theme/components", () => ({
     ThemedButton: ({ children, onClick, variant, ...props }: any) => {
         const { iconColor, hoverable, showLabel, ...cleanProps } = props;
         return (
-            <button data-testid="themed-button" data-variant={variant} onClick={onClick} {...cleanProps}>
+            <button
+                data-testid="themed-button"
+                data-variant={variant}
+                onClick={onClick}
+                {...cleanProps}
+            >
                 {children}
             </button>
         );
@@ -70,7 +86,12 @@ vi.mock("../../../../theme/components", () => ({
     ThemedProgress: ({ value, variant, ...props }: any) => {
         const { iconColor, hoverable, showLabel, ...cleanProps } = props;
         return (
-            <div data-testid="themed-progress" data-value={value} data-variant={variant} {...cleanProps}>
+            <div
+                data-testid="themed-progress"
+                data-value={value}
+                data-variant={variant}
+                {...cleanProps}
+            >
                 {value}%
             </div>
         );
@@ -78,7 +99,12 @@ vi.mock("../../../../theme/components", () => ({
     ThemedText: ({ children, size, variant, ...props }: any) => {
         const { iconColor, hoverable, showLabel, ...cleanProps } = props;
         return (
-            <span data-testid="themed-text" data-size={size} data-variant={variant} {...cleanProps}>
+            <span
+                data-testid="themed-text"
+                data-size={size}
+                data-variant={variant}
+                {...cleanProps}
+            >
                 {children}
             </span>
         );
@@ -112,7 +138,9 @@ vi.mock("../charts/ChartComponents", () => ({
 }));
 
 describe("AnalyticsTab", () => {
-    const createMockProps = (overrides?: Partial<AnalyticsTabProperties>): AnalyticsTabProperties => {
+    const createMockProps = (
+        overrides?: Partial<AnalyticsTabProperties>
+    ): AnalyticsTabProperties => {
         const mockLineChartData: ResponseTimeChartData = {
             labels: ["10:00", "10:15", "10:30"],
             datasets: [
@@ -212,8 +240,12 @@ describe("AnalyticsTab", () => {
             render(<AnalyticsTab {...props} />);
 
             expect(screen.getByTestId("analytics-tab")).toBeInTheDocument();
-            expect(screen.getByText("Analytics Time Range")).toBeInTheDocument();
-            expect(screen.getByText("Key Performance Metrics")).toBeInTheDocument();
+            expect(
+                screen.getByText("Analytics Time Range")
+            ).toBeInTheDocument();
+            expect(
+                screen.getByText("Key Performance Metrics")
+            ).toBeInTheDocument();
             expect(screen.getByText("Performance Charts")).toBeInTheDocument();
         });
 
@@ -221,7 +253,9 @@ describe("AnalyticsTab", () => {
             const props = createMockProps();
             render(<AnalyticsTab {...props} />);
 
-            expect(screen.getByTestId("response-time-chart")).toBeInTheDocument();
+            expect(
+                screen.getByTestId("response-time-chart")
+            ).toBeInTheDocument();
             expect(screen.getByTestId("status-chart")).toBeInTheDocument();
             expect(screen.getByTestId("uptime-chart")).toBeInTheDocument();
         });
@@ -261,7 +295,9 @@ describe("AnalyticsTab", () => {
             });
             render(<AnalyticsTab {...props} />);
 
-            expect(screen.getByTestId("conditional-response-time")).toBeInTheDocument();
+            expect(
+                screen.getByTestId("conditional-response-time")
+            ).toBeInTheDocument();
             expect(screen.getByText("150ms for http")).toBeInTheDocument();
         });
 
@@ -286,7 +322,9 @@ describe("AnalyticsTab", () => {
             });
             render(<AnalyticsTab {...props} />);
 
-            expect(screen.getByText("Mean Time to Recovery")).toBeInTheDocument();
+            expect(
+                screen.getByText("Mean Time to Recovery")
+            ).toBeInTheDocument();
             expect(screen.getByText("5m")).toBeInTheDocument();
             expect(props.formatDuration).toHaveBeenCalledWith(300000);
         });
@@ -319,7 +357,9 @@ describe("AnalyticsTab", () => {
 
             render(<AnalyticsTab {...props} />);
 
-            expect(screen.getByText("Response Time Percentiles")).toBeInTheDocument();
+            expect(
+                screen.getByText("Response Time Percentiles")
+            ).toBeInTheDocument();
             expect(screen.getByText("P50 (Median)")).toBeInTheDocument();
             expect(screen.getByText("P95")).toBeInTheDocument();
             expect(screen.getByText("P99")).toBeInTheDocument();
@@ -332,7 +372,9 @@ describe("AnalyticsTab", () => {
 
             render(<AnalyticsTab {...props} />);
 
-            expect(screen.queryByText("Response Time Percentiles")).not.toBeInTheDocument();
+            expect(
+                screen.queryByText("Response Time Percentiles")
+            ).not.toBeInTheDocument();
             expect(screen.queryByText("P50 (Median)")).not.toBeInTheDocument();
         });
     });
@@ -352,7 +394,9 @@ describe("AnalyticsTab", () => {
 
             render(<AnalyticsTab {...props} />);
 
-            expect(screen.getByText("Recent Downtime Incidents")).toBeInTheDocument();
+            expect(
+                screen.getByText("Recent Downtime Incidents")
+            ).toBeInTheDocument();
         });
 
         it("should show no downtime message when no incidents", () => {
@@ -362,7 +406,9 @@ describe("AnalyticsTab", () => {
 
             render(<AnalyticsTab {...props} />);
 
-            expect(screen.getByText("No downtime incidents in selected period")).toBeInTheDocument();
+            expect(
+                screen.getByText("No downtime incidents in selected period")
+            ).toBeInTheDocument();
         });
 
         it("should display total downtime", () => {
@@ -456,7 +502,9 @@ describe("AnalyticsTab", () => {
             });
 
             render(<AnalyticsTab {...props} />);
-            expect(screen.getByText("No downtime incidents in selected period")).toBeInTheDocument();
+            expect(
+                screen.getByText("No downtime incidents in selected period")
+            ).toBeInTheDocument();
         });
 
         it("should handle perfect uptime (100%)", () => {
@@ -487,7 +535,9 @@ describe("AnalyticsTab", () => {
             render(<AnalyticsTab {...props} />);
 
             // Verify all chart components receive data
-            expect(screen.getByTestId("response-time-chart")).toBeInTheDocument();
+            expect(
+                screen.getByTestId("response-time-chart")
+            ).toBeInTheDocument();
             expect(screen.getByTestId("status-chart")).toBeInTheDocument();
             expect(screen.getByTestId("uptime-chart")).toBeInTheDocument();
         });
@@ -503,7 +553,9 @@ describe("AnalyticsTab", () => {
             });
 
             render(<AnalyticsTab {...props} />);
-            expect(screen.getByTestId("response-time-chart")).toBeInTheDocument();
+            expect(
+                screen.getByTestId("response-time-chart")
+            ).toBeInTheDocument();
         });
     });
 

@@ -58,12 +58,18 @@ import { PORT_NOT_REACHABLE, PortCheckError } from "./portErrorHandling";
  * @see {@link PortCheckError}
  * @public
  */
-export async function performSinglePortCheck(host: string, port: number, timeout: number): Promise<MonitorCheckResult> {
+export async function performSinglePortCheck(
+    host: string,
+    port: number,
+    timeout: number
+): Promise<MonitorCheckResult> {
     // Start high-precision timing for response time measurement
     const startTime = performance.now();
 
     if (isDev()) {
-        logger.debug(`[PortMonitor] Checking port: ${host}:${port} with timeout: ${timeout}ms`);
+        logger.debug(
+            `[PortMonitor] Checking port: ${host}:${port} with timeout: ${timeout}ms`
+        );
     }
 
     // Test TCP connectivity using is-port-reachable library
@@ -77,7 +83,9 @@ export async function performSinglePortCheck(host: string, port: number, timeout
 
     if (isReachable) {
         if (isDev()) {
-            logger.debug(`[PortMonitor] Port ${host}:${port} is reachable in ${responseTime}ms`);
+            logger.debug(
+                `[PortMonitor] Port ${host}:${port} is reachable in ${responseTime}ms`
+            );
         }
         return {
             details: String(port),

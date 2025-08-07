@@ -46,7 +46,8 @@ const SITE_QUERIES = {
     DELETE_BY_ID: "DELETE FROM sites WHERE identifier = ?",
     INSERT: "INSERT OR IGNORE INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)",
     SELECT_ALL: "SELECT identifier, name, monitoring FROM sites",
-    SELECT_BY_ID: "SELECT identifier, name, monitoring FROM sites WHERE identifier = ?",
+    SELECT_BY_ID:
+        "SELECT identifier, name, monitoring FROM sites WHERE identifier = ?",
     UPSERT: "INSERT OR REPLACE INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)",
 } as const;
 
@@ -141,7 +142,9 @@ export class SiteRepository {
                 stmt.run([site.identifier, name, monitoringValue]);
             }
 
-            logger.debug(`[SiteRepository] Bulk inserted ${sites.length} sites (internal)`);
+            logger.debug(
+                `[SiteRepository] Bulk inserted ${sites.length} sites (internal)`
+            );
         } finally {
             stmt.finalize();
         }
@@ -228,12 +231,17 @@ export class SiteRepository {
             if (deleted) {
                 logger.debug(`[SiteRepository] Deleted site: ${identifier}`);
             } else {
-                logger.warn(`[SiteRepository] Site not found for deletion: ${identifier}`);
+                logger.warn(
+                    `[SiteRepository] Site not found for deletion: ${identifier}`
+                );
             }
 
             return deleted;
         } catch (error) {
-            logger.error(`[SiteRepository] Failed to delete site: ${identifier}`, error);
+            logger.error(
+                `[SiteRepository] Failed to delete site: ${identifier}`,
+                error
+            );
             throw error;
         }
     }
@@ -277,7 +285,9 @@ export class SiteRepository {
     public async exportAll(): Promise<SiteRow[]> {
         return withDatabaseOperation(() => {
             const db = this.getDb();
-            const siteRows = db.all(SITE_QUERIES.SELECT_ALL) as DatabaseSiteRow[];
+            const siteRows = db.all(
+                SITE_QUERIES.SELECT_ALL
+            ) as DatabaseSiteRow[];
             return Promise.resolve(rowsToSites(siteRows));
         }, "site-export-all");
     }
@@ -298,7 +308,9 @@ export class SiteRepository {
     public async findAll(): Promise<SiteRow[]> {
         return withDatabaseOperation(() => {
             const db = this.getDb();
-            const siteRows = db.all(SITE_QUERIES.SELECT_ALL) as DatabaseSiteRow[];
+            const siteRows = db.all(
+                SITE_QUERIES.SELECT_ALL
+            ) as DatabaseSiteRow[];
             return Promise.resolve(rowsToSites(siteRows));
         }, "find-all-sites");
     }
@@ -314,19 +326,30 @@ export class SiteRepository {
      * const site = await repo.findByIdentifier("site-123");
      * ```
      */
-    public async findByIdentifier(identifier: string): Promise<SiteRow | undefined> {
+    public async findByIdentifier(
+        identifier: string
+    ): Promise<SiteRow | undefined> {
         return withDatabaseOperation(
             () => {
                 const db = this.getDb();
 
                 try {
-                    const siteRow = db.get(SITE_QUERIES.SELECT_BY_ID, [identifier]) as DatabaseSiteRow | undefined;
+                    const siteRow = db.get(SITE_QUERIES.SELECT_BY_ID, [
+                        identifier,
+                    ]) as DatabaseSiteRow | undefined;
 
-                    const result: SiteRow | undefined = siteRow ? rowToSite(siteRow) : undefined;
+                    const result: SiteRow | undefined = siteRow
+                        ? rowToSite(siteRow)
+                        : undefined;
                     return Promise.resolve(result);
                 } catch (error) {
-                    logger.error(`[SiteRepository] Failed to find site: ${identifier}`, error);
-                    throw error instanceof Error ? error : new Error(String(error));
+                    logger.error(
+                        `[SiteRepository] Failed to find site: ${identifier}`,
+                        error
+                    );
+                    throw error instanceof Error
+                        ? error
+                        : new Error(String(error));
                 }
             },
             "site-lookup",
@@ -350,7 +373,9 @@ export class SiteRepository {
      * await repo.upsert({ identifier: "site-123", name: "My Site", monitoring: true });
      * ```
      */
-    public async upsert(site: Pick<SiteRow, "identifier" | "monitoring" | "name">): Promise<void> {
+    public async upsert(
+        site: Pick<SiteRow, "identifier" | "monitoring" | "name">
+    ): Promise<void> {
         return withDatabaseOperation(
             () => {
                 const db = this.databaseService.getDatabase();
@@ -372,7 +397,10 @@ export class SiteRepository {
      * - Must be called within an active transaction context.
      * - Applies default values for missing fields.
      */
-    public upsertInternal(db: Database, site: Pick<SiteRow, "identifier" | "monitoring" | "name">): void {
+    public upsertInternal(
+        db: Database,
+        site: Pick<SiteRow, "identifier" | "monitoring" | "name">
+    ): void {
         // Apply consistent data normalization
         const identifier = site.identifier;
         const name = site.name ?? SITE_DEFAULTS.NAME;
@@ -380,7 +408,9 @@ export class SiteRepository {
         const monitoringValue = monitoring ? 1 : 0;
 
         db.run(SITE_QUERIES.UPSERT, [identifier, name, monitoringValue]);
-        logger.debug(`[SiteRepository] Upserted site (internal): ${identifier}`);
+        logger.debug(
+            `[SiteRepository] Upserted site (internal): ${identifier}`
+        );
     }
 
     /**

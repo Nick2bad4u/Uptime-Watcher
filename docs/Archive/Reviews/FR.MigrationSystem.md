@@ -47,7 +47,9 @@
 ```typescript
 while (currentVersion !== toVersion) {
  if (visitedVersions.has(currentVersion)) {
-  throw new Error(`Circular migration path detected for ${monitorType} at version ${currentVersion}`);
+  throw new Error(
+   `Circular migration path detected for ${monitorType} at version ${currentVersion}`
+  );
  }
  // ... but what if no nextRule is found after visitedVersions check?
 }
@@ -94,7 +96,9 @@ const versionB = b.split(".").map(Number);
 
 ```typescript
 if (path.length > 100) {
- throw new Error(`Migration path too long for ${monitorType}: ${path.length} steps exceeded maximum of 100`);
+ throw new Error(
+  `Migration path too long for ${monitorType}: ${path.length} steps exceeded maximum of 100`
+ );
 }
 ```
 

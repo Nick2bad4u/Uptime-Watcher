@@ -1,8 +1,16 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { ResponseTimeChart, StatusChart, UptimeChart } from "../../../../components/SiteDetails/charts/ChartComponents";
-import type { ResponseTimeChartData, StatusBarChartData, UptimeChartData } from "../../../../services/chartConfig";
+import {
+    ResponseTimeChart,
+    StatusChart,
+    UptimeChart,
+} from "../../../../components/SiteDetails/charts/ChartComponents";
+import type {
+    ResponseTimeChartData,
+    StatusBarChartData,
+    UptimeChartData,
+} from "../../../../services/chartConfig";
 import type { ChartOptions } from "../../../../services/chartSetup";
 
 // Mock chart.js components
@@ -78,17 +86,26 @@ describe("ChartComponents", () => {
         };
 
         it("should render line chart with correct data and options", () => {
-            render(<ResponseTimeChart data={mockResponseTimeData} options={mockLineOptions} />);
+            render(
+                <ResponseTimeChart
+                    data={mockResponseTimeData}
+                    options={mockLineOptions}
+                />
+            );
 
             const chart = screen.getByTestId("line-chart");
             expect(chart).toBeInTheDocument();
             expect(chart).toHaveAttribute("data-chart-type", "line");
 
             const chartData = screen.getByTestId("chart-data");
-            expect(chartData).toHaveTextContent(JSON.stringify(mockResponseTimeData));
+            expect(chartData).toHaveTextContent(
+                JSON.stringify(mockResponseTimeData)
+            );
 
             const chartOptions = screen.getByTestId("chart-options");
-            expect(chartOptions).toHaveTextContent(JSON.stringify(mockLineOptions));
+            expect(chartOptions).toHaveTextContent(
+                JSON.stringify(mockLineOptions)
+            );
         });
 
         it("should have correct display name for debugging", () => {
@@ -105,7 +122,12 @@ describe("ChartComponents", () => {
                 responsive: true,
             };
 
-            render(<ResponseTimeChart data={minimalData} options={minimalOptions} />);
+            render(
+                <ResponseTimeChart
+                    data={minimalData}
+                    options={minimalOptions}
+                />
+            );
 
             expect(screen.getByTestId("line-chart")).toBeInTheDocument();
         });
@@ -151,7 +173,12 @@ describe("ChartComponents", () => {
                 ],
             };
 
-            render(<ResponseTimeChart data={complexData} options={mockLineOptions} />);
+            render(
+                <ResponseTimeChart
+                    data={complexData}
+                    options={mockLineOptions}
+                />
+            );
 
             const chartData = screen.getByTestId("chart-data");
             expect(chartData).toHaveTextContent(JSON.stringify(complexData));
@@ -186,7 +213,12 @@ describe("ChartComponents", () => {
         };
 
         it("should render doughnut chart with correct data and options", () => {
-            render(<UptimeChart data={mockUptimeData} options={mockDoughnutOptions} />);
+            render(
+                <UptimeChart
+                    data={mockUptimeData}
+                    options={mockDoughnutOptions}
+                />
+            );
 
             const chart = screen.getByTestId("doughnut-chart");
             expect(chart).toBeInTheDocument();
@@ -196,7 +228,9 @@ describe("ChartComponents", () => {
             expect(chartData).toHaveTextContent(JSON.stringify(mockUptimeData));
 
             const chartOptions = screen.getByTestId("chart-options");
-            expect(chartOptions).toHaveTextContent(JSON.stringify(mockDoughnutOptions));
+            expect(chartOptions).toHaveTextContent(
+                JSON.stringify(mockDoughnutOptions)
+            );
         });
 
         it("should have correct display name for debugging", () => {
@@ -216,7 +250,12 @@ describe("ChartComponents", () => {
                 ],
             };
 
-            render(<UptimeChart data={perfectUptimeData} options={mockDoughnutOptions} />);
+            render(
+                <UptimeChart
+                    data={perfectUptimeData}
+                    options={mockDoughnutOptions}
+                />
+            );
 
             expect(screen.getByTestId("doughnut-chart")).toBeInTheDocument();
         });
@@ -234,10 +273,17 @@ describe("ChartComponents", () => {
                 ],
             };
 
-            render(<UptimeChart data={multiDatasetData} options={mockDoughnutOptions} />);
+            render(
+                <UptimeChart
+                    data={multiDatasetData}
+                    options={mockDoughnutOptions}
+                />
+            );
 
             const chartData = screen.getByTestId("chart-data");
-            expect(chartData).toHaveTextContent(JSON.stringify(multiDatasetData));
+            expect(chartData).toHaveTextContent(
+                JSON.stringify(multiDatasetData)
+            );
         });
     });
 
@@ -278,7 +324,9 @@ describe("ChartComponents", () => {
         };
 
         it("should render bar chart with correct data and options", () => {
-            render(<StatusChart data={mockStatusData} options={mockBarOptions} />);
+            render(
+                <StatusChart data={mockStatusData} options={mockBarOptions} />
+            );
 
             const chart = screen.getByTestId("bar-chart");
             expect(chart).toBeInTheDocument();
@@ -288,7 +336,9 @@ describe("ChartComponents", () => {
             expect(chartData).toHaveTextContent(JSON.stringify(mockStatusData));
 
             const chartOptions = screen.getByTestId("chart-options");
-            expect(chartOptions).toHaveTextContent(JSON.stringify(mockBarOptions));
+            expect(chartOptions).toHaveTextContent(
+                JSON.stringify(mockBarOptions)
+            );
         });
 
         it("should have correct display name for debugging", () => {
@@ -309,7 +359,9 @@ describe("ChartComponents", () => {
                 ],
             };
 
-            render(<StatusChart data={singleStatusData} options={mockBarOptions} />);
+            render(
+                <StatusChart data={singleStatusData} options={mockBarOptions} />
+            );
 
             expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
         });
@@ -325,10 +377,17 @@ describe("ChartComponents", () => {
                 },
             };
 
-            render(<StatusChart data={mockStatusData} options={horizontalBarOptions} />);
+            render(
+                <StatusChart
+                    data={mockStatusData}
+                    options={horizontalBarOptions}
+                />
+            );
 
             const chartOptions = screen.getByTestId("chart-options");
-            expect(chartOptions).toHaveTextContent(JSON.stringify(horizontalBarOptions));
+            expect(chartOptions).toHaveTextContent(
+                JSON.stringify(horizontalBarOptions)
+            );
         });
 
         it("should handle stacked bar configuration", () => {
@@ -394,7 +453,9 @@ describe("ChartComponents", () => {
             };
             const options: ChartOptions<"line"> = { responsive: true };
 
-            const { rerender } = render(<ResponseTimeChart data={data} options={options} />);
+            const { rerender } = render(
+                <ResponseTimeChart data={data} options={options} />
+            );
 
             const initialChart = screen.getByTestId("line-chart");
 
@@ -484,12 +545,21 @@ describe("ChartComponents", () => {
             };
 
             const lineOptions: ChartOptions<"line"> = { responsive: true };
-            const doughnutOptions: ChartOptions<"doughnut"> = { responsive: true };
+            const doughnutOptions: ChartOptions<"doughnut"> = {
+                responsive: true,
+            };
             const barOptions: ChartOptions<"bar"> = { responsive: true };
 
             expect(() => {
-                render(<ResponseTimeChart data={responseTimeData} options={lineOptions} />);
-                render(<UptimeChart data={uptimeData} options={doughnutOptions} />);
+                render(
+                    <ResponseTimeChart
+                        data={responseTimeData}
+                        options={lineOptions}
+                    />
+                );
+                render(
+                    <UptimeChart data={uptimeData} options={doughnutOptions} />
+                );
                 render(<StatusChart data={statusData} options={barOptions} />);
             }).not.toThrow();
         });

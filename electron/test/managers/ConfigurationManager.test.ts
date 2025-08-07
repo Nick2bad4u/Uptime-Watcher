@@ -62,16 +62,24 @@ describe("ConfigurationManager", () => {
         // Create mock instances
         mockMonitorValidator = {
             shouldApplyDefaultInterval: vi.fn(() => true),
-            validateMonitorConfiguration: vi.fn(() => ({ success: true, errors: [] })),
+            validateMonitorConfiguration: vi.fn(() => ({
+                success: true,
+                errors: [],
+            })),
         };
 
         mockSiteValidator = {
             shouldIncludeInExport: vi.fn(() => true),
-            validateSiteConfiguration: vi.fn(() => ({ success: true, errors: [] })),
+            validateSiteConfiguration: vi.fn(() => ({
+                success: true,
+                errors: [],
+            })),
         };
 
         // Mock the constructor calls
-        (MonitorValidator as any).mockImplementation(() => mockMonitorValidator);
+        (MonitorValidator as any).mockImplementation(
+            () => mockMonitorValidator
+        );
         (SiteValidator as any).mockImplementation(() => mockSiteValidator);
 
         configManager = new ConfigurationManager();
@@ -154,17 +162,23 @@ describe("ConfigurationManager", () => {
     describe("shouldApplyDefaultInterval", () => {
         it("should delegate to monitor validator", () => {
             const monitor = createMockMonitor();
-            mockMonitorValidator.shouldApplyDefaultInterval.mockReturnValue(true);
+            mockMonitorValidator.shouldApplyDefaultInterval.mockReturnValue(
+                true
+            );
 
             const result = configManager.shouldApplyDefaultInterval(monitor);
 
-            expect(mockMonitorValidator.shouldApplyDefaultInterval).toHaveBeenCalledWith(monitor);
+            expect(
+                mockMonitorValidator.shouldApplyDefaultInterval
+            ).toHaveBeenCalledWith(monitor);
             expect(result).toBe(true);
         });
 
         it("should return false when monitor validator returns false", () => {
             const monitor = createMockMonitor();
-            mockMonitorValidator.shouldApplyDefaultInterval.mockReturnValue(false);
+            mockMonitorValidator.shouldApplyDefaultInterval.mockReturnValue(
+                false
+            );
 
             const result = configManager.shouldApplyDefaultInterval(monitor);
 
@@ -214,7 +228,10 @@ describe("ConfigurationManager", () => {
         it("should handle site with multiple monitors", () => {
             const site = createMockSite({
                 monitoring: true,
-                monitors: [createMockMonitor(), createMockMonitor({ id: "monitor-2" })],
+                monitors: [
+                    createMockMonitor(),
+                    createMockMonitor({ id: "monitor-2" }),
+                ],
             });
 
             const result = configManager.shouldAutoStartMonitoring(site);
@@ -230,7 +247,9 @@ describe("ConfigurationManager", () => {
 
             const result = configManager.shouldIncludeInExport(site);
 
-            expect(mockSiteValidator.shouldIncludeInExport).toHaveBeenCalledWith(site);
+            expect(
+                mockSiteValidator.shouldIncludeInExport
+            ).toHaveBeenCalledWith(site);
             expect(result).toBe(true);
         });
 
@@ -247,26 +266,43 @@ describe("ConfigurationManager", () => {
     describe("validateMonitorConfiguration", () => {
         it("should validate monitor and cache result", async () => {
             const monitor = createMockMonitor();
-            const expectedResult: ValidationResult = { success: true, errors: [] };
-            mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(expectedResult);
+            const expectedResult: ValidationResult = {
+                success: true,
+                errors: [],
+            };
+            mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(
+                expectedResult
+            );
 
-            const result = await configManager.validateMonitorConfiguration(monitor);
+            const result =
+                await configManager.validateMonitorConfiguration(monitor);
 
-            expect(mockMonitorValidator.validateMonitorConfiguration).toHaveBeenCalledWith(monitor);
+            expect(
+                mockMonitorValidator.validateMonitorConfiguration
+            ).toHaveBeenCalledWith(monitor);
             expect(result).toEqual(expectedResult);
         });
 
         it("should return cached result on second call", async () => {
             const monitor = createMockMonitor();
-            const expectedResult: ValidationResult = { success: true, errors: [] };
-            mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(expectedResult);
+            const expectedResult: ValidationResult = {
+                success: true,
+                errors: [],
+            };
+            mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(
+                expectedResult
+            );
 
             // First call
-            const result1 = await configManager.validateMonitorConfiguration(monitor);
+            const result1 =
+                await configManager.validateMonitorConfiguration(monitor);
             // Second call with same monitor
-            const result2 = await configManager.validateMonitorConfiguration(monitor);
+            const result2 =
+                await configManager.validateMonitorConfiguration(monitor);
 
-            expect(mockMonitorValidator.validateMonitorConfiguration).toHaveBeenCalledOnce();
+            expect(
+                mockMonitorValidator.validateMonitorConfiguration
+            ).toHaveBeenCalledOnce();
             expect(result1).toEqual(expectedResult);
             expect(result2).toEqual(expectedResult);
         });
@@ -275,14 +311,23 @@ describe("ConfigurationManager", () => {
             const monitor1 = createMockMonitor({ id: "monitor-1" });
             const monitor2 = createMockMonitor({ id: "monitor-2" });
             const result1: ValidationResult = { success: true, errors: [] };
-            const result2: ValidationResult = { success: false, errors: ["error"] };
+            const result2: ValidationResult = {
+                success: false,
+                errors: ["error"],
+            };
 
-            mockMonitorValidator.validateMonitorConfiguration.mockReturnValueOnce(result1).mockReturnValueOnce(result2);
+            mockMonitorValidator.validateMonitorConfiguration
+                .mockReturnValueOnce(result1)
+                .mockReturnValueOnce(result2);
 
-            const actualResult1 = await configManager.validateMonitorConfiguration(monitor1);
-            const actualResult2 = await configManager.validateMonitorConfiguration(monitor2);
+            const actualResult1 =
+                await configManager.validateMonitorConfiguration(monitor1);
+            const actualResult2 =
+                await configManager.validateMonitorConfiguration(monitor2);
 
-            expect(mockMonitorValidator.validateMonitorConfiguration).toHaveBeenCalledTimes(2);
+            expect(
+                mockMonitorValidator.validateMonitorConfiguration
+            ).toHaveBeenCalledTimes(2);
             expect(actualResult1).toEqual(result1);
             expect(actualResult2).toEqual(result2);
         });
@@ -291,10 +336,16 @@ describe("ConfigurationManager", () => {
             const monitor = createMockMonitor({
                 // Optional properties are omitted to test undefined handling
             });
-            const expectedResult: ValidationResult = { success: true, errors: [] };
-            mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(expectedResult);
+            const expectedResult: ValidationResult = {
+                success: true,
+                errors: [],
+            };
+            mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(
+                expectedResult
+            );
 
-            const result = await configManager.validateMonitorConfiguration(monitor);
+            const result =
+                await configManager.validateMonitorConfiguration(monitor);
 
             expect(result).toEqual(expectedResult);
         });
@@ -302,10 +353,16 @@ describe("ConfigurationManager", () => {
         it("should handle monitors with lastChecked date", async () => {
             const lastChecked = new Date("2023-01-01T00:00:00Z");
             const monitor = createMockMonitor({ lastChecked });
-            const expectedResult: ValidationResult = { success: true, errors: [] };
-            mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(expectedResult);
+            const expectedResult: ValidationResult = {
+                success: true,
+                errors: [],
+            };
+            mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(
+                expectedResult
+            );
 
-            const result = await configManager.validateMonitorConfiguration(monitor);
+            const result =
+                await configManager.validateMonitorConfiguration(monitor);
 
             expect(result).toEqual(expectedResult);
         });
@@ -318,10 +375,16 @@ describe("ConfigurationManager", () => {
             (monitor as any).port = null;
             (monitor as any).lastChecked = null;
 
-            const expectedResult: ValidationResult = { success: true, errors: [] };
-            mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(expectedResult);
+            const expectedResult: ValidationResult = {
+                success: true,
+                errors: [],
+            };
+            mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(
+                expectedResult
+            );
 
-            const result = await configManager.validateMonitorConfiguration(monitor);
+            const result =
+                await configManager.validateMonitorConfiguration(monitor);
 
             expect(result).toEqual(expectedResult);
         });
@@ -333,10 +396,16 @@ describe("ConfigurationManager", () => {
                 port: 80,
                 // url is omitted since it's not needed for port monitors
             });
-            const expectedResult: ValidationResult = { success: true, errors: [] };
-            mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(expectedResult);
+            const expectedResult: ValidationResult = {
+                success: true,
+                errors: [],
+            };
+            mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(
+                expectedResult
+            );
 
-            const result = await configManager.validateMonitorConfiguration(monitor);
+            const result =
+                await configManager.validateMonitorConfiguration(monitor);
 
             expect(result).toEqual(expectedResult);
         });
@@ -345,26 +414,40 @@ describe("ConfigurationManager", () => {
     describe("validateSiteConfiguration", () => {
         it("should validate site and cache result", async () => {
             const site = createMockSite();
-            const expectedResult: ValidationResult = { success: true, errors: [] };
-            mockSiteValidator.validateSiteConfiguration.mockReturnValue(expectedResult);
+            const expectedResult: ValidationResult = {
+                success: true,
+                errors: [],
+            };
+            mockSiteValidator.validateSiteConfiguration.mockReturnValue(
+                expectedResult
+            );
 
             const result = await configManager.validateSiteConfiguration(site);
 
-            expect(mockSiteValidator.validateSiteConfiguration).toHaveBeenCalledWith(site);
+            expect(
+                mockSiteValidator.validateSiteConfiguration
+            ).toHaveBeenCalledWith(site);
             expect(result).toEqual(expectedResult);
         });
 
         it("should return cached result on second call", async () => {
             const site = createMockSite();
-            const expectedResult: ValidationResult = { success: true, errors: [] };
-            mockSiteValidator.validateSiteConfiguration.mockReturnValue(expectedResult);
+            const expectedResult: ValidationResult = {
+                success: true,
+                errors: [],
+            };
+            mockSiteValidator.validateSiteConfiguration.mockReturnValue(
+                expectedResult
+            );
 
             // First call
             const result1 = await configManager.validateSiteConfiguration(site);
             // Second call with same site
             const result2 = await configManager.validateSiteConfiguration(site);
 
-            expect(mockSiteValidator.validateSiteConfiguration).toHaveBeenCalledOnce();
+            expect(
+                mockSiteValidator.validateSiteConfiguration
+            ).toHaveBeenCalledOnce();
             expect(result1).toEqual(expectedResult);
             expect(result2).toEqual(expectedResult);
         });
@@ -373,22 +456,36 @@ describe("ConfigurationManager", () => {
             const site1 = createMockSite({ identifier: "site-1" });
             const site2 = createMockSite({ identifier: "site-2" });
             const result1: ValidationResult = { success: true, errors: [] };
-            const result2: ValidationResult = { success: false, errors: ["error"] };
+            const result2: ValidationResult = {
+                success: false,
+                errors: ["error"],
+            };
 
-            mockSiteValidator.validateSiteConfiguration.mockReturnValueOnce(result1).mockReturnValueOnce(result2);
+            mockSiteValidator.validateSiteConfiguration
+                .mockReturnValueOnce(result1)
+                .mockReturnValueOnce(result2);
 
-            const actualResult1 = await configManager.validateSiteConfiguration(site1);
-            const actualResult2 = await configManager.validateSiteConfiguration(site2);
+            const actualResult1 =
+                await configManager.validateSiteConfiguration(site1);
+            const actualResult2 =
+                await configManager.validateSiteConfiguration(site2);
 
-            expect(mockSiteValidator.validateSiteConfiguration).toHaveBeenCalledTimes(2);
+            expect(
+                mockSiteValidator.validateSiteConfiguration
+            ).toHaveBeenCalledTimes(2);
             expect(actualResult1).toEqual(result1);
             expect(actualResult2).toEqual(result2);
         });
 
         it("should handle sites with no monitors", async () => {
             const site = createMockSite({ monitors: [] });
-            const expectedResult: ValidationResult = { success: true, errors: [] };
-            mockSiteValidator.validateSiteConfiguration.mockReturnValue(expectedResult);
+            const expectedResult: ValidationResult = {
+                success: true,
+                errors: [],
+            };
+            mockSiteValidator.validateSiteConfiguration.mockReturnValue(
+                expectedResult
+            );
 
             const result = await configManager.validateSiteConfiguration(site);
 
@@ -403,8 +500,13 @@ describe("ConfigurationManager", () => {
                     createMockMonitor({ id: "monitor-3" }),
                 ],
             });
-            const expectedResult: ValidationResult = { success: true, errors: [] };
-            mockSiteValidator.validateSiteConfiguration.mockReturnValue(expectedResult);
+            const expectedResult: ValidationResult = {
+                success: true,
+                errors: [],
+            };
+            mockSiteValidator.validateSiteConfiguration.mockReturnValue(
+                expectedResult
+            );
 
             const result = await configManager.validateSiteConfiguration(site);
 
@@ -413,8 +515,13 @@ describe("ConfigurationManager", () => {
 
         it("should handle sites with monitoring disabled", async () => {
             const site = createMockSite({ monitoring: false });
-            const expectedResult: ValidationResult = { success: true, errors: [] };
-            mockSiteValidator.validateSiteConfiguration.mockReturnValue(expectedResult);
+            const expectedResult: ValidationResult = {
+                success: true,
+                errors: [],
+            };
+            mockSiteValidator.validateSiteConfiguration.mockReturnValue(
+                expectedResult
+            );
 
             const result = await configManager.validateSiteConfiguration(site);
 
@@ -425,25 +532,39 @@ describe("ConfigurationManager", () => {
     describe("Cache behavior", () => {
         it("should use cache after clearing and re-validating", async () => {
             const monitor = createMockMonitor();
-            const expectedResult: ValidationResult = { success: true, errors: [] };
-            mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(expectedResult);
+            const expectedResult: ValidationResult = {
+                success: true,
+                errors: [],
+            };
+            mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(
+                expectedResult
+            );
 
             // First validation
             await configManager.validateMonitorConfiguration(monitor);
-            expect(mockMonitorValidator.validateMonitorConfiguration).toHaveBeenCalledOnce();
+            expect(
+                mockMonitorValidator.validateMonitorConfiguration
+            ).toHaveBeenCalledOnce();
 
             // Clear cache
             configManager.clearValidationCache();
 
             // Second validation after cache clear
             await configManager.validateMonitorConfiguration(monitor);
-            expect(mockMonitorValidator.validateMonitorConfiguration).toHaveBeenCalledTimes(2);
+            expect(
+                mockMonitorValidator.validateMonitorConfiguration
+            ).toHaveBeenCalledTimes(2);
         });
 
         it("should track cache statistics correctly", async () => {
             const monitor = createMockMonitor();
-            const expectedResult: ValidationResult = { success: true, errors: [] };
-            mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(expectedResult);
+            const expectedResult: ValidationResult = {
+                success: true,
+                errors: [],
+            };
+            mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(
+                expectedResult
+            );
 
             const initialStats = configManager.getCacheStats();
             expect(initialStats.validation.hits).toBe(0);
@@ -452,12 +573,16 @@ describe("ConfigurationManager", () => {
             // First call - should be a cache miss
             await configManager.validateMonitorConfiguration(monitor);
             const afterMissStats = configManager.getCacheStats();
-            expect(afterMissStats.validation.misses).toBeGreaterThan(initialStats.validation.misses);
+            expect(afterMissStats.validation.misses).toBeGreaterThan(
+                initialStats.validation.misses
+            );
 
             // Second call - should be a cache hit
             await configManager.validateMonitorConfiguration(monitor);
             const afterHitStats = configManager.getCacheStats();
-            expect(afterHitStats.validation.hits).toBeGreaterThan(afterMissStats.validation.hits);
+            expect(afterHitStats.validation.hits).toBeGreaterThan(
+                afterMissStats.validation.hits
+            );
         });
     });
 
@@ -465,21 +590,29 @@ describe("ConfigurationManager", () => {
         it("should handle validator errors gracefully", async () => {
             const monitor = createMockMonitor();
             const error = new Error("Validation error");
-            mockMonitorValidator.validateMonitorConfiguration.mockImplementation(() => {
-                throw error;
-            });
+            mockMonitorValidator.validateMonitorConfiguration.mockImplementation(
+                () => {
+                    throw error;
+                }
+            );
 
-            await expect(configManager.validateMonitorConfiguration(monitor)).rejects.toThrow("Validation error");
+            await expect(
+                configManager.validateMonitorConfiguration(monitor)
+            ).rejects.toThrow("Validation error");
         });
 
         it("should handle site validator errors gracefully", async () => {
             const site = createMockSite();
             const error = new Error("Site validation error");
-            mockSiteValidator.validateSiteConfiguration.mockImplementation(() => {
-                throw error;
-            });
+            mockSiteValidator.validateSiteConfiguration.mockImplementation(
+                () => {
+                    throw error;
+                }
+            );
 
-            await expect(configManager.validateSiteConfiguration(site)).rejects.toThrow("Site validation error");
+            await expect(
+                configManager.validateSiteConfiguration(site)
+            ).rejects.toThrow("Site validation error");
         });
     });
 
@@ -489,12 +622,21 @@ describe("ConfigurationManager", () => {
 
             // Even with valid site conditions, should return false in dev mode
             const siteWithMonitors = createMockSite({ monitoring: true });
-            const siteWithoutMonitors = createMockSite({ monitors: [], monitoring: true });
+            const siteWithoutMonitors = createMockSite({
+                monitors: [],
+                monitoring: true,
+            });
             const siteDisabled = createMockSite({ monitoring: false });
 
-            expect(configManager.shouldAutoStartMonitoring(siteWithMonitors)).toBe(false);
-            expect(configManager.shouldAutoStartMonitoring(siteWithoutMonitors)).toBe(false);
-            expect(configManager.shouldAutoStartMonitoring(siteDisabled)).toBe(false);
+            expect(
+                configManager.shouldAutoStartMonitoring(siteWithMonitors)
+            ).toBe(false);
+            expect(
+                configManager.shouldAutoStartMonitoring(siteWithoutMonitors)
+            ).toBe(false);
+            expect(configManager.shouldAutoStartMonitoring(siteDisabled)).toBe(
+                false
+            );
         });
 
         it("should handle sites with complex monitor configurations", async () => {
@@ -521,14 +663,22 @@ describe("ConfigurationManager", () => {
                 ],
             });
 
-            const expectedResult: ValidationResult = { success: true, errors: [] };
-            mockSiteValidator.validateSiteConfiguration.mockReturnValue(expectedResult);
+            const expectedResult: ValidationResult = {
+                success: true,
+                errors: [],
+            };
+            mockSiteValidator.validateSiteConfiguration.mockReturnValue(
+                expectedResult
+            );
 
-            const result = await configManager.validateSiteConfiguration(complexSite);
+            const result =
+                await configManager.validateSiteConfiguration(complexSite);
             expect(result).toEqual(expectedResult);
 
             // Verify that complex sites can be auto-started
-            expect(configManager.shouldAutoStartMonitoring(complexSite)).toBe(true);
+            expect(configManager.shouldAutoStartMonitoring(complexSite)).toBe(
+                true
+            );
 
             // Verify that complex sites can be included in export
             expect(configManager.shouldIncludeInExport(complexSite)).toBe(true);

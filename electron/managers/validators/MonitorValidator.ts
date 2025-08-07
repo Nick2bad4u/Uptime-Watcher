@@ -71,7 +71,9 @@ export class MonitorValidator {
      * }
      * ```
      */
-    public validateMonitorConfiguration(monitor: Site["monitors"][0]): ValidationResult {
+    public validateMonitorConfiguration(
+        monitor: Site["monitors"][0]
+    ): ValidationResult {
         // Use shared validation from registry (includes timing, retry attempts, and type-specific validation)
         const errors = this.validateMonitorTypeSpecific(monitor);
         return {
@@ -101,11 +103,15 @@ export class MonitorValidator {
      * This method is intended for internal use within {@link MonitorValidator}.
      * @internal
      */
-    private validateMonitorTypeSpecific(monitor: Site["monitors"][0]): string[] {
+    private validateMonitorTypeSpecific(
+        monitor: Site["monitors"][0]
+    ): string[] {
         // Validate monitor type using registry
         if (!isValidMonitorType(monitor.type)) {
             const availableTypes = getRegisteredMonitorTypes().join(", ");
-            return [`Invalid monitor type \`${monitor.type}\`. Available types: \`${availableTypes}\``];
+            return [
+                `Invalid monitor type \`${monitor.type}\`. Available types: \`${availableTypes}\``,
+            ];
         }
 
         // Use Zod schema validation from registry

@@ -76,7 +76,9 @@ export type ChartTimeRange = "1h" | "7d" | "24h" | "30d";
  * ```
  */
 export type StoreActions<T> = {
-    [K in keyof T]: T[K] extends (...arguments_: unknown[]) => unknown ? T[K] : never;
+    [K in keyof T]: T[K] extends (...arguments_: unknown[]) => unknown
+        ? T[K]
+        : never;
 };
 
 /**
@@ -101,7 +103,9 @@ export type StoreActions<T> = {
  * ```
  */
 export type StoreState<T> = {
-    [K in keyof T]: T[K] extends (...arguments_: unknown[]) => unknown ? never : T[K];
+    [K in keyof T]: T[K] extends (...arguments_: unknown[]) => unknown
+        ? never
+        : T[K];
 };
 
 /**
@@ -113,7 +117,13 @@ export type StoreState<T> = {
  * Used by the updates store to track update progress and display
  * appropriate UI states to the user.
  */
-export type UpdateStatus = "available" | "checking" | "downloaded" | "downloading" | "error" | "idle";
+export type UpdateStatus =
+    | "available"
+    | "checking"
+    | "downloaded"
+    | "downloading"
+    | "error"
+    | "idle";
 
 /**
  * Re-exported core types from shared module for convenience.

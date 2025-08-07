@@ -65,18 +65,26 @@ describe("useSettingsStore", () => {
         vi.clearAllMocks();
 
         // Setup default mock returns
-        mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({ data: 1000 });
-        mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue({ data: true });
-        mockElectronAPI.settings.resetSettings.mockResolvedValue({ data: true });
+        mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
+            data: 1000,
+        });
+        mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue({
+            data: true,
+        });
+        mockElectronAPI.settings.resetSettings.mockResolvedValue({
+            data: true,
+        });
 
         mockExtractIpcData.mockImplementation((response: any) => response.data);
-        mockSafeExtractIpcData.mockImplementation((response: any, fallback: any) => {
-            try {
-                return response?.data ?? fallback;
-            } catch {
-                return fallback;
+        mockSafeExtractIpcData.mockImplementation(
+            (response: any, fallback: any) => {
+                try {
+                    return response?.data ?? fallback;
+                } catch {
+                    return fallback;
+                }
             }
-        });
+        );
 
         // Setup withErrorHandling to execute function properly
         mockWithErrorHandling.mockImplementation(async (fn, handlers) => {
@@ -127,7 +135,10 @@ describe("useSettingsStore", () => {
             const { result } = renderHook(() => useSettingsStore());
 
             act(() => {
-                result.current.updateSettings({ theme: "dark", notifications: false });
+                result.current.updateSettings({
+                    theme: "dark",
+                    notifications: false,
+                });
             });
 
             expect(result.current.settings.theme).toBe("dark");
@@ -151,11 +162,17 @@ describe("useSettingsStore", () => {
 
             // First update some settings
             act(() => {
-                result.current.updateSettings({ theme: "dark", notifications: false });
+                result.current.updateSettings({
+                    theme: "dark",
+                    notifications: false,
+                });
             });
 
             // Mock reset to return default value
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({ success: true, data: 1000 });
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
+                success: true,
+                data: 1000,
+            });
 
             // Then reset
             await act(async () => {
@@ -175,7 +192,9 @@ describe("useSettingsStore", () => {
 
     describe("initializeSettings", () => {
         it("should initialize settings from backend", async () => {
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({ data: 500 });
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
+                data: 500,
+            });
 
             const { result } = renderHook(() => useSettingsStore());
 
@@ -189,7 +208,10 @@ describe("useSettingsStore", () => {
         });
 
         it("should handle initialization errors gracefully", async () => {
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValueOnce({ success: false, error: "Backend error" });
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValueOnce({
+                success: false,
+                error: "Backend error",
+            });
 
             const { result } = renderHook(() => useSettingsStore());
 
@@ -227,25 +249,37 @@ describe("useSettingsStore", () => {
             const { result } = renderHook(() => useSettingsStore());
 
             // Mock backend responses
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({ success: true, data: 2000 });
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
+                success: true,
+                data: 2000,
+            });
 
             await act(async () => {
                 await result.current.updateHistoryLimitValue(2000);
             });
 
-            expect(mockElectronAPI.settings.updateHistoryLimit).toHaveBeenCalledWith(2000);
+            expect(
+                mockElectronAPI.settings.updateHistoryLimit
+            ).toHaveBeenCalledWith(2000);
             expect(mockSafeExtractIpcData).toHaveBeenCalled();
             expect(result.current.settings.historyLimit).toBe(2000);
-            expect(mockLogStoreAction).toHaveBeenCalledWith("SettingsStore", "updateHistoryLimitValue", {
-                limit: 2000,
-            });
+            expect(mockLogStoreAction).toHaveBeenCalledWith(
+                "SettingsStore",
+                "updateHistoryLimitValue",
+                {
+                    limit: 2000,
+                }
+            );
         });
 
         it("should validate history limit bounds", async () => {
             const { result } = renderHook(() => useSettingsStore());
 
             // Mock backend to return the same value (no clamping on frontend)
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({ success: true, data: 50 });
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
+                success: true,
+                data: 50,
+            });
 
             // Test update with small value
             await act(async () => {
@@ -255,7 +289,10 @@ describe("useSettingsStore", () => {
             expect(result.current.settings.historyLimit).toBe(50); // No clamping in frontend
 
             // Test large value
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({ success: true, data: 100000 });
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
+                success: true,
+                data: 100000,
+            });
 
             await act(async () => {
                 await result.current.updateHistoryLimitValue(100000);
@@ -275,16 +312,23 @@ describe("useSettingsStore", () => {
             });
 
             // Now mock the error AFTER setting initial state
-            mockElectronAPI.settings.updateHistoryLimit.mockRejectedValue(error);
+            mockElectronAPI.settings.updateHistoryLimit.mockRejectedValue(
+                error
+            );
 
             // Attempt update that will fail
             await act(async () => {
-                await expect(result.current.updateHistoryLimitValue(600)).rejects.toThrow("Update failed");
+                await expect(
+                    result.current.updateHistoryLimitValue(600)
+                ).rejects.toThrow("Update failed");
             });
 
             // Should be reverted to previous value (200), not the attempted value (600)
             expect(result.current.settings.historyLimit).toBe(200);
-            expect(mockErrorStore.setStoreError).toHaveBeenCalledWith("settings", error);
+            expect(mockErrorStore.setStoreError).toHaveBeenCalledWith(
+                "settings",
+                error
+            );
         });
 
         it("should handle all error cases in updateHistoryLimitValue", async () => {
@@ -296,7 +340,9 @@ describe("useSettingsStore", () => {
             });
 
             // Test that the function properly captures current state before starting
-            mockElectronAPI.settings.updateHistoryLimit.mockRejectedValue(new Error("Test error"));
+            mockElectronAPI.settings.updateHistoryLimit.mockRejectedValue(
+                new Error("Test error")
+            );
 
             await act(async () => {
                 try {
@@ -321,7 +367,9 @@ describe("useSettingsStore", () => {
 
             try {
                 await act(async () => {
-                    await expect(result.current.initializeSettings()).rejects.toThrow();
+                    await expect(
+                        result.current.initializeSettings()
+                    ).rejects.toThrow();
                 });
             } finally {
                 // Restore electronAPI
@@ -403,20 +451,29 @@ describe("useSettingsStore", () => {
                 await result.current.updateHistoryLimitValue(500);
             });
 
-            expect(mockErrorStore.clearStoreError).toHaveBeenCalledWith("settings");
+            expect(mockErrorStore.clearStoreError).toHaveBeenCalledWith(
+                "settings"
+            );
         });
 
         it("should maintain error state until cleared", async () => {
             const error = new Error("Persistent error");
-            mockElectronAPI.settings.updateHistoryLimit.mockRejectedValue(error);
+            mockElectronAPI.settings.updateHistoryLimit.mockRejectedValue(
+                error
+            );
 
             const { result } = renderHook(() => useSettingsStore());
 
             await act(async () => {
-                await expect(result.current.updateHistoryLimitValue(500)).rejects.toThrow();
+                await expect(
+                    result.current.updateHistoryLimitValue(500)
+                ).rejects.toThrow();
             });
 
-            expect(mockErrorStore.setStoreError).toHaveBeenCalledWith("settings", error);
+            expect(mockErrorStore.setStoreError).toHaveBeenCalledWith(
+                "settings",
+                error
+            );
         });
     });
 
@@ -449,36 +506,54 @@ describe("useSettingsStore", () => {
             const { result } = renderHook(() => useSettingsStore());
 
             // Mock backend response for getHistoryLimit
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({ success: true, data: 500 });
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
+                success: true,
+                data: 500,
+            });
 
             await act(async () => {
                 await result.current.updateHistoryLimitValue(500);
             });
 
             // Check that both updateHistoryLimitValue and updateSettings are logged
-            expect(mockLogStoreAction).toHaveBeenCalledWith("SettingsStore", "updateHistoryLimitValue", {
-                limit: 500,
-            });
-            expect(mockLogStoreAction).toHaveBeenCalledWith("SettingsStore", "updateSettings", {
-                newSettings: { historyLimit: 500 },
-            });
+            expect(mockLogStoreAction).toHaveBeenCalledWith(
+                "SettingsStore",
+                "updateHistoryLimitValue",
+                {
+                    limit: 500,
+                }
+            );
+            expect(mockLogStoreAction).toHaveBeenCalledWith(
+                "SettingsStore",
+                "updateSettings",
+                {
+                    newSettings: { historyLimit: 500 },
+                }
+            );
         });
 
         it("should log initialization actions", async () => {
             const { result } = renderHook(() => useSettingsStore());
 
             // Mock backend response
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({ success: true, data: 1000 });
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
+                success: true,
+                data: 1000,
+            });
 
             await act(async () => {
                 await result.current.initializeSettings();
             });
 
-            expect(mockLogStoreAction).toHaveBeenCalledWith("SettingsStore", "initializeSettings", {
-                message: "Successfully loaded settings",
-                settingsLoaded: true,
-                success: true,
-            });
+            expect(mockLogStoreAction).toHaveBeenCalledWith(
+                "SettingsStore",
+                "initializeSettings",
+                {
+                    message: "Successfully loaded settings",
+                    settingsLoaded: true,
+                    success: true,
+                }
+            );
         });
     });
 

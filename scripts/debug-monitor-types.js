@@ -3,7 +3,8 @@
     console.log("Testing monitor types IPC...");
 
     try {
-        const response = await window.electronAPI.monitorTypes.getMonitorTypes();
+        const response =
+            await window.electronAPI.monitorTypes.getMonitorTypes();
         console.log("Raw IPC response:", response);
         console.log("Response type:", typeof response);
         console.log("Response keys:", Object.keys(response || {}));

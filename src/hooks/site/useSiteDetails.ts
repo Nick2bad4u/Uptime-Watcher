@@ -17,7 +17,11 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { safeInteger } from "../../../shared/validation/validatorUtils";
-import { ChartTimeRange, DEFAULT_CHECK_INTERVAL, RETRY_CONSTRAINTS } from "../../constants";
+import {
+    ChartTimeRange,
+    DEFAULT_CHECK_INTERVAL,
+    RETRY_CONSTRAINTS,
+} from "../../constants";
 import logger from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
@@ -26,7 +30,11 @@ import { Monitor, Site } from "../../types";
 import { withUtilityErrorHandling } from "../../utils/errorHandling";
 import { getDefaultMonitorId } from "../../utils/monitorUiHelpers";
 import { validateMonitorFieldClientSide } from "../../utils/monitorValidation";
-import { clampTimeoutSeconds, getTimeoutSeconds, timeoutSecondsToMs } from "../../utils/timeoutUtils";
+import {
+    clampTimeoutSeconds,
+    getTimeoutSeconds,
+    timeoutSecondsToMs,
+} from "../../utils/timeoutUtils";
 import { type SiteAnalytics, useSiteAnalytics } from "./useSiteAnalytics";
 
 /**
@@ -122,7 +130,9 @@ export interface UseSiteDetailsResult {
  * ```
  */
 
-export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetailsResult {
+export function useSiteDetails({
+    site,
+}: UseSiteDetailsProperties): UseSiteDetailsResult {
     const {
         checkSiteNow,
         deleteSite,
@@ -161,10 +171,13 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
 
     const monitorIds = currentSite.monitors.map((m) => m.id);
     const defaultMonitorId = getDefaultMonitorId(monitorIds);
-    const selectedMonitorId = getSelectedMonitorId(currentSite.identifier) ?? defaultMonitorId;
+    const selectedMonitorId =
+        getSelectedMonitorId(currentSite.identifier) ?? defaultMonitorId;
 
     // Find the selected monitor, and if it doesn't exist, update the selection to the first monitor
-    const foundMonitor = currentSite.monitors.find((m) => m.id === selectedMonitorId);
+    const foundMonitor = currentSite.monitors.find(
+        (m) => m.id === selectedMonitorId
+    );
     const selectedMonitor = foundMonitor ?? currentSite.monitors[0];
 
     // Use useEffect to handle stale monitor ID updates (avoid state updates during render)
@@ -173,24 +186,40 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
         if (!foundMonitor && selectedMonitor) {
             setSelectedMonitorId(currentSite.identifier, selectedMonitor.id);
         }
-    }, [foundMonitor, selectedMonitor, currentSite.identifier, setSelectedMonitorId]);
+    }, [
+        foundMonitor,
+        selectedMonitor,
+        currentSite.identifier,
+        setSelectedMonitorId,
+    ]);
 
-    const isMonitoring = selectedMonitor ? selectedMonitor.monitoring !== false : false;
+    const isMonitoring = selectedMonitor
+        ? selectedMonitor.monitoring !== false
+        : false;
 
     // Check interval state - track user edits separately from monitor defaults
-    const [userEditedCheckInterval, setUserEditedCheckInterval] = useState<number>();
+    const [userEditedCheckInterval, setUserEditedCheckInterval] =
+        useState<number>();
     const [intervalChanged, setIntervalChanged] = useState(false);
-    const localCheckInterval = userEditedCheckInterval ?? selectedMonitor?.checkInterval ?? DEFAULT_CHECK_INTERVAL;
+    const localCheckInterval =
+        userEditedCheckInterval ??
+        selectedMonitor?.checkInterval ??
+        DEFAULT_CHECK_INTERVAL;
 
     // Timeout state (stored in seconds for UI, converted to ms when saving)
     const [userEditedTimeout, setUserEditedTimeout] = useState<number>();
     const [timeoutChanged, setTimeoutChanged] = useState(false);
-    const localTimeout = userEditedTimeout ?? getTimeoutSeconds(selectedMonitor?.timeout);
+    const localTimeout =
+        userEditedTimeout ?? getTimeoutSeconds(selectedMonitor?.timeout);
 
     // Retry attempts state - track user edits separately from monitor defaults
-    const [userEditedRetryAttempts, setUserEditedRetryAttempts] = useState<number>();
+    const [userEditedRetryAttempts, setUserEditedRetryAttempts] =
+        useState<number>();
     const [retryAttemptsChanged, setRetryAttemptsChanged] = useState(false);
-    const localRetryAttempts = userEditedRetryAttempts ?? selectedMonitor?.retryAttempts ?? RETRY_CONSTRAINTS.DEFAULT;
+    const localRetryAttempts =
+        userEditedRetryAttempts ??
+        selectedMonitor?.retryAttempts ??
+        RETRY_CONSTRAINTS.DEFAULT;
 
     // Site name state for settings
     const [localName, setLocalName] = useState(currentSite.name);
@@ -220,7 +249,9 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
             async () => {
                 logger.user.action("Manual site check initiated", {
                     monitorId: selectedMonitorId,
-                    monitorType: currentSite.monitors.find((m) => m.id === selectedMonitorId)?.type,
+                    monitorType: currentSite.monitors.find(
+                        (m) => m.id === selectedMonitorId
+                    )?.type,
                     siteId: currentSite.identifier,
                     siteName: currentSite.name,
                 });
@@ -257,12 +288,21 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
                 setActiveSiteDetailsTab(`${newId}-analytics`);
             }
         },
-        [currentSite.identifier, activeSiteDetailsTab, setSelectedMonitorId, setActiveSiteDetailsTab]
+        [
+            currentSite.identifier,
+            activeSiteDetailsTab,
+            setSelectedMonitorId,
+            setActiveSiteDetailsTab,
+        ]
     );
 
     // Handler for site removal
     const handleRemoveSite = useCallback(async () => {
-        if (!globalThis.confirm(`Are you sure you want to remove ${currentSite.name}?`)) {
+        if (
+            !globalThis.confirm(
+                `Are you sure you want to remove ${currentSite.name}?`
+            )
+        ) {
             return;
         }
 
@@ -282,11 +322,15 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
     // Handler for monitor removal
     const handleRemoveMonitor = useCallback(async () => {
         if (!selectedMonitor) {
-            logger.site.error(currentSite.identifier, "No monitor selected for removal");
+            logger.site.error(
+                currentSite.identifier,
+                "No monitor selected for removal"
+            );
             return;
         }
 
-        const monitorName = selectedMonitor.url ?? selectedMonitor.host ?? selectedMonitor.type;
+        const monitorName =
+            selectedMonitor.url ?? selectedMonitor.host ?? selectedMonitor.type;
         if (
             !globalThis.confirm(
                 `Are you sure you want to remove the monitor "${monitorName}" from ${currentSite.name}?`
@@ -299,7 +343,10 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
 
         await withUtilityErrorHandling(
             async () => {
-                await removeMonitorFromSite(currentSite.identifier, selectedMonitor.id);
+                await removeMonitorFromSite(
+                    currentSite.identifier,
+                    selectedMonitor.id
+                );
                 logger.user.action("Monitor removed successfully", {
                     monitorId: selectedMonitor.id,
                     monitorType: selectedMonitor.type,
@@ -374,7 +421,10 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
         clearError();
         await withUtilityErrorHandling(
             async () => {
-                await startSiteMonitorMonitoring(currentSite.identifier, selectedMonitorId);
+                await startSiteMonitorMonitoring(
+                    currentSite.identifier,
+                    selectedMonitorId
+                );
                 logger.user.action("Started monitoring", {
                     monitorId: selectedMonitorId,
                     siteId: currentSite.identifier,
@@ -384,13 +434,21 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
             undefined,
             false
         );
-    }, [currentSite.identifier, selectedMonitorId, startSiteMonitorMonitoring, clearError]);
+    }, [
+        currentSite.identifier,
+        selectedMonitorId,
+        startSiteMonitorMonitoring,
+        clearError,
+    ]);
 
     const handleStopMonitoring = useCallback(async () => {
         clearError();
         await withUtilityErrorHandling(
             async () => {
-                await stopSiteMonitorMonitoring(currentSite.identifier, selectedMonitorId);
+                await stopSiteMonitorMonitoring(
+                    currentSite.identifier,
+                    selectedMonitorId
+                );
                 logger.user.action("Stopped monitoring", {
                     monitorId: selectedMonitorId,
                     siteId: currentSite.identifier,
@@ -400,12 +458,20 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
             undefined,
             false
         );
-    }, [currentSite.identifier, selectedMonitorId, stopSiteMonitorMonitoring, clearError]);
+    }, [
+        currentSite.identifier,
+        selectedMonitorId,
+        stopSiteMonitorMonitoring,
+        clearError,
+    ]);
 
     // Interval change handlers
     const handleIntervalChange = useCallback(
         (e: React.ChangeEvent<HTMLSelectElement>) => {
-            const newInterval = safeInteger(e.target.value, DEFAULT_CHECK_INTERVAL);
+            const newInterval = safeInteger(
+                e.target.value,
+                DEFAULT_CHECK_INTERVAL
+            );
             setUserEditedCheckInterval(newInterval);
             setIntervalChanged(newInterval !== selectedMonitor?.checkInterval);
         },
@@ -423,12 +489,18 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
         );
 
         if (!validationResult.success) {
-            const validationError = new Error(`Validation failed: ${validationResult.errors.join(", ")}`);
+            const validationError = new Error(
+                `Validation failed: ${validationResult.errors.join(", ")}`
+            );
             logger.site.error(currentSite.identifier, validationError);
             throw validationError;
         }
 
-        await updateSiteCheckInterval(currentSite.identifier, selectedMonitorId, localCheckInterval);
+        await updateSiteCheckInterval(
+            currentSite.identifier,
+            selectedMonitorId,
+            localCheckInterval
+        );
         setIntervalChanged(false);
         logger.user.action("Updated check interval", {
             monitorId: selectedMonitorId,
@@ -448,10 +520,14 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
     const handleTimeoutChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             // Work directly with seconds in the UI
-            const timeoutInSeconds = clampTimeoutSeconds(safeInteger(e.target.value, 5));
+            const timeoutInSeconds = clampTimeoutSeconds(
+                safeInteger(e.target.value, 5)
+            );
             setUserEditedTimeout(timeoutInSeconds);
             // Compare against the monitor's timeout converted to seconds
-            const currentTimeoutInSeconds = getTimeoutSeconds(selectedMonitor?.timeout);
+            const currentTimeoutInSeconds = getTimeoutSeconds(
+                selectedMonitor?.timeout
+            );
             setTimeoutChanged(timeoutInSeconds !== currentTimeoutInSeconds);
         },
         [selectedMonitor?.timeout]
@@ -469,12 +545,18 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
         );
 
         if (!validationResult.success) {
-            const validationError = new Error(`Validation failed: ${validationResult.errors.join(", ")}`);
+            const validationError = new Error(
+                `Validation failed: ${validationResult.errors.join(", ")}`
+            );
             logger.site.error(currentSite.identifier, validationError);
             throw validationError;
         }
 
-        await updateMonitorTimeout(currentSite.identifier, selectedMonitorId, timeoutInMs);
+        await updateMonitorTimeout(
+            currentSite.identifier,
+            selectedMonitorId,
+            timeoutInMs
+        );
         setTimeoutChanged(false);
         logger.user.action("Updated monitor timeout", {
             monitorId: selectedMonitorId,
@@ -513,12 +595,18 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
 
         if (!validationResult.success) {
             // Log validation error and let the store operation handle it normally
-            const validationError = new Error(`Validation failed: ${validationResult.errors.join(", ")}`);
+            const validationError = new Error(
+                `Validation failed: ${validationResult.errors.join(", ")}`
+            );
             logger.site.error(currentSite.identifier, validationError);
             throw validationError;
         }
 
-        await updateMonitorRetryAttempts(currentSite.identifier, selectedMonitorId, localRetryAttempts);
+        await updateMonitorRetryAttempts(
+            currentSite.identifier,
+            selectedMonitorId,
+            localRetryAttempts
+        );
         setRetryAttemptsChanged(false);
         logger.user.action("Updated monitor retry attempts", {
             monitorId: selectedMonitorId,
@@ -551,7 +639,10 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
                     };
                     await modifySite(currentSite.identifier, updates);
                 }
-                logger.user.action("Updated site name", { identifier: currentSite.identifier, name: localName.trim() });
+                logger.user.action("Updated site name", {
+                    identifier: currentSite.identifier,
+                    name: localName.trim(),
+                });
             },
             "Save site name",
             undefined,
@@ -566,7 +657,10 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetai
     ]);
 
     // Use analytics hook
-    const analytics = useSiteAnalytics(selectedMonitor, siteDetailsChartTimeRange);
+    const analytics = useSiteAnalytics(
+        selectedMonitor,
+        siteDetailsChartTimeRange
+    );
 
     // Check if site exists
     const siteExists = sites.some((s) => s.identifier === site.identifier);

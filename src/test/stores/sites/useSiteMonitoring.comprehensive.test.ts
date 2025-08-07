@@ -55,7 +55,10 @@ describe("useSiteMonitoring", () => {
 
             await actions.checkSiteNow(siteId, monitorId);
 
-            expect(mockElectronAPI.sites.checkSiteNow).toHaveBeenCalledWith(siteId, monitorId);
+            expect(mockElectronAPI.sites.checkSiteNow).toHaveBeenCalledWith(
+                siteId,
+                monitorId
+            );
         });
     });
 
@@ -65,7 +68,9 @@ describe("useSiteMonitoring", () => {
 
             await actions.startSiteMonitoring(siteId);
 
-            expect(mockElectronAPI.monitoring.startMonitoringForSite).toHaveBeenCalledWith(siteId);
+            expect(
+                mockElectronAPI.monitoring.startMonitoringForSite
+            ).toHaveBeenCalledWith(siteId);
         });
     });
 
@@ -76,7 +81,9 @@ describe("useSiteMonitoring", () => {
 
             await actions.startSiteMonitorMonitoring(siteId, monitorId);
 
-            expect(mockElectronAPI.monitoring.startMonitoringForSite).toHaveBeenCalledWith(siteId, monitorId);
+            expect(
+                mockElectronAPI.monitoring.startMonitoringForSite
+            ).toHaveBeenCalledWith(siteId, monitorId);
         });
     });
 
@@ -86,7 +93,9 @@ describe("useSiteMonitoring", () => {
 
             await actions.stopSiteMonitoring(siteId);
 
-            expect(mockElectronAPI.monitoring.stopMonitoringForSite).toHaveBeenCalledWith(siteId);
+            expect(
+                mockElectronAPI.monitoring.stopMonitoringForSite
+            ).toHaveBeenCalledWith(siteId);
         });
     });
 
@@ -97,7 +106,9 @@ describe("useSiteMonitoring", () => {
 
             await actions.stopSiteMonitorMonitoring(siteId, monitorId);
 
-            expect(mockElectronAPI.monitoring.stopMonitoringForSite).toHaveBeenCalledWith(siteId, monitorId);
+            expect(
+                mockElectronAPI.monitoring.stopMonitoringForSite
+            ).toHaveBeenCalledWith(siteId, monitorId);
         });
     });
 });

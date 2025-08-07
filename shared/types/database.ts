@@ -333,7 +333,11 @@ export function isValidSiteRow(obj: unknown): obj is SiteRow {
  * const name = safeGetRowProperty(row, "name", "Unknown");
  * ```
  */
-export function safeGetRowProperty<T>(row: Record<string, unknown>, property: string, defaultValue: T): T {
+export function safeGetRowProperty<T>(
+    row: Record<string, unknown>,
+    property: string,
+    defaultValue: T
+): T {
     if (property in row && row[property] !== undefined) {
         return row[property] as T;
     }

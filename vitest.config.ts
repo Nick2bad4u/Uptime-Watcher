@@ -4,7 +4,11 @@
  * Settings match the test configuration from vite.config.ts.
  */
 
-import { defineConfig, mergeConfig, type UserConfigFnObject } from "vitest/config";
+import {
+    defineConfig,
+    mergeConfig,
+    type UserConfigFnObject,
+} from "vitest/config";
 
 import viteConfig from "./vite.config";
 

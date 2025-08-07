@@ -5,7 +5,13 @@
 
 import { describe, expect, it } from "vitest";
 
-import type { Monitor, MonitorType, Site, StatusHistory, StatusUpdate } from "../types";
+import type {
+    Monitor,
+    MonitorType,
+    Site,
+    StatusHistory,
+    StatusUpdate,
+} from "../types";
 
 describe("Electron Types", () => {
     describe("MonitorType", () => {

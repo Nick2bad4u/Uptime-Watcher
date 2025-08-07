@@ -38,7 +38,9 @@ vi.mock("../../../../shared/utils/environment", () => ({
 
 // Mock log templates
 vi.mock("../../../../shared/utils/logTemplates", () => ({
-    interpolateLogTemplate: vi.fn((template, data) => `${template} ${JSON.stringify(data)}`),
+    interpolateLogTemplate: vi.fn(
+        (template, data) => `${template} ${JSON.stringify(data)}`
+    ),
     createTemplateLogger: vi.fn((baseLogger) => baseLogger),
     LOG_TEMPLATES: {
         services: {
@@ -50,28 +52,42 @@ vi.mock("../../../../shared/utils/logTemplates", () => ({
             APPLICATION_ACTIVATED: "APPLICATION_ACTIVATED",
             APPLICATION_CREATING_WINDOW: "APPLICATION_CREATING_WINDOW",
             APPLICATION_READY: "APPLICATION_READY",
-            APPLICATION_SERVICES_INITIALIZED: "APPLICATION_SERVICES_INITIALIZED",
+            APPLICATION_SERVICES_INITIALIZED:
+                "APPLICATION_SERVICES_INITIALIZED",
         },
         errors: {
             APPLICATION_CLEANUP_ERROR: "APPLICATION_CLEANUP_ERROR",
             APPLICATION_UPDATE_CHECK_ERROR: "APPLICATION_UPDATE_CHECK_ERROR",
-            APPLICATION_FORWARD_MONITOR_UP_ERROR: "APPLICATION_FORWARD_MONITOR_UP_ERROR",
-            APPLICATION_FORWARD_MONITOR_DOWN_ERROR: "APPLICATION_FORWARD_MONITOR_DOWN_ERROR",
+            APPLICATION_FORWARD_MONITOR_UP_ERROR:
+                "APPLICATION_FORWARD_MONITOR_UP_ERROR",
+            APPLICATION_FORWARD_MONITOR_DOWN_ERROR:
+                "APPLICATION_FORWARD_MONITOR_DOWN_ERROR",
             APPLICATION_SYSTEM_ERROR: "APPLICATION_SYSTEM_ERROR",
-            APPLICATION_FORWARD_MONITORING_STARTED_ERROR: "APPLICATION_FORWARD_MONITORING_STARTED_ERROR",
-            APPLICATION_FORWARD_MONITORING_STOPPED_ERROR: "APPLICATION_FORWARD_MONITORING_STOPPED_ERROR",
-            APPLICATION_FORWARD_CACHE_INVALIDATION_ERROR: "APPLICATION_FORWARD_CACHE_INVALIDATION_ERROR",
-            APPLICATION_INITIALIZATION_ERROR: "APPLICATION_INITIALIZATION_ERROR",
-            APPLICATION_FORWARD_MONITOR_STATUS_ERROR: "APPLICATION_FORWARD_MONITOR_STATUS_ERROR",
+            APPLICATION_FORWARD_MONITORING_STARTED_ERROR:
+                "APPLICATION_FORWARD_MONITORING_STARTED_ERROR",
+            APPLICATION_FORWARD_MONITORING_STOPPED_ERROR:
+                "APPLICATION_FORWARD_MONITORING_STOPPED_ERROR",
+            APPLICATION_FORWARD_CACHE_INVALIDATION_ERROR:
+                "APPLICATION_FORWARD_CACHE_INVALIDATION_ERROR",
+            APPLICATION_INITIALIZATION_ERROR:
+                "APPLICATION_INITIALIZATION_ERROR",
+            APPLICATION_FORWARD_MONITOR_STATUS_ERROR:
+                "APPLICATION_FORWARD_MONITOR_STATUS_ERROR",
         },
         debug: {
             APPLICATION_CLEANUP_SERVICE: "APPLICATION_CLEANUP_SERVICE",
-            APPLICATION_FORWARDING_MONITOR_UP: "APPLICATION_FORWARDING_MONITOR_UP",
-            APPLICATION_FORWARDING_MONITOR_DOWN: "APPLICATION_FORWARDING_MONITOR_DOWN",
-            APPLICATION_FORWARDING_MONITORING_STARTED: "APPLICATION_FORWARDING_MONITORING_STARTED",
-            APPLICATION_FORWARDING_MONITORING_STOPPED: "APPLICATION_FORWARDING_MONITORING_STOPPED",
-            APPLICATION_FORWARDING_CACHE_INVALIDATION: "APPLICATION_FORWARDING_CACHE_INVALIDATION",
-            APPLICATION_FORWARDING_MONITOR_STATUS: "APPLICATION_FORWARDING_MONITOR_STATUS",
+            APPLICATION_FORWARDING_MONITOR_UP:
+                "APPLICATION_FORWARDING_MONITOR_UP",
+            APPLICATION_FORWARDING_MONITOR_DOWN:
+                "APPLICATION_FORWARDING_MONITOR_DOWN",
+            APPLICATION_FORWARDING_MONITORING_STARTED:
+                "APPLICATION_FORWARDING_MONITORING_STARTED",
+            APPLICATION_FORWARDING_MONITORING_STOPPED:
+                "APPLICATION_FORWARDING_MONITORING_STOPPED",
+            APPLICATION_FORWARDING_CACHE_INVALIDATION:
+                "APPLICATION_FORWARDING_CACHE_INVALIDATION",
+            APPLICATION_FORWARDING_MONITOR_STATUS:
+                "APPLICATION_FORWARDING_MONITOR_STATUS",
         },
         warnings: {
             APPLICATION_MONITOR_DOWN: "APPLICATION_MONITOR_DOWN",
@@ -135,8 +151,12 @@ describe("ApplicationService", () => {
         vi.clearAllMocks();
 
         // Get the mocked ServiceContainer reference
-        const serviceContainerModule = await import("../../../services/ServiceContainer");
-        mockServiceContainer = vi.mocked(serviceContainerModule.ServiceContainer);
+        const serviceContainerModule = await import(
+            "../../../services/ServiceContainer"
+        );
+        mockServiceContainer = vi.mocked(
+            serviceContainerModule.ServiceContainer
+        );
 
         // Get the mocked app reference
         const electron = await import("electron");
@@ -145,10 +165,18 @@ describe("ApplicationService", () => {
         // Setup mock returns
         mockServiceContainer.getInstance.mockReturnValue(mockServiceContainer);
         mockServiceContainer.getIpcService.mockReturnValue(mockIpcService);
-        mockServiceContainer.getUptimeOrchestrator.mockReturnValue(mockUptimeOrchestrator);
-        mockServiceContainer.getWindowService.mockReturnValue(mockWindowService);
-        mockServiceContainer.getAutoUpdaterService.mockReturnValue(mockAutoUpdaterService);
-        mockServiceContainer.getNotificationService.mockReturnValue(mockNotificationService);
+        mockServiceContainer.getUptimeOrchestrator.mockReturnValue(
+            mockUptimeOrchestrator
+        );
+        mockServiceContainer.getWindowService.mockReturnValue(
+            mockWindowService
+        );
+        mockServiceContainer.getAutoUpdaterService.mockReturnValue(
+            mockAutoUpdaterService
+        );
+        mockServiceContainer.getNotificationService.mockReturnValue(
+            mockNotificationService
+        );
 
         // Mock process platform
         Object.defineProperty(process, "platform", {
@@ -167,7 +195,9 @@ describe("ApplicationService", () => {
             applicationService = new ApplicationService();
 
             // Assert
-            expect(mockLogger.info).toHaveBeenCalledWith("APPLICATION_INITIALIZING");
+            expect(mockLogger.info).toHaveBeenCalledWith(
+                "APPLICATION_INITIALIZING"
+            );
             expect(mockServiceContainer.getInstance).toHaveBeenCalledWith({
                 enableDebugLogging: false,
             });
@@ -176,7 +206,9 @@ describe("ApplicationService", () => {
 
         it("should enable debug logging in development environment", async () => {
             // Arrange
-            const { isDevelopment } = await import("../../../../shared/utils/environment");
+            const { isDevelopment } = await import(
+                "../../../../shared/utils/environment"
+            );
             vi.mocked(isDevelopment).mockReturnValue(true);
 
             // Act
@@ -193,40 +225,75 @@ describe("ApplicationService", () => {
             applicationService = new ApplicationService();
 
             // Assert
-            expect(mockApp.on).toHaveBeenCalledWith("ready", expect.any(Function));
-            expect(mockApp.on).toHaveBeenCalledWith("window-all-closed", expect.any(Function));
-            expect(mockApp.on).toHaveBeenCalledWith("activate", expect.any(Function));
+            expect(mockApp.on).toHaveBeenCalledWith(
+                "ready",
+                expect.any(Function)
+            );
+            expect(mockApp.on).toHaveBeenCalledWith(
+                "window-all-closed",
+                expect.any(Function)
+            );
+            expect(mockApp.on).toHaveBeenCalledWith(
+                "activate",
+                expect.any(Function)
+            );
         });
 
         it("should setup auto updater when ready event fires", async () => {
             // Arrange
             applicationService = new ApplicationService();
-            const readyHandler = mockApp.on.mock.calls.find((call) => call[0] === "ready")?.[1];
+            const readyHandler = mockApp.on.mock.calls.find(
+                (call) => call[0] === "ready"
+            )?.[1];
 
             // Act
             await readyHandler?.();
 
             // Assert
-            expect(mockAutoUpdaterService.setStatusCallback).toHaveBeenCalledWith(expect.any(Function));
+            expect(
+                mockAutoUpdaterService.setStatusCallback
+            ).toHaveBeenCalledWith(expect.any(Function));
             expect(mockAutoUpdaterService.initialize).toHaveBeenCalledTimes(1);
-            expect(mockAutoUpdaterService.checkForUpdates).toHaveBeenCalledTimes(1);
+            expect(
+                mockAutoUpdaterService.checkForUpdates
+            ).toHaveBeenCalledTimes(1);
         });
 
         it("should setup uptime monitoring event handlers when ready event fires", async () => {
             // Arrange
             applicationService = new ApplicationService();
-            const readyHandler = mockApp.on.mock.calls.find((call) => call[0] === "ready")?.[1];
+            const readyHandler = mockApp.on.mock.calls.find(
+                (call) => call[0] === "ready"
+            )?.[1];
 
             // Act
             await readyHandler?.();
 
             // Assert
-            expect(mockUptimeOrchestrator.onTyped).toHaveBeenCalledWith("monitor:up", expect.any(Function));
-            expect(mockUptimeOrchestrator.onTyped).toHaveBeenCalledWith("monitor:down", expect.any(Function));
-            expect(mockUptimeOrchestrator.onTyped).toHaveBeenCalledWith("system:error", expect.any(Function));
-            expect(mockUptimeOrchestrator.onTyped).toHaveBeenCalledWith("monitoring:started", expect.any(Function));
-            expect(mockUptimeOrchestrator.onTyped).toHaveBeenCalledWith("monitoring:stopped", expect.any(Function));
-            expect(mockUptimeOrchestrator.onTyped).toHaveBeenCalledWith("cache:invalidated", expect.any(Function));
+            expect(mockUptimeOrchestrator.onTyped).toHaveBeenCalledWith(
+                "monitor:up",
+                expect.any(Function)
+            );
+            expect(mockUptimeOrchestrator.onTyped).toHaveBeenCalledWith(
+                "monitor:down",
+                expect.any(Function)
+            );
+            expect(mockUptimeOrchestrator.onTyped).toHaveBeenCalledWith(
+                "system:error",
+                expect.any(Function)
+            );
+            expect(mockUptimeOrchestrator.onTyped).toHaveBeenCalledWith(
+                "monitoring:started",
+                expect.any(Function)
+            );
+            expect(mockUptimeOrchestrator.onTyped).toHaveBeenCalledWith(
+                "monitoring:stopped",
+                expect.any(Function)
+            );
+            expect(mockUptimeOrchestrator.onTyped).toHaveBeenCalledWith(
+                "cache:invalidated",
+                expect.any(Function)
+            );
         });
     });
 
@@ -237,8 +304,12 @@ describe("ApplicationService", () => {
             // Make sure all service getter methods return mocked instances
             // to avoid the SiteManager dependency errors
             mockServiceContainer.getIpcService.mockReturnValue(mockIpcService);
-            mockServiceContainer.getUptimeOrchestrator.mockReturnValue(mockUptimeOrchestrator);
-            mockServiceContainer.getWindowService.mockReturnValue(mockWindowService);
+            mockServiceContainer.getUptimeOrchestrator.mockReturnValue(
+                mockUptimeOrchestrator
+            );
+            mockServiceContainer.getWindowService.mockReturnValue(
+                mockWindowService
+            );
         });
 
         it("should cleanup all services successfully", async () => {
@@ -249,12 +320,20 @@ describe("ApplicationService", () => {
             await applicationService.cleanup();
 
             // Assert
-            expect(mockLogger.info).toHaveBeenCalledWith("APPLICATION_CLEANUP_START");
-            expect(mockServiceContainer.getInitializedServices).toHaveBeenCalledTimes(1);
+            expect(mockLogger.info).toHaveBeenCalledWith(
+                "APPLICATION_CLEANUP_START"
+            );
+            expect(
+                mockServiceContainer.getInitializedServices
+            ).toHaveBeenCalledTimes(1);
             expect(mockIpcService.cleanup).toHaveBeenCalledTimes(1);
-            expect(mockUptimeOrchestrator.stopMonitoring).toHaveBeenCalledTimes(1);
+            expect(mockUptimeOrchestrator.stopMonitoring).toHaveBeenCalledTimes(
+                1
+            );
             expect(mockWindowService.closeMainWindow).toHaveBeenCalledTimes(1);
-            expect(mockLogger.info).toHaveBeenCalledWith("APPLICATION_CLEANUP_COMPLETE");
+            expect(mockLogger.info).toHaveBeenCalledWith(
+                "APPLICATION_CLEANUP_COMPLETE"
+            );
         });
 
         it("should handle cleanup errors properly", async () => {
@@ -263,8 +342,13 @@ describe("ApplicationService", () => {
             mockUptimeOrchestrator.stopMonitoring.mockRejectedValue(error);
 
             // Act & Assert
-            await expect(applicationService.cleanup()).rejects.toThrow("Cleanup failed");
-            expect(mockLogger.error).toHaveBeenCalledWith("APPLICATION_CLEANUP_ERROR", error);
+            await expect(applicationService.cleanup()).rejects.toThrow(
+                "Cleanup failed"
+            );
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "APPLICATION_CLEANUP_ERROR",
+                error
+            );
         });
 
         it("should cleanup IPC service if cleanup method exists", async () => {
@@ -278,13 +362,17 @@ describe("ApplicationService", () => {
         it("should handle IPC service without cleanup method", async () => {
             // Arrange
             const ipcServiceWithoutCleanup = {};
-            mockServiceContainer.getIpcService.mockReturnValue(ipcServiceWithoutCleanup);
+            mockServiceContainer.getIpcService.mockReturnValue(
+                ipcServiceWithoutCleanup
+            );
 
             // Act
             await applicationService.cleanup();
 
             // Assert - Should not throw and should continue with other cleanup
-            expect(mockUptimeOrchestrator.stopMonitoring).toHaveBeenCalledTimes(1);
+            expect(mockUptimeOrchestrator.stopMonitoring).toHaveBeenCalledTimes(
+                1
+            );
             expect(mockWindowService.closeMainWindow).toHaveBeenCalledTimes(1);
         });
     });
@@ -297,7 +385,10 @@ describe("ApplicationService", () => {
         describe("window-all-closed event", () => {
             it("should quit app on non-macOS platforms", () => {
                 // Arrange
-                Object.defineProperty(process, "platform", { value: "win32", writable: true });
+                Object.defineProperty(process, "platform", {
+                    value: "win32",
+                    writable: true,
+                });
                 const windowAllClosedHandler = mockApp.on.mock.calls.find(
                     (call) => call[0] === "window-all-closed"
                 )?.[1];
@@ -306,14 +397,21 @@ describe("ApplicationService", () => {
                 windowAllClosedHandler?.();
 
                 // Assert
-                expect(mockLogger.info).toHaveBeenCalledWith("APPLICATION_WINDOWS_CLOSED");
-                expect(mockLogger.info).toHaveBeenCalledWith("APPLICATION_QUITTING");
+                expect(mockLogger.info).toHaveBeenCalledWith(
+                    "APPLICATION_WINDOWS_CLOSED"
+                );
+                expect(mockLogger.info).toHaveBeenCalledWith(
+                    "APPLICATION_QUITTING"
+                );
                 expect(mockApp.quit).toHaveBeenCalledTimes(1);
             });
 
             it("should not quit app on macOS platform", () => {
                 // Arrange
-                Object.defineProperty(process, "platform", { value: "darwin", writable: true });
+                Object.defineProperty(process, "platform", {
+                    value: "darwin",
+                    writable: true,
+                });
                 const windowAllClosedHandler = mockApp.on.mock.calls.find(
                     (call) => call[0] === "window-all-closed"
                 )?.[1];
@@ -322,7 +420,9 @@ describe("ApplicationService", () => {
                 windowAllClosedHandler?.();
 
                 // Assert
-                expect(mockLogger.info).toHaveBeenCalledWith("APPLICATION_WINDOWS_CLOSED");
+                expect(mockLogger.info).toHaveBeenCalledWith(
+                    "APPLICATION_WINDOWS_CLOSED"
+                );
                 expect(mockApp.quit).not.toHaveBeenCalled();
             });
         });
@@ -331,30 +431,48 @@ describe("ApplicationService", () => {
             it("should create main window when no windows exist", () => {
                 // Arrange
                 mockWindowService.getAllWindows.mockReturnValue([]);
-                const activateHandler = mockApp.on.mock.calls.find((call) => call[0] === "activate")?.[1];
+                const activateHandler = mockApp.on.mock.calls.find(
+                    (call) => call[0] === "activate"
+                )?.[1];
 
                 // Act
                 activateHandler?.();
 
                 // Assert
-                expect(mockLogger.info).toHaveBeenCalledWith("APPLICATION_ACTIVATED");
-                expect(mockWindowService.getAllWindows).toHaveBeenCalledTimes(1);
-                expect(mockLogger.info).toHaveBeenCalledWith("APPLICATION_CREATING_WINDOW");
-                expect(mockWindowService.createMainWindow).toHaveBeenCalledTimes(1);
+                expect(mockLogger.info).toHaveBeenCalledWith(
+                    "APPLICATION_ACTIVATED"
+                );
+                expect(mockWindowService.getAllWindows).toHaveBeenCalledTimes(
+                    1
+                );
+                expect(mockLogger.info).toHaveBeenCalledWith(
+                    "APPLICATION_CREATING_WINDOW"
+                );
+                expect(
+                    mockWindowService.createMainWindow
+                ).toHaveBeenCalledTimes(1);
             });
 
             it("should not create window when windows exist", () => {
                 // Arrange
                 mockWindowService.getAllWindows.mockReturnValue([{ id: 1 }]);
-                const activateHandler = mockApp.on.mock.calls.find((call) => call[0] === "activate")?.[1];
+                const activateHandler = mockApp.on.mock.calls.find(
+                    (call) => call[0] === "activate"
+                )?.[1];
 
                 // Act
                 activateHandler?.();
 
                 // Assert
-                expect(mockLogger.info).toHaveBeenCalledWith("APPLICATION_ACTIVATED");
-                expect(mockWindowService.getAllWindows).toHaveBeenCalledTimes(1);
-                expect(mockWindowService.createMainWindow).not.toHaveBeenCalled();
+                expect(mockLogger.info).toHaveBeenCalledWith(
+                    "APPLICATION_ACTIVATED"
+                );
+                expect(mockWindowService.getAllWindows).toHaveBeenCalledTimes(
+                    1
+                );
+                expect(
+                    mockWindowService.createMainWindow
+                ).not.toHaveBeenCalled();
             });
         });
     });
@@ -362,20 +480,26 @@ describe("ApplicationService", () => {
     describe("Auto Updater Setup", () => {
         beforeEach(async () => {
             applicationService = new ApplicationService();
-            const readyHandler = mockApp.on.mock.calls.find((call) => call[0] === "ready")?.[1];
+            const readyHandler = mockApp.on.mock.calls.find(
+                (call) => call[0] === "ready"
+            )?.[1];
             await readyHandler?.();
         });
 
         it("should setup auto updater status callback", () => {
             // Arrange
-            const statusCallback = mockAutoUpdaterService.setStatusCallback.mock.calls[0][0];
+            const statusCallback =
+                mockAutoUpdaterService.setStatusCallback.mock.calls[0][0];
             const statusData = { status: "checking-for-update" };
 
             // Act
             statusCallback(statusData);
 
             // Assert
-            expect(mockWindowService.sendToRenderer).toHaveBeenCalledWith("update-status", statusData);
+            expect(mockWindowService.sendToRenderer).toHaveBeenCalledWith(
+                "update-status",
+                statusData
+            );
         });
 
         it("should handle auto updater check errors", async () => {
@@ -385,7 +509,9 @@ describe("ApplicationService", () => {
 
             // Create new instance to trigger the error
             const newApplicationService = new ApplicationService();
-            const readyHandler = mockApp.on.mock.calls.find((call) => call[0] === "ready")?.[1];
+            const readyHandler = mockApp.on.mock.calls.find(
+                (call) => call[0] === "ready"
+            )?.[1];
 
             // Act
             await readyHandler?.();
@@ -394,23 +520,29 @@ describe("ApplicationService", () => {
             await new Promise((resolve) => setTimeout(resolve, 0));
 
             // Assert
-            expect(mockLogger.error).toHaveBeenCalledWith("APPLICATION_UPDATE_CHECK_ERROR", error);
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "APPLICATION_UPDATE_CHECK_ERROR",
+                error
+            );
         });
     });
 
     describe("Uptime Monitoring Event Handlers", () => {
         beforeEach(async () => {
             applicationService = new ApplicationService();
-            const readyHandler = mockApp.on.mock.calls.find((call) => call[0] === "ready")?.[1];
+            const readyHandler = mockApp.on.mock.calls.find(
+                (call) => call[0] === "ready"
+            )?.[1];
             await readyHandler?.();
         });
 
         describe("monitor:up event", () => {
             it("should forward monitor up event to renderer", () => {
                 // Arrange
-                const monitorUpHandler = mockUptimeOrchestrator.onTyped.mock.calls.find(
-                    (call) => call[0] === "monitor:up"
-                )?.[1];
+                const monitorUpHandler =
+                    mockUptimeOrchestrator.onTyped.mock.calls.find(
+                        (call) => call[0] === "monitor:up"
+                    )?.[1];
                 const eventData = {
                     site: { identifier: "site-1", name: "Test Site" },
                     monitor: { id: "monitor-1" },
@@ -421,18 +553,21 @@ describe("ApplicationService", () => {
                 monitorUpHandler?.(eventData);
 
                 // Assert
-                expect(mockWindowService.sendToRenderer).toHaveBeenCalledWith("monitor:up", eventData);
-                expect(mockNotificationService.notifyMonitorUp).toHaveBeenCalledWith(
-                    eventData.site,
-                    eventData.monitor.id
+                expect(mockWindowService.sendToRenderer).toHaveBeenCalledWith(
+                    "monitor:up",
+                    eventData
                 );
+                expect(
+                    mockNotificationService.notifyMonitorUp
+                ).toHaveBeenCalledWith(eventData.site, eventData.monitor.id);
             });
 
             it("should handle monitor up forwarding errors", () => {
                 // Arrange
-                const monitorUpHandler = mockUptimeOrchestrator.onTyped.mock.calls.find(
-                    (call) => call[0] === "monitor:up"
-                )?.[1];
+                const monitorUpHandler =
+                    mockUptimeOrchestrator.onTyped.mock.calls.find(
+                        (call) => call[0] === "monitor:up"
+                    )?.[1];
                 const eventData = {
                     site: { identifier: "site-1", name: "Test Site" },
                     monitor: { id: "monitor-1" },
@@ -447,16 +582,20 @@ describe("ApplicationService", () => {
                 monitorUpHandler?.(eventData);
 
                 // Assert
-                expect(mockLogger.error).toHaveBeenCalledWith("APPLICATION_FORWARD_MONITOR_UP_ERROR", error);
+                expect(mockLogger.error).toHaveBeenCalledWith(
+                    "APPLICATION_FORWARD_MONITOR_UP_ERROR",
+                    error
+                );
             });
         });
 
         describe("monitor:down event", () => {
             it("should forward monitor down event to renderer", () => {
                 // Arrange
-                const monitorDownHandler = mockUptimeOrchestrator.onTyped.mock.calls.find(
-                    (call) => call[0] === "monitor:down"
-                )?.[1];
+                const monitorDownHandler =
+                    mockUptimeOrchestrator.onTyped.mock.calls.find(
+                        (call) => call[0] === "monitor:down"
+                    )?.[1];
                 const eventData = {
                     site: { identifier: "site-1", name: "Test Site" },
                     monitor: { id: "monitor-1" },
@@ -467,18 +606,21 @@ describe("ApplicationService", () => {
                 monitorDownHandler?.(eventData);
 
                 // Assert
-                expect(mockWindowService.sendToRenderer).toHaveBeenCalledWith("monitor:down", eventData);
-                expect(mockNotificationService.notifyMonitorDown).toHaveBeenCalledWith(
-                    eventData.site,
-                    eventData.monitor.id
+                expect(mockWindowService.sendToRenderer).toHaveBeenCalledWith(
+                    "monitor:down",
+                    eventData
                 );
+                expect(
+                    mockNotificationService.notifyMonitorDown
+                ).toHaveBeenCalledWith(eventData.site, eventData.monitor.id);
             });
 
             it("should handle monitor down forwarding errors", () => {
                 // Arrange
-                const monitorDownHandler = mockUptimeOrchestrator.onTyped.mock.calls.find(
-                    (call) => call[0] === "monitor:down"
-                )?.[1];
+                const monitorDownHandler =
+                    mockUptimeOrchestrator.onTyped.mock.calls.find(
+                        (call) => call[0] === "monitor:down"
+                    )?.[1];
                 const eventData = {
                     site: { identifier: "site-1", name: "Test Site" },
                     monitor: { id: "monitor-1" },
@@ -493,16 +635,20 @@ describe("ApplicationService", () => {
                 monitorDownHandler?.(eventData);
 
                 // Assert
-                expect(mockLogger.error).toHaveBeenCalledWith("APPLICATION_FORWARD_MONITOR_DOWN_ERROR", error);
+                expect(mockLogger.error).toHaveBeenCalledWith(
+                    "APPLICATION_FORWARD_MONITOR_DOWN_ERROR",
+                    error
+                );
             });
         });
 
         describe("system:error event", () => {
             it("should log system errors", () => {
                 // Arrange
-                const systemErrorHandler = mockUptimeOrchestrator.onTyped.mock.calls.find(
-                    (call) => call[0] === "system:error"
-                )?.[1];
+                const systemErrorHandler =
+                    mockUptimeOrchestrator.onTyped.mock.calls.find(
+                        (call) => call[0] === "system:error"
+                    )?.[1];
                 const eventData = {
                     context: "database",
                     error: new Error("Database connection failed"),
@@ -522,23 +668,28 @@ describe("ApplicationService", () => {
         describe("monitoring:started event", () => {
             it("should forward monitoring started event to renderer", () => {
                 // Arrange
-                const monitoringStartedHandler = mockUptimeOrchestrator.onTyped.mock.calls.find(
-                    (call) => call[0] === "monitoring:started"
-                )?.[1];
+                const monitoringStartedHandler =
+                    mockUptimeOrchestrator.onTyped.mock.calls.find(
+                        (call) => call[0] === "monitoring:started"
+                    )?.[1];
                 const eventData = { siteIdentifier: "site-1" };
 
                 // Act
                 monitoringStartedHandler?.(eventData);
 
                 // Assert
-                expect(mockWindowService.sendToRenderer).toHaveBeenCalledWith("monitoring:started", eventData);
+                expect(mockWindowService.sendToRenderer).toHaveBeenCalledWith(
+                    "monitoring:started",
+                    eventData
+                );
             });
 
             it("should handle monitoring started forwarding errors", () => {
                 // Arrange
-                const monitoringStartedHandler = mockUptimeOrchestrator.onTyped.mock.calls.find(
-                    (call) => call[0] === "monitoring:started"
-                )?.[1];
+                const monitoringStartedHandler =
+                    mockUptimeOrchestrator.onTyped.mock.calls.find(
+                        (call) => call[0] === "monitoring:started"
+                    )?.[1];
                 const eventData = { siteIdentifier: "site-1" };
                 const error = new Error("Forward failed");
                 mockWindowService.sendToRenderer.mockImplementation(() => {
@@ -549,30 +700,38 @@ describe("ApplicationService", () => {
                 monitoringStartedHandler?.(eventData);
 
                 // Assert
-                expect(mockLogger.error).toHaveBeenCalledWith("APPLICATION_FORWARD_MONITORING_STARTED_ERROR", error);
+                expect(mockLogger.error).toHaveBeenCalledWith(
+                    "APPLICATION_FORWARD_MONITORING_STARTED_ERROR",
+                    error
+                );
             });
         });
 
         describe("monitoring:stopped event", () => {
             it("should forward monitoring stopped event to renderer", () => {
                 // Arrange
-                const monitoringStoppedHandler = mockUptimeOrchestrator.onTyped.mock.calls.find(
-                    (call) => call[0] === "monitoring:stopped"
-                )?.[1];
+                const monitoringStoppedHandler =
+                    mockUptimeOrchestrator.onTyped.mock.calls.find(
+                        (call) => call[0] === "monitoring:stopped"
+                    )?.[1];
                 const eventData = { siteIdentifier: "site-1" };
 
                 // Act
                 monitoringStoppedHandler?.(eventData);
 
                 // Assert
-                expect(mockWindowService.sendToRenderer).toHaveBeenCalledWith("monitoring:stopped", eventData);
+                expect(mockWindowService.sendToRenderer).toHaveBeenCalledWith(
+                    "monitoring:stopped",
+                    eventData
+                );
             });
 
             it("should handle monitoring stopped forwarding errors", () => {
                 // Arrange
-                const monitoringStoppedHandler = mockUptimeOrchestrator.onTyped.mock.calls.find(
-                    (call) => call[0] === "monitoring:stopped"
-                )?.[1];
+                const monitoringStoppedHandler =
+                    mockUptimeOrchestrator.onTyped.mock.calls.find(
+                        (call) => call[0] === "monitoring:stopped"
+                    )?.[1];
                 const eventData = { siteIdentifier: "site-1" };
                 const error = new Error("Forward failed");
                 mockWindowService.sendToRenderer.mockImplementation(() => {
@@ -583,16 +742,20 @@ describe("ApplicationService", () => {
                 monitoringStoppedHandler?.(eventData);
 
                 // Assert
-                expect(mockLogger.error).toHaveBeenCalledWith("APPLICATION_FORWARD_MONITORING_STOPPED_ERROR", error);
+                expect(mockLogger.error).toHaveBeenCalledWith(
+                    "APPLICATION_FORWARD_MONITORING_STOPPED_ERROR",
+                    error
+                );
             });
         });
 
         describe("cache:invalidated event", () => {
             it("should forward cache invalidated event to renderer", () => {
                 // Arrange
-                const cacheInvalidatedHandler = mockUptimeOrchestrator.onTyped.mock.calls.find(
-                    (call) => call[0] === "cache:invalidated"
-                )?.[1];
+                const cacheInvalidatedHandler =
+                    mockUptimeOrchestrator.onTyped.mock.calls.find(
+                        (call) => call[0] === "cache:invalidated"
+                    )?.[1];
                 const eventData = {
                     identifier: "site-1",
                     reason: "manual",
@@ -603,14 +766,18 @@ describe("ApplicationService", () => {
                 cacheInvalidatedHandler?.(eventData);
 
                 // Assert
-                expect(mockWindowService.sendToRenderer).toHaveBeenCalledWith("cache:invalidated", eventData);
+                expect(mockWindowService.sendToRenderer).toHaveBeenCalledWith(
+                    "cache:invalidated",
+                    eventData
+                );
             });
 
             it("should handle cache invalidation forwarding errors", () => {
                 // Arrange
-                const cacheInvalidatedHandler = mockUptimeOrchestrator.onTyped.mock.calls.find(
-                    (call) => call[0] === "cache:invalidated"
-                )?.[1];
+                const cacheInvalidatedHandler =
+                    mockUptimeOrchestrator.onTyped.mock.calls.find(
+                        (call) => call[0] === "cache:invalidated"
+                    )?.[1];
                 const eventData = {
                     identifier: "site-1",
                     reason: "manual",
@@ -625,7 +792,10 @@ describe("ApplicationService", () => {
                 cacheInvalidatedHandler?.(eventData);
 
                 // Assert
-                expect(mockLogger.error).toHaveBeenCalledWith("APPLICATION_FORWARD_CACHE_INVALIDATION_ERROR", error);
+                expect(mockLogger.error).toHaveBeenCalledWith(
+                    "APPLICATION_FORWARD_CACHE_INVALIDATION_ERROR",
+                    error
+                );
             });
         });
     });
@@ -634,7 +804,9 @@ describe("ApplicationService", () => {
         it("should handle missing service methods gracefully", () => {
             // Arrange
             const serviceWithoutMethods = {};
-            mockServiceContainer.getIpcService.mockReturnValue(serviceWithoutMethods);
+            mockServiceContainer.getIpcService.mockReturnValue(
+                serviceWithoutMethods
+            );
 
             // Act & Assert - Should not throw during construction
             expect(() => new ApplicationService()).not.toThrow();
@@ -643,9 +815,10 @@ describe("ApplicationService", () => {
         it("should handle null/undefined event data", () => {
             // Arrange
             applicationService = new ApplicationService();
-            const monitorUpHandler = mockUptimeOrchestrator.onTyped.mock.calls.find(
-                (call) => call[0] === "monitor:up"
-            )?.[1];
+            const monitorUpHandler =
+                mockUptimeOrchestrator.onTyped.mock.calls.find(
+                    (call) => call[0] === "monitor:up"
+                )?.[1];
 
             // Act & Assert - Should not throw
             expect(() => monitorUpHandler?.(null)).not.toThrow();
@@ -662,7 +835,9 @@ describe("ApplicationService", () => {
             expect(() => new ApplicationService()).not.toThrow();
 
             // Reset for other tests
-            mockServiceContainer.getInstance.mockReturnValue(mockServiceContainer);
+            mockServiceContainer.getInstance.mockReturnValue(
+                mockServiceContainer
+            );
         });
     });
 
@@ -670,7 +845,9 @@ describe("ApplicationService", () => {
         it("should properly coordinate service initialization order", async () => {
             // Act
             applicationService = new ApplicationService();
-            const readyHandler = mockApp.on.mock.calls.find((call) => call[0] === "ready")?.[1];
+            const readyHandler = mockApp.on.mock.calls.find(
+                (call) => call[0] === "ready"
+            )?.[1];
             await readyHandler?.();
 
             // Assert - Verify services are initialized in correct order
@@ -696,16 +873,26 @@ describe("ApplicationService", () => {
 
             // Mock service getter methods to avoid dependency errors
             mockServiceContainer.getIpcService.mockReturnValue(mockIpcService);
-            mockServiceContainer.getUptimeOrchestrator.mockReturnValue(mockUptimeOrchestrator);
-            mockServiceContainer.getWindowService.mockReturnValue(mockWindowService);
+            mockServiceContainer.getUptimeOrchestrator.mockReturnValue(
+                mockUptimeOrchestrator
+            );
+            mockServiceContainer.getWindowService.mockReturnValue(
+                mockWindowService
+            );
 
             // Act
             await applicationService.cleanup();
 
             // Assert
-            expect(mockLogger.info).toHaveBeenCalledWith("APPLICATION_INITIALIZING");
-            expect(mockLogger.info).toHaveBeenCalledWith("APPLICATION_CLEANUP_START");
-            expect(mockLogger.info).toHaveBeenCalledWith("APPLICATION_CLEANUP_COMPLETE");
+            expect(mockLogger.info).toHaveBeenCalledWith(
+                "APPLICATION_INITIALIZING"
+            );
+            expect(mockLogger.info).toHaveBeenCalledWith(
+                "APPLICATION_CLEANUP_START"
+            );
+            expect(mockLogger.info).toHaveBeenCalledWith(
+                "APPLICATION_CLEANUP_COMPLETE"
+            );
         });
     });
 });

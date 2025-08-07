@@ -71,8 +71,11 @@ export function getHistoryLimit(getHistoryLimitFn: () => number): number {
  * @param params - Parameters for setting history limit
  * @throws Error when database operations fail
  */
-export async function setHistoryLimit(params: SetHistoryLimitParams): Promise<void> {
-    const { databaseService, limit, logger, repositories, setHistoryLimit } = params;
+export async function setHistoryLimit(
+    params: SetHistoryLimitParams
+): Promise<void> {
+    const { databaseService, limit, logger, repositories, setHistoryLimit } =
+        params;
 
     // Determine the appropriate limit value
     // Special case: 0 or negative disables history retention (unlimited)
@@ -87,11 +90,18 @@ export async function setHistoryLimit(params: SetHistoryLimitParams): Promise<vo
         async () => {
             return databaseService.executeTransaction((db) => {
                 // Save to settings using internal method
-                repositories.settings.setInternal(db, "historyLimit", finalLimit.toString());
+                repositories.settings.setInternal(
+                    db,
+                    "historyLimit",
+                    finalLimit.toString()
+                );
 
                 // Prune history for all monitors if limit > 0 using internal method
                 if (finalLimit > 0) {
-                    repositories.history.pruneAllHistoryInternal(db, finalLimit);
+                    repositories.history.pruneAllHistoryInternal(
+                        db,
+                        finalLimit
+                    );
                 }
 
                 return Promise.resolve();

@@ -181,9 +181,18 @@ describe("ApplicationService", () => {
         });
 
         it("should setup app event listeners", () => {
-            expect(mockApp.on).toHaveBeenCalledWith("ready", expect.any(Function));
-            expect(mockApp.on).toHaveBeenCalledWith("window-all-closed", expect.any(Function));
-            expect(mockApp.on).toHaveBeenCalledWith("activate", expect.any(Function));
+            expect(mockApp.on).toHaveBeenCalledWith(
+                "ready",
+                expect.any(Function)
+            );
+            expect(mockApp.on).toHaveBeenCalledWith(
+                "window-all-closed",
+                expect.any(Function)
+            );
+            expect(mockApp.on).toHaveBeenCalledWith(
+                "activate",
+                expect.any(Function)
+            );
         });
     });
 

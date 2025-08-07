@@ -27,9 +27,17 @@ export function isNullOrUndefined(value: unknown): value is null | undefined {
  * @param operationName - Name for logging purposes
  * @returns Sync function suitable for React event handlers
  */
-export function withAsyncErrorHandling(operation: () => Promise<void>, operationName: string): () => void {
+export function withAsyncErrorHandling(
+    operation: () => Promise<void>,
+    operationName: string
+): () => void {
     return () => {
-        void withUtilityErrorHandling(operation, operationName, undefined, false);
+        void withUtilityErrorHandling(
+            operation,
+            operationName,
+            undefined,
+            false
+        );
     };
 }
 
@@ -42,7 +50,11 @@ export function withAsyncErrorHandling(operation: () => Promise<void>, operation
  * @param fallbackValue - Value to return if operation fails
  * @returns Result of operation or fallback value
  */
-export function withSyncErrorHandling<T>(operation: () => T, operationName: string, fallbackValue: T): T {
+export function withSyncErrorHandling<T>(
+    operation: () => T,
+    operationName: string,
+    fallbackValue: T
+): T {
     try {
         return operation();
     } catch (error) {
@@ -95,10 +107,19 @@ export const MonitorDefaults = {
  * Configuration for monitor display identifier generation.
  * Maps monitor types to functions that generate display identifiers.
  */
-const MONITOR_IDENTIFIER_GENERATORS = new Map<string, (monitor: Monitor) => string | undefined>([
+const MONITOR_IDENTIFIER_GENERATORS = new Map<
+    string,
+    (monitor: Monitor) => string | undefined
+>([
     ["http", (monitor) => monitor.url ?? undefined],
     ["ping", (monitor) => monitor.host ?? undefined],
-    ["port", (monitor) => (monitor.host && monitor.port ? `${monitor.host}:${monitor.port}` : undefined)],
+    [
+        "port",
+        (monitor) =>
+            monitor.host && monitor.port
+                ? `${monitor.host}:${monitor.port}`
+                : undefined,
+    ],
     // Add new monitor types here as they're implemented
     // ["dns", (monitor) => `${monitor.domain} (${monitor.recordType})` ?? undefined],
     // ["ssl", (monitor) => monitor.host ?? undefined],
@@ -134,7 +155,10 @@ const MONITOR_IDENTIFIER_GENERATORS = new Map<string, (monitor: Monitor) => stri
  * // Returns: "My Site"
  * ```
  */
-export function getMonitorDisplayIdentifier(monitor: Monitor, siteFallback: string): string {
+export function getMonitorDisplayIdentifier(
+    monitor: Monitor,
+    siteFallback: string
+): string {
     return withSyncErrorHandling(
         () => {
             // First, try the configured generator for the monitor type
@@ -221,7 +245,11 @@ export function getMonitorTypeDisplayLabel(monitorType: string): string {
                     // eslint-disable-next-line regexp/require-unicode-sets-regexp -- Lookbehind/lookahead not compatible with 'v' flag
                     .replaceAll(/(?<=[a-z])(?=[A-Z])/g, " ") // Add space before capitals
                     .split(" ")
-                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                    .map(
+                        (word) =>
+                            word.charAt(0).toUpperCase() +
+                            word.slice(1).toLowerCase()
+                    )
                     .join(" ");
 
                 return `${titleCase} Monitor`;

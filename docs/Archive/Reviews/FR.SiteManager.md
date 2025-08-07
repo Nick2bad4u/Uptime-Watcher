@@ -150,7 +150,10 @@ interface ISiteCacheManager {
 
 interface ISiteValidationService {
  validateSite(site: Site): Promise<ValidationResult>;
- validateUpdate(original: Site, updates: Partial<Site>): Promise<ValidationResult>;
+ validateUpdate(
+  original: Site,
+  updates: Partial<Site>
+ ): Promise<ValidationResult>;
 }
 ```
 
@@ -338,7 +341,9 @@ if (this.monitoringOperations) {
 
 // After: Explicit error handling
 if (!this.monitoringOperations) {
- throw new Error("MonitoringOperations not available but required for startMonitoring");
+ throw new Error(
+  "MonitoringOperations not available but required for startMonitoring"
+ );
 }
 return this.monitoringOperations.startMonitoringForSite(identifier, monitorId);
 ```

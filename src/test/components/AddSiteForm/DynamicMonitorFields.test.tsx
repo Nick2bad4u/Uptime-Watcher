@@ -94,7 +94,9 @@ describe("DynamicMonitorFields", () => {
 
         render(<DynamicMonitorFields {...defaultProps} />);
 
-        expect(screen.getByText("Loading monitor fields...")).toBeInTheDocument();
+        expect(
+            screen.getByText("Loading monitor fields...")
+        ).toBeInTheDocument();
     });
 
     it("should handle error state", () => {
@@ -113,7 +115,11 @@ describe("DynamicMonitorFields", () => {
 
         render(<DynamicMonitorFields {...defaultProps} />);
 
-        expect(screen.getByText("Error loading monitor fields: Failed to load configuration")).toBeInTheDocument();
+        expect(
+            screen.getByText(
+                "Error loading monitor fields: Failed to load configuration"
+            )
+        ).toBeInTheDocument();
     });
 
     it("should handle unknown monitor type", () => {
@@ -137,6 +143,8 @@ describe("DynamicMonitorFields", () => {
 
         render(<DynamicMonitorFields {...defaultProps} />);
 
-        expect(screen.getByText("Unknown monitor type: http")).toBeInTheDocument();
+        expect(
+            screen.getByText("Unknown monitor type: http")
+        ).toBeInTheDocument();
     });
 });

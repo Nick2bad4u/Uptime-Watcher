@@ -18,7 +18,10 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { setHistoryLimit, getHistoryLimit } from "../../../utils/database/historyLimitManager";
+import {
+    setHistoryLimit,
+    getHistoryLimit,
+} from "../../../utils/database/historyLimitManager";
 import type { HistoryRepository } from "../../../services/database/HistoryRepository";
 import type { SettingsRepository } from "../../../services/database/SettingsRepository";
 import type { DatabaseService } from "../../../services/database/DatabaseService";
@@ -85,9 +88,15 @@ describe("historyLimitManager", () => {
                 "historyLimit",
                 limit.toString()
             );
-            expect(mockHistoryRepository.pruneAllHistoryInternal).toHaveBeenCalledWith(mockDatabase, limit);
-            expect(mockLogger.debug).toHaveBeenCalledWith(`History limit set to ${limit}`);
-            expect(mockLogger.debug).toHaveBeenCalledWith(`Pruned history to ${limit} entries per monitor`);
+            expect(
+                mockHistoryRepository.pruneAllHistoryInternal
+            ).toHaveBeenCalledWith(mockDatabase, limit);
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                `History limit set to ${limit}`
+            );
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                `Pruned history to ${limit} entries per monitor`
+            );
         });
 
         it("should set minimum limit of 10 for small positive values", async () => {
@@ -112,8 +121,12 @@ describe("historyLimitManager", () => {
                 "historyLimit",
                 expectedLimit.toString()
             );
-            expect(mockHistoryRepository.pruneAllHistoryInternal).toHaveBeenCalledWith(mockDatabase, expectedLimit);
-            expect(mockLogger.debug).toHaveBeenCalledWith(`History limit set to ${expectedLimit}`);
+            expect(
+                mockHistoryRepository.pruneAllHistoryInternal
+            ).toHaveBeenCalledWith(mockDatabase, expectedLimit);
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                `History limit set to ${expectedLimit}`
+            );
         });
 
         it("should set limit to 0 for negative values without pruning", async () => {
@@ -138,9 +151,15 @@ describe("historyLimitManager", () => {
                 "historyLimit",
                 expectedLimit.toString()
             );
-            expect(mockHistoryRepository.pruneAllHistoryInternal).not.toHaveBeenCalled();
-            expect(mockLogger.debug).toHaveBeenCalledWith(`History limit set to ${expectedLimit}`);
-            expect(mockLogger.debug).not.toHaveBeenCalledWith(expect.stringContaining("Pruned history"));
+            expect(
+                mockHistoryRepository.pruneAllHistoryInternal
+            ).not.toHaveBeenCalled();
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                `History limit set to ${expectedLimit}`
+            );
+            expect(mockLogger.debug).not.toHaveBeenCalledWith(
+                expect.stringContaining("Pruned history")
+            );
         });
 
         it("should set limit to 0 for zero value without pruning", async () => {
@@ -165,9 +184,15 @@ describe("historyLimitManager", () => {
                 "historyLimit",
                 expectedLimit.toString()
             );
-            expect(mockHistoryRepository.pruneAllHistoryInternal).not.toHaveBeenCalled();
-            expect(mockLogger.debug).toHaveBeenCalledWith(`History limit set to ${expectedLimit}`);
-            expect(mockLogger.debug).not.toHaveBeenCalledWith(expect.stringContaining("Pruned history"));
+            expect(
+                mockHistoryRepository.pruneAllHistoryInternal
+            ).not.toHaveBeenCalled();
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                `History limit set to ${expectedLimit}`
+            );
+            expect(mockLogger.debug).not.toHaveBeenCalledWith(
+                expect.stringContaining("Pruned history")
+            );
         });
 
         it("should work without logger", async () => {
@@ -190,7 +215,9 @@ describe("historyLimitManager", () => {
                 "historyLimit",
                 limit.toString()
             );
-            expect(mockHistoryRepository.pruneAllHistoryInternal).toHaveBeenCalledWith(mockDatabase, limit);
+            expect(
+                mockHistoryRepository.pruneAllHistoryInternal
+            ).toHaveBeenCalledWith(mockDatabase, limit);
             expect(mockLogger.debug).not.toHaveBeenCalled();
         });
 
@@ -215,7 +242,9 @@ describe("historyLimitManager", () => {
                 "historyLimit",
                 limit.toString()
             );
-            expect(mockHistoryRepository.pruneAllHistoryInternal).toHaveBeenCalledWith(mockDatabase, limit);
+            expect(
+                mockHistoryRepository.pruneAllHistoryInternal
+            ).toHaveBeenCalledWith(mockDatabase, limit);
         });
 
         it("should handle float values by using them as-is", async () => {
@@ -239,14 +268,18 @@ describe("historyLimitManager", () => {
                 "historyLimit",
                 limit.toString()
             );
-            expect(mockHistoryRepository.pruneAllHistoryInternal).toHaveBeenCalledWith(mockDatabase, limit);
+            expect(
+                mockHistoryRepository.pruneAllHistoryInternal
+            ).toHaveBeenCalledWith(mockDatabase, limit);
         });
     });
 
     describe("getHistoryLimit", () => {
         it("should return current history limit from callback", () => {
             const expectedLimit = 250;
-            const getHistoryLimitCallback = vi.fn().mockReturnValue(expectedLimit);
+            const getHistoryLimitCallback = vi
+                .fn()
+                .mockReturnValue(expectedLimit);
 
             const result = getHistoryLimit(getHistoryLimitCallback);
 
@@ -256,7 +289,9 @@ describe("historyLimitManager", () => {
 
         it("should return zero limit", () => {
             const expectedLimit = 0;
-            const getHistoryLimitCallback = vi.fn().mockReturnValue(expectedLimit);
+            const getHistoryLimitCallback = vi
+                .fn()
+                .mockReturnValue(expectedLimit);
 
             const result = getHistoryLimit(getHistoryLimitCallback);
 
@@ -266,7 +301,9 @@ describe("historyLimitManager", () => {
 
         it("should return negative limit if callback returns one", () => {
             const expectedLimit = -1;
-            const getHistoryLimitCallback = vi.fn().mockReturnValue(expectedLimit);
+            const getHistoryLimitCallback = vi
+                .fn()
+                .mockReturnValue(expectedLimit);
 
             const result = getHistoryLimit(getHistoryLimitCallback);
 
@@ -276,7 +313,9 @@ describe("historyLimitManager", () => {
 
         it("should return large limit values", () => {
             const expectedLimit = 999_999;
-            const getHistoryLimitCallback = vi.fn().mockReturnValue(expectedLimit);
+            const getHistoryLimitCallback = vi
+                .fn()
+                .mockReturnValue(expectedLimit);
 
             const result = getHistoryLimit(getHistoryLimitCallback);
 
@@ -325,7 +364,9 @@ describe("historyLimitManager", () => {
                 "historyLimit",
                 limit.toString()
             );
-            expect(mockHistoryRepository.pruneAllHistoryInternal).toHaveBeenCalledWith(mockDatabase, limit);
+            expect(
+                mockHistoryRepository.pruneAllHistoryInternal
+            ).toHaveBeenCalledWith(mockDatabase, limit);
         });
 
         it("should handle workflow with minimum limit enforcement", async () => {
@@ -359,7 +400,9 @@ describe("historyLimitManager", () => {
                 "historyLimit",
                 expectedLimit.toString()
             );
-            expect(mockHistoryRepository.pruneAllHistoryInternal).toHaveBeenCalledWith(mockDatabase, expectedLimit);
+            expect(
+                mockHistoryRepository.pruneAllHistoryInternal
+            ).toHaveBeenCalledWith(mockDatabase, expectedLimit);
         });
     });
 });

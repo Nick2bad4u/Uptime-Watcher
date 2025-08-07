@@ -38,7 +38,9 @@ export function getEnvironment(): string {
  * @param key - The environment variable key to access
  * @returns The environment variable value or undefined
  */
-export function getEnvVar<K extends keyof KnownEnvironmentVariables>(key: K): KnownEnvironmentVariables[K] | undefined {
+export function getEnvVar<K extends keyof KnownEnvironmentVariables>(
+    key: K
+): KnownEnvironmentVariables[K] | undefined {
     if (typeof process === "undefined") {
         return undefined;
     }
@@ -69,7 +71,9 @@ export function getEnvVar<K extends keyof KnownEnvironmentVariables>(key: K): Kn
  */
 export function getNodeEnv(): string {
     const nodeEnv = getEnvVar("NODE_ENV");
-    return typeof process === "undefined" ? "development" : (nodeEnv ?? "development");
+    return typeof process === "undefined"
+        ? "development"
+        : (nodeEnv ?? "development");
 }
 
 /**
@@ -118,7 +122,11 @@ export function isDevelopment(): boolean {
  * @returns True if in Node.js environment
  */
 export function isNodeEnvironment(): boolean {
-    return typeof process !== "undefined" && typeof process.versions === "object" && Boolean(process.versions.node);
+    return (
+        typeof process !== "undefined" &&
+        typeof process.versions === "object" &&
+        Boolean(process.versions.node)
+    );
 }
 
 /**

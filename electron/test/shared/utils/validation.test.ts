@@ -5,7 +5,11 @@
 
 import { describe, expect, it } from "vitest";
 import type { Monitor, Site } from "../../../../shared/types";
-import { getMonitorValidationErrors, validateMonitorType, validateSite } from "../../../../shared/utils/validation";
+import {
+    getMonitorValidationErrors,
+    validateMonitorType,
+    validateSite,
+} from "../../../../shared/utils/validation";
 
 describe("Shared Validation - Backend Coverage", () => {
     describe("getMonitorValidationErrors", () => {
@@ -51,7 +55,9 @@ describe("Shared Validation - Backend Coverage", () => {
 
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toContain("Host is required for port monitors");
-            expect(errors).toContain("Valid port number (1-65535) is required for port monitors");
+            expect(errors).toContain(
+                "Valid port number (1-65535) is required for port monitors"
+            );
         });
     });
 
@@ -96,8 +102,12 @@ describe("Shared Validation - Backend Coverage", () => {
 
         it("should reject invalid site structure", () => {
             expect(validateSite(null as unknown as Partial<Site>)).toBe(false);
-            expect(validateSite(undefined as unknown as Partial<Site>)).toBe(false);
-            expect(validateSite("string" as unknown as Partial<Site>)).toBe(false);
+            expect(validateSite(undefined as unknown as Partial<Site>)).toBe(
+                false
+            );
+            expect(validateSite("string" as unknown as Partial<Site>)).toBe(
+                false
+            );
         });
 
         it("should reject site with missing required fields", () => {

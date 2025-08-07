@@ -6,7 +6,10 @@ import { describe, expect, it, vi } from "vitest";
 
 // Mock all external dependencies
 vi.mock("../../../hooks/useDynamicHelpText", () => ({
-    useDynamicHelpText: vi.fn(() => ({ primaryText: "Help text", secondaryText: null })),
+    useDynamicHelpText: vi.fn(() => ({
+        primaryText: "Help text",
+        secondaryText: null,
+    })),
 }));
 
 vi.mock("../../../hooks/useMonitorTypes", () => ({
@@ -18,11 +21,19 @@ vi.mock("../../../services/logger", () => ({
 }));
 
 vi.mock("../../../stores/error/useErrorStore", () => ({
-    useErrorStore: vi.fn(() => ({ clearError: vi.fn(), isLoading: false, lastError: null })),
+    useErrorStore: vi.fn(() => ({
+        clearError: vi.fn(),
+        isLoading: false,
+        lastError: null,
+    })),
 }));
 
 vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: vi.fn(() => ({ addMonitorToSite: vi.fn(), createSite: vi.fn(), sites: [] })),
+    useSitesStore: vi.fn(() => ({
+        addMonitorToSite: vi.fn(),
+        createSite: vi.fn(),
+        sites: [],
+    })),
 }));
 
 vi.mock("../../../theme/useTheme", () => ({
@@ -78,7 +89,9 @@ vi.mock("react", async () => {
 describe("AddSiteForm Module Tests", () => {
     it("should import the component without errors", async () => {
         // Just importing the module exercises the component
-        const { AddSiteForm } = await import("../../../components/AddSiteForm/AddSiteForm");
+        const { AddSiteForm } = await import(
+            "../../../components/AddSiteForm/AddSiteForm"
+        );
 
         // Test AddSiteForm component
         expect(AddSiteForm).toBeDefined();
@@ -86,18 +99,24 @@ describe("AddSiteForm Module Tests", () => {
 
     it("should validate add modes correctly", async () => {
         // Test basic component functionality
-        const { AddSiteForm } = await import("../../../components/AddSiteForm/AddSiteForm");
+        const { AddSiteForm } = await import(
+            "../../../components/AddSiteForm/AddSiteForm"
+        );
         expect(AddSiteForm).toBeDefined();
     });
 
     it("should validate monitor types correctly", async () => {
         // Test basic component functionality
-        const { AddSiteForm } = await import("../../../components/AddSiteForm/AddSiteForm");
+        const { AddSiteForm } = await import(
+            "../../../components/AddSiteForm/AddSiteForm"
+        );
         expect(AddSiteForm).toBeDefined();
     });
 
     it("should export AddSiteForm component", async () => {
-        const { AddSiteForm } = await import("../../../components/AddSiteForm/AddSiteForm");
+        const { AddSiteForm } = await import(
+            "../../../components/AddSiteForm/AddSiteForm"
+        );
         expect(AddSiteForm).toBeDefined();
         // React.memo components are objects, not functions
         expect(typeof AddSiteForm).toBe("object");

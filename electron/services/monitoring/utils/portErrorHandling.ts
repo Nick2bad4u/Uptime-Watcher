@@ -140,19 +140,30 @@ export class PortCheckError extends Error {
  * @see {@link PortCheckErrorResult}
  * @public
  */
-export function handlePortCheckError(error: unknown, host: string, port: number): PortCheckErrorResult {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+export function handlePortCheckError(
+    error: unknown,
+    host: string,
+    port: number
+): PortCheckErrorResult {
+    const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
     // Extract response time from custom error if available, use -1 for unknown timing
-    const responseTime = error instanceof PortCheckError ? error.responseTime : -1;
+    const responseTime =
+        error instanceof PortCheckError ? error.responseTime : -1;
 
     // Log debug information in development mode
     if (isDev()) {
-        logger.debug(`[PortMonitor] Final error for ${host}:${port}: ${errorMessage}`);
+        logger.debug(
+            `[PortMonitor] Final error for ${host}:${port}: ${errorMessage}`
+        );
     }
 
     return {
         details: String(port),
-        error: errorMessage === PORT_NOT_REACHABLE ? PORT_NOT_REACHABLE : errorMessage,
+        error:
+            errorMessage === PORT_NOT_REACHABLE
+                ? PORT_NOT_REACHABLE
+                : errorMessage,
         responseTime,
         status: "down",
     };

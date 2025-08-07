@@ -43,12 +43,19 @@ export interface SiteCardStatusProperties {
  *
  * @see StatusBadge For the underlying status display component
  */
-export const SiteCardStatus: React.NamedExoticComponent<SiteCardStatusProperties> = React.memo(function SiteCardStatus({
-    selectedMonitorId,
-    status,
-}: SiteCardStatusProperties) {
-    // Ensure selectedMonitorId is a string to prevent runtime errors
-    const safeMonitorId = String(selectedMonitorId || "unknown");
+export const SiteCardStatus: React.NamedExoticComponent<SiteCardStatusProperties> =
+    React.memo(function SiteCardStatus({
+        selectedMonitorId,
+        status,
+    }: SiteCardStatusProperties) {
+        // Ensure selectedMonitorId is a string to prevent runtime errors
+        const safeMonitorId = String(selectedMonitorId || "unknown");
 
-    return <StatusBadge label={`${safeMonitorId.toUpperCase()} Status`} size="sm" status={status} />;
-});
+        return (
+            <StatusBadge
+                label={`${safeMonitorId.toUpperCase()} Status`}
+                size="sm"
+                status={status}
+            />
+        );
+    });

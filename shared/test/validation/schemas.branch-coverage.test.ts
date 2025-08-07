@@ -4,7 +4,11 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { validateMonitorData, validateMonitorField, validateSiteData } from "../../validation/schemas";
+import {
+    validateMonitorData,
+    validateMonitorField,
+    validateSiteData,
+} from "../../validation/schemas";
 
 describe("Validation Schemas - Branch Coverage Completion", () => {
     describe("Error handling edge cases", () => {
@@ -48,21 +52,37 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
     describe("Field validation edge cases", () => {
         it("should test validateFieldWithSchema with specific schema shape checks", () => {
             // Test field that exists in specific monitor schema
-            const result = validateMonitorField("http", "url", "https://example.com");
+            const result = validateMonitorField(
+                "http",
+                "url",
+                "https://example.com"
+            );
             expect(result.success).toBe(true);
         });
 
         it("should test validateFieldWithSchema with base schema fallback", () => {
             // Test field that exists in base schema but not specific schema
-            const result = validateMonitorField("http", "checkInterval", 30_000);
+            const result = validateMonitorField(
+                "http",
+                "checkInterval",
+                30_000
+            );
             expect(result.success).toBe(true);
         });
 
         it("should test validateFieldWithSchema with unknown field error", () => {
             // Test completely unknown field to trigger the error case
-            const result = validateMonitorField("http", "completelyUnknownField", "value");
+            const result = validateMonitorField(
+                "http",
+                "completelyUnknownField",
+                "value"
+            );
             expect(result.success).toBe(false);
-            expect(result.errors.some((error) => error.includes("Field validation failed"))).toBe(true);
+            expect(
+                result.errors.some((error) =>
+                    error.includes("Field validation failed")
+                )
+            ).toBe(true);
         });
 
         it("should test field validation with invalid values to trigger Zod errors", () => {
@@ -124,7 +144,9 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             // Test unknown monitor type
             const unknownResult = validateMonitorData("unknown", {});
             expect(unknownResult.success).toBe(false);
-            expect(unknownResult.errors).toContain("Unknown monitor type: unknown");
+            expect(unknownResult.errors).toContain(
+                "Unknown monitor type: unknown"
+            );
         });
     });
 
@@ -172,7 +194,10 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             const result = validateSiteData(siteData);
             expect(result.success).toBe(true);
             expect(result.metadata).toHaveProperty("monitorCount", 1);
-            expect(result.metadata).toHaveProperty("siteIdentifier", "test-site");
+            expect(result.metadata).toHaveProperty(
+                "siteIdentifier",
+                "test-site"
+            );
         });
     });
 

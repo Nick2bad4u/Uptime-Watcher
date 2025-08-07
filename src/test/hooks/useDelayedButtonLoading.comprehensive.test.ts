@@ -46,9 +46,12 @@ describe("useDelayedButtonLoading", () => {
     describe("Loading State Transitions", () => {
         it("should show loading after delay when isLoading becomes true", () => {
             // Arrange
-            const { result, rerender } = renderHook(({ isLoading }) => useDelayedButtonLoading(isLoading), {
-                initialProps: { isLoading: false },
-            });
+            const { result, rerender } = renderHook(
+                ({ isLoading }) => useDelayedButtonLoading(isLoading),
+                {
+                    initialProps: { isLoading: false },
+                }
+            );
 
             // Act - Start loading
             rerender({ isLoading: true });
@@ -67,9 +70,12 @@ describe("useDelayedButtonLoading", () => {
 
         it("should hide loading after delay when isLoading becomes false", () => {
             // Arrange
-            const { result, rerender } = renderHook(({ isLoading }) => useDelayedButtonLoading(isLoading), {
-                initialProps: { isLoading: true },
-            });
+            const { result, rerender } = renderHook(
+                ({ isLoading }) => useDelayedButtonLoading(isLoading),
+                {
+                    initialProps: { isLoading: true },
+                }
+            );
 
             // Act - Show loading first
             act(() => {
@@ -94,9 +100,12 @@ describe("useDelayedButtonLoading", () => {
 
         it("should not show loading if isLoading becomes false before delay expires", () => {
             // Arrange
-            const { result, rerender } = renderHook(({ isLoading }) => useDelayedButtonLoading(isLoading), {
-                initialProps: { isLoading: false },
-            });
+            const { result, rerender } = renderHook(
+                ({ isLoading }) => useDelayedButtonLoading(isLoading),
+                {
+                    initialProps: { isLoading: false },
+                }
+            );
 
             // Act - Start loading
             rerender({ isLoading: true });
@@ -133,9 +142,12 @@ describe("useDelayedButtonLoading", () => {
         it("should clear previous timeout when isLoading changes rapidly", () => {
             // Arrange
             const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
-            const { rerender } = renderHook(({ isLoading }) => useDelayedButtonLoading(isLoading), {
-                initialProps: { isLoading: false },
-            });
+            const { rerender } = renderHook(
+                ({ isLoading }) => useDelayedButtonLoading(isLoading),
+                {
+                    initialProps: { isLoading: false },
+                }
+            );
 
             // Act - Rapid changes
             rerender({ isLoading: true });
@@ -148,9 +160,12 @@ describe("useDelayedButtonLoading", () => {
 
         it("should handle multiple rapid state changes correctly", () => {
             // Arrange
-            const { result, rerender } = renderHook(({ isLoading }) => useDelayedButtonLoading(isLoading), {
-                initialProps: { isLoading: false },
-            });
+            const { result, rerender } = renderHook(
+                ({ isLoading }) => useDelayedButtonLoading(isLoading),
+                {
+                    initialProps: { isLoading: false },
+                }
+            );
 
             // Act - Rapid on/off changes
             rerender({ isLoading: true });
@@ -173,9 +188,12 @@ describe("useDelayedButtonLoading", () => {
     describe("Timing Behavior", () => {
         it("should use correct delay for showing loading state", () => {
             // Arrange
-            const { result, rerender } = renderHook(({ isLoading }) => useDelayedButtonLoading(isLoading), {
-                initialProps: { isLoading: false },
-            });
+            const { result, rerender } = renderHook(
+                ({ isLoading }) => useDelayedButtonLoading(isLoading),
+                {
+                    initialProps: { isLoading: false },
+                }
+            );
 
             // Act
             rerender({ isLoading: true });
@@ -191,9 +209,12 @@ describe("useDelayedButtonLoading", () => {
 
         it("should use correct delay for hiding loading state", () => {
             // Arrange
-            const { result, rerender } = renderHook(({ isLoading }) => useDelayedButtonLoading(isLoading), {
-                initialProps: { isLoading: true },
-            });
+            const { result, rerender } = renderHook(
+                ({ isLoading }) => useDelayedButtonLoading(isLoading),
+                {
+                    initialProps: { isLoading: true },
+                }
+            );
 
             // Setup - Show loading first
             act(() => vi.advanceTimersByTime(100));
@@ -229,9 +250,12 @@ describe("useDelayedButtonLoading", () => {
 
         it("should handle very rapid successive calls", () => {
             // Arrange
-            const { result, rerender } = renderHook(({ isLoading }) => useDelayedButtonLoading(isLoading), {
-                initialProps: { isLoading: false },
-            });
+            const { result, rerender } = renderHook(
+                ({ isLoading }) => useDelayedButtonLoading(isLoading),
+                {
+                    initialProps: { isLoading: false },
+                }
+            );
 
             // Act - Very rapid state changes
             for (let i = 0; i < 10; i++) {
@@ -254,9 +278,12 @@ describe("useDelayedButtonLoading", () => {
 
             // Act & Assert - Should not throw
             expect(() => {
-                const { result, rerender } = renderHook(({ isLoading }) => useDelayedButtonLoading(isLoading), {
-                    initialProps: { isLoading: false },
-                });
+                const { result, rerender } = renderHook(
+                    ({ isLoading }) => useDelayedButtonLoading(isLoading),
+                    {
+                        initialProps: { isLoading: false },
+                    }
+                );
 
                 rerender({ isLoading: true });
                 act(() => vi.advanceTimersByTime(0));
@@ -269,9 +296,12 @@ describe("useDelayedButtonLoading", () => {
     describe("Callback Stability", () => {
         it("should use stable callbacks to prevent unnecessary re-renders", () => {
             // Arrange
-            const { rerender } = renderHook(({ isLoading }) => useDelayedButtonLoading(isLoading), {
-                initialProps: { isLoading: false },
-            });
+            const { rerender } = renderHook(
+                ({ isLoading }) => useDelayedButtonLoading(isLoading),
+                {
+                    initialProps: { isLoading: false },
+                }
+            );
 
             // Act - Multiple rerenders with same props
             rerender({ isLoading: false });
@@ -284,9 +314,12 @@ describe("useDelayedButtonLoading", () => {
 
         it("should handle prop changes without memory leaks", () => {
             // Arrange
-            const { result, rerender } = renderHook(({ isLoading }) => useDelayedButtonLoading(isLoading), {
-                initialProps: { isLoading: false },
-            });
+            const { result, rerender } = renderHook(
+                ({ isLoading }) => useDelayedButtonLoading(isLoading),
+                {
+                    initialProps: { isLoading: false },
+                }
+            );
 
             // Act - Many prop changes
             for (let i = 0; i < 100; i++) {
@@ -301,9 +334,12 @@ describe("useDelayedButtonLoading", () => {
     describe("Real-world Usage Scenarios", () => {
         it("should handle typical form submission flow", () => {
             // Arrange
-            const { result, rerender } = renderHook(({ isLoading }) => useDelayedButtonLoading(isLoading), {
-                initialProps: { isLoading: false },
-            });
+            const { result, rerender } = renderHook(
+                ({ isLoading }) => useDelayedButtonLoading(isLoading),
+                {
+                    initialProps: { isLoading: false },
+                }
+            );
 
             // Act - User clicks submit (loading starts)
             rerender({ isLoading: true });
@@ -327,9 +363,12 @@ describe("useDelayedButtonLoading", () => {
 
         it("should handle very fast operations without showing loading", () => {
             // Arrange
-            const { result, rerender } = renderHook(({ isLoading }) => useDelayedButtonLoading(isLoading), {
-                initialProps: { isLoading: false },
-            });
+            const { result, rerender } = renderHook(
+                ({ isLoading }) => useDelayedButtonLoading(isLoading),
+                {
+                    initialProps: { isLoading: false },
+                }
+            );
 
             // Act - Fast operation (starts and stops within delay)
             rerender({ isLoading: true });
@@ -343,9 +382,12 @@ describe("useDelayedButtonLoading", () => {
 
         it("should handle long-running operations correctly", () => {
             // Arrange
-            const { result, rerender } = renderHook(({ isLoading }) => useDelayedButtonLoading(isLoading), {
-                initialProps: { isLoading: false },
-            });
+            const { result, rerender } = renderHook(
+                ({ isLoading }) => useDelayedButtonLoading(isLoading),
+                {
+                    initialProps: { isLoading: false },
+                }
+            );
 
             // Act - Long operation
             rerender({ isLoading: true });
@@ -369,9 +411,12 @@ describe("useDelayedButtonLoading", () => {
     describe("Return Value", () => {
         it("should always return a boolean", () => {
             // Arrange & Act
-            const { result, rerender } = renderHook(({ isLoading }) => useDelayedButtonLoading(isLoading), {
-                initialProps: { isLoading: false },
-            });
+            const { result, rerender } = renderHook(
+                ({ isLoading }) => useDelayedButtonLoading(isLoading),
+                {
+                    initialProps: { isLoading: false },
+                }
+            );
 
             // Assert - Initial
             expect(typeof result.current).toBe("boolean");
@@ -387,9 +432,12 @@ describe("useDelayedButtonLoading", () => {
 
         it("should only return true or false values", () => {
             // Arrange
-            const { result, rerender } = renderHook(({ isLoading }) => useDelayedButtonLoading(isLoading), {
-                initialProps: { isLoading: false },
-            });
+            const { result, rerender } = renderHook(
+                ({ isLoading }) => useDelayedButtonLoading(isLoading),
+                {
+                    initialProps: { isLoading: false },
+                }
+            );
 
             // Act & Assert - Check various states
             expect([true, false]).toContain(result.current);

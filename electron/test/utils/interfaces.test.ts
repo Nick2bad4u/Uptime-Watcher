@@ -35,12 +35,21 @@ describe("Interfaces Utility", () => {
             // Test debug method signature
             mockLogger.debug("test message");
             mockLogger.debug("test message", { data: "value" });
-            mockLogger.debug("test message", "arg1", "arg2", { complex: "object" });
+            mockLogger.debug("test message", "arg1", "arg2", {
+                complex: "object",
+            });
 
             expect(mockLogger.debug).toHaveBeenCalledTimes(3);
             expect(mockLogger.debug).toHaveBeenCalledWith("test message");
-            expect(mockLogger.debug).toHaveBeenCalledWith("test message", { data: "value" });
-            expect(mockLogger.debug).toHaveBeenCalledWith("test message", "arg1", "arg2", { complex: "object" });
+            expect(mockLogger.debug).toHaveBeenCalledWith("test message", {
+                data: "value",
+            });
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                "test message",
+                "arg1",
+                "arg2",
+                { complex: "object" }
+            );
         });
 
         it("should allow info method with message and args", () => {
@@ -54,12 +63,20 @@ describe("Interfaces Utility", () => {
             // Test info method signature
             mockLogger.info("info message");
             mockLogger.info("info message", { id: 123 });
-            mockLogger.info("info message", "context", { timestamp: Date.now() });
+            mockLogger.info("info message", "context", {
+                timestamp: Date.now(),
+            });
 
             expect(mockLogger.info).toHaveBeenCalledTimes(3);
             expect(mockLogger.info).toHaveBeenCalledWith("info message");
-            expect(mockLogger.info).toHaveBeenCalledWith("info message", { id: 123 });
-            expect(mockLogger.info).toHaveBeenCalledWith("info message", "context", { timestamp: expect.any(Number) });
+            expect(mockLogger.info).toHaveBeenCalledWith("info message", {
+                id: 123,
+            });
+            expect(mockLogger.info).toHaveBeenCalledWith(
+                "info message",
+                "context",
+                { timestamp: expect.any(Number) }
+            );
         });
 
         it("should allow warn method with message and args", () => {
@@ -77,8 +94,14 @@ describe("Interfaces Utility", () => {
 
             expect(mockLogger.warn).toHaveBeenCalledTimes(3);
             expect(mockLogger.warn).toHaveBeenCalledWith("warning message");
-            expect(mockLogger.warn).toHaveBeenCalledWith("warning message", { severity: "medium" });
-            expect(mockLogger.warn).toHaveBeenCalledWith("warning message", "details", { code: 404 });
+            expect(mockLogger.warn).toHaveBeenCalledWith("warning message", {
+                severity: "medium",
+            });
+            expect(mockLogger.warn).toHaveBeenCalledWith(
+                "warning message",
+                "details",
+                { code: 404 }
+            );
         });
 
         it("should allow error method with message, optional error, and args", () => {
@@ -96,16 +119,38 @@ describe("Interfaces Utility", () => {
             mockLogger.error("error message", testError);
             mockLogger.error("error message", "string error");
             mockLogger.error("error message", { custom: "error" });
-            mockLogger.error("error message", testError, "additional", "context");
+            mockLogger.error(
+                "error message",
+                testError,
+                "additional",
+                "context"
+            );
             mockLogger.error("error message", undefined, "context");
 
             expect(mockLogger.error).toHaveBeenCalledTimes(6);
             expect(mockLogger.error).toHaveBeenCalledWith("error message");
-            expect(mockLogger.error).toHaveBeenCalledWith("error message", testError);
-            expect(mockLogger.error).toHaveBeenCalledWith("error message", "string error");
-            expect(mockLogger.error).toHaveBeenCalledWith("error message", { custom: "error" });
-            expect(mockLogger.error).toHaveBeenCalledWith("error message", testError, "additional", "context");
-            expect(mockLogger.error).toHaveBeenCalledWith("error message", undefined, "context");
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "error message",
+                testError
+            );
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "error message",
+                "string error"
+            );
+            expect(mockLogger.error).toHaveBeenCalledWith("error message", {
+                custom: "error",
+            });
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "error message",
+                testError,
+                "additional",
+                "context"
+            );
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "error message",
+                undefined,
+                "context"
+            );
         });
 
         it("should accept various argument types", () => {
@@ -134,10 +179,23 @@ describe("Interfaces Utility", () => {
             mockLogger.warn("test", ...complexArgs);
             mockLogger.error("test", undefined, ...complexArgs);
 
-            expect(mockLogger.debug).toHaveBeenCalledWith("test", ...complexArgs);
-            expect(mockLogger.info).toHaveBeenCalledWith("test", ...complexArgs);
-            expect(mockLogger.warn).toHaveBeenCalledWith("test", ...complexArgs);
-            expect(mockLogger.error).toHaveBeenCalledWith("test", undefined, ...complexArgs);
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                "test",
+                ...complexArgs
+            );
+            expect(mockLogger.info).toHaveBeenCalledWith(
+                "test",
+                ...complexArgs
+            );
+            expect(mockLogger.warn).toHaveBeenCalledWith(
+                "test",
+                ...complexArgs
+            );
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "test",
+                undefined,
+                ...complexArgs
+            );
         });
 
         it("should work with real logger implementations", () => {
@@ -146,7 +204,11 @@ describe("Interfaces Utility", () => {
                 debug: (message: string, ...args: unknown[]) => {
                     console.debug(`DEBUG: ${message}`, ...args);
                 },
-                error: (message: string, error?: unknown, ...args: unknown[]) => {
+                error: (
+                    message: string,
+                    error?: unknown,
+                    ...args: unknown[]
+                ) => {
                     console.error(`ERROR: ${message}`, error, ...args);
                 },
                 info: (message: string, ...args: unknown[]) => {
@@ -197,7 +259,10 @@ describe("Interfaces Utility", () => {
             expect(mockLogger.info).toHaveBeenCalledWith("test");
             expect(mockLogger.warn).toHaveBeenCalledWith("test", undefined);
             expect(mockLogger.error).toHaveBeenCalledWith("test", null);
-            expect(mockLogger.error).toHaveBeenCalledWith("test", expect.any(Error));
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "test",
+                expect.any(Error)
+            );
         });
     });
 
@@ -207,7 +272,11 @@ describe("Interfaces Utility", () => {
                 debug: (message: string, ...args: unknown[]): void => {
                     console.debug(message, ...args);
                 },
-                error: (message: string, error?: unknown, ...args: unknown[]): void => {
+                error: (
+                    message: string,
+                    error?: unknown,
+                    ...args: unknown[]
+                ): void => {
                     console.error(message, error, ...args);
                 },
                 info: (message: string, ...args: unknown[]): void => {
@@ -231,7 +300,11 @@ describe("Interfaces Utility", () => {
                     // Should accept any unknown types
                     // Implementation removed for test clarity
                 },
-                error: (_message: string, _error?: unknown, ..._args: unknown[]) => {
+                error: (
+                    _message: string,
+                    _error?: unknown,
+                    ..._args: unknown[]
+                ) => {
                     // Error can be anything
                     // Implementation removed for test clarity
                 },
@@ -252,7 +325,11 @@ describe("Interfaces Utility", () => {
             // Extended logger interface
             interface ExtendedLogger extends Logger {
                 trace: (message: string, ...args: unknown[]) => void;
-                fatal: (message: string, error?: unknown, ...args: unknown[]) => void;
+                fatal: (
+                    message: string,
+                    error?: unknown,
+                    ...args: unknown[]
+                ) => void;
             }
 
             const extendedLogger: ExtendedLogger = {
@@ -279,7 +356,11 @@ describe("Interfaces Utility", () => {
                     this.log("DEBUG", message, ...args);
                 }
 
-                error(message: string, error?: unknown, ...args: unknown[]): void {
+                error(
+                    message: string,
+                    error?: unknown,
+                    ...args: unknown[]
+                ): void {
                     this.log("ERROR", message, error, ...args);
                 }
 
@@ -292,7 +373,11 @@ describe("Interfaces Utility", () => {
                 }
 
                 // Additional method not in interface
-                private log(level: string, message: string, ...args: unknown[]): void {
+                private log(
+                    level: string,
+                    message: string,
+                    ...args: unknown[]
+                ): void {
                     console.log(`[${level}] ${message}`, ...args);
                 }
 

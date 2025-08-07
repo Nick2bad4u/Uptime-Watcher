@@ -28,12 +28,18 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             // This should not throw and should return early
             expect(() => {
                 // Use reflection to access private method
-                const applyThemeClassesMethod = (themeManager as any).applyThemeClasses;
+                const applyThemeClassesMethod = (themeManager as any)
+                    .applyThemeClasses;
                 applyThemeClassesMethod.call(themeManager, {
                     name: "light",
                     isDark: false,
                     colors: {},
-                    typography: { fontFamily: "", fontSize: "", fontWeight: "", lineHeight: "" },
+                    typography: {
+                        fontFamily: "",
+                        fontSize: "",
+                        fontWeight: "",
+                        lineHeight: "",
+                    },
                     spacing: {},
                     shadows: { sm: "", md: "", lg: "" },
                     borderRadius: { sm: "", md: "", lg: "" },
@@ -93,7 +99,10 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             const cleanup = themeManager.onSystemThemeChange(mockCallback);
 
             // Verify addEventListener was called
-            expect(mockEventListener).toHaveBeenCalledWith("change", expect.any(Function));
+            expect(mockEventListener).toHaveBeenCalledWith(
+                "change",
+                expect.any(Function)
+            );
 
             // Simulate a media query change event
             const handler = mockEventListener.mock.calls[0]?.[1];
@@ -105,7 +114,10 @@ describe("ThemeManager - Branch Coverage Completion", () => {
 
             // Test cleanup
             cleanup();
-            expect(mockRemoveEventListener).toHaveBeenCalledWith("change", handler);
+            expect(mockRemoveEventListener).toHaveBeenCalledWith(
+                "change",
+                handler
+            );
         });
 
         it("should handle theme change from light to dark", () => {
@@ -174,14 +186,18 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             themeManager.applyTheme(darkTheme);
 
             // Verify dark class is added
-            expect(mockDocumentElementClassList.add).toHaveBeenCalledWith("dark");
+            expect(mockDocumentElementClassList.add).toHaveBeenCalledWith(
+                "dark"
+            );
 
             // Test with light theme
             const lightTheme = themeManager.getTheme("light");
             themeManager.applyTheme(lightTheme);
 
             // Verify dark class is removed for light theme
-            expect(mockDocumentElementClassList.remove).toHaveBeenCalledWith("dark");
+            expect(mockDocumentElementClassList.remove).toHaveBeenCalledWith(
+                "dark"
+            );
         });
     });
 

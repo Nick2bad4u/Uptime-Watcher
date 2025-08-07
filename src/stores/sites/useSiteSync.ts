@@ -185,7 +185,9 @@ let statusUpdateManager: StatusUpdateManager | undefined;
  *
  * @public
  */
-export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActions => {
+export const createSiteSyncActions = (
+    deps: SiteSyncDependencies
+): SiteSyncActions => {
     const actions: SiteSyncActions = {
         fullSyncFromBackend: async () => {
             await actions.syncSitesFromBackend();
@@ -200,7 +202,8 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
                 return await withErrorHandling(
                     async () => {
                         // eslint-disable-next-line n/no-sync -- Method name contains 'sync' but is not a synchronous file operation
-                        const response = await window.electronAPI.stateSync.getSyncStatus();
+                        const response =
+                            await window.electronAPI.stateSync.getSyncStatus();
                         const status = safeExtractIpcData(response, {
                             lastSync: undefined,
                             siteCount: 0,
@@ -216,9 +219,15 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
                         return status;
                     },
                     {
-                        clearError: () => errorStore.clearStoreError("sites-sync"),
-                        setError: (error) => errorStore.setStoreError("sites-sync", error),
-                        setLoading: (loading) => errorStore.setOperationLoading("getSyncStatus", loading),
+                        clearError: () =>
+                            errorStore.clearStoreError("sites-sync"),
+                        setError: (error) =>
+                            errorStore.setStoreError("sites-sync", error),
+                        setLoading: (loading) =>
+                            errorStore.setOperationLoading(
+                                "getSyncStatus",
+                                loading
+                            ),
                     }
                 );
             } catch {
@@ -231,7 +240,9 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
                 };
             }
         },
-        subscribeToStatusUpdates: (callback: (update: StatusUpdate) => void) => {
+        subscribeToStatusUpdates: (
+            callback: (update: StatusUpdate) => void
+        ) => {
             // Initialize status update manager if not already done
             statusUpdateManager ??= new StatusUpdateManager({
                 fullSyncFromBackend: actions.fullSyncFromBackend,
@@ -244,11 +255,15 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
                 // Use the new efficient StatusUpdateManager that handles incremental updates
                 statusUpdateManager.subscribe();
             } catch (error) {
-                logger.error("Failed to subscribe to status updates:", ensureError(error));
+                logger.error(
+                    "Failed to subscribe to status updates:",
+                    ensureError(error)
+                );
             }
 
             const result = {
-                message: "Successfully subscribed to status updates with efficient incremental updates",
+                message:
+                    "Successfully subscribed to status updates with efficient incremental updates",
                 subscribed: true,
                 success: true,
             };
@@ -258,34 +273,38 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
         },
         subscribeToSyncEvents: () => {
             // eslint-disable-next-line n/no-sync -- Switch case handles 'sync' event types, not synchronous file operations
-            const cleanup = window.electronAPI.stateSync.onStateSyncEvent((event) => {
-                logStoreAction("SitesStore", "syncEventReceived", {
-                    action: event.action,
-                    siteIdentifier: event.siteIdentifier,
-                    source: event.source,
-                    timestamp: event.timestamp,
-                }); // Handle different sync actions
-                switch (event.action) {
-                    case "bulk-sync": {
-                        if (event.sites) {
-                            deps.setSites(event.sites);
-                        }
-                        break;
-                    }
-                    case "delete":
-                    case "update": {
-                        // For single site updates, trigger a full sync
-                        void (async () => {
-                            try {
-                                await actions.syncSitesFromBackend();
-                            } catch (error: unknown) {
-                                logStoreAction("SitesStore", "error", { error });
+            const cleanup = window.electronAPI.stateSync.onStateSyncEvent(
+                (event) => {
+                    logStoreAction("SitesStore", "syncEventReceived", {
+                        action: event.action,
+                        siteIdentifier: event.siteIdentifier,
+                        source: event.source,
+                        timestamp: event.timestamp,
+                    }); // Handle different sync actions
+                    switch (event.action) {
+                        case "bulk-sync": {
+                            if (event.sites) {
+                                deps.setSites(event.sites);
                             }
-                        })();
-                        break;
+                            break;
+                        }
+                        case "delete":
+                        case "update": {
+                            // For single site updates, trigger a full sync
+                            void (async () => {
+                                try {
+                                    await actions.syncSitesFromBackend();
+                                } catch (error: unknown) {
+                                    logStoreAction("SitesStore", "error", {
+                                        error,
+                                    });
+                                }
+                            })();
+                            break;
+                        }
                     }
                 }
-            });
+            );
 
             logStoreAction("SitesStore", "subscribeToSyncEvents", {
                 message: "Successfully subscribed to sync events",
@@ -309,8 +328,13 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
                 },
                 {
                     clearError: () => errorStore.clearStoreError("sites-sync"),
-                    setError: (error) => errorStore.setStoreError("sites-sync", error),
-                    setLoading: (loading) => errorStore.setOperationLoading("syncSitesFromBackend", loading),
+                    setError: (error) =>
+                        errorStore.setStoreError("sites-sync", error),
+                    setLoading: (loading) =>
+                        errorStore.setOperationLoading(
+                            "syncSitesFromBackend",
+                            loading
+                        ),
                 }
             );
         },
@@ -321,7 +345,11 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
                 success: true,
                 unsubscribed: true,
             };
-            logStoreAction("SitesStore", "unsubscribeFromStatusUpdates", result);
+            logStoreAction(
+                "SitesStore",
+                "unsubscribeFromStatusUpdates",
+                result
+            );
 
             return result;
         },

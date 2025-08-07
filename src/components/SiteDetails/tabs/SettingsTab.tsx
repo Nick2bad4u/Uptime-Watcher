@@ -7,9 +7,18 @@ import type { JSX } from "react/jsx-runtime";
 
 import React, { useEffect, useState } from "react";
 import { FiSave, FiTrash2 } from "react-icons/fi";
-import { MdDangerous, MdInfoOutline, MdSettings, MdTimer } from "react-icons/md";
+import {
+    MdDangerous,
+    MdInfoOutline,
+    MdSettings,
+    MdTimer,
+} from "react-icons/md";
 
-import { CHECK_INTERVALS, RETRY_CONSTRAINTS, TIMEOUT_CONSTRAINTS } from "../../../constants";
+import {
+    CHECK_INTERVALS,
+    RETRY_CONSTRAINTS,
+    TIMEOUT_CONSTRAINTS,
+} from "../../../constants";
 import logger from "../../../services/logger";
 import {
     ThemedBadge,
@@ -24,7 +33,11 @@ import { useTheme } from "../../../theme/useTheme";
 import { Monitor, Site } from "../../../types";
 import { calculateMaxDuration } from "../../../utils/duration";
 import { withUtilityErrorHandling } from "../../../utils/errorHandling";
-import { getMonitorDisplayIdentifier, getMonitorTypeDisplayLabel, UiDefaults } from "../../../utils/fallbacks";
+import {
+    getMonitorDisplayIdentifier,
+    getMonitorTypeDisplayLabel,
+    UiDefaults,
+} from "../../../utils/fallbacks";
 import { getMonitorTypeConfig } from "../../../utils/monitorTypeHelper";
 import { formatRetryAttemptsText, getIntervalLabel } from "../../../utils/time";
 
@@ -37,11 +50,15 @@ export interface SettingsTabProperties {
     /** Current site being configured */
     readonly currentSite: Site;
     /** Handler for monitor check interval changes */
-    readonly handleIntervalChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    readonly handleIntervalChange: (
+        e: React.ChangeEvent<HTMLSelectElement>
+    ) => void;
     /** Handler for removing/deleting the site */
     readonly handleRemoveSite: () => Promise<void>;
     /** Handler for monitor retry attempts changes */
-    readonly handleRetryAttemptsChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    readonly handleRetryAttemptsChange: (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => void;
     /** Handler for saving interval changes */
     readonly handleSaveInterval: () => void;
     /** Handler for saving site name changes */
@@ -51,7 +68,9 @@ export interface SettingsTabProperties {
     /** Handler for saving timeout changes */
     readonly handleSaveTimeout: () => Promise<void>;
     /** Handler for monitor timeout changes */
-    readonly handleTimeoutChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    readonly handleTimeoutChange: (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => void;
     /** Whether there are unsaved changes pending */
     readonly hasUnsavedChanges: boolean;
     /** Whether the check interval has been modified */
@@ -175,11 +194,18 @@ export const SettingsTab = ({
     return (
         <div className="space-y-6" data-testid="settings-tab">
             {/* Site Configuration */}
-            <ThemedCard icon={<MdSettings color={iconColors.settings} />} title="Site Configuration">
+            <ThemedCard
+                icon={<MdSettings color={iconColors.settings} />}
+                title="Site Configuration"
+            >
                 <div className="space-y-6">
                     {/* Site Name */}
                     <div className="space-y-2">
-                        <ThemedText size="sm" variant="secondary" weight="medium">
+                        <ThemedText
+                            size="sm"
+                            variant="secondary"
+                            weight="medium"
+                        >
                             Site Name
                         </ThemedText>
                         <div className="flex items-center gap-3">
@@ -196,7 +222,9 @@ export const SettingsTab = ({
                                 loading={isLoading}
                                 onClick={() => void loggedHandleSaveName()}
                                 size="sm"
-                                variant={hasUnsavedChanges ? "primary" : "secondary"}
+                                variant={
+                                    hasUnsavedChanges ? "primary" : "secondary"
+                                }
                             >
                                 Save
                             </ThemedButton>
@@ -210,14 +238,23 @@ export const SettingsTab = ({
 
                     {/* Site Identifier */}
                     <div className="space-y-2">
-                        <ThemedText size="sm" variant="secondary" weight="medium">
-                            <IdentifierLabel selectedMonitor={selectedMonitor} />
+                        <ThemedText
+                            size="sm"
+                            variant="secondary"
+                            weight="medium"
+                        >
+                            <IdentifierLabel
+                                selectedMonitor={selectedMonitor}
+                            />
                         </ThemedText>
                         <ThemedInput
                             className="opacity-70"
                             disabled
                             type="text"
-                            value={getDisplayIdentifier(currentSite, selectedMonitor)}
+                            value={getDisplayIdentifier(
+                                currentSite,
+                                selectedMonitor
+                            )}
                         />
                         <ThemedText size="xs" variant="tertiary">
                             Identifier cannot be changed
@@ -227,17 +264,31 @@ export const SettingsTab = ({
             </ThemedCard>
 
             {/* Monitoring Configuration */}
-            <ThemedCard icon={<MdTimer color={iconColors.timing} />} title="Monitoring Configuration">
+            <ThemedCard
+                icon={<MdTimer color={iconColors.timing} />}
+                title="Monitoring Configuration"
+            >
                 <div className="space-y-6">
                     {/* Check Interval */}
                     <div className="space-y-2">
-                        <ThemedText size="sm" variant="secondary" weight="medium">
+                        <ThemedText
+                            size="sm"
+                            variant="secondary"
+                            weight="medium"
+                        >
                             Check Interval
                         </ThemedText>
                         <div className="flex items-center gap-3">
-                            <ThemedSelect className="flex-1" onChange={handleIntervalChange} value={localCheckInterval}>
+                            <ThemedSelect
+                                className="flex-1"
+                                onChange={handleIntervalChange}
+                                value={localCheckInterval}
+                            >
                                 {CHECK_INTERVALS.map((interval) => {
-                                    const value = typeof interval === "number" ? interval : interval.value;
+                                    const value =
+                                        typeof interval === "number"
+                                            ? interval
+                                            : interval.value;
                                     const label = getIntervalLabel(interval);
                                     return (
                                         <option key={value} value={value}>
@@ -251,19 +302,26 @@ export const SettingsTab = ({
                                 icon={<FiSave />}
                                 onClick={loggedHandleSaveInterval}
                                 size="sm"
-                                variant={intervalChanged ? "primary" : "secondary"}
+                                variant={
+                                    intervalChanged ? "primary" : "secondary"
+                                }
                             >
                                 Save
                             </ThemedButton>
                         </div>
                         <ThemedText size="xs" variant="tertiary">
-                            Monitor checks every {Math.round(localCheckInterval / 1000)} seconds
+                            Monitor checks every{" "}
+                            {Math.round(localCheckInterval / 1000)} seconds
                         </ThemedText>
                     </div>
 
                     {/* Timeout Configuration */}
                     <div className="space-y-2">
-                        <ThemedText size="sm" variant="secondary" weight="medium">
+                        <ThemedText
+                            size="sm"
+                            variant="secondary"
+                            weight="medium"
+                        >
                             Timeout (seconds)
                         </ThemedText>
                         <div className="flex items-center gap-3">
@@ -282,7 +340,9 @@ export const SettingsTab = ({
                                 icon={<FiSave />}
                                 onClick={() => void loggedHandleSaveTimeout()}
                                 size="sm"
-                                variant={timeoutChanged ? "primary" : "secondary"}
+                                variant={
+                                    timeoutChanged ? "primary" : "secondary"
+                                }
                             >
                                 Save
                             </ThemedButton>
@@ -294,7 +354,11 @@ export const SettingsTab = ({
 
                     {/* Retry Attempts Configuration */}
                     <div className="space-y-2">
-                        <ThemedText size="sm" variant="secondary" weight="medium">
+                        <ThemedText
+                            size="sm"
+                            variant="secondary"
+                            weight="medium"
+                        >
                             Retry Attempts
                         </ThemedText>
                         <div className="flex items-center gap-3">
@@ -311,9 +375,15 @@ export const SettingsTab = ({
                             <ThemedButton
                                 disabled={!retryAttemptsChanged}
                                 icon={<FiSave />}
-                                onClick={() => void loggedHandleSaveRetryAttempts()}
+                                onClick={() =>
+                                    void loggedHandleSaveRetryAttempts()
+                                }
                                 size="sm"
-                                variant={retryAttemptsChanged ? "primary" : "secondary"}
+                                variant={
+                                    retryAttemptsChanged
+                                        ? "primary"
+                                        : "secondary"
+                                }
                             >
                                 Save
                             </ThemedButton>
@@ -333,8 +403,13 @@ export const SettingsTab = ({
                         >
                             <ThemedText size="xs" variant="secondary">
                                 💡 <strong>Maximum check duration:</strong> ~
-                                {calculateMaxDuration(localTimeout, localRetryAttempts)} ({localTimeout}s per attempt ×{" "}
-                                {localRetryAttempts + 1} attempts + backoff delays)
+                                {calculateMaxDuration(
+                                    localTimeout,
+                                    localRetryAttempts
+                                )}{" "}
+                                ({localTimeout}s per attempt ×{" "}
+                                {localRetryAttempts + 1} attempts + backoff
+                                delays)
                             </ThemedText>
                         </ThemedBox>
                     )}
@@ -342,15 +417,24 @@ export const SettingsTab = ({
             </ThemedCard>
 
             {/* Site Information */}
-            <ThemedCard icon={<MdInfoOutline color={iconColors.info} />} title="Site Information">
+            <ThemedCard
+                icon={<MdInfoOutline color={iconColors.info} />}
+                title="Site Information"
+            >
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="space-y-3">
                         <div className="flex items-center justify-between">
                             <ThemedText size="sm" variant="secondary">
-                                <IdentifierLabel selectedMonitor={selectedMonitor} />:
+                                <IdentifierLabel
+                                    selectedMonitor={selectedMonitor}
+                                />
+                                :
                             </ThemedText>
                             <ThemedBadge size="sm" variant="secondary">
-                                {getDisplayIdentifier(currentSite, selectedMonitor)}
+                                {getDisplayIdentifier(
+                                    currentSite,
+                                    selectedMonitor
+                                )}
                             </ThemedBadge>
                         </div>
                         <div className="flex items-center justify-between">
@@ -369,7 +453,9 @@ export const SettingsTab = ({
                             </ThemedText>
                             <ThemedText size="xs" variant="tertiary">
                                 {selectedMonitor.lastChecked
-                                    ? new Date(selectedMonitor.lastChecked).toLocaleString()
+                                    ? new Date(
+                                          selectedMonitor.lastChecked
+                                      ).toLocaleString()
                                     : "Never"}
                             </ThemedText>
                         </div>
@@ -385,11 +471,21 @@ export const SettingsTab = ({
             >
                 <div className="space-y-4">
                     <div>
-                        <ThemedText className="mb-2" size="sm" variant="error" weight="medium">
+                        <ThemedText
+                            className="mb-2"
+                            size="sm"
+                            variant="error"
+                            weight="medium"
+                        >
                             Remove Site
                         </ThemedText>
-                        <ThemedText className="mb-4" size="xs" variant="tertiary">
-                            This action cannot be undone. All history data for this site will be lost.
+                        <ThemedText
+                            className="mb-4"
+                            size="xs"
+                            variant="tertiary"
+                        >
+                            This action cannot be undone. All history data for
+                            this site will be lost.
                         </ThemedText>
                         <ThemedButton
                             className="w-full"
@@ -406,7 +502,7 @@ export const SettingsTab = ({
             </ThemedCard>
         </div>
     );
-}
+};
 
 /**
  * Helper function to format retry attempts text.
@@ -417,7 +513,10 @@ export const SettingsTab = ({
  * Generate a display identifier based on the monitor type.
  * Uses dynamic utility instead of hardcoded backward compatibility patterns.
  */
-function getDisplayIdentifier(currentSite: Site, selectedMonitor: Monitor): string {
+function getDisplayIdentifier(
+    currentSite: Site,
+    selectedMonitor: Monitor
+): string {
     return getMonitorDisplayIdentifier(selectedMonitor, currentSite.identifier);
 }
 
@@ -430,7 +529,9 @@ async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
             const config = await getMonitorTypeConfig(selectedMonitor.type);
             if (config?.fields) {
                 // Generate label based on primary field(s)
-                const primaryField = config.fields.find((field) => field.required);
+                const primaryField = config.fields.find(
+                    (field) => field.required
+                );
                 if (primaryField) {
                     return primaryField.label;
                 }

@@ -7,7 +7,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Site } from "@shared/types";
 
-import { createSitesStateActions, initialSitesState } from "../../../stores/sites/useSitesState";
+import {
+    createSitesStateActions,
+    initialSitesState,
+} from "../../../stores/sites/useSitesState";
 
 // Mock logging
 vi.mock("../../../stores/utils", () => ({
@@ -76,7 +79,11 @@ describe("useSitesState", () => {
             expect(setFunction).toBeDefined();
 
             if (setFunction) {
-                const result = setFunction({ selectedMonitorIds: {}, selectedSiteId: undefined, sites: [] });
+                const result = setFunction({
+                    selectedMonitorIds: {},
+                    selectedSiteId: undefined,
+                    sites: [],
+                });
                 expect(result).toEqual({ sites: newSites });
             }
         });
@@ -224,7 +231,9 @@ describe("useSitesState", () => {
 
             if (setFunction) {
                 const result = setFunction({ selectedMonitorIds: {} });
-                expect(result.selectedMonitorIds?.["test-site"]).toBe("monitor-1");
+                expect(result.selectedMonitorIds?.["test-site"]).toBe(
+                    "monitor-1"
+                );
             }
         });
 
@@ -236,7 +245,9 @@ describe("useSitesState", () => {
                 const result = setFunction({
                     selectedMonitorIds: { "test-site": "monitor-1" },
                 });
-                expect(result.selectedMonitorIds?.["test-site"]).toBe("monitor-2");
+                expect(result.selectedMonitorIds?.["test-site"]).toBe(
+                    "monitor-2"
+                );
             }
         });
     });
@@ -295,7 +306,9 @@ describe("useSitesState", () => {
                 setFunction({ selectedMonitorIds: originalIds });
 
                 // Original object should be unchanged
-                expect(originalIds).toEqual({ "existing-site": "existing-monitor" });
+                expect(originalIds).toEqual({
+                    "existing-site": "existing-monitor",
+                });
                 expect(originalIds).not.toHaveProperty("test-site");
             }
         });

@@ -128,7 +128,9 @@ export function formatResponseTime(time?: number): string {
  * @param interval - Interval configuration (number or object with value/label)
  * @returns Human readable label for the interval
  */
-export function getIntervalLabel(interval: number | { label?: string; value: number }): string {
+export function getIntervalLabel(
+    interval: number | { label?: string; value: number }
+): string {
     if (typeof interval === "number") {
         return formatIntervalDuration(interval);
     }

@@ -88,13 +88,18 @@ describe("Main Entry Point", () => {
     });
 
     it("should handle error when root element not found", async () => {
-        const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+        const consoleErrorSpy = vi
+            .spyOn(console, "error")
+            .mockImplementation(() => {});
         (document.getElementById as any).mockReturnValue(null);
 
         // The import should succeed but log an error
         await import("../main");
 
-        expect(consoleErrorSpy).toHaveBeenCalledWith("Failed to initialize application:", expect.any(Error));
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+            "Failed to initialize application:",
+            expect.any(Error)
+        );
 
         consoleErrorSpy.mockRestore();
     });

@@ -52,48 +52,49 @@ import { createSiteSyncActions } from "./useSiteSync";
  * @returns Complete sites store with all actions and state
  * @public
  */
-export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> = create<SitesStore>()((
-    set: (function_: (state: SitesStore) => Partial<SitesStore>) => void,
-    get: () => SitesStore
-) => {
-    // Create state actions
-    const stateActions = createSitesStateActions(set, get);
+export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
+    create<SitesStore>()((
+        set: (function_: (state: SitesStore) => Partial<SitesStore>) => void,
+        get: () => SitesStore
+    ) => {
+        // Create state actions
+        const stateActions = createSitesStateActions(set, get);
 
-    // Shared getSites function - eliminates duplication and improves testability
-    const getSites = () => get().sites;
+        // Shared getSites function - eliminates duplication and improves testability
+        const getSites = () => get().sites;
 
-    // Create sync actions (needed by other modules)
-    const syncActions = createSiteSyncActions({
-        getSites,
-        setSites: stateActions.setSites,
+        // Create sync actions (needed by other modules)
+        const syncActions = createSiteSyncActions({
+            getSites,
+            setSites: stateActions.setSites,
+        });
+
+        // Create monitoring actions
+        const monitoringActions = createSiteMonitoringActions();
+
+        // Create operations actions
+        const operationsActions = createSiteOperationsActions({
+            addSite: stateActions.addSite,
+            getSites,
+            removeSite: stateActions.removeSite,
+            setSites: stateActions.setSites,
+            syncSitesFromBackend: syncActions.syncSitesFromBackend,
+        });
+
+        return {
+            // Initial state
+            ...initialSitesState,
+
+            // State actions
+            ...stateActions,
+
+            // Operations actions
+            ...operationsActions,
+
+            // Monitoring actions
+            ...monitoringActions,
+
+            // Sync actions
+            ...syncActions,
+        };
     });
-
-    // Create monitoring actions
-    const monitoringActions = createSiteMonitoringActions();
-
-    // Create operations actions
-    const operationsActions = createSiteOperationsActions({
-        addSite: stateActions.addSite,
-        getSites,
-        removeSite: stateActions.removeSite,
-        setSites: stateActions.setSites,
-        syncSitesFromBackend: syncActions.syncSitesFromBackend,
-    });
-
-    return {
-        // Initial state
-        ...initialSitesState,
-
-        // State actions
-        ...stateActions,
-
-        // Operations actions
-        ...operationsActions,
-
-        // Monitoring actions
-        ...monitoringActions,
-
-        // Sync actions
-        ...syncActions,
-    };
-});

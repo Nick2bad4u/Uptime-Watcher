@@ -167,7 +167,9 @@ describe("Monitor Form Data Types", () => {
         });
 
         it("should create default form data for any type", () => {
-            const defaultCustom = (createDefaultFormData as (type: string) => Partial<BaseFormData>)("custom");
+            const defaultCustom = (
+                createDefaultFormData as (type: string) => Partial<BaseFormData>
+            )("custom");
 
             expect(defaultCustom.type).toBe("custom");
             expect(defaultCustom.checkInterval).toBe(300_000);
@@ -194,7 +196,9 @@ describe("Monitor Form Data Types", () => {
                     url: "https://example.com",
                 };
 
-                expect(isHttpFormData(wrongType as Partial<MonitorFormData>)).toBe(false);
+                expect(
+                    isHttpFormData(wrongType as Partial<MonitorFormData>)
+                ).toBe(false);
             });
 
             it("should return false for data missing URL", () => {
@@ -202,7 +206,9 @@ describe("Monitor Form Data Types", () => {
                     type: "http" as const,
                 };
 
-                expect(isHttpFormData(missingUrl as Partial<MonitorFormData>)).toBe(false);
+                expect(
+                    isHttpFormData(missingUrl as Partial<MonitorFormData>)
+                ).toBe(false);
             });
 
             it("should return false for data with invalid URL type", () => {
@@ -231,7 +237,9 @@ describe("Monitor Form Data Types", () => {
                     type: "http" as const,
                 };
 
-                expect(isPingFormData(wrongType as Partial<MonitorFormData>)).toBe(false);
+                expect(
+                    isPingFormData(wrongType as Partial<MonitorFormData>)
+                ).toBe(false);
             });
 
             it("should return false for data missing host", () => {
@@ -239,7 +247,9 @@ describe("Monitor Form Data Types", () => {
                     type: "ping" as const,
                 };
 
-                expect(isPingFormData(missingHost as Partial<MonitorFormData>)).toBe(false);
+                expect(
+                    isPingFormData(missingHost as Partial<MonitorFormData>)
+                ).toBe(false);
             });
 
             it("should return false for data with invalid host type", () => {
@@ -270,7 +280,9 @@ describe("Monitor Form Data Types", () => {
                     type: "http" as const,
                 };
 
-                expect(isPortFormData(wrongType as Partial<MonitorFormData>)).toBe(false);
+                expect(
+                    isPortFormData(wrongType as Partial<MonitorFormData>)
+                ).toBe(false);
             });
 
             it("should return false for data missing host", () => {
@@ -279,7 +291,9 @@ describe("Monitor Form Data Types", () => {
                     type: "port" as const,
                 };
 
-                expect(isPortFormData(missingHost as Partial<MonitorFormData>)).toBe(false);
+                expect(
+                    isPortFormData(missingHost as Partial<MonitorFormData>)
+                ).toBe(false);
             });
 
             it("should return false for data missing port", () => {
@@ -288,7 +302,9 @@ describe("Monitor Form Data Types", () => {
                     type: "port" as const,
                 };
 
-                expect(isPortFormData(missingPort as Partial<MonitorFormData>)).toBe(false);
+                expect(
+                    isPortFormData(missingPort as Partial<MonitorFormData>)
+                ).toBe(false);
             });
 
             it("should return false for data with invalid host type", () => {
@@ -396,15 +412,23 @@ describe("Monitor Form Data Types", () => {
                     customProperty: "test value",
                 };
 
-                expect(safeGetFormProperty(data, "checkInterval", 1000)).toBe(5000);
-                expect(safeGetFormProperty(data, "customProperty", "default")).toBe("test value");
+                expect(safeGetFormProperty(data, "checkInterval", 1000)).toBe(
+                    5000
+                );
+                expect(
+                    safeGetFormProperty(data, "customProperty", "default")
+                ).toBe("test value");
             });
 
             it("should return default value when property does not exist", () => {
                 const data: DynamicFormData = {};
 
-                expect(safeGetFormProperty(data, "checkInterval", 1000)).toBe(1000);
-                expect(safeGetFormProperty(data, "nonExistent", "default")).toBe("default");
+                expect(safeGetFormProperty(data, "checkInterval", 1000)).toBe(
+                    1000
+                );
+                expect(
+                    safeGetFormProperty(data, "nonExistent", "default")
+                ).toBe("default");
             });
 
             it("should return default value when property is undefined", () => {
@@ -412,7 +436,9 @@ describe("Monitor Form Data Types", () => {
                     checkInterval: undefined,
                 };
 
-                expect(safeGetFormProperty(data, "checkInterval", 1000)).toBe(1000);
+                expect(safeGetFormProperty(data, "checkInterval", 1000)).toBe(
+                    1000
+                );
             });
 
             it("should return property value even if falsy (but not undefined)", () => {
@@ -422,7 +448,9 @@ describe("Monitor Form Data Types", () => {
                     text: "",
                 };
 
-                expect(safeGetFormProperty(data, "checkInterval", 1000)).toBe(0);
+                expect(safeGetFormProperty(data, "checkInterval", 1000)).toBe(
+                    0
+                );
                 expect(safeGetFormProperty(data, "enabled", true)).toBe(false);
                 expect(safeGetFormProperty(data, "text", "default")).toBe("");
             });
@@ -501,8 +529,12 @@ describe("Monitor Form Data Types", () => {
             // Update interval
             safeSetFormProperty(editedData, "checkInterval", 600_000);
 
-            expect(safeGetFormProperty(editedData, "url", "")).toBe("https://new-url.com");
-            expect(safeGetFormProperty(editedData, "checkInterval", 0)).toBe(600_000);
+            expect(safeGetFormProperty(editedData, "url", "")).toBe(
+                "https://new-url.com"
+            );
+            expect(safeGetFormProperty(editedData, "checkInterval", 0)).toBe(
+                600_000
+            );
             expect(isValidMonitorFormData(editedData)).toBe(true);
         });
 

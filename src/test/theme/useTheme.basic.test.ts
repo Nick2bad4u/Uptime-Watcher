@@ -12,7 +12,12 @@ vi.mock("../../theme/ThemeManager", () => ({
             name: "light",
             isDark: false,
             colors: {
-                status: { up: "#10b981", down: "#ef4444", pending: "#f59e0b", unknown: "#6b7280" },
+                status: {
+                    up: "#10b981",
+                    down: "#ef4444",
+                    pending: "#f59e0b",
+                    unknown: "#6b7280",
+                },
                 success: "#10b981",
                 error: "#ef4444",
                 warning: "#f59e0b",
@@ -36,7 +41,13 @@ vi.mock("../../stores/settings/useSettingsStore", () => ({
     })),
 }));
 
-import { useTheme, useAvailabilityColors, useStatusColors, useThemeClasses, useThemeValue } from "../../theme/useTheme";
+import {
+    useTheme,
+    useAvailabilityColors,
+    useStatusColors,
+    useThemeClasses,
+    useThemeValue,
+} from "../../theme/useTheme";
 
 describe("useTheme Basic Coverage", () => {
     beforeEach(() => {
@@ -58,7 +69,9 @@ describe("useTheme Basic Coverage", () => {
 
         expect(typeof result.current.getAvailabilityColor).toBe("function");
         expect(typeof result.current.getAvailabilityVariant).toBe("function");
-        expect(typeof result.current.getAvailabilityDescription).toBe("function");
+        expect(typeof result.current.getAvailabilityDescription).toBe(
+            "function"
+        );
 
         // Test actual function calls for coverage
         const color = result.current.getAvailabilityColor(99);
@@ -97,7 +110,9 @@ describe("useTheme Basic Coverage", () => {
     });
 
     it("should cover useThemeValue", () => {
-        const { result } = renderHook(() => useThemeValue((theme) => theme.name));
+        const { result } = renderHook(() =>
+            useThemeValue((theme) => theme.name)
+        );
 
         expect(typeof result.current).toBe("string");
     });

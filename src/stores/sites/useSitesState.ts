@@ -70,17 +70,27 @@ export const createSitesStateActions = (
 
             // Filter out the monitor selection for the removed site
             const remainingMonitorIds = Object.fromEntries(
-                Object.entries(currentMonitorIds).filter(([key]) => key !== identifier)
+                Object.entries(currentMonitorIds).filter(
+                    ([key]) => key !== identifier
+                )
             );
             return {
                 selectedMonitorIds: remainingMonitorIds,
-                selectedSiteId: state.selectedSiteId === identifier ? undefined : state.selectedSiteId,
-                sites: state.sites.filter((site) => site.identifier !== identifier),
+                selectedSiteId:
+                    state.selectedSiteId === identifier
+                        ? undefined
+                        : state.selectedSiteId,
+                sites: state.sites.filter(
+                    (site) => site.identifier !== identifier
+                ),
             };
         });
     },
     setSelectedMonitorId: (siteId: string, monitorId: string) => {
-        logStoreAction("SitesStore", "setSelectedMonitorId", { monitorId, siteId });
+        logStoreAction("SitesStore", "setSelectedMonitorId", {
+            monitorId,
+            siteId,
+        });
         set((state) => ({
             selectedMonitorIds: {
                 ...state.selectedMonitorIds,

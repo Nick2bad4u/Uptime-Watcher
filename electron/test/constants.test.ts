@@ -66,7 +66,9 @@ describe("Electron Constants", () => {
 
         it("should have reasonable retry delay values", () => {
             expect(RETRY_BACKOFF.INITIAL_DELAY).toBeGreaterThan(0);
-            expect(RETRY_BACKOFF.MAX_DELAY).toBeGreaterThan(RETRY_BACKOFF.INITIAL_DELAY);
+            expect(RETRY_BACKOFF.MAX_DELAY).toBeGreaterThan(
+                RETRY_BACKOFF.INITIAL_DELAY
+            );
             expect(RETRY_BACKOFF.MAX_DELAY).toBeLessThanOrEqual(10_000); // Not more than 10 seconds
         });
 
@@ -115,12 +117,16 @@ describe("Electron Constants", () => {
     describe("Constants Integration", () => {
         it("should have timeout less than check interval", () => {
             // Request timeout should be much less than check interval
-            expect(DEFAULT_REQUEST_TIMEOUT).toBeLessThan(DEFAULT_CHECK_INTERVAL);
+            expect(DEFAULT_REQUEST_TIMEOUT).toBeLessThan(
+                DEFAULT_CHECK_INTERVAL
+            );
         });
 
         it("should have max retry delay less than request timeout", () => {
             // Max retry delay should be less than total request timeout
-            expect(RETRY_BACKOFF.MAX_DELAY).toBeLessThan(DEFAULT_REQUEST_TIMEOUT);
+            expect(RETRY_BACKOFF.MAX_DELAY).toBeLessThan(
+                DEFAULT_REQUEST_TIMEOUT
+            );
         });
     });
 });

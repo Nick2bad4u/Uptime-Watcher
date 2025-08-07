@@ -7,7 +7,12 @@ import type { JSX } from "react/jsx-runtime";
 
 import { FaListOl } from "react-icons/fa";
 import { FiTrash2 } from "react-icons/fi";
-import { MdAccessTime, MdBolt, MdOutlineFactCheck, MdSpeed } from "react-icons/md";
+import {
+    MdAccessTime,
+    MdBolt,
+    MdOutlineFactCheck,
+    MdSpeed,
+} from "react-icons/md";
 
 import { CHECK_INTERVALS, TIMEOUT_CONSTRAINTS } from "../../../constants";
 import logger from "../../../services/logger";
@@ -39,7 +44,9 @@ export interface OverviewTabProperties {
     /** Function to format response time for display */
     readonly formatResponseTime: (time: number) => string;
     /** Handler for monitor check interval changes */
-    readonly handleIntervalChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    readonly handleIntervalChange: (
+        e: React.ChangeEvent<HTMLSelectElement>
+    ) => void;
     /** Handler for removing the monitor */
     readonly handleRemoveMonitor: () => Promise<void>;
     /** Handler for saving interval changes */
@@ -47,7 +54,9 @@ export interface OverviewTabProperties {
     /** Handler for saving timeout changes */
     readonly handleSaveTimeout: () => Promise<void>;
     /** Handler for monitor timeout changes */
-    readonly handleTimeoutChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    readonly handleTimeoutChange: (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => void;
     /** Whether the check interval has been changed */
     readonly intervalChanged: boolean;
     /** Whether any async operation is in progress */
@@ -103,11 +112,14 @@ export const OverviewTab = ({
     totalChecks,
     uptime,
 }: OverviewTabProperties): JSX.Element => {
-    const { getAvailabilityColor, getAvailabilityVariant } = useAvailabilityColors();
+    const { getAvailabilityColor, getAvailabilityVariant } =
+        useAvailabilityColors();
     const { currentTheme } = useTheme();
 
     // Map availability variant to progress/badge variant
-    const mapAvailabilityToBadgeVariant = (availability: number): "error" | "success" | "warning" => {
+    const mapAvailabilityToBadgeVariant = (
+        availability: number
+    ): "error" | "success" | "warning" => {
         const variant = getAvailabilityVariant(availability);
         return variant === "danger" ? "error" : variant;
     };
@@ -156,7 +168,11 @@ export const OverviewTab = ({
                     iconColor={iconColors.status}
                     title="Status"
                 >
-                    <StatusIndicator showText size="lg" status={selectedMonitor.status} />
+                    <StatusIndicator
+                        showText
+                        size="lg"
+                        status={selectedMonitor.status}
+                    />
                 </ThemedCard>
 
                 <ThemedCard
@@ -172,7 +188,11 @@ export const OverviewTab = ({
                         value={uptimeValue}
                         variant={progressVariant}
                     />
-                    <ThemedBadge className="mt-2" size="sm" variant={progressVariant}>
+                    <ThemedBadge
+                        className="mt-2"
+                        size="sm"
+                        variant={progressVariant}
+                    >
                         {uptime}%
                     </ThemedBadge>
                 </ThemedCard>
@@ -184,7 +204,11 @@ export const OverviewTab = ({
                     iconColor={iconColors.response}
                     title="Response Time"
                 >
-                    <ThemedText size="xl" style={{ color: getResponseTimeColor(avgResponseTime) }} weight="bold">
+                    <ThemedText
+                        size="xl"
+                        style={{ color: getResponseTimeColor(avgResponseTime) }}
+                        weight="bold"
+                    >
                         {formatResponseTime(avgResponseTime)}
                     </ThemedText>
                 </ThemedCard>
@@ -203,7 +227,10 @@ export const OverviewTab = ({
             </div>
 
             {/* Performance Metrics */}
-            <ThemedCard icon={<MdBolt color={iconColors.fastest} />} title="Performance Overview">
+            <ThemedCard
+                icon={<MdBolt color={iconColors.fastest} />}
+                title="Performance Overview"
+            >
                 <div className="flex justify-center">
                     <div className="grid grid-cols-2 gap-6">
                         <div className="text-center">
@@ -237,16 +264,26 @@ export const OverviewTab = ({
             </ThemedCard>
 
             {/* Quick Actions */}
-            <ThemedCard icon={<MdBolt color={iconColors.quickAction} />} title="Quick Actions">
+            <ThemedCard
+                icon={<MdBolt color={iconColors.quickAction} />}
+                title="Quick Actions"
+            >
                 <div className="flex flex-wrap items-center justify-between gap-4">
                     {/* Interval Control */}
                     <div className="flex items-center gap-2">
                         <ThemedText size="sm" variant="secondary">
                             Interval:
                         </ThemedText>
-                        <ThemedSelect disabled={isLoading} onChange={handleIntervalChange} value={localCheckInterval}>
+                        <ThemedSelect
+                            disabled={isLoading}
+                            onChange={handleIntervalChange}
+                            value={localCheckInterval}
+                        >
                             {CHECK_INTERVALS.map((interval) => {
-                                const value = typeof interval === "number" ? interval : interval.value;
+                                const value =
+                                    typeof interval === "number"
+                                        ? interval
+                                        : interval.value;
                                 const label = getIntervalLabel(interval);
                                 return (
                                     <option key={value} value={value}>
@@ -316,11 +353,16 @@ export const OverviewTab = ({
                         disabled={isLoading}
                         icon={<FiTrash2 />}
                         onClick={() => {
-                            logger.user.action("Monitor removal button clicked from overview tab", {
-                                monitorId: selectedMonitor.id,
-                                monitorType: selectedMonitor.type,
-                                monitorUrl: selectedMonitor.url ?? selectedMonitor.host,
-                            });
+                            logger.user.action(
+                                "Monitor removal button clicked from overview tab",
+                                {
+                                    monitorId: selectedMonitor.id,
+                                    monitorType: selectedMonitor.type,
+                                    monitorUrl:
+                                        selectedMonitor.url ??
+                                        selectedMonitor.host,
+                                }
+                            );
                             void handleRemoveMonitor();
                         }}
                         size="sm"

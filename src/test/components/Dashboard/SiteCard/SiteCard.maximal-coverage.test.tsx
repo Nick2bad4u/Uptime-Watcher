@@ -41,7 +41,8 @@ vi.mock("../../../../utils/siteStatus", () => ({
 vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHeader", () => ({
     SiteCardHeader: vi.fn(({ site, display, interactions, monitoring }) => (
         <div data-testid="site-card-header" onClick={interactions?.onCheckNow}>
-            Header: {site?.site?.name || "Unknown"} | Loading: {display?.isLoading ? "yes" : "no"} | Monitoring:{" "}
+            Header: {site?.site?.name || "Unknown"} | Loading:{" "}
+            {display?.isLoading ? "yes" : "no"} | Monitoring:{" "}
             {monitoring?.isMonitoring ? "yes" : "no"}
         </div>
     )),
@@ -58,7 +59,8 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardStatus", () => ({
 vi.mock("../../../../components/Dashboard/SiteCard/SiteCardMetrics", () => ({
     SiteCardMetrics: vi.fn(({ status, uptime, checkCount, responseTime }) => (
         <div data-testid="site-card-metrics">
-            Metrics: {status} | Uptime: {uptime}% | Checks: {checkCount} | Response: {responseTime}ms
+            Metrics: {status} | Uptime: {uptime}% | Checks: {checkCount} |
+            Response: {responseTime}ms
         </div>
     )),
 }));
@@ -66,13 +68,16 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardMetrics", () => ({
 vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHistory", () => ({
     SiteCardHistory: vi.fn(({ filteredHistory, monitor }) => (
         <div data-testid="site-card-history">
-            History: {filteredHistory?.length || 0} items | Monitor: {monitor?.type || "none"}
+            History: {filteredHistory?.length || 0} items | Monitor:{" "}
+            {monitor?.type || "none"}
         </div>
     )),
 }));
 
 vi.mock("../../../../components/Dashboard/SiteCard/SiteCardFooter", () => ({
-    SiteCardFooter: vi.fn(() => <div data-testid="site-card-footer">Footer: Click to expand</div>),
+    SiteCardFooter: vi.fn(() => (
+        <div data-testid="site-card-footer">Footer: Click to expand</div>
+    )),
 }));
 
 describe("SiteCard Component - Complete Coverage", () => {
@@ -117,10 +122,20 @@ describe("SiteCard Component - Complete Coverage", () => {
     it("should pass correct data to all child components", () => {
         render(<SiteCard site={mockSite} />);
 
-        expect(screen.getByTestId("site-card-header")).toHaveTextContent("Test Site");
-        expect(screen.getByTestId("site-card-status")).toHaveTextContent("operational");
-        expect(screen.getByTestId("site-card-metrics")).toHaveTextContent("Uptime: 98%");
-        expect(screen.getByTestId("site-card-history")).toHaveTextContent("History: 0 items");
-        expect(screen.getByTestId("site-card-footer")).toHaveTextContent("Click to expand");
+        expect(screen.getByTestId("site-card-header")).toHaveTextContent(
+            "Test Site"
+        );
+        expect(screen.getByTestId("site-card-status")).toHaveTextContent(
+            "operational"
+        );
+        expect(screen.getByTestId("site-card-metrics")).toHaveTextContent(
+            "Uptime: 98%"
+        );
+        expect(screen.getByTestId("site-card-history")).toHaveTextContent(
+            "History: 0 items"
+        );
+        expect(screen.getByTestId("site-card-footer")).toHaveTextContent(
+            "Click to expand"
+        );
     });
 });

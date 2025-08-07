@@ -139,9 +139,13 @@ describe("useSettingsStore", () => {
         });
 
         it("should handle initialization errors", async () => {
-            mockElectronAPI.settings.getHistoryLimit.mockRejectedValue(new Error("Backend error"));
+            mockElectronAPI.settings.getHistoryLimit.mockRejectedValue(
+                new Error("Backend error")
+            );
 
-            await expect(useSettingsStore.getState().initializeSettings()).rejects.toThrow("Backend error");
+            await expect(
+                useSettingsStore.getState().initializeSettings()
+            ).rejects.toThrow("Backend error");
         });
     });
 
@@ -161,14 +165,18 @@ describe("useSettingsStore", () => {
         });
 
         it("should update minimizeToTray via updateSettings", () => {
-            useSettingsStore.getState().updateSettings({ minimizeToTray: false });
+            useSettingsStore
+                .getState()
+                .updateSettings({ minimizeToTray: false });
 
             const state = useSettingsStore.getState();
             expect(state.settings.minimizeToTray).toBe(false);
         });
 
         it("should update notifications via updateSettings", () => {
-            useSettingsStore.getState().updateSettings({ notifications: false });
+            useSettingsStore
+                .getState()
+                .updateSettings({ notifications: false });
 
             const state = useSettingsStore.getState();
             expect(state.settings.notifications).toBe(false);
@@ -191,7 +199,9 @@ describe("useSettingsStore", () => {
 
     describe("updateHistoryLimitValue", () => {
         it("should update history limit with backend sync", async () => {
-            mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue(undefined);
+            mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue(
+                undefined
+            );
             mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
                 success: true,
                 data: 300,
@@ -199,7 +209,9 @@ describe("useSettingsStore", () => {
 
             await useSettingsStore.getState().updateHistoryLimitValue(300);
 
-            expect(mockElectronAPI.settings.updateHistoryLimit).toHaveBeenCalledWith(300);
+            expect(
+                mockElectronAPI.settings.updateHistoryLimit
+            ).toHaveBeenCalledWith(300);
             expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalled();
 
             const state = useSettingsStore.getState();
@@ -207,9 +219,13 @@ describe("useSettingsStore", () => {
         });
 
         it("should handle backend errors when updating history limit", async () => {
-            mockElectronAPI.settings.updateHistoryLimit.mockRejectedValue(new Error("Backend error"));
+            mockElectronAPI.settings.updateHistoryLimit.mockRejectedValue(
+                new Error("Backend error")
+            );
 
-            await expect(useSettingsStore.getState().updateHistoryLimitValue(300)).rejects.toThrow("Backend error");
+            await expect(
+                useSettingsStore.getState().updateHistoryLimitValue(300)
+            ).rejects.toThrow("Backend error");
         });
     });
 
@@ -243,9 +259,15 @@ describe("useSettingsStore", () => {
             expect(state.settings.notifications).toBe(false);
             // All other settings should remain unchanged
             expect(state.settings.autoStart).toBe(originalSettings.autoStart);
-            expect(state.settings.historyLimit).toBe(originalSettings.historyLimit);
-            expect(state.settings.minimizeToTray).toBe(originalSettings.minimizeToTray);
-            expect(state.settings.soundAlerts).toBe(originalSettings.soundAlerts);
+            expect(state.settings.historyLimit).toBe(
+                originalSettings.historyLimit
+            );
+            expect(state.settings.minimizeToTray).toBe(
+                originalSettings.minimizeToTray
+            );
+            expect(state.settings.soundAlerts).toBe(
+                originalSettings.soundAlerts
+            );
             expect(state.settings.theme).toBe(originalSettings.theme);
         });
 
@@ -283,7 +305,9 @@ describe("useSettingsStore", () => {
         });
 
         it("should handle very large historyLimit", () => {
-            useSettingsStore.getState().updateSettings({ historyLimit: 999999 });
+            useSettingsStore
+                .getState()
+                .updateSettings({ historyLimit: 999999 });
 
             const state = useSettingsStore.getState();
             expect(state.settings.historyLimit).toBe(999999);
@@ -293,7 +317,9 @@ describe("useSettingsStore", () => {
     describe("Store Behavior", () => {
         it("should maintain state across multiple calls", () => {
             useSettingsStore.getState().updateSettings({ autoStart: true });
-            useSettingsStore.getState().updateSettings({ notifications: false });
+            useSettingsStore
+                .getState()
+                .updateSettings({ notifications: false });
             useSettingsStore.getState().updateSettings({ theme: "dark" });
 
             const state = useSettingsStore.getState();
@@ -340,21 +366,31 @@ describe("useSettingsStore", () => {
 
             // Test minimizeToTray
             store.updateSettings({ minimizeToTray: true });
-            expect(useSettingsStore.getState().settings.minimizeToTray).toBe(true);
+            expect(useSettingsStore.getState().settings.minimizeToTray).toBe(
+                true
+            );
             store.updateSettings({ minimizeToTray: false });
-            expect(useSettingsStore.getState().settings.minimizeToTray).toBe(false);
+            expect(useSettingsStore.getState().settings.minimizeToTray).toBe(
+                false
+            );
 
             // Test notifications
             store.updateSettings({ notifications: true });
-            expect(useSettingsStore.getState().settings.notifications).toBe(true);
+            expect(useSettingsStore.getState().settings.notifications).toBe(
+                true
+            );
             store.updateSettings({ notifications: false });
-            expect(useSettingsStore.getState().settings.notifications).toBe(false);
+            expect(useSettingsStore.getState().settings.notifications).toBe(
+                false
+            );
 
             // Test soundAlerts
             store.updateSettings({ soundAlerts: true });
             expect(useSettingsStore.getState().settings.soundAlerts).toBe(true);
             store.updateSettings({ soundAlerts: false });
-            expect(useSettingsStore.getState().settings.soundAlerts).toBe(false);
+            expect(useSettingsStore.getState().settings.soundAlerts).toBe(
+                false
+            );
         });
     });
 });

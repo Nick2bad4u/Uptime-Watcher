@@ -149,7 +149,10 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         });
 
         it("should check if specific monitor is active in scheduler", () => {
-            const result = manager.isMonitorActiveInScheduler("site-1", "monitor-1");
+            const result = manager.isMonitorActiveInScheduler(
+                "site-1",
+                "monitor-1"
+            );
             expect(result).toBe(false);
         });
 
@@ -158,7 +161,10 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         });
 
         it("should restart monitor with new config successfully", () => {
-            const result = manager.restartMonitorWithNewConfig("site-1", mockMonitor);
+            const result = manager.restartMonitorWithNewConfig(
+                "site-1",
+                mockMonitor
+            );
             expect(result).toBe(true);
         });
     });
@@ -173,16 +179,25 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             };
 
             // Mock the enhanced checker to return the status update
-            vi.mocked(mockEnhancedServices.checker.checkMonitor).mockResolvedValue(mockStatusUpdate);
+            vi.mocked(
+                mockEnhancedServices.checker.checkMonitor
+            ).mockResolvedValue(mockStatusUpdate);
 
-            const result = await manager.checkSiteManually("site-1", "monitor-1");
+            const result = await manager.checkSiteManually(
+                "site-1",
+                "monitor-1"
+            );
 
-            expect(mockEnhancedServices.checker.checkMonitor).toHaveBeenCalledWith(
+            expect(
+                mockEnhancedServices.checker.checkMonitor
+            ).toHaveBeenCalledWith(
                 mockSite,
                 "monitor-1",
                 true // isManualCheck flag
             );
-            expect(mockDependencies.eventEmitter.emitTyped).toHaveBeenCalledWith(
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).toHaveBeenCalledWith(
                 "internal:monitor:manual-check-completed",
                 expect.objectContaining({
                     identifier: "site-1",
@@ -203,13 +218,19 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             };
 
             // Mock the enhanced checker to return the status update
-            vi.mocked(mockEnhancedServices.checker.checkMonitor).mockResolvedValue(mockStatusUpdate);
+            vi.mocked(
+                mockEnhancedServices.checker.checkMonitor
+            ).mockResolvedValue(mockStatusUpdate);
 
             const result = await manager.checkSiteManually("site-1");
 
             // Should check the first monitor when no specific monitor ID provided
-            expect(mockEnhancedServices.checker.checkMonitor).toHaveBeenCalledWith(mockSite, "monitor-1", true);
-            expect(mockDependencies.eventEmitter.emitTyped).toHaveBeenCalledWith(
+            expect(
+                mockEnhancedServices.checker.checkMonitor
+            ).toHaveBeenCalledWith(mockSite, "monitor-1", true);
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).toHaveBeenCalledWith(
                 "internal:monitor:manual-check-completed",
                 expect.objectContaining({
                     identifier: "site-1",
@@ -222,11 +243,18 @@ describe("MonitorManager - Comprehensive Coverage", () => {
 
         it("should handle manual check returning null", async () => {
             // Mock the enhanced checker to return undefined
-            vi.mocked(mockEnhancedServices.checker.checkMonitor).mockResolvedValue(undefined);
+            vi.mocked(
+                mockEnhancedServices.checker.checkMonitor
+            ).mockResolvedValue(undefined);
 
-            const result = await manager.checkSiteManually("site-1", "monitor-1");
+            const result = await manager.checkSiteManually(
+                "site-1",
+                "monitor-1"
+            );
 
-            expect(mockEnhancedServices.checker.checkMonitor).toHaveBeenCalledWith(mockSite, "monitor-1", true);
+            expect(
+                mockEnhancedServices.checker.checkMonitor
+            ).toHaveBeenCalledWith(mockSite, "monitor-1", true);
             expect(result).toBeUndefined();
         });
     });
@@ -234,8 +262,16 @@ describe("MonitorManager - Comprehensive Coverage", () => {
     describe("setupNewMonitors - Comprehensive Coverage", () => {
         it("should setup new monitors successfully", async () => {
             const newMonitorIds = ["monitor-2", "monitor-3"];
-            const newMonitor1 = createMockMonitor({ id: "monitor-2", type: "http", monitoring: true });
-            const newMonitor2 = createMockMonitor({ id: "monitor-3", type: "http", monitoring: false });
+            const newMonitor1 = createMockMonitor({
+                id: "monitor-2",
+                type: "http",
+                monitoring: true,
+            });
+            const newMonitor2 = createMockMonitor({
+                id: "monitor-3",
+                type: "http",
+                monitoring: false,
+            });
 
             const siteWithNewMonitors = {
                 ...mockSite,
@@ -252,14 +288,18 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             await manager.setupNewMonitors(mockSite, []);
 
             // Should complete without errors but not emit events
-            expect(mockDependencies.eventEmitter.emitTyped).not.toHaveBeenCalled();
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).not.toHaveBeenCalled();
         });
 
         it("should handle new monitor IDs that don't match any monitors", async () => {
             await manager.setupNewMonitors(mockSite, ["non-existent-id"]);
 
             // Should complete without errors
-            expect(mockDependencies.eventEmitter.emitTyped).not.toHaveBeenCalled();
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).not.toHaveBeenCalled();
         });
 
         it("should apply default intervals to new monitors without checkInterval", async () => {
@@ -282,7 +322,9 @@ describe("MonitorManager - Comprehensive Coverage", () => {
 
     describe("setupSiteForMonitoring - Comprehensive Coverage", () => {
         it("should setup site successfully with auto-start", async () => {
-            const { startMonitoringForSite } = await import("../../utils/monitoring/monitorLifecycle");
+            const { startMonitoringForSite } = await import(
+                "../../utils/monitoring/monitorLifecycle"
+            );
             vi.mocked(startMonitoringForSite).mockResolvedValue(true);
 
             // Use a monitor without checkInterval to trigger updateInternal
@@ -302,8 +344,12 @@ describe("MonitorManager - Comprehensive Coverage", () => {
 
             await manager.setupSiteForMonitoring(siteWithoutInterval);
 
-            expect(mockDependencies.repositories.monitor.updateInternal).toHaveBeenCalled();
-            expect(mockDependencies.eventEmitter.emitTyped).toHaveBeenCalledWith(
+            expect(
+                mockDependencies.repositories.monitor.updateInternal
+            ).toHaveBeenCalled();
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).toHaveBeenCalledWith(
                 "internal:monitor:site-setup-completed",
                 expect.objectContaining({
                     identifier: "site-1",
@@ -317,7 +363,9 @@ describe("MonitorManager - Comprehensive Coverage", () => {
 
             await manager.setupSiteForMonitoring(disabledSite);
 
-            expect(mockDependencies.eventEmitter.emitTyped).toHaveBeenCalledWith(
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).toHaveBeenCalledWith(
                 "internal:monitor:site-setup-completed",
                 expect.objectContaining({
                     identifier: "site-1",
@@ -330,7 +378,9 @@ describe("MonitorManager - Comprehensive Coverage", () => {
 
             await manager.setupSiteForMonitoring(siteWithoutMonitors);
 
-            expect(mockDependencies.eventEmitter.emitTyped).toHaveBeenCalledWith(
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).toHaveBeenCalledWith(
                 "internal:monitor:site-setup-completed",
                 expect.objectContaining({
                     identifier: "site-1",
@@ -340,11 +390,16 @@ describe("MonitorManager - Comprehensive Coverage", () => {
 
         it("should setup site with monitors having individual monitoring disabled", async () => {
             const disabledMonitor = { ...mockMonitor, monitoring: false };
-            const siteWithDisabledMonitor = { ...mockSite, monitors: [disabledMonitor] };
+            const siteWithDisabledMonitor = {
+                ...mockSite,
+                monitors: [disabledMonitor],
+            };
 
             await manager.setupSiteForMonitoring(siteWithDisabledMonitor);
 
-            expect(mockDependencies.eventEmitter.emitTyped).toHaveBeenCalledWith(
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).toHaveBeenCalledWith(
                 "internal:monitor:site-setup-completed",
                 expect.objectContaining({
                     identifier: "site-1",
@@ -353,12 +408,20 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         });
 
         it("should setup site with monitors missing IDs", async () => {
-            const monitorWithoutId = { ...mockMonitor, id: "invalid-id" } as Monitor; // Use a valid string instead of undefined
-            const siteWithInvalidMonitor = { ...mockSite, monitors: [monitorWithoutId] };
+            const monitorWithoutId = {
+                ...mockMonitor,
+                id: "invalid-id",
+            } as Monitor; // Use a valid string instead of undefined
+            const siteWithInvalidMonitor = {
+                ...mockSite,
+                monitors: [monitorWithoutId],
+            };
 
             await manager.setupSiteForMonitoring(siteWithInvalidMonitor);
 
-            expect(mockDependencies.eventEmitter.emitTyped).toHaveBeenCalledWith(
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).toHaveBeenCalledWith(
                 "internal:monitor:site-setup-completed",
                 expect.objectContaining({
                     identifier: "site-1",
@@ -371,11 +434,16 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             vi.mocked(isDev).mockReturnValue(true);
 
             const monitorWithoutInterval = { ...mockMonitor, checkInterval: 0 };
-            const siteWithoutInterval = { ...mockSite, monitors: [monitorWithoutInterval] };
+            const siteWithoutInterval = {
+                ...mockSite,
+                monitors: [monitorWithoutInterval],
+            };
 
             await manager.setupSiteForMonitoring(siteWithoutInterval);
 
-            expect(mockDependencies.repositories.monitor.updateInternal).toHaveBeenCalledWith({}, "monitor-1", {
+            expect(
+                mockDependencies.repositories.monitor.updateInternal
+            ).toHaveBeenCalledWith({}, "monitor-1", {
                 checkInterval: DEFAULT_CHECK_INTERVAL,
             });
         });
@@ -383,13 +451,17 @@ describe("MonitorManager - Comprehensive Coverage", () => {
 
     describe("Start/Stop Monitoring - Comprehensive Coverage", () => {
         it("should start monitoring for all sites", async () => {
-            const { startAllMonitoring } = await import("../../utils/monitoring/monitorLifecycle");
+            const { startAllMonitoring } = await import(
+                "../../utils/monitoring/monitorLifecycle"
+            );
             vi.mocked(startAllMonitoring).mockResolvedValue(true);
 
             await manager.startMonitoring();
 
             expect(startAllMonitoring).toHaveBeenCalled();
-            expect(mockDependencies.eventEmitter.emitTyped).toHaveBeenCalledWith(
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).toHaveBeenCalledWith(
                 "monitoring:started",
                 expect.objectContaining({
                     monitorCount: 1,
@@ -399,13 +471,20 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         });
 
         it("should start monitoring for specific site with monitor ID", async () => {
-            const { startMonitoringForSite } = await import("../../utils/monitoring/monitorLifecycle");
+            const { startMonitoringForSite } = await import(
+                "../../utils/monitoring/monitorLifecycle"
+            );
             vi.mocked(startMonitoringForSite).mockResolvedValue(true);
 
-            const result = await manager.startMonitoringForSite("site-1", "monitor-1");
+            const result = await manager.startMonitoringForSite(
+                "site-1",
+                "monitor-1"
+            );
 
             expect(startMonitoringForSite).toHaveBeenCalled();
-            expect(mockDependencies.eventEmitter.emitTyped).toHaveBeenCalledWith(
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).toHaveBeenCalledWith(
                 "internal:monitor:started",
                 expect.objectContaining({
                     identifier: "site-1",
@@ -417,13 +496,17 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         });
 
         it("should start monitoring for specific site without monitor ID", async () => {
-            const { startMonitoringForSite } = await import("../../utils/monitoring/monitorLifecycle");
+            const { startMonitoringForSite } = await import(
+                "../../utils/monitoring/monitorLifecycle"
+            );
             vi.mocked(startMonitoringForSite).mockResolvedValue(true);
 
             const result = await manager.startMonitoringForSite("site-1");
 
             expect(startMonitoringForSite).toHaveBeenCalled();
-            expect(mockDependencies.eventEmitter.emitTyped).toHaveBeenCalledWith(
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).toHaveBeenCalledWith(
                 "internal:monitor:started",
                 expect.objectContaining({
                     identifier: "site-1",
@@ -434,13 +517,17 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         });
 
         it("should handle failed start monitoring for site", async () => {
-            const { startMonitoringForSite } = await import("../../utils/monitoring/monitorLifecycle");
+            const { startMonitoringForSite } = await import(
+                "../../utils/monitoring/monitorLifecycle"
+            );
             vi.mocked(startMonitoringForSite).mockResolvedValue(false);
 
             const result = await manager.startMonitoringForSite("site-1");
 
             expect(startMonitoringForSite).toHaveBeenCalled();
-            expect(mockDependencies.eventEmitter.emitTyped).not.toHaveBeenCalledWith(
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).not.toHaveBeenCalledWith(
                 "internal:monitor:started",
                 expect.any(Object)
             );
@@ -448,13 +535,17 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         });
 
         it("should stop monitoring for all sites", async () => {
-            const { stopAllMonitoring } = await import("../../utils/monitoring/monitorLifecycle");
+            const { stopAllMonitoring } = await import(
+                "../../utils/monitoring/monitorLifecycle"
+            );
             vi.mocked(stopAllMonitoring).mockResolvedValue(false);
 
             await manager.stopMonitoring();
 
             expect(stopAllMonitoring).toHaveBeenCalled();
-            expect(mockDependencies.eventEmitter.emitTyped).toHaveBeenCalledWith(
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).toHaveBeenCalledWith(
                 "monitoring:stopped",
                 expect.objectContaining({
                     activeMonitors: 0,
@@ -464,13 +555,20 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         });
 
         it("should stop monitoring for specific site with monitor ID", async () => {
-            const { stopMonitoringForSite } = await import("../../utils/monitoring/monitorLifecycle");
+            const { stopMonitoringForSite } = await import(
+                "../../utils/monitoring/monitorLifecycle"
+            );
             vi.mocked(stopMonitoringForSite).mockResolvedValue(true);
 
-            const result = await manager.stopMonitoringForSite("site-1", "monitor-1");
+            const result = await manager.stopMonitoringForSite(
+                "site-1",
+                "monitor-1"
+            );
 
             expect(stopMonitoringForSite).toHaveBeenCalled();
-            expect(mockDependencies.eventEmitter.emitTyped).toHaveBeenCalledWith(
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).toHaveBeenCalledWith(
                 "internal:monitor:stopped",
                 expect.objectContaining({
                     identifier: "site-1",
@@ -483,13 +581,17 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         });
 
         it("should handle failed stop monitoring for site", async () => {
-            const { stopMonitoringForSite } = await import("../../utils/monitoring/monitorLifecycle");
+            const { stopMonitoringForSite } = await import(
+                "../../utils/monitoring/monitorLifecycle"
+            );
             vi.mocked(stopMonitoringForSite).mockResolvedValue(false);
 
             const result = await manager.stopMonitoringForSite("site-1");
 
             expect(stopMonitoringForSite).toHaveBeenCalled();
-            expect(mockDependencies.eventEmitter.emitTyped).not.toHaveBeenCalledWith(
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).not.toHaveBeenCalledWith(
                 "internal:monitor:stopped",
                 expect.any(Object)
             );
@@ -499,70 +601,114 @@ describe("MonitorManager - Comprehensive Coverage", () => {
 
     describe("Edge Cases and Error Paths", () => {
         it("should handle recursive call prevention in startMonitoringForSite", async () => {
-            const { startMonitoringForSite } = await import("../../utils/monitoring/monitorLifecycle");
+            const { startMonitoringForSite } = await import(
+                "../../utils/monitoring/monitorLifecycle"
+            );
 
             // Mock the function to trigger recursive behavior
-            vi.mocked(startMonitoringForSite).mockImplementation(async (_config, id, monitorId, recursiveFn) => {
-                if (recursiveFn) {
-                    // Test the recursive prevention by calling with the same parameters
-                    const recursiveResult = await recursiveFn(id, monitorId);
-                    expect(recursiveResult).toBe(false);
+            vi.mocked(startMonitoringForSite).mockImplementation(
+                async (_config, id, monitorId, recursiveFn) => {
+                    if (recursiveFn) {
+                        // Test the recursive prevention by calling with the same parameters
+                        const recursiveResult = await recursiveFn(
+                            id,
+                            monitorId
+                        );
+                        expect(recursiveResult).toBe(false);
+                    }
+                    return true;
                 }
-                return true;
-            });
+            );
 
-            const result = await manager.startMonitoringForSite("site-1", "monitor-1");
+            const result = await manager.startMonitoringForSite(
+                "site-1",
+                "monitor-1"
+            );
             expect(result).toBe(true);
         });
 
         it("should handle recursive call prevention in stopMonitoringForSite", async () => {
-            const { stopMonitoringForSite } = await import("../../utils/monitoring/monitorLifecycle");
+            const { stopMonitoringForSite } = await import(
+                "../../utils/monitoring/monitorLifecycle"
+            );
 
             // Mock the function to trigger recursive behavior
-            vi.mocked(stopMonitoringForSite).mockImplementation(async (_config, id, monitorId, recursiveFn) => {
-                if (recursiveFn) {
-                    // Test the recursive prevention by calling with the same parameters
-                    const recursiveResult = await recursiveFn(id, monitorId);
-                    expect(recursiveResult).toBe(false);
+            vi.mocked(stopMonitoringForSite).mockImplementation(
+                async (_config, id, monitorId, recursiveFn) => {
+                    if (recursiveFn) {
+                        // Test the recursive prevention by calling with the same parameters
+                        const recursiveResult = await recursiveFn(
+                            id,
+                            monitorId
+                        );
+                        expect(recursiveResult).toBe(false);
+                    }
+                    return true;
                 }
-                return true;
-            });
+            );
 
-            const result = await manager.stopMonitoringForSite("site-1", "monitor-1");
+            const result = await manager.stopMonitoringForSite(
+                "site-1",
+                "monitor-1"
+            );
             expect(result).toBe(true);
         });
 
         it("should handle shouldApplyDefaultInterval with zero checkInterval", async () => {
-            const monitorWithZeroInterval = { ...mockMonitor, checkInterval: 0 };
-            const siteWithZeroInterval = { ...mockSite, monitors: [monitorWithZeroInterval] };
+            const monitorWithZeroInterval = {
+                ...mockMonitor,
+                checkInterval: 0,
+            };
+            const siteWithZeroInterval = {
+                ...mockSite,
+                monitors: [monitorWithZeroInterval],
+            };
 
             // Test by calling setupSiteForMonitoring which triggers applyDefaultIntervals
             await manager.setupSiteForMonitoring(siteWithZeroInterval);
 
             // Zero is considered falsy, so default interval should be applied
-            expect(mockDependencies.repositories.monitor.updateInternal).toHaveBeenCalledWith({}, "monitor-1", {
+            expect(
+                mockDependencies.repositories.monitor.updateInternal
+            ).toHaveBeenCalledWith({}, "monitor-1", {
                 checkInterval: DEFAULT_CHECK_INTERVAL,
             });
         });
 
         it("should handle shouldApplyDefaultInterval with null checkInterval", async () => {
-            const monitorWithNullInterval = { ...mockMonitor, checkInterval: null as any };
-            const siteWithNullInterval = { ...mockSite, monitors: [monitorWithNullInterval] };
+            const monitorWithNullInterval = {
+                ...mockMonitor,
+                checkInterval: null as any,
+            };
+            const siteWithNullInterval = {
+                ...mockSite,
+                monitors: [monitorWithNullInterval],
+            };
 
             await manager.setupSiteForMonitoring(siteWithNullInterval);
 
-            expect(mockDependencies.repositories.monitor.updateInternal).toHaveBeenCalledWith({}, "monitor-1", {
+            expect(
+                mockDependencies.repositories.monitor.updateInternal
+            ).toHaveBeenCalledWith({}, "monitor-1", {
                 checkInterval: DEFAULT_CHECK_INTERVAL,
             });
         });
 
         it("should handle shouldApplyDefaultInterval with undefined checkInterval", async () => {
-            const monitorWithUndefinedInterval = { ...mockMonitor, checkInterval: undefined as any };
-            const siteWithUndefinedInterval = { ...mockSite, monitors: [monitorWithUndefinedInterval] };
+            const monitorWithUndefinedInterval = {
+                ...mockMonitor,
+                checkInterval: undefined as any,
+            };
+            const siteWithUndefinedInterval = {
+                ...mockSite,
+                monitors: [monitorWithUndefinedInterval],
+            };
 
             await manager.setupSiteForMonitoring(siteWithUndefinedInterval);
 
-            expect(mockDependencies.repositories.monitor.updateInternal).toHaveBeenCalledWith({}, "monitor-1", {
+            expect(
+                mockDependencies.repositories.monitor.updateInternal
+            ).toHaveBeenCalledWith({}, "monitor-1", {
                 checkInterval: DEFAULT_CHECK_INTERVAL,
             });
         });
@@ -588,11 +734,15 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             new MonitorManager(mockDependencies, testEnhancedServices); // Don't need to store reference
 
             // Simulate a scheduled check by getting the callback and calling it
-            const MonitorSchedulerMock = await import("../../services/monitoring/MonitorScheduler");
-            const scheduleInstance = new MonitorSchedulerMock.MonitorScheduler();
+            const MonitorSchedulerMock = await import(
+                "../../services/monitoring/MonitorScheduler"
+            );
+            const scheduleInstance =
+                new MonitorSchedulerMock.MonitorScheduler();
 
             // Get the callback that was set
-            const callbackArgs = vi.mocked(scheduleInstance.setCheckCallback).mock.calls[0];
+            const callbackArgs = vi.mocked(scheduleInstance.setCheckCallback)
+                .mock.calls[0];
             expect(callbackArgs).toBeDefined();
 
             if (callbackArgs) {
@@ -620,11 +770,15 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             await manager.setupNewMonitors(siteWithInvalidMonitor, []);
 
             // Should complete without errors and not call updateInternal for monitor without ID
-            expect(mockDependencies.repositories.monitor.updateInternal).not.toHaveBeenCalled();
+            expect(
+                mockDependencies.repositories.monitor.updateInternal
+            ).not.toHaveBeenCalled();
         });
 
         it("should handle auto-start with monitor missing id in autoStartNewMonitors", async () => {
-            const { startMonitoringForSite } = await import("../../utils/monitoring/monitorLifecycle");
+            const { startMonitoringForSite } = await import(
+                "../../utils/monitoring/monitorLifecycle"
+            );
             vi.mocked(startMonitoringForSite).mockResolvedValue(true);
 
             const monitorWithoutId = createMockMonitor({

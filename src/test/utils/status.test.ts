@@ -199,12 +199,16 @@ describe("Status Utilities", () => {
             it("should handle special characters correctly", () => {
                 expect(formatStatusWithIcon("@test")).toBe("⚪ @test");
                 expect(formatStatusWithIcon("123abc")).toBe("⚪ 123abc");
-                expect(formatStatusWithIcon("TEST-STATUS")).toBe("⚪ Test-status");
+                expect(formatStatusWithIcon("TEST-STATUS")).toBe(
+                    "⚪ Test-status"
+                );
             });
 
             it("should handle very long status strings", () => {
                 const longStatus = "verylongstatusname";
-                expect(formatStatusWithIcon(longStatus)).toBe("⚪ Verylongstatusname");
+                expect(formatStatusWithIcon(longStatus)).toBe(
+                    "⚪ Verylongstatusname"
+                );
             });
 
             it("should handle unicode characters", () => {
@@ -237,18 +241,30 @@ describe("Status Utilities", () => {
 
         describe("Multi-word status handling (edge case behavior)", () => {
             it("should handle hyphenated statuses", () => {
-                expect(formatStatusWithIcon("not-responding")).toBe("⚪ Not-responding");
-                expect(formatStatusWithIcon("PARTIALLY-UP")).toBe("⚪ Partially-up");
+                expect(formatStatusWithIcon("not-responding")).toBe(
+                    "⚪ Not-responding"
+                );
+                expect(formatStatusWithIcon("PARTIALLY-UP")).toBe(
+                    "⚪ Partially-up"
+                );
             });
 
             it("should handle space-separated statuses", () => {
-                expect(formatStatusWithIcon("not responding")).toBe("⚪ Not responding");
-                expect(formatStatusWithIcon("PARTIALLY UP")).toBe("⚪ Partially up");
+                expect(formatStatusWithIcon("not responding")).toBe(
+                    "⚪ Not responding"
+                );
+                expect(formatStatusWithIcon("PARTIALLY UP")).toBe(
+                    "⚪ Partially up"
+                );
             });
 
             it("should handle underscore-separated statuses", () => {
-                expect(formatStatusWithIcon("not_responding")).toBe("⚪ Not_responding");
-                expect(formatStatusWithIcon("PARTIALLY_UP")).toBe("⚪ Partially_up");
+                expect(formatStatusWithIcon("not_responding")).toBe(
+                    "⚪ Not_responding"
+                );
+                expect(formatStatusWithIcon("PARTIALLY_UP")).toBe(
+                    "⚪ Partially_up"
+                );
             });
         });
     });
@@ -272,16 +288,27 @@ describe("Status Utilities", () => {
                 expect(icon).not.toBe("⚪");
 
                 // Verify formatted string starts with the icon
-                expect(formatted).toMatch(new RegExp(`^${icon.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} `));
+                expect(formatted).toMatch(
+                    new RegExp(
+                        `^${icon.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} `
+                    )
+                );
 
                 // Verify formatted string ends with properly capitalized status
-                const expectedText = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+                const expectedText =
+                    status.charAt(0).toUpperCase() +
+                    status.slice(1).toLowerCase();
                 expect(formatted).toBe(`${icon} ${expectedText}`);
             }
         });
 
         it("should handle unknown statuses consistently in both functions", () => {
-            const unknownStatuses = ["invalid", "custom", "error", "maintenance"];
+            const unknownStatuses = [
+                "invalid",
+                "custom",
+                "error",
+                "maintenance",
+            ];
 
             for (const status of unknownStatuses) {
                 const icon = getStatusIcon(status);
@@ -291,7 +318,9 @@ describe("Status Utilities", () => {
                 expect(icon).toBe("⚪");
 
                 // Verify formatted string is consistent
-                const expectedText = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+                const expectedText =
+                    status.charAt(0).toUpperCase() +
+                    status.slice(1).toLowerCase();
                 expect(formatted).toBe(`⚪ ${expectedText}`);
             }
         });

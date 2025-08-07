@@ -85,7 +85,9 @@ describe("monitorTitleFormatters", () => {
 
                 const result = formatTitleSuffix(monitor);
 
-                expect(result).toBe(" (https://api.example.com:8080/v1/health?check=true)");
+                expect(result).toBe(
+                    " (https://api.example.com:8080/v1/health?check=true)"
+                );
             });
         });
 
@@ -330,7 +332,8 @@ describe("monitorTitleFormatters", () => {
         });
 
         it("should register a new formatter for custom type", () => {
-            const customFormatter: TitleSuffixFormatter = (monitor) => ` (Custom: ${(monitor as any).name})`;
+            const customFormatter: TitleSuffixFormatter = (monitor) =>
+                ` (Custom: ${(monitor as any).name})`;
 
             registerTitleSuffixFormatter("custom", customFormatter);
 
@@ -340,7 +343,8 @@ describe("monitorTitleFormatters", () => {
         });
 
         it("should use registered custom formatter in formatTitleSuffix", () => {
-            const customFormatter: TitleSuffixFormatter = (monitor) => ` [${monitor.url || "API Monitor"}]`;
+            const customFormatter: TitleSuffixFormatter = (monitor) =>
+                ` [${monitor.url || "API Monitor"}]`;
 
             registerTitleSuffixFormatter("api", customFormatter);
 
@@ -455,14 +459,21 @@ describe("monitorTitleFormatters", () => {
             // Manually set type to complex to test custom formatter
             (noEndpointMonitor as any).type = "complex";
 
-            expect(formatTitleSuffix(urlMonitor)).toBe(" (https://api.example.com)");
-            expect(formatTitleSuffix(hostPortMonitor)).toBe(" (service.example.com:3000)");
-            expect(formatTitleSuffix(hostOnlyMonitor)).toBe(" (simple.example.com)");
+            expect(formatTitleSuffix(urlMonitor)).toBe(
+                " (https://api.example.com)"
+            );
+            expect(formatTitleSuffix(hostPortMonitor)).toBe(
+                " (service.example.com:3000)"
+            );
+            expect(formatTitleSuffix(hostOnlyMonitor)).toBe(
+                " (simple.example.com)"
+            );
             expect(formatTitleSuffix(noEndpointMonitor)).toBe(" (No endpoint)");
         });
 
         it("should handle registration with empty type string", () => {
-            const emptyTypeFormatter: TitleSuffixFormatter = () => " (Empty type)";
+            const emptyTypeFormatter: TitleSuffixFormatter = () =>
+                " (Empty type)";
 
             registerTitleSuffixFormatter("", emptyTypeFormatter);
 
@@ -478,13 +489,17 @@ describe("monitorTitleFormatters", () => {
             });
 
             // Verify original behavior
-            expect(formatTitleSuffix(httpMonitor)).toBe(" (https://original.example.com)");
+            expect(formatTitleSuffix(httpMonitor)).toBe(
+                " (https://original.example.com)"
+            );
 
             // Register custom formatter for different type
             registerTitleSuffixFormatter("custom", () => " (Custom)");
 
             // Verify original formatter still works for http
-            expect(formatTitleSuffix(httpMonitor)).toBe(" (https://original.example.com)");
+            expect(formatTitleSuffix(httpMonitor)).toBe(
+                " (https://original.example.com)"
+            );
 
             // Verify custom formatter works for custom type
             const customMonitor = createMockMonitor({});
@@ -514,7 +529,11 @@ describe("monitorTitleFormatters", () => {
 
             const results = monitors.map(formatTitleSuffix);
 
-            expect(results).toEqual([" (https://example.com)", " (db.example.com:5432)", ""]);
+            expect(results).toEqual([
+                " (https://example.com)",
+                " (db.example.com:5432)",
+                "",
+            ]);
         });
 
         it("should demonstrate formatter registration workflow", () => {
@@ -536,7 +555,9 @@ describe("monitorTitleFormatters", () => {
             (pingMonitorWithoutHost as any).type = "ping";
 
             // Test formatting
-            expect(formatTitleSuffix(pingMonitorWithHost)).toBe(" (ping google.com)");
+            expect(formatTitleSuffix(pingMonitorWithHost)).toBe(
+                " (ping google.com)"
+            );
             expect(formatTitleSuffix(pingMonitorWithoutHost)).toBe(" (ping)");
 
             // Verify getter works

@@ -105,7 +105,9 @@ function safeNumber(value: unknown, fallback: number = 0): number {
 ```typescript
 function validateStatus(status: unknown): StatusHistory["status"] {
  if (status === "up" || status === "down") return status;
- logger.warn("[HistoryMapper] Invalid status value, defaulting to 'down'", { status });
+ logger.warn("[HistoryMapper] Invalid status value, defaulting to 'down'", {
+  status,
+ });
  return "down";
 }
 ```

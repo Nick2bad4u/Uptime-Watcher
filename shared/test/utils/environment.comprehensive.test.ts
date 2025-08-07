@@ -33,7 +33,10 @@ describe("Environment Detection Utilities", () => {
 
     describe("getEnvironment", () => {
         it("should return NODE_ENV value when set", async () => {
-            globalThis.process = { ...mockProcess, env: { NODE_ENV: "production" } } as any;
+            globalThis.process = {
+                ...mockProcess,
+                env: { NODE_ENV: "production" },
+            } as any;
 
             const { getEnvironment } = await import("../../utils/environment");
 
@@ -62,7 +65,10 @@ describe("Environment Detection Utilities", () => {
             const environments = ["development", "production", "test"];
 
             for (const env of environments) {
-                globalThis.process = { ...mockProcess, env: { NODE_ENV: env } } as any;
+                globalThis.process = {
+                    ...mockProcess,
+                    env: { NODE_ENV: env },
+                } as any;
                 expect(getEnvironment()).toBe(env);
             }
         });
@@ -100,7 +106,10 @@ describe("Environment Detection Utilities", () => {
         });
 
         it("should handle empty string values", async () => {
-            globalThis.process = { ...mockProcess, env: { NODE_ENV: "" } } as any;
+            globalThis.process = {
+                ...mockProcess,
+                env: { NODE_ENV: "" },
+            } as any;
 
             const { getEnvVar } = await import("../../utils/environment");
 
@@ -110,7 +119,10 @@ describe("Environment Detection Utilities", () => {
 
     describe("getNodeEnv", () => {
         it("should return NODE_ENV value when set", async () => {
-            globalThis.process = { ...mockProcess, env: { NODE_ENV: "production" } } as any;
+            globalThis.process = {
+                ...mockProcess,
+                env: { NODE_ENV: "production" },
+            } as any;
 
             const { getNodeEnv } = await import("../../utils/environment");
 
@@ -139,7 +151,10 @@ describe("Environment Detection Utilities", () => {
             const environments = ["development", "production", "test"];
 
             for (const env of environments) {
-                globalThis.process = { ...mockProcess, env: { NODE_ENV: env } } as any;
+                globalThis.process = {
+                    ...mockProcess,
+                    env: { NODE_ENV: env },
+                } as any;
                 expect(getNodeEnv()).toBe(env);
             }
         });
@@ -163,7 +178,9 @@ describe("Environment Detection Utilities", () => {
             globalThis.window = {} as any;
             globalThis.document = {} as any;
 
-            const { isBrowserEnvironment } = await import("../../utils/environment");
+            const { isBrowserEnvironment } = await import(
+                "../../utils/environment"
+            );
 
             expect(isBrowserEnvironment()).toBe(true);
         });
@@ -172,7 +189,9 @@ describe("Environment Detection Utilities", () => {
             globalThis.window = undefined as any;
             globalThis.document = {} as any;
 
-            const { isBrowserEnvironment } = await import("../../utils/environment");
+            const { isBrowserEnvironment } = await import(
+                "../../utils/environment"
+            );
 
             expect(isBrowserEnvironment()).toBe(false);
         });
@@ -181,7 +200,9 @@ describe("Environment Detection Utilities", () => {
             globalThis.window = {} as any;
             globalThis.document = undefined as any;
 
-            const { isBrowserEnvironment } = await import("../../utils/environment");
+            const { isBrowserEnvironment } = await import(
+                "../../utils/environment"
+            );
 
             expect(isBrowserEnvironment()).toBe(false);
         });
@@ -190,7 +211,9 @@ describe("Environment Detection Utilities", () => {
             globalThis.window = undefined as any;
             globalThis.document = undefined as any;
 
-            const { isBrowserEnvironment } = await import("../../utils/environment");
+            const { isBrowserEnvironment } = await import(
+                "../../utils/environment"
+            );
 
             expect(isBrowserEnvironment()).toBe(false);
         });
@@ -198,7 +221,10 @@ describe("Environment Detection Utilities", () => {
 
     describe("isDevelopment", () => {
         it("should return true when NODE_ENV is 'development'", async () => {
-            globalThis.process = { ...mockProcess, env: { NODE_ENV: "development" } } as any;
+            globalThis.process = {
+                ...mockProcess,
+                env: { NODE_ENV: "development" },
+            } as any;
 
             const { isDevelopment } = await import("../../utils/environment");
 
@@ -206,7 +232,10 @@ describe("Environment Detection Utilities", () => {
         });
 
         it("should return false when NODE_ENV is 'production'", async () => {
-            globalThis.process = { ...mockProcess, env: { NODE_ENV: "production" } } as any;
+            globalThis.process = {
+                ...mockProcess,
+                env: { NODE_ENV: "production" },
+            } as any;
 
             const { isDevelopment } = await import("../../utils/environment");
 
@@ -214,7 +243,10 @@ describe("Environment Detection Utilities", () => {
         });
 
         it("should return false when NODE_ENV is 'test'", async () => {
-            globalThis.process = { ...mockProcess, env: { NODE_ENV: "test" } } as any;
+            globalThis.process = {
+                ...mockProcess,
+                env: { NODE_ENV: "test" },
+            } as any;
 
             const { isDevelopment } = await import("../../utils/environment");
 
@@ -238,7 +270,10 @@ describe("Environment Detection Utilities", () => {
         });
 
         it("should be case sensitive", async () => {
-            globalThis.process = { ...mockProcess, env: { NODE_ENV: "Development" } } as any;
+            globalThis.process = {
+                ...mockProcess,
+                env: { NODE_ENV: "Development" },
+            } as any;
 
             const { isDevelopment } = await import("../../utils/environment");
 
@@ -253,7 +288,9 @@ describe("Environment Detection Utilities", () => {
                 versions: { node: "18.0.0" },
             } as any;
 
-            const { isNodeEnvironment } = await import("../../utils/environment");
+            const { isNodeEnvironment } = await import(
+                "../../utils/environment"
+            );
 
             expect(isNodeEnvironment()).toBe(true);
         });
@@ -261,23 +298,35 @@ describe("Environment Detection Utilities", () => {
         it("should return false when process is undefined", async () => {
             globalThis.process = undefined as any;
 
-            const { isNodeEnvironment } = await import("../../utils/environment");
+            const { isNodeEnvironment } = await import(
+                "../../utils/environment"
+            );
 
             expect(isNodeEnvironment()).toBe(false);
         });
 
         it("should return false when process.versions is undefined", async () => {
-            globalThis.process = { ...mockProcess, versions: undefined as any } as any;
+            globalThis.process = {
+                ...mockProcess,
+                versions: undefined as any,
+            } as any;
 
-            const { isNodeEnvironment } = await import("../../utils/environment");
+            const { isNodeEnvironment } = await import(
+                "../../utils/environment"
+            );
 
             expect(isNodeEnvironment()).toBe(false);
         });
 
         it("should return false when process.versions is not an object", async () => {
-            globalThis.process = { ...mockProcess, versions: "not-an-object" as any } as any;
+            globalThis.process = {
+                ...mockProcess,
+                versions: "not-an-object" as any,
+            } as any;
 
-            const { isNodeEnvironment } = await import("../../utils/environment");
+            const { isNodeEnvironment } = await import(
+                "../../utils/environment"
+            );
 
             expect(isNodeEnvironment()).toBe(false);
         });
@@ -285,15 +334,22 @@ describe("Environment Detection Utilities", () => {
         it("should return false when process.versions.node is undefined", async () => {
             globalThis.process = { ...mockProcess, versions: {} as any } as any;
 
-            const { isNodeEnvironment } = await import("../../utils/environment");
+            const { isNodeEnvironment } = await import(
+                "../../utils/environment"
+            );
 
             expect(isNodeEnvironment()).toBe(false);
         });
 
         it("should return false when process.versions.node is empty string", async () => {
-            globalThis.process = { ...mockProcess, versions: { node: "" } as any } as any;
+            globalThis.process = {
+                ...mockProcess,
+                versions: { node: "" } as any,
+            } as any;
 
-            const { isNodeEnvironment } = await import("../../utils/environment");
+            const { isNodeEnvironment } = await import(
+                "../../utils/environment"
+            );
 
             expect(isNodeEnvironment()).toBe(false);
         });
@@ -301,7 +357,10 @@ describe("Environment Detection Utilities", () => {
 
     describe("isProduction", () => {
         it("should return true when NODE_ENV is 'production'", async () => {
-            globalThis.process = { ...mockProcess, env: { NODE_ENV: "production" } } as any;
+            globalThis.process = {
+                ...mockProcess,
+                env: { NODE_ENV: "production" },
+            } as any;
 
             const { isProduction } = await import("../../utils/environment");
 
@@ -309,7 +368,10 @@ describe("Environment Detection Utilities", () => {
         });
 
         it("should return false when NODE_ENV is 'development'", async () => {
-            globalThis.process = { ...mockProcess, env: { NODE_ENV: "development" } } as any;
+            globalThis.process = {
+                ...mockProcess,
+                env: { NODE_ENV: "development" },
+            } as any;
 
             const { isProduction } = await import("../../utils/environment");
 
@@ -317,7 +379,10 @@ describe("Environment Detection Utilities", () => {
         });
 
         it("should return false when NODE_ENV is 'test'", async () => {
-            globalThis.process = { ...mockProcess, env: { NODE_ENV: "test" } } as any;
+            globalThis.process = {
+                ...mockProcess,
+                env: { NODE_ENV: "test" },
+            } as any;
 
             const { isProduction } = await import("../../utils/environment");
 
@@ -341,7 +406,10 @@ describe("Environment Detection Utilities", () => {
         });
 
         it("should be case sensitive", async () => {
-            globalThis.process = { ...mockProcess, env: { NODE_ENV: "Production" } } as any;
+            globalThis.process = {
+                ...mockProcess,
+                env: { NODE_ENV: "Production" },
+            } as any;
 
             const { isProduction } = await import("../../utils/environment");
 
@@ -351,7 +419,10 @@ describe("Environment Detection Utilities", () => {
 
     describe("isTest", () => {
         it("should return true when NODE_ENV is 'test'", async () => {
-            globalThis.process = { ...mockProcess, env: { NODE_ENV: "test" } } as any;
+            globalThis.process = {
+                ...mockProcess,
+                env: { NODE_ENV: "test" },
+            } as any;
 
             const { isTest } = await import("../../utils/environment");
 
@@ -359,7 +430,10 @@ describe("Environment Detection Utilities", () => {
         });
 
         it("should return false when NODE_ENV is 'development'", async () => {
-            globalThis.process = { ...mockProcess, env: { NODE_ENV: "development" } } as any;
+            globalThis.process = {
+                ...mockProcess,
+                env: { NODE_ENV: "development" },
+            } as any;
 
             const { isTest } = await import("../../utils/environment");
 
@@ -367,7 +441,10 @@ describe("Environment Detection Utilities", () => {
         });
 
         it("should return false when NODE_ENV is 'production'", async () => {
-            globalThis.process = { ...mockProcess, env: { NODE_ENV: "production" } } as any;
+            globalThis.process = {
+                ...mockProcess,
+                env: { NODE_ENV: "production" },
+            } as any;
 
             const { isTest } = await import("../../utils/environment");
 
@@ -391,7 +468,10 @@ describe("Environment Detection Utilities", () => {
         });
 
         it("should be case sensitive", async () => {
-            globalThis.process = { ...mockProcess, env: { NODE_ENV: "Test" } } as any;
+            globalThis.process = {
+                ...mockProcess,
+                env: { NODE_ENV: "Test" },
+            } as any;
 
             const { isTest } = await import("../../utils/environment");
 
@@ -401,11 +481,18 @@ describe("Environment Detection Utilities", () => {
 
     describe("Edge cases and integration", () => {
         it("should handle multiple environment checks consistently", async () => {
-            globalThis.process = { ...mockProcess, env: { NODE_ENV: "development" } } as any;
+            globalThis.process = {
+                ...mockProcess,
+                env: { NODE_ENV: "development" },
+            } as any;
 
-            const { isDevelopment, isProduction, isTest, getNodeEnv, getEnvironment } = await import(
-                "../../utils/environment"
-            );
+            const {
+                isDevelopment,
+                isProduction,
+                isTest,
+                getNodeEnv,
+                getEnvironment,
+            } = await import("../../utils/environment");
 
             expect(isDevelopment()).toBe(true);
             expect(isProduction()).toBe(false);
@@ -417,8 +504,15 @@ describe("Environment Detection Utilities", () => {
         it("should handle undefined process consistently across all functions", async () => {
             globalThis.process = undefined as any;
 
-            const { isDevelopment, isProduction, isTest, isNodeEnvironment, getNodeEnv, getEnvironment, getEnvVar } =
-                await import("../../utils/environment");
+            const {
+                isDevelopment,
+                isProduction,
+                isTest,
+                isNodeEnvironment,
+                getNodeEnv,
+                getEnvironment,
+                getEnvVar,
+            } = await import("../../utils/environment");
 
             expect(isDevelopment()).toBe(false);
             expect(isProduction()).toBe(false);
@@ -435,7 +529,10 @@ describe("Environment Detection Utilities", () => {
             const falsyValues = ["", "0", "false"];
 
             for (const value of falsyValues) {
-                globalThis.process = { ...mockProcess, env: { NODE_ENV: value } } as any;
+                globalThis.process = {
+                    ...mockProcess,
+                    env: { NODE_ENV: value },
+                } as any;
                 expect(getEnvVar("NODE_ENV")).toBe(value);
             }
         });

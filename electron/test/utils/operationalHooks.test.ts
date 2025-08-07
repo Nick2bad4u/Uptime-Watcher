@@ -3,7 +3,10 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
-import { withOperationalHooks, withDatabaseOperation } from "../../utils/operationalHooks";
+import {
+    withOperationalHooks,
+    withDatabaseOperation,
+} from "../../utils/operationalHooks";
 
 describe("Operational Hooks", () => {
     describe("withOperationalHooks", () => {
@@ -38,7 +41,9 @@ describe("Operational Hooks", () => {
         });
 
         it("should fail after max retries", async () => {
-            const mockOperation = vi.fn().mockRejectedValue(new Error("Persistent failure"));
+            const mockOperation = vi
+                .fn()
+                .mockRejectedValue(new Error("Persistent failure"));
 
             await expect(
                 withOperationalHooks(mockOperation, {
@@ -77,7 +82,10 @@ describe("Operational Hooks", () => {
         it("should be a specialized wrapper with correct defaults", async () => {
             const mockOperation = vi.fn().mockResolvedValue("db-result");
 
-            const result = await withDatabaseOperation(mockOperation, "test-db-operation");
+            const result = await withDatabaseOperation(
+                mockOperation,
+                "test-db-operation"
+            );
 
             expect(result).toBe("db-result");
             expect(mockOperation).toHaveBeenCalledTimes(1);

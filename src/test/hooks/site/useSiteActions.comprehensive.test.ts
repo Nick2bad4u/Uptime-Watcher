@@ -70,7 +70,9 @@ describe("useSiteActions Hook", () => {
 
     describe("Basic Functionality", () => {
         it("should return hook functions", () => {
-            const { result } = renderHook(() => useSiteActions(mockSite, mockMonitor));
+            const { result } = renderHook(() =>
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             expect(result.current).toHaveProperty("handleCardClick");
             expect(result.current).toHaveProperty("handleCheckNow");
@@ -81,20 +83,30 @@ describe("useSiteActions Hook", () => {
         });
 
         it("should provide functions as callable", () => {
-            const { result } = renderHook(() => useSiteActions(mockSite, mockMonitor));
+            const { result } = renderHook(() =>
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             expect(typeof result.current.handleCardClick).toBe("function");
             expect(typeof result.current.handleCheckNow).toBe("function");
-            expect(typeof result.current.handleStartMonitoring).toBe("function");
-            expect(typeof result.current.handleStartSiteMonitoring).toBe("function");
+            expect(typeof result.current.handleStartMonitoring).toBe(
+                "function"
+            );
+            expect(typeof result.current.handleStartSiteMonitoring).toBe(
+                "function"
+            );
             expect(typeof result.current.handleStopMonitoring).toBe("function");
-            expect(typeof result.current.handleStopSiteMonitoring).toBe("function");
+            expect(typeof result.current.handleStopSiteMonitoring).toBe(
+                "function"
+            );
         });
     });
 
     describe("Start Monitoring", () => {
         it("should handle start monitoring action", async () => {
-            const { result } = renderHook(() => useSiteActions(mockSite, mockMonitor));
+            const { result } = renderHook(() =>
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             await act(async () => {
                 result.current.handleStartMonitoring();
@@ -105,7 +117,9 @@ describe("useSiteActions Hook", () => {
         });
 
         it("should handle start monitoring without monitor", async () => {
-            const { result } = renderHook(() => useSiteActions(mockSite, undefined));
+            const { result } = renderHook(() =>
+                useSiteActions(mockSite, undefined)
+            );
 
             await act(async () => {
                 result.current.handleStartMonitoring();
@@ -116,7 +130,9 @@ describe("useSiteActions Hook", () => {
         });
 
         it("should handle start site monitoring", async () => {
-            const { result } = renderHook(() => useSiteActions(mockSite, mockMonitor));
+            const { result } = renderHook(() =>
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             await act(async () => {
                 result.current.handleStartSiteMonitoring();
@@ -129,7 +145,9 @@ describe("useSiteActions Hook", () => {
 
     describe("Stop Monitoring", () => {
         it("should handle stop monitoring action", async () => {
-            const { result } = renderHook(() => useSiteActions(mockSite, mockMonitor));
+            const { result } = renderHook(() =>
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             await act(async () => {
                 result.current.handleStopMonitoring();
@@ -145,7 +163,9 @@ describe("useSiteActions Hook", () => {
                 isMonitoringEnabled: false,
             };
 
-            const { result } = renderHook(() => useSiteActions(disabledSite, mockMonitor));
+            const { result } = renderHook(() =>
+                useSiteActions(disabledSite, mockMonitor)
+            );
 
             await act(async () => {
                 result.current.handleStopMonitoring();
@@ -156,7 +176,9 @@ describe("useSiteActions Hook", () => {
         });
 
         it("should handle stop site monitoring", async () => {
-            const { result } = renderHook(() => useSiteActions(mockSite, mockMonitor));
+            const { result } = renderHook(() =>
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             await act(async () => {
                 result.current.handleStopSiteMonitoring();
@@ -169,7 +191,9 @@ describe("useSiteActions Hook", () => {
 
     describe("Card Click", () => {
         it("should handle card click action", async () => {
-            const { result } = renderHook(() => useSiteActions(mockSite, mockMonitor));
+            const { result } = renderHook(() =>
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             await act(async () => {
                 result.current.handleCardClick();
@@ -180,7 +204,9 @@ describe("useSiteActions Hook", () => {
         });
 
         it("should handle card click without monitor", async () => {
-            const { result } = renderHook(() => useSiteActions(mockSite, undefined));
+            const { result } = renderHook(() =>
+                useSiteActions(mockSite, undefined)
+            );
 
             await act(async () => {
                 result.current.handleCardClick();
@@ -193,7 +219,9 @@ describe("useSiteActions Hook", () => {
 
     describe("Check Now", () => {
         it("should handle check now action", async () => {
-            const { result } = renderHook(() => useSiteActions(mockSite, mockMonitor));
+            const { result } = renderHook(() =>
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             await act(async () => {
                 result.current.handleCheckNow();
@@ -207,7 +235,9 @@ describe("useSiteActions Hook", () => {
             const httpMonitor = { ...mockMonitor, type: "http" as const };
             const httpsSite = { ...mockSite, url: "https://example.com" };
 
-            const { result } = renderHook(() => useSiteActions(httpsSite, httpMonitor));
+            const { result } = renderHook(() =>
+                useSiteActions(httpsSite, httpMonitor)
+            );
 
             await act(async () => {
                 result.current.handleCheckNow();
@@ -220,7 +250,9 @@ describe("useSiteActions Hook", () => {
 
     describe("Error Handling", () => {
         it("should handle errors gracefully", async () => {
-            const { result } = renderHook(() => useSiteActions(mockSite, mockMonitor));
+            const { result } = renderHook(() =>
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             // Should not throw even if underlying services fail
             await act(async () => {
@@ -236,7 +268,9 @@ describe("useSiteActions Hook", () => {
         });
 
         it("should handle null/undefined inputs", async () => {
-            const { result } = renderHook(() => useSiteActions(mockSite, undefined));
+            const { result } = renderHook(() =>
+                useSiteActions(mockSite, undefined)
+            );
 
             await act(async () => {
                 result.current.handleStartMonitoring();
@@ -251,7 +285,9 @@ describe("useSiteActions Hook", () => {
 
     describe("Hook Stability", () => {
         it("should maintain stable function references when dependencies don't change", () => {
-            const { result, rerender } = renderHook(() => useSiteActions(mockSite, mockMonitor));
+            const { result, rerender } = renderHook(() =>
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             const firstRender = result.current;
 
@@ -274,12 +310,20 @@ describe("useSiteActions Hook", () => {
         });
 
         it("should work with multiple hook instances", () => {
-            const { result: result1 } = renderHook(() => useSiteActions(mockSite, mockMonitor));
-            const { result: result2 } = renderHook(() => useSiteActions(mockSite, mockMonitor));
+            const { result: result1 } = renderHook(() =>
+                useSiteActions(mockSite, mockMonitor)
+            );
+            const { result: result2 } = renderHook(() =>
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             // Each instance should have properly typed functions
-            expect(typeof result1.current.handleStartMonitoring).toBe("function");
-            expect(typeof result2.current.handleStartMonitoring).toBe("function");
+            expect(typeof result1.current.handleStartMonitoring).toBe(
+                "function"
+            );
+            expect(typeof result2.current.handleStartMonitoring).toBe(
+                "function"
+            );
             expect(typeof result1.current.handleCardClick).toBe("function");
             expect(typeof result2.current.handleCardClick).toBe("function");
 
@@ -298,7 +342,9 @@ describe("useSiteActions Hook", () => {
             ];
 
             for (const site of sites) {
-                const { result } = renderHook(() => useSiteActions(site, mockMonitor));
+                const { result } = renderHook(() =>
+                    useSiteActions(site, mockMonitor)
+                );
 
                 await act(async () => {
                     result.current.handleCheckNow();
@@ -315,21 +361,27 @@ describe("useSiteActions Hook", () => {
             ];
 
             for (const site of sites) {
-                const { result } = renderHook(() => useSiteActions(site, mockMonitor));
+                const { result } = renderHook(() =>
+                    useSiteActions(site, mockMonitor)
+                );
 
                 await act(async () => {
                     result.current.handleStartSiteMonitoring();
                     result.current.handleStopSiteMonitoring();
                 });
 
-                expect(typeof result.current.handleStartSiteMonitoring).toBe("function");
+                expect(typeof result.current.handleStartSiteMonitoring).toBe(
+                    "function"
+                );
             }
         });
     });
 
     describe("Performance", () => {
         it("should handle rapid successive calls", async () => {
-            const { result } = renderHook(() => useSiteActions(mockSite, mockMonitor));
+            const { result } = renderHook(() =>
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             // Make multiple rapid calls
             await act(async () => {
@@ -342,7 +394,9 @@ describe("useSiteActions Hook", () => {
         });
 
         it("should handle concurrent operations", async () => {
-            const { result } = renderHook(() => useSiteActions(mockSite, mockMonitor));
+            const { result } = renderHook(() =>
+                useSiteActions(mockSite, mockMonitor)
+            );
 
             await act(async () => {
                 result.current.handleStartMonitoring();

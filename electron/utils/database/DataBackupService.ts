@@ -46,7 +46,10 @@ export class DataBackupService {
      * @returns Promise resolving to backup buffer and filename
      * @throws SiteLoadingError when backup creation fails
      */
-    async downloadDatabaseBackup(): Promise<{ buffer: Buffer; fileName: string }> {
+    async downloadDatabaseBackup(): Promise<{
+        buffer: Buffer;
+        fileName: string;
+    }> {
         try {
             const dbPath = path.join(app.getPath("userData"), DB_FILE_NAME);
             const result = await createDatabaseBackup(dbPath);
@@ -58,12 +61,16 @@ export class DataBackupService {
 
             await this.eventEmitter.emitTyped("database:error", {
                 details: message,
-                error: error instanceof Error ? error : new Error(String(error)),
+                error:
+                    error instanceof Error ? error : new Error(String(error)),
                 operation: "download-backup",
                 timestamp: Date.now(),
             });
 
-            throw new SiteLoadingError(message, error instanceof Error ? error : new Error(String(error)));
+            throw new SiteLoadingError(
+                message,
+                error instanceof Error ? error : new Error(String(error))
+            );
         }
     }
 }

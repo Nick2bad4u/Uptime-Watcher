@@ -11,7 +11,10 @@ import React, { useEffect, useState } from "react";
 import type { MonitorType } from "../../types";
 
 import logger from "../../services/logger";
-import { supportsResponseTime as checkSupportsResponseTime, formatMonitorDetail } from "../../utils/monitorUiHelpers";
+import {
+    supportsResponseTime as checkSupportsResponseTime,
+    formatMonitorDetail,
+} from "../../utils/monitorUiHelpers";
 
 /**
  * Component that conditionally renders based on response time support.
@@ -42,7 +45,8 @@ export function ConditionalResponseTime({
     fallback,
     monitorType,
 }: ConditionalResponseTimeProps): React.ReactNode {
-    const [supportsResponseTime, setSupportsResponseTime] = useState<boolean>(false);
+    const [supportsResponseTime, setSupportsResponseTime] =
+        useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
@@ -58,7 +62,10 @@ export function ConditionalResponseTime({
             } catch (error) {
                 // Log the error but gracefully degrade to false (no response time support)
                 // This follows project pattern of non-critical feature degradation
-                logger.warn("Failed to check response time support", error as Error);
+                logger.warn(
+                    "Failed to check response time support",
+                    error as Error
+                );
                 if (!isCancelled) {
                     setSupportsResponseTime(false);
                     setIsLoading(false);
@@ -82,7 +89,11 @@ export function ConditionalResponseTime({
     return supportsResponseTime ? children : fallback;
 }
 
-export const DetailLabel = ({ details, fallback = details, monitorType }: DetailLabelProps): JSX.Element => {
+export const DetailLabel = ({
+    details,
+    fallback = details,
+    monitorType,
+}: DetailLabelProps): JSX.Element => {
     const [formattedLabel, setFormattedLabel] = useState<string>(fallback);
 
     useEffect(() => {
@@ -90,7 +101,10 @@ export const DetailLabel = ({ details, fallback = details, monitorType }: Detail
 
         const formatLabel = async () => {
             try {
-                const formatted = await formatMonitorDetail(monitorType, details);
+                const formatted = await formatMonitorDetail(
+                    monitorType,
+                    details
+                );
                 if (!isCancelled) {
                     setFormattedLabel(formatted);
                 }
@@ -114,4 +128,4 @@ export const DetailLabel = ({ details, fallback = details, monitorType }: Detail
     }, [monitorType, details, fallback]);
 
     return <span>{formattedLabel}</span>;
-}
+};

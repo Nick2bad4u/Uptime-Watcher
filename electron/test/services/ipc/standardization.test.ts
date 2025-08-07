@@ -19,7 +19,9 @@ describe("IPC Standardization Concepts", () => {
     /**
      * Helper function to validate IpcResponse format
      */
-    function validateIpcResponse<T>(response: any): asserts response is IpcResponse<T> {
+    function validateIpcResponse<T>(
+        response: any
+    ): asserts response is IpcResponse<T> {
         expect(response).toBeTypeOf("object");
         expect(response).toHaveProperty("success");
         expect(typeof response.success).toBe("boolean");
@@ -99,7 +101,8 @@ describe("IPC Standardization Concepts", () => {
             } catch (error) {
                 return {
                     success: false,
-                    error: error instanceof Error ? error.message : String(error),
+                    error:
+                        error instanceof Error ? error.message : String(error),
                     metadata: {
                         handler: "mock-handler",
                         duration: performance.now() - startTime,
@@ -111,7 +114,9 @@ describe("IPC Standardization Concepts", () => {
 
     describe("Response Format Validation", () => {
         it("should validate successful response format", async () => {
-            const mockHandler = createMockStandardizedHandler(async (data: string) => ({ result: data }));
+            const mockHandler = createMockStandardizedHandler(
+                async (data: string) => ({ result: data })
+            );
 
             const response = await mockHandler("test-data");
 
@@ -139,24 +144,33 @@ describe("IPC Standardization Concepts", () => {
         it("should validate parameter validation error format", async () => {
             const validator = (params: unknown[]) => {
                 if (params.length === 0) return ["Parameter required"];
-                if (typeof params[0] !== "string") return ["Parameter must be string"];
+                if (typeof params[0] !== "string")
+                    return ["Parameter must be string"];
                 return null;
             };
 
-            const mockHandler = createMockStandardizedHandler(async (data: string) => data, validator);
+            const mockHandler = createMockStandardizedHandler(
+                async (data: string) => data,
+                validator
+            );
 
             const response = await mockHandler(123); // Invalid parameter
 
             validateIpcResponse(response);
             expect(response.success).toBe(false);
             expect(response.error).toBe("Parameter validation failed");
-            expect(response.metadata?.["validationErrors"]).toEqual(["Parameter must be string"]);
+            expect(response.metadata?.["validationErrors"]).toEqual([
+                "Parameter must be string",
+            ]);
         });
     });
 
     describe("Parameter Validation Patterns", () => {
         it("should demonstrate string validation", () => {
-            const validateString = (value: unknown, paramName: string): string | null => {
+            const validateString = (
+                value: unknown,
+                paramName: string
+            ): string | null => {
                 if (typeof value !== "string") {
                     return `${paramName} must be a string`;
                 }
@@ -173,7 +187,10 @@ describe("IPC Standardization Concepts", () => {
         });
 
         it("should demonstrate number validation", () => {
-            const validateNumber = (value: unknown, paramName: string): string | null => {
+            const validateNumber = (
+                value: unknown,
+                paramName: string
+            ): string | null => {
                 if (typeof value !== "number") {
                     return `${paramName} must be a number`;
                 }
@@ -188,13 +205,22 @@ describe("IPC Standardization Concepts", () => {
 
             expect(validateNumber(42, "param")).toBeNull();
             expect(validateNumber(0, "param")).toBeNull();
-            expect(validateNumber("42", "param")).toBe("param must be a number");
-            expect(validateNumber(Number.NaN, "param")).toBe("param must be a valid number");
-            expect(validateNumber(-1, "param")).toBe("param must be non-negative");
+            expect(validateNumber("42", "param")).toBe(
+                "param must be a number"
+            );
+            expect(validateNumber(Number.NaN, "param")).toBe(
+                "param must be a valid number"
+            );
+            expect(validateNumber(-1, "param")).toBe(
+                "param must be non-negative"
+            );
         });
 
         it("should demonstrate object validation", () => {
-            const validateObject = (value: unknown, paramName: string): string | null => {
+            const validateObject = (
+                value: unknown,
+                paramName: string
+            ): string | null => {
                 if (typeof value !== "object" || value === null) {
                     return `${paramName} must be an object`;
                 }
@@ -206,9 +232,15 @@ describe("IPC Standardization Concepts", () => {
 
             expect(validateObject({}, "param")).toBeNull();
             expect(validateObject({ key: "value" }, "param")).toBeNull();
-            expect(validateObject(null, "param")).toBe("param must be an object");
-            expect(validateObject([], "param")).toBe("param must be an object, not an array");
-            expect(validateObject("object", "param")).toBe("param must be an object");
+            expect(validateObject(null, "param")).toBe(
+                "param must be an object"
+            );
+            expect(validateObject([], "param")).toBe(
+                "param must be an object, not an array"
+            );
+            expect(validateObject("object", "param")).toBe(
+                "param must be an object"
+            );
         });
     });
 
@@ -237,7 +269,9 @@ describe("IPC Standardization Concepts", () => {
         });
 
         it("should provide consistent metadata across responses", async () => {
-            const successHandler = createMockStandardizedHandler(async () => "success");
+            const successHandler = createMockStandardizedHandler(
+                async () => "success"
+            );
 
             const errorHandler = createMockStandardizedHandler(async () => {
                 throw new Error("failure");
@@ -249,7 +283,9 @@ describe("IPC Standardization Concepts", () => {
             // Both should have consistent metadata structure
             expect(successResponse.metadata?.["handler"]).toBe("mock-handler");
             expect(errorResponse.metadata?.["handler"]).toBe("mock-handler");
-            expect(typeof successResponse.metadata?.["duration"]).toBe("number");
+            expect(typeof successResponse.metadata?.["duration"]).toBe(
+                "number"
+            );
             expect(typeof errorResponse.metadata?.["duration"]).toBe("number");
         });
     });
@@ -333,7 +369,9 @@ registerStandardizedIpcHandler(
 `;
 
             expect(registrationPattern.length).toBeGreaterThan(0);
-            expect(registrationPattern).toContain("registerStandardizedIpcHandler");
+            expect(registrationPattern).toContain(
+                "registerStandardizedIpcHandler"
+            );
             expect(registrationPattern).toContain("Parameter validation");
         });
     });
@@ -343,23 +381,28 @@ registerStandardizedIpcHandler(
             const testingApproaches = [
                 {
                     name: "Response Format Validation",
-                    description: "Ensure all handlers return proper IpcResponse<T> format",
-                    example: "validateIpcResponse(response); expect(response.success).toBe(true);",
+                    description:
+                        "Ensure all handlers return proper IpcResponse<T> format",
+                    example:
+                        "validateIpcResponse(response); expect(response.success).toBe(true);",
                 },
                 {
                     name: "Parameter Validation Testing",
                     description: "Test all parameter validation scenarios",
-                    example: "expect(response.error).toContain('Parameter validation failed');",
+                    example:
+                        "expect(response.error).toContain('Parameter validation failed');",
                 },
                 {
                     name: "Error Handling Testing",
                     description: "Verify consistent error response formatting",
-                    example: "expect(response.success).toBe(false); expect(response.error).toBeDefined();",
+                    example:
+                        "expect(response.success).toBe(false); expect(response.error).toBeDefined();",
                 },
                 {
                     name: "Performance Monitoring",
                     description: "Validate performance metadata inclusion",
-                    example: "expect(response.metadata?.duration).toBeTypeOf('number');",
+                    example:
+                        "expect(response.metadata?.duration).toBeTypeOf('number');",
                 },
                 {
                     name: "Success Path Testing",

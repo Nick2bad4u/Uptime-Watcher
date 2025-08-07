@@ -5,7 +5,13 @@
 
 import { describe, expect, it } from "vitest";
 
-import type { MonitorType, Monitor, Site, StatusHistory, StatusUpdate } from "@shared/types";
+import type {
+    MonitorType,
+    Monitor,
+    Site,
+    StatusHistory,
+    StatusUpdate,
+} from "@shared/types";
 import type { UpdateStatus } from "../stores/types";
 
 describe("Types Module", () => {
@@ -109,7 +115,11 @@ describe("Types Module", () => {
         });
 
         it("should support all status values", () => {
-            const statuses: ("up" | "down" | "pending")[] = ["up", "down", "pending"];
+            const statuses: ("up" | "down" | "pending")[] = [
+                "up",
+                "down",
+                "pending",
+            ];
 
             statuses.forEach((status) => {
                 const monitor: Monitor = {
@@ -280,7 +290,11 @@ describe("Types Module", () => {
         });
 
         it("should support all previous status values", () => {
-            const statuses: ("up" | "down" | "pending")[] = ["up", "down", "pending"];
+            const statuses: ("up" | "down" | "pending")[] = [
+                "up",
+                "down",
+                "pending",
+            ];
             const site: Site = {
                 identifier: "test",
                 monitors: [],
@@ -311,7 +325,11 @@ describe("Types Module", () => {
                 data: {
                     exportData: () => Promise.resolve("data"),
                     importData: () => Promise.resolve(true),
-                    downloadSQLiteBackup: () => Promise.resolve({ buffer: new ArrayBuffer(0), fileName: "backup.db" }),
+                    downloadSQLiteBackup: () =>
+                        Promise.resolve({
+                            buffer: new ArrayBuffer(0),
+                            fileName: "backup.db",
+                        }),
                 },
                 events: {
                     onMonitorStatusChanged: () => {
@@ -356,7 +374,11 @@ describe("Types Module", () => {
                 },
                 sites: {
                     getSites: () => Promise.resolve([]),
-                    addSite: (site: Omit<Site, "id">) => Promise.resolve({ ...site, identifier: "new-id" } as Site),
+                    addSite: (site: Omit<Site, "id">) =>
+                        Promise.resolve({
+                            ...site,
+                            identifier: "new-id",
+                        } as Site),
                     removeSite: () => Promise.resolve(),
                     updateSite: () => Promise.resolve(),
                     checkSiteNow: () => Promise.resolve(),
@@ -371,15 +393,21 @@ describe("Types Module", () => {
             expect(typeof mockAPI.data.importData).toBe("function");
             expect(typeof mockAPI.data.downloadSQLiteBackup).toBe("function");
 
-            expect(typeof mockAPI.events.onMonitorStatusChanged).toBe("function");
+            expect(typeof mockAPI.events.onMonitorStatusChanged).toBe(
+                "function"
+            );
             expect(typeof mockAPI.events.onMonitorUp).toBe("function");
             expect(typeof mockAPI.events.onMonitorDown).toBe("function");
             expect(typeof mockAPI.events.removeAllListeners).toBe("function");
 
             expect(typeof mockAPI.monitoring.startMonitoring).toBe("function");
             expect(typeof mockAPI.monitoring.stopMonitoring).toBe("function");
-            expect(typeof mockAPI.monitoring.startMonitoringForSite).toBe("function");
-            expect(typeof mockAPI.monitoring.stopMonitoringForSite).toBe("function");
+            expect(typeof mockAPI.monitoring.startMonitoringForSite).toBe(
+                "function"
+            );
+            expect(typeof mockAPI.monitoring.stopMonitoringForSite).toBe(
+                "function"
+            );
 
             expect(typeof mockAPI.settings.getHistoryLimit).toBe("function");
             expect(typeof mockAPI.settings.updateHistoryLimit).toBe("function");

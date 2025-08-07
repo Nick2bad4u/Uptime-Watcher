@@ -9,7 +9,11 @@ import { CacheKeys } from "../../shared/utils/cacheKeys";
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { AppCaches } from "./cache";
 import { withUtilityErrorHandling } from "./errorHandling";
-import { getAvailableMonitorTypes, getMonitorTypeConfig, type MonitorTypeConfig } from "./monitorTypeHelper";
+import {
+    getAvailableMonitorTypes,
+    getMonitorTypeConfig,
+    type MonitorTypeConfig,
+} from "./monitorTypeHelper";
 
 /**
  * Check if all monitor types in array support advanced analytics.
@@ -18,10 +22,14 @@ import { getAvailableMonitorTypes, getMonitorTypeConfig, type MonitorTypeConfig 
  * @param monitorTypes - Array of monitor types to check
  * @returns Whether all types support advanced analytics
  */
-export async function allSupportsAdvancedAnalytics(monitorTypes: MonitorType[]): Promise<boolean> {
+export async function allSupportsAdvancedAnalytics(
+    monitorTypes: MonitorType[]
+): Promise<boolean> {
     return withUtilityErrorHandling(
         async () => {
-            const supportChecks = await Promise.all(monitorTypes.map((type) => supportsAdvancedAnalytics(type)));
+            const supportChecks = await Promise.all(
+                monitorTypes.map((type) => supportsAdvancedAnalytics(type))
+            );
             return supportChecks.every(Boolean);
         },
         "Check advanced analytics support for multiple types",
@@ -36,10 +44,14 @@ export async function allSupportsAdvancedAnalytics(monitorTypes: MonitorType[]):
  * @param monitorTypes - Array of monitor types to check
  * @returns Whether all types support response time
  */
-export async function allSupportsResponseTime(monitorTypes: MonitorType[]): Promise<boolean> {
+export async function allSupportsResponseTime(
+    monitorTypes: MonitorType[]
+): Promise<boolean> {
     return withUtilityErrorHandling(
         async () => {
-            const supportChecks = await Promise.all(monitorTypes.map((type) => supportsResponseTime(type)));
+            const supportChecks = await Promise.all(
+                monitorTypes.map((type) => supportsResponseTime(type))
+            );
             return supportChecks.every(Boolean);
         },
         "Check response time support for multiple types",
@@ -67,7 +79,10 @@ export function clearConfigCache(): void {
  * const label = await formatMonitorDetail("port", "80");  // "Port: 80"
  * ```
  */
-export async function formatMonitorDetail(monitorType: MonitorType, details: string): Promise<string> {
+export async function formatMonitorDetail(
+    monitorType: MonitorType,
+    details: string
+): Promise<string> {
     return withUtilityErrorHandling(
         async () => {
             // Use store method instead of direct IPC call
@@ -93,7 +108,10 @@ export async function formatMonitorDetail(monitorType: MonitorType, details: str
  * const suffix = await formatMonitorTitleSuffix("port", { host: "localhost", port: 80 }); // " (localhost:80)"
  * ```
  */
-export async function formatMonitorTitleSuffix(monitorType: MonitorType, monitor: Monitor): Promise<string> {
+export async function formatMonitorTitleSuffix(
+    monitorType: MonitorType,
+    monitor: Monitor
+): Promise<string> {
     return withUtilityErrorHandling(
         async () => {
             // Use store method instead of direct IPC call
@@ -112,11 +130,16 @@ export async function formatMonitorTitleSuffix(monitorType: MonitorType, monitor
  * @param monitorType - Type of monitor
  * @returns Analytics label or fallback
  */
-export async function getAnalyticsLabel(monitorType: MonitorType): Promise<string> {
+export async function getAnalyticsLabel(
+    monitorType: MonitorType
+): Promise<string> {
     return withUtilityErrorHandling(
         async () => {
             const config = await getConfig(monitorType);
-            return config?.uiConfig?.detailFormats?.analyticsLabel ?? `${monitorType.toUpperCase()} Response Time`;
+            return (
+                config?.uiConfig?.detailFormats?.analyticsLabel ??
+                `${monitorType.toUpperCase()} Response Time`
+            );
         },
         `Get analytics label for ${monitorType}`,
         `${monitorType.toUpperCase()} Response Time`
@@ -164,7 +187,9 @@ export async function getMonitorHelpTexts(monitorType: MonitorType): Promise<{
  * @param feature - Feature to check for ('responseTime' | 'advancedAnalytics')
  * @returns Array of monitor types that support the feature
  */
-export async function getTypesWithFeature(feature: "advancedAnalytics" | "responseTime"): Promise<MonitorType[]> {
+export async function getTypesWithFeature(
+    feature: "advancedAnalytics" | "responseTime"
+): Promise<MonitorType[]> {
     return withUtilityErrorHandling(
         async () => {
             const allTypes = await getAvailableMonitorTypes();
@@ -194,7 +219,9 @@ export async function getTypesWithFeature(feature: "advancedAnalytics" | "respon
  * @param monitorType - Type of monitor
  * @returns Whether to show URL
  */
-export async function shouldShowUrl(monitorType: MonitorType): Promise<boolean> {
+export async function shouldShowUrl(
+    monitorType: MonitorType
+): Promise<boolean> {
     return withUtilityErrorHandling(
         async () => {
             const config = await getConfig(monitorType);
@@ -211,7 +238,9 @@ export async function shouldShowUrl(monitorType: MonitorType): Promise<boolean> 
  * @param monitorType - Type of monitor
  * @returns Whether monitor supports advanced analytics
  */
-export async function supportsAdvancedAnalytics(monitorType: MonitorType): Promise<boolean> {
+export async function supportsAdvancedAnalytics(
+    monitorType: MonitorType
+): Promise<boolean> {
     return withUtilityErrorHandling(
         async () => {
             const config = await getConfig(monitorType);
@@ -228,7 +257,9 @@ export async function supportsAdvancedAnalytics(monitorType: MonitorType): Promi
  * @param monitorType - Type of monitor
  * @returns Whether monitor supports response time analytics
  */
-export async function supportsResponseTime(monitorType: MonitorType): Promise<boolean> {
+export async function supportsResponseTime(
+    monitorType: MonitorType
+): Promise<boolean> {
     return withUtilityErrorHandling(
         async () => {
             const config = await getConfig(monitorType);
@@ -242,11 +273,15 @@ export async function supportsResponseTime(monitorType: MonitorType): Promise<bo
 /**
  * Get monitor type configuration with caching
  */
-async function getConfig(monitorType: MonitorType): Promise<MonitorTypeConfig | undefined> {
+async function getConfig(
+    monitorType: MonitorType
+): Promise<MonitorTypeConfig | undefined> {
     const cacheKey = CacheKeys.config.byName(`monitor-config-${monitorType}`);
 
     // Try to get from cache first
-    const cached = AppCaches.uiHelpers.get(cacheKey) as MonitorTypeConfig | undefined;
+    const cached = AppCaches.uiHelpers.get(cacheKey) as
+        | MonitorTypeConfig
+        | undefined;
     if (cached) {
         return cached;
     }

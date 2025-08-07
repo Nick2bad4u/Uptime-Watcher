@@ -79,12 +79,18 @@ describe("useUIStore", () => {
         it("should have all required action methods", () => {
             const { result } = renderHook(() => useUIStore());
 
-            expect(typeof result.current.setActiveSiteDetailsTab).toBe("function");
+            expect(typeof result.current.setActiveSiteDetailsTab).toBe(
+                "function"
+            );
             expect(typeof result.current.setSelectedSite).toBe("function");
-            expect(typeof result.current.setShowAdvancedMetrics).toBe("function");
+            expect(typeof result.current.setShowAdvancedMetrics).toBe(
+                "function"
+            );
             expect(typeof result.current.setShowSettings).toBe("function");
             expect(typeof result.current.setShowSiteDetails).toBe("function");
-            expect(typeof result.current.setSiteDetailsChartTimeRange).toBe("function");
+            expect(typeof result.current.setSiteDetailsChartTimeRange).toBe(
+                "function"
+            );
         });
     });
 

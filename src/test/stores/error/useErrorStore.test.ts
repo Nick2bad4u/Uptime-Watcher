@@ -122,14 +122,18 @@ describe("useErrorStore", () => {
             });
 
             expect(result.current.storeErrors["sites"]).toBe("Sites error");
-            expect(result.current.storeErrors["monitors"]).toBe("Monitors error");
+            expect(result.current.storeErrors["monitors"]).toBe(
+                "Monitors error"
+            );
 
             act(() => {
                 result.current.clearStoreError("sites");
             });
 
             expect(result.current.storeErrors["sites"]).toBeUndefined();
-            expect(result.current.storeErrors["monitors"]).toBe("Monitors error");
+            expect(result.current.storeErrors["monitors"]).toBe(
+                "Monitors error"
+            );
         });
 
         it("should handle multiple store errors", () => {
@@ -142,22 +146,41 @@ describe("useErrorStore", () => {
             });
 
             expect(result.current.storeErrors["sites"]).toBe("Sites error");
-            expect(result.current.storeErrors["monitors"]).toBe("Monitors error");
-            expect(result.current.storeErrors["settings"]).toBe("Settings error");
+            expect(result.current.storeErrors["monitors"]).toBe(
+                "Monitors error"
+            );
+            expect(result.current.storeErrors["settings"]).toBe(
+                "Settings error"
+            );
         });
 
         it("should handle store error keys with special characters", () => {
             const { result } = renderHook(() => useErrorStore());
 
             act(() => {
-                result.current.setStoreError("store-with-dashes", "Error message");
-                result.current.setStoreError("store_with_underscores", "Another error");
-                result.current.setStoreError("store.with.dots", "Yet another error");
+                result.current.setStoreError(
+                    "store-with-dashes",
+                    "Error message"
+                );
+                result.current.setStoreError(
+                    "store_with_underscores",
+                    "Another error"
+                );
+                result.current.setStoreError(
+                    "store.with.dots",
+                    "Yet another error"
+                );
             });
 
-            expect(result.current.getStoreError("store-with-dashes")).toBe("Error message");
-            expect(result.current.getStoreError("store_with_underscores")).toBe("Another error");
-            expect(result.current.getStoreError("store.with.dots")).toBe("Yet another error");
+            expect(result.current.getStoreError("store-with-dashes")).toBe(
+                "Error message"
+            );
+            expect(result.current.getStoreError("store_with_underscores")).toBe(
+                "Another error"
+            );
+            expect(result.current.getStoreError("store.with.dots")).toBe(
+                "Yet another error"
+            );
         });
     });
 
@@ -191,7 +214,9 @@ describe("useErrorStore", () => {
         it("should get operation loading state", () => {
             const { result } = renderHook(() => useErrorStore());
 
-            expect(result.current.getOperationLoading("fetchSites")).toBe(false);
+            expect(result.current.getOperationLoading("fetchSites")).toBe(
+                false
+            );
 
             act(() => {
                 result.current.setOperationLoading("fetchSites", true);
@@ -211,21 +236,35 @@ describe("useErrorStore", () => {
 
             expect(result.current.getOperationLoading("fetchSites")).toBe(true);
             expect(result.current.getOperationLoading("saveSite")).toBe(true);
-            expect(result.current.getOperationLoading("deleteSite")).toBe(false);
+            expect(result.current.getOperationLoading("deleteSite")).toBe(
+                false
+            );
         });
 
         it("should handle operation keys with special characters", () => {
             const { result } = renderHook(() => useErrorStore());
 
             act(() => {
-                result.current.setOperationLoading("operation-with-dashes", true);
-                result.current.setOperationLoading("operation_with_underscores", true);
+                result.current.setOperationLoading(
+                    "operation-with-dashes",
+                    true
+                );
+                result.current.setOperationLoading(
+                    "operation_with_underscores",
+                    true
+                );
                 result.current.setOperationLoading("operation.with.dots", true);
             });
 
-            expect(result.current.getOperationLoading("operation-with-dashes")).toBe(true);
-            expect(result.current.getOperationLoading("operation_with_underscores")).toBe(true);
-            expect(result.current.getOperationLoading("operation.with.dots")).toBe(true);
+            expect(
+                result.current.getOperationLoading("operation-with-dashes")
+            ).toBe(true);
+            expect(
+                result.current.getOperationLoading("operation_with_underscores")
+            ).toBe(true);
+            expect(
+                result.current.getOperationLoading("operation.with.dots")
+            ).toBe(true);
         });
     });
 
@@ -279,9 +318,13 @@ describe("useErrorStore", () => {
 
             expect(result.current.lastError).toBe("Global error");
             expect(result.current.storeErrors["sites"]).toBe("Sites error");
-            expect(result.current.storeErrors["monitors"]).toBe("Monitors error");
+            expect(result.current.storeErrors["monitors"]).toBe(
+                "Monitors error"
+            );
             expect(result.current.getOperationLoading("fetchSites")).toBe(true);
-            expect(result.current.getOperationLoading("saveMonitor")).toBe(true);
+            expect(result.current.getOperationLoading("saveMonitor")).toBe(
+                true
+            );
             expect(result.current.isLoading).toBe(true);
         });
     });
@@ -332,17 +375,23 @@ describe("useErrorStore", () => {
             act(() => {
                 result.current.setOperationLoading("toggle-operation", true);
             });
-            expect(result.current.getOperationLoading("toggle-operation")).toBe(true);
+            expect(result.current.getOperationLoading("toggle-operation")).toBe(
+                true
+            );
 
             act(() => {
                 result.current.setOperationLoading("toggle-operation", false);
             });
-            expect(result.current.getOperationLoading("toggle-operation")).toBe(false);
+            expect(result.current.getOperationLoading("toggle-operation")).toBe(
+                false
+            );
 
             act(() => {
                 result.current.setOperationLoading("toggle-operation", true);
             });
-            expect(result.current.getOperationLoading("toggle-operation")).toBe(true);
+            expect(result.current.getOperationLoading("toggle-operation")).toBe(
+                true
+            );
         });
 
         it("should handle undefined store errors", () => {
@@ -376,7 +425,9 @@ describe("useErrorStore", () => {
                 result1.current.setOperationLoading("shared-operation", true);
             });
 
-            expect(result2.current.getOperationLoading("shared-operation")).toBe(true);
+            expect(
+                result2.current.getOperationLoading("shared-operation")
+            ).toBe(true);
         });
 
         it("should react to state changes", () => {
@@ -409,7 +460,9 @@ describe("useErrorStore", () => {
 
             expect(result.current.lastError).toBe("Persistent error");
             expect(result.current.storeErrors["sites"]).toBe("Sites error");
-            expect(result.current.getOperationLoading("fetchSites")).toBe(false);
+            expect(result.current.getOperationLoading("fetchSites")).toBe(
+                false
+            );
         });
 
         it("should handle clearing errors while maintaining loading states", () => {
@@ -458,7 +511,9 @@ describe("useErrorStore", () => {
 
             expect(result.current.lastError).toBeUndefined();
             expect(result.current.storeErrors["sites"]).toBeUndefined();
-            expect(result.current.storeErrors["monitors"]).toBe("Monitors error");
+            expect(result.current.storeErrors["monitors"]).toBe(
+                "Monitors error"
+            );
             expect(result.current.getOperationLoading("fetchSites")).toBe(true);
             expect(result.current.isLoading).toBe(true);
         });

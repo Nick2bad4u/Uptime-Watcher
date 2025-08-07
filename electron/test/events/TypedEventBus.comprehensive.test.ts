@@ -33,7 +33,10 @@ interface TestEvents extends Record<string, unknown> {
     "object-event": { data: string; nested: { value: number } };
     "array-event": number[];
     "object-with-meta": { data: string; _meta: string };
-    "complex-object": { id: string; items: Array<{ name: string; value: number }> };
+    "complex-object": {
+        id: string;
+        items: Array<{ name: string; value: number }>;
+    };
     "primitive-boolean": boolean;
     "null-event": null;
     "undefined-event": undefined;
@@ -76,18 +79,22 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         });
 
         it("should use custom maxMiddleware option", () => {
-            const bus = new TypedEventBus<TestEvents>("test", { maxMiddleware: 5 });
+            const bus = new TypedEventBus<TestEvents>("test", {
+                maxMiddleware: 5,
+            });
             const diagnostics = bus.getDiagnostics();
             expect(diagnostics.maxMiddleware).toBe(5);
         });
 
         it("should throw error for invalid maxMiddleware", () => {
-            expect(() => new TypedEventBus<TestEvents>("test", { maxMiddleware: 0 })).toThrow(
-                "maxMiddleware must be positive, got 0"
-            );
-            expect(() => new TypedEventBus<TestEvents>("test", { maxMiddleware: -1 })).toThrow(
-                "maxMiddleware must be positive, got -1"
-            );
+            expect(
+                () =>
+                    new TypedEventBus<TestEvents>("test", { maxMiddleware: 0 })
+            ).toThrow("maxMiddleware must be positive, got 0");
+            expect(
+                () =>
+                    new TypedEventBus<TestEvents>("test", { maxMiddleware: -1 })
+            ).toThrow("maxMiddleware must be positive, got -1");
         });
 
         it("should set max listeners to 50 by default", () => {
@@ -98,7 +105,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
     describe("Factory Function", () => {
         it("should create TypedEventBus instance via factory", () => {
-            const bus = createTypedEventBus<TestEvents>("factory-test", { maxMiddleware: 15 });
+            const bus = createTypedEventBus<TestEvents>("factory-test", {
+                maxMiddleware: 15,
+            });
             expect(bus).toBeInstanceOf(TypedEventBus);
             const diagnostics = bus.getDiagnostics();
             expect(diagnostics.busId).toBe("factory-test");
@@ -122,17 +131,21 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should execute middleware in order", async () => {
             const executionOrder: number[] = [];
 
-            const middleware1: EventMiddleware = vi.fn(async (_event, _data, next) => {
-                executionOrder.push(1);
-                await next();
-                executionOrder.push(4);
-            });
+            const middleware1: EventMiddleware = vi.fn(
+                async (_event, _data, next) => {
+                    executionOrder.push(1);
+                    await next();
+                    executionOrder.push(4);
+                }
+            );
 
-            const middleware2: EventMiddleware = vi.fn(async (_event, _data, next) => {
-                executionOrder.push(2);
-                await next();
-                executionOrder.push(3);
-            });
+            const middleware2: EventMiddleware = vi.fn(
+                async (_event, _data, next) => {
+                    executionOrder.push(2);
+                    await next();
+                    executionOrder.push(3);
+                }
+            );
 
             eventBus.use(middleware1);
             eventBus.use(middleware2);
@@ -141,13 +154,23 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             await eventBus.emitTyped("string-event", "test");
 
             expect(executionOrder).toEqual([1, 2, 3, 4]);
-            expect(middleware1).toHaveBeenCalledWith("string-event", "test", expect.any(Function));
-            expect(middleware2).toHaveBeenCalledWith("string-event", "test", expect.any(Function));
+            expect(middleware1).toHaveBeenCalledWith(
+                "string-event",
+                "test",
+                expect.any(Function)
+            );
+            expect(middleware2).toHaveBeenCalledWith(
+                "string-event",
+                "test",
+                expect.any(Function)
+            );
             expect(mockListener).toHaveBeenCalled();
         });
 
         it("should throw error when middleware limit exceeded", () => {
-            const bus = new TypedEventBus<TestEvents>("test", { maxMiddleware: 2 });
+            const bus = new TypedEventBus<TestEvents>("test", {
+                maxMiddleware: 2,
+            });
 
             bus.use(mockMiddleware);
             bus.use(mockMiddleware2);
@@ -166,7 +189,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             eventBus.use(mockMiddleware2); // This should not be called
             eventBus.onTyped("string-event", mockListener);
 
-            await expect(eventBus.emitTyped("string-event", "test")).rejects.toThrow("Middleware error");
+            await expect(
+                eventBus.emitTyped("string-event", "test")
+            ).rejects.toThrow("Middleware error");
 
             expect(errorMiddleware).toHaveBeenCalled();
             expect(mockMiddleware2).not.toHaveBeenCalled();
@@ -174,9 +199,11 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         });
 
         it("should handle synchronous middleware", async () => {
-            const syncMiddleware: EventMiddleware = vi.fn((_event, _data, next) => {
-                next(); // Synchronous call
-            });
+            const syncMiddleware: EventMiddleware = vi.fn(
+                (_event, _data, next) => {
+                    next(); // Synchronous call
+                }
+            );
 
             eventBus.use(syncMiddleware);
             eventBus.onTyped("string-event", mockListener);
@@ -342,7 +369,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(receivedData._meta).toEqual(expect.any(Object));
 
             // Verify _meta is non-enumerable
-            expect(Object.propertyIsEnumerable.call(receivedData, "_meta")).toBe(false);
+            expect(
+                Object.propertyIsEnumerable.call(receivedData, "_meta")
+            ).toBe(false);
         });
 
         it("should handle complex objects correctly", async () => {
@@ -452,7 +481,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         });
 
         it("should calculate middleware utilization correctly", () => {
-            const bus = new TypedEventBus<TestEvents>("test", { maxMiddleware: 4 });
+            const bus = new TypedEventBus<TestEvents>("test", {
+                maxMiddleware: 4,
+            });
 
             bus.use(mockMiddleware);
             bus.use(mockMiddleware2);
@@ -463,7 +494,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
         it("should handle maxMiddleware of 0 in utilization calculation", () => {
             // This tests the edge case protection in getDiagnostics
-            const bus = new TypedEventBus<TestEvents>("test", { maxMiddleware: 1 });
+            const bus = new TypedEventBus<TestEvents>("test", {
+                maxMiddleware: 1,
+            });
 
             // Manually set maxMiddleware to 0 to test the protection
             (bus as any).maxMiddleware = 0;
@@ -501,7 +534,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         });
 
         it("should handle events with no listeners", async () => {
-            await expect(eventBus.emitTyped("string-event", "test")).resolves.not.toThrow();
+            await expect(
+                eventBus.emitTyped("string-event", "test")
+            ).resolves.not.toThrow();
         });
 
         it("should preserve array indices and length", async () => {
@@ -611,7 +646,10 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should handle empty object", async () => {
             eventBus.onTyped("object-event", mockListener);
 
-            await eventBus.emitTyped("object-event", { data: "", nested: { value: 0 } });
+            await eventBus.emitTyped("object-event", {
+                data: "",
+                nested: { value: 0 },
+            });
 
             expect(mockListener).toHaveBeenCalledWith(
                 expect.objectContaining({
@@ -653,23 +691,27 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
     describe("Advanced Edge Cases and Coverage", () => {
         it("should handle constructor with maxMiddleware of 0", () => {
-            expect(() => new TypedEventBus<TestEvents>("test", { maxMiddleware: 0 })).toThrow(
-                "maxMiddleware must be positive, got 0"
-            );
+            expect(
+                () =>
+                    new TypedEventBus<TestEvents>("test", { maxMiddleware: 0 })
+            ).toThrow("maxMiddleware must be positive, got 0");
         });
 
         it("should handle constructor with negative maxMiddleware", () => {
-            expect(() => new TypedEventBus<TestEvents>("test", { maxMiddleware: -1 })).toThrow(
-                "maxMiddleware must be positive, got -1"
-            );
+            expect(
+                () =>
+                    new TypedEventBus<TestEvents>("test", { maxMiddleware: -1 })
+            ).toThrow("maxMiddleware must be positive, got -1");
         });
 
         it("should handle middleware that modifies next function but still processes", async () => {
-            const modifyingMiddleware: EventMiddleware = vi.fn(async (_event, _data, next) => {
-                // Middleware that wraps the next function
-                await next();
-                // Additional processing after next
-            });
+            const modifyingMiddleware: EventMiddleware = vi.fn(
+                async (_event, _data, next) => {
+                    // Middleware that wraps the next function
+                    await next();
+                    // Additional processing after next
+                }
+            );
 
             eventBus.use(modifyingMiddleware);
             eventBus.onTyped("string-event", mockListener);
@@ -707,7 +749,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             eventBus.use(badMiddleware);
             eventBus.onTyped("string-event", mockListener);
 
-            await expect(eventBus.emitTyped("string-event", "test")).rejects.toEqual("String error");
+            await expect(
+                eventBus.emitTyped("string-event", "test")
+            ).rejects.toEqual("String error");
 
             expect(badMiddleware).toHaveBeenCalled();
             expect(mockListener).not.toHaveBeenCalled();
@@ -736,7 +780,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should handle BigInt values", async () => {
             eventBus.onTyped("string-event", mockListener);
 
-            const bigIntValue = BigInt(123_456_789_012_345_678_901_234_567_890n);
+            const bigIntValue =
+                BigInt(123_456_789_012_345_678_901_234_567_890n);
 
             await eventBus.emitTyped("string-event", bigIntValue as any);
 
@@ -822,14 +867,18 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         });
 
         it("should handle middleware with synchronous and asynchronous mix", async () => {
-            const syncMiddleware: EventMiddleware = vi.fn((_event, _data, next) => {
-                next(); // Synchronous
-            });
+            const syncMiddleware: EventMiddleware = vi.fn(
+                (_event, _data, next) => {
+                    next(); // Synchronous
+                }
+            );
 
-            const asyncMiddleware: EventMiddleware = vi.fn(async (_event, _data, next) => {
-                await new Promise((resolve) => setTimeout(resolve, 1));
-                await next(); // Asynchronous
-            });
+            const asyncMiddleware: EventMiddleware = vi.fn(
+                async (_event, _data, next) => {
+                    await new Promise((resolve) => setTimeout(resolve, 1));
+                    await next(); // Asynchronous
+                }
+            );
 
             eventBus.use(syncMiddleware);
             eventBus.use(asyncMiddleware);
@@ -905,7 +954,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         });
 
         it("should handle middleware utilization calculation edge cases", () => {
-            const bus = new TypedEventBus<TestEvents>("test", { maxMiddleware: 1 });
+            const bus = new TypedEventBus<TestEvents>("test", {
+                maxMiddleware: 1,
+            });
 
             // Test 100% utilization
             bus.use(mockMiddleware);

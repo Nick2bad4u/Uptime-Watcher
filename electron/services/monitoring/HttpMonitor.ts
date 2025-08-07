@@ -23,8 +23,15 @@
 
 import { AxiosInstance, AxiosResponse } from "axios";
 
-import { interpolateLogTemplate, LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
-import { DEFAULT_REQUEST_TIMEOUT, RETRY_BACKOFF, USER_AGENT } from "../../constants";
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "../../../shared/utils/logTemplates";
+import {
+    DEFAULT_REQUEST_TIMEOUT,
+    RETRY_BACKOFF,
+    USER_AGENT,
+} from "../../constants";
 import { isDev } from "../../electronUtils";
 import { Site } from "../../types";
 import { logger } from "../../utils/logger";
@@ -34,7 +41,11 @@ import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
 import { createErrorResult, handleCheckError } from "./utils/errorHandling";
 import { createHttpClient } from "./utils/httpClient";
 import { determineMonitorStatus } from "./utils/httpStatusUtils";
-import { getMonitorRetryAttempts, getMonitorTimeout, hasValidUrl } from "./utils/monitorTypeGuards";
+import {
+    getMonitorRetryAttempts,
+    getMonitorTimeout,
+    hasValidUrl,
+} from "./utils/monitorTypeGuards";
 
 /**
  * Extends Axios types to support timing metadata for monitoring.
@@ -157,9 +168,13 @@ export class HttpMonitor implements IMonitorService {
      * @throws {@link Error} if monitor type is not "http".
      * @public
      */
-    public async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
+    public async check(
+        monitor: Site["monitors"][0]
+    ): Promise<MonitorCheckResult> {
         if (monitor.type !== "http") {
-            throw new Error(`HttpMonitor cannot handle monitor type: ${monitor.type}`);
+            throw new Error(
+                `HttpMonitor cannot handle monitor type: ${monitor.type}`
+            );
         }
 
         if (!hasValidUrl(monitor)) {
@@ -167,10 +182,20 @@ export class HttpMonitor implements IMonitorService {
         }
 
         // Use type-safe utility functions instead of type assertions
-        const timeout = getMonitorTimeout(monitor, this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT);
-        const retryAttempts = getMonitorRetryAttempts(monitor, DEFAULT_RETRY_ATTEMPTS);
+        const timeout = getMonitorTimeout(
+            monitor,
+            this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT
+        );
+        const retryAttempts = getMonitorRetryAttempts(
+            monitor,
+            DEFAULT_RETRY_ATTEMPTS
+        );
 
-        return this.performHealthCheckWithRetry(monitor.url, timeout, retryAttempts);
+        return this.performHealthCheckWithRetry(
+            monitor.url,
+            timeout,
+            retryAttempts
+        );
     }
 
     /**
@@ -207,10 +232,16 @@ export class HttpMonitor implements IMonitorService {
      */
     public updateConfig(config: Partial<MonitorConfig>): void {
         // Basic validation of config properties
-        if (config.timeout !== undefined && (typeof config.timeout !== "number" || config.timeout <= 0)) {
+        if (
+            config.timeout !== undefined &&
+            (typeof config.timeout !== "number" || config.timeout <= 0)
+        ) {
             throw new Error("Invalid timeout: must be a positive number");
         }
-        if (config.userAgent !== undefined && typeof config.userAgent !== "string") {
+        if (
+            config.userAgent !== undefined &&
+            typeof config.userAgent !== "string"
+        ) {
             throw new Error("Invalid userAgent: must be a string");
         }
 
@@ -235,7 +266,10 @@ export class HttpMonitor implements IMonitorService {
      * @throws {@link AxiosError} if the request fails.
      * @internal
      */
-    private async makeRequest(url: string, timeout: number): Promise<AxiosResponse> {
+    private async makeRequest(
+        url: string,
+        timeout: number
+    ): Promise<AxiosResponse> {
         // Use our configured Axios instance with specific timeout override
         return this.axiosInstance.get(url, {
             timeout,
@@ -265,19 +299,25 @@ export class HttpMonitor implements IMonitorService {
             // So if maxRetries=3, we want 4 total attempts (1 initial + 3 retries)
             const totalAttempts = maxRetries + 1;
 
-            return await withOperationalHooks(() => this.performSingleHealthCheck(url, timeout), {
-                initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
-                maxRetries: totalAttempts,
-                operationName: `HTTP check for ${url}`,
-                ...(isDev() && {
-                    onRetry: (attempt: number, error: Error) => {
-                        const errorMessage = error instanceof Error ? error.message : String(error);
-                        logger.debug(
-                            `[HttpMonitor] URL ${url} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
-                        );
-                    },
-                }),
-            });
+            return await withOperationalHooks(
+                () => this.performSingleHealthCheck(url, timeout),
+                {
+                    initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
+                    maxRetries: totalAttempts,
+                    operationName: `HTTP check for ${url}`,
+                    ...(isDev() && {
+                        onRetry: (attempt: number, error: Error) => {
+                            const errorMessage =
+                                error instanceof Error
+                                    ? error.message
+                                    : String(error);
+                            logger.debug(
+                                `[HttpMonitor] URL ${url} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
+                            );
+                        },
+                    }),
+                }
+            );
         } catch (error) {
             return handleCheckError(error, url);
         }
@@ -295,9 +335,14 @@ export class HttpMonitor implements IMonitorService {
      * @throws {@link AxiosError} if the request fails.
      * @internal
      */
-    private async performSingleHealthCheck(url: string, timeout: number): Promise<MonitorCheckResult> {
+    private async performSingleHealthCheck(
+        url: string,
+        timeout: number
+    ): Promise<MonitorCheckResult> {
         if (isDev()) {
-            logger.debug(`[HttpMonitor] Checking URL: ${url} with timeout: ${timeout}ms`);
+            logger.debug(
+                `[HttpMonitor] Checking URL: ${url} with timeout: ${timeout}ms`
+            );
         }
 
         const response = await this.makeRequest(url, timeout);
@@ -305,11 +350,14 @@ export class HttpMonitor implements IMonitorService {
 
         if (isDev()) {
             logger.debug(
-                interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_RESPONSE_TIME, {
-                    responseTime,
-                    status: response.status,
-                    url,
-                })
+                interpolateLogTemplate(
+                    LOG_TEMPLATES.debug.MONITOR_RESPONSE_TIME,
+                    {
+                        responseTime,
+                        status: response.status,
+                        url,
+                    }
+                )
             );
         }
 

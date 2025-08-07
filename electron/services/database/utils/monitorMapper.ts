@@ -11,9 +11,16 @@ import type { MonitorRow as DatabaseMonitorRow } from "../../../../shared/types/
 import type { Monitor, Site } from "../../../types";
 
 import { LOG_TEMPLATES } from "../../../../shared/utils/logTemplates";
-import { isValidIdentifierArray, safeInteger } from "../../../../shared/validation/validatorUtils";
+import {
+    isValidIdentifierArray,
+    safeInteger,
+} from "../../../../shared/validation/validatorUtils";
 import { logger } from "../../../utils/logger";
-import { generateSqlParameters, mapMonitorToRow, mapRowToMonitor } from "./dynamicSchema";
+import {
+    generateSqlParameters,
+    mapMonitorToRow,
+    mapRowToMonitor,
+} from "./dynamicSchema";
 import { DbValue } from "./valueConverters";
 
 /**
@@ -48,7 +55,10 @@ import { DbValue } from "./valueConverters";
  * @see {@link generateSqlParameters}
  * @public
  */
-export function buildMonitorParameters(siteIdentifier: string, monitor: Site["monitors"][0]): DbValue[] {
+export function buildMonitorParameters(
+    siteIdentifier: string,
+    monitor: Site["monitors"][0]
+): DbValue[] {
     try {
         // Convert monitor to row format
         const monitorWithMetadata = {
@@ -72,7 +82,11 @@ export function buildMonitorParameters(siteIdentifier: string, monitor: Site["mo
             return value as DbValue;
         });
     } catch (error) {
-        logger.error(LOG_TEMPLATES.errors.MONITOR_MAPPER_FAILED, { error, monitor, siteIdentifier });
+        logger.error(LOG_TEMPLATES.errors.MONITOR_MAPPER_FAILED, {
+            error,
+            monitor,
+            siteIdentifier,
+        });
         throw error;
     }
 }
@@ -163,7 +177,10 @@ export function rowToMonitor(row: DatabaseMonitorRow): Site["monitors"][0] {
 
         return monitor;
     } catch (error) {
-        logger.error(LOG_TEMPLATES.errors.MONITOR_MAPPER_FAILED, { error, row });
+        logger.error(LOG_TEMPLATES.errors.MONITOR_MAPPER_FAILED, {
+            error,
+            row,
+        });
         throw error;
     }
 }
@@ -187,7 +204,9 @@ export function rowToMonitor(row: DatabaseMonitorRow): Site["monitors"][0] {
  * @see {@link rowToMonitor}
  * @public
  */
-export function rowToMonitorOrUndefined(row: DatabaseMonitorRow | undefined): Site["monitors"][0] | undefined {
+export function rowToMonitorOrUndefined(
+    row: DatabaseMonitorRow | undefined
+): Site["monitors"][0] | undefined {
     if (!row) {
         return undefined;
     }
@@ -201,7 +220,10 @@ export function rowToMonitorOrUndefined(row: DatabaseMonitorRow | undefined): Si
  * @param monitor - Base monitor object
  * @param dynamicMonitor - Dynamic monitor data
  */
-function copyDynamicFields(monitor: Site["monitors"][0], dynamicMonitor: Monitor): void {
+function copyDynamicFields(
+    monitor: Site["monitors"][0],
+    dynamicMonitor: Monitor
+): void {
     const excludedFields = new Set([
         "checkInterval",
         "createdAt",
@@ -287,11 +309,17 @@ function parseActiveOperations(row: DatabaseMonitorRow): string[] {
         if (isValidIdentifierArray(parsed)) {
             return parsed;
         } else {
-            logger.warn(LOG_TEMPLATES.warnings.MONITOR_ACTIVE_OPERATIONS_INVALID, { parsed });
+            logger.warn(
+                LOG_TEMPLATES.warnings.MONITOR_ACTIVE_OPERATIONS_INVALID,
+                { parsed }
+            );
             return [];
         }
     } catch (error) {
-        logger.warn(LOG_TEMPLATES.warnings.MONITOR_ACTIVE_OPERATIONS_PARSE_FAILED, error);
+        logger.warn(
+            LOG_TEMPLATES.warnings.MONITOR_ACTIVE_OPERATIONS_PARSE_FAILED,
+            error
+        );
         return [];
     }
 }

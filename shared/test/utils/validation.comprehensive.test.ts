@@ -5,7 +5,11 @@
 
 import { describe, expect, it } from "vitest";
 import type { Monitor, Site } from "../../types";
-import { getMonitorValidationErrors, validateMonitorType, validateSite } from "../../utils/validation";
+import {
+    getMonitorValidationErrors,
+    validateMonitorType,
+    validateSite,
+} from "../../utils/validation";
 
 describe("Shared Validation Utilities - Comprehensive Coverage", () => {
     describe("getMonitorValidationErrors", () => {
@@ -109,7 +113,9 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                 };
 
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).toContain("Check interval must be at least 1000ms");
+                expect(errors).toContain(
+                    "Check interval must be at least 1000ms"
+                );
             });
 
             it("should return error for non-numeric check interval", () => {
@@ -122,7 +128,9 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                 } as unknown as Partial<Monitor>;
 
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).toContain("Check interval must be at least 1000ms");
+                expect(errors).toContain(
+                    "Check interval must be at least 1000ms"
+                );
             });
 
             it("should return error for invalid timeout", () => {
@@ -174,7 +182,9 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                 };
 
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).toContain("Retry attempts must be between 0 and 10");
+                expect(errors).toContain(
+                    "Retry attempts must be between 0 and 10"
+                );
             });
 
             it("should return error for too high retry attempts", () => {
@@ -187,7 +197,9 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                 };
 
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).toContain("Retry attempts must be between 0 and 10");
+                expect(errors).toContain(
+                    "Retry attempts must be between 0 and 10"
+                );
             });
 
             it("should return error for non-numeric retry attempts", () => {
@@ -200,7 +212,9 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                 } as unknown as Partial<Monitor>;
 
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).toContain("Retry attempts must be between 0 and 10");
+                expect(errors).toContain(
+                    "Retry attempts must be between 0 and 10"
+                );
             });
         });
 
@@ -289,7 +303,9 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                 };
 
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).toContain("Valid port number (1-65535) is required for port monitors");
+                expect(errors).toContain(
+                    "Valid port number (1-65535) is required for port monitors"
+                );
             });
 
             it("should return error for invalid port number - too low", () => {
@@ -302,7 +318,9 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                 };
 
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).toContain("Valid port number (1-65535) is required for port monitors");
+                expect(errors).toContain(
+                    "Valid port number (1-65535) is required for port monitors"
+                );
             });
 
             it("should return error for invalid port number - too high", () => {
@@ -315,7 +333,9 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                 };
 
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).toContain("Valid port number (1-65535) is required for port monitors");
+                expect(errors).toContain(
+                    "Valid port number (1-65535) is required for port monitors"
+                );
             });
 
             it("should return error for non-numeric port", () => {
@@ -328,7 +348,9 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                 } as unknown as Partial<Monitor>;
 
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).toContain("Valid port number (1-65535) is required for port monitors");
+                expect(errors).toContain(
+                    "Valid port number (1-65535) is required for port monitors"
+                );
             });
         });
 
@@ -378,7 +400,9 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
 
                 const errors = getMonitorValidationErrors(monitor);
                 // Should not contain any port-related errors
-                expect(errors.some((error) => error.includes("port"))).toBe(false);
+                expect(errors.some((error) => error.includes("port"))).toBe(
+                    false
+                );
             });
 
             it("should validate ping monitor with valid host", () => {
@@ -391,7 +415,9 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
 
                 const errors = getMonitorValidationErrors(monitor);
                 // Should not contain host-related errors for valid hosts
-                expect(errors.some((error) => error.includes("Host is required"))).toBe(false);
+                expect(
+                    errors.some((error) => error.includes("Host is required"))
+                ).toBe(false);
             });
         });
 
@@ -407,9 +433,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                 const errors = getMonitorValidationErrors(monitor);
                 expect(errors).toHaveLength(5);
                 expect(errors).toContain("Monitor id is required");
-                expect(errors).toContain("Check interval must be at least 1000ms");
+                expect(errors).toContain(
+                    "Check interval must be at least 1000ms"
+                );
                 expect(errors).toContain("Timeout must be a positive number");
-                expect(errors).toContain("Retry attempts must be between 0 and 10");
+                expect(errors).toContain(
+                    "Retry attempts must be between 0 and 10"
+                );
                 expect(errors).toContain("URL is required for HTTP monitors");
             });
         });
@@ -576,17 +606,27 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
 
         describe("Invalid sites", () => {
             it("should return false for null", () => {
-                expect(validateSite(null as unknown as Partial<Site>)).toBe(false);
+                expect(validateSite(null as unknown as Partial<Site>)).toBe(
+                    false
+                );
             });
 
             it("should return false for undefined", () => {
-                expect(validateSite(undefined as unknown as Partial<Site>)).toBe(false);
+                expect(
+                    validateSite(undefined as unknown as Partial<Site>)
+                ).toBe(false);
             });
 
             it("should return false for non-object", () => {
-                expect(validateSite("string" as unknown as Partial<Site>)).toBe(false);
-                expect(validateSite(123 as unknown as Partial<Site>)).toBe(false);
-                expect(validateSite([] as unknown as Partial<Site>)).toBe(false);
+                expect(validateSite("string" as unknown as Partial<Site>)).toBe(
+                    false
+                );
+                expect(validateSite(123 as unknown as Partial<Site>)).toBe(
+                    false
+                );
+                expect(validateSite([] as unknown as Partial<Site>)).toBe(
+                    false
+                );
             });
 
             it("should return false for missing identifier", () => {

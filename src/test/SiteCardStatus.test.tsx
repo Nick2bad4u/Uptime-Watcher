@@ -5,7 +5,12 @@ import { SiteCardStatus } from "../components/Dashboard/SiteCard/SiteCardStatus"
 // Mock StatusBadge to isolate SiteCardStatus logic
 vi.mock("../components/common/StatusBadge", () => ({
     StatusBadge: (props: any) => (
-        <div data-testid="status-badge" data-label={props.label} data-status={props.status} data-size={props.size} />
+        <div
+            data-testid="status-badge"
+            data-label={props.label}
+            data-status={props.status}
+            data-size={props.size}
+        />
     ),
 }));
 
@@ -33,7 +38,9 @@ describe("SiteCardStatus", () => {
     });
 
     it("renders correct label and status for 'paused'", () => {
-        render(<SiteCardStatus selectedMonitorId="myMonitor" status="paused" />);
+        render(
+            <SiteCardStatus selectedMonitorId="myMonitor" status="paused" />
+        );
         const badge = screen.getByTestId("status-badge");
         expect(badge).toHaveAttribute("data-label", "MYMONITOR Status");
         expect(badge).toHaveAttribute("data-status", "paused");

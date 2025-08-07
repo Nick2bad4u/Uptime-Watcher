@@ -48,103 +48,109 @@ export interface SiteCardProperties {
  * @param props - SiteCard component props
  * @returns JSX.Element containing the complete site monitoring card
  */
-export const SiteCard: React.NamedExoticComponent<SiteCardProperties> = React.memo(function SiteCard({
-    site,
-}: SiteCardProperties) {
-    // Use our custom hook to get all the data and functionality we need
-    const {
-        checkCount,
-        filteredHistory,
-        handleCardClick,
-        handleCheckNow,
-        handleMonitorIdChange,
-        // Action handlers
-        handleStartMonitoring,
-        handleStartSiteMonitoring,
-        handleStopMonitoring,
-        handleStopSiteMonitoring,
-        // UI state
-        isLoading,
-        isMonitoring,
-        // Site monitor data
-        latestSite,
-        monitor,
-        responseTime,
-        selectedMonitorId,
-        status,
-        // Site statistics
-        uptime,
-    } = useSite(site);
-
-    // Calculate if all monitors are running for the site monitoring button
-    const allMonitorsRunning =
-        latestSite.monitors.length > 0 && latestSite.monitors.every((monitor) => monitor.monitoring === true);
-
-    // Memoize the complete props object to prevent unnecessary re-renders
-    const siteCardHeaderProps = useMemo(
-        () => ({
-            display: {
-                isLoading,
-            },
-            interactions: {
-                onCheckNow: handleCheckNow,
-                onMonitorIdChange: handleMonitorIdChange,
-                onStartMonitoring: handleStartMonitoring,
-                onStartSiteMonitoring: handleStartSiteMonitoring,
-                onStopMonitoring: handleStopMonitoring,
-                onStopSiteMonitoring: handleStopSiteMonitoring,
-            },
-            monitoring: {
-                allMonitorsRunning,
-                hasMonitor: !!monitor,
-                isMonitoring,
-                selectedMonitorId,
-            },
-            site: {
-                site: latestSite,
-            },
-        }),
-        [
-            isLoading,
+export const SiteCard: React.NamedExoticComponent<SiteCardProperties> =
+    React.memo(function SiteCard({ site }: SiteCardProperties) {
+        // Use our custom hook to get all the data and functionality we need
+        const {
+            checkCount,
+            filteredHistory,
+            handleCardClick,
             handleCheckNow,
             handleMonitorIdChange,
+            // Action handlers
             handleStartMonitoring,
             handleStartSiteMonitoring,
             handleStopMonitoring,
             handleStopSiteMonitoring,
-            allMonitorsRunning,
-            monitor,
+            // UI state
+            isLoading,
             isMonitoring,
-            selectedMonitorId,
+            // Site monitor data
             latestSite,
-        ]
-    );
+            monitor,
+            responseTime,
+            selectedMonitorId,
+            status,
+            // Site statistics
+            uptime,
+        } = useSite(site);
 
-    return (
-        <ThemedBox
-            aria-label={`View details for ${latestSite.name}`}
-            className="group flex flex-col w-full gap-2 text-left cursor-pointer site-card"
-            onClick={handleCardClick}
-            padding="md"
-            rounded="md"
-            shadow="sm"
-            variant="secondary"
-        >
-            <SiteCardHeader {...siteCardHeaderProps} />
+        // Calculate if all monitors are running for the site monitoring button
+        const allMonitorsRunning =
+            latestSite.monitors.length > 0 &&
+            latestSite.monitors.every((monitor) => monitor.monitoring === true);
 
-            <SiteCardStatus selectedMonitorId={selectedMonitorId} status={status} />
+        // Memoize the complete props object to prevent unnecessary re-renders
+        const siteCardHeaderProps = useMemo(
+            () => ({
+                display: {
+                    isLoading,
+                },
+                interactions: {
+                    onCheckNow: handleCheckNow,
+                    onMonitorIdChange: handleMonitorIdChange,
+                    onStartMonitoring: handleStartMonitoring,
+                    onStartSiteMonitoring: handleStartSiteMonitoring,
+                    onStopMonitoring: handleStopMonitoring,
+                    onStopSiteMonitoring: handleStopSiteMonitoring,
+                },
+                monitoring: {
+                    allMonitorsRunning,
+                    hasMonitor: !!monitor,
+                    isMonitoring,
+                    selectedMonitorId,
+                },
+                site: {
+                    site: latestSite,
+                },
+            }),
+            [
+                isLoading,
+                handleCheckNow,
+                handleMonitorIdChange,
+                handleStartMonitoring,
+                handleStartSiteMonitoring,
+                handleStopMonitoring,
+                handleStopSiteMonitoring,
+                allMonitorsRunning,
+                monitor,
+                isMonitoring,
+                selectedMonitorId,
+                latestSite,
+            ]
+        );
 
-            <SiteCardMetrics
-                status={status}
-                uptime={uptime}
-                {...(responseTime !== undefined && { responseTime })}
-                checkCount={checkCount}
-            />
+        return (
+            <ThemedBox
+                aria-label={`View details for ${latestSite.name}`}
+                className="group flex flex-col w-full gap-2 text-left cursor-pointer site-card"
+                onClick={handleCardClick}
+                padding="md"
+                rounded="md"
+                shadow="sm"
+                variant="secondary"
+            >
+                <SiteCardHeader {...siteCardHeaderProps} />
 
-            <SiteCardHistory filteredHistory={filteredHistory} monitor={monitor} />
+                <SiteCardStatus
+                    selectedMonitorId={selectedMonitorId}
+                    status={status}
+                />
 
-            {/* SiteCardFooter requires no props as it displays static interactive hint text */}
-            <SiteCardFooter />
-        </ThemedBox>
-    );
-});
+                <SiteCardMetrics
+                    status={status}
+                    uptime={uptime}
+                    {...(responseTime !== undefined && { responseTime })}
+                    checkCount={checkCount}
+                />
+
+                <SiteCardHistory
+                    filteredHistory={filteredHistory}
+                    monitor={monitor}
+                />
+
+                {/* SiteCardFooter requires no props as it displays static interactive hint text */}
+                <SiteCardFooter />
+            </ThemedBox>
+        );
+    });

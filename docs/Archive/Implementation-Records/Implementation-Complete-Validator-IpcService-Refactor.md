@@ -20,7 +20,10 @@ Both targets now meet the ≤8 complexity requirement while maintaining all func
 #### **Before Refactor**
 
 ```typescript
-function createTwoStringValidator(firstParamName: string, secondParamName: string): IpcParameterValidator {
+function createTwoStringValidator(
+ firstParamName: string,
+ secondParamName: string
+): IpcParameterValidator {
  return (params: unknown[]): null | string[] => {
   const errors: string[] = [];
 
@@ -54,15 +57,21 @@ function createTwoStringValidator(firstParamName: string, secondParamName: strin
 
 ```typescript
 // New composition utilities
-function createParameterCountValidator(expectedCount: number): IpcParameterValidator {
+function createParameterCountValidator(
+ expectedCount: number
+): IpcParameterValidator {
  return (params: unknown[]): null | string[] => {
   return params.length === expectedCount
    ? null
-   : [`Expected exactly ${expectedCount} parameter${expectedCount === 1 ? "" : "s"}`];
+   : [
+      `Expected exactly ${expectedCount} parameter${expectedCount === 1 ? "" : "s"}`,
+     ];
  };
 }
 
-function composeValidators(validators: IpcParameterValidator[]): IpcParameterValidator {
+function composeValidators(
+ validators: IpcParameterValidator[]
+): IpcParameterValidator {
  return (params: unknown[]): null | string[] => {
   const allErrors: string[] = [];
 
@@ -78,14 +87,21 @@ function composeValidators(validators: IpcParameterValidator[]): IpcParameterVal
 }
 
 // Refactored createTwoStringValidator
-function createTwoStringValidator(firstParamName: string, secondParamName: string): IpcParameterValidator {
+function createTwoStringValidator(
+ firstParamName: string,
+ secondParamName: string
+): IpcParameterValidator {
  // Create individual parameter validators
- const firstStringValidator: IpcParameterValidator = (params: unknown[]): null | string[] => {
+ const firstStringValidator: IpcParameterValidator = (
+  params: unknown[]
+ ): null | string[] => {
   const error = IpcValidators.requiredString(params[0], firstParamName);
   return error ? [error] : null;
  };
 
- const secondStringValidator: IpcParameterValidator = (params: unknown[]): null | string[] => {
+ const secondStringValidator: IpcParameterValidator = (
+  params: unknown[]
+ ): null | string[] => {
   const error = IpcValidators.requiredString(params[1], secondParamName);
   return error ? [error] : null;
  };

@@ -60,7 +60,9 @@ type UpdatesStoreWithPersist = UseBoundStore<
                 >
             >;
             hasHydrated: () => boolean;
-            onFinishHydration: (fn: (state: UpdatesStore) => void) => () => void;
+            onFinishHydration: (
+                fn: (state: UpdatesStore) => void
+            ) => () => void;
             onHydrate: (fn: (state: UpdatesStore) => void) => () => void;
             rehydrate: () => Promise<void> | void;
             setOptions: (
@@ -106,7 +108,9 @@ export const useUpdatesStore: UpdatesStoreWithPersist = create<UpdatesStore>()(
             },
 
             setUpdateProgress: (progress: number) => {
-                logStoreAction("UpdatesStore", "setUpdateProgress", { progress });
+                logStoreAction("UpdatesStore", "setUpdateProgress", {
+                    progress,
+                });
                 set({ updateProgress: progress });
             },
             setUpdateStatus: (status: UpdateStatus) => {

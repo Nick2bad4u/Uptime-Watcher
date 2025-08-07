@@ -57,10 +57,16 @@ export const SiteService = {
      * const backup = await SiteService.downloadSQLiteBackup();
      * ```
      */
-    async downloadSQLiteBackup(): Promise<{ buffer: ArrayBuffer; fileName: string }> {
+    async downloadSQLiteBackup(): Promise<{
+        buffer: ArrayBuffer;
+        fileName: string;
+    }> {
         await this.initialize();
         const response = await window.electronAPI.data.downloadSQLiteBackup();
-        return safeExtractIpcData(response, { buffer: new ArrayBuffer(0), fileName: "backup.db" });
+        return safeExtractIpcData(response, {
+            buffer: new ArrayBuffer(0),
+            fileName: "backup.db",
+        });
     },
 
     /**
@@ -108,7 +114,10 @@ export const SiteService = {
      * await SiteService.removeMonitor("site123", "monitor456");
      * ```
      */
-    async removeMonitor(siteIdentifier: string, monitorId: string): Promise<void> {
+    async removeMonitor(
+        siteIdentifier: string,
+        monitorId: string
+    ): Promise<void> {
         await this.initialize();
         await window.electronAPI.sites.removeMonitor(siteIdentifier, monitorId);
     },
@@ -141,7 +150,10 @@ export const SiteService = {
      * await SiteService.updateSite("site123", { name: "New Name" });
      * ```
      */
-    async updateSite(identifier: string, updates: Partial<Site>): Promise<void> {
+    async updateSite(
+        identifier: string,
+        updates: Partial<Site>
+    ): Promise<void> {
         await this.initialize();
         await window.electronAPI.sites.updateSite(identifier, updates);
     },

@@ -188,7 +188,12 @@ describe("Frontend siteStatus re-exports", () => {
         });
 
         it("should call all status variants for different monitor statuses", () => {
-            const monitorStatuses = ["up", "down", "pending", "paused"] as const;
+            const monitorStatuses = [
+                "up",
+                "down",
+                "pending",
+                "paused",
+            ] as const;
 
             monitorStatuses.forEach((status) => {
                 const site = {

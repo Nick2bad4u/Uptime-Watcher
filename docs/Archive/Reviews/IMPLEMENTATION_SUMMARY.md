@@ -75,8 +75,12 @@ This document summarizes the fixes implemented based on the comprehensive SOLID 
 
 ```typescript
 // Type guards for safe configuration handling
-export function hasValidTimeout(monitor): monitor is Monitor & { timeout: number };
-export function hasValidRetryAttempts(monitor): monitor is Monitor & { retryAttempts: number };
+export function hasValidTimeout(
+ monitor
+): monitor is Monitor & { timeout: number };
+export function hasValidRetryAttempts(
+ monitor
+): monitor is Monitor & { retryAttempts: number };
 export function hasValidHost(monitor): monitor is Monitor & { host: string };
 export function hasValidPort(monitor): monitor is Monitor & { port: number };
 export function hasValidUrl(monitor): monitor is Monitor & { url: string };

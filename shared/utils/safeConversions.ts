@@ -41,7 +41,10 @@ export function safeNumberConversion(value: unknown, defaultValue = 0): number {
 /**
  * Safely converts a value to a check interval (minimum 1000ms) with fallback.
  */
-export function safeParseCheckInterval(value: unknown, defaultValue = 300_000): number {
+export function safeParseCheckInterval(
+    value: unknown,
+    defaultValue = 300_000
+): number {
     const parsed = safeNumberConversion(value, defaultValue);
     return parsed >= 1000 ? parsed : defaultValue;
 }
@@ -207,7 +210,10 @@ export function safeParsePositiveInt(value: unknown, defaultValue = 1): number {
  * safeParseRetryAttempts("invalid") // 3
  * ```
  */
-export function safeParseRetryAttempts(value: unknown, defaultValue = 3): number {
+export function safeParseRetryAttempts(
+    value: unknown,
+    defaultValue = 3
+): number {
     const parsed = safeParseInt(value, defaultValue);
     return parsed >= 0 && parsed <= 10 ? parsed : defaultValue;
 }
@@ -232,7 +238,10 @@ export function safeParseRetryAttempts(value: unknown, defaultValue = 3): number
  * safeParseTimeout("invalid") // 10000
  * ```
  */
-export function safeParseTimeout(value: unknown, defaultValue = 10_000): number {
+export function safeParseTimeout(
+    value: unknown,
+    defaultValue = 10_000
+): number {
     const parsed = safeNumberConversion(value, defaultValue);
     return parsed > 0 ? parsed : defaultValue;
 }
@@ -259,7 +268,10 @@ export function safeParseTimeout(value: unknown, defaultValue = 10_000): number 
  * safeParseTimestamp(future.toString()) // Current time (too far in future)
  * ```
  */
-export function safeParseTimestamp(value: unknown, defaultValue?: number): number {
+export function safeParseTimestamp(
+    value: unknown,
+    defaultValue?: number
+): number {
     const fallback = defaultValue ?? Date.now();
     const parsed = safeNumberConversion(value, fallback);
 

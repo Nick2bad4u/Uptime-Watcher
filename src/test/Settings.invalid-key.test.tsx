@@ -153,8 +153,13 @@ const mockUseTheme = {
 
 // Mock themed components
 vi.mock("../theme/components", () => ({
-    StatusIndicator: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) =>
-        React.createElement("div", props, children),
+    StatusIndicator: ({
+        children,
+        ...props
+    }: {
+        children?: React.ReactNode;
+        [key: string]: unknown;
+    }) => React.createElement("div", props, children),
     ThemedBox: ({
         border,
         children,
@@ -170,8 +175,10 @@ vi.mock("../theme/components", () => ({
         // Remove non-DOM props
         delete filteredProps["border"];
         delete filteredProps["loading"];
-        if (border !== undefined) filteredProps["data-border"] = border.toString();
-        if (loading !== undefined) filteredProps["data-loading"] = loading.toString();
+        if (border !== undefined)
+            filteredProps["data-border"] = border.toString();
+        if (loading !== undefined)
+            filteredProps["data-loading"] = loading.toString();
         return React.createElement("div", filteredProps, children);
     },
     ThemedButton: ({
@@ -186,14 +193,26 @@ vi.mock("../theme/components", () => ({
         const filteredProps = { ...props };
         // Remove non-DOM props
         delete filteredProps["loading"];
-        if (loading !== undefined) filteredProps["data-loading"] = loading.toString();
+        if (loading !== undefined)
+            filteredProps["data-loading"] = loading.toString();
         return React.createElement("button", filteredProps, children);
     },
-    ThemedCheckbox: (props: Record<string, unknown>) => React.createElement("input", { type: "checkbox", ...props }),
-    ThemedSelect: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) =>
-        React.createElement("select", props, children),
-    ThemedText: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) =>
-        React.createElement("span", props, children),
+    ThemedCheckbox: (props: Record<string, unknown>) =>
+        React.createElement("input", { type: "checkbox", ...props }),
+    ThemedSelect: ({
+        children,
+        ...props
+    }: {
+        children?: React.ReactNode;
+        [key: string]: unknown;
+    }) => React.createElement("select", props, children),
+    ThemedText: ({
+        children,
+        ...props
+    }: {
+        children?: React.ReactNode;
+        [key: string]: unknown;
+    }) => React.createElement("span", props, children),
 }));
 
 // Mock the stores
@@ -232,7 +251,9 @@ describe("Settings Component - Invalid Key Coverage", () => {
         // modifying the component to expose it for testing
 
         // Get the Settings component from the render result
-        const settingsComponent = screen.getByRole("button", { name: /Close/i }).closest(".modal-container");
+        const settingsComponent = screen
+            .getByRole("button", { name: /Close/i })
+            .closest(".modal-container");
         expect(settingsComponent).toBeTruthy();
 
         // We need to simulate the internal handleSettingChange call
@@ -257,8 +278,15 @@ describe("Settings Component - Invalid Key Coverage", () => {
             const invalidKey = "invalidKey";
 
             // Simulate the exact logic from handleSettingChange (lines 86-89)
-            if (!allowedKeys.includes(invalidKey as keyof typeof mockUseStore.settings)) {
-                logger.warn("Attempted to update invalid settings key", invalidKey);
+            if (
+                !allowedKeys.includes(
+                    invalidKey as keyof typeof mockUseStore.settings
+                )
+            ) {
+                logger.warn(
+                    "Attempted to update invalid settings key",
+                    invalidKey
+                );
                 // The return statement would prevent updateSettings from being called
                 return;
             }
@@ -268,7 +296,10 @@ describe("Settings Component - Invalid Key Coverage", () => {
         });
 
         // Verify the warning was logged (line 87)
-        expect(logger.warn).toHaveBeenCalledWith("Attempted to update invalid settings key", "invalidKey");
+        expect(logger.warn).toHaveBeenCalledWith(
+            "Attempted to update invalid settings key",
+            "invalidKey"
+        );
 
         // Verify updateSettings was NOT called (because of return on line 88)
         expect(mockUpdateSettings).not.toHaveBeenCalled();
@@ -290,13 +321,23 @@ describe("Settings Component - Invalid Key Coverage", () => {
             const validKey = "notifications";
 
             // Simulate the logic from handleSettingChange with valid key
-            if (!allowedKeys.includes(validKey as keyof typeof mockUseStore.settings)) {
-                logger.warn("Attempted to update invalid settings key", validKey);
+            if (
+                !allowedKeys.includes(
+                    validKey as keyof typeof mockUseStore.settings
+                )
+            ) {
+                logger.warn(
+                    "Attempted to update invalid settings key",
+                    validKey
+                );
                 return;
             }
 
             // This should be reached for valid keys
-            const oldValue = mockUseStore.settings[validKey as keyof typeof mockUseStore.settings];
+            const oldValue =
+                mockUseStore.settings[
+                    validKey as keyof typeof mockUseStore.settings
+                ];
             mockUpdateSettings({ [validKey]: !oldValue });
             logger.user.settingsChange(validKey, oldValue, !oldValue);
         });
@@ -305,7 +346,13 @@ describe("Settings Component - Invalid Key Coverage", () => {
         expect(logger.warn).not.toHaveBeenCalled();
 
         // Verify updateSettings WAS called for valid key
-        expect(mockUpdateSettings).toHaveBeenCalledWith({ notifications: false });
-        expect(logger.user.settingsChange).toHaveBeenCalledWith("notifications", true, false);
+        expect(mockUpdateSettings).toHaveBeenCalledWith({
+            notifications: false,
+        });
+        expect(logger.user.settingsChange).toHaveBeenCalledWith(
+            "notifications",
+            true,
+            false
+        );
     });
 });

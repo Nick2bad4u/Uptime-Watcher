@@ -84,7 +84,10 @@ function createNoParamsValidator(): IpcParameterValidator {
  * @param secondParamName - Name of the optional second parameter
  * @returns A validator function that validates 1-2 string parameters
  */
-function createOptionalSecondStringValidator(firstParamName: string, secondParamName: string): IpcParameterValidator {
+function createOptionalSecondStringValidator(
+    firstParamName: string,
+    secondParamName: string
+): IpcParameterValidator {
     return (params: unknown[]): null | string[] => {
         const errors: string[] = [];
 
@@ -93,14 +96,20 @@ function createOptionalSecondStringValidator(firstParamName: string, secondParam
         }
 
         if (params.length > 0) {
-            const firstError = IpcValidators.requiredString(params[0], firstParamName);
+            const firstError = IpcValidators.requiredString(
+                params[0],
+                firstParamName
+            );
             if (firstError) {
                 errors.push(firstError);
             }
         }
 
         if (params.length === 2) {
-            const secondError = IpcValidators.optionalString(params[1], secondParamName);
+            const secondError = IpcValidators.optionalString(
+                params[1],
+                secondParamName
+            );
             if (secondError) {
                 errors.push(secondError);
             }
@@ -186,7 +195,10 @@ function createSingleStringValidator(paramName: string): IpcParameterValidator {
  * @param objectParamName - Name of the object parameter for error messages
  * @returns A validator function that validates string and object parameters
  */
-function createStringObjectValidator(stringParamName: string, objectParamName: string): IpcParameterValidator {
+function createStringObjectValidator(
+    stringParamName: string,
+    objectParamName: string
+): IpcParameterValidator {
     return (params: unknown[]): null | string[] => {
         const errors: string[] = [];
 
@@ -194,12 +206,18 @@ function createStringObjectValidator(stringParamName: string, objectParamName: s
             errors.push("Expected exactly 2 parameters");
         }
 
-        const stringError = IpcValidators.requiredString(params[0], stringParamName);
+        const stringError = IpcValidators.requiredString(
+            params[0],
+            stringParamName
+        );
         if (stringError) {
             errors.push(stringError);
         }
 
-        const objectError = IpcValidators.requiredObject(params[1], objectParamName);
+        const objectError = IpcValidators.requiredObject(
+            params[1],
+            objectParamName
+        );
         if (objectError) {
             errors.push(objectError);
         }
@@ -214,7 +232,9 @@ function createStringObjectValidator(stringParamName: string, objectParamName: s
  * @param firstParamName - Name of the required first parameter
  * @returns A validator function that validates first parameter only
  */
-function createStringWithUnvalidatedSecondValidator(firstParamName: string): IpcParameterValidator {
+function createStringWithUnvalidatedSecondValidator(
+    firstParamName: string
+): IpcParameterValidator {
     return (params: unknown[]): null | string[] => {
         const errors: string[] = [];
 
@@ -222,7 +242,10 @@ function createStringWithUnvalidatedSecondValidator(firstParamName: string): Ipc
             errors.push("Expected exactly 2 parameters");
         }
 
-        const firstError = IpcValidators.requiredString(params[0], firstParamName);
+        const firstError = IpcValidators.requiredString(
+            params[0],
+            firstParamName
+        );
         if (firstError) {
             errors.push(firstError);
         }
@@ -240,7 +263,10 @@ function createStringWithUnvalidatedSecondValidator(firstParamName: string): Ipc
  * @param secondParamName - Name of the second parameter for error messages
  * @returns A validator function that validates two string parameters
  */
-function createTwoStringValidator(firstParamName: string, secondParamName: string): IpcParameterValidator {
+function createTwoStringValidator(
+    firstParamName: string,
+    secondParamName: string
+): IpcParameterValidator {
     return (params: unknown[]): null | string[] => {
         const errors: string[] = [];
 
@@ -248,12 +274,18 @@ function createTwoStringValidator(firstParamName: string, secondParamName: strin
             errors.push("Expected exactly 2 parameters");
         }
 
-        const firstError = IpcValidators.requiredString(params[0], firstParamName);
+        const firstError = IpcValidators.requiredString(
+            params[0],
+            firstParamName
+        );
         if (firstError) {
             errors.push(firstError);
         }
 
-        const secondError = IpcValidators.requiredString(params[1], secondParamName);
+        const secondError = IpcValidators.requiredString(
+            params[1],
+            secondParamName
+        );
         if (secondError) {
             errors.push(secondError);
         }
@@ -321,47 +353,54 @@ export const SiteHandlerValidators: SiteHandlerValidatorsInterface = {
  *
  * @public
  */
-export const MonitoringHandlerValidators: MonitoringHandlerValidatorsInterface = {
-    /**
-     * Validates parameters for the "check-site-now" IPC handler.
-     *
-     * @remarks
-     * Expects two parameters: site identifier and monitor ID (both strings).
-     */
-    checkSiteNow: createTwoStringValidator("identifier", "monitorId"),
+export const MonitoringHandlerValidators: MonitoringHandlerValidatorsInterface =
+    {
+        /**
+         * Validates parameters for the "check-site-now" IPC handler.
+         *
+         * @remarks
+         * Expects two parameters: site identifier and monitor ID (both strings).
+         */
+        checkSiteNow: createTwoStringValidator("identifier", "monitorId"),
 
-    /**
-     * Validates parameters for the "start-monitoring" IPC handler.
-     *
-     * @remarks
-     * Expects no parameters.
-     */
-    startMonitoring: createNoParamsValidator(),
+        /**
+         * Validates parameters for the "start-monitoring" IPC handler.
+         *
+         * @remarks
+         * Expects no parameters.
+         */
+        startMonitoring: createNoParamsValidator(),
 
-    /**
-     * Validates parameters for the "start-monitoring-for-site" IPC handler.
-     *
-     * @remarks
-     * Expects one or two parameters: site identifier (string), and optional monitor ID (string).
-     */
-    startMonitoringForSite: createOptionalSecondStringValidator("identifier", "monitorId"),
+        /**
+         * Validates parameters for the "start-monitoring-for-site" IPC handler.
+         *
+         * @remarks
+         * Expects one or two parameters: site identifier (string), and optional monitor ID (string).
+         */
+        startMonitoringForSite: createOptionalSecondStringValidator(
+            "identifier",
+            "monitorId"
+        ),
 
-    /**
-     * Validates parameters for the "stop-monitoring" IPC handler.
-     *
-     * @remarks
-     * Expects no parameters.
-     */
-    stopMonitoring: createNoParamsValidator(),
+        /**
+         * Validates parameters for the "stop-monitoring" IPC handler.
+         *
+         * @remarks
+         * Expects no parameters.
+         */
+        stopMonitoring: createNoParamsValidator(),
 
-    /**
-     * Validates parameters for the "stop-monitoring-for-site" IPC handler.
-     *
-     * @remarks
-     * Expects one or two parameters: site identifier (string), and optional monitor ID (string).
-     */
-    stopMonitoringForSite: createOptionalSecondStringValidator("identifier", "monitorId"),
-} as const;
+        /**
+         * Validates parameters for the "stop-monitoring-for-site" IPC handler.
+         *
+         * @remarks
+         * Expects one or two parameters: site identifier (string), and optional monitor ID (string).
+         */
+        stopMonitoringForSite: createOptionalSecondStringValidator(
+            "identifier",
+            "monitorId"
+        ),
+    } as const;
 
 /**
  * Parameter validators for data management IPC handlers.
@@ -429,40 +468,45 @@ export const DataHandlerValidators: DataHandlerValidatorsInterface = {
  *
  * @public
  */
-export const MonitorTypeHandlerValidators: MonitorTypeHandlerValidatorsInterface = {
-    /**
-     * Validates parameters for the "format-monitor-detail" IPC handler.
-     *
-     * @remarks
-     * Expects two parameters: monitor type (string) and details (string).
-     */
-    formatMonitorDetail: createTwoStringValidator("monitorType", "details"),
+export const MonitorTypeHandlerValidators: MonitorTypeHandlerValidatorsInterface =
+    {
+        /**
+         * Validates parameters for the "format-monitor-detail" IPC handler.
+         *
+         * @remarks
+         * Expects two parameters: monitor type (string) and details (string).
+         */
+        formatMonitorDetail: createTwoStringValidator("monitorType", "details"),
 
-    /**
-     * Validates parameters for the "format-monitor-title-suffix" IPC handler.
-     *
-     * @remarks
-     * Expects two parameters: monitor type (string) and monitor object.
-     */
-    formatMonitorTitleSuffix: createStringObjectValidator("monitorType", "monitor"),
+        /**
+         * Validates parameters for the "format-monitor-title-suffix" IPC handler.
+         *
+         * @remarks
+         * Expects two parameters: monitor type (string) and monitor object.
+         */
+        formatMonitorTitleSuffix: createStringObjectValidator(
+            "monitorType",
+            "monitor"
+        ),
 
-    /**
-     * Validates parameters for the "get-monitor-types" IPC handler.
-     *
-     * @remarks
-     * Expects no parameters.
-     */
-    getMonitorTypes: createNoParamsValidator(),
+        /**
+         * Validates parameters for the "get-monitor-types" IPC handler.
+         *
+         * @remarks
+         * Expects no parameters.
+         */
+        getMonitorTypes: createNoParamsValidator(),
 
-    /**
-     * Validates parameters for the "validate-monitor-data" IPC handler.
-     *
-     * @remarks
-     * Expects two parameters: monitor type (string) and data (any).
-     * Only the monitor type is validated for type.
-     */
-    validateMonitorData: createStringWithUnvalidatedSecondValidator("monitorType"),
-} as const;
+        /**
+         * Validates parameters for the "validate-monitor-data" IPC handler.
+         *
+         * @remarks
+         * Expects two parameters: monitor type (string) and data (any).
+         * Only the monitor type is validated for type.
+         */
+        validateMonitorData:
+            createStringWithUnvalidatedSecondValidator("monitorType"),
+    } as const;
 
 /**
  * Parameter validators for state synchronization IPC handlers.

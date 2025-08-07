@@ -5,7 +5,11 @@
 
 import { describe, expect, it } from "vitest";
 
-import { DEFAULT_REQUEST_TIMEOUT_SECONDS, TIMEOUT_CONSTRAINTS, TIMEOUT_CONSTRAINTS_MS } from "../../constants";
+import {
+    DEFAULT_REQUEST_TIMEOUT_SECONDS,
+    TIMEOUT_CONSTRAINTS,
+    TIMEOUT_CONSTRAINTS_MS,
+} from "../../constants";
 import {
     clampTimeoutMs,
     clampTimeoutSeconds,
@@ -34,8 +38,12 @@ describe("Timeout Utilities", () => {
         });
 
         it("should handle edge values", () => {
-            expect(clampTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MIN)).toBe(TIMEOUT_CONSTRAINTS_MS.MIN);
-            expect(clampTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MAX)).toBe(TIMEOUT_CONSTRAINTS_MS.MAX);
+            expect(clampTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MIN)).toBe(
+                TIMEOUT_CONSTRAINTS_MS.MIN
+            );
+            expect(clampTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MAX)).toBe(
+                TIMEOUT_CONSTRAINTS_MS.MAX
+            );
         });
 
         it("should handle zero and negative values", () => {
@@ -66,8 +74,12 @@ describe("Timeout Utilities", () => {
         });
 
         it("should handle edge values", () => {
-            expect(clampTimeoutSeconds(TIMEOUT_CONSTRAINTS.MIN)).toBe(TIMEOUT_CONSTRAINTS.MIN);
-            expect(clampTimeoutSeconds(TIMEOUT_CONSTRAINTS.MAX)).toBe(TIMEOUT_CONSTRAINTS.MAX);
+            expect(clampTimeoutSeconds(TIMEOUT_CONSTRAINTS.MIN)).toBe(
+                TIMEOUT_CONSTRAINTS.MIN
+            );
+            expect(clampTimeoutSeconds(TIMEOUT_CONSTRAINTS.MAX)).toBe(
+                TIMEOUT_CONSTRAINTS.MAX
+            );
         });
 
         it("should handle zero and negative values", () => {
@@ -89,7 +101,9 @@ describe("Timeout Utilities", () => {
 
         it("should return default when monitor timeout is undefined", () => {
             expect(getTimeoutSeconds()).toBe(DEFAULT_REQUEST_TIMEOUT_SECONDS);
-            expect(getTimeoutSeconds(undefined)).toBe(DEFAULT_REQUEST_TIMEOUT_SECONDS);
+            expect(getTimeoutSeconds(undefined)).toBe(
+                DEFAULT_REQUEST_TIMEOUT_SECONDS
+            );
         });
 
         it("should handle zero timeout", () => {
@@ -114,13 +128,17 @@ describe("Timeout Utilities", () => {
         });
 
         it("should return false for values below minimum", () => {
-            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MIN - 1)).toBe(false);
+            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MIN - 1)).toBe(
+                false
+            );
             expect(isValidTimeoutMs(0)).toBe(false);
             expect(isValidTimeoutMs(-1000)).toBe(false);
         });
 
         it("should return false for values above maximum", () => {
-            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MAX + 1)).toBe(false);
+            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MAX + 1)).toBe(
+                false
+            );
             expect(isValidTimeoutMs(Number.MAX_SAFE_INTEGER)).toBe(false);
         });
 
@@ -145,13 +163,17 @@ describe("Timeout Utilities", () => {
         });
 
         it("should return false for values below minimum", () => {
-            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MIN - 1)).toBe(false);
+            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MIN - 1)).toBe(
+                false
+            );
             expect(isValidTimeoutSeconds(0)).toBe(false);
             expect(isValidTimeoutSeconds(-1)).toBe(false);
         });
 
         it("should return false for values above maximum", () => {
-            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MAX + 1)).toBe(false);
+            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MAX + 1)).toBe(
+                false
+            );
             expect(isValidTimeoutSeconds(Number.MAX_SAFE_INTEGER)).toBe(false);
         });
 
@@ -194,8 +216,12 @@ describe("Timeout Utilities", () => {
         });
 
         it("should handle edge cases", () => {
-            expect(timeoutMsToSeconds(Number.MAX_SAFE_INTEGER)).toBe(Number.MAX_SAFE_INTEGER / 1000);
-            expect(timeoutMsToSeconds(Number.MIN_VALUE)).toBe(Number.MIN_VALUE / 1000);
+            expect(timeoutMsToSeconds(Number.MAX_SAFE_INTEGER)).toBe(
+                Number.MAX_SAFE_INTEGER / 1000
+            );
+            expect(timeoutMsToSeconds(Number.MIN_VALUE)).toBe(
+                Number.MIN_VALUE / 1000
+            );
         });
     });
 
@@ -226,8 +252,12 @@ describe("Timeout Utilities", () => {
         });
 
         it("should handle edge cases", () => {
-            expect(timeoutSecondsToMs(Number.MAX_SAFE_INTEGER)).toBe(Number.MAX_SAFE_INTEGER * 1000);
-            expect(timeoutSecondsToMs(Number.MIN_VALUE)).toBe(Number.MIN_VALUE * 1000);
+            expect(timeoutSecondsToMs(Number.MAX_SAFE_INTEGER)).toBe(
+                Number.MAX_SAFE_INTEGER * 1000
+            );
+            expect(timeoutSecondsToMs(Number.MIN_VALUE)).toBe(
+                Number.MIN_VALUE * 1000
+            );
         });
     });
 
@@ -256,13 +286,19 @@ describe("Timeout Utilities", () => {
             expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MAX)).toBe(true);
 
             // Test conversion consistency with constants
-            expect(timeoutSecondsToMs(TIMEOUT_CONSTRAINTS.MIN)).toBe(TIMEOUT_CONSTRAINTS_MS.MIN);
-            expect(timeoutSecondsToMs(TIMEOUT_CONSTRAINTS.MAX)).toBe(TIMEOUT_CONSTRAINTS_MS.MAX);
+            expect(timeoutSecondsToMs(TIMEOUT_CONSTRAINTS.MIN)).toBe(
+                TIMEOUT_CONSTRAINTS_MS.MIN
+            );
+            expect(timeoutSecondsToMs(TIMEOUT_CONSTRAINTS.MAX)).toBe(
+                TIMEOUT_CONSTRAINTS_MS.MAX
+            );
         });
 
         it("should work correctly with default timeout constant", () => {
             expect(getTimeoutSeconds()).toBe(DEFAULT_REQUEST_TIMEOUT_SECONDS);
-            expect(isValidTimeoutSeconds(DEFAULT_REQUEST_TIMEOUT_SECONDS)).toBe(true);
+            expect(isValidTimeoutSeconds(DEFAULT_REQUEST_TIMEOUT_SECONDS)).toBe(
+                true
+            );
         });
     });
 });

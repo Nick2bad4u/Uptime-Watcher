@@ -38,7 +38,11 @@ import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
 import { MonitorType, Site } from "../../types";
 import { DEFAULT_RETRY_ATTEMPTS } from "./constants";
 import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
-import { getMonitorRetryAttempts, getMonitorTimeout, hasValidHost } from "./utils/monitorTypeGuards";
+import {
+    getMonitorRetryAttempts,
+    getMonitorTimeout,
+    hasValidHost,
+} from "./utils/monitorTypeGuards";
 import { performPingCheckWithRetry } from "./utils/pingRetry";
 
 /**
@@ -153,9 +157,13 @@ export class PingMonitor implements IMonitorService {
      * @see {@link getMonitorRetryAttempts} - Retry attempts extraction utility
      * @see {@link performPingCheckWithRetry} - Core ping functionality
      */
-    public async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
+    public async check(
+        monitor: Site["monitors"][0]
+    ): Promise<MonitorCheckResult> {
         if (monitor.type !== "ping") {
-            throw new Error(`PingMonitor cannot handle monitor type: ${monitor.type}`);
+            throw new Error(
+                `PingMonitor cannot handle monitor type: ${monitor.type}`
+            );
         }
 
         if (!hasValidHost(monitor)) {
@@ -168,8 +176,14 @@ export class PingMonitor implements IMonitorService {
         }
 
         // Use type-safe utility functions instead of type assertions
-        const timeout = getMonitorTimeout(monitor, this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT);
-        const retryAttempts = getMonitorRetryAttempts(monitor, DEFAULT_RETRY_ATTEMPTS);
+        const timeout = getMonitorTimeout(
+            monitor,
+            this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT
+        );
+        const retryAttempts = getMonitorRetryAttempts(
+            monitor,
+            DEFAULT_RETRY_ATTEMPTS
+        );
 
         return performPingCheckWithRetry(monitor.host, timeout, retryAttempts);
     }

@@ -22,7 +22,14 @@ vi.mock("../../../../theme/components", () => ({
             {children}
         </div>
     ),
-    ThemedText: ({ children, className, size, weight, variant, ...props }: any) => (
+    ThemedText: ({
+        children,
+        className,
+        size,
+        weight,
+        variant,
+        ...props
+    }: any) => (
         <span
             data-testid="themed-text"
             data-classname={className}
@@ -63,7 +70,9 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         expect(heading).toBeInTheDocument();
 
         const themedTexts = screen.getAllByTestId("themed-text");
-        const headingElement = themedTexts.find((el) => el.getAttribute("data-classname") === "mb-2");
+        const headingElement = themedTexts.find(
+            (el) => el.getAttribute("data-classname") === "mb-2"
+        );
         expect(headingElement).toHaveAttribute("data-classname", "mb-2");
         expect(headingElement).toHaveAttribute("data-size", "lg");
         expect(headingElement).toHaveAttribute("data-weight", "medium");
@@ -72,14 +81,20 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
     it("should render the descriptive text", () => {
         render(<EmptyState />);
 
-        const description = screen.getByText("Add your first website to start monitoring its uptime.");
+        const description = screen.getByText(
+            "Add your first website to start monitoring its uptime."
+        );
         expect(description).toBeInTheDocument();
 
         // Find the themed text elements and check the secondary one
         const themedTexts = screen.getAllByTestId("themed-text");
-        const secondaryText = themedTexts.find((el) => el.getAttribute("data-variant") === "secondary");
+        const secondaryText = themedTexts.find(
+            (el) => el.getAttribute("data-variant") === "secondary"
+        );
         expect(secondaryText).toBeInTheDocument();
-        expect(secondaryText).toHaveTextContent("Add your first website to start monitoring its uptime.");
+        expect(secondaryText).toHaveTextContent(
+            "Add your first website to start monitoring its uptime."
+        );
     });
 
     it("should have correct CSS classes for styling", () => {
@@ -102,7 +117,9 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         const container = screen.getByTestId("themed-box");
 
         // Check that all child elements are present within the container
-        expect(container).toContainElement(screen.getByText("🌐").closest("div"));
+        expect(container).toContainElement(
+            screen.getByText("🌐").closest("div")
+        );
 
         const themedTexts = screen.getAllByTestId("themed-text");
         themedTexts.forEach((element) => {
@@ -115,7 +132,11 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
 
         // Verify exact text content
         expect(screen.getByText("No sites to monitor")).toBeInTheDocument();
-        expect(screen.getByText("Add your first website to start monitoring its uptime.")).toBeInTheDocument();
+        expect(
+            screen.getByText(
+                "Add your first website to start monitoring its uptime."
+            )
+        ).toBeInTheDocument();
         expect(screen.getByText("🌐")).toBeInTheDocument();
     });
 
@@ -125,14 +146,18 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         const themedTexts = screen.getAllByTestId("themed-text");
 
         // Main heading should have specific props
-        const heading = themedTexts.find((el) => el.textContent === "No sites to monitor");
+        const heading = themedTexts.find(
+            (el) => el.textContent === "No sites to monitor"
+        );
         expect(heading).toHaveAttribute("data-classname", "mb-2");
         expect(heading).toHaveAttribute("data-size", "lg");
         expect(heading).toHaveAttribute("data-weight", "medium");
 
         // Description should have variant prop
         const description = themedTexts.find(
-            (el) => el.textContent === "Add your first website to start monitoring its uptime."
+            (el) =>
+                el.textContent ===
+                "Add your first website to start monitoring its uptime."
         );
         expect(description).toHaveAttribute("data-variant", "secondary");
     });
@@ -142,7 +167,11 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
 
         // Component should be findable by text content
         expect(screen.getByText("No sites to monitor")).toBeInTheDocument();
-        expect(screen.getByText("Add your first website to start monitoring its uptime.")).toBeInTheDocument();
+        expect(
+            screen.getByText(
+                "Add your first website to start monitoring its uptime."
+            )
+        ).toBeInTheDocument();
 
         // Icon should be present
         expect(screen.getByText("🌐")).toBeInTheDocument();

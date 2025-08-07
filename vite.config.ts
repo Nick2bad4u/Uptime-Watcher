@@ -145,10 +145,19 @@ export default defineConfig(() => {
             visualizer({
                 brotliSize: true,
                 emitFile: true,
-                exclude: [{ file: "node_modules/**" }, { file: "**/*.test.*" }, { file: "**/*.spec.*" }],
+                exclude: [
+                    { file: "node_modules/**" },
+                    { file: "**/*.test.*" },
+                    { file: "**/*.spec.*" },
+                ],
                 filename: "build-stats.html",
                 gzipSize: true,
-                include: [{ file: "**/*.ts" }, { file: "**/*.tsx" }, { file: "**/*.js" }, { file: "**/*.jsx" }],
+                include: [
+                    { file: "**/*.ts" },
+                    { file: "**/*.tsx" },
+                    { file: "**/*.js" },
+                    { file: "**/*.jsx" },
+                ],
                 open: false,
                 projectRoot: path.resolve(import.meta.dirname),
                 sourcemap: true,

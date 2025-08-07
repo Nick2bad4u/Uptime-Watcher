@@ -35,7 +35,9 @@ describe("Shared Validation Utils", () => {
         it("should validate correct URL formats", () => {
             expect(isValidUrl("https://example.com")).toBe(true);
             expect(isValidUrl("https://sub.domain.com/path")).toBe(true);
-            expect(isValidUrl("https://api.example.com:8080/v1/test")).toBe(true);
+            expect(isValidUrl("https://api.example.com:8080/v1/test")).toBe(
+                true
+            );
         });
 
         it("should reject invalid URL formats", () => {
@@ -47,8 +49,12 @@ describe("Shared Validation Utils", () => {
 
         it("should respect validation options", () => {
             // Test with protocol restriction
-            expect(isValidUrl("https://example.com", { protocols: ["https"] })).toBe(true);
-            expect(isValidUrl("ftp://example.com", { protocols: ["https"] })).toBe(false);
+            expect(
+                isValidUrl("https://example.com", { protocols: ["https"] })
+            ).toBe(true);
+            expect(
+                isValidUrl("ftp://example.com", { protocols: ["https"] })
+            ).toBe(false);
         });
     });
 
@@ -188,8 +194,12 @@ describe("Shared Validation Utils", () => {
 
     describe("isValidIdentifierArray", () => {
         it("should validate arrays of valid identifiers", () => {
-            expect(isValidIdentifierArray(["test", "valid", "array"])).toBe(true);
-            expect(isValidIdentifierArray(["test-123", "valid_name"])).toBe(true);
+            expect(isValidIdentifierArray(["test", "valid", "array"])).toBe(
+                true
+            );
+            expect(isValidIdentifierArray(["test-123", "valid_name"])).toBe(
+                true
+            );
             expect(isValidIdentifierArray([])).toBe(true);
         });
 
@@ -220,7 +230,12 @@ describe("Shared Validation Utils", () => {
             expect(isValidIdentifierArray(monitorConfig.tags)).toBe(true);
 
             // Safe parsing
-            const timeout = safeInteger(monitorConfig.timeout, 1000, 1000, 30_000);
+            const timeout = safeInteger(
+                monitorConfig.timeout,
+                1000,
+                1000,
+                30_000
+            );
             const retries = safeInteger(monitorConfig.retries, 1, 1, 10);
 
             expect(timeout).toBe(5000);

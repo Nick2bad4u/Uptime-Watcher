@@ -1,6 +1,9 @@
 import { Database } from "node-sqlite3-wasm";
 
-import { interpolateLogTemplate, LOG_TEMPLATES } from "../../../../shared/utils/logTemplates";
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "../../../../shared/utils/logTemplates";
 import { isDev } from "../../../electronUtils";
 import { StatusHistory } from "../../../types";
 import { logger } from "../../../utils/logger";
@@ -25,8 +28,10 @@ const HISTORY_MANIPULATION_QUERIES = {
     DELETE_ALL: "DELETE FROM history",
     DELETE_BY_IDS: "DELETE FROM history WHERE id IN",
     DELETE_BY_MONITOR: "DELETE FROM history WHERE monitor_id = ?",
-    INSERT_ENTRY: "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)",
-    SELECT_EXCESS_ENTRIES: "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
+    INSERT_ENTRY:
+        "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)",
+    SELECT_EXCESS_ENTRIES:
+        "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
 } as const;
 
 /**
@@ -48,7 +53,12 @@ const HISTORY_MANIPULATION_QUERIES = {
  *
  * @internal
  */
-export function addHistoryEntry(db: Database, monitorId: string, entry: StatusHistory, details?: string): void {
+export function addHistoryEntry(
+    db: Database,
+    monitorId: string,
+    entry: StatusHistory,
+    details?: string
+): void {
     try {
         db.run(HISTORY_MANIPULATION_QUERIES.INSERT_ENTRY, [
             monitorId,
@@ -61,11 +71,19 @@ export function addHistoryEntry(db: Database, monitorId: string, entry: StatusHi
 
         if (isDev()) {
             logger.debug(
-                interpolateLogTemplate(LOG_TEMPLATES.debug.HISTORY_ENTRY_ADDED, { monitorId, status: entry.status })
+                interpolateLogTemplate(
+                    LOG_TEMPLATES.debug.HISTORY_ENTRY_ADDED,
+                    { monitorId, status: entry.status }
+                )
             );
         }
     } catch (error) {
-        logger.error(interpolateLogTemplate(LOG_TEMPLATES.errors.HISTORY_ADD_FAILED, { monitorId }), error);
+        logger.error(
+            interpolateLogTemplate(LOG_TEMPLATES.errors.HISTORY_ADD_FAILED, {
+                monitorId,
+            }),
+            error
+        );
         throw error;
     }
 }
@@ -115,16 +133,25 @@ export function bulkInsertHistory(
             }
 
             logger.info(
-                interpolateLogTemplate(LOG_TEMPLATES.services.HISTORY_BULK_INSERT, {
-                    count: historyEntries.length,
-                    monitorId,
-                })
+                interpolateLogTemplate(
+                    LOG_TEMPLATES.services.HISTORY_BULK_INSERT,
+                    {
+                        count: historyEntries.length,
+                        monitorId,
+                    }
+                )
             );
         } finally {
             stmt.finalize();
         }
     } catch (error) {
-        logger.error(interpolateLogTemplate(LOG_TEMPLATES.errors.HISTORY_BULK_INSERT_FAILED, { monitorId }), error);
+        logger.error(
+            interpolateLogTemplate(
+                LOG_TEMPLATES.errors.HISTORY_BULK_INSERT_FAILED,
+                { monitorId }
+            ),
+            error
+        );
         throw error;
     }
 }
@@ -151,7 +178,10 @@ export function deleteAllHistory(db: Database): void {
             logger.debug("[HistoryManipulation] Cleared all history");
         }
     } catch (error) {
-        logger.error("[HistoryManipulation] Failed to clear all history", error);
+        logger.error(
+            "[HistoryManipulation] Failed to clear all history",
+            error
+        );
         throw error;
     }
 }
@@ -170,14 +200,24 @@ export function deleteAllHistory(db: Database): void {
  *
  * @internal
  */
-export function deleteHistoryByMonitorId(db: Database, monitorId: string): void {
+export function deleteHistoryByMonitorId(
+    db: Database,
+    monitorId: string
+): void {
     try {
         db.run(HISTORY_MANIPULATION_QUERIES.DELETE_BY_MONITOR, [monitorId]);
         if (isDev()) {
-            logger.debug(`[HistoryManipulation] Deleted history for monitor: ${monitorId}`);
+            logger.debug(
+                `[HistoryManipulation] Deleted history for monitor: ${monitorId}`
+            );
         }
     } catch (error) {
-        logger.error(interpolateLogTemplate(LOG_TEMPLATES.errors.HISTORY_PRUNE_FAILED, { monitorId }), error);
+        logger.error(
+            interpolateLogTemplate(LOG_TEMPLATES.errors.HISTORY_PRUNE_FAILED, {
+                monitorId,
+            }),
+            error
+        );
         throw error;
     }
 }
@@ -203,25 +243,37 @@ export function deleteHistoryByMonitorId(db: Database, monitorId: string): void 
  *
  * @internal
  */
-export function pruneHistoryForMonitor(db: Database, monitorId: string, limit: number): void {
+export function pruneHistoryForMonitor(
+    db: Database,
+    monitorId: string,
+    limit: number
+): void {
     if (limit <= 0) {
         return;
     }
 
     try {
         // Get entries to delete (keep only the most recent 'limit' entries)
-        const excess = db.all(HISTORY_MANIPULATION_QUERIES.SELECT_EXCESS_ENTRIES, [monitorId, limit]) as {
+        const excess = db.all(
+            HISTORY_MANIPULATION_QUERIES.SELECT_EXCESS_ENTRIES,
+            [monitorId, limit]
+        ) as {
             id: number;
         }[];
 
         if (excess.length > 0) {
             // Convert numeric IDs to ensure type safety and validate they are numbers
-            const excessIds = excess.map((row) => Number(row.id)).filter((id) => Number.isFinite(id) && id > 0);
+            const excessIds = excess
+                .map((row) => Number(row.id))
+                .filter((id) => Number.isFinite(id) && id > 0);
 
             if (excessIds.length > 0) {
                 // Use parameterized query to avoid SQL injection
                 const placeholders = excessIds.map(() => "?").join(",");
-                db.run(`${HISTORY_MANIPULATION_QUERIES.DELETE_BY_IDS} (${placeholders})`, excessIds);
+                db.run(
+                    `${HISTORY_MANIPULATION_QUERIES.DELETE_BY_IDS} (${placeholders})`,
+                    excessIds
+                );
                 if (isDev()) {
                     logger.debug(
                         `[HistoryManipulation] Pruned ${excessIds.length} old history entries for monitor: ${monitorId}`
@@ -230,7 +282,12 @@ export function pruneHistoryForMonitor(db: Database, monitorId: string, limit: n
             }
         }
     } catch (error) {
-        logger.error(interpolateLogTemplate(LOG_TEMPLATES.errors.HISTORY_PRUNE_FAILED, { monitorId }), error);
+        logger.error(
+            interpolateLogTemplate(LOG_TEMPLATES.errors.HISTORY_PRUNE_FAILED, {
+                monitorId,
+            }),
+            error
+        );
         throw error;
     }
 }

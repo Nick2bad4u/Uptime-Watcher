@@ -57,8 +57,14 @@ const VALIDATION_CONSTRAINTS = {
 export const baseMonitorSchema: BaseMonitorSchemaType = z.object({
     checkInterval: z
         .number()
-        .min(VALIDATION_CONSTRAINTS.CHECK_INTERVAL.MIN, "Check interval must be at least 5 seconds")
-        .max(VALIDATION_CONSTRAINTS.CHECK_INTERVAL.MAX, "Check interval cannot exceed 30 days"),
+        .min(
+            VALIDATION_CONSTRAINTS.CHECK_INTERVAL.MIN,
+            "Check interval must be at least 5 seconds"
+        )
+        .max(
+            VALIDATION_CONSTRAINTS.CHECK_INTERVAL.MAX,
+            "Check interval cannot exceed 30 days"
+        ),
     id: z.string().min(1, "Monitor ID is required"),
     lastChecked: z.date().optional(),
     monitoring: z.boolean(),
@@ -72,13 +78,25 @@ export const baseMonitorSchema: BaseMonitorSchemaType = z.object({
     responseTime: z.number().min(-1), // -1 is sentinel for "never checked"
     retryAttempts: z
         .number()
-        .min(VALIDATION_CONSTRAINTS.RETRY_ATTEMPTS.MIN, "Retry attempts cannot be negative")
-        .max(VALIDATION_CONSTRAINTS.RETRY_ATTEMPTS.MAX, "Retry attempts cannot exceed 10"),
+        .min(
+            VALIDATION_CONSTRAINTS.RETRY_ATTEMPTS.MIN,
+            "Retry attempts cannot be negative"
+        )
+        .max(
+            VALIDATION_CONSTRAINTS.RETRY_ATTEMPTS.MAX,
+            "Retry attempts cannot exceed 10"
+        ),
     status: z.enum(["up", "down", "pending", "paused"]),
     timeout: z
         .number()
-        .min(VALIDATION_CONSTRAINTS.TIMEOUT.MIN, "Timeout must be at least 1 second")
-        .max(VALIDATION_CONSTRAINTS.TIMEOUT.MAX, "Timeout cannot exceed 300 seconds"),
+        .min(
+            VALIDATION_CONSTRAINTS.TIMEOUT.MIN,
+            "Timeout must be at least 1 second"
+        )
+        .max(
+            VALIDATION_CONSTRAINTS.TIMEOUT.MAX,
+            "Timeout cannot exceed 300 seconds"
+        ),
     type: z.enum(["http", "port", "ping"]),
 });
 
@@ -88,23 +106,24 @@ export const baseMonitorSchema: BaseMonitorSchemaType = z.object({
  * @remarks
  * Extends {@link baseMonitorSchema} and adds the `url` field with robust validation.
  */
-export const httpMonitorSchema: HttpMonitorSchemaType = baseMonitorSchema.extend({
-    type: z.literal("http"),
-    url: z.string().refine((val) => {
-        // Use validator.js for robust URL validation
-        return validator.isURL(val, {
-            allow_protocol_relative_urls: false,
-            allow_trailing_dot: false,
-            allow_underscores: false,
-            disallow_auth: false,
-            protocols: ["http", "https"],
-            require_host: true,
-            require_protocol: true,
-            require_tld: true,
-            validate_length: true,
-        });
-    }, "Must be a valid HTTP or HTTPS URL"),
-});
+export const httpMonitorSchema: HttpMonitorSchemaType =
+    baseMonitorSchema.extend({
+        type: z.literal("http"),
+        url: z.string().refine((val) => {
+            // Use validator.js for robust URL validation
+            return validator.isURL(val, {
+                allow_protocol_relative_urls: false,
+                allow_trailing_dot: false,
+                allow_underscores: false,
+                disallow_auth: false,
+                protocols: ["http", "https"],
+                require_host: true,
+                require_protocol: true,
+                require_tld: true,
+                validate_length: true,
+            });
+        }, "Must be a valid HTTP or HTTPS URL"),
+    });
 
 /**
  * Zod schema for port monitor fields.
@@ -112,30 +131,31 @@ export const httpMonitorSchema: HttpMonitorSchemaType = baseMonitorSchema.extend
  * @remarks
  * Extends {@link baseMonitorSchema} and adds `host` and `port` fields with strict validation.
  */
-export const portMonitorSchema: PortMonitorSchemaType = baseMonitorSchema.extend({
-    host: z.string().refine((val) => {
-        // Use validator.js for robust host validation
-        if (validator.isIP(val)) {
-            return true;
-        }
-        if (
-            validator.isFQDN(val, {
-                allow_numeric_tld: false,
-                allow_trailing_dot: false,
-                allow_underscores: false,
-                allow_wildcard: false,
-                require_tld: true,
-            })
-        ) {
-            return true;
-        }
-        return val === "localhost";
-    }, "Must be a valid hostname, IP address, or localhost"),
-    port: z.number().refine((val) => {
-        return validator.isPort(val.toString());
-    }, "Must be a valid port number (1-65535)"),
-    type: z.literal("port"),
-});
+export const portMonitorSchema: PortMonitorSchemaType =
+    baseMonitorSchema.extend({
+        host: z.string().refine((val) => {
+            // Use validator.js for robust host validation
+            if (validator.isIP(val)) {
+                return true;
+            }
+            if (
+                validator.isFQDN(val, {
+                    allow_numeric_tld: false,
+                    allow_trailing_dot: false,
+                    allow_underscores: false,
+                    allow_wildcard: false,
+                    require_tld: true,
+                })
+            ) {
+                return true;
+            }
+            return val === "localhost";
+        }, "Must be a valid hostname, IP address, or localhost"),
+        port: z.number().refine((val) => {
+            return validator.isPort(val.toString());
+        }, "Must be a valid port number (1-65535)"),
+        type: z.literal("port"),
+    });
 
 /**
  * Zod schema for ping monitor fields.
@@ -143,27 +163,28 @@ export const portMonitorSchema: PortMonitorSchemaType = baseMonitorSchema.extend
  * @remarks
  * Extends {@link baseMonitorSchema} and adds `host` field with strict validation.
  */
-export const pingMonitorSchema: PingMonitorSchemaType = baseMonitorSchema.extend({
-    host: z.string().refine((val) => {
-        // Use validator.js for robust host validation
-        if (validator.isIP(val)) {
-            return true;
-        }
-        if (
-            validator.isFQDN(val, {
-                allow_numeric_tld: false,
-                allow_trailing_dot: false,
-                allow_underscores: false,
-                allow_wildcard: false,
-                require_tld: true,
-            })
-        ) {
-            return true;
-        }
-        return val === "localhost";
-    }, "Must be a valid hostname, IP address, or localhost"),
-    type: z.literal("ping"),
-});
+export const pingMonitorSchema: PingMonitorSchemaType =
+    baseMonitorSchema.extend({
+        host: z.string().refine((val) => {
+            // Use validator.js for robust host validation
+            if (validator.isIP(val)) {
+                return true;
+            }
+            if (
+                validator.isFQDN(val, {
+                    allow_numeric_tld: false,
+                    allow_trailing_dot: false,
+                    allow_underscores: false,
+                    allow_wildcard: false,
+                    require_tld: true,
+                })
+            ) {
+                return true;
+            }
+            return val === "localhost";
+        }, "Must be a valid hostname, IP address, or localhost"),
+        type: z.literal("ping"),
+    });
 
 /**
  * Zod discriminated union schema for all monitor types.
@@ -184,10 +205,16 @@ export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
  * Validates site identifier, name, monitoring flag, and an array of monitors.
  */
 export const siteSchema: SiteSchemaType = z.object({
-    identifier: z.string().min(1, "Site identifier is required").max(100, "Site identifier too long"),
+    identifier: z
+        .string()
+        .min(1, "Site identifier is required")
+        .max(100, "Site identifier too long"),
     monitoring: z.boolean(),
     monitors: z.array(monitorSchema).min(1, "At least one monitor is required"),
-    name: z.string().min(1, "Site name is required").max(200, "Site name too long"),
+    name: z
+        .string()
+        .min(1, "Site name is required")
+        .max(200, "Site name too long"),
 });
 
 /**
@@ -274,7 +301,10 @@ export type { ValidationResult } from "../types/validation";
  * ```
  * @throws {@link z.ZodError} If validation fails and is not handled internally.
  */
-export function validateMonitorData(type: string, data: unknown): ValidationResult {
+export function validateMonitorData(
+    type: string,
+    data: unknown
+): ValidationResult {
     try {
         // Get the appropriate schema
         const schema = getMonitorSchema(type);
@@ -328,7 +358,9 @@ export function validateMonitorData(type: string, data: unknown): ValidationResu
         }
 
         return {
-            errors: [`Validation failed: ${error instanceof Error ? error.message : String(error)}`],
+            errors: [
+                `Validation failed: ${error instanceof Error ? error.message : String(error)}`,
+            ],
             metadata: { monitorType: type },
             success: false,
             warnings: [],
@@ -350,7 +382,11 @@ export function validateMonitorData(type: string, data: unknown): ValidationResu
  * @throws {@link z.ZodError} If validation fails and is not handled internally.
  * @throws Error If the field name is unknown for the given monitor type.
  */
-export function validateMonitorField(type: string, fieldName: string, value: unknown): ValidationResult {
+export function validateMonitorField(
+    type: string,
+    fieldName: string,
+    value: unknown
+): ValidationResult {
     try {
         const schema = getMonitorSchema(type);
 
@@ -364,7 +400,11 @@ export function validateMonitorField(type: string, fieldName: string, value: unk
         }
 
         // Create a test object and validate the specific field
-        const fieldValidationResult = validateFieldWithSchema(type, fieldName, value);
+        const fieldValidationResult = validateFieldWithSchema(
+            type,
+            fieldName,
+            value
+        );
 
         return {
             data: fieldValidationResult,
@@ -386,7 +426,9 @@ export function validateMonitorField(type: string, fieldName: string, value: unk
         }
 
         return {
-            errors: [`Field validation failed: ${error instanceof Error ? error.message : String(error)}`],
+            errors: [
+                `Field validation failed: ${error instanceof Error ? error.message : String(error)}`,
+            ],
             metadata: { fieldName, monitorType: type },
             success: false,
             warnings: [],
@@ -421,7 +463,9 @@ export function validateSiteData(data: unknown): ValidationResult {
         };
     } catch (error) {
         if (error instanceof z.ZodError) {
-            const errors = error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`);
+            const errors = error.issues.map(
+                (issue) => `${issue.path.join(".")}: ${issue.message}`
+            );
 
             return {
                 errors,
@@ -432,7 +476,9 @@ export function validateSiteData(data: unknown): ValidationResult {
         }
 
         return {
-            errors: [`Validation failed: ${error instanceof Error ? error.message : String(error)}`],
+            errors: [
+                `Validation failed: ${error instanceof Error ? error.message : String(error)}`,
+            ],
             metadata: {},
             success: false,
             warnings: [],
@@ -450,7 +496,9 @@ export function validateSiteData(data: unknown): ValidationResult {
  * @param type - The monitor type string (any supported monitor type).
  * @returns The Zod schema for the monitor type, or `undefined` if unknown.
  */
-function getMonitorSchema(type: string): (typeof monitorSchemas)[keyof typeof monitorSchemas] | undefined {
+function getMonitorSchema(
+    type: string
+): (typeof monitorSchemas)[keyof typeof monitorSchemas] | undefined {
     return monitorSchemas[type as keyof typeof monitorSchemas];
 }
 
@@ -469,7 +517,11 @@ function getMonitorSchema(type: string): (typeof monitorSchemas)[keyof typeof mo
  * @throws Error If the field name is unknown for the monitor type.
  * @throws {@link z.ZodError} If validation fails.
  */
-function validateFieldWithSchema(type: string, fieldName: string, value: unknown): Record<string, unknown> {
+function validateFieldWithSchema(
+    type: string,
+    fieldName: string,
+    value: unknown
+): Record<string, unknown> {
     const testData = {
         [fieldName]: value,
     };
@@ -478,14 +530,20 @@ function validateFieldWithSchema(type: string, fieldName: string, value: unknown
     const schema = getMonitorSchema(type);
     if (schema && fieldName in schema.shape) {
         // Use the specific schema's field definition
-        const fieldSchema = schema.shape[fieldName as keyof typeof schema.shape];
+        const fieldSchema =
+            schema.shape[fieldName as keyof typeof schema.shape];
         return z.object({ [fieldName]: fieldSchema }).parse(testData);
     }
 
     // Fallback to base schema for common fields
     const commonFields = baseMonitorSchema.shape;
     if (fieldName in commonFields) {
-        return z.object({ [fieldName]: commonFields[fieldName as keyof typeof commonFields] }).parse(testData);
+        return z
+            .object({
+                [fieldName]:
+                    commonFields[fieldName as keyof typeof commonFields],
+            })
+            .parse(testData);
     }
 
     throw new Error(`Unknown field: ${fieldName}`);

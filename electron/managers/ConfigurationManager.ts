@@ -7,7 +7,12 @@ import type { ConfigValue } from "../../shared/types/configTypes";
 import type { ValidationResult } from "./validators/interfaces";
 
 import { CacheKeys } from "../../shared/utils/cacheKeys";
-import { CACHE_SIZE_LIMITS, CACHE_TTL, DEFAULT_CHECK_INTERVAL, DEFAULT_HISTORY_LIMIT } from "../constants";
+import {
+    CACHE_SIZE_LIMITS,
+    CACHE_TTL,
+    DEFAULT_CHECK_INTERVAL,
+    DEFAULT_HISTORY_LIMIT,
+} from "../constants";
 import { isDev } from "../electronUtils";
 import { Site } from "../types";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
@@ -274,7 +279,9 @@ export class ConfigurationManager {
      * @remarks
      * Delegates to {@link MonitorValidator.validateMonitorConfiguration} and caches results for performance.
      */
-    public async validateMonitorConfiguration(monitor: Site["monitors"][0]): Promise<ValidationResult> {
+    public async validateMonitorConfiguration(
+        monitor: Site["monitors"][0]
+    ): Promise<ValidationResult> {
         // Create stable cache key using deterministic JSON serialization
         const monitorForKey = {
             checkInterval: monitor.checkInterval,
@@ -291,7 +298,10 @@ export class ConfigurationManager {
             url: monitor.url ?? "",
         };
 
-        const cacheKey = CacheKeys.validation.byType("monitor", JSON.stringify(monitorForKey));
+        const cacheKey = CacheKeys.validation.byType(
+            "monitor",
+            JSON.stringify(monitorForKey)
+        );
 
         // Check cache first
         const cached = this.validationCache.get(cacheKey);
@@ -300,7 +310,9 @@ export class ConfigurationManager {
         }
 
         // Perform validation
-        const result = await Promise.resolve(this.monitorValidator.validateMonitorConfiguration(monitor));
+        const result = await Promise.resolve(
+            this.monitorValidator.validateMonitorConfiguration(monitor)
+        );
 
         // Cache the result
         this.validationCache.set(cacheKey, result);
@@ -317,7 +329,9 @@ export class ConfigurationManager {
      * @remarks
      * Delegates to {@link SiteValidator.validateSiteConfiguration} and caches results for performance.
      */
-    public async validateSiteConfiguration(site: Site): Promise<ValidationResult> {
+    public async validateSiteConfiguration(
+        site: Site
+    ): Promise<ValidationResult> {
         // Create stable cache key using deterministic JSON serialization
         const siteForKey = {
             identifier: site.identifier,
@@ -326,7 +340,10 @@ export class ConfigurationManager {
             name: site.name,
         };
 
-        const cacheKey = CacheKeys.validation.byType("site", JSON.stringify(siteForKey));
+        const cacheKey = CacheKeys.validation.byType(
+            "site",
+            JSON.stringify(siteForKey)
+        );
 
         // Check cache first
         const cached = this.validationCache.get(cacheKey);
@@ -335,7 +352,9 @@ export class ConfigurationManager {
         }
 
         // Perform validation
-        const result = await Promise.resolve(this.siteValidator.validateSiteConfiguration(site));
+        const result = await Promise.resolve(
+            this.siteValidator.validateSiteConfiguration(site)
+        );
 
         // Cache the result
         this.validationCache.set(cacheKey, result);

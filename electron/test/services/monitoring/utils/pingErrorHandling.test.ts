@@ -8,7 +8,10 @@
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
-import { handlePingCheckError, PingOperationContext } from "../../../../services/monitoring/utils/pingErrorHandling";
+import {
+    handlePingCheckError,
+    PingOperationContext,
+} from "../../../../services/monitoring/utils/pingErrorHandling";
 import * as loggerModule from "../../../../utils/logger";
 
 // Mock the logger
@@ -133,7 +136,11 @@ describe("pingErrorHandling", () => {
         });
 
         it("should always return responseTime 0", () => {
-            const testCases = [new Error("Network error"), "String error", { custom: "object" }];
+            const testCases = [
+                new Error("Network error"),
+                "String error",
+                { custom: "object" },
+            ];
 
             for (const error of testCases) {
                 const result = handlePingCheckError(error, defaultContext);
@@ -151,18 +158,35 @@ describe("pingErrorHandling", () => {
                     error: new Error("Request timeout for icmp_seq 1"),
                     expectedMessage: "Request timeout for icmp_seq 1",
                 },
-                { error: new Error("Network is unreachable"), expectedMessage: "Network is unreachable" },
-                { error: new Error("Permission denied"), expectedMessage: "Permission denied" },
-                { error: "Host unreachable", expectedMessage: "Host unreachable" },
-                { error: "100% packet loss", expectedMessage: "100% packet loss" },
+                {
+                    error: new Error("Network is unreachable"),
+                    expectedMessage: "Network is unreachable",
+                },
+                {
+                    error: new Error("Permission denied"),
+                    expectedMessage: "Permission denied",
+                },
+                {
+                    error: "Host unreachable",
+                    expectedMessage: "Host unreachable",
+                },
+                {
+                    error: "100% packet loss",
+                    expectedMessage: "100% packet loss",
+                },
             ];
 
             for (const testCase of commonErrors) {
-                const result = handlePingCheckError(testCase.error, defaultContext);
+                const result = handlePingCheckError(
+                    testCase.error,
+                    defaultContext
+                );
 
                 expect(result.status).toBe("down");
                 expect(result.error).toBe(testCase.expectedMessage);
-                expect(result.details).toBe(`Ping failed: ${testCase.expectedMessage}`);
+                expect(result.details).toBe(
+                    `Ping failed: ${testCase.expectedMessage}`
+                );
             }
         });
 
@@ -186,19 +210,26 @@ describe("pingErrorHandling", () => {
                     error: "Test error",
                 });
 
-                expect(mockLogger.error).toHaveBeenCalledWith("Ping check failed", {
-                    error: "Test error",
-                    ...context,
-                });
+                expect(mockLogger.error).toHaveBeenCalledWith(
+                    "Ping check failed",
+                    {
+                        error: "Test error",
+                        ...context,
+                    }
+                );
             }
         });
 
         it("should preserve error details for debugging", () => {
-            const detailedError = new Error("ICMP socket error: Operation not permitted (you may need to run as root)");
+            const detailedError = new Error(
+                "ICMP socket error: Operation not permitted (you may need to run as root)"
+            );
 
             const result = handlePingCheckError(detailedError, defaultContext);
 
-            expect(result.error).toBe("ICMP socket error: Operation not permitted (you may need to run as root)");
+            expect(result.error).toBe(
+                "ICMP socket error: Operation not permitted (you may need to run as root)"
+            );
             expect(result.details).toBe(
                 "Ping failed: ICMP socket error: Operation not permitted (you may need to run as root)"
             );
@@ -218,12 +249,18 @@ describe("pingErrorHandling", () => {
         });
 
         it("should handle errors with special characters", () => {
-            const error = new Error("Error with émojis 🚫 and spéciàl chars: 漢字");
+            const error = new Error(
+                "Error with émojis 🚫 and spéciàl chars: 漢字"
+            );
 
             const result = handlePingCheckError(error, defaultContext);
 
-            expect(result.error).toBe("Error with émojis 🚫 and spéciàl chars: 漢字");
-            expect(result.details).toBe("Ping failed: Error with émojis 🚫 and spéciàl chars: 漢字");
+            expect(result.error).toBe(
+                "Error with émojis 🚫 and spéciàl chars: 漢字"
+            );
+            expect(result.details).toBe(
+                "Ping failed: Error with émojis 🚫 and spéciàl chars: 漢字"
+            );
         });
     });
 
@@ -253,7 +290,10 @@ describe("pingErrorHandling", () => {
             const result = handlePingCheckError(error, minimalContext);
 
             expect(result.status).toBe("down");
-            expect(mockLogger.error).toHaveBeenCalledWith("Ping check failed", expect.objectContaining(minimalContext));
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "Ping check failed",
+                expect.objectContaining(minimalContext)
+            );
         });
 
         it("should handle edge case context values", () => {

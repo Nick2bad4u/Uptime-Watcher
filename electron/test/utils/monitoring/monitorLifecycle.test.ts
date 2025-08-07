@@ -189,7 +189,9 @@ describe("HTTP Status Utils", () => {
 
         it("should maintain consistency across multiple calls", () => {
             const testStatus = 404;
-            const results = Array.from({ length: 100 }, () => determineMonitorStatus(testStatus));
+            const results = Array.from({ length: 100 }, () =>
+                determineMonitorStatus(testStatus)
+            );
 
             // All results should be identical
             expect(new Set(results).size).toBe(1);

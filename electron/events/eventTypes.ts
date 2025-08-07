@@ -918,7 +918,11 @@ export interface UptimeEvents extends Record<string, unknown> {
  * @public
  */
 export const EVENT_CATEGORIES = {
-    CACHE: ["cache:invalidated", "site:cache-miss", "site:cache-updated"] as const,
+    CACHE: [
+        "cache:invalidated",
+        "site:cache-miss",
+        "site:cache-updated",
+    ] as const,
     CONFIG: ["config:changed"] as const,
     DATABASE: [
         "database:backup-created",
@@ -968,7 +972,12 @@ export const EVENT_CATEGORIES = {
     ] as const,
     MONITORING: ["monitoring:started", "monitoring:stopped"] as const,
     PERFORMANCE: ["performance:metric", "performance:warning"] as const,
-    SITE: ["site:added", "site:removed", "site:updated", "sites:state-synchronized"] as const,
+    SITE: [
+        "site:added",
+        "site:removed",
+        "site:updated",
+        "sites:state-synchronized",
+    ] as const,
     SYSTEM: ["system:error", "system:shutdown", "system:startup"] as const,
 } as const;
 
@@ -986,7 +995,11 @@ export const EVENT_CATEGORIES = {
  * @public
  */
 export const EVENT_PRIORITIES = {
-    CRITICAL: ["performance:warning", "system:error", "system:shutdown"] as const,
+    CRITICAL: [
+        "performance:warning",
+        "system:error",
+        "system:shutdown",
+    ] as const,
     HIGH: [
         "database:transaction-completed",
         "monitor:status-changed",
@@ -995,7 +1008,12 @@ export const EVENT_PRIORITIES = {
         "site:removed",
     ] as const,
     LOW: ["performance:metric"] as const,
-    MEDIUM: ["config:changed", "monitor:added", "site:added", "site:updated"] as const,
+    MEDIUM: [
+        "config:changed",
+        "monitor:added",
+        "site:added",
+        "site:updated",
+    ] as const,
 } as const;
 
 /**
@@ -1025,7 +1043,9 @@ type EventPriorityMap = typeof EVENT_PRIORITIES;
  * @see {@link EVENT_PRIORITIES}
  * @public
  */
-export function getEventPriority(eventName: keyof UptimeEvents): keyof typeof EVENT_PRIORITIES {
+export function getEventPriority(
+    eventName: keyof UptimeEvents
+): keyof typeof EVENT_PRIORITIES {
     for (const [priority, events] of Object.entries(EVENT_PRIORITIES) as Array<
         [keyof EventPriorityMap, readonly string[]]
     >) {
@@ -1056,7 +1076,10 @@ export function getEventPriority(eventName: keyof UptimeEvents): keyof typeof EV
  * @see {@link EVENT_CATEGORIES}
  * @public
  */
-export function isEventOfCategory(eventName: keyof UptimeEvents, category: keyof typeof EVENT_CATEGORIES): boolean {
+export function isEventOfCategory(
+    eventName: keyof UptimeEvents,
+    category: keyof typeof EVENT_CATEGORIES
+): boolean {
     // Type-safe category checking using switch statement
     switch (category) {
         case "CACHE": {
@@ -1069,10 +1092,14 @@ export function isEventOfCategory(eventName: keyof UptimeEvents, category: keyof
             return EVENT_CATEGORIES.DATABASE.includes(eventName as never);
         }
         case "INTERNAL_DATABASE": {
-            return EVENT_CATEGORIES.INTERNAL_DATABASE.includes(eventName as never);
+            return EVENT_CATEGORIES.INTERNAL_DATABASE.includes(
+                eventName as never
+            );
         }
         case "INTERNAL_MONITOR": {
-            return EVENT_CATEGORIES.INTERNAL_MONITOR.includes(eventName as never);
+            return EVENT_CATEGORIES.INTERNAL_MONITOR.includes(
+                eventName as never
+            );
         }
         case "INTERNAL_SITE": {
             return EVENT_CATEGORIES.INTERNAL_SITE.includes(eventName as never);

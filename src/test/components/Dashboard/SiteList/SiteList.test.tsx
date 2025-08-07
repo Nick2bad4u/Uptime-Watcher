@@ -21,16 +21,24 @@ vi.mock("../../../../theme/useTheme", () => ({
 // Mock the components
 vi.mock("../../../../components/Dashboard/SiteCard/SiteCard", () => ({
     SiteCard: vi.fn(({ site }) => (
-        <div data-testid={`site-card-${site.identifier}`}>Site Card for {site.identifier}</div>
+        <div data-testid={`site-card-${site.identifier}`}>
+            Site Card for {site.identifier}
+        </div>
     )),
 }));
 
 vi.mock("../../../../components/Dashboard/SiteList/EmptyState", () => ({
-    EmptyState: vi.fn(() => <div data-testid="empty-state">No sites configured</div>),
+    EmptyState: vi.fn(() => (
+        <div data-testid="empty-state">No sites configured</div>
+    )),
 }));
 
-const mockUseSitesStore = vi.mocked(await import("../../../../stores/sites/useSitesStore")).useSitesStore;
-const mockUseTheme = vi.mocked(await import("../../../../theme/useTheme")).useTheme;
+const mockUseSitesStore = vi.mocked(
+    await import("../../../../stores/sites/useSitesStore")
+).useSitesStore;
+const mockUseTheme = vi.mocked(
+    await import("../../../../theme/useTheme")
+).useTheme;
 
 // Helper to create mock theme return
 const createMockTheme = (isDark = false) => ({
@@ -195,7 +203,9 @@ describe("SiteList", () => {
 
             // Assert
             expect(screen.getByTestId("site-card-site-1")).toBeInTheDocument();
-            expect(screen.queryByTestId("site-card-site-2")).not.toBeInTheDocument();
+            expect(
+                screen.queryByTestId("site-card-site-2")
+            ).not.toBeInTheDocument();
             expect(screen.queryByTestId("empty-state")).not.toBeInTheDocument();
         });
     });
@@ -240,7 +250,10 @@ describe("SiteList", () => {
 
         it("should properly destructure isDark from useTheme", () => {
             // Arrange
-            const mockTheme = { ...createMockTheme(true), otherProperty: "test" };
+            const mockTheme = {
+                ...createMockTheme(true),
+                otherProperty: "test",
+            };
             mockUseSitesStore.mockReturnValue({ sites: mockSites });
             mockUseTheme.mockReturnValue(mockTheme);
 
@@ -264,7 +277,9 @@ describe("SiteList", () => {
 
             // Assert - Each site card should be rendered with its identifier
             mockSites.forEach((site) => {
-                expect(screen.getByTestId(`site-card-${site.identifier}`)).toBeInTheDocument();
+                expect(
+                    screen.getByTestId(`site-card-${site.identifier}`)
+                ).toBeInTheDocument();
             });
         });
 
@@ -287,8 +302,12 @@ describe("SiteList", () => {
             render(<SiteList />);
 
             // Assert
-            expect(screen.getByTestId("site-card-site-with-special-chars_123")).toBeInTheDocument();
-            expect(screen.getByTestId("site-card-site.with.dots")).toBeInTheDocument();
+            expect(
+                screen.getByTestId("site-card-site-with-special-chars_123")
+            ).toBeInTheDocument();
+            expect(
+                screen.getByTestId("site-card-site.with.dots")
+            ).toBeInTheDocument();
         });
     });
 
@@ -407,7 +426,9 @@ describe("SiteList", () => {
 
         it("should call EmptyState component when no sites", async () => {
             // Arrange
-            const { EmptyState: mockEmptyState } = await import("../../../../components/Dashboard/SiteList/EmptyState");
+            const { EmptyState: mockEmptyState } = await import(
+                "../../../../components/Dashboard/SiteList/EmptyState"
+            );
             const mockEmptyStateMocked = vi.mocked(mockEmptyState);
             mockUseSitesStore.mockReturnValue({ sites: [] });
             mockUseTheme.mockReturnValue(createMockTheme(false));

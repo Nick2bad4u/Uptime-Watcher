@@ -19,7 +19,10 @@ export function validateMonitorType(type: unknown): type is MonitorType {
  // ☝️ Missing "ping" support despite being in BASE_MONITOR_TYPES
 }
 
-const validateMonitorFormDataByType = (type: MonitorType, data: Record<string, unknown>) => {
+const validateMonitorFormDataByType = (
+ type: MonitorType,
+ data: Record<string, unknown>
+) => {
  switch (type) {
   case "http": {
    errors.push(...validateHttpMonitorFormData(data));
@@ -36,7 +39,10 @@ const validateMonitorFormDataByType = (type: MonitorType, data: Record<string, u
  }
 };
 
-function validateTypeSpecificFields(monitor: Partial<Monitor>, errors: string[]): void {
+function validateTypeSpecificFields(
+ monitor: Partial<Monitor>,
+ errors: string[]
+): void {
  if (monitor.type === "http") {
   validateHttpMonitorFields(monitor, errors);
  } else if (monitor.type === "port") {
@@ -96,7 +102,10 @@ const validatePingMonitorFormData = (data: Record<string, unknown>) => {
  * Checks that the host field is present and a string. Ping monitors only require a host field,
  * unlike port monitors which also require a port number.
  */
-function validatePingMonitorFields(monitor: Partial<Monitor>, errors: string[]): void {
+function validatePingMonitorFields(
+ monitor: Partial<Monitor>,
+ errors: string[]
+): void {
  if (!monitor.host || typeof monitor.host !== "string") {
   errors.push("Host is required for ping monitors");
  }
@@ -109,7 +118,10 @@ function validatePingMonitorFields(monitor: Partial<Monitor>, errors: string[]):
  * Supports all monitor types: HTTP, port, and ping monitors.
  */
 export function validateMonitorType(type: unknown): type is MonitorType {
- return typeof type === "string" && (type === "http" || type === "port" || type === "ping");
+ return (
+  typeof type === "string" &&
+  (type === "http" || type === "port" || type === "ping")
+ );
 }
 ```
 

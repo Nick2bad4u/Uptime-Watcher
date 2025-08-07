@@ -21,7 +21,9 @@ import {
 /**
  * Helper function to create a test site with specified monitors.
  */
-function createTestSite(monitors: Array<{ monitoring: boolean; status: MonitorStatus }>): SiteForStatus {
+function createTestSite(
+    monitors: Array<{ monitoring: boolean; status: MonitorStatus }>
+): SiteForStatus {
     return {
         monitors: monitors.map((monitor) => ({
             monitoring: monitor.monitoring,
@@ -346,7 +348,9 @@ describe("Edge Cases and Complex Scenarios", () => {
         expect(calculateSiteMonitoringStatus(site)).toBe("partial");
         expect(calculateSiteStatus(site)).toBe("mixed");
         expect(getSiteDisplayStatus(site)).toBe("mixed");
-        expect(getSiteStatusDescription(site)).toBe("Mixed status (50/100 monitoring active)");
+        expect(getSiteStatusDescription(site)).toBe(
+            "Mixed status (50/100 monitoring active)"
+        );
     });
 
     it("should handle all monitors with same non-'up' status", () => {
@@ -372,7 +376,9 @@ describe("Edge Cases and Complex Scenarios", () => {
 
         expect(calculateSiteStatus(site)).toBe("up");
         expect(getSiteDisplayStatus(site)).toBe("paused"); // Overrides operational status
-        expect(getSiteStatusDescription(site)).toBe("Monitoring is paused (0/2 active)");
+        expect(getSiteStatusDescription(site)).toBe(
+            "Monitoring is paused (0/2 active)"
+        );
     });
 
     it("should handle complex mixed monitoring and status scenarios", () => {
@@ -386,7 +392,11 @@ describe("Edge Cases and Complex Scenarios", () => {
         expect(calculateSiteMonitoringStatus(site)).toBe("partial");
         expect(calculateSiteStatus(site)).toBe("mixed");
         expect(getSiteDisplayStatus(site)).toBe("mixed");
-        expect(getSiteStatusDescription(site)).toBe("Mixed status (2/4 monitoring active)");
-        expect(getSiteStatusVariant(getSiteDisplayStatus(site))).toBe("warning");
+        expect(getSiteStatusDescription(site)).toBe(
+            "Mixed status (2/4 monitoring active)"
+        );
+        expect(getSiteStatusVariant(getSiteDisplayStatus(site))).toBe(
+            "warning"
+        );
     });
 });

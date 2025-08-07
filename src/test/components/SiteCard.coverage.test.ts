@@ -56,7 +56,9 @@ describe("SiteCard Component Coverage Tests", () => {
             interactionProps.onStopSiteMonitoring();
 
             expect(interactionProps.onCheckNow).toHaveBeenCalled();
-            expect(interactionProps.onMonitorIdChange).toHaveBeenCalledWith("monitor-1");
+            expect(interactionProps.onMonitorIdChange).toHaveBeenCalledWith(
+                "monitor-1"
+            );
             expect(interactionProps.onStartMonitoring).toHaveBeenCalled();
             expect(interactionProps.onStartSiteMonitoring).toHaveBeenCalled();
             expect(interactionProps.onStopMonitoring).toHaveBeenCalled();
@@ -127,15 +129,22 @@ describe("SiteCard Component Coverage Tests", () => {
 
             const allRunning1 =
                 siteWithAllRunning.monitors.length > 0 &&
-                siteWithAllRunning.monitors.every((m: any) => m.monitoring === true);
+                siteWithAllRunning.monitors.every(
+                    (m: any) => m.monitoring === true
+                );
             const allRunning2 =
                 siteWithSomeRunning.monitors.length > 0 &&
-                siteWithSomeRunning.monitors.every((m: any) => m.monitoring === true);
+                siteWithSomeRunning.monitors.every(
+                    (m: any) => m.monitoring === true
+                );
             const allRunning3 =
                 siteWithNoneRunning.monitors.length > 0 &&
-                siteWithNoneRunning.monitors.every((m: any) => m.monitoring === true);
+                siteWithNoneRunning.monitors.every(
+                    (m: any) => m.monitoring === true
+                );
             const allRunning4 =
-                emptyMonitors.monitors.length > 0 && emptyMonitors.monitors.every((m: any) => m.monitoring === true);
+                emptyMonitors.monitors.length > 0 &&
+                emptyMonitors.monitors.every((m: any) => m.monitoring === true);
 
             expect(allRunning1).toBe(true);
             expect(allRunning2).toBe(false);
@@ -375,7 +384,8 @@ describe("SiteCard Component Coverage Tests", () => {
                 expect(time).toBeGreaterThan(0);
             });
 
-            const avgResponseTime = responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length;
+            const avgResponseTime =
+                responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length;
             expect(avgResponseTime).toBeGreaterThan(0);
         });
 
@@ -429,7 +439,9 @@ describe("SiteCard Component Coverage Tests", () => {
 
             expect(clickHandlers.handleCardClick).toHaveBeenCalled();
             expect(clickHandlers.handleCheckNow).toHaveBeenCalled();
-            expect(clickHandlers.handleMonitorIdChange).toHaveBeenCalledWith("new-monitor");
+            expect(clickHandlers.handleMonitorIdChange).toHaveBeenCalledWith(
+                "new-monitor"
+            );
         });
     });
 });

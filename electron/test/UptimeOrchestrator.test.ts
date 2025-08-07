@@ -5,7 +5,10 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-import { UptimeOrchestrator, UptimeOrchestratorDependencies } from "../UptimeOrchestrator";
+import {
+    UptimeOrchestrator,
+    UptimeOrchestratorDependencies,
+} from "../UptimeOrchestrator";
 import { DatabaseManager } from "../managers/DatabaseManager";
 import { MonitorManager } from "../managers/MonitorManager";
 import { SiteManager } from "../managers/SiteManager";
@@ -112,7 +115,9 @@ describe("UptimeOrchestrator", () => {
         });
 
         it("should throw error when dependencies are not provided", () => {
-            expect(() => new UptimeOrchestrator()).toThrow("UptimeOrchestrator requires dependencies to be injected");
+            expect(() => new UptimeOrchestrator()).toThrow(
+                "UptimeOrchestrator requires dependencies to be injected"
+            );
         });
 
         it("should throw error when dependencies are undefined", () => {
@@ -128,9 +133,13 @@ describe("UptimeOrchestrator", () => {
         });
 
         it("should handle initialization errors", async () => {
-            vi.mocked(mockDatabaseManager.initialize).mockRejectedValueOnce(new Error("Init failed"));
+            vi.mocked(mockDatabaseManager.initialize).mockRejectedValueOnce(
+                new Error("Init failed")
+            );
 
-            await expect(orchestrator.initialize()).rejects.toThrow("Init failed");
+            await expect(orchestrator.initialize()).rejects.toThrow(
+                "Init failed"
+            );
         });
 
         it("should validate initialization and throw for missing database manager method", () => {
@@ -140,8 +149,12 @@ describe("UptimeOrchestrator", () => {
                 siteManager: mockSiteManager,
             };
 
-            const invalidOrchestrator = new UptimeOrchestrator(invalidDependencies);
-            expect(() => invalidOrchestrator["validateInitialization"]()).toThrow(
+            const invalidOrchestrator = new UptimeOrchestrator(
+                invalidDependencies
+            );
+            expect(() =>
+                invalidOrchestrator["validateInitialization"]()
+            ).toThrow(
                 "DatabaseManager not properly initialized - missing initialize method"
             );
         });
@@ -153,8 +166,12 @@ describe("UptimeOrchestrator", () => {
                 siteManager: { initialize: undefined } as any,
             };
 
-            const invalidOrchestrator = new UptimeOrchestrator(invalidDependencies);
-            expect(() => invalidOrchestrator["validateInitialization"]()).toThrow(
+            const invalidOrchestrator = new UptimeOrchestrator(
+                invalidDependencies
+            );
+            expect(() =>
+                invalidOrchestrator["validateInitialization"]()
+            ).toThrow(
                 "SiteManager not properly initialized - missing initialize method"
             );
         });
@@ -166,8 +183,12 @@ describe("UptimeOrchestrator", () => {
                 siteManager: mockSiteManager,
             };
 
-            const invalidOrchestrator = new UptimeOrchestrator(invalidDependencies);
-            expect(() => invalidOrchestrator["validateInitialization"]()).toThrow(
+            const invalidOrchestrator = new UptimeOrchestrator(
+                invalidDependencies
+            );
+            expect(() =>
+                invalidOrchestrator["validateInitialization"]()
+            ).toThrow(
                 "MonitorManager not properly initialized - missing startMonitoring method"
             );
         });
@@ -183,7 +204,9 @@ describe("UptimeOrchestrator", () => {
         it("should set history limit successfully", async () => {
             await orchestrator.setHistoryLimit(500);
 
-            expect(mockDatabaseManager.setHistoryLimit).toHaveBeenCalledWith(500);
+            expect(mockDatabaseManager.setHistoryLimit).toHaveBeenCalledWith(
+                500
+            );
         });
     });
 
@@ -212,7 +235,9 @@ describe("UptimeOrchestrator", () => {
             const result = await orchestrator.addSite(testSite);
 
             expect(mockSiteManager.addSite).toHaveBeenCalledWith(testSite);
-            expect(mockMonitorManager.setupSiteForMonitoring).toHaveBeenCalled();
+            expect(
+                mockMonitorManager.setupSiteForMonitoring
+            ).toHaveBeenCalled();
             expect(result).toEqual(
                 expect.objectContaining({
                     identifier: "test-site",
@@ -222,34 +247,56 @@ describe("UptimeOrchestrator", () => {
         });
 
         it("should handle site addition failure and cleanup", async () => {
-            vi.mocked(mockMonitorManager.setupSiteForMonitoring).mockRejectedValueOnce(new Error("Setup failed"));
+            vi.mocked(
+                mockMonitorManager.setupSiteForMonitoring
+            ).mockRejectedValueOnce(new Error("Setup failed"));
 
-            await expect(orchestrator.addSite(testSite)).rejects.toThrow("Setup failed");
+            await expect(orchestrator.addSite(testSite)).rejects.toThrow(
+                "Setup failed"
+            );
 
-            expect(mockSiteManager.removeSite).toHaveBeenCalledWith(testSite.identifier);
+            expect(mockSiteManager.removeSite).toHaveBeenCalledWith(
+                testSite.identifier
+            );
         });
 
         it("should handle cleanup failure during site addition rollback", async () => {
-            vi.mocked(mockMonitorManager.setupSiteForMonitoring).mockRejectedValueOnce(new Error("Setup failed"));
-            vi.mocked(mockSiteManager.removeSite).mockRejectedValueOnce(new Error("Cleanup failed"));
+            vi.mocked(
+                mockMonitorManager.setupSiteForMonitoring
+            ).mockRejectedValueOnce(new Error("Setup failed"));
+            vi.mocked(mockSiteManager.removeSite).mockRejectedValueOnce(
+                new Error("Cleanup failed")
+            );
 
-            await expect(orchestrator.addSite(testSite)).rejects.toThrow("Setup failed");
+            await expect(orchestrator.addSite(testSite)).rejects.toThrow(
+                "Setup failed"
+            );
 
-            expect(mockSiteManager.removeSite).toHaveBeenCalledWith(testSite.identifier);
+            expect(mockSiteManager.removeSite).toHaveBeenCalledWith(
+                testSite.identifier
+            );
         });
 
         it("should remove site successfully", async () => {
             const result = await orchestrator.removeSite("test-site");
 
-            expect(mockSiteManager.removeSite).toHaveBeenCalledWith("test-site");
+            expect(mockSiteManager.removeSite).toHaveBeenCalledWith(
+                "test-site"
+            );
             expect(result).toBe(true);
         });
 
         it("should update site successfully", async () => {
             const updateData: Partial<Site> = { name: "Updated Site" };
-            const result = await orchestrator.updateSite("test-site", updateData);
+            const result = await orchestrator.updateSite(
+                "test-site",
+                updateData
+            );
 
-            expect(mockSiteManager.updateSite).toHaveBeenCalledWith("test-site", updateData);
+            expect(mockSiteManager.updateSite).toHaveBeenCalledWith(
+                "test-site",
+                updateData
+            );
             expect(result).toEqual(
                 expect.objectContaining({
                     name: "Updated Site",
@@ -267,9 +314,15 @@ describe("UptimeOrchestrator", () => {
 
     describe("Monitor Management", () => {
         it("should check site manually", async () => {
-            const result = await orchestrator.checkSiteManually("test-site", "monitor-1");
+            const result = await orchestrator.checkSiteManually(
+                "test-site",
+                "monitor-1"
+            );
 
-            expect(mockMonitorManager.checkSiteManually).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(mockMonitorManager.checkSiteManually).toHaveBeenCalledWith(
+                "test-site",
+                "monitor-1"
+            );
             expect(result).toEqual(
                 expect.objectContaining({
                     siteIdentifier: "test-site",
@@ -281,77 +334,130 @@ describe("UptimeOrchestrator", () => {
         it("should check site manually without monitor ID", async () => {
             const result = await orchestrator.checkSiteManually("test-site");
 
-            expect(mockMonitorManager.checkSiteManually).toHaveBeenCalledWith("test-site", undefined);
+            expect(mockMonitorManager.checkSiteManually).toHaveBeenCalledWith(
+                "test-site",
+                undefined
+            );
             expect(result).toBeDefined();
         });
 
         it("should start monitoring for site", async () => {
-            const result = await orchestrator.startMonitoringForSite("test-site", "monitor-1");
+            const result = await orchestrator.startMonitoringForSite(
+                "test-site",
+                "monitor-1"
+            );
 
-            expect(mockMonitorManager.startMonitoringForSite).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(
+                mockMonitorManager.startMonitoringForSite
+            ).toHaveBeenCalledWith("test-site", "monitor-1");
             expect(result).toBe(true);
         });
 
         it("should start monitoring for site without monitor ID", async () => {
-            const result = await orchestrator.startMonitoringForSite("test-site");
+            const result =
+                await orchestrator.startMonitoringForSite("test-site");
 
-            expect(mockMonitorManager.startMonitoringForSite).toHaveBeenCalledWith("test-site", undefined);
+            expect(
+                mockMonitorManager.startMonitoringForSite
+            ).toHaveBeenCalledWith("test-site", undefined);
             expect(result).toBe(true);
         });
 
         it("should stop monitoring for site", async () => {
-            const result = await orchestrator.stopMonitoringForSite("test-site", "monitor-1");
+            const result = await orchestrator.stopMonitoringForSite(
+                "test-site",
+                "monitor-1"
+            );
 
-            expect(mockMonitorManager.stopMonitoringForSite).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(
+                mockMonitorManager.stopMonitoringForSite
+            ).toHaveBeenCalledWith("test-site", "monitor-1");
             expect(result).toBe(true);
         });
 
         it("should stop monitoring for site without monitor ID", async () => {
-            const result = await orchestrator.stopMonitoringForSite("test-site");
+            const result =
+                await orchestrator.stopMonitoringForSite("test-site");
 
-            expect(mockMonitorManager.stopMonitoringForSite).toHaveBeenCalledWith("test-site", undefined);
+            expect(
+                mockMonitorManager.stopMonitoringForSite
+            ).toHaveBeenCalledWith("test-site", undefined);
             expect(result).toBe(true);
         });
 
         it("should remove monitor successfully", async () => {
-            const result = await orchestrator.removeMonitor("test-site", "monitor-1");
+            const result = await orchestrator.removeMonitor(
+                "test-site",
+                "monitor-1"
+            );
 
-            expect(mockMonitorManager.stopMonitoringForSite).toHaveBeenCalledWith("test-site", "monitor-1");
-            expect(mockSiteManager.removeMonitor).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(
+                mockMonitorManager.stopMonitoringForSite
+            ).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(mockSiteManager.removeMonitor).toHaveBeenCalledWith(
+                "test-site",
+                "monitor-1"
+            );
             expect(result).toBe(true);
         });
 
         it("should handle monitor removal with failed stop monitoring", async () => {
-            vi.mocked(mockMonitorManager.stopMonitoringForSite).mockResolvedValueOnce(false);
+            vi.mocked(
+                mockMonitorManager.stopMonitoringForSite
+            ).mockResolvedValueOnce(false);
 
-            const result = await orchestrator.removeMonitor("test-site", "monitor-1");
+            const result = await orchestrator.removeMonitor(
+                "test-site",
+                "monitor-1"
+            );
 
-            expect(mockSiteManager.removeMonitor).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(mockSiteManager.removeMonitor).toHaveBeenCalledWith(
+                "test-site",
+                "monitor-1"
+            );
             expect(result).toBe(true);
         });
 
         it("should handle monitor removal with failed database removal", async () => {
-            vi.mocked(mockSiteManager.removeMonitor).mockResolvedValueOnce(false);
+            vi.mocked(mockSiteManager.removeMonitor).mockResolvedValueOnce(
+                false
+            );
 
-            const result = await orchestrator.removeMonitor("test-site", "monitor-1");
+            const result = await orchestrator.removeMonitor(
+                "test-site",
+                "monitor-1"
+            );
 
-            expect(mockMonitorManager.startMonitoringForSite).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(
+                mockMonitorManager.startMonitoringForSite
+            ).toHaveBeenCalledWith("test-site", "monitor-1");
             expect(result).toBe(false);
         });
 
         it.skip("should handle monitor removal with failed restart after failed removal", async () => {
-            vi.mocked(mockSiteManager.removeMonitor).mockResolvedValueOnce(false);
-            vi.mocked(mockMonitorManager.startMonitoringForSite).mockRejectedValueOnce(new Error("Restart failed"));
+            vi.mocked(mockSiteManager.removeMonitor).mockResolvedValueOnce(
+                false
+            );
+            vi.mocked(
+                mockMonitorManager.startMonitoringForSite
+            ).mockRejectedValueOnce(new Error("Restart failed"));
 
-            const result = await orchestrator.removeMonitor("test-site", "monitor-1");
+            const result = await orchestrator.removeMonitor(
+                "test-site",
+                "monitor-1"
+            );
 
             expect(result).toBe(false);
         });
 
         it("should handle monitor removal errors", async () => {
-            vi.mocked(mockMonitorManager.stopMonitoringForSite).mockRejectedValueOnce(new Error("Stop failed"));
+            vi.mocked(
+                mockMonitorManager.stopMonitoringForSite
+            ).mockRejectedValueOnce(new Error("Stop failed"));
 
-            await expect(orchestrator.removeMonitor("test-site", "monitor-1")).rejects.toThrow("Stop failed");
+            await expect(
+                orchestrator.removeMonitor("test-site", "monitor-1")
+            ).rejects.toThrow("Stop failed");
         });
     });
 
@@ -391,7 +497,9 @@ describe("UptimeOrchestrator", () => {
             const testData = '{"sites": []}';
             const result = await orchestrator.importData(testData);
 
-            expect(mockDatabaseManager.importData).toHaveBeenCalledWith(testData);
+            expect(mockDatabaseManager.importData).toHaveBeenCalledWith(
+                testData
+            );
             expect(result).toBe(true);
         });
 
@@ -405,7 +513,9 @@ describe("UptimeOrchestrator", () => {
         it("should set history limit successfully", async () => {
             await orchestrator.setHistoryLimit(500);
 
-            expect(mockDatabaseManager.setHistoryLimit).toHaveBeenCalledWith(500);
+            expect(mockDatabaseManager.setHistoryLimit).toHaveBeenCalledWith(
+                500
+            );
         });
     });
 
@@ -466,17 +576,24 @@ describe("UptimeOrchestrator", () => {
             ];
 
             // Emit internal database event
-            orchestrator.emitTyped("internal:database:update-sites-cache-requested", {
-                sites,
-                operation: "update-sites-cache-requested",
-                timestamp: Date.now(),
-            });
+            orchestrator.emitTyped(
+                "internal:database:update-sites-cache-requested",
+                {
+                    sites,
+                    operation: "update-sites-cache-requested",
+                    timestamp: Date.now(),
+                }
+            );
 
             // Wait for async processing
             await new Promise((resolve) => setTimeout(resolve, 10));
 
-            expect(mockSiteManager.updateSitesCache).toHaveBeenCalledWith(sites);
-            expect(mockMonitorManager.setupSiteForMonitoring).toHaveBeenCalledWith(sites[0]);
+            expect(mockSiteManager.updateSitesCache).toHaveBeenCalledWith(
+                sites
+            );
+            expect(
+                mockMonitorManager.setupSiteForMonitoring
+            ).toHaveBeenCalledWith(sites[0]);
         });
 
         it("should handle internal database events with monitoring setup failures", async () => {
@@ -489,28 +606,40 @@ describe("UptimeOrchestrator", () => {
                 } as Site,
             ];
 
-            vi.mocked(mockMonitorManager.setupSiteForMonitoring).mockRejectedValueOnce(new Error("Setup failed"));
+            vi.mocked(
+                mockMonitorManager.setupSiteForMonitoring
+            ).mockRejectedValueOnce(new Error("Setup failed"));
 
             // Emit internal database event
-            orchestrator.emitTyped("internal:database:update-sites-cache-requested", {
-                sites,
-                operation: "update-sites-cache-requested",
-                timestamp: Date.now(),
-            });
+            orchestrator.emitTyped(
+                "internal:database:update-sites-cache-requested",
+                {
+                    sites,
+                    operation: "update-sites-cache-requested",
+                    timestamp: Date.now(),
+                }
+            );
 
             // Wait for async processing
             await new Promise((resolve) => setTimeout(resolve, 10));
 
-            expect(mockSiteManager.updateSitesCache).toHaveBeenCalledWith(sites);
-            expect(mockMonitorManager.setupSiteForMonitoring).toHaveBeenCalledWith(sites[0]);
+            expect(mockSiteManager.updateSitesCache).toHaveBeenCalledWith(
+                sites
+            );
+            expect(
+                mockMonitorManager.setupSiteForMonitoring
+            ).toHaveBeenCalledWith(sites[0]);
         });
 
         it("should handle get sites from cache request", async () => {
             // Emit internal database event
-            orchestrator.emitTyped("internal:database:get-sites-from-cache-requested", {
-                operation: "get-sites-from-cache-requested",
-                timestamp: Date.now(),
-            });
+            orchestrator.emitTyped(
+                "internal:database:get-sites-from-cache-requested",
+                {
+                    operation: "get-sites-from-cache-requested",
+                    timestamp: Date.now(),
+                }
+            );
 
             // Wait for async processing
             await new Promise((resolve) => setTimeout(resolve, 10));
@@ -543,12 +672,14 @@ describe("UptimeOrchestrator", () => {
         it("should handle database initialized event with errors", async () => {
             // Mock emitTyped to throw an error specifically for "database:transaction-completed"
             const originalEmitTyped = orchestrator.emitTyped.bind(orchestrator);
-            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped").mockImplementation((event, data) => {
-                if (event === "database:transaction-completed") {
-                    throw new Error("Emit failed");
-                }
-                return originalEmitTyped(event, data);
-            });
+            const emitTypedSpy = vi
+                .spyOn(orchestrator, "emitTyped")
+                .mockImplementation((event, data) => {
+                    if (event === "database:transaction-completed") {
+                        throw new Error("Emit failed");
+                    }
+                    return originalEmitTyped(event, data);
+                });
 
             // Emit internal database event - this should trigger the error catch block
             orchestrator.emitTyped("internal:database:initialized", {
@@ -762,9 +893,11 @@ describe("UptimeOrchestrator", () => {
         });
 
         it("should handle monitor started events with errors", async () => {
-            vi.mocked(mockSiteManager.getSitesFromCache).mockImplementationOnce(() => {
-                throw new Error("Cache error");
-            });
+            vi.mocked(mockSiteManager.getSitesFromCache).mockImplementationOnce(
+                () => {
+                    throw new Error("Cache error");
+                }
+            );
 
             // Emit internal monitor event
             orchestrator.emitTyped("internal:monitor:started", {
@@ -807,7 +940,9 @@ describe("UptimeOrchestrator", () => {
 
         it("should handle monitor stopped events when monitoring is inactive", async () => {
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
-            vi.mocked(mockMonitorManager.isMonitoringActive).mockReturnValueOnce(false);
+            vi.mocked(
+                mockMonitorManager.isMonitoringActive
+            ).mockReturnValueOnce(false);
 
             // Emit internal monitor event
             orchestrator.emitTyped("internal:monitor:stopped", {
@@ -831,7 +966,9 @@ describe("UptimeOrchestrator", () => {
         });
 
         it("should handle monitor stopped events with errors", async () => {
-            vi.mocked(mockMonitorManager.isMonitoringActive).mockImplementationOnce(() => {
+            vi.mocked(
+                mockMonitorManager.isMonitoringActive
+            ).mockImplementationOnce(() => {
                 throw new Error("Monitor error");
             });
 
@@ -864,7 +1001,9 @@ describe("UptimeOrchestrator", () => {
             // Wait for async processing
             await new Promise((resolve) => setTimeout(resolve, 10));
 
-            expect(mockMonitorManager.startMonitoringForSite).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(
+                mockMonitorManager.startMonitoringForSite
+            ).toHaveBeenCalledWith("test-site", "monitor-1");
             expect(emitTypedSpy).toHaveBeenCalledWith(
                 "internal:site:start-monitoring-response",
                 expect.objectContaining({
@@ -877,7 +1016,9 @@ describe("UptimeOrchestrator", () => {
 
         it("should handle start monitoring requests with errors", async () => {
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
-            vi.mocked(mockMonitorManager.startMonitoringForSite).mockRejectedValueOnce(new Error("Start failed"));
+            vi.mocked(
+                mockMonitorManager.startMonitoringForSite
+            ).mockRejectedValueOnce(new Error("Start failed"));
 
             // Emit start monitoring request
             orchestrator.emitTyped("internal:site:start-monitoring-requested", {
@@ -914,7 +1055,9 @@ describe("UptimeOrchestrator", () => {
             // Wait for async processing
             await new Promise((resolve) => setTimeout(resolve, 10));
 
-            expect(mockMonitorManager.stopMonitoringForSite).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(
+                mockMonitorManager.stopMonitoringForSite
+            ).toHaveBeenCalledWith("test-site", "monitor-1");
             expect(emitTypedSpy).toHaveBeenCalledWith(
                 "internal:site:stop-monitoring-response",
                 expect.objectContaining({
@@ -927,7 +1070,9 @@ describe("UptimeOrchestrator", () => {
 
         it("should handle stop monitoring requests with errors", async () => {
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
-            vi.mocked(mockMonitorManager.stopMonitoringForSite).mockRejectedValueOnce(new Error("Stop failed"));
+            vi.mocked(
+                mockMonitorManager.stopMonitoringForSite
+            ).mockRejectedValueOnce(new Error("Stop failed"));
 
             // Emit stop monitoring request
             orchestrator.emitTyped("internal:site:stop-monitoring-requested", {
@@ -954,17 +1099,22 @@ describe("UptimeOrchestrator", () => {
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
 
             // Emit is monitoring active request
-            orchestrator.emitTyped("internal:site:is-monitoring-active-requested", {
-                identifier: "test-site",
-                monitorId: "monitor-1",
-                operation: "is-monitoring-active-requested",
-                timestamp: Date.now(),
-            });
+            orchestrator.emitTyped(
+                "internal:site:is-monitoring-active-requested",
+                {
+                    identifier: "test-site",
+                    monitorId: "monitor-1",
+                    operation: "is-monitoring-active-requested",
+                    timestamp: Date.now(),
+                }
+            );
 
             // Wait for async processing
             await new Promise((resolve) => setTimeout(resolve, 10));
 
-            expect(mockMonitorManager.isMonitorActiveInScheduler).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(
+                mockMonitorManager.isMonitorActiveInScheduler
+            ).toHaveBeenCalledWith("test-site", "monitor-1");
             expect(emitTypedSpy).toHaveBeenCalledWith(
                 "internal:site:is-monitoring-active-response",
                 expect.objectContaining({
@@ -984,17 +1134,22 @@ describe("UptimeOrchestrator", () => {
             } as Monitor;
 
             // Emit restart monitoring request
-            orchestrator.emitTyped("internal:site:restart-monitoring-requested", {
-                identifier: "test-site",
-                monitor: testMonitor,
-                operation: "restart-monitoring-requested",
-                timestamp: Date.now(),
-            });
+            orchestrator.emitTyped(
+                "internal:site:restart-monitoring-requested",
+                {
+                    identifier: "test-site",
+                    monitor: testMonitor,
+                    operation: "restart-monitoring-requested",
+                    timestamp: Date.now(),
+                }
+            );
 
             // Wait for async processing
             await new Promise((resolve) => setTimeout(resolve, 10));
 
-            expect(mockMonitorManager.restartMonitorWithNewConfig).toHaveBeenCalledWith("test-site", testMonitor);
+            expect(
+                mockMonitorManager.restartMonitorWithNewConfig
+            ).toHaveBeenCalledWith("test-site", testMonitor);
             expect(emitTypedSpy).toHaveBeenCalledWith(
                 "internal:site:restart-monitoring-response",
                 expect.objectContaining({
@@ -1013,17 +1168,22 @@ describe("UptimeOrchestrator", () => {
                 url: "https://example.com",
             } as Monitor;
 
-            vi.mocked(mockMonitorManager.restartMonitorWithNewConfig).mockImplementationOnce(() => {
+            vi.mocked(
+                mockMonitorManager.restartMonitorWithNewConfig
+            ).mockImplementationOnce(() => {
                 throw new Error("Restart failed");
             });
 
             // Emit restart monitoring request
-            orchestrator.emitTyped("internal:site:restart-monitoring-requested", {
-                identifier: "test-site",
-                monitor: testMonitor,
-                operation: "restart-monitoring-requested",
-                timestamp: Date.now(),
-            });
+            orchestrator.emitTyped(
+                "internal:site:restart-monitoring-requested",
+                {
+                    identifier: "test-site",
+                    monitor: testMonitor,
+                    operation: "restart-monitoring-requested",
+                    timestamp: Date.now(),
+                }
+            );
 
             // Wait for async processing
             await new Promise((resolve) => setTimeout(resolve, 10));
@@ -1055,32 +1215,50 @@ describe("UptimeOrchestrator", () => {
                 monitoring: false,
             };
 
-            await expect(orchestrator.addSite(emptySite)).resolves.toBeDefined();
+            await expect(
+                orchestrator.addSite(emptySite)
+            ).resolves.toBeDefined();
         });
 
         it("should handle undefined monitor ID in manual check", async () => {
-            const result = await orchestrator.checkSiteManually("test-site", undefined);
+            const result = await orchestrator.checkSiteManually(
+                "test-site",
+                undefined
+            );
 
-            expect(mockMonitorManager.checkSiteManually).toHaveBeenCalledWith("test-site", undefined);
+            expect(mockMonitorManager.checkSiteManually).toHaveBeenCalledWith(
+                "test-site",
+                undefined
+            );
             expect(result).toBeDefined();
         });
     });
 
     describe("Error Scenarios", () => {
         it("should handle database manager errors", async () => {
-            vi.mocked(mockDatabaseManager.exportData).mockRejectedValueOnce(new Error("Database error"));
+            vi.mocked(mockDatabaseManager.exportData).mockRejectedValueOnce(
+                new Error("Database error")
+            );
 
-            await expect(orchestrator.exportData()).rejects.toThrow("Database error");
+            await expect(orchestrator.exportData()).rejects.toThrow(
+                "Database error"
+            );
         });
 
         it("should handle monitor manager errors", async () => {
-            vi.mocked(mockMonitorManager.checkSiteManually).mockRejectedValueOnce(new Error("Monitor error"));
+            vi.mocked(
+                mockMonitorManager.checkSiteManually
+            ).mockRejectedValueOnce(new Error("Monitor error"));
 
-            await expect(orchestrator.checkSiteManually("test-site")).rejects.toThrow("Monitor error");
+            await expect(
+                orchestrator.checkSiteManually("test-site")
+            ).rejects.toThrow("Monitor error");
         });
 
         it("should handle site manager errors", async () => {
-            vi.mocked(mockSiteManager.addSite).mockRejectedValueOnce(new Error("Site error"));
+            vi.mocked(mockSiteManager.addSite).mockRejectedValueOnce(
+                new Error("Site error")
+            );
 
             const testSite: Site = {
                 identifier: "test-site",
@@ -1089,7 +1267,9 @@ describe("UptimeOrchestrator", () => {
                 monitoring: true,
             };
 
-            await expect(orchestrator.addSite(testSite)).rejects.toThrow("Site error");
+            await expect(orchestrator.addSite(testSite)).rejects.toThrow(
+                "Site error"
+            );
         });
     });
 });

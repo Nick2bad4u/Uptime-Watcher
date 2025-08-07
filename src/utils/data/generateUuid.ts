@@ -26,7 +26,10 @@
 export function generateUuid(): string {
     try {
         // Try to use native crypto.randomUUID if available
-        if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+        if (
+            typeof crypto !== "undefined" &&
+            typeof crypto.randomUUID === "function"
+        ) {
             return crypto.randomUUID();
         }
     } catch {

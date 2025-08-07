@@ -28,7 +28,10 @@ describe("Error Handling Utils", () => {
         it("should handle successful operation", async () => {
             const operation = vi.fn().mockResolvedValue("success");
 
-            const result = await withErrorHandling(operation, mockFrontendStore);
+            const result = await withErrorHandling(
+                operation,
+                mockFrontendStore
+            );
 
             expect(result).toBe("success");
             expect(mockFrontendStore.clearError).toHaveBeenCalledOnce();
@@ -42,12 +45,16 @@ describe("Error Handling Utils", () => {
             const error = new Error("Test error");
             const operation = vi.fn().mockRejectedValue(error);
 
-            await expect(withErrorHandling(operation, mockFrontendStore)).rejects.toThrow("Test error");
+            await expect(
+                withErrorHandling(operation, mockFrontendStore)
+            ).rejects.toThrow("Test error");
 
             expect(mockFrontendStore.clearError).toHaveBeenCalledOnce();
             expect(mockFrontendStore.setLoading).toHaveBeenCalledWith(true);
             expect(mockFrontendStore.setLoading).toHaveBeenCalledWith(false);
-            expect(mockFrontendStore.setError).toHaveBeenCalledWith("Test error");
+            expect(mockFrontendStore.setError).toHaveBeenCalledWith(
+                "Test error"
+            );
             expect(operation).toHaveBeenCalledOnce();
         });
 
@@ -55,12 +62,16 @@ describe("Error Handling Utils", () => {
             const error = "String error";
             const operation = vi.fn().mockRejectedValue(error);
 
-            await expect(withErrorHandling(operation, mockFrontendStore)).rejects.toBe("String error");
+            await expect(
+                withErrorHandling(operation, mockFrontendStore)
+            ).rejects.toBe("String error");
 
             expect(mockFrontendStore.clearError).toHaveBeenCalledOnce();
             expect(mockFrontendStore.setLoading).toHaveBeenCalledWith(true);
             expect(mockFrontendStore.setLoading).toHaveBeenCalledWith(false);
-            expect(mockFrontendStore.setError).toHaveBeenCalledWith("String error");
+            expect(mockFrontendStore.setError).toHaveBeenCalledWith(
+                "String error"
+            );
             expect(operation).toHaveBeenCalledOnce();
         });
 
@@ -68,12 +79,16 @@ describe("Error Handling Utils", () => {
             const error = { custom: "error" };
             const operation = vi.fn().mockRejectedValue(error);
 
-            await expect(withErrorHandling(operation, mockFrontendStore)).rejects.toEqual({ custom: "error" });
+            await expect(
+                withErrorHandling(operation, mockFrontendStore)
+            ).rejects.toEqual({ custom: "error" });
 
             expect(mockFrontendStore.clearError).toHaveBeenCalledOnce();
             expect(mockFrontendStore.setLoading).toHaveBeenCalledWith(true);
             expect(mockFrontendStore.setLoading).toHaveBeenCalledWith(false);
-            expect(mockFrontendStore.setError).toHaveBeenCalledWith("[object Object]");
+            expect(mockFrontendStore.setError).toHaveBeenCalledWith(
+                "[object Object]"
+            );
             expect(operation).toHaveBeenCalledOnce();
         });
 
@@ -83,7 +98,10 @@ describe("Error Handling Utils", () => {
             });
             const operation = vi.fn().mockResolvedValue("success");
 
-            const result = await withErrorHandling(operation, mockFrontendStore);
+            const result = await withErrorHandling(
+                operation,
+                mockFrontendStore
+            );
 
             expect(result).toBe("success");
             expect(mockFrontendStore.setLoading).toHaveBeenCalledWith(false);
@@ -107,7 +125,10 @@ describe("Error Handling Utils", () => {
         it("should handle successful operation", async () => {
             const operation = vi.fn().mockResolvedValue("success");
 
-            const result = await withErrorHandling(operation, mockBackendContext);
+            const result = await withErrorHandling(
+                operation,
+                mockBackendContext
+            );
 
             expect(result).toBe("success");
             expect(mockLogger.error).not.toHaveBeenCalled();
@@ -118,9 +139,14 @@ describe("Error Handling Utils", () => {
             const error = new Error("Test error");
             const operation = vi.fn().mockRejectedValue(error);
 
-            await expect(withErrorHandling(operation, mockBackendContext)).rejects.toThrow("Test error");
+            await expect(
+                withErrorHandling(operation, mockBackendContext)
+            ).rejects.toThrow("Test error");
 
-            expect(mockLogger.error).toHaveBeenCalledWith("Failed to testOperation", error);
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "Failed to testOperation",
+                error
+            );
             expect(operation).toHaveBeenCalledOnce();
         });
 
@@ -129,9 +155,14 @@ describe("Error Handling Utils", () => {
             const error = new Error("Test error");
             const operation = vi.fn().mockRejectedValue(error);
 
-            await expect(withErrorHandling(operation, contextWithoutName)).rejects.toThrow("Test error");
+            await expect(
+                withErrorHandling(operation, contextWithoutName)
+            ).rejects.toThrow("Test error");
 
-            expect(mockLogger.error).toHaveBeenCalledWith("Async operation failed", error);
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "Async operation failed",
+                error
+            );
             expect(operation).toHaveBeenCalledOnce();
         });
 

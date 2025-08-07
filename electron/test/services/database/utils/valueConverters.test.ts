@@ -58,7 +58,12 @@ describe("Value Converters Utility", () => {
             const updateFields: string[] = [];
             const updateValues: DbValue[] = [];
 
-            addBooleanField("isOptional", undefined, updateFields, updateValues);
+            addBooleanField(
+                "isOptional",
+                undefined,
+                updateFields,
+                updateValues
+            );
 
             expect(updateFields).toEqual([]);
             expect(updateValues).toEqual([]);
@@ -70,10 +75,19 @@ describe("Value Converters Utility", () => {
 
             addBooleanField("isEnabled", true, updateFields, updateValues);
             addBooleanField("isDisabled", false, updateFields, updateValues);
-            addBooleanField("isOptional", undefined, updateFields, updateValues);
+            addBooleanField(
+                "isOptional",
+                undefined,
+                updateFields,
+                updateValues
+            );
             addBooleanField("isActive", true, updateFields, updateValues);
 
-            expect(updateFields).toEqual(["isEnabled = ?", "isDisabled = ?", "isActive = ?"]);
+            expect(updateFields).toEqual([
+                "isEnabled = ?",
+                "isDisabled = ?",
+                "isActive = ?",
+            ]);
             expect(updateValues).toEqual([1, 0, 1]);
         });
 
@@ -85,7 +99,11 @@ describe("Value Converters Utility", () => {
             addBooleanField("field-name", false, updateFields, updateValues);
             addBooleanField("fieldName123", true, updateFields, updateValues);
 
-            expect(updateFields).toEqual(["field_name = ?", "field-name = ?", "fieldName123 = ?"]);
+            expect(updateFields).toEqual([
+                "field_name = ?",
+                "field-name = ?",
+                "fieldName123 = ?",
+            ]);
             expect(updateValues).toEqual([1, 0, 1]);
         });
     });
@@ -146,7 +164,12 @@ describe("Value Converters Utility", () => {
             const updateValues: DbValue[] = [];
 
             // TypeScript would normally prevent this, but testing runtime behavior
-            addNumberField("converted", "123" as any, updateFields, updateValues);
+            addNumberField(
+                "converted",
+                "123" as any,
+                updateFields,
+                updateValues
+            );
 
             expect(updateFields).toEqual(["converted = ?"]);
             expect(updateValues).toEqual([123]);
@@ -157,10 +180,19 @@ describe("Value Converters Utility", () => {
             const updateValues: DbValue[] = [];
 
             addNumberField("infinity", Infinity, updateFields, updateValues);
-            addNumberField("negInfinity", -Infinity, updateFields, updateValues);
+            addNumberField(
+                "negInfinity",
+                -Infinity,
+                updateFields,
+                updateValues
+            );
             addNumberField("nanValue", Number.NaN, updateFields, updateValues);
 
-            expect(updateFields).toEqual(["infinity = ?", "negInfinity = ?", "nanValue = ?"]);
+            expect(updateFields).toEqual([
+                "infinity = ?",
+                "negInfinity = ?",
+                "nanValue = ?",
+            ]);
             expect(updateValues).toEqual([Infinity, -Infinity, Number.NaN]);
         });
     });
@@ -200,12 +232,35 @@ describe("Value Converters Utility", () => {
             const updateFields: string[] = [];
             const updateValues: DbValue[] = [];
 
-            addStringField("special", "Special chars: @#$%^&*()", updateFields, updateValues);
-            addStringField("unicode", "Unicode: 🚀 ñ ç", updateFields, updateValues);
-            addStringField("quotes", `Quotes: "Hello" 'World'`, updateFields, updateValues);
+            addStringField(
+                "special",
+                "Special chars: @#$%^&*()",
+                updateFields,
+                updateValues
+            );
+            addStringField(
+                "unicode",
+                "Unicode: 🚀 ñ ç",
+                updateFields,
+                updateValues
+            );
+            addStringField(
+                "quotes",
+                `Quotes: "Hello" 'World'`,
+                updateFields,
+                updateValues
+            );
 
-            expect(updateFields).toEqual(["special = ?", "unicode = ?", "quotes = ?"]);
-            expect(updateValues).toEqual(["Special chars: @#$%^&*()", "Unicode: 🚀 ñ ç", `Quotes: "Hello" 'World'`]);
+            expect(updateFields).toEqual([
+                "special = ?",
+                "unicode = ?",
+                "quotes = ?",
+            ]);
+            expect(updateValues).toEqual([
+                "Special chars: @#$%^&*()",
+                "Unicode: 🚀 ñ ç",
+                `Quotes: "Hello" 'World'`,
+            ]);
         });
 
         it("should handle non-string values by converting", () => {
@@ -370,11 +425,26 @@ describe("Value Converters Utility", () => {
 
             // Simulate updating a site record
             addStringField("name", "My Website", updateFields, updateValues);
-            addStringField("url", "https://example.com", updateFields, updateValues);
+            addStringField(
+                "url",
+                "https://example.com",
+                updateFields,
+                updateValues
+            );
             addBooleanField("isActive", true, updateFields, updateValues);
             addNumberField("checkInterval", 60_000, updateFields, updateValues);
-            addStringField("description", undefined, updateFields, updateValues); // skipped
-            addBooleanField("notificationsEnabled", false, updateFields, updateValues);
+            addStringField(
+                "description",
+                undefined,
+                updateFields,
+                updateValues
+            ); // skipped
+            addBooleanField(
+                "notificationsEnabled",
+                false,
+                updateFields,
+                updateValues
+            );
 
             expect(updateFields).toEqual([
                 "name = ?",
@@ -416,12 +486,37 @@ describe("Value Converters Utility", () => {
                 addNumberField("timeout", timeout, updateFields, updateValues);
             }
 
-            addNumberField("retries", rawData.retries, updateFields, updateValues);
-            addStringField("description", rawData.description, updateFields, updateValues);
-            addBooleanField("isEnabled", rawData.isEnabled, updateFields, updateValues);
+            addNumberField(
+                "retries",
+                rawData.retries,
+                updateFields,
+                updateValues
+            );
+            addStringField(
+                "description",
+                rawData.description,
+                updateFields,
+                updateValues
+            );
+            addBooleanField(
+                "isEnabled",
+                rawData.isEnabled,
+                updateFields,
+                updateValues
+            );
 
-            expect(updateFields).toEqual(["timestamp = ?", "timeout = ?", "retries = ?", "isEnabled = ?"]);
-            expect(updateValues).toEqual(["2023-12-25T10:30:00.000Z", 5000, 3, 1]);
+            expect(updateFields).toEqual([
+                "timestamp = ?",
+                "timeout = ?",
+                "retries = ?",
+                "isEnabled = ?",
+            ]);
+            expect(updateValues).toEqual([
+                "2023-12-25T10:30:00.000Z",
+                5000,
+                3,
+                1,
+            ]);
         });
     });
 });

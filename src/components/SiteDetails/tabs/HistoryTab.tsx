@@ -11,7 +11,13 @@ import { MdHistory } from "react-icons/md";
 
 import logger from "../../../services/logger";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
-import { StatusIndicator, ThemedButton, ThemedCard, ThemedSelect, ThemedText } from "../../../theme/components";
+import {
+    StatusIndicator,
+    ThemedButton,
+    ThemedCard,
+    ThemedSelect,
+    ThemedText,
+} from "../../../theme/components";
 import { useTheme } from "../../../theme/useTheme";
 import { Monitor, StatusHistory } from "../../../types";
 import { DetailLabel } from "../../common/MonitorUiComponents";
@@ -68,7 +74,9 @@ export const HistoryTab = ({
 }: HistoryTabProperties): JSX.Element => {
     const { settings } = useSettingsStore();
     const { currentTheme } = useTheme();
-    const [historyFilter, setHistoryFilter] = useState<"all" | "down" | "up">("all");
+    const [historyFilter, setHistoryFilter] = useState<"all" | "down" | "up">(
+        "all"
+    );
     const historyLength = selectedMonitor.history.length;
 
     const backendLimit = settings.historyLimit || 25;
@@ -99,7 +107,11 @@ export const HistoryTab = ({
     ].filter((opt) => opt <= maxShow);
 
     // Always include 'All' if there are fewer than backendLimit
-    if (historyLength > 0 && historyLength <= backendLimit && !showOptions.includes(historyLength)) {
+    if (
+        historyLength > 0 &&
+        historyLength <= backendLimit &&
+        !showOptions.includes(historyLength)
+    ) {
         showOptions.push(historyLength);
     }
 
@@ -117,14 +129,20 @@ export const HistoryTab = ({
 
     // Compute effective history limit - use user preference or auto-calculated value
     const safeHistoryLength = selectedMonitor.history.length || 0;
-    const autoLimit = Math.min(50, backendLimit, Math.max(1, safeHistoryLength));
+    const autoLimit = Math.min(
+        50,
+        backendLimit,
+        Math.max(1, safeHistoryLength)
+    );
 
     // Use user preference if set, otherwise use auto-calculated limit
     const historyLimit = userHistoryLimit ?? autoLimit;
 
     // Ensure historyLimit is always valid
     const safeHistoryLimit =
-        Number.isFinite(historyLimit) && historyLimit > 0 ? historyLimit : Math.min(10, Math.max(1, historyLength));
+        Number.isFinite(historyLimit) && historyLimit > 0
+            ? historyLimit
+            : Math.min(10, Math.max(1, historyLength));
 
     // Log when history tab is viewed - only when monitor actually changes
     useEffect(() => {
@@ -140,23 +158,33 @@ export const HistoryTab = ({
     }, [selectedMonitor.id, selectedMonitor.type]);
 
     const filteredHistoryRecords = selectedMonitor.history
-        .filter((record: StatusHistory) => historyFilter === "all" || record.status === historyFilter)
+        .filter(
+            (record: StatusHistory) =>
+                historyFilter === "all" || record.status === historyFilter
+        )
         .slice(0, safeHistoryLimit);
 
     // Helper to render details with label using dynamic formatting
     function renderDetails(record: StatusHistory) {
         if (!record.details) {
-             
             return null;
         }
 
-        return <DetailLabel details={record.details} monitorType={selectedMonitor.type} />;
+        return (
+            <DetailLabel
+                details={record.details}
+                monitorType={selectedMonitor.type}
+            />
+        );
     }
 
     return (
         <div className="space-y-6" data-testid="history-tab">
             {/* History Controls */}
-            <ThemedCard icon={<FiFilter color={iconColors.filters} />} title="History Filters">
+            <ThemedCard
+                icon={<FiFilter color={iconColors.filters} />}
+                title="History Filters"
+            >
                 <div className="flex flex-wrap items-center gap-4">
                     <div className="flex items-center space-x-3">
                         <ThemedText size="sm" variant="secondary">
@@ -169,15 +197,23 @@ export const HistoryTab = ({
                                     key={filter}
                                     onClick={() => {
                                         setHistoryFilter(filter);
-                                        logger.user.action("History filter changed", {
-                                            filter: filter,
-                                            monitorId: selectedMonitor.id,
-                                            monitorType: selectedMonitor.type,
-                                            totalRecords: historyLength,
-                                        });
+                                        logger.user.action(
+                                            "History filter changed",
+                                            {
+                                                filter: filter,
+                                                monitorId: selectedMonitor.id,
+                                                monitorType:
+                                                    selectedMonitor.type,
+                                                totalRecords: historyLength,
+                                            }
+                                        );
                                     }}
                                     size="xs"
-                                    variant={historyFilter === filter ? "primary" : "ghost"}
+                                    variant={
+                                        historyFilter === filter
+                                            ? "primary"
+                                            : "ghost"
+                                    }
                                 >
                                     {getFilterButtonLabel(filter)}
                                 </ThemedButton>
@@ -207,20 +243,27 @@ export const HistoryTab = ({
                         >
                             {showOptions.map((option) => (
                                 <option key={option} value={option}>
-                                    {option === historyLength ? `All (${option})` : option}
+                                    {option === historyLength
+                                        ? `All (${option})`
+                                        : option}
                                 </option>
                             ))}
                         </ThemedSelect>
                         <ThemedText size="xs" variant="secondary">
-                            {filteredHistoryRecords.length} of {historyLength} records
-                            {historyFilter !== "all" && ` (${historyFilter} filter)`}
+                            {filteredHistoryRecords.length} of {historyLength}{" "}
+                            records
+                            {historyFilter !== "all" &&
+                                ` (${historyFilter} filter)`}
                         </ThemedText>
                     </div>
                 </div>
             </ThemedCard>
 
             {/* History List */}
-            <ThemedCard icon={<MdHistory color={iconColors.history} />} title="Check History">
+            <ThemedCard
+                icon={<MdHistory color={iconColors.history} />}
+                title="Check History"
+            >
                 <div className="space-y-2 overflow-y-auto max-h-96">
                     {filteredHistoryRecords.map((record) => (
                         <div
@@ -228,15 +271,26 @@ export const HistoryTab = ({
                             key={record.timestamp}
                         >
                             <div className="flex items-center space-x-3">
-                                <StatusIndicator size="sm" status={record.status} />
+                                <StatusIndicator
+                                    size="sm"
+                                    status={record.status}
+                                />
                                 <div>
                                     <ThemedText size="sm" weight="medium">
                                         {formatFullTimestamp(record.timestamp)}
                                     </ThemedText>
-                                    <ThemedText className="ml-4" size="xs" variant="secondary">
+                                    <ThemedText
+                                        className="ml-4"
+                                        size="xs"
+                                        variant="secondary"
+                                    >
                                         Record #
                                         {historyLength -
-                                            selectedMonitor.history.findIndex((r) => r.timestamp === record.timestamp)}
+                                            selectedMonitor.history.findIndex(
+                                                (r) =>
+                                                    r.timestamp ===
+                                                    record.timestamp
+                                            )}
                                     </ThemedText>
                                     {renderDetails(record)}
                                 </div>
@@ -245,7 +299,11 @@ export const HistoryTab = ({
                                 <ThemedText size="sm" weight="medium">
                                     {formatResponseTime(record.responseTime)}
                                 </ThemedText>
-                                <ThemedText className="ml-4" size="xs" variant="secondary">
+                                <ThemedText
+                                    className="ml-4"
+                                    size="xs"
+                                    variant="secondary"
+                                >
                                     {formatStatusWithIcon(record.status)}
                                 </ThemedText>
                             </div>
@@ -255,7 +313,11 @@ export const HistoryTab = ({
                     {filteredHistoryRecords.length === 0 && (
                         <div className="flex flex-col items-center justify-center py-12 text-center">
                             <FiInbox className="mb-4 text-4xl opacity-50" />
-                            <ThemedText className="mb-2" size="lg" variant="secondary">
+                            <ThemedText
+                                className="mb-2"
+                                size="lg"
+                                variant="secondary"
+                            >
                                 No records found
                             </ThemedText>
                             <ThemedText size="sm" variant="secondary">

@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { generateCorrelationId, ValidationError } from "../../utils/correlation.js";
+import {
+    generateCorrelationId,
+    ValidationError,
+} from "../../utils/correlation.js";
 
 describe("Correlation Utility", () => {
     describe("generateCorrelationId", () => {
@@ -91,10 +94,16 @@ describe("Correlation Utility", () => {
         });
 
         it("should create ValidationError with multiple errors", () => {
-            const errors = ["Invalid email", "Password too short", "Name required"];
+            const errors = [
+                "Invalid email",
+                "Password too short",
+                "Name required",
+            ];
             const error = new ValidationError(errors);
 
-            expect(error.message).toBe("Validation failed: Invalid email, Password too short, Name required");
+            expect(error.message).toBe(
+                "Validation failed: Invalid email, Password too short, Name required"
+            );
             expect(error.errors).toEqual(errors);
         });
 
@@ -114,7 +123,11 @@ describe("Correlation Utility", () => {
         });
 
         it("should handle special characters in error messages", () => {
-            const errors = ['Error with "quotes"', "Error with 'apostrophes'", "Error with <tags>"];
+            const errors = [
+                'Error with "quotes"',
+                "Error with 'apostrophes'",
+                "Error with <tags>",
+            ];
             const error = new ValidationError(errors);
 
             expect(error.errors).toEqual(errors);
@@ -124,7 +137,11 @@ describe("Correlation Utility", () => {
         });
 
         it("should handle unicode characters in error messages", () => {
-            const errors = ["Error with emoji 🚨", "Error with unicode: café", "Error with symbols: ñ§∆"];
+            const errors = [
+                "Error with emoji 🚨",
+                "Error with unicode: café",
+                "Error with symbols: ñ§∆",
+            ];
             const error = new ValidationError(errors);
 
             expect(error.errors).toEqual(errors);
@@ -138,7 +155,9 @@ describe("Correlation Utility", () => {
                 throw new ValidationError(["Test error"]);
             } catch (error) {
                 expect(error).toBeInstanceOf(Error);
-                expect((error as ValidationError).errors).toEqual(["Test error"]);
+                expect((error as ValidationError).errors).toEqual([
+                    "Test error",
+                ]);
             }
         });
 
@@ -170,7 +189,10 @@ describe("Correlation Utility", () => {
         });
 
         it("should handle many errors", () => {
-            const manyErrors = Array.from({ length: 100 }, (_, i) => `Error ${i + 1}`);
+            const manyErrors = Array.from(
+                { length: 100 },
+                (_, i) => `Error ${i + 1}`
+            );
             const error = new ValidationError(manyErrors);
 
             expect(error.errors).toHaveLength(100);

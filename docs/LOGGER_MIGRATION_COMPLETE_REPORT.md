@@ -60,7 +60,9 @@ Based on the Logger-Error-report.md, here's the comprehensive breakdown:
 **Before:**
 
 ```typescript
-logger.debug(`[TypedEventBus:${this.busId}] Created new event bus (max middleware: ${this.maxMiddleware})`);
+logger.debug(
+ `[TypedEventBus:${this.busId}] Created new event bus (max middleware: ${this.maxMiddleware})`
+);
 ```
 
 **After:**
@@ -77,7 +79,9 @@ logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_CREATED, {
 **Current Pattern:**
 
 ```typescript
-logger.debug(`[MonitorManager] Setting up ${newMonitorIds.length} new monitors for site: ${site.identifier}`);
+logger.debug(
+ `[MonitorManager] Setting up ${newMonitorIds.length} new monitors for site: ${site.identifier}`
+);
 ```
 
 **Template Available:**
@@ -194,13 +198,19 @@ logger.error("[ApplicationService] Failed to check for updates", error)
 ### **1. Template Logger Wrapper**
 
 ```typescript
-import { createTemplateLogger, LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import {
+ createTemplateLogger,
+ LOG_TEMPLATES,
+} from "@shared/utils/logTemplates";
 
 const logger = createTemplateLogger(baseLogger);
 
 // Use with templates
 logger.info(LOG_TEMPLATES.services.APPLICATION_READY);
-logger.debug(LOG_TEMPLATES.debug.MONITOR_CHECK_START, { monitorId, siteIdentifier });
+logger.debug(LOG_TEMPLATES.debug.MONITOR_CHECK_START, {
+ monitorId,
+ siteIdentifier,
+});
 
 // Use normally for dynamic content
 logger.debug(`Processing ${items.length} items with complex algorithm X`);
@@ -211,10 +221,13 @@ logger.debug(`Processing ${items.length} items with complex algorithm X`);
 ```typescript
 import { interpolateLogTemplate } from "@shared/utils/logTemplates";
 
-const message = interpolateLogTemplate(LOG_TEMPLATES.debug.SITE_LOADING_COMPLETE, {
- identifier: "example.com",
- count: 5,
-});
+const message = interpolateLogTemplate(
+ LOG_TEMPLATES.debug.SITE_LOADING_COMPLETE,
+ {
+  identifier: "example.com",
+  count: 5,
+ }
+);
 // Result: "[SiteManager] Background site load completed: example.com with 5 monitors"
 ```
 

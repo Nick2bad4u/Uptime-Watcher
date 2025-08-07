@@ -106,13 +106,27 @@ vi.mock("../../../theme/useTheme", () => ({
 
 // Mock FormFields components
 vi.mock("../../../components/AddSiteForm/FormFields", () => ({
-    RadioGroup: ({ label, children }: { label: string; children: React.ReactNode }) => (
+    RadioGroup: ({
+        label,
+        children,
+    }: {
+        label: string;
+        children: React.ReactNode;
+    }) => (
         <div data-testid="radio-group">
             <label>{label}</label>
             {children}
         </div>
     ),
-    SelectField: ({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) => (
+    SelectField: ({
+        label,
+        value,
+        onChange,
+    }: {
+        label: string;
+        value: string;
+        onChange: (value: string) => void;
+    }) => (
         <div data-testid="select-field">
             <label>{label}</label>
             <select value={value} onChange={(e) => onChange(e.target.value)}>
@@ -122,7 +136,15 @@ vi.mock("../../../components/AddSiteForm/FormFields", () => ({
             </select>
         </div>
     ),
-    TextField: ({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) => (
+    TextField: ({
+        label,
+        value,
+        onChange,
+    }: {
+        label: string;
+        value: string;
+        onChange: (value: string) => void;
+    }) => (
         <div data-testid="text-field">
             <label>{label}</label>
             <input value={value} onChange={(e) => onChange(e.target.value)} />
@@ -132,7 +154,9 @@ vi.mock("../../../components/AddSiteForm/FormFields", () => ({
 
 vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
     DynamicMonitorFields: ({ monitorType }: { monitorType: string }) => (
-        <div data-testid="dynamic-monitor-fields">Dynamic fields for {monitorType}</div>
+        <div data-testid="dynamic-monitor-fields">
+            Dynamic fields for {monitorType}
+        </div>
     ),
 }));
 
@@ -142,7 +166,14 @@ vi.mock("../../../theme/components", () => ({
             {children}
         </div>
     ),
-    ThemedButton: ({ children, onClick, ...props }: { children: React.ReactNode; onClick?: () => void }) => (
+    ThemedButton: ({
+        children,
+        onClick,
+        ...props
+    }: {
+        children: React.ReactNode;
+        onClick?: () => void;
+    }) => (
         <button data-testid="themed-button" onClick={onClick} {...props}>
             {children}
         </button>
@@ -172,8 +203,12 @@ describe("AddSiteForm Component", () => {
 
             // Check for main form elements
             expect(screen.getByTestId("radio-group")).toBeInTheDocument();
-            expect(screen.getAllByTestId("select-field")[0]).toBeInTheDocument();
-            expect(screen.getByTestId("dynamic-monitor-fields")).toBeInTheDocument();
+            expect(
+                screen.getAllByTestId("select-field")[0]
+            ).toBeInTheDocument();
+            expect(
+                screen.getByTestId("dynamic-monitor-fields")
+            ).toBeInTheDocument();
         });
 
         it("should render submit button", () => {
@@ -294,7 +329,9 @@ describe("AddSiteForm Component", () => {
 
             // Check for accessibility labels
             expect(screen.getByTestId("radio-group")).toBeInTheDocument();
-            expect(screen.getAllByTestId("select-field")[0]).toBeInTheDocument();
+            expect(
+                screen.getAllByTestId("select-field")[0]
+            ).toBeInTheDocument();
         });
 
         it("should support keyboard navigation", () => {
@@ -315,7 +352,9 @@ describe("AddSiteForm Component", () => {
         it("should handle missing monitor types", () => {
             render(<AddSiteForm />);
 
-            expect(screen.getByTestId("dynamic-monitor-fields")).toBeInTheDocument();
+            expect(
+                screen.getByTestId("dynamic-monitor-fields")
+            ).toBeInTheDocument();
         });
 
         it("should handle loading states", () => {

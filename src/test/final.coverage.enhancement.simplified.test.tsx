@@ -14,7 +14,8 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
 
     describe("Utility Function Tests", () => {
         it("should handle string manipulation", () => {
-            const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+            const capitalize = (str: string) =>
+                str.charAt(0).toUpperCase() + str.slice(1);
             const truncate = (str: string, length: number) =>
                 str.length > length ? str.slice(0, length) + "..." : str;
 
@@ -80,9 +81,12 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
         });
 
         it("should handle type guards", () => {
-            const isString = (value: unknown): value is string => typeof value === "string";
-            const isNumber = (value: unknown): value is number => typeof value === "number";
-            const isArray = (value: unknown): value is unknown[] => Array.isArray(value);
+            const isString = (value: unknown): value is string =>
+                typeof value === "string";
+            const isNumber = (value: unknown): value is number =>
+                typeof value === "number";
+            const isArray = (value: unknown): value is unknown[] =>
+                Array.isArray(value);
 
             expect(isString("hello")).toBe(true);
             expect(isString(123)).toBe(false);
@@ -98,7 +102,11 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 const k = 1024;
                 const sizes = ["Bytes", "KB", "MB", "GB"];
                 const i = Math.floor(Math.log(bytes) / Math.log(k));
-                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+                return (
+                    parseFloat((bytes / Math.pow(k, i)).toFixed(2)) +
+                    " " +
+                    sizes[i]
+                );
             };
 
             const formatTime = (seconds: number) => {
@@ -155,13 +163,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
 
                 emit(event: string, ...args: any[]) {
                     if (this.events[event]) {
-                        this.events[event].forEach((callback) => callback(...args));
+                        this.events[event].forEach((callback) =>
+                            callback(...args)
+                        );
                     }
                 }
 
                 off(event: string, callback: Function) {
                     if (this.events[event]) {
-                        this.events[event] = this.events[event].filter((cb) => cb !== callback);
+                        this.events[event] = this.events[event].filter(
+                            (cb) => cb !== callback
+                        );
                     }
                 }
             }
@@ -235,7 +247,10 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
 
         it("should handle cache with expiration", () => {
             class Cache {
-                private readonly cache = new Map<string, { value: any; expiry: number }>();
+                private readonly cache = new Map<
+                    string,
+                    { value: any; expiry: number }
+                >();
 
                 set(key: string, value: any, ttl: number) {
                     this.cache.set(key, {
@@ -295,7 +310,9 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 }
             };
 
-            const result = parseUrl("https://example.com:8080/path?query=value#hash");
+            const result = parseUrl(
+                "https://example.com:8080/path?query=value#hash"
+            );
             expect(result).toEqual({
                 protocol: "https:",
                 hostname: "example.com",
@@ -363,9 +380,10 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 onClick?: () => void;
             }
 
-            const OptionalPropsComponent = ({ title = "Default", onClick }: Props) => (
-                <button onClick={onClick}>{title}</button>
-            );
+            const OptionalPropsComponent = ({
+                title = "Default",
+                onClick,
+            }: Props) => <button onClick={onClick}>{title}</button>;
 
             render(<OptionalPropsComponent />);
             expect(screen.getByText("Default")).toBeInTheDocument();
@@ -375,9 +393,11 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
         });
 
         it("should handle component with children", () => {
-            const WrapperComponent = ({ children }: { children: React.ReactNode }) => (
-                <div className="wrapper">{children}</div>
-            );
+            const WrapperComponent = ({
+                children,
+            }: {
+                children: React.ReactNode;
+            }) => <div className="wrapper">{children}</div>;
 
             render(
                 <WrapperComponent>
@@ -422,7 +442,9 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 return (
                     <div>
                         <span data-testid="count">{count}</span>
-                        <button onClick={() => setCount(count + 1)}>Increment</button>
+                        <button onClick={() => setCount(count + 1)}>
+                            Increment
+                        </button>
                     </div>
                 );
             };
@@ -565,7 +587,8 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 let isDestroyed = false;
                 return {
                     use: () => {
-                        if (isDestroyed) throw new Error("Resource is destroyed");
+                        if (isDestroyed)
+                            throw new Error("Resource is destroyed");
                         return "resource data";
                     },
                     destroy: () => {
@@ -589,7 +612,11 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             const operation2 = async () => "result2";
             const operation3 = async () => "result3";
 
-            const results = await Promise.all([operation1(), operation2(), operation3()]);
+            const results = await Promise.all([
+                operation1(),
+                operation2(),
+                operation3(),
+            ]);
 
             expect(results).toEqual(["result1", "result2", "result3"]);
         });
@@ -605,7 +632,10 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 return "slow";
             };
 
-            const result = await Promise.race([fastOperation(), slowOperation()]);
+            const result = await Promise.race([
+                fastOperation(),
+                slowOperation(),
+            ]);
             expect(result).toBe("fast");
         });
     });

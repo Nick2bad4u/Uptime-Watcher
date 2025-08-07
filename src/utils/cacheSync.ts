@@ -34,38 +34,48 @@ export function setupCacheSync(): () => void {
     // Check if we're in an Electron environment with cache invalidation events available
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (typeof window === "undefined" || !window.electronAPI?.events) {
-        logger.warn("Cache invalidation events not available - frontend cache sync disabled");
+        logger.warn(
+            "Cache invalidation events not available - frontend cache sync disabled"
+        );
         return () => {
             // No-op cleanup
         };
     }
 
-    const cleanup = window.electronAPI.events.onCacheInvalidated((data: CacheInvalidationData) => {
-        try {
-            logger.debug("Received cache invalidation event", data);
+    const cleanup = window.electronAPI.events.onCacheInvalidated(
+        (data: CacheInvalidationData) => {
+            try {
+                logger.debug("Received cache invalidation event", data);
 
-            // Clear appropriate frontend caches based on invalidation type
-            switch (data.type) {
-                case "all": {
-                    clearAllFrontendCaches();
-                    break;
+                // Clear appropriate frontend caches based on invalidation type
+                switch (data.type) {
+                    case "all": {
+                        clearAllFrontendCaches();
+                        break;
+                    }
+                    case "monitor": {
+                        clearMonitorRelatedCaches(data.identifier);
+                        break;
+                    }
+                    case "site": {
+                        clearSiteRelatedCaches(data.identifier);
+                        break;
+                    }
+                    default: {
+                        logger.warn(
+                            "Unknown cache invalidation type:",
+                            data.type
+                        );
+                    }
                 }
-                case "monitor": {
-                    clearMonitorRelatedCaches(data.identifier);
-                    break;
-                }
-                case "site": {
-                    clearSiteRelatedCaches(data.identifier);
-                    break;
-                }
-                default: {
-                    logger.warn("Unknown cache invalidation type:", data.type);
-                }
+            } catch (error) {
+                logger.error(
+                    "Error handling cache invalidation:",
+                    ensureError(error)
+                );
             }
-        } catch (error) {
-            logger.error("Error handling cache invalidation:", ensureError(error));
         }
-    });
+    );
 
     logger.debug("[CacheSync] Cache synchronization enabled");
     return cleanup;
@@ -96,7 +106,10 @@ function clearAllFrontendCaches(): void {
             clearer();
             logger.debug(`[CacheSync] Cleared ${cacheType} cache`);
         } catch (error) {
-            logger.error(`[CacheSync] Failed to clear ${cacheType} cache:`, ensureError(error));
+            logger.error(
+                `[CacheSync] Failed to clear ${cacheType} cache:`,
+                ensureError(error)
+            );
         }
     }
 }

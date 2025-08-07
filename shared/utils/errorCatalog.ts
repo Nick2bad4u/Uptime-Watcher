@@ -73,7 +73,8 @@ export const SITE_ERRORS = {
  */
 export const MONITOR_ERRORS = {
     /** Error when trying to remove the last monitor from a site */
-    CANNOT_REMOVE_LAST: "Cannot remove the last monitor from a site. Use site removal instead.",
+    CANNOT_REMOVE_LAST:
+        "Cannot remove the last monitor from a site. Use site removal instead.",
 
     /** Error when monitor configuration is invalid */
     CONFIGURATION_INVALID: "Monitor configuration is invalid",
@@ -176,7 +177,8 @@ export const SYSTEM_ERRORS = {
     INTERNAL_ERROR: "An internal error occurred",
 
     /** Error when operation fails and no fallback value provided */
-    OPERATION_FAILED_NO_FALLBACK: "Operation failed and no fallback value provided",
+    OPERATION_FAILED_NO_FALLBACK:
+        "Operation failed and no fallback value provided",
 
     /** Error when operation is not permitted */
     OPERATION_NOT_PERMITTED: "Operation not permitted",
@@ -367,7 +369,10 @@ export type ErrorMessage =
  *
  * @public
  */
-export function formatErrorMessage(template: string, params: Record<string, number | string>): string {
+export function formatErrorMessage(
+    template: string,
+    params: Record<string, number | string>
+): string {
     let result = template;
     for (const [key, value] of Object.entries(params)) {
         const placeholder = `{${key}}`;

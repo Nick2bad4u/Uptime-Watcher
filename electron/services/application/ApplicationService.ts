@@ -1,7 +1,10 @@
 import { app } from "electron";
 
 import { isDevelopment } from "../../../shared/utils/environment";
-import { interpolateLogTemplate, LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "../../../shared/utils/logTemplates";
 import { logger } from "../../utils/logger";
 import { ServiceContainer } from "../ServiceContainer";
 
@@ -74,13 +77,21 @@ export class ApplicationService {
         try {
             const services = this.serviceContainer.getInitializedServices();
             for (const { name } of services) {
-                logger.debug(interpolateLogTemplate(LOG_TEMPLATES.debug.APPLICATION_CLEANUP_SERVICE, { name }));
+                logger.debug(
+                    interpolateLogTemplate(
+                        LOG_TEMPLATES.debug.APPLICATION_CLEANUP_SERVICE,
+                        { name }
+                    )
+                );
             }
 
             // Cleanup IPC handlers
             // NOTE: Currently synchronous, but designed to be future-compatible with async cleanup
             const ipcService = this.serviceContainer.getIpcService();
-            if ("cleanup" in ipcService && typeof ipcService.cleanup === "function") {
+            if (
+                "cleanup" in ipcService &&
+                typeof ipcService.cleanup === "function"
+            ) {
                 ipcService.cleanup();
             }
 
@@ -145,7 +156,10 @@ export class ApplicationService {
                 try {
                     await this.onAppReady();
                 } catch (error) {
-                    logger.error(LOG_TEMPLATES.errors.APPLICATION_INITIALIZATION_ERROR, error);
+                    logger.error(
+                        LOG_TEMPLATES.errors.APPLICATION_INITIALIZATION_ERROR,
+                        error
+                    );
                 }
             })();
         });
@@ -193,7 +207,10 @@ export class ApplicationService {
             try {
                 await autoUpdater.checkForUpdates();
             } catch (error) {
-                logger.error(LOG_TEMPLATES.errors.APPLICATION_UPDATE_CHECK_ERROR, error);
+                logger.error(
+                    LOG_TEMPLATES.errors.APPLICATION_UPDATE_CHECK_ERROR,
+                    error
+                );
             }
         })();
     }
@@ -214,38 +231,52 @@ export class ApplicationService {
     private setupUptimeEventHandlers(): void {
         const orchestrator = this.serviceContainer.getUptimeOrchestrator();
         const windowService = this.serviceContainer.getWindowService();
-        const notificationService = this.serviceContainer.getNotificationService();
+        const notificationService =
+            this.serviceContainer.getNotificationService();
 
         // Handle monitor status changes with typed events
         orchestrator.onTyped("monitor:status-changed", (data) => {
             try {
-                logger.debug(LOG_TEMPLATES.debug.APPLICATION_FORWARDING_MONITOR_STATUS, {
-                    monitorId: data.monitor.id,
-                    newStatus: data.newStatus,
-                    previousStatus: data.previousStatus,
-                    siteId: data.siteId,
-                });
+                logger.debug(
+                    LOG_TEMPLATES.debug.APPLICATION_FORWARDING_MONITOR_STATUS,
+                    {
+                        monitorId: data.monitor.id,
+                        newStatus: data.newStatus,
+                        previousStatus: data.previousStatus,
+                        siteId: data.siteId,
+                    }
+                );
 
                 // Send status update to renderer
                 windowService.sendToRenderer("monitor:status-changed", data);
             } catch (error) {
-                logger.error(LOG_TEMPLATES.errors.APPLICATION_FORWARD_MONITOR_STATUS_ERROR, error);
+                logger.error(
+                    LOG_TEMPLATES.errors
+                        .APPLICATION_FORWARD_MONITOR_STATUS_ERROR,
+                    error
+                );
             }
         });
 
         // Handle monitor up events
         orchestrator.onTyped("monitor:up", (data) => {
             try {
-                logger.info(LOG_TEMPLATES.debug.APPLICATION_FORWARDING_MONITOR_UP, {
-                    monitorId: data.monitor.id,
-                    siteId: data.siteId,
-                    siteName: data.site.name,
-                });
+                logger.info(
+                    LOG_TEMPLATES.debug.APPLICATION_FORWARDING_MONITOR_UP,
+                    {
+                        monitorId: data.monitor.id,
+                        siteId: data.siteId,
+                        siteName: data.site.name,
+                    }
+                );
 
                 windowService.sendToRenderer("monitor:up", data);
                 notificationService.notifyMonitorUp(data.site, data.monitor.id);
             } catch (error) {
-                logger.error(LOG_TEMPLATES.errors.APPLICATION_FORWARD_MONITOR_UP_ERROR, error);
+                logger.error(
+                    LOG_TEMPLATES.errors.APPLICATION_FORWARD_MONITOR_UP_ERROR,
+                    error
+                );
             }
         });
 
@@ -259,16 +290,25 @@ export class ApplicationService {
                 });
 
                 windowService.sendToRenderer("monitor:down", data);
-                notificationService.notifyMonitorDown(data.site, data.monitor.id);
+                notificationService.notifyMonitorDown(
+                    data.site,
+                    data.monitor.id
+                );
             } catch (error) {
-                logger.error(LOG_TEMPLATES.errors.APPLICATION_FORWARD_MONITOR_DOWN_ERROR, error);
+                logger.error(
+                    LOG_TEMPLATES.errors.APPLICATION_FORWARD_MONITOR_DOWN_ERROR,
+                    error
+                );
             }
         });
 
         // Handle system errors
         orchestrator.onTyped("system:error", (data) => {
             logger.error(
-                interpolateLogTemplate(LOG_TEMPLATES.errors.APPLICATION_SYSTEM_ERROR, { context: data.context }),
+                interpolateLogTemplate(
+                    LOG_TEMPLATES.errors.APPLICATION_SYSTEM_ERROR,
+                    { context: data.context }
+                ),
                 data.error
             );
         });
@@ -276,33 +316,57 @@ export class ApplicationService {
         // Forward monitoring start/stop events to renderer
         orchestrator.onTyped("monitoring:started", (data) => {
             try {
-                logger.debug(LOG_TEMPLATES.debug.APPLICATION_FORWARDING_MONITORING_STARTED, data);
+                logger.debug(
+                    LOG_TEMPLATES.debug
+                        .APPLICATION_FORWARDING_MONITORING_STARTED,
+                    data
+                );
                 windowService.sendToRenderer("monitoring:started", data);
             } catch (error) {
-                logger.error(LOG_TEMPLATES.errors.APPLICATION_FORWARD_MONITORING_STARTED_ERROR, error);
+                logger.error(
+                    LOG_TEMPLATES.errors
+                        .APPLICATION_FORWARD_MONITORING_STARTED_ERROR,
+                    error
+                );
             }
         });
 
         orchestrator.onTyped("monitoring:stopped", (data) => {
             try {
-                logger.debug(LOG_TEMPLATES.debug.APPLICATION_FORWARDING_MONITORING_STOPPED, data);
+                logger.debug(
+                    LOG_TEMPLATES.debug
+                        .APPLICATION_FORWARDING_MONITORING_STOPPED,
+                    data
+                );
                 windowService.sendToRenderer("monitoring:stopped", data);
             } catch (error) {
-                logger.error(LOG_TEMPLATES.errors.APPLICATION_FORWARD_MONITORING_STOPPED_ERROR, error);
+                logger.error(
+                    LOG_TEMPLATES.errors
+                        .APPLICATION_FORWARD_MONITORING_STOPPED_ERROR,
+                    error
+                );
             }
         });
 
         // Handle cache invalidation events
         orchestrator.onTyped("cache:invalidated", (data) => {
             try {
-                logger.debug(LOG_TEMPLATES.debug.APPLICATION_FORWARDING_CACHE_INVALIDATION, {
-                    identifier: data.identifier,
-                    reason: data.reason,
-                    type: data.type,
-                });
+                logger.debug(
+                    LOG_TEMPLATES.debug
+                        .APPLICATION_FORWARDING_CACHE_INVALIDATION,
+                    {
+                        identifier: data.identifier,
+                        reason: data.reason,
+                        type: data.type,
+                    }
+                );
                 windowService.sendToRenderer("cache:invalidated", data);
             } catch (error) {
-                logger.error(LOG_TEMPLATES.errors.APPLICATION_FORWARD_CACHE_INVALIDATION_ERROR, error);
+                logger.error(
+                    LOG_TEMPLATES.errors
+                        .APPLICATION_FORWARD_CACHE_INVALIDATION_ERROR,
+                    error
+                );
             }
         });
     }

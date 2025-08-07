@@ -16,7 +16,9 @@ describe("Database Schema", () => {
         createDatabaseTables(mockDatabase as any);
 
         expect(mockDatabase.run).toHaveBeenCalled();
-        expect(mockDatabase.run).toHaveBeenCalledWith(expect.stringContaining("CREATE TABLE IF NOT EXISTS sites"));
+        expect(mockDatabase.run).toHaveBeenCalledWith(
+            expect.stringContaining("CREATE TABLE IF NOT EXISTS sites")
+        );
     });
 
     it("should handle errors", () => {
@@ -24,6 +26,8 @@ describe("Database Schema", () => {
             throw new Error("Database error");
         });
 
-        expect(() => createDatabaseTables(mockDatabase as any)).toThrow("Database error");
+        expect(() => createDatabaseTables(mockDatabase as any)).toThrow(
+            "Database error"
+        );
     });
 });

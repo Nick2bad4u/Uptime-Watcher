@@ -4,7 +4,11 @@
     padding: var(--spacing-xl);
     overflow: hidden;
     color: var(--color-text-inverse);
-    background: linear-gradient(90deg, var(--color-primary-500), var(--color-primary-600));
+    background: linear-gradient(
+        90deg,
+        var(--color-primary-500),
+        var(--color-primary-600)
+    );
     border-radius: var(--border-radius-xl);
     box-shadow: var(--shadow-xl);
     transition:
@@ -12,7 +16,11 @@
         background 0.3s var(--ease-in-out);
 
     &:hover {
-        background: linear-gradient(90deg, var(--color-primary-600), var(--color-primary-400));
+        background: linear-gradient(
+            90deg,
+            var(--color-primary-600),
+            var(--color-primary-400)
+        );
         box-shadow:
             0 12px 36px 0 var(--color-primary-400-33),
             var(--shadow-2xl);
@@ -45,8 +53,18 @@
     @media (prefers-color-scheme: dark) {
         background: linear-gradient(
             120deg,
-            color-mix(in srgb, var(--color-primary-300, #2563eb) 80%, #0a192f 20%) 0%,
-            color-mix(in srgb, var(--color-primary-400, #3b82f6) 60%, #0a192f 40%) 60%,
+            color-mix(
+                    in srgb,
+                    var(--color-primary-300, #2563eb) 80%,
+                    #0a192f 20%
+                )
+                0%,
+            color-mix(
+                    in srgb,
+                    var(--color-primary-400, #3b82f6) 60%,
+                    #0a192f 40%
+                )
+                60%,
             var(--color-background-secondary, #1f2937) 100%
         );
         opacity: 0.92;
@@ -124,7 +142,11 @@
         height: 3px;
         margin-top: 6px;
         content: "";
-        background: linear-gradient(90deg, var(--color-accent, var(--color-primary-400)), var(--color-primary-600));
+        background: linear-gradient(
+            90deg,
+            var(--color-accent, var(--color-primary-400)),
+            var(--color-primary-600)
+        );
         border-radius: 2px;
         transition: width 0.3s var(--ease-in-out);
     }
@@ -135,7 +157,11 @@
         text-shadow:
             0 4px 24px var(--color-primary-400-66),
             0 1px 0 var(--color-primary-700);
-        background: linear-gradient(90deg, var(--color-primary-400), var(--color-primary-200));
+        background: linear-gradient(
+            90deg,
+            var(--color-primary-400),
+            var(--color-primary-200)
+        );
         background-clip: text;
         -webkit-text-fill-color: transparent;
 

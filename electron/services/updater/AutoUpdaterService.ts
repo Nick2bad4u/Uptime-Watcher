@@ -10,7 +10,13 @@ import { logger } from "../../utils/logger";
 /**
  * Status of the application update process.
  */
-export type UpdateStatus = "available" | "checking" | "downloaded" | "downloading" | "error" | "idle";
+export type UpdateStatus =
+    | "available"
+    | "checking"
+    | "downloaded"
+    | "downloading"
+    | "error"
+    | "idle";
 
 /**
  * Data structure for update status information.
@@ -78,7 +84,10 @@ export class AutoUpdaterService {
         try {
             await autoUpdater.checkForUpdatesAndNotify();
         } catch (error) {
-            logger.error("[AutoUpdaterService] Failed to check for updates", error);
+            logger.error(
+                "[AutoUpdaterService] Failed to check for updates",
+                error
+            );
             this.notifyStatusChange({
                 error: error instanceof Error ? error.message : String(error),
                 status: "error",
@@ -229,7 +238,9 @@ export class AutoUpdaterService {
      * });
      * ```
      */
-    public setStatusCallback(callback: (statusData: UpdateStatusData) => void): void {
+    public setStatusCallback(
+        callback: (statusData: UpdateStatusData) => void
+    ): void {
         this.onStatusChange = callback;
     }
 

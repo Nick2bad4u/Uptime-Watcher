@@ -8,7 +8,12 @@ import type { JSX } from "react/jsx-runtime";
 
 import { useCallback, useMemo } from "react";
 import { FiSettings } from "react-icons/fi";
-import { MdDomain, MdMonitorHeart, MdOutlineFactCheck, MdSpeed } from "react-icons/md";
+import {
+    MdDomain,
+    MdMonitorHeart,
+    MdOutlineFactCheck,
+    MdSpeed,
+} from "react-icons/md";
 
 import {
     StatusIndicator,
@@ -71,19 +76,25 @@ export const SiteOverviewTab = ({
     totalChecks,
     uptime,
 }: SiteOverviewTabProperties): JSX.Element => {
-    const { getAvailabilityColor, getAvailabilityVariant } = useAvailabilityColors();
+    const { getAvailabilityColor, getAvailabilityVariant } =
+        useAvailabilityColors();
     const { currentTheme } = useTheme();
 
     // Calculate site-level statistics
     const siteDisplayStatus = getSiteDisplayStatus(site);
     const allMonitorsRunning =
-        site.monitors.length > 0 && site.monitors.every((monitor) => monitor.monitoring === true);
-    const runningMonitors = site.monitors.filter((monitor) => monitor.monitoring === true);
+        site.monitors.length > 0 &&
+        site.monitors.every((monitor) => monitor.monitoring === true);
+    const runningMonitors = site.monitors.filter(
+        (monitor) => monitor.monitoring === true
+    );
 
     /**
      * Get status variant for theming based on uptime percentage
      */
-    const getUptimeVariant = (percentage: number): "error" | "success" | "warning" => {
+    const getUptimeVariant = (
+        percentage: number
+    ): "error" | "success" | "warning" => {
         const variant = getAvailabilityVariant(percentage);
         return variant === "danger" ? "error" : variant;
     };
@@ -141,7 +152,11 @@ export const SiteOverviewTab = ({
             }
             return currentTheme.colors.error;
         },
-        [currentTheme.colors.success, currentTheme.colors.warning, currentTheme.colors.error]
+        [
+            currentTheme.colors.success,
+            currentTheme.colors.warning,
+            currentTheme.colors.error,
+        ]
     );
 
     const iconColors = getIconColors();
@@ -164,7 +179,11 @@ export const SiteOverviewTab = ({
                     iconColor={iconColors.site}
                     title="Site Status"
                 >
-                    <StatusIndicator showText size="lg" status={siteDisplayStatus} />
+                    <StatusIndicator
+                        showText
+                        size="lg"
+                        status={siteDisplayStatus}
+                    />
                 </ThemedCard>
 
                 <ThemedCard
@@ -199,7 +218,11 @@ export const SiteOverviewTab = ({
                         variant={uptimeVariant}
                     />
 
-                    <ThemedBadge className="mt-2" size="sm" variant={uptimeVariant}>
+                    <ThemedBadge
+                        className="mt-2"
+                        size="sm"
+                        variant={uptimeVariant}
+                    >
                         {uptime.toFixed(2)}%
                     </ThemedBadge>
                 </ThemedCard>
@@ -212,7 +235,11 @@ export const SiteOverviewTab = ({
                     title="Avg Response"
                 >
                     <div className="flex flex-col items-center">
-                        <ThemedText size="xl" style={responseTimeTextStyle} weight="bold">
+                        <ThemedText
+                            size="xl"
+                            style={responseTimeTextStyle}
+                            weight="bold"
+                        >
                             {formatResponseTime(avgResponseTime)}
                         </ThemedText>
 
@@ -224,10 +251,18 @@ export const SiteOverviewTab = ({
             </div>
 
             {/* Site Information */}
-            <ThemedCard icon={<MdDomain color={iconColors.site} />} title="Site Information">
+            <ThemedCard
+                icon={<MdDomain color={iconColors.site} />}
+                title="Site Information"
+            >
                 <div className="space-y-4">
                     <div className="space-y-2">
-                        <ThemedText className="text-center" size="xl" variant="primary" weight="bold">
+                        <ThemedText
+                            className="text-center"
+                            size="xl"
+                            variant="primary"
+                            weight="bold"
+                        >
                             {site.name}
                         </ThemedText>
 
@@ -241,7 +276,8 @@ export const SiteOverviewTab = ({
                             </ThemedText>
 
                             <ThemedText variant="secondary">
-                                <strong>Monitors:</strong> {site.monitors.length}
+                                <strong>Monitors:</strong>{" "}
+                                {site.monitors.length}
                             </ThemedText>
                         </div>
                     </div>
@@ -249,10 +285,17 @@ export const SiteOverviewTab = ({
             </ThemedCard>
 
             {/* Monitor Details */}
-            <ThemedCard icon={<MdMonitorHeart color={iconColors.monitors} />} title="Monitor Details">
+            <ThemedCard
+                icon={<MdMonitorHeart color={iconColors.monitors} />}
+                title="Monitor Details"
+            >
                 <div className="space-y-4">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <ThemedText size="lg" variant="primary" weight="semibold">
+                        <ThemedText
+                            size="lg"
+                            variant="primary"
+                            weight="semibold"
+                        >
                             Individual Monitors
                         </ThemedText>
 
@@ -262,11 +305,13 @@ export const SiteOverviewTab = ({
                             </ThemedText>
 
                             <ThemedText variant="secondary">
-                                <strong>Running:</strong> {runningMonitors.length}
+                                <strong>Running:</strong>{" "}
+                                {runningMonitors.length}
                             </ThemedText>
 
                             <ThemedText variant="secondary">
-                                <strong>Stopped:</strong> {site.monitors.length - runningMonitors.length}
+                                <strong>Stopped:</strong>{" "}
+                                {site.monitors.length - runningMonitors.length}
                             </ThemedText>
                         </div>
                     </div>
@@ -284,20 +329,38 @@ export const SiteOverviewTab = ({
                                     variant="secondary"
                                 >
                                     <div className="flex flex-col">
-                                        <ThemedText weight="medium">{monitor.type.toUpperCase()} Monitor</ThemedText>
-
-                                        <ThemedText size="sm" variant="secondary">
-                                            {monitor.url ??
-                                                (monitor.host ? `${monitor.host}:${monitor.port}` : monitor.id)}
+                                        <ThemedText weight="medium">
+                                            {monitor.type.toUpperCase()} Monitor
                                         </ThemedText>
 
-                                        <ThemedText size="xs" variant="tertiary">
-                                            Every {formatDuration(monitor.checkInterval)}
+                                        <ThemedText
+                                            size="sm"
+                                            variant="secondary"
+                                        >
+                                            {monitor.url ??
+                                                (monitor.host
+                                                    ? `${monitor.host}:${monitor.port}`
+                                                    : monitor.id)}
+                                        </ThemedText>
+
+                                        <ThemedText
+                                            size="xs"
+                                            variant="tertiary"
+                                        >
+                                            Every{" "}
+                                            {formatDuration(
+                                                monitor.checkInterval
+                                            )}
                                         </ThemedText>
                                     </div>
 
                                     <div className="flex items-center gap-2">
-                                        <ThemedBadge size="sm" variant={getMonitorBadgeVariant(monitor)}>
+                                        <ThemedBadge
+                                            size="sm"
+                                            variant={getMonitorBadgeVariant(
+                                                monitor
+                                            )}
+                                        >
                                             {getMonitorStatusText(monitor)}
                                         </ThemedBadge>
                                     </div>
@@ -305,7 +368,10 @@ export const SiteOverviewTab = ({
                             ))}
                         </div>
                     ) : (
-                        <ThemedText className="py-8 text-center" variant="secondary">
+                        <ThemedText
+                            className="py-8 text-center"
+                            variant="secondary"
+                        >
                             No monitors configured for this site.
                         </ThemedText>
                     )}
@@ -313,7 +379,10 @@ export const SiteOverviewTab = ({
             </ThemedCard>
 
             {/* Site Actions */}
-            <ThemedCard icon={<FiSettings color={iconColors.actions} />} title="Site Actions">
+            <ThemedCard
+                icon={<FiSettings color={iconColors.actions} />}
+                title="Site Actions"
+            >
                 <div className="flex flex-wrap items-center gap-4">
                     {allMonitorsRunning ? (
                         <ThemedButton
@@ -356,12 +425,14 @@ export const SiteOverviewTab = ({
             </ThemedCard>
         </div>
     );
-}
+};
 
 /**
  * Get monitor badge variant
  */
-function getMonitorBadgeVariant(monitor: Monitor): "error" | "success" | "warning" {
+function getMonitorBadgeVariant(
+    monitor: Monitor
+): "error" | "success" | "warning" {
     return monitor.monitoring ? "success" : "warning";
 }
 

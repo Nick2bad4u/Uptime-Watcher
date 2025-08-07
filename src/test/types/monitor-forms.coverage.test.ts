@@ -169,7 +169,10 @@ describe("Monitor Forms Types Coverage Tests", () => {
         });
 
         it("should handle object field changes", () => {
-            const objectHandler = (fieldName: string, value: Record<string, unknown>) => {
+            const objectHandler = (
+                fieldName: string,
+                value: Record<string, unknown>
+            ) => {
                 return { fieldName, value, type: "object" };
             };
 
@@ -192,7 +195,11 @@ describe("Monitor Forms Types Coverage Tests", () => {
         });
 
         it("should support type-safe field validation", () => {
-            const validateField = (fieldName: string, value: unknown, expectedType: string) => {
+            const validateField = (
+                fieldName: string,
+                value: unknown,
+                expectedType: string
+            ) => {
                 return typeof value === expectedType;
             };
 

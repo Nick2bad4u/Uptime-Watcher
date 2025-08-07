@@ -2,7 +2,10 @@ import { Database } from "node-sqlite3-wasm";
 
 import type { HistoryRow as DatabaseHistoryRow } from "../../../../shared/types/database";
 
-import { interpolateLogTemplate, LOG_TEMPLATES } from "../../../../shared/utils/logTemplates";
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "../../../../shared/utils/logTemplates";
 import { StatusHistory } from "../../../types";
 import { logger } from "../../../utils/logger";
 import { rowToHistoryEntry } from "./historyMapper";
@@ -26,7 +29,8 @@ import { rowToHistoryEntry } from "./historyMapper";
 const HISTORY_QUERY_QUERIES = {
     SELECT_ALL_BY_MONITOR:
         "SELECT timestamp, status, responseTime, details FROM history WHERE monitor_id = ? ORDER BY timestamp DESC",
-    SELECT_COUNT_BY_MONITOR: "SELECT COUNT(*) as count FROM history WHERE monitor_id = ?",
+    SELECT_COUNT_BY_MONITOR:
+        "SELECT COUNT(*) as count FROM history WHERE monitor_id = ?",
     SELECT_LATEST_BY_MONITOR:
         "SELECT timestamp, status, responseTime, details FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT 1",
 } as const;
@@ -49,14 +53,22 @@ const HISTORY_QUERY_QUERIES = {
  *
  * @internal
  */
-export function findHistoryByMonitorId(db: Database, monitorId: string): StatusHistory[] {
+export function findHistoryByMonitorId(
+    db: Database,
+    monitorId: string
+): StatusHistory[] {
     try {
-        const historyRows = db.all(HISTORY_QUERY_QUERIES.SELECT_ALL_BY_MONITOR, [monitorId]) as DatabaseHistoryRow[];
+        const historyRows = db.all(
+            HISTORY_QUERY_QUERIES.SELECT_ALL_BY_MONITOR,
+            [monitorId]
+        ) as DatabaseHistoryRow[];
 
         return historyRows.map((row) => rowToHistoryEntry(row));
     } catch (error) {
         logger.error(
-            interpolateLogTemplate(LOG_TEMPLATES.errors.HISTORY_FETCH_FAILED, { monitorId }),
+            interpolateLogTemplate(LOG_TEMPLATES.errors.HISTORY_FETCH_FAILED, {
+                monitorId,
+            }),
             error
         ); /* v8 ignore next */
         throw error;
@@ -82,13 +94,16 @@ export function findHistoryByMonitorId(db: Database, monitorId: string): StatusH
  */
 export function getHistoryCount(db: Database, monitorId: string): number {
     try {
-        const result = db.get(HISTORY_QUERY_QUERIES.SELECT_COUNT_BY_MONITOR, [monitorId]) as
-            | undefined
-            | { count: number };
+        const result = db.get(HISTORY_QUERY_QUERIES.SELECT_COUNT_BY_MONITOR, [
+            monitorId,
+        ]) as undefined | { count: number };
 
         return result?.count ?? 0;
     } catch (error) {
-        logger.error(`[HistoryQuery] Failed to get history count for monitor: ${monitorId}`, error);
+        logger.error(
+            `[HistoryQuery] Failed to get history count for monitor: ${monitorId}`,
+            error
+        );
         throw error;
     }
 }
@@ -111,11 +126,14 @@ export function getHistoryCount(db: Database, monitorId: string): number {
  *
  * @internal
  */
-export function getLatestHistoryEntry(db: Database, monitorId: string): StatusHistory | undefined {
+export function getLatestHistoryEntry(
+    db: Database,
+    monitorId: string
+): StatusHistory | undefined {
     try {
-        const row = db.get(HISTORY_QUERY_QUERIES.SELECT_LATEST_BY_MONITOR, [monitorId]) as
-            | DatabaseHistoryRow
-            | undefined;
+        const row = db.get(HISTORY_QUERY_QUERIES.SELECT_LATEST_BY_MONITOR, [
+            monitorId,
+        ]) as DatabaseHistoryRow | undefined;
 
         if (!row) {
             return undefined;
@@ -123,7 +141,13 @@ export function getLatestHistoryEntry(db: Database, monitorId: string): StatusHi
 
         return rowToHistoryEntry(row);
     } catch (error) {
-        logger.error(interpolateLogTemplate(LOG_TEMPLATES.errors.HISTORY_LATEST_FETCH_FAILED, { monitorId }), error);
+        logger.error(
+            interpolateLogTemplate(
+                LOG_TEMPLATES.errors.HISTORY_LATEST_FETCH_FAILED,
+                { monitorId }
+            ),
+            error
+        );
         throw error;
     }
 }

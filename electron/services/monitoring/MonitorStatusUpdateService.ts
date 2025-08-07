@@ -11,7 +11,10 @@
  */
 
 import { Monitor } from "../../../shared/types";
-import { interpolateLogTemplate, LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "../../../shared/utils/logTemplates";
 import { Site } from "../../types";
 import { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import { monitorLogger as logger } from "../../utils/logger";
@@ -72,7 +75,9 @@ export class MonitorStatusUpdateService {
      * @param result - Check result with operation correlation
      * @returns Promise resolving to true if update was applied, false if ignored
      */
-    async updateMonitorStatus(result: StatusUpdateMonitorCheckResult): Promise<boolean> {
+    async updateMonitorStatus(
+        result: StatusUpdateMonitorCheckResult
+    ): Promise<boolean> {
         // Validate operation is still valid
         if (!this.operationRegistry.validateOperation(result.operationId)) {
             logger.debug(`Ignoring cancelled operation ${result.operationId}`);
@@ -81,12 +86,17 @@ export class MonitorStatusUpdateService {
 
         try {
             // Get current monitor state
-            const monitor = await this.monitorRepository.findByIdentifier(result.monitorId);
+            const monitor = await this.monitorRepository.findByIdentifier(
+                result.monitorId
+            );
             if (!monitor) {
                 logger.warn(
-                    interpolateLogTemplate(LOG_TEMPLATES.warnings.MONITOR_NOT_FOUND_CACHE, {
-                        monitorId: result.monitorId,
-                    })
+                    interpolateLogTemplate(
+                        LOG_TEMPLATES.warnings.MONITOR_NOT_FOUND_CACHE,
+                        {
+                            monitorId: result.monitorId,
+                        }
+                    )
                 );
                 this.operationRegistry.completeOperation(result.operationId);
                 return false;
@@ -95,9 +105,12 @@ export class MonitorStatusUpdateService {
             // Only update if monitor is still actively monitoring
             if (!monitor.monitoring) {
                 logger.debug(
-                    interpolateLogTemplate(LOG_TEMPLATES.warnings.MONITOR_NOT_MONITORING, {
-                        monitorId: result.monitorId,
-                    })
+                    interpolateLogTemplate(
+                        LOG_TEMPLATES.warnings.MONITOR_NOT_MONITORING,
+                        {
+                            monitorId: result.monitorId,
+                        }
+                    )
                 );
                 this.operationRegistry.completeOperation(result.operationId);
                 return false;
@@ -111,7 +124,9 @@ export class MonitorStatusUpdateService {
             };
 
             // Remove operation from active operations
-            const updatedActiveOperations = (monitor.activeOperations ?? []).filter((op) => op !== result.operationId);
+            const updatedActiveOperations = (
+                monitor.activeOperations ?? []
+            ).filter((op) => op !== result.operationId);
             updates.activeOperations = updatedActiveOperations;
 
             await this.monitorRepository.update(result.monitorId, updates);
@@ -120,10 +135,15 @@ export class MonitorStatusUpdateService {
             await this.refreshSiteCacheForMonitor(result.monitorId);
 
             this.operationRegistry.completeOperation(result.operationId);
-            logger.debug(`Updated monitor ${result.monitorId} status to ${result.status}`);
+            logger.debug(
+                `Updated monitor ${result.monitorId} status to ${result.status}`
+            );
             return true;
         } catch (error) {
-            logger.error(`Failed to update monitor status for ${result.monitorId}`, error);
+            logger.error(
+                `Failed to update monitor status for ${result.monitorId}`,
+                error
+            );
             this.operationRegistry.completeOperation(result.operationId);
             return false;
         }
@@ -138,30 +158,47 @@ export class MonitorStatusUpdateService {
         try {
             // Find the site containing this monitor
             const sites = this.sites.getAll();
-            const site = sites.find((s) => s.monitors.some((m) => m.id === monitorId));
+            const site = sites.find((s) =>
+                s.monitors.some((m) => m.id === monitorId)
+            );
 
             if (!site) {
-                logger.warn(`Site not found for monitor ${monitorId}, cannot refresh cache`);
+                logger.warn(
+                    `Site not found for monitor ${monitorId}, cannot refresh cache`
+                );
                 return;
             }
 
             // Get fresh monitor data from database
-            const freshMonitor = await this.monitorRepository.findByIdentifier(monitorId);
+            const freshMonitor =
+                await this.monitorRepository.findByIdentifier(monitorId);
             if (!freshMonitor) {
-                logger.warn(interpolateLogTemplate(LOG_TEMPLATES.warnings.MONITOR_FRESH_DATA_MISSING, { monitorId }));
+                logger.warn(
+                    interpolateLogTemplate(
+                        LOG_TEMPLATES.warnings.MONITOR_FRESH_DATA_MISSING,
+                        { monitorId }
+                    )
+                );
                 return;
             }
 
             // Update the cached site with fresh monitor data
             const updatedSite = {
                 ...site,
-                monitors: site.monitors.map((m) => (m.id === monitorId ? freshMonitor : m)),
+                monitors: site.monitors.map((m) =>
+                    m.id === monitorId ? freshMonitor : m
+                ),
             };
 
             this.sites.set(site.identifier, updatedSite);
-            logger.debug(`Refreshed site cache for monitor ${monitorId} in site ${site.identifier}`);
+            logger.debug(
+                `Refreshed site cache for monitor ${monitorId} in site ${site.identifier}`
+            );
         } catch (error) {
-            logger.warn(`Failed to refresh site cache for monitor ${monitorId}`, error);
+            logger.warn(
+                `Failed to refresh site cache for monitor ${monitorId}`,
+                error
+            );
             // Don't throw - cache refresh failure shouldn't break monitor updates
         }
     }

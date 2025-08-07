@@ -31,7 +31,12 @@ import { rowsToMonitors } from "../../services/database/utils/monitorMapper";
 import { Monitor, Site } from "../../types";
 import { StandardizedCache } from "../cache/StandardizedCache";
 import { withDatabaseOperation } from "../operationalHooks";
-import { Logger, MonitoringConfig, SiteNotFoundError, SiteWritingConfig } from "./interfaces";
+import {
+    Logger,
+    MonitoringConfig,
+    SiteNotFoundError,
+    SiteWritingConfig,
+} from "./interfaces";
 
 /**
  * Service for handling site writing operations.
@@ -57,7 +62,9 @@ export class SiteWriterService {
         site: SiteRepository;
     };
 
-    constructor(config: SiteWritingConfig & { databaseService: DatabaseService }) {
+    constructor(
+        config: SiteWritingConfig & { databaseService: DatabaseService }
+    ) {
         this.repositories = config.repositories;
         this.logger = config.logger;
         this.databaseService = config.databaseService;
@@ -109,7 +116,9 @@ export class SiteWriterService {
     async createSite(siteData: Site): Promise<Site> {
         return withDatabaseOperation(
             async () => {
-                this.logger.info(`Creating new site in database: ${siteData.identifier}`);
+                this.logger.info(
+                    `Creating new site in database: ${siteData.identifier}`
+                );
 
                 const site: Site = {
                     ...siteData,
@@ -121,11 +130,18 @@ export class SiteWriterService {
                     this.repositories.site.upsertInternal(db, site);
 
                     // Remove all existing monitors for this site, then insert new ones
-                    this.repositories.monitor.deleteBySiteIdentifierInternal(db, site.identifier);
+                    this.repositories.monitor.deleteBySiteIdentifierInternal(
+                        db,
+                        site.identifier
+                    );
 
                     // Create monitors and assign IDs using internal method
                     for (const monitor of site.monitors) {
-                        const newId = this.repositories.monitor.createInternal(db, site.identifier, monitor);
+                        const newId = this.repositories.monitor.createInternal(
+                            db,
+                            site.identifier,
+                            monitor
+                        );
                         monitor.id = newId;
                     }
 
@@ -139,7 +155,10 @@ export class SiteWriterService {
             },
             "site-writer-create",
             undefined,
-            { identifier: siteData.identifier, monitorCount: siteData.monitors.length }
+            {
+                identifier: siteData.identifier,
+                monitorCount: siteData.monitors.length,
+            }
         );
     }
 
@@ -174,7 +193,10 @@ export class SiteWriterService {
      * }
      * ```
      */
-    async deleteSite(sitesCache: StandardizedCache<Site>, identifier: string): Promise<boolean> {
+    async deleteSite(
+        sitesCache: StandardizedCache<Site>,
+        identifier: string
+    ): Promise<boolean> {
         return withDatabaseOperation(
             async () => {
                 this.logger.info(`Removing site: ${identifier}`);
@@ -185,15 +207,22 @@ export class SiteWriterService {
                 // Use executeTransaction for atomic multi-table deletion
                 await this.databaseService.executeTransaction((db) => {
                     // Remove from database using internal methods
-                    this.repositories.monitor.deleteBySiteIdentifierInternal(db, identifier);
+                    this.repositories.monitor.deleteBySiteIdentifierInternal(
+                        db,
+                        identifier
+                    );
                     this.repositories.site.deleteInternal(db, identifier);
                     return Promise.resolve();
                 });
 
                 if (removed) {
-                    this.logger.info(`Site removed successfully: ${identifier}`);
+                    this.logger.info(
+                        `Site removed successfully: ${identifier}`
+                    );
                 } else {
-                    this.logger.warn(`Site not found in cache for removal: ${identifier}`);
+                    this.logger.warn(
+                        `Site not found in cache for removal: ${identifier}`
+                    );
                 }
 
                 return removed;
@@ -220,12 +249,19 @@ export class SiteWriterService {
      * Monitors without IDs are returned with empty string placeholders to indicate
      * they need special handling during monitor setup operations.
      */
-    public detectNewMonitors(originalMonitors: Site["monitors"], updatedMonitors: Site["monitors"]): string[] {
-        const originalIds = new Set(originalMonitors.map((m) => m.id).filter(Boolean));
+    public detectNewMonitors(
+        originalMonitors: Site["monitors"],
+        updatedMonitors: Site["monitors"]
+    ): string[] {
+        const originalIds = new Set(
+            originalMonitors.map((m) => m.id).filter(Boolean)
+        );
         const newMonitorIds: string[] = [];
 
         // Create a comparison set of original monitors for detecting new monitors without IDs
-        const originalMonitorSignatures = new Set(originalMonitors.map((m) => this.createMonitorSignature(m)));
+        const originalMonitorSignatures = new Set(
+            originalMonitors.map((m) => this.createMonitorSignature(m))
+        );
 
         for (const monitor of updatedMonitors) {
             if (monitor.id && !originalIds.has(monitor.id)) {
@@ -258,26 +294,39 @@ export class SiteWriterService {
 
         try {
             for (const newMonitor of newMonitors) {
-                const originalMonitor = originalSite.monitors.find((m) => m.id === newMonitor.id);
+                const originalMonitor = originalSite.monitors.find(
+                    (m) => m.id === newMonitor.id
+                );
 
-                if (originalMonitor?.checkInterval !== newMonitor.checkInterval) {
+                if (
+                    originalMonitor?.checkInterval !== newMonitor.checkInterval
+                ) {
                     this.logger.debug(
                         `Monitor ${newMonitor.id} interval changed from ${originalMonitor?.checkInterval} to ${newMonitor.checkInterval}`
                     );
 
                     if (newMonitor.id) {
                         // Always stop to clean up any existing scheduling
-                        await monitoringConfig.stopMonitoring(identifier, newMonitor.id);
+                        await monitoringConfig.stopMonitoring(
+                            identifier,
+                            newMonitor.id
+                        );
 
                         // Only restart if the monitor was actually monitoring
                         if (originalMonitor?.monitoring) {
-                            await monitoringConfig.startMonitoring(identifier, newMonitor.id);
+                            await monitoringConfig.startMonitoring(
+                                identifier,
+                                newMonitor.id
+                            );
                         }
                     }
                 }
             }
         } catch (error) {
-            this.logger.error(`Failed to handle monitor interval changes for site ${identifier}:`, error);
+            this.logger.error(
+                `Failed to handle monitor interval changes for site ${identifier}:`,
+                error
+            );
             // Don't throw - this is a side effect operation that shouldn't fail the update
         }
     }
@@ -330,14 +379,22 @@ export class SiteWriterService {
      * });
      * ```
      */
-    async updateSite(sitesCache: StandardizedCache<Site>, identifier: string, updates: Partial<Site>): Promise<Site> {
+    async updateSite(
+        sitesCache: StandardizedCache<Site>,
+        identifier: string,
+        updates: Partial<Site>
+    ): Promise<Site> {
         return withDatabaseOperation(
             async () => {
                 // Validate input
                 const site = this.validateSiteExists(sitesCache, identifier);
 
                 // Create updated site
-                const updatedSite = this.createUpdatedSite(sitesCache, site, updates);
+                const updatedSite = this.createUpdatedSite(
+                    sitesCache,
+                    site,
+                    updates
+                );
 
                 // Use executeTransaction for atomic multi-step operation
                 await this.databaseService.executeTransaction((db) => {
@@ -346,7 +403,11 @@ export class SiteWriterService {
 
                     // Update monitors if provided - UPDATE existing monitors instead of recreating
                     if (updates.monitors) {
-                        this.updateMonitorsPreservingHistory(db, identifier, updates.monitors);
+                        this.updateMonitorsPreservingHistory(
+                            db,
+                            identifier,
+                            updates.monitors
+                        );
                     }
 
                     return Promise.resolve();
@@ -364,7 +425,10 @@ export class SiteWriterService {
     /**
      * Build the update data for a monitor, preserving existing state.
      */
-    private buildMonitorUpdateData(newMonitor: Monitor, existingMonitor: Monitor): Partial<Monitor> {
+    private buildMonitorUpdateData(
+        newMonitor: Monitor,
+        existingMonitor: Monitor
+    ): Partial<Monitor> {
         const updateData: Partial<Monitor> = {
             checkInterval: newMonitor.checkInterval,
             monitoring: existingMonitor.monitoring,
@@ -414,18 +478,33 @@ export class SiteWriterService {
     /**
      * Create a new monitor in the database.
      */
-    private createNewMonitor(db: Database, siteIdentifier: string, newMonitor: Monitor, reason?: string): void {
-        const newId = this.repositories.monitor.createInternal(db, siteIdentifier, newMonitor);
+    private createNewMonitor(
+        db: Database,
+        siteIdentifier: string,
+        newMonitor: Monitor,
+        reason?: string
+    ): void {
+        const newId = this.repositories.monitor.createInternal(
+            db,
+            siteIdentifier,
+            newMonitor
+        );
         newMonitor.id = newId;
 
         const reasonSuffix = reason ? ` (${reason})` : "";
-        this.logger.debug(`Created new monitor ${newId} for site ${siteIdentifier}${reasonSuffix}`);
+        this.logger.debug(
+            `Created new monitor ${newId} for site ${siteIdentifier}${reasonSuffix}`
+        );
     }
 
     /**
      * Create updated site object with new values.
      */
-    private createUpdatedSite(sitesCache: StandardizedCache<Site>, site: Site, updates: Partial<Site>): Site {
+    private createUpdatedSite(
+        sitesCache: StandardizedCache<Site>,
+        site: Site,
+        updates: Partial<Site>
+    ): Site {
         const updatedSite: Site = {
             ...site,
             ...updates,
@@ -444,12 +523,24 @@ export class SiteWriterService {
         newMonitor: Monitor,
         existingMonitors: Site["monitors"]
     ): void {
-        const existingMonitor = existingMonitors.find((m) => m.id === newMonitor.id);
+        const existingMonitor = existingMonitors.find(
+            (m) => m.id === newMonitor.id
+        );
 
         if (existingMonitor) {
-            this.updateExistingMonitor(db, siteIdentifier, newMonitor, existingMonitor);
+            this.updateExistingMonitor(
+                db,
+                siteIdentifier,
+                newMonitor,
+                existingMonitor
+            );
         } else {
-            this.createNewMonitor(db, siteIdentifier, newMonitor, "ID not found");
+            this.createNewMonitor(
+                db,
+                siteIdentifier,
+                newMonitor,
+                "ID not found"
+            );
         }
     }
 
@@ -463,7 +554,12 @@ export class SiteWriterService {
         existingMonitors: Site["monitors"]
     ): void {
         if (newMonitor.id) {
-            this.handleExistingMonitor(db, siteIdentifier, newMonitor, existingMonitors);
+            this.handleExistingMonitor(
+                db,
+                siteIdentifier,
+                newMonitor,
+                existingMonitors
+            );
         } else {
             this.createNewMonitor(db, siteIdentifier, newMonitor);
         }
@@ -479,7 +575,12 @@ export class SiteWriterService {
         existingMonitors: Site["monitors"]
     ): void {
         for (const newMonitor of newMonitors) {
-            this.processIndividualMonitor(db, siteIdentifier, newMonitor, existingMonitors);
+            this.processIndividualMonitor(
+                db,
+                siteIdentifier,
+                newMonitor,
+                existingMonitors
+            );
         }
     }
 
@@ -492,12 +593,19 @@ export class SiteWriterService {
         newMonitors: Site["monitors"],
         existingMonitors: Site["monitors"]
     ): void {
-        const newMonitorIds = new Set(newMonitors.map((m) => m.id).filter(Boolean));
+        const newMonitorIds = new Set(
+            newMonitors.map((m) => m.id).filter(Boolean)
+        );
 
         for (const existingMonitor of existingMonitors) {
             if (!newMonitorIds.has(existingMonitor.id)) {
-                this.repositories.monitor.deleteInternal(db, existingMonitor.id);
-                this.logger.debug(`Removed monitor ${existingMonitor.id} from site ${siteIdentifier}`);
+                this.repositories.monitor.deleteInternal(
+                    db,
+                    existingMonitor.id
+                );
+                this.logger.debug(
+                    `Removed monitor ${existingMonitor.id} from site ${siteIdentifier}`
+                );
             }
         }
     }
@@ -513,15 +621,23 @@ export class SiteWriterService {
     ): void {
         if (!newMonitor.id) {
             // Safety check - this should not happen in this context
-            this.logger.warn(`Attempted to update existing monitor without ID for site ${siteIdentifier}`, {
-                newMonitor,
-            });
+            this.logger.warn(
+                `Attempted to update existing monitor without ID for site ${siteIdentifier}`,
+                {
+                    newMonitor,
+                }
+            );
             return;
         }
 
-        const updateData = this.buildMonitorUpdateData(newMonitor, existingMonitor);
+        const updateData = this.buildMonitorUpdateData(
+            newMonitor,
+            existingMonitor
+        );
         this.repositories.monitor.updateInternal(db, newMonitor.id, updateData);
-        this.logger.debug(`Updated existing monitor ${newMonitor.id} for site ${siteIdentifier}`);
+        this.logger.debug(
+            `Updated existing monitor ${newMonitor.id} for site ${siteIdentifier}`
+        );
     }
 
     /**
@@ -538,25 +654,45 @@ export class SiteWriterService {
      * database instance to maintain transactional consistency. All database
      * operations must use the same transaction instance.
      */
-    private updateMonitorsPreservingHistory(db: Database, siteIdentifier: string, newMonitors: Site["monitors"]): void {
+    private updateMonitorsPreservingHistory(
+        db: Database,
+        siteIdentifier: string,
+        newMonitors: Site["monitors"]
+    ): void {
         // Fetch existing monitors using the transaction database instance
         // This ensures consistent reads within the transaction boundary
-        const monitorRows = db.all(SITE_WRITER_QUERIES.SELECT_MONITORS_BY_SITE, [siteIdentifier]) as MonitorRow[];
+        const monitorRows = db.all(
+            SITE_WRITER_QUERIES.SELECT_MONITORS_BY_SITE,
+            [siteIdentifier]
+        ) as MonitorRow[];
 
         // Convert rows to monitor objects using the imported mapper
         const existingMonitors = rowsToMonitors(monitorRows);
 
         // Process each monitor: update existing or create new
-        this.processMonitorUpdates(db, siteIdentifier, newMonitors, existingMonitors);
+        this.processMonitorUpdates(
+            db,
+            siteIdentifier,
+            newMonitors,
+            existingMonitors
+        );
 
         // Clean up monitors that are no longer needed
-        this.removeObsoleteMonitors(db, siteIdentifier, newMonitors, existingMonitors);
+        this.removeObsoleteMonitors(
+            db,
+            siteIdentifier,
+            newMonitors,
+            existingMonitors
+        );
     }
 
     /**
      * Validate that a site exists in the cache.
      */
-    private validateSiteExists(sitesCache: StandardizedCache<Site>, identifier: string): Site {
+    private validateSiteExists(
+        sitesCache: StandardizedCache<Site>,
+        identifier: string
+    ): Site {
         if (!identifier) {
             throw new SiteNotFoundError("Site identifier is required");
         }

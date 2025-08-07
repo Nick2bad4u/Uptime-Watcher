@@ -29,7 +29,9 @@ export const EmptyState = (): JSX.Element => {
             <ThemedText className="mb-2" size="lg" weight="medium">
                 No sites to monitor
             </ThemedText>
-            <ThemedText variant="secondary">Add your first website to start monitoring its uptime.</ThemedText>
+            <ThemedText variant="secondary">
+                Add your first website to start monitoring its uptime.
+            </ThemedText>
         </ThemedBox>
     );
-}
+};

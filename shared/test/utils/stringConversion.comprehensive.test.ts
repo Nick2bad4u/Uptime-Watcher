@@ -39,7 +39,9 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
 
         it("should serialize simple objects", () => {
             expect(safeStringify({ a: 1 })).toBe('{"a":1}');
-            expect(safeStringify({ name: "test", value: 42 })).toBe('{"name":"test","value":42}');
+            expect(safeStringify({ name: "test", value: 42 })).toBe(
+                '{"name":"test","value":42}'
+            );
             expect(safeStringify({})).toBe("{}");
         });
 
@@ -72,7 +74,9 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
         it("should handle symbols", () => {
             expect(safeStringify(Symbol("test"))).toBe("Symbol(test)");
             expect(safeStringify(Symbol())).toBe("Symbol()");
-            expect(safeStringify(Symbol.iterator)).toBe("Symbol(Symbol.iterator)");
+            expect(safeStringify(Symbol.iterator)).toBe(
+                "Symbol(Symbol.iterator)"
+            );
         });
 
         it("should handle unknown types with fallback", () => {
@@ -88,7 +92,9 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
                     },
                 },
             };
-            expect(safeStringify(nested)).toBe('{"level1":{"level2":{"value":"deep"}}}');
+            expect(safeStringify(nested)).toBe(
+                '{"level1":{"level2":{"value":"deep"}}}'
+            );
         });
 
         it("should handle objects with special properties", () => {

@@ -35,7 +35,10 @@ export interface SafeJsonResult<T> {
  * }
  * ```
  */
-export function safeJsonParse<T>(json: string, validator: (data: unknown) => data is T): SafeJsonResult<T> {
+export function safeJsonParse<T>(
+    json: string,
+    validator: (data: unknown) => data is T
+): SafeJsonResult<T> {
     try {
         const parsed: unknown = JSON.parse(json);
 
@@ -130,7 +133,11 @@ export function safeJsonParseArray<T>(
  * );
  * ```
  */
-export function safeJsonParseWithFallback<T>(json: string, validator: (data: unknown) => data is T, fallback: T): T {
+export function safeJsonParseWithFallback<T>(
+    json: string,
+    validator: (data: unknown) => data is T,
+    fallback: T
+): T {
     const result = safeJsonParse(json, validator);
     return result.success && result.data !== undefined ? result.data : fallback;
 }
@@ -152,7 +159,10 @@ export function safeJsonParseWithFallback<T>(json: string, validator: (data: unk
  * }
  * ```
  */
-export function safeJsonStringify(value: unknown, space?: number | string): SafeJsonResult<string> {
+export function safeJsonStringify(
+    value: unknown,
+    space?: number | string
+): SafeJsonResult<string> {
     try {
         const jsonString = JSON.stringify(value, undefined, space);
 
@@ -190,7 +200,11 @@ export function safeJsonStringify(value: unknown, space?: number | string): Safe
  * const jsonString = safeJsonStringifyWithFallback(data, "{}");
  * ```
  */
-export function safeJsonStringifyWithFallback(value: unknown, fallback: string, space?: number | string): string {
+export function safeJsonStringifyWithFallback(
+    value: unknown,
+    fallback: string,
+    space?: number | string
+): string {
     const result = safeJsonStringify(value, space);
     return result.success && result.data !== undefined ? result.data : fallback;
 }

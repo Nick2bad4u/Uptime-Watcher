@@ -159,7 +159,10 @@ describe("useSelectedSite", () => {
 
             // Test the selector function
             const selector = mockUseUIStore.mock.calls[0][0];
-            const mockState = { selectedSiteId: "test-id", otherProperty: "ignored" };
+            const mockState = {
+                selectedSiteId: "test-id",
+                otherProperty: "ignored",
+            };
             expect(selector(mockState)).toBe("test-id");
         });
 
@@ -172,7 +175,9 @@ describe("useSelectedSite", () => {
             renderHook(() => useSelectedSite());
 
             // Assert
-            expect(mockUseSitesStore).toHaveBeenCalledWith(expect.any(Function));
+            expect(mockUseSitesStore).toHaveBeenCalledWith(
+                expect.any(Function)
+            );
 
             // Test the selector function
             const selector = mockUseSitesStore.mock.calls[0][0];
@@ -192,7 +197,10 @@ describe("useSelectedSite", () => {
             renderHook(() => useSelectedSite());
 
             // Assert
-            expect(mockUseMemo).toHaveBeenCalledWith(expect.any(Function), [selectedSiteId, mockSites]);
+            expect(mockUseMemo).toHaveBeenCalledWith(expect.any(Function), [
+                selectedSiteId,
+                mockSites,
+            ]);
         });
 
         it("should pass correct computation function to useMemo", () => {
@@ -223,7 +231,10 @@ describe("useSelectedSite", () => {
             renderHook(() => useSelectedSite());
 
             // Assert
-            expect(mockUseMemo).toHaveBeenCalledWith(expect.any(Function), [null, mockSites]);
+            expect(mockUseMemo).toHaveBeenCalledWith(expect.any(Function), [
+                null,
+                mockSites,
+            ]);
 
             // Test the memoized computation
             const computationFn = mockUseMemo.mock.calls[0][0];
@@ -376,7 +387,9 @@ describe("useSelectedSite", () => {
             expect(result.current?.identifier).toBe("site-2");
 
             // Remove selected site from sites array
-            const filteredSites = mockSites.filter((site) => site.identifier !== "site-2");
+            const filteredSites = mockSites.filter(
+                (site) => site.identifier !== "site-2"
+            );
             mockUseSitesStore.mockReturnValue(filteredSites);
             rerender();
 
@@ -449,7 +462,10 @@ describe("useSelectedSite", () => {
             rerender();
 
             // Assert - useMemo should be called again but deps haven't changed
-            expect(mockUseMemo).toHaveBeenCalledWith(expect.any(Function), [selectedSiteId, mockSites]);
+            expect(mockUseMemo).toHaveBeenCalledWith(expect.any(Function), [
+                selectedSiteId,
+                mockSites,
+            ]);
         });
     });
 });

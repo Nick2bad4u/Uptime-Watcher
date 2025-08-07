@@ -59,20 +59,28 @@ describe("Application Constants", () => {
         });
 
         it("should contain expected monitor types", () => {
-            const values = FALLBACK_MONITOR_TYPE_OPTIONS.map((option) => option.value);
+            const values = FALLBACK_MONITOR_TYPE_OPTIONS.map(
+                (option) => option.value
+            );
             expect(values).toContain("http");
             expect(values).toContain("ping");
             expect(values).toContain("port");
         });
 
         it("should have descriptive labels", () => {
-            const httpOption = FALLBACK_MONITOR_TYPE_OPTIONS.find((opt) => opt.value === "http");
+            const httpOption = FALLBACK_MONITOR_TYPE_OPTIONS.find(
+                (opt) => opt.value === "http"
+            );
             expect(httpOption?.label).toContain("HTTP");
 
-            const pingOption = FALLBACK_MONITOR_TYPE_OPTIONS.find((opt) => opt.value === "ping");
+            const pingOption = FALLBACK_MONITOR_TYPE_OPTIONS.find(
+                (opt) => opt.value === "ping"
+            );
             expect(pingOption?.label).toContain("Ping");
 
-            const portOption = FALLBACK_MONITOR_TYPE_OPTIONS.find((opt) => opt.value === "port");
+            const portOption = FALLBACK_MONITOR_TYPE_OPTIONS.find(
+                (opt) => opt.value === "port"
+            );
             expect(portOption?.label).toContain("Port");
         });
     });
@@ -108,11 +116,21 @@ describe("Application Constants", () => {
         });
 
         it("should have popular fonts", () => {
-            const lowercaseMonoFonts = FONT_FAMILY_MONO.map((f) => f.toLowerCase());
-            expect(lowercaseMonoFonts.some((f) => f.includes("mono"))).toBe(true);
+            const lowercaseMonoFonts = FONT_FAMILY_MONO.map((f) =>
+                f.toLowerCase()
+            );
+            expect(lowercaseMonoFonts.some((f) => f.includes("mono"))).toBe(
+                true
+            );
 
-            const lowercaseSansFonts = FONT_FAMILY_SANS.map((f) => f.toLowerCase());
-            expect(lowercaseSansFonts.some((f) => f.includes("inter") || f.includes("system"))).toBe(true);
+            const lowercaseSansFonts = FONT_FAMILY_SANS.map((f) =>
+                f.toLowerCase()
+            );
+            expect(
+                lowercaseSansFonts.some(
+                    (f) => f.includes("inter") || f.includes("system")
+                )
+            ).toBe(true);
         });
     });
 
@@ -174,7 +192,9 @@ describe("Application Constants", () => {
         });
 
         it("should have consistent timeout values", () => {
-            expect(DEFAULT_REQUEST_TIMEOUT).toBe(DEFAULT_REQUEST_TIMEOUT_SECONDS * 1000);
+            expect(DEFAULT_REQUEST_TIMEOUT).toBe(
+                DEFAULT_REQUEST_TIMEOUT_SECONDS * 1000
+            );
         });
     });
 
@@ -197,7 +217,9 @@ describe("Application Constants", () => {
         });
 
         it("should include unlimited option", () => {
-            const unlimitedOption = HISTORY_LIMIT_OPTIONS.find((opt) => opt.label.toLowerCase().includes("unlimited"));
+            const unlimitedOption = HISTORY_LIMIT_OPTIONS.find((opt) =>
+                opt.label.toLowerCase().includes("unlimited")
+            );
             expect(unlimitedOption).toBeDefined();
             expect(unlimitedOption?.value).toBe(Number.MAX_SAFE_INTEGER);
         });
@@ -221,15 +243,23 @@ describe("Application Constants", () => {
         });
 
         it("should have consistent timeout constraint values", () => {
-            expect(TIMEOUT_CONSTRAINTS_MS.MIN).toBe(TIMEOUT_CONSTRAINTS.MIN * 1000);
-            expect(TIMEOUT_CONSTRAINTS_MS.MAX).toBe(TIMEOUT_CONSTRAINTS.MAX * 1000);
-            expect(TIMEOUT_CONSTRAINTS_MS.STEP).toBe(TIMEOUT_CONSTRAINTS.STEP * 1000);
+            expect(TIMEOUT_CONSTRAINTS_MS.MIN).toBe(
+                TIMEOUT_CONSTRAINTS.MIN * 1000
+            );
+            expect(TIMEOUT_CONSTRAINTS_MS.MAX).toBe(
+                TIMEOUT_CONSTRAINTS.MAX * 1000
+            );
+            expect(TIMEOUT_CONSTRAINTS_MS.STEP).toBe(
+                TIMEOUT_CONSTRAINTS.STEP * 1000
+            );
         });
 
         it("should have reasonable timeout constraints", () => {
             expect(TIMEOUT_CONSTRAINTS.MIN).toBeGreaterThanOrEqual(1);
             expect(TIMEOUT_CONSTRAINTS.MAX).toBeLessThanOrEqual(300);
-            expect(TIMEOUT_CONSTRAINTS.MIN).toBeLessThan(TIMEOUT_CONSTRAINTS.MAX);
+            expect(TIMEOUT_CONSTRAINTS.MIN).toBeLessThan(
+                TIMEOUT_CONSTRAINTS.MAX
+            );
         });
     });
 
@@ -251,8 +281,12 @@ describe("Application Constants", () => {
         });
 
         it("should have logical retry constraints", () => {
-            expect(RETRY_CONSTRAINTS.MIN).toBeLessThanOrEqual(RETRY_CONSTRAINTS.DEFAULT);
-            expect(RETRY_CONSTRAINTS.DEFAULT).toBeLessThanOrEqual(RETRY_CONSTRAINTS.MAX);
+            expect(RETRY_CONSTRAINTS.MIN).toBeLessThanOrEqual(
+                RETRY_CONSTRAINTS.DEFAULT
+            );
+            expect(RETRY_CONSTRAINTS.DEFAULT).toBeLessThanOrEqual(
+                RETRY_CONSTRAINTS.MAX
+            );
         });
     });
 
@@ -292,8 +326,12 @@ describe("Application Constants", () => {
             ];
             expectedPeriods.forEach((period) => {
                 expect(CHART_TIME_PERIODS).toHaveProperty(period);
-                expect(typeof CHART_TIME_PERIODS[period as keyof ChartTimePeriods]).toBe("number");
-                expect(CHART_TIME_PERIODS[period as keyof ChartTimePeriods]).toBeGreaterThan(0);
+                expect(
+                    typeof CHART_TIME_PERIODS[period as keyof ChartTimePeriods]
+                ).toBe("number");
+                expect(
+                    CHART_TIME_PERIODS[period as keyof ChartTimePeriods]
+                ).toBeGreaterThan(0);
             });
         });
 
@@ -304,10 +342,18 @@ describe("Application Constants", () => {
         });
 
         it("should have logical time period progression", () => {
-            expect(CHART_TIME_PERIODS["1h"]).toBeLessThan(CHART_TIME_PERIODS["12h"]);
-            expect(CHART_TIME_PERIODS["12h"]).toBeLessThan(CHART_TIME_PERIODS["24h"]);
-            expect(CHART_TIME_PERIODS["24h"]).toBeLessThan(CHART_TIME_PERIODS["7d"]);
-            expect(CHART_TIME_PERIODS["7d"]).toBeLessThan(CHART_TIME_PERIODS["30d"]);
+            expect(CHART_TIME_PERIODS["1h"]).toBeLessThan(
+                CHART_TIME_PERIODS["12h"]
+            );
+            expect(CHART_TIME_PERIODS["12h"]).toBeLessThan(
+                CHART_TIME_PERIODS["24h"]
+            );
+            expect(CHART_TIME_PERIODS["24h"]).toBeLessThan(
+                CHART_TIME_PERIODS["7d"]
+            );
+            expect(CHART_TIME_PERIODS["7d"]).toBeLessThan(
+                CHART_TIME_PERIODS["30d"]
+            );
         });
     });
 
@@ -338,7 +384,9 @@ describe("Application Constants", () => {
 
     describe("Integration and Consistency", () => {
         it("should have consistent monitor types across configurations", () => {
-            const fallbackTypes = FALLBACK_MONITOR_TYPE_OPTIONS.map((opt) => opt.value);
+            const fallbackTypes = FALLBACK_MONITOR_TYPE_OPTIONS.map(
+                (opt) => opt.value
+            );
 
             // Ensure all fallback types are unique
             const uniqueTypes = [...new Set(fallbackTypes)];
@@ -358,20 +406,32 @@ describe("Application Constants", () => {
         });
 
         it("should have default values within constraint ranges", () => {
-            expect(DEFAULT_REQUEST_TIMEOUT_SECONDS).toBeGreaterThanOrEqual(TIMEOUT_CONSTRAINTS.MIN);
-            expect(DEFAULT_REQUEST_TIMEOUT_SECONDS).toBeLessThanOrEqual(TIMEOUT_CONSTRAINTS.MAX);
+            expect(DEFAULT_REQUEST_TIMEOUT_SECONDS).toBeGreaterThanOrEqual(
+                TIMEOUT_CONSTRAINTS.MIN
+            );
+            expect(DEFAULT_REQUEST_TIMEOUT_SECONDS).toBeLessThanOrEqual(
+                TIMEOUT_CONSTRAINTS.MAX
+            );
 
-            expect(RETRY_CONSTRAINTS.DEFAULT).toBeGreaterThanOrEqual(RETRY_CONSTRAINTS.MIN);
-            expect(RETRY_CONSTRAINTS.DEFAULT).toBeLessThanOrEqual(RETRY_CONSTRAINTS.MAX);
+            expect(RETRY_CONSTRAINTS.DEFAULT).toBeGreaterThanOrEqual(
+                RETRY_CONSTRAINTS.MIN
+            );
+            expect(RETRY_CONSTRAINTS.DEFAULT).toBeLessThanOrEqual(
+                RETRY_CONSTRAINTS.MAX
+            );
         });
 
         it("should have check interval available in options", () => {
-            const intervalValues = CHECK_INTERVALS.map((interval) => interval.value);
+            const intervalValues = CHECK_INTERVALS.map(
+                (interval) => interval.value
+            );
             expect(intervalValues).toContain(DEFAULT_CHECK_INTERVAL);
         });
 
         it("should have history limit available in options", () => {
-            const limitValues = HISTORY_LIMIT_OPTIONS.map((option) => option.value);
+            const limitValues = HISTORY_LIMIT_OPTIONS.map(
+                (option) => option.value
+            );
             expect(limitValues).toContain(DEFAULT_HISTORY_LIMIT);
         });
     });
@@ -402,7 +462,9 @@ describe("Application Constants", () => {
         });
 
         it("should have non-empty monitor type options", () => {
-            expect(FALLBACK_MONITOR_TYPE_OPTIONS.length).toBeGreaterThanOrEqual(3);
+            expect(FALLBACK_MONITOR_TYPE_OPTIONS.length).toBeGreaterThanOrEqual(
+                3
+            );
         });
 
         it("should have at least one font in families", () => {

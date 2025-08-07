@@ -57,7 +57,11 @@ const KEY_SEPARATOR = ":";
  *
  * @internal
  */
-function createCacheKey(prefix: string, identifier: string, operation?: string): string {
+function createCacheKey(
+    prefix: string,
+    identifier: string,
+    operation?: string
+): string {
     if (operation) {
         return [prefix, operation, identifier].join(KEY_SEPARATOR);
     }
@@ -91,7 +95,8 @@ export const CacheKeys = {
          * // Returns: "config:history-limit"
          * ```
          */
-        byName: (name: string): string => createCacheKey(CACHE_PREFIXES.CONFIG, name),
+        byName: (name: string): string =>
+            createCacheKey(CACHE_PREFIXES.CONFIG, name),
 
         /**
          * Generate cache key for configuration validation result.
@@ -105,7 +110,8 @@ export const CacheKeys = {
          * // Returns: "config:validation:monitor-config"
          * ```
          */
-        validation: (name: string): string => createCacheKey(CACHE_PREFIXES.CONFIG, name, "validation"),
+        validation: (name: string): string =>
+            createCacheKey(CACHE_PREFIXES.CONFIG, name, "validation"),
     },
 
     /**
@@ -124,7 +130,8 @@ export const CacheKeys = {
          * // Returns: "monitor:monitor-123"
          * ```
          */
-        byId: (id: string): string => createCacheKey(CACHE_PREFIXES.MONITOR, id),
+        byId: (id: string): string =>
+            createCacheKey(CACHE_PREFIXES.MONITOR, id),
 
         /**
          * Generate cache key for monitors by site identifier.
@@ -138,7 +145,8 @@ export const CacheKeys = {
          * // Returns: "monitor:site:site-456"
          * ```
          */
-        bySite: (siteIdentifier: string): string => createCacheKey(CACHE_PREFIXES.MONITOR, siteIdentifier, "site"),
+        bySite: (siteIdentifier: string): string =>
+            createCacheKey(CACHE_PREFIXES.MONITOR, siteIdentifier, "site"),
 
         /**
          * Generate cache key for monitor operation status.
@@ -152,7 +160,8 @@ export const CacheKeys = {
          * // Returns: "monitor:operation:monitor-123"
          * ```
          */
-        operation: (id: string): string => createCacheKey(CACHE_PREFIXES.MONITOR, id, "operation"),
+        operation: (id: string): string =>
+            createCacheKey(CACHE_PREFIXES.MONITOR, id, "operation"),
     },
 
     /**
@@ -170,7 +179,8 @@ export const CacheKeys = {
          * // Returns: "site:bulk"
          * ```
          */
-        bulkOperation: (): string => createCacheKey(CACHE_PREFIXES.SITE, "bulk"),
+        bulkOperation: (): string =>
+            createCacheKey(CACHE_PREFIXES.SITE, "bulk"),
 
         /**
          * Generate cache key for site by identifier.
@@ -184,7 +194,8 @@ export const CacheKeys = {
          * // Returns: "site:site-123"
          * ```
          */
-        byIdentifier: (identifier: string): string => createCacheKey(CACHE_PREFIXES.SITE, identifier),
+        byIdentifier: (identifier: string): string =>
+            createCacheKey(CACHE_PREFIXES.SITE, identifier),
 
         /**
          * Generate cache key for site loading operation.
@@ -198,7 +209,8 @@ export const CacheKeys = {
          * // Returns: "site:loading:site-123"
          * ```
          */
-        loading: (identifier: string): string => createCacheKey(CACHE_PREFIXES.SITE, identifier, "loading"),
+        loading: (identifier: string): string =>
+            createCacheKey(CACHE_PREFIXES.SITE, identifier, "loading"),
     },
 
     /**
@@ -234,7 +246,11 @@ export const CacheKeys = {
          * ```
          */
         monitorType: (monitorType: string): string =>
-            createCacheKey(CACHE_PREFIXES.VALIDATION, monitorType, "monitor-type"),
+            createCacheKey(
+                CACHE_PREFIXES.VALIDATION,
+                monitorType,
+                "monitor-type"
+            ),
     },
 } as const;
 
@@ -277,7 +293,9 @@ export type StandardizedCacheKey = ReturnType<
  *
  * @public
  */
-export function isStandardizedCacheKey(key: string): key is StandardizedCacheKey {
+export function isStandardizedCacheKey(
+    key: string
+): key is StandardizedCacheKey {
     const parts = key.split(KEY_SEPARATOR);
     if (parts.length < 2 || parts.length > 3) {
         return false;

@@ -47,7 +47,9 @@ describe("generateUuid", () => {
                 "abcdef12-3456-7890-abcd-ef1234567890",
             ];
             let callCount = 0;
-            const mockRandomUuid = vi.fn().mockImplementation(() => mockUuids[callCount++]);
+            const mockRandomUuid = vi
+                .fn()
+                .mockImplementation(() => mockUuids[callCount++]);
 
             global.crypto = {
                 randomUUID: mockRandomUuid,
@@ -92,7 +94,9 @@ describe("generateUuid", () => {
             vi.setSystemTime(new Date("2023-01-01T00:00:00.000Z"));
 
             // Mock Math.random for consistent testing
-            const mockRandom = vi.spyOn(Math, "random").mockReturnValue(0.123456789);
+            const mockRandom = vi
+                .spyOn(Math, "random")
+                .mockReturnValue(0.123456789);
 
             // Act
             const result = generateUuid();
@@ -108,7 +112,9 @@ describe("generateUuid", () => {
             vi.useFakeTimers();
             vi.setSystemTime(new Date("2023-06-15T12:30:00.000Z"));
 
-            const mockRandom = vi.spyOn(Math, "random").mockReturnValue(0.987654321);
+            const mockRandom = vi
+                .spyOn(Math, "random")
+                .mockReturnValue(0.987654321);
 
             // Act
             const result = generateUuid();
@@ -126,7 +132,9 @@ describe("generateUuid", () => {
             vi.useFakeTimers();
             vi.setSystemTime(new Date("2023-12-31T23:59:59.999Z"));
 
-            const mockRandom = vi.spyOn(Math, "random").mockReturnValue(0.555555555);
+            const mockRandom = vi
+                .spyOn(Math, "random")
+                .mockReturnValue(0.555555555);
 
             // Act
             const result = generateUuid();
@@ -149,7 +157,9 @@ describe("generateUuid", () => {
             vi.useFakeTimers();
             vi.setSystemTime(new Date("2023-03-15T10:15:30.500Z"));
 
-            const mockRandom = vi.spyOn(Math, "random").mockReturnValue(0.111111111);
+            const mockRandom = vi
+                .spyOn(Math, "random")
+                .mockReturnValue(0.111111111);
 
             // Act
             const result = generateUuid();
@@ -205,7 +215,9 @@ describe("generateUuid", () => {
             vi.useFakeTimers();
             vi.setSystemTime(new Date("2023-01-01T00:00:00.000Z"));
 
-            const mockRandom = vi.spyOn(Math, "random").mockReturnValue(0.123456789);
+            const mockRandom = vi
+                .spyOn(Math, "random")
+                .mockReturnValue(0.123456789);
 
             // Act
             const result = generateUuid();
@@ -224,13 +236,18 @@ describe("generateUuid", () => {
 
             const testCases = [
                 { random: 0.0, expected: "site--1672531200000" },
-                { random: 0.999999999, expected: "site-zzzzzxtmw-1672531200000" },
+                {
+                    random: 0.999999999,
+                    expected: "site-zzzzzxtmw-1672531200000",
+                },
                 { random: 0.5, expected: "site-i-1672531200000" },
             ];
 
             testCases.forEach(({ random, expected }) => {
                 // Arrange
-                const mockRandom = vi.spyOn(Math, "random").mockReturnValue(random);
+                const mockRandom = vi
+                    .spyOn(Math, "random")
+                    .mockReturnValue(random);
 
                 // Act
                 const result = generateUuid();
@@ -320,7 +337,9 @@ describe("generateUuid", () => {
             vi.useFakeTimers();
             vi.setSystemTime(1000);
 
-            const mockRandom = vi.spyOn(Math, "random").mockReturnValue(0.999999999);
+            const mockRandom = vi
+                .spyOn(Math, "random")
+                .mockReturnValue(0.999999999);
 
             // Act
             const result = generateUuid();
@@ -372,10 +391,12 @@ describe("generateUuid", () => {
 
             // Mock Math.random to return different values for uniqueness
             let randomValue = 0.1;
-            const mockRandom = vi.spyOn(Math, "random").mockImplementation(() => {
-                randomValue += 0.037; // Increment by a prime number for variation
-                return randomValue % 1; // Keep it between 0 and 1
-            });
+            const mockRandom = vi
+                .spyOn(Math, "random")
+                .mockImplementation(() => {
+                    randomValue += 0.037; // Increment by a prime number for variation
+                    return randomValue % 1; // Keep it between 0 and 1
+                });
 
             const results = new Set<string>();
             const numCalls = 100;
@@ -400,7 +421,9 @@ describe("generateUuid", () => {
         it("should maintain consistent format across environments", () => {
             // Test crypto environment
             global.crypto = {
-                randomUUID: vi.fn().mockReturnValue("123e4567-e89b-12d3-a456-426614174000"),
+                randomUUID: vi
+                    .fn()
+                    .mockReturnValue("123e4567-e89b-12d3-a456-426614174000"),
             } as any;
 
             const cryptoResult = generateUuid();
@@ -433,10 +456,12 @@ describe("generateUuid", () => {
 
             // Mock Math.random to return varying values
             let randomValue = 0.2;
-            const mockRandom = vi.spyOn(Math, "random").mockImplementation(() => {
-                randomValue += 0.041; // Different increment for variation
-                return randomValue % 1;
-            });
+            const mockRandom = vi
+                .spyOn(Math, "random")
+                .mockImplementation(() => {
+                    randomValue += 0.041; // Different increment for variation
+                    return randomValue % 1;
+                });
 
             const results: string[] = [];
             const numCalls = 1000;
@@ -501,7 +526,9 @@ describe("generateUuid", () => {
         it("should work with mocked Date.now", () => {
             // Arrange
             global.crypto = undefined as any;
-            const mockNow = vi.spyOn(Date, "now").mockReturnValue(1234567890123);
+            const mockNow = vi
+                .spyOn(Date, "now")
+                .mockReturnValue(1234567890123);
             const mockRandom = vi.spyOn(Math, "random").mockReturnValue(0.5);
 
             // Act
@@ -522,7 +549,9 @@ describe("generateUuid", () => {
         it("should work in Node.js-like environment", () => {
             // Simulate Node.js crypto module
             global.crypto = {
-                randomUUID: vi.fn().mockReturnValue("a1b2c3d4-e5f6-7890-abcd-ef1234567890"),
+                randomUUID: vi
+                    .fn()
+                    .mockReturnValue("a1b2c3d4-e5f6-7890-abcd-ef1234567890"),
             } as any;
 
             const result = generateUuid();
@@ -555,10 +584,12 @@ describe("generateUuid", () => {
 
             // Mock Math.random for consistent testing
             let randomValue = 0.3;
-            const mockRandom = vi.spyOn(Math, "random").mockImplementation(() => {
-                randomValue += 0.039; // Different increment
-                return randomValue % 1;
-            });
+            const mockRandom = vi
+                .spyOn(Math, "random")
+                .mockImplementation(() => {
+                    randomValue += 0.039; // Different increment
+                    return randomValue % 1;
+                });
 
             const ids = Array.from({ length: 50 }, () => generateUuid());
 

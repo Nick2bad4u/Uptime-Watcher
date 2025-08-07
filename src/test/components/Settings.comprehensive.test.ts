@@ -91,7 +91,9 @@ describe("Settings Component Coverage Tests", () => {
 
             expect(typeof settingsStore.resetSettings).toBe("function");
             expect(typeof settingsStore.settings).toBe("object");
-            expect(typeof settingsStore.updateHistoryLimitValue).toBe("function");
+            expect(typeof settingsStore.updateHistoryLimitValue).toBe(
+                "function"
+            );
             expect(typeof settingsStore.updateSettings).toBe("function");
 
             expect(settingsStore.settings.autoStart).toBe(false);
@@ -236,7 +238,9 @@ describe("Settings Component Coverage Tests", () => {
             expect(Array.isArray(HISTORY_LIMIT_OPTIONS)).toBe(true);
             expect(HISTORY_LIMIT_OPTIONS.length).toBeGreaterThan(0);
             expect(typeof DEFAULT_HISTORY_LIMIT).toBe("number");
-            expect(HISTORY_LIMIT_OPTIONS.includes(DEFAULT_HISTORY_LIMIT)).toBe(true);
+            expect(HISTORY_LIMIT_OPTIONS.includes(DEFAULT_HISTORY_LIMIT)).toBe(
+                true
+            );
 
             HISTORY_LIMIT_OPTIONS.forEach((limit) => {
                 expect(typeof limit).toBe("number");
@@ -245,7 +249,12 @@ describe("Settings Component Coverage Tests", () => {
         });
 
         it("should validate safe integer conversion", () => {
-            const safeInteger = (value: string, min: number, max: number, defaultValue: number) => {
+            const safeInteger = (
+                value: string,
+                min: number,
+                max: number,
+                defaultValue: number
+            ) => {
                 const num = parseInt(value, 10);
                 if (isNaN(num)) return defaultValue;
                 if (num < min) return min;
@@ -254,16 +263,36 @@ describe("Settings Component Coverage Tests", () => {
             };
 
             const testCases = [
-                { input: "100", min: 25, max: 1000, default: 100, expected: 100 },
+                {
+                    input: "100",
+                    min: 25,
+                    max: 1000,
+                    default: 100,
+                    expected: 100,
+                },
                 { input: "10", min: 25, max: 1000, default: 100, expected: 25 }, // Below min
-                { input: "2000", min: 25, max: 1000, default: 100, expected: 1000 }, // Above max
-                { input: "invalid", min: 25, max: 1000, default: 100, expected: 100 }, // Invalid
+                {
+                    input: "2000",
+                    min: 25,
+                    max: 1000,
+                    default: 100,
+                    expected: 1000,
+                }, // Above max
+                {
+                    input: "invalid",
+                    min: 25,
+                    max: 1000,
+                    default: 100,
+                    expected: 100,
+                }, // Invalid
             ];
 
-            testCases.forEach(({ input, min, max, default: defaultValue, expected }) => {
-                const result = safeInteger(input, min, max, defaultValue);
-                expect(result).toBe(expected);
-            });
+            testCases.forEach(
+                ({ input, min, max, default: defaultValue, expected }) => {
+                    const result = safeInteger(input, min, max, defaultValue);
+                    expect(result).toBe(expected);
+                }
+            );
         });
     });
 
@@ -471,7 +500,10 @@ describe("Settings Component Coverage Tests", () => {
 
             themedComponents.forEach((component) => {
                 expect(typeof component).toBe("string");
-                expect(component.startsWith("Themed") || component === "StatusIndicator").toBe(true);
+                expect(
+                    component.startsWith("Themed") ||
+                        component === "StatusIndicator"
+                ).toBe(true);
             });
         });
     });

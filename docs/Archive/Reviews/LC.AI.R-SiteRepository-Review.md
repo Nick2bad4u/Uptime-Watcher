@@ -90,10 +90,13 @@ return withDatabaseOperation(async () => {
 
 // AFTER (Consistent Query Standards)
 const SITE_QUERIES = {
- INSERT: "INSERT OR IGNORE INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)",
- UPSERT: "INSERT OR REPLACE INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)",
+ INSERT:
+  "INSERT OR IGNORE INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)",
+ UPSERT:
+  "INSERT OR REPLACE INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)",
  SELECT_ALL: "SELECT identifier, name, monitoring FROM sites",
- SELECT_BY_ID: "SELECT identifier, name, monitoring FROM sites WHERE identifier = ?",
+ SELECT_BY_ID:
+  "SELECT identifier, name, monitoring FROM sites WHERE identifier = ?",
  DELETE_BY_ID: "DELETE FROM sites WHERE identifier = ?",
  DELETE_ALL: "DELETE FROM sites",
 } as const;
@@ -111,7 +114,9 @@ const SITE_QUERIES = {
 // BEFORE (Unnecessary Complexity)
 return new Promise<SiteRow | undefined>((resolve, reject) => {
  try {
-  const siteRow = db.get("SELECT...", [identifier]) as Record<string, unknown> | undefined;
+  const siteRow = db.get("SELECT...", [identifier]) as
+   | Record<string, unknown>
+   | undefined;
   if (!siteRow) {
    resolve(undefined as SiteRow | undefined); // Redundant typing
    return;
@@ -124,7 +129,9 @@ return new Promise<SiteRow | undefined>((resolve, reject) => {
 
 // AFTER (Direct Synchronous Handling)
 try {
- const siteRow = db.get(SITE_QUERIES.SELECT_BY_ID, [identifier]) as Record<string, unknown> | undefined;
+ const siteRow = db.get(SITE_QUERIES.SELECT_BY_ID, [identifier]) as
+  | Record<string, unknown>
+  | undefined;
  const result: SiteRow | undefined = siteRow ? rowToSite(siteRow) : undefined;
  return Promise.resolve(result);
 } catch (error) {
@@ -208,10 +215,13 @@ const SITE_DEFAULTS = {
 const SITE_QUERIES = {
  DELETE_ALL: "DELETE FROM sites",
  DELETE_BY_ID: "DELETE FROM sites WHERE identifier = ?",
- INSERT: "INSERT OR IGNORE INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)",
+ INSERT:
+  "INSERT OR IGNORE INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)",
  SELECT_ALL: "SELECT identifier, name, monitoring FROM sites",
- SELECT_BY_ID: "SELECT identifier, name, monitoring FROM sites WHERE identifier = ?",
- UPSERT: "INSERT OR REPLACE INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)",
+ SELECT_BY_ID:
+  "SELECT identifier, name, monitoring FROM sites WHERE identifier = ?",
+ UPSERT:
+  "INSERT OR REPLACE INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)",
 } as const;
 ```
 

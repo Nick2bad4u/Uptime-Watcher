@@ -11,7 +11,11 @@ import {
     deleteHistoryByMonitorId,
     pruneHistoryForMonitor,
 } from "./utils/historyManipulation";
-import { findHistoryByMonitorId, getHistoryCount, getLatestHistoryEntry } from "./utils/historyQuery";
+import {
+    findHistoryByMonitorId,
+    getHistoryCount,
+    getLatestHistoryEntry,
+} from "./utils/historyQuery";
 
 /**
  * Defines the dependencies required by the {@link HistoryRepository} for managing history data persistence.
@@ -37,8 +41,10 @@ export interface HistoryRepositoryDependencies {
  */
 const HISTORY_QUERIES = {
     DELETE_BY_IDS: "DELETE FROM history WHERE id IN",
-    INSERT_ENTRY: "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)",
-    SELECT_EXCESS_ENTRIES: "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
+    INSERT_ENTRY:
+        "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)",
+    SELECT_EXCESS_ENTRIES:
+        "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
     SELECT_MONITOR_IDS: "SELECT id FROM monitors",
 } as const;
 
@@ -84,7 +90,11 @@ export class HistoryRepository {
      * await repo.addEntry("monitor-123", entryObj, "details");
      * ```
      */
-    public async addEntry(monitorId: string, entry: StatusHistory, details?: string): Promise<void> {
+    public async addEntry(
+        monitorId: string,
+        entry: StatusHistory,
+        details?: string
+    ): Promise<void> {
         return withDatabaseOperation(
             async () => {
                 return this.databaseService.executeTransaction((db) => {
@@ -108,7 +118,12 @@ export class HistoryRepository {
      * @remarks
      * Use this method only when already within a transaction context.
      */
-    public addEntryInternal(db: Database, monitorId: string, entry: StatusHistory, details?: string): void {
+    public addEntryInternal(
+        db: Database,
+        monitorId: string,
+        entry: StatusHistory,
+        details?: string
+    ): void {
         return addHistoryEntry(db, monitorId, entry, details);
     }
 
@@ -303,7 +318,9 @@ export class HistoryRepository {
      * const latest = await repo.getLatestEntry("monitor-123");
      * ```
      */
-    public async getLatestEntry(monitorId: string): Promise<StatusHistory | undefined> {
+    public async getLatestEntry(
+        monitorId: string
+    ): Promise<StatusHistory | undefined> {
         return withDatabaseOperation(
             () => {
                 const db = this.getDb();
@@ -333,12 +350,17 @@ export class HistoryRepository {
             async () => {
                 // Use executeTransaction for atomic multi-monitor operation
                 await this.databaseService.executeTransaction((db) => {
-                    const monitors = db.all(HISTORY_QUERIES.SELECT_MONITOR_IDS) as { id: number }[];
+                    const monitors = db.all(
+                        HISTORY_QUERIES.SELECT_MONITOR_IDS
+                    ) as { id: number }[];
                     for (const monitor of monitors) {
-                        const excessEntries = db.all(HISTORY_QUERIES.SELECT_EXCESS_ENTRIES, [
-                            String(monitor.id),
-                            limit,
-                        ]) as { id: number }[];
+                        const excessEntries = db.all(
+                            HISTORY_QUERIES.SELECT_EXCESS_ENTRIES,
+                            [
+                                String(monitor.id),
+                                limit,
+                            ]
+                        ) as { id: number }[];
                         if (excessEntries.length > 0) {
                             // Convert numeric IDs to ensure type safety and validate they are numbers
                             const excessIds = excessEntries
@@ -346,8 +368,13 @@ export class HistoryRepository {
                                 .filter((id) => Number.isFinite(id) && id > 0);
 
                             if (excessIds.length > 0) {
-                                const placeholders = excessIds.map(() => "?").join(",");
-                                db.run(`${HISTORY_QUERIES.DELETE_BY_IDS} (${placeholders})`, excessIds);
+                                const placeholders = excessIds
+                                    .map(() => "?")
+                                    .join(",");
+                                db.run(
+                                    `${HISTORY_QUERIES.DELETE_BY_IDS} (${placeholders})`,
+                                    excessIds
+                                );
                             }
                         }
                     }
@@ -374,7 +401,9 @@ export class HistoryRepository {
         }
 
         // Get all monitor IDs
-        const monitorRows = db.all(HISTORY_QUERIES.SELECT_MONITOR_IDS) as { id: number }[];
+        const monitorRows = db.all(HISTORY_QUERIES.SELECT_MONITOR_IDS) as {
+            id: number;
+        }[];
 
         // Prune history for each monitor
         for (const row of monitorRows) {
@@ -386,7 +415,9 @@ export class HistoryRepository {
         }
 
         if (isDev()) {
-            logger.debug(`[HistoryRepository] Pruned history for all monitors (limit: ${limit}) (internal)`);
+            logger.debug(
+                `[HistoryRepository] Pruned history for all monitors (limit: ${limit}) (internal)`
+            );
         }
     }
 
@@ -424,7 +455,11 @@ export class HistoryRepository {
      * @remarks
      * Use this method only when already within a transaction context.
      */
-    public pruneHistoryInternal(db: Database, monitorId: string, limit: number): void {
+    public pruneHistoryInternal(
+        db: Database,
+        monitorId: string,
+        limit: number
+    ): void {
         if (limit <= 0) {
             return;
         }
@@ -432,7 +467,9 @@ export class HistoryRepository {
         pruneHistoryForMonitor(db, monitorId, limit);
 
         if (isDev()) {
-            logger.debug(`[HistoryRepository] Pruned history for monitor ${monitorId} (limit: ${limit}) (internal)`);
+            logger.debug(
+                `[HistoryRepository] Pruned history for monitor ${monitorId} (limit: ${limit}) (internal)`
+            );
         }
     }
 

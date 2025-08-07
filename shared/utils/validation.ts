@@ -3,7 +3,13 @@
  * Provides consistent validation logic across frontend and backend.
  */
 
-import { isMonitorStatus, type Monitor, type MonitorType, type Site, validateMonitor } from "../types";
+import {
+    isMonitorStatus,
+    type Monitor,
+    type MonitorType,
+    type Site,
+    validateMonitor,
+} from "../types";
 
 /**
  * Gets validation errors for monitor fields based on monitor type.
@@ -15,7 +21,9 @@ import { isMonitorStatus, type Monitor, type MonitorType, type Site, validateMon
  * Validates required fields and type-specific constraints for monitors.
  * Returns descriptive error messages for any validation failures.
  */
-export function getMonitorValidationErrors(monitor: Partial<Monitor>): string[] {
+export function getMonitorValidationErrors(
+    monitor: Partial<Monitor>
+): string[] {
     const errors: string[] = [];
 
     // Validate basic required fields
@@ -37,7 +45,10 @@ export function getMonitorValidationErrors(monitor: Partial<Monitor>): string[] 
  * Supports all monitor types: HTTP, port, and ping monitors.
  */
 export function validateMonitorType(type: unknown): type is MonitorType {
-    return typeof type === "string" && (type === "http" || type === "port" || type === "ping");
+    return (
+        typeof type === "string" &&
+        (type === "http" || type === "port" || type === "ping")
+    );
 }
 
 /**
@@ -63,7 +74,10 @@ export function validateSite(site: Partial<Site>): site is Site {
         site.name.length > 0 &&
         typeof site.monitoring === "boolean" &&
         Array.isArray(site.monitors) &&
-        site.monitors.every((monitor: unknown) => isPartialMonitor(monitor) && validateMonitor(monitor))
+        site.monitors.every(
+            (monitor: unknown) =>
+                isPartialMonitor(monitor) && validateMonitor(monitor)
+        )
     );
 }
 
@@ -87,7 +101,10 @@ function isPartialMonitor(value: unknown): value is Partial<Monitor> {
  * @param errors - Array to collect validation error messages.
  * @internal
  */
-function validateBasicMonitorFields(monitor: Partial<Monitor>, errors: string[]): void {
+function validateBasicMonitorFields(
+    monitor: Partial<Monitor>,
+    errors: string[]
+): void {
     if (!monitor.id) {
         errors.push("Monitor id is required");
     }
@@ -107,18 +124,24 @@ function validateBasicMonitorFields(monitor: Partial<Monitor>, errors: string[])
     // Validate numeric fields
     if (
         monitor.checkInterval !== undefined &&
-        (typeof monitor.checkInterval !== "number" || monitor.checkInterval < 1000)
+        (typeof monitor.checkInterval !== "number" ||
+            monitor.checkInterval < 1000)
     ) {
         errors.push("Check interval must be at least 1000ms");
     }
 
-    if (monitor.timeout !== undefined && (typeof monitor.timeout !== "number" || monitor.timeout <= 0)) {
+    if (
+        monitor.timeout !== undefined &&
+        (typeof monitor.timeout !== "number" || monitor.timeout <= 0)
+    ) {
         errors.push("Timeout must be a positive number");
     }
 
     if (
         monitor.retryAttempts !== undefined &&
-        (typeof monitor.retryAttempts !== "number" || monitor.retryAttempts < 0 || monitor.retryAttempts > 10)
+        (typeof monitor.retryAttempts !== "number" ||
+            monitor.retryAttempts < 0 ||
+            monitor.retryAttempts > 10)
     ) {
         errors.push("Retry attempts must be between 0 and 10");
     }
@@ -134,7 +157,10 @@ function validateBasicMonitorFields(monitor: Partial<Monitor>, errors: string[])
  * @param errors - Array to collect validation error messages.
  * @internal
  */
-function validateHttpMonitorFields(monitor: Partial<Monitor>, errors: string[]): void {
+function validateHttpMonitorFields(
+    monitor: Partial<Monitor>,
+    errors: string[]
+): void {
     if (!monitor.url || typeof monitor.url !== "string") {
         errors.push("URL is required for HTTP monitors");
     }
@@ -151,7 +177,10 @@ function validateHttpMonitorFields(monitor: Partial<Monitor>, errors: string[]):
  * @param errors - Array to collect validation error messages.
  * @internal
  */
-function validatePingMonitorFields(monitor: Partial<Monitor>, errors: string[]): void {
+function validatePingMonitorFields(
+    monitor: Partial<Monitor>,
+    errors: string[]
+): void {
     if (!monitor.host || typeof monitor.host !== "string") {
         errors.push("Host is required for ping monitors");
     }
@@ -167,12 +196,21 @@ function validatePingMonitorFields(monitor: Partial<Monitor>, errors: string[]):
  * @param errors - Array to collect validation error messages.
  * @internal
  */
-function validatePortMonitorFields(monitor: Partial<Monitor>, errors: string[]): void {
+function validatePortMonitorFields(
+    monitor: Partial<Monitor>,
+    errors: string[]
+): void {
     if (!monitor.host || typeof monitor.host !== "string") {
         errors.push("Host is required for port monitors");
     }
-    if (typeof monitor.port !== "number" || monitor.port < 1 || monitor.port > 65_535) {
-        errors.push("Valid port number (1-65535) is required for port monitors");
+    if (
+        typeof monitor.port !== "number" ||
+        monitor.port < 1 ||
+        monitor.port > 65_535
+    ) {
+        errors.push(
+            "Valid port number (1-65535) is required for port monitors"
+        );
     }
 }
 
@@ -187,7 +225,10 @@ function validatePortMonitorFields(monitor: Partial<Monitor>, errors: string[]):
  * @param errors - Array to collect validation error messages.
  * @internal
  */
-function validateTypeSpecificFields(monitor: Partial<Monitor>, errors: string[]): void {
+function validateTypeSpecificFields(
+    monitor: Partial<Monitor>,
+    errors: string[]
+): void {
     if (!monitor.type) {
         return; // Type validation is handled separately in validateBasicMonitorFields
     }

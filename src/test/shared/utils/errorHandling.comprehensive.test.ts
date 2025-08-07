@@ -5,7 +5,10 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { ErrorHandlingBackendContext, ErrorHandlingFrontendStore } from "../../../../shared/utils/errorHandling";
+import type {
+    ErrorHandlingBackendContext,
+    ErrorHandlingFrontendStore,
+} from "../../../../shared/utils/errorHandling";
 import { withErrorHandling } from "../../../../shared/utils/errorHandling";
 
 describe("Error Handling Utilities - Comprehensive Coverage", () => {
@@ -56,7 +59,9 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             const testError = new Error("Test error");
             const mockOperation = vi.fn().mockRejectedValue(testError);
 
-            await expect(withErrorHandling(mockOperation, mockStore)).rejects.toThrow("Test error");
+            await expect(
+                withErrorHandling(mockOperation, mockStore)
+            ).rejects.toThrow("Test error");
 
             expect(mockStore.clearError).toHaveBeenCalledTimes(1);
             expect(mockStore.setLoading).toHaveBeenCalledWith(true);
@@ -83,7 +88,9 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
         it("should handle non-Error objects as error messages", async () => {
             const mockOperation = vi.fn().mockRejectedValue("String error");
 
-            await expect(withErrorHandling(mockOperation, mockStore)).rejects.toBe("String error");
+            await expect(
+                withErrorHandling(mockOperation, mockStore)
+            ).rejects.toBe("String error");
 
             expect(mockStore.setError).toHaveBeenCalledWith("String error");
         });
@@ -93,7 +100,10 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
         it("should successfully execute operation with backend context", async () => {
             const mockOperation = vi.fn().mockResolvedValue("success");
 
-            const result = await withErrorHandling(mockOperation, mockBackendContext);
+            const result = await withErrorHandling(
+                mockOperation,
+                mockBackendContext
+            );
 
             expect(result).toBe("success");
             expect(mockBackendContext.logger.error).not.toHaveBeenCalled();
@@ -103,9 +113,14 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             const testError = new Error("Backend error");
             const mockOperation = vi.fn().mockRejectedValue(testError);
 
-            await expect(withErrorHandling(mockOperation, mockBackendContext)).rejects.toThrow("Backend error");
+            await expect(
+                withErrorHandling(mockOperation, mockBackendContext)
+            ).rejects.toThrow("Backend error");
 
-            expect(mockBackendContext.logger.error).toHaveBeenCalledWith("Failed to test-operation", testError);
+            expect(mockBackendContext.logger.error).toHaveBeenCalledWith(
+                "Failed to test-operation",
+                testError
+            );
         });
 
         it("should handle backend context without operation name", async () => {
@@ -117,9 +132,14 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             const testError = new Error("Backend error");
             const mockOperation = vi.fn().mockRejectedValue(testError);
 
-            await expect(withErrorHandling(mockOperation, contextWithoutName)).rejects.toThrow("Backend error");
+            await expect(
+                withErrorHandling(mockOperation, contextWithoutName)
+            ).rejects.toThrow("Backend error");
 
-            expect(contextWithoutName.logger.error).toHaveBeenCalledWith("Async operation failed", testError);
+            expect(contextWithoutName.logger.error).toHaveBeenCalledWith(
+                "Async operation failed",
+                testError
+            );
         });
     });
 
@@ -136,7 +156,10 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
         it("should correctly identify backend context", async () => {
             const mockOperation = vi.fn().mockResolvedValue("backend");
 
-            const result = await withErrorHandling(mockOperation, mockBackendContext);
+            const result = await withErrorHandling(
+                mockOperation,
+                mockBackendContext
+            );
 
             expect(result).toBe("backend");
             expect(mockBackendContext.logger).toBeDefined();
@@ -149,7 +172,10 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             };
             const mockOperation = vi.fn().mockResolvedValue("partial");
 
-            const result = await withErrorHandling(mockOperation, partialStore as any);
+            const result = await withErrorHandling(
+                mockOperation,
+                partialStore as any
+            );
 
             expect(result).toBe("partial");
             // Should be treated as backend context since it doesn't have all store methods
@@ -166,10 +192,19 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
                 throw storeError;
             });
 
-            await expect(withErrorHandling(mockOperation, mockStore)).rejects.toThrow("Operation error");
+            await expect(
+                withErrorHandling(mockOperation, mockStore)
+            ).rejects.toThrow("Operation error");
 
-            expect(mockConsole.warn).toHaveBeenCalledWith("Store operation failed for:", "set error state", storeError);
-            expect(mockConsole.error).toHaveBeenCalledWith("Original operation error:", testError);
+            expect(mockConsole.warn).toHaveBeenCalledWith(
+                "Store operation failed for:",
+                "set error state",
+                storeError
+            );
+            expect(mockConsole.error).toHaveBeenCalledWith(
+                "Original operation error:",
+                testError
+            );
         });
 
         it("should handle store setLoading(false) throwing in finally block", async () => {
@@ -177,11 +212,13 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             const finallyError = new Error("Finally setLoading error");
 
             // Mock setLoading to succeed for true, fail for false
-            mockStore.setLoading = vi.fn().mockImplementation((loading: boolean) => {
-                if (!loading) {
-                    throw finallyError;
-                }
-            });
+            mockStore.setLoading = vi
+                .fn()
+                .mockImplementation((loading: boolean) => {
+                    if (!loading) {
+                        throw finallyError;
+                    }
+                });
 
             const result = await withErrorHandling(mockOperation, mockStore);
 
@@ -201,7 +238,9 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             };
             const mockOperation = vi.fn().mockRejectedValue(complexError);
 
-            await expect(withErrorHandling(mockOperation, mockStore)).rejects.toBe(complexError);
+            await expect(
+                withErrorHandling(mockOperation, mockStore)
+            ).rejects.toBe(complexError);
 
             expect(mockStore.setError).toHaveBeenCalledWith("[object Object]");
         });
@@ -209,7 +248,9 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
         it("should handle null and undefined errors", async () => {
             const mockOperation = vi.fn().mockRejectedValue(null);
 
-            await expect(withErrorHandling(mockOperation, mockStore)).rejects.toBe(null);
+            await expect(
+                withErrorHandling(mockOperation, mockStore)
+            ).rejects.toBe(null);
 
             expect(mockStore.setError).toHaveBeenCalledWith("null");
         });
@@ -217,7 +258,9 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
         it("should handle number and boolean errors", async () => {
             const mockOperation = vi.fn().mockRejectedValue(42);
 
-            await expect(withErrorHandling(mockOperation, mockStore)).rejects.toBe(42);
+            await expect(
+                withErrorHandling(mockOperation, mockStore)
+            ).rejects.toBe(42);
 
             expect(mockStore.setError).toHaveBeenCalledWith("42");
         });
@@ -230,9 +273,18 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             const numberOperation = vi.fn().mockResolvedValue(123);
             const objectOperation = vi.fn().mockResolvedValue({ data: "test" });
 
-            const stringResult = await withErrorHandling(stringOperation, mockStore);
-            const numberResult = await withErrorHandling(numberOperation, mockStore);
-            const objectResult = await withErrorHandling(objectOperation, mockStore);
+            const stringResult = await withErrorHandling(
+                stringOperation,
+                mockStore
+            );
+            const numberResult = await withErrorHandling(
+                numberOperation,
+                mockStore
+            );
+            const objectResult = await withErrorHandling(
+                objectOperation,
+                mockStore
+            );
 
             expect(stringResult).toBe("string result");
             expect(numberResult).toBe(123);
@@ -247,15 +299,26 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
                 vi.fn().mockResolvedValue("fourth"),
             ];
 
-            const firstResult = await withErrorHandling(operations[0]!, mockStore);
+            const firstResult = await withErrorHandling(
+                operations[0]!,
+                mockStore
+            );
             expect(firstResult).toBe("first");
 
-            const secondResult = await withErrorHandling(operations[1]!, mockStore);
+            const secondResult = await withErrorHandling(
+                operations[1]!,
+                mockStore
+            );
             expect(secondResult).toBe("second");
 
-            await expect(withErrorHandling(operations[2]!, mockStore)).rejects.toThrow("third failed");
+            await expect(
+                withErrorHandling(operations[2]!, mockStore)
+            ).rejects.toThrow("third failed");
 
-            const fourthResult = await withErrorHandling(operations[3]!, mockStore);
+            const fourthResult = await withErrorHandling(
+                operations[3]!,
+                mockStore
+            );
             expect(fourthResult).toBe("fourth");
 
             // Verify that each operation properly managed loading state

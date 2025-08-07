@@ -4,9 +4,16 @@ import { LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
 import { type Monitor, Site } from "../../types";
 import { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import { logger } from "../../utils/logger";
-import { getAllMonitorTypeConfigs, getMonitorTypeConfig, validateMonitorData } from "../monitoring/MonitorTypeRegistry";
+import {
+    getAllMonitorTypeConfigs,
+    getMonitorTypeConfig,
+    validateMonitorData,
+} from "../monitoring/MonitorTypeRegistry";
 import { AutoUpdaterService } from "../updater/AutoUpdaterService";
-import { createValidationResponse, registerStandardizedIpcHandler } from "./utils";
+import {
+    createValidationResponse,
+    registerStandardizedIpcHandler,
+} from "./utils";
 import {
     DataHandlerValidators,
     MonitoringHandlerValidators,
@@ -25,9 +32,12 @@ const ConfigPropertyValidator = {
      * @param config - The monitor configuration to process
      * @returns Object containing base properties and any unexpected properties
      */
-    extractAndValidateBaseProperties(config: ReturnType<typeof getAllMonitorTypeConfigs>[0]) {
+    extractAndValidateBaseProperties(
+        config: ReturnType<typeof getAllMonitorTypeConfigs>[0]
+    ) {
         // Extract serializable properties, excluding non-serializable ones
-        const { description, displayName, fields, type, uiConfig, version } = config;
+        const { description, displayName, fields, type, uiConfig, version } =
+            config;
 
         // Get unexpected properties by filtering out known properties
         const knownProperties = new Set([
@@ -64,12 +74,18 @@ const ConfigPropertyValidator = {
      * @param unexpectedProperties - Record of unexpected properties found
      * @param monitorType - The monitor type for logging context
      */
-    validateAndLogUnexpectedProperties(unexpectedProperties: Record<string, unknown>, monitorType: string): void {
+    validateAndLogUnexpectedProperties(
+        unexpectedProperties: Record<string, unknown>,
+        monitorType: string
+    ): void {
         if (Object.keys(unexpectedProperties).length > 0) {
-            logger.warn("[IpcService] Unexpected properties in monitor config", {
-                type: monitorType,
-                unexpectedProperties: Object.keys(unexpectedProperties),
-            });
+            logger.warn(
+                "[IpcService] Unexpected properties in monitor config",
+                {
+                    type: monitorType,
+                    unexpectedProperties: Object.keys(unexpectedProperties),
+                }
+            );
         }
     },
 };
@@ -100,7 +116,10 @@ const UiConfigSerializer = {
      * @param display - The display configuration to serialize
      * @returns Serialized display preferences or undefined
      */
-    serializeDisplayPreferences(display?: { showAdvancedMetrics?: boolean; showUrl?: boolean }) {
+    serializeDisplayPreferences(display?: {
+        showAdvancedMetrics?: boolean;
+        showUrl?: boolean;
+    }) {
         return display
             ? {
                   showAdvancedMetrics: display.showAdvancedMetrics ?? false,
@@ -139,10 +158,13 @@ const UiConfigSerializer = {
     }) {
         return uiConfig
             ? {
-                  detailFormats: this.serializeDetailFormats(uiConfig.detailFormats),
+                  detailFormats: this.serializeDetailFormats(
+                      uiConfig.detailFormats
+                  ),
                   display: this.serializeDisplayPreferences(uiConfig.display),
                   helpTexts: this.serializeHelpTexts(uiConfig.helpTexts),
-                  supportsAdvancedAnalytics: uiConfig.supportsAdvancedAnalytics ?? false,
+                  supportsAdvancedAnalytics:
+                      uiConfig.supportsAdvancedAnalytics ?? false,
                   supportsResponseTime: uiConfig.supportsResponseTime ?? false,
               }
             : undefined;
@@ -198,7 +220,10 @@ export class IpcService {
      *
      * @public
      */
-    constructor(uptimeOrchestrator: UptimeOrchestrator, autoUpdaterService: AutoUpdaterService) {
+    constructor(
+        uptimeOrchestrator: UptimeOrchestrator,
+        autoUpdaterService: AutoUpdaterService
+    ) {
         this.uptimeOrchestrator = uptimeOrchestrator;
         this.autoUpdaterService = autoUpdaterService;
     }
@@ -259,16 +284,23 @@ export class IpcService {
      *
      * @internal
      */
-    private serializeMonitorTypeConfig(config: ReturnType<typeof getAllMonitorTypeConfigs>[0]) {
+    private serializeMonitorTypeConfig(
+        config: ReturnType<typeof getAllMonitorTypeConfigs>[0]
+    ) {
         // Extract and validate properties using utility
         const { baseProperties, unexpectedProperties } =
             ConfigPropertyValidator.extractAndValidateBaseProperties(config);
 
         // Validate and log any unexpected properties
-        ConfigPropertyValidator.validateAndLogUnexpectedProperties(unexpectedProperties, baseProperties.type);
+        ConfigPropertyValidator.validateAndLogUnexpectedProperties(
+            unexpectedProperties,
+            baseProperties.type
+        );
 
         // Serialize UI configuration using utility
-        const serializedUiConfig = UiConfigSerializer.serializeUiConfig(baseProperties.uiConfig);
+        const serializedUiConfig = UiConfigSerializer.serializeUiConfig(
+            baseProperties.uiConfig
+        );
 
         return {
             description: baseProperties.description,
@@ -302,7 +334,8 @@ export class IpcService {
         // Import data handler with validation
         registerStandardizedIpcHandler(
             "import-data",
-            async (...args: unknown[]) => this.uptimeOrchestrator.importData(args[0] as string),
+            async (...args: unknown[]) =>
+                this.uptimeOrchestrator.importData(args[0] as string),
             DataHandlerValidators.importData,
             this.registeredIpcHandlers
         );
@@ -310,7 +343,8 @@ export class IpcService {
         // Update history limit handler with validation
         registerStandardizedIpcHandler(
             "update-history-limit",
-            async (...args: unknown[]) => this.uptimeOrchestrator.setHistoryLimit(args[0] as number),
+            async (...args: unknown[]) =>
+                this.uptimeOrchestrator.setHistoryLimit(args[0] as number),
             DataHandlerValidators.updateHistoryLimit,
             this.registeredIpcHandlers
         );
@@ -379,7 +413,10 @@ export class IpcService {
             async (...args: unknown[]) => {
                 const identifier = args[0] as string;
                 const monitorId = args[1] as string | undefined;
-                return this.uptimeOrchestrator.startMonitoringForSite(identifier, monitorId);
+                return this.uptimeOrchestrator.startMonitoringForSite(
+                    identifier,
+                    monitorId
+                );
             },
             MonitoringHandlerValidators.startMonitoringForSite,
             this.registeredIpcHandlers
@@ -391,7 +428,10 @@ export class IpcService {
             async (...args: unknown[]) => {
                 const identifier = args[0] as string;
                 const monitorId = args[1] as string | undefined;
-                return this.uptimeOrchestrator.stopMonitoringForSite(identifier, monitorId);
+                return this.uptimeOrchestrator.stopMonitoringForSite(
+                    identifier,
+                    monitorId
+                );
             },
             MonitoringHandlerValidators.stopMonitoringForSite,
             this.registeredIpcHandlers
@@ -403,7 +443,10 @@ export class IpcService {
             async (...args: unknown[]) => {
                 const identifier = args[0] as string;
                 const monitorId = args[1] as string;
-                return this.uptimeOrchestrator.checkSiteManually(identifier, monitorId);
+                return this.uptimeOrchestrator.checkSiteManually(
+                    identifier,
+                    monitorId
+                );
             },
             MonitoringHandlerValidators.checkSiteNow,
             this.registeredIpcHandlers
@@ -435,7 +478,9 @@ export class IpcService {
             () => {
                 // Get all monitor type configs and serialize them safely for IPC
                 const configs = getAllMonitorTypeConfigs();
-                return configs.map((config) => this.serializeMonitorTypeConfig(config));
+                return configs.map((config) =>
+                    this.serializeMonitorTypeConfig(config)
+                );
             },
             MonitorTypeHandlerValidators.getMonitorTypes,
             this.registeredIpcHandlers
@@ -450,7 +495,10 @@ export class IpcService {
 
                 const config = getMonitorTypeConfig(monitorType.trim());
                 if (!config) {
-                    logger.warn(LOG_TEMPLATES.warnings.MONITOR_TYPE_UNKNOWN_DETAIL, { monitorType });
+                    logger.warn(
+                        LOG_TEMPLATES.warnings.MONITOR_TYPE_UNKNOWN_DETAIL,
+                        { monitorType }
+                    );
                     return details; // Return original details if type is unknown
                 }
 
@@ -473,7 +521,10 @@ export class IpcService {
 
                 const config = getMonitorTypeConfig(monitorType.trim());
                 if (!config) {
-                    logger.warn(LOG_TEMPLATES.warnings.MONITOR_TYPE_UNKNOWN_TITLE, { monitorType });
+                    logger.warn(
+                        LOG_TEMPLATES.warnings.MONITOR_TYPE_UNKNOWN_TITLE,
+                        { monitorType }
+                    );
                     return ""; // Return empty string if type is unknown
                 }
 
@@ -498,7 +549,12 @@ export class IpcService {
                 const result = validateMonitorData(monitorType.trim(), data);
 
                 // Return the validation result directly - map success to success parameter
-                return createValidationResponse(result.success, result.errors, result.warnings, result.metadata);
+                return createValidationResponse(
+                    result.success,
+                    result.errors,
+                    result.warnings,
+                    result.metadata
+                );
             },
             MonitorTypeHandlerValidators.validateMonitorData,
             this.registeredIpcHandlers
@@ -519,7 +575,8 @@ export class IpcService {
         // Add site handler with validation
         registerStandardizedIpcHandler(
             "add-site",
-            async (...args: unknown[]) => this.uptimeOrchestrator.addSite(args[0] as Site),
+            async (...args: unknown[]) =>
+                this.uptimeOrchestrator.addSite(args[0] as Site),
             SiteHandlerValidators.addSite,
             this.registeredIpcHandlers
         );
@@ -527,7 +584,8 @@ export class IpcService {
         // Remove site handler with validation
         registerStandardizedIpcHandler(
             "remove-site",
-            async (...args: unknown[]) => this.uptimeOrchestrator.removeSite(args[0] as string),
+            async (...args: unknown[]) =>
+                this.uptimeOrchestrator.removeSite(args[0] as string),
             SiteHandlerValidators.removeSite,
             this.registeredIpcHandlers
         );
@@ -544,7 +602,10 @@ export class IpcService {
         registerStandardizedIpcHandler(
             "update-site",
             async (...args: unknown[]) =>
-                this.uptimeOrchestrator.updateSite(args[0] as string, args[1] as Partial<Site>),
+                this.uptimeOrchestrator.updateSite(
+                    args[0] as string,
+                    args[1] as Partial<Site>
+                ),
             SiteHandlerValidators.updateSite,
             this.registeredIpcHandlers
         );
@@ -552,7 +613,11 @@ export class IpcService {
         // Remove monitor handler with validation
         registerStandardizedIpcHandler(
             "remove-monitor",
-            async (...args: unknown[]) => this.uptimeOrchestrator.removeMonitor(args[0] as string, args[1] as string),
+            async (...args: unknown[]) =>
+                this.uptimeOrchestrator.removeMonitor(
+                    args[0] as string,
+                    args[1] as string
+                ),
             SiteHandlerValidators.removeMonitor,
             this.registeredIpcHandlers
         );
@@ -578,11 +643,14 @@ export class IpcService {
                 const sites = await this.uptimeOrchestrator.getSites();
 
                 // Emit proper typed sync event
-                await this.uptimeOrchestrator.emitTyped("sites:state-synchronized", {
-                    action: "bulk-sync",
-                    source: "database",
-                    timestamp: Date.now(),
-                });
+                await this.uptimeOrchestrator.emitTyped(
+                    "sites:state-synchronized",
+                    {
+                        action: "bulk-sync",
+                        source: "database",
+                        timestamp: Date.now(),
+                    }
+                );
 
                 // Send state sync event to all renderer processes
                 for (const window of BrowserWindow.getAllWindows()) {
@@ -594,7 +662,9 @@ export class IpcService {
                     });
                 }
 
-                logger.debug("[IpcService] Full sync completed", { siteCount: sites.length });
+                logger.debug("[IpcService] Full sync completed", {
+                    siteCount: sites.length,
+                });
                 return { siteCount: sites.length, success: true };
             },
             StateSyncHandlerValidators.requestFullSync,

@@ -177,12 +177,16 @@ export class SiteValidator {
 
         // Validate each monitor
         for (const [index, monitor] of site.monitors.entries()) {
-            const monitorValidation = this.monitorValidator.validateMonitorConfiguration(monitor);
+            const monitorValidation =
+                this.monitorValidator.validateMonitorConfiguration(monitor);
             if (!monitorValidation.success) {
                 // Include monitor identifier in error message if available for easier debugging
                 const monitorId = monitor.id ? ` (${monitor.id})` : "";
                 errors.push(
-                    ...monitorValidation.errors.map((error: string) => `Monitor ${index + 1}${monitorId}: ${error}`)
+                    ...monitorValidation.errors.map(
+                        (error: string) =>
+                            `Monitor ${index + 1}${monitorId}: ${error}`
+                    )
                 );
             }
         }

@@ -35,9 +35,15 @@ describe("Monitor Configuration Types", () => {
                 },
             };
 
-            expect(config.alerting?.alertTypes).toEqual(["email", "slack", "webhook"]);
+            expect(config.alerting?.alertTypes).toEqual([
+                "email",
+                "slack",
+                "webhook",
+            ]);
             expect(config.alerting?.failureThreshold).toBe(3);
-            expect(config.alerting?.messageTemplate).toBe("Site {name} is down: {error}");
+            expect(config.alerting?.messageTemplate).toBe(
+                "Site {name} is down: {error}"
+            );
             expect(config.alerting?.recoveryThreshold).toBe(2);
         });
 
@@ -65,8 +71,12 @@ describe("Monitor Configuration Types", () => {
                 },
             };
 
-            expect(config.performanceThresholds?.responseTimeCritical).toBe(5000);
-            expect(config.performanceThresholds?.responseTimeWarning).toBe(2000);
+            expect(config.performanceThresholds?.responseTimeCritical).toBe(
+                5000
+            );
+            expect(config.performanceThresholds?.responseTimeWarning).toBe(
+                2000
+            );
             expect(config.performanceThresholds?.uptimeCritical).toBe(95.0);
             expect(config.performanceThresholds?.uptimeWarning).toBe(98.0);
         });
@@ -104,8 +114,13 @@ describe("Monitor Configuration Types", () => {
             ]);
             expect(config.scheduling?.activeHours?.start).toBe("08:00");
             expect(config.scheduling?.activeHours?.end).toBe("18:00");
-            expect(config.scheduling?.activeTimeZones).toEqual(["America/New_York", "Europe/London"]);
-            expect(config.scheduling?.maintenanceWindows?.[0].start).toBe("2024-01-01T02:00:00Z");
+            expect(config.scheduling?.activeTimeZones).toEqual([
+                "America/New_York",
+                "Europe/London",
+            ]);
+            expect(config.scheduling?.maintenanceWindows?.[0].start).toBe(
+                "2024-01-01T02:00:00Z"
+            );
         });
     });
 
@@ -251,9 +266,18 @@ describe("Monitor Configuration Types", () => {
                 },
             };
 
-            expect(config.expectedContent?.contains).toEqual(["Welcome", "Success"]);
-            expect(config.expectedContent?.notContains).toEqual(["Error", "Failed"]);
-            expect(config.expectedContent?.patterns).toEqual(["^.*Welcome.*$", "Status: OK"]);
+            expect(config.expectedContent?.contains).toEqual([
+                "Welcome",
+                "Success",
+            ]);
+            expect(config.expectedContent?.notContains).toEqual([
+                "Error",
+                "Failed",
+            ]);
+            expect(config.expectedContent?.patterns).toEqual([
+                "^.*Welcome.*$",
+                "Status: OK",
+            ]);
         });
 
         it("should support custom headers and request body", () => {
@@ -369,14 +393,17 @@ describe("Monitor Configuration Types", () => {
                 ipVersion: "ipv4",
                 protocol: {
                     useTls: true,
-                    sendData: "GET / HTTP/1.1\r\nHost: secure.example.com\r\n\r\n",
+                    sendData:
+                        "GET / HTTP/1.1\r\nHost: secure.example.com\r\n\r\n",
                     expectedResponse: "HTTP/1.1 200",
                 },
             };
 
             expect(config.ipVersion).toBe("ipv4");
             expect(config.protocol?.useTls).toBe(true);
-            expect(config.protocol?.sendData).toBe("GET / HTTP/1.1\r\nHost: secure.example.com\r\n\r\n");
+            expect(config.protocol?.sendData).toBe(
+                "GET / HTTP/1.1\r\nHost: secure.example.com\r\n\r\n"
+            );
             expect(config.protocol?.expectedResponse).toBe("HTTP/1.1 200");
         });
     });
@@ -666,7 +693,9 @@ describe("Monitor Configuration Types", () => {
                         break;
                     default:
                         // This should never happen with proper typing
-                        fail(`Unexpected monitor type: ${(config as any).type}`);
+                        fail(
+                            `Unexpected monitor type: ${(config as any).type}`
+                        );
                 }
             });
         });

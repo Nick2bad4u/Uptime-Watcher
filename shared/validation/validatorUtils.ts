@@ -65,7 +65,10 @@ export function isNonEmptyString(value: unknown): value is string {
  *
  * @public
  */
-export function isValidFQDN(value: unknown, options?: Parameters<typeof validator.isFQDN>[1]): value is string {
+export function isValidFQDN(
+    value: unknown,
+    options?: Parameters<typeof validator.isFQDN>[1]
+): value is string {
     return typeof value === "string" && validator.isFQDN(value, options);
 }
 
@@ -133,7 +136,10 @@ export function isValidIdentifierArray(value: unknown): value is string[] {
  *
  * @public
  */
-export function isValidInteger(value: unknown, options?: Parameters<typeof validator.isInt>[1]): value is string {
+export function isValidInteger(
+    value: unknown,
+    options?: Parameters<typeof validator.isInt>[1]
+): value is string {
     return typeof value === "string" && validator.isInt(value, options);
 }
 
@@ -152,7 +158,10 @@ export function isValidInteger(value: unknown, options?: Parameters<typeof valid
  *
  * @public
  */
-export function isValidNumeric(value: unknown, options?: Parameters<typeof validator.isFloat>[1]): value is string {
+export function isValidNumeric(
+    value: unknown,
+    options?: Parameters<typeof validator.isFloat>[1]
+): value is string {
     return typeof value === "string" && validator.isFloat(value, options);
 }
 
@@ -171,7 +180,10 @@ export function isValidNumeric(value: unknown, options?: Parameters<typeof valid
  *
  * @public
  */
-export function isValidUrl(value: unknown, options?: Parameters<typeof validator.isURL>[1]): value is string {
+export function isValidUrl(
+    value: unknown,
+    options?: Parameters<typeof validator.isURL>[1]
+): value is string {
     if (typeof value !== "string") {
         return false;
     }
@@ -211,7 +223,12 @@ export function isValidUrl(value: unknown, options?: Parameters<typeof validator
  *
  * @public
  */
-export function safeInteger(value: unknown, defaultValue: number, min?: number, max?: number): number {
+export function safeInteger(
+    value: unknown,
+    defaultValue: number,
+    min?: number,
+    max?: number
+): number {
     const str = String(value);
 
     if (!isValidInteger(str)) {

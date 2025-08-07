@@ -107,7 +107,10 @@ describe("main.ts - Missing Branch Coverage", () => {
     describe("Command Line Argument Processing", () => {
         it("should handle --debug flag", async () => {
             process.argv = ["node", "main.js", "--debug"];
-            Object.defineProperty(process.versions, "electron", { value: "1.0.0", configurable: true });
+            Object.defineProperty(process.versions, "electron", {
+                value: "1.0.0",
+                configurable: true,
+            });
             mockApp.isPackaged = true; // Simulate production environment
             mockIsDev.mockReturnValue(false);
 
@@ -120,7 +123,10 @@ describe("main.ts - Missing Branch Coverage", () => {
 
         it("should handle --log-debug flag", async () => {
             process.argv = ["node", "main.js", "--log-debug"];
-            Object.defineProperty(process.versions, "electron", { value: "1.0.0", configurable: true });
+            Object.defineProperty(process.versions, "electron", {
+                value: "1.0.0",
+                configurable: true,
+            });
             mockApp.isPackaged = true;
             mockIsDev.mockReturnValue(false);
 
@@ -133,7 +139,10 @@ describe("main.ts - Missing Branch Coverage", () => {
 
         it("should handle --log-production flag", async () => {
             process.argv = ["node", "main.js", "--log-production"];
-            Object.defineProperty(process.versions, "electron", { value: "1.0.0", configurable: true });
+            Object.defineProperty(process.versions, "electron", {
+                value: "1.0.0",
+                configurable: true,
+            });
             mockApp.isPackaged = true;
             mockIsDev.mockReturnValue(false);
 
@@ -146,7 +155,10 @@ describe("main.ts - Missing Branch Coverage", () => {
 
         it("should handle --log-info flag", async () => {
             process.argv = ["node", "main.js", "--log-info"];
-            Object.defineProperty(process.versions, "electron", { value: "1.0.0", configurable: true });
+            Object.defineProperty(process.versions, "electron", {
+                value: "1.0.0",
+                configurable: true,
+            });
             mockApp.isPackaged = true;
             mockIsDev.mockReturnValue(false);
 
@@ -158,8 +170,16 @@ describe("main.ts - Missing Branch Coverage", () => {
         });
 
         it("should handle unknown flags gracefully", async () => {
-            process.argv = ["node", "main.js", "--unknown-flag", "--another-unknown"];
-            Object.defineProperty(process.versions, "electron", { value: "1.0.0", configurable: true });
+            process.argv = [
+                "node",
+                "main.js",
+                "--unknown-flag",
+                "--another-unknown",
+            ];
+            Object.defineProperty(process.versions, "electron", {
+                value: "1.0.0",
+                configurable: true,
+            });
             mockApp.isPackaged = false;
             mockIsDev.mockReturnValue(true);
 
@@ -174,7 +194,10 @@ describe("main.ts - Missing Branch Coverage", () => {
     describe("Development Extension Loading", () => {
         it("should handle extension loading in development mode", async () => {
             process.argv = ["node", "main.js"];
-            Object.defineProperty(process.versions, "electron", { value: "1.0.0", configurable: true });
+            Object.defineProperty(process.versions, "electron", {
+                value: "1.0.0",
+                configurable: true,
+            });
             mockApp.isPackaged = false;
             mockIsDev.mockReturnValue(true);
 
@@ -186,10 +209,15 @@ describe("main.ts - Missing Branch Coverage", () => {
 
         it("should handle extension loading failure gracefully", async () => {
             process.argv = ["node", "main.js"];
-            Object.defineProperty(process.versions, "electron", { value: "1.0.0", configurable: true });
+            Object.defineProperty(process.versions, "electron", {
+                value: "1.0.0",
+                configurable: true,
+            });
             mockApp.isPackaged = false;
             mockIsDev.mockReturnValue(true);
-            mockInstallExtension.mockRejectedValue(new Error("Extension loading failed"));
+            mockInstallExtension.mockRejectedValue(
+                new Error("Extension loading failed")
+            );
 
             // Import the module to trigger the configuration logic
             await import("../main");
@@ -201,7 +229,10 @@ describe("main.ts - Missing Branch Coverage", () => {
     describe("Environment Detection Edge Cases", () => {
         it("should handle production environment correctly", async () => {
             process.argv = ["node", "main.js"];
-            Object.defineProperty(process.versions, "electron", { value: "1.0.0", configurable: true });
+            Object.defineProperty(process.versions, "electron", {
+                value: "1.0.0",
+                configurable: true,
+            });
             mockApp.isPackaged = true;
             mockIsDev.mockReturnValue(false);
 
@@ -215,7 +246,10 @@ describe("main.ts - Missing Branch Coverage", () => {
     describe("Application Lifecycle", () => {
         it("should initialize logger", async () => {
             process.argv = ["node", "main.js"];
-            Object.defineProperty(process.versions, "electron", { value: "1.0.0", configurable: true });
+            Object.defineProperty(process.versions, "electron", {
+                value: "1.0.0",
+                configurable: true,
+            });
             mockApp.isPackaged = false;
             mockIsDev.mockReturnValue(true);
 
@@ -227,7 +261,10 @@ describe("main.ts - Missing Branch Coverage", () => {
 
         it("should handle app ready event", async () => {
             process.argv = ["node", "main.js"];
-            Object.defineProperty(process.versions, "electron", { value: "1.0.0", configurable: true });
+            Object.defineProperty(process.versions, "electron", {
+                value: "1.0.0",
+                configurable: true,
+            });
             mockApp.isPackaged = false;
             mockIsDev.mockReturnValue(true);
 

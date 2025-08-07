@@ -24,13 +24,26 @@ vi.mock("../../../theme/components", () => ({
             {children}
         </div>
     )),
-    ThemedButton: vi.fn(({ children, onClick, variant, size, className, ...props }) => (
-        <button onClick={onClick} data-variant={variant} data-size={size} className={className} {...props}>
-            {children}
-        </button>
-    )),
+    ThemedButton: vi.fn(
+        ({ children, onClick, variant, size, className, ...props }) => (
+            <button
+                onClick={onClick}
+                data-variant={variant}
+                data-size={size}
+                className={className}
+                {...props}
+            >
+                {children}
+            </button>
+        )
+    ),
     ThemedSelect: vi.fn(({ children, onChange, value, ...props }) => (
-        <select onChange={onChange} value={value} data-testid="monitor-select" {...props}>
+        <select
+            onChange={onChange}
+            value={value}
+            data-testid="monitor-select"
+            {...props}
+        >
             {children}
         </select>
     )),
@@ -42,18 +55,36 @@ vi.mock("../../../theme/components", () => ({
 }));
 
 // Mock the SiteMonitoringButton
-vi.mock("../../../components/common/SiteMonitoringButton/SiteMonitoringButton", () => ({
-    SiteMonitoringButton: vi.fn(({ allMonitorsRunning, isLoading, onStartSiteMonitoring, onStopSiteMonitoring }) => (
-        <div data-testid="site-monitoring-button">
-            <button data-testid="start-site-monitoring" onClick={onStartSiteMonitoring} disabled={isLoading}>
-                Start Site
-            </button>
-            <button data-testid="stop-site-monitoring" onClick={onStopSiteMonitoring} disabled={isLoading}>
-                Stop Site
-            </button>
-        </div>
-    )),
-}));
+vi.mock(
+    "../../../components/common/SiteMonitoringButton/SiteMonitoringButton",
+    () => ({
+        SiteMonitoringButton: vi.fn(
+            ({
+                allMonitorsRunning,
+                isLoading,
+                onStartSiteMonitoring,
+                onStopSiteMonitoring,
+            }) => (
+                <div data-testid="site-monitoring-button">
+                    <button
+                        data-testid="start-site-monitoring"
+                        onClick={onStartSiteMonitoring}
+                        disabled={isLoading}
+                    >
+                        Start Site
+                    </button>
+                    <button
+                        data-testid="stop-site-monitoring"
+                        onClick={onStopSiteMonitoring}
+                        disabled={isLoading}
+                    >
+                        Stop Site
+                    </button>
+                </div>
+            )
+        ),
+    })
+);
 
 const mockSite = {
     identifier: "test-site-1",
@@ -193,7 +224,9 @@ describe("SiteDetailsNavigation Component", () => {
 
             fireEvent.click(screen.getByText(/Site Overview/));
 
-            expect(setActiveSiteDetailsTab).toHaveBeenCalledWith("site-overview");
+            expect(setActiveSiteDetailsTab).toHaveBeenCalledWith(
+                "site-overview"
+            );
         });
 
         it("should call setActiveSiteDetailsTab when monitor overview clicked", () => {
@@ -204,7 +237,9 @@ describe("SiteDetailsNavigation Component", () => {
 
             fireEvent.click(screen.getByText(/Monitor Overview/));
 
-            expect(setActiveSiteDetailsTab).toHaveBeenCalledWith("monitor-overview");
+            expect(setActiveSiteDetailsTab).toHaveBeenCalledWith(
+                "monitor-overview"
+            );
         });
 
         it("should call setActiveSiteDetailsTab when settings clicked", () => {
@@ -237,7 +272,9 @@ describe("SiteDetailsNavigation Component", () => {
 
             fireEvent.click(screen.getByText(/HTTP Analytics/));
 
-            expect(setActiveSiteDetailsTab).toHaveBeenCalledWith("monitor-1-analytics");
+            expect(setActiveSiteDetailsTab).toHaveBeenCalledWith(
+                "monitor-1-analytics"
+            );
         });
     });
 
@@ -248,7 +285,10 @@ describe("SiteDetailsNavigation Component", () => {
             });
 
             const siteOverviewButton = screen.getByText(/Site Overview/);
-            expect(siteOverviewButton).toHaveAttribute("data-variant", "primary");
+            expect(siteOverviewButton).toHaveAttribute(
+                "data-variant",
+                "primary"
+            );
         });
 
         it("should highlight settings tab when active", () => {
@@ -283,7 +323,9 @@ describe("SiteDetailsNavigation Component", () => {
         it("should render site monitoring button", () => {
             renderSiteDetailsNavigation();
 
-            expect(screen.getByTestId("site-monitoring-button")).toBeInTheDocument();
+            expect(
+                screen.getByTestId("site-monitoring-button")
+            ).toBeInTheDocument();
         });
 
         it("should show stop button when monitoring", () => {
@@ -291,7 +333,9 @@ describe("SiteDetailsNavigation Component", () => {
                 isMonitoring: true,
             });
 
-            expect(screen.getByLabelText(/Stop Monitoring/)).toBeInTheDocument();
+            expect(
+                screen.getByLabelText(/Stop Monitoring/)
+            ).toBeInTheDocument();
         });
 
         it("should show start button when not monitoring", () => {
@@ -299,7 +343,9 @@ describe("SiteDetailsNavigation Component", () => {
                 isMonitoring: false,
             });
 
-            expect(screen.getByLabelText(/Start Monitoring/)).toBeInTheDocument();
+            expect(
+                screen.getByLabelText(/Start Monitoring/)
+            ).toBeInTheDocument();
         });
 
         it("should handle start monitoring click", () => {
@@ -393,18 +439,25 @@ describe("SiteDetailsNavigation Component", () => {
         it("should calculate all monitors running correctly", () => {
             const siteWithAllMonitorsRunning = {
                 ...mockSite,
-                monitors: mockSite.monitors.map((m) => ({ ...m, monitoring: true })),
+                monitors: mockSite.monitors.map((m) => ({
+                    ...m,
+                    monitoring: true,
+                })),
             };
 
             renderSiteDetailsNavigation({
                 currentSite: siteWithAllMonitorsRunning,
             });
 
-            expect(screen.getByTestId("site-monitoring-button")).toBeInTheDocument();
+            expect(
+                screen.getByTestId("site-monitoring-button")
+            ).toBeInTheDocument();
         });
 
         it("should handle site monitoring start", () => {
-            const handleStartSiteMonitoring = vi.fn().mockResolvedValue(undefined);
+            const handleStartSiteMonitoring = vi
+                .fn()
+                .mockResolvedValue(undefined);
             renderSiteDetailsNavigation({
                 handleStartSiteMonitoring,
             });
@@ -415,7 +468,9 @@ describe("SiteDetailsNavigation Component", () => {
         });
 
         it("should handle site monitoring stop", () => {
-            const handleStopSiteMonitoring = vi.fn().mockResolvedValue(undefined);
+            const handleStopSiteMonitoring = vi
+                .fn()
+                .mockResolvedValue(undefined);
             renderSiteDetailsNavigation({
                 handleStopSiteMonitoring,
             });

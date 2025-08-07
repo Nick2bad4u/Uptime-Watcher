@@ -46,7 +46,9 @@ describe("Theme Components - Basic Functionality", () => {
     describe("ThemedButton", () => {
         it("should render with text", () => {
             render(<ThemedButton>Click Me</ThemedButton>);
-            expect(screen.getByRole("button", { name: "Click Me" })).toBeInTheDocument();
+            expect(
+                screen.getByRole("button", { name: "Click Me" })
+            ).toBeInTheDocument();
         });
 
         it("should handle click events", () => {
@@ -64,7 +66,9 @@ describe("Theme Components - Basic Functionality", () => {
 
         it("should handle change events", () => {
             render(<ThemedInput onChange={mockOnChange} />);
-            fireEvent.change(screen.getByRole("textbox"), { target: { value: "test" } });
+            fireEvent.change(screen.getByRole("textbox"), {
+                target: { value: "test" },
+            });
             expect(mockOnChange).toHaveBeenCalled();
         });
     });
@@ -128,7 +132,9 @@ describe("Theme Components - Basic Functionality", () => {
     describe("StatusIndicator", () => {
         it("should render status indicator", () => {
             const { container } = render(<StatusIndicator status="up" />);
-            expect(container.querySelector(".themed-status-indicator")).toBeInTheDocument();
+            expect(
+                container.querySelector(".themed-status-indicator")
+            ).toBeInTheDocument();
         });
 
         it("should show text when enabled", () => {

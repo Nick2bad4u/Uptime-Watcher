@@ -113,7 +113,10 @@ export class DatabaseService {
                 this.db = undefined;
                 logger.info(LOG_TEMPLATES.services.DATABASE_CONNECTION_CLOSED);
             } catch (error) {
-                logger.error(LOG_TEMPLATES.errors.DATABASE_SCHEMA_FAILED, error);
+                logger.error(
+                    LOG_TEMPLATES.errors.DATABASE_SCHEMA_FAILED,
+                    error
+                );
                 throw error;
             }
         }
@@ -146,7 +149,9 @@ export class DatabaseService {
      * });
      * ```
      */
-    public async executeTransaction<T>(operation: (db: Database) => Promise<T>): Promise<T> {
+    public async executeTransaction<T>(
+        operation: (db: Database) => Promise<T>
+    ): Promise<T> {
         const db = this.getDatabase();
 
         try {
@@ -158,7 +163,10 @@ export class DatabaseService {
             try {
                 db.run(DATABASE_SERVICE_QUERIES.ROLLBACK);
             } catch (rollbackError) {
-                logger.error("[DatabaseService] Failed to rollback transaction", rollbackError);
+                logger.error(
+                    "[DatabaseService] Failed to rollback transaction",
+                    rollbackError
+                );
             }
             throw error;
         }
@@ -178,7 +186,9 @@ export class DatabaseService {
      */
     public getDatabase(): Database {
         if (!this.db) {
-            throw new Error("Database not initialized. Call initialize() first.");
+            throw new Error(
+                "Database not initialized. Call initialize() first."
+            );
         }
         return this.db;
     }
@@ -215,7 +225,9 @@ export class DatabaseService {
 
         try {
             const dbPath = path.join(app.getPath("userData"), DB_FILE_NAME);
-            logger.info(`[DatabaseService] Initializing SQLite DB at: ${dbPath}`);
+            logger.info(
+                `[DatabaseService] Initializing SQLite DB at: ${dbPath}`
+            );
 
             this.db = new Database(dbPath);
 

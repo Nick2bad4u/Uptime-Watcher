@@ -176,8 +176,12 @@ describe("App Component - Comprehensive Coverage", () => {
         defaultSettingsStore.getState.mockReturnValue(defaultSettingsStore);
 
         // Mock store static functions
-        (mockUseSitesStore as any).getState = vi.fn().mockReturnValue(defaultSitesStore);
-        (mockUseSettingsStore as any).getState = vi.fn().mockReturnValue(defaultSettingsStore);
+        (mockUseSitesStore as any).getState = vi
+            .fn()
+            .mockReturnValue(defaultSitesStore);
+        (mockUseSettingsStore as any).getState = vi
+            .fn()
+            .mockReturnValue(defaultSettingsStore);
     });
 
     describe("Basic Rendering", () => {
@@ -232,7 +236,9 @@ describe("App Component - Comprehensive Coverage", () => {
             // Wait for loading overlay to appear (after 100ms delay)
             await waitFor(
                 () => {
-                    expect(screen.getByLabelText("Loading application")).toBeInTheDocument();
+                    expect(
+                        screen.getByLabelText("Loading application")
+                    ).toBeInTheDocument();
                 },
                 { timeout: 200 }
             );
@@ -253,7 +259,9 @@ describe("App Component - Comprehensive Coverage", () => {
 
             // Wait for loading to appear
             await waitFor(() => {
-                expect(screen.getByLabelText("Loading application")).toBeInTheDocument();
+                expect(
+                    screen.getByLabelText("Loading application")
+                ).toBeInTheDocument();
             });
 
             // Change to loading false
@@ -266,7 +274,9 @@ describe("App Component - Comprehensive Coverage", () => {
 
             // Loading should disappear after the timeout
             await waitFor(() => {
-                expect(screen.queryByLabelText("Loading application")).not.toBeInTheDocument();
+                expect(
+                    screen.queryByLabelText("Loading application")
+                ).not.toBeInTheDocument();
             });
         });
 
@@ -288,7 +298,9 @@ describe("App Component - Comprehensive Coverage", () => {
             });
 
             // Should not show loading overlay
-            expect(screen.queryByLabelText("Loading application")).not.toBeInTheDocument();
+            expect(
+                screen.queryByLabelText("Loading application")
+            ).not.toBeInTheDocument();
         });
     });
 
@@ -343,7 +355,9 @@ describe("App Component - Comprehensive Coverage", () => {
 
             render(<App />);
 
-            expect(screen.getByText("A new update is available. Downloading...")).toBeInTheDocument();
+            expect(
+                screen.getByText("A new update is available. Downloading...")
+            ).toBeInTheDocument();
             expect(screen.getByText("⬇️")).toBeInTheDocument();
         });
 
@@ -355,7 +369,9 @@ describe("App Component - Comprehensive Coverage", () => {
 
             render(<App />);
 
-            expect(screen.getByText("Update is downloading...")).toBeInTheDocument();
+            expect(
+                screen.getByText("Update is downloading...")
+            ).toBeInTheDocument();
             expect(screen.getByText("⏬")).toBeInTheDocument();
         });
 
@@ -367,7 +383,9 @@ describe("App Component - Comprehensive Coverage", () => {
 
             render(<App />);
 
-            expect(screen.getByText("Update downloaded! Restart to apply.")).toBeInTheDocument();
+            expect(
+                screen.getByText("Update downloaded! Restart to apply.")
+            ).toBeInTheDocument();
             expect(screen.getByText("✅")).toBeInTheDocument();
             expect(screen.getByText("Restart Now")).toBeInTheDocument();
         });
@@ -381,7 +399,9 @@ describe("App Component - Comprehensive Coverage", () => {
 
             render(<App />);
 
-            expect(screen.getByText("Custom error message")).toBeInTheDocument();
+            expect(
+                screen.getByText("Custom error message")
+            ).toBeInTheDocument();
             expect(screen.getByText("Dismiss")).toBeInTheDocument();
         });
 
@@ -454,7 +474,9 @@ describe("App Component - Comprehensive Coverage", () => {
 
             render(<App />);
 
-            expect(screen.queryByTestId("settings-modal")).not.toBeInTheDocument();
+            expect(
+                screen.queryByTestId("settings-modal")
+            ).not.toBeInTheDocument();
         });
 
         it("should close settings modal when close handler is called", async () => {
@@ -480,13 +502,21 @@ describe("App Component - Comprehensive Coverage", () => {
             });
 
             // Mock useSelectedSite to return a site
-            const mockUseSelectedSite = await import("../hooks/useSelectedSite");
-            vi.mocked(mockUseSelectedSite.useSelectedSite).mockReturnValue(mockSite);
+            const mockUseSelectedSite = await import(
+                "../hooks/useSelectedSite"
+            );
+            vi.mocked(mockUseSelectedSite.useSelectedSite).mockReturnValue(
+                mockSite
+            );
 
             render(<App />);
 
-            expect(screen.getByTestId("site-details-modal")).toBeInTheDocument();
-            expect(screen.getByTestId("site-details-identifier")).toHaveTextContent("test-site-1");
+            expect(
+                screen.getByTestId("site-details-modal")
+            ).toBeInTheDocument();
+            expect(
+                screen.getByTestId("site-details-identifier")
+            ).toHaveTextContent("test-site-1");
         });
 
         it("should not show site details modal when showSiteDetails is true but no site is selected", async () => {
@@ -496,12 +526,18 @@ describe("App Component - Comprehensive Coverage", () => {
             });
 
             // Mock useSelectedSite to return null
-            const mockUseSelectedSite = await import("../hooks/useSelectedSite");
-            vi.mocked(mockUseSelectedSite.useSelectedSite).mockReturnValue(undefined);
+            const mockUseSelectedSite = await import(
+                "../hooks/useSelectedSite"
+            );
+            vi.mocked(mockUseSelectedSite.useSelectedSite).mockReturnValue(
+                undefined
+            );
 
             render(<App />);
 
-            expect(screen.queryByTestId("site-details-modal")).not.toBeInTheDocument();
+            expect(
+                screen.queryByTestId("site-details-modal")
+            ).not.toBeInTheDocument();
         });
 
         it("should close site details modal when close handler is called", async () => {
@@ -513,8 +549,12 @@ describe("App Component - Comprehensive Coverage", () => {
             });
 
             // Mock useSelectedSite to return a site
-            const mockUseSelectedSite = await import("../hooks/useSelectedSite");
-            vi.mocked(mockUseSelectedSite.useSelectedSite).mockReturnValue(mockSite);
+            const mockUseSelectedSite = await import(
+                "../hooks/useSelectedSite"
+            );
+            vi.mocked(mockUseSelectedSite.useSelectedSite).mockReturnValue(
+                mockSite
+            );
 
             render(<App />);
 
@@ -541,7 +581,9 @@ describe("App Component - Comprehensive Coverage", () => {
             };
 
             (mockUseSitesStore as any).getState.mockReturnValue(sitesStore);
-            (mockUseSettingsStore as any).getState.mockReturnValue(settingsStore);
+            (mockUseSettingsStore as any).getState.mockReturnValue(
+                settingsStore
+            );
 
             render(<App />);
 
@@ -590,7 +632,9 @@ describe("App Component - Comprehensive Coverage", () => {
             (mockUseSitesStore as any).getState.mockReturnValue(sitesStore);
 
             const mockCacheSync = await import("../utils/cacheSync");
-            vi.mocked(mockCacheSync.setupCacheSync).mockReturnValue(cacheSyncCleanup);
+            vi.mocked(mockCacheSync.setupCacheSync).mockReturnValue(
+                cacheSyncCleanup
+            );
 
             const { unmount } = render(<App />);
 
@@ -608,7 +652,9 @@ describe("App Component - Comprehensive Coverage", () => {
 
     describe("Status Update Handling", () => {
         it("should handle status updates in development mode", async () => {
-            const mockEnvironment = await import("../../shared/utils/environment");
+            const mockEnvironment = await import(
+                "../../shared/utils/environment"
+            );
             vi.mocked(mockEnvironment.isDevelopment).mockReturnValue(true);
 
             const mockLogger = await import("../services/logger");
@@ -640,24 +686,32 @@ describe("App Component - Comprehensive Coverage", () => {
             });
 
             expect(mockLogger.default.debug).toHaveBeenCalledWith(
-                expect.stringContaining("Status update received for site: test-site")
+                expect.stringContaining(
+                    "Status update received for site: test-site"
+                )
             );
         });
     });
 
     describe("Backend Focus Sync", () => {
         it("should call useBackendFocusSync with disabled state", async () => {
-            const mockBackendFocusSync = await import("../hooks/useBackendFocusSync");
+            const mockBackendFocusSync = await import(
+                "../hooks/useBackendFocusSync"
+            );
 
             render(<App />);
 
-            expect(mockBackendFocusSync.useBackendFocusSync).toHaveBeenCalledWith(false);
+            expect(
+                mockBackendFocusSync.useBackendFocusSync
+            ).toHaveBeenCalledWith(false);
         });
     });
 
     describe("Production vs Development Behavior", () => {
         it("should log app started in production mode", async () => {
-            const mockEnvironment = await import("../../shared/utils/environment");
+            const mockEnvironment = await import(
+                "../../shared/utils/environment"
+            );
             vi.mocked(mockEnvironment.isProduction).mockReturnValue(true);
 
             const mockLogger = await import("../services/logger");
@@ -670,7 +724,9 @@ describe("App Component - Comprehensive Coverage", () => {
         });
 
         it("should not log app started in non-production mode", async () => {
-            const mockEnvironment = await import("../../shared/utils/environment");
+            const mockEnvironment = await import(
+                "../../shared/utils/environment"
+            );
             vi.mocked(mockEnvironment.isProduction).mockReturnValue(false);
 
             const mockLogger = await import("../services/logger");

@@ -51,7 +51,11 @@ describe("File Download Utility Coverage Tests", () => {
     describe("downloadFile Function", () => {
         it("should handle successful download", () => {
             const downloadFile = (options: any) => {
-                const { buffer, fileName, mimeType = "application/octet-stream" } = options;
+                const {
+                    buffer,
+                    fileName,
+                    mimeType = "application/octet-stream",
+                } = options;
 
                 try {
                     // Mock createAndTriggerDownload success
@@ -85,7 +89,11 @@ describe("File Download Utility Coverage Tests", () => {
 
         it("should handle download with default mimeType", () => {
             const downloadFile = (options: any) => {
-                const { buffer, fileName, mimeType = "application/octet-stream" } = options;
+                const {
+                    buffer,
+                    fileName,
+                    mimeType = "application/octet-stream",
+                } = options;
                 expect(mimeType).toBe("application/octet-stream");
                 return true;
             };
@@ -103,14 +111,21 @@ describe("File Download Utility Coverage Tests", () => {
             const mockError = new Error("DOM manipulation failed");
 
             const downloadFile = (options: any) => {
-                const { buffer, fileName, mimeType = "application/octet-stream" } = options;
+                const {
+                    buffer,
+                    fileName,
+                    mimeType = "application/octet-stream",
+                } = options;
 
                 try {
                     // Simulate primary method failure
                     throw mockError;
                 } catch (error) {
                     // Handle error with fallback
-                    console.warn("Download failed, attempting fallback:", error);
+                    console.warn(
+                        "Download failed, attempting fallback:",
+                        error
+                    );
 
                     // Fallback method
                     const blob = new Blob([buffer], { type: mimeType });
@@ -131,7 +146,10 @@ describe("File Download Utility Coverage Tests", () => {
 
     describe("generateBackupFileName Function", () => {
         it("should generate filename with default parameters", () => {
-            const generateBackupFileName = (prefix = "backup", extension = "sqlite") => {
+            const generateBackupFileName = (
+                prefix = "backup",
+                extension = "sqlite"
+            ) => {
                 const timestamp = new Date().toISOString().split("T")[0];
                 return `${prefix}-${timestamp}.${extension}`;
             };
@@ -144,7 +162,10 @@ describe("File Download Utility Coverage Tests", () => {
         });
 
         it("should generate filename with custom parameters", () => {
-            const generateBackupFileName = (prefix = "backup", extension = "sqlite") => {
+            const generateBackupFileName = (
+                prefix = "backup",
+                extension = "sqlite"
+            ) => {
                 const timestamp = new Date().toISOString().split("T")[0];
                 return `${prefix}-${timestamp}.${extension}`;
             };
@@ -157,7 +178,10 @@ describe("File Download Utility Coverage Tests", () => {
         });
 
         it("should generate different filenames on different dates", () => {
-            const generateBackupFileName = (prefix = "backup", extension = "sqlite") => {
+            const generateBackupFileName = (
+                prefix = "backup",
+                extension = "sqlite"
+            ) => {
                 const timestamp = new Date().toISOString().split("T")[0];
                 return `${prefix}-${timestamp}.${extension}`;
             };
@@ -170,13 +194,24 @@ describe("File Download Utility Coverage Tests", () => {
             expect(fileName2).toMatch(/^test-\d{4}-\d{2}-\d{2}\.sqlite$/);
 
             // Extract date parts
-            const date1 = fileName1.split("-").slice(1, 4).join("-").replace(".sqlite", "");
-            const date2 = fileName2.split("-").slice(1, 4).join("-").replace(".sqlite", "");
+            const date1 = fileName1
+                .split("-")
+                .slice(1, 4)
+                .join("-")
+                .replace(".sqlite", "");
+            const date2 = fileName2
+                .split("-")
+                .slice(1, 4)
+                .join("-")
+                .replace(".sqlite", "");
             expect(date1).toBe(date2);
         });
 
         it("should handle various file extensions", () => {
-            const generateBackupFileName = (prefix = "backup", extension = "sqlite") => {
+            const generateBackupFileName = (
+                prefix = "backup",
+                extension = "sqlite"
+            ) => {
                 const timestamp = new Date().toISOString().split("T")[0];
                 return `${prefix}-${timestamp}.${extension}`;
             };
@@ -205,9 +240,13 @@ describe("File Download Utility Coverage Tests", () => {
                 4,
                 5,
             ]);
-            const mockDownloadFunction = vi.fn().mockResolvedValue(mockBackupData);
+            const mockDownloadFunction = vi
+                .fn()
+                .mockResolvedValue(mockBackupData);
 
-            const handleSQLiteBackupDownload = async (downloadFunction: () => Promise<Uint8Array>) => {
+            const handleSQLiteBackupDownload = async (
+                downloadFunction: () => Promise<Uint8Array>
+            ) => {
                 const backupData = await downloadFunction();
 
                 if (!(backupData instanceof Uint8Array)) {
@@ -215,7 +254,9 @@ describe("File Download Utility Coverage Tests", () => {
                 }
 
                 const blobData = new Uint8Array(backupData);
-                const blob = new Blob([blobData], { type: "application/x-sqlite3" });
+                const blob = new Blob([blobData], {
+                    type: "application/x-sqlite3",
+                });
 
                 const url = URL.createObjectURL(blob);
                 const anchor = document.createElement("a");
@@ -231,7 +272,8 @@ describe("File Download Utility Coverage Tests", () => {
                 return true;
             };
 
-            const result = await handleSQLiteBackupDownload(mockDownloadFunction);
+            const result =
+                await handleSQLiteBackupDownload(mockDownloadFunction);
 
             expect(mockDownloadFunction).toHaveBeenCalled();
             expect(result).toBe(true);
@@ -239,9 +281,13 @@ describe("File Download Utility Coverage Tests", () => {
 
         it("should validate backup data type", async () => {
             const invalidBackupData = "not a uint8array";
-            const mockDownloadFunction = vi.fn().mockResolvedValue(invalidBackupData);
+            const mockDownloadFunction = vi
+                .fn()
+                .mockResolvedValue(invalidBackupData);
 
-            const handleSQLiteBackupDownload = async (downloadFunction: () => Promise<Uint8Array>) => {
+            const handleSQLiteBackupDownload = async (
+                downloadFunction: () => Promise<Uint8Array>
+            ) => {
                 const backupData = await downloadFunction();
 
                 if (!(backupData instanceof Uint8Array)) {
@@ -251,16 +297,18 @@ describe("File Download Utility Coverage Tests", () => {
                 return true;
             };
 
-            await expect(handleSQLiteBackupDownload(mockDownloadFunction)).rejects.toThrow(
-                "Invalid backup data received"
-            );
+            await expect(
+                handleSQLiteBackupDownload(mockDownloadFunction)
+            ).rejects.toThrow("Invalid backup data received");
         });
 
         it("should handle download function errors", async () => {
             const mockError = new Error("Failed to fetch backup data");
             const mockDownloadFunction = vi.fn().mockRejectedValue(mockError);
 
-            const handleSQLiteBackupDownload = async (downloadFunction: () => Promise<Uint8Array>) => {
+            const handleSQLiteBackupDownload = async (
+                downloadFunction: () => Promise<Uint8Array>
+            ) => {
                 try {
                     const backupData = await downloadFunction();
                     return backupData;
@@ -269,16 +317,20 @@ describe("File Download Utility Coverage Tests", () => {
                 }
             };
 
-            await expect(handleSQLiteBackupDownload(mockDownloadFunction)).rejects.toThrow(
-                "Failed to fetch backup data"
-            );
+            await expect(
+                handleSQLiteBackupDownload(mockDownloadFunction)
+            ).rejects.toThrow("Failed to fetch backup data");
         });
 
         it("should handle empty backup data", async () => {
             const emptyBackupData = new Uint8Array(0);
-            const mockDownloadFunction = vi.fn().mockResolvedValue(emptyBackupData);
+            const mockDownloadFunction = vi
+                .fn()
+                .mockResolvedValue(emptyBackupData);
 
-            const handleSQLiteBackupDownload = async (downloadFunction: () => Promise<Uint8Array>) => {
+            const handleSQLiteBackupDownload = async (
+                downloadFunction: () => Promise<Uint8Array>
+            ) => {
                 const backupData = await downloadFunction();
 
                 if (!(backupData instanceof Uint8Array)) {
@@ -293,16 +345,21 @@ describe("File Download Utility Coverage Tests", () => {
                 return backupData.length;
             };
 
-            const result = await handleSQLiteBackupDownload(mockDownloadFunction);
+            const result =
+                await handleSQLiteBackupDownload(mockDownloadFunction);
             expect(result).toBe(0);
         });
 
         it("should handle large backup data", async () => {
             const largeBackupData = new Uint8Array(1024 * 1024); // 1MB
             largeBackupData.fill(42);
-            const mockDownloadFunction = vi.fn().mockResolvedValue(largeBackupData);
+            const mockDownloadFunction = vi
+                .fn()
+                .mockResolvedValue(largeBackupData);
 
-            const handleSQLiteBackupDownload = async (downloadFunction: () => Promise<Uint8Array>) => {
+            const handleSQLiteBackupDownload = async (
+                downloadFunction: () => Promise<Uint8Array>
+            ) => {
                 const backupData = await downloadFunction();
 
                 if (!(backupData instanceof Uint8Array)) {
@@ -312,14 +369,20 @@ describe("File Download Utility Coverage Tests", () => {
                 return backupData.length;
             };
 
-            const result = await handleSQLiteBackupDownload(mockDownloadFunction);
+            const result =
+                await handleSQLiteBackupDownload(mockDownloadFunction);
             expect(result).toBe(1024 * 1024);
         });
     });
 
     describe("Error Handling", () => {
         it("should handle DOM manipulation errors", () => {
-            const handleDownloadError = (error: unknown, buffer: ArrayBuffer, fileName: string, mimeType: string) => {
+            const handleDownloadError = (
+                error: unknown,
+                buffer: ArrayBuffer,
+                fileName: string,
+                mimeType: string
+            ) => {
                 console.error("Download failed:", error);
 
                 // Attempt fallback
@@ -336,7 +399,12 @@ describe("File Download Utility Coverage Tests", () => {
             const mockError = new Error("createElement failed");
             const buffer = new ArrayBuffer(100);
 
-            const result = handleDownloadError(mockError, buffer, "test.txt", "text/plain");
+            const result = handleDownloadError(
+                mockError,
+                buffer,
+                "test.txt",
+                "text/plain"
+            );
             expect(result).toBe("fallback-attempted");
         });
 
@@ -402,7 +470,9 @@ describe("File Download Utility Coverage Tests", () => {
             ];
 
             mimeTypes.forEach((mimeType) => {
-                const blob = new Blob([new ArrayBuffer(100)], { type: mimeType });
+                const blob = new Blob([new ArrayBuffer(100)], {
+                    type: mimeType,
+                });
                 expect(blob.type).toBe(mimeType);
             });
         });

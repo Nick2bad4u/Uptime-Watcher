@@ -8,7 +8,10 @@
 import type { Theme } from "../types";
 
 // Helper functions for theme merging (reduces function length by composition)
-const mergeColors = (baseColors: Theme["colors"], overrideColors?: Partial<Theme["colors"]>) => ({
+const mergeColors = (
+    baseColors: Theme["colors"],
+    overrideColors?: Partial<Theme["colors"]>
+) => ({
     ...baseColors,
     ...overrideColors,
     background: {
@@ -41,7 +44,10 @@ const mergeColors = (baseColors: Theme["colors"], overrideColors?: Partial<Theme
     },
 });
 
-const mergeTypography = (baseTypography: Theme["typography"], overrideTypography?: Partial<Theme["typography"]>) => ({
+const mergeTypography = (
+    baseTypography: Theme["typography"],
+    overrideTypography?: Partial<Theme["typography"]>
+) => ({
     ...baseTypography,
     ...overrideTypography,
     fontFamily: {
@@ -87,7 +93,10 @@ const mergeTypography = (baseTypography: Theme["typography"], overrideTypography
  * });
  * ```
  */
-export function deepMergeTheme(baseTheme: Theme, overrides: Partial<Theme>): Theme {
+export function deepMergeTheme(
+    baseTheme: Theme,
+    overrides: Partial<Theme>
+): Theme {
     return {
         ...baseTheme,
         ...overrides,

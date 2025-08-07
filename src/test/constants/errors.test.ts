@@ -23,10 +23,18 @@ describe("Error Constants", () => {
 
         it("should contain expected site error messages", () => {
             expect(ERROR_CATALOG.sites.NOT_FOUND).toBe("Site not found");
-            expect(ERROR_CATALOG.sites.FAILED_TO_ADD).toBe("Failed to add site");
-            expect(ERROR_CATALOG.sites.FAILED_TO_DELETE).toBe("Failed to delete site");
-            expect(ERROR_CATALOG.sites.FAILED_TO_UPDATE).toBe("Failed to update site");
-            expect(ERROR_CATALOG.sites.FAILED_TO_CHECK).toBe("Failed to check site");
+            expect(ERROR_CATALOG.sites.FAILED_TO_ADD).toBe(
+                "Failed to add site"
+            );
+            expect(ERROR_CATALOG.sites.FAILED_TO_DELETE).toBe(
+                "Failed to delete site"
+            );
+            expect(ERROR_CATALOG.sites.FAILED_TO_UPDATE).toBe(
+                "Failed to update site"
+            );
+            expect(ERROR_CATALOG.sites.FAILED_TO_CHECK).toBe(
+                "Failed to check site"
+            );
         });
 
         it("should contain expected monitor error messages", () => {
@@ -34,32 +42,60 @@ describe("Error Constants", () => {
             expect(ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST).toBe(
                 "Cannot remove the last monitor from a site. Use site removal instead."
             );
-            expect(ERROR_CATALOG.monitors.FAILED_TO_ADD).toBe("Failed to add monitor");
-            expect(ERROR_CATALOG.monitors.FAILED_TO_UPDATE_INTERVAL).toBe("Failed to update check interval");
+            expect(ERROR_CATALOG.monitors.FAILED_TO_ADD).toBe(
+                "Failed to add monitor"
+            );
+            expect(ERROR_CATALOG.monitors.FAILED_TO_UPDATE_INTERVAL).toBe(
+                "Failed to update check interval"
+            );
         });
 
         it("should contain expected validation error messages", () => {
-            expect(ERROR_CATALOG.validation.URL_INVALID).toBe("URL format is invalid");
-            expect(ERROR_CATALOG.validation.FIELD_REQUIRED).toBe("This field is required");
-            expect(ERROR_CATALOG.validation.HOST_INVALID).toBe("Host address is invalid");
+            expect(ERROR_CATALOG.validation.URL_INVALID).toBe(
+                "URL format is invalid"
+            );
+            expect(ERROR_CATALOG.validation.FIELD_REQUIRED).toBe(
+                "This field is required"
+            );
+            expect(ERROR_CATALOG.validation.HOST_INVALID).toBe(
+                "Host address is invalid"
+            );
         });
 
         it("should contain expected system error messages", () => {
-            expect(ERROR_CATALOG.system.INTERNAL_ERROR).toBe("An internal error occurred");
-            expect(ERROR_CATALOG.system.SERVICE_UNAVAILABLE).toBe("Service temporarily unavailable");
-            expect(ERROR_CATALOG.system.OPERATION_TIMEOUT).toBe("Operation timed out");
+            expect(ERROR_CATALOG.system.INTERNAL_ERROR).toBe(
+                "An internal error occurred"
+            );
+            expect(ERROR_CATALOG.system.SERVICE_UNAVAILABLE).toBe(
+                "Service temporarily unavailable"
+            );
+            expect(ERROR_CATALOG.system.OPERATION_TIMEOUT).toBe(
+                "Operation timed out"
+            );
         });
 
         it("should contain expected network error messages", () => {
-            expect(ERROR_CATALOG.network.CONNECTION_FAILED).toBe("Network connection failed");
-            expect(ERROR_CATALOG.network.CONNECTION_TIMEOUT).toBe("Connection timed out");
-            expect(ERROR_CATALOG.network.HOST_UNREACHABLE).toBe("Host unreachable");
+            expect(ERROR_CATALOG.network.CONNECTION_FAILED).toBe(
+                "Network connection failed"
+            );
+            expect(ERROR_CATALOG.network.CONNECTION_TIMEOUT).toBe(
+                "Connection timed out"
+            );
+            expect(ERROR_CATALOG.network.HOST_UNREACHABLE).toBe(
+                "Host unreachable"
+            );
         });
 
         it("should contain expected database error messages", () => {
-            expect(ERROR_CATALOG.database.CONNECTION_FAILED).toBe("Database connection failed");
-            expect(ERROR_CATALOG.database.QUERY_FAILED).toBe("Database query failed");
-            expect(ERROR_CATALOG.database.RECORD_NOT_FOUND).toBe("Record not found");
+            expect(ERROR_CATALOG.database.CONNECTION_FAILED).toBe(
+                "Database connection failed"
+            );
+            expect(ERROR_CATALOG.database.QUERY_FAILED).toBe(
+                "Database query failed"
+            );
+            expect(ERROR_CATALOG.database.RECORD_NOT_FOUND).toBe(
+                "Record not found"
+            );
         });
 
         it("should have proper structure for all domains", () => {

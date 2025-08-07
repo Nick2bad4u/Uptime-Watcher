@@ -27,9 +27,13 @@ export interface ScreenshotThumbnailProperties {
     readonly url: string;
 }
 
-export const ScreenshotThumbnail = ({ siteName, url }: ScreenshotThumbnailProperties): JSX.Element => {
+export const ScreenshotThumbnail = ({
+    siteName,
+    url,
+}: ScreenshotThumbnailProperties): JSX.Element => {
     const [hovered, setHovered] = useState(false);
-    const [overlayVariables, setOverlayVariables] = useState<React.CSSProperties>({});
+    const [overlayVariables, setOverlayVariables] =
+        useState<React.CSSProperties>({});
     const linkReference = useRef<HTMLAnchorElement>(null);
     const portalReference = useRef<HTMLDivElement>(null);
     const hoverTimeoutReference = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -53,7 +57,10 @@ export const ScreenshotThumbnail = ({ siteName, url }: ScreenshotThumbnailProper
     }, []);
 
     // Create stable callbacks to avoid direct setState in useEffect
-    const clearOverlayVariables = useCallback(() => setOverlayVariables({}), []);
+    const clearOverlayVariables = useCallback(
+        () => setOverlayVariables({}),
+        []
+    );
 
     // Additional cleanup on hovered state changes
     useEffect(() => {
@@ -64,7 +71,10 @@ export const ScreenshotThumbnail = ({ siteName, url }: ScreenshotThumbnailProper
                 hoverTimeoutReference.current = undefined;
             }
             // Use timeout to defer state update to avoid direct call in useEffect
-            const clearTimeoutId = setTimeout(clearOverlayVariables, UI_DELAYS.STATE_UPDATE_DEFER);
+            const clearTimeoutId = setTimeout(
+                clearOverlayVariables,
+                UI_DELAYS.STATE_UPDATE_DEFER
+            );
             return () => clearTimeout(clearTimeoutId);
         }
         return () => {};
@@ -116,7 +126,10 @@ export const ScreenshotThumbnail = ({ siteName, url }: ScreenshotThumbnailProper
     useEffect(() => {
         if (hovered && linkReference.current) {
             // Use timeout to defer state update to avoid direct call in useEffect
-            const updateTimeoutId = setTimeout(updateOverlayPosition, UI_DELAYS.STATE_UPDATE_DEFER);
+            const updateTimeoutId = setTimeout(
+                updateOverlayPosition,
+                UI_DELAYS.STATE_UPDATE_DEFER
+            );
             return () => clearTimeout(updateTimeoutId);
         }
         return () => {};
@@ -184,7 +197,9 @@ export const ScreenshotThumbnail = ({ siteName, url }: ScreenshotThumbnailProper
                     loading="lazy"
                     src={screenshotUrl}
                 />
-                <span className="site-details-thumbnail-caption">Preview: {siteName}</span>
+                <span className="site-details-thumbnail-caption">
+                    Preview: {siteName}
+                </span>
             </a>
             {hovered
                 ? createPortal(
@@ -207,7 +222,7 @@ export const ScreenshotThumbnail = ({ siteName, url }: ScreenshotThumbnailProper
                 : null}
         </>
     );
-}
+};
 
 /**
  * Screenshot thumbnail component with hover preview overlay.

@@ -20,7 +20,8 @@ import crypto from "node:crypto";
 const DOC_NAME = "Example-Package";
 
 // Base URL for docs (no trailing slash)
-const BASE_URL = "https://raw.githubusercontent.com/exampleOrg/exampleRepo/refs/heads/master";
+const BASE_URL =
+    "https://raw.githubusercontent.com/exampleOrg/exampleRepo/refs/heads/master";
 
 // Array of doc/page names (relative to BASE_URL).
 // These should match the paths in your repo, relative to the base URL.
@@ -142,7 +143,8 @@ function cleanContent(content) {
     let cleaned = content;
     // Section removal logic, only if variables are defined
     switch (true) {
-        case typeof REMOVE_FROM_MARKER !== "undefined" && Array.isArray(REMOVE_FROM_MARKER):
+        case typeof REMOVE_FROM_MARKER !== "undefined" &&
+            Array.isArray(REMOVE_FROM_MARKER):
             for (const marker of REMOVE_FROM_MARKER) {
                 const idx = cleaned.indexOf(marker);
                 if (idx !== -1) {
@@ -154,7 +156,8 @@ function cleanContent(content) {
             break;
     }
     switch (true) {
-        case typeof REMOVE_ABOVE_MARKER !== "undefined" && Array.isArray(REMOVE_ABOVE_MARKER):
+        case typeof REMOVE_ABOVE_MARKER !== "undefined" &&
+            Array.isArray(REMOVE_ABOVE_MARKER):
             for (const marker of REMOVE_ABOVE_MARKER) {
                 const idx = cleaned.indexOf(marker);
                 if (idx !== -1) {
@@ -166,10 +169,16 @@ function cleanContent(content) {
             break;
     }
     switch (true) {
-        case typeof REMOVE_LINE_MARKERS !== "undefined" && Array.isArray(REMOVE_LINE_MARKERS):
+        case typeof REMOVE_LINE_MARKERS !== "undefined" &&
+            Array.isArray(REMOVE_LINE_MARKERS):
             cleaned = cleaned
                 .split("\n")
-                .filter((line) => !REMOVE_LINE_MARKERS.some((marker) => line.includes(marker)))
+                .filter(
+                    (line) =>
+                        !REMOVE_LINE_MARKERS.some((marker) =>
+                            line.includes(marker)
+                        )
+                )
                 .join("\n")
                 .trimEnd();
             break;
@@ -210,7 +219,9 @@ function downloadFile(cmd, filePath, logMsg, name) {
 
         // Basic validation: cmd must start with "pandoc"
         if (typeof cmd !== "string" || !cmd.trim().startsWith("pandoc")) {
-            return reject(new Error("Unsafe or invalid command detected: " + cmd));
+            return reject(
+                new Error("Unsafe or invalid command detected: " + cmd)
+            );
         }
 
         // Ensure parent directory exists before running pandoc
@@ -223,26 +234,36 @@ function downloadFile(cmd, filePath, logMsg, name) {
                 return reject(err);
             }
             if (!fs.existsSync(resolvedPath)) {
-                console.error(logMsg.replace("✅", "❌") + " → File not created.");
+                console.error(
+                    logMsg.replace("✅", "❌") + " → File not created."
+                );
                 return reject(new Error("File not created: " + resolvedPath));
             }
             let content;
             try {
                 content = fs.readFileSync(resolvedPath, "utf8");
             } catch (readErr) {
-                console.error(logMsg.replace("✅", "❌") + ` → Failed to read file: ${readErr.message}`);
+                console.error(
+                    logMsg.replace("✅", "❌") +
+                        ` → Failed to read file: ${readErr.message}`
+                );
                 return reject(readErr);
             }
             if (!content || content.trim().length === 0) {
                 console.error(logMsg.replace("✅", "❌") + " → File is empty.");
-                return reject(new Error("Downloaded file is empty: " + resolvedPath));
+                return reject(
+                    new Error("Downloaded file is empty: " + resolvedPath)
+                );
             }
             try {
                 let processedContent = rewriteLinks(content);
                 processedContent = cleanContent(processedContent);
                 fs.writeFileSync(resolvedPath, processedContent);
             } catch (writeErr) {
-                console.error(logMsg.replace("✅", "❌") + ` → Failed to write file: ${writeErr.message}`);
+                console.error(
+                    logMsg.replace("✅", "❌") +
+                        ` → Failed to write file: ${writeErr.message}`
+                );
                 return reject(writeErr);
             }
             console.log(logMsg);
@@ -258,7 +279,12 @@ const pagePromises = PAGES.map((page) => {
     const fileName = FILE_NAME_TEMPLATE(page);
     const filePath = path.join(OUTPUT_DIR, fileName);
     const cmd = CMD_TEMPLATE(url, filePath);
-    return downloadFile(cmd, filePath, `✅ Downloaded: ${page} → ${fileName}`, fileName);
+    return downloadFile(
+        cmd,
+        filePath,
+        `✅ Downloaded: ${page} → ${fileName}`,
+        fileName
+    );
 });
 
 /**
@@ -298,7 +324,9 @@ function writeLogIfComplete() {
     });
 
     if (successfulFiles.length === 0) {
-        console.warn("⚠️ No files were successfully downloaded. No log entry written.");
+        console.warn(
+            "⚠️ No files were successfully downloaded. No log entry written."
+        );
         return;
     }
 

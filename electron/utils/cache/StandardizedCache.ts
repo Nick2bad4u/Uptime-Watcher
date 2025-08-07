@@ -114,13 +114,17 @@ export class StandardizedCache<T> {
      * Individual item cache events are not emitted during bulk operations.
      */
     bulkUpdate(items: { data: T; key: string; ttl?: number }[]): void {
-        logger.debug(`[Cache:${this.config.name}] Bulk updating ${items.length} items`);
+        logger.debug(
+            `[Cache:${this.config.name}] Bulk updating ${items.length} items`
+        );
 
         for (const item of items) {
             this.set(item.key, item.data, item.ttl);
         }
 
-        this.emitEvent("internal:cache:bulk-updated", { itemCount: items.length });
+        this.emitEvent("internal:cache:bulk-updated", {
+            itemCount: items.length,
+        });
     }
 
     /**
@@ -141,8 +145,12 @@ export class StandardizedCache<T> {
 
         if (cleaned > 0) {
             this.updateSize();
-            logger.debug(`[Cache:${this.config.name}] Cleaned up ${cleaned} expired items`);
-            this.emitEvent("internal:cache:cleanup-completed", { itemCount: cleaned });
+            logger.debug(
+                `[Cache:${this.config.name}] Cleaned up ${cleaned} expired items`
+            );
+            this.emitEvent("internal:cache:cleanup-completed", {
+                itemCount: cleaned,
+            });
 
             // Notify callbacks for each cleaned item
             for (const key of cleanedKeys) {
@@ -161,7 +169,9 @@ export class StandardizedCache<T> {
         this.cache.clear();
         this.updateSize();
 
-        logger.debug(`[Cache:${this.config.name}] Cleared cache (${size} items)`);
+        logger.debug(
+            `[Cache:${this.config.name}] Cleared cache (${size} items)`
+        );
         this.emitEvent("internal:cache:cleared", { itemCount: size });
 
         // Notify callbacks that all items were invalidated
@@ -322,7 +332,9 @@ export class StandardizedCache<T> {
         const size = this.cache.size;
         this.clear();
 
-        logger.debug(`[Cache:${this.config.name}] Invalidated all ${size} items`);
+        logger.debug(
+            `[Cache:${this.config.name}] Invalidated all ${size} items`
+        );
         this.emitEvent("internal:cache:all-invalidated", { itemCount: size });
         this.notifyInvalidation(); // No key = all invalidated
     }
@@ -366,12 +378,16 @@ export class StandardizedCache<T> {
      */
     onInvalidation(callback: (key?: string) => void): () => void {
         this.invalidationCallbacks.add(callback);
-        logger.debug(`[Cache:${this.config.name}] Invalidation callback registered`);
+        logger.debug(
+            `[Cache:${this.config.name}] Invalidation callback registered`
+        );
 
         // Return cleanup function
         return () => {
             this.invalidationCallbacks.delete(callback);
-            logger.debug(`[Cache:${this.config.name}] Invalidation callback removed`);
+            logger.debug(
+                `[Cache:${this.config.name}] Invalidation callback removed`
+            );
         };
     }
 
@@ -401,8 +417,13 @@ export class StandardizedCache<T> {
         this.cache.set(key, entry);
         this.updateSize();
 
-        logger.debug(`[Cache:${this.config.name}] Cached item: ${key} (TTL: ${effectiveTTL}ms)`);
-        this.emitEvent("internal:cache:item-cached", { key, ttl: effectiveTTL });
+        logger.debug(
+            `[Cache:${this.config.name}] Cached item: ${key} (TTL: ${effectiveTTL}ms)`
+        );
+        this.emitEvent("internal:cache:item-cached", {
+            key,
+            ttl: effectiveTTL,
+        });
     }
 
     /**
@@ -435,8 +456,13 @@ export class StandardizedCache<T> {
         if (oldestKey) {
             this.cache.delete(oldestKey);
             this.updateSize();
-            logger.debug(`[Cache:${this.config.name}] Evicted LRU item: ${oldestKey}`);
-            this.emitEvent("internal:cache:item-evicted", { key: oldestKey, reason: "lru" });
+            logger.debug(
+                `[Cache:${this.config.name}] Evicted LRU item: ${oldestKey}`
+            );
+            this.emitEvent("internal:cache:item-evicted", {
+                key: oldestKey,
+                reason: "lru",
+            });
             this.notifyInvalidation(oldestKey);
         }
     }
@@ -454,7 +480,10 @@ export class StandardizedCache<T> {
                 // eslint-disable-next-line n/callback-return -- Synchronous callback for immediate invalidation notification
                 callback(key);
             } catch (error) {
-                logger.error(`[Cache:${this.config.name}] Error in invalidation callback:`, error);
+                logger.error(
+                    `[Cache:${this.config.name}] Error in invalidation callback:`,
+                    error
+                );
             }
         }
     }

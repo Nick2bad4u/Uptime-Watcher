@@ -14,7 +14,11 @@ import { isDevelopment } from "../../shared/utils/environment";
 import { logger as baseLogger } from "../utils/logger";
 
 // Helper functions for metrics middleware (reduces complexity by composition)
-type MetricsCallback = (metric: { name: string; type: "counter" | "timing"; value: number }) => void;
+type MetricsCallback = (metric: {
+    name: string;
+    type: "counter" | "timing";
+    value: number;
+}) => void;
 
 /**
  * Interface for middleware stack functions.
@@ -26,7 +30,11 @@ interface MiddlewareStacks {
     testing: () => EventMiddleware;
 }
 
-const trackEventCount = (event: string, eventCounts: Map<string, number>, metricsCallback?: MetricsCallback) => {
+const trackEventCount = (
+    event: string,
+    eventCounts: Map<string, number>,
+    metricsCallback?: MetricsCallback
+) => {
     const count = eventCounts.get(event) ?? 0;
     const newCount = count + 1;
     eventCounts.set(event, newCount);
@@ -162,8 +170,14 @@ const EVENT_EMITTED_MSG = "[EventBus] Event emitted";
  */
 /* eslint-disable n/callback-return -- Middleware pattern doesn't follow Node.js callback convention */
 
-export function composeMiddleware(...middlewares: EventMiddleware[]): EventMiddleware {
-    return async (event: string, data: unknown, next: () => Promise<void> | void) => {
+export function composeMiddleware(
+    ...middlewares: EventMiddleware[]
+): EventMiddleware {
+    return async (
+        event: string,
+        data: unknown,
+        next: () => Promise<void> | void
+    ) => {
         let index = 0;
 
         const processNext = async (): Promise<void> => {
@@ -203,10 +217,17 @@ export function composeMiddleware(...middlewares: EventMiddleware[]): EventMiddl
  * ```
  */
 
-export function createDebugMiddleware(options: { enabled?: boolean; verbose?: boolean }): EventMiddleware {
+export function createDebugMiddleware(options: {
+    enabled?: boolean;
+    verbose?: boolean;
+}): EventMiddleware {
     const { enabled = isDevelopment(), verbose = false } = options;
 
-    return async (event: string, data: unknown, next: () => Promise<void> | void) => {
+    return async (
+        event: string,
+        data: unknown,
+        next: () => Promise<void> | void
+    ) => {
         if (!enabled) {
             await next();
             return;
@@ -227,7 +248,9 @@ export function createDebugMiddleware(options: { enabled?: boolean; verbose?: bo
         await next();
 
         const duration = Date.now() - startTime;
-        baseLogger.debug(`[EventBus:Debug] Completed event '${event}' in ${duration}ms`);
+        baseLogger.debug(
+            `[EventBus:Debug] Completed event '${event}' in ${duration}ms`
+        );
     };
 }
 
@@ -259,18 +282,26 @@ export function createErrorHandlingMiddleware(options: {
 }): EventMiddleware {
     const { continueOnError = true, onError } = options;
 
-    return async (event: string, data: unknown, next: () => Promise<void> | void) => {
+    return async (
+        event: string,
+        data: unknown,
+        next: () => Promise<void> | void
+    ) => {
         try {
             await next();
             return;
         } catch (error) {
-            const err = error instanceof Error ? error : new Error(String(error));
+            const err =
+                error instanceof Error ? error : new Error(String(error));
 
-            baseLogger.error(`[EventBus] Middleware error for event '${event}'`, {
-                data: safeSerialize(data),
-                error: err,
-                event,
-            });
+            baseLogger.error(
+                `[EventBus] Middleware error for event '${event}'`,
+                {
+                    data: safeSerialize(data),
+                    error: err,
+                    event,
+                }
+            );
 
             if (onError) {
                 onError(err, event, data);
@@ -312,22 +343,32 @@ export function createFilterMiddleware(options: {
 }): EventMiddleware {
     const { allowList, blockList, condition } = options;
 
-    return async (event: string, data: unknown, next: () => Promise<void> | void) => {
+    return async (
+        event: string,
+        data: unknown,
+        next: () => Promise<void> | void
+    ) => {
         // Check allow list
         if (allowList && !allowList.includes(event)) {
-            baseLogger.debug(`[EventBus] Event '${event}' blocked by allow list`);
+            baseLogger.debug(
+                `[EventBus] Event '${event}' blocked by allow list`
+            );
             return;
         }
 
         // Check block list
         if (blockList?.includes(event)) {
-            baseLogger.debug(`[EventBus] Event '${event}' blocked by block list`);
+            baseLogger.debug(
+                `[EventBus] Event '${event}' blocked by block list`
+            );
             return;
         }
 
         // Check custom condition
         if (condition && !condition(event, data)) {
-            baseLogger.debug(`[EventBus] Event '${event}' blocked by custom condition`);
+            baseLogger.debug(
+                `[EventBus] Event '${event}' blocked by custom condition`
+            );
             return;
         }
 
@@ -364,7 +405,11 @@ export function createLoggingMiddleware(options: {
 }): EventMiddleware {
     const { filter, includeData = false, level = "info" } = options;
 
-    return async (event: string, data: unknown, next: () => Promise<void> | void) => {
+    return async (
+        event: string,
+        data: unknown,
+        next: () => Promise<void> | void
+    ) => {
         // Apply filter if provided
         if (filter && !filter(event)) {
             await next();
@@ -421,7 +466,11 @@ export function createLoggingMiddleware(options: {
  * ```
  */
 export function createMetricsMiddleware(options: {
-    metricsCallback?: (metric: { name: string; type: "counter" | "timing"; value: number }) => void;
+    metricsCallback?: (metric: {
+        name: string;
+        type: "counter" | "timing";
+        value: number;
+    }) => void;
     trackCounts?: boolean;
     trackTiming?: boolean;
 }): EventMiddleware {
@@ -429,7 +478,11 @@ export function createMetricsMiddleware(options: {
     const eventCounts = new Map<string, number>();
     const eventTimings = new Map<string, number[]>();
 
-    return async (event: string, _data: unknown, next: () => Promise<void> | void) => {
+    return async (
+        event: string,
+        _data: unknown,
+        next: () => Promise<void> | void
+    ) => {
         const startTime = Date.now();
 
         // Track event counts
@@ -479,7 +532,11 @@ export function createRateLimitMiddleware(options: {
     const { burstLimit = 10, maxEventsPerSecond = 100, onRateLimit } = options;
     const eventTimes = new Map<string, number[]>();
 
-    return async (event: string, data: unknown, next: () => Promise<void> | void) => {
+    return async (
+        event: string,
+        data: unknown,
+        next: () => Promise<void> | void
+    ) => {
         const now = Date.now();
         const times = eventTimes.get(event) ?? [];
 
@@ -488,7 +545,9 @@ export function createRateLimitMiddleware(options: {
 
         // Check burst limit
         if (recent.length >= burstLimit) {
-            baseLogger.warn(`[EventBus] Rate limit exceeded for event '${event}' (burst limit: ${burstLimit})`);
+            baseLogger.warn(
+                `[EventBus] Rate limit exceeded for event '${event}' (burst limit: ${burstLimit})`
+            );
             if (onRateLimit) {
                 onRateLimit(event, data);
             }
@@ -539,7 +598,11 @@ export function createRateLimitMiddleware(options: {
 export function createValidationMiddleware<T extends Record<string, unknown>>(
     validators: ValidatorMap<T>
 ): EventMiddleware {
-    return async (event: string, data: unknown, next: () => Promise<void> | void) => {
+    return async (
+        event: string,
+        data: unknown,
+        next: () => Promise<void> | void
+    ) => {
         // Type-safe validator lookup with runtime validation
         if (!Object.hasOwn(validators, event)) {
             // No validator for this event - continue processing
@@ -560,33 +623,50 @@ export function createValidationMiddleware<T extends Record<string, unknown>>(
 
             if (typeof result === "boolean") {
                 if (!result) {
-                    baseLogger.error(`[EventBus] Validation failed for event '${event}'`, {
-                        data: safeSerialize(data),
-                        event,
-                    });
+                    baseLogger.error(
+                        `[EventBus] Validation failed for event '${event}'`,
+                        {
+                            data: safeSerialize(data),
+                            event,
+                        }
+                    );
                     throw new Error(`Validation failed for event '${event}'`);
                 }
             } else if (!result.isValid) {
                 const errorMsg = result.error ?? "Validation failed";
-                baseLogger.error(`[EventBus] Validation failed for event '${event}': ${errorMsg}`, {
-                    data: safeSerialize(data),
-                    event,
-                });
-                throw new Error(`Validation failed for event '${event}': ${errorMsg}`);
+                baseLogger.error(
+                    `[EventBus] Validation failed for event '${event}': ${errorMsg}`,
+                    {
+                        data: safeSerialize(data),
+                        event,
+                    }
+                );
+                throw new Error(
+                    `Validation failed for event '${event}': ${errorMsg}`
+                );
             }
         } catch (error) {
             // Re-throw validation errors, wrap unexpected errors
-            if (error instanceof Error && error.message.includes("Validation failed")) {
+            if (
+                error instanceof Error &&
+                error.message.includes("Validation failed")
+            ) {
                 throw error;
             }
 
-            const wrappedError = error instanceof Error ? error : new Error(String(error));
-            baseLogger.error(`[EventBus] Validator threw unexpected error for event '${event}'`, {
-                data: safeSerialize(data),
-                error: wrappedError,
-                event,
-            });
-            throw new Error(`Validator error for event '${event}': ${wrappedError.message}`);
+            const wrappedError =
+                error instanceof Error ? error : new Error(String(error));
+            baseLogger.error(
+                `[EventBus] Validator threw unexpected error for event '${event}'`,
+                {
+                    data: safeSerialize(data),
+                    error: wrappedError,
+                    event,
+                }
+            );
+            throw new Error(
+                `Validator error for event '${event}': ${wrappedError.message}`
+            );
         }
 
         await next();
@@ -631,7 +711,8 @@ export const MIDDLEWARE_STACKS: MiddlewareStacks = {
      * ]);
      * ```
      */
-    custom: (middlewares: EventMiddleware[]): EventMiddleware => composeMiddleware(...middlewares),
+    custom: (middlewares: EventMiddleware[]): EventMiddleware =>
+        composeMiddleware(...middlewares),
 
     /**
      * Development stack with comprehensive debugging, verbose logging, and error handling.
@@ -652,8 +733,14 @@ export const MIDDLEWARE_STACKS: MiddlewareStacks = {
                 createLoggingMiddleware({ includeData: true, level: "debug" })
             );
         } catch (error) {
-            baseLogger.error("[MiddlewareStacks] Failed to create development stack", error);
-            return createLoggingMiddleware({ includeData: true, level: "debug" });
+            baseLogger.error(
+                "[MiddlewareStacks] Failed to create development stack",
+                error
+            );
+            return createLoggingMiddleware({
+                includeData: true,
+                level: "debug",
+            });
         }
     },
 
@@ -673,13 +760,25 @@ export const MIDDLEWARE_STACKS: MiddlewareStacks = {
         try {
             return composeMiddleware(
                 createErrorHandlingMiddleware({ continueOnError: true }),
-                createRateLimitMiddleware({ burstLimit: 5, maxEventsPerSecond: 50 }),
-                createMetricsMiddleware({ trackCounts: true, trackTiming: true }),
+                createRateLimitMiddleware({
+                    burstLimit: 5,
+                    maxEventsPerSecond: 50,
+                }),
+                createMetricsMiddleware({
+                    trackCounts: true,
+                    trackTiming: true,
+                }),
                 createLoggingMiddleware({ includeData: false, level: "info" })
             );
         } catch (error) {
-            baseLogger.error("[MiddlewareStacks] Failed to create production stack", error);
-            return createLoggingMiddleware({ includeData: false, level: "info" });
+            baseLogger.error(
+                "[MiddlewareStacks] Failed to create production stack",
+                error
+            );
+            return createLoggingMiddleware({
+                includeData: false,
+                level: "info",
+            });
         }
     },
 
@@ -701,8 +800,14 @@ export const MIDDLEWARE_STACKS: MiddlewareStacks = {
                 createLoggingMiddleware({ includeData: false, level: "warn" })
             );
         } catch (error) {
-            baseLogger.error("[MiddlewareStacks] Failed to create testing stack", error);
-            return createLoggingMiddleware({ includeData: false, level: "warn" });
+            baseLogger.error(
+                "[MiddlewareStacks] Failed to create testing stack",
+                error
+            );
+            return createLoggingMiddleware({
+                includeData: false,
+                level: "warn",
+            });
         }
     },
 };

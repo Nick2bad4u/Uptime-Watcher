@@ -46,38 +46,54 @@ describe("Shared Utils Coverage", () => {
                 },
                 analytics: {
                     byPeriod: (period: string) => `analytics:period:${period}`,
-                    bySite: (siteId: string, period: string) => `analytics:site:${siteId}:${period}`,
+                    bySite: (siteId: string, period: string) =>
+                        `analytics:site:${siteId}:${period}`,
                 },
             };
 
             expect(CacheKeys.sites.all()).toBe("sites:all");
             expect(CacheKeys.sites.byId("123")).toBe("sites:id:123");
             expect(CacheKeys.sites.byStatus("up")).toBe("sites:status:up");
-            expect(CacheKeys.monitors.byType("http")).toBe("monitors:type:http");
+            expect(CacheKeys.monitors.byType("http")).toBe(
+                "monitors:type:http"
+            );
             expect(CacheKeys.monitors.bySite("456")).toBe("monitors:site:456");
             expect(CacheKeys.settings.byName("theme")).toBe("settings:theme");
-            expect(CacheKeys.analytics.byPeriod("24h")).toBe("analytics:period:24h");
-            expect(CacheKeys.analytics.bySite("789", "7d")).toBe("analytics:site:789:7d");
+            expect(CacheKeys.analytics.byPeriod("24h")).toBe(
+                "analytics:period:24h"
+            );
+            expect(CacheKeys.analytics.bySite("789", "7d")).toBe(
+                "analytics:site:789:7d"
+            );
         });
 
         it("should handle cache key validation and normalization", () => {
             const validateCacheKey = (key: string): boolean => {
-                return key.length > 0 && key.includes(":") && !key.includes(" ");
+                return (
+                    key.length > 0 && key.includes(":") && !key.includes(" ")
+                );
             };
 
             const normalizeCacheKey = (key: string): string => {
                 return key.toLowerCase().replace(/\s+/g, "-");
             };
 
-            const generateCacheKey = (prefix: string, ...parts: string[]): string => {
-                const normalizedParts = parts.map((part) => normalizeCacheKey(part));
+            const generateCacheKey = (
+                prefix: string,
+                ...parts: string[]
+            ): string => {
+                const normalizedParts = parts.map((part) =>
+                    normalizeCacheKey(part)
+                );
                 return `${prefix}:${normalizedParts.join(":")}`;
             };
 
             expect(validateCacheKey("sites:all")).toBe(true);
             expect(validateCacheKey("invalid key")).toBe(false);
             expect(normalizeCacheKey("Site Name")).toBe("site-name");
-            expect(generateCacheKey("sites", "My Site", "Status")).toBe("sites:my-site:status");
+            expect(generateCacheKey("sites", "My Site", "Status")).toBe(
+                "sites:my-site:status"
+            );
         });
 
         it("should handle cache operations", () => {
@@ -90,7 +106,10 @@ describe("Shared Utils Coverage", () => {
                 exists: (key: string) => boolean;
             }
 
-            const mockCache = new Map<string, { value: any; expires?: number }>();
+            const mockCache = new Map<
+                string,
+                { value: any; expires?: number }
+            >();
 
             const cacheOps: CacheOperations = {
                 set: (key: string, value: any, ttl?: number) => {
@@ -153,7 +172,10 @@ describe("Shared Utils Coverage", () => {
                     context?: Record<string, any>
                 ) => LogTemplate;
                 formatMessage: (template: LogTemplate) => string;
-                addCorrelation: (template: LogTemplate, correlationId: string) => LogTemplate;
+                addCorrelation: (
+                    template: LogTemplate,
+                    correlationId: string
+                ) => LogTemplate;
             }
 
             const logGenerator: LogTemplateGenerator = {
@@ -166,7 +188,9 @@ describe("Shared Utils Coverage", () => {
                 }),
                 formatMessage: (template) => {
                     const contextStr =
-                        Object.keys(template.context || {}).length > 0 ? JSON.stringify(template.context) : "";
+                        Object.keys(template.context || {}).length > 0
+                            ? JSON.stringify(template.context)
+                            : "";
                     return `[${template.level.toUpperCase()}] ${template.category}: ${template.message} ${contextStr}`.trim();
                 },
                 addCorrelation: (template, correlationId) => ({
@@ -175,17 +199,27 @@ describe("Shared Utils Coverage", () => {
                 }),
             };
 
-            const template = logGenerator.createTemplate("info", "SiteManager", "Site created successfully", {
-                siteId: "123",
-            });
+            const template = logGenerator.createTemplate(
+                "info",
+                "SiteManager",
+                "Site created successfully",
+                {
+                    siteId: "123",
+                }
+            );
             expect(template.level).toBe("info");
             expect(template.category).toBe("SiteManager");
             expect(template.context?.siteId).toBe("123");
 
             const formatted = logGenerator.formatMessage(template);
-            expect(formatted).toContain("[INFO] SiteManager: Site created successfully");
+            expect(formatted).toContain(
+                "[INFO] SiteManager: Site created successfully"
+            );
 
-            const withCorrelation = logGenerator.addCorrelation(template, "req-456");
+            const withCorrelation = logGenerator.addCorrelation(
+                template,
+                "req-456"
+            );
             expect(withCorrelation.correlationId).toBe("req-456");
         });
 
@@ -216,13 +250,27 @@ describe("Shared Utils Coverage", () => {
                 };
             };
 
-            expect(createCategoryTemplate(logCategories.SITE_MANAGEMENT, "createSite", "started").category).toBe(
-                "SiteManager"
-            );
-            expect(createCategoryTemplate(logCategories.MONITOR_EXECUTION, "runCheck", "completed").operation).toBe(
-                "runCheck"
-            );
-            expect(createCategoryTemplate(logCategories.DATABASE_OPERATIONS, "query", "failed").status).toBe("failed");
+            expect(
+                createCategoryTemplate(
+                    logCategories.SITE_MANAGEMENT,
+                    "createSite",
+                    "started"
+                ).category
+            ).toBe("SiteManager");
+            expect(
+                createCategoryTemplate(
+                    logCategories.MONITOR_EXECUTION,
+                    "runCheck",
+                    "completed"
+                ).operation
+            ).toBe("runCheck");
+            expect(
+                createCategoryTemplate(
+                    logCategories.DATABASE_OPERATIONS,
+                    "query",
+                    "failed"
+                ).status
+            ).toBe("failed");
         });
 
         it("should handle log filtering and querying", () => {
@@ -243,7 +291,12 @@ describe("Shared Utils Coverage", () => {
             }
 
             const mockLogs: LogTemplate[] = [
-                { level: "info", category: "SiteManager", message: "Site created", timestamp: "2024-01-01T10:00:00Z" },
+                {
+                    level: "info",
+                    category: "SiteManager",
+                    message: "Site created",
+                    timestamp: "2024-01-01T10:00:00Z",
+                },
                 {
                     level: "error",
                     category: "MonitorExecutor",
@@ -258,11 +311,23 @@ describe("Shared Utils Coverage", () => {
                 },
             ];
 
-            const filterLogs = (logs: LogTemplate[], filter: LogFilter): LogTemplate[] => {
+            const filterLogs = (
+                logs: LogTemplate[],
+                filter: LogFilter
+            ): LogTemplate[] => {
                 return logs.filter((log) => {
-                    if (filter.level && !filter.level.includes(log.level)) return false;
-                    if (filter.category && !filter.category.includes(log.category)) return false;
-                    if (filter.containsText && !log.message.includes(filter.containsText)) return false;
+                    if (filter.level && !filter.level.includes(log.level))
+                        return false;
+                    if (
+                        filter.category &&
+                        !filter.category.includes(log.category)
+                    )
+                        return false;
+                    if (
+                        filter.containsText &&
+                        !log.message.includes(filter.containsText)
+                    )
+                        return false;
                     return true;
                 });
             };
@@ -271,7 +336,9 @@ describe("Shared Utils Coverage", () => {
             expect(errorLogs).toHaveLength(1);
             expect(errorLogs[0].level).toBe("error");
 
-            const siteManagerLogs = filterLogs(mockLogs, { category: ["SiteManager"] });
+            const siteManagerLogs = filterLogs(mockLogs, {
+                category: ["SiteManager"],
+            });
             expect(siteManagerLogs).toHaveLength(2);
 
             const failedLogs = filterLogs(mockLogs, { containsText: "failed" });
@@ -285,7 +352,12 @@ describe("Shared Utils Coverage", () => {
             interface ErrorCatalogEntry {
                 code: string;
                 message: string;
-                category: "validation" | "network" | "database" | "system" | "user";
+                category:
+                    | "validation"
+                    | "network"
+                    | "database"
+                    | "system"
+                    | "user";
                 severity: "low" | "medium" | "high" | "critical";
                 recoverable: boolean;
                 suggestions?: string[];
@@ -298,7 +370,10 @@ describe("Shared Utils Coverage", () => {
                     category: "validation",
                     severity: "medium",
                     recoverable: true,
-                    suggestions: ["Check the site ID", "Verify the site exists"],
+                    suggestions: [
+                        "Check the site ID",
+                        "Verify the site exists",
+                    ],
                 },
                 NETWORK_TIMEOUT: {
                     code: "NETWORK_TIMEOUT",
@@ -306,7 +381,10 @@ describe("Shared Utils Coverage", () => {
                     category: "network",
                     severity: "medium",
                     recoverable: true,
-                    suggestions: ["Check network connectivity", "Increase timeout value"],
+                    suggestions: [
+                        "Check network connectivity",
+                        "Increase timeout value",
+                    ],
                 },
                 DATABASE_CONNECTION_FAILED: {
                     code: "DATABASE_CONNECTION_FAILED",
@@ -314,7 +392,10 @@ describe("Shared Utils Coverage", () => {
                     category: "database",
                     severity: "critical",
                     recoverable: false,
-                    suggestions: ["Check database status", "Verify connection parameters"],
+                    suggestions: [
+                        "Check database status",
+                        "Verify connection parameters",
+                    ],
                 },
                 INVALID_MONITOR_CONFIG: {
                     code: "INVALID_MONITOR_CONFIG",
@@ -322,21 +403,33 @@ describe("Shared Utils Coverage", () => {
                     category: "validation",
                     severity: "high",
                     recoverable: true,
-                    suggestions: ["Check required fields", "Validate configuration format"],
+                    suggestions: [
+                        "Check required fields",
+                        "Validate configuration format",
+                    ],
                 },
             };
 
             expect(errorCatalog.SITE_NOT_FOUND.category).toBe("validation");
             expect(errorCatalog.NETWORK_TIMEOUT.severity).toBe("medium");
-            expect(errorCatalog.DATABASE_CONNECTION_FAILED.recoverable).toBe(false);
-            expect(errorCatalog.INVALID_MONITOR_CONFIG.suggestions).toContain("Check required fields");
+            expect(errorCatalog.DATABASE_CONNECTION_FAILED.recoverable).toBe(
+                false
+            );
+            expect(errorCatalog.INVALID_MONITOR_CONFIG.suggestions).toContain(
+                "Check required fields"
+            );
         });
 
         it("should handle error resolution and recovery", () => {
             interface ErrorCatalogEntry {
                 code: string;
                 message: string;
-                category: "validation" | "network" | "database" | "system" | "user";
+                category:
+                    | "validation"
+                    | "network"
+                    | "database"
+                    | "system"
+                    | "user";
                 severity: "low" | "medium" | "high" | "critical";
                 recoverable: boolean;
                 suggestions?: string[];
@@ -362,23 +455,40 @@ describe("Shared Utils Coverage", () => {
 
             const errorHandler: ErrorHandler = {
                 getErrorInfo: (code: string) => mockErrorCatalog[code],
-                isRecoverable: (code: string) => mockErrorCatalog[code]?.recoverable || false,
-                getSuggestions: (code: string) => mockErrorCatalog[code]?.suggestions || [],
-                categorizeError: (code: string) => mockErrorCatalog[code]?.category || "unknown",
+                isRecoverable: (code: string) =>
+                    mockErrorCatalog[code]?.recoverable || false,
+                getSuggestions: (code: string) =>
+                    mockErrorCatalog[code]?.suggestions || [],
+                categorizeError: (code: string) =>
+                    mockErrorCatalog[code]?.category || "unknown",
             };
 
-            expect(errorHandler.getErrorInfo("TEST_ERROR")?.message).toBe("Test error message");
+            expect(errorHandler.getErrorInfo("TEST_ERROR")?.message).toBe(
+                "Test error message"
+            );
             expect(errorHandler.isRecoverable("TEST_ERROR")).toBe(true);
-            expect(errorHandler.getSuggestions("TEST_ERROR")).toEqual(["Test suggestion"]);
-            expect(errorHandler.categorizeError("TEST_ERROR")).toBe("validation");
-            expect(errorHandler.categorizeError("UNKNOWN_ERROR")).toBe("unknown");
+            expect(errorHandler.getSuggestions("TEST_ERROR")).toEqual([
+                "Test suggestion",
+            ]);
+            expect(errorHandler.categorizeError("TEST_ERROR")).toBe(
+                "validation"
+            );
+            expect(errorHandler.categorizeError("UNKNOWN_ERROR")).toBe(
+                "unknown"
+            );
         });
 
         it("should handle error formatting and localization", () => {
             interface ErrorFormatter {
-                formatError: (code: string, context?: Record<string, any>) => string;
+                formatError: (
+                    code: string,
+                    context?: Record<string, any>
+                ) => string;
                 getLocalizedMessage: (code: string, locale: string) => string;
-                formatWithContext: (template: string, context: Record<string, any>) => string;
+                formatWithContext: (
+                    template: string,
+                    context: Record<string, any>
+                ) => string;
             }
 
             const errorFormatter: ErrorFormatter = {
@@ -400,19 +510,30 @@ describe("Shared Utils Coverage", () => {
                     };
                     return messages[locale]?.[code] || code;
                 },
-                formatWithContext: (template: string, context: Record<string, any>) => {
+                formatWithContext: (
+                    template: string,
+                    context: Record<string, any>
+                ) => {
                     return template.replace(/\{(\w+)\}/g, (match, key) => {
                         return context[key]?.toString() || match;
                     });
                 },
             };
 
-            expect(errorFormatter.formatError("TEST_ERROR", { siteId: "123" })).toBe("Error TEST_ERROR (siteId: 123)");
-            expect(errorFormatter.getLocalizedMessage("SITE_NOT_FOUND", "en")).toBe("Site not found");
-            expect(errorFormatter.getLocalizedMessage("SITE_NOT_FOUND", "es")).toBe("Sitio no encontrado");
-            expect(errorFormatter.formatWithContext("Site {siteId} not found", { siteId: "123" })).toBe(
-                "Site 123 not found"
-            );
+            expect(
+                errorFormatter.formatError("TEST_ERROR", { siteId: "123" })
+            ).toBe("Error TEST_ERROR (siteId: 123)");
+            expect(
+                errorFormatter.getLocalizedMessage("SITE_NOT_FOUND", "en")
+            ).toBe("Site not found");
+            expect(
+                errorFormatter.getLocalizedMessage("SITE_NOT_FOUND", "es")
+            ).toBe("Sitio no encontrado");
+            expect(
+                errorFormatter.formatWithContext("Site {siteId} not found", {
+                    siteId: "123",
+                })
+            ).toBe("Site 123 not found");
         });
     });
 
@@ -445,8 +566,12 @@ describe("Shared Utils Coverage", () => {
             expect(stringUtils.safeToString(123)).toBe("123");
             expect(stringUtils.safeToString(true)).toBe("true");
             expect(stringUtils.safeToString([1, 2, 3])).toBe("[1,2,3]");
-            expect(stringUtils.truncateString("Very long string", 10)).toBe("Very lo...");
-            expect(stringUtils.normalizeWhitespace("  Multiple   spaces  ")).toBe("Multiple spaces");
+            expect(stringUtils.truncateString("Very long string", 10)).toBe(
+                "Very lo..."
+            );
+            expect(
+                stringUtils.normalizeWhitespace("  Multiple   spaces  ")
+            ).toBe("Multiple spaces");
         });
     });
 
@@ -475,9 +600,13 @@ describe("Shared Utils Coverage", () => {
             const circular: any = { name: "test" };
             circular.self = circular;
 
-            expect(jsonUtils.safeStringify(circular)).toBe("[Circular Reference or Invalid JSON]");
+            expect(jsonUtils.safeStringify(circular)).toBe(
+                "[Circular Reference or Invalid JSON]"
+            );
             expect(jsonUtils.safeParse("invalid json", {})).toEqual({});
-            expect(jsonUtils.safeParse('{"valid": true}', {})).toEqual({ valid: true });
+            expect(jsonUtils.safeParse('{"valid": true}', {})).toEqual({
+                valid: true,
+            });
         });
     });
 
@@ -486,7 +615,8 @@ describe("Shared Utils Coverage", () => {
             // Test safeConversions.ts edge case (line 267)
             const conversionUtils = {
                 safeNumber: (value: any, fallback = 0): number => {
-                    if (typeof value === "number" && !isNaN(value)) return value;
+                    if (typeof value === "number" && !isNaN(value))
+                        return value;
                     if (typeof value === "string") {
                         const parsed = parseFloat(value);
                         return isNaN(parsed) ? fallback : parsed;

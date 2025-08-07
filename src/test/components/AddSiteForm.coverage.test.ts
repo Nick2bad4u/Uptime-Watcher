@@ -218,12 +218,18 @@ describe("AddSiteForm Component Coverage Tests", () => {
             // Test invalid monitor type
             const invalidType = "invalid-type";
             mockLogger.error(`Invalid monitor type value: ${invalidType}`);
-            expect(mockLogger.error).toHaveBeenCalledWith(`Invalid monitor type value: ${invalidType}`);
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                `Invalid monitor type value: ${invalidType}`
+            );
 
             // Test invalid check interval
             const invalidInterval = "invalid-number";
-            mockLogger.error(`Invalid check interval value: ${invalidInterval}`);
-            expect(mockLogger.error).toHaveBeenCalledWith(`Invalid check interval value: ${invalidInterval}`);
+            mockLogger.error(
+                `Invalid check interval value: ${invalidInterval}`
+            );
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                `Invalid check interval value: ${invalidInterval}`
+            );
         });
     });
 

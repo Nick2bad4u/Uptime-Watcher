@@ -59,7 +59,9 @@ describe("monitorOperations", () => {
         it("should create a monitor with overrides", () => {
             const overrides: Partial<Monitor> = {
                 checkInterval: 60000,
-                history: [{ responseTime: 250, status: "up", timestamp: Date.now() }],
+                history: [
+                    { responseTime: 250, status: "up", timestamp: Date.now() },
+                ],
                 host: "example.com",
                 id: "custom-id",
                 lastChecked: new Date(),
@@ -140,7 +142,9 @@ describe("monitorOperations", () => {
                 type: "http",
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(
+                false
+            );
         });
 
         it("should return false for invalid id type", () => {
@@ -152,7 +156,9 @@ describe("monitorOperations", () => {
                 type: "http" as MonitorType,
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(
+                false
+            );
         });
 
         it("should return false for missing type", () => {
@@ -163,7 +169,9 @@ describe("monitorOperations", () => {
                 status: "up" as const,
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(
+                false
+            );
         });
 
         it("should return false for invalid type", () => {
@@ -175,7 +183,9 @@ describe("monitorOperations", () => {
                 type: 123,
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(
+                false
+            );
         });
 
         it("should return false for missing status", () => {
@@ -186,7 +196,9 @@ describe("monitorOperations", () => {
                 type: "http",
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(
+                false
+            );
         });
 
         it("should return false for invalid status value", () => {
@@ -198,7 +210,9 @@ describe("monitorOperations", () => {
                 type: "http" as MonitorType,
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(
+                false
+            );
         });
 
         it("should return false for invalid status type", () => {
@@ -210,7 +224,9 @@ describe("monitorOperations", () => {
                 type: "http" as MonitorType,
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(
+                false
+            );
         });
 
         it("should return false for missing monitoring", () => {
@@ -221,7 +237,9 @@ describe("monitorOperations", () => {
                 type: "http",
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(
+                false
+            );
         });
 
         it("should return false for invalid monitoring type", () => {
@@ -233,7 +251,9 @@ describe("monitorOperations", () => {
                 type: "http" as MonitorType,
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(
+                false
+            );
         });
 
         it("should return false for missing history", () => {
@@ -244,7 +264,9 @@ describe("monitorOperations", () => {
                 type: "http",
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(
+                false
+            );
         });
 
         it("should return false for invalid history type", () => {
@@ -256,7 +278,9 @@ describe("monitorOperations", () => {
                 type: "http" as MonitorType,
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(
+                false
+            );
         });
 
         it("should validate all valid status values", () => {
@@ -275,7 +299,9 @@ describe("monitorOperations", () => {
                     timeout: 5000,
                     type: "http" as MonitorType,
                 };
-                expect(validateMonitor(monitor as unknown as Monitor)).toBe(true);
+                expect(validateMonitor(monitor as unknown as Monitor)).toBe(
+                    true
+                );
             }
         });
     });
@@ -308,7 +334,12 @@ describe("monitorOperations", () => {
         });
 
         it("should default invalid status to pending", () => {
-            const result = normalizeMonitor({ status: "invalid-status" as unknown as "up" | "down" | "pending" });
+            const result = normalizeMonitor({
+                status: "invalid-status" as unknown as
+                    | "up"
+                    | "down"
+                    | "pending",
+            });
             expect(result.status).toBe("pending");
         });
 
@@ -325,7 +356,13 @@ describe("monitorOperations", () => {
         });
 
         it("should preserve existing history", () => {
-            const history = [{ responseTime: 250, status: "up" as const, timestamp: Date.now() }];
+            const history = [
+                {
+                    responseTime: 250,
+                    status: "up" as const,
+                    timestamp: Date.now(),
+                },
+            ];
             const result = normalizeMonitor({ history });
             expect(result.history).toBe(history);
         });
@@ -686,7 +723,10 @@ describe("monitorOperations", () => {
                 monitors: [mockSite.monitors[0]!],
             };
 
-            const result = removeMonitorFromSite(siteWithOneMonitor, "monitor-1");
+            const result = removeMonitorFromSite(
+                siteWithOneMonitor,
+                "monitor-1"
+            );
 
             expect(result.monitors).toHaveLength(0);
         });
@@ -697,7 +737,10 @@ describe("monitorOperations", () => {
                 monitors: [],
             };
 
-            const result = removeMonitorFromSite(siteWithNoMonitors, "monitor-1");
+            const result = removeMonitorFromSite(
+                siteWithNoMonitors,
+                "monitor-1"
+            );
 
             expect(result.monitors).toHaveLength(0);
         });
@@ -782,7 +825,9 @@ describe("monitorOperations", () => {
                     monitoring: false,
                 };
 
-                const result = monitorOperations.toggleMonitoring(monitorWithMonitoringOff);
+                const result = monitorOperations.toggleMonitoring(
+                    monitorWithMonitoringOff
+                );
 
                 expect(result).toEqual({
                     ...mockMonitor,
@@ -804,7 +849,10 @@ describe("monitorOperations", () => {
             it("should update check interval", () => {
                 const newInterval = 60000;
 
-                const result = monitorOperations.updateCheckInterval(mockMonitor, newInterval);
+                const result = monitorOperations.updateCheckInterval(
+                    mockMonitor,
+                    newInterval
+                );
 
                 expect(result).toEqual({
                     ...mockMonitor,
@@ -815,14 +863,20 @@ describe("monitorOperations", () => {
             it("should not mutate original monitor", () => {
                 const originalMonitor = { ...mockMonitor };
 
-                const result = monitorOperations.updateCheckInterval(mockMonitor, 60000);
+                const result = monitorOperations.updateCheckInterval(
+                    mockMonitor,
+                    60000
+                );
 
                 expect(mockMonitor).toEqual(originalMonitor);
                 expect(result).not.toBe(mockMonitor);
             });
 
             it("should handle zero interval", () => {
-                const result = monitorOperations.updateCheckInterval(mockMonitor, 0);
+                const result = monitorOperations.updateCheckInterval(
+                    mockMonitor,
+                    0
+                );
 
                 expect(result.checkInterval).toBe(0);
             });
@@ -832,7 +886,10 @@ describe("monitorOperations", () => {
             it("should update retry attempts", () => {
                 const newRetryAttempts = 5;
 
-                const result = monitorOperations.updateRetryAttempts(mockMonitor, newRetryAttempts);
+                const result = monitorOperations.updateRetryAttempts(
+                    mockMonitor,
+                    newRetryAttempts
+                );
 
                 expect(result).toEqual({
                     ...mockMonitor,
@@ -843,7 +900,10 @@ describe("monitorOperations", () => {
             it("should not mutate original monitor", () => {
                 const originalMonitor = { ...mockMonitor };
 
-                const result = monitorOperations.updateRetryAttempts(mockMonitor, 5);
+                const result = monitorOperations.updateRetryAttempts(
+                    mockMonitor,
+                    5
+                );
 
                 expect(mockMonitor).toEqual(originalMonitor);
                 expect(result).not.toBe(mockMonitor);
@@ -852,7 +912,10 @@ describe("monitorOperations", () => {
 
         describe("updateStatus", () => {
             it("should update status to pending", () => {
-                const result = monitorOperations.updateStatus(mockMonitor, "pending");
+                const result = monitorOperations.updateStatus(
+                    mockMonitor,
+                    "pending"
+                );
 
                 expect(result).toEqual({
                     ...mockMonitor,
@@ -861,7 +924,10 @@ describe("monitorOperations", () => {
             });
 
             it("should update status to down", () => {
-                const result = monitorOperations.updateStatus(mockMonitor, "down");
+                const result = monitorOperations.updateStatus(
+                    mockMonitor,
+                    "down"
+                );
 
                 expect(result).toEqual({
                     ...mockMonitor,
@@ -872,7 +938,10 @@ describe("monitorOperations", () => {
             it("should not mutate original monitor", () => {
                 const originalMonitor = { ...mockMonitor };
 
-                const result = monitorOperations.updateStatus(mockMonitor, "down");
+                const result = monitorOperations.updateStatus(
+                    mockMonitor,
+                    "down"
+                );
 
                 expect(mockMonitor).toEqual(originalMonitor);
                 expect(result).not.toBe(mockMonitor);
@@ -883,7 +952,10 @@ describe("monitorOperations", () => {
             it("should update timeout", () => {
                 const newTimeout = 10000;
 
-                const result = monitorOperations.updateTimeout(mockMonitor, newTimeout);
+                const result = monitorOperations.updateTimeout(
+                    mockMonitor,
+                    newTimeout
+                );
 
                 expect(result).toEqual({
                     ...mockMonitor,
@@ -894,7 +966,10 @@ describe("monitorOperations", () => {
             it("should not mutate original monitor", () => {
                 const originalMonitor = { ...mockMonitor };
 
-                const result = monitorOperations.updateTimeout(mockMonitor, 10000);
+                const result = monitorOperations.updateTimeout(
+                    mockMonitor,
+                    10000
+                );
 
                 expect(mockMonitor).toEqual(originalMonitor);
                 expect(result).not.toBe(mockMonitor);

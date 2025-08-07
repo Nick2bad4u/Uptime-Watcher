@@ -89,13 +89,21 @@ vi.mock("../../../utils/data/generateUuid", () => ({
 
 // Mock FormFields components
 vi.mock("../../../components/AddSiteForm/FormFields", () => ({
-    RadioGroup: ({ children }: { children: React.ReactNode }) => <div data-testid="radio-group">{children}</div>,
-    SelectField: ({ children }: { children: React.ReactNode }) => <div data-testid="select-field">{children}</div>,
-    FormField: ({ children }: { children: React.ReactNode }) => <div data-testid="form-field">{children}</div>,
+    RadioGroup: ({ children }: { children: React.ReactNode }) => (
+        <div data-testid="radio-group">{children}</div>
+    ),
+    SelectField: ({ children }: { children: React.ReactNode }) => (
+        <div data-testid="select-field">{children}</div>
+    ),
+    FormField: ({ children }: { children: React.ReactNode }) => (
+        <div data-testid="form-field">{children}</div>
+    ),
 }));
 
 vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
-    DynamicMonitorFields: () => <div data-testid="dynamic-monitor-fields">Dynamic fields</div>,
+    DynamicMonitorFields: () => (
+        <div data-testid="dynamic-monitor-fields">Dynamic fields</div>
+    ),
 }));
 
 vi.mock("../../../theme/components", () => ({
@@ -128,6 +136,8 @@ describe("AddSiteForm", () => {
     it("should render form elements", () => {
         render(<AddSiteForm />);
         expect(screen.getByTestId("radio-group")).toBeInTheDocument();
-        expect(screen.getByTestId("dynamic-monitor-fields")).toBeInTheDocument();
+        expect(
+            screen.getByTestId("dynamic-monitor-fields")
+        ).toBeInTheDocument();
     });
 });

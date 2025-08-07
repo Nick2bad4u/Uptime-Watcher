@@ -36,17 +36,29 @@ export function useDelayedButtonLoading(isLoading: boolean): boolean {
     const [showButtonLoading, setShowButtonLoading] = useState(false);
 
     // Create stable callbacks to avoid direct setState in useEffect
-    const clearButtonLoading = useCallback(() => setShowButtonLoading(false), []);
-    const showButtonLoadingCallback = useCallback(() => setShowButtonLoading(true), []);
+    const clearButtonLoading = useCallback(
+        () => setShowButtonLoading(false),
+        []
+    );
+    const showButtonLoadingCallback = useCallback(
+        () => setShowButtonLoading(true),
+        []
+    );
 
     useEffect(() => {
         if (!isLoading) {
             // Use timeout to defer state update to avoid direct call in useEffect
-            const clearTimeoutId = setTimeout(clearButtonLoading, UI_DELAYS.STATE_UPDATE_DEFER);
+            const clearTimeoutId = setTimeout(
+                clearButtonLoading,
+                UI_DELAYS.STATE_UPDATE_DEFER
+            );
             return () => clearTimeout(clearTimeoutId);
         }
 
-        const timeoutId = setTimeout(showButtonLoadingCallback, UI_DELAYS.LOADING_BUTTON);
+        const timeoutId = setTimeout(
+            showButtonLoadingCallback,
+            UI_DELAYS.LOADING_BUTTON
+        );
 
         return () => clearTimeout(timeoutId);
     }, [isLoading, clearButtonLoading, showButtonLoadingCallback]);

@@ -68,7 +68,9 @@ export interface IDatabaseCommand<TResult = void> {
  * @typeParam TResult - The result type returned by the command's execute method.
  * @public
  */
-export abstract class DatabaseCommand<TResult = void> implements IDatabaseCommand<TResult> {
+export abstract class DatabaseCommand<TResult = void>
+    implements IDatabaseCommand<TResult>
+{
     protected readonly cache: StandardizedCache<Site>;
     protected readonly eventEmitter: TypedEventBus<UptimeEvents>;
     protected readonly serviceFactory: DatabaseServiceFactory;
@@ -168,11 +170,15 @@ export class DatabaseCommandExecutor {
      * @throws When command validation or execution fails.
      * @public
      */
-    public async execute<TResult>(command: IDatabaseCommand<TResult>): Promise<TResult> {
+    public async execute<TResult>(
+        command: IDatabaseCommand<TResult>
+    ): Promise<TResult> {
         // Validate command before execution
         const validation = await command.validate();
         if (!validation.isValid) {
-            throw new Error(`Command validation failed: ${validation.errors.join(", ")}`);
+            throw new Error(
+                `Command validation failed: ${validation.errors.join(", ")}`
+            );
         }
 
         try {
@@ -185,7 +191,11 @@ export class DatabaseCommandExecutor {
                 await command.rollback();
             } catch (rollbackError) {
                 // Log rollback failure but don't mask original error
-                console.error("Rollback failed for command:", command.getDescription(), rollbackError);
+                console.error(
+                    "Rollback failed for command:",
+                    command.getDescription(),
+                    rollbackError
+                );
             }
             throw error;
         }
@@ -212,14 +222,18 @@ export class DatabaseCommandExecutor {
                     await command.rollback();
                 }
             } catch (error) {
-                errors.push(error instanceof Error ? error : new Error(String(error)));
+                errors.push(
+                    error instanceof Error ? error : new Error(String(error))
+                );
             }
         }
 
         this.executedCommands.length = 0;
 
         if (errors.length > 0) {
-            throw new Error(`Rollback errors: ${errors.map((e) => e.message).join(", ")}`);
+            throw new Error(
+                `Rollback errors: ${errors.map((e) => e.message).join(", ")}`
+            );
         }
     }
 }
@@ -232,7 +246,10 @@ export class DatabaseCommandExecutor {
  *
  * @public
  */
-export class DownloadBackupCommand extends DatabaseCommand<{ buffer: Buffer; fileName: string }> {
+export class DownloadBackupCommand extends DatabaseCommand<{
+    buffer: Buffer;
+    fileName: string;
+}> {
     public async execute(): Promise<{ buffer: Buffer; fileName: string }> {
         const dataBackupService = this.serviceFactory.createBackupService();
         const result = await dataBackupService.downloadDatabaseBackup();
@@ -286,7 +303,8 @@ export class DownloadBackupCommand extends DatabaseCommand<{ buffer: Buffer; fil
  */
 export class ExportDataCommand extends DatabaseCommand<string> {
     public async execute(): Promise<string> {
-        const dataImportExportService = this.serviceFactory.createImportExportService();
+        const dataImportExportService =
+            this.serviceFactory.createImportExportService();
         const result = await dataImportExportService.exportAllData();
 
         await this.emitSuccessEvent("internal:database:data-exported", {
@@ -337,15 +355,19 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
         // Create backup of current sites
         this.backupSites = this.cache.getAll();
 
-        const dataImportExportService = this.serviceFactory.createImportExportService();
+        const dataImportExportService =
+            this.serviceFactory.createImportExportService();
 
         // Parse and import data
-        const { settings, sites } = await dataImportExportService.importDataFromJson(this.data);
+        const { settings, sites } =
+            await dataImportExportService.importDataFromJson(this.data);
         await dataImportExportService.persistImportedData(sites, settings);
 
         // Reload sites from database
-        const siteRepositoryService = this.serviceFactory.createSiteRepositoryService();
-        const reloadedSites = await siteRepositoryService.getSitesFromDatabase();
+        const siteRepositoryService =
+            this.serviceFactory.createSiteRepositoryService();
+        const reloadedSites =
+            await siteRepositoryService.getSitesFromDatabase();
 
         // Update cache
         this.cache.clear();
@@ -411,7 +433,8 @@ export class LoadSitesCommand extends DatabaseCommand<Site[]> {
             this.originalCacheState.set(key, site);
         }
 
-        const siteRepositoryService = this.serviceFactory.createSiteRepositoryService();
+        const siteRepositoryService =
+            this.serviceFactory.createSiteRepositoryService();
         const sites = await siteRepositoryService.getSitesFromDatabase();
 
         // Atomic cache replacement

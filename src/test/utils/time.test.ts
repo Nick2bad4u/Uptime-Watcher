@@ -136,7 +136,9 @@ describe("Time Utilities", () => {
             expect(formatRelativeTimestamp(recentTimestamp)).toBe("Just now");
 
             const veryRecentTimestamp = 1640995200000 - 5000; // 5 seconds ago
-            expect(formatRelativeTimestamp(veryRecentTimestamp)).toBe("Just now");
+            expect(formatRelativeTimestamp(veryRecentTimestamp)).toBe(
+                "Just now"
+            );
         });
 
         it("should format seconds ago for timestamps 31+ seconds old", () => {
@@ -187,7 +189,9 @@ describe("Time Utilities", () => {
 
             // Exactly 31 seconds
             const thirtyOneSecondsAgo = 1640995200000 - 31000;
-            expect(formatRelativeTimestamp(thirtyOneSecondsAgo)).toBe("31 seconds ago");
+            expect(formatRelativeTimestamp(thirtyOneSecondsAgo)).toBe(
+                "31 seconds ago"
+            );
 
             // Current timestamp (0 difference)
             expect(formatRelativeTimestamp(1640995200000)).toBe("Just now");
@@ -281,9 +285,15 @@ describe("Time Utilities", () => {
         });
 
         it("should use custom label when provided", () => {
-            expect(getIntervalLabel({ value: 5000, label: "Every 5 seconds" })).toBe("Every 5 seconds");
-            expect(getIntervalLabel({ value: 60000, label: "Custom minute" })).toBe("Custom minute");
-            expect(getIntervalLabel({ value: 3600000, label: "Hourly Check" })).toBe("Hourly Check");
+            expect(
+                getIntervalLabel({ value: 5000, label: "Every 5 seconds" })
+            ).toBe("Every 5 seconds");
+            expect(
+                getIntervalLabel({ value: 60000, label: "Custom minute" })
+            ).toBe("Custom minute");
+            expect(
+                getIntervalLabel({ value: 3600000, label: "Hourly Check" })
+            ).toBe("Hourly Check");
         });
 
         it("should fall back to formatIntervalDuration when label is empty", () => {
@@ -294,38 +304,60 @@ describe("Time Utilities", () => {
 
         it("should handle edge cases", () => {
             expect(getIntervalLabel(0)).toBe("0s");
-            expect(getIntervalLabel({ value: 0, label: "Instant" })).toBe("Instant");
+            expect(getIntervalLabel({ value: 0, label: "Instant" })).toBe(
+                "Instant"
+            );
             expect(getIntervalLabel({ value: 1000 })).toBe("1s");
         });
     });
 
     describe("formatRetryAttemptsText", () => {
         it("should return special message for 0 attempts", () => {
-            expect(formatRetryAttemptsText(0)).toBe("(Retry disabled - immediate failure detection)");
+            expect(formatRetryAttemptsText(0)).toBe(
+                "(Retry disabled - immediate failure detection)"
+            );
         });
 
         it("should use singular 'time' for 1 attempt", () => {
-            expect(formatRetryAttemptsText(1)).toBe("(Retry 1 time before marking down)");
+            expect(formatRetryAttemptsText(1)).toBe(
+                "(Retry 1 time before marking down)"
+            );
         });
 
         it("should use plural 'times' for multiple attempts", () => {
-            expect(formatRetryAttemptsText(2)).toBe("(Retry 2 times before marking down)");
-            expect(formatRetryAttemptsText(3)).toBe("(Retry 3 times before marking down)");
-            expect(formatRetryAttemptsText(5)).toBe("(Retry 5 times before marking down)");
-            expect(formatRetryAttemptsText(10)).toBe("(Retry 10 times before marking down)");
+            expect(formatRetryAttemptsText(2)).toBe(
+                "(Retry 2 times before marking down)"
+            );
+            expect(formatRetryAttemptsText(3)).toBe(
+                "(Retry 3 times before marking down)"
+            );
+            expect(formatRetryAttemptsText(5)).toBe(
+                "(Retry 5 times before marking down)"
+            );
+            expect(formatRetryAttemptsText(10)).toBe(
+                "(Retry 10 times before marking down)"
+            );
         });
 
         it("should handle edge cases", () => {
             // Test negative values (not expected but should be handled)
-            expect(formatRetryAttemptsText(-1)).toBe("(Retry -1 times before marking down)");
+            expect(formatRetryAttemptsText(-1)).toBe(
+                "(Retry -1 times before marking down)"
+            );
 
             // Test very large values
-            expect(formatRetryAttemptsText(100)).toBe("(Retry 100 times before marking down)");
+            expect(formatRetryAttemptsText(100)).toBe(
+                "(Retry 100 times before marking down)"
+            );
         });
 
         it("should handle decimal values (though not expected in normal use)", () => {
-            expect(formatRetryAttemptsText(1.5)).toBe("(Retry 1.5 times before marking down)");
-            expect(formatRetryAttemptsText(2.7)).toBe("(Retry 2.7 times before marking down)");
+            expect(formatRetryAttemptsText(1.5)).toBe(
+                "(Retry 1.5 times before marking down)"
+            );
+            expect(formatRetryAttemptsText(2.7)).toBe(
+                "(Retry 2.7 times before marking down)"
+            );
         });
     });
 

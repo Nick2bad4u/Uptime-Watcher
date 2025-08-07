@@ -4,7 +4,10 @@
 
 import { describe, expect, it } from "vitest";
 
-import { ChartConfigService, createChartConfigs } from "../services/chartConfig";
+import {
+    ChartConfigService,
+    createChartConfigs,
+} from "../services/chartConfig";
 import { Theme } from "../theme/types";
 import { getScaleProperty, getNestedScaleProperty } from "../utils/chartUtils";
 
@@ -134,7 +137,9 @@ describe("ChartConfigService", () => {
         it("should store the theme correctly", () => {
             // Test by calling a method that uses the theme
             const config = chartService.getLineChartConfig();
-            expect(config.plugins?.legend?.labels?.color).toBe(mockTheme.colors.text.primary);
+            expect(config.plugins?.legend?.labels?.color).toBe(
+                mockTheme.colors.text.primary
+            );
         });
     });
 
@@ -169,11 +174,25 @@ describe("ChartConfigService", () => {
 
             expect(getScaleProperty(config, "x", "type")).toBe("time");
             // TypeScript has overly strict Chart.js types, so we use assertions for deep nested properties
-            expect(getNestedScaleProperty(config, "x", "time.displayFormats.day")).toBe("MMM dd");
-            expect(getNestedScaleProperty(config, "x", "time.displayFormats.hour")).toBe("HH:mm");
-            expect(getNestedScaleProperty(config, "x", "time.displayFormats.minute")).toBe("HH:mm");
-            expect(getNestedScaleProperty(config, "y", "beginAtZero")).toBe(true);
-            expect(getNestedScaleProperty(config, "y", "title.text")).toBe("Response Time (ms)");
+            expect(
+                getNestedScaleProperty(config, "x", "time.displayFormats.day")
+            ).toBe("MMM dd");
+            expect(
+                getNestedScaleProperty(config, "x", "time.displayFormats.hour")
+            ).toBe("HH:mm");
+            expect(
+                getNestedScaleProperty(
+                    config,
+                    "x",
+                    "time.displayFormats.minute"
+                )
+            ).toBe("HH:mm");
+            expect(getNestedScaleProperty(config, "y", "beginAtZero")).toBe(
+                true
+            );
+            expect(getNestedScaleProperty(config, "y", "title.text")).toBe(
+                "Response Time (ms)"
+            );
         });
 
         it("should have correct title", () => {
@@ -186,25 +205,41 @@ describe("ChartConfigService", () => {
         it("should apply theme colors", () => {
             const config = chartService.getLineChartConfig();
 
-            expect(config.plugins?.title?.color).toBe(mockTheme.colors.text.primary);
-            expect(config.plugins?.legend?.labels?.color).toBe(mockTheme.colors.text.primary);
-            expect(config.plugins?.tooltip?.backgroundColor).toBe(mockTheme.colors.surface.elevated);
-            expect(config.plugins?.tooltip?.titleColor).toBe(mockTheme.colors.text.primary);
-            expect(config.plugins?.tooltip?.bodyColor).toBe(mockTheme.colors.text.secondary);
-            expect(config.plugins?.tooltip?.borderColor).toBe(mockTheme.colors.border.primary);
+            expect(config.plugins?.title?.color).toBe(
+                mockTheme.colors.text.primary
+            );
+            expect(config.plugins?.legend?.labels?.color).toBe(
+                mockTheme.colors.text.primary
+            );
+            expect(config.plugins?.tooltip?.backgroundColor).toBe(
+                mockTheme.colors.surface.elevated
+            );
+            expect(config.plugins?.tooltip?.titleColor).toBe(
+                mockTheme.colors.text.primary
+            );
+            expect(config.plugins?.tooltip?.bodyColor).toBe(
+                mockTheme.colors.text.secondary
+            );
+            expect(config.plugins?.tooltip?.borderColor).toBe(
+                mockTheme.colors.border.primary
+            );
         });
 
         it("should apply theme typography", () => {
             const config = chartService.getLineChartConfig();
 
             // TypeScript has overly strict Chart.js types, so we use assertions for deep nested properties
-            expect((config.plugins?.title?.font as any)?.family).toBe(mockTheme.typography.fontFamily.sans.join(", "));
+            expect((config.plugins?.title?.font as any)?.family).toBe(
+                mockTheme.typography.fontFamily.sans.join(", ")
+            );
             expect((config.plugins?.title?.font as any)?.size).toBe(16);
             expect((config.plugins?.title?.font as any)?.weight).toBe("bold");
             expect((config.plugins?.legend?.labels?.font as any)?.family).toBe(
                 mockTheme.typography.fontFamily.sans.join(", ")
             );
-            expect((config.plugins?.legend?.labels?.font as any)?.size).toBe(12);
+            expect((config.plugins?.legend?.labels?.font as any)?.size).toBe(
+                12
+            );
         });
     });
 
@@ -233,25 +268,37 @@ describe("ChartConfigService", () => {
         it("should have correct scale configuration", () => {
             const config = chartService.getBarChartConfig();
 
-            expect(getNestedScaleProperty(config, "y", "beginAtZero")).toBe(true);
-            expect(getNestedScaleProperty(config, "y", "title.text")).toBe("Count");
-            expect(getNestedScaleProperty(config, "y", "title.display")).toBe(true);
+            expect(getNestedScaleProperty(config, "y", "beginAtZero")).toBe(
+                true
+            );
+            expect(getNestedScaleProperty(config, "y", "title.text")).toBe(
+                "Count"
+            );
+            expect(getNestedScaleProperty(config, "y", "title.display")).toBe(
+                true
+            );
         });
 
         it("should apply theme colors", () => {
             const config = chartService.getBarChartConfig();
 
-            expect(config.plugins?.title?.color).toBe(mockTheme.colors.text.primary);
-            expect(getNestedScaleProperty(config, "y", "title.color")).toBe(mockTheme.colors.text.secondary);
+            expect(config.plugins?.title?.color).toBe(
+                mockTheme.colors.text.primary
+            );
+            expect(getNestedScaleProperty(config, "y", "title.color")).toBe(
+                mockTheme.colors.text.secondary
+            );
         });
 
         it("should apply theme typography", () => {
             const config = chartService.getBarChartConfig();
 
-            expect((config.plugins?.title?.font as any)?.family).toBe(mockTheme.typography.fontFamily.sans.join(", "));
-            expect(getNestedScaleProperty(config, "y", "title.font.family")).toBe(
+            expect((config.plugins?.title?.font as any)?.family).toBe(
                 mockTheme.typography.fontFamily.sans.join(", ")
             );
+            expect(
+                getNestedScaleProperty(config, "y", "title.font.family")
+            ).toBe(mockTheme.typography.fontFamily.sans.join(", "));
         });
     });
 
@@ -281,7 +328,9 @@ describe("ChartConfigService", () => {
             const config = chartService.getDoughnutChartConfig(100);
 
             expect(config.plugins?.tooltip?.callbacks?.label).toBeDefined();
-            expect(typeof config.plugins?.tooltip?.callbacks?.label).toBe("function");
+            expect(typeof config.plugins?.tooltip?.callbacks?.label).toBe(
+                "function"
+            );
         });
 
         it("should calculate percentages correctly in tooltip", () => {
@@ -293,7 +342,10 @@ describe("ChartConfigService", () => {
                     label: "Up",
                     parsed: 25,
                 };
-                const result = labelCallback.call({} as any, mockContext as any);
+                const result = labelCallback.call(
+                    {} as any,
+                    mockContext as any
+                );
                 expect(result).toBe("Up: 25 (25.0%)");
             }
         });
@@ -307,7 +359,10 @@ describe("ChartConfigService", () => {
                     label: "Up",
                     parsed: 25,
                 };
-                const result = labelCallback.call({} as any, mockContext as any);
+                const result = labelCallback.call(
+                    {} as any,
+                    mockContext as any
+                );
                 expect(result).toBe("Up: 25 (0%)");
             }
         });
@@ -315,14 +370,20 @@ describe("ChartConfigService", () => {
         it("should apply theme colors", () => {
             const config = chartService.getDoughnutChartConfig(100);
 
-            expect(config.plugins?.title?.color).toBe(mockTheme.colors.text.primary);
-            expect(config.plugins?.legend?.labels?.color).toBe(mockTheme.colors.text.primary);
+            expect(config.plugins?.title?.color).toBe(
+                mockTheme.colors.text.primary
+            );
+            expect(config.plugins?.legend?.labels?.color).toBe(
+                mockTheme.colors.text.primary
+            );
         });
 
         it("should apply theme typography", () => {
             const config = chartService.getDoughnutChartConfig(100);
 
-            expect((config.plugins?.title?.font as any)?.family).toBe(mockTheme.typography.fontFamily.sans.join(", "));
+            expect((config.plugins?.title?.font as any)?.family).toBe(
+                mockTheme.typography.fontFamily.sans.join(", ")
+            );
             expect((config.plugins?.legend?.labels?.font as any)?.family).toBe(
                 mockTheme.typography.fontFamily.sans.join(", ")
             );
@@ -349,8 +410,12 @@ describe("ChartConfigService", () => {
             const lineConfig = chartService.getLineChartConfig();
             const barConfig = chartService.getBarChartConfig();
 
-            expect(lineConfig.plugins?.tooltip?.backgroundColor).toBe(mockTheme.colors.surface.elevated);
-            expect(barConfig.plugins?.tooltip?.backgroundColor).toBe(mockTheme.colors.surface.elevated);
+            expect(lineConfig.plugins?.tooltip?.backgroundColor).toBe(
+                mockTheme.colors.surface.elevated
+            );
+            expect(barConfig.plugins?.tooltip?.backgroundColor).toBe(
+                mockTheme.colors.surface.elevated
+            );
 
             expect(lineConfig.plugins?.tooltip?.borderWidth).toBe(1);
             expect(barConfig.plugins?.tooltip?.borderWidth).toBe(1);
@@ -361,12 +426,20 @@ describe("ChartConfigService", () => {
             const barConfig = chartService.getBarChartConfig();
 
             // Check that grid colors are consistent
-            expect(getNestedScaleProperty(lineConfig, "x", "grid.color")).toBe(mockTheme.colors.border.secondary);
-            expect(getNestedScaleProperty(barConfig, "x", "grid.color")).toBe(mockTheme.colors.border.secondary);
+            expect(getNestedScaleProperty(lineConfig, "x", "grid.color")).toBe(
+                mockTheme.colors.border.secondary
+            );
+            expect(getNestedScaleProperty(barConfig, "x", "grid.color")).toBe(
+                mockTheme.colors.border.secondary
+            );
 
             // Check that tick colors are consistent
-            expect(getNestedScaleProperty(lineConfig, "x", "ticks.color")).toBe(mockTheme.colors.text.secondary);
-            expect(getNestedScaleProperty(barConfig, "x", "ticks.color")).toBe(mockTheme.colors.text.secondary);
+            expect(getNestedScaleProperty(lineConfig, "x", "ticks.color")).toBe(
+                mockTheme.colors.text.secondary
+            );
+            expect(getNestedScaleProperty(barConfig, "x", "ticks.color")).toBe(
+                mockTheme.colors.text.secondary
+            );
         });
     });
 });
@@ -394,7 +467,8 @@ describe("createChartConfigs", () => {
 
     it("should pass totalChecks to doughnut configuration", () => {
         const configs = createChartConfigs(mockTheme, 150);
-        const labelCallback = configs.doughnutOptions.plugins?.tooltip?.callbacks?.label;
+        const labelCallback =
+            configs.doughnutOptions.plugins?.tooltip?.callbacks?.label;
 
         if (labelCallback) {
             const mockContext = {
@@ -408,7 +482,8 @@ describe("createChartConfigs", () => {
 
     it("should handle default totalChecks", () => {
         const configs = createChartConfigs(mockTheme);
-        const labelCallback = configs.doughnutOptions.plugins?.tooltip?.callbacks?.label;
+        const labelCallback =
+            configs.doughnutOptions.plugins?.tooltip?.callbacks?.label;
 
         if (labelCallback) {
             const mockContext = {
@@ -432,9 +507,15 @@ describe("createChartConfigs", () => {
     it("should apply theme consistently across all configurations", () => {
         const configs = createChartConfigs(mockTheme, 100);
 
-        expect(configs.lineChartOptions.plugins?.title?.color).toBe(mockTheme.colors.text.primary);
-        expect(configs.barChartOptions.plugins?.title?.color).toBe(mockTheme.colors.text.primary);
-        expect(configs.doughnutOptions.plugins?.title?.color).toBe(mockTheme.colors.text.primary);
+        expect(configs.lineChartOptions.plugins?.title?.color).toBe(
+            mockTheme.colors.text.primary
+        );
+        expect(configs.barChartOptions.plugins?.title?.color).toBe(
+            mockTheme.colors.text.primary
+        );
+        expect(configs.doughnutOptions.plugins?.title?.color).toBe(
+            mockTheme.colors.text.primary
+        );
     });
 
     it("should handle different theme objects", () => {
@@ -454,8 +535,14 @@ describe("createChartConfigs", () => {
 
         const configs = createChartConfigs(darkTheme, 100);
 
-        expect(configs.lineChartOptions.plugins?.title?.color).toBe(darkTheme.colors.text.primary);
-        expect(configs.barChartOptions.plugins?.title?.color).toBe(darkTheme.colors.text.primary);
-        expect(configs.doughnutOptions.plugins?.title?.color).toBe(darkTheme.colors.text.primary);
+        expect(configs.lineChartOptions.plugins?.title?.color).toBe(
+            darkTheme.colors.text.primary
+        );
+        expect(configs.barChartOptions.plugins?.title?.color).toBe(
+            darkTheme.colors.text.primary
+        );
+        expect(configs.doughnutOptions.plugins?.title?.color).toBe(
+            darkTheme.colors.text.primary
+        );
     });
 });

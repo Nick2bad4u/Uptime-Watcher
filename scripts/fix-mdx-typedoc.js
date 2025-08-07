@@ -62,4 +62,6 @@ for (const dir of DOCS_DIRS) {
     walk(dir);
 }
 
-console.log("Finished fixing TypeDoc markdown for MDX compatibility in all directories.");
+console.log(
+    "Finished fixing TypeDoc markdown for MDX compatibility in all directories."
+);

@@ -25,7 +25,12 @@ import { useSettingsStore } from "./stores/settings/useSettingsStore";
 import { useSitesStore } from "./stores/sites/useSitesStore";
 import { useUIStore } from "./stores/ui/useUiStore";
 import { useUpdatesStore } from "./stores/updates/useUpdatesStore";
-import { ThemedBox, ThemedButton, ThemedText, ThemeProvider } from "./theme/components";
+import {
+    ThemedBox,
+    ThemedButton,
+    ThemedText,
+    ThemeProvider,
+} from "./theme/components";
 import { useTheme } from "./theme/useTheme";
 import { setupCacheSync } from "./utils/cacheSync";
 
@@ -86,19 +91,37 @@ const App = (): JSX.Element => {
     // Store subscription happens automatically when store is accessed
 
     // UI store
-    const { setShowSettings, setShowSiteDetails, showSettings, showSiteDetails } = useUIStore();
+    const {
+        setShowSettings,
+        setShowSiteDetails,
+        showSettings,
+        showSiteDetails,
+    } = useUIStore();
 
     // Updates store
-    const { applyUpdate, setUpdateError, setUpdateStatus, updateError, updateStatus } = useUpdatesStore();
+    const {
+        applyUpdate,
+        setUpdateError,
+        setUpdateStatus,
+        updateError,
+        updateStatus,
+    } = useUpdatesStore();
 
     const { isDark } = useTheme();
 
     // Delayed loading state to prevent flash for quick operations
-    const [showLoadingOverlay, setShowLoadingOverlay] = useState<boolean>(false);
+    const [showLoadingOverlay, setShowLoadingOverlay] =
+        useState<boolean>(false);
 
     // Create stable callbacks to avoid direct setState in useEffect
-    const clearLoadingOverlay = useCallback(() => setShowLoadingOverlay(false), []);
-    const showLoadingOverlayCallback = useCallback(() => setShowLoadingOverlay(true), []);
+    const clearLoadingOverlay = useCallback(
+        () => setShowLoadingOverlay(false),
+        []
+    );
+    const showLoadingOverlayCallback = useCallback(
+        () => setShowLoadingOverlay(true),
+        []
+    );
 
     /**
      * Only show loading overlay if loading takes more than 100ms
@@ -107,13 +130,19 @@ const App = (): JSX.Element => {
     useEffect((): (() => void) | undefined => {
         if (!isLoading) {
             // Use timeout to defer state update to avoid direct call in useEffect
-            const clearTimeoutId = setTimeout(clearLoadingOverlay, UI_DELAYS.STATE_UPDATE_DEFER);
+            const clearTimeoutId = setTimeout(
+                clearLoadingOverlay,
+                UI_DELAYS.STATE_UPDATE_DEFER
+            );
             return (): void => {
                 clearTimeout(clearTimeoutId);
             };
         }
 
-        const timeoutId = setTimeout(showLoadingOverlayCallback, UI_DELAYS.LOADING_OVERLAY);
+        const timeoutId = setTimeout(
+            showLoadingOverlayCallback,
+            UI_DELAYS.LOADING_OVERLAY
+        );
 
         return (): void => {
             clearTimeout(timeoutId);
@@ -141,7 +170,10 @@ const App = (): JSX.Element => {
             const settingsStore = useSettingsStore.getState();
 
             // Initialize both stores
-            await Promise.all([sitesStore.initializeSites(), settingsStore.initializeSettings()]);
+            await Promise.all([
+                sitesStore.initializeSites(),
+                settingsStore.initializeSettings(),
+            ]);
 
             // Set up cache synchronization with backend
             // eslint-disable-next-line n/no-sync -- Function name contains 'sync' but is not a synchronous file operation
@@ -199,8 +231,17 @@ const App = (): JSX.Element => {
                 <div className={`app-container ${isDark ? "dark" : ""}`}>
                     {/* Global Loading Overlay */}
                     {showLoadingOverlay ? (
-                        <output aria-label="Loading application" aria-live="polite" className="loading-overlay">
-                            <ThemedBox padding="lg" rounded="lg" shadow="xl" surface="elevated">
+                        <output
+                            aria-label="Loading application"
+                            aria-live="polite"
+                            className="loading-overlay"
+                        >
+                            <ThemedBox
+                                padding="lg"
+                                rounded="lg"
+                                shadow="xl"
+                                surface="elevated"
+                            >
                                 <div className="loading-content">
                                     <div className="loading-spinner" />
                                     <ThemedText size="base" weight="medium">
@@ -213,11 +254,21 @@ const App = (): JSX.Element => {
 
                     {/* Global Error Notification */}
                     {lastError ? (
-                        <div aria-live="assertive" className="fixed top-0 left-0 right-0 z-50" role="alert">
-                            <ThemedBox className="error-alert" padding="md" surface="elevated">
+                        <div
+                            aria-live="assertive"
+                            className="fixed top-0 left-0 right-0 z-50"
+                            role="alert"
+                        >
+                            <ThemedBox
+                                className="error-alert"
+                                padding="md"
+                                surface="elevated"
+                            >
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-2">
-                                        <div className="error-alert__icon">⚠️</div>
+                                        <div className="error-alert__icon">
+                                            ⚠️
+                                        </div>
                                         <ThemedText size="sm" variant="error">
                                             {lastError}
                                         </ThemedText>
@@ -241,7 +292,11 @@ const App = (): JSX.Element => {
                         updateStatus === "downloaded" ||
                         updateStatus === "error") &&
                         (updateStatus === "error" ? (
-                            <div aria-live="assertive" className="fixed left-0 right-0 z-50 top-12" role="alert">
+                            <div
+                                aria-live="assertive"
+                                className="fixed left-0 right-0 z-50 top-12"
+                                role="alert"
+                            >
                                 <ThemedBox
                                     className={`update-alert update-alert--${updateStatus}`}
                                     padding="md"
@@ -249,9 +304,15 @@ const App = (): JSX.Element => {
                                 >
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-2">
-                                            <div className="update-alert__icon">⚠️</div>
-                                            <ThemedText size="sm" variant="error">
-                                                {updateError ?? UI_MESSAGES.UPDATE_ERROR_FALLBACK}
+                                            <div className="update-alert__icon">
+                                                ⚠️
+                                            </div>
+                                            <ThemedText
+                                                size="sm"
+                                                variant="error"
+                                            >
+                                                {updateError ??
+                                                    UI_MESSAGES.UPDATE_ERROR_FALLBACK}
                                             </ThemedText>
                                         </div>
                                         <ThemedButton
@@ -266,7 +327,10 @@ const App = (): JSX.Element => {
                                 </ThemedBox>
                             </div>
                         ) : (
-                            <output aria-live="polite" className="fixed left-0 right-0 z-50 top-12">
+                            <output
+                                aria-live="polite"
+                                className="fixed left-0 right-0 z-50 top-12"
+                            >
                                 <ThemedBox
                                     className={`update-alert update-alert--${updateStatus}`}
                                     padding="md"
@@ -275,14 +339,25 @@ const App = (): JSX.Element => {
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-2">
                                             <div className="update-alert__icon">
-                                                {updateStatus === "available" && "⬇️"}
-                                                {updateStatus === "downloading" && "⏬"}
-                                                {updateStatus === "downloaded" && "✅"}
+                                                {updateStatus === "available" &&
+                                                    "⬇️"}
+                                                {updateStatus ===
+                                                    "downloading" && "⏬"}
+                                                {updateStatus ===
+                                                    "downloaded" && "✅"}
                                             </div>
-                                            <ThemedText size="sm" variant="primary">
-                                                {updateStatus === "available" && UI_MESSAGES.UPDATE_AVAILABLE}
-                                                {updateStatus === "downloading" && UI_MESSAGES.UPDATE_DOWNLOADING}
-                                                {updateStatus === "downloaded" && UI_MESSAGES.UPDATE_DOWNLOADED}
+                                            <ThemedText
+                                                size="sm"
+                                                variant="primary"
+                                            >
+                                                {updateStatus === "available" &&
+                                                    UI_MESSAGES.UPDATE_AVAILABLE}
+                                                {updateStatus ===
+                                                    "downloading" &&
+                                                    UI_MESSAGES.UPDATE_DOWNLOADING}
+                                                {updateStatus ===
+                                                    "downloaded" &&
+                                                    UI_MESSAGES.UPDATE_DOWNLOADED}
                                             </ThemedText>
                                         </div>
                                         {updateStatus === "downloaded" && (
@@ -292,7 +367,9 @@ const App = (): JSX.Element => {
                                                 size="sm"
                                                 variant="secondary"
                                             >
-                                                {UI_MESSAGES.UPDATE_RESTART_BUTTON}
+                                                {
+                                                    UI_MESSAGES.UPDATE_RESTART_BUTTON
+                                                }
                                             </ThemedButton>
                                         )}
                                     </div>
@@ -304,10 +381,21 @@ const App = (): JSX.Element => {
 
                     <main className="main-container">
                         {/* Full-width site list */}
-                        <ThemedBox padding="md" rounded="lg" shadow="sm" surface="elevated">
-                            <ThemedBox border className="border-b" padding="md" surface="base">
+                        <ThemedBox
+                            padding="md"
+                            rounded="lg"
+                            shadow="sm"
+                            surface="elevated"
+                        >
+                            <ThemedBox
+                                border
+                                className="border-b"
+                                padding="md"
+                                surface="base"
+                            >
                                 <ThemedText size="lg" weight="medium">
-                                    {UI_MESSAGES.SITE_COUNT_LABEL} ({sites.length})
+                                    {UI_MESSAGES.SITE_COUNT_LABEL} (
+                                    {sites.length})
                                 </ThemedText>
                             </ThemedBox>
                             <div className="p-0">
@@ -320,16 +408,21 @@ const App = (): JSX.Element => {
                     <AddSiteModal />
 
                     {/* Settings Modal */}
-                    {showSettings ? <Settings onClose={handleCloseSettings} /> : null}
+                    {showSettings ? (
+                        <Settings onClose={handleCloseSettings} />
+                    ) : null}
 
                     {/* Site Details Modal */}
                     {showSiteDetails && selectedSite ? (
-                        <SiteDetails onClose={handleCloseSiteDetails} site={selectedSite} />
+                        <SiteDetails
+                            onClose={handleCloseSiteDetails}
+                            site={selectedSite}
+                        />
                     ) : null}
                 </div>
             </ThemeProvider>
         </ErrorBoundary>
     );
-}
+};
 
 export default App;

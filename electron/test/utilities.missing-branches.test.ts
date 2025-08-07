@@ -24,7 +24,9 @@ describe("Utility Files - Missing Branch Coverage", () => {
     describe("Correlation Utils Edge Cases", () => {
         it("should handle edge cases in correlation ID generation", () => {
             // Generate multiple IDs to test randomness
-            const ids = Array.from({ length: 100 }, () => generateCorrelationId());
+            const ids = Array.from({ length: 100 }, () =>
+                generateCorrelationId()
+            );
 
             // All should be unique
             const uniqueIds = new Set(ids);
@@ -49,12 +51,22 @@ describe("Utility Files - Missing Branch Coverage", () => {
             expect(error2.errors).toEqual(["Single error"]);
 
             // Test with multiple errors
-            const error3 = new ValidationError(["Error 1", "Error 2", "Error 3"]);
-            expect(error3.message).toBe("Validation failed: Error 1, Error 2, Error 3");
+            const error3 = new ValidationError([
+                "Error 1",
+                "Error 2",
+                "Error 3",
+            ]);
+            expect(error3.message).toBe(
+                "Validation failed: Error 1, Error 2, Error 3"
+            );
             expect(error3.errors).toEqual(["Error 1", "Error 2", "Error 3"]);
 
             // Test with converted types
-            const error4 = new ValidationError(["string", "string2", "string3"]);
+            const error4 = new ValidationError([
+                "string",
+                "string2",
+                "string3",
+            ]);
             expect(error4.errors).toHaveLength(3);
         });
     });
@@ -71,9 +83,14 @@ describe("Utility Files - Missing Branch Coverage", () => {
             logger.info(JSON.stringify([1, 2, 3]));
 
             // Test with multiple parameters
-            logger.error("Error:", new Error("test error"), { context: "test" });
+            logger.error("Error:", new Error("test error"), {
+                context: "test",
+            });
             logger.warn("Warning", String(123), String(true), String(null));
-            logger.debug("Debug", JSON.stringify({ complex: { nested: { object: true } } }));
+            logger.debug(
+                "Debug",
+                JSON.stringify({ complex: { nested: { object: true } } })
+            );
 
             // All calls should not throw
             expect(true).toBe(true); // Test passes if no errors thrown
@@ -163,7 +180,8 @@ describe("Utility Files - Missing Branch Coverage", () => {
             for (const error of errors) {
                 // Should handle any error type without throwing
                 expect(() => {
-                    const errorString = error instanceof Error ? error.message : String(error);
+                    const errorString =
+                        error instanceof Error ? error.message : String(error);
                     expect(typeof errorString).toBe("string");
                 }).not.toThrow();
             }
@@ -233,7 +251,9 @@ describe("Utility Files - Missing Branch Coverage", () => {
                 Promise.resolve(undefined),
                 Promise.resolve(0),
                 Promise.resolve(false),
-                new Promise((resolve) => setTimeout(() => resolve("delayed"), 1)),
+                new Promise((resolve) =>
+                    setTimeout(() => resolve("delayed"), 1)
+                ),
             ];
 
             // Handle all promises
@@ -245,9 +265,14 @@ describe("Utility Files - Missing Branch Coverage", () => {
         });
 
         it("should handle timeout scenarios", async () => {
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 10));
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error("Timeout")), 10)
+            );
 
-            const racePromise = Promise.race([Promise.resolve("fast"), timeoutPromise]);
+            const racePromise = Promise.race([
+                Promise.resolve("fast"),
+                timeoutPromise,
+            ]);
 
             await expect(racePromise).resolves.toBe("fast");
         });
@@ -274,7 +299,12 @@ describe("Utility Files - Missing Branch Coverage", () => {
             for (const config of configs) {
                 expect(() => {
                     // Configuration processing
-                    const timeout = safeInteger(config.timeout, 5000, 1000, 300_000);
+                    const timeout = safeInteger(
+                        config.timeout,
+                        5000,
+                        1000,
+                        300_000
+                    );
                     const retries = safeInteger(config.retries, 3, 0, 10);
                     const enabled = Boolean(config.enabled);
 
@@ -365,13 +395,21 @@ describe("Utility Files - Missing Branch Coverage", () => {
     describe("Memory and Performance Edge Cases", () => {
         it("should handle memory intensive operations", () => {
             // Test with large data structures
-            const largeArray = Array.from({ length: 10_000 }, (_, i) => ({ id: i, data: `item-${i}` }));
-            const largeObject = Object.fromEntries(largeArray.map((item) => [item.id, item.data]));
+            const largeArray = Array.from({ length: 10_000 }, (_, i) => ({
+                id: i,
+                data: `item-${i}`,
+            }));
+            const largeObject = Object.fromEntries(
+                largeArray.map((item) => [item.id, item.data])
+            );
 
             expect(() => {
                 // Operations that might stress memory
                 const filtered = largeArray.filter((item) => item.id % 2 === 0);
-                const mapped = largeArray.map((item) => ({ ...item, processed: true }));
+                const mapped = largeArray.map((item) => ({
+                    ...item,
+                    processed: true,
+                }));
                 const keyCount = Object.keys(largeObject).length;
                 const serialized = JSON.stringify(largeArray.slice(0, 100)); // Partial to avoid timeout
 

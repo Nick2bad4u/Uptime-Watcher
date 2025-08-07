@@ -145,9 +145,17 @@ export async function withOperationalHooks<T>(
             );
 
             const result = await operation();
-            return await handleSuccess(result, config, operationName, startTime, attempt, operationId);
+            return await handleSuccess(
+                result,
+                config,
+                operationName,
+                startTime,
+                attempt,
+                operationId
+            );
         } catch (error) {
-            lastError = error instanceof Error ? error : new Error(String(error));
+            lastError =
+                error instanceof Error ? error : new Error(String(error));
 
             /* v8 ignore next 2 */ logger.debug(
                 `[OperationalHooks] ${operationName} failed on attempt ${attempt}/${maxRetries}`,
@@ -159,22 +167,47 @@ export async function withOperationalHooks<T>(
 
             // If this was the last attempt, handle failure
             if (attempt === maxRetries) {
-                return handleFailure(lastError, config, operationName, startTime, attempt, operationId, throwOnFailure);
+                return handleFailure(
+                    lastError,
+                    config,
+                    operationName,
+                    startTime,
+                    attempt,
+                    operationId,
+                    throwOnFailure
+                );
             }
 
             // Handle retry
-            await handleRetry(lastError, config, operationName, attempt, operationId, backoff, initialDelay);
+            await handleRetry(
+                lastError,
+                config,
+                operationName,
+                attempt,
+                operationId,
+                backoff,
+                initialDelay
+            );
         }
     }
 
     // This should never be reached, but TypeScript needs it
-    throw lastError ?? new Error(`Operation ${operationName} completed without success or error`);
+    throw (
+        lastError ??
+        new Error(
+            `Operation ${operationName} completed without success or error`
+        )
+    );
 }
 
 /**
  * Calculate retry delay based on attempt number and backoff strategy.
  */
-function calculateDelay(attempt: number, initialDelay: number, backoff: "exponential" | "linear"): number {
+function calculateDelay(
+    attempt: number,
+    initialDelay: number,
+    backoff: "exponential" | "linear"
+): number {
     if (backoff === "exponential") {
         return initialDelay * 2 ** (attempt - 1);
     }
@@ -216,7 +249,10 @@ function generateOperationId(): string {
         return `op_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
     } catch (error) {
         // Fallback for environments where crypto.randomUUID() is not available
-        logger.debug("[OperationalHooks] crypto.randomUUID() not available, using fallback", error);
+        logger.debug(
+            "[OperationalHooks] crypto.randomUUID() not available, using fallback",
+            error
+        );
         // eslint-disable-next-line sonarjs/pseudo-random
         return `op_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
     }
@@ -310,10 +346,13 @@ async function handleRetry<T>(
     const delay = calculateDelay(attempt, initialDelay, backoff);
 
     if (delay > 0) {
-        /* v8 ignore next 2 */ logger.debug(`[OperationalHooks] Retrying ${operationName} in ${delay}ms`, {
-            attempt: attempt + 1,
-            operationId,
-        });
+        /* v8 ignore next 2 */ logger.debug(
+            `[OperationalHooks] Retrying ${operationName} in ${delay}ms`,
+            {
+                attempt: attempt + 1,
+                operationId,
+            }
+        );
 
         await new Promise((resolve) => setTimeout(resolve, delay));
     }
@@ -364,10 +403,13 @@ async function handleSuccess<T>(
         }
     }
 
-    /* v8 ignore next 2 */ logger.debug(`[OperationalHooks] ${operationName} succeeded after ${attempt} attempt(s)`, {
-        duration,
-        operationId,
-    });
+    /* v8 ignore next 2 */ logger.debug(
+        `[OperationalHooks] ${operationName} succeeded after ${attempt} attempt(s)`,
+        {
+            duration,
+            operationId,
+        }
+    );
 
     return result;
 }

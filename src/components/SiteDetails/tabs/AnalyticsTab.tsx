@@ -10,16 +10,30 @@ import { MdAnalytics, MdPieChart, MdSpeed, MdTrendingUp } from "react-icons/md";
 
 import { CHART_TIME_RANGES, ChartTimeRange } from "../../../constants";
 import { DowntimePeriod } from "../../../hooks/site/useSiteAnalytics";
-import { ResponseTimeChartData, StatusBarChartData, UptimeChartData } from "../../../services/chartConfig";
+import {
+    ResponseTimeChartData,
+    StatusBarChartData,
+    UptimeChartData,
+} from "../../../services/chartConfig";
 import { ChartOptions } from "../../../services/chartSetup";
 import logger from "../../../services/logger";
-import { ThemedBadge, ThemedButton, ThemedCard, ThemedProgress, ThemedText } from "../../../theme/components";
+import {
+    ThemedBadge,
+    ThemedButton,
+    ThemedCard,
+    ThemedProgress,
+    ThemedText,
+} from "../../../theme/components";
 import { Theme } from "../../../theme/types";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
 import { MonitorType } from "../../../types";
 import { parseUptimeValue } from "../../../utils/monitoring/dataValidation";
 import { ConditionalResponseTime } from "../../common/MonitorUiComponents";
-import { ResponseTimeChart, StatusChart, UptimeChart } from "../charts/ChartComponents";
+import {
+    ResponseTimeChart,
+    StatusChart,
+    UptimeChart,
+} from "../charts/ChartComponents";
 
 /**
  * Get color for MTTR display based on recovery status
@@ -135,7 +149,10 @@ export const AnalyticsTab = ({
     uptime,
     uptimeChartData,
 }: AnalyticsTabProperties): JSX.Element => {
-    const { getAvailabilityColor: getColor, getAvailabilityVariant: getVariant } = useAvailabilityColors();
+    const {
+        getAvailabilityColor: getColor,
+        getAvailabilityVariant: getVariant,
+    } = useAvailabilityColors();
     const { currentTheme } = useTheme();
 
     // Function to get response time color based on performance
@@ -183,16 +200,24 @@ export const AnalyticsTab = ({
                             <ThemedButton
                                 key={range}
                                 onClick={() => {
-                                    const previousRange = siteDetailsChartTimeRange;
-                                    logger.user.action("Chart time range changed", {
-                                        monitorType: monitorType,
-                                        newRange: range,
-                                        previousRange: previousRange,
-                                    });
+                                    const previousRange =
+                                        siteDetailsChartTimeRange;
+                                    logger.user.action(
+                                        "Chart time range changed",
+                                        {
+                                            monitorType: monitorType,
+                                            newRange: range,
+                                            previousRange: previousRange,
+                                        }
+                                    );
                                     setSiteDetailsChartTimeRange(range);
                                 }}
                                 size="sm"
-                                variant={siteDetailsChartTimeRange === range ? "primary" : "ghost"}
+                                variant={
+                                    siteDetailsChartTimeRange === range
+                                        ? "primary"
+                                        : "ghost"
+                                }
                             >
                                 {range}
                             </ThemedButton>
@@ -283,7 +308,10 @@ export const AnalyticsTab = ({
 
             {/* Response Time Percentiles */}
             <ConditionalResponseTime monitorType={monitorType}>
-                <ThemedCard icon={<MdSpeed color={iconColors.performance} />} title="Response Time Analysis">
+                <ThemedCard
+                    icon={<MdSpeed color={iconColors.performance} />}
+                    title="Response Time Analysis"
+                >
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
                             <ThemedText size="lg" weight="semibold">
@@ -293,11 +321,14 @@ export const AnalyticsTab = ({
                                 onClick={() => {
                                     const previousValue = showAdvancedMetrics;
                                     const newValue = !showAdvancedMetrics;
-                                    logger.user.action("Advanced metrics toggle", {
-                                        monitorType: monitorType,
-                                        newValue: newValue,
-                                        previousValue: previousValue,
-                                    });
+                                    logger.user.action(
+                                        "Advanced metrics toggle",
+                                        {
+                                            monitorType: monitorType,
+                                            newValue: newValue,
+                                            previousValue: previousValue,
+                                        }
+                                    );
                                     setShowAdvancedMetrics(newValue);
                                 }}
                                 size="sm"
@@ -309,26 +340,50 @@ export const AnalyticsTab = ({
 
                         <div className="grid grid-cols-3 gap-4">
                             <div className="flex flex-col items-center text-center">
-                                <ThemedText className="mb-2" size="sm" variant="secondary">
+                                <ThemedText
+                                    className="mb-2"
+                                    size="sm"
+                                    variant="secondary"
+                                >
                                     P50
                                 </ThemedText>
-                                <ThemedText size="lg" style={{ color: getResponseTimeColor(p50) }} weight="medium">
+                                <ThemedText
+                                    size="lg"
+                                    style={{ color: getResponseTimeColor(p50) }}
+                                    weight="medium"
+                                >
                                     {formatResponseTime(p50)}
                                 </ThemedText>
                             </div>
                             <div className="flex flex-col items-center text-center">
-                                <ThemedText className="mb-2" size="sm" variant="secondary">
+                                <ThemedText
+                                    className="mb-2"
+                                    size="sm"
+                                    variant="secondary"
+                                >
                                     P95
                                 </ThemedText>
-                                <ThemedText size="lg" style={{ color: getResponseTimeColor(p95) }} weight="medium">
+                                <ThemedText
+                                    size="lg"
+                                    style={{ color: getResponseTimeColor(p95) }}
+                                    weight="medium"
+                                >
                                     {formatResponseTime(p95)}
                                 </ThemedText>
                             </div>
                             <div className="flex flex-col items-center text-center">
-                                <ThemedText className="mb-2" size="sm" variant="secondary">
+                                <ThemedText
+                                    className="mb-2"
+                                    size="sm"
+                                    variant="secondary"
+                                >
                                     P99
                                 </ThemedText>
-                                <ThemedText size="lg" style={{ color: getResponseTimeColor(p99) }} weight="medium">
+                                <ThemedText
+                                    size="lg"
+                                    style={{ color: getResponseTimeColor(p99) }}
+                                    weight="medium"
+                                >
                                     {formatResponseTime(p99)}
                                 </ThemedText>
                             </div>
@@ -337,13 +392,20 @@ export const AnalyticsTab = ({
                         {showAdvancedMetrics ? (
                             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-primary/20">
                                 <div className="flex flex-col items-center text-center">
-                                    <ThemedText className="mb-2" size="sm" variant="secondary">
+                                    <ThemedText
+                                        className="mb-2"
+                                        size="sm"
+                                        variant="secondary"
+                                    >
                                         Mean Time To Recovery
                                     </ThemedText>
                                     <ThemedText
                                         size="lg"
                                         style={{
-                                            color: getMttrColor(mttr, currentTheme),
+                                            color: getMttrColor(
+                                                mttr,
+                                                currentTheme
+                                            ),
                                         }}
                                         weight="medium"
                                     >
@@ -351,13 +413,20 @@ export const AnalyticsTab = ({
                                     </ThemedText>
                                 </div>
                                 <div className="flex flex-col items-center text-center">
-                                    <ThemedText className="mb-2" size="sm" variant="secondary">
+                                    <ThemedText
+                                        className="mb-2"
+                                        size="sm"
+                                        variant="secondary"
+                                    >
                                         Incidents
                                     </ThemedText>
                                     <ThemedText
                                         size="lg"
                                         style={{
-                                            color: getIncidentsColor(downtimePeriods.length, currentTheme),
+                                            color: getIncidentsColor(
+                                                downtimePeriods.length,
+                                                currentTheme
+                                            ),
                                         }}
                                         weight="medium"
                                     >
@@ -374,17 +443,29 @@ export const AnalyticsTab = ({
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 {/* Response Time Chart */}
                 <ConditionalResponseTime monitorType={monitorType}>
-                    <ThemedCard icon={<FiTrendingUp color={iconColors.performance} />} title="Response Time Trends">
+                    <ThemedCard
+                        icon={<FiTrendingUp color={iconColors.performance} />}
+                        title="Response Time Trends"
+                    >
                         <div className="h-64">
-                            <ResponseTimeChart data={lineChartData} options={lineChartOptions} />
+                            <ResponseTimeChart
+                                data={lineChartData}
+                                options={lineChartOptions}
+                            />
                         </div>
                     </ThemedCard>
                 </ConditionalResponseTime>
 
                 {/* Uptime Doughnut Chart */}
-                <ThemedCard icon={<MdPieChart color={iconColors.uptime} />} title="Uptime Distribution">
+                <ThemedCard
+                    icon={<MdPieChart color={iconColors.uptime} />}
+                    title="Uptime Distribution"
+                >
                     <div className="h-64">
-                        <UptimeChart data={uptimeChartData} options={doughnutOptions} />
+                        <UptimeChart
+                            data={uptimeChartData}
+                            options={doughnutOptions}
+                        />
                     </div>
                 </ThemedCard>
 
@@ -395,10 +476,13 @@ export const AnalyticsTab = ({
                     title="Status Distribution"
                 >
                     <div className="h-64">
-                        <StatusChart data={barChartData} options={barChartOptions} />
+                        <StatusChart
+                            data={barChartData}
+                            options={barChartOptions}
+                        />
                     </div>
                 </ThemedCard>
             </div>
         </div>
     );
-}
+};

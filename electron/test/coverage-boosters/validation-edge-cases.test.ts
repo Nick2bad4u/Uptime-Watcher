@@ -9,7 +9,9 @@ import { describe, expect, it } from "vitest";
 describe("Validation Error Paths and Edge Cases", () => {
     describe("URL validation edge cases", () => {
         it("should test URL validation branches", () => {
-            const validateUrl = (url: string): { valid: boolean; protocol?: string } => {
+            const validateUrl = (
+                url: string
+            ): { valid: boolean; protocol?: string } => {
                 try {
                     const parsed = new URL(url);
                     return { valid: true, protocol: parsed.protocol };
@@ -18,11 +20,20 @@ describe("Validation Error Paths and Edge Cases", () => {
                 }
             };
 
-            expect(validateUrl("https://example.com")).toEqual({ valid: true, protocol: "https:" });
-            expect(validateUrl("https://secure.example.com")).toEqual({ valid: true, protocol: "https:" });
+            expect(validateUrl("https://example.com")).toEqual({
+                valid: true,
+                protocol: "https:",
+            });
+            expect(validateUrl("https://secure.example.com")).toEqual({
+                valid: true,
+                protocol: "https:",
+            });
             expect(validateUrl("invalid-url")).toEqual({ valid: false });
             expect(validateUrl("")).toEqual({ valid: false });
-            expect(validateUrl("ftp://example.com")).toEqual({ valid: true, protocol: "ftp:" });
+            expect(validateUrl("ftp://example.com")).toEqual({
+                valid: true,
+                protocol: "ftp:",
+            });
         });
     });
 
@@ -89,34 +100,90 @@ describe("Validation Error Paths and Edge Cases", () => {
             } => {
                 switch (status) {
                     case "up": {
-                        return { display: "Online", color: "green", severity: 0 };
+                        return {
+                            display: "Online",
+                            color: "green",
+                            severity: 0,
+                        };
                     }
                     case "down": {
-                        return { display: "Offline", color: "red", severity: 3 };
+                        return {
+                            display: "Offline",
+                            color: "red",
+                            severity: 3,
+                        };
                     }
                     case "degraded": {
-                        return { display: "Degraded", color: "yellow", severity: 2 };
+                        return {
+                            display: "Degraded",
+                            color: "yellow",
+                            severity: 2,
+                        };
                     }
                     case "maintenance": {
-                        return { display: "Maintenance", color: "blue", severity: 1 };
+                        return {
+                            display: "Maintenance",
+                            color: "blue",
+                            severity: 1,
+                        };
                     }
                     case "pending": {
-                        return { display: "Checking", color: "gray", severity: 1 };
+                        return {
+                            display: "Checking",
+                            color: "gray",
+                            severity: 1,
+                        };
                     }
                     default: {
-                        return { display: "Unknown", color: "gray", severity: 1 };
+                        return {
+                            display: "Unknown",
+                            color: "gray",
+                            severity: 1,
+                        };
                     }
                 }
             };
 
-            expect(mapMonitorStatus("up")).toEqual({ display: "Online", color: "green", severity: 0 });
-            expect(mapMonitorStatus("down")).toEqual({ display: "Offline", color: "red", severity: 3 });
-            expect(mapMonitorStatus("degraded")).toEqual({ display: "Degraded", color: "yellow", severity: 2 });
-            expect(mapMonitorStatus("maintenance")).toEqual({ display: "Maintenance", color: "blue", severity: 1 });
-            expect(mapMonitorStatus("pending")).toEqual({ display: "Checking", color: "gray", severity: 1 });
-            expect(mapMonitorStatus("unknown")).toEqual({ display: "Unknown", color: "gray", severity: 1 });
-            expect(mapMonitorStatus("")).toEqual({ display: "Unknown", color: "gray", severity: 1 });
-            expect(mapMonitorStatus("invalid")).toEqual({ display: "Unknown", color: "gray", severity: 1 });
+            expect(mapMonitorStatus("up")).toEqual({
+                display: "Online",
+                color: "green",
+                severity: 0,
+            });
+            expect(mapMonitorStatus("down")).toEqual({
+                display: "Offline",
+                color: "red",
+                severity: 3,
+            });
+            expect(mapMonitorStatus("degraded")).toEqual({
+                display: "Degraded",
+                color: "yellow",
+                severity: 2,
+            });
+            expect(mapMonitorStatus("maintenance")).toEqual({
+                display: "Maintenance",
+                color: "blue",
+                severity: 1,
+            });
+            expect(mapMonitorStatus("pending")).toEqual({
+                display: "Checking",
+                color: "gray",
+                severity: 1,
+            });
+            expect(mapMonitorStatus("unknown")).toEqual({
+                display: "Unknown",
+                color: "gray",
+                severity: 1,
+            });
+            expect(mapMonitorStatus("")).toEqual({
+                display: "Unknown",
+                color: "gray",
+                severity: 1,
+            });
+            expect(mapMonitorStatus("invalid")).toEqual({
+                display: "Unknown",
+                color: "gray",
+                severity: 1,
+            });
         });
     });
 
@@ -131,15 +198,23 @@ describe("Validation Error Paths and Edge Cases", () => {
                 }
             };
 
-            expect(safeJsonParse('{"test": "value"}', {})).toEqual({ test: "value" });
-            expect(safeJsonParse("invalid json", { default: true })).toEqual({ default: true });
+            expect(safeJsonParse('{"test": "value"}', {})).toEqual({
+                test: "value",
+            });
+            expect(safeJsonParse("invalid json", { default: true })).toEqual({
+                default: true,
+            });
             expect(safeJsonParse("", [])).toEqual([]);
             expect(safeJsonParse("null", { fallback: true })).toBe(null);
             expect(safeJsonParse("undefined", "fallback")).toBe("fallback");
         });
 
         it("should test number parsing with validation", () => {
-            const parseNumber = (value: unknown, min?: number, max?: number): number | null => {
+            const parseNumber = (
+                value: unknown,
+                min?: number,
+                max?: number
+            ): number | null => {
                 let num: number;
 
                 if (typeof value === "number") {
@@ -182,7 +257,10 @@ describe("Validation Error Paths and Edge Cases", () => {
 
     describe("Array processing edge cases", () => {
         it("should test array filtering with type guards", () => {
-            const filterValidItems = <T>(items: unknown[], validator: (item: unknown) => item is T): T[] => {
+            const filterValidItems = <T>(
+                items: unknown[],
+                validator: (item: unknown) => item is T
+            ): T[] => {
                 if (!Array.isArray(items)) {
                     return [];
                 }
@@ -190,8 +268,10 @@ describe("Validation Error Paths and Edge Cases", () => {
                 return items.filter((item) => validator(item));
             };
 
-            const isString = (value: unknown): value is string => typeof value === "string";
-            const isNumber = (value: unknown): value is number => typeof value === "number" && !Number.isNaN(value);
+            const isString = (value: unknown): value is string =>
+                typeof value === "string";
+            const isNumber = (value: unknown): value is number =>
+                typeof value === "number" && !Number.isNaN(value);
 
             const mixedArray = [
                 "hello",
@@ -203,7 +283,11 @@ describe("Validation Error Paths and Edge Cases", () => {
                 "test",
             ];
 
-            expect(filterValidItems(mixedArray, isString)).toEqual(["hello", "world", "test"]);
+            expect(filterValidItems(mixedArray, isString)).toEqual([
+                "hello",
+                "world",
+                "test",
+            ]);
             expect(filterValidItems(mixedArray, isNumber)).toEqual([42, 3.14]);
             expect(filterValidItems([], isString)).toEqual([]);
             expect(filterValidItems([null, undefined], isString)).toEqual([]);
@@ -269,7 +353,9 @@ describe("Validation Error Paths and Edge Cases", () => {
             expect(parseDate(invalidDate)).toBeNull();
             expect(parseDate("2023-01-01")).toEqual(new Date("2023-01-01"));
             expect(parseDate("invalid")).toBeNull();
-            expect(parseDate(1_672_531_200_000)).toEqual(new Date(1_672_531_200_000)); // 2023-01-01
+            expect(parseDate(1_672_531_200_000)).toEqual(
+                new Date(1_672_531_200_000)
+            ); // 2023-01-01
             expect(parseDate(null)).toBeNull();
             expect(parseDate(undefined)).toBeNull();
             expect(parseDate({})).toBeNull();
@@ -315,7 +401,9 @@ describe("Validation Error Paths and Edge Cases", () => {
                 url?: string;
             }
 
-            const mergeConfig = (partial: Partial<Config> | null | undefined): Config => {
+            const mergeConfig = (
+                partial: Partial<Config> | null | undefined
+            ): Config => {
                 const defaults: Config = {
                     timeout: 5000,
                     retries: 3,
@@ -332,10 +420,26 @@ describe("Validation Error Paths and Edge Cases", () => {
                 };
             };
 
-            expect(mergeConfig(null)).toEqual({ timeout: 5000, retries: 3, enabled: true });
-            expect(mergeConfig(undefined)).toEqual({ timeout: 5000, retries: 3, enabled: true });
-            expect(mergeConfig({})).toEqual({ timeout: 5000, retries: 3, enabled: true });
-            expect(mergeConfig({ timeout: 1000 })).toEqual({ timeout: 1000, retries: 3, enabled: true });
+            expect(mergeConfig(null)).toEqual({
+                timeout: 5000,
+                retries: 3,
+                enabled: true,
+            });
+            expect(mergeConfig(undefined)).toEqual({
+                timeout: 5000,
+                retries: 3,
+                enabled: true,
+            });
+            expect(mergeConfig({})).toEqual({
+                timeout: 5000,
+                retries: 3,
+                enabled: true,
+            });
+            expect(mergeConfig({ timeout: 1000 })).toEqual({
+                timeout: 1000,
+                retries: 3,
+                enabled: true,
+            });
             expect(mergeConfig({ url: "https://example.com" })).toEqual({
                 timeout: 5000,
                 retries: 3,

@@ -14,7 +14,8 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const url = "https://github.com/tndrle/node-sqlite3-wasm/raw/refs/heads/main/dist/node-sqlite3-wasm.wasm";
+const url =
+    "https://github.com/tndrle/node-sqlite3-wasm/raw/refs/heads/main/dist/node-sqlite3-wasm.wasm";
 const destDir = path.resolve(__dirname, "../dist-electron");
 const dest = path.join(destDir, "node-sqlite3-wasm.wasm");
 const scriptsDir = path.resolve(__dirname, "../assets");

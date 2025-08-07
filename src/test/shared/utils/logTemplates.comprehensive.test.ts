@@ -12,28 +12,42 @@ import {
 describe("Log Templates", () => {
     describe("SERVICE_LOGS", () => {
         it("should contain all application service log templates", () => {
-            expect(SERVICE_LOGS.APPLICATION_ACTIVATED).toBe("[ApplicationService] App activated");
-            expect(SERVICE_LOGS.APPLICATION_CLEANUP_COMPLETE).toBe("[ApplicationService] Cleanup completed");
-            expect(SERVICE_LOGS.APPLICATION_CLEANUP_START).toBe("[ApplicationService] Starting cleanup");
+            expect(SERVICE_LOGS.APPLICATION_ACTIVATED).toBe(
+                "[ApplicationService] App activated"
+            );
+            expect(SERVICE_LOGS.APPLICATION_CLEANUP_COMPLETE).toBe(
+                "[ApplicationService] Cleanup completed"
+            );
+            expect(SERVICE_LOGS.APPLICATION_CLEANUP_START).toBe(
+                "[ApplicationService] Starting cleanup"
+            );
             expect(SERVICE_LOGS.APPLICATION_CREATING_WINDOW).toBe(
                 "[ApplicationService] No windows open, creating main window"
             );
             expect(SERVICE_LOGS.APPLICATION_INITIALIZING).toBe(
                 "[ApplicationService] Initializing application services"
             );
-            expect(SERVICE_LOGS.APPLICATION_QUITTING).toBe("[ApplicationService] Quitting app (non-macOS)");
-            expect(SERVICE_LOGS.APPLICATION_READY).toBe("[ApplicationService] App ready - initializing services");
+            expect(SERVICE_LOGS.APPLICATION_QUITTING).toBe(
+                "[ApplicationService] Quitting app (non-macOS)"
+            );
+            expect(SERVICE_LOGS.APPLICATION_READY).toBe(
+                "[ApplicationService] App ready - initializing services"
+            );
         });
 
         it("should have consistent message format with service prefix", () => {
             const serviceLogValues = Object.values(SERVICE_LOGS);
 
             // Most service logs should start with a bracketed service name
-            const logWithPrefix = serviceLogValues.filter((msg) => msg.startsWith("["));
+            const logWithPrefix = serviceLogValues.filter((msg) =>
+                msg.startsWith("[")
+            );
 
             // Should have mostly prefixed logs (expect at least 80% to have brackets)
             // Note: Some logs like "Applying migration:" and "Started monitoring" don't use brackets
-            expect(logWithPrefix.length).toBeGreaterThanOrEqual(Math.floor(serviceLogValues.length * 0.8));
+            expect(logWithPrefix.length).toBeGreaterThanOrEqual(
+                Math.floor(serviceLogValues.length * 0.8)
+            );
         });
         it("should have no empty or undefined values", () => {
             const serviceLogValues = Object.values(SERVICE_LOGS);
@@ -47,17 +61,25 @@ describe("Log Templates", () => {
 
         it("should contain database service logs", () => {
             expect(SERVICE_LOGS.DATABASE_INITIALIZED).toBeDefined();
-            expect(SERVICE_LOGS.DATABASE_INITIALIZED).toContain("[DatabaseService]");
+            expect(SERVICE_LOGS.DATABASE_INITIALIZED).toContain(
+                "[DatabaseService]"
+            );
         });
 
         it("should contain site manager logs", () => {
             expect(SERVICE_LOGS.SITE_MANAGER_INITIALIZED).toBeDefined();
-            expect(SERVICE_LOGS.SITE_MANAGER_INITIALIZED).toContain("[SiteManager]");
+            expect(SERVICE_LOGS.SITE_MANAGER_INITIALIZED).toContain(
+                "[SiteManager]"
+            );
         });
 
         it("should contain monitor manager logs", () => {
-            expect(SERVICE_LOGS.MONITOR_MANAGER_APPLYING_INTERVALS).toBeDefined();
-            expect(SERVICE_LOGS.MONITOR_MANAGER_APPLYING_INTERVALS).toContain("[MonitorManager]");
+            expect(
+                SERVICE_LOGS.MONITOR_MANAGER_APPLYING_INTERVALS
+            ).toBeDefined();
+            expect(SERVICE_LOGS.MONITOR_MANAGER_APPLYING_INTERVALS).toContain(
+                "[MonitorManager]"
+            );
         });
     });
 
@@ -151,16 +173,28 @@ describe("Log Templates", () => {
         });
 
         it("should have all required categories", () => {
-            const requiredCategories = ["services", "debug", "errors", "warnings"];
+            const requiredCategories = [
+                "services",
+                "debug",
+                "errors",
+                "warnings",
+            ];
 
             requiredCategories.forEach((category) => {
                 expect(LOG_TEMPLATES).toHaveProperty(category);
-                expect(LOG_TEMPLATES[category as keyof LogTemplatesInterface]).toBeDefined();
+                expect(
+                    LOG_TEMPLATES[category as keyof LogTemplatesInterface]
+                ).toBeDefined();
             });
         });
 
         it("should maintain consistent structure", () => {
-            expect(Object.keys(LOG_TEMPLATES)).toEqual(["debug", "errors", "services", "warnings"]);
+            expect(Object.keys(LOG_TEMPLATES)).toEqual([
+                "debug",
+                "errors",
+                "services",
+                "warnings",
+            ]);
         });
     });
 
@@ -228,13 +262,17 @@ describe("Log Templates", () => {
         it("should contain orchestrator logs", () => {
             const serviceKeys = Object.keys(SERVICE_LOGS);
             // Look for APPLICATION or similar service logs since there might not be specific "ORCHESTRATOR" logs
-            const applicationLogs = serviceKeys.filter((key) => key.includes("APPLICATION"));
+            const applicationLogs = serviceKeys.filter((key) =>
+                key.includes("APPLICATION")
+            );
             expect(applicationLogs.length).toBeGreaterThan(0);
         });
 
         it("should contain monitoring related logs", () => {
             const serviceKeys = Object.keys(SERVICE_LOGS);
-            const monitoringLogs = serviceKeys.filter((key) => key.includes("MONITOR") || key.includes("SITE"));
+            const monitoringLogs = serviceKeys.filter(
+                (key) => key.includes("MONITOR") || key.includes("SITE")
+            );
             expect(monitoringLogs.length).toBeGreaterThan(0);
         });
     });
@@ -251,7 +289,10 @@ describe("Log Templates", () => {
 
         it("should have readonly properties", () => {
             // TypeScript should enforce this, but we can verify structure
-            const descriptor = Object.getOwnPropertyDescriptor(LOG_TEMPLATES, "services");
+            const descriptor = Object.getOwnPropertyDescriptor(
+                LOG_TEMPLATES,
+                "services"
+            );
             expect(descriptor).toBeDefined();
         });
     });
@@ -262,7 +303,9 @@ describe("Log Templates", () => {
             const testMessage = SERVICE_LOGS.APPLICATION_ACTIVATED;
             const interpolatedMessage = `${testMessage} - Additional context`;
 
-            expect(interpolatedMessage).toBe("[ApplicationService] App activated - Additional context");
+            expect(interpolatedMessage).toBe(
+                "[ApplicationService] App activated - Additional context"
+            );
         });
 
         it("should support template literal usage", () => {
@@ -282,7 +325,9 @@ describe("Log Templates", () => {
                 timestamp: new Date().toISOString(),
             };
 
-            expect(logContext.message).toBe("[ApplicationService] App activated");
+            expect(logContext.message).toBe(
+                "[ApplicationService] App activated"
+            );
             expect(logContext.service).toBe("ApplicationService");
         });
     });
@@ -335,7 +380,9 @@ describe("Log Templates", () => {
             ];
 
             serviceValues.forEach((message) => {
-                const hasKnownPrefix = knownPrefixes.some((prefix) => message.startsWith(prefix));
+                const hasKnownPrefix = knownPrefixes.some((prefix) =>
+                    message.startsWith(prefix)
+                );
                 expect(hasKnownPrefix).toBe(true);
             });
         });

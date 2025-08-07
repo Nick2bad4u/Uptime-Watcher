@@ -6,7 +6,10 @@
  * @param retryAttempts - Number of retry attempts
  * @returns Formatted duration string (e.g., "30s", "2m")
  */
-export function calculateMaxDuration(timeout: number, retryAttempts: number): string {
+export function calculateMaxDuration(
+    timeout: number,
+    retryAttempts: number
+): string {
     const totalAttempts = retryAttempts + 1;
     const timeoutTime = timeout * totalAttempts;
 

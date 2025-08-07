@@ -56,10 +56,18 @@ interface LoggerInterface {
     // Log site monitoring events
     site: {
         added: (identifier: string) => void;
-        check: (identifier: string, status: string, responseTime?: number) => void;
+        check: (
+            identifier: string,
+            status: string,
+            responseTime?: number
+        ) => void;
         error: (identifier: string, error: Error | string) => void;
         removed: (identifier: string) => void;
-        statusChange: (identifier: string, oldStatus: string, newStatus: string) => void;
+        statusChange: (
+            identifier: string,
+            oldStatus: string,
+            newStatus: string
+        ) => void;
     };
     // Log system/electron events
     system: {
@@ -70,7 +78,11 @@ interface LoggerInterface {
     // Log user actions
     user: {
         action: (action: string, details?: unknown) => void;
-        settingsChange: (setting: string, oldValue: unknown, newValue: unknown) => void;
+        settingsChange: (
+            setting: string,
+            oldValue: unknown,
+            newValue: unknown
+        ) => void;
     };
     // Verbose level - very detailed debugging
     verbose: (message: string, ...args: unknown[]) => void;
@@ -98,7 +110,9 @@ interface LogTransports {
  * @param transportName - Name of the transport
  * @returns Transport object or undefined if not available
  */
-function getLogTransport<K extends keyof LogTransports>(transportName: K): LogTransports[K] | undefined {
+function getLogTransport<K extends keyof LogTransports>(
+    transportName: K
+): LogTransports[K] | undefined {
     const transports = log.transports as unknown as Record<string, unknown>;
 
     if (transportName in transports) {
@@ -207,9 +221,15 @@ const logger: LoggerInterface = {
         added: (identifier: string): void => {
             logger.info(`Site added: ${identifier}`);
         },
-        check: (identifier: string, status: string, responseTime?: number): void => {
+        check: (
+            identifier: string,
+            status: string,
+            responseTime?: number
+        ): void => {
             const timeInfo = responseTime ? ` (${responseTime}ms)` : "";
-            logger.info(`Site check: ${identifier} - Status: ${status}${timeInfo}`);
+            logger.info(
+                `Site check: ${identifier} - Status: ${status}${timeInfo}`
+            );
         },
         error: (identifier: string, error: Error | string): void => {
             if (typeof error === "string") {
@@ -221,8 +241,14 @@ const logger: LoggerInterface = {
         removed: (identifier: string): void => {
             logger.info(`Site removed: ${identifier}`);
         },
-        statusChange: (identifier: string, oldStatus: string, newStatus: string): void => {
-            logger.info(`Site status change: ${identifier} - ${oldStatus} -> ${newStatus}`);
+        statusChange: (
+            identifier: string,
+            oldStatus: string,
+            newStatus: string
+        ): void => {
+            logger.info(
+                `Site status change: ${identifier} - ${oldStatus} -> ${newStatus}`
+            );
         },
     },
     // Log system/electron events
@@ -243,8 +269,14 @@ const logger: LoggerInterface = {
         action: (action: string, details?: unknown): void => {
             logger.info(`User action: ${action}`, details ?? "");
         },
-        settingsChange: (setting: string, oldValue: unknown, newValue: unknown): void => {
-            logger.info(`Settings change: ${setting} - ${String(oldValue)} -> ${String(newValue)}`);
+        settingsChange: (
+            setting: string,
+            oldValue: unknown,
+            newValue: unknown
+        ): void => {
+            logger.info(
+                `Settings change: ${setting} - ${String(oldValue)} -> ${String(newValue)}`
+            );
         },
     },
     // Verbose level - very detailed debugging

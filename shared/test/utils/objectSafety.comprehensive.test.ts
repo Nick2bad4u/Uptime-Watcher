@@ -36,59 +36,100 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
 
         it("should return fallback when object is not an object", () => {
             expect(safeObjectAccess(null, "key", "fallback")).toBe("fallback");
-            expect(safeObjectAccess(undefined, "key", "fallback")).toBe("fallback");
-            expect(safeObjectAccess("string", "key", "fallback")).toBe("fallback");
+            expect(safeObjectAccess(undefined, "key", "fallback")).toBe(
+                "fallback"
+            );
+            expect(safeObjectAccess("string", "key", "fallback")).toBe(
+                "fallback"
+            );
             expect(safeObjectAccess(42, "key", "fallback")).toBe("fallback");
             expect(safeObjectAccess([], "key", "fallback")).toBe("fallback");
         });
 
         it("should return fallback when property doesn't exist", () => {
-            expect(safeObjectAccess(testObj, "nonexistent", "fallback")).toBe("fallback");
+            expect(safeObjectAccess(testObj, "nonexistent", "fallback")).toBe(
+                "fallback"
+            );
             expect(safeObjectAccess({}, "key", "fallback")).toBe("fallback");
         });
 
         it("should return fallback when property type doesn't match fallback type", () => {
             expect(safeObjectAccess(testObj, "string", 42)).toBe(42); // string vs number
-            expect(safeObjectAccess(testObj, "number", "default")).toBe("default"); // number vs string
-            expect(safeObjectAccess(testObj, "boolean", "default")).toBe("default"); // boolean vs string
+            expect(safeObjectAccess(testObj, "number", "default")).toBe(
+                "default"
+            ); // number vs string
+            expect(safeObjectAccess(testObj, "boolean", "default")).toBe(
+                "default"
+            ); // boolean vs string
         });
 
         it("should work with validator function", () => {
-            const isString = (value: unknown): value is string => typeof value === "string";
-            const isNumber = (value: unknown): value is number => typeof value === "number";
-            const isPositiveNumber = (value: unknown): value is number => typeof value === "number" && value > 0;
+            const isString = (value: unknown): value is string =>
+                typeof value === "string";
+            const isNumber = (value: unknown): value is number =>
+                typeof value === "number";
+            const isPositiveNumber = (value: unknown): value is number =>
+                typeof value === "number" && value > 0;
 
-            expect(safeObjectAccess(testObj, "string", "fallback", isString)).toBe("test");
+            expect(
+                safeObjectAccess(testObj, "string", "fallback", isString)
+            ).toBe("test");
             expect(safeObjectAccess(testObj, "number", 0, isNumber)).toBe(42);
-            expect(safeObjectAccess(testObj, "number", 0, isPositiveNumber)).toBe(42);
+            expect(
+                safeObjectAccess(testObj, "number", 0, isPositiveNumber)
+            ).toBe(42);
 
             // Validator fails - use type assertions to test edge cases
-            expect(safeObjectAccess(testObj, "string", "fallback", isNumber as any)).toBe("fallback");
-            expect(safeObjectAccess(testObj, "number", 0, isString as any)).toBe(0);
-            expect(safeObjectAccess({ negative: -5 }, "negative", 0, isPositiveNumber)).toBe(0);
+            expect(
+                safeObjectAccess(testObj, "string", "fallback", isNumber as any)
+            ).toBe("fallback");
+            expect(
+                safeObjectAccess(testObj, "number", 0, isString as any)
+            ).toBe(0);
+            expect(
+                safeObjectAccess(
+                    { negative: -5 },
+                    "negative",
+                    0,
+                    isPositiveNumber
+                )
+            ).toBe(0);
         });
 
         it("should handle null and undefined values correctly", () => {
-            expect(safeObjectAccess(testObj, "null", "fallback")).toBe("fallback");
-            expect(safeObjectAccess(testObj, "undefined", "fallback")).toBe("fallback");
+            expect(safeObjectAccess(testObj, "null", "fallback")).toBe(
+                "fallback"
+            );
+            expect(safeObjectAccess(testObj, "undefined", "fallback")).toBe(
+                "fallback"
+            );
         });
 
         it("should work with symbol keys", () => {
-            expect(safeObjectAccess(objWithSymbol, symbolKey, "fallback")).toBe("symbol value");
+            expect(safeObjectAccess(objWithSymbol, symbolKey, "fallback")).toBe(
+                "symbol value"
+            );
         });
 
         it("should handle nested objects", () => {
-            const isObject = (value: unknown): value is object => typeof value === "object" && value !== null;
+            const isObject = (value: unknown): value is object =>
+                typeof value === "object" && value !== null;
 
-            expect(safeObjectAccess(testObj, "nested", {}, isObject)).toEqual({ prop: "value" });
+            expect(safeObjectAccess(testObj, "nested", {}, isObject)).toEqual({
+                prop: "value",
+            });
         });
 
         it("should handle edge cases with validator", () => {
             const alwaysFails = (_value: unknown): _value is string => false;
             const alwaysPasses = (_value: unknown): _value is string => true;
 
-            expect(safeObjectAccess(testObj, "string", "fallback", alwaysFails)).toBe("fallback");
-            expect(safeObjectAccess(testObj, "string", "fallback", alwaysPasses)).toBe("test");
+            expect(
+                safeObjectAccess(testObj, "string", "fallback", alwaysFails)
+            ).toBe("fallback");
+            expect(
+                safeObjectAccess(testObj, "string", "fallback", alwaysPasses)
+            ).toBe("test");
         });
     });
 
@@ -108,7 +149,9 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
 
         it("should handle non-object inputs gracefully", () => {
             const mockCallback = vi.fn();
-            const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+            const consoleSpy = vi
+                .spyOn(console, "warn")
+                .mockImplementation(() => {});
 
             safeObjectIteration(null, mockCallback);
             safeObjectIteration(undefined, mockCallback);
@@ -118,22 +161,36 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
 
             expect(mockCallback).not.toHaveBeenCalled();
             expect(consoleSpy).toHaveBeenCalledTimes(5);
-            expect(consoleSpy).toHaveBeenCalledWith("Safe object iteration: Expected object, got object"); // null
-            expect(consoleSpy).toHaveBeenCalledWith("Safe object iteration: Expected object, got undefined");
-            expect(consoleSpy).toHaveBeenCalledWith("Safe object iteration: Expected object, got string");
-            expect(consoleSpy).toHaveBeenCalledWith("Safe object iteration: Expected object, got number");
-            expect(consoleSpy).toHaveBeenCalledWith("Safe object iteration: Expected object, got object"); // array
+            expect(consoleSpy).toHaveBeenCalledWith(
+                "Safe object iteration: Expected object, got object"
+            ); // null
+            expect(consoleSpy).toHaveBeenCalledWith(
+                "Safe object iteration: Expected object, got undefined"
+            );
+            expect(consoleSpy).toHaveBeenCalledWith(
+                "Safe object iteration: Expected object, got string"
+            );
+            expect(consoleSpy).toHaveBeenCalledWith(
+                "Safe object iteration: Expected object, got number"
+            );
+            expect(consoleSpy).toHaveBeenCalledWith(
+                "Safe object iteration: Expected object, got object"
+            ); // array
 
             consoleSpy.mockRestore();
         });
 
         it("should use custom context in error messages", () => {
             const mockCallback = vi.fn();
-            const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+            const consoleSpy = vi
+                .spyOn(console, "warn")
+                .mockImplementation(() => {});
 
             safeObjectIteration(null, mockCallback, "Custom context");
 
-            expect(consoleSpy).toHaveBeenCalledWith("Custom context: Expected object, got object");
+            expect(consoleSpy).toHaveBeenCalledWith(
+                "Custom context: Expected object, got object"
+            );
 
             consoleSpy.mockRestore();
         });
@@ -142,7 +199,9 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             const errorCallback = vi.fn().mockImplementation(() => {
                 throw new Error("Callback error");
             });
-            const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+            const consoleSpy = vi
+                .spyOn(console, "error")
+                .mockImplementation(() => {});
 
             safeObjectIteration(testObj, errorCallback);
 
@@ -160,7 +219,9 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             const errorCallback = vi.fn().mockImplementation(() => {
                 throw new Error("Callback error");
             });
-            const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+            const consoleSpy = vi
+                .spyOn(console, "error")
+                .mockImplementation(() => {});
 
             safeObjectIteration(testObj, errorCallback, "Custom error context");
 
@@ -203,7 +264,9 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
         });
 
         it("should handle omitting non-existent keys gracefully", () => {
-            const result = safeObjectOmit(testObj, ["nonexistent" as keyof typeof testObj]);
+            const result = safeObjectOmit(testObj, [
+                "nonexistent" as keyof typeof testObj,
+            ]);
 
             expect(result).toEqual(testObj);
         });
@@ -232,7 +295,11 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
 
     describe("safeObjectPick", () => {
         it("should pick specified keys from object", () => {
-            const result = safeObjectPick(testObj, ["string", "number", "boolean"]);
+            const result = safeObjectPick(testObj, [
+                "string",
+                "number",
+                "boolean",
+            ]);
 
             expect(result).toEqual({
                 string: "test",
@@ -252,7 +319,9 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
         });
 
         it("should handle picking non-existent keys gracefully", () => {
-            const result = safeObjectPick(testObj, ["nonexistent" as keyof typeof testObj]);
+            const result = safeObjectPick(testObj, [
+                "nonexistent" as keyof typeof testObj,
+            ]);
 
             expect(result).toEqual({});
         });
@@ -280,7 +349,10 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
 
         it("should only pick existing keys", () => {
             const partialObj = { a: 1 };
-            const result = safeObjectPick(partialObj, ["a", "b" as keyof typeof partialObj]);
+            const result = safeObjectPick(partialObj, [
+                "a",
+                "b" as keyof typeof partialObj,
+            ]);
 
             expect(result).toEqual({ a: 1 });
         });
@@ -359,7 +431,9 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             const keys = typedObjectKeys(testObject);
 
             expect(keys).toHaveLength(3);
-            expect(keys).toEqual(expect.arrayContaining(["first", "second", "third"]));
+            expect(keys).toEqual(
+                expect.arrayContaining(["first", "second", "third"])
+            );
         });
 
         it("should not include symbol keys", () => {
@@ -399,7 +473,9 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             const values = typedObjectValues(testObject);
 
             expect(values).toHaveLength(3);
-            expect(values).toEqual(expect.arrayContaining(["one", "two", "three"]));
+            expect(values).toEqual(
+                expect.arrayContaining(["one", "two", "three"])
+            );
         });
 
         it("should preserve object references", () => {
@@ -449,7 +525,12 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             };
 
             // Pick public fields
-            const publicFields = safeObjectPick(sourceObj, ["id", "name", "email", "isActive"]);
+            const publicFields = safeObjectPick(sourceObj, [
+                "id",
+                "name",
+                "email",
+                "isActive",
+            ]);
 
             // Omit sensitive fields
             const safeObj = safeObjectOmit(sourceObj, ["password"]);
@@ -464,8 +545,12 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(safeObj).not.toHaveProperty("password");
             expect(safeObj).toHaveProperty("metadata");
 
-            expect(keys).toEqual(expect.arrayContaining(["id", "name", "email", "isActive"]));
-            expect(values).toEqual(expect.arrayContaining([1, "John", "john@example.com", true]));
+            expect(keys).toEqual(
+                expect.arrayContaining(["id", "name", "email", "isActive"])
+            );
+            expect(values).toEqual(
+                expect.arrayContaining([1, "John", "john@example.com", true])
+            );
             expect(entries).toHaveLength(4);
         });
 
@@ -483,7 +568,11 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             };
 
             const deepValue = safeObjectAccess(
-                safeObjectAccess(safeObjectAccess(complexObj, "level1", {}), "level2", {}),
+                safeObjectAccess(
+                    safeObjectAccess(complexObj, "level1", {}),
+                    "level2",
+                    {}
+                ),
                 "level3",
                 {}
             );
@@ -500,9 +589,17 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             const testObject = { normal: "value" };
 
             // These operations should be safe
-            const accessResult = safeObjectAccess(testObject, maliciousKey, "fallback");
-            const omitResult = safeObjectOmit(testObject, [maliciousKey as keyof typeof testObject]);
-            const pickResult = safeObjectPick(testObject, [maliciousKey as keyof typeof testObject]);
+            const accessResult = safeObjectAccess(
+                testObject,
+                maliciousKey,
+                "fallback"
+            );
+            const omitResult = safeObjectOmit(testObject, [
+                maliciousKey as keyof typeof testObject,
+            ]);
+            const pickResult = safeObjectPick(testObject, [
+                maliciousKey as keyof typeof testObject,
+            ]);
 
             expect(accessResult).toBe("fallback");
             expect(omitResult).toEqual(testObject);
@@ -510,22 +607,36 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
         });
 
         it("should maintain performance with large objects", () => {
-            const largeObj = Object.fromEntries(Array.from({ length: 1000 }, (_, i) => [`key${i}`, `value${i}`]));
+            const largeObj = Object.fromEntries(
+                Array.from({ length: 1000 }, (_, i) => [`key${i}`, `value${i}`])
+            );
 
             const start = Date.now();
 
             const keys = typedObjectKeys(largeObj);
             const values = typedObjectValues(largeObj);
             const entries = typedObjectEntries(largeObj);
-            const picked = safeObjectPick(largeObj, ["key0", "key500", "key999"]);
-            const omitted = safeObjectOmit(largeObj, ["key0", "key500", "key999"]);
+            const picked = safeObjectPick(largeObj, [
+                "key0",
+                "key500",
+                "key999",
+            ]);
+            const omitted = safeObjectOmit(largeObj, [
+                "key0",
+                "key500",
+                "key999",
+            ]);
 
             const end = Date.now();
 
             expect(keys).toHaveLength(1000);
             expect(values).toHaveLength(1000);
             expect(entries).toHaveLength(1000);
-            expect(picked).toEqual({ key0: "value0", key500: "value500", key999: "value999" });
+            expect(picked).toEqual({
+                key0: "value0",
+                key500: "value500",
+                key999: "value999",
+            });
             expect(omitted).not.toHaveProperty("key0");
             expect(Object.keys(omitted)).toHaveLength(997);
 

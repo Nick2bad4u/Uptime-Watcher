@@ -113,7 +113,10 @@ import {
 
 // Example validation for a web monitor
 function validateWebMonitor(monitor: WebMonitor): boolean {
- return isValidUrl(monitor.url) && safeInteger(monitor.timeout, 5000, 1000, 300_000) > 0;
+ return (
+  isValidUrl(monitor.url) &&
+  safeInteger(monitor.timeout, 5000, 1000, 300_000) > 0
+ );
 }
 ```
 
@@ -236,7 +239,10 @@ export const monitorSchemas = {
 ```typescript
 import { DEFAULT_RETRY_ATTEMPTS } from "./constants";
 import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
-import { getMonitorRetryAttempts, getMonitorTimeout } from "./utils/monitorTypeGuards";
+import {
+ getMonitorRetryAttempts,
+ getMonitorTimeout,
+} from "./utils/monitorTypeGuards";
 
 export class DnsMonitor implements IMonitorService {
  private config: MonitorConfig;
@@ -255,8 +261,14 @@ export class DnsMonitor implements IMonitorService {
   }
 
   // CRITICAL: Use utility functions for timeout and retries
-  const timeout = getMonitorTimeout(monitor, this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT);
-  const retryAttempts = getMonitorRetryAttempts(monitor, DEFAULT_RETRY_ATTEMPTS);
+  const timeout = getMonitorTimeout(
+   monitor,
+   this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT
+  );
+  const retryAttempts = getMonitorRetryAttempts(
+   monitor,
+   DEFAULT_RETRY_ATTEMPTS
+  );
 
   // Implement DNS-specific checking logic here
   // Return MonitorCheckResult with status, responseTime, details
@@ -328,7 +340,8 @@ registerMonitorType({
   },
   helpTexts: {
    primary: "Enter the domain name to resolve",
-   secondary: "The monitor will check DNS resolution according to your monitoring interval",
+   secondary:
+    "The monitor will check DNS resolution according to your monitoring interval",
   },
  },
 });
@@ -599,7 +612,10 @@ export const monitorSchemas = {
 import { lookup } from "dns/promises";
 import { DEFAULT_RETRY_ATTEMPTS, DEFAULT_REQUEST_TIMEOUT } from "./constants";
 import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
-import { getMonitorRetryAttempts, getMonitorTimeout } from "./utils/monitorTypeGuards";
+import {
+ getMonitorRetryAttempts,
+ getMonitorTimeout,
+} from "./utils/monitorTypeGuards";
 
 export class DnsMonitor implements IMonitorService {
  private config: MonitorConfig;
@@ -617,8 +633,14 @@ export class DnsMonitor implements IMonitorService {
   }
 
   const startTime = performance.now();
-  const timeout = getMonitorTimeout(monitor, this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT);
-  const retryAttempts = getMonitorRetryAttempts(monitor, DEFAULT_RETRY_ATTEMPTS);
+  const timeout = getMonitorTimeout(
+   monitor,
+   this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT
+  );
+  const retryAttempts = getMonitorRetryAttempts(
+   monitor,
+   DEFAULT_RETRY_ATTEMPTS
+  );
 
   try {
    const result = await lookup(monitor.hostname || "");

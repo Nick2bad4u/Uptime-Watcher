@@ -25,7 +25,12 @@ import { useMemo } from "react";
 
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { useUIStore } from "../../stores/ui/useUiStore";
-import { StatusIndicator, ThemedBox, ThemedButton, ThemedText } from "../../theme/components";
+import {
+    StatusIndicator,
+    ThemedBox,
+    ThemedButton,
+    ThemedText,
+} from "../../theme/components";
 import "./Header.css";
 import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
 
@@ -38,7 +43,10 @@ const initializeMonitorCounts = () => ({
     up: 0,
 });
 
-const incrementCountByStatus = (counts: ReturnType<typeof initializeMonitorCounts>, status: string) => {
+const incrementCountByStatus = (
+    counts: ReturnType<typeof initializeMonitorCounts>,
+    status: string
+) => {
     counts.total++;
     switch (status) {
         case "down": {
@@ -116,10 +124,16 @@ export const Header = (): JSX.Element => {
     } = monitorCounts;
 
     // Calculate overall uptime percentage across all monitors
-    const uptimePercentage = totalMonitors > 0 ? Math.round((upMonitors / totalMonitors) * 100) : 0;
+    const uptimePercentage =
+        totalMonitors > 0 ? Math.round((upMonitors / totalMonitors) * 100) : 0;
 
     return (
-        <ThemedBox border className="border-b shadow-sm" padding="md" surface="elevated">
+        <ThemedBox
+            border
+            className="border-b shadow-sm"
+            padding="md"
+            surface="elevated"
+        >
             <div className="header-container">
                 <div className="flex flex-wrap items-center justify-between gap-4 py-4">
                     {/* Left: App Title & Status Summary */}
@@ -127,7 +141,11 @@ export const Header = (): JSX.Element => {
                         {/* App Title with subtle background and border */}
                         <span className="flex items-center gap-2 min-w-[180px] px-4 py-1 header-title-box">
                             <span className="text-2xl select-none">📊</span>
-                            <ThemedText className="truncate header-title-accent" size="2xl" weight="bold">
+                            <ThemedText
+                                className="truncate header-title-accent"
+                                size="2xl"
+                                weight="bold"
+                            >
                                 Uptime Watcher
                             </ThemedText>
                         </span>
@@ -144,38 +162,58 @@ export const Header = (): JSX.Element => {
                             {totalMonitors > 0 && (
                                 <div
                                     className="flex items-center space-x-2 px-3 py-1 rounded-md group transition-all duration-200 health-badge"
-                                    data-health-color={getAvailabilityColor(uptimePercentage)}
+                                    data-health-color={getAvailabilityColor(
+                                        uptimePercentage
+                                    )}
                                 >
                                     <div
                                         className="w-3 h-3 rounded-full animate-pulse health-dot"
-                                        data-health-color={getAvailabilityColor(uptimePercentage)}
+                                        data-health-color={getAvailabilityColor(
+                                            uptimePercentage
+                                        )}
                                     />
                                     <div className="flex flex-col">
                                         <ThemedText
                                             className="health-text"
-                                            data-health-color={getAvailabilityColor(uptimePercentage)}
+                                            data-health-color={getAvailabilityColor(
+                                                uptimePercentage
+                                            )}
                                             size="sm"
                                             weight="bold"
                                         >
                                             {uptimePercentage}%
                                         </ThemedText>
-                                        <ThemedText className="leading-none" size="xs" variant="secondary">
+                                        <ThemedText
+                                            className="leading-none"
+                                            size="xs"
+                                            variant="secondary"
+                                        >
                                             Health
                                         </ThemedText>
                                     </div>
                                 </div>
                             )}
 
-                            {totalMonitors > 0 && <div className="w-px h-8 bg-current opacity-20" />}
+                            {totalMonitors > 0 && (
+                                <div className="w-px h-8 bg-current opacity-20" />
+                            )}
 
                             {/* Up Status */}
                             <div className="flex items-center px-2 py-1 space-x-2 transition-all duration-200 rounded-md group status-up-badge">
                                 <StatusIndicator size="sm" status="up" />
                                 <div className="flex flex-col">
-                                    <ThemedText size="sm" variant="primary" weight="semibold">
+                                    <ThemedText
+                                        size="sm"
+                                        variant="primary"
+                                        weight="semibold"
+                                    >
                                         {upMonitors}
                                     </ThemedText>
-                                    <ThemedText className="leading-none" size="xs" variant="secondary">
+                                    <ThemedText
+                                        className="leading-none"
+                                        size="xs"
+                                        variant="secondary"
+                                    >
                                         Up
                                     </ThemedText>
                                 </div>
@@ -188,10 +226,18 @@ export const Header = (): JSX.Element => {
                             <div className="flex items-center px-2 py-1 space-x-2 transition-all duration-200 rounded-md group status-down-badge">
                                 <StatusIndicator size="sm" status="down" />
                                 <div className="flex flex-col">
-                                    <ThemedText size="sm" variant="primary" weight="semibold">
+                                    <ThemedText
+                                        size="sm"
+                                        variant="primary"
+                                        weight="semibold"
+                                    >
                                         {downMonitors}
                                     </ThemedText>
-                                    <ThemedText className="leading-none" size="xs" variant="secondary">
+                                    <ThemedText
+                                        className="leading-none"
+                                        size="xs"
+                                        variant="secondary"
+                                    >
                                         Down
                                     </ThemedText>
                                 </div>
@@ -204,10 +250,18 @@ export const Header = (): JSX.Element => {
                             <div className="flex items-center px-2 py-1 space-x-2 transition-all duration-200 rounded-md group status-pending-badge">
                                 <StatusIndicator size="sm" status="pending" />
                                 <div className="flex flex-col">
-                                    <ThemedText size="sm" variant="primary" weight="semibold">
+                                    <ThemedText
+                                        size="sm"
+                                        variant="primary"
+                                        weight="semibold"
+                                    >
                                         {pendingMonitors}
                                     </ThemedText>
-                                    <ThemedText className="leading-none" size="xs" variant="secondary">
+                                    <ThemedText
+                                        className="leading-none"
+                                        size="xs"
+                                        variant="secondary"
+                                    >
                                         Pending
                                     </ThemedText>
                                 </div>
@@ -220,10 +274,18 @@ export const Header = (): JSX.Element => {
                             <div className="flex items-center px-2 py-1 space-x-2 transition-all duration-200 rounded-md group status-paused-badge">
                                 <StatusIndicator size="sm" status="paused" />
                                 <div className="flex flex-col">
-                                    <ThemedText size="sm" variant="primary" weight="semibold">
+                                    <ThemedText
+                                        size="sm"
+                                        variant="primary"
+                                        weight="semibold"
+                                    >
                                         {pausedMonitors}
                                     </ThemedText>
-                                    <ThemedText className="leading-none" size="xs" variant="secondary">
+                                    <ThemedText
+                                        className="leading-none"
+                                        size="xs"
+                                        variant="secondary"
+                                    >
                                         Paused
                                     </ThemedText>
                                 </div>
@@ -236,10 +298,18 @@ export const Header = (): JSX.Element => {
                                     <div className="flex items-center px-2 py-1 space-x-2 rounded-md bg-opacity-10 total-sites-badge">
                                         <div className="w-2 h-2 bg-current rounded-full opacity-50" />
                                         <div className="flex flex-col">
-                                            <ThemedText size="sm" variant="primary" weight="semibold">
+                                            <ThemedText
+                                                size="sm"
+                                                variant="primary"
+                                                weight="semibold"
+                                            >
                                                 {totalMonitors}
                                             </ThemedText>
-                                            <ThemedText className="leading-none" size="xs" variant="secondary">
+                                            <ThemedText
+                                                className="leading-none"
+                                                size="xs"
+                                                variant="secondary"
+                                            >
                                                 Total
                                             </ThemedText>
                                         </div>
@@ -309,4 +379,4 @@ export const Header = (): JSX.Element => {
             </div>
         </ThemedBox>
     );
-}
+};

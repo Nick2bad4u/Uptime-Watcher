@@ -22,7 +22,10 @@ process.on("unhandledRejection", (reason, promise) => {
 const originalStderr = process.stderr.write;
 process.stderr.write = function (chunk: any, encoding?: any, fd?: any) {
     const output = chunk.toString();
-    if (output.includes("PromiseRejectionHandledWarning") || output.includes("UnhandledPromiseRejectionWarning")) {
+    if (
+        output.includes("PromiseRejectionHandledWarning") ||
+        output.includes("UnhandledPromiseRejectionWarning")
+    ) {
         return true; // Suppress these warnings in test environment
     }
     return originalStderr.call(this, chunk, encoding, fd);
@@ -177,13 +180,21 @@ vi.mock("../services/monitoring/MonitorScheduler", () => ({
             setCheckCallback: vi.fn(function (this: any, callback: any) {
                 this.onCheckCallback = callback;
             }),
-            startMonitor: vi.fn(function (this: any, siteId: string, monitor: any) {
+            startMonitor: vi.fn(function (
+                this: any,
+                siteId: string,
+                monitor: any
+            ) {
                 if (!monitor.id) return false;
                 const key = `${siteId}|${monitor.id}`;
                 this.intervals.set(key, 123); // Mock interval ID
                 return true;
             }),
-            stopMonitor: vi.fn(function (this: any, siteId: string, monitorId: string) {
+            stopMonitor: vi.fn(function (
+                this: any,
+                siteId: string,
+                monitorId: string
+            ) {
                 const key = `${siteId}|${monitorId}`;
                 if (this.intervals.has(key)) {
                     this.intervals.delete(key);
@@ -203,7 +214,11 @@ vi.mock("../services/monitoring/MonitorScheduler", () => ({
                 }
                 return started;
             }),
-            stopSite: vi.fn(function (this: any, siteId: string, monitors?: any[]) {
+            stopSite: vi.fn(function (
+                this: any,
+                siteId: string,
+                monitors?: any[]
+            ) {
                 if (monitors) {
                     for (const monitor of monitors) {
                         if (monitor.id) {
@@ -214,7 +229,10 @@ vi.mock("../services/monitoring/MonitorScheduler", () => ({
                     // Stop all monitors for the site
                     const keysToDelete: string[] = [];
                     for (const key of this.intervals.keys()) {
-                        if (typeof key === "string" && key.startsWith(`${siteId}|`)) {
+                        if (
+                            typeof key === "string" &&
+                            key.startsWith(`${siteId}|`)
+                        ) {
                             keysToDelete.push(key);
                         }
                     }
@@ -224,12 +242,20 @@ vi.mock("../services/monitoring/MonitorScheduler", () => ({
             stopAll: vi.fn(function (this: any) {
                 this.intervals.clear();
             }),
-            restartMonitor: vi.fn(function (this: any, siteId: string, monitor: any) {
+            restartMonitor: vi.fn(function (
+                this: any,
+                siteId: string,
+                monitor: any
+            ) {
                 if (!monitor.id) return false;
                 this.stopMonitor(siteId, monitor.id);
                 return this.startMonitor(siteId, monitor);
             }),
-            isMonitoring: vi.fn(function (this: any, siteId: string, monitorId: string) {
+            isMonitoring: vi.fn(function (
+                this: any,
+                siteId: string,
+                monitorId: string
+            ) {
                 const key = `${siteId}|${monitorId}`;
                 return this.intervals.has(key);
             }),

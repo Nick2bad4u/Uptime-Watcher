@@ -72,7 +72,9 @@ Simplify the mock to remove the useless try-catch:
 
 ```typescript
 vi.mock("../../utils/errorHandling", () => ({
- ensureError: vi.fn((error) => (error instanceof Error ? error : new Error(String(error)))),
+ ensureError: vi.fn((error) =>
+  error instanceof Error ? error : new Error(String(error))
+ ),
  withUtilityErrorHandling: vi.fn((operation) => operation()),
 }));
 ```

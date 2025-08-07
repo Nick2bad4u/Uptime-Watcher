@@ -61,7 +61,8 @@ export interface UseMonitorFieldsResult {
 }
 
 export function useMonitorFields(): UseMonitorFieldsResult {
-    const { fieldConfigs, isLoaded, lastError, loadMonitorTypes } = useMonitorTypesStore();
+    const { fieldConfigs, isLoaded, lastError, loadMonitorTypes } =
+        useMonitorTypesStore();
 
     useEffect(() => {
         // Load monitor types when hook is first used
@@ -80,7 +81,9 @@ export function useMonitorFields(): UseMonitorFieldsResult {
     const getRequiredFields = useCallback(
         (monitorType: string): string[] => {
             const fields = getFields(monitorType);
-            return fields.filter((field) => field.required).map((field) => field.name);
+            return fields
+                .filter((field) => field.required)
+                .map((field) => field.name);
         },
         [getFields]
     );

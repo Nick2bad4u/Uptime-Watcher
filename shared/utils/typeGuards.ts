@@ -28,7 +28,10 @@ export function hasProperties<K extends PropertyKey>(
     value: unknown,
     properties: readonly K[]
 ): value is Record<K, unknown> {
-    return isObject(value) && properties.every((prop) => Object.hasOwn(value, prop));
+    return (
+        isObject(value) &&
+        properties.every((prop) => Object.hasOwn(value, prop))
+    );
 }
 
 /**
@@ -46,7 +49,10 @@ export function hasProperties<K extends PropertyKey>(
  * }
  * ```
  */
-export function hasProperty<K extends PropertyKey>(value: unknown, property: K): value is Record<K, unknown> {
+export function hasProperty<K extends PropertyKey>(
+    value: unknown,
+    property: K
+): value is Record<K, unknown> {
     return isObject(value) && Object.hasOwn(value, property);
 }
 
@@ -65,7 +71,10 @@ export function hasProperty<K extends PropertyKey>(value: unknown, property: K):
  * }
  * ```
  */
-export function isArray<T = unknown>(value: unknown, itemValidator?: (item: unknown) => item is T): value is T[] {
+export function isArray<T = unknown>(
+    value: unknown,
+    itemValidator?: (item: unknown) => item is T
+): value is T[] {
     if (!Array.isArray(value)) {
         return false;
     }
@@ -145,7 +154,9 @@ export function isFiniteNumber(value: unknown): value is number {
  * }
  * ```
  */
-export function isFunction(value: unknown): value is (...args: unknown[]) => unknown {
+export function isFunction(
+    value: unknown
+): value is (...args: unknown[]) => unknown {
     return typeof value === "function";
 }
 
@@ -165,7 +176,9 @@ export function isNonNegativeNumber(value: unknown): value is number {
  * @param value - The value to check.
  * @returns True if `value` is a non-null object; otherwise, false.
  */
-export function isNonNullObject(value: unknown): value is Record<string, unknown> {
+export function isNonNullObject(
+    value: unknown
+): value is Record<string, unknown> {
     return isObject(value);
 }
 
@@ -216,7 +229,12 @@ export function isString(value: unknown): value is string {
  * @returns True if `value` is a valid port number; otherwise, false.
  */
 export function isValidPort(value: unknown): value is number {
-    return isNumber(value) && Number.isInteger(value) && value >= 1 && value <= 65_535;
+    return (
+        isNumber(value) &&
+        Number.isInteger(value) &&
+        value >= 1 &&
+        value <= 65_535
+    );
 }
 
 /**

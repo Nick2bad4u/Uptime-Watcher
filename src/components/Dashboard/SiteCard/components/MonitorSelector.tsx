@@ -47,8 +47,8 @@ export interface MonitorSelectorProperties {
  * />
  * ```
  */
-export const MonitorSelector: React.NamedExoticComponent<MonitorSelectorProperties> = React.memo(
-    function MonitorSelector({
+export const MonitorSelector: React.NamedExoticComponent<MonitorSelectorProperties> =
+    React.memo(function MonitorSelector({
         className = "min-w-[80px]",
         monitors,
         onChange,
@@ -93,5 +93,4 @@ export const MonitorSelector: React.NamedExoticComponent<MonitorSelectorProperti
                 ))}
             </ThemedSelect>
         );
-    }
-);
+    });

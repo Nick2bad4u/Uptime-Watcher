@@ -24,7 +24,10 @@ export interface MonitoringConfig {
     /** Function to setup new monitors for a site */
     setupNewMonitors: (site: Site, newMonitorIds: string[]) => Promise<void>;
     /** Function to start monitoring for a site/monitor */
-    startMonitoring: (identifier: string, monitorId: string) => Promise<boolean>;
+    startMonitoring: (
+        identifier: string,
+        monitorId: string
+    ) => Promise<boolean>;
     /** Function to stop monitoring for a site/monitor */
     stopMonitoring: (identifier: string, monitorId: string) => Promise<boolean>;
 }

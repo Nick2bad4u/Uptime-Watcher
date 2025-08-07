@@ -62,8 +62,13 @@ export interface IDataBackupService {
  */
 export interface IDataImportExportService {
     exportAllData(): Promise<string>;
-    importDataFromJson(data: string): Promise<{ settings: Record<string, string>; sites: unknown[] }>;
-    persistImportedData(sites: unknown[], settings: Record<string, string>): Promise<void>;
+    importDataFromJson(
+        data: string
+    ): Promise<{ settings: Record<string, string>; sites: unknown[] }>;
+    persistImportedData(
+        sites: unknown[],
+        settings: Record<string, string>
+    ): Promise<void>;
 }
 
 /**

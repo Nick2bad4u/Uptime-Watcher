@@ -9,7 +9,11 @@
  */
 
 import { app } from "electron";
-import { installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
+import {
+    installExtension,
+    REACT_DEVELOPER_TOOLS,
+    REDUX_DEVTOOLS,
+} from "electron-devtools-installer";
 import log from "electron-log/main";
 
 import { isDev } from "./electronUtils";
@@ -22,7 +26,8 @@ const configureLogging = () => {
     // Check for debug flag in command line arguments
     const args = new Set(process.argv.slice(2));
     const debugFlag = args.has("--debug") || args.has("--log-debug");
-    const productionFlag = args.has("--log-production") || args.has("--log-prod");
+    const productionFlag =
+        args.has("--log-production") || args.has("--log-prod");
     const infoFlag = args.has("--log-info");
 
     // Determine log level based on flags and environment
@@ -36,17 +41,23 @@ const configureLogging = () => {
     } else if (productionFlag) {
         consoleLevel = "info";
         fileLevel = "warn";
-        console.log("[LOGGING] Production logging level enabled via command line flag");
+        console.log(
+            "[LOGGING] Production logging level enabled via command line flag"
+        );
     } else if (infoFlag) {
         consoleLevel = "info";
         fileLevel = "info";
-        console.log("[LOGGING] Info logging level enabled via command line flag");
+        console.log(
+            "[LOGGING] Info logging level enabled via command line flag"
+        );
     } else {
         // Default development behavior
         const isDev = !app.isPackaged;
         consoleLevel = isDev ? "debug" : "info";
         fileLevel = isDev ? "info" : "warn";
-        console.log(`[LOGGING] Default logging: console=${consoleLevel}, file=${fileLevel} (isDev=${isDev})`);
+        console.log(
+            `[LOGGING] Default logging: console=${consoleLevel}, file=${fileLevel} (isDev=${isDev})`
+        );
     }
 
     return { consoleLevel, fileLevel };
@@ -55,11 +66,18 @@ const configureLogging = () => {
 // Enable preload mode for reliable logging in Electron's main process, especially with context isolation enabled
 log.initialize({ preload: true });
 
-type ElectronLogLevel = "debug" | "error" | "info" | "silly" | "verbose" | "warn";
+type ElectronLogLevel =
+    | "debug"
+    | "error"
+    | "info"
+    | "silly"
+    | "verbose"
+    | "warn";
 
 const ELECTRON_LOG_FILE = "uptime-watcher-main.log" as const;
 const LOG_FILE_MAX_SIZE = 1024 ** 2 * 5; // 5MB max file size
-const LOG_FILE_FORMAT: string = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";
+const LOG_FILE_FORMAT: string =
+    "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";
 const LOG_CONSOLE_FORMAT: string = "[{h}:{i}:{s}.{ms}] [{level}] {text}";
 
 const { consoleLevel, fileLevel } = configureLogging();
@@ -157,13 +175,21 @@ if (process.versions.electron) {
 
         if (isDev()) {
             try {
-                const extensions = await installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS], {
-                    loadExtensionOptions: { allowFileAccess: true },
-                });
-                logger.info(`[Main] Added Extensions: ${extensions.map((ext) => ext.name).join(", ")}`);
+                const extensions = await installExtension(
+                    [REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS],
+                    {
+                        loadExtensionOptions: { allowFileAccess: true },
+                    }
+                );
+                logger.info(
+                    `[Main] Added Extensions: ${extensions.map((ext) => ext.name).join(", ")}`
+                );
                 return extensions;
             } catch (error) {
-                logger.warn("[Main] Failed to install dev extensions (this is normal in production)", error);
+                logger.warn(
+                    "[Main] Failed to install dev extensions (this is normal in production)",
+                    error
+                );
                 return [];
             }
         }

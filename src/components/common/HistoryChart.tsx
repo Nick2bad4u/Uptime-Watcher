@@ -37,42 +37,43 @@ export interface HistoryChartProps {
  * @param props - HistoryChart component props
  * @returns JSX element containing the history chart, or null if no data (following React conventions for conditional rendering)
  */
-export const HistoryChart: React.NamedExoticComponent<HistoryChartProps> = React.memo(function HistoryChart({
-    className = "",
-    history,
-    maxItems = 120,
-    title,
-}: HistoryChartProps) {
-    // Return null for empty history (React convention for "render nothing")
-    if (history.length === 0) {
-        // React components, returning null from a render function
-        // is actually the correct and idiomatic way to indicate "render nothing."
-        // This is a special case where null is the standard React convention.
-         
-        return null;
-    }
+export const HistoryChart: React.NamedExoticComponent<HistoryChartProps> =
+    React.memo(function HistoryChart({
+        className = "",
+        history,
+        maxItems = 120,
+        title,
+    }: HistoryChartProps) {
+        // Return null for empty history (React convention for "render nothing")
+        if (history.length === 0) {
+            // React components, returning null from a render function
+            // is actually the correct and idiomatic way to indicate "render nothing."
+            // This is a special case where null is the standard React convention.
 
-    // Show up to maxItems bars, oldest first after reversal (chronological order display)
-    // Note: Assumes input history is in newest-first order, toReversed() makes it oldest-first for display
-    const displayedHistory = history.slice(0, maxItems).toReversed();
+            return null;
+        }
 
-    return (
-        <div className={`mb-3 w-full ${className}`}>
-            <div className="flex items-center justify-end mb-2">
-                <ThemedText size="xs" variant="secondary">
-                    {title}
-                </ThemedText>
+        // Show up to maxItems bars, oldest first after reversal (chronological order display)
+        // Note: Assumes input history is in newest-first order, toReversed() makes it oldest-first for display
+        const displayedHistory = history.slice(0, maxItems).toReversed();
+
+        return (
+            <div className={`mb-3 w-full ${className}`}>
+                <div className="flex items-center justify-end mb-2">
+                    <ThemedText size="xs" variant="secondary">
+                        {title}
+                    </ThemedText>
+                </div>
+                <div className="flex items-center justify-end flex-shrink min-w-0 gap-1 overflow-hidden">
+                    {displayedHistory.map((record) => (
+                        <MiniChartBar
+                            key={`${record.timestamp}-${record.status}-${record.responseTime}`}
+                            responseTime={record.responseTime}
+                            status={record.status}
+                            timestamp={record.timestamp}
+                        />
+                    ))}
+                </div>
             </div>
-            <div className="flex items-center justify-end flex-shrink min-w-0 gap-1 overflow-hidden">
-                {displayedHistory.map((record) => (
-                    <MiniChartBar
-                        key={`${record.timestamp}-${record.status}-${record.responseTime}`}
-                        responseTime={record.responseTime}
-                        status={record.status}
-                        timestamp={record.timestamp}
-                    />
-                ))}
-            </div>
-        </div>
-    );
-});
+        );
+    });

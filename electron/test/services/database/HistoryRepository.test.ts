@@ -1,7 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Database } from "node-sqlite3-wasm";
 
-import { HistoryRepository, type HistoryRepositoryDependencies } from "../../../services/database/HistoryRepository";
+import {
+    HistoryRepository,
+    type HistoryRepositoryDependencies,
+} from "../../../services/database/HistoryRepository";
 import type { DatabaseService } from "../../../services/database/DatabaseService";
 import type { StatusHistory } from "../../../types";
 
@@ -57,7 +60,9 @@ describe("HistoryRepository", () => {
         historyRepository = new HistoryRepository(dependencies);
 
         // Setup default mocks
-        vi.mocked(operationalHooks.withDatabaseOperation).mockImplementation((operation) => operation());
+        vi.mocked(operationalHooks.withDatabaseOperation).mockImplementation(
+            (operation) => operation()
+        );
         vi.mocked(electronUtils.isDev).mockReturnValue(true);
 
         // Clear all mocks
@@ -67,7 +72,9 @@ describe("HistoryRepository", () => {
     describe("Constructor", () => {
         it("should create repository with dependencies", () => {
             expect(historyRepository).toBeInstanceOf(HistoryRepository);
-            expect(historyRepository["databaseService"]).toBe(mockDatabaseService);
+            expect(historyRepository["databaseService"]).toBe(
+                mockDatabaseService
+            );
         });
     });
 
@@ -76,9 +83,15 @@ describe("HistoryRepository", () => {
             const monitorId = "monitor-123";
             const details = "Test details";
 
-            await historyRepository.addEntry(monitorId, mockStatusHistory, details);
+            await historyRepository.addEntry(
+                monitorId,
+                mockStatusHistory,
+                details
+            );
 
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalledTimes(1);
+            expect(
+                mockDatabaseService.executeTransaction
+            ).toHaveBeenCalledTimes(1);
             expect(historyManipulation.addHistoryEntry).toHaveBeenCalledWith(
                 mockDatabase,
                 monitorId,
@@ -106,7 +119,12 @@ describe("HistoryRepository", () => {
             const monitorId = "monitor-123";
             const details = "Test details";
 
-            historyRepository.addEntryInternal(mockDatabase, monitorId, mockStatusHistory, details);
+            historyRepository.addEntryInternal(
+                mockDatabase,
+                monitorId,
+                mockStatusHistory,
+                details
+            );
 
             expect(historyManipulation.addHistoryEntry).toHaveBeenCalledWith(
                 mockDatabase,
@@ -129,11 +147,15 @@ describe("HistoryRepository", () => {
                 run: vi.fn(),
                 finalize: vi.fn(),
             };
-            vi.mocked(mockDatabase.prepare).mockReturnValue(mockStatement as any);
+            vi.mocked(mockDatabase.prepare).mockReturnValue(
+                mockStatement as any
+            );
 
             await historyRepository.bulkInsert(monitorId, historyEntries);
 
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalledTimes(1);
+            expect(
+                mockDatabaseService.executeTransaction
+            ).toHaveBeenCalledTimes(1);
             expect(mockDatabase.prepare).toHaveBeenCalledWith(
                 "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)"
             );
@@ -150,7 +172,9 @@ describe("HistoryRepository", () => {
 
             await historyRepository.bulkInsert(monitorId, historyEntries);
 
-            expect(mockDatabaseService.executeTransaction).not.toHaveBeenCalled();
+            expect(
+                mockDatabaseService.executeTransaction
+            ).not.toHaveBeenCalled();
         });
 
         it("should finalize statement even on error", async () => {
@@ -163,9 +187,13 @@ describe("HistoryRepository", () => {
                 }),
                 finalize: vi.fn(),
             };
-            vi.mocked(mockDatabase.prepare).mockReturnValue(mockStatement as any);
+            vi.mocked(mockDatabase.prepare).mockReturnValue(
+                mockStatement as any
+            );
 
-            await expect(historyRepository.bulkInsert(monitorId, historyEntries)).rejects.toThrow("SQL error");
+            await expect(
+                historyRepository.bulkInsert(monitorId, historyEntries)
+            ).rejects.toThrow("SQL error");
 
             expect(mockStatement.finalize).toHaveBeenCalledTimes(1);
         });
@@ -175,8 +203,12 @@ describe("HistoryRepository", () => {
         it("should delete all history", async () => {
             await historyRepository.deleteAll();
 
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalledTimes(1);
-            expect(historyManipulation.deleteAllHistory).toHaveBeenCalledWith(mockDatabase);
+            expect(
+                mockDatabaseService.executeTransaction
+            ).toHaveBeenCalledTimes(1);
+            expect(historyManipulation.deleteAllHistory).toHaveBeenCalledWith(
+                mockDatabase
+            );
         });
     });
 
@@ -184,7 +216,9 @@ describe("HistoryRepository", () => {
         it("should delete all history internally", () => {
             historyRepository.deleteAllInternal(mockDatabase);
 
-            expect(historyManipulation.deleteAllHistory).toHaveBeenCalledWith(mockDatabase);
+            expect(historyManipulation.deleteAllHistory).toHaveBeenCalledWith(
+                mockDatabase
+            );
         });
     });
 
@@ -194,8 +228,12 @@ describe("HistoryRepository", () => {
 
             await historyRepository.deleteByMonitorId(monitorId);
 
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalledTimes(1);
-            expect(historyManipulation.deleteHistoryByMonitorId).toHaveBeenCalledWith(mockDatabase, monitorId);
+            expect(
+                mockDatabaseService.executeTransaction
+            ).toHaveBeenCalledTimes(1);
+            expect(
+                historyManipulation.deleteHistoryByMonitorId
+            ).toHaveBeenCalledWith(mockDatabase, monitorId);
         });
     });
 
@@ -203,9 +241,14 @@ describe("HistoryRepository", () => {
         it("should delete history by monitor ID internally", () => {
             const monitorId = "monitor-123";
 
-            historyRepository.deleteByMonitorIdInternal(mockDatabase, monitorId);
+            historyRepository.deleteByMonitorIdInternal(
+                mockDatabase,
+                monitorId
+            );
 
-            expect(historyManipulation.deleteHistoryByMonitorId).toHaveBeenCalledWith(mockDatabase, monitorId);
+            expect(
+                historyManipulation.deleteHistoryByMonitorId
+            ).toHaveBeenCalledWith(mockDatabase, monitorId);
         });
     });
 
@@ -214,12 +257,17 @@ describe("HistoryRepository", () => {
             const monitorId = "monitor-123";
             const expectedHistory = [mockStatusHistory];
 
-            vi.mocked(historyQuery.findHistoryByMonitorId).mockReturnValue(expectedHistory);
+            vi.mocked(historyQuery.findHistoryByMonitorId).mockReturnValue(
+                expectedHistory
+            );
 
             const result = await historyRepository.findByMonitorId(monitorId);
 
             expect(mockDatabaseService.getDatabase).toHaveBeenCalledTimes(1);
-            expect(historyQuery.findHistoryByMonitorId).toHaveBeenCalledWith(mockDatabase, monitorId);
+            expect(historyQuery.findHistoryByMonitorId).toHaveBeenCalledWith(
+                mockDatabase,
+                monitorId
+            );
             expect(result).toEqual(expectedHistory);
         });
     });
@@ -229,12 +277,17 @@ describe("HistoryRepository", () => {
             const monitorId = "monitor-123";
             const expectedCount = 42;
 
-            vi.mocked(historyQuery.getHistoryCount).mockReturnValue(expectedCount);
+            vi.mocked(historyQuery.getHistoryCount).mockReturnValue(
+                expectedCount
+            );
 
             const result = await historyRepository.getHistoryCount(monitorId);
 
             expect(mockDatabaseService.getDatabase).toHaveBeenCalledTimes(1);
-            expect(historyQuery.getHistoryCount).toHaveBeenCalledWith(mockDatabase, monitorId);
+            expect(historyQuery.getHistoryCount).toHaveBeenCalledWith(
+                mockDatabase,
+                monitorId
+            );
             expect(result).toBe(expectedCount);
         });
     });
@@ -244,11 +297,19 @@ describe("HistoryRepository", () => {
             const monitorId = "monitor-123";
             const expectedCount = 42;
 
-            vi.mocked(historyQuery.getHistoryCount).mockReturnValue(expectedCount);
+            vi.mocked(historyQuery.getHistoryCount).mockReturnValue(
+                expectedCount
+            );
 
-            const result = historyRepository.getHistoryCountInternal(mockDatabase, monitorId);
+            const result = historyRepository.getHistoryCountInternal(
+                mockDatabase,
+                monitorId
+            );
 
-            expect(historyQuery.getHistoryCount).toHaveBeenCalledWith(mockDatabase, monitorId);
+            expect(historyQuery.getHistoryCount).toHaveBeenCalledWith(
+                mockDatabase,
+                monitorId
+            );
             expect(result).toBe(expectedCount);
         });
     });
@@ -257,19 +318,26 @@ describe("HistoryRepository", () => {
         it("should get latest entry", async () => {
             const monitorId = "monitor-123";
 
-            vi.mocked(historyQuery.getLatestHistoryEntry).mockReturnValue(mockStatusHistory);
+            vi.mocked(historyQuery.getLatestHistoryEntry).mockReturnValue(
+                mockStatusHistory
+            );
 
             const result = await historyRepository.getLatestEntry(monitorId);
 
             expect(mockDatabaseService.getDatabase).toHaveBeenCalledTimes(1);
-            expect(historyQuery.getLatestHistoryEntry).toHaveBeenCalledWith(mockDatabase, monitorId);
+            expect(historyQuery.getLatestHistoryEntry).toHaveBeenCalledWith(
+                mockDatabase,
+                monitorId
+            );
             expect(result).toEqual(mockStatusHistory);
         });
 
         it("should return undefined when no entry exists", async () => {
             const monitorId = "monitor-123";
 
-            vi.mocked(historyQuery.getLatestHistoryEntry).mockReturnValue(undefined);
+            vi.mocked(historyQuery.getLatestHistoryEntry).mockReturnValue(
+                undefined
+            );
 
             const result = await historyRepository.getLatestEntry(monitorId);
 
@@ -283,32 +351,47 @@ describe("HistoryRepository", () => {
             const mockMonitors = [{ id: 1 }, { id: 2 }];
             const mockExcessEntries = [{ id: 10 }, { id: 11 }];
 
-            vi.mocked(mockDatabase.all).mockReturnValueOnce(mockMonitors).mockReturnValue(mockExcessEntries);
+            vi.mocked(mockDatabase.all)
+                .mockReturnValueOnce(mockMonitors)
+                .mockReturnValue(mockExcessEntries);
 
             await historyRepository.pruneAllHistory(limit);
 
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalledTimes(1);
-            expect(mockDatabase.all).toHaveBeenCalledWith("SELECT id FROM monitors");
-            expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM history WHERE id IN (?,?)", [10, 11]);
+            expect(
+                mockDatabaseService.executeTransaction
+            ).toHaveBeenCalledTimes(1);
+            expect(mockDatabase.all).toHaveBeenCalledWith(
+                "SELECT id FROM monitors"
+            );
+            expect(mockDatabase.run).toHaveBeenCalledWith(
+                "DELETE FROM history WHERE id IN (?,?)",
+                [10, 11]
+            );
         });
 
         it("should not prune with zero limit", async () => {
             await historyRepository.pruneAllHistory(0);
 
-            expect(mockDatabaseService.executeTransaction).not.toHaveBeenCalled();
+            expect(
+                mockDatabaseService.executeTransaction
+            ).not.toHaveBeenCalled();
         });
 
         it("should not prune with negative limit", async () => {
             await historyRepository.pruneAllHistory(-1);
 
-            expect(mockDatabaseService.executeTransaction).not.toHaveBeenCalled();
+            expect(
+                mockDatabaseService.executeTransaction
+            ).not.toHaveBeenCalled();
         });
 
         it("should handle no excess entries", async () => {
             const limit = 100;
             const mockMonitors = [{ id: 1 }];
 
-            vi.mocked(mockDatabase.all).mockReturnValueOnce(mockMonitors).mockReturnValue([]);
+            vi.mocked(mockDatabase.all)
+                .mockReturnValueOnce(mockMonitors)
+                .mockReturnValue([]);
 
             await historyRepository.pruneAllHistory(limit);
 
@@ -318,13 +401,23 @@ describe("HistoryRepository", () => {
         it("should filter invalid IDs", async () => {
             const limit = 100;
             const mockMonitors = [{ id: 1 }];
-            const mockExcessEntries = [{ id: 10 }, { id: "invalid" }, { id: null }, { id: 12 }];
+            const mockExcessEntries = [
+                { id: 10 },
+                { id: "invalid" },
+                { id: null },
+                { id: 12 },
+            ];
 
-            vi.mocked(mockDatabase.all).mockReturnValueOnce(mockMonitors).mockReturnValue(mockExcessEntries);
+            vi.mocked(mockDatabase.all)
+                .mockReturnValueOnce(mockMonitors)
+                .mockReturnValue(mockExcessEntries);
 
             await historyRepository.pruneAllHistory(limit);
 
-            expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM history WHERE id IN (?,?)", [10, 12]);
+            expect(mockDatabase.run).toHaveBeenCalledWith(
+                "DELETE FROM history WHERE id IN (?,?)",
+                [10, 12]
+            );
         });
     });
 
@@ -337,9 +430,15 @@ describe("HistoryRepository", () => {
 
             historyRepository.pruneAllHistoryInternal(mockDatabase, limit);
 
-            expect(mockDatabase.all).toHaveBeenCalledWith("SELECT id FROM monitors");
-            expect(historyManipulation.pruneHistoryForMonitor).toHaveBeenCalledWith(mockDatabase, "1", limit);
-            expect(historyManipulation.pruneHistoryForMonitor).toHaveBeenCalledWith(mockDatabase, "2", limit);
+            expect(mockDatabase.all).toHaveBeenCalledWith(
+                "SELECT id FROM monitors"
+            );
+            expect(
+                historyManipulation.pruneHistoryForMonitor
+            ).toHaveBeenCalledWith(mockDatabase, "1", limit);
+            expect(
+                historyManipulation.pruneHistoryForMonitor
+            ).toHaveBeenCalledWith(mockDatabase, "2", limit);
             expect(logger.logger.debug).toHaveBeenCalledWith(
                 "[HistoryRepository] Pruned history for all monitors (limit: 100) (internal)"
             );
@@ -353,15 +452,26 @@ describe("HistoryRepository", () => {
 
         it("should filter invalid monitor IDs", () => {
             const limit = 100;
-            const mockMonitors = [{ id: 1 }, { id: "invalid" }, { id: null }, { id: 3 }];
+            const mockMonitors = [
+                { id: 1 },
+                { id: "invalid" },
+                { id: null },
+                { id: 3 },
+            ];
 
             vi.mocked(mockDatabase.all).mockReturnValue(mockMonitors);
 
             historyRepository.pruneAllHistoryInternal(mockDatabase, limit);
 
-            expect(historyManipulation.pruneHistoryForMonitor).toHaveBeenCalledWith(mockDatabase, "1", limit);
-            expect(historyManipulation.pruneHistoryForMonitor).toHaveBeenCalledWith(mockDatabase, "3", limit);
-            expect(historyManipulation.pruneHistoryForMonitor).toHaveBeenCalledTimes(2);
+            expect(
+                historyManipulation.pruneHistoryForMonitor
+            ).toHaveBeenCalledWith(mockDatabase, "1", limit);
+            expect(
+                historyManipulation.pruneHistoryForMonitor
+            ).toHaveBeenCalledWith(mockDatabase, "3", limit);
+            expect(
+                historyManipulation.pruneHistoryForMonitor
+            ).toHaveBeenCalledTimes(2);
         });
     });
 
@@ -373,7 +483,9 @@ describe("HistoryRepository", () => {
             await historyRepository.pruneHistory(monitorId, limit);
 
             expect(mockDatabaseService.getDatabase).toHaveBeenCalledTimes(1);
-            expect(historyManipulation.pruneHistoryForMonitor).toHaveBeenCalledWith(mockDatabase, monitorId, limit);
+            expect(
+                historyManipulation.pruneHistoryForMonitor
+            ).toHaveBeenCalledWith(mockDatabase, monitorId, limit);
         });
     });
 
@@ -382,9 +494,15 @@ describe("HistoryRepository", () => {
             const monitorId = "monitor-123";
             const limit = 100;
 
-            historyRepository.pruneHistoryInternal(mockDatabase, monitorId, limit);
+            historyRepository.pruneHistoryInternal(
+                mockDatabase,
+                monitorId,
+                limit
+            );
 
-            expect(historyManipulation.pruneHistoryForMonitor).toHaveBeenCalledWith(mockDatabase, monitorId, limit);
+            expect(
+                historyManipulation.pruneHistoryForMonitor
+            ).toHaveBeenCalledWith(mockDatabase, monitorId, limit);
             expect(logger.logger.debug).toHaveBeenCalledWith(
                 "[HistoryRepository] Pruned history for monitor monitor-123 (limit: 100) (internal)"
             );
@@ -395,7 +513,9 @@ describe("HistoryRepository", () => {
 
             historyRepository.pruneHistoryInternal(mockDatabase, monitorId, 0);
 
-            expect(historyManipulation.pruneHistoryForMonitor).not.toHaveBeenCalled();
+            expect(
+                historyManipulation.pruneHistoryForMonitor
+            ).not.toHaveBeenCalled();
         });
 
         it("should not prune with negative limit", () => {
@@ -403,7 +523,9 @@ describe("HistoryRepository", () => {
 
             historyRepository.pruneHistoryInternal(mockDatabase, monitorId, -5);
 
-            expect(historyManipulation.pruneHistoryForMonitor).not.toHaveBeenCalled();
+            expect(
+                historyManipulation.pruneHistoryForMonitor
+            ).not.toHaveBeenCalled();
         });
     });
 

@@ -88,7 +88,9 @@ export interface SiteAnalytics {
  */
 export function useChartData(monitor: Monitor, theme: Theme): ChartData {
     return useMemo(() => {
-        const sortedHistory = Array.from(monitor.history).sort((a, b) => a.timestamp - b.timestamp);
+        const sortedHistory = Array.from(monitor.history).sort(
+            (a, b) => a.timestamp - b.timestamp
+        );
 
         const lineChartData = {
             datasets: [
@@ -103,10 +105,14 @@ export function useChartData(monitor: Monitor, theme: Theme): ChartData {
                     fill: true,
                     label: "Response Time",
                     pointBackgroundColor: sortedHistory.map((record) =>
-                        record.status === "up" ? theme.colors.success : theme.colors.error
+                        record.status === "up"
+                            ? theme.colors.success
+                            : theme.colors.error
                     ),
                     pointBorderColor: sortedHistory.map((record) =>
-                        record.status === "up" ? theme.colors.success : theme.colors.error
+                        record.status === "up"
+                            ? theme.colors.success
+                            : theme.colors.error
                     ),
                     pointHoverRadius: 6,
                     pointRadius: 4,
@@ -146,7 +152,10 @@ export function useChartData(monitor: Monitor, theme: Theme): ChartData {
  * }
  * ```
  */
-export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePeriod = "24h"): SiteAnalytics {
+export function useSiteAnalytics(
+    monitor: Monitor | undefined,
+    timeRange: TimePeriod = "24h"
+): SiteAnalytics {
     return useMemo(() => {
         // Defensive: handle undefined monitor
         const history = monitor?.history ?? [];
@@ -155,7 +164,9 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
 
         const totalChecks = filteredHistory.length;
         const upCount = filteredHistory.filter((h) => h.status === "up").length;
-        const downCount = filteredHistory.filter((h) => h.status === "down").length;
+        const downCount = filteredHistory.filter(
+            (h) => h.status === "down"
+        ).length;
 
         // Basic metrics
         const uptimeRaw = totalChecks > 0 ? (upCount / totalChecks) * 100 : 0;
@@ -167,8 +178,14 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
 
         // Calculate downtime periods
         const downtimePeriods = calculateDowntimePeriods(filteredHistory);
-        const totalDowntime = downtimePeriods.reduce((sum, period) => sum + period.duration, 0);
-        const mttr = downtimePeriods.length > 0 ? totalDowntime / downtimePeriods.length : 0;
+        const totalDowntime = downtimePeriods.reduce(
+            (sum, period) => sum + period.duration,
+            0
+        );
+        const mttr =
+            downtimePeriods.length > 0
+                ? totalDowntime / downtimePeriods.length
+                : 0;
 
         return {
             avgResponseTime,
@@ -224,7 +241,9 @@ export const SiteAnalyticsUtils = {
      * @remarks
      * Thresholds: ≥99.9% = excellent, ≥99% = good, ≥95% = warning, \<95% = critical
      */
-    getAvailabilityStatus(uptime: number): "critical" | "excellent" | "good" | "warning" {
+    getAvailabilityStatus(
+        uptime: number
+    ): "critical" | "excellent" | "good" | "warning" {
         if (uptime >= 99.9) {
             return "excellent";
         }
@@ -245,7 +264,9 @@ export const SiteAnalyticsUtils = {
      * @remarks
      * Thresholds: ≤200ms = excellent, ≤500ms = good, ≤1000ms = warning, \>1000ms = critical
      */
-    getPerformanceStatus(responseTime: number): "critical" | "excellent" | "good" | "warning" {
+    getPerformanceStatus(
+        responseTime: number
+    ): "critical" | "excellent" | "good" | "warning" {
         if (responseTime <= 200) {
             return "excellent";
         }
@@ -262,15 +283,24 @@ export const SiteAnalyticsUtils = {
 /**
  * Calculate average response time from filtered history
  */
-function calculateAverageResponseTime(filteredHistory: StatusHistory[]): number {
+function calculateAverageResponseTime(
+    filteredHistory: StatusHistory[]
+): number {
     const totalChecks = filteredHistory.length;
-    return totalChecks > 0 ? Math.round(filteredHistory.reduce((sum, h) => sum + h.responseTime, 0) / totalChecks) : 0;
+    return totalChecks > 0
+        ? Math.round(
+              filteredHistory.reduce((sum, h) => sum + h.responseTime, 0) /
+                  totalChecks
+          )
+        : 0;
 }
 
 /**
  * Calculate downtime periods from filtered history
  */
-function calculateDowntimePeriods(filteredHistory: StatusHistory[]): DowntimePeriod[] {
+function calculateDowntimePeriods(
+    filteredHistory: StatusHistory[]
+): DowntimePeriod[] {
     const downtimePeriods: DowntimePeriod[] = [];
     let downtimeEnd: number | undefined; // Most recent "down" timestamp
     let downtimeStart: number | undefined; // Earliest "down" timestamp in the period
@@ -330,8 +360,10 @@ function calculateResponseMetrics(filteredHistory: StatusHistory[]): {
     slowestResponse: number;
 } {
     const responseTimes = filteredHistory.map((h) => h.responseTime);
-    const fastestResponse = responseTimes.length > 0 ? Math.min(...responseTimes) : 0;
-    const slowestResponse = responseTimes.length > 0 ? Math.max(...responseTimes) : 0;
+    const fastestResponse =
+        responseTimes.length > 0 ? Math.min(...responseTimes) : 0;
+    const slowestResponse =
+        responseTimes.length > 0 ? Math.max(...responseTimes) : 0;
 
     // Calculate percentiles
     const sortedResponseTimes = Array.from(responseTimes).sort((a, b) => a - b);
@@ -360,11 +392,16 @@ function calculateResponseMetrics(filteredHistory: StatusHistory[]): {
 /**
  * Filter history records based on time range
  */
-function filterHistoryByTimeRange(history: StatusHistory[], timeRange: TimePeriod): StatusHistory[] {
+function filterHistoryByTimeRange(
+    history: StatusHistory[],
+    timeRange: TimePeriod
+): StatusHistory[] {
     const now = Date.now();
     // Sanitize timeRange to prevent object injection
     const allowedTimeRanges = Object.keys(TIME_PERIOD_LABELS) as TimePeriod[];
-    const safeTimeRange = allowedTimeRanges.includes(timeRange) ? timeRange : "24h";
+    const safeTimeRange = allowedTimeRanges.includes(timeRange)
+        ? timeRange
+        : "24h";
 
     const cutoff = now - CHART_TIME_PERIODS[safeTimeRange];
     return history.filter((record) => record.timestamp >= cutoff);

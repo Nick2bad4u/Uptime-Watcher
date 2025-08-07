@@ -112,7 +112,9 @@ describe("useMonitorFields Hook", () => {
             mockMonitorTypesStore.isLoaded = false;
 
             // Make the IPC call never resolve
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockImplementation(() => new Promise(() => {}));
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockImplementation(
+                () => new Promise(() => {})
+            );
 
             const { result } = renderHook(() => useMonitorFields());
 
@@ -163,7 +165,9 @@ describe("useMonitorFields Hook", () => {
             // Since the store is already loaded, should immediately be available
             expect(result.current.isLoaded).toBe(true);
             expect(result.current.error).toBeUndefined();
-            expect(result.current.getFields("http")).toEqual(mockFieldDefinitions);
+            expect(result.current.getFields("http")).toEqual(
+                mockFieldDefinitions
+            );
             expect(result.current.getFields("ping")).toHaveLength(1);
             expect(result.current.getFields("ping")[0]?.name).toBe("host");
         });
@@ -274,7 +278,11 @@ describe("useMonitorFields Hook", () => {
 
                 const httpFields = result.current.getFields("http");
                 expect(httpFields).toHaveLength(3);
-                expect(httpFields.map((f) => f.name)).toEqual(["url", "method", "timeout"]);
+                expect(httpFields.map((f) => f.name)).toEqual([
+                    "url",
+                    "method",
+                    "timeout",
+                ]);
 
                 const tcpFields = result.current.getFields("tcp");
                 expect(tcpFields).toHaveLength(2);
@@ -302,17 +310,21 @@ describe("useMonitorFields Hook", () => {
             it("should return only required field names", async () => {
                 const result = await setupHookWithData();
 
-                const httpRequiredFields = result.current.getRequiredFields("http");
+                const httpRequiredFields =
+                    result.current.getRequiredFields("http");
                 expect(httpRequiredFields).toEqual(["url", "timeout"]);
 
-                const tcpRequiredFields = result.current.getRequiredFields("tcp");
+                const tcpRequiredFields =
+                    result.current.getRequiredFields("tcp");
                 expect(tcpRequiredFields).toEqual(["host", "port"]);
             });
 
             it("should return empty array for non-existent monitor types", async () => {
                 const result = await setupHookWithData();
 
-                expect(result.current.getRequiredFields("non-existent")).toEqual([]);
+                expect(
+                    result.current.getRequiredFields("non-existent")
+                ).toEqual([]);
             });
 
             it("should handle monitor types with no required fields", async () => {
@@ -353,7 +365,9 @@ describe("useMonitorFields Hook", () => {
                     expect(result.current.isLoaded).toBe(true);
                 });
 
-                expect(result.current.getRequiredFields("optional-only")).toEqual([]);
+                expect(
+                    result.current.getRequiredFields("optional-only")
+                ).toEqual([]);
             });
         });
 
@@ -361,23 +375,40 @@ describe("useMonitorFields Hook", () => {
             it("should correctly identify required fields", async () => {
                 const result = await setupHookWithData();
 
-                expect(result.current.isFieldRequired("http", "url")).toBe(true);
-                expect(result.current.isFieldRequired("http", "timeout")).toBe(true);
-                expect(result.current.isFieldRequired("tcp", "host")).toBe(true);
-                expect(result.current.isFieldRequired("tcp", "port")).toBe(true);
+                expect(result.current.isFieldRequired("http", "url")).toBe(
+                    true
+                );
+                expect(result.current.isFieldRequired("http", "timeout")).toBe(
+                    true
+                );
+                expect(result.current.isFieldRequired("tcp", "host")).toBe(
+                    true
+                );
+                expect(result.current.isFieldRequired("tcp", "port")).toBe(
+                    true
+                );
             });
 
             it("should correctly identify optional fields", async () => {
                 const result = await setupHookWithData();
 
-                expect(result.current.isFieldRequired("http", "method")).toBe(false);
+                expect(result.current.isFieldRequired("http", "method")).toBe(
+                    false
+                );
             });
 
             it("should return false for non-existent fields", async () => {
                 const result = await setupHookWithData();
 
-                expect(result.current.isFieldRequired("http", "non-existent-field")).toBe(false);
-                expect(result.current.isFieldRequired("non-existent-type", "any-field")).toBe(false);
+                expect(
+                    result.current.isFieldRequired("http", "non-existent-field")
+                ).toBe(false);
+                expect(
+                    result.current.isFieldRequired(
+                        "non-existent-type",
+                        "any-field"
+                    )
+                ).toBe(false);
             });
 
             it("should handle empty field names", async () => {
@@ -404,27 +435,33 @@ describe("useMonitorFields Hook", () => {
 
         it("should handle non-Error objects", async () => {
             // Configure mock store to have an error
-            mockMonitorTypesStore.lastError = "Failed to load monitor field configurations";
+            mockMonitorTypesStore.lastError =
+                "Failed to load monitor field configurations";
             mockMonitorTypesStore.isLoaded = true;
             mockMonitorTypesStore.fieldConfigs = {};
 
             const { result } = renderHook(() => useMonitorFields());
 
             expect(result.current.isLoaded).toBe(true);
-            expect(result.current.error).toBe("Failed to load monitor field configurations");
+            expect(result.current.error).toBe(
+                "Failed to load monitor field configurations"
+            );
             expect(result.current.getFields("http")).toEqual([]);
         });
 
         it("should handle null/undefined errors", async () => {
             // Configure mock store to have an error
-            mockMonitorTypesStore.lastError = "Failed to load monitor field configurations";
+            mockMonitorTypesStore.lastError =
+                "Failed to load monitor field configurations";
             mockMonitorTypesStore.isLoaded = true;
             mockMonitorTypesStore.fieldConfigs = {};
 
             const { result } = renderHook(() => useMonitorFields());
 
             expect(result.current.isLoaded).toBe(true);
-            expect(result.current.error).toBe("Failed to load monitor field configurations");
+            expect(result.current.error).toBe(
+                "Failed to load monitor field configurations"
+            );
         });
 
         it("should set isLoaded to true even on error", async () => {
@@ -460,7 +497,9 @@ describe("useMonitorFields Hook", () => {
 
             expect(result.current.isLoaded).toBe(true);
             expect(result.current.error).toBeUndefined();
-            expect(result.current.getFields("http")).toEqual(mockFieldDefinitions);
+            expect(result.current.getFields("http")).toEqual(
+                mockFieldDefinitions
+            );
         });
 
         it("should handle empty store gracefully", async () => {
@@ -518,7 +557,9 @@ describe("useMonitorFields Hook", () => {
 
             // Functions should remain the same references due to useCallback
             expect(result.current.getFields).toBe(initialGetFields);
-            expect(result.current.getRequiredFields).toBe(initialGetRequiredFields);
+            expect(result.current.getRequiredFields).toBe(
+                initialGetRequiredFields
+            );
             expect(result.current.isFieldRequired).toBe(initialIsFieldRequired);
         });
     });
@@ -557,7 +598,9 @@ describe("useMonitorFields Hook", () => {
             });
 
             // Should handle gracefully - missing required defaults to false
-            expect(result.current.isFieldRequired("incomplete", "field1")).toBe(false);
+            expect(result.current.isFieldRequired("incomplete", "field1")).toBe(
+                false
+            );
             expect(result.current.getRequiredFields("incomplete")).toEqual([]);
         });
 
@@ -589,7 +632,9 @@ describe("useMonitorFields Hook", () => {
             // Should not crash and return empty arrays
             expect(result.current.getFields("no-fields")).toEqual([]);
             expect(result.current.getRequiredFields("no-fields")).toEqual([]);
-            expect(result.current.isFieldRequired("no-fields", "any-field")).toBe(false);
+            expect(
+                result.current.isFieldRequired("no-fields", "any-field")
+            ).toBe(false);
         });
     });
 });

@@ -97,7 +97,9 @@ export function createDefaultFormData(type: string): Partial<BaseFormData> {
  * @param data - Form data to check
  * @returns True if data is HTTP form data
  */
-export function isHttpFormData(data: Partial<MonitorFormData>): data is HttpFormData {
+export function isHttpFormData(
+    data: Partial<MonitorFormData>
+): data is HttpFormData {
     return data.type === "http" && typeof data.url === "string";
 }
 
@@ -107,7 +109,9 @@ export function isHttpFormData(data: Partial<MonitorFormData>): data is HttpForm
  * @param data - Form data to check
  * @returns True if data is ping form data
  */
-export function isPingFormData(data: Partial<MonitorFormData>): data is PingFormData {
+export function isPingFormData(
+    data: Partial<MonitorFormData>
+): data is PingFormData {
     return data.type === "ping" && typeof data.host === "string";
 }
 
@@ -117,8 +121,14 @@ export function isPingFormData(data: Partial<MonitorFormData>): data is PingForm
  * @param data - Form data to check
  * @returns True if data is port form data
  */
-export function isPortFormData(data: Partial<MonitorFormData>): data is PortFormData {
-    return data.type === "port" && typeof data.host === "string" && typeof data.port === "number";
+export function isPortFormData(
+    data: Partial<MonitorFormData>
+): data is PortFormData {
+    return (
+        data.type === "port" &&
+        typeof data.host === "string" &&
+        typeof data.port === "number"
+    );
 }
 
 /**
@@ -150,7 +160,10 @@ export function isValidMonitorFormData(data: unknown): data is MonitorFormData {
 
     // Use index signature to avoid TypeScript compiler warnings
     const validator = (
-        FORM_DATA_VALIDATORS as Record<string, ((data: Partial<MonitorFormData>) => boolean) | undefined>
+        FORM_DATA_VALIDATORS as Record<
+            string,
+            ((data: Partial<MonitorFormData>) => boolean) | undefined
+        >
     )[formData.type];
     if (!validator) {
         return false;
@@ -167,7 +180,11 @@ export function isValidMonitorFormData(data: unknown): data is MonitorFormData {
  * @param defaultValue - Default value if property is undefined
  * @returns Property value or default
  */
-export function safeGetFormProperty<T>(data: DynamicFormData, property: string, defaultValue: T): T {
+export function safeGetFormProperty<T>(
+    data: DynamicFormData,
+    property: string,
+    defaultValue: T
+): T {
     if (property in data && data[property] !== undefined) {
         return data[property] as T;
     }
@@ -181,6 +198,10 @@ export function safeGetFormProperty<T>(data: DynamicFormData, property: string, 
  * @param property - Property name to set
  * @param value - Value to set
  */
-export function safeSetFormProperty<T>(data: DynamicFormData, property: string, value: T): void {
+export function safeSetFormProperty<T>(
+    data: DynamicFormData,
+    property: string,
+    value: T
+): void {
     data[property] = value;
 }

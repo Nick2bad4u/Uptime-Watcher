@@ -9,7 +9,11 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import type { Theme } from "../theme/types";
 import type { TimePeriod } from "../utils/time";
 
-import { useSiteAnalytics, useChartData, SiteAnalyticsUtils } from "../hooks/site/useSiteAnalytics";
+import {
+    useSiteAnalytics,
+    useChartData,
+    SiteAnalyticsUtils,
+} from "../hooks/site/useSiteAnalytics";
 import { Monitor, StatusHistory } from "@shared/types";
 
 // Mock constants to avoid dependency issues
@@ -39,7 +43,11 @@ describe("useSiteAnalytics", () => {
     const threeDaysAgo = now - 3 * 24 * 60 * 60 * 1000;
     const oneWeekAgo = now - 7 * 24 * 60 * 60 * 1000;
 
-    const createStatusRecord = (timestamp: number, status: "up" | "down", responseTime: number): StatusHistory => ({
+    const createStatusRecord = (
+        timestamp: number,
+        status: "up" | "down",
+        responseTime: number
+    ): StatusHistory => ({
         responseTime,
         status,
         timestamp,
@@ -106,7 +114,9 @@ describe("useSiteAnalytics", () => {
 
     describe("Hook Initialization", () => {
         it("should return default analytics for undefined monitor", () => {
-            const { result } = renderHook(() => useSiteAnalytics(undefined, "24h"));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(undefined, "24h")
+            );
 
             expect(result.current).toEqual({
                 avgResponseTime: 0,
@@ -129,7 +139,9 @@ describe("useSiteAnalytics", () => {
         });
 
         it("should return default analytics for monitor with empty history", () => {
-            const { result } = renderHook(() => useSiteAnalytics(mockMonitorEmpty, "24h"));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(mockMonitorEmpty, "24h")
+            );
 
             expect(result.current).toEqual({
                 avgResponseTime: 0,
@@ -152,7 +164,9 @@ describe("useSiteAnalytics", () => {
         });
 
         it("should use default time range when not provided", () => {
-            const { result } = renderHook(() => useSiteAnalytics(mockMonitorWithHistory));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(mockMonitorWithHistory)
+            );
 
             // Should default to "24h" and filter out older records
             expect(result.current.totalChecks).toBe(6); // Only records within last 24h
@@ -160,7 +174,12 @@ describe("useSiteAnalytics", () => {
         });
 
         it("should sanitize invalid time range to default", () => {
-            const { result } = renderHook(() => useSiteAnalytics(mockMonitorWithHistory, "invalid" as TimePeriod));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(
+                    mockMonitorWithHistory,
+                    "invalid" as TimePeriod
+                )
+            );
 
             // Should default to "24h" when invalid time range is provided
             expect(result.current.totalChecks).toBe(6);
@@ -170,7 +189,9 @@ describe("useSiteAnalytics", () => {
 
     describe("Time Range Filtering", () => {
         it("should filter history by 1h time range", () => {
-            const { result } = renderHook(() => useSiteAnalytics(mockMonitorWithHistory, "1h"));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(mockMonitorWithHistory, "1h")
+            );
 
             // Only records within last hour (5 records)
             expect(result.current.totalChecks).toBe(5);
@@ -179,7 +200,9 @@ describe("useSiteAnalytics", () => {
         });
 
         it("should filter history by 24h time range", () => {
-            const { result } = renderHook(() => useSiteAnalytics(mockMonitorWithHistory, "24h"));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(mockMonitorWithHistory, "24h")
+            );
 
             // Records within last 24 hours (6 records)
             expect(result.current.totalChecks).toBe(6);
@@ -188,7 +211,9 @@ describe("useSiteAnalytics", () => {
         });
 
         it("should filter history by 7d time range", () => {
-            const { result } = renderHook(() => useSiteAnalytics(mockMonitorWithHistory, "7d"));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(mockMonitorWithHistory, "7d")
+            );
 
             // Records within last 7 days (8 records - oneWeekAgo is exactly at the boundary)
             expect(result.current.totalChecks).toBe(8);
@@ -197,7 +222,9 @@ describe("useSiteAnalytics", () => {
         });
 
         it("should filter history by 30d time range", () => {
-            const { result } = renderHook(() => useSiteAnalytics(mockMonitorWithHistory, "30d"));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(mockMonitorWithHistory, "30d")
+            );
 
             // All records (8 records)
             expect(result.current.totalChecks).toBe(8);
@@ -208,7 +235,9 @@ describe("useSiteAnalytics", () => {
 
     describe("Basic Metrics Calculation", () => {
         it("should calculate uptime percentage correctly", () => {
-            const { result } = renderHook(() => useSiteAnalytics(mockMonitorWithHistory, "1h"));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(mockMonitorWithHistory, "1h")
+            );
 
             // Within 1h: 4 records (now-1000, now-2000, now-3000, now-4000)
             // 3 up out of 5 total = 60%
@@ -216,7 +245,9 @@ describe("useSiteAnalytics", () => {
         });
 
         it("should calculate average response time correctly", () => {
-            const { result } = renderHook(() => useSiteAnalytics(mockMonitorWithHistory, "1h"));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(mockMonitorWithHistory, "1h")
+            );
 
             // (200 + 0 + 150 + 300 + 0) / 5 = 130
             expect(result.current.avgResponseTime).toBe(130);
@@ -228,7 +259,9 @@ describe("useSiteAnalytics", () => {
                 history: [createStatusRecord(oneWeekAgo, "up", 100)], // Outside 24h range
             };
 
-            const { result } = renderHook(() => useSiteAnalytics(emptyMonitor, "24h"));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(emptyMonitor, "24h")
+            );
 
             expect(result.current.uptime).toBe("0.00");
             expect(result.current.avgResponseTime).toBe(0);
@@ -237,14 +270,18 @@ describe("useSiteAnalytics", () => {
 
     describe("Performance Metrics", () => {
         it("should calculate fastest and slowest response times", () => {
-            const { result } = renderHook(() => useSiteAnalytics(mockMonitorWithHistory, "1h"));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(mockMonitorWithHistory, "1h")
+            );
 
             expect(result.current.fastestResponse).toBe(0); // Down status has 0 response time
             expect(result.current.slowestResponse).toBe(300);
         });
 
         it("should handle empty response times", () => {
-            const { result } = renderHook(() => useSiteAnalytics(mockMonitorEmpty, "24h"));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(mockMonitorEmpty, "24h")
+            );
 
             expect(result.current.fastestResponse).toBe(0);
             expect(result.current.slowestResponse).toBe(0);
@@ -252,7 +289,9 @@ describe("useSiteAnalytics", () => {
 
         it("should calculate percentiles correctly", () => {
             // Create monitor with sorted response times: [0, 150, 200, 300]
-            const { result } = renderHook(() => useSiteAnalytics(mockMonitorWithHistory, "1h"));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(mockMonitorWithHistory, "1h")
+            );
 
             expect(result.current.p50).toBe(150); // 50th percentile (median)
             expect(result.current.p95).toBe(300); // 95th percentile
@@ -265,7 +304,9 @@ describe("useSiteAnalytics", () => {
                 history: [createStatusRecord(now - 1000, "up", 500)],
             };
 
-            const { result } = renderHook(() => useSiteAnalytics(singleRecordMonitor, "24h"));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(singleRecordMonitor, "24h")
+            );
 
             expect(result.current.p50).toBe(500);
             expect(result.current.p95).toBe(500);
@@ -273,7 +314,9 @@ describe("useSiteAnalytics", () => {
         });
 
         it("should handle edge cases in percentile calculation", () => {
-            const { result } = renderHook(() => useSiteAnalytics(mockMonitorEmpty, "24h"));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(mockMonitorEmpty, "24h")
+            );
 
             expect(result.current.p50).toBe(0);
             expect(result.current.p95).toBe(0);
@@ -295,7 +338,9 @@ describe("useSiteAnalytics", () => {
                 ],
             };
 
-            const { result } = renderHook(() => useSiteAnalytics(alwaysUpMonitor, "24h"));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(alwaysUpMonitor, "24h")
+            );
 
             expect(result.current.incidentCount).toBe(0);
             expect(result.current.downtimePeriods).toHaveLength(0);
@@ -315,7 +360,9 @@ describe("useSiteAnalytics", () => {
                 ],
             };
 
-            const { result } = renderHook(() => useSiteAnalytics(multipleDowntimeMonitor, "24h"));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(multipleDowntimeMonitor, "24h")
+            );
 
             expect(result.current.incidentCount).toBe(2);
             expect(result.current.totalDowntime).toBe(0); // Both periods have duration 0
@@ -325,18 +372,25 @@ describe("useSiteAnalytics", () => {
 
     describe("Monitor Types", () => {
         it("should handle HTTP monitors correctly", () => {
-            const { result } = renderHook(() => useSiteAnalytics(mockMonitorWithHistory, "24h"));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(mockMonitorWithHistory, "24h")
+            );
 
             expect(result.current.totalChecks).toBeGreaterThan(0);
             expect(result.current.filteredHistory).toEqual(
                 expect.arrayContaining([
-                    expect.objectContaining({ responseTime: expect.any(Number), status: expect.any(String) }),
+                    expect.objectContaining({
+                        responseTime: expect.any(Number),
+                        status: expect.any(String),
+                    }),
                 ])
             );
         });
 
         it("should handle port monitors correctly", () => {
-            const { result } = renderHook(() => useSiteAnalytics(mockPortMonitor, "24h"));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(mockPortMonitor, "24h")
+            );
 
             expect(result.current.totalChecks).toBe(3);
             expect(result.current.upCount).toBe(2);
@@ -347,47 +401,81 @@ describe("useSiteAnalytics", () => {
 
     describe("Memoization", () => {
         it("should memoize results when dependencies don't change", () => {
-            const { rerender, result } = renderHook(({ monitor, timeRange }) => useSiteAnalytics(monitor, timeRange), {
-                initialProps: { monitor: mockMonitorWithHistory, timeRange: "24h" as TimePeriod },
-            });
+            const { rerender, result } = renderHook(
+                ({ monitor, timeRange }) =>
+                    useSiteAnalytics(monitor, timeRange),
+                {
+                    initialProps: {
+                        monitor: mockMonitorWithHistory,
+                        timeRange: "24h" as TimePeriod,
+                    },
+                }
+            );
 
             const firstResult = result.current;
 
             // Rerender with same props
-            rerender({ monitor: mockMonitorWithHistory, timeRange: "24h" as TimePeriod });
+            rerender({
+                monitor: mockMonitorWithHistory,
+                timeRange: "24h" as TimePeriod,
+            });
 
             expect(result.current).toBe(firstResult); // Should be the exact same object reference
         });
 
         it("should recalculate when monitor history changes", () => {
-            const { rerender, result } = renderHook(({ monitor, timeRange }) => useSiteAnalytics(monitor, timeRange), {
-                initialProps: { monitor: mockMonitorWithHistory, timeRange: "24h" as TimePeriod },
-            });
+            const { rerender, result } = renderHook(
+                ({ monitor, timeRange }) =>
+                    useSiteAnalytics(monitor, timeRange),
+                {
+                    initialProps: {
+                        monitor: mockMonitorWithHistory,
+                        timeRange: "24h" as TimePeriod,
+                    },
+                }
+            );
 
             const firstResult = result.current;
 
             const newMonitor: Monitor = {
                 ...mockMonitorWithHistory,
-                history: [...mockMonitorWithHistory.history, createStatusRecord(now - 500, "up", 400)],
+                history: [
+                    ...mockMonitorWithHistory.history,
+                    createStatusRecord(now - 500, "up", 400),
+                ],
             };
 
             rerender({ monitor: newMonitor, timeRange: "24h" as TimePeriod });
 
             expect(result.current).not.toBe(firstResult);
-            expect(result.current.totalChecks).toBe(firstResult.totalChecks + 1);
+            expect(result.current.totalChecks).toBe(
+                firstResult.totalChecks + 1
+            );
         });
 
         it("should recalculate when time range changes", () => {
-            const { rerender, result } = renderHook(({ monitor, timeRange }) => useSiteAnalytics(monitor, timeRange), {
-                initialProps: { monitor: mockMonitorWithHistory, timeRange: "24h" as TimePeriod },
-            });
+            const { rerender, result } = renderHook(
+                ({ monitor, timeRange }) =>
+                    useSiteAnalytics(monitor, timeRange),
+                {
+                    initialProps: {
+                        monitor: mockMonitorWithHistory,
+                        timeRange: "24h" as TimePeriod,
+                    },
+                }
+            );
 
             const firstResult = result.current;
 
-            rerender({ monitor: mockMonitorWithHistory, timeRange: "1h" as TimePeriod });
+            rerender({
+                monitor: mockMonitorWithHistory,
+                timeRange: "1h" as TimePeriod,
+            });
 
             expect(result.current).not.toBe(firstResult);
-            expect(result.current.totalChecks).toBeLessThan(firstResult.totalChecks);
+            expect(result.current.totalChecks).toBeLessThan(
+                firstResult.totalChecks
+            );
         });
     });
 
@@ -405,7 +493,9 @@ describe("useSiteAnalytics", () => {
                 retryAttempts: 0,
             };
 
-            const { result } = renderHook(() => useSiteAnalytics(minimalMonitor, "24h"));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(minimalMonitor, "24h")
+            );
 
             expect(result.current.totalChecks).toBe(1);
             expect(result.current.uptime).toBe("100.00");
@@ -414,10 +504,15 @@ describe("useSiteAnalytics", () => {
         it("should handle very large response times", () => {
             const largeResponseMonitor: Monitor = {
                 ...mockMonitorEmpty,
-                history: [createStatusRecord(now - 1000, "up", 999999), createStatusRecord(now - 2000, "up", 1000000)],
+                history: [
+                    createStatusRecord(now - 1000, "up", 999999),
+                    createStatusRecord(now - 2000, "up", 1000000),
+                ],
             };
 
-            const { result } = renderHook(() => useSiteAnalytics(largeResponseMonitor, "24h"));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(largeResponseMonitor, "24h")
+            );
 
             expect(result.current.avgResponseTime).toBe(1000000); // Math.round(999999.5) = 1000000
             expect(result.current.slowestResponse).toBe(1000000);
@@ -426,10 +521,15 @@ describe("useSiteAnalytics", () => {
         it("should handle zero response times", () => {
             const zeroResponseMonitor: Monitor = {
                 ...mockMonitorEmpty,
-                history: [createStatusRecord(now - 1000, "up", 0), createStatusRecord(now - 2000, "down", 0)],
+                history: [
+                    createStatusRecord(now - 1000, "up", 0),
+                    createStatusRecord(now - 2000, "down", 0),
+                ],
             };
 
-            const { result } = renderHook(() => useSiteAnalytics(zeroResponseMonitor, "24h"));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(zeroResponseMonitor, "24h")
+            );
 
             expect(result.current.avgResponseTime).toBe(0);
             expect(result.current.fastestResponse).toBe(0);
@@ -442,7 +542,9 @@ describe("useSiteAnalytics", () => {
                 history: [createStatusRecord(oneWeekAgo - 1000, "up", 200)], // Outside even 30d range
             };
 
-            const { result } = renderHook(() => useSiteAnalytics(oldHistoryMonitor, "1h"));
+            const { result } = renderHook(() =>
+                useSiteAnalytics(oldHistoryMonitor, "1h")
+            );
 
             expect(result.current.totalChecks).toBe(0);
             expect(result.current.uptime).toBe("0.00");
@@ -479,7 +581,9 @@ describe("useChartData", () => {
     };
 
     it("should generate chart data with correct structure", () => {
-        const { result } = renderHook(() => useChartData(mockMonitor, mockTheme));
+        const { result } = renderHook(() =>
+            useChartData(mockMonitor, mockTheme)
+        );
 
         expect(result.current.lineChartData).toBeDefined();
         expect(result.current.lineChartData.datasets).toHaveLength(1);
@@ -493,7 +597,9 @@ describe("useChartData", () => {
     });
 
     it("should map data points correctly", () => {
-        const { result } = renderHook(() => useChartData(mockMonitor, mockTheme));
+        const { result } = renderHook(() =>
+            useChartData(mockMonitor, mockTheme)
+        );
 
         const dataset = result.current.lineChartData.datasets[0];
         expect(dataset).toBeDefined();
@@ -505,7 +611,9 @@ describe("useChartData", () => {
     });
 
     it("should color points based on status", () => {
-        const { result } = renderHook(() => useChartData(mockMonitor, mockTheme));
+        const { result } = renderHook(() =>
+            useChartData(mockMonitor, mockTheme)
+        );
 
         const dataset = result.current.lineChartData.datasets[0];
         expect(dataset).toBeDefined();
@@ -514,7 +622,11 @@ describe("useChartData", () => {
             "#ef4444", // down - error color
             "#10b981", // up - success color
         ]);
-        expect(dataset?.pointBorderColor).toEqual(["#10b981", "#ef4444", "#10b981"]);
+        expect(dataset?.pointBorderColor).toEqual([
+            "#10b981",
+            "#ef4444",
+            "#10b981",
+        ]);
     });
 
     it("should handle empty history", () => {
@@ -523,7 +635,9 @@ describe("useChartData", () => {
             history: [],
         };
 
-        const { result } = renderHook(() => useChartData(emptyMonitor, mockTheme));
+        const { result } = renderHook(() =>
+            useChartData(emptyMonitor, mockTheme)
+        );
 
         const dataset = result.current.lineChartData.datasets[0];
         expect(dataset).toBeDefined();
@@ -541,7 +655,9 @@ describe("useChartData", () => {
             ],
         };
 
-        const { result } = renderHook(() => useChartData(unsortedMonitor, mockTheme));
+        const { result } = renderHook(() =>
+            useChartData(unsortedMonitor, mockTheme)
+        );
 
         const dataset = result.current.lineChartData.datasets[0];
         expect(dataset).toBeDefined();
@@ -553,9 +669,12 @@ describe("useChartData", () => {
     });
 
     it("should memoize chart data correctly", () => {
-        const { rerender, result } = renderHook(({ monitor, theme }) => useChartData(monitor, theme), {
-            initialProps: { monitor: mockMonitor, theme: mockTheme },
-        });
+        const { rerender, result } = renderHook(
+            ({ monitor, theme }) => useChartData(monitor, theme),
+            {
+                initialProps: { monitor: mockMonitor, theme: mockTheme },
+            }
+        );
 
         const firstResult = result.current;
 
@@ -566,15 +685,21 @@ describe("useChartData", () => {
     });
 
     it("should recalculate when monitor history changes", () => {
-        const { rerender, result } = renderHook(({ monitor, theme }) => useChartData(monitor, theme), {
-            initialProps: { monitor: mockMonitor, theme: mockTheme },
-        });
+        const { rerender, result } = renderHook(
+            ({ monitor, theme }) => useChartData(monitor, theme),
+            {
+                initialProps: { monitor: mockMonitor, theme: mockTheme },
+            }
+        );
 
         const firstResult = result.current;
 
         const newMonitor: Monitor = {
             ...mockMonitor,
-            history: [...mockMonitor.history, { responseTime: 300, status: "up", timestamp: 4000 }],
+            history: [
+                ...mockMonitor.history,
+                { responseTime: 300, status: "up", timestamp: 4000 },
+            ],
         };
 
         rerender({ monitor: newMonitor, theme: mockTheme });
@@ -629,8 +754,12 @@ describe("SiteAnalyticsUtils", () => {
 
     describe("getAvailabilityStatus", () => {
         it("should return excellent for 99.9%+ uptime", () => {
-            expect(SiteAnalyticsUtils.getAvailabilityStatus(99.9)).toBe("excellent");
-            expect(SiteAnalyticsUtils.getAvailabilityStatus(100)).toBe("excellent");
+            expect(SiteAnalyticsUtils.getAvailabilityStatus(99.9)).toBe(
+                "excellent"
+            );
+            expect(SiteAnalyticsUtils.getAvailabilityStatus(100)).toBe(
+                "excellent"
+            );
         });
 
         it("should return good for 99%+ uptime", () => {
@@ -639,26 +768,42 @@ describe("SiteAnalyticsUtils", () => {
         });
 
         it("should return warning for 95%+ uptime", () => {
-            expect(SiteAnalyticsUtils.getAvailabilityStatus(95)).toBe("warning");
-            expect(SiteAnalyticsUtils.getAvailabilityStatus(98)).toBe("warning");
+            expect(SiteAnalyticsUtils.getAvailabilityStatus(95)).toBe(
+                "warning"
+            );
+            expect(SiteAnalyticsUtils.getAvailabilityStatus(98)).toBe(
+                "warning"
+            );
         });
 
         it("should return critical for <95% uptime", () => {
-            expect(SiteAnalyticsUtils.getAvailabilityStatus(94.9)).toBe("critical");
-            expect(SiteAnalyticsUtils.getAvailabilityStatus(0)).toBe("critical");
+            expect(SiteAnalyticsUtils.getAvailabilityStatus(94.9)).toBe(
+                "critical"
+            );
+            expect(SiteAnalyticsUtils.getAvailabilityStatus(0)).toBe(
+                "critical"
+            );
         });
 
         it("should handle edge cases", () => {
             expect(SiteAnalyticsUtils.getAvailabilityStatus(99.0)).toBe("good");
-            expect(SiteAnalyticsUtils.getAvailabilityStatus(95.0)).toBe("warning");
+            expect(SiteAnalyticsUtils.getAvailabilityStatus(95.0)).toBe(
+                "warning"
+            );
         });
     });
 
     describe("getPerformanceStatus", () => {
         it("should return excellent for ≤200ms response time", () => {
-            expect(SiteAnalyticsUtils.getPerformanceStatus(200)).toBe("excellent");
-            expect(SiteAnalyticsUtils.getPerformanceStatus(100)).toBe("excellent");
-            expect(SiteAnalyticsUtils.getPerformanceStatus(0)).toBe("excellent");
+            expect(SiteAnalyticsUtils.getPerformanceStatus(200)).toBe(
+                "excellent"
+            );
+            expect(SiteAnalyticsUtils.getPerformanceStatus(100)).toBe(
+                "excellent"
+            );
+            expect(SiteAnalyticsUtils.getPerformanceStatus(0)).toBe(
+                "excellent"
+            );
         });
 
         it("should return good for ≤500ms response time", () => {
@@ -667,18 +812,28 @@ describe("SiteAnalyticsUtils", () => {
         });
 
         it("should return warning for ≤1000ms response time", () => {
-            expect(SiteAnalyticsUtils.getPerformanceStatus(1000)).toBe("warning");
-            expect(SiteAnalyticsUtils.getPerformanceStatus(750)).toBe("warning");
+            expect(SiteAnalyticsUtils.getPerformanceStatus(1000)).toBe(
+                "warning"
+            );
+            expect(SiteAnalyticsUtils.getPerformanceStatus(750)).toBe(
+                "warning"
+            );
         });
 
         it("should return critical for >1000ms response time", () => {
-            expect(SiteAnalyticsUtils.getPerformanceStatus(1001)).toBe("critical");
-            expect(SiteAnalyticsUtils.getPerformanceStatus(5000)).toBe("critical");
+            expect(SiteAnalyticsUtils.getPerformanceStatus(1001)).toBe(
+                "critical"
+            );
+            expect(SiteAnalyticsUtils.getPerformanceStatus(5000)).toBe(
+                "critical"
+            );
         });
 
         it("should handle edge cases", () => {
             expect(SiteAnalyticsUtils.getPerformanceStatus(500.0)).toBe("good");
-            expect(SiteAnalyticsUtils.getPerformanceStatus(1000.0)).toBe("warning");
+            expect(SiteAnalyticsUtils.getPerformanceStatus(1000.0)).toBe(
+                "warning"
+            );
         });
     });
 });

@@ -42,7 +42,10 @@ export class MonitorScheduler {
      *
      * @internal
      */
-    private onCheckCallback?: (siteIdentifier: string, monitorId: string) => Promise<void>;
+    private onCheckCallback?: (
+        siteIdentifier: string,
+        monitorId: string
+    ) => Promise<void>;
 
     /**
      * Returns the number of currently active monitoring intervals.
@@ -94,13 +97,22 @@ export class MonitorScheduler {
      *
      * @public
      */
-    public async performImmediateCheck(siteIdentifier: string, monitorId: string): Promise<void> {
+    public async performImmediateCheck(
+        siteIdentifier: string,
+        monitorId: string
+    ): Promise<void> {
         if (this.onCheckCallback) {
             try {
                 await this.onCheckCallback(siteIdentifier, monitorId);
             } catch (error) {
-                const intervalKey = this.createIntervalKey(siteIdentifier, monitorId);
-                logger.error(`[MonitorScheduler] Error during immediate check for ${intervalKey}`, error);
+                const intervalKey = this.createIntervalKey(
+                    siteIdentifier,
+                    monitorId
+                );
+                logger.error(
+                    `[MonitorScheduler] Error during immediate check for ${intervalKey}`,
+                    error
+                );
             }
         }
     }
@@ -122,7 +134,10 @@ export class MonitorScheduler {
      *
      * @public
      */
-    public restartMonitor(siteIdentifier: string, monitor: Site["monitors"][0]): boolean {
+    public restartMonitor(
+        siteIdentifier: string,
+        monitor: Site["monitors"][0]
+    ): boolean {
         if (!monitor.id) {
             return false;
         }
@@ -146,7 +161,9 @@ export class MonitorScheduler {
      *
      * @public
      */
-    public setCheckCallback(callback: (siteIdentifier: string, monitorId: string) => Promise<void>): void {
+    public setCheckCallback(
+        callback: (siteIdentifier: string, monitorId: string) => Promise<void>
+    ): void {
         this.onCheckCallback = callback;
     }
 
@@ -169,9 +186,14 @@ export class MonitorScheduler {
      *
      * @public
      */
-    public startMonitor(siteIdentifier: string, monitor: Site["monitors"][0]): boolean {
+    public startMonitor(
+        siteIdentifier: string,
+        monitor: Site["monitors"][0]
+    ): boolean {
         if (!monitor.id) {
-            logger.warn(`[MonitorScheduler] Cannot start monitoring for monitor without ID: ${siteIdentifier}`);
+            logger.warn(
+                `[MonitorScheduler] Cannot start monitoring for monitor without ID: ${siteIdentifier}`
+            );
             return false;
         }
 
@@ -196,7 +218,10 @@ export class MonitorScheduler {
                     try {
                         await this.onCheckCallback(siteIdentifier, monitor.id);
                     } catch (error) {
-                        logger.error(`[MonitorScheduler] Error during scheduled check for ${intervalKey}`, error);
+                        logger.error(
+                            `[MonitorScheduler] Error during scheduled check for ${intervalKey}`,
+                            error
+                        );
                     }
                 }
             })();
@@ -208,9 +233,15 @@ export class MonitorScheduler {
         if (this.onCheckCallback) {
             void (async () => {
                 try {
-                    await this.performImmediateCheck(siteIdentifier, monitor.id);
+                    await this.performImmediateCheck(
+                        siteIdentifier,
+                        monitor.id
+                    );
                 } catch (error) {
-                    logger.error(`[MonitorScheduler] Error during immediate check for ${intervalKey}`, error);
+                    logger.error(
+                        `[MonitorScheduler] Error during immediate check for ${intervalKey}`,
+                        error
+                    );
                 }
             })();
         }
@@ -291,7 +322,9 @@ export class MonitorScheduler {
         if (interval) {
             clearInterval(interval);
             this.intervals.delete(intervalKey);
-            logger.debug(`[MonitorScheduler] Stopped monitoring for ${intervalKey}`);
+            logger.debug(
+                `[MonitorScheduler] Stopped monitoring for ${intervalKey}`
+            );
             return true;
         }
 
@@ -325,8 +358,8 @@ export class MonitorScheduler {
             }
         } else {
             // Stop all monitors for this site
-            const siteIntervals = Array.from(this.intervals.keys()).filter((key) =>
-                key.startsWith(`${siteIdentifier}|`)
+            const siteIntervals = Array.from(this.intervals.keys()).filter(
+                (key) => key.startsWith(`${siteIdentifier}|`)
             );
             for (const intervalKey of siteIntervals) {
                 const parsed = this.parseIntervalKey(intervalKey);
@@ -354,7 +387,10 @@ export class MonitorScheduler {
      *
      * @internal
      */
-    private createIntervalKey(siteIdentifier: string, monitorId: string): string {
+    private createIntervalKey(
+        siteIdentifier: string,
+        monitorId: string
+    ): string {
         return `${siteIdentifier}|${monitorId}`;
     }
 
@@ -375,7 +411,9 @@ export class MonitorScheduler {
      *
      * @internal
      */
-    private parseIntervalKey(intervalKey: string): null | { monitorId: string; siteIdentifier: string } {
+    private parseIntervalKey(
+        intervalKey: string
+    ): null | { monitorId: string; siteIdentifier: string } {
         const parts = intervalKey.split("|");
         if (parts.length !== 2) return null;
 
@@ -405,7 +443,9 @@ export class MonitorScheduler {
      */
     private validateCheckInterval(checkInterval: number): number {
         if (!Number.isInteger(checkInterval) || checkInterval <= 0) {
-            throw new Error(`Invalid check interval: ${checkInterval}. Must be a positive integer.`);
+            throw new Error(
+                `Invalid check interval: ${checkInterval}. Must be a positive integer.`
+            );
         }
 
         // Minimum interval to prevent excessive CPU usage

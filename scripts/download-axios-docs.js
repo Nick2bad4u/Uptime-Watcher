@@ -22,7 +22,9 @@ const axiosPages = [
 ];
 
 const baseAxiosUrl = "https://axios-http.com/docs";
-let outputDir = process.env.AXIOS_DOCS_OUTPUT_DIR || path.join(process.cwd(), "docs", "packages", "axios");
+let outputDir =
+    process.env.AXIOS_DOCS_OUTPUT_DIR ||
+    path.join(process.cwd(), "docs", "packages", "axios");
 // Normalize and resolve the output directory for cross-platform compatibility
 outputDir = path.resolve(outputDir);
 const logFile = path.join(outputDir, "Axios-Download-Log.md");
@@ -61,7 +63,10 @@ function cleanContent(content) {
     const marker = "::::: sponsors_container";
     // 1. Remove everything from sponsors_container onward
     const idx = content.indexOf(marker);
-    let keepContent = idx === -1 ? content : content.slice(0, content.lastIndexOf("\n", idx) + 1);
+    let keepContent =
+        idx === -1
+            ? content
+            : content.slice(0, content.lastIndexOf("\n", idx) + 1);
 
     // 2. Remove any line that contains '::::::: body'
     keepContent = keepContent
@@ -82,7 +87,10 @@ function cleanContent(content) {
  * @returns {string}
  */
 function rewriteLinks(content) {
-    return content.replace(/\(\.\/([\w-]+)\)/g, (_, page) => `(${baseAxiosUrl}/${page})`);
+    return content.replace(
+        /\(\.\/([\w-]+)\)/g,
+        (_, page) => `(${baseAxiosUrl}/${page})`
+    );
 }
 
 // Download a single Axios doc page as markdown
@@ -94,19 +102,26 @@ function downloadFile(cmd, filePath, logMsg, name) {
                 return reject(err);
             }
             if (!fs.existsSync(filePath)) {
-                console.error(logMsg.replace("✅", "❌") + " → File not created.");
+                console.error(
+                    logMsg.replace("✅", "❌") + " → File not created."
+                );
                 return reject(new Error("File not created: " + filePath));
             }
             let content;
             try {
                 content = fs.readFileSync(filePath, "utf8");
             } catch (readErr) {
-                console.error(logMsg.replace("✅", "❌") + ` → Failed to read file: ${readErr.message}`);
+                console.error(
+                    logMsg.replace("✅", "❌") +
+                        ` → Failed to read file: ${readErr.message}`
+                );
                 return reject(readErr);
             }
             if (!content || content.trim().length === 0) {
                 console.error(logMsg.replace("✅", "❌") + " → File is empty.");
-                return reject(new Error("Downloaded file is empty: " + filePath));
+                return reject(
+                    new Error("Downloaded file is empty: " + filePath)
+                );
             }
             try {
                 // Process content: rewrite links, then clean unwanted sections
@@ -114,7 +129,10 @@ function downloadFile(cmd, filePath, logMsg, name) {
                 processedContent = cleanContent(processedContent);
                 fs.writeFileSync(filePath, processedContent);
             } catch (writeErr) {
-                console.error(logMsg.replace("✅", "❌") + ` → Failed to write file: ${writeErr.message}`);
+                console.error(
+                    logMsg.replace("✅", "❌") +
+                        ` → Failed to write file: ${writeErr.message}`
+                );
                 return reject(writeErr);
             }
             console.log(logMsg);
@@ -130,7 +148,12 @@ const axiosPagePromises = axiosPages.map((page) => {
     const fileName = `Axios-${page.replace(/_/g, "-")}.md`;
     const filePath = path.join(outputDir, fileName);
     const cmd = `pandoc "${url}.html" -t markdown -o "${filePath}"`;
-    return downloadFile(cmd, filePath, `✅ Downloaded: ${page} → ${fileName}`, fileName);
+    return downloadFile(
+        cmd,
+        filePath,
+        `✅ Downloaded: ${page} → ${fileName}`,
+        fileName
+    );
 });
 
 (async function main() {

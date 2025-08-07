@@ -5,15 +5,21 @@ import type { IpcParameterValidator } from "../../../services/ipc/types";
 /**
  * Import the validator creation functions we refactored
  */
-function createParameterCountValidator(expectedCount: number): IpcParameterValidator {
+function createParameterCountValidator(
+    expectedCount: number
+): IpcParameterValidator {
     return (params: unknown[]): null | string[] => {
         return params.length === expectedCount
             ? null
-            : [`Expected exactly ${expectedCount} parameter${expectedCount === 1 ? "" : "s"}`];
+            : [
+                  `Expected exactly ${expectedCount} parameter${expectedCount === 1 ? "" : "s"}`,
+              ];
     };
 }
 
-function composeValidators(validators: IpcParameterValidator[]): IpcParameterValidator {
+function composeValidators(
+    validators: IpcParameterValidator[]
+): IpcParameterValidator {
     return (params: unknown[]): null | string[] => {
         const allErrors: string[] = [];
 
@@ -55,8 +61,12 @@ describe("Validator Composition Utilities", () => {
             const singleValidator = createParameterCountValidator(1);
             const multiValidator = createParameterCountValidator(3);
 
-            expect(singleValidator([])).toEqual(["Expected exactly 1 parameter"]);
-            expect(multiValidator([])).toEqual(["Expected exactly 3 parameters"]);
+            expect(singleValidator([])).toEqual([
+                "Expected exactly 1 parameter",
+            ]);
+            expect(multiValidator([])).toEqual([
+                "Expected exactly 3 parameters",
+            ]);
         });
     });
 
@@ -71,7 +81,10 @@ describe("Validator Composition Utilities", () => {
 
         it("should collect errors from all validators", () => {
             const validator1: IpcParameterValidator = () => ["Error 1"];
-            const validator2: IpcParameterValidator = () => ["Error 2", "Error 3"];
+            const validator2: IpcParameterValidator = () => [
+                "Error 2",
+                "Error 3",
+            ];
 
             const composed = composeValidators([validator1, validator2]);
             const result = composed(["test"]);
@@ -88,7 +101,10 @@ describe("Validator Composition Utilities", () => {
             const passingValidator: IpcParameterValidator = () => null;
             const failingValidator: IpcParameterValidator = () => ["Error"];
 
-            const composed = composeValidators([passingValidator, failingValidator]);
+            const composed = composeValidators([
+                passingValidator,
+                failingValidator,
+            ]);
             const result = composed(["test"]);
 
             expect(result).toEqual(["Error"]);
@@ -115,7 +131,9 @@ describe("Validator Composition Utilities", () => {
 
             // Should fail with invalid strings
             const invalidStringResult = twoStringValidator(["", "world"]);
-            expect(invalidStringResult).toContain("first must be a non-empty string");
+            expect(invalidStringResult).toContain(
+                "first must be a non-empty string"
+            );
         });
 
         it("should demonstrate complexity reduction", () => {

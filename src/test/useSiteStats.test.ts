@@ -20,7 +20,9 @@ describe("useSiteStats", () => {
         });
 
         it("should calculate stats for single record", () => {
-            const history: StatusHistory[] = [{ responseTime: 200, status: "up", timestamp: 1640995200000 }];
+            const history: StatusHistory[] = [
+                { responseTime: 200, status: "up", timestamp: 1640995200000 },
+            ];
 
             const { result } = renderHook(() => useSiteStats(history));
 
@@ -147,7 +149,11 @@ describe("useSiteStats", () => {
         it("should handle undefined response times", () => {
             const history: StatusHistory[] = [
                 { responseTime: 200, status: "up", timestamp: 1640995200000 },
-                { responseTime: undefined as any, status: "up", timestamp: 1640991600000 },
+                {
+                    responseTime: undefined as any,
+                    status: "up",
+                    timestamp: 1640991600000,
+                },
                 { responseTime: 300, status: "up", timestamp: 1640988000000 },
             ];
 
@@ -159,7 +165,11 @@ describe("useSiteStats", () => {
         it("should handle non-numeric response times", () => {
             const history: StatusHistory[] = [
                 { responseTime: 200, status: "up", timestamp: 1640995200000 },
-                { responseTime: "invalid" as any, status: "up", timestamp: 1640991600000 },
+                {
+                    responseTime: "invalid" as any,
+                    status: "up",
+                    timestamp: 1640991600000,
+                },
                 { responseTime: 300, status: "up", timestamp: 1640988000000 },
             ];
 
@@ -185,7 +195,9 @@ describe("useSiteStats", () => {
         });
 
         it("should handle single record", () => {
-            const history: StatusHistory[] = [{ responseTime: 200, status: "up", timestamp: 1640995200000 }];
+            const history: StatusHistory[] = [
+                { responseTime: 200, status: "up", timestamp: 1640995200000 },
+            ];
 
             const { result } = renderHook(() => useSiteStats(history));
 
@@ -200,9 +212,12 @@ describe("useSiteStats", () => {
                 { responseTime: 0, status: "down", timestamp: 1640991600000 },
             ];
 
-            const { rerender, result } = renderHook((props) => useSiteStats(props.history), {
-                initialProps: { history },
-            });
+            const { rerender, result } = renderHook(
+                (props) => useSiteStats(props.history),
+                {
+                    initialProps: { history },
+                }
+            );
 
             const firstResult = result.current;
 
@@ -214,16 +229,21 @@ describe("useSiteStats", () => {
         });
 
         it("should recalculate when history changes", () => {
-            const history1: StatusHistory[] = [{ responseTime: 200, status: "up", timestamp: 1640995200000 }];
+            const history1: StatusHistory[] = [
+                { responseTime: 200, status: "up", timestamp: 1640995200000 },
+            ];
 
             const history2: StatusHistory[] = [
                 { responseTime: 200, status: "up", timestamp: 1640995200000 },
                 { responseTime: 0, status: "down", timestamp: 1640991600000 },
             ];
 
-            const { rerender, result } = renderHook((props) => useSiteStats(props.history), {
-                initialProps: { history: history1 },
-            });
+            const { rerender, result } = renderHook(
+                (props) => useSiteStats(props.history),
+                {
+                    initialProps: { history: history1 },
+                }
+            );
 
             expect(result.current.checkCount).toBe(1);
             expect(result.current.uptime).toBe(100);
@@ -238,11 +258,14 @@ describe("useSiteStats", () => {
 
     describe("Edge Cases", () => {
         it("should handle very large numbers", () => {
-            const history: StatusHistory[] = Array.from({ length: 1000 }, (_, i) => ({
-                responseTime: i % 2 === 0 ? 200 : 0,
-                status: i % 2 === 0 ? "up" : "down",
-                timestamp: 1640995200000 + i * 60000,
-            })) as StatusHistory[];
+            const history: StatusHistory[] = Array.from(
+                { length: 1000 },
+                (_, i) => ({
+                    responseTime: i % 2 === 0 ? 200 : 0,
+                    status: i % 2 === 0 ? "up" : "down",
+                    timestamp: 1640995200000 + i * 60000,
+                })
+            ) as StatusHistory[];
 
             const { result } = renderHook(() => useSiteStats(history));
 

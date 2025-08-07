@@ -43,7 +43,11 @@ export interface SettingsStore {
      *
      * @returns Promise resolving to initialization result with status indicators
      */
-    initializeSettings: () => Promise<{ message: string; settingsLoaded: boolean; success: boolean }>;
+    initializeSettings: () => Promise<{
+        message: string;
+        settingsLoaded: boolean;
+        success: boolean;
+    }>;
 
     /**
      * Resets all settings to default values with backend synchronization.

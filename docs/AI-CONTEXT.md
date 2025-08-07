@@ -585,13 +585,15 @@ const electronAPI = {
  sites: {
   addSite: (site: Site) => ipcRenderer.invoke("add-site", site),
   getSites: () => ipcRenderer.invoke("get-sites"),
-  updateSite: (id: string, updates: Partial<Site>) => ipcRenderer.invoke("update-site", id, updates),
+  updateSite: (id: string, updates: Partial<Site>) =>
+   ipcRenderer.invoke("update-site", id, updates),
   // ... all site operations
  },
  monitoring: {
   startMonitoring: () => ipcRenderer.invoke("start-monitoring"),
   stopMonitoring: () => ipcRenderer.invoke("stop-monitoring"),
-  checkSiteNow: (siteId: string, monitorId: string) => ipcRenderer.invoke("check-site-now", siteId, monitorId),
+  checkSiteNow: (siteId: string, monitorId: string) =>
+   ipcRenderer.invoke("check-site-now", siteId, monitorId),
   // ... all monitoring operations
  },
  // ... other domains
@@ -1149,7 +1151,10 @@ export function getEnvVar(name: string, defaultValue?: string): string {
    }
 
    // ✅ CORRECT - Proper error handling
-   await withErrorHandling(() => operation(), { logger, operationName: "operation" });
+   await withErrorHandling(() => operation(), {
+    logger,
+    operationName: "operation",
+   });
    ```
 
 ### Performance Considerations 🚀

@@ -115,13 +115,19 @@ export async function performPortCheckWithRetry(
    ? {
       ...config,
       onRetry: (attempt: number, error: Error) => {
-       const errorMessage = error instanceof Error ? error.message : String(error);
-       logger.debug(`[PortMonitor] Port ${host}:${port} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`);
+       const errorMessage =
+        error instanceof Error ? error.message : String(error);
+       logger.debug(
+        `[PortMonitor] Port ${host}:${port} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
+       );
       },
      }
    : config;
 
-  return await withOperationalHooks(() => performSinglePortCheck(host, port, timeout), devConfig);
+  return await withOperationalHooks(
+   () => performSinglePortCheck(host, port, timeout),
+   devConfig
+  );
  } catch (error) {
   return handlePortCheckError(error, host, port);
  }

@@ -45,7 +45,10 @@
 **Location**: Lines 87-88
 
 ```typescript
-const timeout = (monitor.timeout as number | undefined) ?? this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT;
+const timeout =
+ (monitor.timeout as number | undefined) ??
+ this.config.timeout ??
+ DEFAULT_REQUEST_TIMEOUT;
 const retryAttempts = (monitor.retryAttempts as number | undefined) ?? 3;
 ```
 

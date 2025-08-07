@@ -14,7 +14,11 @@ import {
     type MonitorType,
     type Site,
 } from "@shared/types";
-import { isNonEmptyString, isValidUrl, safeInteger } from "@shared/validation/validatorUtils";
+import {
+    isNonEmptyString,
+    isValidUrl,
+    safeInteger,
+} from "@shared/validation/validatorUtils";
 
 import { ERROR_CATALOG } from "../../../../shared/utils/errorCatalog";
 
@@ -40,7 +44,9 @@ export function addMonitorToSite(site: Site, monitor: Monitor): Site {
  * const monitor = createDefaultMonitor({ url: "https://example.com" });
  * ```
  */
-export function createDefaultMonitor(overrides: Partial<Monitor> = {}): Monitor {
+export function createDefaultMonitor(
+    overrides: Partial<Monitor> = {}
+): Monitor {
     return {
         activeOperations: [],
         checkInterval: 300_000, // 5 minutes default
@@ -59,7 +65,10 @@ export function createDefaultMonitor(overrides: Partial<Monitor> = {}): Monitor 
 /**
  * Finds a monitor in a site by ID
  */
-export function findMonitorInSite(site: Site, monitorId: string): Monitor | undefined {
+export function findMonitorInSite(
+    site: Site,
+    monitorId: string
+): Monitor | undefined {
     return site.monitors.find((monitor) => monitor.id === monitorId);
 }
 
@@ -76,21 +85,32 @@ export function findMonitorInSite(site: Site, monitorId: string): Monitor | unde
  */
 export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
     return {
-        activeOperations: Array.isArray(monitor.activeOperations) ? monitor.activeOperations : [],
+        activeOperations: Array.isArray(monitor.activeOperations)
+            ? monitor.activeOperations
+            : [],
         checkInterval: safeInteger(monitor.checkInterval, 300_000, 5000),
         history: Array.isArray(monitor.history) ? monitor.history : [],
         id: monitor.id ?? crypto.randomUUID(),
         monitoring: monitor.monitoring ?? true,
-        responseTime: typeof monitor.responseTime === "number" ? monitor.responseTime : -1,
+        responseTime:
+            typeof monitor.responseTime === "number"
+                ? monitor.responseTime
+                : -1,
         retryAttempts: safeInteger(monitor.retryAttempts, 3, 0, 10),
-        status: monitor.status && isMonitorStatus(monitor.status) ? monitor.status : DEFAULT_MONITOR_STATUS,
+        status:
+            monitor.status && isMonitorStatus(monitor.status)
+                ? monitor.status
+                : DEFAULT_MONITOR_STATUS,
         timeout: safeInteger(monitor.timeout, 5000, 1000, 300_000),
         type: validateMonitorType(monitor.type),
         // Only add optional fields if they are explicitly provided and valid
         ...(isValidUrl(monitor.url) && { url: monitor.url }),
         ...(isNonEmptyString(monitor.host) && { host: monitor.host }),
-        ...(typeof monitor.port === "number" && monitor.port > 0 && { port: monitor.port }),
-        ...(monitor.lastChecked instanceof Date && { lastChecked: monitor.lastChecked }),
+        ...(typeof monitor.port === "number" &&
+            monitor.port > 0 && { port: monitor.port }),
+        ...(monitor.lastChecked instanceof Date && {
+            lastChecked: monitor.lastChecked,
+        }),
     };
 }
 
@@ -107,7 +127,9 @@ export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
  * ```
  */
 export function removeMonitorFromSite(site: Site, monitorId: string): Site {
-    const updatedMonitors = site.monitors.filter((monitor) => monitor.id !== monitorId);
+    const updatedMonitors = site.monitors.filter(
+        (monitor) => monitor.id !== monitorId
+    );
     return { ...site, monitors: updatedMonitors };
 }
 
@@ -125,8 +147,14 @@ export function removeMonitorFromSite(site: Site, monitorId: string): Site {
  * const updatedSite = updateMonitorInSite(site, "monitor-123", { timeout: 10000 });
  * ```
  */
-export function updateMonitorInSite(site: Site, monitorId: string, updates: Partial<Monitor>): Site {
-    const monitorExists = site.monitors.some((monitor) => monitor.id === monitorId);
+export function updateMonitorInSite(
+    site: Site,
+    monitorId: string,
+    updates: Partial<Monitor>
+): Site {
+    const monitorExists = site.monitors.some(
+        (monitor) => monitor.id === monitorId
+    );
     if (!monitorExists) {
         throw new Error(ERROR_CATALOG.monitors.NOT_FOUND);
     }
@@ -158,7 +186,10 @@ export function updateMonitorInSite(site: Site, monitorId: string, updates: Part
  * validateMonitorExists(site, "monitor-123");
  * ```
  */
-export function validateMonitorExists(site: Site | undefined, monitorId: string): void {
+export function validateMonitorExists(
+    site: Site | undefined,
+    monitorId: string
+): void {
     if (!site) {
         throw new Error(ERROR_CATALOG.sites.NOT_FOUND);
     }
@@ -190,7 +221,10 @@ export const monitorOperations = {
     /**
      * Update monitor retry attempts
      */
-    updateRetryAttempts: (monitor: Monitor, retryAttempts: number): Monitor => ({
+    updateRetryAttempts: (
+        monitor: Monitor,
+        retryAttempts: number
+    ): Monitor => ({
         ...monitor,
         retryAttempts,
     }),
@@ -224,7 +258,8 @@ export const monitorOperations = {
  * Validates and returns a monitor type or default
  */
 function validateMonitorType(type: unknown): MonitorType {
-    return typeof type === "string" && BASE_MONITOR_TYPES.includes(type as MonitorType)
+    return typeof type === "string" &&
+        BASE_MONITOR_TYPES.includes(type as MonitorType)
         ? (type as MonitorType)
         : BASE_MONITOR_TYPES[0];
 }

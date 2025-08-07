@@ -53,7 +53,9 @@ describe("MonitorManager", () => {
             identifier: "site-1",
             name: "Test Site",
             monitoring: true,
-            monitors: [{ id: "monitor-1", type: "http", url: "https://test.com" }],
+            monitors: [
+                { id: "monitor-1", type: "http", url: "https://test.com" },
+            ],
         };
 
         const mockStatusUpdate = {
@@ -67,11 +69,17 @@ describe("MonitorManager", () => {
         dependencies.eventEmitter.emitTyped = vi.fn();
 
         // Mock the enhanced checker to return a result
-        vi.mocked(enhancedServices.checker.checkMonitor).mockResolvedValue(mockStatusUpdate);
+        vi.mocked(enhancedServices.checker.checkMonitor).mockResolvedValue(
+            mockStatusUpdate
+        );
 
         const result = await manager.checkSiteManually("site-1", "monitor-1");
 
-        expect(enhancedServices.checker.checkMonitor).toHaveBeenCalledWith(mockSite, "monitor-1", true);
+        expect(enhancedServices.checker.checkMonitor).toHaveBeenCalledWith(
+            mockSite,
+            "monitor-1",
+            true
+        );
         expect(dependencies.eventEmitter.emitTyped).toHaveBeenCalled();
         expect(result).toEqual(mockStatusUpdate);
     });

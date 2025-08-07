@@ -14,7 +14,11 @@ import { dbLogger } from "./logger";
  * @param maxRetries - Maximum number of retry attempts (default: 5)
  * @returns Promise that resolves with the operation result
  */
-export async function withDbRetry<T>(operation: () => Promise<T>, operationName: string, maxRetries = 5): Promise<T> {
+export async function withDbRetry<T>(
+    operation: () => Promise<T>,
+    operationName: string,
+    maxRetries = 5
+): Promise<T> {
     return withRetry(operation, {
         delayMs: 300,
         maxRetries,
@@ -40,7 +44,12 @@ export async function withRetry<T>(
         operationName?: string;
     } = {}
 ): Promise<T> {
-    const { delayMs = 300, maxRetries = 5, onError, operationName = "operation" } = options;
+    const {
+        delayMs = 300,
+        maxRetries = 5,
+        onError,
+        operationName = "operation",
+    } = options;
 
     const errors: unknown[] = [];
 
@@ -53,7 +62,10 @@ export async function withRetry<T>(
             if (onError) {
                 onError(error, attempt + 1);
             } else {
-                dbLogger.error(`${operationName} failed (attempt ${attempt + 1}/${maxRetries})`, error);
+                dbLogger.error(
+                    `${operationName} failed (attempt ${attempt + 1}/${maxRetries})`,
+                    error
+                );
             }
 
             if (attempt < maxRetries - 1) {
@@ -63,6 +75,9 @@ export async function withRetry<T>(
     }
 
     const lastError = errors.at(-1);
-    dbLogger.error(`Persistent failure after ${maxRetries} retries for ${operationName}`, lastError);
+    dbLogger.error(
+        `Persistent failure after ${maxRetries} retries for ${operationName}`,
+        lastError
+    );
     throw lastError;
 }

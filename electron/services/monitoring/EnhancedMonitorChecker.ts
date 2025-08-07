@@ -28,7 +28,10 @@
  */
 
 import { Monitor, Site, StatusUpdate } from "../../../shared/types";
-import { interpolateLogTemplate, LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "../../../shared/utils/logTemplates";
 import { UptimeEvents } from "../../events/eventTypes";
 import { TypedEventBus } from "../../events/TypedEventBus";
 import { Site as SiteType } from "../../types";
@@ -37,14 +40,24 @@ import { monitorLogger as logger } from "../../utils/logger";
 import { HistoryRepository } from "../database/HistoryRepository";
 import { MonitorRepository } from "../database/MonitorRepository";
 import { SiteRepository } from "../database/SiteRepository";
-import { DEFAULT_MONITOR_TIMEOUT_SECONDS, MONITOR_TIMEOUT_BUFFER_MS, SECONDS_TO_MS_MULTIPLIER } from "./constants";
+import {
+    DEFAULT_MONITOR_TIMEOUT_SECONDS,
+    MONITOR_TIMEOUT_BUFFER_MS,
+    SECONDS_TO_MS_MULTIPLIER,
+} from "./constants";
 import { HttpMonitor } from "./HttpMonitor";
 import { MonitorOperationRegistry } from "./MonitorOperationRegistry";
-import { MonitorStatusUpdateService, type StatusUpdateMonitorCheckResult } from "./MonitorStatusUpdateService";
+import {
+    MonitorStatusUpdateService,
+    type StatusUpdateMonitorCheckResult,
+} from "./MonitorStatusUpdateService";
 import { OperationTimeoutManager } from "./OperationTimeoutManager";
 import { PingMonitor } from "./PingMonitor";
 import { PortMonitor } from "./PortMonitor";
-import { IMonitorService, type MonitorCheckResult as ServiceMonitorCheckResult } from "./types";
+import {
+    IMonitorService,
+    type MonitorCheckResult as ServiceMonitorCheckResult,
+} from "./types";
 
 /**
  * Configuration interface for enhanced monitor checking with comprehensive service dependencies.
@@ -291,8 +304,14 @@ export class EnhancedMonitorChecker {
      *
      * @public
      */
-    async checkMonitor(site: Site, monitorId: string, isManualCheck = false): Promise<StatusUpdate | undefined> {
-        const monitor = site.monitors.find((m) => String(m.id) === String(monitorId));
+    async checkMonitor(
+        site: Site,
+        monitorId: string,
+        isManualCheck = false
+    ): Promise<StatusUpdate | undefined> {
+        const monitor = site.monitors.find(
+            (m) => String(m.id) === String(monitorId)
+        );
 
         if (!this.validateMonitorForCheck(monitor, site, monitorId)) {
             return undefined;
@@ -319,7 +338,10 @@ export class EnhancedMonitorChecker {
      * @param monitorId - Monitor ID
      * @returns Promise resolving to true if started successfully
      */
-    async startMonitoring(siteIdentifier: string, monitorId: string): Promise<boolean> {
+    async startMonitoring(
+        siteIdentifier: string,
+        monitorId: string
+    ): Promise<boolean> {
         try {
             // Cancel any existing operations for this monitor
             this.config.operationRegistry.cancelOperations(monitorId);
@@ -330,19 +352,30 @@ export class EnhancedMonitorChecker {
                 monitoring: true,
             });
 
-            logger.info(interpolateLogTemplate(LOG_TEMPLATES.services.MONITOR_STARTED, { monitorId, siteIdentifier }));
+            logger.info(
+                interpolateLogTemplate(LOG_TEMPLATES.services.MONITOR_STARTED, {
+                    monitorId,
+                    siteIdentifier,
+                })
+            );
 
             // Emit event
-            await this.config.eventEmitter.emitTyped("internal:monitor:started", {
-                identifier: siteIdentifier,
-                monitorId,
-                operation: "started",
-                timestamp: Date.now(),
-            });
+            await this.config.eventEmitter.emitTyped(
+                "internal:monitor:started",
+                {
+                    identifier: siteIdentifier,
+                    monitorId,
+                    operation: "started",
+                    timestamp: Date.now(),
+                }
+            );
 
             return true;
         } catch (error) {
-            logger.error(`Failed to start monitoring for monitor ${monitorId}`, error);
+            logger.error(
+                `Failed to start monitoring for monitor ${monitorId}`,
+                error
+            );
             return false;
         }
     }
@@ -354,7 +387,10 @@ export class EnhancedMonitorChecker {
      * @param monitorId - Monitor ID
      * @returns Promise resolving to true if stopped successfully
      */
-    async stopMonitoring(siteIdentifier: string, monitorId: string): Promise<boolean> {
+    async stopMonitoring(
+        siteIdentifier: string,
+        monitorId: string
+    ): Promise<boolean> {
         try {
             // Cancel all active operations for this monitor
             this.config.operationRegistry.cancelOperations(monitorId);
@@ -365,20 +401,31 @@ export class EnhancedMonitorChecker {
                 monitoring: false,
             });
 
-            logger.info(interpolateLogTemplate(LOG_TEMPLATES.services.MONITOR_STOPPED, { monitorId, siteIdentifier }));
+            logger.info(
+                interpolateLogTemplate(LOG_TEMPLATES.services.MONITOR_STOPPED, {
+                    monitorId,
+                    siteIdentifier,
+                })
+            );
 
             // Emit event
-            await this.config.eventEmitter.emitTyped("internal:monitor:stopped", {
-                identifier: siteIdentifier,
-                monitorId,
-                operation: "stopped",
-                reason: "user",
-                timestamp: Date.now(),
-            });
+            await this.config.eventEmitter.emitTyped(
+                "internal:monitor:stopped",
+                {
+                    identifier: siteIdentifier,
+                    monitorId,
+                    operation: "stopped",
+                    reason: "user",
+                    timestamp: Date.now(),
+                }
+            );
 
             return true;
         } catch (error) {
-            logger.error(`Failed to stop monitoring for monitor ${monitorId}`, error);
+            logger.error(
+                `Failed to stop monitoring for monitor ${monitorId}`,
+                error
+            );
             return false;
         }
     }
@@ -407,7 +454,10 @@ export class EnhancedMonitorChecker {
                 siteId: site.identifier,
                 timestamp,
             });
-        } else if (checkResult.status === "down" && originalMonitor.status !== "down") {
+        } else if (
+            checkResult.status === "down" &&
+            originalMonitor.status !== "down"
+        ) {
             await this.config.eventEmitter.emitTyped("monitor:down", {
                 monitor: freshMonitor,
                 site: site,
@@ -424,13 +474,20 @@ export class EnhancedMonitorChecker {
      * @param operationId - Operation correlation ID
      * @returns Monitor check result with correlation
      */
-    private async executeMonitorCheck(monitor: Monitor, operationId: string): Promise<StatusUpdateMonitorCheckResult> {
+    private async executeMonitorCheck(
+        monitor: Monitor,
+        operationId: string
+    ): Promise<StatusUpdateMonitorCheckResult> {
         try {
             // Perform the check based on monitor type - now returns full result
             const serviceResult = await this.performTypeSpecificCheck(monitor);
 
             return {
-                details: serviceResult.details ?? (serviceResult.status === "up" ? "Check successful" : "Check failed"),
+                details:
+                    serviceResult.details ??
+                    (serviceResult.status === "up"
+                        ? "Check successful"
+                        : "Check failed"),
                 monitorId: monitor.id,
                 operationId,
                 responseTime: serviceResult.responseTime,
@@ -441,7 +498,10 @@ export class EnhancedMonitorChecker {
             logger.error(`Monitor check failed for ${monitor.id}`, error);
 
             return {
-                details: error instanceof Error ? error.message : "Monitor check failed",
+                details:
+                    error instanceof Error
+                        ? error.message
+                        : "Monitor check failed",
                 monitorId: monitor.id,
                 operationId,
                 responseTime: 0,
@@ -466,15 +526,23 @@ export class EnhancedMonitorChecker {
         checkResult: StatusUpdateMonitorCheckResult
     ): Promise<StatusUpdate | undefined> {
         // Get fresh monitor and site data for event emission
-        const freshMonitor = await this.config.monitorRepository.findByIdentifier(checkResult.monitorId);
+        const freshMonitor =
+            await this.config.monitorRepository.findByIdentifier(
+                checkResult.monitorId
+            );
         if (!freshMonitor) {
-            logger.warn(`Fresh monitor data not found for ${checkResult.monitorId}`);
+            logger.warn(
+                `Fresh monitor data not found for ${checkResult.monitorId}`
+            );
             return undefined;
         }
 
         // Create status update for event emission
         const statusUpdate: StatusUpdate = {
-            details: checkResult.status === "up" ? "Monitor is responding" : "Monitor is not responding",
+            details:
+                checkResult.status === "up"
+                    ? "Monitor is responding"
+                    : "Monitor is not responding",
             monitorId: checkResult.monitorId,
             previousStatus: monitor.status,
             siteIdentifier: site.identifier,
@@ -494,7 +562,12 @@ export class EnhancedMonitorChecker {
         });
 
         // Emit monitor up/down events for status changes
-        await this.emitStatusChangeEvents(site, monitor, freshMonitor, checkResult);
+        await this.emitStatusChangeEvents(
+            site,
+            monitor,
+            freshMonitor,
+            checkResult
+        );
 
         return statusUpdate;
     }
@@ -513,7 +586,10 @@ export class EnhancedMonitorChecker {
         monitor: Site["monitors"][0],
         monitorId: string
     ): Promise<StatusUpdate | undefined> {
-        const operationId = await this.setupOperationCorrelation(monitor, monitorId);
+        const operationId = await this.setupOperationCorrelation(
+            monitor,
+            monitorId
+        );
         if (!operationId) {
             return undefined;
         }
@@ -528,16 +604,26 @@ export class EnhancedMonitorChecker {
 
         try {
             // Perform the actual check
-            const checkResult = await this.executeMonitorCheck(monitor, operationId);
+            const checkResult = await this.executeMonitorCheck(
+                monitor,
+                operationId
+            );
 
             // Save history entry before updating status
             await this.saveHistoryEntry(monitor, checkResult);
 
             // Update status through the correlation service
-            const updated = await this.config.statusUpdateService.updateMonitorStatus(checkResult);
+            const updated =
+                await this.config.statusUpdateService.updateMonitorStatus(
+                    checkResult
+                );
 
             if (updated) {
-                return await this.handleSuccessfulCheck(site, monitor, checkResult);
+                return await this.handleSuccessfulCheck(
+                    site,
+                    monitor,
+                    checkResult
+                );
             }
         } catch (error) {
             logger.error(`Monitor check failed for ${monitorId}`, error);
@@ -564,11 +650,18 @@ export class EnhancedMonitorChecker {
             const serviceResult = await this.performTypeSpecificCheck(monitor);
 
             // For manual checks on paused monitors, preserve the paused status
-            const finalStatus = isManualCheck && monitor.status === "paused" ? "paused" : serviceResult.status;
+            const finalStatus =
+                isManualCheck && monitor.status === "paused"
+                    ? "paused"
+                    : serviceResult.status;
 
             // Create an enhanced check result for history saving
             const checkResult: StatusUpdateMonitorCheckResult = {
-                details: serviceResult.details ?? (serviceResult.status === "up" ? "Check successful" : "Check failed"),
+                details:
+                    serviceResult.details ??
+                    (serviceResult.status === "up"
+                        ? "Check successful"
+                        : "Check failed"),
                 monitorId: monitor.id,
                 operationId: "direct-check",
                 responseTime: serviceResult.responseTime,
@@ -582,7 +675,9 @@ export class EnhancedMonitorChecker {
             const statusUpdate: StatusUpdate = {
                 details:
                     serviceResult.details ??
-                    (serviceResult.status === "up" ? "Monitor is responding" : "Monitor is not responding"),
+                    (serviceResult.status === "up"
+                        ? "Monitor is responding"
+                        : "Monitor is not responding"),
                 monitorId: monitor.id,
                 previousStatus: monitor.status,
                 siteIdentifier: site.identifier,
@@ -605,7 +700,10 @@ export class EnhancedMonitorChecker {
             await this.config.monitorRepository.update(monitor.id, updateData);
 
             // Get fresh monitor and site data for event emission
-            const freshMonitor = await this.config.monitorRepository.findByIdentifier(monitor.id);
+            const freshMonitor =
+                await this.config.monitorRepository.findByIdentifier(
+                    monitor.id
+                );
             if (!freshMonitor) {
                 logger.warn(`Fresh monitor data not found for ${monitor.id}`);
                 return statusUpdate;
@@ -632,7 +730,10 @@ export class EnhancedMonitorChecker {
                         siteId: site.identifier,
                         timestamp: checkResult.timestamp.getTime(),
                     });
-                } else if (serviceResult.status === "down" && monitor.status !== "down") {
+                } else if (
+                    serviceResult.status === "down" &&
+                    monitor.status !== "down"
+                ) {
                     await this.config.eventEmitter.emitTyped("monitor:down", {
                         monitor: freshMonitor,
                         site: site,
@@ -644,7 +745,10 @@ export class EnhancedMonitorChecker {
 
             return statusUpdate;
         } catch (error) {
-            logger.error(`Direct monitor check failed for ${monitor.id}`, error);
+            logger.error(
+                `Direct monitor check failed for ${monitor.id}`,
+                error
+            );
             return undefined;
         }
     }
@@ -655,7 +759,9 @@ export class EnhancedMonitorChecker {
      * @param monitor - Monitor to check
      * @returns Promise resolving to monitor check result with details
      */
-    private async performTypeSpecificCheck(monitor: Monitor): Promise<ServiceMonitorCheckResult> {
+    private async performTypeSpecificCheck(
+        monitor: Monitor
+    ): Promise<ServiceMonitorCheckResult> {
         let monitorService: IMonitorService;
 
         switch (monitor.type) {
@@ -673,9 +779,12 @@ export class EnhancedMonitorChecker {
             }
             default: {
                 logger.warn(
-                    interpolateLogTemplate(LOG_TEMPLATES.warnings.MONITOR_TYPE_UNKNOWN_CHECK, {
-                        monitorType: monitor.type,
-                    })
+                    interpolateLogTemplate(
+                        LOG_TEMPLATES.warnings.MONITOR_TYPE_UNKNOWN_CHECK,
+                        {
+                            monitorType: monitor.type,
+                        }
+                    )
                 );
                 return {
                     details: `Unknown monitor type: ${monitor.type}`,
@@ -691,7 +800,10 @@ export class EnhancedMonitorChecker {
         } catch (error) {
             logger.error(`Monitor check failed for ${monitor.id}`, error);
             return {
-                details: error instanceof Error ? error.message : "Monitor check failed",
+                details:
+                    error instanceof Error
+                        ? error.message
+                        : "Monitor check failed",
                 responseTime: 0,
                 status: "down",
             };
@@ -704,7 +816,10 @@ export class EnhancedMonitorChecker {
      * @param monitor - Monitor that was checked
      * @param checkResult - Result of the monitor check
      */
-    private async saveHistoryEntry(monitor: Monitor, checkResult: StatusUpdateMonitorCheckResult): Promise<void> {
+    private async saveHistoryEntry(
+        monitor: Monitor,
+        checkResult: StatusUpdateMonitorCheckResult
+    ): Promise<void> {
         if (!monitor.id) {
             logger.warn("Cannot save history entry: monitor missing ID");
             return;
@@ -712,13 +827,20 @@ export class EnhancedMonitorChecker {
 
         const historyEntry = {
             responseTime: checkResult.responseTime,
-            status: checkResult.status === "up" ? ("up" as const) : ("down" as const),
+            status:
+                checkResult.status === "up"
+                    ? ("up" as const)
+                    : ("down" as const),
             timestamp: checkResult.timestamp.getTime(),
         };
 
         try {
             // Pass the details field from the check result to the history repository
-            await this.config.historyRepository.addEntry(monitor.id, historyEntry, checkResult.details);
+            await this.config.historyRepository.addEntry(
+                monitor.id,
+                historyEntry,
+                checkResult.details
+            );
 
             // Smart history pruning: Only prune when necessary to avoid performance overhead
             const historyLimit = this.config.getHistoryLimit();
@@ -726,19 +848,30 @@ export class EnhancedMonitorChecker {
                 // Use a buffer strategy: only prune when we exceed limit + buffer
                 const bufferSize = Math.max(Math.floor(historyLimit * 0.2), 5);
                 const pruneThreshold = historyLimit + bufferSize;
-                const currentCount = await this.config.historyRepository.getHistoryCount(monitor.id);
+                const currentCount =
+                    await this.config.historyRepository.getHistoryCount(
+                        monitor.id
+                    );
 
                 if (currentCount > pruneThreshold) {
-                    await this.config.historyRepository.pruneHistory(monitor.id, historyLimit);
+                    await this.config.historyRepository.pruneHistory(
+                        monitor.id,
+                        historyLimit
+                    );
                     logger.debug(
                         `[EnhancedMonitorChecker] Pruned history for monitor ${monitor.id}: ${currentCount} -> ${historyLimit} entries`
                     );
                 }
             }
 
-            logger.debug(`Saved history entry for monitor ${monitor.id}: ${checkResult.status}`);
+            logger.debug(
+                `Saved history entry for monitor ${monitor.id}: ${checkResult.status}`
+            );
         } catch (error) {
-            logger.error(`Failed to save history entry for monitor ${monitor.id}`, error);
+            logger.error(
+                `Failed to save history entry for monitor ${monitor.id}`,
+                error
+            );
             // Don't throw error - history saving failure shouldn't stop monitoring
         }
     }
@@ -750,24 +883,37 @@ export class EnhancedMonitorChecker {
      * @param monitorId - Monitor ID
      * @returns Operation ID if successful, undefined if failed
      */
-    private async setupOperationCorrelation(monitor: Monitor, monitorId: string): Promise<string | undefined> {
+    private async setupOperationCorrelation(
+        monitor: Monitor,
+        monitorId: string
+    ): Promise<string | undefined> {
         // Create operation correlation
-        const operationId = this.config.operationRegistry.initiateCheck(monitorId);
+        const operationId =
+            this.config.operationRegistry.initiateCheck(monitorId);
 
         // Calculate operation timeout with buffer for cleanup
-        const monitorTimeoutSeconds = monitor.timeout || DEFAULT_MONITOR_TIMEOUT_SECONDS;
-        const timeoutMs = monitorTimeoutSeconds * SECONDS_TO_MS_MULTIPLIER + MONITOR_TIMEOUT_BUFFER_MS;
+        const monitorTimeoutSeconds =
+            monitor.timeout || DEFAULT_MONITOR_TIMEOUT_SECONDS;
+        const timeoutMs =
+            monitorTimeoutSeconds * SECONDS_TO_MS_MULTIPLIER +
+            MONITOR_TIMEOUT_BUFFER_MS;
         this.config.timeoutManager.scheduleTimeout(operationId, timeoutMs);
 
         // Add operation to monitor's active operations
         try {
-            const updatedActiveOperations = [...(monitor.activeOperations ?? []), operationId];
+            const updatedActiveOperations = [
+                ...(monitor.activeOperations ?? []),
+                operationId,
+            ];
             await this.config.monitorRepository.update(monitorId, {
                 activeOperations: updatedActiveOperations,
             });
             return operationId;
         } catch (error) {
-            logger.error(`Failed to add operation ${operationId} to monitor ${monitorId}`, error);
+            logger.error(
+                `Failed to add operation ${operationId} to monitor ${monitorId}`,
+                error
+            );
             this.config.operationRegistry.completeOperation(operationId);
             this.config.timeoutManager.clearTimeout(operationId);
             return undefined;
@@ -782,14 +928,22 @@ export class EnhancedMonitorChecker {
      * @param monitorId - Monitor ID
      * @returns True if valid, false otherwise
      */
-    private validateMonitorForCheck(monitor: Monitor | undefined, site: Site, monitorId: string): monitor is Monitor {
+    private validateMonitorForCheck(
+        monitor: Monitor | undefined,
+        site: Site,
+        monitorId: string
+    ): monitor is Monitor {
         if (!monitor) {
-            logger.error(`Monitor not found for id: ${monitorId} on site: ${site.identifier}`);
+            logger.error(
+                `Monitor not found for id: ${monitorId} on site: ${site.identifier}`
+            );
             return false;
         }
 
         if (!monitor.id) {
-            logger.error(`Monitor missing id for ${site.identifier}, skipping check.`);
+            logger.error(
+                `Monitor missing id for ${site.identifier}, skipping check.`
+            );
             return false;
         }
 

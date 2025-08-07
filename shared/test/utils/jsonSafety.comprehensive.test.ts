@@ -16,7 +16,11 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
     describe("safeJsonParse", () => {
         it("should parse valid JSON and validate with type guard", () => {
             const validator = (data: unknown): data is { name: string } => {
-                return typeof data === "object" && data !== null && typeof (data as any).name === "string";
+                return (
+                    typeof data === "object" &&
+                    data !== null &&
+                    typeof (data as any).name === "string"
+                );
             };
 
             const result = safeJsonParse('{"name":"test"}', validator);
@@ -36,13 +40,19 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
 
         it("should return error when parsed data doesn't match type", () => {
             const validator = (data: unknown): data is { name: string } => {
-                return typeof data === "object" && data !== null && typeof (data as any).name === "string";
+                return (
+                    typeof data === "object" &&
+                    data !== null &&
+                    typeof (data as any).name === "string"
+                );
             };
 
             const result = safeJsonParse('{"value":123}', validator);
             expect(result.success).toBe(false);
             expect(result.data).toBeUndefined();
-            expect(result.error).toBe("Parsed data does not match expected type");
+            expect(result.error).toBe(
+                "Parsed data does not match expected type"
+            );
         });
 
         it("should handle null JSON values", () => {
@@ -54,7 +64,8 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
         });
 
         it("should handle boolean JSON values", () => {
-            const validator = (data: unknown): data is boolean => typeof data === "boolean";
+            const validator = (data: unknown): data is boolean =>
+                typeof data === "boolean";
             const result = safeJsonParse("true", validator);
 
             expect(result.success).toBe(true);
@@ -62,7 +73,8 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
         });
 
         it("should handle number JSON values", () => {
-            const validator = (data: unknown): data is number => typeof data === "number";
+            const validator = (data: unknown): data is number =>
+                typeof data === "number";
             const result = safeJsonParse("42", validator);
 
             expect(result.success).toBe(true);
@@ -71,7 +83,10 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
 
         it("should handle array JSON values", () => {
             const validator = (data: unknown): data is number[] => {
-                return Array.isArray(data) && data.every((item) => typeof item === "number");
+                return (
+                    Array.isArray(data) &&
+                    data.every((item) => typeof item === "number")
+                );
             };
             const result = safeJsonParse("[1,2,3]", validator);
 
@@ -82,11 +97,20 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
 
     describe("safeJsonParseArray", () => {
         it("should parse valid JSON array with element validation", () => {
-            const elementValidator = (data: unknown): data is { id: number } => {
-                return typeof data === "object" && data !== null && typeof (data as any).id === "number";
+            const elementValidator = (
+                data: unknown
+            ): data is { id: number } => {
+                return (
+                    typeof data === "object" &&
+                    data !== null &&
+                    typeof (data as any).id === "number"
+                );
             };
 
-            const result = safeJsonParseArray('[{"id":1},{"id":2}]', elementValidator);
+            const result = safeJsonParseArray(
+                '[{"id":1},{"id":2}]',
+                elementValidator
+            );
             expect(result.success).toBe(true);
             expect(result.data).toHaveLength(2);
             if (result.success && result.data) {
@@ -105,18 +129,30 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
 
         it("should return error when parsed data is not an array", () => {
             const elementValidator = (_data: unknown): _data is any => true;
-            const result = safeJsonParseArray('{"not":"array"}', elementValidator);
+            const result = safeJsonParseArray(
+                '{"not":"array"}',
+                elementValidator
+            );
 
             expect(result.success).toBe(false);
             expect(result.error).toBe("Parsed data is not an array");
         });
 
         it("should return error when array elements don't match type", () => {
-            const elementValidator = (data: unknown): data is { name: string } => {
-                return typeof data === "object" && data !== null && typeof (data as any).name === "string";
+            const elementValidator = (
+                data: unknown
+            ): data is { name: string } => {
+                return (
+                    typeof data === "object" &&
+                    data !== null &&
+                    typeof (data as any).name === "string"
+                );
             };
 
-            const result = safeJsonParseArray('[{"name":"valid"},{"id":123}]', elementValidator);
+            const result = safeJsonParseArray(
+                '[{"name":"valid"},{"id":123}]',
+                elementValidator
+            );
             expect(result.success).toBe(false);
             expect(result.error).toContain("Array element at index 1");
         });
@@ -130,8 +166,12 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
         });
 
         it("should validate all elements correctly", () => {
-            const elementValidator = (data: unknown): data is string => typeof data === "string";
-            const result = safeJsonParseArray('["a","b","c"]', elementValidator);
+            const elementValidator = (data: unknown): data is string =>
+                typeof data === "string";
+            const result = safeJsonParseArray(
+                '["a","b","c"]',
+                elementValidator
+            );
 
             expect(result.success).toBe(true);
             expect(result.data).toEqual(["a", "b", "c"]);
@@ -148,7 +188,10 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
         it("should return fallback for circular references", () => {
             const obj: any = { name: "test" };
             obj.self = obj;
-            const result = safeJsonStringifyWithFallback(obj, "circular_fallback");
+            const result = safeJsonStringifyWithFallback(
+                obj,
+                "circular_fallback"
+            );
             expect(result).toBe("circular_fallback");
         });
 
@@ -158,7 +201,10 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
                 func: () => "function",
                 symbol: Symbol("test"),
             };
-            const result = safeJsonStringifyWithFallback(obj, "complex_fallback");
+            const result = safeJsonStringifyWithFallback(
+                obj,
+                "complex_fallback"
+            );
             // This might succeed or fail depending on JSON.stringify behavior
             expect(result).toBeDefined();
         });
@@ -175,14 +221,21 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
         });
 
         it("should handle undefined values with fallback", () => {
-            const result = safeJsonStringifyWithFallback(undefined, "undefined_fallback");
+            const result = safeJsonStringifyWithFallback(
+                undefined,
+                "undefined_fallback"
+            );
             expect(result).toBe("undefined_fallback");
         });
 
         it("should handle primitive values", () => {
-            expect(safeJsonStringifyWithFallback("string", "fallback")).toBe('"string"');
+            expect(safeJsonStringifyWithFallback("string", "fallback")).toBe(
+                '"string"'
+            );
             expect(safeJsonStringifyWithFallback(42, "fallback")).toBe("42");
-            expect(safeJsonStringifyWithFallback(true, "fallback")).toBe("true");
+            expect(safeJsonStringifyWithFallback(true, "fallback")).toBe(
+                "true"
+            );
         });
 
         it("should handle complex nested objects", () => {
@@ -217,19 +270,28 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
                     throw new Error("Cannot serialize");
                 },
             };
-            const result = safeJsonStringifyWithFallback(problematic, "error_fallback");
+            const result = safeJsonStringifyWithFallback(
+                problematic,
+                "error_fallback"
+            );
             expect(result).toBe("error_fallback");
         });
 
         it("should handle BigInt with fallback", () => {
             const obj = { bigInt: BigInt(123) };
-            const result = safeJsonStringifyWithFallback(obj, "bigint_fallback");
+            const result = safeJsonStringifyWithFallback(
+                obj,
+                "bigint_fallback"
+            );
             expect(result).toBe("bigint_fallback");
         });
 
         it("should handle functions with fallback", () => {
             const obj = { func: () => "test" };
-            const result = safeJsonStringifyWithFallback(obj, "function_fallback");
+            const result = safeJsonStringifyWithFallback(
+                obj,
+                "function_fallback"
+            );
             expect(result).toBe("{}"); // Functions are not serialized
         });
 
@@ -249,43 +311,73 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
     describe("safeJsonParseWithFallback", () => {
         it("should return parsed data on successful parsing", () => {
             const validator = (data: unknown): data is { name: string } => {
-                return typeof data === "object" && data !== null && typeof (data as any).name === "string";
+                return (
+                    typeof data === "object" &&
+                    data !== null &&
+                    typeof (data as any).name === "string"
+                );
             };
 
-            const result = safeJsonParseWithFallback('{"name":"test"}', validator, { name: "fallback" });
+            const result = safeJsonParseWithFallback(
+                '{"name":"test"}',
+                validator,
+                { name: "fallback" }
+            );
             expect(result.name).toBe("test");
         });
 
         it("should return fallback on parsing failure", () => {
             const validator = (data: unknown): data is { name: string } => {
-                return typeof data === "object" && data !== null && typeof (data as any).name === "string";
+                return (
+                    typeof data === "object" &&
+                    data !== null &&
+                    typeof (data as any).name === "string"
+                );
             };
 
             const fallback = { name: "fallback" };
-            const result = safeJsonParseWithFallback("invalid json", validator, fallback);
+            const result = safeJsonParseWithFallback(
+                "invalid json",
+                validator,
+                fallback
+            );
             expect(result).toBe(fallback);
         });
 
         it("should return fallback when data doesn't match type", () => {
             const validator = (data: unknown): data is { name: string } => {
-                return typeof data === "object" && data !== null && typeof (data as any).name === "string";
+                return (
+                    typeof data === "object" &&
+                    data !== null &&
+                    typeof (data as any).name === "string"
+                );
             };
 
             const fallback = { name: "fallback" };
-            const result = safeJsonParseWithFallback('{"value":123}', validator, fallback);
+            const result = safeJsonParseWithFallback(
+                '{"value":123}',
+                validator,
+                fallback
+            );
             expect(result).toBe(fallback);
         });
 
         it("should handle primitive types", () => {
-            const validator = (data: unknown): data is number => typeof data === "number";
+            const validator = (data: unknown): data is number =>
+                typeof data === "number";
             const result = safeJsonParseWithFallback("42", validator, 0);
             expect(result).toBe(42);
         });
 
         it("should return fallback for undefined data", () => {
-            const validator = (data: unknown): data is string => typeof data === "string";
+            const validator = (data: unknown): data is string =>
+                typeof data === "string";
             const fallback = "fallback";
-            const result = safeJsonParseWithFallback("null", validator, fallback);
+            const result = safeJsonParseWithFallback(
+                "null",
+                validator,
+                fallback
+            );
             expect(result).toBe(fallback);
         });
     });
@@ -322,7 +414,9 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
         it("should handle undefined values", () => {
             const result = safeJsonStringify(undefined);
             expect(result.success).toBe(false); // JSON.stringify(undefined) returns undefined, not a string
-            expect(result.error).toContain("Value cannot be serialized to JSON");
+            expect(result.error).toContain(
+                "Value cannot be serialized to JSON"
+            );
         });
 
         it("should handle circular references", () => {

@@ -6,7 +6,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import logger from "../../services/logger";
-import { createBaseStore, createPersistConfig, debounce, logStoreAction, waitForElectronAPI } from "../../stores/utils";
+import {
+    createBaseStore,
+    createPersistConfig,
+    debounce,
+    logStoreAction,
+    waitForElectronAPI,
+} from "../../stores/utils";
 
 // Mock logger
 vi.mock("../../services/logger", () => ({
@@ -112,7 +118,10 @@ describe("Store Utils", () => {
 
         it("should create a persist config with custom partialize function", () => {
             const partializeFunction = (state: any) => ({ data: state.data });
-            const config = createPersistConfig("test-store", partializeFunction);
+            const config = createPersistConfig(
+                "test-store",
+                partializeFunction
+            );
 
             expect(config).toEqual({
                 name: "uptime-watcher-test-store",
@@ -225,7 +234,10 @@ describe("Store Utils", () => {
             const data = { id: "test-id", value: 123 };
             logStoreAction("TestStore", "testAction", data);
 
-            expect(logger.info).toHaveBeenCalledWith("[TestStore] testAction", data);
+            expect(logger.info).toHaveBeenCalledWith(
+                "[TestStore] testAction",
+                data
+            );
         });
 
         it("should not log when data is undefined", () => {
@@ -238,12 +250,18 @@ describe("Store Utils", () => {
             logStoreAction("SitesStore", "addSite", { id: "site-123" });
             logStoreAction("SettingsStore", "updateTheme");
 
-            expect(logger.info).toHaveBeenCalledWith("[SitesStore] addSite", { id: "site-123" });
-            expect(logger.info).toHaveBeenCalledWith("[SettingsStore] updateTheme");
+            expect(logger.info).toHaveBeenCalledWith("[SitesStore] addSite", {
+                id: "site-123",
+            });
+            expect(logger.info).toHaveBeenCalledWith(
+                "[SettingsStore] updateTheme"
+            );
         });
 
         it("should not log in production mode", async () => {
-            const { isDevelopment } = await vi.importMock("../../../shared/utils/environment");
+            const { isDevelopment } = await vi.importMock(
+                "../../../shared/utils/environment"
+            );
             (isDevelopment as any).mockReturnValue(false);
 
             logStoreAction("TestStore", "testAction");

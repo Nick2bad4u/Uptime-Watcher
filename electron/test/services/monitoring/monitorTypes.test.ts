@@ -4,7 +4,11 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { type MonitorType, getBaseMonitorTypes, isBaseMonitorType } from "../../../services/monitoring/monitorTypes";
+import {
+    type MonitorType,
+    getBaseMonitorTypes,
+    isBaseMonitorType,
+} from "../../../services/monitoring/monitorTypes";
 
 describe("Monitor Types Utility", () => {
     describe("getBaseMonitorTypes", () => {
@@ -179,7 +183,11 @@ describe("Monitor Types Utility", () => {
 
                 // Test case sensitivity for each type
                 expect(isBaseMonitorType(type.toUpperCase())).toBe(false);
-                expect(isBaseMonitorType(type.charAt(0).toUpperCase() + type.slice(1))).toBe(false);
+                expect(
+                    isBaseMonitorType(
+                        type.charAt(0).toUpperCase() + type.slice(1)
+                    )
+                ).toBe(false);
             }
         });
 
@@ -281,7 +289,9 @@ describe("Monitor Types Utility", () => {
             }
 
             expect(processMonitorType("http")).toBe("Processing http monitor");
-            expect(processMonitorType("invalid")).toBe("Unknown monitor type: invalid");
+            expect(processMonitorType("invalid")).toBe(
+                "Unknown monitor type: invalid"
+            );
         });
     });
 });

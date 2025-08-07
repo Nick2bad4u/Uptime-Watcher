@@ -181,7 +181,10 @@ function safeDateConversion(value: unknown): Date | undefined {
 
 ```typescript
 // Instead of returning null, use undefined or omit the field
-function buildMonitorParameters(siteIdentifier: string, monitor: Site["monitors"][0]): DbValue[] {
+function buildMonitorParameters(
+ siteIdentifier: string,
+ monitor: Site["monitors"][0]
+): DbValue[] {
  // Use undefined instead of null
  const value = someValue ?? undefined;
  return columns.map((column) => row[column] ?? undefined);

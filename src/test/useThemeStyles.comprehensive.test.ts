@@ -53,10 +53,16 @@ describe("useThemeStyles", () => {
     });
 
     it("should handle collapsed state", () => {
-        const { result: collapsedResult } = renderHook(() => useThemeStyles(true));
-        const { result: expandedResult } = renderHook(() => useThemeStyles(false));
+        const { result: collapsedResult } = renderHook(() =>
+            useThemeStyles(true)
+        );
+        const { result: expandedResult } = renderHook(() =>
+            useThemeStyles(false)
+        );
 
-        expect(collapsedResult.current.contentStyle.padding).toBe("1rem 1.5rem");
+        expect(collapsedResult.current.contentStyle.padding).toBe(
+            "1rem 1.5rem"
+        );
         expect(expandedResult.current.contentStyle.padding).toBe("1.5rem");
     });
 
@@ -74,7 +80,9 @@ describe("useThemeStyles", () => {
 
         const { result } = renderHook(() => useThemeStyles());
 
-        expect(result.current.headerStyle.background).toContain("rgba(59, 130, 246, 0.1)");
+        expect(result.current.headerStyle.background).toContain(
+            "rgba(59, 130, 246, 0.1)"
+        );
         expect(result.current.headerStyle.color).toBe("#111827");
     });
 
@@ -92,14 +100,18 @@ describe("useThemeStyles", () => {
 
         const { result } = renderHook(() => useThemeStyles());
 
-        expect(result.current.headerStyle.background).toContain("rgba(37, 99, 235, 0.15)");
+        expect(result.current.headerStyle.background).toContain(
+            "rgba(37, 99, 235, 0.15)"
+        );
         expect(result.current.headerStyle.color).toBe("#f3f4f6");
     });
 
     it("should provide collapse button styles", () => {
         const { result } = renderHook(() => useThemeStyles());
 
-        expect(result.current.collapseButtonStyle.backgroundColor).toBe("transparent");
+        expect(result.current.collapseButtonStyle.backgroundColor).toBe(
+            "transparent"
+        );
         expect(result.current.collapseButtonStyle.border).toBe("none");
         expect(result.current.collapseButtonStyle.cursor).toBe("pointer");
         expect(result.current.collapseButtonStyle.padding).toBe("0.5rem");
@@ -108,7 +120,9 @@ describe("useThemeStyles", () => {
     it("should provide header styles with gradients", () => {
         const { result } = renderHook(() => useThemeStyles());
 
-        expect(result.current.headerStyle.background).toContain("linear-gradient");
+        expect(result.current.headerStyle.background).toContain(
+            "linear-gradient"
+        );
         expect(result.current.headerStyle.borderRadius).toBe("0.75rem");
         expect(result.current.headerStyle.boxShadow).toBeDefined();
     });
@@ -153,9 +167,12 @@ describe("useThemeStyles", () => {
     });
 
     it("should update styles when collapsed state changes", () => {
-        const { result } = renderHook(({ isCollapsed }) => useThemeStyles(isCollapsed), {
-            initialProps: { isCollapsed: false },
-        });
+        const { result } = renderHook(
+            ({ isCollapsed }) => useThemeStyles(isCollapsed),
+            {
+                initialProps: { isCollapsed: false },
+            }
+        );
 
         const expandedStyles = result.current;
 
@@ -178,7 +195,9 @@ describe("useThemeStyles", () => {
     it("should provide transition effects", () => {
         const { result } = renderHook(() => useThemeStyles());
 
-        expect(result.current.collapseButtonStyle.transition).toContain("0.3s cubic-bezier");
+        expect(result.current.collapseButtonStyle.transition).toContain(
+            "0.3s cubic-bezier"
+        );
         expect(result.current.contentStyle.transition).toContain("padding");
     });
 
@@ -212,8 +231,12 @@ describe("useThemeStyles", () => {
         const { result: darkResult } = renderHook(() => useThemeStyles());
 
         // Colors should be different between light and dark modes
-        expect(lightResult.current.headerStyle.color).not.toBe(darkResult.current.headerStyle.color);
-        expect(lightResult.current.headerStyle.background).not.toBe(darkResult.current.headerStyle.background);
+        expect(lightResult.current.headerStyle.color).not.toBe(
+            darkResult.current.headerStyle.color
+        );
+        expect(lightResult.current.headerStyle.background).not.toBe(
+            darkResult.current.headerStyle.background
+        );
     });
 
     it("should provide default collapsed state", () => {

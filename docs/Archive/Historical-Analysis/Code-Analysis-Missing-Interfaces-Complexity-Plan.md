@@ -116,9 +116,17 @@ Conducted comprehensive searches for:
 
 ```typescript
 // ❌ Current - Generic Record types
-export function mapMonitorToRow(monitor: Record<string, unknown>): Record<string, unknown>;
-export function mapRowToMonitor(row: Record<string, unknown>): Record<string, unknown>;
-export function historyEntryToRow(monitorId: string, entry: StatusHistory, details?: string): Record<string, unknown>;
+export function mapMonitorToRow(
+ monitor: Record<string, unknown>
+): Record<string, unknown>;
+export function mapRowToMonitor(
+ row: Record<string, unknown>
+): Record<string, unknown>;
+export function historyEntryToRow(
+ monitorId: string,
+ entry: StatusHistory,
+ details?: string
+): Record<string, unknown>;
 ```
 
 **Proposed Interfaces:**
@@ -354,8 +362,13 @@ type MonitorConfig = HttpMonitorConfig | PortMonitorConfig | PingMonitorConfig;
 
 ```typescript
 // ❌ Current - Generic chart configs
-export function getScaleConfig(config: unknown, axis: "x" | "y"): Record<string, unknown> | undefined;
-export function hasScales(config: unknown): config is { scales: { x?: unknown; y?: unknown } };
+export function getScaleConfig(
+ config: unknown,
+ axis: "x" | "y"
+): Record<string, unknown> | undefined;
+export function hasScales(
+ config: unknown
+): config is { scales: { x?: unknown; y?: unknown } };
 ```
 
 **Proposed Interfaces:**
@@ -546,15 +559,24 @@ class ParameterValidator {
   context.errors.push(message);
  }
 
- private validateParameterCount(context: ValidationContext, expected: number): boolean {
+ private validateParameterCount(
+  context: ValidationContext,
+  expected: number
+ ): boolean {
   if (context.params.length !== expected) {
-   this.addError(context, `Expected exactly ${expected} parameter(s), got ${context.params.length}`);
+   this.addError(
+    context,
+    `Expected exactly ${expected} parameter(s), got ${context.params.length}`
+   );
    return false;
   }
   return true;
  }
 
- private validateStringParameter(context: ValidationContext, paramName: string): boolean {
+ private validateStringParameter(
+  context: ValidationContext,
+  paramName: string
+ ): boolean {
   const param = context.params[context.paramIndex];
   const error = IpcValidators.requiredString(param, paramName);
   if (error) {
@@ -564,7 +586,10 @@ class ParameterValidator {
   return true;
  }
 
- createTwoStringValidator(firstParamName: string, secondParamName: string): IpcParameterValidator {
+ createTwoStringValidator(
+  firstParamName: string,
+  secondParamName: string
+ ): IpcParameterValidator {
   return (params: unknown[]): null | string[] => {
    const context: ValidationContext = { params, errors: [], paramIndex: 0 };
 
@@ -676,7 +701,12 @@ const handleSaveName = useCallback(async () => {
  if (!isValidToSave()) return;
 
  clearError();
- await withUtilityErrorHandling(() => saveSiteName(localName), "Save site name", undefined, false);
+ await withUtilityErrorHandling(
+  () => saveSiteName(localName),
+  "Save site name",
+  undefined,
+  false
+ );
 }, [isValidToSave, clearError, saveSiteName, localName]);
 ```
 
@@ -694,17 +724,26 @@ interface FormValidationRules {
  validateMode: (addMode: FormMode, selectedSite: string) => boolean;
  validateBasicFields: (name: string, monitorType: MonitorType) => boolean;
  validateMonitorFields: (monitorType: MonitorType, fields: any) => boolean;
- validateTypeSpecific: (monitorType: MonitorType, url: string, host: string, port: string) => boolean;
+ validateTypeSpecific: (
+  monitorType: MonitorType,
+  url: string,
+  host: string,
+  port: string
+ ) => boolean;
 }
 
 const createFormValidator = (): FormValidationRules => ({
- validateMode: (addMode, selectedSite) => addMode === "new" || (addMode === "existing" && selectedSite.length > 0),
+ validateMode: (addMode, selectedSite) =>
+  addMode === "new" || (addMode === "existing" && selectedSite.length > 0),
 
- validateBasicFields: (name, monitorType) => name.trim().length > 0 && monitorType.length > 0,
+ validateBasicFields: (name, monitorType) =>
+  name.trim().length > 0 && monitorType.length > 0,
 
  validateMonitorFields: (monitorType, fields) => {
   const requiredFields = getFields(monitorType);
-  return requiredFields.every((field) => (field.required ? fields[field.name]?.trim().length > 0 : true));
+  return requiredFields.every((field) =>
+   field.required ? fields[field.name]?.trim().length > 0 : true
+  );
  },
 
  validateTypeSpecific: (monitorType, url, host, port) => {

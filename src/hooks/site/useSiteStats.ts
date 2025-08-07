@@ -73,18 +73,25 @@ export function useSiteStats(history: StatusHistory[]): SiteStats {
         const checkCount = history.length;
 
         // Calculate uptime percentage
-        const upCount = history.filter((record) => record.status === "up").length;
+        const upCount = history.filter(
+            (record) => record.status === "up"
+        ).length;
         const uptime = Math.round((upCount / checkCount) * 100);
 
         // Calculate average response time (only for successful "up" checks)
         const upRecordsWithResponseTime = history.filter(
-            (record) => record.status === "up" && typeof record.responseTime === "number" && record.responseTime > 0
+            (record) =>
+                record.status === "up" &&
+                typeof record.responseTime === "number" &&
+                record.responseTime > 0
         );
         const averageResponseTime =
             upRecordsWithResponseTime.length > 0
                 ? Math.round(
-                      upRecordsWithResponseTime.reduce((sum, record) => sum + record.responseTime, 0) /
-                          upRecordsWithResponseTime.length
+                      upRecordsWithResponseTime.reduce(
+                          (sum, record) => sum + record.responseTime,
+                          0
+                      ) / upRecordsWithResponseTime.length
                   )
                 : 0;
 

@@ -64,7 +64,9 @@ export interface UseMonitorTypesResult {
  * @returns Monitor type options and loading state
  */
 export function useMonitorTypes(): UseMonitorTypesResult {
-    const [options, setOptions] = useState<Array<{ label: string; value: string }>>([]);
+    const [options, setOptions] = useState<
+        Array<{ label: string; value: string }>
+    >([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | undefined>();
 
@@ -75,12 +77,17 @@ export function useMonitorTypes(): UseMonitorTypesResult {
             const monitorOptions = await getMonitorTypeOptions();
             setOptions(monitorOptions);
         } catch (loadError) {
-            const errorMessage = loadError instanceof Error ? loadError.message : "Failed to load monitor types";
+            const errorMessage =
+                loadError instanceof Error
+                    ? loadError.message
+                    : "Failed to load monitor types";
             const contextualError = `Monitor types loading failed: ${errorMessage}. Using fallback options.`;
             setError(contextualError);
             logger.error(
                 "Failed to load monitor types from backend",
-                loadError instanceof Error ? loadError : new Error(String(loadError))
+                loadError instanceof Error
+                    ? loadError
+                    : new Error(String(loadError))
             );
             // Use centralized fallback options to ensure consistency
             setOptions(Array.from(FALLBACK_MONITOR_TYPE_OPTIONS));

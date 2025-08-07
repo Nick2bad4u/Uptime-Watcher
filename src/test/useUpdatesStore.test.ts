@@ -400,18 +400,42 @@ describe("useUpdatesStore", () => {
                 result.current.applyUpdate();
             });
 
-            expect(logStoreAction).toHaveBeenCalledWith("UpdatesStore", "setUpdateStatus", { status: "checking" });
-            expect(logStoreAction).toHaveBeenCalledWith("UpdatesStore", "setUpdateProgress", { progress: 50 });
-            expect(logStoreAction).toHaveBeenCalledWith("UpdatesStore", "setUpdateError", { error: "Test error" });
-            expect(logStoreAction).toHaveBeenCalledWith("UpdatesStore", "setUpdateInfo", { info: updateInfo });
-            expect(logStoreAction).toHaveBeenCalledWith("UpdatesStore", "clearUpdateError", {
-                message: "Update error cleared",
-                success: true,
-            });
-            expect(logStoreAction).toHaveBeenCalledWith("UpdatesStore", "applyUpdate", {
-                message: "Applying update and restarting application",
-                success: true,
-            });
+            expect(logStoreAction).toHaveBeenCalledWith(
+                "UpdatesStore",
+                "setUpdateStatus",
+                { status: "checking" }
+            );
+            expect(logStoreAction).toHaveBeenCalledWith(
+                "UpdatesStore",
+                "setUpdateProgress",
+                { progress: 50 }
+            );
+            expect(logStoreAction).toHaveBeenCalledWith(
+                "UpdatesStore",
+                "setUpdateError",
+                { error: "Test error" }
+            );
+            expect(logStoreAction).toHaveBeenCalledWith(
+                "UpdatesStore",
+                "setUpdateInfo",
+                { info: updateInfo }
+            );
+            expect(logStoreAction).toHaveBeenCalledWith(
+                "UpdatesStore",
+                "clearUpdateError",
+                {
+                    message: "Update error cleared",
+                    success: true,
+                }
+            );
+            expect(logStoreAction).toHaveBeenCalledWith(
+                "UpdatesStore",
+                "applyUpdate",
+                {
+                    message: "Applying update and restarting application",
+                    success: true,
+                }
+            );
         });
     });
 });

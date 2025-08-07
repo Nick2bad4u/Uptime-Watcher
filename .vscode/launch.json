@@ -48,7 +48,10 @@
     "compounds": [
         {
             "name": "Dev: Vite + Electron Main",
-            "configurations": ["Run Vite Dev Server", "Debug Electron Main Process"],
+            "configurations": [
+                "Run Vite Dev Server",
+                "Debug Electron Main Process"
+            ],
             "stopAll": true
         }
     ]

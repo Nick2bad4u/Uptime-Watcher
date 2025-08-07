@@ -9,7 +9,10 @@
  * @packageDocumentation
  */
 
-import { interpolateLogTemplate, LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "../../../shared/utils/logTemplates";
 import { monitorLogger as logger } from "../../utils/logger";
 
 /**
@@ -63,7 +66,10 @@ export interface MonitorCheckResult {
  * @public
  */
 export class MonitorOperationRegistry {
-    private readonly activeOperations = new Map<string, MonitorCheckOperation>();
+    private readonly activeOperations = new Map<
+        string,
+        MonitorCheckOperation
+    >();
 
     /**
      * Cancel all operations for a specific monitor.
@@ -81,7 +87,10 @@ export class MonitorOperationRegistry {
 
         if (cancelledCount > 0) {
             logger.debug(
-                interpolateLogTemplate(LOG_TEMPLATES.debug.OPERATION_CANCELLED, { count: cancelledCount, monitorId })
+                interpolateLogTemplate(
+                    LOG_TEMPLATES.debug.OPERATION_CANCELLED,
+                    { count: cancelledCount, monitorId }
+                )
             );
         }
     }
@@ -96,10 +105,13 @@ export class MonitorOperationRegistry {
         if (operation) {
             this.activeOperations.delete(operationId);
             logger.debug(
-                interpolateLogTemplate(LOG_TEMPLATES.debug.OPERATION_COMPLETED, {
-                    monitorId: operation.monitorId,
-                    operationId,
-                })
+                interpolateLogTemplate(
+                    LOG_TEMPLATES.debug.OPERATION_COMPLETED,
+                    {
+                        monitorId: operation.monitorId,
+                        operationId,
+                    }
+                )
             );
         }
     }
@@ -139,7 +151,9 @@ export class MonitorOperationRegistry {
         } while (this.activeOperations.has(operationId) && attempts < 5);
 
         if (this.activeOperations.has(operationId)) {
-            throw new Error("Failed to generate a unique operation ID after multiple attempts.");
+            throw new Error(
+                "Failed to generate a unique operation ID after multiple attempts."
+            );
         }
 
         const operation: MonitorCheckOperation = {
@@ -150,7 +164,9 @@ export class MonitorOperationRegistry {
         };
 
         this.activeOperations.set(operationId, operation);
-        logger.debug(`Initiated operation ${operationId} for monitor ${monitorId}`);
+        logger.debug(
+            `Initiated operation ${operationId} for monitor ${monitorId}`
+        );
         return operationId;
     }
 
@@ -171,4 +187,5 @@ export class MonitorOperationRegistry {
  *
  * @public
  */
-export const operationRegistry: MonitorOperationRegistry = new MonitorOperationRegistry();
+export const operationRegistry: MonitorOperationRegistry =
+    new MonitorOperationRegistry();

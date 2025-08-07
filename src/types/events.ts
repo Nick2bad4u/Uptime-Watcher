@@ -97,5 +97,11 @@ export interface UpdateStatusEventData {
     /** Progress percentage (0-100) */
     progress?: number;
     /** Current update status */
-    status: "available" | "checking" | "downloaded" | "downloading" | "error" | "idle";
+    status:
+        | "available"
+        | "checking"
+        | "downloaded"
+        | "downloading"
+        | "error"
+        | "idle";
 }

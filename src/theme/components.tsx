@@ -21,8 +21,22 @@ import "./components.css";
 import { useTheme, useThemeClasses } from "./useTheme";
 
 export type BadgeSize = "lg" | "md" | "sm" | "xs";
-export type BadgeVariant = "error" | "info" | "primary" | "secondary" | "success" | "warning";
-export type BoxElement = "article" | "aside" | "button" | "div" | "footer" | "header" | "nav" | "section";
+export type BadgeVariant =
+    | "error"
+    | "info"
+    | "primary"
+    | "secondary"
+    | "success"
+    | "warning";
+export type BoxElement =
+    | "article"
+    | "aside"
+    | "button"
+    | "div"
+    | "footer"
+    | "header"
+    | "nav"
+    | "section";
 export type BoxPadding = "lg" | "md" | "sm" | "xl" | "xs";
 export type BoxRounded = "full" | "lg" | "md" | "none" | "sm" | "xl";
 export type BoxShadow = "inner" | "lg" | "md" | "sm" | "xl";
@@ -42,7 +56,16 @@ export type ButtonVariant =
     | "warning";
 
 export type TextAlign = "center" | "justify" | "left" | "right";
-export type TextSize = "2xl" | "3xl" | "4xl" | "base" | "lg" | "md" | "sm" | "xl" | "xs";
+export type TextSize =
+    | "2xl"
+    | "3xl"
+    | "4xl"
+    | "base"
+    | "lg"
+    | "md"
+    | "sm"
+    | "xl"
+    | "xs";
 
 export type TextVariant =
     | "danger"
@@ -295,7 +318,12 @@ export interface ThemeProviderProperties {
     readonly children: React.ReactNode;
 }
 
-export const MiniChartBar = ({ className = "", responseTime, status, timestamp }: MiniChartBarProperties): JSX.Element => {
+export const MiniChartBar = ({
+    className = "",
+    responseTime,
+    status,
+    timestamp,
+}: MiniChartBarProperties): JSX.Element => {
     const { currentTheme, getStatusColor } = useTheme();
 
     const styles: React.CSSProperties = {
@@ -311,7 +339,7 @@ export const MiniChartBar = ({ className = "", responseTime, status, timestamp }
             title={`${status} - ${formatResponseTime(responseTime)} at ${new Date(timestamp).toLocaleString()}`}
         />
     );
-}
+};
 
 export const StatusIndicator = ({
     className = "",
@@ -356,7 +384,10 @@ export const StatusIndicator = ({
     const sizeStyles = getSizeStyles();
 
     const indicatorStyle: React.CSSProperties = {
-        animation: status === "pending" ? "pulse 1.5s ease-in-out infinite" : undefined,
+        animation:
+            status === "pending"
+                ? "pulse 1.5s ease-in-out infinite"
+                : undefined,
         backgroundColor: getStatusColor(status),
         borderRadius: currentTheme.borderRadius.full,
         boxShadow: `0 0 0 2px ${currentTheme.colors.background.primary}`,
@@ -384,20 +415,29 @@ export const StatusIndicator = ({
     };
 
     return (
-        <div className={`themed-status-indicator ${className}`} style={{ alignItems: "center", display: "flex" }}>
+        <div
+            className={`themed-status-indicator ${className}`}
+            style={{ alignItems: "center", display: "flex" }}
+        >
             {showText ? (
                 <div style={iconStyle}>{getStatusIcon(status)}</div>
             ) : (
-                <div className="themed-status-indicator__dot" style={indicatorStyle} />
+                <div
+                    className="themed-status-indicator__dot"
+                    style={indicatorStyle}
+                />
             )}
             {showText ? (
-                <span className="themed-status-indicator__text" style={textStyle}>
+                <span
+                    className="themed-status-indicator__text"
+                    style={textStyle}
+                >
                     {status.charAt(0).toUpperCase() + status.slice(1)}
                 </span>
             ) : null}
         </div>
     );
-}
+};
 
 export const ThemedBadge = ({
     children,
@@ -518,7 +558,7 @@ export const ThemedBadge = ({
             {children}
         </span>
     );
-}
+};
 
 // Default styles object to prevent infinite render loops
 const DEFAULT_THEMED_BOX_STYLE = {};
@@ -572,7 +612,9 @@ export const ThemedBox = ({
     const isInteractive = Boolean(onClick);
     const elementProperties = {
         className: classNames,
-        onClick: onClick ? (e: React.MouseEvent<HTMLElement>) => onClick(e) : undefined,
+        onClick: onClick
+            ? (e: React.MouseEvent<HTMLElement>) => onClick(e)
+            : undefined,
         onMouseEnter,
         onMouseLeave,
         style,
@@ -596,7 +638,7 @@ export const ThemedBox = ({
     };
 
     return React.createElement(Component, elementProperties, children);
-}
+};
 
 export const ThemedButton = ({
     "aria-label": ariaLabel,
@@ -677,7 +719,7 @@ export const ThemedButton = ({
             {renderContent()}
         </button>
     );
-}
+};
 
 export const ThemedCard = ({
     children,
@@ -742,7 +784,11 @@ export const ThemedCard = ({
                     ) : null}
                     <div style={{ flex: 1 }}>
                         {title ? (
-                            <ThemedText size="lg" variant="primary" weight="semibold">
+                            <ThemedText
+                                size="lg"
+                                variant="primary"
+                                weight="semibold"
+                            >
                                 {title}
                             </ThemedText>
                         ) : null}
@@ -757,7 +803,7 @@ export const ThemedCard = ({
             <div className="themed-card__content">{children}</div>
         </ThemedBox>
     );
-}
+};
 
 // Enhanced components with better visual feedback and icons
 
@@ -780,7 +826,7 @@ export const ThemedCheckbox = ({
             required={required}
         />
     );
-}
+};
 
 export const ThemedIconButton = ({
     className = "",
@@ -838,7 +884,7 @@ export const ThemedIconButton = ({
             {...(tooltip && { title: tooltip })}
         />
     );
-}
+};
 
 export const ThemedInput = ({
     "aria-describedby": ariaDescribedBy,
@@ -856,7 +902,8 @@ export const ThemedInput = ({
     value,
 }: ThemedInputProperties): JSX.Element => {
     const { currentTheme } = useTheme();
-    const { getBackgroundClass, getBorderClass, getTextClass } = useThemeClasses();
+    const { getBackgroundClass, getBorderClass, getTextClass } =
+        useThemeClasses();
 
     // Ensure value is always defined to prevent controlled/uncontrolled warnings
     const inputValue = value ?? "";
@@ -891,7 +938,7 @@ export const ThemedInput = ({
             {...(value === undefined ? {} : { value: inputValue })}
         />
     );
-}
+};
 
 export const ThemedProgress = ({
     className = "",
@@ -986,13 +1033,21 @@ export const ThemedProgress = ({
                     ) : null}
                 </div>
             ) : null}
-            <progress max={max} style={{ left: "-9999px", position: "absolute", top: "-9999px" }} value={value} />
+            <progress
+                max={max}
+                style={{
+                    left: "-9999px",
+                    position: "absolute",
+                    top: "-9999px",
+                }}
+                value={value}
+            />
             <div aria-hidden="true" style={containerStyles}>
                 <div style={progressStyles} />
             </div>
         </div>
     );
-}
+};
 
 export const ThemedSelect = ({
     "aria-describedby": ariaDescribedBy,
@@ -1009,7 +1064,8 @@ export const ThemedSelect = ({
     value,
 }: ThemedSelectProperties): JSX.Element => {
     const { currentTheme } = useTheme();
-    const { getBackgroundClass, getBorderClass, getTextClass } = useThemeClasses();
+    const { getBackgroundClass, getBorderClass, getTextClass } =
+        useThemeClasses();
 
     // Ensure value is always defined to prevent controlled/uncontrolled warnings
     const selectValue = value ?? "";
@@ -1044,7 +1100,7 @@ export const ThemedSelect = ({
             {children}
         </select>
     );
-}
+};
 
 export const ThemedText = ({
     align = "left",
@@ -1071,18 +1127,24 @@ export const ThemedText = ({
             {children}
         </span>
     );
-}
+};
 
-export const ThemedTooltip = ({ children, className = "", content }: ThemedTooltipProperties): JSX.Element => {
+export const ThemedTooltip = ({
+    children,
+    className = "",
+    content,
+}: ThemedTooltipProperties): JSX.Element => {
     return (
         <div className={`themed-tooltip ${className}`} title={content}>
             {children}
         </div>
     );
-}
+};
 
 // eslint-disable-next-line sonarjs/function-return-type -- React component returns children as-is
-export function ThemeProvider({ children }: ThemeProviderProperties): React.ReactNode {
+export function ThemeProvider({
+    children,
+}: ThemeProviderProperties): React.ReactNode {
     // Initialize theme system on mount to ensure theme context is available
     useTheme();
 

@@ -98,37 +98,40 @@ export interface SiteInfo {
  * @param props - SiteCardHeader component props
  * @returns JSX.Element containing site header with controls
  */
-export const SiteCardHeader: React.NamedExoticComponent<SiteCardHeaderProps> = React.memo(function SiteCardHeader({
-    display,
-    interactions,
-    monitoring,
-    site,
-}: SiteCardHeaderProps) {
-    return (
-        <div className="flex items-center justify-between">
-            <ThemedText size="lg" variant="primary" weight="semibold">
-                {site.site.name}
-            </ThemedText>
+export const SiteCardHeader: React.NamedExoticComponent<SiteCardHeaderProps> =
+    React.memo(function SiteCardHeader({
+        display,
+        interactions,
+        monitoring,
+        site,
+    }: SiteCardHeaderProps) {
+        return (
+            <div className="flex items-center justify-between">
+                <ThemedText size="lg" variant="primary" weight="semibold">
+                    {site.site.name}
+                </ThemedText>
 
-            <div className="flex items-center gap-2 min-w-[180px]">
-                <MonitorSelector
-                    monitors={site.site.monitors}
-                    onChange={interactions.onMonitorIdChange}
-                    selectedMonitorId={monitoring.selectedMonitorId}
-                />
+                <div className="flex items-center gap-2 min-w-[180px]">
+                    <MonitorSelector
+                        monitors={site.site.monitors}
+                        onChange={interactions.onMonitorIdChange}
+                        selectedMonitorId={monitoring.selectedMonitorId}
+                    />
 
-                <ActionButtonGroup
-                    allMonitorsRunning={monitoring.allMonitorsRunning}
-                    disabled={!monitoring.hasMonitor}
-                    isLoading={display.isLoading}
-                    isMonitoring={monitoring.isMonitoring}
-                    onCheckNow={interactions.onCheckNow}
-                    onStartMonitoring={interactions.onStartMonitoring}
-                    onStartSiteMonitoring={interactions.onStartSiteMonitoring}
-                    onStopMonitoring={interactions.onStopMonitoring}
-                    onStopSiteMonitoring={interactions.onStopSiteMonitoring}
-                />
+                    <ActionButtonGroup
+                        allMonitorsRunning={monitoring.allMonitorsRunning}
+                        disabled={!monitoring.hasMonitor}
+                        isLoading={display.isLoading}
+                        isMonitoring={monitoring.isMonitoring}
+                        onCheckNow={interactions.onCheckNow}
+                        onStartMonitoring={interactions.onStartMonitoring}
+                        onStartSiteMonitoring={
+                            interactions.onStartSiteMonitoring
+                        }
+                        onStopMonitoring={interactions.onStopMonitoring}
+                        onStopSiteMonitoring={interactions.onStopSiteMonitoring}
+                    />
+                </div>
             </div>
-        </div>
-    );
-});
+        );
+    });

@@ -26,14 +26,41 @@ I have successfully implemented a comprehensive LOG_TEMPLATES system that addres
 
 ```typescript
 // ✅ 8 logger calls converted to templates
-logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_CREATED, { busId: this.busId, maxMiddleware: this.maxMiddleware });
-logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_CLEARED, { busId: this.busId, count });
-logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_EMISSION_START, { busId: this.busId, correlationId, eventName });
-logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_EMISSION_SUCCESS, { busId: this.busId, correlationId, eventName });
-logger.error(LOG_TEMPLATES.errors.EVENT_BUS_EMISSION_FAILED, { busId: this.busId, correlationId, eventName });
-logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_LISTENER_REMOVED, { busId: this.busId, eventName });
-logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_LISTENER_REGISTERED, { busId: this.busId, eventName });
-logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_ONE_TIME_LISTENER, { busId: this.busId, eventName });
+logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_CREATED, {
+ busId: this.busId,
+ maxMiddleware: this.maxMiddleware,
+});
+logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_CLEARED, {
+ busId: this.busId,
+ count,
+});
+logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_EMISSION_START, {
+ busId: this.busId,
+ correlationId,
+ eventName,
+});
+logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_EMISSION_SUCCESS, {
+ busId: this.busId,
+ correlationId,
+ eventName,
+});
+logger.error(LOG_TEMPLATES.errors.EVENT_BUS_EMISSION_FAILED, {
+ busId: this.busId,
+ correlationId,
+ eventName,
+});
+logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_LISTENER_REMOVED, {
+ busId: this.busId,
+ eventName,
+});
+logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_LISTENER_REGISTERED, {
+ busId: this.busId,
+ eventName,
+});
+logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_ONE_TIME_LISTENER, {
+ busId: this.busId,
+ eventName,
+});
 ```
 
 #### **2. ApplicationService.ts - FULLY MIGRATED**
@@ -42,7 +69,11 @@ logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_ONE_TIME_LISTENER, { busId: this.busI
 // ✅ 12 logger calls converted to templates
 logger.info(LOG_TEMPLATES.services.APPLICATION_INITIALIZING);
 logger.info(LOG_TEMPLATES.services.APPLICATION_CLEANUP_START);
-logger.debug(interpolateLogTemplate(LOG_TEMPLATES.debug.APPLICATION_CLEANUP_SERVICE, { name }));
+logger.debug(
+ interpolateLogTemplate(LOG_TEMPLATES.debug.APPLICATION_CLEANUP_SERVICE, {
+  name,
+ })
+);
 logger.info(LOG_TEMPLATES.services.APPLICATION_CLEANUP_COMPLETE);
 logger.error(LOG_TEMPLATES.errors.APPLICATION_CLEANUP_ERROR, error);
 logger.info(LOG_TEMPLATES.services.APPLICATION_READY);
@@ -72,7 +103,11 @@ logger.info(
 
 ```typescript
 // ✅ 1 logger call converted to template (sample)
-logger.warn(interpolateLogTemplate(LOG_TEMPLATES.warnings.SITE_NOT_FOUND_MANUAL, { identifier }));
+logger.warn(
+ interpolateLogTemplate(LOG_TEMPLATES.warnings.SITE_NOT_FOUND_MANUAL, {
+  identifier,
+ })
+);
 ```
 
 ### **✅ Build Verification**

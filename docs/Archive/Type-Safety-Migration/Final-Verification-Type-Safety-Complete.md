@@ -44,7 +44,9 @@ Comprehensive search for improvement opportunities:
 
 ```typescript
 // ✅ Proper usage in SiteWriterService
-const monitorRows = db.all(SITE_WRITER_QUERIES.SELECT_MONITORS_BY_SITE, [siteIdentifier]) as MonitorRow[];
+const monitorRows = db.all(SITE_WRITER_QUERIES.SELECT_MONITORS_BY_SITE, [
+ siteIdentifier,
+]) as MonitorRow[];
 const existingMonitors = rowsToMonitors(monitorRows);
 ```
 
@@ -92,7 +94,9 @@ export function rowsToMonitors(rows: DatabaseMonitorRow[]): Site["monitors"] {
 
 ```typescript
 // ✅ Legitimate Record<string, unknown> usage remains
-const insertResult = db.get(insertSql, parameters) as Record<string, unknown> | undefined;
+const insertResult = db.get(insertSql, parameters) as
+ | Record<string, unknown>
+ | undefined;
 ```
 
 **Analysis**:

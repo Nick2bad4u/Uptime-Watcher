@@ -75,15 +75,21 @@ describe("ThemeManager", () => {
             themeManager.applyTheme(lightTheme);
 
             expect(mockDocumentElement.style.setProperty).toHaveBeenCalled();
-            expect(mockBodyClassList.classList.add).toHaveBeenCalledWith("theme-light");
+            expect(mockBodyClassList.classList.add).toHaveBeenCalledWith(
+                "theme-light"
+            );
         });
 
         it("should apply dark theme", () => {
             themeManager.applyTheme(darkTheme);
 
             expect(mockDocumentElement.style.setProperty).toHaveBeenCalled();
-            expect(mockBodyClassList.classList.add).toHaveBeenCalledWith("theme-dark");
-            expect(mockDocumentElement.classList.add).toHaveBeenCalledWith("dark");
+            expect(mockBodyClassList.classList.add).toHaveBeenCalledWith(
+                "theme-dark"
+            );
+            expect(mockDocumentElement.classList.add).toHaveBeenCalledWith(
+                "dark"
+            );
         });
 
         it("should handle undefined document", () => {
@@ -198,10 +204,16 @@ describe("ThemeManager", () => {
 
             const cleanup = themeManager.onSystemThemeChange(callback);
 
-            expect(mockMediaQuery.addEventListener).toHaveBeenCalledWith("change", expect.any(Function));
+            expect(mockMediaQuery.addEventListener).toHaveBeenCalledWith(
+                "change",
+                expect.any(Function)
+            );
 
             cleanup();
-            expect(mockMediaQuery.removeEventListener).toHaveBeenCalledWith("change", expect.any(Function));
+            expect(mockMediaQuery.removeEventListener).toHaveBeenCalledWith(
+                "change",
+                expect.any(Function)
+            );
         });
 
         it("should return no-op function when window is undefined", () => {
@@ -374,20 +386,42 @@ describe("ThemeManager", () => {
             } as any as Theme;
 
             // These should all complete without throwing, exercising the null checks
-            expect(() => manager.generateCSSVariables(themeWithNullBorderRadius)).not.toThrow();
-            expect(() => manager.generateCSSVariables(themeWithNullSpacing)).not.toThrow();
-            expect(() => manager.generateCSSVariables(themeWithNullShadows)).not.toThrow();
-            expect(() => manager.generateCSSVariables(themeWithNullColors)).not.toThrow();
-            expect(() => manager.generateCSSVariables(themeWithNullTypography)).not.toThrow();
-            expect(() => manager.generateCSSVariables(themeWithNullFontSize)).not.toThrow();
+            expect(() =>
+                manager.generateCSSVariables(themeWithNullBorderRadius)
+            ).not.toThrow();
+            expect(() =>
+                manager.generateCSSVariables(themeWithNullSpacing)
+            ).not.toThrow();
+            expect(() =>
+                manager.generateCSSVariables(themeWithNullShadows)
+            ).not.toThrow();
+            expect(() =>
+                manager.generateCSSVariables(themeWithNullColors)
+            ).not.toThrow();
+            expect(() =>
+                manager.generateCSSVariables(themeWithNullTypography)
+            ).not.toThrow();
+            expect(() =>
+                manager.generateCSSVariables(themeWithNullFontSize)
+            ).not.toThrow();
 
             // Also test applyTheme method which calls the apply methods directly
-            expect(() => manager.applyTheme(themeWithNullBorderRadius)).not.toThrow();
-            expect(() => manager.applyTheme(themeWithNullSpacing)).not.toThrow();
-            expect(() => manager.applyTheme(themeWithNullShadows)).not.toThrow();
+            expect(() =>
+                manager.applyTheme(themeWithNullBorderRadius)
+            ).not.toThrow();
+            expect(() =>
+                manager.applyTheme(themeWithNullSpacing)
+            ).not.toThrow();
+            expect(() =>
+                manager.applyTheme(themeWithNullShadows)
+            ).not.toThrow();
             expect(() => manager.applyTheme(themeWithNullColors)).not.toThrow();
-            expect(() => manager.applyTheme(themeWithNullTypography)).not.toThrow();
-            expect(() => manager.applyTheme(themeWithNullFontSize)).not.toThrow();
+            expect(() =>
+                manager.applyTheme(themeWithNullTypography)
+            ).not.toThrow();
+            expect(() =>
+                manager.applyTheme(themeWithNullFontSize)
+            ).not.toThrow();
         });
 
         it("should handle undefined document in applyThemeClasses", () => {

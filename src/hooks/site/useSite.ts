@@ -10,7 +10,10 @@ import { type SiteStats, useSiteStats } from "./useSiteStats";
  *
  * @public
  */
-export interface UseSiteResult extends SiteActionsResult, SiteMonitorResult, SiteStats {
+export interface UseSiteResult
+    extends SiteActionsResult,
+        SiteMonitorResult,
+        SiteStats {
     /** Loading state from error store for UI consistency */
     isLoading: boolean;
 }

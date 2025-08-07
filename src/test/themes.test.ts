@@ -69,8 +69,12 @@ describe("Theme Definitions", () => {
 
     describe("theme differences", () => {
         it("should have different background colors between themes", () => {
-            expect(lightTheme.colors.background.primary).not.toBe(darkTheme.colors.background.primary);
-            expect(lightTheme.colors.text.primary).not.toBe(darkTheme.colors.text.primary);
+            expect(lightTheme.colors.background.primary).not.toBe(
+                darkTheme.colors.background.primary
+            );
+            expect(lightTheme.colors.text.primary).not.toBe(
+                darkTheme.colors.text.primary
+            );
         });
 
         it("should have consistent status colors across themes", () => {

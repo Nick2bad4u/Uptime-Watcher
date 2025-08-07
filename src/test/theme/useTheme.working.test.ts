@@ -7,14 +7,25 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom";
 
 // Import the hooks directly
-import { useTheme, useAvailabilityColors, useStatusColors, useThemeClasses, useThemeValue } from "../../theme/useTheme";
+import {
+    useTheme,
+    useAvailabilityColors,
+    useStatusColors,
+    useThemeClasses,
+    useThemeValue,
+} from "../../theme/useTheme";
 
 // Mock window.electronAPI
 beforeEach(() => {
     Object.defineProperty(window, "electronAPI", {
         value: {
             settings: {
-                get: vi.fn().mockResolvedValue({ success: true, data: { theme: "light" } }),
+                get: vi
+                    .fn()
+                    .mockResolvedValue({
+                        success: true,
+                        data: { theme: "light" },
+                    }),
                 set: vi.fn().mockResolvedValue({ success: true }),
             },
         },
@@ -31,29 +42,55 @@ describe("useTheme Hooks - Working Tests", () => {
             expect(result.current).toHaveProperty("getAvailabilityVariant");
             expect(result.current).toHaveProperty("getAvailabilityDescription");
             expect(typeof result.current.getAvailabilityColor).toBe("function");
-            expect(typeof result.current.getAvailabilityVariant).toBe("function");
-            expect(typeof result.current.getAvailabilityDescription).toBe("function");
+            expect(typeof result.current.getAvailabilityVariant).toBe(
+                "function"
+            );
+            expect(typeof result.current.getAvailabilityDescription).toBe(
+                "function"
+            );
         });
 
         it("should return correct colors for different percentages", () => {
             const { result } = renderHook(() => useAvailabilityColors());
 
             // Test various percentages
-            expect(typeof result.current.getAvailabilityColor(100)).toBe("string");
-            expect(typeof result.current.getAvailabilityColor(75)).toBe("string");
-            expect(typeof result.current.getAvailabilityColor(50)).toBe("string");
-            expect(typeof result.current.getAvailabilityColor(25)).toBe("string");
-            expect(typeof result.current.getAvailabilityColor(0)).toBe("string");
+            expect(typeof result.current.getAvailabilityColor(100)).toBe(
+                "string"
+            );
+            expect(typeof result.current.getAvailabilityColor(75)).toBe(
+                "string"
+            );
+            expect(typeof result.current.getAvailabilityColor(50)).toBe(
+                "string"
+            );
+            expect(typeof result.current.getAvailabilityColor(25)).toBe(
+                "string"
+            );
+            expect(typeof result.current.getAvailabilityColor(0)).toBe(
+                "string"
+            );
 
             // Test variants
-            expect(typeof result.current.getAvailabilityVariant(100)).toBe("string");
-            expect(typeof result.current.getAvailabilityVariant(50)).toBe("string");
-            expect(typeof result.current.getAvailabilityVariant(0)).toBe("string");
+            expect(typeof result.current.getAvailabilityVariant(100)).toBe(
+                "string"
+            );
+            expect(typeof result.current.getAvailabilityVariant(50)).toBe(
+                "string"
+            );
+            expect(typeof result.current.getAvailabilityVariant(0)).toBe(
+                "string"
+            );
 
             // Test descriptions
-            expect(typeof result.current.getAvailabilityDescription(100)).toBe("string");
-            expect(typeof result.current.getAvailabilityDescription(50)).toBe("string");
-            expect(typeof result.current.getAvailabilityDescription(0)).toBe("string");
+            expect(typeof result.current.getAvailabilityDescription(100)).toBe(
+                "string"
+            );
+            expect(typeof result.current.getAvailabilityDescription(50)).toBe(
+                "string"
+            );
+            expect(typeof result.current.getAvailabilityDescription(0)).toBe(
+                "string"
+            );
         });
     });
 
@@ -106,14 +143,18 @@ describe("useTheme Hooks - Working Tests", () => {
 
     describe("useThemeValue", () => {
         it("should extract value from theme using selector", () => {
-            const { result } = renderHook(() => useThemeValue((theme) => theme.colors));
+            const { result } = renderHook(() =>
+                useThemeValue((theme) => theme.colors)
+            );
 
             expect(result.current).toBeDefined();
             expect(typeof result.current).toBe("object");
         });
 
         it("should extract complex values using selector", () => {
-            const { result } = renderHook(() => useThemeValue((theme) => theme.colors?.primary));
+            const { result } = renderHook(() =>
+                useThemeValue((theme) => theme.colors?.primary)
+            );
 
             // The selector returns the colors.primary which could be undefined, so test appropriately
             expect(result.current).toBeDefined();
@@ -151,7 +192,9 @@ describe("useTheme Hooks - Working Tests", () => {
         it("should handle invalid color paths gracefully", () => {
             const { result } = renderHook(() => useTheme());
 
-            const color = result.current.getColor("invalid.path.that.does.not.exist");
+            const color = result.current.getColor(
+                "invalid.path.that.does.not.exist"
+            );
             expect(typeof color).toBe("string"); // Should return fallback
         });
 
@@ -159,9 +202,15 @@ describe("useTheme Hooks - Working Tests", () => {
             const { result } = renderHook(() => useAvailabilityColors());
 
             // Test edge cases
-            expect(typeof result.current.getAvailabilityColor(-10)).toBe("string");
-            expect(typeof result.current.getAvailabilityColor(110)).toBe("string");
-            expect(typeof result.current.getAvailabilityColor(NaN)).toBe("string");
+            expect(typeof result.current.getAvailabilityColor(-10)).toBe(
+                "string"
+            );
+            expect(typeof result.current.getAvailabilityColor(110)).toBe(
+                "string"
+            );
+            expect(typeof result.current.getAvailabilityColor(NaN)).toBe(
+                "string"
+            );
         });
     });
 });

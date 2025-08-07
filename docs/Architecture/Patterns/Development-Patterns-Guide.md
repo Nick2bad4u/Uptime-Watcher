@@ -318,7 +318,10 @@ interface OperationsModule {
 }
 
 // 2. Create module implementations
-export function createStateModule(set: SetFunction, get: GetFunction): StateModule {
+export function createStateModule(
+ set: SetFunction,
+ get: GetFunction
+): StateModule {
  return {
   sites: [],
   selectedSiteId: undefined,
@@ -329,7 +332,9 @@ export function createStateModule(set: SetFunction, get: GetFunction): StateModu
   },
 
   setSelectedSite: (site: Site | undefined) => {
-   logStoreAction("SitesStore", "setSelectedSite", { siteId: site?.identifier });
+   logStoreAction("SitesStore", "setSelectedSite", {
+    siteId: site?.identifier,
+   });
    set({ selectedSiteId: site?.identifier });
   },
  };
@@ -426,12 +431,14 @@ private registerExampleHandlers(deps: IpcServiceDependencies): void {
 // preload.ts
 const electronAPI = {
  example: {
-  create: (params: ExampleParams): Promise<Example> => ipcRenderer.invoke("example:create", params),
+  create: (params: ExampleParams): Promise<Example> =>
+   ipcRenderer.invoke("example:create", params),
   getAll: (): Promise<Example[]> => ipcRenderer.invoke("example:get-all"),
  },
  events: {
   onExampleEvent: (callback: (data: ExampleEventData) => void) => {
-   const wrappedCallback = (_event: any, data: ExampleEventData) => callback(data);
+   const wrappedCallback = (_event: any, data: ExampleEventData) =>
+    callback(data);
    ipcRenderer.on("example:event", wrappedCallback);
    return () => ipcRenderer.off("example:event", wrappedCallback);
   },
@@ -523,7 +530,10 @@ describe("ExampleRepository", () => {
   await repository.create(mockData);
 
   expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
-  expect(mockDatabase.run).toHaveBeenCalledWith(expect.stringContaining("INSERT"), expect.any(Array));
+  expect(mockDatabase.run).toHaveBeenCalledWith(
+   expect.stringContaining("INSERT"),
+   expect.any(Array)
+  );
  });
 });
 ```

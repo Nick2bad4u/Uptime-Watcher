@@ -55,7 +55,10 @@ This document provides comprehensive guidelines for adding and modifying UI feat
 
 ```typescript
 // ✅ Good: Use shared validation schemas
-import { httpMonitorSchema, baseMonitorSchema } from "shared/validation/schemas";
+import {
+ httpMonitorSchema,
+ baseMonitorSchema,
+} from "shared/validation/schemas";
 
 const validateSiteForm = (formData: FormData) => {
  const result = httpMonitorSchema.safeParse(formData);
@@ -172,7 +175,10 @@ Always follow this order to minimize breaking changes:
  *
  * @public
  */
-export const MyComponent = React.memo(function MyComponent({ prop1, prop2 }: MyComponentProperties) {
+export const MyComponent = React.memo(function MyComponent({
+ prop1,
+ prop2,
+}: MyComponentProperties) {
  // State and hooks
  const { state } = useAppropriateStore();
 
@@ -281,7 +287,9 @@ Each store module has clear responsibilities:
 import { withErrorHandling } from "@shared/utils/errorHandling";
 import { useErrorStore } from "../error/useErrorStore";
 
-export const createSiteOperationsActions = (deps: SiteOperationsDependencies) => ({
+export const createSiteOperationsActions = (
+ deps: SiteOperationsDependencies
+) => ({
  createSite: async (siteData) => {
   const errorStore = useErrorStore.getState();
   await withErrorHandling(
@@ -294,7 +302,8 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies) =>
    {
     clearError: () => errorStore.clearStoreError("sites-operations"),
     setError: (error) => errorStore.setStoreError("sites-operations", error),
-    setLoading: (loading) => errorStore.setOperationLoading("createSite", loading),
+    setLoading: (loading) =>
+     errorStore.setOperationLoading("createSite", loading),
    }
   );
  },
@@ -766,9 +775,14 @@ const timeoutMs = (monitor.timeout || 30) * 1000 + 5000;
 
 ```typescript
 // Right - use defined constants
-import { DEFAULT_MONITOR_TIMEOUT_SECONDS, MONITOR_TIMEOUT_BUFFER_MS } from "./constants";
+import {
+ DEFAULT_MONITOR_TIMEOUT_SECONDS,
+ MONITOR_TIMEOUT_BUFFER_MS,
+} from "./constants";
 const timeoutMs =
- (monitor.timeout || DEFAULT_MONITOR_TIMEOUT_SECONDS) * SECONDS_TO_MS_MULTIPLIER + MONITOR_TIMEOUT_BUFFER_MS;
+ (monitor.timeout || DEFAULT_MONITOR_TIMEOUT_SECONDS) *
+  SECONDS_TO_MS_MULTIPLIER +
+ MONITOR_TIMEOUT_BUFFER_MS;
 ```
 
 **❌ Performance Issues in Validation**
@@ -803,7 +817,10 @@ try {
  const parsed = JSON.parse(dbValue);
  if (
   Array.isArray(parsed) &&
-  parsed.every((item) => typeof item === "string" && !item.includes("{") && !item.includes("}"))
+  parsed.every(
+   (item) =>
+    typeof item === "string" && !item.includes("{") && !item.includes("}")
+  )
  ) {
   return parsed;
  }

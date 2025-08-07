@@ -103,14 +103,18 @@ describe("SiteService", () => {
             const error = new Error("Failed to fetch sites");
             mockElectronAPI.sites.getSites.mockRejectedValueOnce(error);
 
-            await expect(SiteService.getSites()).rejects.toThrow("Failed to fetch sites");
+            await expect(SiteService.getSites()).rejects.toThrow(
+                "Failed to fetch sites"
+            );
         });
 
         it("should handle network errors", async () => {
             const networkError = new Error("Network error");
             mockElectronAPI.sites.getSites.mockRejectedValueOnce(networkError);
 
-            await expect(SiteService.getSites()).rejects.toThrow("Network error");
+            await expect(SiteService.getSites()).rejects.toThrow(
+                "Network error"
+            );
         });
     });
 
@@ -175,7 +179,9 @@ describe("SiteService", () => {
             const error = new Error("Failed to create site");
             mockElectronAPI.sites.addSite.mockRejectedValueOnce(error);
 
-            await expect(SiteService.addSite(newSite)).rejects.toThrow("Failed to create site");
+            await expect(SiteService.addSite(newSite)).rejects.toThrow(
+                "Failed to create site"
+            );
         });
 
         it("should handle validation errors", async () => {
@@ -187,9 +193,13 @@ describe("SiteService", () => {
             };
 
             const validationError = new Error("Invalid site data");
-            mockElectronAPI.sites.addSite.mockRejectedValueOnce(validationError);
+            mockElectronAPI.sites.addSite.mockRejectedValueOnce(
+                validationError
+            );
 
-            await expect(SiteService.addSite(invalidSite)).rejects.toThrow("Invalid site data");
+            await expect(SiteService.addSite(invalidSite)).rejects.toThrow(
+                "Invalid site data"
+            );
         });
 
         it("should handle duplicate site errors", async () => {
@@ -203,7 +213,9 @@ describe("SiteService", () => {
             const duplicateError = new Error("Site already exists");
             mockElectronAPI.sites.addSite.mockRejectedValueOnce(duplicateError);
 
-            await expect(SiteService.addSite(duplicateSite)).rejects.toThrow("Site already exists");
+            await expect(SiteService.addSite(duplicateSite)).rejects.toThrow(
+                "Site already exists"
+            );
         });
     });
 
@@ -218,7 +230,10 @@ describe("SiteService", () => {
 
             await SiteService.updateSite(identifier, updates);
 
-            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalledWith(identifier, updates);
+            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalledWith(
+                identifier,
+                updates
+            );
         });
 
         it("should handle update errors", async () => {
@@ -230,7 +245,9 @@ describe("SiteService", () => {
             const error = new Error("Failed to update site");
             mockElectronAPI.sites.updateSite.mockRejectedValueOnce(error);
 
-            await expect(SiteService.updateSite(identifier, updates)).rejects.toThrow("Failed to update site");
+            await expect(
+                SiteService.updateSite(identifier, updates)
+            ).rejects.toThrow("Failed to update site");
         });
 
         it("should handle non-existent site errors", async () => {
@@ -240,9 +257,13 @@ describe("SiteService", () => {
             };
 
             const notFoundError = new Error("Site not found");
-            mockElectronAPI.sites.updateSite.mockRejectedValueOnce(notFoundError);
+            mockElectronAPI.sites.updateSite.mockRejectedValueOnce(
+                notFoundError
+            );
 
-            await expect(SiteService.updateSite(identifier, updates)).rejects.toThrow("Site not found");
+            await expect(
+                SiteService.updateSite(identifier, updates)
+            ).rejects.toThrow("Site not found");
         });
 
         it("should handle partial updates", async () => {
@@ -255,7 +276,10 @@ describe("SiteService", () => {
 
             await SiteService.updateSite(identifier, updates);
 
-            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalledWith(identifier, updates);
+            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalledWith(
+                identifier,
+                updates
+            );
         });
     });
 
@@ -266,7 +290,9 @@ describe("SiteService", () => {
 
             await SiteService.removeSite(identifier);
 
-            expect(mockElectronAPI.sites.removeSite).toHaveBeenCalledWith(identifier);
+            expect(mockElectronAPI.sites.removeSite).toHaveBeenCalledWith(
+                identifier
+            );
         });
 
         it("should handle removal errors", async () => {
@@ -274,15 +300,21 @@ describe("SiteService", () => {
             const error = new Error("Failed to remove site");
             mockElectronAPI.sites.removeSite.mockRejectedValueOnce(error);
 
-            await expect(SiteService.removeSite(identifier)).rejects.toThrow("Failed to remove site");
+            await expect(SiteService.removeSite(identifier)).rejects.toThrow(
+                "Failed to remove site"
+            );
         });
 
         it("should handle non-existent site removal", async () => {
             const identifier = "non-existent-site";
             const notFoundError = new Error("Site not found");
-            mockElectronAPI.sites.removeSite.mockRejectedValueOnce(notFoundError);
+            mockElectronAPI.sites.removeSite.mockRejectedValueOnce(
+                notFoundError
+            );
 
-            await expect(SiteService.removeSite(identifier)).rejects.toThrow("Site not found");
+            await expect(SiteService.removeSite(identifier)).rejects.toThrow(
+                "Site not found"
+            );
         });
 
         it("should handle empty site identifier", async () => {
@@ -303,7 +335,10 @@ describe("SiteService", () => {
 
             await SiteService.checkSiteNow(siteId, monitorId);
 
-            expect(mockElectronAPI.sites.checkSiteNow).toHaveBeenCalledWith(siteId, monitorId);
+            expect(mockElectronAPI.sites.checkSiteNow).toHaveBeenCalledWith(
+                siteId,
+                monitorId
+            );
         });
 
         it("should handle check errors", async () => {
@@ -312,7 +347,9 @@ describe("SiteService", () => {
             const error = new Error("Failed to check site");
             mockElectronAPI.sites.checkSiteNow.mockRejectedValueOnce(error);
 
-            await expect(SiteService.checkSiteNow(siteId, monitorId)).rejects.toThrow("Failed to check site");
+            await expect(
+                SiteService.checkSiteNow(siteId, monitorId)
+            ).rejects.toThrow("Failed to check site");
         });
 
         it("should handle invalid site/monitor IDs", async () => {
@@ -321,7 +358,9 @@ describe("SiteService", () => {
             const error = new Error("Invalid site or monitor ID");
             mockElectronAPI.sites.checkSiteNow.mockRejectedValueOnce(error);
 
-            await expect(SiteService.checkSiteNow(siteId, monitorId)).rejects.toThrow("Invalid site or monitor ID");
+            await expect(
+                SiteService.checkSiteNow(siteId, monitorId)
+            ).rejects.toThrow("Invalid site or monitor ID");
         });
     });
 
@@ -332,19 +371,27 @@ describe("SiteService", () => {
                 fileName: "backup.db",
             };
 
-            mockElectronAPI.data.downloadSQLiteBackup.mockResolvedValueOnce(backupData);
+            mockElectronAPI.data.downloadSQLiteBackup.mockResolvedValueOnce(
+                backupData
+            );
 
             const result = await SiteService.downloadSQLiteBackup();
 
-            expect(mockElectronAPI.data.downloadSQLiteBackup).toHaveBeenCalledOnce();
+            expect(
+                mockElectronAPI.data.downloadSQLiteBackup
+            ).toHaveBeenCalledOnce();
             expect(result).toEqual(backupData);
         });
 
         it("should handle download errors", async () => {
             const error = new Error("Failed to download backup");
-            mockElectronAPI.data.downloadSQLiteBackup.mockRejectedValueOnce(error);
+            mockElectronAPI.data.downloadSQLiteBackup.mockRejectedValueOnce(
+                error
+            );
 
-            await expect(SiteService.downloadSQLiteBackup()).rejects.toThrow("Failed to download backup");
+            await expect(SiteService.downloadSQLiteBackup()).rejects.toThrow(
+                "Failed to download backup"
+            );
         });
     });
 
@@ -360,18 +407,34 @@ describe("SiteService", () => {
 
         it("should handle undefined window.electronAPI gracefully", async () => {
             // Import the mock so we can control it
-            const { waitForElectronAPI } = await import("../../../stores/utils");
+            const { waitForElectronAPI } = await import(
+                "../../../stores/utils"
+            );
 
             // Make waitForElectronAPI reject for all calls in this test
             const mockWaitForElectronAPI = vi.mocked(waitForElectronAPI);
-            mockWaitForElectronAPI.mockRejectedValue(new Error("ElectronAPI not available"));
+            mockWaitForElectronAPI.mockRejectedValue(
+                new Error("ElectronAPI not available")
+            );
 
-            await expect(SiteService.getSites()).rejects.toThrow("ElectronAPI not available");
-            await expect(SiteService.addSite({} as Omit<Site, "id">)).rejects.toThrow("ElectronAPI not available");
-            await expect(SiteService.updateSite("test", {})).rejects.toThrow("ElectronAPI not available");
-            await expect(SiteService.removeSite("test")).rejects.toThrow("ElectronAPI not available");
-            await expect(SiteService.checkSiteNow("test", "test")).rejects.toThrow("ElectronAPI not available");
-            await expect(SiteService.downloadSQLiteBackup()).rejects.toThrow("ElectronAPI not available");
+            await expect(SiteService.getSites()).rejects.toThrow(
+                "ElectronAPI not available"
+            );
+            await expect(
+                SiteService.addSite({} as Omit<Site, "id">)
+            ).rejects.toThrow("ElectronAPI not available");
+            await expect(SiteService.updateSite("test", {})).rejects.toThrow(
+                "ElectronAPI not available"
+            );
+            await expect(SiteService.removeSite("test")).rejects.toThrow(
+                "ElectronAPI not available"
+            );
+            await expect(
+                SiteService.checkSiteNow("test", "test")
+            ).rejects.toThrow("ElectronAPI not available");
+            await expect(SiteService.downloadSQLiteBackup()).rejects.toThrow(
+                "ElectronAPI not available"
+            );
 
             // Reset the mock for other tests
             mockWaitForElectronAPI.mockResolvedValue(undefined);
@@ -400,11 +463,15 @@ describe("SiteService", () => {
                 monitoring: false,
             };
 
-            mockElectronAPI.sites.addSite.mockResolvedValueOnce(validSite as Site);
+            mockElectronAPI.sites.addSite.mockResolvedValueOnce(
+                validSite as Site
+            );
 
             await SiteService.addSite(validSite);
 
-            expect(mockElectronAPI.sites.addSite).toHaveBeenCalledWith(validSite);
+            expect(mockElectronAPI.sites.addSite).toHaveBeenCalledWith(
+                validSite
+            );
         });
 
         it("should handle sites with multiple monitors", async () => {
@@ -441,7 +508,9 @@ describe("SiteService", () => {
                 monitoring: false,
             };
 
-            mockElectronAPI.sites.addSite.mockResolvedValueOnce(siteWithMonitors as Site);
+            mockElectronAPI.sites.addSite.mockResolvedValueOnce(
+                siteWithMonitors as Site
+            );
 
             const result = await SiteService.addSite(siteWithMonitors);
 
@@ -469,7 +538,9 @@ describe("SiteService", () => {
                 monitoring: false,
             };
 
-            mockElectronAPI.sites.addSite.mockResolvedValueOnce(siteWithSpecialChars as Site);
+            mockElectronAPI.sites.addSite.mockResolvedValueOnce(
+                siteWithSpecialChars as Site
+            );
 
             const result = await SiteService.addSite(siteWithSpecialChars);
 
@@ -497,7 +568,9 @@ describe("SiteService", () => {
                 monitoring: false,
             };
 
-            mockElectronAPI.sites.addSite.mockResolvedValueOnce(siteWithUnicode as Site);
+            mockElectronAPI.sites.addSite.mockResolvedValueOnce(
+                siteWithUnicode as Site
+            );
 
             const result = await SiteService.addSite(siteWithUnicode);
 
@@ -510,28 +583,42 @@ describe("SiteService", () => {
             const networkError = new Error("Network error");
             mockElectronAPI.sites.getSites.mockRejectedValueOnce(networkError);
 
-            await expect(SiteService.getSites()).rejects.toThrow("Network error");
+            await expect(SiteService.getSites()).rejects.toThrow(
+                "Network error"
+            );
         });
 
         it("should propagate validation errors from backend", async () => {
             const validationError = new Error("Invalid site data");
-            mockElectronAPI.sites.addSite.mockRejectedValueOnce(validationError);
+            mockElectronAPI.sites.addSite.mockRejectedValueOnce(
+                validationError
+            );
 
-            await expect(SiteService.addSite({} as Omit<Site, "id">)).rejects.toThrow("Invalid site data");
+            await expect(
+                SiteService.addSite({} as Omit<Site, "id">)
+            ).rejects.toThrow("Invalid site data");
         });
 
         it("should handle timeout errors", async () => {
             const timeoutError = new Error("Request timeout");
-            mockElectronAPI.sites.updateSite.mockRejectedValueOnce(timeoutError);
+            mockElectronAPI.sites.updateSite.mockRejectedValueOnce(
+                timeoutError
+            );
 
-            await expect(SiteService.updateSite("test", {})).rejects.toThrow("Request timeout");
+            await expect(SiteService.updateSite("test", {})).rejects.toThrow(
+                "Request timeout"
+            );
         });
 
         it("should handle database connection errors", async () => {
             const dbError = new Error("Database connection failed");
-            mockElectronAPI.data.downloadSQLiteBackup.mockRejectedValueOnce(dbError);
+            mockElectronAPI.data.downloadSQLiteBackup.mockRejectedValueOnce(
+                dbError
+            );
 
-            await expect(SiteService.downloadSQLiteBackup()).rejects.toThrow("Database connection failed");
+            await expect(SiteService.downloadSQLiteBackup()).rejects.toThrow(
+                "Database connection failed"
+            );
         });
     });
 });

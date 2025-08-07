@@ -51,7 +51,11 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                     if (error instanceof Error) {
                         const message = error.message;
                         expect(typeof message).toBe("string");
-                    } else if (error && typeof error === "object" && "message" in error) {
+                    } else if (
+                        error &&
+                        typeof error === "object" &&
+                        "message" in error
+                    ) {
                         const message = error.message;
                         expect(typeof message).toBe("string");
                     } else {
@@ -66,7 +70,9 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             const asyncOperations = [
                 Promise.resolve("success"),
                 Promise.reject(new Error("async error")),
-                new Promise((resolve) => setTimeout(() => resolve("delayed"), 1)),
+                new Promise((resolve) =>
+                    setTimeout(() => resolve("delayed"), 1)
+                ),
                 Promise.resolve(null),
                 Promise.resolve(undefined),
             ];
@@ -103,13 +109,22 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                 expect(() => {
                     // Configuration processing logic
                     if (!config || typeof config !== "object") {
-                        const defaultConfig = { enabled: true, timeout: 5000, retries: 3 };
+                        const defaultConfig = {
+                            enabled: true,
+                            timeout: 5000,
+                            retries: 3,
+                        };
                         expect(defaultConfig.enabled).toBe(true);
                         return;
                     }
 
                     const enabled = Boolean(config.enabled);
-                    const timeout = safeInteger(config.timeout, 5000, 1000, 300_000);
+                    const timeout = safeInteger(
+                        config.timeout,
+                        5000,
+                        1000,
+                        300_000
+                    );
                     const retries = safeInteger(config.retries, 3, 0, 10);
 
                     expect(typeof enabled).toBe("boolean");
@@ -188,16 +203,28 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
         it("should handle concurrent operations", async () => {
             const operations = Array.from(
                 { length: 50 },
-                (_, i) => new Promise((resolve) => setTimeout(() => resolve(`result-${i}`), Math.random() * 10))
+                (_, i) =>
+                    new Promise((resolve) =>
+                        setTimeout(
+                            () => resolve(`result-${i}`),
+                            Math.random() * 10
+                        )
+                    )
             );
 
             const results = await Promise.all(operations);
 
             expect(results).toHaveLength(50);
-            expect(results.every((result) => typeof result === "string")).toBe(true);
-            expect(results.every((result) => typeof result === "string" && String(result).startsWith("result-"))).toBe(
+            expect(results.every((result) => typeof result === "string")).toBe(
                 true
             );
+            expect(
+                results.every(
+                    (result) =>
+                        typeof result === "string" &&
+                        String(result).startsWith("result-")
+                )
+            ).toBe(true);
         });
 
         it("should handle mixed success/failure scenarios", async () => {
@@ -240,7 +267,10 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                             resource.cleanup();
                         } catch (error) {
                             // Log error but don't rethrow
-                            const errorMessage = error instanceof Error ? error.message : String(error);
+                            const errorMessage =
+                                error instanceof Error
+                                    ? error.message
+                                    : String(error);
                             expect(typeof errorMessage).toBe("string");
                         }
                     }
@@ -251,16 +281,21 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
         it("should handle timeout scenarios", async () => {
             const timeoutOperations = [
                 new Promise((resolve) => setTimeout(() => resolve("fast"), 1)),
-                new Promise((resolve) => setTimeout(() => resolve("medium"), 5)),
+                new Promise((resolve) =>
+                    setTimeout(() => resolve("medium"), 5)
+                ),
                 new Promise((resolve) => setTimeout(() => resolve("slow"), 10)),
-                new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 15)),
+                new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error("timeout")), 15)
+                ),
             ];
 
             // Test with different timeout strategies
             const raceResult = await Promise.race(timeoutOperations);
             expect(raceResult).toBe("fast");
 
-            const allSettledResults = await Promise.allSettled(timeoutOperations);
+            const allSettledResults =
+                await Promise.allSettled(timeoutOperations);
             expect(allSettledResults).toHaveLength(4);
         });
     });
@@ -332,7 +367,9 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
 
             for (const testCase of stateValidationCases) {
                 expect(() => {
-                    const isValid = typeof testCase.state === "string" && validStates.has(testCase.state);
+                    const isValid =
+                        typeof testCase.state === "string" &&
+                        validStates.has(testCase.state);
                     expect(isValid).toBe(testCase.isValid);
                 }).not.toThrow();
             }
@@ -361,7 +398,10 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                             handler("test event data");
                         } catch (error) {
                             // Handle handler errors gracefully
-                            const errorMessage = error instanceof Error ? error.message : String(error);
+                            const errorMessage =
+                                error instanceof Error
+                                    ? error.message
+                                    : String(error);
                             expect(typeof errorMessage).toBe("string");
                         }
                     }
@@ -423,10 +463,19 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
         it("should handle memory usage scenarios", () => {
             const memoryOperations = [
                 () => Array.from({ length: 1000 }, () => 0),
-                () => Object.fromEntries(Array.from({ length: 100 }, (_, i) => [i, `value-${i}`])),
-                () => structuredClone({ large: Array.from({ length: 500 }, () => "data") }),
+                () =>
+                    Object.fromEntries(
+                        Array.from({ length: 100 }, (_, i) => [i, `value-${i}`])
+                    ),
+                () =>
+                    structuredClone({
+                        large: Array.from({ length: 500 }, () => "data"),
+                    }),
                 () => new Set(Array.from({ length: 200 }, (_, i) => i)),
-                () => new Map(Array.from({ length: 200 }, (_, i) => [i, `value-${i}`])),
+                () =>
+                    new Map(
+                        Array.from({ length: 200 }, (_, i) => [i, `value-${i}`])
+                    ),
             ];
 
             for (const operation of memoryOperations) {

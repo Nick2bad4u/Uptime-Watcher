@@ -248,8 +248,16 @@ describe("Theme Types Module", () => {
                     tertiary: "#9ca3af",
                     inverse: "#ffffff",
                 },
-                border: { primary: "#e5e7eb", secondary: "#d1d5db", focus: "#3b82f6" },
-                surface: { base: "#ffffff", elevated: "#f9fafb", overlay: "#00000080" },
+                border: {
+                    primary: "#e5e7eb",
+                    secondary: "#d1d5db",
+                    focus: "#3b82f6",
+                },
+                surface: {
+                    base: "#ffffff",
+                    elevated: "#f9fafb",
+                    overlay: "#00000080",
+                },
                 hover: { light: "#f9fafb", medium: "#f3f4f6", dark: "#e5e7eb" },
             };
 
@@ -466,8 +474,16 @@ describe("Theme Types Module", () => {
                     tertiary: "#9ca3af",
                     inverse: "#ffffff",
                 },
-                border: { primary: "#e5e7eb", secondary: "#d1d5db", focus: "#3b82f6" },
-                surface: { base: "#ffffff", elevated: "#f9fafb", overlay: "#00000080" },
+                border: {
+                    primary: "#e5e7eb",
+                    secondary: "#d1d5db",
+                    focus: "#3b82f6",
+                },
+                surface: {
+                    base: "#ffffff",
+                    elevated: "#f9fafb",
+                    overlay: "#00000080",
+                },
                 hover: { light: "#f9fafb", medium: "#f3f4f6", dark: "#e5e7eb" },
             };
 

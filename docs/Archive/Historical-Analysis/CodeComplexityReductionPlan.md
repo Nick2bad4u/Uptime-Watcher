@@ -97,11 +97,16 @@ const styles = useMemo<ThemeStyles>(() => ({
 unexpectedProperties: (Object.keys(unexpectedProperties),
  // AFTER: Extract validation utilities
  class ConfigValidator {
-  static validateExpectedProperties(config: unknown, expectedKeys: string[]): ValidationResult {
+  static validateExpectedProperties(
+   config: unknown,
+   expectedKeys: string[]
+  ): ValidationResult {
    // Focused validation logic
   }
 
-  static formatUnexpectedProperties(unexpected: Record<string, unknown>): string[] {
+  static formatUnexpectedProperties(
+   unexpected: Record<string, unknown>
+  ): string[] {
    // Simple, focused formatting
   }
  });
@@ -122,12 +127,18 @@ unexpectedProperties: (Object.keys(unexpectedProperties),
 
 ```typescript
 // BEFORE: Complex validation with nested conditions
-function createTwoStringValidator(firstParamName: string, secondParamName: string) {
+function createTwoStringValidator(
+ firstParamName: string,
+ secondParamName: string
+) {
  // 11 decision points in one function
 }
 
 // AFTER: Composition of simple validators
-const createTwoStringValidator = (first: string, second: string): IpcParameterValidator =>
+const createTwoStringValidator = (
+ first: string,
+ second: string
+): IpcParameterValidator =>
  composeValidators([
   createSingleStringValidator(first),
   createSingleStringValidator(second),

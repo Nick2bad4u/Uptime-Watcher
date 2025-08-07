@@ -57,7 +57,11 @@ export interface HistoryRow {
  *
  * @public
  */
-export function historyEntryToRow(monitorId: string, entry: StatusHistory, details?: string): DatabaseHistoryRow {
+export function historyEntryToRow(
+    monitorId: string,
+    entry: StatusHistory,
+    details?: string
+): DatabaseHistoryRow {
     return {
         monitorId,
         responseTime: entry.responseTime,
@@ -110,7 +114,9 @@ export function isValidHistoryRow(row: DatabaseHistoryRow): boolean {
  *
  * @public
  */
-export function rowsToHistoryEntries(rows: DatabaseHistoryRow[]): StatusHistory[] {
+export function rowsToHistoryEntries(
+    rows: DatabaseHistoryRow[]
+): StatusHistory[] {
     return rows.map((row) => rowToHistoryEntry(row));
 }
 
@@ -136,7 +142,10 @@ export function rowToHistoryEntry(row: DatabaseHistoryRow): StatusHistory {
     try {
         return {
             ...(row.details !== undefined && {
-                details: typeof row.details === "string" ? row.details : JSON.stringify(row.details),
+                details:
+                    typeof row.details === "string"
+                        ? row.details
+                        : JSON.stringify(row.details),
             }),
             responseTime: safeNumber(row.responseTime, 0),
             status: validateStatus(row.status),
@@ -170,7 +179,9 @@ export function rowToHistoryEntry(row: DatabaseHistoryRow): StatusHistory {
  *
  * @public
  */
-export function rowToHistoryEntryOrUndefined(row: DatabaseHistoryRow | undefined): StatusHistory | undefined {
+export function rowToHistoryEntryOrUndefined(
+    row: DatabaseHistoryRow | undefined
+): StatusHistory | undefined {
     if (!row) {
         return undefined;
     }

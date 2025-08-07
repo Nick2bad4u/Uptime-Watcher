@@ -44,8 +44,12 @@ describe("Shared Validation Utils", () => {
 
         it("should respect validation options", () => {
             // Test with protocol restriction
-            expect(isValidUrl("https://example.com", { protocols: ["https"] })).toBe(true);
-            expect(isValidUrl("ftp://example.com", { protocols: ["https"] })).toBe(false);
+            expect(
+                isValidUrl("https://example.com", { protocols: ["https"] })
+            ).toBe(true);
+            expect(
+                isValidUrl("ftp://example.com", { protocols: ["https"] })
+            ).toBe(false);
         });
     });
 

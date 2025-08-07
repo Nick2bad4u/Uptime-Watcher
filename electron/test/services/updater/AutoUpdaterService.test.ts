@@ -92,7 +92,9 @@ describe("AutoUpdaterService", () => {
         });
 
         it("should log initialization", () => {
-            expect(logger.info).toHaveBeenCalledWith("[AutoUpdaterService] Initializing auto-updater");
+            expect(logger.info).toHaveBeenCalledWith(
+                "[AutoUpdaterService] Initializing auto-updater"
+            );
         });
 
         it("should setup all event listeners", () => {
@@ -106,7 +108,10 @@ describe("AutoUpdaterService", () => {
             ];
 
             for (const event of expectedEvents) {
-                expect(mockAutoUpdater.on).toHaveBeenCalledWith(event, expect.any(Function));
+                expect(mockAutoUpdater.on).toHaveBeenCalledWith(
+                    event,
+                    expect.any(Function)
+                );
             }
         });
 
@@ -114,7 +119,9 @@ describe("AutoUpdaterService", () => {
             const handler = getEventHandler("checking-for-update");
             handler();
 
-            expect(logger.debug).toHaveBeenCalledWith("[AutoUpdaterService] Checking for updates");
+            expect(logger.debug).toHaveBeenCalledWith(
+                "[AutoUpdaterService] Checking for updates"
+            );
             expect(statusCallback).toHaveBeenCalledWith({ status: "checking" });
         });
 
@@ -123,8 +130,13 @@ describe("AutoUpdaterService", () => {
             const handler = getEventHandler("update-available");
             handler(updateInfo);
 
-            expect(logger.info).toHaveBeenCalledWith("[AutoUpdaterService] Update available", updateInfo);
-            expect(statusCallback).toHaveBeenCalledWith({ status: "available" });
+            expect(logger.info).toHaveBeenCalledWith(
+                "[AutoUpdaterService] Update available",
+                updateInfo
+            );
+            expect(statusCallback).toHaveBeenCalledWith({
+                status: "available",
+            });
         });
 
         it("should handle update-not-available event", () => {
@@ -132,7 +144,10 @@ describe("AutoUpdaterService", () => {
             const handler = getEventHandler("update-not-available");
             handler(updateInfo);
 
-            expect(logger.debug).toHaveBeenCalledWith("[AutoUpdaterService] No update available", updateInfo);
+            expect(logger.debug).toHaveBeenCalledWith(
+                "[AutoUpdaterService] No update available",
+                updateInfo
+            );
             expect(statusCallback).toHaveBeenCalledWith({ status: "idle" });
         });
 
@@ -146,8 +161,13 @@ describe("AutoUpdaterService", () => {
             const handler = getEventHandler("download-progress");
             handler(progressObj);
 
-            expect(logger.debug).toHaveBeenCalledWith("[AutoUpdaterService] Download progress", progressObj);
-            expect(statusCallback).toHaveBeenCalledWith({ status: "downloading" });
+            expect(logger.debug).toHaveBeenCalledWith(
+                "[AutoUpdaterService] Download progress",
+                progressObj
+            );
+            expect(statusCallback).toHaveBeenCalledWith({
+                status: "downloading",
+            });
         });
 
         it("should handle update-downloaded event", () => {
@@ -155,8 +175,13 @@ describe("AutoUpdaterService", () => {
             const handler = getEventHandler("update-downloaded");
             handler(updateInfo);
 
-            expect(logger.info).toHaveBeenCalledWith("[AutoUpdaterService] Update downloaded", updateInfo);
-            expect(statusCallback).toHaveBeenCalledWith({ status: "downloaded" });
+            expect(logger.info).toHaveBeenCalledWith(
+                "[AutoUpdaterService] Update downloaded",
+                updateInfo
+            );
+            expect(statusCallback).toHaveBeenCalledWith({
+                status: "downloaded",
+            });
         });
 
         it("should handle error event with Error object", () => {
@@ -164,7 +189,10 @@ describe("AutoUpdaterService", () => {
             const handler = getEventHandler("error");
             handler(error);
 
-            expect(logger.error).toHaveBeenCalledWith("[AutoUpdaterService] Auto-updater error", error);
+            expect(logger.error).toHaveBeenCalledWith(
+                "[AutoUpdaterService] Auto-updater error",
+                error
+            );
             expect(statusCallback).toHaveBeenCalledWith({
                 status: "error",
                 error: "Update failed",
@@ -176,7 +204,10 @@ describe("AutoUpdaterService", () => {
             const handler = getEventHandler("error");
             handler(error);
 
-            expect(logger.error).toHaveBeenCalledWith("[AutoUpdaterService] Auto-updater error", error);
+            expect(logger.error).toHaveBeenCalledWith(
+                "[AutoUpdaterService] Auto-updater error",
+                error
+            );
             expect(statusCallback).toHaveBeenCalledWith({
                 status: "error",
                 error: "String error",
@@ -203,7 +234,10 @@ describe("AutoUpdaterService", () => {
 
             await autoUpdaterService.checkForUpdates();
 
-            expect(logger.error).toHaveBeenCalledWith("[AutoUpdaterService] Failed to check for updates", error);
+            expect(logger.error).toHaveBeenCalledWith(
+                "[AutoUpdaterService] Failed to check for updates",
+                error
+            );
             expect(statusCallback).toHaveBeenCalledWith({
                 status: "error",
                 error: "Network error",
@@ -227,7 +261,9 @@ describe("AutoUpdaterService", () => {
         it("should call autoUpdater.quitAndInstall", () => {
             autoUpdaterService.quitAndInstall();
 
-            expect(logger.info).toHaveBeenCalledWith("[AutoUpdaterService] Quitting and installing update");
+            expect(logger.info).toHaveBeenCalledWith(
+                "[AutoUpdaterService] Quitting and installing update"
+            );
             expect(mockAutoUpdater.quitAndInstall).toHaveBeenCalled();
         });
     });
@@ -269,16 +305,29 @@ describe("AutoUpdaterService", () => {
             const downloadedHandler = getEventHandler("update-downloaded");
 
             checkingHandler();
-            expect(statusCallback).toHaveBeenLastCalledWith({ status: "checking" });
+            expect(statusCallback).toHaveBeenLastCalledWith({
+                status: "checking",
+            });
 
             availableHandler({ version: "1.0.1" });
-            expect(statusCallback).toHaveBeenLastCalledWith({ status: "available" });
+            expect(statusCallback).toHaveBeenLastCalledWith({
+                status: "available",
+            });
 
-            progressHandler({ percent: 50, bytesPerSecond: 1024, total: 2048, transferred: 1024 });
-            expect(statusCallback).toHaveBeenLastCalledWith({ status: "downloading" });
+            progressHandler({
+                percent: 50,
+                bytesPerSecond: 1024,
+                total: 2048,
+                transferred: 1024,
+            });
+            expect(statusCallback).toHaveBeenLastCalledWith({
+                status: "downloading",
+            });
 
             downloadedHandler({ version: "1.0.1" });
-            expect(statusCallback).toHaveBeenLastCalledWith({ status: "downloaded" });
+            expect(statusCallback).toHaveBeenLastCalledWith({
+                status: "downloaded",
+            });
 
             expect(statusCallback).toHaveBeenCalledTimes(4);
         });
@@ -288,7 +337,9 @@ describe("AutoUpdaterService", () => {
             const errorHandler = getEventHandler("error");
 
             checkingHandler();
-            expect(statusCallback).toHaveBeenLastCalledWith({ status: "checking" });
+            expect(statusCallback).toHaveBeenLastCalledWith({
+                status: "checking",
+            });
 
             errorHandler(new Error("Download failed"));
             expect(statusCallback).toHaveBeenLastCalledWith({
@@ -302,7 +353,9 @@ describe("AutoUpdaterService", () => {
 
     // Helper function to get event handler
     function getEventHandler(eventName: string): (...args: unknown[]) => void {
-        const call = mockAutoUpdater.on.mock.calls.find((call: any[]) => call[0] === eventName);
+        const call = mockAutoUpdater.on.mock.calls.find(
+            (call: any[]) => call[0] === eventName
+        );
         expect(call).toBeDefined();
         return call![1];
     }

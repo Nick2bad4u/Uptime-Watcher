@@ -54,7 +54,15 @@ export interface AdvancedMonitorConfig {
     /** Scheduling configuration */
     scheduling?: {
         /** Days of the week when monitoring is active */
-        activeDays?: Array<"friday" | "monday" | "saturday" | "sunday" | "thursday" | "tuesday" | "wednesday">;
+        activeDays?: Array<
+            | "friday"
+            | "monday"
+            | "saturday"
+            | "sunday"
+            | "thursday"
+            | "tuesday"
+            | "wednesday"
+        >;
         /** Time ranges when monitoring is active */
         activeHours?: {
             end: string; // HH:mm format
@@ -161,7 +169,10 @@ export interface HttpMonitorConfig extends BaseMonitorConfig {
  *
  * @public
  */
-export type MonitorConfig = HttpMonitorConfig | PingMonitorConfig | PortMonitorConfig;
+export type MonitorConfig =
+    | HttpMonitorConfig
+    | PingMonitorConfig
+    | PortMonitorConfig;
 
 /**
  * Monitor configuration template interface.
@@ -258,7 +269,9 @@ export interface PortMonitorConfig extends BaseMonitorConfig {
  *
  * @public
  */
-export function isHttpMonitorConfig(config: MonitorConfig): config is HttpMonitorConfig {
+export function isHttpMonitorConfig(
+    config: MonitorConfig
+): config is HttpMonitorConfig {
     return config.type === "http";
 }
 
@@ -270,7 +283,9 @@ export function isHttpMonitorConfig(config: MonitorConfig): config is HttpMonito
  *
  * @public
  */
-export function isPingMonitorConfig(config: MonitorConfig): config is PingMonitorConfig {
+export function isPingMonitorConfig(
+    config: MonitorConfig
+): config is PingMonitorConfig {
     return config.type === "ping";
 }
 
@@ -282,7 +297,9 @@ export function isPingMonitorConfig(config: MonitorConfig): config is PingMonito
  *
  * @public
  */
-export function isPortMonitorConfig(config: MonitorConfig): config is PortMonitorConfig {
+export function isPortMonitorConfig(
+    config: MonitorConfig
+): config is PortMonitorConfig {
     return config.type === "port";
 }
 

@@ -95,8 +95,8 @@ export interface SiteMonitoringButtonProperties {
  * />
  * ```
  */
-export const SiteMonitoringButton: React.NamedExoticComponent<SiteMonitoringButtonProperties> = React.memo(
-    function SiteMonitoringButton({
+export const SiteMonitoringButton: React.NamedExoticComponent<SiteMonitoringButtonProperties> =
+    React.memo(function SiteMonitoringButton({
         allMonitorsRunning,
         className = "",
         compact = false,
@@ -118,7 +118,11 @@ export const SiteMonitoringButton: React.NamedExoticComponent<SiteMonitoringButt
                     variant="error"
                 >
                     <span>⏹️</span>
-                    {!compact && <span className="hidden text-xs sm:inline">Stop All</span>}
+                    {!compact && (
+                        <span className="hidden text-xs sm:inline">
+                            Stop All
+                        </span>
+                    )}
                 </ThemedButton>
             );
         }
@@ -136,8 +140,9 @@ export const SiteMonitoringButton: React.NamedExoticComponent<SiteMonitoringButt
                 variant="success"
             >
                 <span>▶️</span>
-                {!compact && <span className="hidden text-xs sm:inline">Start All</span>}
+                {!compact && (
+                    <span className="hidden text-xs sm:inline">Start All</span>
+                )}
             </ThemedButton>
         );
-    }
-);
+    });

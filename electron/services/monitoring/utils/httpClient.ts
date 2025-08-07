@@ -111,16 +111,21 @@ export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
     axiosInstance.interceptors.response.use(
         (response) => {
             if (response.config.metadata?.startTime) {
-                const duration = performance.now() - response.config.metadata.startTime;
+                const duration =
+                    performance.now() - response.config.metadata.startTime;
                 response.responseTime = Math.round(duration);
             }
             return response;
         },
         (error) => {
             // Also calculate timing for error responses
-            const err = error as { config?: { metadata?: { startTime?: number } }; responseTime?: number };
+            const err = error as {
+                config?: { metadata?: { startTime?: number } };
+                responseTime?: number;
+            };
             if (err.config?.metadata?.startTime) {
-                const duration = performance.now() - err.config.metadata.startTime;
+                const duration =
+                    performance.now() - err.config.metadata.startTime;
                 err.responseTime = Math.round(duration);
             }
             return Promise.reject(ensureErrorInstance(error));

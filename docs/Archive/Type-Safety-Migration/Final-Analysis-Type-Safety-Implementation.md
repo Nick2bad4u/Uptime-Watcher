@@ -70,7 +70,10 @@ export type CacheValue =
  | import("../../src/utils/monitorTypeHelper").MonitorTypeConfig
  | import("./validation").BaseValidationResult;
 
-formatMonitorTitleSuffix: (type: string, monitor: import("../shared/types").Monitor) => Promise<string>;
+formatMonitorTitleSuffix: (
+ type: string,
+ monitor: import("../shared/types").Monitor
+) => Promise<string>;
 ```
 
 **Solution**: Proper import statements
@@ -125,7 +128,10 @@ export type CacheValue = ConfigValue | unknown[]; // Too broad, no type safety
 
 ```typescript
 // ✅ AFTER: Specific, type-safe arrays
-export type CacheValue = ConfigValue | MonitorTypeConfigArray | ValidationResultArray;
+export type CacheValue =
+ | ConfigValue
+ | MonitorTypeConfigArray
+ | ValidationResultArray;
 
 export type MonitorTypeConfigArray = MonitorTypeConfig[];
 export type ValidationResultArray = BaseValidationResult[];
@@ -307,7 +313,9 @@ type AssertValidationResultShape = ValidationResult extends {
 
 // ✅ RECOMMENDED: Runtime type guards
 function isValidationResult(obj: unknown): obj is ValidationResult {
- return typeof obj === "object" && obj !== null && "errors" in obj && "isValid" in obj;
+ return (
+  typeof obj === "object" && obj !== null && "errors" in obj && "isValid" in obj
+ );
 }
 ```
 
@@ -328,7 +336,10 @@ export type CacheValue =
  | NewDomainType; // Not Record<string, unknown>
 
 // ✅ PATTERN: Array-specific types
-export type ValidArrayTypes = MonitorTypeConfig[] | BaseValidationResult[] | Monitor[];
+export type ValidArrayTypes =
+ | MonitorTypeConfig[]
+ | BaseValidationResult[]
+ | Monitor[];
 ```
 
 ---

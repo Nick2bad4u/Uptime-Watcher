@@ -65,7 +65,9 @@ describe("useSitesStore - Site Monitoring Functions", () => {
             await mockSitesStore.startSiteMonitoring("test-site-id");
         });
 
-        expect(mockSitesStore.startSiteMonitoring).toHaveBeenCalledWith("test-site-id");
+        expect(mockSitesStore.startSiteMonitoring).toHaveBeenCalledWith(
+            "test-site-id"
+        );
     });
 
     it("should handle errors in start site monitoring", async () => {
@@ -80,7 +82,9 @@ describe("useSitesStore - Site Monitoring Functions", () => {
             }
         });
 
-        expect(mockSitesStore.startSiteMonitoring).toHaveBeenCalledWith("test-site-id");
+        expect(mockSitesStore.startSiteMonitoring).toHaveBeenCalledWith(
+            "test-site-id"
+        );
     });
 
     it("should stop site monitoring successfully", async () => {
@@ -90,7 +94,9 @@ describe("useSitesStore - Site Monitoring Functions", () => {
             await mockSitesStore.stopSiteMonitoring("test-site-id");
         });
 
-        expect(mockSitesStore.stopSiteMonitoring).toHaveBeenCalledWith("test-site-id");
+        expect(mockSitesStore.stopSiteMonitoring).toHaveBeenCalledWith(
+            "test-site-id"
+        );
     });
 
     it("should handle errors in stop site monitoring", async () => {
@@ -105,17 +111,27 @@ describe("useSitesStore - Site Monitoring Functions", () => {
             }
         });
 
-        expect(mockSitesStore.stopSiteMonitoring).toHaveBeenCalledWith("test-site-id");
+        expect(mockSitesStore.stopSiteMonitoring).toHaveBeenCalledWith(
+            "test-site-id"
+        );
     });
 
     it("should start site monitor monitoring successfully", async () => {
-        mockSitesStore.startSiteMonitorMonitoring.mockResolvedValueOnce(undefined);
+        mockSitesStore.startSiteMonitorMonitoring.mockResolvedValueOnce(
+            undefined
+        );
 
         await act(async () => {
-            await mockSitesStore.startSiteMonitorMonitoring("test-site-id", "test-monitor-id");
+            await mockSitesStore.startSiteMonitorMonitoring(
+                "test-site-id",
+                "test-monitor-id"
+            );
         });
 
-        expect(mockSitesStore.startSiteMonitorMonitoring).toHaveBeenCalledWith("test-site-id", "test-monitor-id");
+        expect(mockSitesStore.startSiteMonitorMonitoring).toHaveBeenCalledWith(
+            "test-site-id",
+            "test-monitor-id"
+        );
     });
 
     it("should handle errors in start site monitor monitoring", async () => {
@@ -124,23 +140,37 @@ describe("useSitesStore - Site Monitoring Functions", () => {
 
         await act(async () => {
             try {
-                await mockSitesStore.startSiteMonitorMonitoring("test-site-id", "test-monitor-id");
+                await mockSitesStore.startSiteMonitorMonitoring(
+                    "test-site-id",
+                    "test-monitor-id"
+                );
             } catch (error) {
                 expect(error).toBeInstanceOf(Error);
             }
         });
 
-        expect(mockSitesStore.startSiteMonitorMonitoring).toHaveBeenCalledWith("test-site-id", "test-monitor-id");
+        expect(mockSitesStore.startSiteMonitorMonitoring).toHaveBeenCalledWith(
+            "test-site-id",
+            "test-monitor-id"
+        );
     });
 
     it("should stop site monitor monitoring successfully", async () => {
-        mockSitesStore.stopSiteMonitorMonitoring.mockResolvedValueOnce(undefined);
+        mockSitesStore.stopSiteMonitorMonitoring.mockResolvedValueOnce(
+            undefined
+        );
 
         await act(async () => {
-            await mockSitesStore.stopSiteMonitorMonitoring("test-site-id", "test-monitor-id");
+            await mockSitesStore.stopSiteMonitorMonitoring(
+                "test-site-id",
+                "test-monitor-id"
+            );
         });
 
-        expect(mockSitesStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith("test-site-id", "test-monitor-id");
+        expect(mockSitesStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith(
+            "test-site-id",
+            "test-monitor-id"
+        );
     });
 
     it("should handle errors in stop site monitor monitoring", async () => {
@@ -149,12 +179,18 @@ describe("useSitesStore - Site Monitoring Functions", () => {
 
         await act(async () => {
             try {
-                await mockSitesStore.stopSiteMonitorMonitoring("test-site-id", "test-monitor-id");
+                await mockSitesStore.stopSiteMonitorMonitoring(
+                    "test-site-id",
+                    "test-monitor-id"
+                );
             } catch (error) {
                 expect(error).toBeInstanceOf(Error);
             }
         });
 
-        expect(mockSitesStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith("test-site-id", "test-monitor-id");
+        expect(mockSitesStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith(
+            "test-site-id",
+            "test-monitor-id"
+        );
     });
 });

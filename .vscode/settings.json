@@ -113,7 +113,11 @@
     },
     "errorLens.excludeBySource": ["ts(2339)", "ts(2307)", "ts(2304)", "eslint"],
     "errorLens.exclude": ["**/node_modules/**"],
-    "sonarlint.pathsToExclude": ["**/node_modules/**", "**/dist/**", "**/coverage/**"],
+    "sonarlint.pathsToExclude": [
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/coverage/**"
+    ],
     "typescript.preferences.includeCompletionsForImportStatements": false,
     "typescript.preferences.includeCompletionsForModuleExports": false,
     "typescript.preferences.includeCompletionsWithLowerCaseLetters": false,

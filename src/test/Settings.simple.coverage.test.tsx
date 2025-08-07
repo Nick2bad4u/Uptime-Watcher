@@ -37,7 +37,10 @@ describe("Settings Component - Coverage Tests", () => {
         }
 
         // Verify the warning was logged
-        expect(logger.warn).toHaveBeenCalledWith("Attempted to update invalid settings key", "invalidKey");
+        expect(logger.warn).toHaveBeenCalledWith(
+            "Attempted to update invalid settings key",
+            "invalidKey"
+        );
     });
 
     it("should not warn when valid settings key is used", () => {

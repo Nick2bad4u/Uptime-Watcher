@@ -243,7 +243,9 @@ export interface SiteFormData {
  *
  * @public
  */
-export function isHttpFormData(formData: MonitorFormData): formData is HttpFormData {
+export function isHttpFormData(
+    formData: MonitorFormData
+): formData is HttpFormData {
     return formData.type === "http";
 }
 
@@ -255,7 +257,9 @@ export function isHttpFormData(formData: MonitorFormData): formData is HttpFormD
  *
  * @public
  */
-export function isPingFormData(formData: MonitorFormData): formData is PingFormData {
+export function isPingFormData(
+    formData: MonitorFormData
+): formData is PingFormData {
     return formData.type === "ping";
 }
 
@@ -267,7 +271,9 @@ export function isPingFormData(formData: MonitorFormData): formData is PingFormD
  *
  * @public
  */
-export function isPortFormData(formData: MonitorFormData): formData is PortFormData {
+export function isPortFormData(
+    formData: MonitorFormData
+): formData is PortFormData {
     return formData.type === "port";
 }
 

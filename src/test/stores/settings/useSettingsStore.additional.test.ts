@@ -40,7 +40,9 @@ vi.mock("../utils", () => ({
             return result;
         } catch (error) {
             if (errorHandling?.setError) {
-                errorHandling.setError(error instanceof Error ? error.message : String(error));
+                errorHandling.setError(
+                    error instanceof Error ? error.message : String(error)
+                );
             }
             if (errorHandling?.setLoading) {
                 errorHandling.setLoading(false);

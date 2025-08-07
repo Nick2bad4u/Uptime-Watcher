@@ -20,12 +20,18 @@ const crypto = require("crypto");
 const DOC_NAME = "Node-Ping";
 
 // Base URL for docs (no trailing slash)
-const BASE_URL = "https://raw.githubusercontent.com/danielzzz/node-ping/refs/heads/master";
+const BASE_URL =
+    "https://raw.githubusercontent.com/danielzzz/node-ping/refs/heads/master";
 
 // Array of doc/page names (relative, e.g. ["intro", "example"])
 // These should match the paths in your repo, relative to the base URL
 // If you have subdirectories, include them (e.g. "examples/example.js")
-const PAGES = ["examples/example.js", "examples/example2.js", "examples/example_win_de_v6.js", "README.md"];
+const PAGES = [
+    "examples/example.js",
+    "examples/example2.js",
+    "examples/example_win_de_v6.js",
+    "README.md",
+];
 
 const INPUT_FORMAT = "gfm"; // Change to your input format if needed
 const OUTPUT_FORMAT = "gfm"; // Change to your desired output format
@@ -53,7 +59,9 @@ const REMOVE_LINE_MARKERS = ["::::::: body"];
 
 /* --------- END CONFIGURATION (edit above only!) -------- */
 
-let OUTPUT_DIR = process.env.DOCS_OUTPUT_DIR || path.join(process.cwd(), SUBDIR_1, SUBDIR_2, DOC_NAME.toLowerCase());
+let OUTPUT_DIR =
+    process.env.DOCS_OUTPUT_DIR ||
+    path.join(process.cwd(), SUBDIR_1, SUBDIR_2, DOC_NAME.toLowerCase());
 OUTPUT_DIR = path.resolve(OUTPUT_DIR);
 
 // Log and hash file paths (auto-uses DOC_NAME)
@@ -78,7 +86,10 @@ const CMD_TEMPLATE = (url, outFile) =>
  * @returns {string}
  */
 function rewriteLinks(content) {
-    return content.replace(/\(\.\/([\w-]+)\)/g, (_, page) => `(${BASE_URL}/${page})`);
+    return content.replace(
+        /\(\.\/([\w-]+)\)/g,
+        (_, page) => `(${BASE_URL}/${page})`
+    );
 }
 
 /**
@@ -102,7 +113,10 @@ function cleanContent(content) {
     // Remove lines containing any REMOVE_LINE_MARKERS
     cleaned = cleaned
         .split("\n")
-        .filter((line) => !REMOVE_LINE_MARKERS.some((marker) => line.includes(marker)))
+        .filter(
+            (line) =>
+                !REMOVE_LINE_MARKERS.some((marker) => line.includes(marker))
+        )
         .join("\n")
         .trimEnd();
 
@@ -143,26 +157,36 @@ function downloadFile(cmd, filePath, logMsg, name) {
                 return reject(err);
             }
             if (!fs.existsSync(filePath)) {
-                console.error(logMsg.replace("✅", "❌") + " → File not created.");
+                console.error(
+                    logMsg.replace("✅", "❌") + " → File not created."
+                );
                 return reject(new Error("File not created: " + filePath));
             }
             let content;
             try {
                 content = fs.readFileSync(filePath, "utf8");
             } catch (readErr) {
-                console.error(logMsg.replace("✅", "❌") + ` → Failed to read file: ${readErr.message}`);
+                console.error(
+                    logMsg.replace("✅", "❌") +
+                        ` → Failed to read file: ${readErr.message}`
+                );
                 return reject(readErr);
             }
             if (!content || content.trim().length === 0) {
                 console.error(logMsg.replace("✅", "❌") + " → File is empty.");
-                return reject(new Error("Downloaded file is empty: " + filePath));
+                return reject(
+                    new Error("Downloaded file is empty: " + filePath)
+                );
             }
             try {
                 let processedContent = rewriteLinks(content);
                 processedContent = cleanContent(processedContent);
                 fs.writeFileSync(filePath, processedContent);
             } catch (writeErr) {
-                console.error(logMsg.replace("✅", "❌") + ` → Failed to write file: ${writeErr.message}`);
+                console.error(
+                    logMsg.replace("✅", "❌") +
+                        ` → Failed to write file: ${writeErr.message}`
+                );
                 return reject(writeErr);
             }
             console.log(logMsg);
@@ -178,7 +202,12 @@ const pagePromises = PAGES.map((page) => {
     const fileName = FILE_NAME_TEMPLATE(page);
     const filePath = path.join(OUTPUT_DIR, fileName);
     const cmd = CMD_TEMPLATE(url, filePath);
-    return downloadFile(cmd, filePath, `✅ Downloaded: ${page} → ${fileName}`, fileName);
+    return downloadFile(
+        cmd,
+        filePath,
+        `✅ Downloaded: ${page} → ${fileName}`,
+        fileName
+    );
 });
 
 (async function main() {

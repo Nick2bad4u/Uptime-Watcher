@@ -79,9 +79,15 @@ describe("Settings - Invalid Key Logging", () => {
                 "historyLimit",
             ];
 
-            const handleSettingChange = (key: keyof SettingsType, value: unknown) => {
+            const handleSettingChange = (
+                key: keyof SettingsType,
+                value: unknown
+            ) => {
                 if (!allowedKeys.includes(key)) {
-                    logger.warn("Attempted to update invalid settings key", key);
+                    logger.warn(
+                        "Attempted to update invalid settings key",
+                        key
+                    );
                     return;
                 }
                 mockUpdateSettings({ [key]: value });
@@ -89,7 +95,10 @@ describe("Settings - Invalid Key Logging", () => {
 
             React.useEffect(() => {
                 // Simulate the invalid key scenario
-                handleSettingChange("invalidKey" as keyof SettingsType, "someValue");
+                handleSettingChange(
+                    "invalidKey" as keyof SettingsType,
+                    "someValue"
+                );
             }, []);
 
             return <div data-testid="test-component">Test</div>;
@@ -101,7 +110,10 @@ describe("Settings - Invalid Key Logging", () => {
         await screen.findByTestId("test-component");
 
         // Verify warning was logged
-        expect(logger.warn).toHaveBeenCalledWith("Attempted to update invalid settings key", "invalidKey");
+        expect(logger.warn).toHaveBeenCalledWith(
+            "Attempted to update invalid settings key",
+            "invalidKey"
+        );
 
         // Verify updateSettings was not called
         expect(mockUpdateSettings).not.toHaveBeenCalled();

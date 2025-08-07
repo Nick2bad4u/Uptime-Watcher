@@ -86,7 +86,8 @@ export interface SiteMonitorResult {
  * ```
  */
 export function useSiteMonitor(site: Site): SiteMonitorResult {
-    const { getSelectedMonitorId, setSelectedMonitorId, sites } = useSitesStore();
+    const { getSelectedMonitorId, setSelectedMonitorId, sites } =
+        useSitesStore();
 
     // Always select the latest site from the store by id to ensure we have the most updated data
     const latestSite = useMemo(() => {
@@ -99,7 +100,8 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
     }, [latestSite]);
 
     const defaultMonitorId = getDefaultMonitorId(monitorIds);
-    const selectedMonitorId = getSelectedMonitorId(latestSite.identifier) ?? defaultMonitorId;
+    const selectedMonitorId =
+        getSelectedMonitorId(latestSite.identifier) ?? defaultMonitorId;
 
     // Get the currently selected monitor
     const monitor = useMemo(() => {

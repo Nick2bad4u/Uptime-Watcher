@@ -64,7 +64,9 @@ describe("Targeted Coverage for Missing Branches", () => {
         it("should test error handling in module imports", async () => {
             // Test that imports handle errors gracefully
             try {
-                const correlationModule = await import("../utils/correlation.js");
+                const correlationModule = await import(
+                    "../utils/correlation.js"
+                );
                 expect(correlationModule.generateCorrelationId).toBeDefined();
 
                 // Test with various edge cases
@@ -95,11 +97,17 @@ describe("Targeted Coverage for Missing Branches", () => {
                 expect(constantsModule.DEFAULT_HISTORY_LIMIT).toBeDefined();
 
                 // Test that constants have expected types
-                expect(typeof constantsModule.DEFAULT_REQUEST_TIMEOUT).toBe("number");
-                expect(typeof constantsModule.DEFAULT_CHECK_INTERVAL).toBe("number");
+                expect(typeof constantsModule.DEFAULT_REQUEST_TIMEOUT).toBe(
+                    "number"
+                );
+                expect(typeof constantsModule.DEFAULT_CHECK_INTERVAL).toBe(
+                    "number"
+                );
                 expect(typeof constantsModule.USER_AGENT).toBe("string");
                 expect(typeof constantsModule.RETRY_BACKOFF).toBe("object");
-                expect(typeof constantsModule.DEFAULT_HISTORY_LIMIT).toBe("number");
+                expect(typeof constantsModule.DEFAULT_HISTORY_LIMIT).toBe(
+                    "number"
+                );
             } catch (error) {
                 // Test import error handling branch
                 expect(error).toBeDefined();
@@ -124,7 +132,9 @@ describe("Targeted Coverage for Missing Branches", () => {
     describe("Service Container Branches", () => {
         it("should handle service container edge cases", async () => {
             try {
-                const { ServiceContainer } = await import("../services/ServiceContainer.js");
+                const { ServiceContainer } = await import(
+                    "../services/ServiceContainer.js"
+                );
 
                 // Test edge cases in service container
                 const container = ServiceContainer.getInstance();

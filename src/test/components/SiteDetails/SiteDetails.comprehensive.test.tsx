@@ -96,7 +96,9 @@ vi.mock("../../../services/chartConfig", () => ({
 }));
 
 vi.mock("../../../theme/components", () => ({
-    ThemedBox: vi.fn(({ children, ...props }) => <div {...props}>{children}</div>),
+    ThemedBox: vi.fn(({ children, ...props }) => (
+        <div {...props}>{children}</div>
+    )),
 }));
 
 // Mock the hook and all dependencies
@@ -114,40 +116,61 @@ vi.mock("../../../components/SiteDetails/SiteDetailsHeader", () => ({
 }));
 
 vi.mock("../../../components/SiteDetails/SiteDetailsNavigation", () => ({
-    SiteDetailsNavigation: vi.fn(({ setActiveSiteDetailsTab, activeSiteDetailsTab }) => (
-        <div data-testid="site-details-navigation">
-            <button onClick={() => setActiveSiteDetailsTab("overview")} data-testid="overview-tab">
-                Overview
-            </button>
-            <button onClick={() => setActiveSiteDetailsTab("history")} data-testid="history-tab">
-                History
-            </button>
-            <button onClick={() => setActiveSiteDetailsTab("analytics")} data-testid="analytics-tab">
-                Analytics
-            </button>
-            <span data-testid="selected-tab">{activeSiteDetailsTab}</span>
-        </div>
-    )),
+    SiteDetailsNavigation: vi.fn(
+        ({ setActiveSiteDetailsTab, activeSiteDetailsTab }) => (
+            <div data-testid="site-details-navigation">
+                <button
+                    onClick={() => setActiveSiteDetailsTab("overview")}
+                    data-testid="overview-tab"
+                >
+                    Overview
+                </button>
+                <button
+                    onClick={() => setActiveSiteDetailsTab("history")}
+                    data-testid="history-tab"
+                >
+                    History
+                </button>
+                <button
+                    onClick={() => setActiveSiteDetailsTab("analytics")}
+                    data-testid="analytics-tab"
+                >
+                    Analytics
+                </button>
+                <span data-testid="selected-tab">{activeSiteDetailsTab}</span>
+            </div>
+        )
+    ),
 }));
 
 vi.mock("../../../components/SiteDetails/tabs/OverviewTab", () => ({
-    OverviewTab: vi.fn(() => <div data-testid="overview-tab-content">Overview Content</div>),
+    OverviewTab: vi.fn(() => (
+        <div data-testid="overview-tab-content">Overview Content</div>
+    )),
 }));
 
 vi.mock("../../../components/SiteDetails/tabs/SiteOverviewTab", () => ({
-    SiteOverviewTab: vi.fn(() => <div data-testid="site-overview-tab-content">Site Overview Content</div>),
+    SiteOverviewTab: vi.fn(() => (
+        <div data-testid="site-overview-tab-content">Site Overview Content</div>
+    )),
 }));
 
 vi.mock("../../../components/SiteDetails/tabs/HistoryTab", () => ({
-    HistoryTab: vi.fn(() => <div data-testid="history-tab-content">History Content</div>),
+    HistoryTab: vi.fn(() => (
+        <div data-testid="history-tab-content">History Content</div>
+    )),
 }));
 
 vi.mock("../../../components/SiteDetails/tabs/AnalyticsTab", () => ({
-    AnalyticsTab: vi.fn(() => <div data-testid="analytics-tab-content">Analytics Content</div>),
+    AnalyticsTab: vi.fn(() => (
+        <div data-testid="analytics-tab-content">Analytics Content</div>
+    )),
 }));
 
 vi.mock("../../../components/SiteDetails/tabs/SettingsTab", () => ({
-    SettingsTab: vi.fn(() => <div data-testid="settings-tab-content">Settings Content</div>),
+    SettingsTab: vi.fn(() => (
+        <div data-testid="settings-tab-content">Settings Content</div>
+    )),
 }));
 
 vi.mock("../../../components/error/DefaultErrorFallback", () => ({
@@ -260,8 +283,12 @@ describe("SiteDetails Component", () => {
         it("should render site details component", () => {
             renderSiteDetails();
 
-            expect(screen.getByTestId("site-details-header")).toBeInTheDocument();
-            expect(screen.getByTestId("site-details-navigation")).toBeInTheDocument();
+            expect(
+                screen.getByTestId("site-details-header")
+            ).toBeInTheDocument();
+            expect(
+                screen.getByTestId("site-details-navigation")
+            ).toBeInTheDocument();
         });
 
         it("should render with correct site data", () => {
@@ -279,7 +306,9 @@ describe("SiteDetails Component", () => {
         it("should render default overview tab content", () => {
             renderSiteDetails();
 
-            expect(screen.getByTestId("site-overview-tab-content")).toBeInTheDocument();
+            expect(
+                screen.getByTestId("site-overview-tab-content")
+            ).toBeInTheDocument();
         });
     });
 
@@ -292,8 +321,12 @@ describe("SiteDetails Component", () => {
 
             renderSiteDetails();
 
-            expect(screen.getByTestId("history-tab-content")).toBeInTheDocument();
-            expect(screen.queryByTestId("site-overview-tab-content")).not.toBeInTheDocument();
+            expect(
+                screen.getByTestId("history-tab-content")
+            ).toBeInTheDocument();
+            expect(
+                screen.queryByTestId("site-overview-tab-content")
+            ).not.toBeInTheDocument();
         });
 
         it("should switch to analytics tab when selected", () => {
@@ -304,8 +337,12 @@ describe("SiteDetails Component", () => {
 
             renderSiteDetails();
 
-            expect(screen.getByTestId("analytics-tab-content")).toBeInTheDocument();
-            expect(screen.queryByTestId("site-overview-tab-content")).not.toBeInTheDocument();
+            expect(
+                screen.getByTestId("analytics-tab-content")
+            ).toBeInTheDocument();
+            expect(
+                screen.queryByTestId("site-overview-tab-content")
+            ).not.toBeInTheDocument();
         });
 
         it("should switch to settings tab when selected", () => {
@@ -316,8 +353,12 @@ describe("SiteDetails Component", () => {
 
             renderSiteDetails();
 
-            expect(screen.getByTestId("settings-tab-content")).toBeInTheDocument();
-            expect(screen.queryByTestId("site-overview-tab-content")).not.toBeInTheDocument();
+            expect(
+                screen.getByTestId("settings-tab-content")
+            ).toBeInTheDocument();
+            expect(
+                screen.queryByTestId("site-overview-tab-content")
+            ).not.toBeInTheDocument();
         });
 
         it("should handle tab change events", () => {
@@ -326,7 +367,9 @@ describe("SiteDetails Component", () => {
             const historyTabButton = screen.getByTestId("history-tab");
             fireEvent.click(historyTabButton);
 
-            expect(mockUseSiteDetailsReturn.setActiveSiteDetailsTab).toHaveBeenCalledWith("history");
+            expect(
+                mockUseSiteDetailsReturn.setActiveSiteDetailsTab
+            ).toHaveBeenCalledWith("history");
         });
     });
 
@@ -381,15 +424,23 @@ describe("SiteDetails Component", () => {
             renderSiteDetails();
 
             // Should still render structure but with loading state
-            expect(screen.getByTestId("site-details-header")).toBeInTheDocument();
+            expect(
+                screen.getByTestId("site-details-header")
+            ).toBeInTheDocument();
         });
 
         it("should render content when loading is complete", () => {
             renderSiteDetails();
 
-            expect(screen.getByTestId("site-details-header")).toBeInTheDocument();
-            expect(screen.getByTestId("site-details-navigation")).toBeInTheDocument();
-            expect(screen.getByTestId("site-overview-tab-content")).toBeInTheDocument(); // Corrected expectation
+            expect(
+                screen.getByTestId("site-details-header")
+            ).toBeInTheDocument();
+            expect(
+                screen.getByTestId("site-details-navigation")
+            ).toBeInTheDocument();
+            expect(
+                screen.getByTestId("site-overview-tab-content")
+            ).toBeInTheDocument(); // Corrected expectation
         });
     });
 
@@ -406,8 +457,12 @@ describe("SiteDetails Component", () => {
             renderSiteDetails();
 
             // Component still renders normally - error handling would be at a higher level
-            expect(screen.getByTestId("site-details-header")).toBeInTheDocument();
-            expect(screen.getByTestId("site-details-navigation")).toBeInTheDocument();
+            expect(
+                screen.getByTestId("site-details-header")
+            ).toBeInTheDocument();
+            expect(
+                screen.getByTestId("site-details-navigation")
+            ).toBeInTheDocument();
         });
 
         it("should handle missing error boundary gracefully", () => {
@@ -421,7 +476,9 @@ describe("SiteDetails Component", () => {
             renderSiteDetails();
 
             // Component should still render normally
-            expect(screen.getByTestId("site-details-header")).toBeInTheDocument();
+            expect(
+                screen.getByTestId("site-details-header")
+            ).toBeInTheDocument();
         });
     });
 
@@ -437,13 +494,17 @@ describe("SiteDetails Component", () => {
             renderSiteDetails();
 
             // Should still render basic structure
-            expect(screen.getByTestId("site-details-header")).toBeInTheDocument();
+            expect(
+                screen.getByTestId("site-details-header")
+            ).toBeInTheDocument();
         });
 
         it("should pass correct site data to tabs", () => {
             renderSiteDetails();
 
-            expect(screen.getByTestId("site-overview-tab-content")).toBeInTheDocument(); // Corrected expectation
+            expect(
+                screen.getByTestId("site-overview-tab-content")
+            ).toBeInTheDocument(); // Corrected expectation
             // Tabs should receive site data through props
         });
     });
@@ -527,8 +588,12 @@ describe("SiteDetails Component", () => {
             renderSiteDetails();
 
             // Check that main components are rendered
-            expect(screen.getByTestId("site-details-header")).toBeInTheDocument();
-            expect(screen.getByTestId("site-details-navigation")).toBeInTheDocument();
+            expect(
+                screen.getByTestId("site-details-header")
+            ).toBeInTheDocument();
+            expect(
+                screen.getByTestId("site-details-navigation")
+            ).toBeInTheDocument();
         });
 
         it("should handle keyboard navigation", () => {
@@ -556,7 +621,9 @@ describe("SiteDetails Component", () => {
             );
 
             // Component should still render correctly
-            expect(screen.getByTestId("site-details-header")).toBeInTheDocument();
+            expect(
+                screen.getByTestId("site-details-header")
+            ).toBeInTheDocument();
         });
 
         it("should handle rapid tab switching", async () => {
@@ -574,11 +641,15 @@ describe("SiteDetails Component", () => {
             }
 
             // Verify the total number of calls matches expectations
-            expect(mockUseSiteDetailsReturn.setActiveSiteDetailsTab).toHaveBeenCalledTimes(availableTabs.length);
+            expect(
+                mockUseSiteDetailsReturn.setActiveSiteDetailsTab
+            ).toHaveBeenCalledTimes(availableTabs.length);
 
             // Verify each call was made with the correct tab name
             availableTabs.forEach((tab, index) => {
-                expect(mockUseSiteDetailsReturn.setActiveSiteDetailsTab).toHaveBeenNthCalledWith(index + 1, tab);
+                expect(
+                    mockUseSiteDetailsReturn.setActiveSiteDetailsTab
+                ).toHaveBeenNthCalledWith(index + 1, tab);
             });
         });
     });

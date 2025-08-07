@@ -116,7 +116,9 @@ describe("useSiteSync", () => {
                 success: true,
             };
 
-            vi.mocked(mockElectronAPI.stateSync.getSyncStatus).mockResolvedValue(mockStatus);
+            vi.mocked(
+                mockElectronAPI.stateSync.getSyncStatus
+            ).mockResolvedValue(mockStatus);
 
             const result = await syncActions.getSyncStatus();
 
@@ -125,7 +127,9 @@ describe("useSiteSync", () => {
         });
 
         it("should handle getSyncStatus errors with fallback", async () => {
-            vi.mocked(mockElectronAPI.stateSync.getSyncStatus).mockRejectedValue(new Error("Network error"));
+            vi.mocked(
+                mockElectronAPI.stateSync.getSyncStatus
+            ).mockRejectedValue(new Error("Network error"));
 
             const result = await syncActions.getSyncStatus();
 
@@ -140,7 +144,9 @@ describe("useSiteSync", () => {
 
         it("should handle withErrorHandling exceptions and use fallback", async () => {
             // Mock the actual electronAPI call to succeed, but withErrorHandling to fail
-            vi.mocked(mockElectronAPI.stateSync.getSyncStatus).mockResolvedValue({
+            vi.mocked(
+                mockElectronAPI.stateSync.getSyncStatus
+            ).mockResolvedValue({
                 siteCount: 5,
                 synchronized: true,
                 lastSync: 1640995200000,
@@ -174,7 +180,8 @@ describe("useSiteSync", () => {
                 expect.objectContaining({
                     success: true,
                     subscribed: true,
-                    message: "Successfully subscribed to status updates with efficient incremental updates",
+                    message:
+                        "Successfully subscribed to status updates with efficient incremental updates",
                 })
             );
         });
@@ -183,7 +190,9 @@ describe("useSiteSync", () => {
             const mockCallback = vi.fn();
 
             // Mock StatusUpdateManager to throw an error during subscribe
-            const statusUpdateHandlerModule = await import("../../../stores/sites/utils/statusUpdateHandler");
+            const statusUpdateHandlerModule = await import(
+                "../../../stores/sites/utils/statusUpdateHandler"
+            );
             const mockStatusUpdateManager = {
                 subscribe: vi.fn(() => {
                     throw new Error("Subscribe failed");
@@ -191,7 +200,9 @@ describe("useSiteSync", () => {
                 unsubscribe: vi.fn(),
             } as any; // Use any to bypass type checking for test mock
 
-            vi.mocked(statusUpdateHandlerModule.StatusUpdateManager).mockImplementation(() => mockStatusUpdateManager);
+            vi.mocked(
+                statusUpdateHandlerModule.StatusUpdateManager
+            ).mockImplementation(() => mockStatusUpdateManager);
 
             // Should still return success even if subscribe throws (error is caught and logged)
             const result = syncActions.subscribeToStatusUpdates(mockCallback);
@@ -208,20 +219,26 @@ describe("useSiteSync", () => {
     describe("subscribeToSyncEvents", () => {
         it("should subscribe to sync events successfully", () => {
             const mockCleanup = vi.fn();
-            mockElectronAPI.stateSync.onStateSyncEvent.mockReturnValue(mockCleanup);
+            mockElectronAPI.stateSync.onStateSyncEvent.mockReturnValue(
+                mockCleanup
+            );
 
             const result = syncActions.subscribeToSyncEvents();
 
-            expect(mockElectronAPI.stateSync.onStateSyncEvent).toHaveBeenCalledWith(expect.any(Function));
+            expect(
+                mockElectronAPI.stateSync.onStateSyncEvent
+            ).toHaveBeenCalledWith(expect.any(Function));
             expect(typeof result).toBe("function");
         });
 
         it("should handle bulk-sync events", () => {
             let eventHandler: any;
-            mockElectronAPI.stateSync.onStateSyncEvent.mockImplementation((handler) => {
-                eventHandler = handler;
-                return vi.fn();
-            });
+            mockElectronAPI.stateSync.onStateSyncEvent.mockImplementation(
+                (handler) => {
+                    eventHandler = handler;
+                    return vi.fn();
+                }
+            );
 
             syncActions.subscribeToSyncEvents();
 
@@ -239,10 +256,12 @@ describe("useSiteSync", () => {
 
         it("should handle bulk-sync events without sites", () => {
             let eventHandler: any;
-            mockElectronAPI.stateSync.onStateSyncEvent.mockImplementation((handler) => {
-                eventHandler = handler;
-                return vi.fn();
-            });
+            mockElectronAPI.stateSync.onStateSyncEvent.mockImplementation(
+                (handler) => {
+                    eventHandler = handler;
+                    return vi.fn();
+                }
+            );
 
             syncActions.subscribeToSyncEvents();
 
@@ -334,7 +353,9 @@ describe("useSiteSync", () => {
             expect(typeof actions.subscribeToStatusUpdates).toBe("function");
             expect(typeof actions.subscribeToSyncEvents).toBe("function");
             expect(typeof actions.syncSitesFromBackend).toBe("function");
-            expect(typeof actions.unsubscribeFromStatusUpdates).toBe("function");
+            expect(typeof actions.unsubscribeFromStatusUpdates).toBe(
+                "function"
+            );
         });
     });
 });

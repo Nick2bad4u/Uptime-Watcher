@@ -112,7 +112,10 @@ describe("withRetry", () => {
     });
 
     it("should use custom delay between retries", async () => {
-        const operation = vi.fn().mockRejectedValueOnce(new Error("Failure")).mockResolvedValue("success");
+        const operation = vi
+            .fn()
+            .mockRejectedValueOnce(new Error("Failure"))
+            .mockResolvedValue("success");
 
         const promise = withRetry(operation, { delayMs: 500 });
 
@@ -142,7 +145,10 @@ describe("withRetry", () => {
     it("should call custom onError callback when provided", async () => {
         const onError = vi.fn();
         const error = new Error("Custom error");
-        const operation = vi.fn().mockRejectedValueOnce(error).mockResolvedValue("success");
+        const operation = vi
+            .fn()
+            .mockRejectedValueOnce(error)
+            .mockResolvedValue("success");
 
         const promise = withRetry(operation, { onError, delayMs: 50 });
 
@@ -168,7 +174,10 @@ describe("withRetry", () => {
 
         await expect(promise).rejects.toThrow("Test error");
 
-        expect(dbLogger.error).toHaveBeenCalledWith("database-connection failed (attempt 1/1)", error);
+        expect(dbLogger.error).toHaveBeenCalledWith(
+            "database-connection failed (attempt 1/1)",
+            error
+        );
         expect(dbLogger.error).toHaveBeenCalledWith(
             "Persistent failure after 1 retries for database-connection",
             error
@@ -188,7 +197,10 @@ describe("withRetry", () => {
         expect(operation).toHaveBeenCalledTimes(5);
 
         // Should log with default operation name
-        expect(dbLogger.error).toHaveBeenCalledWith("operation failed (attempt 1/5)", error);
+        expect(dbLogger.error).toHaveBeenCalledWith(
+            "operation failed (attempt 1/5)",
+            error
+        );
     });
 
     it("should handle async operations that throw non-Error objects", async () => {
@@ -200,7 +212,10 @@ describe("withRetry", () => {
         await vi.advanceTimersByTimeAsync(20);
 
         await expect(promise).rejects.toBe(stringError);
-        expect(dbLogger.error).toHaveBeenCalledWith("operation failed (attempt 1/1)", stringError);
+        expect(dbLogger.error).toHaveBeenCalledWith(
+            "operation failed (attempt 1/1)",
+            stringError
+        );
     });
 
     it("should not delay after the last failed attempt", async () => {
@@ -273,7 +288,10 @@ describe("withDbRetry", () => {
         expect(result).toBe("database result");
         expect(operation).toHaveBeenCalledTimes(3);
         expect(dbLogger.error).toHaveBeenCalledTimes(2);
-        expect(dbLogger.error).toHaveBeenCalledWith("database-query failed (attempt 1/5)", expect.any(Error));
+        expect(dbLogger.error).toHaveBeenCalledWith(
+            "database-query failed (attempt 1/5)",
+            expect.any(Error)
+        );
     });
 
     it("should fail after max retries are exhausted", async () => {
@@ -302,8 +320,14 @@ describe("withDbRetry", () => {
 
         await expect(promise).rejects.toThrow("Database locked");
         expect(operation).toHaveBeenCalledTimes(3);
-        expect(dbLogger.error).toHaveBeenCalledWith("database-write failed (attempt 1/3)", error);
-        expect(dbLogger.error).toHaveBeenCalledWith("Persistent failure after 3 retries for database-write", error);
+        expect(dbLogger.error).toHaveBeenCalledWith(
+            "database-write failed (attempt 1/3)",
+            error
+        );
+        expect(dbLogger.error).toHaveBeenCalledWith(
+            "Persistent failure after 3 retries for database-write",
+            error
+        );
     }, 1000);
 
     it("should use default maxRetries (5) when not specified", async () => {
@@ -315,12 +339,21 @@ describe("withDbRetry", () => {
 
         await expect(promise).rejects.toThrow("Connection timeout");
         expect(operation).toHaveBeenCalledTimes(5);
-        expect(dbLogger.error).toHaveBeenCalledWith("database-read failed (attempt 1/5)", error);
-        expect(dbLogger.error).toHaveBeenCalledWith("Persistent failure after 5 retries for database-read", error);
+        expect(dbLogger.error).toHaveBeenCalledWith(
+            "database-read failed (attempt 1/5)",
+            error
+        );
+        expect(dbLogger.error).toHaveBeenCalledWith(
+            "Persistent failure after 5 retries for database-read",
+            error
+        );
     }, 1000);
 
     it("should use fixed delay of 300ms", async () => {
-        const operation = vi.fn().mockRejectedValueOnce(new Error("Temporary failure")).mockResolvedValue("success");
+        const operation = vi
+            .fn()
+            .mockRejectedValueOnce(new Error("Temporary failure"))
+            .mockResolvedValue("success");
 
         const promise = withDbRetry(operation, "database-transaction");
 

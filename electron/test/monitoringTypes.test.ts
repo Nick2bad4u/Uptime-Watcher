@@ -4,7 +4,11 @@
  */
 
 import { describe, expect, it } from "vitest";
-import type { MonitorCheckResult, IMonitorService, MonitorConfig } from "../services/monitoring/types";
+import type {
+    MonitorCheckResult,
+    IMonitorService,
+    MonitorConfig,
+} from "../services/monitoring/types";
 import type { Site } from "../types";
 
 describe("Monitoring Types", () => {
@@ -52,7 +56,9 @@ describe("Monitoring Types", () => {
         it("should define monitor service contract", () => {
             // This is a type check to ensure the interface compiles correctly
             const mockService: IMonitorService = {
-                async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
+                async check(
+                    monitor: Site["monitors"][0]
+                ): Promise<MonitorCheckResult> {
                     return {
                         status: monitor.monitoring ? "up" : "down",
                         responseTime: 100,
@@ -85,7 +91,9 @@ describe("Monitoring Types", () => {
             };
 
             const httpService: IMonitorService = {
-                async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
+                async check(
+                    monitor: Site["monitors"][0]
+                ): Promise<MonitorCheckResult> {
                     return {
                         status: monitor.url ? "up" : "down",
                         responseTime: 150,
@@ -123,11 +131,15 @@ describe("Monitoring Types", () => {
             };
 
             const portService: IMonitorService = {
-                async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
+                async check(
+                    monitor: Site["monitors"][0]
+                ): Promise<MonitorCheckResult> {
                     return {
                         status: monitor.host && monitor.port ? "up" : "down",
                         responseTime: 50,
-                        details: monitor.port ? String(monitor.port) : "No port provided",
+                        details: monitor.port
+                            ? String(monitor.port)
+                            : "No port provided",
                     };
                 },
                 getType(): Site["monitors"][0]["type"] {

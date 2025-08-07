@@ -7,7 +7,10 @@
  * @public
  */
 
-import { interpolateLogTemplate, LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "../../../shared/utils/logTemplates";
 import { logger } from "../../utils/logger";
 import { MAX_LOG_DATA_LENGTH, MAX_MIGRATION_STEPS } from "./constants";
 
@@ -69,7 +72,9 @@ export interface MigrationRule {
      * @returns A promise resolving to the transformed data.
      * @throws Throws if transformation fails or data is invalid.
      */
-    transform: (data: Record<string, unknown>) => Promise<Record<string, unknown>>;
+    transform: (
+        data: Record<string, unknown>
+    ) => Promise<Record<string, unknown>>;
 }
 
 /**
@@ -171,7 +176,11 @@ class MigrationOrchestrator {
             }
 
             // Get migration path
-            const migrationPath = this.registry.getMigrationPath(monitorType, fromVersion, toVersion);
+            const migrationPath = this.registry.getMigrationPath(
+                monitorType,
+                fromVersion,
+                toVersion
+            );
 
             // Apply migrations in sequence
             let currentData = data;
@@ -179,27 +188,38 @@ class MigrationOrchestrator {
             for (const migration of migrationPath) {
                 try {
                     logger.info(
-                        interpolateLogTemplate(LOG_TEMPLATES.services.MIGRATION_APPLYING, {
-                            fromVersion: migration.fromVersion,
-                            monitorType,
-                            toVersion: migration.toVersion,
-                        })
+                        interpolateLogTemplate(
+                            LOG_TEMPLATES.services.MIGRATION_APPLYING,
+                            {
+                                fromVersion: migration.fromVersion,
+                                monitorType,
+                                toVersion: migration.toVersion,
+                            }
+                        )
                     );
 
                     currentData = await migration.transform(currentData);
-                    appliedMigrations.push(`${migration.fromVersion}_to_${migration.toVersion}`);
+                    appliedMigrations.push(
+                        `${migration.fromVersion}_to_${migration.toVersion}`
+                    );
 
                     if (migration.isBreaking) {
-                        warnings.push(`Applied breaking migration: ${migration.description}`);
+                        warnings.push(
+                            `Applied breaking migration: ${migration.description}`
+                        );
                     }
                 } catch (error) {
                     // Preserve error context for better debugging
-                    const errorDetails = error instanceof Error ? error.message : String(error);
+                    const errorDetails =
+                        error instanceof Error ? error.message : String(error);
                     const errorMessage = `Migration failed: ${migration.description}`;
 
                     errors.push(`${errorMessage} - ${errorDetails}`);
                     logger.error(errorMessage, {
-                        currentData: JSON.stringify(currentData).slice(0, MAX_LOG_DATA_LENGTH), // Truncate for logging
+                        currentData: JSON.stringify(currentData).slice(
+                            0,
+                            MAX_LOG_DATA_LENGTH
+                        ), // Truncate for logging
                         error,
                         migration: {
                             description: migration.description,
@@ -263,7 +283,11 @@ class MigrationRegistry {
      * @param toVersion - The target version.
      * @returns True if migration is possible, false otherwise.
      */
-    canMigrate(monitorType: string, fromVersion: string, toVersion: string): boolean {
+    canMigrate(
+        monitorType: string,
+        fromVersion: string,
+        toVersion: string
+    ): boolean {
         try {
             this.getMigrationPath(monitorType, fromVersion, toVersion);
             return true;
@@ -288,7 +312,11 @@ class MigrationRegistry {
      * @returns Array of migration rules to apply in order.
      * @throws {@link Error} If no migration path exists, circular path detected, or path exceeds maximum steps.
      */
-    getMigrationPath(monitorType: string, fromVersion: string, toVersion: string): MigrationRule[] {
+    getMigrationPath(
+        monitorType: string,
+        fromVersion: string,
+        toVersion: string
+    ): MigrationRule[] {
         // Validate version strings
         this.validateVersionString(fromVersion, "fromVersion");
         this.validateVersionString(toVersion, "toVersion");
@@ -310,10 +338,14 @@ class MigrationRegistry {
             }
 
             // Find next migration rule
-            const nextRule = rules.find((rule) => rule.fromVersion === currentVersion);
+            const nextRule = rules.find(
+                (rule) => rule.fromVersion === currentVersion
+            );
 
             if (!nextRule) {
-                const availableFromVersions = rules.map((r) => r.fromVersion).join(", ");
+                const availableFromVersions = rules
+                    .map((r) => r.fromVersion)
+                    .join(", ");
                 throw new Error(
                     `No migration path from ${currentVersion} to ${toVersion} for ${monitorType}. ` +
                         `Available migration starting points: [${availableFromVersions}]`
@@ -355,20 +387,27 @@ class MigrationRegistry {
 
         const rules = this.migrations.get(monitorType);
         if (!rules) {
-            throw new Error(`Failed to create migration rules for ${monitorType}`);
+            throw new Error(
+                `Failed to create migration rules for ${monitorType}`
+            );
         }
 
         rules.push(rule);
 
         // Sort by version
-        rules.sort((a, b) => this.compareVersions(a.fromVersion, b.fromVersion));
+        rules.sort((a, b) =>
+            this.compareVersions(a.fromVersion, b.fromVersion)
+        );
 
         logger.info(
-            interpolateLogTemplate(LOG_TEMPLATES.services.MIGRATION_REGISTERED, {
-                fromVersion: rule.fromVersion,
-                monitorType,
-                toVersion: rule.toVersion,
-            })
+            interpolateLogTemplate(
+                LOG_TEMPLATES.services.MIGRATION_REGISTERED,
+                {
+                    fromVersion: rule.fromVersion,
+                    monitorType,
+                    toVersion: rule.toVersion,
+                }
+            )
         );
     }
 
@@ -417,14 +456,20 @@ class MigrationRegistry {
      * @throws {@link Error} If the version string format is invalid.
      * @internal
      */
-    private validateVersionString(version: string, parameterName: string): void {
+    private validateVersionString(
+        version: string,
+        parameterName: string
+    ): void {
         if (!version || typeof version !== "string") {
-            throw new Error(`${parameterName} must be a non-empty string, got: ${typeof version}`);
+            throw new Error(
+                `${parameterName} must be a non-empty string, got: ${typeof version}`
+            );
         }
 
         // Basic semantic version validation: x.y.z where x, y, z are non-negative integers
         // eslint-disable-next-line security/detect-unsafe-regex, regexp/require-unicode-sets-regexp -- Simple semver pattern, safe for our use case
-        const versionPattern = /^\d+\.\d+\.\d+(?:-[\da-z\-]+)?(?:\+[\da-z\-]+)?$/i;
+        const versionPattern =
+            /^\d+\.\d+\.\d+(?:-[\da-z\-]+)?(?:\+[\da-z\-]+)?$/i;
         if (!versionPattern.test(version)) {
             throw new Error(
                 `${parameterName} "${version}" is not a valid semantic version. Expected format: x.y.z (e.g., "1.0.0")`
@@ -435,7 +480,9 @@ class MigrationRegistry {
         const parts = version.split(".").slice(0, 3).map(Number);
         for (const part of parts) {
             if (part < 0 || part > Number.MAX_SAFE_INTEGER) {
-                throw new Error(`${parameterName} "${version}" contains invalid numeric parts`);
+                throw new Error(
+                    `${parameterName} "${version}" contains invalid numeric parts`
+                );
             }
         }
     }
@@ -623,7 +670,9 @@ export const exampleMigrations = {
                         port: parsed,
                     });
                 } else {
-                    throw new Error(`Invalid port value: ${portValue}. Must be 1-65535.`);
+                    throw new Error(
+                        `Invalid port value: ${portValue}. Must be 1-65535.`
+                    );
                 }
             }
 
@@ -635,12 +684,16 @@ export const exampleMigrations = {
                         port: portValue,
                     });
                 } else {
-                    throw new Error(`Invalid port number: ${portValue}. Must be 1-65535.`);
+                    throw new Error(
+                        `Invalid port number: ${portValue}. Must be 1-65535.`
+                    );
                 }
             }
 
             // Invalid port type
-            throw new Error(`Port must be a number or numeric string, got: ${typeof portValue}`);
+            throw new Error(
+                `Port must be a number or numeric string, got: ${typeof portValue}`
+            );
         },
     } as MigrationRule,
 };

@@ -24,11 +24,14 @@ import { generateMonitorTableSchema } from "./dynamicSchema";
 const SCHEMA_QUERIES = {
     BEGIN_TRANSACTION: "BEGIN TRANSACTION",
     COMMIT: "COMMIT",
-    CREATE_INDEX_HISTORY_MONITOR_ID: "CREATE INDEX IF NOT EXISTS idx_history_monitor_id ON history(monitor_id)",
-    CREATE_INDEX_HISTORY_TIMESTAMP: "CREATE INDEX IF NOT EXISTS idx_history_timestamp ON history(timestamp)",
+    CREATE_INDEX_HISTORY_MONITOR_ID:
+        "CREATE INDEX IF NOT EXISTS idx_history_monitor_id ON history(monitor_id)",
+    CREATE_INDEX_HISTORY_TIMESTAMP:
+        "CREATE INDEX IF NOT EXISTS idx_history_timestamp ON history(timestamp)",
     CREATE_INDEX_MONITORS_SITE_IDENTIFIER:
         "CREATE INDEX IF NOT EXISTS idx_monitors_site_identifier ON monitors(site_identifier)",
-    CREATE_INDEX_MONITORS_TYPE: "CREATE INDEX IF NOT EXISTS idx_monitors_type ON monitors(type)",
+    CREATE_INDEX_MONITORS_TYPE:
+        "CREATE INDEX IF NOT EXISTS idx_monitors_type ON monitors(type)",
     CREATE_TABLE_HISTORY: `
             CREATE TABLE IF NOT EXISTS history (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -195,12 +198,17 @@ export function setupMonitorTypeValidation(): void {
         const validTypes = getRegisteredMonitorTypes();
 
         if (validTypes.length === 0) {
-            logger.warn(LOG_TEMPLATES.warnings.DATABASE_MONITOR_VALIDATION_MISSING);
+            logger.warn(
+                LOG_TEMPLATES.warnings.DATABASE_MONITOR_VALIDATION_MISSING
+            );
         } else {
-            logger.info(LOG_TEMPLATES.services.DATABASE_MONITOR_VALIDATION_INITIALIZED, {
-                count: validTypes.length,
-                validTypes,
-            });
+            logger.info(
+                LOG_TEMPLATES.services.DATABASE_MONITOR_VALIDATION_INITIALIZED,
+                {
+                    count: validTypes.length,
+                    validTypes,
+                }
+            );
         }
 
         // Future enhancement: Create database CHECK constraint or trigger
@@ -215,10 +223,15 @@ export function setupMonitorTypeValidation(): void {
 
         logger.info(LOG_TEMPLATES.services.DATABASE_MONITOR_VALIDATION_READY);
     } catch (error) {
-        logger.error(LOG_TEMPLATES.errors.DATABASE_VALIDATION_SETUP_FAILED, error);
+        logger.error(
+            LOG_TEMPLATES.errors.DATABASE_VALIDATION_SETUP_FAILED,
+            error
+        );
         // Don't throw here - this is a non-critical enhancement
         // The application should still work without validation
-        logger.warn(LOG_TEMPLATES.warnings.DATABASE_MONITOR_VALIDATION_CONTINUE);
+        logger.warn(
+            LOG_TEMPLATES.warnings.DATABASE_MONITOR_VALIDATION_CONTINUE
+        );
     }
 }
 
@@ -237,7 +250,9 @@ function validateGeneratedSchema(schema: string): void {
         throw new Error("Generated schema is empty or invalid");
     }
     if (!schema.includes("CREATE TABLE IF NOT EXISTS monitors")) {
-        throw new Error("Generated schema missing required monitors table definition");
+        throw new Error(
+            "Generated schema missing required monitors table definition"
+        );
     }
     if (schema.includes("undefined") || schema.includes("null")) {
         throw new Error("Generated schema contains undefined or null values");

@@ -52,7 +52,9 @@ if (errors.length === 0 && appliedMigrations.length > 0) {
 **Before (UNSAFE)**:
 
 ```typescript
-port: typeof data.port === "string" ? Number.parseInt(data.port, 10) : data.port;
+port: typeof data.port === "string"
+ ? Number.parseInt(data.port, 10)
+ : data.port;
 // Could result in NaN for invalid strings!
 ```
 

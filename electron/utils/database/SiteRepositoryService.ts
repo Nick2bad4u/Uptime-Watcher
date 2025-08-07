@@ -70,7 +70,12 @@ import { SiteRepository } from "../../services/database/SiteRepository";
 import { SiteRow } from "../../services/database/utils/siteMapper";
 import { Site } from "../../types";
 import { StandardizedCache } from "../cache/StandardizedCache";
-import { Logger, MonitoringConfig, SiteLoadingConfig, SiteLoadingError } from "./interfaces";
+import {
+    Logger,
+    MonitoringConfig,
+    SiteLoadingConfig,
+    SiteLoadingError,
+} from "./interfaces";
 
 /**
  * Orchestrates the complete site loading process.
@@ -96,7 +101,9 @@ export class SiteLoadingOrchestrator {
             await this.siteRepositoryService.loadSitesIntoCache(siteCache);
 
             // Apply settings
-            await this.siteRepositoryService.applyHistoryLimitSetting(monitoringConfig);
+            await this.siteRepositoryService.applyHistoryLimitSetting(
+                monitoringConfig
+            );
 
             // Note: Auto-start monitoring is now handled by MonitorManager.setupSiteForMonitoring()
             // No need to explicitly start monitoring here as it's handled during site setup
@@ -160,7 +167,9 @@ export class SiteRepositoryService {
      * Apply history limit setting.
      * Side effect operation separated from data loading.
      */
-    async applyHistoryLimitSetting(monitoringConfig: MonitoringConfig): Promise<void> {
+    async applyHistoryLimitSetting(
+        monitoringConfig: MonitoringConfig
+    ): Promise<void> {
         const limit = await this.getHistoryLimitSetting();
         if (limit !== undefined) {
             monitoringConfig.setHistoryLimit(limit);
@@ -174,20 +183,26 @@ export class SiteRepositoryService {
      */
     async getHistoryLimitSetting(): Promise<number | undefined> {
         try {
-            const historyLimitSetting = await this.repositories.settings.get("historyLimit");
+            const historyLimitSetting =
+                await this.repositories.settings.get("historyLimit");
             if (!historyLimitSetting) {
                 return undefined;
             }
 
             const limit = Number.parseInt(historyLimitSetting, 10);
             if (Number.isNaN(limit) || limit <= 0) {
-                this.logger.warn(`Invalid history limit setting: ${historyLimitSetting}`);
+                this.logger.warn(
+                    `Invalid history limit setting: ${historyLimitSetting}`
+                );
                 return undefined;
             }
 
             return limit;
         } catch (error) {
-            this.logger.warn("Could not load history limit from settings:", error);
+            this.logger.warn(
+                "Could not load history limit from settings:",
+                error
+            );
             return undefined;
         }
     }
@@ -214,7 +229,8 @@ export class SiteRepositoryService {
             const sites: Site[] = [];
 
             for (const siteRow of siteRows) {
-                const site = await this.buildSiteWithMonitorsAndHistory(siteRow);
+                const site =
+                    await this.buildSiteWithMonitorsAndHistory(siteRow);
                 sites.push(site);
             }
 
@@ -222,7 +238,10 @@ export class SiteRepositoryService {
         } catch (error) {
             const message = `Failed to fetch sites from database: ${error instanceof Error ? error.message : String(error)}`;
             this.logger.error(message, error);
-            throw new SiteLoadingError(message, error instanceof Error ? error : undefined);
+            throw new SiteLoadingError(
+                message,
+                error instanceof Error ? error : undefined
+            );
         }
     }
 
@@ -230,7 +249,9 @@ export class SiteRepositoryService {
      * Load sites into cache.
      * Pure data operation that populates the cache.
      */
-    async loadSitesIntoCache(siteCache: StandardizedCache<Site>): Promise<void> {
+    async loadSitesIntoCache(
+        siteCache: StandardizedCache<Site>
+    ): Promise<void> {
         try {
             const sites = await this.getSitesFromDatabase();
             siteCache.clear();
@@ -247,7 +268,8 @@ export class SiteRepositoryService {
             // Emit typed error event
             await this.eventEmitter.emitTyped("database:error", {
                 details: message,
-                error: error instanceof Error ? error : new Error(String(error)),
+                error:
+                    error instanceof Error ? error : new Error(String(error)),
                 operation: "load-sites-into-cache",
                 timestamp: Date.now(),
             });
@@ -260,14 +282,21 @@ export class SiteRepositoryService {
      * Build a site object with monitors and history.
      * Private helper method for data construction.
      */
-    private async buildSiteWithMonitorsAndHistory(siteRow: SiteRow): Promise<Site> {
-        const monitors = await this.repositories.monitor.findBySiteIdentifier(siteRow.identifier);
+    private async buildSiteWithMonitorsAndHistory(
+        siteRow: SiteRow
+    ): Promise<Site> {
+        const monitors = await this.repositories.monitor.findBySiteIdentifier(
+            siteRow.identifier
+        );
 
         // Load history for all monitors in parallel for better performance
         await Promise.all(
             monitors.map(async (monitor) => {
                 if (monitor.id) {
-                    monitor.history = await this.repositories.history.findByMonitorId(monitor.id);
+                    monitor.history =
+                        await this.repositories.history.findByMonitorId(
+                            monitor.id
+                        );
                 }
             })
         );

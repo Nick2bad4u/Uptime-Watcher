@@ -42,7 +42,10 @@ export interface PingOperationContext {
  * @see {@link PingOperationContext}
  * @public
  */
-export function handlePingCheckError(error: unknown, context: PingOperationContext): MonitorCheckResult {
+export function handlePingCheckError(
+    error: unknown,
+    context: PingOperationContext
+): MonitorCheckResult {
     const errorMessage = error instanceof Error ? error.message : String(error);
 
     logger.error("Ping check failed", {

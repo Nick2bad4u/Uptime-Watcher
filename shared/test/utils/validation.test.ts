@@ -5,7 +5,11 @@
 import { describe, it, expect } from "vitest";
 
 import type { Monitor, Site } from "../../types";
-import { getMonitorValidationErrors, validateMonitorType, validateSite } from "../../utils/validation";
+import {
+    getMonitorValidationErrors,
+    validateMonitorType,
+    validateSite,
+} from "../../utils/validation";
 
 describe("Shared Validation Utilities", () => {
     describe("getMonitorValidationErrors", () => {
@@ -73,7 +77,11 @@ describe("Shared Validation Utilities", () => {
             };
 
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors.some((error) => error.includes("url") || error.includes("URL"))).toBe(true);
+            expect(
+                errors.some(
+                    (error) => error.includes("url") || error.includes("URL")
+                )
+            ).toBe(true);
         });
 
         it.skip("should return errors for port monitor without host or port", () => {
@@ -98,7 +106,13 @@ describe("Shared Validation Utilities", () => {
             };
 
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors.some((error) => error.includes("interval") || error.includes("checkInterval"))).toBe(true);
+            expect(
+                errors.some(
+                    (error) =>
+                        error.includes("interval") ||
+                        error.includes("checkInterval")
+                )
+            ).toBe(true);
         });
 
         it.skip("should return errors for invalid timeout", () => {
@@ -112,7 +126,9 @@ describe("Shared Validation Utilities", () => {
             };
 
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors.some((error) => error.includes("timeout"))).toBe(true);
+            expect(errors.some((error) => error.includes("timeout"))).toBe(
+                true
+            );
         });
 
         it("should return errors for invalid retry attempts", () => {
@@ -126,7 +142,12 @@ describe("Shared Validation Utilities", () => {
             };
 
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors.some((error) => error.includes("retry") || error.includes("attempts"))).toBe(true);
+            expect(
+                errors.some(
+                    (error) =>
+                        error.includes("retry") || error.includes("attempts")
+                )
+            ).toBe(true);
         });
     });
 

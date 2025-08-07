@@ -134,7 +134,11 @@ class MigrationRegistry {
   this.sortedCache.set(monitorType, false);
  }
 
- getMigrationPath(monitorType: string, fromVersion: string, toVersion: string): MigrationRule[] {
+ getMigrationPath(
+  monitorType: string,
+  fromVersion: string,
+  toVersion: string
+ ): MigrationRule[] {
   const rules = this.migrations.get(monitorType) ?? [];
 
   // Sort only when needed

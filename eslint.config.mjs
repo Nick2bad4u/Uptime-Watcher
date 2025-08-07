@@ -453,10 +453,10 @@ export default [
             "import-x/no-unassigned-import": [
                 "error",
                 {
-                    allow: ["**/*.css", "**/*.scss"] // Allow CSS imports without assignment
-                }
+                    allow: ["**/*.css", "**/*.scss"], // Allow CSS imports without assignment
+                },
             ],
-            
+
             // Core quality rules
             // "no-console": "warn", // Allow in development, but warn - DISABLED FOR NOW
             "consistent-return": "warn",
@@ -730,7 +730,10 @@ export default [
             ],
             "@typescript-eslint/prefer-optional-chain": "error", // Use optional chaining instead of logical AND
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
-            "@typescript-eslint/array-type": ["error", { "default": "array-simple" }], // Prefer T[] for simple types, Array<T> for complex types
+            "@typescript-eslint/array-type": [
+                "error",
+                { default: "array-simple" },
+            ], // Prefer T[] for simple types, Array<T> for complex types
 
             // React
             "react/boolean-prop-naming": "warn",
@@ -744,10 +747,13 @@ export default [
             "react/forbid-foreign-prop-types": "warn",
             "react/forbid-prop-types": "warn",
             "react/forward-ref-uses-ref": "warn",
-            "react/function-component-definition": ["error", {
-                "namedComponents": "arrow-function",
-                "unnamedComponents": "arrow-function"
-            }], // Enforce consistent arrow function components
+            "react/function-component-definition": [
+                "error",
+                {
+                    namedComponents: "arrow-function",
+                    unnamedComponents: "arrow-function",
+                },
+            ], // Enforce consistent arrow function components
             "react/hook-use-state": "warn",
             "react/iframe-missing-sandbox": "warn",
             "react/jsx-child-element-spacing": "warn",
@@ -757,12 +763,12 @@ export default [
             "react/jsx-curly-newline": "off",
             "react/jsx-curly-spacing": "off",
             "react/jsx-equals-spacing": "off",
-            "react/jsx-filename-extension": ["error", { "extensions": [".tsx"] }], // Enforce .tsx for JSX files
+            "react/jsx-filename-extension": ["error", { extensions: [".tsx"] }], // Enforce .tsx for JSX files
             "react/jsx-first-prop-new-line": "off",
-             "react/jsx-handler-names": "warn", // Enforce consistent handler names
+            "react/jsx-handler-names": "warn", // Enforce consistent handler names
             "react/jsx-indent": "off",
             "react/jsx-indent-props": "off",
-            "react/jsx-max-depth": ["warn", { "max": 7 }], // Warn on deeply nested JSX to encourage component extraction
+            "react/jsx-max-depth": ["warn", { max: 7 }], // Warn on deeply nested JSX to encourage component extraction
             "react/jsx-max-props-per-line": "off",
             "react/jsx-newline": "off",
             "react/jsx-no-bind": "off", // Allow inline functions for development speed
@@ -2289,7 +2295,7 @@ export default [
             react: { version: "19" },
         },
     },
-    
+
     // eslint-config-prettier MUST be last to override conflicting rules
     eslintConfigPrettier,
 ];

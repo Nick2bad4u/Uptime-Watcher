@@ -9,7 +9,9 @@ import { getMonitorTypeConfig } from "../../utils/monitorTypeHelper";
 
 // Mock dependencies
 vi.mock("../../types/ipc", () => ({
-    safeExtractIpcData: vi.fn((response, fallback) => response.data || fallback),
+    safeExtractIpcData: vi.fn(
+        (response, fallback) => response.data || fallback
+    ),
 }));
 
 vi.mock("../../utils/errorHandling", () => ({
@@ -65,7 +67,9 @@ describe("Monitor UI Helpers", () => {
         vi.clearAllMocks();
         AppCaches.uiHelpers.clear();
         // Reset getMonitorTypeConfig mock to default implementation
-        vi.mocked(getMonitorTypeConfig).mockImplementation(async () => undefined);
+        vi.mocked(getMonitorTypeConfig).mockImplementation(
+            async () => undefined
+        );
     });
 
     afterEach(() => {
@@ -85,7 +89,10 @@ describe("Monitor UI Helpers", () => {
                 return undefined;
             });
 
-            const result = await monitorUiHelpers.allSupportsAdvancedAnalytics(["http", "port"]);
+            const result = await monitorUiHelpers.allSupportsAdvancedAnalytics([
+                "http",
+                "port",
+            ]);
 
             expect(result).toBe(true);
         });
@@ -107,13 +114,18 @@ describe("Monitor UI Helpers", () => {
                 return undefined;
             });
 
-            const result = await monitorUiHelpers.allSupportsAdvancedAnalytics(["http", "port"]);
+            const result = await monitorUiHelpers.allSupportsAdvancedAnalytics([
+                "http",
+                "port",
+            ]);
 
             expect(result).toBe(false);
         });
 
         it("should return true for empty array", async () => {
-            const result = await monitorUiHelpers.allSupportsAdvancedAnalytics([]);
+            const result = await monitorUiHelpers.allSupportsAdvancedAnalytics(
+                []
+            );
 
             expect(result).toBe(true);
         });
@@ -131,7 +143,10 @@ describe("Monitor UI Helpers", () => {
                 return undefined;
             });
 
-            const result = await monitorUiHelpers.allSupportsResponseTime(["http", "port"]);
+            const result = await monitorUiHelpers.allSupportsResponseTime([
+                "http",
+                "port",
+            ]);
 
             expect(result).toBe(true);
         });
@@ -153,7 +168,10 @@ describe("Monitor UI Helpers", () => {
                 return undefined;
             });
 
-            const result = await monitorUiHelpers.allSupportsResponseTime(["http", "port"]);
+            const result = await monitorUiHelpers.allSupportsResponseTime([
+                "http",
+                "port",
+            ]);
 
             expect(result).toBe(false);
         });
@@ -174,7 +192,8 @@ describe("Monitor UI Helpers", () => {
                 })
             );
 
-            const result = await monitorUiHelpers.supportsAdvancedAnalytics("http");
+            const result =
+                await monitorUiHelpers.supportsAdvancedAnalytics("http");
 
             expect(result).toBe(true);
         });
@@ -187,7 +206,8 @@ describe("Monitor UI Helpers", () => {
                 })
             );
 
-            const result = await monitorUiHelpers.supportsAdvancedAnalytics("http");
+            const result =
+                await monitorUiHelpers.supportsAdvancedAnalytics("http");
 
             expect(result).toBe(false);
         });
@@ -195,7 +215,8 @@ describe("Monitor UI Helpers", () => {
         it("should return false when config is undefined", async () => {
             vi.mocked(getMonitorTypeConfig).mockResolvedValue(undefined);
 
-            const result = await monitorUiHelpers.supportsAdvancedAnalytics("http");
+            const result =
+                await monitorUiHelpers.supportsAdvancedAnalytics("http");
 
             expect(result).toBe(false);
         });
@@ -289,7 +310,11 @@ describe("Monitor UI Helpers", () => {
 
     describe("getDefaultMonitorId", () => {
         it("should return first monitor ID from non-empty array", () => {
-            const result = monitorUiHelpers.getDefaultMonitorId(["monitor-1", "monitor-2", "monitor-3"]);
+            const result = monitorUiHelpers.getDefaultMonitorId([
+                "monitor-1",
+                "monitor-2",
+                "monitor-3",
+            ]);
 
             expect(result).toBe("monitor-1");
         });
@@ -301,7 +326,9 @@ describe("Monitor UI Helpers", () => {
         });
 
         it("should handle array with single element", () => {
-            const result = monitorUiHelpers.getDefaultMonitorId(["only-monitor"]);
+            const result = monitorUiHelpers.getDefaultMonitorId([
+                "only-monitor",
+            ]);
 
             expect(result).toBe("only-monitor");
         });
@@ -309,14 +336,24 @@ describe("Monitor UI Helpers", () => {
 
     describe("Error handling and edge cases", () => {
         it("should handle errors gracefully in basic functions", async () => {
-            vi.mocked(getMonitorTypeConfig).mockRejectedValue(new Error("Config fetch failed"));
+            vi.mocked(getMonitorTypeConfig).mockRejectedValue(
+                new Error("Config fetch failed")
+            );
 
             // All functions should return their fallback values on error
-            expect(await monitorUiHelpers.supportsAdvancedAnalytics("http")).toBe(false);
-            expect(await monitorUiHelpers.supportsResponseTime("http")).toBe(false);
+            expect(
+                await monitorUiHelpers.supportsAdvancedAnalytics("http")
+            ).toBe(false);
+            expect(await monitorUiHelpers.supportsResponseTime("http")).toBe(
+                false
+            );
             expect(await monitorUiHelpers.shouldShowUrl("http")).toBe(false);
-            expect(await monitorUiHelpers.getAnalyticsLabel("http")).toBe("HTTP Response Time");
-            expect(await monitorUiHelpers.getMonitorHelpTexts("http")).toEqual({});
+            expect(await monitorUiHelpers.getAnalyticsLabel("http")).toBe(
+                "HTTP Response Time"
+            );
+            expect(await monitorUiHelpers.getMonitorHelpTexts("http")).toEqual(
+                {}
+            );
         });
 
         it("should handle invalid monitor types", async () => {
@@ -325,9 +362,15 @@ describe("Monitor UI Helpers", () => {
             // Mock to return undefined for invalid types (this is the default, but let's be explicit)
             vi.mocked(getMonitorTypeConfig).mockResolvedValue(undefined);
 
-            expect(await monitorUiHelpers.supportsAdvancedAnalytics(invalidType)).toBe(false);
-            expect(await monitorUiHelpers.supportsResponseTime(invalidType)).toBe(false);
-            expect(await monitorUiHelpers.shouldShowUrl(invalidType)).toBe(false);
+            expect(
+                await monitorUiHelpers.supportsAdvancedAnalytics(invalidType)
+            ).toBe(false);
+            expect(
+                await monitorUiHelpers.supportsResponseTime(invalidType)
+            ).toBe(false);
+            expect(await monitorUiHelpers.shouldShowUrl(invalidType)).toBe(
+                false
+            );
         });
     });
 

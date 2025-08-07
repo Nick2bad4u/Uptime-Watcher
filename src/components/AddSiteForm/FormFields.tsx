@@ -27,7 +27,8 @@ const REQUIRED_SUFFIX = " (required)";
  * createAriaLabel("Site Name", true); // "Site Name (required)"
  * ```
  */
-const createAriaLabel = (label: string, required: boolean): string => `${label}${required ? REQUIRED_SUFFIX : ""}`;
+const createAriaLabel = (label: string, required: boolean): string =>
+    `${label}${required ? REQUIRED_SUFFIX : ""}`;
 
 /**
  * Determines the appropriate aria-describedby value for a form field.
@@ -40,7 +41,11 @@ const createAriaLabel = (label: string, required: boolean): string => `${label}$
  * @remarks
  * If both error and helpText are present, error takes precedence for accessibility.
  */
-const getAriaDescribedBy = (id: string, error?: string, helpText?: string): string | undefined => {
+const getAriaDescribedBy = (
+    id: string,
+    error?: string,
+    helpText?: string
+): string | undefined => {
     if (error) {
         return `${id}-error`;
     }
@@ -78,39 +83,44 @@ export interface FormFieldProperties {
  * @param props - {@link FormFieldProperties}
  * @returns JSX element containing labeled form field with error/help text.
  */
-export const FormField: React.NamedExoticComponent<FormFieldProperties> = React.memo(function FormField({
-    children,
-    error,
-    helpText,
-    id,
-    label,
-    required = false,
-}: FormFieldProperties) {
-    return (
-        <div>
-            <label className="block mb-1" htmlFor={id}>
-                <ThemedText size="sm" variant="secondary" weight="medium">
-                    {label} {required ? "*" : null}
-                </ThemedText>
-            </label>
-            {children}
-            {error ? (
-                <div id={`${id}-error`}>
-                    <ThemedText className="mt-1" size="xs" variant="error">
-                        {error}
+export const FormField: React.NamedExoticComponent<FormFieldProperties> =
+    React.memo(function FormField({
+        children,
+        error,
+        helpText,
+        id,
+        label,
+        required = false,
+    }: FormFieldProperties) {
+        return (
+            <div>
+                <label className="block mb-1" htmlFor={id}>
+                    <ThemedText size="sm" variant="secondary" weight="medium">
+                        {label} {required ? "*" : null}
                     </ThemedText>
-                </div>
-            ) : null}
-            {helpText && !error ? (
-                <div id={`${id}-help`}>
-                    <ThemedText className="mt-1" size="xs" variant="tertiary">
-                        {helpText}
-                    </ThemedText>
-                </div>
-            ) : null}
-        </div>
-    );
-});
+                </label>
+                {children}
+                {error ? (
+                    <div id={`${id}-error`}>
+                        <ThemedText className="mt-1" size="xs" variant="error">
+                            {error}
+                        </ThemedText>
+                    </div>
+                ) : null}
+                {helpText && !error ? (
+                    <div id={`${id}-help`}>
+                        <ThemedText
+                            className="mt-1"
+                            size="xs"
+                            variant="tertiary"
+                        >
+                            {helpText}
+                        </ThemedText>
+                    </div>
+                ) : null}
+            </div>
+        );
+    });
 
 /**
  * Props for the TextField component.
@@ -162,49 +172,56 @@ export interface TextFieldProperties {
  * />
  * ```
  */
-export const TextField: React.NamedExoticComponent<TextFieldProperties> = React.memo(function TextField({
-    disabled = false,
-    error,
-    helpText,
-    id,
-    label,
-    max,
-    min,
-    onChange,
-    placeholder,
-    required = false,
-    type = "text",
-    value,
-}: TextFieldProperties) {
-    return (
-        <FormField
-            {...(error !== undefined && { error })}
-            {...(helpText !== undefined && { helpText })}
-            id={id}
-            label={label}
-            required={required}
-        >
-            <ThemedInput
-                {...(() => {
-                    const ariaDescribedBy = getAriaDescribedBy(id, error, helpText);
-                    return ariaDescribedBy ? { "aria-describedby": ariaDescribedBy } : {};
-                })()}
-                aria-label={createAriaLabel(label, required)}
-                disabled={disabled}
+export const TextField: React.NamedExoticComponent<TextFieldProperties> =
+    React.memo(function TextField({
+        disabled = false,
+        error,
+        helpText,
+        id,
+        label,
+        max,
+        min,
+        onChange,
+        placeholder,
+        required = false,
+        type = "text",
+        value,
+    }: TextFieldProperties) {
+        return (
+            <FormField
+                {...(error !== undefined && { error })}
+                {...(helpText !== undefined && { helpText })}
                 id={id}
-                {...(max !== undefined && { max })}
-                {...(min !== undefined && { min })}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    onChange(event.target.value);
-                }}
-                {...(placeholder !== undefined && { placeholder })}
+                label={label}
                 required={required}
-                type={type}
-                value={value}
-            />
-        </FormField>
-    );
-});
+            >
+                <ThemedInput
+                    {...(() => {
+                        const ariaDescribedBy = getAriaDescribedBy(
+                            id,
+                            error,
+                            helpText
+                        );
+                        return ariaDescribedBy
+                            ? { "aria-describedby": ariaDescribedBy }
+                            : {};
+                    })()}
+                    aria-label={createAriaLabel(label, required)}
+                    disabled={disabled}
+                    id={id}
+                    {...(max !== undefined && { max })}
+                    {...(min !== undefined && { min })}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        onChange(event.target.value);
+                    }}
+                    {...(placeholder !== undefined && { placeholder })}
+                    required={required}
+                    type={type}
+                    value={value}
+                />
+            </FormField>
+        );
+    });
 
 /**
  * Props for the SelectField component.
@@ -262,49 +279,58 @@ export interface SelectOption {
  * />
  * ```
  */
-export const SelectField: React.NamedExoticComponent<SelectFieldProperties> = React.memo(function SelectField({
-    disabled = false,
-    error,
-    helpText,
-    id,
-    label,
-    onChange,
-    options,
-    placeholder,
-    required = false,
-    value,
-}: SelectFieldProperties) {
-    return (
-        <FormField
-            {...(error !== undefined && { error })}
-            {...(helpText !== undefined && { helpText })}
-            id={id}
-            label={label}
-            required={required}
-        >
-            <ThemedSelect
-                {...(() => {
-                    const ariaDescribedBy = getAriaDescribedBy(id, error, helpText);
-                    return ariaDescribedBy ? { "aria-describedby": ariaDescribedBy } : {};
-                })()}
-                aria-label={createAriaLabel(label, required)}
-                disabled={disabled}
+export const SelectField: React.NamedExoticComponent<SelectFieldProperties> =
+    React.memo(function SelectField({
+        disabled = false,
+        error,
+        helpText,
+        id,
+        label,
+        onChange,
+        options,
+        placeholder,
+        required = false,
+        value,
+    }: SelectFieldProperties) {
+        return (
+            <FormField
+                {...(error !== undefined && { error })}
+                {...(helpText !== undefined && { helpText })}
                 id={id}
-                onChange={(event) => onChange(event.target.value)}
+                label={label}
                 required={required}
-                title={createAriaLabel(label, required)}
-                value={value}
             >
-                {placeholder ? <option value="">{placeholder}</option> : null}
-                {options.map((option) => (
-                    <option key={option.value} value={option.value}>
-                        {option.label}
-                    </option>
-                ))}
-            </ThemedSelect>
-        </FormField>
-    );
-});
+                <ThemedSelect
+                    {...(() => {
+                        const ariaDescribedBy = getAriaDescribedBy(
+                            id,
+                            error,
+                            helpText
+                        );
+                        return ariaDescribedBy
+                            ? { "aria-describedby": ariaDescribedBy }
+                            : {};
+                    })()}
+                    aria-label={createAriaLabel(label, required)}
+                    disabled={disabled}
+                    id={id}
+                    onChange={(event) => onChange(event.target.value)}
+                    required={required}
+                    title={createAriaLabel(label, required)}
+                    value={value}
+                >
+                    {placeholder ? (
+                        <option value="">{placeholder}</option>
+                    ) : null}
+                    {options.map((option) => (
+                        <option key={option.value} value={option.value}>
+                            {option.label}
+                        </option>
+                    ))}
+                </ThemedSelect>
+            </FormField>
+        );
+    });
 
 /**
  * Props for the RadioGroup component.
@@ -367,42 +393,46 @@ export interface RadioOption {
  * />
  * ```
  */
-export const RadioGroup: React.NamedExoticComponent<RadioGroupProperties> = React.memo(function RadioGroup({
-    disabled = false,
-    error,
-    helpText,
-    id,
-    label,
-    name,
-    onChange,
-    options,
-    required = false,
-    value,
-}: RadioGroupProperties) {
-    return (
-        <FormField
-            {...(error !== undefined && { error })}
-            {...(helpText !== undefined && { helpText })}
-            id={id}
-            label={label}
-            required={required}
-        >
-            <div className="flex items-center gap-4" role="radiogroup">
-                {options.map((option) => (
-                    <label className="flex items-center gap-1" key={option.value}>
-                        <input
-                            checked={value === option.value}
-                            disabled={disabled}
-                            name={name}
-                            onChange={() => onChange(option.value)}
-                            required={required}
-                            type="radio"
-                            value={option.value}
-                        />
-                        <ThemedText size="sm">{option.label}</ThemedText>
-                    </label>
-                ))}
-            </div>
-        </FormField>
-    );
-});
+export const RadioGroup: React.NamedExoticComponent<RadioGroupProperties> =
+    React.memo(function RadioGroup({
+        disabled = false,
+        error,
+        helpText,
+        id,
+        label,
+        name,
+        onChange,
+        options,
+        required = false,
+        value,
+    }: RadioGroupProperties) {
+        return (
+            <FormField
+                {...(error !== undefined && { error })}
+                {...(helpText !== undefined && { helpText })}
+                id={id}
+                label={label}
+                required={required}
+            >
+                <div className="flex items-center gap-4" role="radiogroup">
+                    {options.map((option) => (
+                        <label
+                            className="flex items-center gap-1"
+                            key={option.value}
+                        >
+                            <input
+                                checked={value === option.value}
+                                disabled={disabled}
+                                name={name}
+                                onChange={() => onChange(option.value)}
+                                required={required}
+                                type="radio"
+                                value={option.value}
+                            />
+                            <ThemedText size="sm">{option.label}</ThemedText>
+                        </label>
+                    ))}
+                </div>
+            </FormField>
+        );
+    });

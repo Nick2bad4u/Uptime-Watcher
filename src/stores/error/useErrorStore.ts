@@ -36,71 +36,77 @@ import type { ErrorStore } from "./types";
 
 import { logStoreAction } from "../shared/utils";
 
-export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> = create<ErrorStore>()((set, get) => ({
-    // Actions
-    clearAllErrors: () => {
-        logStoreAction("ErrorStore", "clearAllErrors");
-        set({
-            lastError: undefined,
-            storeErrors: {},
-        });
-    },
-    clearError: () => {
-        logStoreAction("ErrorStore", "clearError");
-        set({ lastError: undefined });
-    },
-    clearStoreError: (store: string) => {
-        logStoreAction("ErrorStore", "clearStoreError", { store });
-        set((state) => {
-            const newStoreErrors = {
-                ...state.storeErrors,
-            };
-            // Filter out the specified store error
-            const remainingErrors = Object.fromEntries(
-                Object.entries(newStoreErrors).filter(([key]) => key !== store)
-            );
-            return { storeErrors: remainingErrors };
-        });
-    },
-    getOperationLoading: (operation: string) => {
-        const loading = get().operationLoading;
+export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
+    create<ErrorStore>()((set, get) => ({
+        // Actions
+        clearAllErrors: () => {
+            logStoreAction("ErrorStore", "clearAllErrors");
+            set({
+                lastError: undefined,
+                storeErrors: {},
+            });
+        },
+        clearError: () => {
+            logStoreAction("ErrorStore", "clearError");
+            set({ lastError: undefined });
+        },
+        clearStoreError: (store: string) => {
+            logStoreAction("ErrorStore", "clearStoreError", { store });
+            set((state) => {
+                const newStoreErrors = {
+                    ...state.storeErrors,
+                };
+                // Filter out the specified store error
+                const remainingErrors = Object.fromEntries(
+                    Object.entries(newStoreErrors).filter(
+                        ([key]) => key !== store
+                    )
+                );
+                return { storeErrors: remainingErrors };
+            });
+        },
+        getOperationLoading: (operation: string) => {
+            const loading = get().operationLoading;
 
-        return loading[operation] ?? false;
-    },
-    getStoreError: (store: string) => {
-        const errors = get().storeErrors;
+            return loading[operation] ?? false;
+        },
+        getStoreError: (store: string) => {
+            const errors = get().storeErrors;
 
-        return errors[store];
-    },
-    // State
-    isLoading: false,
-    lastError: undefined,
-    operationLoading: {},
-    setError: (error: string | undefined) => {
-        logStoreAction("ErrorStore", "setError", { error });
-        set({ lastError: error });
-    },
-    setLoading: (loading: boolean) => {
-        logStoreAction("ErrorStore", "setLoading", { loading });
-        set({ isLoading: loading });
-    },
-    setOperationLoading: (operation: string, loading: boolean) => {
-        logStoreAction("ErrorStore", "setOperationLoading", { loading, operation });
-        set((state) => ({
-            operationLoading: {
-                ...state.operationLoading,
-                [operation]: loading,
-            },
-        }));
-    },
-    setStoreError: (store: string, error: string | undefined) => {
-        logStoreAction("ErrorStore", "setStoreError", { error, store });
-        set((state) => ({
-            storeErrors: {
-                ...state.storeErrors,
-                [store]: error,
-            },
-        }));
-    },
-    storeErrors: {},
-}));
+            return errors[store];
+        },
+        // State
+        isLoading: false,
+        lastError: undefined,
+        operationLoading: {},
+        setError: (error: string | undefined) => {
+            logStoreAction("ErrorStore", "setError", { error });
+            set({ lastError: error });
+        },
+        setLoading: (loading: boolean) => {
+            logStoreAction("ErrorStore", "setLoading", { loading });
+            set({ isLoading: loading });
+        },
+        setOperationLoading: (operation: string, loading: boolean) => {
+            logStoreAction("ErrorStore", "setOperationLoading", {
+                loading,
+                operation,
+            });
+            set((state) => ({
+                operationLoading: {
+                    ...state.operationLoading,
+                    [operation]: loading,
+                },
+            }));
+        },
+        setStoreError: (store: string, error: string | undefined) => {
+            logStoreAction("ErrorStore", "setStoreError", { error, store });
+            set((state) => ({
+                storeErrors: {
+                    ...state.storeErrors,
+                    [store]: error,
+                },
+            }));
+        },
+        storeErrors: {},
+    }));

@@ -25,7 +25,9 @@ After thorough code review, this is not a valid issue for the following reasons:
 
    ```typescript
    await this.monitorRepository.update(result.monitorId, updates);
-   const monitor = await this.monitorRepository.findByIdentifier(result.monitorId);
+   const monitor = await this.monitorRepository.findByIdentifier(
+    result.monitorId
+   );
    ```
 
 3. **Parameterized Queries**: The underlying repository uses parameterized queries through the database abstraction layer, not string concatenation.

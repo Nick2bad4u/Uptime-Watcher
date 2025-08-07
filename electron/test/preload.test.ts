@@ -16,7 +16,8 @@ describe("Electron Preload Script", () => {
 
     // Helper function to safely get exposed API
     const getExposedAPI = () => {
-        const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0]?.[1];
+        const exposedAPI =
+            mockContextBridge.exposeInMainWorld.mock.calls[0]?.[1];
         expect(exposedAPI).toBeDefined();
         return exposedAPI;
     };
@@ -48,13 +49,17 @@ describe("Electron Preload Script", () => {
         it("should expose electronAPI to main world", async () => {
             await import("../preload");
 
-            expect(mockContextBridge.exposeInMainWorld).toHaveBeenCalledWith("electronAPI", expect.any(Object));
+            expect(mockContextBridge.exposeInMainWorld).toHaveBeenCalledWith(
+                "electronAPI",
+                expect.any(Object)
+            );
         });
 
         it("should expose all required API domains", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0]?.[1];
+            const exposedAPI =
+                mockContextBridge.exposeInMainWorld.mock.calls[0]?.[1];
 
             expect(exposedAPI).toHaveProperty("sites");
             expect(exposedAPI).toHaveProperty("monitoring");
@@ -83,11 +88,18 @@ describe("Electron Preload Script", () => {
             await import("../preload");
 
             const exposedAPI = getExposedAPI();
-            const mockSite = { identifier: "test", name: "Test Site", monitors: [] };
+            const mockSite = {
+                identifier: "test",
+                name: "Test Site",
+                monitors: [],
+            };
 
             await exposedAPI.sites.addSite(mockSite);
 
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith("add-site", mockSite);
+            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                "add-site",
+                mockSite
+            );
         });
 
         it("should properly invoke IPC for getSites", async () => {
@@ -108,7 +120,10 @@ describe("Electron Preload Script", () => {
 
             await exposedAPI.sites.removeSite(identifier);
 
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith("remove-site", identifier);
+            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                "remove-site",
+                identifier
+            );
         });
 
         it("should properly invoke IPC for updateSite", async () => {
@@ -120,7 +135,11 @@ describe("Electron Preload Script", () => {
 
             await exposedAPI.sites.updateSite(identifier, updates);
 
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith("update-site", identifier, updates);
+            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                "update-site",
+                identifier,
+                updates
+            );
         });
 
         it("should properly invoke IPC for checkSiteNow", async () => {
@@ -132,7 +151,11 @@ describe("Electron Preload Script", () => {
 
             await exposedAPI.sites.checkSiteNow(identifier, monitorType);
 
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith("check-site-now", identifier, monitorType);
+            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                "check-site-now",
+                identifier,
+                monitorType
+            );
         });
     });
 
@@ -156,7 +179,9 @@ describe("Electron Preload Script", () => {
 
             await exposedAPI.monitoring.startMonitoring();
 
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith("start-monitoring");
+            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                "start-monitoring"
+            );
         });
 
         it("should properly invoke IPC for stopMonitoring", async () => {
@@ -166,7 +191,9 @@ describe("Electron Preload Script", () => {
 
             await exposedAPI.monitoring.stopMonitoring();
 
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith("stop-monitoring");
+            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                "stop-monitoring"
+            );
         });
 
         it("should properly invoke IPC for startMonitoringForSite", async () => {
@@ -176,9 +203,16 @@ describe("Electron Preload Script", () => {
             const identifier = "test-site";
             const monitorType = "http";
 
-            await exposedAPI.monitoring.startMonitoringForSite(identifier, monitorType);
+            await exposedAPI.monitoring.startMonitoringForSite(
+                identifier,
+                monitorType
+            );
 
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith("start-monitoring-for-site", identifier, monitorType);
+            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                "start-monitoring-for-site",
+                identifier,
+                monitorType
+            );
         });
 
         it("should properly invoke IPC for stopMonitoringForSite", async () => {
@@ -188,9 +222,16 @@ describe("Electron Preload Script", () => {
             const identifier = "test-site";
             const monitorType = "port";
 
-            await exposedAPI.monitoring.stopMonitoringForSite(identifier, monitorType);
+            await exposedAPI.monitoring.stopMonitoringForSite(
+                identifier,
+                monitorType
+            );
 
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith("stop-monitoring-for-site", identifier, monitorType);
+            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                "stop-monitoring-for-site",
+                identifier,
+                monitorType
+            );
         });
     });
 
@@ -224,7 +265,10 @@ describe("Electron Preload Script", () => {
 
             await exposedAPI.data.importData(data);
 
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith("import-data", data);
+            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                "import-data",
+                data
+            );
         });
 
         it("should properly invoke IPC for downloadSQLiteBackup", async () => {
@@ -234,7 +278,9 @@ describe("Electron Preload Script", () => {
 
             await exposedAPI.data.downloadSQLiteBackup();
 
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith("download-sqlite-backup");
+            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                "download-sqlite-backup"
+            );
         });
     });
 
@@ -256,7 +302,9 @@ describe("Electron Preload Script", () => {
 
             await exposedAPI.settings.getHistoryLimit();
 
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith("get-history-limit");
+            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                "get-history-limit"
+            );
         });
 
         it("should properly invoke IPC for updateHistoryLimit", async () => {
@@ -267,7 +315,10 @@ describe("Electron Preload Script", () => {
 
             await exposedAPI.settings.updateHistoryLimit(limit);
 
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith("update-history-limit", limit);
+            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                "update-history-limit",
+                limit
+            );
         });
     });
 
@@ -293,7 +344,10 @@ describe("Electron Preload Script", () => {
 
             exposedAPI.events.onMonitorStatusChanged(callback);
 
-            expect(mockIpcRenderer.on).toHaveBeenCalledWith("monitor:status-changed", expect.any(Function));
+            expect(mockIpcRenderer.on).toHaveBeenCalledWith(
+                "monitor:status-changed",
+                expect.any(Function)
+            );
         });
 
         it("should properly setup IPC listener for onUpdateStatus", async () => {
@@ -304,7 +358,10 @@ describe("Electron Preload Script", () => {
 
             exposedAPI.events.onUpdateStatus(callback);
 
-            expect(mockIpcRenderer.on).toHaveBeenCalledWith("update-status", expect.any(Function));
+            expect(mockIpcRenderer.on).toHaveBeenCalledWith(
+                "update-status",
+                expect.any(Function)
+            );
         });
 
         it("should properly remove listeners", async () => {
@@ -315,7 +372,9 @@ describe("Electron Preload Script", () => {
 
             exposedAPI.events.removeAllListeners(channel);
 
-            expect(mockIpcRenderer.removeAllListeners).toHaveBeenCalledWith(channel);
+            expect(mockIpcRenderer.removeAllListeners).toHaveBeenCalledWith(
+                channel
+            );
         });
 
         it("should call callback with data when IPC event is received", async () => {
@@ -327,7 +386,9 @@ describe("Electron Preload Script", () => {
             exposedAPI.events.onMonitorStatusChanged(callback);
 
             // Get the listener function that was registered
-            const listenerCall = mockIpcRenderer.on.mock.calls.find((call) => call[0] === "monitor:status-changed");
+            const listenerCall = mockIpcRenderer.on.mock.calls.find(
+                (call) => call[0] === "monitor:status-changed"
+            );
             expect(listenerCall).toBeDefined();
 
             const listener = listenerCall![1];
@@ -422,7 +483,10 @@ describe("Electron Preload Script", () => {
             };
 
             await exposedAPI.sites.addSite(site);
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith("add-site", site);
+            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                "add-site",
+                site
+            );
         });
 
         it("should properly handle partial Site updates in updateSite", async () => {
@@ -433,7 +497,11 @@ describe("Electron Preload Script", () => {
             const partialUpdate = { name: "New Name" };
 
             await exposedAPI.sites.updateSite("test-id", partialUpdate);
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith("update-site", "test-id", partialUpdate);
+            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                "update-site",
+                "test-id",
+                partialUpdate
+            );
         });
     });
 });

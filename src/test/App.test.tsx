@@ -91,7 +91,9 @@ vi.mock("../constants", () => ({
 
 // Mock all theme components
 vi.mock("../theme/components", () => ({
-    ThemeProvider: ({ children }: { children: React.ReactNode }) => <div data-testid="theme-provider">{children}</div>,
+    ThemeProvider: ({ children }: { children: React.ReactNode }) => (
+        <div data-testid="theme-provider">{children}</div>
+    ),
     ThemedBox: ({ children, ...props }: any) => (
         <div data-testid="themed-box" {...props}>
             {children}
@@ -111,7 +113,9 @@ vi.mock("../theme/components", () => ({
 
 // Mock ErrorBoundary
 vi.mock("../stores/error/ErrorBoundary", () => ({
-    ErrorBoundary: ({ children }: { children: React.ReactNode }) => <div data-testid="error-boundary">{children}</div>,
+    ErrorBoundary: ({ children }: { children: React.ReactNode }) => (
+        <div data-testid="error-boundary">{children}</div>
+    ),
 }));
 
 // Mock the child components to avoid complex rendering

@@ -186,8 +186,11 @@ export class DatabaseManager {
         });
 
         // Create site loading orchestrator
-        const siteRepositoryService = this.serviceFactory.createSiteRepositoryService();
-        this.siteLoadingOrchestrator = new SiteLoadingOrchestrator(siteRepositoryService);
+        const siteRepositoryService =
+            this.serviceFactory.createSiteRepositoryService();
+        this.siteLoadingOrchestrator = new SiteLoadingOrchestrator(
+            siteRepositoryService
+        );
 
         // Initialize command executor
         this.commandExecutor = new DatabaseCommandExecutor();
@@ -208,8 +211,15 @@ export class DatabaseManager {
      * // Use backup.buffer and backup.fileName
      * ```
      */
-    public async downloadBackup(): Promise<{ buffer: Buffer; fileName: string }> {
-        const command = new DownloadBackupCommand(this.serviceFactory, this.eventEmitter, this.siteCache);
+    public async downloadBackup(): Promise<{
+        buffer: Buffer;
+        fileName: string;
+    }> {
+        const command = new DownloadBackupCommand(
+            this.serviceFactory,
+            this.eventEmitter,
+            this.siteCache
+        );
         return this.commandExecutor.execute(command);
     }
 
@@ -228,7 +238,11 @@ export class DatabaseManager {
      * ```
      */
     public async exportData(): Promise<string> {
-        const command = new ExportDataCommand(this.serviceFactory, this.eventEmitter, this.siteCache);
+        const command = new ExportDataCommand(
+            this.serviceFactory,
+            this.eventEmitter,
+            this.siteCache
+        );
         return this.commandExecutor.execute(command);
     }
 
@@ -254,7 +268,12 @@ export class DatabaseManager {
         try {
             await withErrorHandling(
                 async () => {
-                    const command = new ImportDataCommand(this.serviceFactory, this.eventEmitter, this.siteCache, data);
+                    const command = new ImportDataCommand(
+                        this.serviceFactory,
+                        this.eventEmitter,
+                        this.siteCache,
+                        data
+                    );
                     await this.commandExecutor.execute(command);
                     return true;
                 },
@@ -264,13 +283,19 @@ export class DatabaseManager {
         } catch {
             // Emit typed data imported event with failure
             try {
-                await this.eventEmitter.emitTyped("internal:database:data-imported", {
-                    operation: "data-imported",
-                    success: false,
-                    timestamp: Date.now(),
-                });
+                await this.eventEmitter.emitTyped(
+                    "internal:database:data-imported",
+                    {
+                        operation: "data-imported",
+                        success: false,
+                        timestamp: Date.now(),
+                    }
+                );
             } catch (emitError) {
-                monitorLogger.error("[DatabaseManager] Failed to emit data imported failure event:", emitError);
+                monitorLogger.error(
+                    "[DatabaseManager] Failed to emit data imported failure event:",
+                    emitError
+                );
             }
 
             // withErrorHandling already logged the error, so we just return false
@@ -292,7 +317,10 @@ export class DatabaseManager {
             async () => {
                 // First, load current settings from database including history limit
                 try {
-                    const currentLimit = await this.dependencies.repositories.settings.get("historyLimit");
+                    const currentLimit =
+                        await this.dependencies.repositories.settings.get(
+                            "historyLimit"
+                        );
                     if (currentLimit) {
                         this.historyLimit = Number(currentLimit);
                         monitorLogger.info(
@@ -315,15 +343,21 @@ export class DatabaseManager {
 
                 // Emit typed database initialized event (with error handling for event emission)
                 try {
-                    await this.eventEmitter.emitTyped("database:transaction-completed", {
-                        duration: 0, // Database initialization duration not tracked yet
-                        operation: "database:initialize",
-                        recordsAffected: 0,
-                        success: true,
-                        timestamp: Date.now(),
-                    });
+                    await this.eventEmitter.emitTyped(
+                        "database:transaction-completed",
+                        {
+                            duration: 0, // Database initialization duration not tracked yet
+                            operation: "database:initialize",
+                            recordsAffected: 0,
+                            success: true,
+                            timestamp: Date.now(),
+                        }
+                    );
                 } catch (error) {
-                    monitorLogger.error("[DatabaseManager] Error emitting database initialized event:", error);
+                    monitorLogger.error(
+                        "[DatabaseManager] Error emitting database initialized event:",
+                        error
+                    );
                     // Don't throw here as the database initialization itself succeeded
                 }
             },
@@ -346,25 +380,37 @@ export class DatabaseManager {
 
         // Then get them from cache - return actual site data from cache
         try {
-            const sites = Array.from(this.siteCache.entries(), ([, site]) => site);
+            const sites = Array.from(
+                this.siteCache.entries(),
+                ([, site]) => site
+            );
 
             // Emit typed sites refreshed event
-            await this.eventEmitter.emitTyped("internal:database:sites-refreshed", {
-                operation: "sites-refreshed",
-                siteCount: sites.length,
-                timestamp: Date.now(),
-            });
+            await this.eventEmitter.emitTyped(
+                "internal:database:sites-refreshed",
+                {
+                    operation: "sites-refreshed",
+                    siteCount: sites.length,
+                    timestamp: Date.now(),
+                }
+            );
 
             // Return actual site data instead of hardcoded values
             return sites;
         } catch (error) {
             // Handle error case - log and re-emit event with zero count
-            monitorLogger.error("[DatabaseManager] Failed to refresh sites from cache:", error);
-            await this.eventEmitter.emitTyped("internal:database:sites-refreshed", {
-                operation: "sites-refreshed",
-                siteCount: 0,
-                timestamp: Date.now(),
-            });
+            monitorLogger.error(
+                "[DatabaseManager] Failed to refresh sites from cache:",
+                error
+            );
+            await this.eventEmitter.emitTyped(
+                "internal:database:sites-refreshed",
+                {
+                    operation: "sites-refreshed",
+                    siteCount: 0,
+                    timestamp: Date.now(),
+                }
+            );
 
             // Return empty array as fallback, but the error is logged for debugging
             // This allows the UI to continue functioning even if cache refresh fails
@@ -425,11 +471,14 @@ export class DatabaseManager {
         }
 
         if (!Number.isFinite(limit)) {
-            throw new RangeError(`[DatabaseManager.setHistoryLimit] History limit must be finite, received: ${limit}`);
+            throw new RangeError(
+                `[DatabaseManager.setHistoryLimit] History limit must be finite, received: ${limit}`
+            );
         }
 
         // Use ConfigurationManager to get proper business rules for history limits
-        const historyRules = this.configurationManager.getHistoryRetentionRules();
+        const historyRules =
+            this.configurationManager.getHistoryRetentionRules();
         if (limit > historyRules.maxLimit) {
             throw new RangeError(
                 `[DatabaseManager.setHistoryLimit] History limit too large (max: ${historyRules.maxLimit}), received: ${limit}`
@@ -448,7 +497,10 @@ export class DatabaseManager {
                 this.historyLimit = newLimit;
                 // Use centralized event emission (fire and forget)
                 this.emitHistoryLimitUpdated(newLimit).catch((error) => {
-                    monitorLogger.error("[DatabaseManager] Failed to emit history limit updated event:", error);
+                    monitorLogger.error(
+                        "[DatabaseManager] Failed to emit history limit updated event:",
+                        error
+                    );
                 });
             },
         });
@@ -464,13 +516,19 @@ export class DatabaseManager {
      */
     private async emitHistoryLimitUpdated(limit: number): Promise<void> {
         try {
-            await this.eventEmitter.emitTyped("internal:database:history-limit-updated", {
-                limit,
-                operation: "history-limit-updated",
-                timestamp: Date.now(),
-            });
+            await this.eventEmitter.emitTyped(
+                "internal:database:history-limit-updated",
+                {
+                    limit,
+                    operation: "history-limit-updated",
+                    timestamp: Date.now(),
+                }
+            );
         } catch (error) {
-            monitorLogger.error("[DatabaseManager] Failed to emit history limit updated event:", error);
+            monitorLogger.error(
+                "[DatabaseManager] Failed to emit history limit updated event:",
+                error
+            );
         }
     }
 
@@ -482,13 +540,22 @@ export class DatabaseManager {
      */
     private async emitSitesCacheUpdateRequested(): Promise<void> {
         try {
-            await this.eventEmitter.emitTyped("internal:database:update-sites-cache-requested", {
-                operation: "update-sites-cache-requested",
-                sites: Array.from(this.siteCache.entries(), ([, site]) => site),
-                timestamp: Date.now(),
-            });
+            await this.eventEmitter.emitTyped(
+                "internal:database:update-sites-cache-requested",
+                {
+                    operation: "update-sites-cache-requested",
+                    sites: Array.from(
+                        this.siteCache.entries(),
+                        ([, site]) => site
+                    ),
+                    timestamp: Date.now(),
+                }
+            );
         } catch (error) {
-            monitorLogger.error("[DatabaseManager] Failed to emit sites cache update requested event:", error);
+            monitorLogger.error(
+                "[DatabaseManager] Failed to emit sites cache update requested event:",
+                error
+            );
         }
     }
 
@@ -502,10 +569,14 @@ export class DatabaseManager {
      */
     private async loadSites(): Promise<void> {
         const operationId = `loadSites-${Date.now()}`;
-        monitorLogger.debug(`[DatabaseManager:${operationId}] Starting site loading operation`);
+        monitorLogger.debug(
+            `[DatabaseManager:${operationId}] Starting site loading operation`
+        );
 
         // Create a temporary cache for atomic replacement (prevents race conditions)
-        const tempCache = new StandardizedCache<Site>({ name: "tempSiteCache" });
+        const tempCache = new StandardizedCache<Site>({
+            name: "tempSiteCache",
+        });
 
         // Create monitoring configuration
         const monitoringConfig = {
@@ -527,30 +598,39 @@ export class DatabaseManager {
                 await this.emitSitesCacheUpdateRequested();
 
                 // Then request monitoring start via events
-                await this.eventEmitter.emitTyped("internal:site:start-monitoring-requested", {
-                    identifier,
-                    monitorId,
-                    operation: "start-monitoring-requested",
-                    timestamp: Date.now(),
-                });
+                await this.eventEmitter.emitTyped(
+                    "internal:site:start-monitoring-requested",
+                    {
+                        identifier,
+                        monitorId,
+                        operation: "start-monitoring-requested",
+                        timestamp: Date.now(),
+                    }
+                );
 
                 return true; // Always return true for the interface
             },
             stopMonitoring: async (identifier: string, monitorId: string) => {
                 // Request monitoring stop via events
-                await this.eventEmitter.emitTyped("internal:site:stop-monitoring-requested", {
-                    identifier,
-                    monitorId,
-                    operation: "stop-monitoring-requested",
-                    timestamp: Date.now(),
-                });
+                await this.eventEmitter.emitTyped(
+                    "internal:site:stop-monitoring-requested",
+                    {
+                        identifier,
+                        monitorId,
+                        operation: "stop-monitoring-requested",
+                        timestamp: Date.now(),
+                    }
+                );
 
                 return true; // Always return true for the interface
             },
         };
 
         // Load sites using the new service-based architecture into temporary cache
-        const result = await this.siteLoadingOrchestrator.loadSitesFromDatabase(tempCache, monitoringConfig);
+        const result = await this.siteLoadingOrchestrator.loadSitesFromDatabase(
+            tempCache,
+            monitoringConfig
+        );
 
         if (!result.success) {
             throw new Error(result.message);

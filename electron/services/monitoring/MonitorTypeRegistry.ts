@@ -11,13 +11,25 @@ import { z } from "zod";
 
 import type { MonitorType } from "./monitorTypes";
 
-import { type Monitor, MONITOR_STATUS, type MonitorFieldDefinition } from "../../../shared/types";
+import {
+    type Monitor,
+    MONITOR_STATUS,
+    type MonitorFieldDefinition,
+} from "../../../shared/types";
 // Import shared validation schemas
 import { withErrorHandling } from "../../../shared/utils/errorHandling";
-import { monitorSchemas, validateMonitorData as sharedValidateMonitorData } from "../../../shared/validation/schemas";
+import {
+    monitorSchemas,
+    validateMonitorData as sharedValidateMonitorData,
+} from "../../../shared/validation/schemas";
 import { logger } from "../../utils/logger";
 import { HttpMonitor } from "./HttpMonitor";
-import { createMigrationOrchestrator, exampleMigrations, migrationRegistry, versionManager } from "./MigrationSystem";
+import {
+    createMigrationOrchestrator,
+    exampleMigrations,
+    migrationRegistry,
+    versionManager,
+} from "./MigrationSystem";
 import { PingMonitor } from "./PingMonitor";
 import { PortMonitor } from "./PortMonitor";
 
@@ -142,7 +154,9 @@ export function getAllMonitorTypeConfigs(): BaseMonitorConfig[] {
  * @returns Service factory function or undefined if the type is not registered.
  * @public
  */
-export function getMonitorServiceFactory(type: string): (() => import("./types").IMonitorService) | undefined {
+export function getMonitorServiceFactory(
+    type: string
+): (() => import("./types").IMonitorService) | undefined {
     const config = getMonitorTypeConfig(type);
     return config?.serviceFactory;
 }
@@ -157,7 +171,9 @@ export function getMonitorServiceFactory(type: string): (() => import("./types")
  * @returns Monitor configuration object or undefined if the type is not registered.
  * @public
  */
-export function getMonitorTypeConfig(type: string): BaseMonitorConfig | undefined {
+export function getMonitorTypeConfig(
+    type: string
+): BaseMonitorConfig | undefined {
     return monitorTypes.get(type);
 }
 
@@ -277,7 +293,8 @@ function validateMonitorTypeInternal(type: unknown): {
 
 // Register existing monitor types with their field definitions and schemas
 registerMonitorType({
-    description: "Monitors HTTP/HTTPS endpoints for availability and response time",
+    description:
+        "Monitors HTTP/HTTPS endpoints for availability and response time",
     displayName: "HTTP (Website/API)",
     fields: [
         {
@@ -309,7 +326,8 @@ registerMonitorType({
         },
         helpTexts: {
             primary: "Enter the full URL including http:// or https://",
-            secondary: "The monitor will check this URL according to your monitoring interval",
+            secondary:
+                "The monitor will check this URL according to your monitoring interval",
         },
         supportsAdvancedAnalytics: true,
         supportsResponseTime: true,
@@ -355,7 +373,9 @@ registerMonitorType({
         formatDetail: (details: string) => `Port: ${details}`,
         formatTitleSuffix: (monitor: Monitor) => {
             if (monitor.type === "port") {
-                return monitor.host && monitor.port ? ` (${monitor.host}:${monitor.port})` : "";
+                return monitor.host && monitor.port
+                    ? ` (${monitor.host}:${monitor.port})`
+                    : "";
             }
             return "";
         },
@@ -403,7 +423,8 @@ registerMonitorType({
         },
         helpTexts: {
             primary: "Enter a valid host (domain or IP)",
-            secondary: "The monitor will ping this host according to your monitoring interval",
+            secondary:
+                "The monitor will ping this host according to your monitoring interval",
         },
         supportsAdvancedAnalytics: true,
         supportsResponseTime: true,
@@ -543,16 +564,21 @@ export async function migrateMonitorType(
         return await withErrorHandling(
             async () => {
                 // Validate the monitor type using internal validation
-                const validationResult = validateMonitorTypeInternal(monitorType);
+                const validationResult =
+                    validateMonitorTypeInternal(monitorType);
                 if (!validationResult.success) {
                     return {
                         appliedMigrations: [],
-                        errors: [validationResult.error ?? "Invalid monitor type"],
+                        errors: [
+                            validationResult.error ?? "Invalid monitor type",
+                        ],
                         success: false,
                     };
                 }
 
-                logger.info(`Migrating monitor type ${monitorType} from ${fromVersion} to ${toVersion}`);
+                logger.info(
+                    `Migrating monitor type ${monitorType} from ${fromVersion} to ${toVersion}`
+                );
 
                 // Check if migration is needed
                 if (fromVersion === toVersion) {
@@ -567,7 +593,9 @@ export async function migrateMonitorType(
                 // If no data provided, just return success for version bump
                 if (!data) {
                     return {
-                        appliedMigrations: [`${monitorType}_${fromVersion}_to_${toVersion}`],
+                        appliedMigrations: [
+                            `${monitorType}_${fromVersion}_to_${toVersion}`,
+                        ],
                         errors: [],
                         success: true,
                     };
@@ -576,12 +604,13 @@ export async function migrateMonitorType(
                 // Use the migration orchestrator for data migration
                 const migrationOrchestrator = createMigrationOrchestrator();
 
-                const migrationResult = await migrationOrchestrator.migrateMonitorData(
-                    monitorType,
-                    data,
-                    fromVersion,
-                    toVersion
-                );
+                const migrationResult =
+                    await migrationOrchestrator.migrateMonitorData(
+                        monitorType,
+                        data,
+                        fromVersion,
+                        toVersion
+                    );
 
                 return {
                     appliedMigrations: migrationResult.appliedMigrations,
@@ -595,7 +624,9 @@ export async function migrateMonitorType(
     } catch (error) {
         return {
             appliedMigrations: [],
-            errors: [`Migration failed: ${error instanceof Error ? error.message : String(error)}`],
+            errors: [
+                `Migration failed: ${error instanceof Error ? error.message : String(error)}`,
+            ],
             success: false,
         };
     }

@@ -78,7 +78,9 @@ export async function getAvailableMonitorTypes(): Promise<MonitorTypeConfig[]> {
     const cacheKey = CacheKeys.config.byName("all-monitor-types");
 
     // Try cache first
-    const cached = AppCaches.monitorTypes.get(cacheKey) as MonitorTypeConfig[] | undefined;
+    const cached = AppCaches.monitorTypes.get(cacheKey) as
+        | MonitorTypeConfig[]
+        | undefined;
     if (cached) {
         return cached;
     }
@@ -114,7 +116,9 @@ export async function getAvailableMonitorTypes(): Promise<MonitorTypeConfig[]> {
  * Returns undefined if the monitor type is not registered or available from the backend.
  * The search uses the complete cached list from getAvailableMonitorTypes().
  */
-export async function getMonitorTypeConfig(type: string): Promise<MonitorTypeConfig | undefined> {
+export async function getMonitorTypeConfig(
+    type: string
+): Promise<MonitorTypeConfig | undefined> {
     const configs = await getAvailableMonitorTypes();
     return configs.find((config) => config.type === type);
 }
@@ -130,7 +134,9 @@ export async function getMonitorTypeConfig(type: string): Promise<MonitorTypeCon
  * This format is suitable for use with form select components and dropdown menus.
  * The options are derived from all available monitor types from the backend.
  */
-export async function getMonitorTypeOptions(): Promise<Array<{ label: string; value: string }>> {
+export async function getMonitorTypeOptions(): Promise<
+    Array<{ label: string; value: string }>
+> {
     const configs = await getAvailableMonitorTypes();
     return configs.map((config) => ({
         label: config.displayName,

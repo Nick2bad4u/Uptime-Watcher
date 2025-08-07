@@ -4,7 +4,12 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { getNestedScaleProperty, getScaleConfig, getScaleProperty, hasScales } from "../../utils/chartUtils";
+import {
+    getNestedScaleProperty,
+    getScaleConfig,
+    getScaleProperty,
+    hasScales,
+} from "../../utils/chartUtils";
 
 describe("Chart Utilities", () => {
     describe("hasScales", () => {
@@ -183,17 +188,25 @@ describe("Chart Utilities", () => {
             expect(getScaleProperty(validConfig, "x", "type")).toBe("linear");
             expect(getScaleProperty(validConfig, "x", "min")).toBe(0);
             expect(getScaleProperty(validConfig, "x", "max")).toBe(100);
-            expect(getScaleProperty(validConfig, "x", "title")).toEqual({ text: "X Axis" });
+            expect(getScaleProperty(validConfig, "x", "title")).toEqual({
+                text: "X Axis",
+            });
         });
 
         it("should return existing property from y scale", () => {
             expect(getScaleProperty(validConfig, "y", "type")).toBe("category");
-            expect(getScaleProperty(validConfig, "y", "beginAtZero")).toBe(true);
+            expect(getScaleProperty(validConfig, "y", "beginAtZero")).toBe(
+                true
+            );
         });
 
         it("should return undefined for non-existent property", () => {
-            expect(getScaleProperty(validConfig, "x", "nonExistent")).toBeUndefined();
-            expect(getScaleProperty(validConfig, "y", "missingProp")).toBeUndefined();
+            expect(
+                getScaleProperty(validConfig, "x", "nonExistent")
+            ).toBeUndefined();
+            expect(
+                getScaleProperty(validConfig, "y", "missingProp")
+            ).toBeUndefined();
         });
 
         it("should return undefined for config without scales", () => {
@@ -272,31 +285,59 @@ describe("Chart Utilities", () => {
         });
 
         it("should return nested property from x scale - multiple levels", () => {
-            expect(getNestedScaleProperty(validConfig, "x", "title.text")).toBe("X Axis Title");
-            expect(getNestedScaleProperty(validConfig, "x", "title.display")).toBe(true);
-            expect(getNestedScaleProperty(validConfig, "x", "title.font.size")).toBe(14);
-            expect(getNestedScaleProperty(validConfig, "x", "title.font.weight")).toBe("bold");
+            expect(getNestedScaleProperty(validConfig, "x", "title.text")).toBe(
+                "X Axis Title"
+            );
+            expect(
+                getNestedScaleProperty(validConfig, "x", "title.display")
+            ).toBe(true);
+            expect(
+                getNestedScaleProperty(validConfig, "x", "title.font.size")
+            ).toBe(14);
+            expect(
+                getNestedScaleProperty(validConfig, "x", "title.font.weight")
+            ).toBe("bold");
         });
 
         it("should return nested property from y scale", () => {
-            expect(getNestedScaleProperty(validConfig, "y", "title.text")).toBe("Y Axis Title");
-            expect(getNestedScaleProperty(validConfig, "y", "title.display")).toBe(false);
+            expect(getNestedScaleProperty(validConfig, "y", "title.text")).toBe(
+                "Y Axis Title"
+            );
+            expect(
+                getNestedScaleProperty(validConfig, "y", "title.display")
+            ).toBe(false);
         });
 
         it("should return undefined for non-existent nested property", () => {
-            expect(getNestedScaleProperty(validConfig, "x", "title.nonExistent")).toBeUndefined();
-            expect(getNestedScaleProperty(validConfig, "x", "nonExistent.property")).toBeUndefined();
-            expect(getNestedScaleProperty(validConfig, "x", "title.font.nonExistent")).toBeUndefined();
+            expect(
+                getNestedScaleProperty(validConfig, "x", "title.nonExistent")
+            ).toBeUndefined();
+            expect(
+                getNestedScaleProperty(validConfig, "x", "nonExistent.property")
+            ).toBeUndefined();
+            expect(
+                getNestedScaleProperty(
+                    validConfig,
+                    "x",
+                    "title.font.nonExistent"
+                )
+            ).toBeUndefined();
         });
 
         it("should return undefined for config without scales", () => {
             const config = { type: "line", data: {} };
-            expect(getNestedScaleProperty(config, "x", "title.text")).toBeUndefined();
+            expect(
+                getNestedScaleProperty(config, "x", "title.text")
+            ).toBeUndefined();
         });
 
         it("should return undefined for null/undefined config", () => {
-            expect(getNestedScaleProperty(null, "x", "title.text")).toBeUndefined();
-            expect(getNestedScaleProperty(undefined, "x", "title.text")).toBeUndefined();
+            expect(
+                getNestedScaleProperty(null, "x", "title.text")
+            ).toBeUndefined();
+            expect(
+                getNestedScaleProperty(undefined, "x", "title.text")
+            ).toBeUndefined();
         });
 
         it("should return undefined for non-existent scale", () => {
@@ -306,7 +347,9 @@ describe("Chart Utilities", () => {
                     // y is missing
                 },
             };
-            expect(getNestedScaleProperty(config, "y", "title.text")).toBeUndefined();
+            expect(
+                getNestedScaleProperty(config, "y", "title.text")
+            ).toBeUndefined();
         });
 
         it("should handle null/undefined intermediate properties", () => {
@@ -320,8 +363,12 @@ describe("Chart Utilities", () => {
                     },
                 },
             };
-            expect(getNestedScaleProperty(config, "x", "title.text")).toBeUndefined();
-            expect(getNestedScaleProperty(config, "x", "grid.color.value")).toBeUndefined();
+            expect(
+                getNestedScaleProperty(config, "x", "title.text")
+            ).toBeUndefined();
+            expect(
+                getNestedScaleProperty(config, "x", "grid.color.value")
+            ).toBeUndefined();
         });
 
         it("should handle non-object intermediate properties", () => {
@@ -333,12 +380,18 @@ describe("Chart Utilities", () => {
                     },
                 },
             };
-            expect(getNestedScaleProperty(config, "x", "title.text")).toBeUndefined();
-            expect(getNestedScaleProperty(config, "x", "number.value")).toBeUndefined();
+            expect(
+                getNestedScaleProperty(config, "x", "title.text")
+            ).toBeUndefined();
+            expect(
+                getNestedScaleProperty(config, "x", "number.value")
+            ).toBeUndefined();
         });
 
         it("should handle empty path gracefully", () => {
-            expect(getNestedScaleProperty(validConfig, "x", "")).toBeUndefined();
+            expect(
+                getNestedScaleProperty(validConfig, "x", "")
+            ).toBeUndefined();
         });
 
         it("should handle single property path", () => {
@@ -364,8 +417,20 @@ describe("Chart Utilities", () => {
                     },
                 },
             };
-            expect(getNestedScaleProperty(deepConfig, "x", "level1.level2.level3.level4.value")).toBe("deep value");
-            expect(getNestedScaleProperty(deepConfig, "x", "level1.level2.level3.level4.nonExistent")).toBeUndefined();
+            expect(
+                getNestedScaleProperty(
+                    deepConfig,
+                    "x",
+                    "level1.level2.level3.level4.value"
+                )
+            ).toBe("deep value");
+            expect(
+                getNestedScaleProperty(
+                    deepConfig,
+                    "x",
+                    "level1.level2.level3.level4.nonExistent"
+                )
+            ).toBeUndefined();
         });
 
         it("should handle falsy values in nested path", () => {
@@ -382,9 +447,15 @@ describe("Chart Utilities", () => {
                 },
             };
             expect(getNestedScaleProperty(config, "x", "values.zero")).toBe(0);
-            expect(getNestedScaleProperty(config, "x", "values.false")).toBe(false);
-            expect(getNestedScaleProperty(config, "x", "values.empty")).toBe("");
-            expect(getNestedScaleProperty(config, "x", "values.null")).toBe(null);
+            expect(getNestedScaleProperty(config, "x", "values.false")).toBe(
+                false
+            );
+            expect(getNestedScaleProperty(config, "x", "values.empty")).toBe(
+                ""
+            );
+            expect(getNestedScaleProperty(config, "x", "values.null")).toBe(
+                null
+            );
         });
     });
 
@@ -443,14 +514,26 @@ describe("Chart Utilities", () => {
             expect(yScale?.["type"]).toBe("linear");
 
             // Test getScaleProperty
-            expect(getScaleProperty(complexConfig, "x", "type")).toBe("category");
-            expect(getScaleProperty(complexConfig, "y", "beginAtZero")).toBe(true);
+            expect(getScaleProperty(complexConfig, "x", "type")).toBe(
+                "category"
+            );
+            expect(getScaleProperty(complexConfig, "y", "beginAtZero")).toBe(
+                true
+            );
 
             // Test getNestedScaleProperty
-            expect(getNestedScaleProperty(complexConfig, "x", "title.text")).toBe("Months");
-            expect(getNestedScaleProperty(complexConfig, "x", "title.font.size")).toBe(16);
-            expect(getNestedScaleProperty(complexConfig, "y", "title.text")).toBe("Revenue ($)");
-            expect(getNestedScaleProperty(complexConfig, "y", "ticks.callback")).toBeTypeOf("function");
+            expect(
+                getNestedScaleProperty(complexConfig, "x", "title.text")
+            ).toBe("Months");
+            expect(
+                getNestedScaleProperty(complexConfig, "x", "title.font.size")
+            ).toBe(16);
+            expect(
+                getNestedScaleProperty(complexConfig, "y", "title.text")
+            ).toBe("Revenue ($)");
+            expect(
+                getNestedScaleProperty(complexConfig, "y", "ticks.callback")
+            ).toBeTypeOf("function");
         });
 
         it("should handle all function combinations with invalid inputs", () => {
@@ -466,11 +549,19 @@ describe("Chart Utilities", () => {
 
             for (const input of invalidInputs) {
                 expect(hasScales(input)).toBe(
-                    input === false ? false : !!(input && typeof input === "object" && "scales" in input)
+                    input === false
+                        ? false
+                        : !!(
+                              input &&
+                              typeof input === "object" &&
+                              "scales" in input
+                          )
                 );
                 expect(getScaleConfig(input, "x")).toBeUndefined();
                 expect(getScaleProperty(input, "x", "type")).toBeUndefined();
-                expect(getNestedScaleProperty(input, "x", "title.text")).toBeUndefined();
+                expect(
+                    getNestedScaleProperty(input, "x", "title.text")
+                ).toBeUndefined();
             }
         });
     });

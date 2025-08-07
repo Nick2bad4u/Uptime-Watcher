@@ -26,14 +26,18 @@ import type { SiteForStatus, SiteStatus } from "../types";
  * // status: "running" | "stopped" | "partial"
  * ```
  */
-export function calculateSiteMonitoringStatus(site: SiteForStatus): "partial" | "running" | "stopped" {
+export function calculateSiteMonitoringStatus(
+    site: SiteForStatus
+): "partial" | "running" | "stopped" {
     const monitors = site.monitors;
 
     if (monitors.length === 0) {
         return "stopped";
     }
 
-    const monitoringCount = monitors.filter((m) => m.monitoring === true).length;
+    const monitoringCount = monitors.filter(
+        (m) => m.monitoring === true
+    ).length;
 
     if (monitoringCount === 0) {
         return "stopped";
@@ -146,7 +150,9 @@ export function getSiteDisplayStatus(site: SiteForStatus): SiteStatus {
 export function getSiteStatusDescription(site: SiteForStatus): string {
     const status = getSiteDisplayStatus(site);
     const monitorCount = site.monitors.length;
-    const runningCount = site.monitors.filter((m) => m.monitoring === true).length;
+    const runningCount = site.monitors.filter(
+        (m) => m.monitoring === true
+    ).length;
 
     switch (status) {
         case "down": {
@@ -191,7 +197,9 @@ export function getSiteStatusDescription(site: SiteForStatus): string {
  * const color = getSiteStatusVariant("up"); // "success"
  * ```
  */
-export function getSiteStatusVariant(status: SiteStatus): "error" | "info" | "success" | "warning" {
+export function getSiteStatusVariant(
+    status: SiteStatus
+): "error" | "info" | "success" | "warning" {
     switch (status) {
         case "down": {
             return "error";

@@ -32,7 +32,9 @@ export function rowsToSettings(rows: Record<string, unknown>[]): SettingRow[] {
 
 // rowToSetting returns empty key for invalid data:
 if (!key || typeof key !== "string") {
- logger.warn("[SettingsMapper] Invalid or missing key in database row", { row });
+ logger.warn("[SettingsMapper] Invalid or missing key in database row", {
+  row,
+ });
  return {
   key: "",
   value: "",
@@ -154,7 +156,9 @@ return row.key !== undefined && row.key !== null && typeof row.key === "string" 
 
 ```typescript
 export function rowsToSettings(rows: Record<string, unknown>[]): SettingRow[] {
- return rows.filter((row) => isValidSettingRow(row)).map((row) => rowToSetting(row));
+ return rows
+  .filter((row) => isValidSettingRow(row))
+  .map((row) => rowToSetting(row));
 }
 ```
 
@@ -177,7 +181,9 @@ export function rowToSetting(row: Record<string, unknown>): SettingRow {
 ### 3. Fix Falsy Value Handling
 
 ```typescript
-export function rowToSettingValue(row: Record<string, unknown> | undefined): string | undefined {
+export function rowToSettingValue(
+ row: Record<string, unknown> | undefined
+): string | undefined {
  if (row?.value == null) {
   return undefined;
  }
@@ -190,7 +196,9 @@ export function rowToSettingValue(row: Record<string, unknown> | undefined): str
 ### 4. Consolidate Validation Logic
 
 ```typescript
-export function settingsToRecord(settings: SettingRow[]): Record<string, string> {
+export function settingsToRecord(
+ settings: SettingRow[]
+): Record<string, string> {
  const result: Record<string, string> = {};
 
  for (const setting of settings) {

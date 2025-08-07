@@ -62,8 +62,8 @@ export interface ActionButtonGroupProperties {
  * />
  * ```
  */
-export const ActionButtonGroup: React.NamedExoticComponent<ActionButtonGroupProperties> = React.memo(
-    function ActionButtonGroup({
+export const ActionButtonGroup: React.NamedExoticComponent<ActionButtonGroupProperties> =
+    React.memo(function ActionButtonGroup({
         allMonitorsRunning,
         disabled,
         isLoading,
@@ -149,5 +149,4 @@ export const ActionButtonGroup: React.NamedExoticComponent<ActionButtonGroupProp
                 )}
             </div>
         );
-    }
-);
+    });

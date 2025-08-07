@@ -44,7 +44,9 @@ export function extractIpcData<T>(response: unknown): T {
     }
 
     if (!response.success) {
-        throw new Error(response.error ?? ERROR_CATALOG.ipc.IPC_OPERATION_FAILED);
+        throw new Error(
+            response.error ?? ERROR_CATALOG.ipc.IPC_OPERATION_FAILED
+        );
     }
 
     return response.data as T;

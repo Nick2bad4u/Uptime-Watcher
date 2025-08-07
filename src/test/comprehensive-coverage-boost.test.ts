@@ -126,12 +126,18 @@ describe("Comprehensive Coverage Boost Tests", () => {
 
             expect(generateCacheKey("sites", "123")).toBe("sites:123");
             expect(generateCacheKey("monitors", "abc")).toBe("monitors:abc");
-            expect(generateCacheKey("settings", "theme")).toBe("settings:theme");
+            expect(generateCacheKey("settings", "theme")).toBe(
+                "settings:theme"
+            );
         });
 
         it("should test log template generation", () => {
             // Simulate logTemplates.ts functionality (lines 29-357)
-            const generateLogTemplate = (level: string, message: string, context?: any) => {
+            const generateLogTemplate = (
+                level: string,
+                message: string,
+                context?: any
+            ) => {
                 const timestamp = new Date().toISOString();
                 return {
                     timestamp,
@@ -141,11 +147,15 @@ describe("Comprehensive Coverage Boost Tests", () => {
                 };
             };
 
-            const log = generateLogTemplate("info", "Test message", { userId: 123 });
+            const log = generateLogTemplate("info", "Test message", {
+                userId: 123,
+            });
             expect(log.level).toBe("info");
             expect(log.message).toBe("Test message");
             expect(log.context.userId).toBe(123);
-            expect(log.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
+            expect(log.timestamp).toMatch(
+                /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
+            );
         });
 
         it("should test error catalog usage", () => {
@@ -158,13 +168,24 @@ describe("Comprehensive Coverage Boost Tests", () => {
             };
 
             const getErrorMessage = (code: string) => {
-                return errorCatalog[code as keyof typeof errorCatalog] || errorCatalog.UNKNOWN_ERROR;
+                return (
+                    errorCatalog[code as keyof typeof errorCatalog] ||
+                    errorCatalog.UNKNOWN_ERROR
+                );
             };
 
-            expect(getErrorMessage("VALIDATION_ERROR")).toBe("Validation failed");
-            expect(getErrorMessage("NETWORK_ERROR")).toBe("Network request failed");
-            expect(getErrorMessage("DATABASE_ERROR")).toBe("Database operation failed");
-            expect(getErrorMessage("INVALID_CODE")).toBe("An unknown error occurred");
+            expect(getErrorMessage("VALIDATION_ERROR")).toBe(
+                "Validation failed"
+            );
+            expect(getErrorMessage("NETWORK_ERROR")).toBe(
+                "Network request failed"
+            );
+            expect(getErrorMessage("DATABASE_ERROR")).toBe(
+                "Database operation failed"
+            );
+            expect(getErrorMessage("INVALID_CODE")).toBe(
+                "An unknown error occurred"
+            );
         });
     });
 
@@ -178,7 +199,10 @@ describe("Comprehensive Coverage Boost Tests", () => {
             };
 
             const isEmpty = mockSiteListState.sites.length === 0;
-            const shouldShowEmptyState = isEmpty && !mockSiteListState.loading && !mockSiteListState.error;
+            const shouldShowEmptyState =
+                isEmpty &&
+                !mockSiteListState.loading &&
+                !mockSiteListState.error;
 
             expect(isEmpty).toBe(true);
             expect(shouldShowEmptyState).toBe(true);
@@ -227,9 +251,18 @@ describe("Comprehensive Coverage Boost Tests", () => {
             };
 
             // Simulate state transitions
-            const startMonitoring = () => ({ ...mockMonitoringState, isMonitoring: true });
-            const stopMonitoring = () => ({ ...mockMonitoringState, isMonitoring: false });
-            const setError = (error: string) => ({ ...mockMonitoringState, error });
+            const startMonitoring = () => ({
+                ...mockMonitoringState,
+                isMonitoring: true,
+            });
+            const stopMonitoring = () => ({
+                ...mockMonitoringState,
+                isMonitoring: false,
+            });
+            const setError = (error: string) => ({
+                ...mockMonitoringState,
+                error,
+            });
 
             expect(startMonitoring().isMonitoring).toBe(true);
             expect(stopMonitoring().isMonitoring).toBe(false);
@@ -249,7 +282,11 @@ describe("Comprehensive Coverage Boost Tests", () => {
                     return { url, filename, blob };
                 },
                 validateFilename: (filename: string) => {
-                    return filename.length > 0 && !filename.includes("/") && !filename.includes("\\");
+                    return (
+                        filename.length > 0 &&
+                        !filename.includes("/") &&
+                        !filename.includes("\\")
+                    );
                 },
                 getFileExtension: (filename: string) => {
                     const parts = filename.split(".");
@@ -257,12 +294,17 @@ describe("Comprehensive Coverage Boost Tests", () => {
                 },
             };
 
-            const download = mockFileDownload.createDownloadLink("{}", "test.json");
+            const download = mockFileDownload.createDownloadLink(
+                "{}",
+                "test.json"
+            );
             expect(download.filename).toBe("test.json");
             expect(download.blob).toBeInstanceOf(Blob);
             expect(download.url).toContain("test.json");
             expect(mockFileDownload.validateFilename("test.json")).toBe(true);
-            expect(mockFileDownload.validateFilename("invalid/file")).toBe(false);
+            expect(mockFileDownload.validateFilename("invalid/file")).toBe(
+                false
+            );
             expect(mockFileDownload.getFileExtension("test.json")).toBe("json");
         });
     });
@@ -357,10 +399,16 @@ describe("Comprehensive Coverage Boost Tests", () => {
         it("should test fallback utilities", () => {
             // Test fallbacks.ts edge cases (lines 100,164)
             const mockFallbacks = {
-                getFallbackValue: <T>(value: T | null | undefined, fallback: T): T => {
+                getFallbackValue: <T>(
+                    value: T | null | undefined,
+                    fallback: T
+                ): T => {
                     return value ?? fallback;
                 },
-                getFallbackFunction: <T>(fn: (() => T) | null | undefined, fallback: () => T): (() => T) => {
+                getFallbackFunction: <T>(
+                    fn: (() => T) | null | undefined,
+                    fallback: () => T
+                ): (() => T) => {
                     return fn ?? fallback;
                 },
                 getFallbackArray: <T>(arr: T[] | null | undefined): T[] => {
@@ -368,10 +416,16 @@ describe("Comprehensive Coverage Boost Tests", () => {
                 },
             };
 
-            expect(mockFallbacks.getFallbackValue(null, "default")).toBe("default");
-            expect(mockFallbacks.getFallbackValue("value", "default")).toBe("value");
+            expect(mockFallbacks.getFallbackValue(null, "default")).toBe(
+                "default"
+            );
+            expect(mockFallbacks.getFallbackValue("value", "default")).toBe(
+                "value"
+            );
             expect(mockFallbacks.getFallbackArray(null)).toEqual([]);
-            expect(mockFallbacks.getFallbackArray([1, 2, 3])).toEqual([1, 2, 3]);
+            expect(mockFallbacks.getFallbackArray([1, 2, 3])).toEqual([
+                1, 2, 3,
+            ]);
         });
     });
 });

@@ -24,7 +24,9 @@ vi.mock("../../theme", () => ({
             {children}
         </span>
     ),
-    ThemedInput: ({ className, ...props }: any) => <input className={`themed-input ${className ?? ""}`} {...props} />,
+    ThemedInput: ({ className, ...props }: any) => (
+        <input className={`themed-input ${className ?? ""}`} {...props} />
+    ),
     ThemedSelect: ({ children, className, ...props }: any) => (
         <select className={`themed-select ${className ?? ""}`} {...props}>
             {children}
@@ -47,7 +49,11 @@ const TestFormField = ({
     children?: React.ReactNode;
 }) => {
     // This mimics the FormField component structure to test getAriaDescribedBy
-    const getAriaDescribedBy = (id: string, error?: string, helpText?: string): string | undefined => {
+    const getAriaDescribedBy = (
+        id: string,
+        error?: string,
+        helpText?: string
+    ): string | undefined => {
         if (error) {
             return `${id}-error`;
         }
@@ -64,7 +70,11 @@ const TestFormField = ({
             <label htmlFor={id}>
                 <span className="themed-text">{label}</span>
             </label>
-            <input id={id} aria-describedby={ariaDescribedBy} data-testid={`input-${id}`} />
+            <input
+                id={id}
+                aria-describedby={ariaDescribedBy}
+                data-testid={`input-${id}`}
+            />
             {children}
             {error && (
                 <div id={`${id}-error`}>
@@ -96,7 +106,13 @@ describe("FormFields - Uncovered Lines Coverage", () => {
     });
 
     it("should handle getAriaDescribedBy with error", () => {
-        render(<TestFormField id="test-field" label="Test Field" error="Test error" />);
+        render(
+            <TestFormField
+                id="test-field"
+                label="Test Field"
+                error="Test error"
+            />
+        );
 
         const input = screen.getByTestId("input-test-field");
         expect(input).toHaveAttribute("aria-describedby", "test-field-error");
@@ -104,7 +120,13 @@ describe("FormFields - Uncovered Lines Coverage", () => {
     });
 
     it("should handle getAriaDescribedBy with helpText", () => {
-        render(<TestFormField id="test-field" label="Test Field" helpText="Test help text" />);
+        render(
+            <TestFormField
+                id="test-field"
+                label="Test Field"
+                helpText="Test help text"
+            />
+        );
 
         const input = screen.getByTestId("input-test-field");
         expect(input).toHaveAttribute("aria-describedby", "test-field-help");
@@ -114,7 +136,11 @@ describe("FormFields - Uncovered Lines Coverage", () => {
     it("should show helpText only when no error present (lines 79-83)", () => {
         // Test with helpText but no error - should show helpText
         const { rerender } = render(
-            <TestFormField id="test-field" label="Test Field" helpText="Help text should show" />
+            <TestFormField
+                id="test-field"
+                label="Test Field"
+                helpText="Help text should show"
+            />
         );
 
         expect(screen.getByText("Help text should show")).toBeInTheDocument();
@@ -130,12 +156,21 @@ describe("FormFields - Uncovered Lines Coverage", () => {
         );
 
         expect(screen.getByText("Error message")).toBeInTheDocument();
-        expect(screen.queryByText("Help text should NOT show")).not.toBeInTheDocument();
+        expect(
+            screen.queryByText("Help text should NOT show")
+        ).not.toBeInTheDocument();
     });
 
     it("should handle edge cases for aria-describedby logic", () => {
         // Test with empty strings - these should NOT trigger error/helpText paths
-        render(<TestFormField id="test-field" label="Test Field" error="" helpText="" />);
+        render(
+            <TestFormField
+                id="test-field"
+                label="Test Field"
+                error=""
+                helpText=""
+            />
+        );
 
         const input = screen.getByTestId("input-test-field");
         // Empty error string should NOT trigger the error path since it's falsy for conditional rendering

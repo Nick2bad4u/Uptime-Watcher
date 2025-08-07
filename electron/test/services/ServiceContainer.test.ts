@@ -5,7 +5,10 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-import { ServiceContainer, ServiceContainerConfig } from "../../services/ServiceContainer";
+import {
+    ServiceContainer,
+    ServiceContainerConfig,
+} from "../../services/ServiceContainer";
 
 describe("ServiceContainer", () => {
     let container: ServiceContainer;
@@ -61,7 +64,9 @@ describe("ServiceContainer", () => {
 
             const customContainer = ServiceContainer.getInstance(config);
             expect(() => customContainer.getDatabaseService()).not.toThrow();
-            expect(() => customContainer.getNotificationService()).not.toThrow();
+            expect(() =>
+                customContainer.getNotificationService()
+            ).not.toThrow();
 
             // Complex services should work after initializing dependencies
             customContainer.getSiteManager();
@@ -76,7 +81,9 @@ describe("ServiceContainer", () => {
 
             const customContainer = ServiceContainer.getInstance(config);
             expect(() => customContainer.getDatabaseService()).not.toThrow();
-            expect(() => customContainer.getNotificationService()).not.toThrow();
+            expect(() =>
+                customContainer.getNotificationService()
+            ).not.toThrow();
 
             // Complex services should work after initializing dependencies
             customContainer.getSiteManager();
@@ -94,7 +101,9 @@ describe("ServiceContainer", () => {
 
             const customContainer = ServiceContainer.getInstance(config);
             expect(() => customContainer.getDatabaseService()).not.toThrow();
-            expect(() => customContainer.getNotificationService()).not.toThrow();
+            expect(() =>
+                customContainer.getNotificationService()
+            ).not.toThrow();
 
             // Complex services should work after initializing dependencies
             customContainer.getSiteManager();
@@ -345,7 +354,9 @@ describe("ServiceContainer", () => {
 
             const customContainer = ServiceContainer.getInstance(config);
             expect(() => customContainer.getDatabaseService()).not.toThrow();
-            expect(() => customContainer.getNotificationService()).not.toThrow();
+            expect(() =>
+                customContainer.getNotificationService()
+            ).not.toThrow();
 
             // Complex services should work after initializing dependencies
             customContainer.getSiteManager();
@@ -360,7 +371,9 @@ describe("ServiceContainer", () => {
 
             const customContainer = ServiceContainer.getInstance(config);
             expect(() => customContainer.getDatabaseService()).not.toThrow();
-            expect(() => customContainer.getNotificationService()).not.toThrow();
+            expect(() =>
+                customContainer.getNotificationService()
+            ).not.toThrow();
 
             // Complex services should work after initializing dependencies
             customContainer.getSiteManager();
@@ -377,14 +390,18 @@ describe("ServiceContainer", () => {
             };
 
             const customContainer = ServiceContainer.getInstance(config);
-            expect(() => customContainer.getNotificationService()).not.toThrow();
+            expect(() =>
+                customContainer.getNotificationService()
+            ).not.toThrow();
         });
 
         it("should handle undefined configuration", () => {
             ServiceContainer.resetForTesting();
 
             const customContainer = ServiceContainer.getInstance(undefined);
-            expect(() => customContainer.getNotificationService()).not.toThrow();
+            expect(() =>
+                customContainer.getNotificationService()
+            ).not.toThrow();
         });
     });
 

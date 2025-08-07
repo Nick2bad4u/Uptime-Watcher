@@ -24,7 +24,11 @@ These are **architecturally appropriate** uses of `unknown` that align with the 
 
 ```typescript
 // ✅ APPROPRIATE: Generic event middleware
-export type EventMiddleware<T = unknown> = (event: string, data: T, next: () => Promise<void>) => Promise<void>;
+export type EventMiddleware<T = unknown> = (
+ event: string,
+ data: T,
+ next: () => Promise<void>
+) => Promise<void>;
 
 // ✅ APPROPRIATE: Extensible event interfaces
 export interface UptimeEvents extends Record<string, unknown> {
@@ -36,7 +40,10 @@ export interface UptimeEvents extends Record<string, unknown> {
 
 ```typescript
 // ✅ APPROPRIATE: JavaScript can throw anything
-export function handleCheckError(error: unknown, url: string): MonitorCheckResult;
+export function handleCheckError(
+ error: unknown,
+ url: string
+): MonitorCheckResult;
 function ensureError(error: unknown): Error;
 ```
 
@@ -53,7 +60,10 @@ export function safeJsonStringify(value: unknown): SafeJsonResult<string>;
 ```typescript
 // ✅ APPROPRIATE: Must accept unknown to validate
 export function isValidMonitorRow(obj: unknown): obj is MonitorRow;
-export function safeJsonParse<T>(json: string, validator: (data: unknown) => data is T);
+export function safeJsonParse<T>(
+ json: string,
+ validator: (data: unknown) => data is T
+);
 ```
 
 #### **📋 Logging Systems**
@@ -69,7 +79,8 @@ action: (action: string, details?: unknown) => void
 ```typescript
 // ✅ APPROPRIATE: IPC parameters before validation
 export type IpcParameterValidator = (params: unknown[]) => string[] | null;
-async (...args: unknown[]) => this.uptimeOrchestrator.importData(args[0] as string);
+async (...args: unknown[]) =>
+ this.uptimeOrchestrator.importData(args[0] as string);
 ```
 
 ---
@@ -148,7 +159,10 @@ interface TypedIpcResponse<T> extends IpcResponse<T> {
 }
 
 // 5. Database Transform Function Types
-type TransformFunction<TIn, TOut> = (value: TIn, context: MonitorContext) => TOut;
+type TransformFunction<TIn, TOut> = (
+ value: TIn,
+ context: MonitorContext
+) => TOut;
 ```
 
 ### **⏳ Phase 2: Medium-Impact (Optional)**

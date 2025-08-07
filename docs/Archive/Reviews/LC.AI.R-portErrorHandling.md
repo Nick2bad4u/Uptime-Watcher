@@ -153,19 +153,26 @@ interface PortCheckErrorResult {
  * Response time defaults to -1 when timing information is unavailable,
  * distinguishing from valid 0ms responses.
  */
-export function handlePortCheckError(error: unknown, host: string, port: number): PortCheckErrorResult {
+export function handlePortCheckError(
+ error: unknown,
+ host: string,
+ port: number
+): PortCheckErrorResult {
  const errorMessage = error instanceof Error ? error.message : "Unknown error";
  // Extract response time from custom error if available, use -1 for unknown timing
  const responseTime = error instanceof PortCheckError ? error.responseTime : -1;
 
  // Log debug information in development mode
  if (isDev()) {
-  logger.debug(`[PortMonitor] Final error for ${host}:${port}: ${errorMessage}`);
+  logger.debug(
+   `[PortMonitor] Final error for ${host}:${port}: ${errorMessage}`
+  );
  }
 
  return {
   details: String(port),
-  error: errorMessage === PORT_NOT_REACHABLE ? PORT_NOT_REACHABLE : errorMessage,
+  error:
+   errorMessage === PORT_NOT_REACHABLE ? PORT_NOT_REACHABLE : errorMessage,
   responseTime,
   status: "down",
  };
@@ -176,7 +183,8 @@ export function handlePortCheckError(error: unknown, host: string, port: number)
 
 ```typescript
 // Option: Use undefined instead of -1 for unknown response times
-const responseTime = error instanceof PortCheckError ? error.responseTime : undefined;
+const responseTime =
+ error instanceof PortCheckError ? error.responseTime : undefined;
 
 // Return type would change to:
 interface PortCheckErrorResult {

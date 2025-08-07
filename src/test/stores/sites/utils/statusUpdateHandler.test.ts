@@ -8,7 +8,9 @@ import type { Site } from "../../../../../shared/types";
 // Mock the error handling utility
 vi.mock("../../../../utils/errorHandling", () => ({
     withUtilityErrorHandling: vi.fn(),
-    ensureError: vi.fn((err) => (err instanceof Error ? err : new Error(String(err)))),
+    ensureError: vi.fn((err) =>
+        err instanceof Error ? err : new Error(String(err))
+    ),
 }));
 
 // Mock the logger
@@ -144,9 +146,15 @@ describe("StatusUpdateHandler", () => {
 
         it("should become subscribed after calling subscribe", () => {
             // Mock the event listener functions to return cleanup functions
-            mockElectronAPI.events.onMonitorStatusChanged.mockReturnValue(() => {});
-            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(() => {});
-            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(() => {});
+            mockElectronAPI.events.onMonitorStatusChanged.mockReturnValue(
+                () => {}
+            );
+            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(
+                () => {}
+            );
+            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(
+                () => {}
+            );
 
             manager.subscribe();
             expect(manager.isSubscribed()).toBe(true);
@@ -154,22 +162,40 @@ describe("StatusUpdateHandler", () => {
 
         it("should set up event listeners when subscribing", () => {
             // Mock the event listener functions to return cleanup functions
-            mockElectronAPI.events.onMonitorStatusChanged.mockReturnValue(() => {});
-            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(() => {});
-            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(() => {});
+            mockElectronAPI.events.onMonitorStatusChanged.mockReturnValue(
+                () => {}
+            );
+            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(
+                () => {}
+            );
+            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(
+                () => {}
+            );
 
             manager.subscribe();
 
-            expect(mockElectronAPI.events.onMonitorStatusChanged).toHaveBeenCalled();
-            expect(mockElectronAPI.events.onMonitoringStarted).toHaveBeenCalled();
-            expect(mockElectronAPI.events.onMonitoringStopped).toHaveBeenCalled();
+            expect(
+                mockElectronAPI.events.onMonitorStatusChanged
+            ).toHaveBeenCalled();
+            expect(
+                mockElectronAPI.events.onMonitoringStarted
+            ).toHaveBeenCalled();
+            expect(
+                mockElectronAPI.events.onMonitoringStopped
+            ).toHaveBeenCalled();
         });
 
         it("should cleanup existing subscriptions before subscribing again", () => {
             const cleanupFn = vi.fn();
-            mockElectronAPI.events.onMonitorStatusChanged.mockReturnValue(cleanupFn);
-            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(cleanupFn);
-            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(cleanupFn);
+            mockElectronAPI.events.onMonitorStatusChanged.mockReturnValue(
+                cleanupFn
+            );
+            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(
+                cleanupFn
+            );
+            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(
+                cleanupFn
+            );
 
             manager.subscribe();
             manager.subscribe(); // Subscribe again
@@ -179,9 +205,15 @@ describe("StatusUpdateHandler", () => {
 
         it("should unsubscribe and remove all listeners", () => {
             const cleanupFn = vi.fn();
-            mockElectronAPI.events.onMonitorStatusChanged.mockReturnValue(cleanupFn);
-            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(cleanupFn);
-            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(cleanupFn);
+            mockElectronAPI.events.onMonitorStatusChanged.mockReturnValue(
+                cleanupFn
+            );
+            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(
+                cleanupFn
+            );
+            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(
+                cleanupFn
+            );
 
             manager.subscribe();
             expect(manager.isSubscribed()).toBe(true);
@@ -205,18 +237,24 @@ describe("StatusUpdateHandler", () => {
 
         beforeEach(() => {
             // Mock the event listener functions to capture callbacks
-            mockElectronAPI.events.onMonitorStatusChanged.mockImplementation((callback: any) => {
-                statusChangedCallback = callback;
-                return () => {}; // Return cleanup function
-            });
-            mockElectronAPI.events.onMonitoringStarted.mockImplementation((callback: any) => {
-                startedCallback = callback;
-                return () => {}; // Return cleanup function
-            });
-            mockElectronAPI.events.onMonitoringStopped.mockImplementation((callback: any) => {
-                stoppedCallback = callback;
-                return () => {}; // Return cleanup function
-            });
+            mockElectronAPI.events.onMonitorStatusChanged.mockImplementation(
+                (callback: any) => {
+                    statusChangedCallback = callback;
+                    return () => {}; // Return cleanup function
+                }
+            );
+            mockElectronAPI.events.onMonitoringStarted.mockImplementation(
+                (callback: any) => {
+                    startedCallback = callback;
+                    return () => {}; // Return cleanup function
+                }
+            );
+            mockElectronAPI.events.onMonitoringStopped.mockImplementation(
+                (callback: any) => {
+                    stoppedCallback = callback;
+                    return () => {}; // Return cleanup function
+                }
+            );
         });
 
         it("should handle monitor status changed events", async () => {
@@ -267,12 +305,18 @@ describe("StatusUpdateHandler", () => {
         let statusChangedCallback: any;
 
         beforeEach(() => {
-            mockElectronAPI.events.onMonitorStatusChanged.mockImplementation((callback: any) => {
-                statusChangedCallback = callback;
-                return () => {};
-            });
-            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(() => {});
-            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(() => {});
+            mockElectronAPI.events.onMonitorStatusChanged.mockImplementation(
+                (callback: any) => {
+                    statusChangedCallback = callback;
+                    return () => {};
+                }
+            );
+            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(
+                () => {}
+            );
+            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(
+                () => {}
+            );
         });
 
         it("should process status updates incrementally", async () => {
@@ -330,12 +374,18 @@ describe("StatusUpdateHandler", () => {
         let statusChangedCallback: any;
 
         beforeEach(() => {
-            mockElectronAPI.events.onMonitorStatusChanged.mockImplementation((callback: any) => {
-                statusChangedCallback = callback;
-                return () => {};
-            });
-            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(() => {});
-            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(() => {});
+            mockElectronAPI.events.onMonitorStatusChanged.mockImplementation(
+                (callback: any) => {
+                    statusChangedCallback = callback;
+                    return () => {};
+                }
+            );
+            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(
+                () => {}
+            );
+            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(
+                () => {}
+            );
         });
 
         it("should handle errors in status update processing gracefully", async () => {
@@ -420,12 +470,18 @@ describe("StatusUpdateHandler", () => {
         let statusChangedCallback: any;
 
         beforeEach(() => {
-            mockElectronAPI.events.onMonitorStatusChanged.mockImplementation((callback: any) => {
-                statusChangedCallback = callback;
-                return () => {};
-            });
-            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(() => {});
-            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(() => {});
+            mockElectronAPI.events.onMonitorStatusChanged.mockImplementation(
+                (callback: any) => {
+                    statusChangedCallback = callback;
+                    return () => {};
+                }
+            );
+            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(
+                () => {}
+            );
+            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(
+                () => {}
+            );
         });
 
         it("should handle empty sites array", async () => {
@@ -499,7 +555,9 @@ describe("StatusUpdateHandler", () => {
                 },
             ];
 
-            await Promise.all(updates.map((update) => statusChangedCallback(update)));
+            await Promise.all(
+                updates.map((update) => statusChangedCallback(update))
+            );
 
             expect(mockSetSites).toHaveBeenCalledTimes(3);
         });

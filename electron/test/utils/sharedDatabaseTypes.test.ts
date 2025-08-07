@@ -237,9 +237,13 @@ describe("Shared Database Types - Backend Coverage", () => {
                 flag: false,
             };
 
-            expect(safeGetRowProperty(row, "name", "default")).toBe("Test Site");
+            expect(safeGetRowProperty(row, "name", "default")).toBe(
+                "Test Site"
+            );
             expect(safeGetRowProperty(row, "enabled", 0)).toBe(1);
-            expect(safeGetRowProperty(row, "url", "")).toBe("https://example.com");
+            expect(safeGetRowProperty(row, "url", "")).toBe(
+                "https://example.com"
+            );
             expect(safeGetRowProperty(row, "count", -1)).toBe(0);
             expect(safeGetRowProperty(row, "flag", true)).toBe(false);
         });
@@ -249,7 +253,9 @@ describe("Shared Database Types - Backend Coverage", () => {
                 name: "Test Site",
             };
 
-            expect(safeGetRowProperty(row, "missing", "default")).toBe("default");
+            expect(safeGetRowProperty(row, "missing", "default")).toBe(
+                "default"
+            );
             expect(safeGetRowProperty(row, "nonexistent", 42)).toBe(42);
             expect(safeGetRowProperty(row, "absent", true)).toBe(true);
         });
@@ -260,7 +266,9 @@ describe("Shared Database Types - Backend Coverage", () => {
                 undefined_value: undefined,
             };
 
-            expect(safeGetRowProperty(row, "undefined_value", "default")).toBe("default");
+            expect(safeGetRowProperty(row, "undefined_value", "default")).toBe(
+                "default"
+            );
         });
 
         it("should handle different property types", () => {
@@ -273,10 +281,14 @@ describe("Shared Database Types - Backend Coverage", () => {
                 nullProp: null,
             };
 
-            expect(safeGetRowProperty(row, "stringProp", "default")).toBe("hello");
+            expect(safeGetRowProperty(row, "stringProp", "default")).toBe(
+                "hello"
+            );
             expect(safeGetRowProperty(row, "numberProp", 0)).toBe(123);
             expect(safeGetRowProperty(row, "booleanProp", false)).toBe(true);
-            expect(safeGetRowProperty(row, "objectProp", {})).toEqual({ nested: "value" });
+            expect(safeGetRowProperty(row, "objectProp", {})).toEqual({
+                nested: "value",
+            });
             expect(safeGetRowProperty(row, "arrayProp", [])).toEqual([1, 2, 3]);
             expect(safeGetRowProperty(row, "nullProp", "default")).toBe(null);
         });

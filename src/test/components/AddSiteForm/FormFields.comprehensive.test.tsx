@@ -2,7 +2,12 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom";
-import { FormField, TextField, SelectField, RadioGroup } from "../../../components/AddSiteForm/FormFields";
+import {
+    FormField,
+    TextField,
+    SelectField,
+    RadioGroup,
+} from "../../../components/AddSiteForm/FormFields";
 import type {
     FormFieldProperties,
     TextFieldProperties,
@@ -12,8 +17,12 @@ import type {
 
 // Mock all dependencies
 vi.mock("../../../theme/components", () => ({
-    ThemedBox: vi.fn(({ children, ...props }) => <div {...props}>{children}</div>),
-    ThemedText: vi.fn(({ children, ...props }) => <span {...props}>{children}</span>),
+    ThemedBox: vi.fn(({ children, ...props }) => (
+        <div {...props}>{children}</div>
+    )),
+    ThemedText: vi.fn(({ children, ...props }) => (
+        <span {...props}>{children}</span>
+    )),
     ThemedInput: vi.fn(({ onChange, value, placeholder, ...props }) => (
         <input
             {...props}
@@ -24,7 +33,12 @@ vi.mock("../../../theme/components", () => ({
         />
     )),
     ThemedSelect: vi.fn(({ children, value, onChange, ...props }) => (
-        <select {...props} value={value} onChange={(e) => onChange?.(e)} data-testid="themed-select">
+        <select
+            {...props}
+            value={value}
+            onChange={(e) => onChange?.(e)}
+            data-testid="themed-select"
+        >
             {children}
         </select>
     )),
@@ -66,13 +80,27 @@ describe("FormFields Components - Complete Coverage", () => {
         });
 
         it("should display error message", () => {
-            render(<FormField {...defaultFormFieldProps} error="This field is required" />);
-            expect(screen.getByText("This field is required")).toBeInTheDocument();
+            render(
+                <FormField
+                    {...defaultFormFieldProps}
+                    error="This field is required"
+                />
+            );
+            expect(
+                screen.getByText("This field is required")
+            ).toBeInTheDocument();
         });
 
         it("should display help text", () => {
-            render(<FormField {...defaultFormFieldProps} helpText="This is helpful information" />);
-            expect(screen.getByText("This is helpful information")).toBeInTheDocument();
+            render(
+                <FormField
+                    {...defaultFormFieldProps}
+                    helpText="This is helpful information"
+                />
+            );
+            expect(
+                screen.getByText("This is helpful information")
+            ).toBeInTheDocument();
         });
 
         it("should render children", () => {
@@ -86,7 +114,13 @@ describe("FormFields Components - Complete Coverage", () => {
         });
 
         it("should prioritize error over help text when both are present", () => {
-            render(<FormField {...defaultFormFieldProps} error="Error message" helpText="Help text" />);
+            render(
+                <FormField
+                    {...defaultFormFieldProps}
+                    error="Error message"
+                    helpText="Help text"
+                />
+            );
             expect(screen.getByText("Error message")).toBeInTheDocument();
             expect(screen.queryByText("Help text")).not.toBeInTheDocument();
         });
@@ -97,7 +131,13 @@ describe("FormFields Components - Complete Coverage", () => {
         });
 
         it("should handle required prop explicitly set to false", () => {
-            render(<FormField {...defaultFormFieldProps} label="Test Label" required={false} />);
+            render(
+                <FormField
+                    {...defaultFormFieldProps}
+                    label="Test Label"
+                    required={false}
+                />
+            );
             const labelElement = screen.getByText("Test Label");
             expect(labelElement).toBeInTheDocument();
             // Ensure the * is not added when required is explicitly false
@@ -121,7 +161,9 @@ describe("FormFields Components - Complete Coverage", () => {
 
         it("should handle value changes", () => {
             const onChange = vi.fn();
-            render(<TextField {...defaultTextFieldProps} onChange={onChange} />);
+            render(
+                <TextField {...defaultTextFieldProps} onChange={onChange} />
+            );
 
             const input = screen.getByTestId("themed-input");
             fireEvent.change(input, { target: { value: "Test Value" } });
@@ -130,8 +172,12 @@ describe("FormFields Components - Complete Coverage", () => {
         });
 
         it("should display current value", () => {
-            render(<TextField {...defaultTextFieldProps} value="Current Value" />);
-            expect(screen.getByDisplayValue("Current Value")).toBeInTheDocument();
+            render(
+                <TextField {...defaultTextFieldProps} value="Current Value" />
+            );
+            expect(
+                screen.getByDisplayValue("Current Value")
+            ).toBeInTheDocument();
         });
 
         it("should be disabled when disabled prop is true", () => {
@@ -141,7 +187,9 @@ describe("FormFields Components - Complete Coverage", () => {
 
         it("should show placeholder text", () => {
             render(<TextField {...defaultTextFieldProps} />);
-            expect(screen.getByPlaceholderText("Enter site name")).toBeInTheDocument();
+            expect(
+                screen.getByPlaceholderText("Enter site name")
+            ).toBeInTheDocument();
         });
 
         it("should handle required field", () => {
@@ -150,17 +198,27 @@ describe("FormFields Components - Complete Coverage", () => {
         });
 
         it("should display validation error", () => {
-            render(<TextField {...defaultTextFieldProps} error="Invalid input" />);
+            render(
+                <TextField {...defaultTextFieldProps} error="Invalid input" />
+            );
             expect(screen.getByText("Invalid input")).toBeInTheDocument();
         });
 
         it("should support different input types", () => {
             render(<TextField {...defaultTextFieldProps} type="url" />);
-            expect(screen.getByTestId("themed-input")).toHaveAttribute("type", "url");
+            expect(screen.getByTestId("themed-input")).toHaveAttribute(
+                "type",
+                "url"
+            );
         });
 
         it("should display help text without error", () => {
-            render(<TextField {...defaultTextFieldProps} helpText="This is helpful" />);
+            render(
+                <TextField
+                    {...defaultTextFieldProps}
+                    helpText="This is helpful"
+                />
+            );
             expect(screen.getByText("This is helpful")).toBeInTheDocument();
         });
 
@@ -176,7 +234,14 @@ describe("FormFields Components - Complete Coverage", () => {
         });
 
         it("should handle min and max attributes for number inputs", () => {
-            render(<TextField {...defaultTextFieldProps} type="number" min={1} max={100} />);
+            render(
+                <TextField
+                    {...defaultTextFieldProps}
+                    type="number"
+                    min={1}
+                    max={100}
+                />
+            );
             const input = screen.getByTestId("themed-input");
             expect(input).toHaveAttribute("min", "1");
             expect(input).toHaveAttribute("max", "100");
@@ -212,7 +277,9 @@ describe("FormFields Components - Complete Coverage", () => {
 
         it("should handle option selection", () => {
             const onChange = vi.fn();
-            render(<SelectField {...defaultSelectFieldProps} onChange={onChange} />);
+            render(
+                <SelectField {...defaultSelectFieldProps} onChange={onChange} />
+            );
 
             const select = screen.getByTestId("themed-select");
             fireEvent.change(select, { target: { value: "port" } });
@@ -227,7 +294,9 @@ describe("FormFields Components - Complete Coverage", () => {
         });
 
         it("should be disabled when disabled prop is true", () => {
-            render(<SelectField {...defaultSelectFieldProps} disabled={true} />);
+            render(
+                <SelectField {...defaultSelectFieldProps} disabled={true} />
+            );
             expect(screen.getByTestId("themed-select")).toBeDisabled();
         });
 
@@ -237,12 +306,22 @@ describe("FormFields Components - Complete Coverage", () => {
         });
 
         it("should show validation error", () => {
-            render(<SelectField {...defaultSelectFieldProps} error="Selection required" />);
+            render(
+                <SelectField
+                    {...defaultSelectFieldProps}
+                    error="Selection required"
+                />
+            );
             expect(screen.getByText("Selection required")).toBeInTheDocument();
         });
 
         it("should display help text without error", () => {
-            render(<SelectField {...defaultSelectFieldProps} helpText="Choose an option" />);
+            render(
+                <SelectField
+                    {...defaultSelectFieldProps}
+                    helpText="Choose an option"
+                />
+            );
             expect(screen.getByText("Choose an option")).toBeInTheDocument();
         });
 
@@ -258,7 +337,13 @@ describe("FormFields Components - Complete Coverage", () => {
         });
 
         it("should show placeholder option when provided", () => {
-            render(<SelectField {...defaultSelectFieldProps} placeholder="Select option..." value="" />);
+            render(
+                <SelectField
+                    {...defaultSelectFieldProps}
+                    placeholder="Select option..."
+                    value=""
+                />
+            );
             expect(screen.getByText("Select option...")).toBeInTheDocument();
         });
     });
@@ -287,12 +372,16 @@ describe("FormFields Components - Complete Coverage", () => {
         it("should display option labels", () => {
             render(<RadioGroup {...defaultRadioGroupProps} />);
             expect(screen.getByText("Create New Site")).toBeInTheDocument();
-            expect(screen.getByText("Add to Existing Site")).toBeInTheDocument();
+            expect(
+                screen.getByText("Add to Existing Site")
+            ).toBeInTheDocument();
         });
 
         it("should handle option selection", () => {
             const onChange = vi.fn();
-            render(<RadioGroup {...defaultRadioGroupProps} onChange={onChange} />);
+            render(
+                <RadioGroup {...defaultRadioGroupProps} onChange={onChange} />
+            );
 
             const existingRadio = screen.getByDisplayValue("existing");
             fireEvent.click(existingRadio);
@@ -345,12 +434,23 @@ describe("FormFields Components - Complete Coverage", () => {
         });
 
         it("should display help text without error", () => {
-            render(<RadioGroup {...defaultRadioGroupProps} helpText="Choose an option" />);
+            render(
+                <RadioGroup
+                    {...defaultRadioGroupProps}
+                    helpText="Choose an option"
+                />
+            );
             expect(screen.getByText("Choose an option")).toBeInTheDocument();
         });
 
         it("should handle radiogroup without error or helpText", () => {
-            render(<RadioGroup {...defaultRadioGroupProps} error={undefined} helpText={undefined} />);
+            render(
+                <RadioGroup
+                    {...defaultRadioGroupProps}
+                    error={undefined}
+                    helpText={undefined}
+                />
+            );
             expect(screen.getByText("Create New Site")).toBeInTheDocument();
         });
 
@@ -363,7 +463,9 @@ describe("FormFields Components - Complete Coverage", () => {
             };
             render(<RadioGroup {...propsWithExplicitUndefined} />);
             expect(screen.getByText("Create New Site")).toBeInTheDocument();
-            expect(screen.getByText("Add to Existing Site")).toBeInTheDocument();
+            expect(
+                screen.getByText("Add to Existing Site")
+            ).toBeInTheDocument();
         });
     });
 
@@ -399,7 +501,10 @@ describe("FormFields Components - Complete Coverage", () => {
                         value="new"
                         options={[
                             { value: "new", label: "Create New Site" },
-                            { value: "existing", label: "Add to Existing Site" },
+                            {
+                                value: "existing",
+                                label: "Add to Existing Site",
+                            },
                         ]}
                         onChange={handleRadioChange}
                     />
@@ -407,13 +512,17 @@ describe("FormFields Components - Complete Coverage", () => {
             );
 
             // Test that all components render
-            expect(screen.getByPlaceholderText("Enter site name")).toBeInTheDocument();
+            expect(
+                screen.getByPlaceholderText("Enter site name")
+            ).toBeInTheDocument();
             expect(screen.getByText("HTTP")).toBeInTheDocument();
             expect(screen.getByText("Port")).toBeInTheDocument();
             expect(screen.getByText("Create New Site")).toBeInTheDocument();
 
             // Test interactions
-            fireEvent.change(screen.getByTestId("themed-input"), { target: { value: "Test" } });
+            fireEvent.change(screen.getByTestId("themed-input"), {
+                target: { value: "Test" },
+            });
             expect(handleTextChange).toHaveBeenCalledWith("Test");
 
             const select = screen.getByTestId("themed-select");

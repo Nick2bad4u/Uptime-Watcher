@@ -65,7 +65,9 @@ export interface DynamicHelpTextResult {
  *
  * @public
  */
-export function useDynamicHelpText(monitorType: MonitorType): DynamicHelpTextResult {
+export function useDynamicHelpText(
+    monitorType: MonitorType
+): DynamicHelpTextResult {
     const [helpTexts, setHelpTexts] = useState<{
         primary?: string;
         secondary?: string;
@@ -86,9 +88,15 @@ export function useDynamicHelpText(monitorType: MonitorType): DynamicHelpTextRes
                     setIsLoading(false);
                 }
             } catch (error) {
-                logger.warn("Failed to load help texts", error instanceof Error ? error : new Error(String(error)));
+                logger.warn(
+                    "Failed to load help texts",
+                    error instanceof Error ? error : new Error(String(error))
+                );
                 if (!isCancelled) {
-                    const errorMessage = error instanceof Error ? error.message : "Help text unavailable";
+                    const errorMessage =
+                        error instanceof Error
+                            ? error.message
+                            : "Help text unavailable";
                     setError(errorMessage);
                     setHelpTexts({
                         primary: "Help text could not be loaded",

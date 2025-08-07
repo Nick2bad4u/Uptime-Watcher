@@ -96,11 +96,14 @@ export async function performPingCheckWithRetry(
     }
 
     try {
-        return await withOperationalHooks(async () => performSinglePingCheck(host, timeout), {
-            initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
-            maxRetries,
-            operationName: "ping-check",
-        });
+        return await withOperationalHooks(
+            async () => performSinglePingCheck(host, timeout),
+            {
+                initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
+                maxRetries,
+                operationName: "ping-check",
+            }
+        );
     } catch (error) {
         return handlePingCheckError(error, {
             host,
@@ -127,7 +130,10 @@ export async function performPingCheckWithRetry(
  * @see {@link performPingCheckWithRetry}
  * @public
  */
-export async function performSinglePingCheck(host: string, timeout: number): Promise<MonitorCheckResult> {
+export async function performSinglePingCheck(
+    host: string,
+    timeout: number
+): Promise<MonitorCheckResult> {
     const startTime = Date.now();
     const timeoutInSeconds = Math.max(1, Math.floor(timeout / 1000)); // Convert to seconds, minimum 1
 
@@ -144,7 +150,9 @@ export async function performSinglePingCheck(host: string, timeout: number): Pro
         if (pingResult.alive) {
             // Parse response time from ping result, fallback to measured time
             const pingTime =
-                pingResult.time && typeof pingResult.time === "number" ? Math.round(pingResult.time) : responseTime;
+                pingResult.time && typeof pingResult.time === "number"
+                    ? Math.round(pingResult.time)
+                    : responseTime;
 
             return {
                 details: `Ping successful - packet loss: ${pingResult.packetLoss || "0"}%`,
@@ -161,8 +169,11 @@ export async function performSinglePingCheck(host: string, timeout: number): Pro
         }
     } catch (error) {
         const responseTime = Date.now() - startTime;
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
 
-        throw new Error(`Ping failed: ${errorMessage} (response time: ${responseTime}ms)`);
+        throw new Error(
+            `Ping failed: ${errorMessage} (response time: ${responseTime}ms)`
+        );
     }
 }

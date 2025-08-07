@@ -52,7 +52,11 @@ export interface SiteRow {
  * @public
  */
 export function isValidSiteRow(row: DatabaseSiteRow): boolean {
-    return row.identifier !== undefined && typeof row.identifier === "string" && row.identifier.trim().length > 0;
+    return (
+        row.identifier !== undefined &&
+        typeof row.identifier === "string" &&
+        row.identifier.trim().length > 0
+    );
 }
 
 /**
@@ -115,7 +119,8 @@ export function rowToSite(row: DatabaseSiteRow): SiteRow {
 
         return site;
     } catch (error) {
-        const errorType = error instanceof Error ? error.constructor.name : "Unknown";
+        const errorType =
+            error instanceof Error ? error.constructor.name : "Unknown";
         logger.error(LOG_TEMPLATES.errors.SITE_MAPPER_FAILED, {
             error,
             errorType,

@@ -52,18 +52,32 @@ await this.databaseService.executeTransaction((db) => {
 
 ```typescript
 // BEFORE (Unsafe Type Casting)
-const insertResult = db.get(insertSql, parameters) as undefined | { id: number };
+const insertResult = db.get(insertSql, parameters) as
+ | undefined
+ | { id: number };
 if (!insertResult || typeof insertResult.id !== "number") {
  throw new Error("Failed to create monitor: no ID returned");
 }
 
 // AFTER (Enhanced Type Safety)
-const insertResult = db.get(insertSql, parameters) as Record<string, unknown> | undefined;
-if (!insertResult || typeof insertResult !== "object" || insertResult === null) {
+const insertResult = db.get(insertSql, parameters) as
+ | Record<string, unknown>
+ | undefined;
+if (
+ !insertResult ||
+ typeof insertResult !== "object" ||
+ insertResult === null
+) {
  throw new Error("Failed to create monitor: invalid database response");
 }
-if (!("id" in insertResult) || typeof insertResult.id !== "number" || insertResult.id <= 0) {
- throw new Error("Failed to create monitor: invalid or missing ID in database response");
+if (
+ !("id" in insertResult) ||
+ typeof insertResult.id !== "number" ||
+ insertResult.id <= 0
+) {
+ throw new Error(
+  "Failed to create monitor: invalid or missing ID in database response"
+ );
 }
 ```
 
@@ -151,7 +165,10 @@ const result = db.get(sql, params) as Record<string, unknown> | undefined;
 if (!result || typeof result !== "object" || result === null) {
  throw new Error("Invalid database response");
 }
-if (!("expectedField" in result) || typeof result.expectedField !== "expectedType") {
+if (
+ !("expectedField" in result) ||
+ typeof result.expectedField !== "expectedType"
+) {
  throw new Error("Missing or invalid field in database response");
 }
 ```
@@ -272,7 +289,9 @@ During the review, I identified several issues not mentioned in the claims:
 
 ```typescript
 // Enhanced: More descriptive error context
-throw new Error(`Failed to create monitor: invalid or missing ID in database response`);
+throw new Error(
+ `Failed to create monitor: invalid or missing ID in database response`
+);
 // Instead of generic: "Failed to create monitor"
 ```
 

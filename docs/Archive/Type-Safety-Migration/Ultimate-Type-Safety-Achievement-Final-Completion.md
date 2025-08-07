@@ -39,10 +39,14 @@ export function isColorPalette(obj: unknown): obj is ColorPalette {
 ```typescript
 // ❌ BEFORE: Duplicate function definitions causing conflicts
 // chartConfig.ts:
-export function hasScales(config: unknown): config is { scales: ChartScalesConfig };
+export function hasScales(
+ config: unknown
+): config is { scales: ChartScalesConfig };
 
 // chartUtils.ts:
-export function hasScales(config: unknown): config is { scales: { x?: unknown; y?: unknown } };
+export function hasScales(
+ config: unknown
+): config is { scales: { x?: unknown; y?: unknown } };
 
 // ✅ AFTER: Unified interface with proper import
 // chartUtils.ts:

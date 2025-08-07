@@ -13,7 +13,10 @@ import type { Monitor, MonitorStatus, Site, StatusUpdate } from "@shared/types";
 
 import { isDevelopment } from "../../../../shared/utils/environment";
 import logger from "../../../services/logger";
-import { ensureError, withUtilityErrorHandling } from "../../../utils/errorHandling";
+import {
+    ensureError,
+    withUtilityErrorHandling,
+} from "../../../utils/errorHandling";
 
 /**
  * Configuration options for status update handler operations.
@@ -159,51 +162,59 @@ export class StatusUpdateManager {
         );
 
         // Listen to monitor status changed events for efficient incremental updates
-        const statusUpdateCleanup = window.electronAPI.events.onMonitorStatusChanged((data: unknown) => {
-            void withUtilityErrorHandling(
-                async () => {
-                    if (this.isMonitorStatusChangedEvent(data)) {
-                        await this.handleIncrementalStatusUpdate(data);
-                    } else {
-                        // Invalid data structure - trigger full sync as fallback
-                        if (isDevelopment()) {
-                            logger.warn("Invalid monitor status changed event data, triggering full sync", data);
-                        }
-                        await this.fullSyncFromBackend();
-                    }
-                },
-                "Monitor status update processing",
-                undefined,
-                false
+        const statusUpdateCleanup =
+            window.electronAPI.events.onMonitorStatusChanged(
+                (data: unknown) => {
+                    void withUtilityErrorHandling(
+                        async () => {
+                            if (this.isMonitorStatusChangedEvent(data)) {
+                                await this.handleIncrementalStatusUpdate(data);
+                            } else {
+                                // Invalid data structure - trigger full sync as fallback
+                                if (isDevelopment()) {
+                                    logger.warn(
+                                        "Invalid monitor status changed event data, triggering full sync",
+                                        data
+                                    );
+                                }
+                                await this.fullSyncFromBackend();
+                            }
+                        },
+                        "Monitor status update processing",
+                        undefined,
+                        false
+                    );
+                }
             );
-        });
 
         this.cleanupFunctions.push(statusUpdateCleanup);
 
         // Subscribe to monitoring lifecycle events for full sync triggers
-        const monitoringStartedCleanup = window.electronAPI.events.onMonitoringStarted(() => {
-            void withUtilityErrorHandling(
-                async () => {
-                    await this.fullSyncFromBackend();
-                },
-                "Full sync on monitoring started",
-                undefined,
-                false
-            );
-        });
+        const monitoringStartedCleanup =
+            window.electronAPI.events.onMonitoringStarted(() => {
+                void withUtilityErrorHandling(
+                    async () => {
+                        await this.fullSyncFromBackend();
+                    },
+                    "Full sync on monitoring started",
+                    undefined,
+                    false
+                );
+            });
 
         this.cleanupFunctions.push(monitoringStartedCleanup);
 
-        const monitoringStoppedCleanup = window.electronAPI.events.onMonitoringStopped(() => {
-            void withUtilityErrorHandling(
-                async () => {
-                    await this.fullSyncFromBackend();
-                },
-                "Full sync on monitoring stopped",
-                undefined,
-                false
-            );
-        });
+        const monitoringStoppedCleanup =
+            window.electronAPI.events.onMonitoringStopped(() => {
+                void withUtilityErrorHandling(
+                    async () => {
+                        await this.fullSyncFromBackend();
+                    },
+                    "Full sync on monitoring stopped",
+                    undefined,
+                    false
+                );
+            });
 
         this.cleanupFunctions.push(monitoringStoppedCleanup);
 
@@ -259,10 +270,14 @@ export class StatusUpdateManager {
 
         const updatedSite = {
             ...site,
-            monitors: site.monitors.map((m) => (m.id === event.monitorId ? updatedMonitor : m)),
+            monitors: site.monitors.map((m) =>
+                m.id === event.monitorId ? updatedMonitor : m
+            ),
         };
 
-        return sites.map((s) => (s.identifier === event.siteId ? updatedSite : s));
+        return sites.map((s) =>
+            s.identifier === event.siteId ? updatedSite : s
+        );
     }
 
     /**
@@ -274,7 +289,10 @@ export class StatusUpdateManager {
      *
      * @internal
      */
-    private findMonitorInSite(site: Site, monitorId: string): Monitor | undefined {
+    private findMonitorInSite(
+        site: Site,
+        monitorId: string
+    ): Monitor | undefined {
         return site.monitors.find((monitor) => monitor.id === monitorId);
     }
 
@@ -303,14 +321,18 @@ export class StatusUpdateManager {
      *
      * @internal
      */
-    private async handleIncrementalStatusUpdate(event: MonitorStatusChangedEvent): Promise<void> {
+    private async handleIncrementalStatusUpdate(
+        event: MonitorStatusChangedEvent
+    ): Promise<void> {
         try {
             const currentSites = this.getSites();
             const site = this.findSiteInStore(currentSites, event.siteId);
 
             if (!site) {
                 if (isDevelopment()) {
-                    logger.debug(`Site ${event.siteId} not found in store, triggering full sync`);
+                    logger.debug(
+                        `Site ${event.siteId} not found in store, triggering full sync`
+                    );
                 }
                 await this.fullSyncFromBackend();
                 return;
@@ -320,18 +342,27 @@ export class StatusUpdateManager {
 
             if (!monitor) {
                 if (isDevelopment()) {
-                    logger.debug(`Monitor ${event.monitorId} not found in site ${event.siteId}, triggering full sync`);
+                    logger.debug(
+                        `Monitor ${event.monitorId} not found in site ${event.siteId}, triggering full sync`
+                    );
                 }
                 await this.fullSyncFromBackend();
                 return;
             }
 
-            const updatedSites = this.applyMonitorStatusUpdate(currentSites, site, monitor, event);
+            const updatedSites = this.applyMonitorStatusUpdate(
+                currentSites,
+                site,
+                monitor,
+                event
+            );
             this.setSites(updatedSites);
 
             // Call optional update callback
             if (this.onUpdate) {
-                const updatedSite = updatedSites.find((s) => s.identifier === event.siteId);
+                const updatedSite = updatedSites.find(
+                    (s) => s.identifier === event.siteId
+                );
                 if (updatedSite) {
                     this.onUpdate({
                         monitorId: event.monitorId,
@@ -350,7 +381,10 @@ export class StatusUpdateManager {
                 );
             }
         } catch (error) {
-            logger.error("Failed to apply incremental status update, falling back to full sync", ensureError(error));
+            logger.error(
+                "Failed to apply incremental status update, falling back to full sync",
+                ensureError(error)
+            );
             await this.fullSyncFromBackend();
         }
     }
@@ -367,7 +401,9 @@ export class StatusUpdateManager {
      *
      * @internal
      */
-    private isMonitorStatusChangedEvent(data: unknown): data is MonitorStatusChangedEvent {
+    private isMonitorStatusChangedEvent(
+        data: unknown
+    ): data is MonitorStatusChangedEvent {
         if (typeof data !== "object" || data === null) {
             return false;
         }

@@ -150,7 +150,10 @@ describe("useSite Hook", () => {
 
             renderHook(() => useSite(mockSite));
 
-            expect(mockUseSiteActions).toHaveBeenCalledWith(mockSite, mockMonitor);
+            expect(mockUseSiteActions).toHaveBeenCalledWith(
+                mockSite,
+                mockMonitor
+            );
         });
     });
 
@@ -171,7 +174,10 @@ describe("useSite Hook", () => {
                 uptime: 95.5,
                 downtimeCount: 2,
                 avgResponseTime: 145,
-                lastIncident: { timestamp: Date.now() - 86400000, status: "offline" as const },
+                lastIncident: {
+                    timestamp: Date.now() - 86400000,
+                    status: "offline" as const,
+                },
                 totalChecks: 100,
                 successfulChecks: 95,
                 failedChecks: 5,
@@ -313,7 +319,9 @@ describe("useSite Hook", () => {
                 responseTime: null,
             });
 
-            const { result } = renderHook(() => useSite(disabledMonitoringSite));
+            const { result } = renderHook(() =>
+                useSite(disabledMonitoringSite)
+            );
 
             expect(result.current.monitor?.monitoring).toBe(false);
             expect(result.current.status).toBe("offline");
@@ -322,7 +330,9 @@ describe("useSite Hook", () => {
 
     describe("Hook Dependencies", () => {
         it("should re-call hooks when site changes", () => {
-            const { rerender } = renderHook(({ site }) => useSite(site), { initialProps: { site: mockSite } });
+            const { rerender } = renderHook(({ site }) => useSite(site), {
+                initialProps: { site: mockSite },
+            });
 
             const newSite: Site = {
                 ...mockSite,
@@ -338,11 +348,17 @@ describe("useSite Hook", () => {
 
         it("should maintain referential stability for functions", () => {
             const { result: firstResult } = renderHook(() => useSite(mockSite));
-            const { result: secondResult } = renderHook(() => useSite(mockSite));
+            const { result: secondResult } = renderHook(() =>
+                useSite(mockSite)
+            );
 
             // Functions should be stable across renders with same data
-            expect(typeof firstResult.current.handleStartMonitoring).toBe("function");
-            expect(typeof secondResult.current.handleStartMonitoring).toBe("function");
+            expect(typeof firstResult.current.handleStartMonitoring).toBe(
+                "function"
+            );
+            expect(typeof secondResult.current.handleStartMonitoring).toBe(
+                "function"
+            );
         });
     });
 
@@ -382,9 +398,13 @@ describe("useSite Hook", () => {
             const { result } = renderHook(() => useSite(mockSite));
 
             expect(typeof result.current.selectedMonitorId).toBe("string");
-            expect(typeof result.current.handleMonitorIdChange).toBe("function");
+            expect(typeof result.current.handleMonitorIdChange).toBe(
+                "function"
+            );
             expect(typeof result.current.handleCardClick).toBe("function");
-            expect(typeof result.current.handleStartMonitoring).toBe("function");
+            expect(typeof result.current.handleStartMonitoring).toBe(
+                "function"
+            );
             expect(typeof result.current.handleStopMonitoring).toBe("function");
             expect(typeof result.current.handleCheckNow).toBe("function");
         });

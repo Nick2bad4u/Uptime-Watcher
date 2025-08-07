@@ -238,7 +238,9 @@ export class AutoUpdaterService {
   * });
   * ```
   */
- public setStatusCallback(callback: (statusData: UpdateStatusData) => void): void {
+ public setStatusCallback(
+  callback: (statusData: UpdateStatusData) => void
+ ): void {
   // ... existing implementation
  }
 

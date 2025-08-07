@@ -14,7 +14,10 @@ import { safeExtractIpcData } from "../../types/ipc";
 import { useErrorStore } from "../error/useErrorStore";
 import { logStoreAction, withErrorHandling } from "../utils";
 import { handleSQLiteBackupDownload } from "./utils/fileDownload";
-import { normalizeMonitor, updateMonitorInSite } from "./utils/monitorOperations";
+import {
+    normalizeMonitor,
+    updateMonitorInSite,
+} from "./utils/monitorOperations";
 
 export interface SiteOperationsActions {
     /** Add a monitor to an existing site */
@@ -31,17 +34,33 @@ export interface SiteOperationsActions {
     /** Download SQLite backup */
     downloadSQLiteBackup: () => Promise<void>;
     /** Initialize sites data from backend */
-    initializeSites: () => Promise<{ message: string; sitesLoaded: number; success: boolean }>;
+    initializeSites: () => Promise<{
+        message: string;
+        sitesLoaded: number;
+        success: boolean;
+    }>;
     /** Modify an existing site */
     modifySite: (identifier: string, updates: Partial<Site>) => Promise<void>;
     /** Remove a monitor from a site */
     removeMonitorFromSite: (siteId: string, monitorId: string) => Promise<void>;
     /** Update monitor retry attempts */
-    updateMonitorRetryAttempts: (siteId: string, monitorId: string, retryAttempts: number) => Promise<void>;
+    updateMonitorRetryAttempts: (
+        siteId: string,
+        monitorId: string,
+        retryAttempts: number
+    ) => Promise<void>;
     /** Update monitor timeout */
-    updateMonitorTimeout: (siteId: string, monitorId: string, timeout: number) => Promise<void>;
+    updateMonitorTimeout: (
+        siteId: string,
+        monitorId: string,
+        timeout: number
+    ) => Promise<void>;
     /** Update site check interval */
-    updateSiteCheckInterval: (siteId: string, monitorId: string, interval: number) => Promise<void>;
+    updateSiteCheckInterval: (
+        siteId: string,
+        monitorId: string,
+        interval: number
+    ) => Promise<void>;
 }
 
 export interface SiteOperationsDependencies {
@@ -52,7 +71,9 @@ export interface SiteOperationsDependencies {
     syncSitesFromBackend: () => Promise<void>;
 }
 
-export const createSiteOperationsActions = (deps: SiteOperationsDependencies): SiteOperationsActions => ({
+export const createSiteOperationsActions = (
+    deps: SiteOperationsDependencies
+): SiteOperationsActions => ({
     addMonitorToSite: async (siteId, monitor) => {
         logStoreAction("SitesStore", "addMonitorToSite", { monitor, siteId });
 
@@ -60,20 +81,27 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
         await withErrorHandling(
             async () => {
                 // Get the current site
-                const site = deps.getSites().find((s) => s.identifier === siteId);
+                const site = deps
+                    .getSites()
+                    .find((s) => s.identifier === siteId);
                 if (!site) {
                     throw new Error(ERROR_CATALOG.sites.NOT_FOUND);
                 }
 
                 // Allow multiple monitors of the same type
                 const updatedMonitors = [...site.monitors, monitor];
-                await window.electronAPI.sites.updateSite(siteId, { monitors: updatedMonitors });
+                await window.electronAPI.sites.updateSite(siteId, {
+                    monitors: updatedMonitors,
+                });
                 await deps.syncSitesFromBackend();
             },
             {
-                clearError: () => errorStore.clearStoreError("sites-operations"),
-                setError: (error) => errorStore.setStoreError("sites-operations", error),
-                setLoading: (loading) => errorStore.setOperationLoading("addMonitorToSite", loading),
+                clearError: () =>
+                    errorStore.clearStoreError("sites-operations"),
+                setError: (error) =>
+                    errorStore.setStoreError("sites-operations", error),
+                setLoading: (loading) =>
+                    errorStore.setOperationLoading("addMonitorToSite", loading),
             }
         );
     },
@@ -106,14 +134,18 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                     name: siteData.name ?? "Unnamed Site", // Provide default name
                 };
 
-                const response = await window.electronAPI.sites.addSite(completeSite);
+                const response =
+                    await window.electronAPI.sites.addSite(completeSite);
                 const newSite = safeExtractIpcData(response, completeSite);
                 deps.addSite(newSite);
             },
             {
-                clearError: () => errorStore.clearStoreError("sites-operations"),
-                setError: (error) => errorStore.setStoreError("sites-operations", error),
-                setLoading: (loading) => errorStore.setOperationLoading("createSite", loading),
+                clearError: () =>
+                    errorStore.clearStoreError("sites-operations"),
+                setError: (error) =>
+                    errorStore.setStoreError("sites-operations", error),
+                setLoading: (loading) =>
+                    errorStore.setOperationLoading("createSite", loading),
             }
         );
     },
@@ -125,17 +157,24 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
             async () => {
                 // Stop monitoring for all monitors of this site before deleting
                 // Filter out null/undefined values to handle corrupted data
-                const site = deps.getSites().find((s) => s.identifier === identifier);
+                const site = deps
+                    .getSites()
+                    .find((s) => s.identifier === identifier);
                 if (site?.monitors) {
                     for (const monitor of site.monitors) {
                         try {
-                            await window.electronAPI.monitoring.stopMonitoringForSite(identifier, monitor.id);
+                            await window.electronAPI.monitoring.stopMonitoringForSite(
+                                identifier,
+                                monitor.id
+                            );
                         } catch (error) {
                             // Log but do not block deletion if stopping fails
                             if (isDevelopment()) {
                                 logger.warn(
                                     `Failed to stop monitoring for monitor ${monitor.id} of site ${identifier}`,
-                                    error instanceof Error ? error : new Error(String(error))
+                                    error instanceof Error
+                                        ? error
+                                        : new Error(String(error))
                                 );
                             }
                         }
@@ -145,9 +184,12 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 deps.removeSite(identifier);
             },
             {
-                clearError: () => errorStore.clearStoreError("sites-operations"),
-                setError: (error) => errorStore.setStoreError("sites-operations", error),
-                setLoading: (loading) => errorStore.setOperationLoading("deleteSite", loading),
+                clearError: () =>
+                    errorStore.clearStoreError("sites-operations"),
+                setError: (error) =>
+                    errorStore.setStoreError("sites-operations", error),
+                setLoading: (loading) =>
+                    errorStore.setOperationLoading("deleteSite", loading),
             }
         );
     },
@@ -158,19 +200,31 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 // eslint-disable-next-line ex/no-unhandled
                 await handleSQLiteBackupDownload(async () => {
                     try {
-                        const response = await window.electronAPI.data.downloadSQLiteBackup();
-                        const result = safeExtractIpcData(response, { buffer: new ArrayBuffer(0) });
+                        const response =
+                            await window.electronAPI.data.downloadSQLiteBackup();
+                        const result = safeExtractIpcData(response, {
+                            buffer: new ArrayBuffer(0),
+                        });
                         return new Uint8Array(result.buffer);
                     } catch (error) {
-                        console.error("Failed to download SQLite backup:", error);
+                        console.error(
+                            "Failed to download SQLite backup:",
+                            error
+                        );
                         throw error;
                     }
                 });
             },
             {
-                clearError: () => errorStore.clearStoreError("sites-operations"),
-                setError: (error) => errorStore.setStoreError("sites-operations", error),
-                setLoading: (loading) => errorStore.setOperationLoading("downloadSQLiteBackup", loading),
+                clearError: () =>
+                    errorStore.clearStoreError("sites-operations"),
+                setError: (error) =>
+                    errorStore.setStoreError("sites-operations", error),
+                setLoading: (loading) =>
+                    errorStore.setOperationLoading(
+                        "downloadSQLiteBackup",
+                        loading
+                    ),
             }
         );
 
@@ -193,9 +247,12 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 };
             },
             {
-                clearError: () => errorStore.clearStoreError("sites-operations"),
-                setError: (error) => errorStore.setStoreError("sites-operations", error),
-                setLoading: (loading) => errorStore.setOperationLoading("initializeSites", loading),
+                clearError: () =>
+                    errorStore.clearStoreError("sites-operations"),
+                setError: (error) =>
+                    errorStore.setStoreError("sites-operations", error),
+                setLoading: (loading) =>
+                    errorStore.setOperationLoading("initializeSites", loading),
             }
         );
 
@@ -217,20 +274,28 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 await deps.syncSitesFromBackend();
             },
             {
-                clearError: () => errorStore.clearStoreError("sites-operations"),
-                setError: (error) => errorStore.setStoreError("sites-operations", error),
-                setLoading: (loading) => errorStore.setOperationLoading("modifySite", loading),
+                clearError: () =>
+                    errorStore.clearStoreError("sites-operations"),
+                setError: (error) =>
+                    errorStore.setStoreError("sites-operations", error),
+                setLoading: (loading) =>
+                    errorStore.setOperationLoading("modifySite", loading),
             }
         );
     },
     removeMonitorFromSite: async (siteId, monitorId) => {
-        logStoreAction("SitesStore", "removeMonitorFromSite", { monitorId, siteId });
+        logStoreAction("SitesStore", "removeMonitorFromSite", {
+            monitorId,
+            siteId,
+        });
 
         const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
                 // Get the current site
-                const site = deps.getSites().find((s) => s.identifier === siteId);
+                const site = deps
+                    .getSites()
+                    .find((s) => s.identifier === siteId);
                 if (!site) {
                     throw new Error(ERROR_CATALOG.sites.NOT_FOUND);
                 }
@@ -242,13 +307,18 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
 
                 // Stop monitoring for this specific monitor first
                 try {
-                    await window.electronAPI.monitoring.stopMonitoringForSite(siteId, monitorId);
+                    await window.electronAPI.monitoring.stopMonitoringForSite(
+                        siteId,
+                        monitorId
+                    );
                 } catch (error) {
                     // Log but do not block removal if stopping fails
                     if (isDevelopment()) {
                         logger.warn(
                             `Failed to stop monitoring for monitor ${monitorId} of site ${siteId}`,
-                            error instanceof Error ? error : new Error(String(error))
+                            error instanceof Error
+                                ? error
+                                : new Error(String(error))
                         );
                     }
                 }
@@ -260,19 +330,35 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 await deps.syncSitesFromBackend();
             },
             {
-                clearError: () => errorStore.clearStoreError("sites-operations"),
-                setError: (error) => errorStore.setStoreError("sites-operations", error),
-                setLoading: (loading) => errorStore.setOperationLoading("removeMonitorFromSite", loading),
+                clearError: () =>
+                    errorStore.clearStoreError("sites-operations"),
+                setError: (error) =>
+                    errorStore.setStoreError("sites-operations", error),
+                setLoading: (loading) =>
+                    errorStore.setOperationLoading(
+                        "removeMonitorFromSite",
+                        loading
+                    ),
             }
         );
     },
-    updateMonitorRetryAttempts: async (siteId: string, monitorId: string, retryAttempts: number | undefined) => {
-        logStoreAction("SitesStore", "updateMonitorRetryAttempts", { monitorId, retryAttempts, siteId });
+    updateMonitorRetryAttempts: async (
+        siteId: string,
+        monitorId: string,
+        retryAttempts: number | undefined
+    ) => {
+        logStoreAction("SitesStore", "updateMonitorRetryAttempts", {
+            monitorId,
+            retryAttempts,
+            siteId,
+        });
 
         const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
-                const site = deps.getSites().find((s) => s.identifier === siteId);
+                const site = deps
+                    .getSites()
+                    .find((s) => s.identifier === siteId);
                 if (!site) {
                     throw new Error(ERROR_CATALOG.sites.NOT_FOUND);
                 }
@@ -283,24 +369,46 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                     updates.retryAttempts = retryAttempts;
                 }
 
-                const updatedSite = updateMonitorInSite(site, monitorId, updates);
-                await window.electronAPI.sites.updateSite(siteId, { monitors: updatedSite.monitors });
+                const updatedSite = updateMonitorInSite(
+                    site,
+                    monitorId,
+                    updates
+                );
+                await window.electronAPI.sites.updateSite(siteId, {
+                    monitors: updatedSite.monitors,
+                });
                 await deps.syncSitesFromBackend();
             },
             {
-                clearError: () => errorStore.clearStoreError("sites-operations"),
-                setError: (error) => errorStore.setStoreError("sites-operations", error),
-                setLoading: (loading) => errorStore.setOperationLoading("updateMonitorRetryAttempts", loading),
+                clearError: () =>
+                    errorStore.clearStoreError("sites-operations"),
+                setError: (error) =>
+                    errorStore.setStoreError("sites-operations", error),
+                setLoading: (loading) =>
+                    errorStore.setOperationLoading(
+                        "updateMonitorRetryAttempts",
+                        loading
+                    ),
             }
         );
     },
-    updateMonitorTimeout: async (siteId: string, monitorId: string, timeout: number | undefined) => {
-        logStoreAction("SitesStore", "updateMonitorTimeout", { monitorId, siteId, timeout });
+    updateMonitorTimeout: async (
+        siteId: string,
+        monitorId: string,
+        timeout: number | undefined
+    ) => {
+        logStoreAction("SitesStore", "updateMonitorTimeout", {
+            monitorId,
+            siteId,
+            timeout,
+        });
 
         const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
-                const site = deps.getSites().find((s) => s.identifier === siteId);
+                const site = deps
+                    .getSites()
+                    .find((s) => s.identifier === siteId);
                 if (!site) {
                     throw new Error(ERROR_CATALOG.sites.NOT_FOUND);
                 }
@@ -311,36 +419,68 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                     updates.timeout = timeout;
                 }
 
-                const updatedSite = updateMonitorInSite(site, monitorId, updates);
-                await window.electronAPI.sites.updateSite(siteId, { monitors: updatedSite.monitors });
+                const updatedSite = updateMonitorInSite(
+                    site,
+                    monitorId,
+                    updates
+                );
+                await window.electronAPI.sites.updateSite(siteId, {
+                    monitors: updatedSite.monitors,
+                });
                 await deps.syncSitesFromBackend();
             },
             {
-                clearError: () => errorStore.clearStoreError("sites-operations"),
-                setError: (error) => errorStore.setStoreError("sites-operations", error),
-                setLoading: (loading) => errorStore.setOperationLoading("updateMonitorTimeout", loading),
+                clearError: () =>
+                    errorStore.clearStoreError("sites-operations"),
+                setError: (error) =>
+                    errorStore.setStoreError("sites-operations", error),
+                setLoading: (loading) =>
+                    errorStore.setOperationLoading(
+                        "updateMonitorTimeout",
+                        loading
+                    ),
             }
         );
     },
-    updateSiteCheckInterval: async (siteId: string, monitorId: string, interval: number) => {
-        logStoreAction("SitesStore", "updateSiteCheckInterval", { interval, monitorId, siteId });
+    updateSiteCheckInterval: async (
+        siteId: string,
+        monitorId: string,
+        interval: number
+    ) => {
+        logStoreAction("SitesStore", "updateSiteCheckInterval", {
+            interval,
+            monitorId,
+            siteId,
+        });
 
         const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
-                const site = deps.getSites().find((s) => s.identifier === siteId);
+                const site = deps
+                    .getSites()
+                    .find((s) => s.identifier === siteId);
                 if (!site) {
                     throw new Error(ERROR_CATALOG.sites.NOT_FOUND);
                 }
 
-                const updatedSite = updateMonitorInSite(site, monitorId, { checkInterval: interval });
-                await window.electronAPI.sites.updateSite(siteId, { monitors: updatedSite.monitors });
+                const updatedSite = updateMonitorInSite(site, monitorId, {
+                    checkInterval: interval,
+                });
+                await window.electronAPI.sites.updateSite(siteId, {
+                    monitors: updatedSite.monitors,
+                });
                 await deps.syncSitesFromBackend();
             },
             {
-                clearError: () => errorStore.clearStoreError("sites-operations"),
-                setError: (error) => errorStore.setStoreError("sites-operations", error),
-                setLoading: (loading) => errorStore.setOperationLoading("updateSiteCheckInterval", loading),
+                clearError: () =>
+                    errorStore.clearStoreError("sites-operations"),
+                setError: (error) =>
+                    errorStore.setStoreError("sites-operations", error),
+                setLoading: (loading) =>
+                    errorStore.setOperationLoading(
+                        "updateSiteCheckInterval",
+                        loading
+                    ),
             }
         );
     },

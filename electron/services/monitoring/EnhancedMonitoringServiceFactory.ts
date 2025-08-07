@@ -45,8 +45,14 @@ import { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import { HistoryRepository } from "../database/HistoryRepository";
 import { MonitorRepository } from "../database/MonitorRepository";
 import { SiteRepository } from "../database/SiteRepository";
-import { EnhancedMonitorCheckConfig, EnhancedMonitorChecker } from "./EnhancedMonitorChecker";
-import { MonitorOperationRegistry, operationRegistry } from "./MonitorOperationRegistry";
+import {
+    EnhancedMonitorCheckConfig,
+    EnhancedMonitorChecker,
+} from "./EnhancedMonitorChecker";
+import {
+    MonitorOperationRegistry,
+    operationRegistry,
+} from "./MonitorOperationRegistry";
 import { MonitorStatusUpdateService } from "./MonitorStatusUpdateService";
 import { OperationTimeoutManager } from "./OperationTimeoutManager";
 
@@ -294,12 +300,16 @@ export const EnhancedMonitoringServiceFactory = {
      *
      * @public
      */
-    createServices(dependencies: EnhancedMonitoringDependencies): EnhancedMonitoringServices {
+    createServices(
+        dependencies: EnhancedMonitoringDependencies
+    ): EnhancedMonitoringServices {
         // Use singleton operation registry
         const operationRegistryInstance = operationRegistry;
 
         // Create timeout manager
-        const timeoutManager = new OperationTimeoutManager(operationRegistryInstance);
+        const timeoutManager = new OperationTimeoutManager(
+            operationRegistryInstance
+        );
 
         // Create status update service
         const statusUpdateService = new MonitorStatusUpdateService(

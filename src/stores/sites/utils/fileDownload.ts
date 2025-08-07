@@ -63,7 +63,10 @@ export function downloadFile(options: FileDownloadOptions): void {
  * // "db-2024-06-01.sqlite3"
  * ```
  */
-export function generateBackupFileName(prefix = "backup", extension = "sqlite"): string {
+export function generateBackupFileName(
+    prefix = "backup",
+    extension = "sqlite"
+): string {
     const timestamp = new Date().toISOString().split("T")[0];
     return `${prefix}-${timestamp}.${extension}`;
 }
@@ -84,7 +87,9 @@ export function generateBackupFileName(prefix = "backup", extension = "sqlite"):
  * ```
  */
 /* eslint-disable n/no-unsupported-features/node-builtins -- URL.createObjectURL is always available in modern browsers in Node */
-export async function handleSQLiteBackupDownload(downloadFunction: () => Promise<Uint8Array>): Promise<void> {
+export async function handleSQLiteBackupDownload(
+    downloadFunction: () => Promise<Uint8Array>
+): Promise<void> {
     // Get the backup data
     const backupData = await downloadFunction();
 
@@ -117,7 +122,9 @@ export async function handleSQLiteBackupDownload(downloadFunction: () => Promise
             // Log the click error for debugging and add context
             logger.error(
                 "Failed to trigger download click",
-                clickError instanceof Error ? clickError : new Error(String(clickError))
+                clickError instanceof Error
+                    ? clickError
+                    : new Error(String(clickError))
             );
             // Re-throw with more context
             throw new Error(
@@ -143,7 +150,11 @@ export async function handleSQLiteBackupDownload(downloadFunction: () => Promise
  * @param mimeType - MIME type for the file
  * @throws Error if browser APIs are unavailable or download cannot be triggered
  */
-function createAndTriggerDownload(buffer: ArrayBuffer, fileName: string, mimeType: string): void {
+function createAndTriggerDownload(
+    buffer: ArrayBuffer,
+    fileName: string,
+    mimeType: string
+): void {
     const blob = new Blob([buffer], { type: mimeType });
     let objectURL: string | undefined;
 
@@ -165,7 +176,9 @@ function createAndTriggerDownload(buffer: ArrayBuffer, fileName: string, mimeTyp
             // Fallback: just click without DOM manipulation
             logger.warn(
                 "DOM manipulation failed, using fallback click",
-                domError instanceof Error ? domError : new Error(String(domError))
+                domError instanceof Error
+                    ? domError
+                    : new Error(String(domError))
             );
             anchor.click();
         }
@@ -190,7 +203,12 @@ function createAndTriggerDownload(buffer: ArrayBuffer, fileName: string, mimeTyp
  * @param mimeType - The MIME type.
  * @throws {@link Error} Always throws after logging and attempting fallback.
  */
-function handleDownloadError(error: unknown, buffer: ArrayBuffer, fileName: string, mimeType: string): void {
+function handleDownloadError(
+    error: unknown,
+    buffer: ArrayBuffer,
+    fileName: string,
+    mimeType: string
+): void {
     if (!(error instanceof Error)) {
         logger.error("File download failed", new Error(String(error)));
         throw new Error("File download failed");
@@ -227,7 +245,9 @@ function shouldRethrowError(error: Error): boolean {
         "createElement not available",
     ];
 
-    return rethrownErrorMessages.some((message) => error.message.includes(message));
+    return rethrownErrorMessages.some((message) =>
+        error.message.includes(message)
+    );
 }
 
 /**
@@ -238,13 +258,19 @@ function shouldRethrowError(error: Error): boolean {
  * @param mimeType - The MIME type.
  * @throws {@link Error} If both primary and fallback methods fail.
  */
-function tryFallbackDownload(buffer: ArrayBuffer, fileName: string, mimeType: string): void {
+function tryFallbackDownload(
+    buffer: ArrayBuffer,
+    fileName: string,
+    mimeType: string
+): void {
     try {
         createAndTriggerDownload(buffer, fileName, mimeType);
     } catch (fallbackError) {
         logger.error(
             "File download failed: both primary and fallback methods failed",
-            fallbackError instanceof Error ? fallbackError : new Error(String(fallbackError))
+            fallbackError instanceof Error
+                ? fallbackError
+                : new Error(String(fallbackError))
         );
         throw new Error("File download failed");
     }

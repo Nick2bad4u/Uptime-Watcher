@@ -84,12 +84,18 @@ vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({
 }));
 
 vi.mock("../../../services/ipc/utils", () => ({
-    createValidationResponse: vi.fn((success, data, error) => ({ success, data, error })),
-    registerStandardizedIpcHandler: vi.fn((channel, handler, _validator, registeredHandlers) => {
-        registeredHandlers.add(channel);
-        // Mock the actual IPC registration
-        ipcMain.handle(channel, handler);
-    }),
+    createValidationResponse: vi.fn((success, data, error) => ({
+        success,
+        data,
+        error,
+    })),
+    registerStandardizedIpcHandler: vi.fn(
+        (channel, handler, _validator, registeredHandlers) => {
+            registeredHandlers.add(channel);
+            // Mock the actual IPC registration
+            ipcMain.handle(channel, handler);
+        }
+    ),
 }));
 
 vi.mock("../../../services/ipc/validators", () => ({
@@ -149,7 +155,10 @@ describe("IpcService", () => {
         vi.clearAllMocks();
         mockUptimeOrchestrator = new UptimeOrchestrator();
         mockAutoUpdaterService = new AutoUpdaterService();
-        ipcService = new IpcService(mockUptimeOrchestrator, mockAutoUpdaterService);
+        ipcService = new IpcService(
+            mockUptimeOrchestrator,
+            mockAutoUpdaterService
+        );
     });
 
     afterEach(() => {
@@ -229,13 +238,17 @@ describe("IpcService", () => {
             ipcService.cleanup();
 
             expect(ipcMain.removeHandler).toHaveBeenCalled();
-            expect(ipcMain.removeAllListeners).toHaveBeenCalledWith("quit-and-install");
+            expect(ipcMain.removeAllListeners).toHaveBeenCalledWith(
+                "quit-and-install"
+            );
         });
 
         it("should handle cleanup when no handlers are registered", () => {
             ipcService.cleanup();
 
-            expect(ipcMain.removeAllListeners).toHaveBeenCalledWith("quit-and-install");
+            expect(ipcMain.removeAllListeners).toHaveBeenCalledWith(
+                "quit-and-install"
+            );
         });
 
         it("should log cleanup operation", () => {
@@ -407,7 +420,9 @@ describe("IpcService", () => {
             ipcService.cleanup();
             ipcService.cleanup();
 
-            expect(ipcMain.removeAllListeners).toHaveBeenCalledWith("quit-and-install");
+            expect(ipcMain.removeAllListeners).toHaveBeenCalledWith(
+                "quit-and-install"
+            );
         });
     });
 
@@ -436,7 +451,8 @@ describe("IpcService", () => {
             ipcService.setupHandlers();
 
             ipcService.cleanup();
-            const removeCallsAfterCleanup = vi.mocked(ipcMain.removeHandler).mock.calls.length;
+            const removeCallsAfterCleanup = vi.mocked(ipcMain.removeHandler)
+                .mock.calls.length;
 
             // Should have called removeHandler for each registered handler
             expect(removeCallsAfterCleanup).toBeGreaterThan(0);
@@ -446,7 +462,9 @@ describe("IpcService", () => {
             ipcService.setupHandlers();
             ipcService.cleanup();
 
-            expect(ipcMain.removeAllListeners).toHaveBeenCalledWith("quit-and-install");
+            expect(ipcMain.removeAllListeners).toHaveBeenCalledWith(
+                "quit-and-install"
+            );
         });
     });
 

@@ -581,23 +581,35 @@ describe("Shared Database Types - Complete Coverage", () => {
                 emptyStringProp: "",
             };
 
-            expect(safeGetRowProperty(row, "stringProp", "default")).toBe("hello");
+            expect(safeGetRowProperty(row, "stringProp", "default")).toBe(
+                "hello"
+            );
             expect(safeGetRowProperty(row, "numberProp", 0)).toBe(42);
             expect(safeGetRowProperty(row, "booleanProp", false)).toBe(true);
-            expect(safeGetRowProperty(row, "objectProp", {})).toEqual({ nested: "value" });
+            expect(safeGetRowProperty(row, "objectProp", {})).toEqual({
+                nested: "value",
+            });
             expect(safeGetRowProperty(row, "arrayProp", [])).toEqual([1, 2, 3]);
             expect(safeGetRowProperty(row, "nullProp", "default")).toBe(null);
             expect(safeGetRowProperty(row, "zeroProp", 999)).toBe(0);
             expect(safeGetRowProperty(row, "falseProp", true)).toBe(false);
-            expect(safeGetRowProperty(row, "emptyStringProp", "default")).toBe("");
+            expect(safeGetRowProperty(row, "emptyStringProp", "default")).toBe(
+                ""
+            );
         });
 
         it("should return default value when property does not exist", () => {
             const row = { existingProp: "value" };
 
-            expect(safeGetRowProperty(row, "nonExistentProp", "default")).toBe("default");
-            expect(safeGetRowProperty(row, "anotherMissingProp", 123)).toBe(123);
-            expect(safeGetRowProperty(row, "missingBoolProp", false)).toBe(false);
+            expect(safeGetRowProperty(row, "nonExistentProp", "default")).toBe(
+                "default"
+            );
+            expect(safeGetRowProperty(row, "anotherMissingProp", 123)).toBe(
+                123
+            );
+            expect(safeGetRowProperty(row, "missingBoolProp", false)).toBe(
+                false
+            );
         });
 
         it("should return default value when property is undefined", () => {
@@ -606,22 +618,30 @@ describe("Shared Database Types - Complete Coverage", () => {
                 existingProp: "value",
             };
 
-            expect(safeGetRowProperty(row, "undefinedProp", "default")).toBe("default");
+            expect(safeGetRowProperty(row, "undefinedProp", "default")).toBe(
+                "default"
+            );
         });
 
         it("should handle empty row object", () => {
             const row = {};
 
-            expect(safeGetRowProperty(row, "anyProp", "default")).toBe("default");
+            expect(safeGetRowProperty(row, "anyProp", "default")).toBe(
+                "default"
+            );
             expect(safeGetRowProperty(row, "anotherProp", 42)).toBe(42);
             expect(safeGetRowProperty(row, "boolProp", true)).toBe(true);
         });
 
         it("should work with complex default values", () => {
             const row = {};
-            const complexDefault = { nested: { array: [1, 2, 3], value: "test" } };
+            const complexDefault = {
+                nested: { array: [1, 2, 3], value: "test" },
+            };
 
-            expect(safeGetRowProperty(row, "complexProp", complexDefault)).toEqual(complexDefault);
+            expect(
+                safeGetRowProperty(row, "complexProp", complexDefault)
+            ).toEqual(complexDefault);
         });
 
         it("should handle special property names", () => {
@@ -632,10 +652,18 @@ describe("Shared Database Types - Complete Coverage", () => {
                 "123numeric": "numeric-value",
             };
 
-            expect(safeGetRowProperty(row, "prop-with-dashes", "default")).toBe("dash-value");
-            expect(safeGetRowProperty(row, "prop_with_underscores", "default")).toBe("underscore-value");
-            expect(safeGetRowProperty(row, "prop.with.dots", "default")).toBe("dot-value");
-            expect(safeGetRowProperty(row, "123numeric", "default")).toBe("numeric-value");
+            expect(safeGetRowProperty(row, "prop-with-dashes", "default")).toBe(
+                "dash-value"
+            );
+            expect(
+                safeGetRowProperty(row, "prop_with_underscores", "default")
+            ).toBe("underscore-value");
+            expect(safeGetRowProperty(row, "prop.with.dots", "default")).toBe(
+                "dot-value"
+            );
+            expect(safeGetRowProperty(row, "123numeric", "default")).toBe(
+                "numeric-value"
+            );
         });
 
         it("should preserve type information", () => {
@@ -646,7 +674,11 @@ describe("Shared Database Types - Complete Coverage", () => {
                 dateVal: new Date(),
             };
 
-            const stringResult = safeGetRowProperty(row, "stringVal", "default");
+            const stringResult = safeGetRowProperty(
+                row,
+                "stringVal",
+                "default"
+            );
             const numberResult = safeGetRowProperty(row, "numberVal", 0);
             const boolResult = safeGetRowProperty(row, "boolVal", false);
             const dateResult = safeGetRowProperty(row, "dateVal", new Date(0));

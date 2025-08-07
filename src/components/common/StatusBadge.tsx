@@ -44,52 +44,62 @@ export interface StatusBadgeProperties {
  * @param props - StatusBadge component props
  * @returns JSX element containing status indicator and text
  */
-export const StatusBadge: React.NamedExoticComponent<StatusBadgeProperties> = React.memo(function StatusBadge({
-    className = "",
-    formatter,
-    label,
-    showIcon = true,
-    size = "sm",
-    status,
-}: StatusBadgeProperties) {
-    /**
-     * Maps text sizes to appropriate indicator sizes.
-     * Ensures visual consistency between text and icon.
-     *
-     * @param textSize - The text size to map
-     * @returns Corresponding indicator size
-     */
-    const getIndicatorSize = (textSize: typeof size): "lg" | "md" | "sm" => {
-        switch (textSize) {
-            case "2xl":
-            case "3xl":
-            case "4xl":
-            case "xl": {
-                return "lg";
+export const StatusBadge: React.NamedExoticComponent<StatusBadgeProperties> =
+    React.memo(function StatusBadge({
+        className = "",
+        formatter,
+        label,
+        showIcon = true,
+        size = "sm",
+        status,
+    }: StatusBadgeProperties) {
+        /**
+         * Maps text sizes to appropriate indicator sizes.
+         * Ensures visual consistency between text and icon.
+         *
+         * @param textSize - The text size to map
+         * @returns Corresponding indicator size
+         */
+        const getIndicatorSize = (
+            textSize: typeof size
+        ): "lg" | "md" | "sm" => {
+            switch (textSize) {
+                case "2xl":
+                case "3xl":
+                case "4xl":
+                case "xl": {
+                    return "lg";
+                }
+                case "base":
+                case "lg": {
+                    return "md";
+                }
+                case "sm":
+                case "xs": {
+                    return "sm";
+                }
+                default: {
+                    return "sm";
+                }
             }
-            case "base":
-            case "lg": {
-                return "md";
-            }
-            case "sm":
-            case "xs": {
-                return "sm";
-            }
-            default: {
-                return "sm";
-            }
-        }
-    };
+        };
 
-    // Use custom formatter if provided, otherwise default format
-    const displayText = formatter ? formatter(label, status) : `${label}: ${status}`;
+        // Use custom formatter if provided, otherwise default format
+        const displayText = formatter
+            ? formatter(label, status)
+            : `${label}: ${status}`;
 
-    return (
-        <div className={`flex items-center gap-3 ${className}`}>
-            {showIcon ? <StatusIndicator size={getIndicatorSize(size)} status={status} /> : null}
-            <ThemedText size={size} variant="secondary">
-                {displayText}
-            </ThemedText>
-        </div>
-    );
-});
+        return (
+            <div className={`flex items-center gap-3 ${className}`}>
+                {showIcon ? (
+                    <StatusIndicator
+                        size={getIndicatorSize(size)}
+                        status={status}
+                    />
+                ) : null}
+                <ThemedText size={size} variant="secondary">
+                    {displayText}
+                </ThemedText>
+            </div>
+        );
+    });

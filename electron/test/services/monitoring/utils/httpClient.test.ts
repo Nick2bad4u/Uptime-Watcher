@@ -5,7 +5,10 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import axios, { AxiosInstance } from "axios";
-import { createHttpClient, setupTimingInterceptors } from "../../../../services/monitoring/utils/httpClient";
+import {
+    createHttpClient,
+    setupTimingInterceptors,
+} from "../../../../services/monitoring/utils/httpClient";
 import { MonitorConfig } from "../../../../services/monitoring/types";
 
 // Mock axios
@@ -119,8 +122,12 @@ describe("HTTP Client Utils", () => {
             createHttpClient(config);
 
             // Assert
-            expect(mockAxiosInstance.interceptors.request.use).toHaveBeenCalled();
-            expect(mockAxiosInstance.interceptors.response.use).toHaveBeenCalled();
+            expect(
+                mockAxiosInstance.interceptors.request.use
+            ).toHaveBeenCalled();
+            expect(
+                mockAxiosInstance.interceptors.response.use
+            ).toHaveBeenCalled();
         });
     });
 
@@ -171,7 +178,9 @@ describe("HTTP Client Utils", () => {
             setupTimingInterceptors(mockInstance);
 
             // Get the request interceptor function
-            const requestInterceptor = (mockInstance.interceptors.request.use as any).mock.calls[0][0];
+            const requestInterceptor = (
+                mockInstance.interceptors.request.use as any
+            ).mock.calls[0][0];
             const config = {} as any;
             const result = requestInterceptor(config);
 
@@ -204,7 +213,9 @@ describe("HTTP Client Utils", () => {
             setupTimingInterceptors(mockInstance);
 
             // Get the response interceptor function
-            const responseInterceptor = (mockInstance.interceptors.response.use as any).mock.calls[0][0];
+            const responseInterceptor = (
+                mockInstance.interceptors.response.use as any
+            ).mock.calls[0][0];
             const response = {
                 config: {
                     metadata: {
@@ -236,7 +247,9 @@ describe("HTTP Client Utils", () => {
             setupTimingInterceptors(mockInstance);
 
             // Get the response interceptor function
-            const responseInterceptor = (mockInstance.interceptors.response.use as any).mock.calls[0][0];
+            const responseInterceptor = (
+                mockInstance.interceptors.response.use as any
+            ).mock.calls[0][0];
             const response = {
                 config: {},
             } as any;
@@ -264,20 +277,32 @@ describe("HTTP Client Utils", () => {
             setupTimingInterceptors(mockInstance);
 
             // Get the interceptor error handlers
-            const requestErrorHandler = (mockInstance.interceptors.request.use as any).mock.calls[0][1];
-            const responseErrorHandler = (mockInstance.interceptors.response.use as any).mock.calls[0][1];
+            const requestErrorHandler = (
+                mockInstance.interceptors.request.use as any
+            ).mock.calls[0][1];
+            const responseErrorHandler = (
+                mockInstance.interceptors.response.use as any
+            ).mock.calls[0][1];
 
             // Test request error handler
             const requestError = new Error("Request error");
-            await expect(requestErrorHandler(requestError)).rejects.toThrow("Request error");
+            await expect(requestErrorHandler(requestError)).rejects.toThrow(
+                "Request error"
+            );
 
             // Test response error handler
             const responseError = new Error("Response error");
-            await expect(responseErrorHandler(responseError)).rejects.toThrow("Response error");
+            await expect(responseErrorHandler(responseError)).rejects.toThrow(
+                "Response error"
+            );
 
             // Test with non-Error objects
-            await expect(requestErrorHandler("String error")).rejects.toThrow("String error");
-            await expect(responseErrorHandler("String error")).rejects.toThrow("String error");
+            await expect(requestErrorHandler("String error")).rejects.toThrow(
+                "String error"
+            );
+            await expect(responseErrorHandler("String error")).rejects.toThrow(
+                "String error"
+            );
         });
 
         it("should calculate response time for error responses", () => {
@@ -301,7 +326,9 @@ describe("HTTP Client Utils", () => {
             setupTimingInterceptors(mockInstance);
 
             // Get the response error handler
-            const responseErrorHandler = (mockInstance.interceptors.response.use as any).mock.calls[0][1];
+            const responseErrorHandler = (
+                mockInstance.interceptors.response.use as any
+            ).mock.calls[0][1];
             const error = {
                 config: {
                     metadata: {

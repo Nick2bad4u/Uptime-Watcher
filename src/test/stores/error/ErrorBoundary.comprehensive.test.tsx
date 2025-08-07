@@ -8,7 +8,10 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import "@testing-library/jest-dom";
 
-import { ErrorBoundary, withErrorBoundary } from "../../../stores/error/ErrorBoundary";
+import {
+    ErrorBoundary,
+    withErrorBoundary,
+} from "../../../stores/error/ErrorBoundary";
 
 // Create a component that throws errors for testing
 const ThrowingComponent = ({ shouldThrow }: { shouldThrow?: boolean }) => {
@@ -19,7 +22,13 @@ const ThrowingComponent = ({ shouldThrow }: { shouldThrow?: boolean }) => {
 };
 
 // Create a custom fallback component for testing
-const CustomFallback = ({ error, onRetry }: { error?: Error; onRetry: () => void }) => (
+const CustomFallback = ({
+    error,
+    onRetry,
+}: {
+    error?: Error;
+    onRetry: () => void;
+}) => (
     <div data-testid="custom-fallback">
         <p>Custom error: {error?.message}</p>
         <button onClick={onRetry} data-testid="custom-retry">
@@ -45,7 +54,9 @@ describe("ErrorBoundary", () => {
             );
 
             expect(screen.getByTestId("normal-content")).toBeInTheDocument();
-            expect(screen.queryByText(/Something went wrong/)).not.toBeInTheDocument();
+            expect(
+                screen.queryByText(/Something went wrong/)
+            ).not.toBeInTheDocument();
         });
 
         it("should render multiple children correctly", () => {
@@ -69,8 +80,12 @@ describe("ErrorBoundary", () => {
                 </ErrorBoundary>
             );
 
-            expect(screen.queryByTestId("normal-content")).not.toBeInTheDocument();
-            expect(screen.getByText(/Something went wrong/)).toBeInTheDocument();
+            expect(
+                screen.queryByTestId("normal-content")
+            ).not.toBeInTheDocument();
+            expect(
+                screen.getByText(/Something went wrong/)
+            ).toBeInTheDocument();
         });
 
         it("should display custom fallback when provided", () => {
@@ -81,7 +96,9 @@ describe("ErrorBoundary", () => {
             );
 
             expect(screen.getByTestId("custom-fallback")).toBeInTheDocument();
-            expect(screen.getByText("Custom error: Test error")).toBeInTheDocument();
+            expect(
+                screen.getByText("Custom error: Test error")
+            ).toBeInTheDocument();
         });
 
         it("should call onError callback when error occurs", () => {
@@ -132,7 +149,9 @@ describe("ErrorBoundary", () => {
             );
 
             // Should show error initially
-            expect(screen.getByText(/Something went wrong/)).toBeInTheDocument();
+            expect(
+                screen.getByText(/Something went wrong/)
+            ).toBeInTheDocument();
 
             // Fix the condition to stop throwing
             shouldThrow = false;
@@ -142,7 +161,9 @@ describe("ErrorBoundary", () => {
 
             // Should show normal content after retry
             await waitFor(() => {
-                expect(screen.getByTestId("normal-content")).toBeInTheDocument();
+                expect(
+                    screen.getByTestId("normal-content")
+                ).toBeInTheDocument();
             });
         });
 
@@ -150,7 +171,13 @@ describe("ErrorBoundary", () => {
             const user = userEvent.setup();
             let shouldThrow = true;
 
-            const CustomFallback = ({ error, onRetry }: { error?: Error; onRetry: () => void }) => (
+            const CustomFallback = ({
+                error,
+                onRetry,
+            }: {
+                error?: Error;
+                onRetry: () => void;
+            }) => (
                 <div data-testid="custom-fallback">
                     <p>Custom error: {error?.message}</p>
                     <button data-testid="custom-retry" onClick={onRetry}>
@@ -198,7 +225,11 @@ describe("ErrorBoundary", () => {
 
             let componentState = { shouldThrow: true };
             const StateControlledComponent = () => {
-                return <ThrowingComponent shouldThrow={componentState.shouldThrow} />;
+                return (
+                    <ThrowingComponent
+                        shouldThrow={componentState.shouldThrow}
+                    />
+                );
             };
 
             render(
@@ -208,7 +239,9 @@ describe("ErrorBoundary", () => {
             );
 
             // Should show error
-            expect(screen.getByText(/Something went wrong/)).toBeInTheDocument();
+            expect(
+                screen.getByText(/Something went wrong/)
+            ).toBeInTheDocument();
 
             // Fix the component state
             componentState.shouldThrow = false;
@@ -237,7 +270,9 @@ describe("ErrorBoundary", () => {
 });
 
 describe("withErrorBoundary HOC", () => {
-    const TestComponent = ({ message }: { message: string }) => <div data-testid="wrapped-component">{message}</div>;
+    const TestComponent = ({ message }: { message: string }) => (
+        <div data-testid="wrapped-component">{message}</div>
+    );
 
     it("should wrap component with error boundary", () => {
         const WrappedComponent = withErrorBoundary(TestComponent);
@@ -249,19 +284,28 @@ describe("withErrorBoundary HOC", () => {
     });
 
     it("should use custom fallback when provided", () => {
-        const ThrowingTestComponent = ({ shouldThrow }: { shouldThrow: boolean }) => {
+        const ThrowingTestComponent = ({
+            shouldThrow,
+        }: {
+            shouldThrow: boolean;
+        }) => {
             if (shouldThrow) {
                 throw new Error("HOC test error");
             }
             return <div data-testid="wrapped-component">Normal content</div>;
         };
 
-        const WrappedComponent = withErrorBoundary(ThrowingTestComponent, CustomFallback);
+        const WrappedComponent = withErrorBoundary(
+            ThrowingTestComponent,
+            CustomFallback
+        );
 
         render(<WrappedComponent shouldThrow={true} />);
 
         expect(screen.getByTestId("custom-fallback")).toBeInTheDocument();
-        expect(screen.getByText("Custom error: HOC test error")).toBeInTheDocument();
+        expect(
+            screen.getByText("Custom error: HOC test error")
+        ).toBeInTheDocument();
     });
 
     it("should set correct display name for wrapped component", () => {
@@ -272,14 +316,18 @@ describe("withErrorBoundary HOC", () => {
 
         const WrappedComponent = withErrorBoundary(TestComponentWithName);
 
-        expect(WrappedComponent.displayName).toBe("withErrorBoundary(TestComponent)");
+        expect(WrappedComponent.displayName).toBe(
+            "withErrorBoundary(TestComponent)"
+        );
     });
 
     it("should handle component without displayName", () => {
         const AnonymousComponent = () => <div>Anonymous</div>;
         const WrappedComponent = withErrorBoundary(AnonymousComponent);
 
-        expect(WrappedComponent.displayName).toBe("withErrorBoundary(AnonymousComponent)");
+        expect(WrappedComponent.displayName).toBe(
+            "withErrorBoundary(AnonymousComponent)"
+        );
     });
 
     it("should use default fallback when none provided", () => {

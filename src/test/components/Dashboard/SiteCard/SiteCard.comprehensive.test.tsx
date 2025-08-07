@@ -30,11 +30,15 @@ vi.mock("../SiteCardStatus", () => ({
 }));
 
 vi.mock("../SiteCardHistory", () => ({
-    SiteCardHistory: () => <div data-testid="site-card-history">Site History</div>,
+    SiteCardHistory: () => (
+        <div data-testid="site-card-history">Site History</div>
+    ),
 }));
 
 vi.mock("../SiteCardMetrics", () => ({
-    SiteCardMetrics: () => <div data-testid="site-card-metrics">Site Metrics</div>,
+    SiteCardMetrics: () => (
+        <div data-testid="site-card-metrics">Site Metrics</div>
+    ),
 }));
 
 vi.mock("../SiteCardFooter", () => ({

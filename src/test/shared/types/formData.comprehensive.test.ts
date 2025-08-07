@@ -9,7 +9,12 @@ import type {
     PortFormData,
     SiteFormData,
 } from "../../../../shared/types/formData";
-import { DEFAULT_FORM_DATA, isHttpFormData, isPingFormData, isPortFormData } from "../../../../shared/types/formData";
+import {
+    DEFAULT_FORM_DATA,
+    isHttpFormData,
+    isPingFormData,
+    isPortFormData,
+} from "../../../../shared/types/formData";
 
 describe("FormData Types", () => {
     describe("SiteFormData", () => {
@@ -640,7 +645,9 @@ describe("FormData Types", () => {
                     default:
                         // TypeScript should catch this at compile time
                         const _exhaustive: never = monitor;
-                        throw new Error(`Unhandled monitor type: ${_exhaustive}`);
+                        throw new Error(
+                            `Unhandled monitor type: ${_exhaustive}`
+                        );
                 }
             });
         });

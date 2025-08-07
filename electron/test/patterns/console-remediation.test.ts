@@ -18,7 +18,10 @@ import path from "node:path";
 
 describe("Console Statement Remediation", () => {
     const projectRoot = path.resolve(import.meta.dirname, "../../../..");
-    const srcDirs = [path.join(projectRoot, "src"), path.join(projectRoot, "electron")];
+    const srcDirs = [
+        path.join(projectRoot, "src"),
+        path.join(projectRoot, "electron"),
+    ];
 
     /**
      * Find all TypeScript files
@@ -36,9 +39,16 @@ describe("Console Statement Remediation", () => {
             const fullPath = path.join(dir, item);
             const stat = fs.statSync(fullPath);
 
-            if (stat.isDirectory() && !item.startsWith(".") && item !== "node_modules") {
+            if (
+                stat.isDirectory() &&
+                !item.startsWith(".") &&
+                item !== "node_modules"
+            ) {
                 files.push(...findTSFiles(fullPath));
-            } else if ((item.endsWith(".ts") || item.endsWith(".tsx")) && !item.endsWith(".d.ts")) {
+            } else if (
+                (item.endsWith(".ts") || item.endsWith(".tsx")) &&
+                !item.endsWith(".d.ts")
+            ) {
                 files.push(fullPath);
             }
         }
@@ -69,12 +79,19 @@ describe("Console Statement Remediation", () => {
         for (const [index, line] of lines.entries()) {
             const match = line.match(consoleRegex);
             if (match) {
-                const type = match[1] as "error" | "warn" | "log" | "debug" | "info";
+                const type = match[1] as
+                    | "error"
+                    | "warn"
+                    | "log"
+                    | "debug"
+                    | "info";
 
                 // Get some context around the line
                 const startLine = Math.max(0, index - 2);
                 const endLine = Math.min(lines.length - 1, index + 2);
-                const context = lines.slice(startLine, endLine + 1).join(String.raw`\n`);
+                const context = lines
+                    .slice(startLine, endLine + 1)
+                    .join(String.raw`\n`);
 
                 consoleStatements.push({
                     line: index + 1,
@@ -118,14 +135,20 @@ describe("Console Statement Remediation", () => {
         }
 
         // Check for legitimate usage patterns
-        if (statement.context.includes("TSDoc") || statement.context.includes("* @example")) {
+        if (
+            statement.context.includes("TSDoc") ||
+            statement.context.includes("* @example")
+        ) {
             return {
                 category: "legitimate",
                 reason: "Documentation example in TSDoc comment",
             };
         }
 
-        if (statement.context.includes("// Development only") || statement.context.includes("if (isDev())")) {
+        if (
+            statement.context.includes("// Development only") ||
+            statement.context.includes("if (isDev())")
+        ) {
             return {
                 category: "legitimate",
                 reason: "Development-only console statement",
@@ -138,7 +161,8 @@ describe("Console Statement Remediation", () => {
         switch (statement.type) {
             case "error": {
                 replacement =
-                    statement.context.includes("catch") || statement.context.includes("error")
+                    statement.context.includes("catch") ||
+                    statement.context.includes("error")
                         ? 'logger.error("Operation failed", error);'
                         : 'logger.error("Error message");';
 
@@ -151,7 +175,8 @@ describe("Console Statement Remediation", () => {
             }
             case "log": {
                 replacement =
-                    statement.context.includes("debug") || statement.context.includes("Debug")
+                    statement.context.includes("debug") ||
+                    statement.context.includes("Debug")
                         ? 'logger.debug("Debug information");'
                         : 'logger.info("Information message");';
 
@@ -207,7 +232,10 @@ describe("Console Statement Remediation", () => {
                     };
 
                     for (const statement of statements) {
-                        const category = categorizeConsoleStatement(statement, file);
+                        const category = categorizeConsoleStatement(
+                            statement,
+                            file
+                        );
 
                         switch (category.category) {
                             case "legitimate": {
@@ -251,7 +279,11 @@ describe("Console Statement Remediation", () => {
 
             if (analysisResults.length > 0) {
                 console.log(String.raw`\nFiles with console statements:`);
-                for (const { file, statements, categorized } of analysisResults.slice(0, 10)) {
+                for (const {
+                    file,
+                    statements,
+                    categorized,
+                } of analysisResults.slice(0, 10)) {
                     console.log(`\\n${file}:`);
                     console.log(
                         `  Total: ${statements.length}, Needs fix: ${categorized.needsReplacement}, Legitimate: ${categorized.legitimate}`
@@ -279,9 +311,15 @@ describe("Console Statement Remediation", () => {
                 const statements = extractConsoleStatements(file);
 
                 for (const statement of statements) {
-                    const category = categorizeConsoleStatement(statement, file);
+                    const category = categorizeConsoleStatement(
+                        statement,
+                        file
+                    );
 
-                    if (category.category === "needs-replacement" && category.replacement) {
+                    if (
+                        category.category === "needs-replacement" &&
+                        category.replacement
+                    ) {
                         replacementRecommendations.push({
                             file: path.relative(projectRoot, file),
                             line: statement.line,
@@ -297,7 +335,13 @@ describe("Console Statement Remediation", () => {
             console.log("=".repeat(50));
 
             if (replacementRecommendations.length > 0) {
-                for (const { file, line, original, replacement, reason } of replacementRecommendations.slice(0, 5)) {
+                for (const {
+                    file,
+                    line,
+                    original,
+                    replacement,
+                    reason,
+                } of replacementRecommendations.slice(0, 5)) {
                     console.log(`\\n${file}:${line}`);
                     console.log(`  Original: ${original}`);
                     console.log(`  Replace with: ${replacement}`);
@@ -308,7 +352,9 @@ describe("Console Statement Remediation", () => {
                     `\\n... and ${Math.max(0, replacementRecommendations.length - 5)} more replacements needed.`
                 );
             } else {
-                console.log("No console statements need replacement in analyzed files.");
+                console.log(
+                    "No console statements need replacement in analyzed files."
+                );
             }
 
             expect(replacementRecommendations.length).toBeGreaterThanOrEqual(0);
@@ -321,7 +367,8 @@ describe("Console Statement Remediation", () => {
                 {
                     level: "error",
                     usage: "For errors that need investigation",
-                    example: 'logger.error("Database connection failed", error);',
+                    example:
+                        'logger.error("Database connection failed", error);',
                     when: "Exceptions, API failures, critical issues",
                 },
                 {
@@ -339,7 +386,8 @@ describe("Console Statement Remediation", () => {
                 {
                     level: "debug",
                     usage: "For detailed debugging information",
-                    example: 'logger.debug("Processing request", { userId, action });',
+                    example:
+                        'logger.debug("Processing request", { userId, action });',
                     when: "Development debugging, detailed execution flow",
                 },
             ];
@@ -362,7 +410,8 @@ describe("Console Statement Remediation", () => {
                 {
                     step: 1,
                     title: "Audit Current Console Usage",
-                    description: "Run this tool to identify all console statements",
+                    description:
+                        "Run this tool to identify all console statements",
                     action: "npm test -- patterns/console-remediation",
                 },
                 {
@@ -374,19 +423,22 @@ describe("Console Statement Remediation", () => {
                 {
                     step: 3,
                     title: "Replace Debug Statements",
-                    description: "Replace console.log with appropriate logger calls",
+                    description:
+                        "Replace console.log with appropriate logger calls",
                     action: "Use logger.debug for development info, logger.info for user events",
                 },
                 {
                     step: 4,
                     title: "Update Development Scripts",
-                    description: "Ensure logger is properly configured for development",
+                    description:
+                        "Ensure logger is properly configured for development",
                     action: "Verify logger.debug shows in development mode",
                 },
                 {
                     step: 5,
                     title: "Add Linting Rules",
-                    description: "Prevent future console statement introduction",
+                    description:
+                        "Prevent future console statement introduction",
                     action: "Add ESLint rule to warn about console usage",
                 },
             ];
@@ -420,7 +472,8 @@ describe("Console Statement Remediation", () => {
                 {
                     pattern: /console\.log\\((.+)\\);?/g,
                     replacement: "logger.info($1);",
-                    description: "Replace console.log with logger.info (review manually)",
+                    description:
+                        "Replace console.log with logger.info (review manually)",
                 },
                 {
                     pattern: /console\.debug\\((.+)\\);?/g,
@@ -437,7 +490,11 @@ describe("Console Statement Remediation", () => {
             console.log(String.raw`\nAutomated Replacement Patterns:`);
             console.log("=".repeat(40));
 
-            for (const { pattern, replacement, description } of replacementPatterns) {
+            for (const {
+                pattern,
+                replacement,
+                description,
+            } of replacementPatterns) {
                 console.log(`\\n${description}:`);
                 console.log(`  Pattern: ${pattern.source}`);
                 console.log(`  Replace: ${replacement}`);
@@ -460,7 +517,10 @@ function replaceConsoleStatements(fileContent: string): string {
     
     // Apply replacements (requires manual review)
     ${replacementPatterns
-        .map(({ pattern, replacement }) => `result = result.replace(${pattern}, '${replacement}');`)
+        .map(
+            ({ pattern, replacement }) =>
+                `result = result.replace(${pattern}, '${replacement}');`
+        )
         .join(String.raw`\n    `)}
     
     return result;

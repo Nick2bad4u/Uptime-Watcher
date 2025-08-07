@@ -86,7 +86,10 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
  for (const fieldDef of fieldDefs) {
   const value = row[fieldDef.columnName as keyof MonitorRow];
   if (value != null) {
-   (monitor as any)[fieldDef.sourceField] = convertFromDatabase(value, fieldDef.sqlType);
+   (monitor as any)[fieldDef.sourceField] = convertFromDatabase(
+    value,
+    fieldDef.sqlType
+   );
   }
  }
 
@@ -163,7 +166,9 @@ const validateHttpMonitorFormData = (data: Partial<HttpFormData>) => {
 #### **Database SQL Results**
 
 ```typescript
-const insertResult = db.get(insertSql, parameters) as Record<string, unknown> | undefined;
+const insertResult = db.get(insertSql, parameters) as
+ | Record<string, unknown>
+ | undefined;
 ```
 
 **Reasoning**: SQLite returns generic objects; type casting happens at proper boundaries
@@ -187,7 +192,10 @@ const parsed: unknown = JSON.parse(jsonString);
 #### **Dynamic Schema Systems**
 
 ```typescript
-(monitor as any)[fieldDef.sourceField] = convertFromDatabase(value, fieldDef.sqlType);
+(monitor as any)[fieldDef.sourceField] = convertFromDatabase(
+ value,
+ fieldDef.sqlType
+);
 ```
 
 **Reasoning**: Dynamic field assignment required for extensible monitor type system

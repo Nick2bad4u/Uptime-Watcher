@@ -8,7 +8,10 @@
 import { Database } from "node-sqlite3-wasm";
 
 import { ERROR_CATALOG } from "../../../shared/utils/errorCatalog";
-import { safeJsonParse, safeJsonStringifyWithFallback } from "../../../shared/utils/jsonSafety";
+import {
+    safeJsonParse,
+    safeJsonStringifyWithFallback,
+} from "../../../shared/utils/jsonSafety";
 import { UptimeEvents } from "../../events/eventTypes";
 import { TypedEventBus } from "../../events/TypedEventBus";
 import { DatabaseService } from "../../services/database/DatabaseService";
@@ -95,14 +98,23 @@ export class DataImportExportService {
             const message = `Failed to export data: ${error instanceof Error ? error.message : String(error)}`;
             this.logger.error(message, error);
 
-            await this.eventEmitter.emitTyped(DataImportExportService.DATABASE_ERROR_EVENT, {
-                details: message,
-                error: error instanceof Error ? error : new Error(String(error)),
-                operation: "export-data",
-                timestamp: Date.now(),
-            });
+            await this.eventEmitter.emitTyped(
+                DataImportExportService.DATABASE_ERROR_EVENT,
+                {
+                    details: message,
+                    error:
+                        error instanceof Error
+                            ? error
+                            : new Error(String(error)),
+                    operation: "export-data",
+                    timestamp: Date.now(),
+                }
+            );
 
-            throw new SiteLoadingError(message, error instanceof Error ? error : undefined);
+            throw new SiteLoadingError(
+                message,
+                error instanceof Error ? error : undefined
+            );
         }
     }
 
@@ -110,7 +122,9 @@ export class DataImportExportService {
      * Import data from JSON string.
      * Pure data operation that returns the imported data.
      */
-    async importDataFromJson(jsonData: string): Promise<{ settings: Record<string, string>; sites: ImportSite[] }> {
+    async importDataFromJson(
+        jsonData: string
+    ): Promise<{ settings: Record<string, string>; sites: ImportSite[] }> {
         try {
             // Parse and validate the JSON data using safe parsing
             const parseResult = safeJsonParse(jsonData, isImportData);
@@ -130,14 +144,23 @@ export class DataImportExportService {
             const message = `Failed to parse import data: ${error instanceof Error ? error.message : String(error)}`;
             this.logger.error(message, error);
 
-            await this.eventEmitter.emitTyped(DataImportExportService.DATABASE_ERROR_EVENT, {
-                details: message,
-                error: error instanceof Error ? error : new Error(String(error)),
-                operation: "import-data-parse",
-                timestamp: Date.now(),
-            });
+            await this.eventEmitter.emitTyped(
+                DataImportExportService.DATABASE_ERROR_EVENT,
+                {
+                    details: message,
+                    error:
+                        error instanceof Error
+                            ? error
+                            : new Error(String(error)),
+                    operation: "import-data-parse",
+                    timestamp: Date.now(),
+                }
+            );
 
-            throw new SiteLoadingError(message, error instanceof Error ? error : undefined);
+            throw new SiteLoadingError(
+                message,
+                error instanceof Error ? error : undefined
+            );
         }
     }
 
@@ -145,7 +168,10 @@ export class DataImportExportService {
      * Import sites and settings into database.
      * Database operation that persists the imported data.
      */
-    async persistImportedData(sites: ImportSite[], settings: Record<string, string>): Promise<void> {
+    async persistImportedData(
+        sites: ImportSite[],
+        settings: Record<string, string>
+    ): Promise<void> {
         return withDatabaseOperation(
             async () => {
                 // Use executeTransaction for atomic multi-table operation
@@ -177,7 +203,10 @@ export class DataImportExportService {
             },
             "data-import-persist",
             this.eventEmitter,
-            { settingsCount: Object.keys(settings).length, sitesCount: sites.length }
+            {
+                settingsCount: Object.keys(settings).length,
+                sitesCount: sites.length,
+            }
         );
     }
 
@@ -199,8 +228,16 @@ export class DataImportExportService {
                     orig.port === createdMonitor.port
             );
 
-            if (originalMonitor?.history && originalMonitor.history.length > 0 && createdMonitor.id) {
-                this.importMonitorHistory(db, Number(createdMonitor.id), originalMonitor.history);
+            if (
+                originalMonitor?.history &&
+                originalMonitor.history.length > 0 &&
+                createdMonitor.id
+            ) {
+                this.importMonitorHistory(
+                    db,
+                    Number(createdMonitor.id),
+                    originalMonitor.history
+                );
             }
         }
     }
@@ -209,7 +246,11 @@ export class DataImportExportService {
      * Import history for a specific monitor.
      * Private helper method for history data persistence.
      */
-    private importMonitorHistory(db: Database, monitorId: number, history: StatusHistory[]): void {
+    private importMonitorHistory(
+        db: Database,
+        monitorId: number,
+        history: StatusHistory[]
+    ): void {
         for (const entry of history) {
             this.repositories.history.addEntryInternal(
                 db,
@@ -228,15 +269,26 @@ export class DataImportExportService {
      * Import monitors with their history for all sites.
      * Private helper method for monitor data persistence.
      */
-    private async importMonitorsWithHistory(db: Database, sites: ImportSite[]): Promise<void> {
+    private async importMonitorsWithHistory(
+        db: Database,
+        sites: ImportSite[]
+    ): Promise<void> {
         for (const site of sites) {
             if (Array.isArray(site.monitors) && site.monitors.length > 0) {
                 try {
                     // Create monitors using the async bulkCreate method
-                    const createdMonitors = await this.repositories.monitor.bulkCreate(site.identifier, site.monitors);
+                    const createdMonitors =
+                        await this.repositories.monitor.bulkCreate(
+                            site.identifier,
+                            site.monitors
+                        );
 
                     // Import history for the created monitors
-                    this.importHistoryForMonitors(db, createdMonitors, site.monitors);
+                    this.importHistoryForMonitors(
+                        db,
+                        createdMonitors,
+                        site.monitors
+                    );
 
                     this.logger.debug(
                         `[DataImportExportService] Imported ${createdMonitors.length} monitors for site: ${site.identifier}`
@@ -262,6 +314,12 @@ export class DataImportExportService {
  * @param obj - Object to validate
  * @returns True if the object matches the expected import data structure
  */
-function isImportData(obj: unknown): obj is { settings?: Record<string, string>; sites: ImportSite[] } {
-    return typeof obj === "object" && obj !== null && Array.isArray((obj as Record<string, unknown>)["sites"]);
+function isImportData(
+    obj: unknown
+): obj is { settings?: Record<string, string>; sites: ImportSite[] } {
+    return (
+        typeof obj === "object" &&
+        obj !== null &&
+        Array.isArray((obj as Record<string, unknown>)["sites"])
+    );
 }

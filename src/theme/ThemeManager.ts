@@ -105,7 +105,9 @@ export class ThemeManager {
     getSystemThemePreference(): "dark" | "light" {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (typeof window !== "undefined" && window.matchMedia) {
-            return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            return window.matchMedia("(prefers-color-scheme: dark)").matches
+                ? "dark"
+                : "light";
         }
         return "light";
     }
@@ -177,8 +179,12 @@ export class ThemeManager {
             for (const [category, colors] of Object.entries(theme.colors)) {
                 if (typeof colors === "object" && colors !== null) {
                     // Type-safe access to color values - colors are either string or nested color objects
-                    for (const [key, value] of Object.entries(colors as Record<string, string>)) {
-                        variables.push(`  --color-${category}-${key}: ${value};`);
+                    for (const [key, value] of Object.entries(
+                        colors as Record<string, string>
+                    )) {
+                        variables.push(
+                            `  --color-${category}-${key}: ${value};`
+                        );
                     }
                 } else {
                     variables.push(`  --color-${category}: ${colors};`);
@@ -220,21 +226,27 @@ export class ThemeManager {
         // Typography - defensive checks for runtime safety
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (theme.typography?.fontSize) {
-            for (const [size, value] of Object.entries(theme.typography.fontSize)) {
+            for (const [size, value] of Object.entries(
+                theme.typography.fontSize
+            )) {
                 variables.push(`  --font-size-${size}: ${value};`);
             }
         }
 
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (theme.typography?.fontWeight) {
-            for (const [weight, value] of Object.entries(theme.typography.fontWeight)) {
+            for (const [weight, value] of Object.entries(
+                theme.typography.fontWeight
+            )) {
                 variables.push(`  --font-weight-${weight}: ${value};`);
             }
         }
 
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (theme.typography?.lineHeight) {
-            for (const [height, value] of Object.entries(theme.typography.lineHeight)) {
+            for (const [height, value] of Object.entries(
+                theme.typography.lineHeight
+            )) {
                 variables.push(`  --line-height-${height}: ${value};`);
             }
         }
@@ -243,7 +255,10 @@ export class ThemeManager {
     /**
      * Apply border radius CSS custom properties
      */
-    private applyBorderRadius(root: HTMLElement, borderRadius: Theme["borderRadius"]): void {
+    private applyBorderRadius(
+        root: HTMLElement,
+        borderRadius: Theme["borderRadius"]
+    ): void {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (borderRadius) {
             for (const [size, value] of Object.entries(borderRadius)) {
@@ -261,11 +276,19 @@ export class ThemeManager {
             for (const [category, colorValue] of Object.entries(colors)) {
                 if (typeof colorValue === "object" && colorValue !== null) {
                     // Type-safe access to color values - colorValue is a nested color object with string values
-                    for (const [key, value] of Object.entries(colorValue as Record<string, string>)) {
-                        root.style.setProperty(`--color-${category}-${key}`, String(value));
+                    for (const [key, value] of Object.entries(
+                        colorValue as Record<string, string>
+                    )) {
+                        root.style.setProperty(
+                            `--color-${category}-${key}`,
+                            String(value)
+                        );
                     }
                 } else {
-                    root.style.setProperty(`--color-${category}`, String(colorValue));
+                    root.style.setProperty(
+                        `--color-${category}`,
+                        String(colorValue)
+                    );
                 }
             }
         }
@@ -331,7 +354,10 @@ export class ThemeManager {
     /**
      * Apply typography CSS custom properties
      */
-    private applyTypography(root: HTMLElement, typography: Theme["typography"]): void {
+    private applyTypography(
+        root: HTMLElement,
+        typography: Theme["typography"]
+    ): void {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (typography?.fontSize) {
             for (const [size, value] of Object.entries(typography.fontSize)) {
@@ -341,15 +367,25 @@ export class ThemeManager {
 
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (typography?.fontWeight) {
-            for (const [weight, value] of Object.entries(typography.fontWeight)) {
-                root.style.setProperty(`--font-weight-${weight}`, String(value));
+            for (const [weight, value] of Object.entries(
+                typography.fontWeight
+            )) {
+                root.style.setProperty(
+                    `--font-weight-${weight}`,
+                    String(value)
+                );
             }
         }
 
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (typography?.lineHeight) {
-            for (const [height, value] of Object.entries(typography.lineHeight)) {
-                root.style.setProperty(`--line-height-${height}`, String(value));
+            for (const [height, value] of Object.entries(
+                typography.lineHeight
+            )) {
+                root.style.setProperty(
+                    `--line-height-${height}`,
+                    String(value)
+                );
             }
         }
     }

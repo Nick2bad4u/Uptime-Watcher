@@ -61,12 +61,23 @@ describe("Shared Types Coverage", () => {
 
             const fieldValidations: FormFieldValidation[] = [
                 { field: "siteName", required: true, type: "string" },
-                { field: "url", required: true, type: "string", validator: (url) => url.startsWith("http") },
+                {
+                    field: "url",
+                    required: true,
+                    type: "string",
+                    validator: (url) => url.startsWith("http"),
+                },
                 { field: "monitors", required: true, type: "array" },
             ];
 
-            const validateField = (field: FormFieldValidation, value: any): boolean => {
-                if (field.required && (value === null || value === undefined || value === "")) {
+            const validateField = (
+                field: FormFieldValidation,
+                value: any
+            ): boolean => {
+                if (
+                    field.required &&
+                    (value === null || value === undefined || value === "")
+                ) {
                     return false;
                 }
                 if (field.validator) {
@@ -77,8 +88,12 @@ describe("Shared Types Coverage", () => {
 
             expect(validateField(fieldValidations[0], "Test Site")).toBe(true);
             expect(validateField(fieldValidations[0], "")).toBe(false);
-            expect(validateField(fieldValidations[1], "https://example.com")).toBe(true);
-            expect(validateField(fieldValidations[1], "ftp://example.com")).toBe(false);
+            expect(
+                validateField(fieldValidations[1], "https://example.com")
+            ).toBe(true);
+            expect(
+                validateField(fieldValidations[1], "ftp://example.com")
+            ).toBe(false);
         });
     });
 
@@ -139,10 +154,14 @@ describe("Shared Types Coverage", () => {
             }
 
             const validator: MonitorValidator = {
-                validateType: (type: string) => ["http", "ping", "port", "dns"].includes(type),
-                validateInterval: (interval: number) => interval >= 30000 && interval <= 3600000,
-                validateTimeout: (timeout: number) => timeout >= 1000 && timeout <= 300000,
-                validateRetryAttempts: (attempts: number) => attempts >= 0 && attempts <= 10,
+                validateType: (type: string) =>
+                    ["http", "ping", "port", "dns"].includes(type),
+                validateInterval: (interval: number) =>
+                    interval >= 30000 && interval <= 3600000,
+                validateTimeout: (timeout: number) =>
+                    timeout >= 1000 && timeout <= 300000,
+                validateRetryAttempts: (attempts: number) =>
+                    attempts >= 0 && attempts <= 10,
             };
 
             expect(validator.validateType("http")).toBe(true);
@@ -288,7 +307,10 @@ describe("Shared Types Coverage", () => {
                 },
                 applyTheme: (themeName: string) => {
                     // Mock theme application
-                    document.documentElement.setAttribute("data-theme", themeName);
+                    document.documentElement.setAttribute(
+                        "data-theme",
+                        themeName
+                    );
                 },
             };
 
@@ -382,15 +404,25 @@ describe("Shared Types Coverage", () => {
                 },
             ];
 
-            const applyValidationRule = (rule: ValidationRule, value: any): boolean => {
+            const applyValidationRule = (
+                rule: ValidationRule,
+                value: any
+            ): boolean => {
                 switch (rule.type) {
                     case "required":
-                        return value !== null && value !== undefined && value !== "";
+                        return (
+                            value !== null &&
+                            value !== undefined &&
+                            value !== ""
+                        );
                     case "format":
                         return rule.validator ? rule.validator(value) : true;
                     case "range":
                         if (rule.parameters) {
-                            return value >= rule.parameters.min && value <= rule.parameters.max;
+                            return (
+                                value >= rule.parameters.min &&
+                                value <= rule.parameters.max
+                            );
                         }
                         return true;
                     default:
@@ -398,9 +430,13 @@ describe("Shared Types Coverage", () => {
                 }
             };
 
-            expect(applyValidationRule(validationRules[0], "Test Site")).toBe(true);
+            expect(applyValidationRule(validationRules[0], "Test Site")).toBe(
+                true
+            );
             expect(applyValidationRule(validationRules[0], "")).toBe(false);
-            expect(applyValidationRule(validationRules[1], "https://example.com")).toBe(true);
+            expect(
+                applyValidationRule(validationRules[1], "https://example.com")
+            ).toBe(true);
             expect(applyValidationRule(validationRules[2], 5000)).toBe(true);
             expect(applyValidationRule(validationRules[2], 500)).toBe(false);
         });

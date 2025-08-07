@@ -4,7 +4,10 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { DatabaseManager, DatabaseManagerDependencies } from "../../managers/DatabaseManager";
+import {
+    DatabaseManager,
+    DatabaseManagerDependencies,
+} from "../../managers/DatabaseManager";
 import { TypedEventBus } from "../../events/TypedEventBus";
 import { UptimeEvents } from "../../events/eventTypes";
 
@@ -152,11 +155,15 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
     describe("Initialize - Error Handling Branches", () => {
         it("should handle settings.get throwing an error during initialize", async () => {
             // Mock settings to throw an error
-            vi.mocked(mockSettingsRepository.get).mockRejectedValue(new Error("Settings error"));
+            vi.mocked(mockSettingsRepository.get).mockRejectedValue(
+                new Error("Settings error")
+            );
 
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock();
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(() => mockOrchestrator as any);
+            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
+                () => mockOrchestrator as any
+            );
 
             // Should not throw and should use default history limit
             await expect(databaseManager.initialize()).resolves.toBeUndefined();
@@ -178,10 +185,14 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
                     message: "Success",
                 }),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(() => mockOrchestrator as any);
+            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
+                () => mockOrchestrator as any
+            );
 
             // Mock event emission to fail
-            vi.mocked(mockEventEmitter.emitTyped).mockRejectedValue(new Error("Event emission failed"));
+            vi.mocked(mockEventEmitter.emitTyped).mockRejectedValue(
+                new Error("Event emission failed")
+            );
 
             // Should not throw even if event emission fails
             await expect(databaseManager.initialize()).resolves.toBeUndefined();
@@ -204,7 +215,9 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
                     message: "Success",
                 }),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(() => mockOrchestrator as any);
+            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
+                () => mockOrchestrator as any
+            );
 
             await databaseManager.initialize();
 
@@ -223,27 +236,36 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
                     message: "Failed to load sites",
                 }),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(() => mockOrchestrator as any);
+            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
+                () => mockOrchestrator as any
+            );
 
             // Should throw when loadSitesFromDatabase fails
-            await expect(databaseManager.initialize()).rejects.toThrow("Failed to load sites");
+            await expect(databaseManager.initialize()).rejects.toThrow(
+                "Failed to load sites"
+            );
         });
 
         it("should handle site cache operations during loadSites", async () => {
             // Reset and configure the SiteLoadingOrchestrator mock
             // Mock to test the cache operations in loadSites
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
-                loadSitesFromDatabase: vi.fn().mockImplementation(async (_tempCache, config) => {
-                    // Call the callbacks to test cache operations
-                    if (config.stopMonitoring) await config.stopMonitoring("site1", "monitor1");
-                    return {
-                        success: true,
-                        sitesLoaded: 1,
-                        message: "Success",
-                    };
-                }),
+                loadSitesFromDatabase: vi
+                    .fn()
+                    .mockImplementation(async (_tempCache, config) => {
+                        // Call the callbacks to test cache operations
+                        if (config.stopMonitoring)
+                            await config.stopMonitoring("site1", "monitor1");
+                        return {
+                            success: true,
+                            sitesLoaded: 1,
+                            message: "Success",
+                        };
+                    }),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(() => mockOrchestrator as any);
+            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
+                () => mockOrchestrator as any
+            );
 
             await databaseManager.initialize();
             expect(mockOrchestrator.loadSitesFromDatabase).toHaveBeenCalled();
@@ -254,7 +276,9 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
         it("should handle cache access errors during refreshSites", async () => {
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock();
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(() => mockOrchestrator as any);
+            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
+                () => mockOrchestrator as any
+            );
 
             // Initialize first
             await databaseManager.initialize();
@@ -267,7 +291,9 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
         it("should return sites from cache during successful refreshSites", async () => {
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock();
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(() => mockOrchestrator as any);
+            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
+                () => mockOrchestrator as any
+            );
 
             await databaseManager.initialize();
             const result = await databaseManager.refreshSites();
@@ -282,10 +308,14 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
             await databaseManager.initialize();
 
             // Mock event emission to fail
-            vi.mocked(mockEventEmitter.emitTyped).mockRejectedValue(new Error("Event emission failed"));
+            vi.mocked(mockEventEmitter.emitTyped).mockRejectedValue(
+                new Error("Event emission failed")
+            );
 
             // Should not throw even if event emission fails
-            await expect(databaseManager.setHistoryLimit(100)).resolves.toBeUndefined();
+            await expect(
+                databaseManager.setHistoryLimit(100)
+            ).resolves.toBeUndefined();
 
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:history-limit-updated",
@@ -299,20 +329,27 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
             // Reset and configure the SiteLoadingOrchestrator mock
             // Create a mock that uses the startMonitoring callback
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
-                loadSitesFromDatabase: vi.fn().mockImplementation(async (_tempCache, config) => {
-                    // Simulate calling startMonitoring which triggers emitSitesCacheUpdateRequested
-                    if (config.startMonitoring) await config.startMonitoring("site1", "monitor1");
-                    return {
-                        success: true,
-                        sitesLoaded: 1,
-                        message: "Success",
-                    };
-                }),
+                loadSitesFromDatabase: vi
+                    .fn()
+                    .mockImplementation(async (_tempCache, config) => {
+                        // Simulate calling startMonitoring which triggers emitSitesCacheUpdateRequested
+                        if (config.startMonitoring)
+                            await config.startMonitoring("site1", "monitor1");
+                        return {
+                            success: true,
+                            sitesLoaded: 1,
+                            message: "Success",
+                        };
+                    }),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(() => mockOrchestrator as any);
+            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
+                () => mockOrchestrator as any
+            );
 
             // Mock event emission to fail
-            vi.mocked(mockEventEmitter.emitTyped).mockRejectedValue(new Error("Event emission failed"));
+            vi.mocked(mockEventEmitter.emitTyped).mockRejectedValue(
+                new Error("Event emission failed")
+            );
 
             // Should still complete successfully even if events fail
             await expect(databaseManager.initialize()).resolves.toBeUndefined();
@@ -324,9 +361,13 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
             // Reset and configure the DataImportExportService mock
             // Mock import service to fail
             const mockImportService = createDataImportExportServiceMock({
-                importDataFromJson: vi.fn().mockRejectedValue(new Error("Import failed")),
+                importDataFromJson: vi
+                    .fn()
+                    .mockRejectedValue(new Error("Import failed")),
             });
-            vi.mocked(DataImportExportService).mockImplementation(() => mockImportService as any);
+            vi.mocked(DataImportExportService).mockImplementation(
+                () => mockImportService as any
+            );
 
             // Mock first event emission to succeed, second to fail
             vi.mocked(mockEventEmitter.emitTyped)
@@ -340,12 +381,18 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
         it("should handle successful importData flow", async () => {
             // Reset and configure the DataImportExportService mock
             const mockImportService = createDataImportExportServiceMock({
-                importDataFromJson: vi.fn().mockResolvedValue({ sites: [], settings: [] }),
+                importDataFromJson: vi
+                    .fn()
+                    .mockResolvedValue({ sites: [], settings: [] }),
                 persistImportedData: vi.fn().mockResolvedValue(undefined),
             });
-            vi.mocked(DataImportExportService).mockImplementation(() => mockImportService as any);
+            vi.mocked(DataImportExportService).mockImplementation(
+                () => mockImportService as any
+            );
 
-            const result = await databaseManager.importData('{"sites": [{"identifier": "site1"}], "settings": []}');
+            const result = await databaseManager.importData(
+                '{"sites": [{"identifier": "site1"}], "settings": []}'
+            );
 
             expect(result).toBe(true);
             expect(mockImportService.importDataFromJson).toHaveBeenCalled();
@@ -364,9 +411,13 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
             await databaseManager.initialize();
 
             // Mock the utilities to throw an error
-            vi.mocked(mockSettingsRepository.upsert).mockRejectedValue(new Error("Failed to set limit"));
+            vi.mocked(mockSettingsRepository.upsert).mockRejectedValue(
+                new Error("Failed to set limit")
+            );
 
-            await expect(databaseManager.setHistoryLimit(100)).rejects.toThrow("Failed to set limit");
+            await expect(databaseManager.setHistoryLimit(100)).rejects.toThrow(
+                "Failed to set limit"
+            );
         });
     });
 
@@ -374,19 +425,23 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
         it("should handle stopMonitoring callback in loadSites", async () => {
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
-                loadSitesFromDatabase: vi.fn().mockImplementation(async (_tempCache, config) => {
-                    // Test the stopMonitoring callback
-                    if (config.stopMonitoring) {
-                        await config.stopMonitoring("site1", "monitor1");
-                    }
-                    return {
-                        success: true,
-                        sitesLoaded: 1,
-                        message: "Success",
-                    };
-                }),
+                loadSitesFromDatabase: vi
+                    .fn()
+                    .mockImplementation(async (_tempCache, config) => {
+                        // Test the stopMonitoring callback
+                        if (config.stopMonitoring) {
+                            await config.stopMonitoring("site1", "monitor1");
+                        }
+                        return {
+                            success: true,
+                            sitesLoaded: 1,
+                            message: "Success",
+                        };
+                    }),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(() => mockOrchestrator as any);
+            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
+                () => mockOrchestrator as any
+            );
 
             // Should complete without errors
             await expect(databaseManager.initialize()).resolves.toBeUndefined();
@@ -395,19 +450,26 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
         it("should handle setupNewMonitors callback in loadSites", async () => {
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
-                loadSitesFromDatabase: vi.fn().mockImplementation(async (_tempCache, config) => {
-                    // Test the setupNewMonitors callback
-                    if (config.setupNewMonitors) {
-                        await config.setupNewMonitors(["monitor1", "monitor2"]);
-                    }
-                    return {
-                        success: true,
-                        sitesLoaded: 1,
-                        message: "Success",
-                    };
-                }),
+                loadSitesFromDatabase: vi
+                    .fn()
+                    .mockImplementation(async (_tempCache, config) => {
+                        // Test the setupNewMonitors callback
+                        if (config.setupNewMonitors) {
+                            await config.setupNewMonitors([
+                                "monitor1",
+                                "monitor2",
+                            ]);
+                        }
+                        return {
+                            success: true,
+                            sitesLoaded: 1,
+                            message: "Success",
+                        };
+                    }),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(() => mockOrchestrator as any);
+            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
+                () => mockOrchestrator as any
+            );
 
             await expect(databaseManager.initialize()).resolves.toBeUndefined();
         });
@@ -415,19 +477,23 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
         it("should handle setHistoryLimit callback in monitoring config", async () => {
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
-                loadSitesFromDatabase: vi.fn().mockImplementation(async (_tempCache, config) => {
-                    // Test the setHistoryLimit callback
-                    if (config.setHistoryLimit) {
-                        await config.setHistoryLimit(200);
-                    }
-                    return {
-                        success: true,
-                        sitesLoaded: 1,
-                        message: "Success",
-                    };
-                }),
+                loadSitesFromDatabase: vi
+                    .fn()
+                    .mockImplementation(async (_tempCache, config) => {
+                        // Test the setHistoryLimit callback
+                        if (config.setHistoryLimit) {
+                            await config.setHistoryLimit(200);
+                        }
+                        return {
+                            success: true,
+                            sitesLoaded: 1,
+                            message: "Success",
+                        };
+                    }),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(() => mockOrchestrator as any);
+            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
+                () => mockOrchestrator as any
+            );
 
             await expect(databaseManager.initialize()).resolves.toBeUndefined();
         });
@@ -435,21 +501,31 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
         it("should handle loadSitesFromDatabase throwing an error", async () => {
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
-                loadSitesFromDatabase: vi.fn().mockRejectedValue(new Error("Database connection failed")),
+                loadSitesFromDatabase: vi
+                    .fn()
+                    .mockRejectedValue(new Error("Database connection failed")),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(() => mockOrchestrator as any);
+            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
+                () => mockOrchestrator as any
+            );
 
             // Should propagate the error
-            await expect(databaseManager.initialize()).rejects.toThrow("Database connection failed");
+            await expect(databaseManager.initialize()).rejects.toThrow(
+                "Database connection failed"
+            );
         });
     });
 
     describe("Import/Export Operations", () => {
         it("should handle downloadBackup successfully", async () => {
             const mockImportService = createDataImportExportServiceMock({
-                downloadBackup: vi.fn().mockResolvedValue("/path/to/backup.json"),
+                downloadBackup: vi
+                    .fn()
+                    .mockResolvedValue("/path/to/backup.json"),
             });
-            vi.mocked(DataImportExportService).mockImplementation(() => mockImportService as any);
+            vi.mocked(DataImportExportService).mockImplementation(
+                () => mockImportService as any
+            );
 
             const result = await databaseManager.downloadBackup();
 
@@ -459,17 +535,25 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
 
         it("should handle downloadBackup with file system errors", async () => {
             const mockImportService = createDataImportExportServiceMock({
-                downloadBackup: vi.fn().mockRejectedValue(new Error("File system error")),
+                downloadBackup: vi
+                    .fn()
+                    .mockRejectedValue(new Error("File system error")),
             });
-            vi.mocked(DataImportExportService).mockImplementation(() => mockImportService as any);
+            vi.mocked(DataImportExportService).mockImplementation(
+                () => mockImportService as any
+            );
 
-            await expect(databaseManager.downloadBackup()).rejects.toThrow("File system error");
+            await expect(databaseManager.downloadBackup()).rejects.toThrow(
+                "File system error"
+            );
         });
     });
 
     describe("History Management", () => {
         it("should handle setHistoryLimit with valid limit", async () => {
-            vi.mocked(mockConfigurationManager.getHistoryRetentionRules).mockReturnValue({
+            vi.mocked(
+                mockConfigurationManager.getHistoryRetentionRules
+            ).mockReturnValue({
                 defaultLimit: 500,
                 maxLimit: 1000,
                 minLimit: 25,
@@ -485,7 +569,9 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
         });
 
         it("should handle setHistoryLimit with limit exceeding maximum", async () => {
-            vi.mocked(mockConfigurationManager.getHistoryRetentionRules).mockReturnValue({
+            vi.mocked(
+                mockConfigurationManager.getHistoryRetentionRules
+            ).mockReturnValue({
                 defaultLimit: 500,
                 maxLimit: 1000,
                 minLimit: 25,
@@ -502,7 +588,9 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
         });
 
         it("should handle setHistoryLimit with limit below minimum", async () => {
-            vi.mocked(mockConfigurationManager.getHistoryRetentionRules).mockReturnValue({
+            vi.mocked(
+                mockConfigurationManager.getHistoryRetentionRules
+            ).mockReturnValue({
                 defaultLimit: 500,
                 maxLimit: 1000,
                 minLimit: 25,
@@ -519,9 +607,13 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
         });
 
         it("should handle setHistoryLimit with database error", async () => {
-            vi.mocked(mockSettingsRepository.upsert).mockRejectedValue(new Error("Database write error"));
+            vi.mocked(mockSettingsRepository.upsert).mockRejectedValue(
+                new Error("Database write error")
+            );
 
-            await expect(databaseManager.setHistoryLimit(200)).rejects.toThrow("Database write error");
+            await expect(databaseManager.setHistoryLimit(200)).rejects.toThrow(
+                "Database write error"
+            );
         });
     });
 
@@ -545,7 +637,9 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
             vi.clearAllMocks();
 
             const mockOrchestrator = createSiteLoadingOrchestratorMock();
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(() => mockOrchestrator as any);
+            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
+                () => mockOrchestrator as any
+            );
 
             // First initialization
             await databaseManager.initialize();
@@ -554,14 +648,20 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
             await databaseManager.initialize();
 
             expect(mockDatabaseService.initialize).toHaveBeenCalledTimes(2);
-            expect(mockOrchestrator.loadSitesFromDatabase).toHaveBeenCalledTimes(2);
+            expect(
+                mockOrchestrator.loadSitesFromDatabase
+            ).toHaveBeenCalledTimes(2);
         });
 
         it("should handle configuration manager returning undefined rules", async () => {
-            vi.mocked(mockConfigurationManager.getHistoryRetentionRules).mockReturnValue(undefined as any);
+            vi.mocked(
+                mockConfigurationManager.getHistoryRetentionRules
+            ).mockReturnValue(undefined as any);
 
             // Should handle gracefully and use fallback values
-            await expect(databaseManager.setHistoryLimit(300)).resolves.toBeUndefined();
+            await expect(
+                databaseManager.setHistoryLimit(300)
+            ).resolves.toBeUndefined();
         });
 
         it("should handle concurrent database operations", async () => {
@@ -572,7 +672,11 @@ describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
                 databaseManager.setHistoryLimit(300),
             ];
 
-            await expect(Promise.all(promises)).resolves.toEqual([undefined, undefined, undefined]);
+            await expect(Promise.all(promises)).resolves.toEqual([
+                undefined,
+                undefined,
+                undefined,
+            ]);
 
             expect(mockSettingsRepository.upsert).toHaveBeenCalledTimes(3);
         });

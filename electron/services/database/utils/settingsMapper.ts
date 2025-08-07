@@ -43,7 +43,9 @@ export function isValidSettingRow(row: DatabaseSettingsRow): boolean {
  * @public
  */
 export function rowsToSettings(rows: DatabaseSettingsRow[]): SettingRow[] {
-    return rows.filter((row) => isValidSettingRow(row)).map((row) => rowToSetting(row));
+    return rows
+        .filter((row) => isValidSettingRow(row))
+        .map((row) => rowToSetting(row));
 }
 
 /**
@@ -111,7 +113,9 @@ export function rowToSetting(row: DatabaseSettingsRow): SettingRow {
  *
  * @public
  */
-export function rowToSettingValue(row: DatabaseSettingsRow | undefined): string | undefined {
+export function rowToSettingValue(
+    row: DatabaseSettingsRow | undefined
+): string | undefined {
     if (row?.value == null) {
         return undefined;
     }
@@ -139,7 +143,9 @@ export function rowToSettingValue(row: DatabaseSettingsRow | undefined): string 
  *
  * @public
  */
-export function settingsToRecord(settings: SettingRow[]): Record<string, string> {
+export function settingsToRecord(
+    settings: SettingRow[]
+): Record<string, string> {
     const result: Record<string, string> = {};
 
     for (const setting of settings) {

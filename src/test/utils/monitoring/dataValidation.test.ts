@@ -4,7 +4,11 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { parseUptimeValue, isValidUrl, safeGetHostname } from "../../../utils/monitoring/dataValidation";
+import {
+    parseUptimeValue,
+    isValidUrl,
+    safeGetHostname,
+} from "../../../utils/monitoring/dataValidation";
 import logger from "../../../services/logger";
 
 // Mock the logger
@@ -69,24 +73,39 @@ describe("Monitoring Data Validation", () => {
 
         it("should return 0 for invalid numeric strings and log warning", () => {
             expect(parseUptimeValue("invalid")).toBe(0);
-            expect(logger.warn).toHaveBeenCalledWith("Invalid uptime value received", { uptime: "invalid" });
+            expect(logger.warn).toHaveBeenCalledWith(
+                "Invalid uptime value received",
+                { uptime: "invalid" }
+            );
 
             vi.clearAllMocks();
             expect(parseUptimeValue("abc123")).toBe(0);
-            expect(logger.warn).toHaveBeenCalledWith("Invalid uptime value received", { uptime: "abc123" });
+            expect(logger.warn).toHaveBeenCalledWith(
+                "Invalid uptime value received",
+                { uptime: "abc123" }
+            );
 
             vi.clearAllMocks();
             expect(parseUptimeValue("")).toBe(0);
-            expect(logger.warn).toHaveBeenCalledWith("Invalid uptime value received", { uptime: "" });
+            expect(logger.warn).toHaveBeenCalledWith(
+                "Invalid uptime value received",
+                { uptime: "" }
+            );
         });
 
         it("should return 0 for NaN values and log warning", () => {
             expect(parseUptimeValue("NaN")).toBe(0);
-            expect(logger.warn).toHaveBeenCalledWith("Invalid uptime value received", { uptime: "NaN" });
+            expect(logger.warn).toHaveBeenCalledWith(
+                "Invalid uptime value received",
+                { uptime: "NaN" }
+            );
 
             vi.clearAllMocks();
             expect(parseUptimeValue("undefined")).toBe(0);
-            expect(logger.warn).toHaveBeenCalledWith("Invalid uptime value received", { uptime: "undefined" });
+            expect(logger.warn).toHaveBeenCalledWith(
+                "Invalid uptime value received",
+                { uptime: "undefined" }
+            );
         });
 
         it("should handle edge cases", () => {
@@ -109,7 +128,9 @@ describe("Monitoring Data Validation", () => {
             expect(isValidUrl("https://www.example.com")).toBe(true);
             expect(isValidUrl("https://example.com:443")).toBe(true);
             expect(isValidUrl("https://example.com/path")).toBe(true);
-            expect(isValidUrl("https://example.com/path?query=value")).toBe(true);
+            expect(isValidUrl("https://example.com/path?query=value")).toBe(
+                true
+            );
             expect(isValidUrl("https://example.com#anchor")).toBe(true);
         });
 
@@ -147,26 +168,50 @@ describe("Monitoring Data Validation", () => {
 
         it("should handle special characters in URLs", () => {
             // Note: URLs with spaces are actually considered valid by URL constructor
-            expect(isValidUrl("https://example.com/path with spaces")).toBe(true);
-            expect(isValidUrl("https://example.com/path%20with%20encoded%20spaces")).toBe(true);
-            expect(isValidUrl("https://example.com/path?param=value&other=test")).toBe(true);
+            expect(isValidUrl("https://example.com/path with spaces")).toBe(
+                true
+            );
+            expect(
+                isValidUrl("https://example.com/path%20with%20encoded%20spaces")
+            ).toBe(true);
+            expect(
+                isValidUrl("https://example.com/path?param=value&other=test")
+            ).toBe(true);
         });
     });
 
     describe("safeGetHostname", () => {
         it("should extract hostname from valid HTTPS URLs", () => {
             expect(safeGetHostname("https://example.com")).toBe("example.com");
-            expect(safeGetHostname("https://www.example.com")).toBe("www.example.com");
-            expect(safeGetHostname("https://sub.example.com")).toBe("sub.example.com");
-            expect(safeGetHostname("https://example.com:443")).toBe("example.com");
+            expect(safeGetHostname("https://www.example.com")).toBe(
+                "www.example.com"
+            );
+            expect(safeGetHostname("https://sub.example.com")).toBe(
+                "sub.example.com"
+            );
+            expect(safeGetHostname("https://example.com:443")).toBe(
+                "example.com"
+            );
         });
 
         it("should extract hostname from URLs with paths and queries", () => {
-            expect(safeGetHostname("https://example.com/path")).toBe("example.com");
-            expect(safeGetHostname("https://example.com/path/to/resource")).toBe("example.com");
-            expect(safeGetHostname("https://example.com/path?query=value")).toBe("example.com");
-            expect(safeGetHostname("https://example.com/path?query=value&other=test")).toBe("example.com");
-            expect(safeGetHostname("https://example.com/path#anchor")).toBe("example.com");
+            expect(safeGetHostname("https://example.com/path")).toBe(
+                "example.com"
+            );
+            expect(
+                safeGetHostname("https://example.com/path/to/resource")
+            ).toBe("example.com");
+            expect(
+                safeGetHostname("https://example.com/path?query=value")
+            ).toBe("example.com");
+            expect(
+                safeGetHostname(
+                    "https://example.com/path?query=value&other=test"
+                )
+            ).toBe("example.com");
+            expect(safeGetHostname("https://example.com/path#anchor")).toBe(
+                "example.com"
+            );
         });
 
         it("should return empty string for invalid URLs", () => {
@@ -189,7 +234,9 @@ describe("Monitoring Data Validation", () => {
             expect(safeGetHostname("https://[")).toBe("");
             expect(safeGetHostname("https://]")).toBe("");
             // Note: "https://example..com" is valid to URL constructor and returns hostname
-            expect(safeGetHostname("https://example..com")).toBe("example..com");
+            expect(safeGetHostname("https://example..com")).toBe(
+                "example..com"
+            );
         });
 
         it("should handle URLs with special hostnames", () => {
@@ -208,7 +255,11 @@ describe("Monitoring Data Validation", () => {
 
     describe("Integration tests", () => {
         it("should work together for URL processing workflow", () => {
-            const urls = ["https://example.com", "invalid-url", "https://test.com:8080/path"];
+            const urls = [
+                "https://example.com",
+                "invalid-url",
+                "https://test.com:8080/path",
+            ];
 
             const results = urls.map((url) => ({
                 url,
@@ -217,9 +268,17 @@ describe("Monitoring Data Validation", () => {
             }));
 
             expect(results).toEqual([
-                { url: "https://example.com", isValid: true, hostname: "example.com" },
+                {
+                    url: "https://example.com",
+                    isValid: true,
+                    hostname: "example.com",
+                },
                 { url: "invalid-url", isValid: false, hostname: "" },
-                { url: "https://test.com:8080/path", isValid: true, hostname: "test.com" },
+                {
+                    url: "https://test.com:8080/path",
+                    isValid: true,
+                    hostname: "test.com",
+                },
             ]);
         });
 
@@ -237,13 +296,20 @@ describe("Monitoring Data Validation", () => {
             }));
 
             expect(processed).toEqual([
-                { uptimeValue: 95.5, isValidUrl: true, hostname: "example.com" },
+                {
+                    uptimeValue: 95.5,
+                    isValidUrl: true,
+                    hostname: "example.com",
+                },
                 { uptimeValue: 0, isValidUrl: false, hostname: "" },
                 { uptimeValue: 100, isValidUrl: true, hostname: "test.com" },
             ]);
 
             // Should have logged warning for invalid uptime
-            expect(logger.warn).toHaveBeenCalledWith("Invalid uptime value received", { uptime: "invalid" });
+            expect(logger.warn).toHaveBeenCalledWith(
+                "Invalid uptime value received",
+                { uptime: "invalid" }
+            );
         });
     });
 });

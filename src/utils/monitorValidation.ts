@@ -4,7 +4,12 @@
  */
 
 import type { Monitor, MonitorType } from "@shared/types";
-import type { HttpFormData, MonitorFormData, PingFormData, PortFormData } from "@shared/types/formData";
+import type {
+    HttpFormData,
+    MonitorFormData,
+    PingFormData,
+    PortFormData,
+} from "@shared/types/formData";
 import type { ValidationResult } from "@shared/types/validation";
 
 // Import shared validation functions for client-side validation
@@ -24,7 +29,16 @@ export type { ValidationResult } from "@shared/types/validation";
  * Prevents runtime errors by guaranteeing essential properties are present.
  */
 export interface MonitorCreationData
-    extends Pick<Monitor, "history" | "monitoring" | "responseTime" | "retryAttempts" | "status" | "timeout" | "type">,
+    extends Pick<
+            Monitor,
+            | "history"
+            | "monitoring"
+            | "responseTime"
+            | "retryAttempts"
+            | "status"
+            | "timeout"
+            | "type"
+        >,
         Record<string, unknown> {}
 
 /**
@@ -34,7 +48,10 @@ export interface MonitorCreationData
  * @param fields - Field values to merge with defaults
  * @returns Monitor creation data with type-specific fields and guaranteed required fields
  */
-export function createMonitorObject(type: MonitorType, fields: Partial<MonitorFormData>): MonitorCreationData {
+export function createMonitorObject(
+    type: MonitorType,
+    fields: Partial<MonitorFormData>
+): MonitorCreationData {
     const monitor: MonitorCreationData = {
         history: [],
         monitoring: true,
@@ -118,7 +135,11 @@ export async function validateMonitorDataClientSide(
  * @param value - Field value
  * @returns Promise resolving to validation errors (empty if valid)
  */
-export async function validateMonitorField(type: MonitorType, fieldName: string, value: unknown): Promise<string[]> {
+export async function validateMonitorField(
+    type: MonitorType,
+    fieldName: string,
+    value: unknown
+): Promise<string[]> {
     return withUtilityErrorHandling(
         async () => {
             // Use the full validation and extract errors for this field
@@ -214,7 +235,11 @@ const validatePortMonitorFormData = (data: Partial<PortFormData>) => {
         errors.push("Host is required for port monitors");
     } else {
         // Validate host field specifically
-        const hostResult = sharedValidateMonitorField("port", "host", data.host);
+        const hostResult = sharedValidateMonitorField(
+            "port",
+            "host",
+            data.host
+        );
         errors.push(...hostResult.errors);
     }
 
@@ -222,7 +247,11 @@ const validatePortMonitorFormData = (data: Partial<PortFormData>) => {
         errors.push("Port is required for port monitors");
     } else {
         // Validate port field specifically
-        const portResult = sharedValidateMonitorField("port", "port", data.port);
+        const portResult = sharedValidateMonitorField(
+            "port",
+            "port",
+            data.port
+        );
         errors.push(...portResult.errors);
     }
 
@@ -246,28 +275,41 @@ const validatePingMonitorFormData = (data: Partial<PingFormData>) => {
         errors.push("Host is required for ping monitors");
     } else {
         // Validate host field specifically
-        const hostResult = sharedValidateMonitorField("ping", "host", data.host);
+        const hostResult = sharedValidateMonitorField(
+            "ping",
+            "host",
+            data.host
+        );
         errors.push(...hostResult.errors);
     }
 
     return errors;
 };
 
-const validateMonitorFormDataByType = (type: MonitorType, data: Partial<MonitorFormData>) => {
+const validateMonitorFormDataByType = (
+    type: MonitorType,
+    data: Partial<MonitorFormData>
+) => {
     const errors: string[] = [];
 
     // Validate type-specific required fields only
     switch (type) {
         case "http": {
-            errors.push(...validateHttpMonitorFormData(data as Partial<HttpFormData>));
+            errors.push(
+                ...validateHttpMonitorFormData(data as Partial<HttpFormData>)
+            );
             break;
         }
         case "ping": {
-            errors.push(...validatePingMonitorFormData(data as Partial<PingFormData>));
+            errors.push(
+                ...validatePingMonitorFormData(data as Partial<PingFormData>)
+            );
             break;
         }
         case "port": {
-            errors.push(...validatePortMonitorFormData(data as Partial<PortFormData>));
+            errors.push(
+                ...validatePortMonitorFormData(data as Partial<PortFormData>)
+            );
             break;
         }
     }

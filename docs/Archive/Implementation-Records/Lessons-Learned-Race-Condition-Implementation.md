@@ -57,7 +57,10 @@ function getCollapseButtonStyle(isDarkMode: boolean): React.CSSProperties {
  };
 }
 
-function getHeaderStyle(isCollapsed: boolean, isDarkMode: boolean): React.CSSProperties {
+function getHeaderStyle(
+ isCollapsed: boolean,
+ isDarkMode: boolean
+): React.CSSProperties {
  const darkGradient = "linear-gradient(...)";
  const lightGradient = "linear-gradient(...)";
 

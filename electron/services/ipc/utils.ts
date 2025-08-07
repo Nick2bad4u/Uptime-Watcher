@@ -5,7 +5,11 @@
 
 import { ipcMain } from "electron";
 
-import type { IpcParameterValidator, IpcResponse, IpcValidationResponse } from "./types";
+import type {
+    IpcParameterValidator,
+    IpcResponse,
+    IpcValidationResponse,
+} from "./types";
 
 import { isNonEmptyString } from "../../../shared/validation/validatorUtils";
 import { isDev } from "../../electronUtils";
@@ -53,7 +57,11 @@ export const IpcValidators = {
      * @returns Error message or null if valid
      */
     requiredObject: (value: unknown, paramName: string): null | string => {
-        if (typeof value !== "object" || value === null || Array.isArray(value)) {
+        if (
+            typeof value !== "object" ||
+            value === null ||
+            Array.isArray(value)
+        ) {
             return `${paramName} must be a valid object`;
         }
         return null;
@@ -83,7 +91,10 @@ export const IpcValidators = {
  *
  * @public
  */
-export function createErrorResponse<T = void>(error: string, metadata?: Record<string, unknown>): IpcResponse<T> {
+export function createErrorResponse<T = void>(
+    error: string,
+    metadata?: Record<string, unknown>
+): IpcResponse<T> {
     const response: IpcResponse<T> = {
         error,
         success: false,
@@ -190,7 +201,12 @@ export function registerStandardizedIpcHandler<T>(
 
     ipcMain.handle(channelName, async (_, ...args: unknown[]) => {
         return validateParams
-            ? withIpcHandlerValidation(channelName, handler, validateParams, args)
+            ? withIpcHandlerValidation(
+                  channelName,
+                  handler,
+                  validateParams,
+                  args
+              )
             : withIpcHandler(channelName, () => handler(...args));
     });
 }
@@ -217,12 +233,18 @@ export function registerStandardizedIpcHandler<T>(
  *
  * @public
  */
-export async function withIpcHandler<T>(channelName: string, handler: () => Promise<T> | T): Promise<IpcResponse<T>> {
+export async function withIpcHandler<T>(
+    channelName: string,
+    handler: () => Promise<T> | T
+): Promise<IpcResponse<T>> {
     const startTime = Date.now();
 
     try {
         // Reduce logging spam for high-frequency operations
-        const isHighFrequencyOperation = ["format-monitor-detail", "get-monitor-types"].includes(channelName);
+        const isHighFrequencyOperation = [
+            "format-monitor-detail",
+            "get-monitor-types",
+        ].includes(channelName);
 
         if (isDev() && !isHighFrequencyOperation) {
             logger.debug(`[IpcHandler] Starting ${channelName}`);
@@ -235,10 +257,14 @@ export async function withIpcHandler<T>(channelName: string, handler: () => Prom
             logger.debug(`[IpcHandler] Completed ${channelName}`, { duration });
         }
 
-        return createSuccessResponse(result, { duration, handler: channelName });
+        return createSuccessResponse(result, {
+            duration,
+            handler: channelName,
+        });
     } catch (error) {
         const duration = Date.now() - startTime;
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
 
         logger.error(`[IpcHandler] Failed ${channelName}`, {
             duration,
@@ -246,7 +272,10 @@ export async function withIpcHandler<T>(channelName: string, handler: () => Prom
             handler: channelName,
         });
 
-        return createErrorResponse<T>(errorMessage, { duration, handler: channelName });
+        return createErrorResponse<T>(errorMessage, {
+            duration,
+            handler: channelName,
+        });
     }
 }
 
@@ -285,18 +314,28 @@ export async function withIpcHandlerValidation<T>(
 
     try {
         // Reduce logging spam for high-frequency operations
-        const isHighFrequencyOperation = ["format-monitor-detail", "get-monitor-types"].includes(channelName);
+        const isHighFrequencyOperation = [
+            "format-monitor-detail",
+            "get-monitor-types",
+        ].includes(channelName);
 
         if (isDev() && !isHighFrequencyOperation) {
-            logger.debug(`[IpcHandler] Starting ${channelName}`, { paramCount: params.length });
+            logger.debug(`[IpcHandler] Starting ${channelName}`, {
+                paramCount: params.length,
+            });
         }
 
         // Validate parameters
         const validationErrors = validateParams(params);
         if (validationErrors) {
             const errorMessage = `Parameter validation failed: ${validationErrors.join(", ")}`;
-            logger.warn(`[IpcHandler] Validation failed ${channelName}`, { errors: validationErrors });
-            return createErrorResponse<T>(errorMessage, { handler: channelName, validationErrors });
+            logger.warn(`[IpcHandler] Validation failed ${channelName}`, {
+                errors: validationErrors,
+            });
+            return createErrorResponse<T>(errorMessage, {
+                handler: channelName,
+                validationErrors,
+            });
         }
 
         const result = await handler(...params);
@@ -306,10 +345,14 @@ export async function withIpcHandlerValidation<T>(
             logger.debug(`[IpcHandler] Completed ${channelName}`, { duration });
         }
 
-        return createSuccessResponse(result, { duration, handler: channelName });
+        return createSuccessResponse(result, {
+            duration,
+            handler: channelName,
+        });
     } catch (error) {
         const duration = Date.now() - startTime;
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
 
         logger.error(`[IpcHandler] Failed ${channelName}`, {
             duration,
@@ -317,6 +360,9 @@ export async function withIpcHandlerValidation<T>(
             handler: channelName,
         });
 
-        return createErrorResponse<T>(errorMessage, { duration, handler: channelName });
+        return createErrorResponse<T>(errorMessage, {
+            duration,
+            handler: channelName,
+        });
     }
 }

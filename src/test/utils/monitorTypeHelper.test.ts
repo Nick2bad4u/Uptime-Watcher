@@ -172,13 +172,19 @@ describe("monitorTypeHelper", () => {
 
     describe("getAvailableMonitorTypes", () => {
         it("should return cached data when available", async () => {
-            vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(mockMonitorTypes);
+            vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(
+                mockMonitorTypes
+            );
 
             const result = await getAvailableMonitorTypes();
 
             expect(result).toEqual(mockMonitorTypes);
-            expect(AppCaches.monitorTypes.get).toHaveBeenCalledWith("config:all-monitor-types");
-            expect(mockElectronAPI.monitorTypes.getMonitorTypes).not.toHaveBeenCalled();
+            expect(AppCaches.monitorTypes.get).toHaveBeenCalledWith(
+                "config:all-monitor-types"
+            );
+            expect(
+                mockElectronAPI.monitorTypes.getMonitorTypes
+            ).not.toHaveBeenCalled();
         });
 
         it("should fetch from backend when cache is empty", async () => {
@@ -188,25 +194,37 @@ describe("monitorTypeHelper", () => {
             mockMonitorTypesStore.monitorTypes = mockMonitorTypes;
             mockMonitorTypesStore.isLoaded = true;
 
-            vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(async (fn) => await fn());
+            vi.mocked(
+                errorHandling.withUtilityErrorHandling
+            ).mockImplementation(async (fn) => await fn());
 
             const result = await getAvailableMonitorTypes();
 
             expect(result).toEqual(mockMonitorTypes);
-            expect(AppCaches.monitorTypes.get).toHaveBeenCalledWith("config:all-monitor-types");
-            expect(AppCaches.monitorTypes.set).toHaveBeenCalledWith("config:all-monitor-types", mockMonitorTypes);
+            expect(AppCaches.monitorTypes.get).toHaveBeenCalledWith(
+                "config:all-monitor-types"
+            );
+            expect(AppCaches.monitorTypes.set).toHaveBeenCalledWith(
+                "config:all-monitor-types",
+                mockMonitorTypes
+            );
         });
 
         it("should handle backend fetch errors gracefully", async () => {
             const fallbackValue: MonitorTypeConfig[] = [];
 
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
-            vi.mocked(errorHandling.withUtilityErrorHandling).mockResolvedValue(fallbackValue);
+            vi.mocked(errorHandling.withUtilityErrorHandling).mockResolvedValue(
+                fallbackValue
+            );
 
             const result = await getAvailableMonitorTypes();
 
             expect(result).toEqual(fallbackValue);
-            expect(AppCaches.monitorTypes.set).toHaveBeenCalledWith("config:all-monitor-types", fallbackValue);
+            expect(AppCaches.monitorTypes.set).toHaveBeenCalledWith(
+                "config:all-monitor-types",
+                fallbackValue
+            );
         });
 
         it("should cache fetched data for subsequent calls", async () => {
@@ -216,16 +234,23 @@ describe("monitorTypeHelper", () => {
             mockMonitorTypesStore.monitorTypes = mockMonitorTypes;
             mockMonitorTypesStore.isLoaded = true;
 
-            vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(async (fn) => await fn());
+            vi.mocked(
+                errorHandling.withUtilityErrorHandling
+            ).mockImplementation(async (fn) => await fn());
 
             await getAvailableMonitorTypes();
 
-            expect(AppCaches.monitorTypes.set).toHaveBeenCalledWith("config:all-monitor-types", mockMonitorTypes);
+            expect(AppCaches.monitorTypes.set).toHaveBeenCalledWith(
+                "config:all-monitor-types",
+                mockMonitorTypes
+            );
         });
 
         it("should handle empty response from backend", async () => {
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
-            vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(async (fn) => await fn());
+            vi.mocked(
+                errorHandling.withUtilityErrorHandling
+            ).mockImplementation(async (fn) => await fn());
             vi.mocked(ipcTypes.safeExtractIpcData).mockReturnValue([]);
 
             // Configure the mock store to return empty data
@@ -240,7 +265,10 @@ describe("monitorTypeHelper", () => {
             const result = await getAvailableMonitorTypes();
 
             expect(result).toEqual([]);
-            expect(AppCaches.monitorTypes.set).toHaveBeenCalledWith("config:all-monitor-types", []);
+            expect(AppCaches.monitorTypes.set).toHaveBeenCalledWith(
+                "config:all-monitor-types",
+                []
+            );
         });
 
         it("should handle invalid cache data gracefully", async () => {
@@ -250,7 +278,9 @@ describe("monitorTypeHelper", () => {
             mockMonitorTypesStore.monitorTypes = mockMonitorTypes;
             mockMonitorTypesStore.isLoaded = true;
 
-            vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(async (fn) => await fn());
+            vi.mocked(
+                errorHandling.withUtilityErrorHandling
+            ).mockImplementation(async (fn) => await fn());
 
             const result = await getAvailableMonitorTypes();
 
@@ -261,7 +291,9 @@ describe("monitorTypeHelper", () => {
     describe("getMonitorTypeConfig", () => {
         beforeEach(() => {
             // Mock getAvailableMonitorTypes by directly mocking the cache
-            vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(mockMonitorTypes);
+            vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(
+                mockMonitorTypes
+            );
         });
 
         it("should return config for existing monitor type", async () => {
@@ -320,7 +352,9 @@ describe("monitorTypeHelper", () => {
     describe("getMonitorTypeOptions", () => {
         beforeEach(() => {
             // Mock getAvailableMonitorTypes by directly mocking the cache
-            vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(mockMonitorTypes);
+            vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(
+                mockMonitorTypes
+            );
         });
 
         it("should return options array for all monitor types", async () => {
@@ -370,7 +404,9 @@ describe("monitorTypeHelper", () => {
 
         it("should preserve order of monitor types from backend", async () => {
             const reversedTypes = [...mockMonitorTypes].reverse();
-            vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(reversedTypes);
+            vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(
+                reversedTypes
+            );
 
             const result = await getMonitorTypeOptions();
 
@@ -398,7 +434,9 @@ describe("monitorTypeHelper", () => {
                     fields: [],
                 },
             ];
-            vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(typesWithEmptyNames);
+            vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(
+                typesWithEmptyNames
+            );
 
             const result = await getMonitorTypeOptions();
 
@@ -422,14 +460,18 @@ describe("monitorTypeHelper", () => {
 
             const result = await getMonitorTypeOptions();
 
-            expect(result).toEqual([{ label: "Monitor (v2.0) - Advanced & Fast", value: "special" }]);
+            expect(result).toEqual([
+                { label: "Monitor (v2.0) - Advanced & Fast", value: "special" },
+            ]);
         });
     });
 
     describe("error handling integration", () => {
         it("should pass correct parameters to withUtilityErrorHandling", async () => {
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
-            vi.mocked(errorHandling.withUtilityErrorHandling).mockResolvedValue([]);
+            vi.mocked(errorHandling.withUtilityErrorHandling).mockResolvedValue(
+                []
+            );
 
             await getAvailableMonitorTypes();
 
@@ -444,7 +486,9 @@ describe("monitorTypeHelper", () => {
             const fallbackValue = [mockMonitorTypes[0]];
 
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
-            vi.mocked(errorHandling.withUtilityErrorHandling).mockResolvedValue(fallbackValue);
+            vi.mocked(errorHandling.withUtilityErrorHandling).mockResolvedValue(
+                fallbackValue
+            );
 
             const result = await getAvailableMonitorTypes();
 
@@ -467,7 +511,9 @@ describe("monitorTypeHelper", () => {
             });
             mockMonitorTypesStore.loadMonitorTypes = loadMonitorTypesMock;
 
-            vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(async (fn) => await fn());
+            vi.mocked(
+                errorHandling.withUtilityErrorHandling
+            ).mockImplementation(async (fn) => await fn());
 
             await getAvailableMonitorTypes();
 

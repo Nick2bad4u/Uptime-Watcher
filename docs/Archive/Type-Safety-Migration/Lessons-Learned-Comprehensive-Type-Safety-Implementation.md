@@ -94,7 +94,10 @@ export type CacheValue =
  | import("../../src/utils/monitorTypeHelper").MonitorTypeConfig
  | import("./validation").BaseValidationResult;
 
-formatMonitorTitleSuffix: (type: string, monitor: import("../shared/types").Monitor) => Promise<string>;
+formatMonitorTitleSuffix: (
+ type: string,
+ monitor: import("../shared/types").Monitor
+) => Promise<string>;
 
 // ✅ PROJECT STANDARD: Explicit imports at top
 import type { MonitorTypeConfig } from "../../src/utils/monitorTypeHelper";
@@ -201,7 +204,10 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
   const value = row[fieldDef.columnName as keyof MonitorRow];
   if (value != null) {
    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic field assignment from database schema
-   (monitor as any)[fieldDef.sourceField] = convertFromDatabase(value, fieldDef.sqlType);
+   (monitor as any)[fieldDef.sourceField] = convertFromDatabase(
+    value,
+    fieldDef.sqlType
+   );
   }
  }
 
@@ -409,7 +415,9 @@ Inconsistent function signatures create **cascading type errors**:
 ```typescript
 // ❌ BEFORE: Inconsistent signatures
 export function rowToMonitor(row: DatabaseMonitorRow): Site["monitors"][0]; // New signature
-export function rowToMonitorOrUndefined(row: Record<string, unknown> | undefined); // Old signature
+export function rowToMonitorOrUndefined(
+ row: Record<string, unknown> | undefined
+); // Old signature
 
 // ❌ This creates a type error:
 function rowToMonitorOrUndefined(row: Record<string, unknown> | undefined) {

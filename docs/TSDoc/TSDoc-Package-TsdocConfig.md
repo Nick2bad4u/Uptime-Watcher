@@ -72,7 +72,9 @@ import { TSDocConfigFile } from "@microsoft/tsdoc-config";
 const mySourceFile: string = "my-project/src/example.ts";
 
 // Load the nearest config file, for example `my-project/tsdoc.json`
-const tsdocConfigFile: TSDocConfigFile = TSDocConfigFile.loadForFolder(path.dirname(mySourceFile));
+const tsdocConfigFile: TSDocConfigFile = TSDocConfigFile.loadForFolder(
+ path.dirname(mySourceFile)
+);
 if (tsdocConfigFile.hasErrors) {
  // Report any errors
  console.log(tsdocConfigFile.getErrorSummary());

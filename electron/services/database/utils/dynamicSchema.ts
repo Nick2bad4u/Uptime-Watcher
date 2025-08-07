@@ -7,7 +7,11 @@
  * @public
  */
 
-import type { Monitor, MonitorStatus, MonitorType } from "../../../../shared/types";
+import type {
+    Monitor,
+    MonitorStatus,
+    MonitorType,
+} from "../../../../shared/types";
 import type { MonitorRow } from "../../../../shared/types/database";
 
 import { safeGetRowProperty } from "../../../../shared/types/database";
@@ -247,7 +251,10 @@ export function generateMonitorTableSchema(): string {
     `;
 
     const dynamicFields = generateDatabaseFieldDefinitions()
-        .map((field) => `        ${field.columnName} ${field.sqlType}${field.nullable ? "" : " NOT NULL"}`)
+        .map(
+            (field) =>
+                `        ${field.columnName} ${field.sqlType}${field.nullable ? "" : " NOT NULL"}`
+        )
         .join(",\n");
 
     return `CREATE TABLE IF NOT EXISTS monitors (
@@ -286,7 +293,9 @@ export function generateSqlParameters(): SqlParameters {
         "updated_at",
     ];
 
-    const dynamicColumns = generateDatabaseFieldDefinitions().map((field) => field.columnName);
+    const dynamicColumns = generateDatabaseFieldDefinitions().map(
+        (field) => field.columnName
+    );
 
     const allColumns = [...staticColumns, ...dynamicColumns];
     const placeholders = allColumns.map(() => "?").join(", ");
@@ -340,7 +349,10 @@ export function mapMonitorToRow(monitor: Monitor): MonitorRow {
 export function mapRowToMonitor(row: MonitorRow): Monitor {
     // Parse activeOperations safely
     const activeOperations = (() => {
-        if (!row.active_operations || typeof row.active_operations !== "string") {
+        if (
+            !row.active_operations ||
+            typeof row.active_operations !== "string"
+        ) {
             return [];
         }
         try {
@@ -377,7 +389,10 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
         const value = row[fieldDef.columnName as keyof MonitorRow];
         if (value != null) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- Dynamic field assignment required for extensible monitor type system. fieldDef.sourceField is validated by generateDatabaseFieldDefinitions() from monitor type registry.
-            (monitor as any)[fieldDef.sourceField] = convertFromDatabase(value, fieldDef.sqlType);
+            (monitor as any)[fieldDef.sourceField] = convertFromDatabase(
+                value,
+                fieldDef.sqlType
+            );
         }
     }
 
@@ -525,11 +540,17 @@ function getSqlTypeFromFieldType(fieldType: string): string {
  * @param row - Database row object to populate.
  * @internal
  */
-function mapDynamicFields(monitor: Record<string, unknown>, row: Record<string, unknown>): void {
+function mapDynamicFields(
+    monitor: Record<string, unknown>,
+    row: Record<string, unknown>
+): void {
     const fieldDefs = generateDatabaseFieldDefinitions();
     for (const fieldDef of fieldDefs) {
         if (monitor[fieldDef.sourceField] !== undefined) {
-            row[fieldDef.columnName] = convertToDatabase(monitor[fieldDef.sourceField], fieldDef.sqlType);
+            row[fieldDef.columnName] = convertToDatabase(
+                monitor[fieldDef.sourceField],
+                fieldDef.sqlType
+            );
         }
     }
 }
@@ -544,9 +565,15 @@ function mapDynamicFields(monitor: Record<string, unknown>, row: Record<string, 
  * @param row - Database row object to populate.
  * @internal
  */
-function mapStandardFields(monitor: Record<string, unknown>, row: Record<string, unknown>): void {
+function mapStandardFields(
+    monitor: Record<string, unknown>,
+    row: Record<string, unknown>
+): void {
     // Handle enabled/monitoring fields specially since they map to the same db field
-    if (monitor["monitoring"] !== undefined || monitor["enabled"] !== undefined) {
+    if (
+        monitor["monitoring"] !== undefined ||
+        monitor["enabled"] !== undefined
+    ) {
         row["enabled"] = convertEnabledField(monitor);
     }
 
@@ -555,7 +582,11 @@ function mapStandardFields(monitor: Record<string, unknown>, row: Record<string,
         if (monitor[mapping.sourceField] !== undefined) {
             const value = mapping.transform
                 ? mapping.transform(monitor[mapping.sourceField], monitor)
-                : safeGetRowProperty(monitor, mapping.sourceField, mapping.defaultValue);
+                : safeGetRowProperty(
+                      monitor,
+                      mapping.sourceField,
+                      mapping.defaultValue
+                  );
 
             row[mapping.dbField] = value;
         }

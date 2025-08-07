@@ -92,320 +92,342 @@ function isValidMonitorType(value: string): value is MonitorType {
  * <AddSiteForm onSuccess={() => console.log('Site added!')} />
  * ```
  */
-export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> = React.memo(function AddSiteForm({
-    onSuccess,
-}: AddSiteFormProperties) {
-    // Combine store calls to avoid duplicates and improve performance
-    const { clearError, isLoading, lastError } = useErrorStore();
-    const { addMonitorToSite, createSite, sites } = useSitesStore();
-    const { isDark } = useTheme();
+export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
+    React.memo(function AddSiteForm({ onSuccess }: AddSiteFormProperties) {
+        // Combine store calls to avoid duplicates and improve performance
+        const { clearError, isLoading, lastError } = useErrorStore();
+        const { addMonitorToSite, createSite, sites } = useSitesStore();
+        const { isDark } = useTheme();
 
-    // Load monitor types from backend
-    const { isLoading: isLoadingMonitorTypes, options: monitorTypeOptions } = useMonitorTypes();
+        // Load monitor types from backend
+        const {
+            isLoading: isLoadingMonitorTypes,
+            options: monitorTypeOptions,
+        } = useMonitorTypes();
 
-    // Use our custom hook for form state management
-    const formState = useAddSiteForm();
-    const {
-        addMode,
-        checkInterval,
-        formError,
-        host,
-        monitorType,
-        name,
-        port,
-        resetForm,
-        selectedExistingSite,
-        setAddMode,
-        setCheckInterval,
-        setFormError,
-        setHost,
-        setMonitorType,
-        setName,
-        setPort,
-        setSelectedExistingSite,
-        setUrl,
-        siteId,
-        url,
-    } = formState;
-
-    // Get dynamic help text for the current monitor type
-    const helpTexts = useDynamicHelpText(monitorType);
-
-    // Memoized handlers for form field changes
-    const handleMonitorTypeChange = useCallback(
-        (value: string) => {
-            if (isValidMonitorType(value)) {
-                setMonitorType(value);
-            } else {
-                logger.error(`Invalid monitor type value: ${value}`);
-            }
-        },
-        [setMonitorType]
-    );
-
-    const handleCheckIntervalChange = useCallback(
-        (value: string) => {
-            const numericValue = Number(value);
-            if (!Number.isNaN(numericValue)) {
-                setCheckInterval(numericValue);
-            } else {
-                logger.error(`Invalid check interval value: ${value}`);
-            }
-        },
-        [setCheckInterval]
-    );
-
-    // Combined success callback that resets form and calls prop callback
-    const handleSuccess = useCallback(() => {
-        resetForm();
-        onSuccess?.();
-    }, [resetForm, onSuccess]);
-
-    // Delayed loading state for button spinner (managed by custom hook)
-    const showButtonLoading = useDelayedButtonLoading(isLoading);
-
-    /**
-     * Handles form submission for adding a site or monitor.
-     *
-     * @param event - The form submission event.
-     * @remarks
-     * Delegates to {@link handleSubmit} with all relevant form state and handlers.
-     */
-    const onSubmit = useCallback(
-        async (event: React.FormEvent) => {
-            try {
-                await handleSubmit(event, {
-                    addMode,
-                    addMonitorToSite,
-                    checkInterval,
-                    clearError,
-                    createSite,
-                    formError,
-                    generateUuid,
-                    host,
-                    logger,
-                    monitorType,
-                    name,
-                    onSuccess: handleSuccess,
-                    port,
-                    selectedExistingSite,
-                    setFormError,
-                    siteId,
-                    url,
-                });
-            } catch (error) {
-                console.error("Form submission failed:", error);
-                // Form error handling is already managed by handleSubmit
-            }
-        },
-        [
+        // Use our custom hook for form state management
+        const formState = useAddSiteForm();
+        const {
             addMode,
-            addMonitorToSite,
             checkInterval,
-            clearError,
-            createSite,
             formError,
-            handleSuccess,
             host,
             monitorType,
             name,
             port,
+            resetForm,
             selectedExistingSite,
+            setAddMode,
+            setCheckInterval,
             setFormError,
+            setHost,
+            setMonitorType,
+            setName,
+            setPort,
+            setSelectedExistingSite,
+            setUrl,
             siteId,
             url,
-        ]
-    );
+        } = formState;
 
-    /**
-     * Clears both global and local form errors.
-     *
-     * @remarks
-     * Invokes the error store's clearError and resets local form error state.
-     */
-    const onClearError = useCallback(() => {
-        clearError();
-        setFormError(undefined);
-    }, [clearError, setFormError]);
+        // Get dynamic help text for the current monitor type
+        const helpTexts = useDynamicHelpText(monitorType);
 
-    // Memoized callbacks for form components to optimize re-renders
-    const handleAddModeChange = useCallback(
-        (value: string) => {
-            if (isValidAddMode(value)) {
-                setAddMode(value);
-            } else {
-                logger.error(`Invalid add mode value: ${value}`);
-            }
-        },
-        [setAddMode]
-    );
+        // Memoized handlers for form field changes
+        const handleMonitorTypeChange = useCallback(
+            (value: string) => {
+                if (isValidMonitorType(value)) {
+                    setMonitorType(value);
+                } else {
+                    logger.error(`Invalid monitor type value: ${value}`);
+                }
+            },
+            [setMonitorType]
+        );
 
-    // Memoized options arrays to prevent unnecessary re-renders
-    const addModeOptions = React.useMemo(
-        () => [
-            { label: "Create New Site", value: "new" },
-            { label: "Add to Existing Site", value: "existing" },
-        ],
-        []
-    );
+        const handleCheckIntervalChange = useCallback(
+            (value: string) => {
+                const numericValue = Number(value);
+                if (!Number.isNaN(numericValue)) {
+                    setCheckInterval(numericValue);
+                } else {
+                    logger.error(`Invalid check interval value: ${value}`);
+                }
+            },
+            [setCheckInterval]
+        );
 
-    const checkIntervalOptions = React.useMemo(
-        () =>
-            CHECK_INTERVALS.map((interval) => ({
-                label: interval.label,
-                value: interval.value,
-            })),
-        []
-    );
+        // Combined success callback that resets form and calls prop callback
+        const handleSuccess = useCallback(() => {
+            resetForm();
+            onSuccess?.();
+        }, [resetForm, onSuccess]);
 
-    return (
-        <ThemedBox className="max-w-md mx-auto" padding="lg" rounded="lg" surface="base">
-            <form
-                className="space-y-4"
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    void onSubmit(e);
-                }}
+        // Delayed loading state for button spinner (managed by custom hook)
+        const showButtonLoading = useDelayedButtonLoading(isLoading);
+
+        /**
+         * Handles form submission for adding a site or monitor.
+         *
+         * @param event - The form submission event.
+         * @remarks
+         * Delegates to {@link handleSubmit} with all relevant form state and handlers.
+         */
+        const onSubmit = useCallback(
+            async (event: React.FormEvent) => {
+                try {
+                    await handleSubmit(event, {
+                        addMode,
+                        addMonitorToSite,
+                        checkInterval,
+                        clearError,
+                        createSite,
+                        formError,
+                        generateUuid,
+                        host,
+                        logger,
+                        monitorType,
+                        name,
+                        onSuccess: handleSuccess,
+                        port,
+                        selectedExistingSite,
+                        setFormError,
+                        siteId,
+                        url,
+                    });
+                } catch (error) {
+                    console.error("Form submission failed:", error);
+                    // Form error handling is already managed by handleSubmit
+                }
+            },
+            [
+                addMode,
+                addMonitorToSite,
+                checkInterval,
+                clearError,
+                createSite,
+                formError,
+                handleSuccess,
+                host,
+                monitorType,
+                name,
+                port,
+                selectedExistingSite,
+                setFormError,
+                siteId,
+                url,
+            ]
+        );
+
+        /**
+         * Clears both global and local form errors.
+         *
+         * @remarks
+         * Invokes the error store's clearError and resets local form error state.
+         */
+        const onClearError = useCallback(() => {
+            clearError();
+            setFormError(undefined);
+        }, [clearError, setFormError]);
+
+        // Memoized callbacks for form components to optimize re-renders
+        const handleAddModeChange = useCallback(
+            (value: string) => {
+                if (isValidAddMode(value)) {
+                    setAddMode(value);
+                } else {
+                    logger.error(`Invalid add mode value: ${value}`);
+                }
+            },
+            [setAddMode]
+        );
+
+        // Memoized options arrays to prevent unnecessary re-renders
+        const addModeOptions = React.useMemo(
+            () => [
+                { label: "Create New Site", value: "new" },
+                { label: "Add to Existing Site", value: "existing" },
+            ],
+            []
+        );
+
+        const checkIntervalOptions = React.useMemo(
+            () =>
+                CHECK_INTERVALS.map((interval) => ({
+                    label: interval.label,
+                    value: interval.value,
+                })),
+            []
+        );
+
+        return (
+            <ThemedBox
+                className="max-w-md mx-auto"
+                padding="lg"
+                rounded="lg"
+                surface="base"
             >
-                {/* Add mode toggle */}
-                <RadioGroup
-                    disabled={isLoading}
-                    id="addMode"
-                    label="Add Mode"
-                    name="addMode"
-                    onChange={handleAddModeChange}
-                    options={addModeOptions}
-                    value={addMode}
-                />
+                <form
+                    className="space-y-4"
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        void onSubmit(e);
+                    }}
+                >
+                    {/* Add mode toggle */}
+                    <RadioGroup
+                        disabled={isLoading}
+                        id="addMode"
+                        label="Add Mode"
+                        name="addMode"
+                        onChange={handleAddModeChange}
+                        options={addModeOptions}
+                        value={addMode}
+                    />
 
-                {/* Existing site selector */}
-                {addMode === "existing" && (
+                    {/* Existing site selector */}
+                    {addMode === "existing" && (
+                        <SelectField
+                            disabled={isLoading}
+                            id="selectedSite"
+                            label="Select Site"
+                            onChange={setSelectedExistingSite}
+                            options={sites.map((site) => ({
+                                label: site.name,
+                                value: site.identifier,
+                            }))}
+                            placeholder="-- Select a site --"
+                            required
+                            value={selectedExistingSite}
+                        />
+                    )}
+
+                    {/* Site Name (only for new site) */}
+                    {addMode === "new" && (
+                        <TextField
+                            disabled={isLoading}
+                            id="siteName"
+                            label="Site Name"
+                            onChange={setName}
+                            placeholder="My Website"
+                            required
+                            type="text"
+                            value={name}
+                        />
+                    )}
+
+                    {/* Show generated UUID (for new site) */}
+                    {addMode === "new" && (
+                        <div>
+                            <ThemedText
+                                className="block select-all"
+                                size="xs"
+                                variant="tertiary"
+                            >
+                                Site Identifier:{" "}
+                                <span className="font-mono">{siteId}</span>
+                            </ThemedText>
+                        </div>
+                    )}
+
+                    {/* Monitor Type Selector */}
+                    <SelectField
+                        disabled={isLoading || isLoadingMonitorTypes}
+                        id="monitorType"
+                        label="Monitor Type"
+                        onChange={handleMonitorTypeChange}
+                        options={monitorTypeOptions}
+                        value={monitorType}
+                    />
+
+                    {/* Dynamic Monitor Fields */}
+                    <DynamicMonitorFields
+                        isLoading={isLoading}
+                        monitorType={monitorType}
+                        onChange={{
+                            host: (value: number | string) =>
+                                setHost(String(value)),
+                            port: (value: number | string) =>
+                                setPort(String(value)),
+                            url: (value: number | string) =>
+                                setUrl(String(value)),
+                        }}
+                        values={{
+                            host: host,
+                            port: port,
+                            url: url,
+                        }}
+                    />
+
                     <SelectField
                         disabled={isLoading}
-                        id="selectedSite"
-                        label="Select Site"
-                        onChange={setSelectedExistingSite}
-                        options={sites.map((site) => ({
-                            label: site.name,
-                            value: site.identifier,
-                        }))}
-                        placeholder="-- Select a site --"
-                        required
-                        value={selectedExistingSite}
+                        id="checkInterval"
+                        label="Check Interval"
+                        onChange={handleCheckIntervalChange}
+                        options={checkIntervalOptions}
+                        value={checkInterval}
                     />
-                )}
 
-                {/* Site Name (only for new site) */}
-                {addMode === "new" && (
-                    <TextField
+                    <ThemedButton
                         disabled={isLoading}
-                        id="siteName"
-                        label="Site Name"
-                        onChange={setName}
-                        placeholder="My Website"
-                        required
-                        type="text"
-                        value={name}
-                    />
-                )}
+                        fullWidth
+                        loading={showButtonLoading}
+                        type="submit"
+                        variant="primary"
+                    >
+                        {addMode === "new" ? "Add Site" : "Add Monitor"}
+                    </ThemedButton>
 
-                {/* Show generated UUID (for new site) */}
-                {addMode === "new" && (
-                    <div>
-                        <ThemedText className="block select-all" size="xs" variant="tertiary">
-                            Site Identifier: <span className="font-mono">{siteId}</span>
+                    {/* Error Message */}
+                    {(lastError ?? formError) ? (
+                        <ThemedBox
+                            className={`error-alert ${isDark ? "dark" : ""}`}
+                            padding="md"
+                            rounded="md"
+                            surface="base"
+                        >
+                            <div className="flex items-center">
+                                <ThemedText
+                                    className={`error-alert__text ${isDark ? "dark" : ""}`}
+                                    size="sm"
+                                >
+                                    ❌ {formError ?? lastError}
+                                </ThemedText>
+                                <ThemedButton
+                                    className={`error-alert__close ${isDark ? "dark" : ""}`}
+                                    onClick={onClearError}
+                                    size="xs"
+                                    variant="secondary"
+                                >
+                                    ✕
+                                </ThemedButton>
+                            </div>
+                        </ThemedBox>
+                    ) : null}
+
+                    <div className="space-y-1">
+                        <ThemedText size="xs" variant="tertiary">
+                            •{" "}
+                            {addMode === "new"
+                                ? "Site name is required"
+                                : "Select a site to add the monitor to"}
+                        </ThemedText>
+                        {helpTexts.primary ? (
+                            <ThemedText size="xs" variant="tertiary">
+                                • {helpTexts.primary}
+                            </ThemedText>
+                        ) : null}
+                        {helpTexts.secondary ? (
+                            <ThemedText size="xs" variant="tertiary">
+                                • {helpTexts.secondary}
+                            </ThemedText>
+                        ) : null}
+                        <ThemedText size="xs" variant="tertiary">
+                            • The monitor will be checked according to your
+                            monitoring interval
                         </ThemedText>
                     </div>
-                )}
-
-                {/* Monitor Type Selector */}
-                <SelectField
-                    disabled={isLoading || isLoadingMonitorTypes}
-                    id="monitorType"
-                    label="Monitor Type"
-                    onChange={handleMonitorTypeChange}
-                    options={monitorTypeOptions}
-                    value={monitorType}
-                />
-
-                {/* Dynamic Monitor Fields */}
-                <DynamicMonitorFields
-                    isLoading={isLoading}
-                    monitorType={monitorType}
-                    onChange={{
-                        host: (value: number | string) => setHost(String(value)),
-                        port: (value: number | string) => setPort(String(value)),
-                        url: (value: number | string) => setUrl(String(value)),
-                    }}
-                    values={{
-                        host: host,
-                        port: port,
-                        url: url,
-                    }}
-                />
-
-                <SelectField
-                    disabled={isLoading}
-                    id="checkInterval"
-                    label="Check Interval"
-                    onChange={handleCheckIntervalChange}
-                    options={checkIntervalOptions}
-                    value={checkInterval}
-                />
-
-                <ThemedButton
-                    disabled={isLoading}
-                    fullWidth
-                    loading={showButtonLoading}
-                    type="submit"
-                    variant="primary"
-                >
-                    {addMode === "new" ? "Add Site" : "Add Monitor"}
-                </ThemedButton>
-
-                {/* Error Message */}
-                {(lastError ?? formError) ? (
-                    <ThemedBox
-                        className={`error-alert ${isDark ? "dark" : ""}`}
-                        padding="md"
-                        rounded="md"
-                        surface="base"
-                    >
-                        <div className="flex items-center">
-                            <ThemedText className={`error-alert__text ${isDark ? "dark" : ""}`} size="sm">
-                                ❌ {formError ?? lastError}
-                            </ThemedText>
-                            <ThemedButton
-                                className={`error-alert__close ${isDark ? "dark" : ""}`}
-                                onClick={onClearError}
-                                size="xs"
-                                variant="secondary"
-                            >
-                                ✕
-                            </ThemedButton>
-                        </div>
-                    </ThemedBox>
-                ) : null}
-
-                <div className="space-y-1">
-                    <ThemedText size="xs" variant="tertiary">
-                        • {addMode === "new" ? "Site name is required" : "Select a site to add the monitor to"}
-                    </ThemedText>
-                    {helpTexts.primary ? (
-                        <ThemedText size="xs" variant="tertiary">
-                            • {helpTexts.primary}
-                        </ThemedText>
-                    ) : null}
-                    {helpTexts.secondary ? (
-                        <ThemedText size="xs" variant="tertiary">
-                            • {helpTexts.secondary}
-                        </ThemedText>
-                    ) : null}
-                    <ThemedText size="xs" variant="tertiary">
-                        • The monitor will be checked according to your monitoring interval
-                    </ThemedText>
-                </div>
-            </form>
-        </ThemedBox>
-    );
-});
+                </form>
+            </ThemedBox>
+        );
+    });

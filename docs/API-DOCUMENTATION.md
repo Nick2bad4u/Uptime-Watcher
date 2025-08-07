@@ -105,7 +105,10 @@ await window.electronAPI.sites.stopMonitoring(siteId);
 Performs a manual health check for a specific monitor.
 
 ```typescript
-const result = await window.electronAPI.monitors.checkManually(siteId, monitorId);
+const result = await window.electronAPI.monitors.checkManually(
+ siteId,
+ monitorId
+);
 // result: { status: "up" | "down", responseTime: number, details?: string, error?: string }
 ```
 

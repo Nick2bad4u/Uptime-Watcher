@@ -12,7 +12,11 @@ export interface SitesActions {
     /** Check a site now */
     checkSiteNow: (siteId: string, monitorId: string) => Promise<void>;
     /** Create a new site */
-    createSite: (siteData: { identifier: string; monitors?: Monitor[]; name?: string }) => Promise<void>;
+    createSite: (siteData: {
+        identifier: string;
+        monitors?: Monitor[];
+        name?: string;
+    }) => Promise<void>;
     /** Delete a site */
     deleteSite: (identifier: string) => Promise<void>;
     /** Download SQLite backup */
@@ -31,7 +35,11 @@ export interface SitesActions {
         synchronized: boolean;
     }>;
     /** Initialize sites data from backend */
-    initializeSites: () => Promise<{ message: string; sitesLoaded: number; success: boolean }>;
+    initializeSites: () => Promise<{
+        message: string;
+        sitesLoaded: number;
+        success: boolean;
+    }>;
     /** Modify an existing site */
     modifySite: (identifier: string, updates: Partial<Site>) => Promise<void>;
     /** Remove a monitor from a site */
@@ -47,13 +55,21 @@ export interface SitesActions {
     /** Start monitoring for all monitors of a site */
     startSiteMonitoring: (siteId: string) => Promise<void>;
     /** Start monitoring for a site monitor */
-    startSiteMonitorMonitoring: (siteId: string, monitorId: string) => Promise<void>;
+    startSiteMonitorMonitoring: (
+        siteId: string,
+        monitorId: string
+    ) => Promise<void>;
     /** Stop monitoring for all monitors of a site */
     stopSiteMonitoring: (siteId: string) => Promise<void>;
     /** Stop monitoring for a site monitor */
-    stopSiteMonitorMonitoring: (siteId: string, monitorId: string) => Promise<void>;
+    stopSiteMonitorMonitoring: (
+        siteId: string,
+        monitorId: string
+    ) => Promise<void>;
     /** Subscribe to status updates */
-    subscribeToStatusUpdates: (callback: (update: StatusUpdate) => void) => void;
+    subscribeToStatusUpdates: (
+        callback: (update: StatusUpdate) => void
+    ) => void;
     /** Subscribe to sync events */
     subscribeToSyncEvents: () => () => void;
     /** Sync sites from backend */
@@ -61,11 +77,23 @@ export interface SitesActions {
     /** Unsubscribe from status updates */
     unsubscribeFromStatusUpdates: () => void;
     /** Update monitor retry attempts */
-    updateMonitorRetryAttempts: (siteId: string, monitorId: string, retryAttempts: number) => Promise<void>;
+    updateMonitorRetryAttempts: (
+        siteId: string,
+        monitorId: string,
+        retryAttempts: number
+    ) => Promise<void>;
     /** Update monitor timeout */
-    updateMonitorTimeout: (siteId: string, monitorId: string, timeout: number) => Promise<void>;
+    updateMonitorTimeout: (
+        siteId: string,
+        monitorId: string,
+        timeout: number
+    ) => Promise<void>;
     /** Update site check interval */
-    updateSiteCheckInterval: (siteId: string, monitorId: string, interval: number) => Promise<void>;
+    updateSiteCheckInterval: (
+        siteId: string,
+        monitorId: string,
+        interval: number
+    ) => Promise<void>;
 }
 
 export interface SitesState {

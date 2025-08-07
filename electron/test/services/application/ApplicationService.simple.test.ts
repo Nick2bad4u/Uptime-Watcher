@@ -68,12 +68,16 @@ describe("ApplicationService Coverage Tests", () => {
     });
 
     it("should import the service without errors", async () => {
-        const { ApplicationService } = await import("../../../services/application/ApplicationService");
+        const { ApplicationService } = await import(
+            "../../../services/application/ApplicationService"
+        );
         expect(ApplicationService).toBeDefined();
     });
 
     it("should create service instance", async () => {
-        const { ApplicationService } = await import("../../../services/application/ApplicationService");
+        const { ApplicationService } = await import(
+            "../../../services/application/ApplicationService"
+        );
 
         const service = new ApplicationService();
         expect(service).toBeDefined();
@@ -81,7 +85,9 @@ describe("ApplicationService Coverage Tests", () => {
     });
 
     it("should handle cleanup operations", async () => {
-        const { ApplicationService } = await import("../../../services/application/ApplicationService");
+        const { ApplicationService } = await import(
+            "../../../services/application/ApplicationService"
+        );
 
         try {
             const service = new ApplicationService();
@@ -94,7 +100,9 @@ describe("ApplicationService Coverage Tests", () => {
     });
 
     it("should handle service container integration", async () => {
-        const { ApplicationService } = await import("../../../services/application/ApplicationService");
+        const { ApplicationService } = await import(
+            "../../../services/application/ApplicationService"
+        );
 
         try {
             const service = new ApplicationService();
@@ -108,7 +116,9 @@ describe("ApplicationService Coverage Tests", () => {
     });
 
     it("should handle app event listeners", async () => {
-        const { ApplicationService } = await import("../../../services/application/ApplicationService");
+        const { ApplicationService } = await import(
+            "../../../services/application/ApplicationService"
+        );
 
         try {
             const service = new ApplicationService();
@@ -121,7 +131,9 @@ describe("ApplicationService Coverage Tests", () => {
     });
 
     it("should handle different platform behaviors", async () => {
-        const { ApplicationService } = await import("../../../services/application/ApplicationService");
+        const { ApplicationService } = await import(
+            "../../../services/application/ApplicationService"
+        );
 
         try {
             const service = new ApplicationService();
@@ -135,7 +147,9 @@ describe("ApplicationService Coverage Tests", () => {
     });
 
     it("should handle error scenarios gracefully", async () => {
-        const { ApplicationService } = await import("../../../services/application/ApplicationService");
+        const { ApplicationService } = await import(
+            "../../../services/application/ApplicationService"
+        );
 
         try {
             const service = new ApplicationService();
@@ -148,7 +162,9 @@ describe("ApplicationService Coverage Tests", () => {
     });
 
     it("should exercise constructor logic", async () => {
-        const { ApplicationService } = await import("../../../services/application/ApplicationService");
+        const { ApplicationService } = await import(
+            "../../../services/application/ApplicationService"
+        );
 
         try {
             // Test multiple instantiations to cover different paths
@@ -163,7 +179,9 @@ describe("ApplicationService Coverage Tests", () => {
     });
 
     it("should handle cleanup edge cases", async () => {
-        const { ApplicationService } = await import("../../../services/application/ApplicationService");
+        const { ApplicationService } = await import(
+            "../../../services/application/ApplicationService"
+        );
 
         try {
             const service = new ApplicationService();
@@ -179,7 +197,9 @@ describe("ApplicationService Coverage Tests", () => {
     });
 
     it("should handle service coordination", async () => {
-        const { ApplicationService } = await import("../../../services/application/ApplicationService");
+        const { ApplicationService } = await import(
+            "../../../services/application/ApplicationService"
+        );
 
         try {
             const service = new ApplicationService();

@@ -45,10 +45,13 @@ describe("operationalHooks.ts - Branch Coverage", () => {
         it("should execute operation successfully on first attempt", async () => {
             const mockOperation = vi.fn().mockResolvedValue("success");
 
-            const result = await operationalHooks.withOperationalHooks(mockOperation, {
-                operationName: "testOperation",
-                maxRetries: 3,
-            });
+            const result = await operationalHooks.withOperationalHooks(
+                mockOperation,
+                {
+                    operationName: "testOperation",
+                    maxRetries: 3,
+                }
+            );
 
             expect(result).toBe("success");
             expect(mockOperation).toHaveBeenCalledTimes(1);
@@ -57,12 +60,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
         it("should handle operation with event emission", async () => {
             const mockOperation = vi.fn().mockResolvedValue("success");
 
-            const result = await operationalHooks.withOperationalHooks(mockOperation, {
-                operationName: "testOperation",
-                maxRetries: 3,
-                eventEmitter: mockEventEmitter,
-                emitEvents: true,
-            });
+            const result = await operationalHooks.withOperationalHooks(
+                mockOperation,
+                {
+                    operationName: "testOperation",
+                    maxRetries: 3,
+                    eventEmitter: mockEventEmitter,
+                    emitEvents: true,
+                }
+            );
 
             expect(result).toBe("success");
             expect(mockEventEmitter.emitTyped).toHaveBeenCalled();
@@ -71,11 +77,14 @@ describe("operationalHooks.ts - Branch Coverage", () => {
         it("should handle operation without event emission", async () => {
             const mockOperation = vi.fn().mockResolvedValue("success");
 
-            const result = await operationalHooks.withOperationalHooks(mockOperation, {
-                operationName: "testOperation",
-                maxRetries: 3,
-                emitEvents: false,
-            });
+            const result = await operationalHooks.withOperationalHooks(
+                mockOperation,
+                {
+                    operationName: "testOperation",
+                    maxRetries: 3,
+                    emitEvents: false,
+                }
+            );
 
             expect(result).toBe("success");
             expect(mockEventEmitter.emit).not.toHaveBeenCalled();
@@ -90,18 +99,23 @@ describe("operationalHooks.ts - Branch Coverage", () => {
                 .mockRejectedValueOnce(new Error("Second failure"))
                 .mockResolvedValueOnce("success");
 
-            const result = await operationalHooks.withOperationalHooks(mockOperation, {
-                operationName: "testOperation",
-                maxRetries: 3,
-                initialDelay: 10, // Short delay for tests
-            });
+            const result = await operationalHooks.withOperationalHooks(
+                mockOperation,
+                {
+                    operationName: "testOperation",
+                    maxRetries: 3,
+                    initialDelay: 10, // Short delay for tests
+                }
+            );
 
             expect(result).toBe("success");
             expect(mockOperation).toHaveBeenCalledTimes(3);
         });
 
         it("should handle all retries exhausted - throwOnFailure=true", async () => {
-            const mockOperation = vi.fn().mockRejectedValue(new Error("Persistent failure"));
+            const mockOperation = vi
+                .fn()
+                .mockRejectedValue(new Error("Persistent failure"));
 
             await expect(
                 operationalHooks.withOperationalHooks(mockOperation, {
@@ -116,14 +130,19 @@ describe("operationalHooks.ts - Branch Coverage", () => {
         });
 
         it("should handle all retries exhausted - throwOnFailure=false", async () => {
-            const mockOperation = vi.fn().mockRejectedValue(new Error("Persistent failure"));
+            const mockOperation = vi
+                .fn()
+                .mockRejectedValue(new Error("Persistent failure"));
 
-            const result = await operationalHooks.withOperationalHooks(mockOperation, {
-                operationName: "testOperation",
-                maxRetries: 2,
-                throwOnFailure: false,
-                initialDelay: 10,
-            });
+            const result = await operationalHooks.withOperationalHooks(
+                mockOperation,
+                {
+                    operationName: "testOperation",
+                    maxRetries: 2,
+                    throwOnFailure: false,
+                    initialDelay: 10,
+                }
+            );
 
             expect(result).toBeNull();
             expect(mockOperation).toHaveBeenCalledTimes(2);
@@ -137,12 +156,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
                 .mockRejectedValueOnce(new Error("First failure"))
                 .mockResolvedValueOnce("success");
 
-            const result = await operationalHooks.withOperationalHooks(mockOperation, {
-                operationName: "testOperation",
-                maxRetries: 3,
-                backoff: "exponential",
-                initialDelay: 10,
-            });
+            const result = await operationalHooks.withOperationalHooks(
+                mockOperation,
+                {
+                    operationName: "testOperation",
+                    maxRetries: 3,
+                    backoff: "exponential",
+                    initialDelay: 10,
+                }
+            );
 
             expect(result).toBe("success");
             expect(mockOperation).toHaveBeenCalledTimes(2);
@@ -154,12 +176,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
                 .mockRejectedValueOnce(new Error("First failure"))
                 .mockResolvedValueOnce("success");
 
-            const result = await operationalHooks.withOperationalHooks(mockOperation, {
-                operationName: "testOperation",
-                maxRetries: 3,
-                backoff: "linear",
-                initialDelay: 10,
-            });
+            const result = await operationalHooks.withOperationalHooks(
+                mockOperation,
+                {
+                    operationName: "testOperation",
+                    maxRetries: 3,
+                    backoff: "linear",
+                    initialDelay: 10,
+                }
+            );
 
             expect(result).toBe("success");
             expect(mockOperation).toHaveBeenCalledTimes(2);
@@ -171,11 +196,14 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             const mockOperation = vi.fn().mockResolvedValue("success");
             const onSuccess = vi.fn();
 
-            const result = await operationalHooks.withOperationalHooks(mockOperation, {
-                operationName: "testOperation",
-                maxRetries: 3,
-                onSuccess,
-            });
+            const result = await operationalHooks.withOperationalHooks(
+                mockOperation,
+                {
+                    operationName: "testOperation",
+                    maxRetries: 3,
+                    onSuccess,
+                }
+            );
 
             expect(result).toBe("success");
             expect(onSuccess).toHaveBeenCalledWith("success");
@@ -188,19 +216,24 @@ describe("operationalHooks.ts - Branch Coverage", () => {
                 .mockResolvedValueOnce("success");
             const onRetry = vi.fn();
 
-            const result = await operationalHooks.withOperationalHooks(mockOperation, {
-                operationName: "testOperation",
-                maxRetries: 3,
-                onRetry,
-                initialDelay: 10,
-            });
+            const result = await operationalHooks.withOperationalHooks(
+                mockOperation,
+                {
+                    operationName: "testOperation",
+                    maxRetries: 3,
+                    onRetry,
+                    initialDelay: 10,
+                }
+            );
 
             expect(result).toBe("success");
             expect(onRetry).toHaveBeenCalledWith(1, expect.any(Error));
         });
 
         it("should call onFailure callback when all retries exhausted", async () => {
-            const mockOperation = vi.fn().mockRejectedValue(new Error("Persistent failure"));
+            const mockOperation = vi
+                .fn()
+                .mockRejectedValue(new Error("Persistent failure"));
             const onFailure = vi.fn();
 
             await expect(
@@ -243,14 +276,19 @@ describe("operationalHooks.ts - Branch Coverage", () => {
 
         it("should handle callback errors gracefully", async () => {
             const mockOperation = vi.fn().mockResolvedValue("success");
-            const onSuccess = vi.fn().mockRejectedValue(new Error("Callback error"));
+            const onSuccess = vi
+                .fn()
+                .mockRejectedValue(new Error("Callback error"));
 
             // Should not throw even if callback fails
-            const result = await operationalHooks.withOperationalHooks(mockOperation, {
-                operationName: "testOperation",
-                maxRetries: 3,
-                onSuccess,
-            });
+            const result = await operationalHooks.withOperationalHooks(
+                mockOperation,
+                {
+                    operationName: "testOperation",
+                    maxRetries: 3,
+                    onSuccess,
+                }
+            );
 
             expect(result).toBe("success");
         });
@@ -258,9 +296,14 @@ describe("operationalHooks.ts - Branch Coverage", () => {
 
     describe("withDatabaseOperation - Specialized Wrapper", () => {
         it("should execute database operation successfully", async () => {
-            const mockOperation = vi.fn().mockResolvedValue({ id: 1, name: "test" });
+            const mockOperation = vi
+                .fn()
+                .mockResolvedValue({ id: 1, name: "test" });
 
-            const result = await operationalHooks.withDatabaseOperation(mockOperation, "createSite");
+            const result = await operationalHooks.withDatabaseOperation(
+                mockOperation,
+                "createSite"
+            );
 
             expect(result).toEqual({ id: 1, name: "test" });
             expect(mockOperation).toHaveBeenCalledTimes(1);
@@ -269,7 +312,11 @@ describe("operationalHooks.ts - Branch Coverage", () => {
         it("should handle database operation with event emitter", async () => {
             const mockOperation = vi.fn().mockResolvedValue({ id: 1 });
 
-            const result = await operationalHooks.withDatabaseOperation(mockOperation, "updateSite", mockEventEmitter);
+            const result = await operationalHooks.withDatabaseOperation(
+                mockOperation,
+                "updateSite",
+                mockEventEmitter
+            );
 
             expect(result).toEqual({ id: 1 });
             expect(mockEventEmitter.emitTyped).toHaveBeenCalled();
@@ -296,7 +343,10 @@ describe("operationalHooks.ts - Branch Coverage", () => {
                 .mockRejectedValueOnce(new Error("Database connection failed"))
                 .mockResolvedValueOnce({ recovered: true });
 
-            const result = await operationalHooks.withDatabaseOperation(mockOperation, "recoverSite");
+            const result = await operationalHooks.withDatabaseOperation(
+                mockOperation,
+                "recoverSite"
+            );
 
             expect(result).toEqual({ recovered: true });
             expect(mockOperation).toHaveBeenCalledTimes(2);
@@ -306,7 +356,10 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             const mockOperation = vi.fn().mockResolvedValue("success");
 
             // This tests that database operation uses specific defaults
-            const result = await operationalHooks.withDatabaseOperation(mockOperation, "testDbOp");
+            const result = await operationalHooks.withDatabaseOperation(
+                mockOperation,
+                "testDbOp"
+            );
 
             expect(result).toBe("success");
             // The operation name should be prefixed with "database:"
@@ -318,9 +371,12 @@ describe("operationalHooks.ts - Branch Coverage", () => {
         it("should handle minimal configuration", async () => {
             const mockOperation = vi.fn().mockResolvedValue("minimal");
 
-            const result = await operationalHooks.withOperationalHooks(mockOperation, {
-                operationName: "minimal",
-            });
+            const result = await operationalHooks.withOperationalHooks(
+                mockOperation,
+                {
+                    operationName: "minimal",
+                }
+            );
 
             expect(result).toBe("minimal");
         });
@@ -331,19 +387,22 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             const onRetry = vi.fn();
             const onFailure = vi.fn();
 
-            const result = await operationalHooks.withOperationalHooks(mockOperation, {
-                operationName: "maximal",
-                maxRetries: 5,
-                initialDelay: 50,
-                backoff: "exponential",
-                throwOnFailure: true,
-                emitEvents: true,
-                eventEmitter: mockEventEmitter,
-                context: { test: "data" },
-                onSuccess,
-                onRetry,
-                onFailure,
-            });
+            const result = await operationalHooks.withOperationalHooks(
+                mockOperation,
+                {
+                    operationName: "maximal",
+                    maxRetries: 5,
+                    initialDelay: 50,
+                    backoff: "exponential",
+                    throwOnFailure: true,
+                    emitEvents: true,
+                    eventEmitter: mockEventEmitter,
+                    context: { test: "data" },
+                    onSuccess,
+                    onRetry,
+                    onFailure,
+                }
+            );
 
             expect(result).toBe("maximal");
             expect(onSuccess).toHaveBeenCalledWith("maximal");
@@ -352,10 +411,13 @@ describe("operationalHooks.ts - Branch Coverage", () => {
         it("should handle undefined/null context gracefully", async () => {
             const mockOperation = vi.fn().mockResolvedValue("success");
 
-            const result = await operationalHooks.withOperationalHooks(mockOperation, {
-                operationName: "testOperation",
-                context: undefined,
-            });
+            const result = await operationalHooks.withOperationalHooks(
+                mockOperation,
+                {
+                    operationName: "testOperation",
+                    context: undefined,
+                }
+            );
 
             expect(result).toBe("success");
         });
@@ -365,16 +427,23 @@ describe("operationalHooks.ts - Branch Coverage", () => {
         it("should handle event emission failures gracefully", async () => {
             const mockOperation = vi.fn().mockResolvedValue("success");
             const failingEventEmitter = {
-                emit: vi.fn().mockRejectedValue(new Error("Event emission failed")),
-                emitTyped: vi.fn().mockRejectedValue(new Error("Event emission failed")),
+                emit: vi
+                    .fn()
+                    .mockRejectedValue(new Error("Event emission failed")),
+                emitTyped: vi
+                    .fn()
+                    .mockRejectedValue(new Error("Event emission failed")),
             };
 
             // Should not throw even if event emission fails
-            const result = await operationalHooks.withOperationalHooks(mockOperation, {
-                operationName: "testOperation",
-                eventEmitter: failingEventEmitter,
-                emitEvents: true,
-            });
+            const result = await operationalHooks.withOperationalHooks(
+                mockOperation,
+                {
+                    operationName: "testOperation",
+                    eventEmitter: failingEventEmitter,
+                    emitEvents: true,
+                }
+            );
 
             expect(result).toBe("success");
         });
@@ -383,11 +452,14 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             const mockOperation = vi.fn().mockResolvedValue("success");
             const invalidEventEmitter = {};
 
-            const result = await operationalHooks.withOperationalHooks(mockOperation, {
-                operationName: "testOperation",
-                eventEmitter: invalidEventEmitter as any,
-                emitEvents: true,
-            });
+            const result = await operationalHooks.withOperationalHooks(
+                mockOperation,
+                {
+                    operationName: "testOperation",
+                    eventEmitter: invalidEventEmitter as any,
+                    emitEvents: true,
+                }
+            );
 
             expect(result).toBe("success");
         });

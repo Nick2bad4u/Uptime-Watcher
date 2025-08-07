@@ -94,7 +94,9 @@ function validateGeneratedSchema(schema: string): void {
   throw new Error("Generated schema is empty or invalid");
  }
  if (!schema.includes("CREATE TABLE IF NOT EXISTS monitors")) {
-  throw new Error("Generated schema missing required monitors table definition");
+  throw new Error(
+   "Generated schema missing required monitors table definition"
+  );
  }
  if (schema.includes("undefined") || schema.includes("null")) {
   throw new Error("Generated schema contains undefined or null values");
@@ -323,7 +325,9 @@ During the review, I identified several issues not mentioned in the claims:
 function toSnakeCase(str: string): string {
  if (!str || typeof str !== "string") return str;
  // Handle leading uppercase (SiteIdentifier -> site_identifier)
- return str.replace(/^[A-Z]/, (match) => match.toLowerCase()).replace(/[A-Z]/g, (match) => `_${match.toLowerCase()}`);
+ return str
+  .replace(/^[A-Z]/, (match) => match.toLowerCase())
+  .replace(/[A-Z]/g, (match) => `_${match.toLowerCase()}`);
 }
 ```
 
@@ -341,7 +345,9 @@ function getSqlTypeFromFieldType(fieldType: string): string {
 
  const sqlType = typeMap[fieldType?.toLowerCase()];
  if (!sqlType) {
-  logger.warn(`[DynamicSchema] Unknown field type: ${fieldType}, defaulting to TEXT`);
+  logger.warn(
+   `[DynamicSchema] Unknown field type: ${fieldType}, defaulting to TEXT`
+  );
   return "TEXT"; // Safe default
  }
  return sqlType;

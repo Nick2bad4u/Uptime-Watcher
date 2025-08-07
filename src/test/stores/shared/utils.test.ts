@@ -35,7 +35,9 @@ describe("Store Utils", () => {
 
             logStoreAction("TestStore", "testAction");
 
-            expect(mockLogger.debug).toHaveBeenCalledWith("[TestStore] testAction");
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                "[TestStore] testAction"
+            );
         });
 
         it("should log action with payload in development", () => {
@@ -44,7 +46,10 @@ describe("Store Utils", () => {
 
             logStoreAction("TestStore", "testAction", payload);
 
-            expect(mockLogger.debug).toHaveBeenCalledWith("[TestStore] testAction", payload);
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                "[TestStore] testAction",
+                payload
+            );
         });
 
         it("should not log action in production", () => {
@@ -69,7 +74,9 @@ describe("Store Utils", () => {
 
             logStoreAction("TestStore", "testAction", undefined);
 
-            expect(mockLogger.debug).toHaveBeenCalledWith("[TestStore] testAction");
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                "[TestStore] testAction"
+            );
         });
 
         it("should handle null payload", () => {
@@ -77,7 +84,10 @@ describe("Store Utils", () => {
 
             logStoreAction("TestStore", "testAction", null);
 
-            expect(mockLogger.debug).toHaveBeenCalledWith("[TestStore] testAction", null);
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                "[TestStore] testAction",
+                null
+            );
         });
 
         it("should handle empty string payload", () => {
@@ -85,7 +95,10 @@ describe("Store Utils", () => {
 
             logStoreAction("TestStore", "testAction", "");
 
-            expect(mockLogger.debug).toHaveBeenCalledWith("[TestStore] testAction", "");
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                "[TestStore] testAction",
+                ""
+            );
         });
 
         it("should handle number payload", () => {
@@ -93,7 +106,10 @@ describe("Store Utils", () => {
 
             logStoreAction("TestStore", "testAction", 42);
 
-            expect(mockLogger.debug).toHaveBeenCalledWith("[TestStore] testAction", 42);
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                "[TestStore] testAction",
+                42
+            );
         });
 
         it("should handle boolean payload", () => {
@@ -101,7 +117,10 @@ describe("Store Utils", () => {
 
             logStoreAction("TestStore", "testAction", true);
 
-            expect(mockLogger.debug).toHaveBeenCalledWith("[TestStore] testAction", true);
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                "[TestStore] testAction",
+                true
+            );
         });
     });
 });

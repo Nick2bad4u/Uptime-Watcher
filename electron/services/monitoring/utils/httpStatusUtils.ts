@@ -50,5 +50,7 @@ export function determineMonitorStatus(httpStatus: number): "down" | "up" {
  * @internal
  */
 function isValidHttpStatus(httpStatus: number): boolean {
-    return Number.isInteger(httpStatus) && httpStatus >= 100 && httpStatus <= 599;
+    return (
+        Number.isInteger(httpStatus) && httpStatus >= 100 && httpStatus <= 599
+    );
 }

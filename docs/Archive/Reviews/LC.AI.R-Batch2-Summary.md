@@ -42,7 +42,10 @@ if (!instance) {
 
 ```typescript
 // Apply configuration if provided and appropriate
-if (config && (forceConfigUpdate || this.serviceInstances.get(type) === instance)) {
+if (
+ config &&
+ (forceConfigUpdate || this.serviceInstances.get(type) === instance)
+) {
  try {
   instance.updateConfig(config);
  } catch (error) {
