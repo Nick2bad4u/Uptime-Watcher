@@ -7,6 +7,7 @@
 **Uptime Watcher** is a sophisticated Electron desktop application for monitoring website uptime with real-time updates, response time tracking, and historical data visualization.
 
 ### Core Purpose & Capabilities
+
 - **Multi-Service Monitoring**: HTTP, port connectivity, and ping monitoring
 - **Real-Time Status Updates**: Live status changes with visual feedback
 - **Historical Data Tracking**: Comprehensive uptime history and response times
@@ -16,6 +17,7 @@
 - **Auto-Updates**: Built-in update mechanism with restart coordination
 
 ### Project Metadata
+
 - **Version**: 10.1.0
 - **License**: Unlicense
 - **Repository**: https://github.com/Nick2bad4u/Uptime-Watcher
@@ -25,17 +27,19 @@
 ## 🏗️ Technology Stack (COMPLETE)
 
 ### Frontend Stack
+
 ```yaml
 Framework: React 18+ with TypeScript
 Styling: Tailwind CSS + Custom Theme System
 State Management: Zustand (modular stores)
-Build Tool: Vite 5.4+ 
+Build Tool: Vite 5.4+
 Development: Hot reload with React DevTools
 Icons: React Icons (Heroicons, Lucide)
 Charts: Chart.js with React-Chartjs-2
 ```
 
 ### Desktop Framework
+
 ```yaml
 Platform: Electron 32+ (main + renderer processes)
 Security: Context isolation + preload scripts
@@ -45,6 +49,7 @@ Native Features: System tray, notifications, auto-updater
 ```
 
 ### Backend/Data Layer
+
 ```yaml
 Database: SQLite with node-sqlite3-wasm
 ORM Pattern: Custom repository pattern
@@ -54,6 +59,7 @@ Backup: Export/import functionality
 ```
 
 ### Development & Quality
+
 ```yaml
 Testing: Vitest (dual config: frontend + electron)
 Type Checking: TypeScript 5.6+ (strict mode)
@@ -64,6 +70,7 @@ Coverage: Codecov integration with dual reporting
 ```
 
 ### Build & Distribution
+
 ```yaml
 Build: Vite + TypeScript compilation
 Packaging: Electron Builder
@@ -313,22 +320,29 @@ Uptime-Watcher/
 
 ```typescript
 export class ServiceContainer {
-    private static instance: ServiceContainer | undefined;
-    
-    // Service Categories:
-    // - Core Services: Infrastructure (Database, IPC, Events)
-    // - Application Services: Business orchestrators (Managers)
-    // - Feature Services: Domain functionality (Monitoring, Notifications)
-    // - Utility Services: Support functions (Window, Updater)
-    
-    public getDatabaseService(): DatabaseService { /* ... */ }
-    public getMonitorManager(): MonitorManager { /* ... */ }
-    public getSiteManager(): SiteManager { /* ... */ }
-    // ... all services accessible via getters
+ private static instance: ServiceContainer | undefined;
+
+ // Service Categories:
+ // - Core Services: Infrastructure (Database, IPC, Events)
+ // - Application Services: Business orchestrators (Managers)
+ // - Feature Services: Domain functionality (Monitoring, Notifications)
+ // - Utility Services: Support functions (Window, Updater)
+
+ public getDatabaseService(): DatabaseService {
+  /* ... */
+ }
+ public getMonitorManager(): MonitorManager {
+  /* ... */
+ }
+ public getSiteManager(): SiteManager {
+  /* ... */
+ }
+ // ... all services accessible via getters
 }
 ```
 
 **Service Categories**:
+
 - **Core Services**: `DatabaseService`, `IpcService`, `TypedEventBus`
 - **Application Services**: `ApplicationService`, managers
 - **Feature Services**: `MonitoringServices`, `NotificationService`
@@ -343,7 +357,7 @@ export class ServiceContainer {
 async addSite(site: Site): Promise<Site>
 async updateSite(id: string, updates: Partial<Site>): Promise<void>
 
-// Internal sync methods (within existing transactions)  
+// Internal sync methods (within existing transactions)
 addSiteSync(site: Site, db: Database): Site
 updateSiteSync(id: string, updates: Partial<Site>, db: Database): void
 ```
@@ -351,6 +365,7 @@ updateSiteSync(id: string, updates: Partial<Site>, db: Database): void
 **Transaction Safety**: All mutations wrapped in `executeTransaction()`
 
 **Repositories**:
+
 - `SiteRepository` - Site configuration and metadata
 - `MonitorRepository` - Monitor configurations
 - `HistoryRepository` - Status history and metrics
@@ -362,19 +377,19 @@ updateSiteSync(id: string, updates: Partial<Site>, db: Database): void
 
 ```typescript
 interface UptimeEvents {
-    'monitor:status-updated': MonitorStatusUpdateEventData;
-    'site:monitoring-started': SiteMonitoringStartedEventData;
-    'database:operation-completed': DatabaseOperationEventData;
-    // ... 50+ typed events
+ "monitor:status-updated": MonitorStatusUpdateEventData;
+ "site:monitoring-started": SiteMonitoringStartedEventData;
+ "database:operation-completed": DatabaseOperationEventData;
+ // ... 50+ typed events
 }
 
 // Type-safe event emission
-eventBus.emit('monitor:status-updated', {
-    siteId: 'site-123',
-    monitorId: 'monitor-456',
-    oldStatus: 'up',
-    newStatus: 'down'
-    // ... automatic metadata injection
+eventBus.emit("monitor:status-updated", {
+ siteId: "site-123",
+ monitorId: "monitor-456",
+ oldStatus: "up",
+ newStatus: "down",
+ // ... automatic metadata injection
 });
 ```
 
@@ -398,10 +413,10 @@ eventBus.emit('monitor:status-updated', {
 ```typescript
 // Operation Correlation for Race Condition Prevention
 interface MonitorCheckOperation {
-    id: string; // UUID-based operation tracking
-    monitorId: string;
-    initiatedAt: Date;
-    cancelled: boolean;
+ id: string; // UUID-based operation tracking
+ monitorId: string;
+ initiatedAt: Date;
+ cancelled: boolean;
 }
 
 // Enhanced monitoring components:
@@ -417,23 +432,28 @@ interface MonitorCheckOperation {
 
 ```typescript
 export const useSitesStore = create<SitesStore>()((set, get) => {
-    // Modular composition
-    const stateActions = createSitesStateActions(set, get);
-    const syncActions = createSiteSyncActions({ /* deps */ });
-    const monitoringActions = createSiteMonitoringActions();
-    const operationsActions = createSiteOperationsActions({ /* deps */ });
-    
-    return {
-        ...initialSitesState,
-        ...stateActions,     // Core state management
-        ...operationsActions, // CRUD operations  
-        ...monitoringActions, // Monitoring lifecycle
-        ...syncActions,       // Backend synchronization
-    };
+ // Modular composition
+ const stateActions = createSitesStateActions(set, get);
+ const syncActions = createSiteSyncActions({
+  /* deps */
+ });
+ const monitoringActions = createSiteMonitoringActions();
+ const operationsActions = createSiteOperationsActions({
+  /* deps */
+ });
+
+ return {
+  ...initialSitesState,
+  ...stateActions, // Core state management
+  ...operationsActions, // CRUD operations
+  ...monitoringActions, // Monitoring lifecycle
+  ...syncActions, // Backend synchronization
+ };
 });
 ```
 
 **Store Modules**:
+
 - **State Module**: Core data manipulation
 - **Operations Module**: CRUD operations
 - **Monitoring Module**: Monitoring lifecycle
@@ -445,21 +465,22 @@ export const useSitesStore = create<SitesStore>()((set, get) => {
 
 ```jsonc
 {
-    "compilerOptions": {
-        "strict": true,                    // All strict flags enabled
-        "exactOptionalPropertyTypes": true, // Exact optional properties
-        "noUncheckedIndexedAccess": true,   // Safe array/object access
-        "noImplicitReturns": true,          // All code paths return
-        "noUnusedLocals": true,             // No unused variables
-        "noUnusedParameters": true,         // No unused parameters
-        "isolatedModules": true,            // Module isolation
-        "isolatedDeclarations": true,       // Declaration isolation
-        // ... comprehensive strict configuration
-    }
+ "compilerOptions": {
+  "strict": true, // All strict flags enabled
+  "exactOptionalPropertyTypes": true, // Exact optional properties
+  "noUncheckedIndexedAccess": true, // Safe array/object access
+  "noImplicitReturns": true, // All code paths return
+  "noUnusedLocals": true, // No unused variables
+  "noUnusedParameters": true, // No unused parameters
+  "isolatedModules": true, // Module isolation
+  "isolatedDeclarations": true, // Declaration isolation
+  // ... comprehensive strict configuration
+ },
 }
 ```
 
 **Type Safety Rules**:
+
 - ❌ No `any`, `unknown`, `null`, `undefined` when avoidable
 - ✅ Interface-first design for all IPC and events
 - ✅ Strict union types and discriminated unions
@@ -472,26 +493,26 @@ export const useSitesStore = create<SitesStore>()((set, get) => {
 ```typescript
 // Frontend usage (with store integration)
 await withErrorHandling(
-    async () => {
-        const result = await window.electronAPI.sites.addSite(siteData);
-        return result;
-    },
-    {
-        clearError: () => errorStore.clearStoreError("sites"),
-        setError: (error) => errorStore.setStoreError("sites", error),
-        setLoading: (loading) => errorStore.setOperationLoading("addSite", loading),
-    }
+ async () => {
+  const result = await window.electronAPI.sites.addSite(siteData);
+  return result;
+ },
+ {
+  clearError: () => errorStore.clearStoreError("sites"),
+  setError: (error) => errorStore.setStoreError("sites", error),
+  setLoading: (loading) => errorStore.setOperationLoading("addSite", loading),
+ }
 );
 
 // Backend usage (with logging)
 await withErrorHandling(
-    async () => {
-        return await this.repository.performOperation();
-    },
-    {
-        logger: logger,
-        operationName: "performOperation"
-    }
+ async () => {
+  return await this.repository.performOperation();
+ },
+ {
+  logger: logger,
+  operationName: "performOperation",
+ }
 );
 ```
 
@@ -501,29 +522,32 @@ await withErrorHandling(
 
 ```typescript
 export const baseMonitorSchema = z.object({
-    id: z.string().min(1),
-    type: z.enum(["http", "port", "ping"]),
-    status: z.enum(["up", "down", "pending", "paused"]),
-    monitoring: z.boolean(),
-    checkInterval: z.number().min(5000).max(2_592_000_000), // 5s to 30 days
-    timeout: z.number().min(1000).max(300_000), // 1s to 5min
-    retryAttempts: z.number().min(0).max(10),
-    responseTime: z.number().min(-1), // -1 = never checked
-    lastChecked: z.date().optional(),
+ id: z.string().min(1),
+ type: z.enum(["http", "port", "ping"]),
+ status: z.enum(["up", "down", "pending", "paused"]),
+ monitoring: z.boolean(),
+ checkInterval: z.number().min(5000).max(2_592_000_000), // 5s to 30 days
+ timeout: z.number().min(1000).max(300_000), // 1s to 5min
+ retryAttempts: z.number().min(0).max(10),
+ responseTime: z.number().min(-1), // -1 = never checked
+ lastChecked: z.date().optional(),
 });
 
 export const httpMonitorSchema = baseMonitorSchema.extend({
-    type: z.literal("http"),
-    url: z.string().refine((val) => validator.isURL(val, {
-        protocols: ["http", "https"],
-        require_protocol: true,
-        require_tld: true,
-        // ... comprehensive URL validation
-    })),
+ type: z.literal("http"),
+ url: z.string().refine((val) =>
+  validator.isURL(val, {
+   protocols: ["http", "https"],
+   require_protocol: true,
+   require_tld: true,
+   // ... comprehensive URL validation
+  })
+ ),
 });
 ```
 
 **Validation Utilities** (`shared/validation/validatorUtils.ts`):
+
 - Consistent validation across frontend/backend
 - Security-focused patterns using validator.js
 - Type-safe validation with automatic TypeScript inference
@@ -558,25 +582,24 @@ public addSiteSync(site: Site, db: Database): Site {
 ```typescript
 // Organized by functional domains
 const electronAPI = {
-    sites: {
-        addSite: (site: Site) => ipcRenderer.invoke("add-site", site),
-        getSites: () => ipcRenderer.invoke("get-sites"),
-        updateSite: (id: string, updates: Partial<Site>) => 
-            ipcRenderer.invoke("update-site", id, updates),
-        // ... all site operations
-    },
-    monitoring: {
-        startMonitoring: () => ipcRenderer.invoke("start-monitoring"),
-        stopMonitoring: () => ipcRenderer.invoke("stop-monitoring"),
-        checkSiteNow: (siteId: string, monitorId: string) =>
-            ipcRenderer.invoke("check-site-now", siteId, monitorId),
-        // ... all monitoring operations
-    },
-    // ... other domains
+ sites: {
+  addSite: (site: Site) => ipcRenderer.invoke("add-site", site),
+  getSites: () => ipcRenderer.invoke("get-sites"),
+  updateSite: (id: string, updates: Partial<Site>) => ipcRenderer.invoke("update-site", id, updates),
+  // ... all site operations
+ },
+ monitoring: {
+  startMonitoring: () => ipcRenderer.invoke("start-monitoring"),
+  stopMonitoring: () => ipcRenderer.invoke("stop-monitoring"),
+  checkSiteNow: (siteId: string, monitorId: string) => ipcRenderer.invoke("check-site-now", siteId, monitorId),
+  // ... all monitoring operations
+ },
+ // ... other domains
 };
 ```
 
 **IPC Handlers** (`electron/services/ipc/IpcService.ts`):
+
 - Standardized registration with validators
 - Comprehensive error handling and logging
 - Type-safe message contracts
@@ -587,21 +610,22 @@ const electronAPI = {
 
 ```typescript
 export interface MonitorCheckResult {
-    /** Optional human-readable details about the check result */
-    details?: string;
-    
-    /** Optional error message if the check failed */
-    error?: string;
-    
-    /** Response time in milliseconds (REQUIRED) */
-    responseTime: number;
-    
-    /** Status outcome of the check (REQUIRED) */
-    status: "up" | "down";
+ /** Optional human-readable details about the check result */
+ details?: string;
+
+ /** Optional error message if the check failed */
+ error?: string;
+
+ /** Response time in milliseconds (REQUIRED) */
+ responseTime: number;
+
+ /** Status outcome of the check (REQUIRED) */
+ status: "up" | "down";
 }
 ```
 
 **Critical Notes**:
+
 - `responseTime` is **REQUIRED** (not optional as some docs claim)
 - `details` should be populated for proper history tracking
 - Return `status: "up" | "down"` only (not "pending" or "paused")
@@ -699,41 +723,42 @@ public getWindowService(): WindowService
 
 ```typescript
 interface UptimeEvents {
-    // Database Events
-    'database:operation-started': DatabaseOperationStartedEventData;
-    'database:operation-completed': DatabaseOperationCompletedEventData;
-    'database:migration-started': DatabaseMigrationStartedEventData;
-    'database:backup-created': DatabaseBackupCreatedEventData;
-    
-    // Monitoring Events
-    'monitor:status-updated': MonitorStatusUpdateEventData;
-    'monitor:check-started': MonitorCheckStartedEventData;
-    'monitor:check-completed': MonitorCheckCompletedEventData;
-    'monitor:up': MonitorUpEventData;
-    'monitor:down': MonitorDownEventData;
-    
-    // Site Events
-    'site:added': SiteAddedEventData;
-    'site:updated': SiteUpdatedEventData;
-    'site:deleted': SiteDeletedEventData;
-    'site:monitoring-started': SiteMonitoringStartedEventData;
-    'site:monitoring-stopped': SiteMonitoringStoppedEventData;
-    
-    // System Events
-    'system:startup-completed': SystemStartupCompletedEventData;
-    'system:shutdown-initiated': SystemShutdownInitiatedEventData;
-    'system:focus-changed': SystemFocusChangedEventData;
-    
-    // UI Events
-    'ui:modal-opened': UiModalOpenedEventData;
-    'ui:theme-changed': UiThemeChangedEventData;
-    'ui:view-changed': UiViewChangedEventData;
-    
-    // ... 50+ total events with complete type safety
+ // Database Events
+ "database:operation-started": DatabaseOperationStartedEventData;
+ "database:operation-completed": DatabaseOperationCompletedEventData;
+ "database:migration-started": DatabaseMigrationStartedEventData;
+ "database:backup-created": DatabaseBackupCreatedEventData;
+
+ // Monitoring Events
+ "monitor:status-updated": MonitorStatusUpdateEventData;
+ "monitor:check-started": MonitorCheckStartedEventData;
+ "monitor:check-completed": MonitorCheckCompletedEventData;
+ "monitor:up": MonitorUpEventData;
+ "monitor:down": MonitorDownEventData;
+
+ // Site Events
+ "site:added": SiteAddedEventData;
+ "site:updated": SiteUpdatedEventData;
+ "site:deleted": SiteDeletedEventData;
+ "site:monitoring-started": SiteMonitoringStartedEventData;
+ "site:monitoring-stopped": SiteMonitoringStoppedEventData;
+
+ // System Events
+ "system:startup-completed": SystemStartupCompletedEventData;
+ "system:shutdown-initiated": SystemShutdownInitiatedEventData;
+ "system:focus-changed": SystemFocusChangedEventData;
+
+ // UI Events
+ "ui:modal-opened": UiModalOpenedEventData;
+ "ui:theme-changed": UiThemeChangedEventData;
+ "ui:view-changed": UiViewChangedEventData;
+
+ // ... 50+ total events with complete type safety
 }
 ```
 
 **Event Metadata** (Automatic):
+
 - `correlationId` - UUID for request tracing
 - `timestamp` - ISO string timestamp
 - `environment` - development/production
@@ -745,41 +770,44 @@ interface UptimeEvents {
 ### Dual Test Configuration
 
 **Frontend Tests** (`vitest.config.ts`):
+
 ```typescript
 export default defineConfig((configEnv) =>
-    mergeConfig(
-        viteConfig(configEnv),
-        defineConfig({
-            test: {
-                environment: 'jsdom',
-                coverage: {
-                    provider: 'v8',
-                    reporter: ['text', 'json', 'lcov', 'html'],
-                    reportsDirectory: './coverage/',
-                },
-                setupFiles: ['src/test/setup.ts'],
-            },
-        })
-    )
+ mergeConfig(
+  viteConfig(configEnv),
+  defineConfig({
+   test: {
+    environment: "jsdom",
+    coverage: {
+     provider: "v8",
+     reporter: ["text", "json", "lcov", "html"],
+     reportsDirectory: "./coverage/",
+    },
+    setupFiles: ["src/test/setup.ts"],
+   },
+  })
+ )
 );
 ```
 
 **Backend Tests** (`vitest.electron.config.ts`):
+
 ```typescript
 export default defineConfig({
-    test: {
-        environment: 'node',
-        coverage: {
-            provider: 'v8',
-            reporter: ['text', 'json', 'lcov', 'html'],
-            reportsDirectory: './coverage/electron/',
-        },
-        setupFiles: ['electron/test/setup.ts'],
-    },
+ test: {
+  environment: "node",
+  coverage: {
+   provider: "v8",
+   reporter: ["text", "json", "lcov", "html"],
+   reportsDirectory: "./coverage/electron/",
+  },
+  setupFiles: ["electron/test/setup.ts"],
+ },
 });
 ```
 
 **Test Commands**:
+
 ```bash
 # Frontend tests
 npm run test                    # Run frontend tests
@@ -787,7 +815,7 @@ npm run test:coverage           # Frontend with coverage
 npm run test:ui                 # Interactive UI
 npm run test:watch              # Watch mode
 
-# Backend tests  
+# Backend tests
 npm run test:electron           # Run electron tests
 npm run test:electron:coverage  # Electron with coverage
 npm run test:electron:ui        # Interactive UI
@@ -800,6 +828,7 @@ npm run test:codecov            # Codecov reporting
 ```
 
 **Coverage Integration**:
+
 - **Frontend Flag**: `frontend` - covers `src/` directory
 - **Backend Flag**: `electron` - covers `electron/` directory
 - **Codecov**: Automatic dual-flag reporting via GitHub Actions
@@ -807,53 +836,56 @@ npm run test:codecov            # Codecov reporting
 ### Test Patterns
 
 **Repository Testing**:
+
 ```typescript
-describe('SiteRepository', () => {
-    let repository: SiteRepository;
-    let mockDatabaseService: MockDatabaseService;
-    
-    beforeEach(() => {
-        mockDatabaseService = createMockDatabaseService();
-        repository = new SiteRepository(mockDatabaseService);
-    });
-    
-    it('should add site with transaction', async () => {
-        // Test async public methods
-        const site = await repository.addSite(mockSite);
-        expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
-    });
+describe("SiteRepository", () => {
+ let repository: SiteRepository;
+ let mockDatabaseService: MockDatabaseService;
+
+ beforeEach(() => {
+  mockDatabaseService = createMockDatabaseService();
+  repository = new SiteRepository(mockDatabaseService);
+ });
+
+ it("should add site with transaction", async () => {
+  // Test async public methods
+  const site = await repository.addSite(mockSite);
+  expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
+ });
 });
 ```
 
 **Store Testing**:
+
 ```typescript
-describe('useSitesStore', () => {
-    let store: UseBoundStore<StoreApi<SitesStore>>;
-    
-    beforeEach(() => {
-        store = useSitesStore;
-        store.getState().clearAllSites();
-    });
-    
-    it('should handle async operations with error handling', async () => {
-        await store.getState().createSite(mockSiteData);
-        expect(store.getState().sites).toHaveLength(1);
-    });
+describe("useSitesStore", () => {
+ let store: UseBoundStore<StoreApi<SitesStore>>;
+
+ beforeEach(() => {
+  store = useSitesStore;
+  store.getState().clearAllSites();
+ });
+
+ it("should handle async operations with error handling", async () => {
+  await store.getState().createSite(mockSiteData);
+  expect(store.getState().sites).toHaveLength(1);
+ });
 });
 ```
 
 **Component Testing**:
+
 ```typescript
 describe('SiteCard', () => {
     it('should render site information correctly', () => {
         render(<SiteCard site={mockSite} />);
         expect(screen.getByText(mockSite.name)).toBeInTheDocument();
     });
-    
+
     it('should handle monitoring toggle', async () => {
         const user = userEvent.setup();
         render(<SiteCard site={mockSite} />);
-        
+
         await user.click(screen.getByRole('button', { name: /toggle monitoring/i }));
         // Assert monitoring state change
     });
@@ -871,7 +903,7 @@ npm run electron-dev           # Concurrent Vite + Electron
 npm run electron-dev:debug     # With debugging enabled
 npm run dev:with-sqlite3       # Copy WASM + start dev
 
-# Building  
+# Building
 npm run build                  # Full production build
 npm run build:electron-main    # Electron main process only
 npm run build:prepublish       # Lint + test + build
@@ -898,106 +930,119 @@ npm run docusaurus:start       # Local documentation server
 ### Build Configuration Details
 
 **Vite Configuration** (`vite.config.ts`):
+
 ```typescript
 export default defineConfig(() => ({
-    base: "./",                    // Relative paths for Electron
-    target: "es2024",              // Modern JavaScript
-    esbuild: {
-        target: "es2024",
-        keepNames: true,           // Better coverage reports
-        include: ["**/*.{js,ts,jsx,tsx,mjs}"], // Comprehensive transpilation
-    },
-    build: {
-        emptyOutDir: true,
-        sourcemap: true,           // Debugging support
-        outDir: "dist",
-        rollupOptions: {
-            // Optimized for Electron builds
-        },
-    },
-    plugins: [
-        react(),                   // React support
-        electron([                 // Electron processes
-            {
-                entry: "electron/main.ts",
-                vite: electronMainConfig,
-            },
-            {
-                entry: "electron/preload.ts", 
-                vite: electronPreloadConfig,
-            },
-        ]),
-        ViteMcp(),                 // MCP integration
-        viteStaticCopy([           // Copy WASM files
-            {
-                src: "node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm",
-                dest: ".",
-            },
-        ]),
-        codecovVitePlugin({        // Coverage integration
-            enableBundleAnalysis: true,
-            bundleName: "uptime-watcher",
-        }),
-    ],
+ base: "./", // Relative paths for Electron
+ target: "es2024", // Modern JavaScript
+ esbuild: {
+  target: "es2024",
+  keepNames: true, // Better coverage reports
+  include: ["**/*.{js,ts,jsx,tsx,mjs}"], // Comprehensive transpilation
+ },
+ build: {
+  emptyOutDir: true,
+  sourcemap: true, // Debugging support
+  outDir: "dist",
+  rollupOptions: {
+   // Optimized for Electron builds
+  },
+ },
+ plugins: [
+  react(), // React support
+  electron([
+   // Electron processes
+   {
+    entry: "electron/main.ts",
+    vite: electronMainConfig,
+   },
+   {
+    entry: "electron/preload.ts",
+    vite: electronPreloadConfig,
+   },
+  ]),
+  ViteMcp(), // MCP integration
+  viteStaticCopy([
+   // Copy WASM files
+   {
+    src: "node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm",
+    dest: ".",
+   },
+  ]),
+  codecovVitePlugin({
+   // Coverage integration
+   enableBundleAnalysis: true,
+   bundleName: "uptime-watcher",
+  }),
+ ],
 }));
 ```
 
 **Electron Builder Configuration** (package.json):
+
 ```json
 {
-    "build": {
-        "appId": "io.github.uptimewatcher",
-        "productName": "Uptime Watcher",
-        "directories": {
-            "output": "release"
-        },
-        "files": [
-            "dist/**/*",
-            "dist-electron/**/*",
-            "!**/node_modules/**/*"
-        ],
-        "extraFiles": [
-            {
-                "from": "node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm",
-                "to": "node-sqlite3-wasm.wasm"
-            }
-        ],
-        "mac": { /* macOS specific config */ },
-        "win": { /* Windows specific config */ },
-        "linux": { /* Linux specific config */ }
-    }
+ "build": {
+  "appId": "io.github.uptimewatcher",
+  "productName": "Uptime Watcher",
+  "directories": {
+   "output": "release"
+  },
+  "files": [
+   "dist/**/*",
+   "dist-electron/**/*",
+   "!**/node_modules/**/*"
+  ],
+  "extraFiles": [
+   {
+    "from": "node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm",
+    "to": "node-sqlite3-wasm.wasm"
+   }
+  ],
+  "mac": {
+   /* macOS specific config */
+  },
+  "win": {
+   /* Windows specific config */
+  },
+  "linux": {
+   /* Linux specific config */
+  }
+ }
 }
 ```
 
 ### Environment & Path Configuration
 
 **Path Aliases** (tsconfig.json):
+
 ```jsonc
 {
-    "compilerOptions": {
-        "baseUrl": ".",
-        "paths": {
-            "@/*": ["src/*"],           // Frontend components and utilities
-            "@shared/*": ["shared/*"],   // Shared types and utilities
-            "@electron/*": ["electron/*"] // Backend services and utilities
-        }
-    }
+ "compilerOptions": {
+  "baseUrl": ".",
+  "paths": {
+   "@/*": ["src/*"], // Frontend components and utilities
+   "@shared/*": ["shared/*"], // Shared types and utilities
+   "@electron/*": ["electron/*"], // Backend services and utilities
+  },
+ },
 }
 ```
 
 **Environment Detection** (`shared/utils/environment.ts`):
+
 ```typescript
-export const isDevelopment = process.env.NODE_ENV === 'development';
-export const isProduction = process.env.NODE_ENV === 'production';
-export const isTest = process.env.NODE_ENV === 'test';
+export const isDevelopment = process.env.NODE_ENV === "development";
+export const isProduction = process.env.NODE_ENV === "production";
+export const isTest = process.env.NODE_ENV === "test";
 
 export function getEnvVar(name: string, defaultValue?: string): string {
-    const value = process.env[name];
-    if (value === undefined) {
-        if (defaultValue !== undefined) return defaultValue;
-        throw new Error(`Required environment variable ${name} is not set`);
-    }
-    return value;
+ const value = process.env[name];
+ if (value === undefined) {
+  if (defaultValue !== undefined) return defaultValue;
+  throw new Error(`Required environment variable ${name} is not set`);
+ }
+ return value;
 }
 ```
 
@@ -1064,46 +1109,47 @@ export function getEnvVar(name: string, defaultValue?: string): string {
 ### Common Pitfalls to Avoid ❌
 
 1. **Direct Database Access**
+
    ```typescript
    // ❌ WRONG - Direct database access
    const result = db.prepare("SELECT * FROM sites").all();
-   
+
    // ✅ CORRECT - Repository pattern
    const sites = await siteRepository.getAllSites();
    ```
 
 2. **Untyped IPC Communication**
+
    ```typescript
    // ❌ WRONG - Untyped IPC
    ipcRenderer.invoke("some-operation", data);
-   
+
    // ✅ CORRECT - Typed IPC
    window.electronAPI.sites.addSite(siteData);
    ```
 
 3. **Direct State Mutation**
+
    ```typescript
    // ❌ WRONG - Direct mutation
    store.sites.push(newSite);
-   
+
    // ✅ CORRECT - Store actions
    store.addSite(newSite);
    ```
 
 4. **Incorrect Error Handling**
+
    ```typescript
    // ❌ WRONG - Swallowing errors
    try {
-       await operation();
+    await operation();
    } catch (error) {
-       console.log(error);
+    console.log(error);
    }
-   
+
    // ✅ CORRECT - Proper error handling
-   await withErrorHandling(
-       () => operation(),
-       { logger, operationName: "operation" }
-   );
+   await withErrorHandling(() => operation(), { logger, operationName: "operation" });
    ```
 
 ### Performance Considerations 🚀
@@ -1135,6 +1181,7 @@ export function getEnvVar(name: string, defaultValue?: string): string {
 ## 🔧 Common Development Tasks
 
 ### Adding a New Monitor Type
+
 1. **Interface**: Implement `IMonitorService` in `electron/services/monitoring/`
 2. **Registration**: Add to monitoring service factory
 3. **Validation**: Create validation schema in `shared/validation/`
@@ -1142,18 +1189,21 @@ export function getEnvVar(name: string, defaultValue?: string): string {
 5. **Testing**: Unit tests for both backend and frontend
 
 ### Adding IPC Handlers
+
 1. **Handler**: Create in `electron/services/ipc/` following domain pattern
 2. **Validation**: Add type guards in `validators.ts`
 3. **Types**: Define interfaces for parameters and responses
 4. **Frontend**: Use via `window.electronAPI` with type safety
 
 ### Adding Database Entities
+
 1. **Repository**: Create using repository template
 2. **Migration**: Add database schema changes
 3. **Manager**: Add business logic orchestration
 4. **IPC**: Expose operations via IPC handlers
 
 ### Frontend Component Development
+
 1. **Store**: Create Zustand store for state management
 2. **Validation**: Use shared validation schemas
 3. **IPC Integration**: Communicate with backend via typed IPC
@@ -1162,41 +1212,49 @@ export function getEnvVar(name: string, defaultValue?: string): string {
 ## 📚 Essential Files Reference
 
 ### Entry Points
+
 - **Electron Main**: `electron/main.ts` - Application lifecycle
 - **React Renderer**: `src/main.tsx` - UI application entry
 - **IPC Bridge**: `electron/preload.ts` - Secure communication layer
 
 ### Core Architecture
+
 - **Service Container**: `electron/services/ServiceContainer.ts` - DI container
 - **Event System**: `electron/events/TypedEventBus.ts` - Type-safe events
 - **Main Orchestrator**: `electron/UptimeOrchestrator.ts` - Application coordinator
 
 ### Database Layer
+
 - **Database Service**: `electron/services/database/DatabaseService.ts`
 - **Site Repository**: `electron/services/database/SiteRepository.ts`
 - **Monitor Repository**: `electron/services/database/MonitorRepository.ts`
 - **History Repository**: `electron/services/database/HistoryRepository.ts`
 
 ### Business Logic
+
 - **Site Manager**: `electron/managers/SiteManager.ts` - Site operations
 - **Monitor Manager**: `electron/managers/MonitorManager.ts` - Monitoring logic
 - **Enhanced Monitor Checker**: `electron/services/monitoring/EnhancedMonitorChecker.ts`
 
 ### State Management
+
 - **Sites Store**: `src/stores/sites/useSitesStore.ts` - Main data store
 - **Settings Store**: `src/stores/settings/useSettingsStore.ts` - Preferences
 - **Error Store**: `src/stores/error/useErrorStore.ts` - Error handling
 
 ### Type Definitions
+
 - **Shared Types**: `shared/types.ts` - Core domain types
 - **Event Types**: `electron/events/eventTypes.ts` - Event definitions
 - **Store Types**: `src/stores/types.ts` - Frontend store types
 
 ### Validation
+
 - **Schemas**: `shared/validation/schemas.ts` - Zod validation schemas
 - **Utilities**: `shared/validation/validatorUtils.ts` - Validation helpers
 
 ### Configuration
+
 - **TypeScript**: `tsconfig.json`, `tsconfig.electron.json`
 - **Build**: `vite.config.ts`, `package.json`
 - **Testing**: `vitest.config.ts`, `vitest.electron.config.ts`
@@ -1204,22 +1262,26 @@ export function getEnvVar(name: string, defaultValue?: string): string {
 ## 📚 Documentation Quick Links
 
 ### For Architecture Understanding
+
 - `docs/Architecture/ADRs/` - Key architectural decisions
 - `docs/Architecture/Patterns/Development-Patterns-Guide.md` - Coding patterns
 - `docs/Architecture/TSDoc-Standards.md` - Documentation standards
 
 ### For Implementation
+
 - `docs/Guides/NEW_MONITOR_TYPE_IMPLEMENTATION.md` - Adding monitor types
 - `docs/Guides/UI-Feature-Development-Guide.md` - Frontend development
 - `docs/Architecture/Templates/` - Code templates for common patterns
 
 ### For Context
+
 - `docs/Guides/Monitoring-Race-Condition-Solution-Plan.md` - Monitoring architecture
 - `docs/Guides/Fallback-System-Usage-Analysis.md` - Migration history
 
 ## 🎯 AI Assistant Guidelines
 
 ### When Helping with Code
+
 1. **Check Documentation First**: Most patterns are documented
 2. **Follow Established Patterns**: Don't invent new patterns
 3. **Maintain Type Safety**: All code must be properly typed
@@ -1228,12 +1290,14 @@ export function getEnvVar(name: string, defaultValue?: string): string {
 6. **Test Completeness**: Ensure both frontend and backend are tested
 
 ### Common AI Tasks
+
 - **Bug Fixes**: Check error handling patterns and transaction safety
 - **Feature Addition**: Follow the service/repository/IPC pattern
 - **Refactoring**: Maintain existing interfaces and event contracts
 - **Documentation**: Use TSDoc standards for all new code
 
 ### Integration Points
+
 - **IPC Communication**: All frontend ↔ backend via typed IPC
 - **Event System**: Cross-service communication via TypedEventBus
 - **Database**: All access via repository pattern with transactions

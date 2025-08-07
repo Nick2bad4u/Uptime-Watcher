@@ -32,26 +32,32 @@ describe("Component Coverage Boost", () => {
                 },
                 shouldShowSites: (props: SiteListProps) => {
                     return props.sites.length > 0 && !props.loading && !props.error;
-                }
+                },
             };
 
             expect(SiteListLogic.shouldShowEmptyState({ sites: [], loading: false, error: null })).toBe(true);
             expect(SiteListLogic.shouldShowLoading({ sites: [], loading: true, error: null })).toBe(true);
             expect(SiteListLogic.shouldShowError({ sites: [], loading: false, error: "Network error" })).toBe(true);
-            expect(SiteListLogic.shouldShowSites({ sites: [{ id: "1", name: "Test", status: "up" }], loading: false, error: null })).toBe(true);
+            expect(
+                SiteListLogic.shouldShowSites({
+                    sites: [{ id: "1", name: "Test", status: "up" }],
+                    loading: false,
+                    error: null,
+                })
+            ).toBe(true);
         });
 
         it("should handle site list rendering scenarios", () => {
             const mockSites = [
                 { id: "1", name: "Site 1", status: "up" },
                 { id: "2", name: "Site 2", status: "down" },
-                { id: "3", name: "Site 3", status: "pending" }
+                { id: "3", name: "Site 3", status: "pending" },
             ];
 
             const renderSiteList = (sites: typeof mockSites) => {
-                return sites.map(site => ({
+                return sites.map((site) => ({
                     ...site,
-                    statusColor: site.status === "up" ? "green" : site.status === "down" ? "red" : "yellow"
+                    statusColor: site.status === "up" ? "green" : site.status === "down" ? "red" : "yellow",
                 }));
             };
 
@@ -83,7 +89,7 @@ describe("Component Coverage Boost", () => {
                         return { ...currentState, currentTab: siteDetailsLogic.getDefaultTab() };
                     }
                     return { ...currentState, currentTab: newTab };
-                }
+                },
             };
 
             const initialState: SiteDetailsState = {
@@ -91,7 +97,7 @@ describe("Component Coverage Boost", () => {
                 siteId: "123",
                 data: null,
                 loading: false,
-                error: null
+                error: null,
             };
 
             expect(siteDetailsLogic.getTabKey("overview", "123")).toBe("overview-123");
@@ -119,9 +125,9 @@ describe("Component Coverage Boost", () => {
                 getStatusIcon: (status: string) => {
                     const icons: Record<string, string> = {
                         up: "✅",
-                        down: "❌", 
+                        down: "❌",
                         pending: "⏳",
-                        unknown: "❓"
+                        unknown: "❓",
                     };
                     return icons[status] || icons.unknown;
                 },
@@ -137,7 +143,7 @@ describe("Component Coverage Boost", () => {
                     } catch {
                         return url;
                     }
-                }
+                },
             };
 
             expect(siteHeaderLogic.getStatusIcon("up")).toBe("✅");
@@ -163,21 +169,21 @@ describe("Component Coverage Boost", () => {
                     { key: "overview", label: "Overview", icon: "📊" },
                     { key: "analytics", label: "Analytics", icon: "📈", disabled: !hasData },
                     { key: "history", label: "History", icon: "📝" },
-                    { key: "settings", label: "Settings", icon: "⚙️" }
+                    { key: "settings", label: "Settings", icon: "⚙️" },
                 ],
                 getActiveItem: (items: NavigationItem[], currentTab: string) => {
-                    return items.find(item => item.key === currentTab) || items[0];
+                    return items.find((item) => item.key === currentTab) || items[0];
                 },
                 getNextTab: (items: NavigationItem[], currentTab: string) => {
-                    const currentIndex = items.findIndex(item => item.key === currentTab);
+                    const currentIndex = items.findIndex((item) => item.key === currentTab);
                     const nextIndex = (currentIndex + 1) % items.length;
                     return items[nextIndex].key;
                 },
                 getPreviousTab: (items: NavigationItem[], currentTab: string) => {
-                    const currentIndex = items.findIndex(item => item.key === currentTab);
+                    const currentIndex = items.findIndex((item) => item.key === currentTab);
                     const prevIndex = currentIndex === 0 ? items.length - 1 : currentIndex - 1;
                     return items[prevIndex].key;
-                }
+                },
             };
 
             const items = navigationLogic.getNavigationItems("123", true);
@@ -228,18 +234,18 @@ describe("Component Coverage Boost", () => {
                 },
                 validateForm: (data: FormData) => {
                     const errors: string[] = [];
-                    
+
                     const nameError = formValidation.validateSiteName(data.siteName);
                     if (nameError) errors.push(nameError);
-                    
+
                     const urlError = formValidation.validateUrl(data.url);
                     if (urlError) errors.push(urlError);
-                    
+
                     const monitorError = formValidation.validateMonitors(data.monitors);
                     if (monitorError) errors.push(monitorError);
-                    
+
                     return errors;
-                }
+                },
             };
 
             expect(formValidation.validateSiteName("")).toBe("Site name is required");
@@ -253,14 +259,14 @@ describe("Component Coverage Boost", () => {
             const validForm: FormData = {
                 siteName: "Test Site",
                 url: "https://example.com",
-                monitors: [{ type: "http", name: "HTTP Check" }]
+                monitors: [{ type: "http", name: "HTTP Check" }],
             };
             expect(formValidation.validateForm(validForm)).toEqual([]);
 
             const invalidForm: FormData = {
                 siteName: "",
                 url: "invalid",
-                monitors: []
+                monitors: [],
             };
             const errors = formValidation.validateForm(invalidForm);
             expect(errors).toHaveLength(3);
@@ -285,25 +291,25 @@ describe("Component Coverage Boost", () => {
                     fields: [
                         { name: "url", type: "text", required: true },
                         { name: "timeout", type: "number", required: false },
-                        { name: "followRedirects", type: "boolean", required: false }
-                    ]
+                        { name: "followRedirects", type: "boolean", required: false },
+                    ],
                 },
                 {
                     type: "ping",
                     fields: [
                         { name: "host", type: "text", required: true },
-                        { name: "count", type: "number", required: false }
-                    ]
-                }
+                        { name: "count", type: "number", required: false },
+                    ],
+                },
             ];
 
             const fieldLogic = {
                 getFieldsForType: (type: string) => {
-                    return monitorConfigs.find(config => config.type === type)?.fields || [];
+                    return monitorConfigs.find((config) => config.type === type)?.fields || [];
                 },
                 getRequiredFields: (type: string) => {
                     const fields = fieldLogic.getFieldsForType(type);
-                    return fields.filter(field => field.required);
+                    return fields.filter((field) => field.required);
                 },
                 validateFieldValue: (field: MonitorFieldConfig["fields"][0], value: any) => {
                     if (field.required && (value === null || value === undefined || value === "")) {
@@ -313,13 +319,17 @@ describe("Component Coverage Boost", () => {
                         return field.validation(value);
                     }
                     return null;
-                }
+                },
             };
 
             expect(fieldLogic.getFieldsForType("http")).toHaveLength(3);
             expect(fieldLogic.getRequiredFields("http")).toHaveLength(1);
-            expect(fieldLogic.validateFieldValue({ name: "url", type: "text", required: true }, "")).toBe("url is required");
-            expect(fieldLogic.validateFieldValue({ name: "url", type: "text", required: true }, "https://example.com")).toBe(null);
+            expect(fieldLogic.validateFieldValue({ name: "url", type: "text", required: true }, "")).toBe(
+                "url is required"
+            );
+            expect(
+                fieldLogic.validateFieldValue({ name: "url", type: "text", required: true }, "https://example.com")
+            ).toBe(null);
         });
     });
 
@@ -338,18 +348,18 @@ describe("Component Coverage Boost", () => {
                     props: {
                         status,
                         lastCheck: lastCheck?.toISOString(),
-                        color: status === "up" ? "green" : status === "down" ? "red" : "gray"
+                        color: status === "up" ? "green" : status === "down" ? "red" : "gray",
                     },
-                    visible: true
+                    visible: true,
                 }),
                 createActionButton: (action: string, enabled: boolean): MonitorUIComponent => ({
                     type: "action",
                     props: {
                         action,
                         enabled,
-                        variant: action === "delete" ? "danger" : "primary"
+                        variant: action === "delete" ? "danger" : "primary",
                     },
-                    visible: enabled
+                    visible: enabled,
                 }),
                 createMetricDisplay: (label: string, value: number, unit: string): MonitorUIComponent => ({
                     type: "metric",
@@ -357,13 +367,13 @@ describe("Component Coverage Boost", () => {
                         label,
                         value,
                         unit,
-                        formatted: `${value}${unit}`
+                        formatted: `${value}${unit}`,
                     },
-                    visible: value !== null && value !== undefined
+                    visible: value !== null && value !== undefined,
                 }),
                 getVisibleComponents: (components: MonitorUIComponent[]) => {
-                    return components.filter(component => component.visible);
-                }
+                    return components.filter((component) => component.visible);
+                },
             };
 
             const statusComponent = monitorUILogic.createStatusComponent("up", new Date());
@@ -401,7 +411,7 @@ describe("Component Coverage Boost", () => {
                         down: "#ef4444",
                         pending: "#f59e0b",
                         paused: "#6b7280",
-                        unknown: "#6b7280"
+                        unknown: "#6b7280",
                     };
                     return colors[status] || colors.unknown;
                 },
@@ -411,7 +421,7 @@ describe("Component Coverage Boost", () => {
                         down: "●",
                         pending: "●",
                         paused: "⏸",
-                        unknown: "?"
+                        unknown: "?",
                     };
                     return icons[status] || icons.unknown;
                 },
@@ -423,14 +433,16 @@ describe("Component Coverage Boost", () => {
                     if (props.size) baseClasses.push(`size-${props.size}`);
                     baseClasses.push(`status-${props.status}`);
                     return baseClasses.join(" ");
-                }
+                },
             };
 
             expect(statusBadgeLogic.getStatusColor("up")).toBe("#10b981");
             expect(statusBadgeLogic.getStatusColor("invalid")).toBe("#6b7280");
             expect(statusBadgeLogic.getStatusIcon("paused")).toBe("⏸");
             expect(statusBadgeLogic.getStatusText("up")).toBe("Up");
-            expect(statusBadgeLogic.getBadgeClasses({ status: "up", size: "large" })).toBe("status-badge size-large status-up");
+            expect(statusBadgeLogic.getBadgeClasses({ status: "up", size: "large" })).toBe(
+                "status-badge size-large status-up"
+            );
         });
     });
 
@@ -450,24 +462,26 @@ describe("Component Coverage Boost", () => {
             const chartLogic = {
                 formatChartData: (rawData: Array<{ timestamp: string; value: number }>, label: string): ChartData => {
                     return {
-                        labels: rawData.map(item => new Date(item.timestamp).toLocaleTimeString()),
-                        datasets: [{
-                            label,
-                            data: rawData.map(item => item.value),
-                            borderColor: "#3b82f6",
-                            backgroundColor: "#3b82f620"
-                        }]
+                        labels: rawData.map((item) => new Date(item.timestamp).toLocaleTimeString()),
+                        datasets: [
+                            {
+                                label,
+                                data: rawData.map((item) => item.value),
+                                borderColor: "#3b82f6",
+                                backgroundColor: "#3b82f620",
+                            },
+                        ],
                     };
                 },
                 getChartOptions: (title: string) => ({
                     responsive: true,
                     plugins: {
                         legend: { position: "top" as const },
-                        title: { display: true, text: title }
+                        title: { display: true, text: title },
                     },
                     scales: {
-                        y: { beginAtZero: true }
-                    }
+                        y: { beginAtZero: true },
+                    },
                 }),
                 calculateTrend: (data: number[]) => {
                     if (data.length < 2) return "insufficient-data";
@@ -476,12 +490,12 @@ describe("Component Coverage Boost", () => {
                     if (last > previous) return "increasing";
                     if (last < previous) return "decreasing";
                     return "stable";
-                }
+                },
             };
 
             const rawData = [
                 { timestamp: "2024-01-01T10:00:00Z", value: 100 },
-                { timestamp: "2024-01-01T11:00:00Z", value: 150 }
+                { timestamp: "2024-01-01T11:00:00Z", value: 150 },
             ];
 
             const chartData = chartLogic.formatChartData(rawData, "Response Time");
@@ -509,7 +523,7 @@ describe("Component Coverage Boost", () => {
                 filterDataByTimeRange: (data: HistoryChartProps["data"], timeRange: HistoryChartProps["timeRange"]) => {
                     const now = new Date();
                     const cutoffTime = new Date();
-                    
+
                     switch (timeRange) {
                         case "1h":
                             cutoffTime.setHours(now.getHours() - 1);
@@ -524,27 +538,27 @@ describe("Component Coverage Boost", () => {
                             cutoffTime.setDate(now.getDate() - 7);
                             break;
                     }
-                    
-                    return data.filter(item => new Date(item.timestamp) >= cutoffTime);
+
+                    return data.filter((item) => new Date(item.timestamp) >= cutoffTime);
                 },
                 aggregateByStatus: (data: HistoryChartProps["data"]) => {
                     const statusCounts: Record<string, number> = {};
-                    data.forEach(item => {
+                    data.forEach((item) => {
                         statusCounts[item.status] = (statusCounts[item.status] || 0) + 1;
                     });
                     return statusCounts;
                 },
                 calculateUptime: (data: HistoryChartProps["data"]) => {
                     if (data.length === 0) return 0;
-                    const upCount = data.filter(item => item.status === "up").length;
+                    const upCount = data.filter((item) => item.status === "up").length;
                     return (upCount / data.length) * 100;
-                }
+                },
             };
 
             const sampleData = [
                 { timestamp: "2024-01-01T10:00:00Z", status: "up", responseTime: 100 },
                 { timestamp: "2024-01-01T11:00:00Z", status: "down", responseTime: 0 },
-                { timestamp: "2024-01-01T12:00:00Z", status: "up", responseTime: 120 }
+                { timestamp: "2024-01-01T12:00:00Z", status: "up", responseTime: 120 },
             ];
 
             const aggregated = historyChartLogic.aggregateByStatus(sampleData);
@@ -590,7 +604,7 @@ describe("Component Coverage Boost", () => {
                         return total + (end - start);
                     }, 0);
                     return totalDowntime / incidents.length / 1000 / 60; // minutes
-                }
+                },
             };
 
             const analyticsData: AnalyticsData = {
@@ -598,7 +612,7 @@ describe("Component Coverage Boost", () => {
                 averageResponseTime: 245,
                 totalChecks: 1000,
                 failedChecks: 5,
-                incidentCount: 2
+                incidentCount: 2,
             };
 
             expect(analyticsLogic.calculateReliability(analyticsData)).toBe(99.5);
@@ -608,7 +622,7 @@ describe("Component Coverage Boost", () => {
 
             const incidents = [
                 { startTime: "2024-01-01T10:00:00Z", endTime: "2024-01-01T10:05:00Z" },
-                { startTime: "2024-01-01T15:00:00Z", endTime: "2024-01-01T15:10:00Z" }
+                { startTime: "2024-01-01T15:00:00Z", endTime: "2024-01-01T15:10:00Z" },
             ];
             const mttr = analyticsLogic.calculateMTTR(incidents);
             expect(mttr).toBe(7.5); // (5 + 10) / 2 = 7.5 minutes

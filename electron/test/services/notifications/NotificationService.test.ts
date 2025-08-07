@@ -135,9 +135,7 @@ describe("NotificationService", () => {
             notificationService.notifyMonitorDown(mockSite, "monitor-1");
 
             expect(Notification).not.toHaveBeenCalled();
-            expect(logger.warn).toHaveBeenCalledWith(
-                "Notifications not supported on this platform"
-            );
+            expect(logger.warn).toHaveBeenCalledWith("Notifications not supported on this platform");
         });
     });
 
@@ -195,9 +193,7 @@ describe("NotificationService", () => {
             notificationService.notifyMonitorUp(mockSite, "monitor-1");
 
             expect(Notification).not.toHaveBeenCalled();
-            expect(logger.warn).toHaveBeenCalledWith(
-                "Notifications not supported on this platform"
-            );
+            expect(logger.warn).toHaveBeenCalledWith("Notifications not supported on this platform");
         });
     });
 

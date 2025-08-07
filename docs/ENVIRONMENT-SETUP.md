@@ -5,12 +5,14 @@
 ## 📋 Prerequisites
 
 ### Required Software
+
 - **Node.js**: 18+ LTS (recommended: 18.17.0 or later)
 - **npm**: 9+ (comes with Node.js)
 - **Git**: Latest version
 - **VS Code**: Recommended IDE (with extensions)
 
 ### Operating System Support
+
 - ✅ **Windows**: 10+ (tested on Windows 11)
 - ✅ **macOS**: 11+ (Big Sur and later)
 - ✅ **Linux**: Ubuntu 20.04+ (or equivalent)
@@ -20,6 +22,7 @@
 ### 1. Node.js Setup
 
 #### Installation
+
 ```bash
 # Using Node Version Manager (recommended)
 # macOS/Linux
@@ -34,6 +37,7 @@ choco install nodejs --version=18.17.0
 ```
 
 #### Verification
+
 ```bash
 node --version  # Should be 18+
 npm --version   # Should be 9+
@@ -42,6 +46,7 @@ npm --version   # Should be 9+
 ### 2. VS Code Configuration
 
 #### Required Extensions
+
 ```bash
 # Install via command line
 code --install-extension ms-vscode.vscode-typescript-next
@@ -53,6 +58,7 @@ code --install-extension ms-playwright.playwright
 ```
 
 Or install from VS Code Extensions marketplace:
+
 - **TypeScript and JavaScript**: Latest TypeScript features
 - **Tailwind CSS IntelliSense**: Autocomplete for CSS classes
 - **ESLint**: JavaScript/TypeScript linting
@@ -61,6 +67,7 @@ Or install from VS Code Extensions marketplace:
 - **Playwright**: E2E testing (if used)
 
 #### Recommended Extensions
+
 ```bash
 # Additional useful extensions
 code --install-extension ms-vscode.vscode-json
@@ -72,63 +79,66 @@ code --install-extension ms-vscode.vscode-git-graph
 ```
 
 #### VS Code Settings
+
 Create `.vscode/settings.json` in your workspace:
 
 ```json
 {
-  "typescript.preferences.importModuleSpecifier": "relative",
-  "typescript.preferences.includePackageJsonAutoImports": "on",
-  "editor.formatOnSave": true,
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true,
-    "source.organizeImports": true
-  },
-  "eslint.validate": [
-    "javascript",
-    "typescript",
-    "javascriptreact", 
-    "typescriptreact"
-  ],
-  "tailwindCSS.includeLanguages": {
-    "typescript": "javascript",
-    "typescriptreact": "javascript"
-  },
-  "files.associations": {
-    "*.css": "tailwindcss"
-  }
+ "typescript.preferences.importModuleSpecifier": "relative",
+ "typescript.preferences.includePackageJsonAutoImports": "on",
+ "editor.formatOnSave": true,
+ "editor.codeActionsOnSave": {
+  "source.fixAll.eslint": true,
+  "source.organizeImports": true
+ },
+ "eslint.validate": [
+  "javascript",
+  "typescript",
+  "javascriptreact",
+  "typescriptreact"
+ ],
+ "tailwindCSS.includeLanguages": {
+  "typescript": "javascript",
+  "typescriptreact": "javascript"
+ },
+ "files.associations": {
+  "*.css": "tailwindcss"
+ }
 }
 ```
 
 #### Launch Configuration
+
 Debugging configuration (`.vscode/launch.json`):
 
 ```json
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Debug Electron Main",
-      "type": "node",
-      "request": "launch",
-      "program": "${workspaceFolder}/dist-electron/main.js",
-      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
-      "runtimeArgs": ["--remote-debugging-port=9229"],
-      "console": "integratedTerminal"
-    },
-    {
-      "name": "Debug Electron Renderer",
-      "type": "chrome",
-      "request": "launch",
-      "url": "http://localhost:5173",
-      "webRoot": "${workspaceFolder}/src"
-    }
-  ]
+ "version": "0.2.0",
+ "configurations": [
+  {
+   "name": "Debug Electron Main",
+   "type": "node",
+   "request": "launch",
+   "program": "${workspaceFolder}/dist-electron/main.js",
+   "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+   "runtimeArgs": ["--remote-debugging-port=9229"],
+   "console": "integratedTerminal"
+  },
+  {
+   "name": "Debug Electron Renderer",
+   "type": "chrome",
+   "request": "launch",
+   "url": "http://localhost:5173",
+   "webRoot": "${workspaceFolder}/src"
+  }
+ ]
 }
 ```
 
 ### 3. Git Configuration
 
 #### Global Settings
+
 ```bash
 git config --global user.name "Your Name"
 git config --global user.email "your.email@example.com"
@@ -137,6 +147,7 @@ git config --global pull.rebase false
 ```
 
 #### Project-Specific Hooks
+
 The project uses Husky for Git hooks:
 
 ```bash
@@ -148,6 +159,7 @@ npx husky install
 ## 🚀 Project Setup
 
 ### 1. Clone and Install
+
 ```bash
 # Clone the repository
 git clone https://github.com/Nick2bad4u/Uptime-Watcher.git
@@ -163,6 +175,7 @@ npm test
 ```
 
 ### 2. Environment Variables
+
 Create `.env` file in project root (if needed):
 
 ```bash
@@ -179,6 +192,7 @@ NOTIFICATIONS_ENABLED=true
 ```
 
 ### 3. Database Setup
+
 The SQLite database is automatically initialized:
 
 ```bash
@@ -190,6 +204,7 @@ npm run electron-dev
 ```
 
 ### 4. Verify Setup
+
 ```bash
 # Type checking
 npm run check-types
@@ -212,6 +227,7 @@ npm run electron-dev
 ### Terminal Setup
 
 #### Windows (PowerShell/Command Prompt)
+
 ```powershell
 # Enable developer mode
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
@@ -221,6 +237,7 @@ winget install Microsoft.WindowsTerminal
 ```
 
 #### macOS (Terminal/iTerm2)
+
 ```bash
 # Install Homebrew (if not already installed)
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -231,6 +248,7 @@ brew install jq
 ```
 
 #### Linux (Bash/Zsh)
+
 ```bash
 # Install useful tools
 sudo apt update
@@ -238,6 +256,7 @@ sudo apt install tree jq curl wget
 ```
 
 ### Useful Global Tools
+
 ```bash
 # Install globally useful development tools
 npm install -g @commitlint/cli
@@ -251,39 +270,41 @@ npm install -g nodemon
 ## ⚙️ IDE-Specific Setup
 
 ### VS Code Workspace
+
 Create `.vscode/uptime-watcher.code-workspace`:
 
 ```json
 {
-  "folders": [
-    {
-      "path": "."
-    }
-  ],
-  "settings": {
-    "typescript.preferences.importModuleSpecifier": "relative",
-    "editor.formatOnSave": true,
-    "files.exclude": {
-      "**/node_modules": true,
-      "**/dist": true,
-      "**/dist-electron": true,
-      "**/.git": true,
-      "**/.DS_Store": true,
-      "**/coverage": true
-    }
-  },
-  "extensions": {
-    "recommendations": [
-      "ms-vscode.vscode-typescript-next",
-      "bradlc.vscode-tailwindcss",
-      "ms-vscode.vscode-eslint",
-      "esbenp.prettier-vscode"
-    ]
+ "folders": [
+  {
+   "path": "."
   }
+ ],
+ "settings": {
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "editor.formatOnSave": true,
+  "files.exclude": {
+   "**/node_modules": true,
+   "**/dist": true,
+   "**/dist-electron": true,
+   "**/.git": true,
+   "**/.DS_Store": true,
+   "**/coverage": true
+  }
+ },
+ "extensions": {
+  "recommendations": [
+   "ms-vscode.vscode-typescript-next",
+   "bradlc.vscode-tailwindcss",
+   "ms-vscode.vscode-eslint",
+   "esbenp.prettier-vscode"
+  ]
+ }
 }
 ```
 
 ### WebStorm/IntelliJ Setup
+
 1. **Install Node.js plugin**
 2. **Configure TypeScript**: Settings → Languages → TypeScript → use project TypeScript
 3. **Configure ESLint**: Settings → Languages → JavaScript → Code Quality Tools → ESLint
@@ -292,6 +313,7 @@ Create `.vscode/uptime-watcher.code-workspace`:
 ## 🧪 Testing Environment
 
 ### Test Database
+
 The test environment uses an in-memory SQLite database:
 
 ```bash
@@ -307,6 +329,7 @@ npm run test:frontend  # Frontend tests
 ```
 
 ### Coverage Reports
+
 ```bash
 # Generate coverage reports
 npm run test:coverage
@@ -320,6 +343,7 @@ xdg-open coverage/index.html      # Linux
 ## 🔒 Security Setup
 
 ### Code Scanning
+
 The project includes multiple security tools:
 
 ```bash
@@ -330,6 +354,7 @@ npm run lint:vulnerability
 ```
 
 ### Dependencies
+
 ```bash
 # Audit dependencies
 npm audit
@@ -361,25 +386,26 @@ CMD ["npm", "run", "electron-dev"]
 
 ```yaml
 # docker-compose.dev.yml
-version: '3.8'
+version: "3.8"
 services:
-  uptime-watcher:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    volumes:
-      - .:/app
-      - /app/node_modules
-    ports:
-      - "5173:5173"
-      - "9229:9229"
-    environment:
-      - NODE_ENV=development
+ uptime-watcher:
+  build:
+   context: .
+   dockerfile: Dockerfile.dev
+  volumes:
+   - .:/app
+   - /app/node_modules
+  ports:
+   - "5173:5173"
+   - "9229:9229"
+  environment:
+   - NODE_ENV=development
 ```
 
 ## 🚀 Performance Optimization
 
 ### Development Performance
+
 ```bash
 # Enable TypeScript project references for faster builds
 npm run build:references
@@ -392,6 +418,7 @@ code --max-memory=8192
 ```
 
 ### Build Performance
+
 ```bash
 # Parallel builds
 npm run build:parallel
@@ -403,6 +430,7 @@ npm config set cache-folder ./npm-cache
 ## 📱 Platform-Specific Setup
 
 ### Windows
+
 ```powershell
 # Enable developer features
 dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
@@ -412,6 +440,7 @@ npm install --global windows-build-tools
 ```
 
 ### macOS
+
 ```bash
 # Install Xcode command line tools
 xcode-select --install
@@ -421,6 +450,7 @@ brew install git node
 ```
 
 ### Linux
+
 ```bash
 # Install build essentials
 sudo apt update
@@ -434,6 +464,7 @@ sudo apt-get install -y nodejs
 ## ✅ Verification Checklist
 
 ### Environment Verification
+
 - [ ] Node.js 18+ installed and active
 - [ ] npm 9+ available
 - [ ] Git configured with user details
@@ -441,6 +472,7 @@ sudo apt-get install -y nodejs
 - [ ] Project cloned and dependencies installed
 
 ### Development Verification
+
 - [ ] `npm run electron-dev` starts successfully
 - [ ] Hot reload works for both frontend and backend
 - [ ] TypeScript compilation works without errors
@@ -449,6 +481,7 @@ sudo apt-get install -y nodejs
 - [ ] Build process completes successfully
 
 ### Tool Verification
+
 - [ ] ESLint integration working in IDE
 - [ ] Prettier formatting on save
 - [ ] TypeScript IntelliSense working

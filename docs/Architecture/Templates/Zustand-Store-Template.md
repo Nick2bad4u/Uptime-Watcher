@@ -6,7 +6,7 @@ Use this template when creating new Zustand stores for frontend state management
 
 For stores with straightforward state that don't require modular composition:
 
-```typescript
+````typescript
 /**
  * [DESCRIPTION] store for managing [DOMAIN] state and interactions.
  *
@@ -51,16 +51,16 @@ import { logStoreAction } from "../utils";
  * @public
  */
 export interface ExampleState {
-    /** Current example value */
-    exampleValue: string;
-    /** Loading state for async operations */
-    isLoading: boolean;
-    /** Array of example items */
-    items: ExampleItem[];
-    /** Selected item identifier */
-    selectedItemId?: string;
-    /** User preferences (if using persistence) */
-    userPreference: boolean;
+ /** Current example value */
+ exampleValue: string;
+ /** Loading state for async operations */
+ isLoading: boolean;
+ /** Array of example items */
+ items: ExampleItem[];
+ /** Selected item identifier */
+ selectedItemId?: string;
+ /** User preferences (if using persistence) */
+ userPreference: boolean;
 }
 
 /**
@@ -73,22 +73,22 @@ export interface ExampleState {
  * @public
  */
 export interface ExampleActions {
-    // Sync actions for immediate state updates
-    setExampleValue: (value: string) => void;
-    setLoading: (loading: boolean) => void;
-    addItem: (item: ExampleItem) => void;
-    removeItem: (id: string) => void;
-    setSelectedItem: (item: ExampleItem | undefined) => void;
-    setUserPreference: (enabled: boolean) => void;
+ // Sync actions for immediate state updates
+ setExampleValue: (value: string) => void;
+ setLoading: (loading: boolean) => void;
+ addItem: (item: ExampleItem) => void;
+ removeItem: (id: string) => void;
+ setSelectedItem: (item: ExampleItem | undefined) => void;
+ setUserPreference: (enabled: boolean) => void;
 
-    // Async actions for operations that involve IPC or complex logic
-    fetchItems: () => Promise<void>;
-    createItem: (data: CreateItemData) => Promise<ExampleItem>;
-    deleteItem: (id: string) => Promise<void>;
-    
-    // Utility actions
-    reset: () => void;
-    openExternal: (url: string, context?: { itemName?: string }) => void;
+ // Async actions for operations that involve IPC or complex logic
+ fetchItems: () => Promise<void>;
+ createItem: (data: CreateItemData) => Promise<ExampleItem>;
+ deleteItem: (id: string) => Promise<void>;
+
+ // Utility actions
+ reset: () => void;
+ openExternal: (url: string, context?: { itemName?: string }) => void;
 }
 
 /**
@@ -104,11 +104,11 @@ export interface ExampleStore extends ExampleState, ExampleActions {}
  * @internal
  */
 const initialState: ExampleState = {
-    exampleValue: "",
-    isLoading: false,
-    items: [],
-    selectedItemId: undefined,
-    userPreference: false,
+ exampleValue: "",
+ isLoading: false,
+ items: [],
+ selectedItemId: undefined,
+ userPreference: false,
 };
 
 /**
@@ -120,129 +120,129 @@ const initialState: ExampleState = {
  * @public
  */
 export const useExampleStore = create<ExampleStore>()(
-    // Remove persist wrapper if persistence is not needed
-    persist(
-        (set, get) => ({
-            // Initial state
-            ...initialState,
+ // Remove persist wrapper if persistence is not needed
+ persist(
+  (set, get) => ({
+   // Initial state
+   ...initialState,
 
-            // Sync actions
-            setExampleValue: (exampleValue: string) => {
-                logStoreAction("ExampleStore", "setExampleValue", { exampleValue });
-                set({ exampleValue });
-            },
+   // Sync actions
+   setExampleValue: (exampleValue: string) => {
+    logStoreAction("ExampleStore", "setExampleValue", { exampleValue });
+    set({ exampleValue });
+   },
 
-            setLoading: (isLoading: boolean) => {
-                logStoreAction("ExampleStore", "setLoading", { isLoading });
-                set({ isLoading });
-            },
+   setLoading: (isLoading: boolean) => {
+    logStoreAction("ExampleStore", "setLoading", { isLoading });
+    set({ isLoading });
+   },
 
-            addItem: (item: ExampleItem) => {
-                logStoreAction("ExampleStore", "addItem", { itemId: item.id });
-                set((state) => ({
-                    items: [...state.items, item],
-                }));
-            },
+   addItem: (item: ExampleItem) => {
+    logStoreAction("ExampleStore", "addItem", { itemId: item.id });
+    set((state) => ({
+     items: [...state.items, item],
+    }));
+   },
 
-            removeItem: (id: string) => {
-                logStoreAction("ExampleStore", "removeItem", { id });
-                set((state) => ({
-                    items: state.items.filter(item => item.id !== id),
-                    selectedItemId: state.selectedItemId === id ? undefined : state.selectedItemId,
-                }));
-            },
+   removeItem: (id: string) => {
+    logStoreAction("ExampleStore", "removeItem", { id });
+    set((state) => ({
+     items: state.items.filter((item) => item.id !== id),
+     selectedItemId: state.selectedItemId === id ? undefined : state.selectedItemId,
+    }));
+   },
 
-            setSelectedItem: (item: ExampleItem | undefined) => {
-                logStoreAction("ExampleStore", "setSelectedItem", { itemId: item?.id });
-                set({ selectedItemId: item ? item.id : undefined });
-            },
+   setSelectedItem: (item: ExampleItem | undefined) => {
+    logStoreAction("ExampleStore", "setSelectedItem", { itemId: item?.id });
+    set({ selectedItemId: item ? item.id : undefined });
+   },
 
-            setUserPreference: (userPreference: boolean) => {
-                logStoreAction("ExampleStore", "setUserPreference", { userPreference });
-                set({ userPreference });
-            },
+   setUserPreference: (userPreference: boolean) => {
+    logStoreAction("ExampleStore", "setUserPreference", { userPreference });
+    set({ userPreference });
+   },
 
-            // Async actions
-            fetchItems: async () => {
-                await withErrorHandling(async () => {
-                    get().setLoading(true);
-                    const items = await window.electronAPI.example.getItems();
-                    set({ items });
-                }, errorStore);
-                get().setLoading(false);
-            },
+   // Async actions
+   fetchItems: async () => {
+    await withErrorHandling(async () => {
+     get().setLoading(true);
+     const items = await window.electronAPI.example.getItems();
+     set({ items });
+    }, errorStore);
+    get().setLoading(false);
+   },
 
-            createItem: async (data: CreateItemData) => {
-                return await withErrorHandling(async () => {
-                    const newItem = await window.electronAPI.example.createItem(data);
-                    get().addItem(newItem);
-                    return newItem;
-                }, errorStore);
-            },
+   createItem: async (data: CreateItemData) => {
+    return await withErrorHandling(async () => {
+     const newItem = await window.electronAPI.example.createItem(data);
+     get().addItem(newItem);
+     return newItem;
+    }, errorStore);
+   },
 
-            deleteItem: async (id: string) => {
-                await withErrorHandling(async () => {
-                    // Optimistic update
-                    const originalItems = get().items;
-                    get().removeItem(id);
-                    
-                    try {
-                        await window.electronAPI.example.deleteItem(id);
-                    } catch (error) {
-                        // Rollback on failure
-                        set({ items: originalItems });
-                        throw error;
-                    }
-                }, errorStore);
-            },
+   deleteItem: async (id: string) => {
+    await withErrorHandling(async () => {
+     // Optimistic update
+     const originalItems = get().items;
+     get().removeItem(id);
 
-            // Utility actions
-            reset: () => {
-                logStoreAction("ExampleStore", "reset");
-                set(initialState);
-            },
+     try {
+      await window.electronAPI.example.deleteItem(id);
+     } catch (error) {
+      // Rollback on failure
+      set({ items: originalItems });
+      throw error;
+     }
+    }, errorStore);
+   },
 
-            openExternal: (url: string, context?: { itemName?: string }) => {
-                logStoreAction("ExampleStore", "openExternal", { url, context });
+   // Utility actions
+   reset: () => {
+    logStoreAction("ExampleStore", "reset");
+    set(initialState);
+   },
 
-                // Log user action for analytics
-                logger.user.action("External URL opened", {
-                    url,
-                    ...(context && { itemName: context.itemName }),
-                });
+   openExternal: (url: string, context?: { itemName?: string }) => {
+    logStoreAction("ExampleStore", "openExternal", { url, context });
 
-                // Use electronAPI to open external URL
-                window.electronAPI.system.openExternal(url);
-            },
-        }),
-        {
-            // Persistence configuration (remove if not needed)
-            name: "uptime-watcher-example",
-            
-            /**
-             * Partialize function for selective state persistence.
-             *
-             * @param state - Current store state
-             * @returns Object with only the state properties that should be persisted
-             *
-             * @remarks
-             * Only persists user preferences and settings. Transient state like
-             * loading states, selected items, and data arrays are excluded.
-             */
-            partialize: (state) => ({
-                // Persist user preferences
-                userPreference: state.userPreference,
-                exampleValue: state.exampleValue, // If it's a user setting
-                
-                // Exclude transient state
-                // isLoading: false,
-                // items: [],
-                // selectedItemId: undefined,
-            }),
-        }
-    )
+    // Log user action for analytics
+    logger.user.action("External URL opened", {
+     url,
+     ...(context && { itemName: context.itemName }),
+    });
+
+    // Use electronAPI to open external URL
+    window.electronAPI.system.openExternal(url);
+   },
+  }),
+  {
+   // Persistence configuration (remove if not needed)
+   name: "uptime-watcher-example",
+
+   /**
+    * Partialize function for selective state persistence.
+    *
+    * @param state - Current store state
+    * @returns Object with only the state properties that should be persisted
+    *
+    * @remarks
+    * Only persists user preferences and settings. Transient state like
+    * loading states, selected items, and data arrays are excluded.
+    */
+   partialize: (state) => ({
+    // Persist user preferences
+    userPreference: state.userPreference,
+    exampleValue: state.exampleValue, // If it's a user setting
+
+    // Exclude transient state
+    // isLoading: false,
+    // items: [],
+    // selectedItemId: undefined,
+   }),
+  }
+ )
 );
-```
+````
 
 ## Complex Store with Modules Template
 
@@ -283,43 +283,43 @@ import { createExampleSyncActions } from "./useExampleSync";
  * @public
  */
 export const useExampleStore = create<ExampleStore>()((
-    set: (partial: (state: ExampleStore) => Partial<ExampleStore>) => void,
-    get: () => ExampleStore
+ set: (partial: (state: ExampleStore) => Partial<ExampleStore>) => void,
+ get: () => ExampleStore
 ) => {
-    // Create state actions
-    const stateActions = createExampleStateActions(set, get);
+ // Create state actions
+ const stateActions = createExampleStateActions(set, get);
 
-    // Shared getItems function - eliminates duplication and improves testability
-    const getItems = () => get().items;
+ // Shared getItems function - eliminates duplication and improves testability
+ const getItems = () => get().items;
 
-    // Create sync actions (needed by other modules)
-    const syncActions = createExampleSyncActions({
-        getItems,
-        setItems: stateActions.setItems,
-    });
+ // Create sync actions (needed by other modules)
+ const syncActions = createExampleSyncActions({
+  getItems,
+  setItems: stateActions.setItems,
+ });
 
-    // Create operations actions
-    const operationsActions = createExampleOperationsActions({
-        addItem: stateActions.addItem,
-        getItems,
-        removeItem: stateActions.removeItem,
-        setItems: stateActions.setItems,
-        syncItemsFromBackend: syncActions.syncItemsFromBackend,
-    });
+ // Create operations actions
+ const operationsActions = createExampleOperationsActions({
+  addItem: stateActions.addItem,
+  getItems,
+  removeItem: stateActions.removeItem,
+  setItems: stateActions.setItems,
+  syncItemsFromBackend: syncActions.syncItemsFromBackend,
+ });
 
-    return {
-        // Initial state
-        ...initialExampleState,
+ return {
+  // Initial state
+  ...initialExampleState,
 
-        // State actions
-        ...stateActions,
+  // State actions
+  ...stateActions,
 
-        // Operations actions
-        ...operationsActions,
+  // Operations actions
+  ...operationsActions,
 
-        // Sync actions
-        ...syncActions,
-    };
+  // Sync actions
+  ...syncActions,
+ };
 });
 ```
 
@@ -348,18 +348,18 @@ import { logStoreAction } from "../utils";
  * @public
  */
 export interface ExampleStateModule {
-    // State
-    items: ExampleItem[];
-    selectedItemId?: string;
-    lastUpdated?: number;
+ // State
+ items: ExampleItem[];
+ selectedItemId?: string;
+ lastUpdated?: number;
 
-    // Actions
-    setItems: (items: ExampleItem[]) => void;
-    addItem: (item: ExampleItem) => void;
-    removeItem: (id: string) => void;
-    updateItem: (id: string, updates: Partial<ExampleItem>) => void;
-    setSelectedItem: (item: ExampleItem | undefined) => void;
-    clearSelection: () => void;
+ // Actions
+ setItems: (items: ExampleItem[]) => void;
+ addItem: (item: ExampleItem) => void;
+ removeItem: (id: string) => void;
+ updateItem: (id: string, updates: Partial<ExampleItem>) => void;
+ setSelectedItem: (item: ExampleItem | undefined) => void;
+ clearSelection: () => void;
 }
 
 /**
@@ -367,10 +367,10 @@ export interface ExampleStateModule {
  *
  * @public
  */
-export const initialExampleState: Pick<ExampleStateModule, 'items' | 'selectedItemId' | 'lastUpdated'> = {
-    items: [],
-    selectedItemId: undefined,
-    lastUpdated: undefined,
+export const initialExampleState: Pick<ExampleStateModule, "items" | "selectedItemId" | "lastUpdated"> = {
+ items: [],
+ selectedItemId: undefined,
+ lastUpdated: undefined,
 };
 
 /**
@@ -383,55 +383,53 @@ export const initialExampleState: Pick<ExampleStateModule, 'items' | 'selectedIt
  * @public
  */
 export function createExampleStateActions(
-    set: (partial: (state: any) => Partial<any>) => void,
-    get: () => any
-): Omit<ExampleStateModule, 'items' | 'selectedItemId' | 'lastUpdated'> {
-    return {
-        setItems: (items: ExampleItem[]) => {
-            logStoreAction("ExampleStore", "setItems", { count: items.length });
-            set((state) => ({
-                items,
-                lastUpdated: Date.now(),
-            }));
-        },
+ set: (partial: (state: any) => Partial<any>) => void,
+ get: () => any
+): Omit<ExampleStateModule, "items" | "selectedItemId" | "lastUpdated"> {
+ return {
+  setItems: (items: ExampleItem[]) => {
+   logStoreAction("ExampleStore", "setItems", { count: items.length });
+   set((state) => ({
+    items,
+    lastUpdated: Date.now(),
+   }));
+  },
 
-        addItem: (item: ExampleItem) => {
-            logStoreAction("ExampleStore", "addItem", { itemId: item.id });
-            set((state) => ({
-                items: [...state.items, item],
-                lastUpdated: Date.now(),
-            }));
-        },
+  addItem: (item: ExampleItem) => {
+   logStoreAction("ExampleStore", "addItem", { itemId: item.id });
+   set((state) => ({
+    items: [...state.items, item],
+    lastUpdated: Date.now(),
+   }));
+  },
 
-        removeItem: (id: string) => {
-            logStoreAction("ExampleStore", "removeItem", { id });
-            set((state) => ({
-                items: state.items.filter(item => item.id !== id),
-                selectedItemId: state.selectedItemId === id ? undefined : state.selectedItemId,
-                lastUpdated: Date.now(),
-            }));
-        },
+  removeItem: (id: string) => {
+   logStoreAction("ExampleStore", "removeItem", { id });
+   set((state) => ({
+    items: state.items.filter((item) => item.id !== id),
+    selectedItemId: state.selectedItemId === id ? undefined : state.selectedItemId,
+    lastUpdated: Date.now(),
+   }));
+  },
 
-        updateItem: (id: string, updates: Partial<ExampleItem>) => {
-            logStoreAction("ExampleStore", "updateItem", { id, updates });
-            set((state) => ({
-                items: state.items.map(item =>
-                    item.id === id ? { ...item, ...updates } : item
-                ),
-                lastUpdated: Date.now(),
-            }));
-        },
+  updateItem: (id: string, updates: Partial<ExampleItem>) => {
+   logStoreAction("ExampleStore", "updateItem", { id, updates });
+   set((state) => ({
+    items: state.items.map((item) => (item.id === id ? { ...item, ...updates } : item)),
+    lastUpdated: Date.now(),
+   }));
+  },
 
-        setSelectedItem: (item: ExampleItem | undefined) => {
-            logStoreAction("ExampleStore", "setSelectedItem", { itemId: item?.id });
-            set({ selectedItemId: item ? item.id : undefined });
-        },
+  setSelectedItem: (item: ExampleItem | undefined) => {
+   logStoreAction("ExampleStore", "setSelectedItem", { itemId: item?.id });
+   set({ selectedItemId: item ? item.id : undefined });
+  },
 
-        clearSelection: () => {
-            logStoreAction("ExampleStore", "clearSelection");
-            set({ selectedItemId: undefined });
-        },
-    };
+  clearSelection: () => {
+   logStoreAction("ExampleStore", "clearSelection");
+   set({ selectedItemId: undefined });
+  },
+ };
 }
 ```
 
@@ -451,151 +449,151 @@ import { useExampleStore } from "../useExampleStore";
 
 // Mock the shared utils
 vi.mock("../utils", () => ({
-    logStoreAction: vi.fn(),
+ logStoreAction: vi.fn(),
 }));
 
 // Mock error handling
 vi.mock("../../utils/errorHandling", () => ({
-    withErrorHandling: vi.fn().mockImplementation(async (operation) => {
-        return await operation();
-    }),
+ withErrorHandling: vi.fn().mockImplementation(async (operation) => {
+  return await operation();
+ }),
 }));
 
 describe("useExampleStore", () => {
-    const mockItem: ExampleItem = {
-        id: "test-item-123",
-        name: "Test Item",
-        createdAt: Date.now(),
-    };
+ const mockItem: ExampleItem = {
+  id: "test-item-123",
+  name: "Test Item",
+  createdAt: Date.now(),
+ };
 
-    beforeEach(() => {
-        // Reset store state before each test
-        const store = useExampleStore.getState();
-        act(() => {
-            store.reset();
-        });
-        vi.clearAllMocks();
-    });
+ beforeEach(() => {
+  // Reset store state before each test
+  const store = useExampleStore.getState();
+  act(() => {
+   store.reset();
+  });
+  vi.clearAllMocks();
+ });
 
-    describe("Initial State", () => {
-        it("should initialize with correct default values", () => {
-            const { result } = renderHook(() => useExampleStore());
+ describe("Initial State", () => {
+  it("should initialize with correct default values", () => {
+   const { result } = renderHook(() => useExampleStore());
 
-            expect(result.current.items).toEqual([]);
-            expect(result.current.selectedItemId).toBeUndefined();
-            expect(result.current.isLoading).toBe(false);
-            expect(result.current.userPreference).toBe(false);
-        });
+   expect(result.current.items).toEqual([]);
+   expect(result.current.selectedItemId).toBeUndefined();
+   expect(result.current.isLoading).toBe(false);
+   expect(result.current.userPreference).toBe(false);
+  });
 
-        it("should have all required action methods", () => {
-            const { result } = renderHook(() => useExampleStore());
+  it("should have all required action methods", () => {
+   const { result } = renderHook(() => useExampleStore());
 
-            expect(typeof result.current.setExampleValue).toBe("function");
-            expect(typeof result.current.addItem).toBe("function");
-            expect(typeof result.current.removeItem).toBe("function");
-            expect(typeof result.current.fetchItems).toBe("function");
-        });
-    });
+   expect(typeof result.current.setExampleValue).toBe("function");
+   expect(typeof result.current.addItem).toBe("function");
+   expect(typeof result.current.removeItem).toBe("function");
+   expect(typeof result.current.fetchItems).toBe("function");
+  });
+ });
 
-    describe("State Management", () => {
-        it("should add item correctly", () => {
-            const { result } = renderHook(() => useExampleStore());
+ describe("State Management", () => {
+  it("should add item correctly", () => {
+   const { result } = renderHook(() => useExampleStore());
 
-            act(() => {
-                result.current.addItem(mockItem);
-            });
+   act(() => {
+    result.current.addItem(mockItem);
+   });
 
-            expect(result.current.items).toContain(mockItem);
-        });
+   expect(result.current.items).toContain(mockItem);
+  });
 
-        it("should remove item correctly", () => {
-            const { result } = renderHook(() => useExampleStore());
+  it("should remove item correctly", () => {
+   const { result } = renderHook(() => useExampleStore());
 
-            act(() => {
-                result.current.addItem(mockItem);
-                result.current.removeItem(mockItem.id);
-            });
+   act(() => {
+    result.current.addItem(mockItem);
+    result.current.removeItem(mockItem.id);
+   });
 
-            expect(result.current.items).not.toContain(mockItem);
-        });
+   expect(result.current.items).not.toContain(mockItem);
+  });
 
-        it("should handle selection correctly", () => {
-            const { result } = renderHook(() => useExampleStore());
+  it("should handle selection correctly", () => {
+   const { result } = renderHook(() => useExampleStore());
 
-            act(() => {
-                result.current.addItem(mockItem);
-                result.current.setSelectedItem(mockItem);
-            });
+   act(() => {
+    result.current.addItem(mockItem);
+    result.current.setSelectedItem(mockItem);
+   });
 
-            expect(result.current.selectedItemId).toBe(mockItem.id);
-        });
+   expect(result.current.selectedItemId).toBe(mockItem.id);
+  });
 
-        it("should clear selection when item is removed", () => {
-            const { result } = renderHook(() => useExampleStore());
+  it("should clear selection when item is removed", () => {
+   const { result } = renderHook(() => useExampleStore());
 
-            act(() => {
-                result.current.addItem(mockItem);
-                result.current.setSelectedItem(mockItem);
-                result.current.removeItem(mockItem.id);
-            });
+   act(() => {
+    result.current.addItem(mockItem);
+    result.current.setSelectedItem(mockItem);
+    result.current.removeItem(mockItem.id);
+   });
 
-            expect(result.current.selectedItemId).toBeUndefined();
-        });
-    });
+   expect(result.current.selectedItemId).toBeUndefined();
+  });
+ });
 
-    describe("Async Operations", () => {
-        it("should handle fetchItems", async () => {
-            const mockItems = [mockItem];
-            window.electronAPI.example.getItems = vi.fn().mockResolvedValue(mockItems);
+ describe("Async Operations", () => {
+  it("should handle fetchItems", async () => {
+   const mockItems = [mockItem];
+   window.electronAPI.example.getItems = vi.fn().mockResolvedValue(mockItems);
 
-            const { result } = renderHook(() => useExampleStore());
+   const { result } = renderHook(() => useExampleStore());
 
-            await act(async () => {
-                await result.current.fetchItems();
-            });
+   await act(async () => {
+    await result.current.fetchItems();
+   });
 
-            expect(result.current.items).toEqual(mockItems);
-        });
+   expect(result.current.items).toEqual(mockItems);
+  });
 
-        it("should handle createItem", async () => {
-            window.electronAPI.example.createItem = vi.fn().mockResolvedValue(mockItem);
+  it("should handle createItem", async () => {
+   window.electronAPI.example.createItem = vi.fn().mockResolvedValue(mockItem);
 
-            const { result } = renderHook(() => useExampleStore());
+   const { result } = renderHook(() => useExampleStore());
 
-            await act(async () => {
-                await result.current.createItem({ name: "Test Item" });
-            });
+   await act(async () => {
+    await result.current.createItem({ name: "Test Item" });
+   });
 
-            expect(result.current.items).toContain(mockItem);
-        });
-    });
+   expect(result.current.items).toContain(mockItem);
+  });
+ });
 
-    describe("Error Handling", () => {
-        it("should handle fetchItems errors gracefully", async () => {
-            window.electronAPI.example.getItems = vi.fn().mockRejectedValue(new Error("Fetch failed"));
+ describe("Error Handling", () => {
+  it("should handle fetchItems errors gracefully", async () => {
+   window.electronAPI.example.getItems = vi.fn().mockRejectedValue(new Error("Fetch failed"));
 
-            const { result } = renderHook(() => useExampleStore());
+   const { result } = renderHook(() => useExampleStore());
 
-            await act(async () => {
-                await expect(result.current.fetchItems()).rejects.toThrow("Fetch failed");
-            });
-        });
-    });
+   await act(async () => {
+    await expect(result.current.fetchItems()).rejects.toThrow("Fetch failed");
+   });
+  });
+ });
 
-    describe("Reset Functionality", () => {
-        it("should reset to initial state", () => {
-            const { result } = renderHook(() => useExampleStore());
+ describe("Reset Functionality", () => {
+  it("should reset to initial state", () => {
+   const { result } = renderHook(() => useExampleStore());
 
-            act(() => {
-                result.current.addItem(mockItem);
-                result.current.setExampleValue("test");
-                result.current.reset();
-            });
+   act(() => {
+    result.current.addItem(mockItem);
+    result.current.setExampleValue("test");
+    result.current.reset();
+   });
 
-            expect(result.current.items).toEqual([]);
-            expect(result.current.exampleValue).toBe("");
-        });
-    });
+   expect(result.current.items).toEqual([]);
+   expect(result.current.exampleValue).toBe("");
+  });
+ });
 });
 ```
 

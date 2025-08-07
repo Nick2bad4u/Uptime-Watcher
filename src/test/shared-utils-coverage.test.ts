@@ -33,21 +33,21 @@ describe("Shared Utils Coverage", () => {
                 sites: {
                     all: () => "sites:all",
                     byId: (id: string) => `sites:id:${id}`,
-                    byStatus: (status: string) => `sites:status:${status}`
+                    byStatus: (status: string) => `sites:status:${status}`,
                 },
                 monitors: {
                     all: () => "monitors:all",
                     byType: (type: string) => `monitors:type:${type}`,
-                    bySite: (siteId: string) => `monitors:site:${siteId}`
+                    bySite: (siteId: string) => `monitors:site:${siteId}`,
                 },
                 settings: {
                     all: () => "settings:all",
-                    byName: (name: string) => `settings:${name}`
+                    byName: (name: string) => `settings:${name}`,
                 },
                 analytics: {
                     byPeriod: (period: string) => `analytics:period:${period}`,
-                    bySite: (siteId: string, period: string) => `analytics:site:${siteId}:${period}`
-                }
+                    bySite: (siteId: string, period: string) => `analytics:site:${siteId}:${period}`,
+                },
             };
 
             expect(CacheKeys.sites.all()).toBe("sites:all");
@@ -70,7 +70,7 @@ describe("Shared Utils Coverage", () => {
             };
 
             const generateCacheKey = (prefix: string, ...parts: string[]): string => {
-                const normalizedParts = parts.map(part => normalizeCacheKey(part));
+                const normalizedParts = parts.map((part) => normalizeCacheKey(part));
                 return `${prefix}:${normalizedParts.join(":")}`;
             };
 
@@ -122,7 +122,7 @@ describe("Shared Utils Coverage", () => {
                     }
                     return count;
                 },
-                exists: (key: string) => mockCache.has(key)
+                exists: (key: string) => mockCache.has(key),
             };
 
             cacheOps.set("sites:123", { name: "Test Site" });
@@ -146,7 +146,12 @@ describe("Shared Utils Coverage", () => {
             }
 
             interface LogTemplateGenerator {
-                createTemplate: (level: LogTemplate["level"], category: string, message: string, context?: Record<string, any>) => LogTemplate;
+                createTemplate: (
+                    level: LogTemplate["level"],
+                    category: string,
+                    message: string,
+                    context?: Record<string, any>
+                ) => LogTemplate;
                 formatMessage: (template: LogTemplate) => string;
                 addCorrelation: (template: LogTemplate, correlationId: string) => LogTemplate;
             }
@@ -157,21 +162,22 @@ describe("Shared Utils Coverage", () => {
                     category,
                     message,
                     context,
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
                 }),
                 formatMessage: (template) => {
-                    const contextStr = Object.keys(template.context || {}).length > 0 
-                        ? JSON.stringify(template.context) 
-                        : "";
+                    const contextStr =
+                        Object.keys(template.context || {}).length > 0 ? JSON.stringify(template.context) : "";
                     return `[${template.level.toUpperCase()}] ${template.category}: ${template.message} ${contextStr}`.trim();
                 },
                 addCorrelation: (template, correlationId) => ({
                     ...template,
-                    correlationId
-                })
+                    correlationId,
+                }),
             };
 
-            const template = logGenerator.createTemplate("info", "SiteManager", "Site created successfully", { siteId: "123" });
+            const template = logGenerator.createTemplate("info", "SiteManager", "Site created successfully", {
+                siteId: "123",
+            });
             expect(template.level).toBe("info");
             expect(template.category).toBe("SiteManager");
             expect(template.context?.siteId).toBe("123");
@@ -186,27 +192,36 @@ describe("Shared Utils Coverage", () => {
         it("should handle different log template categories", () => {
             const logCategories = {
                 SITE_MANAGEMENT: "SiteManager",
-                MONITOR_EXECUTION: "MonitorExecutor", 
+                MONITOR_EXECUTION: "MonitorExecutor",
                 DATABASE_OPERATIONS: "DatabaseManager",
                 API_REQUESTS: "ApiHandler",
                 AUTHENTICATION: "AuthService",
                 VALIDATION: "Validator",
                 CACHE_OPERATIONS: "CacheManager",
-                FILE_OPERATIONS: "FileManager"
+                FILE_OPERATIONS: "FileManager",
             };
 
-            const createCategoryTemplate = (category: string, operation: string, status: "started" | "completed" | "failed", details?: any) => {
+            const createCategoryTemplate = (
+                category: string,
+                operation: string,
+                status: "started" | "completed" | "failed",
+                details?: any
+            ) => {
                 return {
                     category,
                     operation,
                     status,
                     details: details || {},
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
                 };
             };
 
-            expect(createCategoryTemplate(logCategories.SITE_MANAGEMENT, "createSite", "started").category).toBe("SiteManager");
-            expect(createCategoryTemplate(logCategories.MONITOR_EXECUTION, "runCheck", "completed").operation).toBe("runCheck");
+            expect(createCategoryTemplate(logCategories.SITE_MANAGEMENT, "createSite", "started").category).toBe(
+                "SiteManager"
+            );
+            expect(createCategoryTemplate(logCategories.MONITOR_EXECUTION, "runCheck", "completed").operation).toBe(
+                "runCheck"
+            );
             expect(createCategoryTemplate(logCategories.DATABASE_OPERATIONS, "query", "failed").status).toBe("failed");
         });
 
@@ -229,12 +244,22 @@ describe("Shared Utils Coverage", () => {
 
             const mockLogs: LogTemplate[] = [
                 { level: "info", category: "SiteManager", message: "Site created", timestamp: "2024-01-01T10:00:00Z" },
-                { level: "error", category: "MonitorExecutor", message: "Check failed", timestamp: "2024-01-01T11:00:00Z" },
-                { level: "warn", category: "SiteManager", message: "Site deprecated", timestamp: "2024-01-01T12:00:00Z" }
+                {
+                    level: "error",
+                    category: "MonitorExecutor",
+                    message: "Check failed",
+                    timestamp: "2024-01-01T11:00:00Z",
+                },
+                {
+                    level: "warn",
+                    category: "SiteManager",
+                    message: "Site deprecated",
+                    timestamp: "2024-01-01T12:00:00Z",
+                },
             ];
 
             const filterLogs = (logs: LogTemplate[], filter: LogFilter): LogTemplate[] => {
-                return logs.filter(log => {
+                return logs.filter((log) => {
                     if (filter.level && !filter.level.includes(log.level)) return false;
                     if (filter.category && !filter.category.includes(log.category)) return false;
                     if (filter.containsText && !log.message.includes(filter.containsText)) return false;
@@ -273,7 +298,7 @@ describe("Shared Utils Coverage", () => {
                     category: "validation",
                     severity: "medium",
                     recoverable: true,
-                    suggestions: ["Check the site ID", "Verify the site exists"]
+                    suggestions: ["Check the site ID", "Verify the site exists"],
                 },
                 NETWORK_TIMEOUT: {
                     code: "NETWORK_TIMEOUT",
@@ -281,7 +306,7 @@ describe("Shared Utils Coverage", () => {
                     category: "network",
                     severity: "medium",
                     recoverable: true,
-                    suggestions: ["Check network connectivity", "Increase timeout value"]
+                    suggestions: ["Check network connectivity", "Increase timeout value"],
                 },
                 DATABASE_CONNECTION_FAILED: {
                     code: "DATABASE_CONNECTION_FAILED",
@@ -289,7 +314,7 @@ describe("Shared Utils Coverage", () => {
                     category: "database",
                     severity: "critical",
                     recoverable: false,
-                    suggestions: ["Check database status", "Verify connection parameters"]
+                    suggestions: ["Check database status", "Verify connection parameters"],
                 },
                 INVALID_MONITOR_CONFIG: {
                     code: "INVALID_MONITOR_CONFIG",
@@ -297,8 +322,8 @@ describe("Shared Utils Coverage", () => {
                     category: "validation",
                     severity: "high",
                     recoverable: true,
-                    suggestions: ["Check required fields", "Validate configuration format"]
-                }
+                    suggestions: ["Check required fields", "Validate configuration format"],
+                },
             };
 
             expect(errorCatalog.SITE_NOT_FOUND.category).toBe("validation");
@@ -331,15 +356,15 @@ describe("Shared Utils Coverage", () => {
                     category: "validation",
                     severity: "medium",
                     recoverable: true,
-                    suggestions: ["Test suggestion"]
-                }
+                    suggestions: ["Test suggestion"],
+                },
             };
 
             const errorHandler: ErrorHandler = {
                 getErrorInfo: (code: string) => mockErrorCatalog[code],
                 isRecoverable: (code: string) => mockErrorCatalog[code]?.recoverable || false,
                 getSuggestions: (code: string) => mockErrorCatalog[code]?.suggestions || [],
-                categorizeError: (code: string) => mockErrorCatalog[code]?.category || "unknown"
+                categorizeError: (code: string) => mockErrorCatalog[code]?.category || "unknown",
             };
 
             expect(errorHandler.getErrorInfo("TEST_ERROR")?.message).toBe("Test error message");
@@ -359,16 +384,19 @@ describe("Shared Utils Coverage", () => {
             const errorFormatter: ErrorFormatter = {
                 formatError: (code: string, context = {}) => {
                     const baseMessage = `Error ${code}`;
-                    const contextStr = Object.keys(context).length > 0 
-                        ? ` (${Object.entries(context).map(([k, v]) => `${k}: ${v}`).join(", ")})`
-                        : "";
+                    const contextStr =
+                        Object.keys(context).length > 0
+                            ? ` (${Object.entries(context)
+                                  .map(([k, v]) => `${k}: ${v}`)
+                                  .join(", ")})`
+                            : "";
                     return baseMessage + contextStr;
                 },
                 getLocalizedMessage: (code: string, locale: string) => {
                     // Mock localization
                     const messages: Record<string, Record<string, string>> = {
                         en: { SITE_NOT_FOUND: "Site not found" },
-                        es: { SITE_NOT_FOUND: "Sitio no encontrado" }
+                        es: { SITE_NOT_FOUND: "Sitio no encontrado" },
                     };
                     return messages[locale]?.[code] || code;
                 },
@@ -376,13 +404,15 @@ describe("Shared Utils Coverage", () => {
                     return template.replace(/\{(\w+)\}/g, (match, key) => {
                         return context[key]?.toString() || match;
                     });
-                }
+                },
             };
 
             expect(errorFormatter.formatError("TEST_ERROR", { siteId: "123" })).toBe("Error TEST_ERROR (siteId: 123)");
             expect(errorFormatter.getLocalizedMessage("SITE_NOT_FOUND", "en")).toBe("Site not found");
             expect(errorFormatter.getLocalizedMessage("SITE_NOT_FOUND", "es")).toBe("Sitio no encontrado");
-            expect(errorFormatter.formatWithContext("Site {siteId} not found", { siteId: "123" })).toBe("Site 123 not found");
+            expect(errorFormatter.formatWithContext("Site {siteId} not found", { siteId: "123" })).toBe(
+                "Site 123 not found"
+            );
         });
     });
 
@@ -407,7 +437,7 @@ describe("Shared Utils Coverage", () => {
                 },
                 normalizeWhitespace: (str: string): string => {
                     return str.replace(/\s+/g, " ").trim();
-                }
+                },
             };
 
             expect(stringUtils.safeToString(null)).toBe("null");
@@ -438,7 +468,7 @@ describe("Shared Utils Coverage", () => {
                     } catch (error) {
                         return fallback;
                     }
-                }
+                },
             };
 
             // Test circular reference handling
@@ -474,7 +504,7 @@ describe("Shared Utils Coverage", () => {
                         return value !== 0;
                     }
                     return fallback;
-                }
+                },
             };
 
             expect(conversionUtils.safeNumber("123.45")).toBe(123.45);

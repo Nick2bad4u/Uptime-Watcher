@@ -110,7 +110,7 @@ describe("useMonitorFields Hook", () => {
         it("should return initial loading state", () => {
             // Set up mock to simulate loading state
             mockMonitorTypesStore.isLoaded = false;
-            
+
             // Make the IPC call never resolve
             mockElectronAPI.monitorTypes.getMonitorTypes.mockImplementation(() => new Promise(() => {}));
 
@@ -172,7 +172,7 @@ describe("useMonitorFields Hook", () => {
             // Configure the mock store to have empty field configurations
             mockMonitorTypesStore.fieldConfigs = {};
             mockMonitorTypesStore.isLoaded = true;
-            
+
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
                 success: true,
                 data: [],

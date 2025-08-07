@@ -34,7 +34,7 @@ describe("DynamicMonitorFields", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         // Default mock implementation
         vi.mocked(useMonitorTypesStore).mockReturnValue({
             monitorTypes: [

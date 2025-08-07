@@ -22,17 +22,17 @@ Your monitor service **MUST** return a result matching the `MonitorCheckResult` 
 
 ```typescript
 export interface MonitorCheckResult {
-    /** Optional human-readable details about the check result */
-    details?: string;
-    
-    /** Optional error message if the check failed */
-    error?: string;
-    
-    /** Response time in milliseconds (required) */
-    responseTime: number;
-    
-    /** Status outcome of the check */
-    status: "up" | "down";
+ /** Optional human-readable details about the check result */
+ details?: string;
+
+ /** Optional error message if the check failed */
+ error?: string;
+
+ /** Response time in milliseconds (required) */
+ responseTime: number;
+
+ /** Status outcome of the check */
+ status: "up" | "down";
 }
 ```
 
@@ -41,7 +41,7 @@ export interface MonitorCheckResult {
 **⚠️ IMPORTANT - Required Fields:**
 
 - **`responseTime: number`** - **REQUIRED** field representing response time in milliseconds
-- **`status: "up" | "down"`** - **REQUIRED** status outcome 
+- **`status: "up" | "down"`** - **REQUIRED** status outcome
 - **`details?: string`** - **RECOMMENDED** for proper history tracking
 - **`error?: string`** - **OPTIONAL** for technical error information
 
@@ -50,25 +50,25 @@ export interface MonitorCheckResult {
 ```typescript
 // ✅ CORRECT - Complete implementation
 return {
-    status: "up",
-    responseTime: 150, // Required - actual response time in ms
-    details: "HTTP 200 OK - Response received successfully", // Recommended for history
-    error: undefined // Optional - only if there's a technical error to report
+ status: "up",
+ responseTime: 150, // Required - actual response time in ms
+ details: "HTTP 200 OK - Response received successfully", // Recommended for history
+ error: undefined, // Optional - only if there's a technical error to report
 };
 
-// ✅ CORRECT - Minimal valid implementation  
+// ✅ CORRECT - Minimal valid implementation
 return {
-    status: "down",
-    responseTime: 5000, // Required - timeout value when failed
-    details: "Connection timeout", // Recommended
-    error: "ECONNREFUSED" // Optional technical details
+ status: "down",
+ responseTime: 5000, // Required - timeout value when failed
+ details: "Connection timeout", // Recommended
+ error: "ECONNREFUSED", // Optional technical details
 };
 
 // ❌ WRONG - Missing required responseTime
 return {
-    status: "up",
-    details: "HTTP 200 OK"
-    // Missing responseTime - will cause TypeScript compilation error
+ status: "up",
+ details: "HTTP 200 OK",
+ // Missing responseTime - will cause TypeScript compilation error
 };
 ```
 
@@ -77,7 +77,7 @@ return {
 The system uses the **unified enhanced monitoring architecture**:
 
 - **Enhanced Monitoring**: The only monitoring system with operation correlation and race condition prevention
-- **Used for**: All scheduled and manual health checks  
+- **Used for**: All scheduled and manual health checks
 - **Location**: `electron/services/monitoring/` directory
 - **No Fallbacks**: Legacy monitoring systems have been completely removed
 
@@ -87,12 +87,12 @@ The system uses the **unified enhanced monitoring architecture**:
 
 **Core required fields for every monitor type:**
 
-| Field           | Type     | Range/Validation  | Description                    |
-| --------------- | -------- | ----------------- | ------------------------------ |
-| `checkInterval` | `number` | 5000ms - 30 days  | Check frequency                |
-| `retryAttempts` | `number` | 0 - 10 attempts   | Retry attempts on failure      |
-| `timeout`       | `number` | 1000ms - 300000ms | Request timeout                |
-| `details`       | `string` | Non-empty string  | Result details for history     |
+| Field           | Type     | Range/Validation  | Description                |
+| --------------- | -------- | ----------------- | -------------------------- |
+| `checkInterval` | `number` | 5000ms - 30 days  | Check frequency            |
+| `retryAttempts` | `number` | 0 - 10 attempts   | Retry attempts on failure  |
+| `timeout`       | `number` | 1000ms - 300000ms | Request timeout            |
+| `details`       | `string` | Non-empty string  | Result details for history |
 
 These fields are enforced by validation schemas and used by the monitoring scheduler.
 

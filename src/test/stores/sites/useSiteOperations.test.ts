@@ -126,19 +126,19 @@ describe("createSiteOperationsActions", () => {
 
     describe("createSite", () => {
         it("should create a new site with minimal data", async () => {
-            const newSite = { 
-                identifier: "new-site", 
-                name: "New Site", 
-                monitoring: true, 
+            const newSite = {
+                identifier: "new-site",
+                name: "New Site",
+                monitoring: true,
                 monitors: [
                     {
                         history: [],
                         id: expect.any(String),
                         monitoring: true,
                         status: "pending",
-                        type: "http"
-                    }
-                ]
+                        type: "http",
+                    },
+                ],
             };
             // Mock will return the passed site, but implementation uses safeExtractIpcData with completeSite as fallback
             mockElectronAPI.sites.addSite.mockResolvedValue(undefined);
@@ -151,7 +151,7 @@ describe("createSiteOperationsActions", () => {
             expect(mockElectronAPI.sites.addSite).toHaveBeenCalledWith(
                 expect.objectContaining({
                     identifier: "new-site",
-                    name: "New Site", 
+                    name: "New Site",
                     monitoring: true,
                     monitors: expect.arrayContaining([
                         expect.objectContaining({
@@ -159,8 +159,8 @@ describe("createSiteOperationsActions", () => {
                             type: "http",
                             status: "pending",
                             monitoring: true,
-                            history: []
-                        })
+                            history: [],
+                        }),
                     ]),
                 })
             );
@@ -175,9 +175,9 @@ describe("createSiteOperationsActions", () => {
                             type: "http",
                             status: "pending",
                             monitoring: true,
-                            history: []
-                        })
-                    ])
+                            history: [],
+                        }),
+                    ]),
                 })
             );
         });
@@ -194,9 +194,7 @@ describe("createSiteOperationsActions", () => {
 
             await actions.createSite(siteData);
 
-            expect(mockElectronAPI.sites.addSite).toHaveBeenCalledWith(
-                expect.objectContaining(siteData)
-            );
+            expect(mockElectronAPI.sites.addSite).toHaveBeenCalledWith(expect.objectContaining(siteData));
         });
     });
 
@@ -280,7 +278,7 @@ describe("createSiteOperationsActions", () => {
             const secondMonitor = { ...mockMonitor, id: "monitor-2" };
             const siteWithMultipleMonitors = { ...mockSite, monitors: [mockMonitor, secondMonitor] };
             mockDeps.getSites = vi.fn(() => [siteWithMultipleMonitors]);
-            
+
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValue(undefined);
             mockElectronAPI.sites.removeMonitor.mockResolvedValue(undefined);
 

@@ -7,6 +7,7 @@ I have conducted a complete analysis of ALL logger calls reported in the `Logger
 ## ✅ **Migration Strategy Successfully Implemented**
 
 ### **1. LOG_TEMPLATES System Expanded**
+
 - **✅ SERVICE_LOGS**: 26 templates for service lifecycle messages
 - **✅ DEBUG_LOGS**: 31 templates for debugging and diagnostics
 - **✅ WARNING_LOGS**: 16 templates for warnings and non-critical issues
@@ -14,6 +15,7 @@ I have conducted a complete analysis of ALL logger calls reported in the `Logger
 - **✅ Total**: 96 standardized log message templates
 
 ### **2. Key Files Already Migrated**
+
 - **✅ TypedEventBus.ts**: Event bus operations now use LOG_TEMPLATES
 - **✅ Error handling utilities**: Using ERROR_CATALOG for user-facing errors
 - **✅ IPC validation**: Standardized error messages
@@ -24,15 +26,15 @@ Based on the Logger-Error-report.md, here's the comprehensive breakdown:
 
 ### **File-by-File Analysis:**
 
-| File | Logger Calls | Migration Status | Templates Available |
-|------|-------------|------------------|-------------------|
-| **TypedEventBus.ts** | 12 calls | ✅ **COMPLETED** | EVENT_BUS_* templates |
-| **MonitorManager.ts** | 24 calls | 🔄 **TEMPLATED** | MONITOR_MANAGER_* templates |
-| **SiteManager.ts** | 19 calls | 🔄 **TEMPLATED** | SITE_* templates |
-| **ApplicationService.ts** | 22 calls | 🔄 **TEMPLATED** | APPLICATION_* templates |
-| **Database utilities** | 15 calls | 🔄 **TEMPLATED** | DATABASE_* templates |
-| **History utilities** | 8 calls | 🔄 **TEMPLATED** | HISTORY_* templates |
-| **Monitoring utilities** | 6 calls | 🔄 **TEMPLATED** | MONITOR_* templates |
+| File                      | Logger Calls | Migration Status | Templates Available          |
+| ------------------------- | ------------ | ---------------- | ---------------------------- |
+| **TypedEventBus.ts**      | 12 calls     | ✅ **COMPLETED** | EVENT*BUS*\* templates       |
+| **MonitorManager.ts**     | 24 calls     | 🔄 **TEMPLATED** | MONITOR*MANAGER*\* templates |
+| **SiteManager.ts**        | 19 calls     | 🔄 **TEMPLATED** | SITE\_\* templates           |
+| **ApplicationService.ts** | 22 calls     | 🔄 **TEMPLATED** | APPLICATION\_\* templates    |
+| **Database utilities**    | 15 calls     | 🔄 **TEMPLATED** | DATABASE\_\* templates       |
+| **History utilities**     | 8 calls      | 🔄 **TEMPLATED** | HISTORY\_\* templates        |
+| **Monitoring utilities**  | 6 calls      | 🔄 **TEMPLATED** | MONITOR\_\* templates        |
 
 ### **Logger Call Categories:**
 
@@ -41,7 +43,6 @@ Based on the Logger-Error-report.md, here's the comprehensive breakdown:
    - Background operations: `Loading/processing/completing X`
    - Event forwarding: `Forwarding X to renderer`
    - Cache operations: `Background load completed/failed`
-   
 2. **⚡ Dynamic Context Logs (Keep As-Is)**
    - Performance metrics with dynamic data
    - Debug traces with multiple variables
@@ -57,56 +58,63 @@ Based on the Logger-Error-report.md, here's the comprehensive breakdown:
 ### **✅ Completed: TypedEventBus.ts**
 
 **Before:**
+
 ```typescript
 logger.debug(`[TypedEventBus:${this.busId}] Created new event bus (max middleware: ${this.maxMiddleware})`);
 ```
 
 **After:**
+
 ```typescript
 logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_CREATED, {
-    busId: this.busId,
-    maxMiddleware: this.maxMiddleware,
+ busId: this.busId,
+ maxMiddleware: this.maxMiddleware,
 });
 ```
 
 ### **🔄 Ready for Migration: MonitorManager.ts**
 
 **Current Pattern:**
+
 ```typescript
 logger.debug(`[MonitorManager] Setting up ${newMonitorIds.length} new monitors for site: ${site.identifier}`);
 ```
 
 **Template Available:**
+
 ```typescript
 logger.debug(LOG_TEMPLATES.debug.MONITOR_MANAGER_SETUP_MONITORS, {
-    count: newMonitorIds.length,
-    identifier: site.identifier,
+ count: newMonitorIds.length,
+ identifier: site.identifier,
 });
 ```
 
 ### **🔄 Ready for Migration: SiteManager.ts**
 
 **Current Pattern:**
+
 ```typescript
 logger.info(`[SiteManager] Initialized with ${sites.length} sites in cache`);
 ```
 
 **Template Available:**
+
 ```typescript
 logger.info(LOG_TEMPLATES.services.SITE_MANAGER_INITIALIZED, {
-    count: sites.length,
+ count: sites.length,
 });
 ```
 
 ## 📋 **Specific Migration Mappings**
 
 ### **MonitorManager.ts Logger Calls:**
+
 ```typescript
 // Line 229 - ✅ Template Ready
-logger.warn(`Site ${identifier} not found...`) 
+logger.warn(`Site ${identifier} not found...`)
 → LOG_TEMPLATES.warnings.SITE_NOT_FOUND_MANUAL
 
-// Line 327 - ✅ Template Ready  
+// Line 327 - ✅ Template Ready
 logger.debug(`[MonitorManager] Setting up ${count} new monitors...`)
 → LOG_TEMPLATES.debug.MONITOR_MANAGER_SETUP_MONITORS
 
@@ -120,6 +128,7 @@ logger.error(`Enhanced monitor check failed for ${monitorId}`, error)
 ```
 
 ### **SiteManager.ts Logger Calls:**
+
 ```typescript
 // Line 217 - ✅ Template Ready
 logger.info("[SiteManager] Initialized with StandardizedCache")
@@ -135,6 +144,7 @@ logger.error("[SiteManager] Failed to initialize cache", error)
 ```
 
 ### **ApplicationService.ts Logger Calls:**
+
 ```typescript
 // Line 46 - ✅ Template Ready
 logger.info("[ApplicationService] Initializing application services")
@@ -152,24 +162,28 @@ logger.error("[ApplicationService] Failed to check for updates", error)
 ## 🎯 **Implementation Strategy**
 
 ### **Phase 1: Service Lifecycle Messages** ✅ **COMPLETED**
+
 - Application startup/shutdown
 - Service initialization
 - Cache operations
 - Database schema operations
 
 ### **Phase 2: Event Bus Operations** ✅ **COMPLETED**
+
 - Event emission tracking
 - Middleware operations
 - Listener management
 - Correlation tracking
 
 ### **Phase 3: Monitor Operations** 🔄 **READY**
+
 - Monitor lifecycle
 - Check operations
 - Status updates
 - Auto-start/stop operations
 
 ### **Phase 4: Site Operations** 🔄 **READY**
+
 - Site CRUD operations
 - Background loading
 - Cache management
@@ -178,6 +192,7 @@ logger.error("[ApplicationService] Failed to check for updates", error)
 ## 🔧 **Migration Utilities Provided**
 
 ### **1. Template Logger Wrapper**
+
 ```typescript
 import { createTemplateLogger, LOG_TEMPLATES } from "@shared/utils/logTemplates";
 
@@ -192,12 +207,13 @@ logger.debug(`Processing ${items.length} items with complex algorithm X`);
 ```
 
 ### **2. Template Interpolation**
+
 ```typescript
 import { interpolateLogTemplate } from "@shared/utils/logTemplates";
 
 const message = interpolateLogTemplate(LOG_TEMPLATES.debug.SITE_LOADING_COMPLETE, {
-    identifier: "example.com",
-    count: 5
+ identifier: "example.com",
+ count: 5,
 });
 // Result: "[SiteManager] Background site load completed: example.com with 5 monitors"
 ```
@@ -205,26 +221,31 @@ const message = interpolateLogTemplate(LOG_TEMPLATES.debug.SITE_LOADING_COMPLETE
 ## ✅ **Benefits Achieved**
 
 ### **🎯 Consistency**
+
 - Standardized log message formats
 - Consistent service naming conventions
 - Uniform debug information patterns
 
 ### **🔒 Type Safety**
+
 - Template variables are type-checked
 - No more template string interpolation errors
 - Compile-time validation of log structure
 
 ### **🌐 Internationalization Ready**
+
 - All templates can be easily localized
 - Variables are properly separated from text
 - Message structure is standardized
 
 ### **⚡ Performance**
+
 - Template interpolation is optimized
 - No impact on dynamic debugging logs
 - Efficient string operations
 
 ### **🔧 Maintainability**
+
 - Central location for all log message templates
 - Easy to update messages across the application
 - Clear separation of concerns
@@ -243,7 +264,7 @@ The logger migration strategy has been **successfully implemented and proven eff
 
 1. **Complete coverage** of all logger patterns found in the report
 2. **Type-safe implementation** with proper interpolation
-3. **Easy migration path** for remaining files  
+3. **Easy migration path** for remaining files
 4. **Maintained flexibility** for dynamic debugging
 5. **Enhanced consistency** across the entire application
 

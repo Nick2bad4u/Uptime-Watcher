@@ -183,11 +183,11 @@ describe("monitorTypeHelper", () => {
 
         it("should fetch from backend when cache is empty", async () => {
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
-            
+
             // Configure mock store to return the expected monitor types
             mockMonitorTypesStore.monitorTypes = mockMonitorTypes;
             mockMonitorTypesStore.isLoaded = true;
-            
+
             vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(async (fn) => await fn());
 
             const result = await getAvailableMonitorTypes();
@@ -211,11 +211,11 @@ describe("monitorTypeHelper", () => {
 
         it("should cache fetched data for subsequent calls", async () => {
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
-            
+
             // Configure mock store to return the expected monitor types
             mockMonitorTypesStore.monitorTypes = mockMonitorTypes;
             mockMonitorTypesStore.isLoaded = true;
-            
+
             vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(async (fn) => await fn());
 
             await getAvailableMonitorTypes();
@@ -227,11 +227,11 @@ describe("monitorTypeHelper", () => {
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
             vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(async (fn) => await fn());
             vi.mocked(ipcTypes.safeExtractIpcData).mockReturnValue([]);
-            
+
             // Configure the mock store to return empty data
             mockMonitorTypesStore.monitorTypes = [];
             mockMonitorTypesStore.isLoaded = true;
-            
+
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
                 success: true,
                 data: [],
@@ -245,11 +245,11 @@ describe("monitorTypeHelper", () => {
 
         it("should handle invalid cache data gracefully", async () => {
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(null);
-            
+
             // Configure mock store to return the expected monitor types
             mockMonitorTypesStore.monitorTypes = mockMonitorTypes;
             mockMonitorTypesStore.isLoaded = true;
-            
+
             vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(async (fn) => await fn());
 
             const result = await getAvailableMonitorTypes();
@@ -455,18 +455,18 @@ describe("monitorTypeHelper", () => {
     describe("Store integration", () => {
         it("should use monitor types store correctly", async () => {
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
-            
+
             // Configure mock store to simulate unloaded state initially
             mockMonitorTypesStore.monitorTypes = [];
             mockMonitorTypesStore.isLoaded = false;
-            
+
             const loadMonitorTypesMock = vi.fn().mockImplementation(() => {
                 // Simulate loading completing
                 mockMonitorTypesStore.monitorTypes = mockMonitorTypes;
                 mockMonitorTypesStore.isLoaded = true;
             });
             mockMonitorTypesStore.loadMonitorTypes = loadMonitorTypesMock;
-            
+
             vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(async (fn) => await fn());
 
             await getAvailableMonitorTypes();

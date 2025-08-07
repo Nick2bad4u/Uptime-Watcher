@@ -14,7 +14,7 @@ electron/services/ipc/
 
 ## Handler Implementation Template
 
-```typescript
+````typescript
 /**
  * IPC handlers for [DOMAIN] operations.
  *
@@ -30,11 +30,7 @@ import type { IpcServiceDependencies } from "../IpcService";
 import { logger } from "../../utils/logger";
 
 // Import validation functions from validators.ts
-import {
-    isExampleCreateData,
-    isExampleUpdateData,
-    isExampleIdParams,
-} from "../validators";
+import { isExampleCreateData, isExampleUpdateData, isExampleIdParams } from "../validators";
 
 /**
  * Registers all [DOMAIN]-related IPC handlers.
@@ -58,115 +54,112 @@ import {
  * @public
  */
 export function registerExampleHandlers(
-    ipcService: any, // Use actual IpcService type
-    dependencies: IpcServiceDependencies
+ ipcService: any, // Use actual IpcService type
+ dependencies: IpcServiceDependencies
 ): void {
-    const { exampleManager } = dependencies;
+ const { exampleManager } = dependencies;
 
-    // GET operations (no parameters)
-    ipcService.registerStandardizedIpcHandler(
-        'example:get-all',
-        async (): Promise<Example[]> => {
-            logger.debug("[IPC] Getting all examples");
-            const examples = await exampleManager.getAllExamples();
-            return examples;
-        }
-        // No validation needed for parameterless operations
-    );
+ // GET operations (no parameters)
+ ipcService.registerStandardizedIpcHandler(
+  "example:get-all",
+  async (): Promise<Example[]> => {
+   logger.debug("[IPC] Getting all examples");
+   const examples = await exampleManager.getAllExamples();
+   return examples;
+  }
+  // No validation needed for parameterless operations
+ );
 
-    // GET operations (with parameters)
-    ipcService.registerStandardizedIpcHandler(
-        'example:get-by-id',
-        async (params: ExampleIdParams): Promise<Example | undefined> => {
-            logger.debug(`[IPC] Getting example by ID: ${params.id}`);
-            const example = await exampleManager.getExampleById(params.id);
-            return example;
-        },
-        isExampleIdParams
-    );
+ // GET operations (with parameters)
+ ipcService.registerStandardizedIpcHandler(
+  "example:get-by-id",
+  async (params: ExampleIdParams): Promise<Example | undefined> => {
+   logger.debug(`[IPC] Getting example by ID: ${params.id}`);
+   const example = await exampleManager.getExampleById(params.id);
+   return example;
+  },
+  isExampleIdParams
+ );
 
-    // CREATE operations
-    ipcService.registerStandardizedIpcHandler(
-        'example:create',
-        async (params: ExampleCreateData): Promise<Example> => {
-            logger.debug(`[IPC] Creating example: ${params.name}`);
-            const example = await exampleManager.createExample(params);
-            return example;
-        },
-        isExampleCreateData
-    );
+ // CREATE operations
+ ipcService.registerStandardizedIpcHandler(
+  "example:create",
+  async (params: ExampleCreateData): Promise<Example> => {
+   logger.debug(`[IPC] Creating example: ${params.name}`);
+   const example = await exampleManager.createExample(params);
+   return example;
+  },
+  isExampleCreateData
+ );
 
-    // UPDATE operations
-    ipcService.registerStandardizedIpcHandler(
-        'example:update',
-        async (params: ExampleUpdateParams): Promise<void> => {
-            logger.debug(`[IPC] Updating example: ${params.id}`);
-            await exampleManager.updateExample(params.id, params.updates);
-        },
-        isExampleUpdateParams
-    );
+ // UPDATE operations
+ ipcService.registerStandardizedIpcHandler(
+  "example:update",
+  async (params: ExampleUpdateParams): Promise<void> => {
+   logger.debug(`[IPC] Updating example: ${params.id}`);
+   await exampleManager.updateExample(params.id, params.updates);
+  },
+  isExampleUpdateParams
+ );
 
-    // DELETE operations
-    ipcService.registerStandardizedIpcHandler(
-        'example:delete',
-        async (params: ExampleIdParams): Promise<void> => {
-            logger.debug(`[IPC] Deleting example: ${params.id}`);
-            await exampleManager.deleteExample(params.id);
-        },
-        isExampleIdParams
-    );
+ // DELETE operations
+ ipcService.registerStandardizedIpcHandler(
+  "example:delete",
+  async (params: ExampleIdParams): Promise<void> => {
+   logger.debug(`[IPC] Deleting example: ${params.id}`);
+   await exampleManager.deleteExample(params.id);
+  },
+  isExampleIdParams
+ );
 
-    // BULK operations
-    ipcService.registerStandardizedIpcHandler(
-        'example:bulk-create',
-        async (params: ExampleBulkCreateData): Promise<Example[]> => {
-            logger.debug(`[IPC] Bulk creating ${params.examples.length} examples`);
-            const examples = await exampleManager.bulkCreateExamples(params.examples);
-            return examples;
-        },
-        isExampleBulkCreateData
-    );
+ // BULK operations
+ ipcService.registerStandardizedIpcHandler(
+  "example:bulk-create",
+  async (params: ExampleBulkCreateData): Promise<Example[]> => {
+   logger.debug(`[IPC] Bulk creating ${params.examples.length} examples`);
+   const examples = await exampleManager.bulkCreateExamples(params.examples);
+   return examples;
+  },
+  isExampleBulkCreateData
+ );
 
-    // UTILITY operations
-    ipcService.registerStandardizedIpcHandler(
-        'example:validate-data',
-        async (params: ExampleValidationData): Promise<ValidationResult> => {
-            logger.debug("[IPC] Validating example data");
-            const result = await exampleManager.validateExampleData(params);
-            return result;
-        },
-        isExampleValidationData
-    );
+ // UTILITY operations
+ ipcService.registerStandardizedIpcHandler(
+  "example:validate-data",
+  async (params: ExampleValidationData): Promise<ValidationResult> => {
+   logger.debug("[IPC] Validating example data");
+   const result = await exampleManager.validateExampleData(params);
+   return result;
+  },
+  isExampleValidationData
+ );
 
-    // EXPORT/IMPORT operations
-    ipcService.registerStandardizedIpcHandler(
-        'example:export-data',
-        async (): Promise<ExportData> => {
-            logger.debug("[IPC] Exporting example data");
-            const exportData = await exampleManager.exportExamples();
-            return exportData;
-        }
-    );
+ // EXPORT/IMPORT operations
+ ipcService.registerStandardizedIpcHandler("example:export-data", async (): Promise<ExportData> => {
+  logger.debug("[IPC] Exporting example data");
+  const exportData = await exampleManager.exportExamples();
+  return exportData;
+ });
 
-    ipcService.registerStandardizedIpcHandler(
-        'example:import-data',
-        async (params: ExampleImportData): Promise<ImportResult> => {
-            logger.debug(`[IPC] Importing example data: ${params.examples.length} items`);
-            const result = await exampleManager.importExamples(params.examples);
-            return result;
-        },
-        isExampleImportData
-    );
+ ipcService.registerStandardizedIpcHandler(
+  "example:import-data",
+  async (params: ExampleImportData): Promise<ImportResult> => {
+   logger.debug(`[IPC] Importing example data: ${params.examples.length} items`);
+   const result = await exampleManager.importExamples(params.examples);
+   return result;
+  },
+  isExampleImportData
+ );
 
-    logger.info("[IPC] Example handlers registered successfully");
+ logger.info("[IPC] Example handlers registered successfully");
 }
-```
+````
 
 ## Validation Functions Template
 
 Add validation functions to `validators.ts` or import them from `../validation/exampleValidation.ts`:
 
-```typescript
+````typescript
 /**
  * Validation functions for [DOMAIN] IPC operations.
  *
@@ -183,7 +176,7 @@ Add validation functions to `validators.ts` or import them from `../validation/e
  * @public
  */
 export interface ExampleIdParams {
-    id: string;
+ id: string;
 }
 
 /**
@@ -191,10 +184,10 @@ export interface ExampleIdParams {
  * @public
  */
 export interface ExampleCreateData {
-    name: string;
-    description?: string;
-    category: string;
-    // Add other required fields
+ name: string;
+ description?: string;
+ category: string;
+ // Add other required fields
 }
 
 /**
@@ -202,8 +195,8 @@ export interface ExampleCreateData {
  * @public
  */
 export interface ExampleUpdateParams {
-    id: string;
-    updates: Partial<ExampleCreateData>;
+ id: string;
+ updates: Partial<ExampleCreateData>;
 }
 
 /**
@@ -211,7 +204,7 @@ export interface ExampleUpdateParams {
  * @public
  */
 export interface ExampleBulkCreateData {
-    examples: ExampleCreateData[];
+ examples: ExampleCreateData[];
 }
 
 /**
@@ -219,9 +212,9 @@ export interface ExampleBulkCreateData {
  * @public
  */
 export interface ExampleValidationData {
-    name: string;
-    category: string;
-    // Add validation-specific fields
+ name: string;
+ category: string;
+ // Add validation-specific fields
 }
 
 /**
@@ -229,11 +222,11 @@ export interface ExampleValidationData {
  * @public
  */
 export interface ExampleImportData {
-    examples: Example[];
-    options?: {
-        overwrite?: boolean;
-        validate?: boolean;
-    };
+ examples: Example[];
+ options?: {
+  overwrite?: boolean;
+  validate?: boolean;
+ };
 }
 
 /**
@@ -251,13 +244,13 @@ export interface ExampleImportData {
  * ```
  */
 export function isExampleIdParams(data: unknown): data is ExampleIdParams {
-    return (
-        typeof data === 'object' &&
-        data !== null &&
-        'id' in data &&
-        typeof (data as any).id === 'string' &&
-        (data as any).id.length > 0
-    );
+ return (
+  typeof data === "object" &&
+  data !== null &&
+  "id" in data &&
+  typeof (data as any).id === "string" &&
+  (data as any).id.length > 0
+ );
 }
 
 /**
@@ -267,26 +260,25 @@ export function isExampleIdParams(data: unknown): data is ExampleIdParams {
  * @returns Type predicate indicating if data is valid ExampleCreateData
  */
 export function isExampleCreateData(data: unknown): data is ExampleCreateData {
-    if (typeof data !== 'object' || data === null) {
-        return false;
-    }
+ if (typeof data !== "object" || data === null) {
+  return false;
+ }
 
-    const obj = data as any;
+ const obj = data as any;
 
-    return (
-        // Required fields
-        'name' in obj &&
-        typeof obj.name === 'string' &&
-        obj.name.length > 0 &&
-        'category' in obj &&
-        typeof obj.category === 'string' &&
-        obj.category.length > 0 &&
-        
-        // Optional fields
-        (obj.description === undefined || typeof obj.description === 'string')
-        
-        // Add validation for other fields
-    );
+ return (
+  // Required fields
+  "name" in obj &&
+  typeof obj.name === "string" &&
+  obj.name.length > 0 &&
+  "category" in obj &&
+  typeof obj.category === "string" &&
+  obj.category.length > 0 &&
+  // Optional fields
+  (obj.description === undefined || typeof obj.description === "string")
+
+  // Add validation for other fields
+ );
 }
 
 /**
@@ -296,39 +288,37 @@ export function isExampleCreateData(data: unknown): data is ExampleCreateData {
  * @returns Type predicate indicating if data is valid ExampleUpdateParams
  */
 export function isExampleUpdateParams(data: unknown): data is ExampleUpdateParams {
-    if (typeof data !== 'object' || data === null) {
-        return false;
-    }
+ if (typeof data !== "object" || data === null) {
+  return false;
+ }
 
-    const obj = data as any;
+ const obj = data as any;
 
-    return (
-        // Must have id
-        'id' in obj &&
-        typeof obj.id === 'string' &&
-        obj.id.length > 0 &&
-        
-        // Must have updates object
-        'updates' in obj &&
-        typeof obj.updates === 'object' &&
-        obj.updates !== null &&
-        
-        // Validate updates content (at least one valid field)
-        Object.keys(obj.updates).length > 0 &&
-        Object.keys(obj.updates).every((key) => {
-            switch (key) {
-                case 'name':
-                    return typeof obj.updates[key] === 'string';
-                case 'description':
-                    return typeof obj.updates[key] === 'string' || obj.updates[key] === undefined;
-                case 'category':
-                    return typeof obj.updates[key] === 'string';
-                // Add other updateable fields
-                default:
-                    return false; // Unknown fields not allowed
-            }
-        })
-    );
+ return (
+  // Must have id
+  "id" in obj &&
+  typeof obj.id === "string" &&
+  obj.id.length > 0 &&
+  // Must have updates object
+  "updates" in obj &&
+  typeof obj.updates === "object" &&
+  obj.updates !== null &&
+  // Validate updates content (at least one valid field)
+  Object.keys(obj.updates).length > 0 &&
+  Object.keys(obj.updates).every((key) => {
+   switch (key) {
+    case "name":
+     return typeof obj.updates[key] === "string";
+    case "description":
+     return typeof obj.updates[key] === "string" || obj.updates[key] === undefined;
+    case "category":
+     return typeof obj.updates[key] === "string";
+    // Add other updateable fields
+    default:
+     return false; // Unknown fields not allowed
+   }
+  })
+ );
 }
 
 /**
@@ -338,18 +328,18 @@ export function isExampleUpdateParams(data: unknown): data is ExampleUpdateParam
  * @returns Type predicate indicating if data is valid ExampleBulkCreateData
  */
 export function isExampleBulkCreateData(data: unknown): data is ExampleBulkCreateData {
-    if (typeof data !== 'object' || data === null) {
-        return false;
-    }
+ if (typeof data !== "object" || data === null) {
+  return false;
+ }
 
-    const obj = data as any;
+ const obj = data as any;
 
-    return (
-        'examples' in obj &&
-        Array.isArray(obj.examples) &&
-        obj.examples.length > 0 &&
-        obj.examples.every((example: unknown) => isExampleCreateData(example))
-    );
+ return (
+  "examples" in obj &&
+  Array.isArray(obj.examples) &&
+  obj.examples.length > 0 &&
+  obj.examples.every((example: unknown) => isExampleCreateData(example))
+ );
 }
 
 /**
@@ -359,19 +349,16 @@ export function isExampleBulkCreateData(data: unknown): data is ExampleBulkCreat
  * @returns Type predicate indicating if data is valid ExampleValidationData
  */
 export function isExampleValidationData(data: unknown): data is ExampleValidationData {
-    if (typeof data !== 'object' || data === null) {
-        return false;
-    }
+ if (typeof data !== "object" || data === null) {
+  return false;
+ }
 
-    const obj = data as any;
+ const obj = data as any;
 
-    return (
-        'name' in obj &&
-        typeof obj.name === 'string' &&
-        'category' in obj &&
-        typeof obj.category === 'string'
-        // Add other validation-specific field checks
-    );
+ return (
+  "name" in obj && typeof obj.name === "string" && "category" in obj && typeof obj.category === "string"
+  // Add other validation-specific field checks
+ );
 }
 
 /**
@@ -381,32 +368,26 @@ export function isExampleValidationData(data: unknown): data is ExampleValidatio
  * @returns Type predicate indicating if data is valid ExampleImportData
  */
 export function isExampleImportData(data: unknown): data is ExampleImportData {
-    if (typeof data !== 'object' || data === null) {
-        return false;
-    }
+ if (typeof data !== "object" || data === null) {
+  return false;
+ }
 
-    const obj = data as any;
+ const obj = data as any;
 
-    const hasValidExamples = (
-        'examples' in obj &&
-        Array.isArray(obj.examples) &&
-        obj.examples.length > 0
-        // Note: Import might have full Example objects, not just creation data
-    );
+ const hasValidExamples =
+  "examples" in obj && Array.isArray(obj.examples) && obj.examples.length > 0;
+  // Note: Import might have full Example objects, not just creation data
 
-    const hasValidOptions = (
-        obj.options === undefined ||
-        (
-            typeof obj.options === 'object' &&
-            obj.options !== null &&
-            (obj.options.overwrite === undefined || typeof obj.options.overwrite === 'boolean') &&
-            (obj.options.validate === undefined || typeof obj.options.validate === 'boolean')
-        )
-    );
+ const hasValidOptions =
+  obj.options === undefined ||
+  (typeof obj.options === "object" &&
+   obj.options !== null &&
+   (obj.options.overwrite === undefined || typeof obj.options.overwrite === "boolean") &&
+   (obj.options.validate === undefined || typeof obj.options.validate === "boolean"));
 
-    return hasValidExamples && hasValidOptions;
+ return hasValidExamples && hasValidOptions;
 }
-```
+````
 
 ## Preload API Extension Template
 
@@ -415,44 +396,38 @@ Add to your preload script:
 ```typescript
 // In preload.ts, add to electronAPI object
 const electronAPI = {
-    // ... existing API
-    
-    example: {
-        // GET operations
-        getAll: (): Promise<Example[]> =>
-            ipcRenderer.invoke('example:get-all'),
-        
-        getById: (id: string): Promise<Example | undefined> =>
-            ipcRenderer.invoke('example:get-by-id', { id }),
-        
-        // CREATE operations
-        create: (data: ExampleCreateData): Promise<Example> =>
-            ipcRenderer.invoke('example:create', data),
-        
-        bulkCreate: (examples: ExampleCreateData[]): Promise<Example[]> =>
-            ipcRenderer.invoke('example:bulk-create', { examples }),
-        
-        // UPDATE operations
-        update: (id: string, updates: Partial<ExampleCreateData>): Promise<void> =>
-            ipcRenderer.invoke('example:update', { id, updates }),
-        
-        // DELETE operations
-        delete: (id: string): Promise<void> =>
-            ipcRenderer.invoke('example:delete', { id }),
-        
-        // UTILITY operations
-        validateData: (data: ExampleValidationData): Promise<ValidationResult> =>
-            ipcRenderer.invoke('example:validate-data', data),
-        
-        // EXPORT/IMPORT operations
-        exportData: (): Promise<ExportData> =>
-            ipcRenderer.invoke('example:export-data'),
-        
-        importData: (data: ExampleImportData): Promise<ImportResult> =>
-            ipcRenderer.invoke('example:import-data', data),
-    },
-    
-    // ... existing API
+ // ... existing API
+
+ example: {
+  // GET operations
+  getAll: (): Promise<Example[]> => ipcRenderer.invoke("example:get-all"),
+
+  getById: (id: string): Promise<Example | undefined> => ipcRenderer.invoke("example:get-by-id", { id }),
+
+  // CREATE operations
+  create: (data: ExampleCreateData): Promise<Example> => ipcRenderer.invoke("example:create", data),
+
+  bulkCreate: (examples: ExampleCreateData[]): Promise<Example[]> =>
+   ipcRenderer.invoke("example:bulk-create", { examples }),
+
+  // UPDATE operations
+  update: (id: string, updates: Partial<ExampleCreateData>): Promise<void> =>
+   ipcRenderer.invoke("example:update", { id, updates }),
+
+  // DELETE operations
+  delete: (id: string): Promise<void> => ipcRenderer.invoke("example:delete", { id }),
+
+  // UTILITY operations
+  validateData: (data: ExampleValidationData): Promise<ValidationResult> =>
+   ipcRenderer.invoke("example:validate-data", data),
+
+  // EXPORT/IMPORT operations
+  exportData: (): Promise<ExportData> => ipcRenderer.invoke("example:export-data"),
+
+  importData: (data: ExampleImportData): Promise<ImportResult> => ipcRenderer.invoke("example:import-data", data),
+ },
+
+ // ... existing API
 };
 ```
 
@@ -468,13 +443,13 @@ Add to your types file:
  * @public
  */
 export interface Example {
-    id: string;
-    name: string;
-    description?: string;
-    category: string;
-    createdAt: number;
-    updatedAt: number;
-    // Add other entity-specific fields
+ id: string;
+ name: string;
+ description?: string;
+ category: string;
+ createdAt: number;
+ updatedAt: number;
+ // Add other entity-specific fields
 }
 
 /**
@@ -482,8 +457,8 @@ export interface Example {
  * @public
  */
 export interface ValidationResult {
-    isValid: boolean;
-    errors: ValidationError[];
+ isValid: boolean;
+ errors: ValidationError[];
 }
 
 /**
@@ -491,9 +466,9 @@ export interface ValidationResult {
  * @public
  */
 export interface ValidationError {
-    field: string;
-    message: string;
-    code: string;
+ field: string;
+ message: string;
+ code: string;
 }
 
 /**
@@ -501,12 +476,12 @@ export interface ValidationError {
  * @public
  */
 export interface ExportData {
-    examples: Example[];
-    metadata: {
-        exportedAt: number;
-        version: string;
-        count: number;
-    };
+ examples: Example[];
+ metadata: {
+  exportedAt: number;
+  version: string;
+  count: number;
+ };
 }
 
 /**
@@ -514,10 +489,10 @@ export interface ExportData {
  * @public
  */
 export interface ImportResult {
-    success: boolean;
-    imported: number;
-    skipped: number;
-    errors: ImportError[];
+ success: boolean;
+ imported: number;
+ skipped: number;
+ errors: ImportError[];
 }
 
 /**
@@ -525,9 +500,9 @@ export interface ImportResult {
  * @public
  */
 export interface ImportError {
-    item: any;
-    reason: string;
-    code: string;
+ item: any;
+ reason: string;
+ code: string;
 }
 ```
 
@@ -541,67 +516,65 @@ import { registerExampleHandlers } from "../exampleHandlers";
 import type { IpcServiceDependencies } from "../../IpcService";
 
 describe("Example IPC Handlers", () => {
-    let mockIpcService: any;
-    let mockExampleManager: any;
-    let dependencies: IpcServiceDependencies;
+ let mockIpcService: any;
+ let mockExampleManager: any;
+ let dependencies: IpcServiceDependencies;
 
-    beforeEach(() => {
-        mockExampleManager = {
-            getAllExamples: vi.fn(),
-            getExampleById: vi.fn(),
-            createExample: vi.fn(),
-            updateExample: vi.fn(),
-            deleteExample: vi.fn(),
-            bulkCreateExamples: vi.fn(),
-            validateExampleData: vi.fn(),
-            exportExamples: vi.fn(),
-            importExamples: vi.fn(),
-        };
+ beforeEach(() => {
+  mockExampleManager = {
+   getAllExamples: vi.fn(),
+   getExampleById: vi.fn(),
+   createExample: vi.fn(),
+   updateExample: vi.fn(),
+   deleteExample: vi.fn(),
+   bulkCreateExamples: vi.fn(),
+   validateExampleData: vi.fn(),
+   exportExamples: vi.fn(),
+   importExamples: vi.fn(),
+  };
 
-        mockIpcService = {
-            registerStandardizedIpcHandler: vi.fn(),
-        };
+  mockIpcService = {
+   registerStandardizedIpcHandler: vi.fn(),
+  };
 
-        dependencies = {
-            exampleManager: mockExampleManager,
-            // ... other dependencies
-        } as IpcServiceDependencies;
-    });
+  dependencies = {
+   exampleManager: mockExampleManager,
+   // ... other dependencies
+  } as IpcServiceDependencies;
+ });
 
-    it("should register all example handlers", () => {
-        registerExampleHandlers(mockIpcService, dependencies);
+ it("should register all example handlers", () => {
+  registerExampleHandlers(mockIpcService, dependencies);
 
-        expect(mockIpcService.registerStandardizedIpcHandler).toHaveBeenCalledWith(
-            'example:get-all',
-            expect.any(Function)
-        );
-        
-        expect(mockIpcService.registerStandardizedIpcHandler).toHaveBeenCalledWith(
-            'example:create',
-            expect.any(Function),
-            expect.any(Function)
-        );
+  expect(mockIpcService.registerStandardizedIpcHandler).toHaveBeenCalledWith("example:get-all", expect.any(Function));
 
-        // Verify all handlers are registered
-        expect(mockIpcService.registerStandardizedIpcHandler).toHaveBeenCalledTimes(8);
-    });
+  expect(mockIpcService.registerStandardizedIpcHandler).toHaveBeenCalledWith(
+   "example:create",
+   expect.any(Function),
+   expect.any(Function)
+  );
 
-    it("should handle get-all operation", async () => {
-        const mockExamples = [{ id: "1", name: "Test" }];
-        mockExampleManager.getAllExamples.mockResolvedValue(mockExamples);
+  // Verify all handlers are registered
+  expect(mockIpcService.registerStandardizedIpcHandler).toHaveBeenCalledTimes(8);
+ });
 
-        registerExampleHandlers(mockIpcService, dependencies);
-        
-        // Get the registered handler
-        const getAllHandler = mockIpcService.registerStandardizedIpcHandler.mock.calls
-            .find(call => call[0] === 'example:get-all')[1];
+ it("should handle get-all operation", async () => {
+  const mockExamples = [{ id: "1", name: "Test" }];
+  mockExampleManager.getAllExamples.mockResolvedValue(mockExamples);
 
-        const result = await getAllHandler();
-        expect(result).toBe(mockExamples);
-        expect(mockExampleManager.getAllExamples).toHaveBeenCalled();
-    });
+  registerExampleHandlers(mockIpcService, dependencies);
 
-    // Add more handler tests...
+  // Get the registered handler
+  const getAllHandler = mockIpcService.registerStandardizedIpcHandler.mock.calls.find(
+   (call) => call[0] === "example:get-all"
+  )[1];
+
+  const result = await getAllHandler();
+  expect(result).toBe(mockExamples);
+  expect(mockExampleManager.getAllExamples).toHaveBeenCalled();
+ });
+
+ // Add more handler tests...
 });
 ```
 
@@ -634,6 +607,7 @@ Follow these naming patterns:
 ## Error Handling
 
 All handlers automatically get:
+
 - Parameter validation
 - Error logging
 - Consistent error response format

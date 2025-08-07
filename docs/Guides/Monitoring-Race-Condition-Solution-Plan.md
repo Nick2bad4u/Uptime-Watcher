@@ -111,6 +111,7 @@ constructor(private operationRegistry: MonitorOperationRegistry) {}
     async updateMonitorStatus(result: MonitorCheckResult): Promise<boolean> {
         // Validate operation is still valid
         if (!this.operationRegistry.validateOperation(result.operationId)) {
+
 ### 2. ✅ Status Update Validation
 
 **Implementation: `MonitorStatusUpdateService.ts`**
@@ -120,10 +121,10 @@ The monitoring system validates all status updates to prevent race conditions. T
 ```typescript
 // Core health check result interface
 interface MonitorCheckResult {
-    details?: string;      // Optional diagnostic information
-    error?: string;        // Optional error details
-    responseTime: number;  // Response time in milliseconds
-    status: "up" | "down"; // Health status
+ details?: string; // Optional diagnostic information
+ error?: string; // Optional error details
+ responseTime: number; // Response time in milliseconds
+ status: "up" | "down"; // Health status
 }
 
 // Enhanced monitoring handles operation tracking separately
@@ -133,6 +134,7 @@ interface MonitorCheckResult {
 ```
 
 **Key Features:**
+
 - ✅ Operation validation before status updates
 - ✅ Monitor state checking (only update if actively monitoring)
 - ✅ Atomic updates within database transactions
@@ -241,7 +243,7 @@ The race condition solution is **fully implemented and operational**. The monito
 ## ✅ Benefits Delivered
 
 1. ✅ **Prevents state overwrites** - Cancelled operations cannot update monitor status
-2. ✅ **Provides operation correlation** - All checks are tracked with unique IDs  
+2. ✅ **Provides operation correlation** - All checks are tracked with unique IDs
 3. ✅ **Implements timeout management** - Operations auto-cancel to prevent resource leaks
 4. ✅ **Maintains state consistency** - Only active monitors can receive status updates
 5. ✅ **Preserves user experience** - All existing functionality works seamlessly
@@ -251,15 +253,18 @@ The race condition solution is **fully implemented and operational**. The monito
 ## ✅ Implementation Summary
 
 ### Enhanced Monitoring Integration
+
 - ✅ **Operation correlation**: IPC handlers use enhanced monitoring through MonitorManager
 - ✅ **Result validation**: Enhanced monitoring validates operations before processing
 - ✅ **Cleanup on state changes**: MonitorManager cleans up operations on stop/start
 
-### Database Integration  
+### Database Integration
+
 - ✅ **Operation tracking**: Added operation management methods to MonitorRepository
 - ✅ **Transaction safety**: All operation updates wrapped in transactions for consistency
 
 ### Testing and Validation
+
 - ✅ **No regression**: All existing tests pass
 - ✅ **Race condition prevention**: Enhanced monitoring prevents cancelled operations from updating status
 - ✅ **Operation cleanup**: Start/stop operations properly clean up active operations

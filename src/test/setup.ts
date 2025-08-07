@@ -3,7 +3,7 @@
  * Configures testing environment for React components.
  */
 
-import '@testing-library/jest-dom'
+import "@testing-library/jest-dom";
 import { vi, type Mock } from "vitest";
 
 // Global test configuration and mocks
@@ -12,7 +12,8 @@ const mockElectronAPI: {
         downloadSQLiteBackup: Mock<(...args: any[]) => any>;
         exportData: Mock<(...args: any[]) => any>;
         importData: Mock<(...args: any[]) => any>;
-    }; events: {
+    };
+    events: {
         onMonitorStatusChanged: Mock<(_callback: any) => Mock<(...args: any[]) => any>>;
         onMonitorUp: Mock<(_callback: any) => Mock<(...args: any[]) => any>>;
         onMonitorDown: Mock<(_callback: any) => Mock<(...args: any[]) => any>>;
@@ -21,29 +22,35 @@ const mockElectronAPI: {
         onTestEvent: Mock<(_callback: any) => Mock<(...args: any[]) => any>>;
         onUpdateStatus: Mock<(_callback: any) => Mock<(...args: any[]) => any>>;
         removeAllListeners: Mock<(...args: any[]) => any>;
-    }; monitoring: {
+    };
+    monitoring: {
         startMonitoring: Mock<(...args: any[]) => any>;
         startMonitoringForSite: Mock<(...args: any[]) => any>;
         stopMonitoring: Mock<(...args: any[]) => any>;
         stopMonitoringForSite: Mock<(...args: any[]) => any>;
-    }; monitorTypes: {
+    };
+    monitorTypes: {
         formatMonitorDetail: Mock<(...args: any[]) => any>;
         getMonitorTypes: Mock<(...args: any[]) => any>;
         validateMonitorData: Mock<(...args: any[]) => any>;
-    }; settings: {
+    };
+    settings: {
         getHistoryLimit: Mock<(...args: any[]) => any>;
         updateHistoryLimit: Mock<(...args: any[]) => any>;
-    }; sites: {
+    };
+    sites: {
         addSite: Mock<(...args: any[]) => any>;
         checkSiteNow: Mock<(...args: any[]) => any>;
         getSites: Mock<(...args: any[]) => any>;
         removeMonitor: Mock<(...args: any[]) => any>;
         removeSite: Mock<(...args: any[]) => any>;
         updateSite: Mock<(...args: any[]) => any>;
-    }; stateSync: {
+    };
+    stateSync: {
         getSyncStatus: Mock<(...args: any[]) => any>;
         onStateSyncEvent: Mock<(_callback: any) => Mock<(...args: any[]) => any>>;
-    }; system: {
+    };
+    system: {
         openExternal: Mock<(...args: any[]) => any>;
         quitAndInstall: Mock<(...args: any[]) => any>;
     };
@@ -164,7 +171,7 @@ const mockElectronAPI: {
         }),
         getSites: vi.fn().mockResolvedValue([]),
         removeMonitor: vi.fn().mockResolvedValue(true), // Returns boolean
-        removeSite: vi.fn().mockResolvedValue(true), // Returns boolean  
+        removeSite: vi.fn().mockResolvedValue(true), // Returns boolean
         updateSite: vi.fn().mockResolvedValue(undefined), // Returns void
     },
     stateSync: {

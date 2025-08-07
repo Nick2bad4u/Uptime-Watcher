@@ -5,7 +5,8 @@ This document standardizes inline code examples and TSDoc patterns across the Up
 ## TSDoc Standards
 
 ### Basic Format
-```typescript
+
+````typescript
 /**
  * Brief one-line description of the function/class/interface.
  *
@@ -41,19 +42,20 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  * @since Version 1.2.0
  * @public
  */
-```
+````
 
 ### Repository Pattern Documentation
 
 #### Repository Class
-```typescript
+
+````typescript
 /**
  * Repository for managing [ENTITY] data persistence.
  *
  * @remarks
  * Handles all CRUD operations for [ENTITY] in the database using the repository pattern.
  * All mutations are wrapped in transactions for consistency and error handling.
- * 
+ *
  * **Transaction Safety**: All write operations use `executeTransaction()` to ensure atomicity.
  * **Dual Methods**: Public async methods create transactions, internal sync methods work within existing transactions.
  * **Error Handling**: Uses `withDatabaseOperation()` for retry logic and event emission.
@@ -62,17 +64,17 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  * ```typescript
  * // Basic repository usage
  * const repository = new ExampleRepository({ databaseService });
- * 
+ *
  * // Create a new entity
  * await repository.create({
  *   id: "unique-id",
  *   name: "Example Entity",
  *   createdAt: Date.now()
  * });
- * 
+ *
  * // Find all entities
  * const entities = await repository.findAll();
- * 
+ *
  * // Find specific entity
  * const entity = await repository.findById("unique-id");
  * ```
@@ -89,10 +91,11 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  *
  * @public
  */
-```
+````
 
 #### Repository Methods
-```typescript
+
+````typescript
 /**
  * Creates a new [ENTITY] in the database.
  *
@@ -135,12 +138,13 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  * @see {@link createInternal} for transaction-context usage
  * @public
  */
-```
+````
 
 ### Event System Documentation
 
 #### Event Bus
-```typescript
+
+````typescript
 /**
  * Enhanced event bus with type safety and middleware support.
  *
@@ -163,10 +167,10 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  *   'user:login': { userId: string; timestamp: number };
  *   'data:updated': { entityId: string; changes: string[] };
  * }
- * 
+ *
  * // Create typed event bus
  * const eventBus = new TypedEventBus<MyEvents>();
- * 
+ *
  * // Emit typed event
  * await eventBus.emitTyped('user:login', {
  *   userId: '123',
@@ -182,7 +186,7 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  *   console.log(`User ${data.userId} logged in at ${data.timestamp}`);
  *   console.log(`Correlation ID: ${data._meta.correlationId}`);
  * });
- * 
+ *
  * // Add middleware for logging
  * eventBus.use(async (eventName, data, correlationId, next) => {
  *   console.log(`[Event] ${eventName} [${correlationId}]`);
@@ -192,10 +196,11 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  *
  * @public
  */
-```
+````
 
 #### Event Emission
-```typescript
+
+````typescript
 /**
  * Emits a typed event with automatic metadata injection.
  *
@@ -215,11 +220,11 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  * // Object event (typical case)
  * await bus.emitTyped('user:login', { userId: '123', timestamp: Date.now() });
  * // Listener receives: { userId: '123', timestamp: Date.now(), _meta: {...} }
- * 
+ *
  * // Array event
  * await bus.emitTyped('data:batch', [1, 2, 3]);
  * // Listener receives: [1, 2, 3] with _meta property attached
- * 
+ *
  * // Primitive event
  * await bus.emitTyped('count:updated', 42);
  * // Listener receives: { value: 42, _meta: {...} }
@@ -242,19 +247,20 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  *
  * @public
  */
-```
+````
 
 ### Frontend Store Documentation
 
 #### Store Interface
-```typescript
+
+````typescript
 /**
  * [DOMAIN] store for managing [DESCRIPTION] state and interactions.
  *
  * @remarks
  * This store manages [DETAILED DESCRIPTION]. It uses Zustand with [persistence/modular composition]
  * to provide [SPECIFIC CAPABILITIES].
- * 
+ *
  * **State Management**: Uses immutable updates with automatic action logging.
  * **Error Handling**: Integrates with `withErrorHandling()` for consistent error management.
  * **IPC Integration**: Communicates with backend via `window.electronAPI`.
@@ -264,10 +270,10 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  * ```typescript
  * // Basic store usage
  * import { useExampleStore } from './stores/useExampleStore';
- * 
+ *
  * function MyComponent() {
  *   const { items, addItem, removeItem, isLoading } = useExampleStore();
- * 
+ *
  *   const handleAdd = async () => {
  *     const newItem = await useExampleStore.getState().createItem({
  *       name: 'New Item',
@@ -275,7 +281,7 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  *     });
  *     console.log('Created:', newItem);
  *   };
- * 
+ *
  *   return (
  *     <div>
  *       {isLoading ? <Spinner /> : null}
@@ -290,10 +296,10 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  * ```typescript
  * // Advanced usage with selectors
  * // Efficient selector for derived state
- * const activeItems = useExampleStore(state => 
+ * const activeItems = useExampleStore(state =>
  *   state.items.filter(item => item.status === 'active')
  * );
- * 
+ *
  * // Subscription to specific state changes
  * useEffect(() => {
  *   const unsubscribe = useExampleStore.subscribe(
@@ -306,12 +312,13 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  *
  * @public
  */
-```
+````
 
 ### Error Handling Documentation
 
 #### withErrorHandling Function
-```typescript
+
+````typescript
 /**
  * Shared error handling utility for async operations with context-aware behavior.
  *
@@ -322,10 +329,10 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  *
  * @remarks
  * This utility provides two overloaded signatures for different contexts:
- * 
+ *
  * **Frontend Context**: Integrates with store state management (loading, error states).
  * **Backend Context**: Integrates with logging infrastructure for operation tracking.
- * 
+ *
  * **Error Preservation**: Always re-throws original errors to maintain stack traces.
  * **State Safety**: Frontend store operations are protected from cascading failures.
  * **Correlation Tracking**: Backend operations include correlation IDs for debugging.
@@ -350,9 +357,9 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  *     const result = await this.repository.performComplexOperation();
  *     await this.eventBus.emitTyped('operation:completed', { result });
  *     return result;
- *   }, { 
- *     logger, 
- *     operationName: "performBackendOperation" 
+ *   }, {
+ *     logger,
+ *     operationName: "performBackendOperation"
  *   });
  * }
  * ```
@@ -377,12 +384,13 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  *
  * @public
  */
-```
+````
 
 ### IPC Documentation
 
 #### Handler Registration
-```typescript
+
+````typescript
 /**
  * Registers standardized IPC handler with validation and error handling.
  *
@@ -446,14 +454,15 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  *
  * @internal
  */
-```
+````
 
 ## Code Example Standards
 
 ### Inline Examples Format
 
 #### Simple Examples
-```typescript
+
+````typescript
 /**
  * @example
  * ```typescript
@@ -462,57 +471,61 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  * console.log(result);
  * ```
  */
-```
+````
 
 #### Complex Examples
-```typescript
+
+````typescript
 /**
  * @example
  * ```typescript
  * // Comprehensive example with error handling
  * try {
  *   const repository = new ExampleRepository({ databaseService });
- *   
+ *
  *   // Create multiple entities in a transaction
  *   const entities = await repository.bulkCreate([
  *     { name: "Entity 1", category: "test" },
  *     { name: "Entity 2", category: "prod" }
  *   ]);
- *   
+ *
  *   console.log(`Created ${entities.length} entities`);
  * } catch (error) {
  *   console.error("Bulk creation failed:", error.message);
  * }
  * ```
  */
-```
+````
 
 #### Usage Pattern Examples
-```typescript
+
+````typescript
 /**
  * @example
  * ```typescript
  * // Basic usage pattern
  * const store = useExampleStore();
  * const { items, addItem, isLoading } = store;
- * 
+ *
  * // React component integration
  * useEffect(() => {
  *   store.fetchItems();
  * }, []);
- * 
+ *
  * const handleAdd = () => {
  *   addItem({ name: "New Item", category: "default" });
  * };
  * ```
  */
-```
+````
 
 ### Example Categories
 
 #### 1. Basic Usage
+
 Show the most common, straightforward usage:
-```typescript
+
+````typescript
 /**
  * @example
  * ```typescript
@@ -523,11 +536,13 @@ Show the most common, straightforward usage:
  * }
  * ```
  */
-```
+````
 
 #### 2. Error Handling
+
 Demonstrate proper error handling patterns:
-```typescript
+
+````typescript
 /**
  * @example
  * ```typescript
@@ -542,11 +557,13 @@ Demonstrate proper error handling patterns:
  * }
  * ```
  */
-```
+````
 
 #### 3. Advanced Usage
+
 Show complex scenarios and integration patterns:
-```typescript
+
+````typescript
 /**
  * @example
  * ```typescript
@@ -554,22 +571,23 @@ Show complex scenarios and integration patterns:
  * await databaseService.executeTransaction(async (db) => {
  *   // Create user
  *   userRepository.createInternal(db, userData);
- *   
+ *
  *   // Create initial settings
  *   settingsRepository.createInternal(db, defaultSettings);
- *   
+ *
  *   // Log creation event
  *   await eventBus.emitTyped('user:created', { userId: userData.id });
  * });
  * ```
  */
-```
+````
 
 ## TSDoc Tags Reference
 
 ### Standard Tags
+
 - `@param` - Parameter description
-- `@returns` - Return value description  
+- `@returns` - Return value description
 - `@throws` - Exception conditions
 - `@example` - Code examples (always use)
 - `@remarks` - Detailed implementation notes
@@ -578,12 +596,14 @@ Show complex scenarios and integration patterns:
 - `@deprecated` - Mark obsolete APIs
 
 ### Visibility Tags
+
 - `@public` - Public API (exported)
 - `@internal` - Internal implementation (not exported)
 - `@readonly` - Read-only property
 - `@override` - Method overrides parent
 
 ### Custom Tags (Project-Specific)
+
 - `@typeParam` - Generic type parameter description
 - `@template` - Alternative to @typeParam
 

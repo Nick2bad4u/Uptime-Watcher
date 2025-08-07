@@ -1,24 +1,24 @@
 {
-  "$schema": "https://unpkg.com/knip@5/schema.json",
-  "ignoreBinaries": [],
-  "ignoreDependencies": [],
-  "rules": {
-    "files": "error",
-    "dependencies": "error",
-    "devDependencies": "error",
-    "unlisted": "error",
-    "exports": "warn",
-    "nsExports": "warn",
-    "classMembers": "warn",
-    "types": "warn",
-    "nsTypes": "warn",
-    "enumMembers": "warn",
-    "duplicates": "error"
-  },
-  "ignore": [
-    "shared/types/monitorTypes.ts",
-    "shared/types/themeConfig.ts",
-    "src/types/events.ts"
-  ],
-  "ignoreExportsUsedInFile": true
+    "$schema": "https://unpkg.com/knip@5/schema.json",
+    "ignoreBinaries": [],
+    "ignoreDependencies": [],
+    "rules": {
+        "files": "error",
+        "dependencies": "error",
+        "devDependencies": "error",
+        "unlisted": "error",
+        "exports": "warn",
+        "nsExports": "warn",
+        "classMembers": "warn",
+        "types": "warn",
+        "nsTypes": "warn",
+        "enumMembers": "warn",
+        "duplicates": "error"
+    },
+    "ignore": [
+        "shared/types/monitorTypes.ts",
+        "shared/types/themeConfig.ts",
+        "src/types/events.ts"
+    ],
+    "ignoreExportsUsedInFile": true
 }

@@ -266,7 +266,7 @@ describe("useSettingsStore", () => {
 
         it("should handle backend update errors", async () => {
             const error = new Error("Update failed");
-            
+
             const { result } = renderHook(() => useSettingsStore());
 
             // Set initial value BEFORE setting up the error mock
@@ -349,12 +349,12 @@ describe("useSettingsStore", () => {
         it("should handle safeExtractIpcData errors gracefully", async () => {
             // Reset the mock first
             mockElectronAPI.settings.getHistoryLimit.mockReset();
-            
+
             // Make the electronAPI call fail to return an error response
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({ 
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
                 success: false,
                 error: "Backend error",
-                data: undefined
+                data: undefined,
             });
 
             const { result } = renderHook(() => useSettingsStore());

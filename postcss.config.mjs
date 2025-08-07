@@ -5,7 +5,7 @@
  */
 
 export default {
-    "$schema": "https://www.schemastore.org/postcssrc.json",
+    $schema: "https://www.schemastore.org/postcssrc.json",
     plugins: {
         "@tailwindcss/postcss": {},
         autoprefixer: {},

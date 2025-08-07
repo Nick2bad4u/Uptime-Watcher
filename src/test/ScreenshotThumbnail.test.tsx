@@ -204,12 +204,12 @@ describe("ScreenshotThumbnail", () => {
         it("should handle electronAPI without openExternal method", () => {
             // Mock electronAPI without system.openExternal that throws an error
             Object.defineProperty(window, "electronAPI", {
-                value: { 
-                    system: { 
+                value: {
+                    system: {
                         openExternal: vi.fn().mockImplementation(() => {
                             throw new Error("openExternal not available");
-                        })
-                    }
+                        }),
+                    },
                 },
                 writable: true,
             });
@@ -638,8 +638,8 @@ describe("ScreenshotThumbnail", () => {
                 system: {
                     openExternal: vi.fn().mockImplementation(() => {
                         throw new Error("openExternal not available");
-                    })
-                }
+                    }),
+                },
             };
 
             Object.defineProperty(window, "electronAPI", {

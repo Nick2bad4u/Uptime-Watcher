@@ -27,35 +27,45 @@ docs/Architecture/
 ADRs document the key architectural decisions made during development, their context, consequences, and implementation guidelines.
 
 ### [ADR-001: Repository Pattern](./ADRs/ADR-001-Repository-Pattern.md)
+
 **Status: Accepted** - Establishes the repository pattern for all database access
+
 - Dual method pattern (public async + internal sync)
 - Transaction safety with `executeTransaction()`
 - Consistent error handling and event emission
 - All repositories follow this pattern: `SiteRepository`, `MonitorRepository`, `HistoryRepository`, `SettingsRepository`
 
 ### [ADR-002: Event-Driven Architecture](./ADRs/ADR-002-Event-Driven-Architecture.md)
+
 **Status: Accepted** - Core communication mechanism using TypedEventBus
+
 - Type-safe event system with compile-time checking
 - Automatic metadata injection (correlation IDs, timestamps)
 - Domain-based event naming (`domain:action`)
 - IPC event forwarding for frontend integration
 
 ### [ADR-003: Error Handling Strategy](./ADRs/ADR-003-Error-Handling-Strategy.md)
+
 **Status: Accepted** - Multi-layered error handling across all application layers
+
 - Shared `withErrorHandling()` utility with frontend/backend overloads
 - `withDatabaseOperation()` for retry logic and database operations
 - Error preservation principles maintaining stack traces
 - Safe store operations preventing cascading failures
 
 ### [ADR-004: Frontend State Management](./ADRs/ADR-004-Frontend-State-Management.md)
+
 **Status: Accepted** - Zustand-based state management with modular composition
+
 - Type-safe store interfaces with comprehensive TypeScript
 - Modular composition for complex stores
 - Selective persistence for user preferences
 - Integration with error handling and IPC systems
 
 ### [ADR-005: IPC Communication Protocol](./ADRs/ADR-005-IPC-Communication-Protocol.md)
+
 **Status: Accepted** - Standardized Electron IPC communication
+
 - Centralized IPC service with domain-specific handlers
 - Type-safe preload API with contextBridge isolation
 - Consistent validation and error handling
@@ -64,11 +74,12 @@ ADRs document the key architectural decisions made during development, their con
 ## 📋 Development Patterns
 
 ### [Development Patterns Guide](./Patterns/Development-Patterns-Guide.md)
+
 Comprehensive guide to all established patterns in the codebase:
 
 - **Repository Pattern** - Database access with transaction safety
 - **Event-Driven Communication** - TypedEventBus usage and event naming
-- **Error Handling Patterns** - Multi-layered error handling strategies  
+- **Error Handling Patterns** - Multi-layered error handling strategies
 - **Frontend State Management** - Zustand stores and modular composition
 - **IPC Communication** - Electron IPC patterns and type safety
 - **Testing Patterns** - Consistent testing approaches across layers
@@ -78,21 +89,27 @@ Comprehensive guide to all established patterns in the codebase:
 Ready-to-use templates for implementing common patterns:
 
 ### [Repository Template](./Templates/Repository-Template.md)
+
 Complete template for creating new repository classes:
+
 - Full TypeScript implementation with dual methods
 - Query constants and dependency injection
 - Comprehensive TSDoc documentation
 - Test template and integration checklist
 
 ### [Zustand Store Template](./Templates/Zustand-Store-Template.md)
+
 Templates for both simple and complex Zustand stores:
+
 - Simple store pattern for straightforward state
 - Complex store with modular composition
 - Module templates for focused functionality
 - Testing patterns and error integration
 
 ### [IPC Handler Template](./Templates/IPC-Handler-Template.md)
+
 Complete IPC communication implementation:
+
 - Handler registration with validation
 - Preload API extensions
 - Type definitions and error handling
@@ -101,7 +118,9 @@ Complete IPC communication implementation:
 ## 📚 Documentation Standards
 
 ### [TSDoc Standards](./TSDoc-Standards.md)
+
 Standardized documentation patterns for inline code examples:
+
 - Repository pattern documentation examples
 - Event system documentation standards
 - Frontend store documentation patterns
@@ -112,18 +131,21 @@ Standardized documentation patterns for inline code examples:
 ## 🎯 Using This Documentation
 
 ### For New Developers
+
 1. **Start with ADRs** - Understand the architectural decisions and their context
 2. **Read the Patterns Guide** - Learn the established patterns and conventions
 3. **Use Templates** - Implement new features using the provided templates
 4. **Follow TSDoc Standards** - Document your code using the established patterns
 
 ### For Existing Developers
+
 1. **Reference ADRs** - When making architectural changes, consult existing decisions
 2. **Update Patterns** - If you discover new patterns, document them in the guide
 3. **Improve Templates** - Update templates based on learnings and improvements
 4. **Maintain Standards** - Follow and improve the documentation standards
 
 ### For Code Reviews
+
 1. **Check Pattern Compliance** - Ensure new code follows established patterns
 2. **Verify Documentation** - Check that TSDoc follows the standards
 3. **Validate Architecture** - Ensure changes align with ADR decisions
@@ -132,16 +154,19 @@ Standardized documentation patterns for inline code examples:
 ## 🔄 Maintenance Guidelines
 
 ### When to Update ADRs
+
 - **Status Changes** - Mark ADRs as superseded when patterns evolve
 - **New Decisions** - Create new ADRs for significant architectural changes
 - **Context Updates** - Update context and consequences as understanding improves
 
 ### Pattern Evolution
+
 - **Document New Patterns** - Add emerging patterns to the guide
 - **Update Templates** - Evolve templates based on best practices
 - **Maintain Consistency** - Ensure all patterns work together harmoniously
 
 ### Documentation Quality
+
 - **Regular Reviews** - Periodically review and update documentation
 - **Example Accuracy** - Ensure code examples remain current and accurate
 - **Cross-References** - Maintain links between related documents
@@ -149,30 +174,35 @@ Standardized documentation patterns for inline code examples:
 ## 📊 Compliance Tracking
 
 ### Repository Pattern
+
 - ✅ All database access uses repository pattern
 - ✅ All repositories implement dual-method pattern
 - ✅ All mutations use `executeTransaction()`
 - ✅ All operations use `withDatabaseOperation()`
 
 ### Event System
+
 - ✅ All communication uses TypedEventBus
 - ✅ All events follow naming conventions
 - ✅ All events include proper metadata
 - ✅ IPC events are automatically forwarded
 
 ### Error Handling
+
 - ✅ All layers use appropriate error handling utilities
 - ✅ All errors preserve original context
 - ✅ All operations emit appropriate events
 - ✅ Frontend stores use safe operations
 
 ### Frontend State
+
 - ✅ All stores use TypeScript interfaces
 - ✅ Complex stores use modular composition
 - ✅ Persistence is selective and purposeful
 - ✅ Actions include consistent logging
 
 ### IPC Communication
+
 - ✅ All handlers use standardized registration
 - ✅ All parameters are validated
 - ✅ All channels follow naming conventions

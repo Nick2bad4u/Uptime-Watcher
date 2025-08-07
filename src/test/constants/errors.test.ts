@@ -31,7 +31,9 @@ describe("Error Constants", () => {
 
         it("should contain expected monitor error messages", () => {
             expect(ERROR_CATALOG.monitors.NOT_FOUND).toBe("Monitor not found");
-            expect(ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST).toBe("Cannot remove the last monitor from a site. Use site removal instead.");
+            expect(ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST).toBe(
+                "Cannot remove the last monitor from a site. Use site removal instead."
+            );
             expect(ERROR_CATALOG.monitors.FAILED_TO_ADD).toBe("Failed to add monitor");
             expect(ERROR_CATALOG.monitors.FAILED_TO_UPDATE_INTERVAL).toBe("Failed to update check interval");
         });
@@ -65,7 +67,7 @@ describe("Error Constants", () => {
             Object.values(ERROR_CATALOG).forEach((domain) => {
                 expect(typeof domain).toBe("object");
                 expect(Object.keys(domain).length).toBeGreaterThan(0);
-                
+
                 // Test that all error messages are strings
                 Object.values(domain).forEach((message) => {
                     expect(typeof message).toBe("string");

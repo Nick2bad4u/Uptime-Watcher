@@ -83,13 +83,14 @@ npm run dist
 The application follows a sophisticated service-oriented architecture with:
 
 - **Main Process (Electron)**: Service container with dependency injection
-- **Renderer Process (React)**: Component-based UI with Zustand state management  
+- **Renderer Process (React)**: Component-based UI with Zustand state management
 - **IPC Communication**: Type-safe communication via contextBridge
 - **Database Layer**: Repository pattern with SQLite and transaction safety
 - **Event System**: TypedEventBus for cross-service communication
 - **Monitoring System**: Enhanced monitoring with operation correlation and race condition prevention
 
 ### Key Features
+
 - 🏗️ **Service-Oriented Architecture**: Modular, testable service design
 - 🔒 **Type Safety**: Strict TypeScript with comprehensive interfaces
 - 📊 **Enhanced Monitoring**: Race condition prevention and operation correlation
@@ -98,6 +99,7 @@ The application follows a sophisticated service-oriented architecture with:
 - 📚 **Comprehensive Documentation**: ADRs, guides, and code templates
 
 ### Documentation
+
 - 🤖 **[AI Context Guide](./docs/AI-CONTEXT.md)** - Quick onboarding for AI assistants
 - 🚀 **[Developer Quick Start](./docs/DEVELOPER-QUICK-START.md)** - Get started in minutes
 - 📚 **[Complete Documentation Index](./docs/DOCUMENTATION-INDEX.md)** - All documentation organized by role and topic

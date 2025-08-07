@@ -34,14 +34,14 @@ describe("Shared Types Coverage", () => {
                         name: "HTTP Check",
                         configuration: {
                             timeout: 5000,
-                            followRedirects: true
-                        }
-                    }
+                            followRedirects: true,
+                        },
+                    },
                 ],
                 validation: {
                     isValid: true,
-                    errors: []
-                }
+                    errors: [],
+                },
             };
 
             expect(formData.siteName).toBe("Test Site");
@@ -62,7 +62,7 @@ describe("Shared Types Coverage", () => {
             const fieldValidations: FormFieldValidation[] = [
                 { field: "siteName", required: true, type: "string" },
                 { field: "url", required: true, type: "string", validator: (url) => url.startsWith("http") },
-                { field: "monitors", required: true, type: "array" }
+                { field: "monitors", required: true, type: "array" },
             ];
 
             const validateField = (field: FormFieldValidation, value: any): boolean => {
@@ -114,14 +114,14 @@ describe("Shared Types Coverage", () => {
                     expectedStatusCode: 200,
                     followRedirects: true,
                     headers: {
-                        "User-Agent": "Uptime-Watcher/1.0"
-                    }
+                        "User-Agent": "Uptime-Watcher/1.0",
+                    },
                 },
                 alerts: {
                     onFailure: true,
                     onRecovery: true,
-                    threshold: 2
-                }
+                    threshold: 2,
+                },
             };
 
             expect(httpMonitor.type).toBe("http");
@@ -142,7 +142,7 @@ describe("Shared Types Coverage", () => {
                 validateType: (type: string) => ["http", "ping", "port", "dns"].includes(type),
                 validateInterval: (interval: number) => interval >= 30000 && interval <= 3600000,
                 validateTimeout: (timeout: number) => timeout >= 1000 && timeout <= 300000,
-                validateRetryAttempts: (attempts: number) => attempts >= 0 && attempts <= 10
+                validateRetryAttempts: (attempts: number) => attempts >= 0 && attempts <= 10,
             };
 
             expect(validator.validateType("http")).toBe(true);
@@ -221,15 +221,15 @@ describe("Shared Types Coverage", () => {
                     text: {
                         primary: "#f9fafb",
                         secondary: "#d1d5db",
-                        disabled: "#6b7280"
-                    }
+                        disabled: "#6b7280",
+                    },
                 },
                 spacing: {
                     xs: 4,
                     sm: 8,
                     md: 16,
                     lg: 24,
-                    xl: 32
+                    xl: 32,
                 },
                 typography: {
                     fontFamily: "Inter, system-ui, sans-serif",
@@ -238,19 +238,19 @@ describe("Shared Types Coverage", () => {
                         sm: "0.875rem",
                         md: "1rem",
                         lg: "1.125rem",
-                        xl: "1.25rem"
-                    }
+                        xl: "1.25rem",
+                    },
                 },
                 shadows: {
                     sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
                     md: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                    lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1)"
+                    lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
                 },
                 borderRadius: {
                     sm: "0.125rem",
                     md: "0.375rem",
-                    lg: "0.5rem"
-                }
+                    lg: "0.5rem",
+                },
             };
 
             expect(darkTheme.name).toBe("dark");
@@ -272,20 +272,24 @@ describe("Shared Types Coverage", () => {
                         up: "#10b981",
                         down: "#ef4444",
                         pending: "#f59e0b",
-                        unknown: "#6b7280"
+                        unknown: "#6b7280",
                     };
                     return statusColors[status] || statusColors.unknown;
                 },
                 getSpacingValue: (size: string) => {
                     const spacing: Record<string, number> = {
-                        xs: 4, sm: 8, md: 16, lg: 24, xl: 32
+                        xs: 4,
+                        sm: 8,
+                        md: 16,
+                        lg: 24,
+                        xl: 32,
                     };
                     return spacing[size] || spacing.md;
                 },
                 applyTheme: (themeName: string) => {
                     // Mock theme application
                     document.documentElement.setAttribute("data-theme", themeName);
-                }
+                },
             };
 
             expect(themeUtils.getColorByStatus("up")).toBe("#10b981");
@@ -325,21 +329,21 @@ describe("Shared Types Coverage", () => {
                     {
                         field: "siteName",
                         message: "Site name is required",
-                        code: "REQUIRED_FIELD"
-                    }
+                        code: "REQUIRED_FIELD",
+                    },
                 ],
                 warnings: [
                     {
                         field: "url",
                         message: "URL should use HTTPS",
-                        code: "SECURITY_WARNING"
-                    }
+                        code: "SECURITY_WARNING",
+                    },
                 ],
                 metadata: {
                     validatedAt: new Date(),
                     validator: "SiteValidator",
-                    context: { version: "1.0" }
-                }
+                    context: { version: "1.0" },
+                },
             };
 
             expect(validationResult.isValid).toBe(false);
@@ -362,20 +366,20 @@ describe("Shared Types Coverage", () => {
                 {
                     field: "siteName",
                     type: "required",
-                    message: "Site name is required"
+                    message: "Site name is required",
                 },
                 {
                     field: "url",
                     type: "format",
                     message: "Must be a valid URL",
-                    validator: (value: string) => /^https?:\/\/.+/.test(value)
+                    validator: (value: string) => /^https?:\/\/.+/.test(value),
                 },
                 {
                     field: "timeout",
                     type: "range",
                     message: "Timeout must be between 1000 and 300000ms",
-                    parameters: { min: 1000, max: 300000 }
-                }
+                    parameters: { min: 1000, max: 300000 },
+                },
             ];
 
             const applyValidationRule = (rule: ValidationRule, value: any): boolean => {

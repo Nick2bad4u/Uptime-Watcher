@@ -12,9 +12,9 @@ describe("Comprehensive Coverage Boost Tests", () => {
             const mockFormData = {
                 siteName: "test",
                 url: "https://example.com",
-                monitors: []
+                monitors: [],
             };
-            
+
             expect(mockFormData).toBeDefined();
             expect(mockFormData.siteName).toBe("test");
             expect(mockFormData.url).toBe("https://example.com");
@@ -27,9 +27,9 @@ describe("Comprehensive Coverage Boost Tests", () => {
                 type: "http",
                 timeout: 5000,
                 interval: 60000,
-                retryAttempts: 3
+                retryAttempts: 3,
             };
-            
+
             expect(mockMonitorConfig).toBeDefined();
             expect(mockMonitorConfig.type).toBe("http");
             expect(mockMonitorConfig.timeout).toBe(5000);
@@ -43,15 +43,15 @@ describe("Comprehensive Coverage Boost Tests", () => {
                 name: "dark",
                 colors: {
                     primary: "#000000",
-                    secondary: "#ffffff"
+                    secondary: "#ffffff",
                 },
                 spacing: {
                     small: 8,
                     medium: 16,
-                    large: 24
-                }
+                    large: 24,
+                },
             };
-            
+
             expect(mockThemeConfig).toBeDefined();
             expect(mockThemeConfig.name).toBe("dark");
             expect(mockThemeConfig.colors.primary).toBe("#000000");
@@ -63,9 +63,9 @@ describe("Comprehensive Coverage Boost Tests", () => {
             const mockValidationResult = {
                 isValid: true,
                 errors: [],
-                warnings: []
+                warnings: [],
             };
-            
+
             expect(mockValidationResult).toBeDefined();
             expect(mockValidationResult.isValid).toBe(true);
             expect(Array.isArray(mockValidationResult.errors)).toBe(true);
@@ -81,9 +81,9 @@ describe("Comprehensive Coverage Boost Tests", () => {
                 type: "http",
                 url: "https://example.com",
                 enabled: true,
-                configuration: {}
+                configuration: {},
             };
-            
+
             expect(mockMonitorForm).toBeDefined();
             expect(mockMonitorForm.name).toBe("Test Monitor");
             expect(mockMonitorForm.type).toBe("http");
@@ -100,15 +100,15 @@ describe("Comprehensive Coverage Boost Tests", () => {
                         name: "HTTP Monitor",
                         url: "https://api.example.com",
                         timeout: 30000,
-                        interval: 300000
-                    }
+                        interval: 300000,
+                    },
                 ],
                 validation: {
                     hasErrors: false,
-                    errors: []
-                }
+                    errors: [],
+                },
             };
-            
+
             expect(mockFormData).toBeDefined();
             expect(Array.isArray(mockFormData.monitors)).toBe(true);
             expect(mockFormData.monitors.length).toBe(1);
@@ -123,7 +123,7 @@ describe("Comprehensive Coverage Boost Tests", () => {
             const generateCacheKey = (prefix: string, identifier: string) => {
                 return `${prefix}:${identifier}`;
             };
-            
+
             expect(generateCacheKey("sites", "123")).toBe("sites:123");
             expect(generateCacheKey("monitors", "abc")).toBe("monitors:abc");
             expect(generateCacheKey("settings", "theme")).toBe("settings:theme");
@@ -137,10 +137,10 @@ describe("Comprehensive Coverage Boost Tests", () => {
                     timestamp,
                     level,
                     message,
-                    context: context || {}
+                    context: context || {},
                 };
             };
-            
+
             const log = generateLogTemplate("info", "Test message", { userId: 123 });
             expect(log.level).toBe("info");
             expect(log.message).toBe("Test message");
@@ -152,15 +152,15 @@ describe("Comprehensive Coverage Boost Tests", () => {
             // Test errorCatalog.ts functionality (lines 356-390)
             const errorCatalog = {
                 VALIDATION_ERROR: "Validation failed",
-                NETWORK_ERROR: "Network request failed", 
+                NETWORK_ERROR: "Network request failed",
                 DATABASE_ERROR: "Database operation failed",
-                UNKNOWN_ERROR: "An unknown error occurred"
+                UNKNOWN_ERROR: "An unknown error occurred",
             };
-            
+
             const getErrorMessage = (code: string) => {
                 return errorCatalog[code as keyof typeof errorCatalog] || errorCatalog.UNKNOWN_ERROR;
             };
-            
+
             expect(getErrorMessage("VALIDATION_ERROR")).toBe("Validation failed");
             expect(getErrorMessage("NETWORK_ERROR")).toBe("Network request failed");
             expect(getErrorMessage("DATABASE_ERROR")).toBe("Database operation failed");
@@ -174,12 +174,12 @@ describe("Comprehensive Coverage Boost Tests", () => {
             const mockSiteListState = {
                 sites: [],
                 loading: false,
-                error: null
+                error: null,
             };
-            
+
             const isEmpty = mockSiteListState.sites.length === 0;
             const shouldShowEmptyState = isEmpty && !mockSiteListState.loading && !mockSiteListState.error;
-            
+
             expect(isEmpty).toBe(true);
             expect(shouldShowEmptyState).toBe(true);
         });
@@ -189,13 +189,13 @@ describe("Comprehensive Coverage Boost Tests", () => {
             const mockNavigationState = {
                 currentTab: "overview",
                 availableTabs: ["overview", "analytics", "history", "settings"],
-                siteId: "123"
+                siteId: "123",
             };
-            
+
             const isValidTab = (tab: string) => {
                 return mockNavigationState.availableTabs.includes(tab);
             };
-            
+
             expect(isValidTab("overview")).toBe(true);
             expect(isValidTab("analytics")).toBe(true);
             expect(isValidTab("invalid")).toBe(false);
@@ -207,9 +207,9 @@ describe("Comprehensive Coverage Boost Tests", () => {
             const mockMonitorComponents = {
                 statusIndicator: { color: "green", text: "Online" },
                 actionButtons: ["start", "stop", "edit", "delete"],
-                metrics: { uptime: 99.9, responseTime: 245 }
+                metrics: { uptime: 99.9, responseTime: 245 },
             };
-            
+
             expect(mockMonitorComponents.statusIndicator.color).toBe("green");
             expect(mockMonitorComponents.actionButtons).toContain("start");
             expect(mockMonitorComponents.metrics.uptime).toBe(99.9);
@@ -223,14 +223,14 @@ describe("Comprehensive Coverage Boost Tests", () => {
                 isMonitoring: false,
                 lastCheck: null,
                 nextCheck: null,
-                error: null
+                error: null,
             };
-            
+
             // Simulate state transitions
             const startMonitoring = () => ({ ...mockMonitoringState, isMonitoring: true });
             const stopMonitoring = () => ({ ...mockMonitoringState, isMonitoring: false });
             const setError = (error: string) => ({ ...mockMonitoringState, error });
-            
+
             expect(startMonitoring().isMonitoring).toBe(true);
             expect(stopMonitoring().isMonitoring).toBe(false);
             expect(setError("Network error").error).toBe("Network error");
@@ -242,9 +242,10 @@ describe("Comprehensive Coverage Boost Tests", () => {
                 createDownloadLink: (data: string, filename: string) => {
                     const blob = new Blob([data], { type: "application/json" });
                     // Mock URL.createObjectURL for Node.js environment
-                    const url = typeof URL !== 'undefined' && URL.createObjectURL 
-                        ? URL.createObjectURL(blob) 
-                        : `blob:${filename}`;
+                    const url =
+                        typeof URL !== "undefined" && URL.createObjectURL
+                            ? URL.createObjectURL(blob)
+                            : `blob:${filename}`;
                     return { url, filename, blob };
                 },
                 validateFilename: (filename: string) => {
@@ -253,9 +254,9 @@ describe("Comprehensive Coverage Boost Tests", () => {
                 getFileExtension: (filename: string) => {
                     const parts = filename.split(".");
                     return parts.length > 1 ? parts[parts.length - 1] : "";
-                }
+                },
             };
-            
+
             const download = mockFileDownload.createDownloadLink("{}", "test.json");
             expect(download.filename).toBe("test.json");
             expect(download.blob).toBeInstanceOf(Blob);
@@ -275,13 +276,13 @@ describe("Comprehensive Coverage Boost Tests", () => {
                 autoStart: false,
                 historyLimit: 1000,
                 isLoading: false,
-                hasChanges: false
+                hasChanges: false,
             };
-            
+
             const updateSetting = (key: string, value: any) => {
                 return { ...mockSettingsState, [key]: value, hasChanges: true };
             };
-            
+
             const resetSettings = () => {
                 return {
                     theme: "system",
@@ -289,10 +290,10 @@ describe("Comprehensive Coverage Boost Tests", () => {
                     autoStart: false,
                     historyLimit: 500,
                     isLoading: false,
-                    hasChanges: false
+                    hasChanges: false,
                 };
             };
-            
+
             expect(updateSetting("theme", "dark").theme).toBe("dark");
             expect(updateSetting("theme", "dark").hasChanges).toBe(true);
             expect(resetSettings().historyLimit).toBe(500);
@@ -304,9 +305,9 @@ describe("Comprehensive Coverage Boost Tests", () => {
                 Button: { variants: ["primary", "secondary", "danger"] },
                 Input: { types: ["text", "email", "password", "url"] },
                 Card: { sizes: ["small", "medium", "large"] },
-                Modal: { positions: ["center", "top", "bottom"] }
+                Modal: { positions: ["center", "top", "bottom"] },
             };
-            
+
             expect(mockThemeComponents.Button.variants).toContain("primary");
             expect(mockThemeComponents.Input.types).toContain("url");
             expect(mockThemeComponents.Card.sizes.length).toBe(3);
@@ -321,33 +322,33 @@ describe("Comprehensive Coverage Boost Tests", () => {
                 hasError: false,
                 error: null,
                 errorInfo: null,
-                retryCount: 0
+                retryCount: 0,
             };
-            
+
             const simulateError = (error: Error) => {
                 return {
                     ...mockErrorBoundaryState,
                     hasError: true,
                     error,
-                    errorInfo: { componentStack: "Component stack trace" }
+                    errorInfo: { componentStack: "Component stack trace" },
                 };
             };
-            
+
             const resetError = () => {
                 return {
                     ...mockErrorBoundaryState,
                     hasError: false,
                     error: null,
                     errorInfo: null,
-                    retryCount: mockErrorBoundaryState.retryCount + 1
+                    retryCount: mockErrorBoundaryState.retryCount + 1,
                 };
             };
-            
+
             const error = new Error("Test error");
             const errorState = simulateError(error);
             expect(errorState.hasError).toBe(true);
             expect(errorState.error).toBe(error);
-            
+
             const resetState = resetError();
             expect(resetState.hasError).toBe(false);
             expect(resetState.retryCount).toBe(1);
@@ -359,14 +360,14 @@ describe("Comprehensive Coverage Boost Tests", () => {
                 getFallbackValue: <T>(value: T | null | undefined, fallback: T): T => {
                     return value ?? fallback;
                 },
-                getFallbackFunction: <T>(fn: (() => T) | null | undefined, fallback: () => T): () => T => {
+                getFallbackFunction: <T>(fn: (() => T) | null | undefined, fallback: () => T): (() => T) => {
                     return fn ?? fallback;
                 },
                 getFallbackArray: <T>(arr: T[] | null | undefined): T[] => {
                     return arr ?? [];
-                }
+                },
             };
-            
+
             expect(mockFallbacks.getFallbackValue(null, "default")).toBe("default");
             expect(mockFallbacks.getFallbackValue("value", "default")).toBe("value");
             expect(mockFallbacks.getFallbackArray(null)).toEqual([]);

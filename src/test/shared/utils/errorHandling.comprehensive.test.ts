@@ -73,7 +73,11 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             const result = await withErrorHandling(mockOperation, mockStore);
 
             expect(result).toBe("success");
-            expect(mockConsole.warn).toHaveBeenCalledWith("Store operation failed for:", "clear error state", expect.any(Error));
+            expect(mockConsole.warn).toHaveBeenCalledWith(
+                "Store operation failed for:",
+                "clear error state",
+                expect.any(Error)
+            );
         });
 
         it("should handle non-Error objects as error messages", async () => {
