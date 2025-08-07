@@ -374,9 +374,8 @@ export function isExampleImportData(data: unknown): data is ExampleImportData {
 
  const obj = data as any;
 
- const hasValidExamples =
-  "examples" in obj && Array.isArray(obj.examples) && obj.examples.length > 0;
-  // Note: Import might have full Example objects, not just creation data
+ const hasValidExamples = "examples" in obj && Array.isArray(obj.examples) && obj.examples.length > 0;
+ // Note: Import might have full Example objects, not just creation data
 
  const hasValidOptions =
   obj.options === undefined ||

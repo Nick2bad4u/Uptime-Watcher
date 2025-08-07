@@ -166,6 +166,7 @@ private logger = createTemplateLogger(baseLogger);
 - ```typescript
 
   ```
+
 - // ✅ GOOD: User-facing error
 - throw new Error(ERROR_CATALOG.sites.NOT_FOUND);
 -
