@@ -1319,11 +1319,11 @@ export default [
     {
         files: [
             "**/*.config.{ts}", // Configuration files
-            "**/*.config.ts",   // Configuration files
+            "**/*.config.ts", // Configuration files
             "**/*.config.{ts}", // Configuration files
         ],
         ignores: [
-            "./.*/**"
+            "./.*/**",
         ],
         languageOptions: {
             parser: tseslintParser,
