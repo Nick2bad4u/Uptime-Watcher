@@ -1,11 +1,10 @@
 /* eslint-disable no-inline-comments */
-/* eslint-disable unicorn/prefer-module */
 /**
  * PostCSS configuration for the Uptime Watcher application.
  * Configures Tailwind CSS processing, autoprefixer, and additional plugins for enhanced CSS workflows.
  */
 
-module.exports = {
+export default {
     "$schema": "https://www.schemastore.org/postcssrc.json",
     plugins: {
         "@tailwindcss/postcss": {},

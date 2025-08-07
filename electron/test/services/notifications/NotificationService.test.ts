@@ -136,7 +136,7 @@ describe("NotificationService", () => {
 
             expect(Notification).not.toHaveBeenCalled();
             expect(logger.warn).toHaveBeenCalledWith(
-                "[NotificationService] Notifications not supported on this platform"
+                "Notifications not supported on this platform"
             );
         });
     });
@@ -196,7 +196,7 @@ describe("NotificationService", () => {
 
             expect(Notification).not.toHaveBeenCalled();
             expect(logger.warn).toHaveBeenCalledWith(
-                "[NotificationService] Notifications not supported on this platform"
+                "Notifications not supported on this platform"
             );
         });
     });

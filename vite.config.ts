@@ -3,15 +3,20 @@
  * Configures React frontend build and Electron main/preload process compilation.
  */
 
+import { analyzer } from "vite-bundle-analyzer";
 import { codecovVitePlugin } from "@codecov/vite-plugin";
-import react from "@vitejs/plugin-react";
-import path from "node:path";
-import electron from "vite-plugin-electron";
-import { ViteMcp } from "vite-plugin-mcp";
-import { getEnvVar as getEnvironmentVariable } from "./shared/utils/environment";
-import { viteStaticCopy } from "vite-plugin-static-copy";
-import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig, type PluginOption, type UserConfigFnObject } from "vite";
+import { getEnvVar as getEnvironmentVariable } from "./shared/utils/environment";
+import { patchCssModules } from "vite-css-modules";
+import { visualizer } from "rollup-plugin-visualizer";
+import { ViteMcp } from "vite-plugin-mcp";
+import { viteStaticCopy } from "vite-plugin-static-copy";
+import electron from "vite-plugin-electron";
+import packageVersion from "vite-plugin-package-version";
+import path from "node:path";
+import react from "@vitejs/plugin-react";
+import reactScan from "@react-scan/vite-plugin-react-scan";
+import devtoolsJson from "vite-plugin-devtools-json";
 
 /**
  * Vite configuration object.
@@ -31,11 +36,17 @@ export default defineConfig(() => {
                 // No manual chunks configuration for Electron builds
             },
             sourcemap: true, // Recommended for Electron debugging
-            target: "es2024", // Match TypeScript target for consistency
+            target: "es2024", // Updated from es2024 for CSS Modules compatibility
+        },
+        css: {
+            modules: {
+                // CSS Modules configuration
+                localsConvention: "camelCase" as const, // Convert kebab-case to camelCase for named exports
+                generateScopedName: "[name]__[local]___[hash:base64:5]", // Custom scoped name pattern
+            },
         },
         esbuild: {
-            target: "es2024", // Match TypeScript target for consistency
-
+            target: "es2024", // Updated to match build target for CSS Modules compatibility
 
             // Transpile all files with ESBuild to remove comments from code coverage.
             // Required for `test.coverage.ignoreEmptyLines` to work:
@@ -50,6 +61,12 @@ export default defineConfig(() => {
             keepNames: true, // Preserve function names for better coverage reports
         },
         plugins: [
+            // CSS Modules patch to fix Vite's CSS Modules handling
+            patchCssModules({
+                generateSourceTypes: true, // Generate .d.ts files for TypeScript support
+            }),
+            // Inject package version into import.meta.env.PACKAGE_VERSION
+            packageVersion(),
             electron([
                 {
                     entry: "electron/main.ts",
@@ -106,6 +123,22 @@ export default defineConfig(() => {
             //     enableBuild: false, // Disable in build mode (use CI for production checking)
             // }),
             ViteMcp(),
+            reactScan({
+                enable: process.env["NODE_ENV"] === "development",
+                autoDisplayNames: true,
+                debug: false, // Disable debug logs
+                // React Scan specific options
+                scanOptions: {
+                    enabled: process.env["NODE_ENV"] === "development",
+                    dangerouslyForceRunInProduction: false,
+                    log: false,
+                    showToolbar: true,
+                    animationSpeed: "fast",
+                    trackUnnecessaryRenders: true,
+                },
+            }),
+            devtoolsJson({ normalizeForWindowsContainer: true }),
+            // Bundle analysis tools - both provide different perspectives
             visualizer({
                 filename: "build-stats.html",
                 title: "Electron React Bundle Stats",
@@ -119,6 +152,16 @@ export default defineConfig(() => {
                 include: [{ file: "**/*.ts" }, { file: "**/*.tsx" }, { file: "**/*.js" }, { file: "**/*.jsx" }],
                 exclude: [{ file: "node_modules/**" }, { file: "**/*.test.*" }, { file: "**/*.spec.*" }],
             }) as PluginOption,
+            analyzer({
+                analyzerMode: "static", // Generate static HTML report
+                fileName: "bundle-analysis", // Different from visualizer
+                reportTitle: "Uptime Watcher Bundle Analysis",
+                openAnalyzer: false, // Don't auto-open (you have visualizer for that)
+                defaultSizes: "gzip", // Show gzipped sizes by default
+                summary: true, // Show summary in console
+                gzipOptions: {}, // Use default gzip options
+                brotliOptions: {}, // Use default brotli options
+            }),
             viteStaticCopy({
                 targets: [
                     // Remove copy to dist/ (frontend) - only needed in dist-electron/

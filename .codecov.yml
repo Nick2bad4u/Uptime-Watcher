@@ -93,7 +93,7 @@ coverage:
         - "tsconfig*.json"
         - "eslint.config.mjs"
         - "tailwind.config.js"
-        - "postcss.config.js"
+        - "postcss.config.mjs"
 
         # Test files (don't test the tests)
         - "**/*.test.*"

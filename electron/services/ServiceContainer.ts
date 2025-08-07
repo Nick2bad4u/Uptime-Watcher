@@ -83,7 +83,7 @@ export interface ServiceContainerConfig {
  * @public
  */
 export class ServiceContainer {
-    private static instance: ServiceContainer | undefined = undefined;
+    private static instance: ServiceContainer | undefined;
 
     /**
      * Singleton instance of {@link AutoUpdaterService}.

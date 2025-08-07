@@ -56,7 +56,7 @@ const DATABASE_SERVICE_QUERIES = {
 export class DatabaseService {
     private static readonly instance: DatabaseService = new DatabaseService();
 
-    private db: Database | undefined = undefined;
+    private db: Database | undefined;
 
     /**
      * Private constructor for singleton pattern.

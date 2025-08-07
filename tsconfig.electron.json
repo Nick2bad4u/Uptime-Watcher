@@ -6,7 +6,9 @@
             "@/*": ["electron/*"],
             "@shared/*": ["shared/*"],
             "@app/*": ["src/*"]
-        }
+        },
+        "incremental": true,
+        "tsBuildInfoFile": "./dist-electron/tsconfig.electron.tsbuildinfo"
     },
     "exclude": [
         "electron/**/*.spec.ts",

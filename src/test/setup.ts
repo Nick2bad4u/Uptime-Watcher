@@ -3,11 +3,8 @@
  * Configures testing environment for React components.
  */
 
-import matchers from '@testing-library/jest-dom/matchers'
-import { expect, vi, type Mock } from "vitest";
-
-// Extend Vitest's expect with jest-dom matchers
-expect.extend(matchers);
+import '@testing-library/jest-dom'
+import { vi, type Mock } from "vitest";
 
 // Global test configuration and mocks
 const mockElectronAPI: {
@@ -91,10 +88,10 @@ const mockElectronAPI: {
         removeAllListeners: vi.fn(),
     },
     monitoring: {
-        startMonitoring: vi.fn().mockResolvedValue(undefined),
-        startMonitoringForSite: vi.fn().mockResolvedValue(undefined),
-        stopMonitoring: vi.fn().mockResolvedValue(undefined),
-        stopMonitoringForSite: vi.fn().mockResolvedValue(undefined),
+        startMonitoring: vi.fn().mockResolvedValue(true),
+        startMonitoringForSite: vi.fn().mockResolvedValue(true),
+        stopMonitoring: vi.fn().mockResolvedValue(true),
+        stopMonitoringForSite: vi.fn().mockResolvedValue(true),
     },
     monitorTypes: {
         formatMonitorDetail: vi.fn().mockResolvedValue({
@@ -152,7 +149,7 @@ const mockElectronAPI: {
     },
     settings: {
         getHistoryLimit: vi.fn().mockResolvedValue(1000),
-        updateHistoryLimit: vi.fn().mockResolvedValue(undefined),
+        updateHistoryLimit: vi.fn().mockResolvedValue(undefined), // Returns void
     },
     sites: {
         addSite: vi.fn().mockResolvedValue({
@@ -160,11 +157,15 @@ const mockElectronAPI: {
             monitors: [],
             name: "Test Site",
         }),
-        checkSiteNow: vi.fn().mockResolvedValue(undefined),
+        checkSiteNow: vi.fn().mockResolvedValue({
+            monitorId: "test-monitor",
+            status: "up",
+            timestamp: Date.now(),
+        }),
         getSites: vi.fn().mockResolvedValue([]),
-        removeMonitor: vi.fn().mockResolvedValue(undefined),
-        removeSite: vi.fn().mockResolvedValue(undefined),
-        updateSite: vi.fn().mockResolvedValue(undefined),
+        removeMonitor: vi.fn().mockResolvedValue(true), // Returns boolean
+        removeSite: vi.fn().mockResolvedValue(true), // Returns boolean  
+        updateSite: vi.fn().mockResolvedValue(undefined), // Returns void
     },
     stateSync: {
         getSyncStatus: vi.fn().mockResolvedValue({

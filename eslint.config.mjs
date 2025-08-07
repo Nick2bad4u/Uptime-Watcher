@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Optimized ESLint configuration for Uptime Watcher
  *

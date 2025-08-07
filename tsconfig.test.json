@@ -1,5 +1,14 @@
 {
     "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "paths": {
+            "@/*": ["electron/*"],
+            "@shared/*": ["shared/*"],
+            "@app/*": ["src/*"]
+        },
+        "incremental": true,
+        "tsBuildInfoFile": "./dist-electron/tsconfig.test.tsbuildinfo"
+    },
     "include": [
         "*.config.js",
         "*.config.mjs",

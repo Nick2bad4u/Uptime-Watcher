@@ -4,6 +4,8 @@
         "enable": true
     },
     "compilerOptions": {
+        "incremental": true,
+        "tsBuildInfoFile": "./dist-electron/tsconfig.tsbuildinfo",
         "baseUrl": ".",
         "jsx": "react-jsx",
         "module": "ESNext",

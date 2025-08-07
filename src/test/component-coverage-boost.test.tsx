@@ -2,8 +2,7 @@
  * Tests for component areas with low coverage
  */
 
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect } from "vitest";
 import React from "react";
 
 // Mock React components for testing uncovered component paths
