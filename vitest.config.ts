@@ -5,6 +5,7 @@
  */
 
 import { defineConfig, mergeConfig, type UserConfigFnObject } from "vitest/config";
+
 import viteConfig from "./vite.config";
 
 export default defineConfig((configEnv) =>

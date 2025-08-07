@@ -3,30 +3,33 @@
  * Configures React frontend build and Electron main/preload process compilation.
  */
 
-import { analyzer } from "vite-bundle-analyzer";
 import { codecovVitePlugin } from "@codecov/vite-plugin";
-import { defineConfig, type PluginOption, type UserConfigFnObject } from "vite";
-import { getEnvVar as getEnvironmentVariable } from "./shared/utils/environment";
-import { patchCssModules } from "vite-css-modules";
-import { visualizer } from "rollup-plugin-visualizer";
-import { ViteMcp } from "vite-plugin-mcp";
-import { viteStaticCopy } from "vite-plugin-static-copy";
-import electron from "vite-plugin-electron";
-import packageVersion from "vite-plugin-package-version";
-import path from "node:path";
-import react from "@vitejs/plugin-react";
 import reactScan from "@react-scan/vite-plugin-react-scan";
+import react from "@vitejs/plugin-react";
+import path from "node:path";
+import { visualizer } from "rollup-plugin-visualizer";
+import { defineConfig, type PluginOption, type UserConfigFnObject } from "vite";
+import { analyzer } from "vite-bundle-analyzer";
+import { patchCssModules } from "vite-css-modules";
 import devtoolsJson from "vite-plugin-devtools-json";
+import electron from "vite-plugin-electron";
+import { ViteMcp } from "vite-plugin-mcp";
+import packageVersion from "vite-plugin-package-version";
+import { viteStaticCopy } from "vite-plugin-static-copy";
+
+import { getEnvVar as getEnvironmentVariable } from "./shared/utils/environment";
 
 /**
  * Vite configuration object.
  * Sets up build settings for both renderer (React) and main/preload processes.
  */
+
 export default defineConfig(() => {
     const codecovToken = getEnvironmentVariable("CODECOV_TOKEN");
     return {
         base: "./", // Ensures relative asset paths for Electron
         build: {
+            copyPublicDir: true, // Copy public assets to dist
             emptyOutDir: true, // Clean output before build
             modulePreload: {
                 polyfill: false, // Modern browsers don't need polyfill
@@ -40,14 +43,12 @@ export default defineConfig(() => {
         },
         css: {
             modules: {
+                generateScopedName: "[name]__[local]___[hash:base64:5]", // Custom scoped name pattern
                 // CSS Modules configuration
                 localsConvention: "camelCase" as const, // Convert kebab-case to camelCase for named exports
-                generateScopedName: "[name]__[local]___[hash:base64:5]", // Custom scoped name pattern
             },
         },
         esbuild: {
-            target: "es2024", // Updated to match build target for CSS Modules compatibility
-
             // Transpile all files with ESBuild to remove comments from code coverage.
             // Required for `test.coverage.ignoreEmptyLines` to work:
             include: [
@@ -57,8 +58,10 @@ export default defineConfig(() => {
                 "**/*.ts",
                 "**/*.tsx",
             ],
+
             // More aggressive transformation to help coverage parsing
             keepNames: true, // Preserve function names for better coverage reports
+            target: "es2024", // Updated to match build target for CSS Modules compatibility
         },
         plugins: [
             // CSS Modules patch to fix Vite's CSS Modules handling
@@ -71,7 +74,7 @@ export default defineConfig(() => {
                 {
                     entry: "electron/main.ts",
                     onstart(options) {
-                        options.startup();
+                        void options.startup();
                     },
                     vite: {
                         build: {
@@ -92,11 +95,6 @@ export default defineConfig(() => {
                 },
             ]),
             react({
-                // Enable Fast Refresh for better development experience
-                // Includes .js, .jsx, .ts, .tsx by default
-                // Use automatic JSX runtime (default, but explicit for clarity)
-                jsxRuntime: "automatic",
-
                 // Configure babel for any custom transformations if needed
                 babel: {
                     // Use babel configuration files if they exist
@@ -105,6 +103,11 @@ export default defineConfig(() => {
                     // Add any custom babel plugins here if needed
                     plugins: [],
                 },
+
+                // Enable Fast Refresh for better development experience
+                // Includes .js, .jsx, .ts, .tsx by default
+                // Use automatic JSX runtime (default, but explicit for clarity)
+                jsxRuntime: "automatic",
             }),
             // // TypeScript checking in development (ESLint disabled due to flat config compatibility)
             // checker({
@@ -124,43 +127,43 @@ export default defineConfig(() => {
             // }),
             ViteMcp(),
             reactScan({
-                enable: process.env["NODE_ENV"] === "development",
                 autoDisplayNames: true,
                 debug: false, // Disable debug logs
+                enable: process.env["NODE_ENV"] === "development",
                 // React Scan specific options
                 scanOptions: {
-                    enabled: process.env["NODE_ENV"] === "development",
-                    dangerouslyForceRunInProduction: false,
-                    log: false,
-                    showToolbar: true,
                     animationSpeed: "fast",
+                    dangerouslyForceRunInProduction: false,
+                    enabled: process.env["NODE_ENV"] === "development",
+                    log: false,
+                    showToolbar: process.env["NODE_ENV"] === "development",
                     trackUnnecessaryRenders: true,
                 },
             }),
             devtoolsJson({ normalizeForWindowsContainer: true }),
             // Bundle analysis tools - both provide different perspectives
             visualizer({
-                filename: "build-stats.html",
-                title: "Electron React Bundle Stats",
-                open: false,
-                gzipSize: true,
                 brotliSize: true,
-                template: "treemap",
                 emitFile: true,
-                sourcemap: true,
-                projectRoot: path.resolve(import.meta.dirname),
-                include: [{ file: "**/*.ts" }, { file: "**/*.tsx" }, { file: "**/*.js" }, { file: "**/*.jsx" }],
                 exclude: [{ file: "node_modules/**" }, { file: "**/*.test.*" }, { file: "**/*.spec.*" }],
+                filename: "build-stats.html",
+                gzipSize: true,
+                include: [{ file: "**/*.ts" }, { file: "**/*.tsx" }, { file: "**/*.js" }, { file: "**/*.jsx" }],
+                open: false,
+                projectRoot: path.resolve(import.meta.dirname),
+                sourcemap: true,
+                template: "treemap",
+                title: "Electron React Bundle Stats",
             }) as PluginOption,
             analyzer({
                 analyzerMode: "static", // Generate static HTML report
-                fileName: "bundle-analysis", // Different from visualizer
-                reportTitle: "Uptime Watcher Bundle Analysis",
-                openAnalyzer: false, // Don't auto-open (you have visualizer for that)
-                defaultSizes: "gzip", // Show gzipped sizes by default
-                summary: true, // Show summary in console
-                gzipOptions: {}, // Use default gzip options
                 brotliOptions: {}, // Use default brotli options
+                defaultSizes: "gzip", // Show gzipped sizes by default
+                fileName: "bundle-analysis", // Different from visualizer
+                gzipOptions: {}, // Use default gzip options
+                openAnalyzer: false, // Don't auto-open (you have visualizer for that)
+                reportTitle: "Uptime Watcher Bundle Analysis",
+                summary: true, // Show summary in console
             }),
             viteStaticCopy({
                 targets: [
@@ -196,6 +199,7 @@ export default defineConfig(() => {
         },
         test: {
             coverage: {
+                all: true, // Include all source files in coverage
                 exclude: [
                     "**/*.config.*",
                     "**/*.d.ts",
@@ -217,14 +221,13 @@ export default defineConfig(() => {
                     "report/**", // Exclude report files,
                     "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
                 ],
-                ignoreEmptyLines: true, // Ignore empty lines in coverage reports
                 experimentalAstAwareRemapping: true, // Enable AST-aware remapping for better accuracy
+                ignoreEmptyLines: true, // Ignore empty lines in coverage reports
                 processingConcurrency: 2, // Reduce concurrency to avoid parsing conflicts
-                skipFull: false, // Don't skip full coverage collection
-                all: true, // Include all source files in coverage
                 provider: "istanbul" as const,
                 reporter: ["text", "json", "lcov", "html"],
                 reportsDirectory: "./coverage",
+                skipFull: false, // Don't skip full coverage collection
                 thresholds: {
                     branches: 70, // Minimum 70% branch coverage
                     functions: 80, // Minimum 80% function coverage
@@ -258,13 +261,15 @@ export default defineConfig(() => {
             poolOptions: {
                 threads: {
                     isolate: true, // Isolate tests for better reliability
+                    maxThreads: 4, // Limit concurrent threads to reduce listener conflicts
+                    minThreads: 1, // Ensure at least one thread
                     singleThread: false, // Enable multi-threading
                 },
             },
             // Improve test output
             reporters: ["default", "json", "verbose", "hanging-process"],
             setupFiles: ["./src/test/setup.ts"], // Setup file for testing
-            testTimeout: 15000, // Set Vitest timeout to 15 seconds
+            testTimeout: 15_000, // Set Vitest timeout to 15 seconds
         },
     };
 }) satisfies UserConfigFnObject as UserConfigFnObject;

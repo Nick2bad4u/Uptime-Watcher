@@ -1,6 +1,11 @@
-import { defineConfig, mergeConfig } from "vitest/config";
-import viteConfig from "./vite.config";
+/* eslint-disable eslint-comments/disable-enable-pair -- needed to merge configs*/
+/* eslint-disable @typescript-eslint/no-unsafe-assignment -- needed to merge configs */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access -- needed to merge configs */
+
 import { type UserConfigFnObject } from "vite";
+import { defineConfig, mergeConfig } from "vitest/config";
+
+import viteConfig from "./vite.config";
 
 // Your overriding test config
 const myTestConfig = {

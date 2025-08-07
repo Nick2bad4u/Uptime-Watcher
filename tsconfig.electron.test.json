@@ -15,6 +15,7 @@
         "*.config.js",
         "*.config.mjs",
         "*.config.ts",
+        "**.config.ts",
         "**/*.config.js",
         "**/*.config.mjs",
         "**/*.config.ts",
@@ -31,6 +32,7 @@
         "shared/**/*.tsx",
         "shared/test/**/*",
         "tailwind.config.js",
+        "vitest.config.ts",
         "vitest.electron.config.ts"
     ]
 }

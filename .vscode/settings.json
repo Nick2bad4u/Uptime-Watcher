@@ -10,6 +10,13 @@
     "eslint.workingDirectories": ["."],
     "eslint.ignoreUntitled": true,
     "css.lint.importStatement": "ignore",
+    "debug.javascript.terminalOptions": {
+        "resolveSourceMapLocations": [
+            "${workspaceFolder}/**",
+            "!**/node_modules/**",
+            "**/node_modules/.vite-temp/**"
+        ]
+    },
     "eslint.validate": [
         "javascript",
         "javascriptreact",

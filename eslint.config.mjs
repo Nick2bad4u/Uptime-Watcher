@@ -1216,7 +1216,6 @@ export default [
     // Test files (Backend) + Configuration files
     {
         files: [
-            "**/*.config.{ts}", // Configuration files
             "electron/**/*.spec.{ts,tsx}",
             "electron/**/*.test.{ts,tsx}",
             "electron/test/**/*.{ts,tsx}",
@@ -1313,6 +1312,406 @@ export default [
                     project: ["tsconfig.electron.test.json"],
                 },
             },
+        },
+    },
+
+    // TypeScript Config files using Electron Test TSConfig
+    {
+        files: [
+            "**/*.config.{ts}", // Configuration files
+            "**/*.config.ts",   // Configuration files
+            "**/*.config.{ts}", // Configuration files
+        ],
+        ignores: [
+            "./.*/**"
+        ],
+        languageOptions: {
+            parser: tseslintParser,
+            parserOptions: {
+                ecmaVersion: "latest",
+                project: "tsconfig.electron.test.json",
+                sourceType: "module",
+                tsconfigRootDir: import.meta.dirname,
+                ecmaFeatures: {
+                    jsx: true,
+                },
+                experimentalDecorators: true,
+                JSDocParsingMode: "all",
+                jsxFragmentName: "React.Fragment",
+                jsxPragma: "React",
+                warnOnUnsupportedTypeScriptVersion: true,
+            },
+            globals: {
+                ...globals.node,
+                __dirname: "readonly",
+                __filename: "readonly",
+                process: "readonly",
+                Buffer: "readonly",
+                global: "readonly",
+                require: "readonly",
+                module: "readonly",
+            },
+        },
+        settings: {
+            react: { version: "19" },
+            n: {
+                allowModules: [
+                    "electron",
+                    "node",
+                    "electron-devtools-installer",
+                ],
+            },
+            "boundaries/elements": [
+                { type: "main", pattern: "electron/main.ts" },
+                { type: "preload", pattern: "electron/preload.ts" },
+                { type: "managers", pattern: "electron/managers/**/*" },
+                { type: "services", pattern: "electron/services/**/*" },
+                { type: "utils", pattern: "electron/utils/**/*" },
+                { type: "events", pattern: "electron/events/**/*" },
+                { type: "types", pattern: "electron/types.ts" },
+            ],
+            "import-x/resolver": {
+                // You will also need to install and configure the TypeScript resolver
+                // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
+                typescript: true,
+                node: true,
+                project: ["tsconfig.electron.test.json"],
+            },
+            "import/resolver": {
+                // You will also need to install and configure the TypeScript resolver
+                // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
+                typescript: {
+                    alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
+                    project: ["tsconfig.electron.test.json"],
+                },
+            },
+        },
+        plugins: {
+            "@typescript-eslint": tseslint,
+            "jsx-a11y": jsxA11y,
+            "no-unsanitized": nounsanitized,
+            "prefer-arrow": pluginPreferArrow,
+            "react-hooks": pluginReactHooks,
+            "sort-class-members": pluginSortClassMembers,
+            "unused-imports": pluginUnusedImports,
+            "write-good-comments": pluginWriteGood,
+            boundaries: pluginBoundaries,
+            compat: pluginCompat,
+            css: cssPlugin,
+            depend: depend,
+            functional: pluginFunctional,
+            js: js,
+            math: eslintPluginMath,
+            n: nodePlugin,
+            perfectionist: pluginPerfectionist,
+            "import-x": importX,
+            prettier: pluginPrettier,
+            promise: pluginPromise,
+            putout: putout,
+            react: pluginReact,
+            redos: pluginRedos,
+            regexp: pluginRegexp,
+            security: pluginSecurity,
+            sonarjs: pluginSonarjs,
+            tailwind: tailwind,
+            tsdoc: pluginTsdoc,
+            unicorn: pluginUnicorn,
+            "eslint-comments": pluginComments,
+            ex: ex,
+            canonical: pluginCanonical,
+            "@eslint-react": eslintReact,
+            "@eslint-react/dom": eslintReactDom,
+            "@eslint-react/web-api": eslintReactWeb,
+            "@eslint-react/hooks-extra": eslintReactHooksExtra,
+            "@eslint-react/naming-convention": eslintReactNamingConvention,
+            xss: xss,
+            "array-func": arrayFunc,
+        },
+        rules: {
+            // TypeScript backend rules
+            ...tseslint.configs.recommendedTypeChecked,
+            ...tseslint.configs.strictTypeChecked,
+            ...tseslint.configs.stylisticTypeChecked,
+            ...pluginRegexp.configs["flat/recommended"].rules,
+            ...importX.flatConfigs.typescript.rules,
+            ...pluginPromise.configs["flat/recommended"].rules,
+            ...pluginUnicorn.configs.all.rules,
+            ...pluginReact.configs.recommended.rules,
+            ...pluginReactHooks.configs["recommended-latest"].rules,
+            ...jsxA11y.flatConfigs.recommended.rules,
+            ...pluginSonarjs.configs.recommended.rules,
+            ...pluginPerfectionist.configs["recommended-natural"].rules,
+            ...pluginBoundaries.configs.recommended.rules,
+            ...pluginRedos.configs.recommended.rules,
+            ...nodePlugin.configs["flat/all"].rules,
+            ...depend.configs["flat/recommended"].rules,
+            ...eslintPluginMath.configs.recommended.rules,
+            ...tailwind.configs["flat/recommended"].rules,
+            ...cssPlugin.configs["flat/standard"].rules,
+            ...pluginComments.configs.recommended.rules,
+            ...pluginCanonical.configs.recommended.rules,
+            ...eslintReact.configs["recommended-typescript"].rules,
+            ...arrayFunc.configs.all.rules,
+
+            "n/no-unpublished-import": "off",
+            "n/no-process-env": "off", // Allow process.env usage in Electron
+
+            "xss/no-location-href-assign": "error",
+
+            "canonical/no-barrel-import": "error",
+            "canonical/export-specifier-newline": "off",
+            "canonical/destructuring-property-newline": "off",
+            "canonical/import-specifier-newline": "off",
+            "canonical/filename-no-index": "warn",
+
+            "ex/no-unhandled": "warn",
+
+            "no-unsanitized/method": "error",
+            "no-unsanitized/property": "error",
+
+            "n/file-extension-in-import": "off", // Allow missing file extensions for imports
+            "n/no-missing-file-extension": "off", // Allow missing file extensions for imports
+            "n/no-missing-import": "off", // Allow missing imports for dynamic imports
+            "n/no-unsupported-features/es-syntax": "off", // Allow modern ES2024+ syntax
+
+            // "write-good-comments/write-good-comments": "warn",
+
+            "unicorn/no-null": "off", // Null is common in SQLite and IPC
+            "unicorn/prefer-global-this": "off", // Not suitable for Electron
+            "unicorn/prevent-abbreviations": "off", // Too many false positives
+            "unicorn/prefer-spread": "off", // Prefer Array.From for readability
+            // Node.js specific
+            // "no-console": "off", // Logging is important for backend - DISABLED FOR NOW
+            "no-var": "error",
+            "prefer-const": "error",
+
+            "putout/align-spaces": "error",
+            "putout/array-element-newline": "off",
+            "putout/destructuring-as-function-argument": "off",
+            "putout/function-declaration-paren-newline": "error",
+            "putout/long-properties-destructuring": "off",
+            "putout/multiple-properties-destructuring": "off",
+            "putout/newline-function-call-arguments": "off",
+            "putout/object-property-newline": "error",
+            "putout/objects-braces-inside-array": "error",
+            "putout/single-property-destructuring": "off",
+            // Import management
+            "unused-imports/no-unused-imports": "error",
+            "unused-imports/no-unused-vars": [
+                "warn",
+                {
+                    vars: "all",
+                    varsIgnorePattern: "^_",
+                    args: "after-used",
+                    argsIgnorePattern: "^_",
+                },
+            ],
+
+            // Architecture boundaries for Electron
+            "boundaries/element-types": [
+                "error",
+                {
+                    default: "disallow",
+                    rules: [
+                        { from: "events", allow: ["types"] },
+                        {
+                            from: "main",
+                            allow: [
+                                "managers",
+                                "services",
+                                "utils",
+                                "events",
+                                "types",
+                            ],
+                        },
+                        {
+                            from: "managers",
+                            allow: [
+                                "services",
+                                "utils",
+                                "events",
+                                "types",
+                            ],
+                        },
+                        {
+                            from: "preload",
+                            allow: [
+                                "utils",
+                                "types",
+                            ],
+                        },
+                        {
+                            from: "services",
+                            allow: [
+                                "services",
+                                "utils",
+                                "types",
+                            ],
+                        },
+                        { from: "types", allow: [] },
+                        {
+                            from: "utils",
+                            allow: [
+                                "managers",
+                                "services",
+                                "utils",
+                                "events",
+                                "types",
+                            ],
+                        },
+                        { from: "utils", allow: ["types"] },
+                    ],
+                },
+            ],
+
+            // Class organization for service classes
+            "sort-class-members/sort-class-members": [
+                "off",
+                {
+                    order: [
+                        "[static-properties]",
+                        "[static-methods]",
+                        "[properties]",
+                        "constructor",
+                        "[methods]",
+                        "[private-methods]",
+                    ],
+                },
+            ],
+
+            // Backend-specific unicorn rules
+            "unicorn/filename-case": [
+                "warn",
+                {
+                    cases: {
+                        camelCase: true,
+                        pascalCase: true, // Service classes
+                    },
+                },
+            ],
+            "unicorn/no-keyword-prefix": [
+                "error",
+                {
+                    disallowedPrefixes: [
+                        "interface",
+                        "type",
+                        "enum",
+                    ],
+                    checkProperties: false,
+                },
+            ],
+            "unicorn/prefer-module": "off", // CommonJS required for Electron
+            "unicorn/prefer-node-protocol": "error", // Enforce for backend
+            "unicorn/prefer-top-level-await": "off", // Not suitable for Electron main
+
+            // Security for backend
+            "redos/no-vulnerable": "error",
+            "security/detect-non-literal-fs-filename": "error",
+            "security/detect-non-literal-require": "error",
+            "security/detect-non-literal-regexp": "warn",
+            "security/detect-object-injection": "off",
+
+            // Documentation
+            "tsdoc/syntax": "warn",
+
+            // Allow more flexibility for backend patterns
+            "@typescript-eslint/no-explicit-any": "warn",
+            "functional/functional-parameters": "off",
+            "functional/immutable-data": "off",
+            "functional/no-class-inheritance": "off", // Classes are common in Electron services
+            "functional/no-classes": "off", // Classes are common in Electron services
+            "functional/no-conditional-statement": "off",
+            "functional/no-conditional-statements": "off",
+            "functional/no-expression-statements": "off",
+            "functional/no-let": "off",
+            "functional/no-loop-statements": "off",
+            "functional/no-mixed-types": "off", // Mixed types are common in Electron services
+            "functional/no-return-void": "off",
+            "functional/no-throw-statements": "off", // Throwing errors is common in Electron
+            "functional/prefer-immutable-types": "off",
+
+            // Function and type safety rules (same as frontend)
+            "@typescript-eslint/no-restricted-types": [
+                "error",
+                {
+                    types: {
+                        Function: {
+                            message: [
+                                "The `Function` type accepts any function-like value.",
+                                "It provides no type safety when calling the function, which can be a common source of bugs.",
+                                "If you are expecting the function to accept certain arguments, you should explicitly define the function shape.",
+                                "Use '(...args: unknown[]) => unknown' for generic handlers or define specific function signatures.",
+                            ].join("\n"),
+                        },
+                    },
+                },
+            ],
+            "@typescript-eslint/no-empty-object-type": "error",
+            "@typescript-eslint/no-unsafe-function-type": "error",
+            "@typescript-eslint/no-wrapper-object-types": "error",
+            "@typescript-eslint/prefer-function-type": "error",
+            "@typescript-eslint/no-empty-function": [
+                "error",
+                {
+                    allow: ["arrowFunctions"], // Allow empty arrow functions for React useEffect cleanup
+                },
+            ],
+
+            "prettier/prettier": [
+                "warn",
+                { usePrettierrc: true },
+            ],
+
+            // Advanced type-checked rules for backend async safety and runtime error prevention
+            "@typescript-eslint/no-floating-promises": [
+                "error",
+                {
+                    ignoreVoid: true, // Allow void for intentionally ignored promises
+                    ignoreIIFE: false, // Catch floating IIFEs which can cause issues in Node.js
+                },
+            ],
+            "@typescript-eslint/await-thenable": "error", // Prevent awaiting non-promises
+            "@typescript-eslint/no-misused-promises": [
+                "error",
+                {
+                    checksConditionals: true, // Check if Promises used in conditionals
+                    checksSpreads: true, // Check Promise spreads
+                    checksVoidReturn: true, // Critical for Electron IPC handlers
+                },
+            ],
+            "@typescript-eslint/require-await": "error", // Functions marked async must use await
+            "@typescript-eslint/return-await": [
+                "error",
+                "in-try-catch",
+            ], // Proper await handling in try-catch
+
+            // Enhanced type safety for backend services
+            "@typescript-eslint/no-unnecessary-type-assertion": "off", // Remove redundant type assertions
+            "@typescript-eslint/no-unsafe-argument": "warn", // Warn on passing any to typed parameters
+            "@typescript-eslint/no-unsafe-assignment": "warn", // Warn on unsafe assignments to any
+            "@typescript-eslint/no-unsafe-call": "warn", // Warn on calling any-typed functions
+            "@typescript-eslint/no-unsafe-member-access": "warn", // Warn on accessing any-typed properties
+            "@typescript-eslint/no-unsafe-return": "warn", // Warn on returning any from typed functions
+
+            // Backend-specific type safety
+            "@typescript-eslint/prefer-readonly": "warn", // Prefer readonly for service class properties
+            "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
+
+            // Null safety for backend operations
+            "@typescript-eslint/no-unnecessary-condition": [
+                "warn",
+                {
+                    allowConstantLoopConditions: true, // Allow while(true) patterns in services
+                },
+            ],
+            "@typescript-eslint/prefer-nullish-coalescing": [
+                "error",
+                {
+                    ignoreConditionalTests: false, // Check conditionals for nullish coalescing opportunities
+                    ignoreMixedLogicalExpressions: false, // Check complex logical expressions
+                },
+            ],
+            "@typescript-eslint/prefer-optional-chain": "error", // Use optional chaining instead of logical AND
         },
     },
 
