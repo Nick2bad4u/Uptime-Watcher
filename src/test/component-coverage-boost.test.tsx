@@ -54,10 +54,16 @@ describe("Component Coverage Boost", () => {
                 { id: "3", name: "Site 3", status: "pending" },
             ];
 
+            const getStatusColor = (status: string): string => {
+                if (status === "up") return "green";
+                if (status === "down") return "red";
+                return "yellow";
+            };
+
             const renderSiteList = (sites: typeof mockSites) => {
                 return sites.map((site) => ({
                     ...site,
-                    statusColor: site.status === "up" ? "green" : site.status === "down" ? "red" : "yellow",
+                    statusColor: getStatusColor(site.status),
                 }));
             };
 
@@ -342,13 +348,19 @@ describe("Component Coverage Boost", () => {
                 visible: boolean;
             }
 
+            const getStatusColor = (status: string): string => {
+                if (status === "up") return "green";
+                if (status === "down") return "red";
+                return "gray";
+            };
+
             const monitorUILogic = {
                 createStatusComponent: (status: string, lastCheck: Date | null): MonitorUIComponent => ({
                     type: "status",
                     props: {
                         status,
                         lastCheck: lastCheck?.toISOString(),
-                        color: status === "up" ? "green" : status === "down" ? "red" : "gray",
+                        color: getStatusColor(status),
                     },
                     visible: true,
                 }),
