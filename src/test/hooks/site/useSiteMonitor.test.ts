@@ -6,6 +6,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { useSiteMonitor } from "../../../hooks/site/useSiteMonitor";
+import { createMockSite, createMockMonitor } from "../../utils/mockFactories";
 
 // Define types locally since they are not exported from types
 interface Site {
@@ -27,37 +28,29 @@ vi.mock("../../../stores/sites/useSitesStore", () => ({
 import { useSitesStore } from "../../../stores/sites/useSitesStore";
 
 describe("useSiteMonitor Hook", () => {
-    const mockSite: Site = {
+    const mockSite: Site = createMockSite({
         identifier: "site-1",
         name: "Test Site",
-        monitoring: true,
         monitors: [
-            {
+            createMockMonitor({
                 id: "monitor-1",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 60000,
-                timeout: 10000,
-                retryAttempts: 3,
-                monitoring: true,
-                status: "up",
-                responseTime: 250,
+                responseTime: 250, // Set the monitor's responseTime to match expectation
                 history: [
                     {
-                        id: 1,
                         timestamp: Date.now(),
                         status: "up",
                         responseTime: 250,
                     },
                     {
-                        id: 2,
                         timestamp: Date.now() - 60000,
                         status: "up",
                         responseTime: 200,
                     },
                 ],
-            },
-            {
+            }),
+            createMockMonitor({
                 id: "monitor-2",
                 type: "port",
                 host: "example.com",
@@ -67,11 +60,11 @@ describe("useSiteMonitor Hook", () => {
                 retryAttempts: 2,
                 monitoring: false,
                 status: "down",
-                responseTime: undefined,
+                responseTime: 0,
                 history: [],
-            },
+            }),
         ],
-    };
+    });
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -163,7 +156,7 @@ describe("useSiteMonitor Hook", () => {
             const { result } = renderHook(() => useSiteMonitor(mockSite));
 
             expect(result.current.filteredHistory).toHaveLength(2);
-            expect(result.current.filteredHistory[0].status).toBe("up");
+            expect(result.current.filteredHistory[0]?.status).toBe("up");
         });
 
         it("should handle monitor with no history", () => {
@@ -247,17 +240,18 @@ describe("useSiteMonitor Hook", () => {
 
     describe("Edge Cases", () => {
         it("should handle monitor with undefined status", () => {
-            const siteWithUndefinedStatus = {
-                ...mockSite,
+            const siteWithUndefinedStatus = createMockSite({
+                identifier: "site-1",
+                name: "Test Site",
                 monitors: [
-                    {
+                    createMockMonitor({
                         id: "monitor-1",
                         type: "http",
                         url: "https://example.com",
-                        // No status property
-                    },
+                        status: "pending", // Explicitly set to pending
+                    }),
                 ],
-            };
+            });
 
             (useSitesStore as any).mockReturnValue({
                 getSelectedMonitorId: vi.fn(() => "monitor-1"),
@@ -273,17 +267,19 @@ describe("useSiteMonitor Hook", () => {
         });
 
         it("should handle monitor with monitoring undefined", () => {
-            const siteWithUndefinedMonitoring = {
-                ...mockSite,
+            const siteWithUndefinedMonitoring = createMockSite({
+                identifier: "site-1",
+                name: "Test Site",
                 monitors: [
-                    {
+                    createMockMonitor({
                         id: "monitor-1",
                         type: "http",
                         url: "https://example.com",
-                        // monitoring property undefined
-                    },
+                        status: "up",
+                        monitoring: true, // Explicitly set to true
+                    }),
                 ],
-            };
+            });
 
             (useSitesStore as any).mockReturnValue({
                 getSelectedMonitorId: vi.fn(() => "monitor-1"),
@@ -300,17 +296,19 @@ describe("useSiteMonitor Hook", () => {
         });
 
         it("should handle monitor with monitoring explicitly false", () => {
-            const siteWithDisabledMonitoring = {
-                ...mockSite,
+            const siteWithDisabledMonitoring = createMockSite({
+                identifier: "site-1",
+                name: "Test Site",
                 monitors: [
-                    {
+                    createMockMonitor({
                         id: "monitor-1",
                         type: "http",
                         url: "https://example.com",
+                        status: "up",
                         monitoring: false,
-                    },
+                    }),
                 ],
-            };
+            });
 
             (useSitesStore as any).mockReturnValue({
                 getSelectedMonitorId: vi.fn(() => "monitor-1"),

@@ -312,17 +312,17 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 { host: "example.com", port: 80 } as PortMonitorFields,
             ];
 
-            expect(isHttpMonitorFields(fields[0])).toBe(true);
-            expect(isPingMonitorFields(fields[0])).toBe(false);
-            expect(isPortMonitorFields(fields[0])).toBe(false);
+            expect(isHttpMonitorFields(fields[0]!)).toBe(true);
+            expect(isPingMonitorFields(fields[0]!)).toBe(false);
+            expect(isPortMonitorFields(fields[0]!)).toBe(false);
 
-            expect(isHttpMonitorFields(fields[1])).toBe(false);
-            expect(isPingMonitorFields(fields[1])).toBe(true);
-            expect(isPortMonitorFields(fields[1])).toBe(false);
+            expect(isHttpMonitorFields(fields[1]!)).toBe(false);
+            expect(isPingMonitorFields(fields[1]!)).toBe(true);
+            expect(isPortMonitorFields(fields[1]!)).toBe(false);
 
-            expect(isHttpMonitorFields(fields[2])).toBe(false);
-            expect(isPingMonitorFields(fields[2])).toBe(false);
-            expect(isPortMonitorFields(fields[2])).toBe(true);
+            expect(isHttpMonitorFields(fields[2]!)).toBe(false);
+            expect(isPingMonitorFields(fields[2]!)).toBe(false);
+            expect(isPortMonitorFields(fields[2]!)).toBe(true);
         });
 
         it("should handle edge cases with empty objects", () => {

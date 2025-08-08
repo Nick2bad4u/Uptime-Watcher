@@ -118,7 +118,7 @@ describe("Monitor Configuration Types", () => {
                 "America/New_York",
                 "Europe/London",
             ]);
-            expect(config.scheduling?.maintenanceWindows?.[0].start).toBe(
+            expect(config.scheduling?.maintenanceWindows?.[0]!.start).toBe(
                 "2024-01-01T02:00:00Z"
             );
         });
@@ -452,9 +452,9 @@ describe("Monitor Configuration Types", () => {
             ];
 
             expect(configs).toHaveLength(3);
-            expect(configs[0].type).toBe("http");
-            expect(configs[1].type).toBe("ping");
-            expect(configs[2].type).toBe("port");
+            expect(configs[0]!.type).toBe("http");
+            expect(configs[1]!.type).toBe("ping");
+            expect(configs[2]!.type).toBe("port");
         });
     });
 

@@ -3,12 +3,9 @@
  */
 
 import { describe, it, expect } from "vitest";
-import React from "react";
 
 // Mock React components for testing uncovered component paths
-const MockComponent: React.FC<{ children?: React.ReactNode }> = ({
-    children,
-}) => <div data-testid="mock-component">{children}</div>;
+// Removed unused MockComponent to fix TS6133
 
 describe("Component Coverage Boost", () => {
     describe("SiteList Component Coverage", () => {
@@ -93,9 +90,9 @@ describe("Component Coverage Boost", () => {
 
             const rendered = renderSiteList(mockSites);
             expect(rendered).toHaveLength(3);
-            expect(rendered[0].statusColor).toBe("green");
-            expect(rendered[1].statusColor).toBe("red");
-            expect(rendered[2].statusColor).toBe("yellow");
+            expect(rendered[0]?.statusColor).toBe("green");
+            expect(rendered[1]?.statusColor).toBe("red");
+            expect(rendered[2]?.statusColor).toBe("yellow");
         });
     });
 
@@ -161,12 +158,7 @@ describe("Component Coverage Boost", () => {
 
         it("should handle SiteDetailsHeader logic", () => {
             // Test SiteDetailsHeader.tsx functionality (lines 50-175)
-            interface SiteHeaderProps {
-                site: { id: string; name: string; url: string; status: string };
-                onEdit: () => void;
-                onDelete: () => void;
-                onToggleMonitoring: () => void;
-            }
+            // Removed unused interface to fix TS6196
 
             const siteHeaderLogic = {
                 getStatusIcon: (status: string) => {
@@ -176,7 +168,7 @@ describe("Component Coverage Boost", () => {
                         pending: "⏳",
                         unknown: "❓",
                     };
-                    return icons[status] || icons.unknown;
+                    return icons[status] || icons["unknown"];
                 },
                 getActionButtons: (status: string) => {
                     const baseActions = ["edit", "delete"];
@@ -218,7 +210,7 @@ describe("Component Coverage Boost", () => {
 
             const navigationLogic = {
                 getNavigationItems: (
-                    siteId: string,
+                    _siteId: string,
                     hasData: boolean
                 ): NavigationItem[] => [
                     { key: "overview", label: "Overview", icon: "📊" },
@@ -245,7 +237,7 @@ describe("Component Coverage Boost", () => {
                         (item) => item.key === currentTab
                     );
                     const nextIndex = (currentIndex + 1) % items.length;
-                    return items[nextIndex].key;
+                    return items[nextIndex]?.key;
                 },
                 getPreviousTab: (
                     items: NavigationItem[],
@@ -258,19 +250,19 @@ describe("Component Coverage Boost", () => {
                         currentIndex === 0
                             ? items.length - 1
                             : currentIndex - 1;
-                    return items[prevIndex].key;
+                    return items[prevIndex]?.key;
                 },
             };
 
             const items = navigationLogic.getNavigationItems("123", true);
             expect(items).toHaveLength(4);
-            expect(items[1].disabled).toBe(false);
+            expect(items[1]?.disabled).toBe(false);
 
             const itemsNoData = navigationLogic.getNavigationItems(
                 "123",
                 false
             );
-            expect(itemsNoData[1].disabled).toBe(true);
+            expect(itemsNoData[1]?.disabled).toBe(true);
 
             expect(
                 navigationLogic.getActiveItem(items, "analytics")?.label
@@ -520,19 +512,19 @@ describe("Component Coverage Boost", () => {
                 new Date()
             );
             expect(statusComponent.type).toBe("status");
-            expect(statusComponent.props.color).toBe("green");
+            expect(statusComponent.props["color"]).toBe("green");
 
             const actionButton = monitorUILogic.createActionButton(
                 "start",
                 true
             );
-            expect(actionButton.props.variant).toBe("primary");
+            expect(actionButton.props["variant"]).toBe("primary");
 
             const deleteButton = monitorUILogic.createActionButton(
                 "delete",
                 false
             );
-            expect(deleteButton.props.variant).toBe("danger");
+            expect(deleteButton.props["variant"]).toBe("danger");
             expect(deleteButton.visible).toBe(false);
 
             const metric = monitorUILogic.createMetricDisplay(
@@ -540,7 +532,7 @@ describe("Component Coverage Boost", () => {
                 245,
                 "ms"
             );
-            expect(metric.props.formatted).toBe("245ms");
+            expect(metric.props["formatted"]).toBe("245ms");
 
             const components = [
                 statusComponent,
@@ -570,7 +562,7 @@ describe("Component Coverage Boost", () => {
                         paused: "#6b7280",
                         unknown: "#6b7280",
                     };
-                    return colors[status] || colors.unknown;
+                    return colors[status] || colors["unknown"];
                 },
                 getStatusIcon: (status: string) => {
                     const icons: Record<string, string> = {
@@ -580,7 +572,7 @@ describe("Component Coverage Boost", () => {
                         paused: "⏸",
                         unknown: "?",
                     };
-                    return icons[status] || icons.unknown;
+                    return icons[status] || icons["unknown"];
                 },
                 getStatusText: (status: string) => {
                     return status.charAt(0).toUpperCase() + status.slice(1);
@@ -652,8 +644,8 @@ describe("Component Coverage Boost", () => {
                     if (data.length < 2) return "insufficient-data";
                     const last = data[data.length - 1];
                     const previous = data[data.length - 2];
-                    if (last > previous) return "increasing";
-                    if (last < previous) return "decreasing";
+                    if (last !== undefined && previous !== undefined && last > previous) return "increasing";
+                    if (last !== undefined && previous !== undefined && last < previous) return "decreasing";
                     return "stable";
                 },
             };
@@ -668,7 +660,7 @@ describe("Component Coverage Boost", () => {
                 "Response Time"
             );
             expect(chartData.labels).toHaveLength(2);
-            expect(chartData.datasets[0].label).toBe("Response Time");
+            expect(chartData.datasets[0]?.label).toBe("Response Time");
 
             const options = chartLogic.getChartOptions("Test Chart");
             expect(options.plugins.title.text).toBe("Test Chart");
@@ -754,8 +746,8 @@ describe("Component Coverage Boost", () => {
             ];
 
             const aggregated = historyChartLogic.aggregateByStatus(sampleData);
-            expect(aggregated.up).toBe(2);
-            expect(aggregated.down).toBe(1);
+            expect(aggregated["up"]).toBe(2);
+            expect(aggregated["down"]).toBe(1);
 
             const uptime = historyChartLogic.calculateUptime(sampleData);
             expect(uptime).toBeCloseTo(66.67, 1);

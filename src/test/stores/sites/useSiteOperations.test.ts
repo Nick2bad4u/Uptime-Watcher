@@ -137,7 +137,7 @@ describe("createSiteOperationsActions", () => {
 
     describe("createSite", () => {
         it("should create a new site with minimal data", async () => {
-            const newSite = {
+            const _newSite = {
                 identifier: "new-site",
                 name: "New Site",
                 monitoring: true,
@@ -151,6 +151,7 @@ describe("createSiteOperationsActions", () => {
                     },
                 ],
             };
+            void _newSite;
             // Mock will return the passed site, but implementation uses safeExtractIpcData with completeSite as fallback
             mockElectronAPI.sites.addSite.mockResolvedValue(undefined);
 

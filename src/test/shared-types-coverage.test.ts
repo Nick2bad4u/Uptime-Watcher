@@ -47,7 +47,7 @@ describe("Shared Types Coverage", () => {
             expect(formData.siteName).toBe("Test Site");
             expect(formData.url).toBe("https://example.com");
             expect(formData.monitors).toHaveLength(1);
-            expect(formData.monitors[0].type).toBe("http");
+            expect(formData.monitors[0]?.type).toBe("http");
             expect(formData.validation?.isValid).toBe(true);
         });
 
@@ -86,13 +86,13 @@ describe("Shared Types Coverage", () => {
                 return true;
             };
 
-            expect(validateField(fieldValidations[0], "Test Site")).toBe(true);
-            expect(validateField(fieldValidations[0], "")).toBe(false);
+            expect(validateField(fieldValidations[0]!, "Test Site")).toBe(true);
+            expect(validateField(fieldValidations[0]!, "")).toBe(false);
             expect(
-                validateField(fieldValidations[1], "https://example.com")
+                validateField(fieldValidations[1]!, "https://example.com")
             ).toBe(true);
             expect(
-                validateField(fieldValidations[1], "ftp://example.com")
+                validateField(fieldValidations[1]!, "ftp://example.com")
             ).toBe(false);
         });
     });
@@ -141,7 +141,7 @@ describe("Shared Types Coverage", () => {
 
             expect(httpMonitor.type).toBe("http");
             expect(httpMonitor.enabled).toBe(true);
-            expect(httpMonitor.configuration.url).toBe("https://example.com");
+            expect(httpMonitor.configuration["url"]).toBe("https://example.com");
             expect(httpMonitor.alerts?.onFailure).toBe(true);
         });
 
@@ -293,7 +293,7 @@ describe("Shared Types Coverage", () => {
                         pending: "#f59e0b",
                         unknown: "#6b7280",
                     };
-                    return statusColors[status] || statusColors.unknown;
+                    return (statusColors[status] ?? statusColors["unknown"]) as string;
                 },
                 getSpacingValue: (size: string) => {
                     const spacing: Record<string, number> = {
@@ -303,7 +303,7 @@ describe("Shared Types Coverage", () => {
                         lg: 24,
                         xl: 32,
                     };
-                    return spacing[size] || spacing.md;
+                    return (spacing[size] ?? spacing["md"]) as number;
                 },
                 applyTheme: (themeName: string) => {
                     // Mock theme application
@@ -371,7 +371,7 @@ describe("Shared Types Coverage", () => {
             expect(validationResult.isValid).toBe(false);
             expect(validationResult.errors).toHaveLength(1);
             expect(validationResult.warnings).toHaveLength(1);
-            expect(validationResult.errors[0].code).toBe("REQUIRED_FIELD");
+            expect(validationResult.errors[0]?.code).toBe("REQUIRED_FIELD");
             expect(validationResult.metadata?.validator).toBe("SiteValidator");
         });
 
@@ -420,8 +420,8 @@ describe("Shared Types Coverage", () => {
                     case "range":
                         if (rule.parameters) {
                             return (
-                                value >= rule.parameters.min &&
-                                value <= rule.parameters.max
+                                value >= rule.parameters["min"] &&
+                                value <= rule.parameters["max"]
                             );
                         }
                         return true;
@@ -430,15 +430,15 @@ describe("Shared Types Coverage", () => {
                 }
             };
 
-            expect(applyValidationRule(validationRules[0], "Test Site")).toBe(
+            expect(applyValidationRule(validationRules[0]!, "Test Site")).toBe(
                 true
             );
-            expect(applyValidationRule(validationRules[0], "")).toBe(false);
+            expect(applyValidationRule(validationRules[0]!, "")).toBe(false);
             expect(
-                applyValidationRule(validationRules[1], "https://example.com")
+                applyValidationRule(validationRules[1]!, "https://example.com")
             ).toBe(true);
-            expect(applyValidationRule(validationRules[2], 5000)).toBe(true);
-            expect(applyValidationRule(validationRules[2], 500)).toBe(false);
+            expect(applyValidationRule(validationRules[2]!, 5000)).toBe(true);
+            expect(applyValidationRule(validationRules[2]!, 500)).toBe(false);
         });
     });
 });

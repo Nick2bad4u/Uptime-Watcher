@@ -79,7 +79,7 @@ vi.mock("../../../theme/useTheme", () => ({
         },
         setTheme: vi.fn(),
         availableThemes: ["light", "dark"],
-        getColor: vi.fn((path: string) => "#000000"),
+        getColor: vi.fn((_path: string) => "#000000"),
         getStatusColor: vi.fn(() => "#000000"),
         isDark: false,
         systemTheme: "light" as const,
@@ -91,7 +91,7 @@ vi.mock("../../../theme/useTheme", () => ({
 }));
 
 vi.mock("../../../services/chartConfig", () => ({
-    ChartConfigService: vi.fn().mockImplementation((theme) => ({
+    ChartConfigService: vi.fn().mockImplementation((_theme) => ({
         getLineChartConfig: vi.fn(() => ({})),
         getBarChartConfig: vi.fn(() => ({})),
         getDoughnutChartConfig: vi.fn(() => ({})),
@@ -197,10 +197,13 @@ const mockSite = {
             id: "monitor-1",
             type: "http" as const,
             url: "https://example.com",
-            interval: 300000,
+            checkInterval: 300000,
             timeout: 30000,
             retryAttempts: 3,
-            isEnabled: true,
+            monitoring: true,
+            status: "up" as const,
+            responseTime: 150,
+            history: [],
         },
     ],
 };
@@ -410,7 +413,7 @@ describe("SiteDetails", () => {
 
             // Use a more flexible text matcher to handle broken up text
             expect(
-                screen.getByText((content, element) => {
+                screen.getByText((_content, element) => {
                     return element?.textContent === "Site: Custom Test Site";
                 })
             ).toBeInTheDocument();

@@ -421,7 +421,7 @@ describe("Cache Utilities", () => {
             AppCaches.general.set("test", "value");
             expect(AppCaches.general.get("test")).toBe("value");
 
-            AppCaches.monitorTypes.set("http", { config: "data" });
+            AppCaches.monitorTypes.set("http", { config: "data" } as any);
             expect(AppCaches.monitorTypes.get("http")).toEqual({
                 config: "data",
             });
@@ -435,7 +435,7 @@ describe("Cache Utilities", () => {
         beforeEach(() => {
             // Add some data to caches
             AppCaches.general.set("item1", "value1");
-            AppCaches.monitorTypes.set("http", { type: "http" });
+            AppCaches.monitorTypes.set("http", { type: "http" } as any);
             AppCaches.uiHelpers.set("theme", "light");
         });
 

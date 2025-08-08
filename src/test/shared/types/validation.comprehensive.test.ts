@@ -279,7 +279,7 @@ describe("Validation Types and Utilities", () => {
 
             expect(fullResult.data).toEqual({ validated: true });
             expect(fullResult.errors).toEqual([]);
-            expect(fullResult.metadata?.validatedAt).toBeDefined();
+            expect(fullResult.metadata?.["validatedAt"]).toBeDefined();
             expect(fullResult.success).toBe(true);
             expect(fullResult.warnings).toEqual(["Minor issue"]);
         });
@@ -292,10 +292,10 @@ describe("Validation Types and Utilities", () => {
                 timestamp: Date.now(),
             };
 
-            expect(metadata.context).toBe("form-validation");
-            expect(metadata.field).toBe("username");
-            expect(metadata.rule).toBe("required");
-            expect(typeof metadata.timestamp).toBe("number");
+            expect(metadata["context"]).toBe("form-validation");
+            expect(metadata["field"]).toBe("username");
+            expect(metadata["rule"]).toBe("required");
+            expect(typeof metadata["timestamp"]).toBe("number");
         });
     });
 

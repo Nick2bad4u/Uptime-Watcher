@@ -457,7 +457,7 @@ describe("ChartComponents", () => {
                 <ResponseTimeChart data={data} options={options} />
             );
 
-            const initialChart = screen.getByTestId("line-chart");
+            screen.getByTestId("line-chart");
 
             // Re-render with same props - should not create new instance
             rerender(<ResponseTimeChart data={data} options={options} />);

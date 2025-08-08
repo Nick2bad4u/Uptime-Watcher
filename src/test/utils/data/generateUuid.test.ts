@@ -144,7 +144,7 @@ describe("generateUuid", () => {
             expect(parts).toHaveLength(3);
             expect(parts[0]).toBe("site");
 
-            const extractedTimestamp = parseInt(parts[2], 10);
+            const extractedTimestamp = parseInt(parts[2]!, 10);
             expect(extractedTimestamp).toBeGreaterThanOrEqual(beforeTimestamp);
             expect(extractedTimestamp).toBeLessThanOrEqual(afterTimestamp);
         });
@@ -155,7 +155,7 @@ describe("generateUuid", () => {
 
             expect(parts).toHaveLength(3);
             expect(parts[1]).toMatch(/^[a-z0-9]+$/);
-            expect(parts[1].length).toBeGreaterThan(0);
+            expect(parts[1]!.length).toBeGreaterThan(0);
         });
 
         it("should use consistent format across calls", () => {

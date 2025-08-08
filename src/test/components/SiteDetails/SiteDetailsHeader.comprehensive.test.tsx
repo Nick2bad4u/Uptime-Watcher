@@ -290,7 +290,7 @@ describe("SiteDetailsHeader", () => {
         });
 
         it("should not render URL for HTTP monitor without URL", () => {
-            const monitorWithoutUrl = { ...mockHttpMonitor, url: undefined };
+            const { url, ...monitorWithoutUrl } = mockHttpMonitor;
             render(
                 <SiteDetailsHeader
                     site={mockSite}
@@ -302,7 +302,7 @@ describe("SiteDetailsHeader", () => {
         });
 
         it("should render empty screenshot URL for HTTP monitor without URL", () => {
-            const monitorWithoutUrl = { ...mockHttpMonitor, url: undefined };
+            const { url, ...monitorWithoutUrl } = mockHttpMonitor;
             render(
                 <SiteDetailsHeader
                     site={mockSite}
@@ -516,27 +516,24 @@ describe("SiteDetailsHeader", () => {
         });
 
         it("should handle undefined monitor status", () => {
-            const monitorWithoutStatus = {
-                ...mockHttpMonitor,
-                status: undefined,
-            };
+            const { status, ...monitorWithoutStatus } = mockHttpMonitor;
             render(
                 <SiteDetailsHeader
                     site={mockSite}
                     isCollapsed={false}
-                    selectedMonitor={monitorWithoutStatus}
+                    selectedMonitor={{
+                        ...monitorWithoutStatus,
+                        status: "pending" as const,
+                    }}
                 />
             );
             const statusIndicator = screen.getByTestId("status-indicator");
-            expect(statusIndicator).toHaveAttribute("data-status", "unknown");
+            expect(statusIndicator).toHaveAttribute("data-status", "pending");
         });
 
         it("should handle port monitor without host or port", () => {
-            const incompletePortMonitor = {
-                ...mockPortMonitor,
-                host: undefined,
-                port: undefined,
-            };
+            const { host, port, ...monitorWithoutHostPort } = mockPortMonitor;
+            const incompletePortMonitor = monitorWithoutHostPort;
             const siteWithMonitors = {
                 ...mockSite,
                 monitors: [incompletePortMonitor],

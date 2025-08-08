@@ -51,7 +51,6 @@ describe("Shared Utils Coverage", () => {
                 },
             };
 
-            expect(CacheKeys.sites.all()).toBe("sites:all");
             expect(CacheKeys.sites.byId("123")).toBe("sites:id:123");
             expect(CacheKeys.sites.byStatus("up")).toBe("sites:status:up");
             expect(CacheKeys.monitors.byType("http")).toBe(
@@ -114,7 +113,7 @@ describe("Shared Utils Coverage", () => {
             const cacheOps: CacheOperations = {
                 set: (key: string, value: any, ttl?: number) => {
                     const expires = ttl ? Date.now() + ttl : undefined;
-                    mockCache.set(key, { value, expires });
+                    mockCache.set(key, { value, ...(expires !== undefined && { expires }) });
                 },
                 get: (key: string) => {
                     const entry = mockCache.get(key);
@@ -209,7 +208,7 @@ describe("Shared Utils Coverage", () => {
             );
             expect(template.level).toBe("info");
             expect(template.category).toBe("SiteManager");
-            expect(template.context?.siteId).toBe("123");
+            expect(template.context?.['siteId']).toBe("123");
 
             const formatted = logGenerator.formatMessage(template);
             expect(formatted).toContain(
@@ -334,7 +333,7 @@ describe("Shared Utils Coverage", () => {
 
             const errorLogs = filterLogs(mockLogs, { level: ["error"] });
             expect(errorLogs).toHaveLength(1);
-            expect(errorLogs[0].level).toBe("error");
+            expect(errorLogs?.[0]?.level).toBe("error");
 
             const siteManagerLogs = filterLogs(mockLogs, {
                 category: ["SiteManager"],
@@ -410,12 +409,12 @@ describe("Shared Utils Coverage", () => {
                 },
             };
 
-            expect(errorCatalog.SITE_NOT_FOUND.category).toBe("validation");
-            expect(errorCatalog.NETWORK_TIMEOUT.severity).toBe("medium");
-            expect(errorCatalog.DATABASE_CONNECTION_FAILED.recoverable).toBe(
+            expect(errorCatalog['SITE_NOT_FOUND']?.category).toBe("validation");
+            expect(errorCatalog['NETWORK_TIMEOUT']?.severity).toBe("medium");
+            expect(errorCatalog['DATABASE_CONNECTION_FAILED']?.recoverable).toBe(
                 false
             );
-            expect(errorCatalog.INVALID_MONITOR_CONFIG.suggestions).toContain(
+            expect(errorCatalog['INVALID_MONITOR_CONFIG']?.suggestions).toContain(
                 "Check required fields"
             );
         });

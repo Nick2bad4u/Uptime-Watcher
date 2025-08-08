@@ -90,8 +90,8 @@ describe("File Download Utility Coverage Tests", () => {
         it("should handle download with default mimeType", () => {
             const downloadFile = (options: any) => {
                 const {
-                    buffer,
-                    fileName,
+                    buffer: _buffer,
+                    fileName: _fileName,
                     mimeType = "application/octet-stream",
                 } = options;
                 expect(mimeType).toBe("application/octet-stream");
@@ -113,7 +113,7 @@ describe("File Download Utility Coverage Tests", () => {
             const downloadFile = (options: any) => {
                 const {
                     buffer,
-                    fileName,
+                    fileName: _fileName,
                     mimeType = "application/octet-stream",
                 } = options;
 
@@ -128,7 +128,8 @@ describe("File Download Utility Coverage Tests", () => {
                     );
 
                     // Fallback method
-                    const blob = new Blob([buffer], { type: mimeType });
+                    const _blob = new Blob([buffer], { type: mimeType });
+                    void _blob; // TypeScript unused variable workaround
                     // Alternative download approach
                     return false; // Indicates fallback was used
                 }
@@ -380,14 +381,15 @@ describe("File Download Utility Coverage Tests", () => {
             const handleDownloadError = (
                 error: unknown,
                 buffer: ArrayBuffer,
-                fileName: string,
+                _fileName: string,
                 mimeType: string
             ) => {
                 console.error("Download failed:", error);
 
                 // Attempt fallback
                 try {
-                    const blob = new Blob([buffer], { type: mimeType });
+                    const _blob = new Blob([buffer], { type: mimeType });
+                    void _blob; // TypeScript unused variable workaround
                     // Alternative method
                     return "fallback-attempted";
                 } catch (fallbackError) {

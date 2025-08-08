@@ -1,4 +1,3 @@
-import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom";
@@ -64,8 +63,6 @@ describe("FormFields Components - Complete Coverage", () => {
             id: "test-field",
             label: "Test Field",
             required: false,
-            error: undefined,
-            helpText: undefined,
             children: <input data-testid="child-input" />,
         };
 
@@ -109,7 +106,7 @@ describe("FormFields Components - Complete Coverage", () => {
         });
 
         it("should handle no error gracefully", () => {
-            render(<FormField {...defaultFormFieldProps} error={undefined} />);
+            render(<FormField {...defaultFormFieldProps} />);
             expect(screen.getByText("Test Field")).toBeInTheDocument();
         });
 
@@ -226,8 +223,6 @@ describe("FormFields Components - Complete Coverage", () => {
             // Test conditional spreading edge cases
             const propsWithExplicitUndefined = {
                 ...defaultTextFieldProps,
-                error: undefined as undefined,
-                helpText: undefined as undefined,
             };
             render(<TextField {...propsWithExplicitUndefined} />);
             expect(screen.getByTestId("themed-input")).toBeInTheDocument();
@@ -329,8 +324,6 @@ describe("FormFields Components - Complete Coverage", () => {
             // Test conditional spreading edge cases
             const propsWithExplicitUndefined = {
                 ...defaultSelectFieldProps,
-                error: undefined as undefined,
-                helpText: undefined as undefined,
             };
             render(<SelectField {...propsWithExplicitUndefined} />);
             expect(screen.getByTestId("themed-select")).toBeInTheDocument();
@@ -447,8 +440,6 @@ describe("FormFields Components - Complete Coverage", () => {
             render(
                 <RadioGroup
                     {...defaultRadioGroupProps}
-                    error={undefined}
-                    helpText={undefined}
                 />
             );
             expect(screen.getByText("Create New Site")).toBeInTheDocument();
@@ -458,8 +449,6 @@ describe("FormFields Components - Complete Coverage", () => {
             // This specifically tests the conditional spread operator edge case
             const propsWithExplicitUndefined = {
                 ...defaultRadioGroupProps,
-                error: undefined as undefined,
-                helpText: undefined as undefined,
             };
             render(<RadioGroup {...propsWithExplicitUndefined} />);
             expect(screen.getByText("Create New Site")).toBeInTheDocument();

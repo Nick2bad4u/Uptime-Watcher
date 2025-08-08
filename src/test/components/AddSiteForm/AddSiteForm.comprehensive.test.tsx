@@ -224,10 +224,10 @@ describe("AddSiteForm Component", () => {
             render(<AddSiteForm />);
 
             const selectFields = screen.getAllByRole("combobox");
-            fireEvent.change(selectFields[0], { target: { value: "port" } });
+            fireEvent.change(selectFields[0]!, { target: { value: "port" } });
 
             // Verify the form field interaction
-            expect(selectFields[0]).toBeInTheDocument();
+            expect(selectFields[0]!).toBeInTheDocument();
         });
 
         it("should handle monitor type changes", () => {

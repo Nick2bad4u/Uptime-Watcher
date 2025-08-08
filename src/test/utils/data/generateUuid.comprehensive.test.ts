@@ -215,9 +215,10 @@ describe("generateUuid", () => {
             vi.useFakeTimers();
             vi.setSystemTime(new Date("2023-01-01T00:00:00.000Z"));
 
-            const mockRandom = vi
+            const _mockRandom = vi
                 .spyOn(Math, "random")
                 .mockReturnValue(0.123456789);
+            void _mockRandom;
 
             // Act
             const result = generateUuid();
@@ -268,7 +269,8 @@ describe("generateUuid", () => {
             vi.useFakeTimers();
             vi.setSystemTime(testTimestamp);
 
-            const mockRandom = vi.spyOn(Math, "random").mockReturnValue(0.5);
+            const _mockRandom = vi.spyOn(Math, "random").mockReturnValue(0.5);
+            void _mockRandom;
 
             // Act
             const result = generateUuid();
@@ -288,7 +290,8 @@ describe("generateUuid", () => {
             vi.useFakeTimers();
             vi.setSystemTime(largeTimestamp);
 
-            const mockRandom = vi.spyOn(Math, "random").mockReturnValue(0.123);
+            const _mockRandom = vi.spyOn(Math, "random").mockReturnValue(0.123);
+            void _mockRandom;
 
             // Act
             const result = generateUuid();
@@ -305,7 +308,8 @@ describe("generateUuid", () => {
             vi.useFakeTimers();
             vi.setSystemTime(0); // Unix epoch
 
-            const mockRandom = vi.spyOn(Math, "random").mockReturnValue(0.5);
+            const _mockRandom = vi.spyOn(Math, "random").mockReturnValue(0.5);
+            void _mockRandom;
 
             // Act
             const result = generateUuid();
@@ -321,7 +325,8 @@ describe("generateUuid", () => {
             vi.useFakeTimers();
             vi.setSystemTime(1000);
 
-            const mockRandom = vi.spyOn(Math, "random").mockReturnValue(0);
+            const _mockRandom = vi.spyOn(Math, "random").mockReturnValue(0);
+            void _mockRandom;
 
             // Act
             const result = generateUuid();
@@ -337,9 +342,10 @@ describe("generateUuid", () => {
             vi.useFakeTimers();
             vi.setSystemTime(1000);
 
-            const mockRandom = vi
+            const _mockRandom = vi
                 .spyOn(Math, "random")
                 .mockReturnValue(0.999999999);
+            void _mockRandom;
 
             // Act
             const result = generateUuid();

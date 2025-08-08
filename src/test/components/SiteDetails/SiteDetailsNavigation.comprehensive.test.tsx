@@ -64,7 +64,6 @@ vi.mock(
     () => ({
         SiteMonitoringButton: vi.fn(
             ({
-                allMonitorsRunning,
                 isLoading,
                 onStartSiteMonitoring,
                 onStopSiteMonitoring,
@@ -99,22 +98,26 @@ const mockSite = {
             id: "monitor-1",
             type: "http" as const,
             url: "https://example.com",
-            interval: 300000,
+            checkInterval: 300000,
             timeout: 30000,
             retryAttempts: 3,
-            isEnabled: true,
             monitoring: true,
+            history: [],
+            responseTime: 150,
+            status: "up" as const,
         },
         {
             id: "monitor-2",
             type: "port" as const,
             host: "localhost",
             port: 8080,
-            interval: 300000,
+            checkInterval: 300000,
             timeout: 30000,
             retryAttempts: 3,
-            isEnabled: true,
             monitoring: false,
+            history: [],
+            responseTime: 25,
+            status: "down" as const,
         },
     ],
 };

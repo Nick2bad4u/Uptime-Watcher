@@ -161,7 +161,11 @@ describe("Application Constants", () => {
         it("should have sorted intervals", () => {
             const values = CHECK_INTERVALS.map((interval) => interval.value);
             for (let i = 1; i < values.length; i++) {
-                expect(values[i]).toBeGreaterThanOrEqual(values[i - 1]);
+                const currentValue = values[i];
+                const previousValue = values[i - 1];
+                if (currentValue != null && previousValue != null) {
+                    expect(currentValue).toBeGreaterThanOrEqual(previousValue);
+                }
             }
         });
     });
@@ -398,7 +402,7 @@ describe("Application Constants", () => {
             const timingMatch = TRANSITION_ALL.match(/([\d.]+)s/);
             expect(timingMatch).not.toBeNull();
 
-            if (timingMatch) {
+            if (timingMatch && timingMatch[1]) {
                 const seconds = parseFloat(timingMatch[1]);
                 expect(seconds).toBeGreaterThan(0);
                 expect(seconds).toBeLessThan(2); // Should be reasonable for UI animations

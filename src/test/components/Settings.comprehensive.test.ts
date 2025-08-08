@@ -157,7 +157,8 @@ describe("Settings Component Coverage Tests", () => {
 
         it("should handle timeout cleanup", () => {
             const clearTimeout = vi.fn();
-            const setTimeout = vi.fn(() => 123);
+            const _timeoutId = vi.fn(() => 123);
+            void _timeoutId;
 
             // Simulate effect cleanup
             const cleanup = () => {
@@ -192,7 +193,7 @@ describe("Settings Component Coverage Tests", () => {
                 "theme",
             ]);
 
-            const handleSettingChange = (key: string, value: unknown) => {
+            const handleSettingChange = (key: string, _value: unknown) => {
                 if (!ALLOWED_SETTINGS_KEYS.has(key as any)) {
                     return false; // Invalid key
                 }
@@ -218,6 +219,8 @@ describe("Settings Component Coverage Tests", () => {
             ];
 
             testValues.forEach(({ key, value, type }) => {
+                // Using key for test validation
+                expect(key).toBeTruthy();
                 expect(typeof value).toBe(type);
             });
         });
@@ -412,7 +415,7 @@ describe("Settings Component Coverage Tests", () => {
 
     describe("Callbacks", () => {
         it("should handle useCallback optimization", () => {
-            const useCallback = (fn: Function, deps: any[]) => {
+            const useCallback = (fn: Function, _deps: any[]) => {
                 return fn;
             };
 

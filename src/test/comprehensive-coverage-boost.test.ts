@@ -112,7 +112,7 @@ describe("Comprehensive Coverage Boost Tests", () => {
             expect(mockFormData).toBeDefined();
             expect(Array.isArray(mockFormData.monitors)).toBe(true);
             expect(mockFormData.monitors.length).toBe(1);
-            expect(mockFormData.monitors[0].type).toBe("http");
+            expect(mockFormData.monitors[0]?.type).toBe("http");
             expect(mockFormData.validation.hasErrors).toBe(false);
         });
     });

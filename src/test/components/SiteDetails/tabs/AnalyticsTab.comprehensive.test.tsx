@@ -111,7 +111,7 @@ vi.mock("../../../../theme/components", () => ({
 }));
 
 vi.mock("../../../../components/common/MonitorUiComponents", () => ({
-    ConditionalResponseTime: ({ children, monitorType, fallback }: any) => {
+    ConditionalResponseTime: ({ children, monitorType }: any) => {
         // Always show children (assumes response time is supported for test simplicity)
         return (
             <div
@@ -131,17 +131,17 @@ vi.mock("../../../../utils/monitorUiHelpers", () => ({
 }));
 
 vi.mock("../../../../components/SiteDetails/charts/ChartComponents", () => ({
-    ResponseTimeChart: ({ data, options }: any) => (
+    ResponseTimeChart: () => (
         <div data-testid="response-time-chart" data-chart-type="line">
             Line Chart
         </div>
     ),
-    StatusChart: ({ data, options }: any) => (
+    StatusChart: () => (
         <div data-testid="status-chart" data-chart-type="bar">
             Bar Chart
         </div>
     ),
-    UptimeChart: ({ data, options }: any) => (
+    UptimeChart: () => (
         <div data-testid="uptime-chart" data-chart-type="doughnut">
             Doughnut Chart
         </div>
@@ -214,8 +214,8 @@ describe("AnalyticsTab", () => {
         return {
             avgResponseTime: 150,
             barChartData: mockBarChartData,
-            barChartOptions: mockChartOptions as ChartOptions<"bar">,
-            doughnutOptions: mockChartOptions as ChartOptions<"doughnut">,
+            barChartOptions: mockChartOptions as unknown as ChartOptions<"bar">,
+            doughnutOptions: mockChartOptions as unknown as ChartOptions<"doughnut">,
             downCount: 5,
             downtimePeriods: mockDowntimePeriods,
             formatDuration: vi.fn((ms: number) => `${Math.round(ms / 1000)}s`),

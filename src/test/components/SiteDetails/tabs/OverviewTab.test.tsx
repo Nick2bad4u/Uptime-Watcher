@@ -322,10 +322,7 @@ describe("OverviewTab", () => {
         });
 
         it("should handle monitor without last check", () => {
-            const monitorWithoutLastCheck = {
-                ...createMockMonitor(),
-                lastChecked: undefined,
-            };
+            const { lastChecked, ...monitorWithoutLastCheck } = createMockMonitor();
 
             render(
                 <OverviewTab

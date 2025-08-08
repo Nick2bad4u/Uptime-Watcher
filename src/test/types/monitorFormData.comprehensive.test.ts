@@ -49,7 +49,7 @@ describe("Monitor Form Data Types", () => {
             };
 
             expect(dynamicForm.checkInterval).toBe(300_000);
-            expect(dynamicForm.customProperty).toBe("custom value");
+            expect(dynamicForm["customProperty"]).toBe("custom value");
             expect(dynamicForm.monitoring).toBe(true);
         });
 
@@ -432,9 +432,7 @@ describe("Monitor Form Data Types", () => {
             });
 
             it("should return default value when property is undefined", () => {
-                const data: DynamicFormData = {
-                    checkInterval: undefined,
-                };
+                const data: DynamicFormData = {};
 
                 expect(safeGetFormProperty(data, "checkInterval", 1000)).toBe(
                     1000
@@ -464,7 +462,7 @@ describe("Monitor Form Data Types", () => {
                 safeSetFormProperty(data, "customProperty", "test value");
 
                 expect(data.checkInterval).toBe(5000);
-                expect(data.customProperty).toBe("test value");
+                expect(data["customProperty"]).toBe("test value");
             });
 
             it("should overwrite existing property", () => {
@@ -486,11 +484,11 @@ describe("Monitor Form Data Types", () => {
                 safeSetFormProperty(data, "object", { nested: "value" });
                 safeSetFormProperty(data, "array", [1, 2, 3]);
 
-                expect(data.number).toBe(123);
-                expect(data.string).toBe("test");
-                expect(data.boolean).toBe(true);
-                expect(data.object).toEqual({ nested: "value" });
-                expect(data.array).toEqual([1, 2, 3]);
+                expect(data["number"]).toBe(123);
+                expect(data["string"]).toBe("test");
+                expect(data["boolean"]).toBe(true);
+                expect(data["object"]).toEqual({ nested: "value" });
+                expect(data["array"]).toEqual([1, 2, 3]);
             });
         });
     });

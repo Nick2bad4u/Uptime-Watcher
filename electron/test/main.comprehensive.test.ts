@@ -323,6 +323,9 @@ describe("main.ts - Electron Main Process", () => {
                 .value;
             await whenReadyPromise;
 
+            // Wait for the setTimeout(resolve, 1) and extension installation code to complete
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
             expect(mockLogger.warn).toHaveBeenCalledWith(
                 "[Main] Failed to install dev extensions (this is normal in production)",
                 expect.any(Error)

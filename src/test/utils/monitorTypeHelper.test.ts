@@ -12,8 +12,8 @@ import {
     getAvailableMonitorTypes,
     getMonitorTypeConfig,
     getMonitorTypeOptions,
-    type MonitorTypeConfig,
 } from "../../utils/monitorTypeHelper";
+import type { MonitorTypeConfig } from "../../../shared/types/monitorTypes";
 
 // Mock the monitor types store
 const mockMonitorTypesStore = {

@@ -107,7 +107,7 @@ describe("Error Constants", () => {
                 // Test that all error messages are strings
                 Object.values(domain).forEach((message) => {
                     expect(typeof message).toBe("string");
-                    expect(message.length).toBeGreaterThan(0);
+                    expect((message as string).length).toBeGreaterThan(0);
                 });
             });
         });

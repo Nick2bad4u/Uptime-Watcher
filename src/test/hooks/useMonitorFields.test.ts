@@ -250,8 +250,8 @@ describe("useMonitorFields Hook", () => {
 
             // Configure the mock store with field configurations
             mockMonitorTypesStore.fieldConfigs = {
-                http: mockConfigs[0].fields,
-                tcp: mockConfigs[1].fields,
+                http: mockConfigs[0]?.fields || [],
+                tcp: mockConfigs[1]?.fields || [],
             };
             mockMonitorTypesStore.isLoaded = true;
 

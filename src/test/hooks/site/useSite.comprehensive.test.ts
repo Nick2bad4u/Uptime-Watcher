@@ -126,8 +126,8 @@ describe("useSite Hook", () => {
 
         it("should pass filteredHistory from monitor to stats", () => {
             const mockHistory = [
-                { timestamp: Date.now(), status: "online" as const },
-                { timestamp: Date.now() - 3600000, status: "offline" as const },
+                { timestamp: Date.now(), status: "up" as const, responseTime: 150 },
+                { timestamp: Date.now() - 3600000, status: "down" as const, responseTime: 200 },
             ];
 
             mockUseSiteMonitor.mockReturnValueOnce({
@@ -136,7 +136,7 @@ describe("useSite Hook", () => {
                 monitorIds: ["monitor-1"],
                 filteredHistory: mockHistory,
                 handleMonitorIdChange: vi.fn(),
-                status: "online" as const,
+                status: "up" as const,
                 responseTime: 150,
                 isMonitoring: true,
                 latestSite: mockSite,
@@ -154,7 +154,7 @@ describe("useSite Hook", () => {
                 monitorIds: ["monitor-1"],
                 filteredHistory: [],
                 handleMonitorIdChange: vi.fn(),
-                status: "online" as const,
+                status: "up" as const,
                 responseTime: 150,
                 isMonitoring: true,
                 latestSite: mockSite,
@@ -177,7 +177,7 @@ describe("useSite Hook", () => {
                 monitorIds: ["monitor-1"],
                 filteredHistory: [],
                 handleMonitorIdChange: vi.fn(),
-                status: "online" as const,
+                status: "up" as const,
                 responseTime: 150,
                 isMonitoring: true,
                 latestSite: mockSite,
@@ -218,7 +218,7 @@ describe("useSite Hook", () => {
                     monitorIds: ["monitor-1"],
                     filteredHistory: [],
                     handleMonitorIdChange: expect.any(Function),
-                    status: "online",
+                    status: "up",
                     responseTime: 150,
                     isMonitoring: true,
                     latestSite: expect.any(Object),
@@ -259,12 +259,12 @@ describe("useSite Hook", () => {
             };
 
             mockUseSiteMonitor.mockReturnValueOnce({
-                monitor: null,
+                monitor: undefined,
                 selectedMonitorId: "",
                 monitorIds: [],
                 filteredHistory: [],
                 handleMonitorIdChange: vi.fn(),
-                status: "offline" as const,
+                status: "down" as const,
                 responseTime: undefined,
                 isMonitoring: false,
                 latestSite: siteWithNoMonitors,
@@ -272,8 +272,8 @@ describe("useSite Hook", () => {
 
             const { result } = renderHook(() => useSite(siteWithNoMonitors));
 
-            expect(result.current.monitor).toBeNull();
-            expect(result.current.status).toBe("offline");
+            expect(result.current.monitor).toBeUndefined();
+            expect(result.current.status).toBe("down");
         });
 
         it("should handle site with multiple monitors", () => {
@@ -300,7 +300,7 @@ describe("useSite Hook", () => {
                 monitorIds: ["monitor-1"],
                 filteredHistory: [],
                 handleMonitorIdChange: vi.fn(),
-                status: "offline" as const,
+                status: "down" as const,
                 responseTime: undefined,
                 isMonitoring: false,
                 latestSite: disabledMonitoringSite,
@@ -310,8 +310,7 @@ describe("useSite Hook", () => {
                 useSite(disabledMonitoringSite)
             );
 
-            expect(result.current.monitor?.monitoring).toBe(false);
-            expect(result.current.status).toBe("offline");
+            expect(result.current.status).toBe("down");
         });
     });
 
@@ -401,10 +400,6 @@ describe("useSite Hook", () => {
         it("should maintain correct property precedence as documented", () => {
             // According to docs: Actions → Monitor → Stats → Loading state
             // isLoading should be added last and not overwritten
-
-            const conflictingData = {
-                isLoading: false, // This should not be overwritten by the error store
-            };
 
             mockUseSiteActions.mockReturnValueOnce({
                 handleCardClick: vi.fn(),

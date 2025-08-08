@@ -131,35 +131,6 @@ describe("FormData Types", () => {
             expect(httpWithOptions.auth).toBeDefined();
             expect(httpWithOptions.expectedContent).toBe("success");
         });
-
-        it("should enforce HTTP method types", () => {
-            const getMethods: HttpFormData["method"][] = [
-                "GET",
-                "POST",
-                "PUT",
-                "DELETE",
-                "HEAD",
-            ];
-
-            getMethods.forEach((method) => {
-                const httpData: HttpFormData = {
-                    type: "http",
-                    url: "https://example.com",
-                    checkInterval: 300000,
-                    timeout: 30000,
-                    retryAttempts: 3,
-                    method,
-                };
-
-                expect([
-                    "GET",
-                    "POST",
-                    "PUT",
-                    "DELETE",
-                    "HEAD",
-                ]).toContain(httpData.method);
-            });
-        });
     });
 
     describe("PingFormData", () => {

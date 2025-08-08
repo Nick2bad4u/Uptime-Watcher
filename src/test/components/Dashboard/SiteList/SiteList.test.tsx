@@ -8,6 +8,7 @@ import { render, screen } from "@testing-library/react";
 import { SiteList } from "../../../../components/Dashboard/SiteList/SiteList";
 import type { Site } from "../../../../../shared/types";
 import type { ThemeName } from "../../../../theme/types";
+import { createMockSite } from "../../../utils/mockFactories";
 
 // Mock the stores and theme
 vi.mock("../../../../stores/sites/useSitesStore", () => ({
@@ -286,14 +287,16 @@ describe("SiteList", () => {
         it("should handle sites with special characters in identifiers", () => {
             // Arrange
             const specialSites: Site[] = [
-                {
-                    ...mockSites[0],
+                createMockSite({
                     identifier: "site-with-special-chars_123",
-                },
-                {
-                    ...mockSites[1],
+                    name: mockSites[0]!.name,
+                    monitoring: mockSites[0]!.monitoring,
+                }),
+                createMockSite({
                     identifier: "site.with.dots",
-                },
+                    name: mockSites[1]!.name,
+                    monitoring: mockSites[1]!.monitoring,
+                }),
             ];
             mockUseSitesStore.mockReturnValue({ sites: specialSites });
             mockUseTheme.mockReturnValue(createMockTheme(false));

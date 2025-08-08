@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
-import React from "react";
+import { createMockSite, createMockMonitor } from "../../../utils/mockFactories";
 
 // Mock theme components
 vi.mock("../../../../theme/components", async (importOriginal) => {
@@ -48,14 +48,12 @@ vi.mock("../SiteCardFooter", () => ({
 // Mock the hooks
 vi.mock("../../../../hooks/site/useSite", () => ({
     useSite: vi.fn(() => {
-        const mockSite = {
-            id: "test-site-1",
+        const mockSite = createMockSite({
             identifier: "test-site-1",
             name: "Test Site",
             monitoring: true,
-            history: [],
             monitors: [
-                {
+                createMockMonitor({
                     id: "monitor-1",
                     type: "http",
                     url: "https://example.com",
@@ -65,11 +63,9 @@ vi.mock("../../../../hooks/site/useSite", () => ({
                     checkInterval: 30000,
                     timeout: 5000,
                     retryAttempts: 3,
-                    history: [],
-                    activeOperations: [],
-                },
+                }),
             ],
-        };
+        });
 
         return {
             // Site data
@@ -116,14 +112,12 @@ vi.mock("../../../../hooks/site/useSite", () => ({
 import { SiteCard } from "../../../../components/Dashboard/SiteCard/SiteCard";
 
 describe("SiteCard Component", () => {
-    const mockSite = {
-        id: "test-site-1",
+    const mockSite = createMockSite({
         identifier: "test-site-1",
         name: "Test Site",
         monitoring: true,
-        history: [],
         monitors: [
-            {
+            createMockMonitor({
                 id: "monitor-1",
                 type: "http",
                 url: "https://example.com",
@@ -133,11 +127,9 @@ describe("SiteCard Component", () => {
                 checkInterval: 30000,
                 timeout: 5000,
                 retryAttempts: 3,
-                history: [],
-                activeOperations: [],
-            },
+            }),
         ],
-    };
+    });
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -170,23 +162,22 @@ describe("SiteCard Component", () => {
     });
 
     it("should handle site with multiple monitors", () => {
-        const siteWithMultipleMonitors = {
+        const siteWithMultipleMonitors = createMockSite({
             ...mockSite,
             monitors: [
-                mockSite.monitors[0],
-                {
+                mockSite.monitors![0]!,
+                createMockMonitor({
                     id: "monitor-2",
                     type: "http" as const,
                     url: "https://api.example.com",
                     status: "down" as const,
                     responseTime: 5000,
-                    history: [],
                     monitoring: false,
                     timeout: 10000,
                     retryAttempts: 3,
-                },
+                }),
             ],
-        };
+        });
 
         render(<SiteCard site={siteWithMultipleMonitors} />);
 

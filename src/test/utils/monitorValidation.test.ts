@@ -108,9 +108,9 @@ describe("Monitor Validation Utilities", () => {
                 url: "https://example.com",
                 timeout: 5000,
                 retryAttempts: 5,
-                monitoring: false,
+                ['monitoring']: false,
                 status: "up",
-            });
+            } as any);
 
             expect(result).toEqual({
                 history: [],
@@ -139,9 +139,9 @@ describe("Monitor Validation Utilities", () => {
         it("should preserve additional custom fields", () => {
             const result = createMonitorObject("http", {
                 url: "https://example.com",
-                customField: "customValue",
+                ['customField']: "customValue",
                 anotherField: 123,
-            });
+            } as any);
 
             expect(result["url"]).toBe("https://example.com");
             expect(result["customField"]).toBe("customValue");
@@ -631,7 +631,7 @@ describe("Monitor Validation Utilities", () => {
 
             it("should validate URL type for HTTP monitors", async () => {
                 const result = await validateMonitorFormData("http", {
-                    url: 123,
+                    url: 123 as any,
                 });
 
                 expect(result).toEqual({
@@ -696,7 +696,7 @@ describe("Monitor Validation Utilities", () => {
 
             it("should validate host type for port monitors", async () => {
                 const result = await validateMonitorFormData("port", {
-                    host: 123,
+                    host: 123 as any,
                     port: 3000,
                 });
 
@@ -722,7 +722,7 @@ describe("Monitor Validation Utilities", () => {
             it("should validate port type for port monitors", async () => {
                 const result = await validateMonitorFormData("port", {
                     host: "localhost",
-                    port: "3000",
+                    port: "3000" as any,
                 });
 
                 expect(result).toEqual({
@@ -814,7 +814,7 @@ describe("Monitor Validation Utilities", () => {
 
             it("should validate host type for ping monitors", async () => {
                 const result = await validateMonitorFormData("ping", {
-                    host: 123,
+                    host: 123 as any,
                 });
 
                 expect(result).toEqual({
@@ -895,7 +895,7 @@ describe("Monitor Validation Utilities", () => {
         it("should handle unknown monitor types", async () => {
             const result = await validateMonitorFormData(
                 "unknown" as MonitorType,
-                { someField: "value" }
+                { ['someField']: "value" } as any
             );
 
             expect(result.success).toBe(true);
@@ -957,9 +957,9 @@ describe("Monitor Validation Utilities", () => {
         it("should handle null and undefined values in createMonitorObject", () => {
             const result = createMonitorObject("http", {
                 url: "https://example.com",
-                customField: null,
+                ['customField']: null,
                 anotherField: undefined,
-            });
+            } as any);
 
             expect(result["customField"]).toBeNull();
             expect(result["anotherField"]).toBeUndefined();

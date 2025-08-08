@@ -85,11 +85,11 @@ describe("Monitor Form Data Types Coverage Tests", () => {
                 undefinedField: undefined,
             };
 
-            expect(dynamicData.knownField).toBe("known");
-            expect(typeof dynamicData.unknownField).toBe("object");
-            expect(Array.isArray(dynamicData.arrayField)).toBe(true);
-            expect(dynamicData.nullField).toBeNull();
-            expect(dynamicData.undefinedField).toBeUndefined();
+            expect(dynamicData["knownField"]).toBe("known");
+            expect(typeof dynamicData["unknownField"]).toBe("object");
+            expect(Array.isArray(dynamicData["arrayField"])).toBe(true);
+            expect(dynamicData["nullField"]).toBeNull();
+            expect(dynamicData["undefinedField"]).toBeUndefined();
         });
 
         it("should support extensible monitor types", () => {

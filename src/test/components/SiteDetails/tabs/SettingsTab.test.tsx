@@ -370,7 +370,8 @@ describe("SettingsTab", () => {
             render(<SettingsTab {...baseProps} hasUnsavedChanges={true} />);
 
             const saveButtons = screen.getAllByText("Save");
-            fireEvent.click(saveButtons[0]);
+            expect(saveButtons[0]).toBeDefined();
+            fireEvent.click(saveButtons[0]!);
 
             await waitFor(() => {
                 expect(baseProps.handleSaveName).toHaveBeenCalledTimes(1);
@@ -405,7 +406,8 @@ describe("SettingsTab", () => {
             render(<SettingsTab {...baseProps} intervalChanged={true} />);
 
             const saveButtons = screen.getAllByText("Save");
-            fireEvent.click(saveButtons[1]);
+            expect(saveButtons[1]).toBeDefined();
+            fireEvent.click(saveButtons[1]!);
 
             expect(baseProps.handleSaveInterval).toHaveBeenCalledTimes(1);
         });
@@ -430,7 +432,8 @@ describe("SettingsTab", () => {
             render(<SettingsTab {...baseProps} timeoutChanged={true} />);
 
             const saveButtons = screen.getAllByText("Save");
-            fireEvent.click(saveButtons[2]);
+            expect(saveButtons[2]).toBeDefined();
+            fireEvent.click(saveButtons[2]!);
 
             await waitFor(() => {
                 expect(baseProps.handleSaveTimeout).toHaveBeenCalledTimes(1);
@@ -459,7 +462,8 @@ describe("SettingsTab", () => {
             render(<SettingsTab {...baseProps} retryAttemptsChanged={true} />);
 
             const saveButtons = screen.getAllByText("Save");
-            fireEvent.click(saveButtons[3]);
+            expect(saveButtons[3]).toBeDefined();
+            fireEvent.click(saveButtons[3]!);
 
             await waitFor(() => {
                 expect(baseProps.handleSaveRetryAttempts).toHaveBeenCalledTimes(
@@ -476,7 +480,7 @@ describe("SettingsTab", () => {
             ).toBeInTheDocument();
             // Use a more flexible text matcher to handle the case where text might be broken up
             expect(
-                screen.getByText((content, element) => {
+                screen.getByText((content) => {
                     return (
                         content.includes("45") && content.includes("seconds")
                     );

@@ -243,7 +243,7 @@ describe("ApplicationService", () => {
             // Arrange
             applicationService = new ApplicationService();
             const readyHandler = mockApp.on.mock.calls.find(
-                (call) => call[0] === "ready"
+                (call: any[]) => call[0] === "ready"
             )?.[1];
 
             // Act
@@ -263,7 +263,7 @@ describe("ApplicationService", () => {
             // Arrange
             applicationService = new ApplicationService();
             const readyHandler = mockApp.on.mock.calls.find(
-                (call) => call[0] === "ready"
+                (call: any[]) => call[0] === "ready"
             )?.[1];
 
             // Act
@@ -390,7 +390,7 @@ describe("ApplicationService", () => {
                     writable: true,
                 });
                 const windowAllClosedHandler = mockApp.on.mock.calls.find(
-                    (call) => call[0] === "window-all-closed"
+                    (call: any[]) => call[0] === "window-all-closed"
                 )?.[1];
 
                 // Act
@@ -413,7 +413,7 @@ describe("ApplicationService", () => {
                     writable: true,
                 });
                 const windowAllClosedHandler = mockApp.on.mock.calls.find(
-                    (call) => call[0] === "window-all-closed"
+                    (call: any[]) => call[0] === "window-all-closed"
                 )?.[1];
 
                 // Act
@@ -432,7 +432,7 @@ describe("ApplicationService", () => {
                 // Arrange
                 mockWindowService.getAllWindows.mockReturnValue([]);
                 const activateHandler = mockApp.on.mock.calls.find(
-                    (call) => call[0] === "activate"
+                    (call: any[]) => call[0] === "activate"
                 )?.[1];
 
                 // Act
@@ -457,7 +457,7 @@ describe("ApplicationService", () => {
                 // Arrange
                 mockWindowService.getAllWindows.mockReturnValue([{ id: 1 }]);
                 const activateHandler = mockApp.on.mock.calls.find(
-                    (call) => call[0] === "activate"
+                    (call: any[]) => call[0] === "activate"
                 )?.[1];
 
                 // Act
@@ -481,7 +481,7 @@ describe("ApplicationService", () => {
         beforeEach(async () => {
             applicationService = new ApplicationService();
             const readyHandler = mockApp.on.mock.calls.find(
-                (call) => call[0] === "ready"
+                (call: any[]) => call[0] === "ready"
             )?.[1];
             await readyHandler?.();
         });
@@ -489,11 +489,11 @@ describe("ApplicationService", () => {
         it("should setup auto updater status callback", () => {
             // Arrange
             const statusCallback =
-                mockAutoUpdaterService.setStatusCallback.mock.calls[0][0];
+                mockAutoUpdaterService.setStatusCallback.mock.calls[0]?.[0];
             const statusData = { status: "checking-for-update" };
 
             // Act
-            statusCallback(statusData);
+            statusCallback?.(statusData);
 
             // Assert
             expect(mockWindowService.sendToRenderer).toHaveBeenCalledWith(
@@ -508,9 +508,9 @@ describe("ApplicationService", () => {
             mockAutoUpdaterService.checkForUpdates.mockRejectedValue(error);
 
             // Create new instance to trigger the error
-            const newApplicationService = new ApplicationService();
+            new ApplicationService();
             const readyHandler = mockApp.on.mock.calls.find(
-                (call) => call[0] === "ready"
+                (call: any[]) => call[0] === "ready"
             )?.[1];
 
             // Act
@@ -531,7 +531,7 @@ describe("ApplicationService", () => {
         beforeEach(async () => {
             applicationService = new ApplicationService();
             const readyHandler = mockApp.on.mock.calls.find(
-                (call) => call[0] === "ready"
+                (call: any[]) => call[0] === "ready"
             )?.[1];
             await readyHandler?.();
         });
@@ -846,7 +846,7 @@ describe("ApplicationService", () => {
             // Act
             applicationService = new ApplicationService();
             const readyHandler = mockApp.on.mock.calls.find(
-                (call) => call[0] === "ready"
+                (call: any[]) => call[0] === "ready"
             )?.[1];
             await readyHandler?.();
 

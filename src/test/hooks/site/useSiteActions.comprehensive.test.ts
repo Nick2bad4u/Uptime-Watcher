@@ -1,6 +1,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useSiteActions } from "../../../hooks/site/useSiteActions";
+import { createMockSite, createMockMonitor } from "../../utils/mockFactories";
 
 // Mock dependencies - define all mocks inline to avoid hoisting issues
 vi.mock("../../../stores/sites/useSitesStore", () => ({
@@ -32,32 +33,8 @@ vi.mock("../../../services/logger", () => ({
     },
 }));
 
-const mockSite = {
-    identifier: "test-site-1",
-    name: "Test Site",
-    monitoring: true,
-    monitors: [
-        {
-            id: "monitor-1",
-            type: "http" as const,
-            url: "https://example.com",
-            interval: 300000,
-            timeout: 30000,
-            retryAttempts: 3,
-            isEnabled: true,
-        },
-    ],
-};
-
-const mockMonitor = {
-    id: "monitor-1",
-    type: "http" as const,
-    url: "https://example.com",
-    interval: 300000,
-    timeout: 30000,
-    retryAttempts: 3,
-    isEnabled: true,
-};
+const mockSite = createMockSite();
+const mockMonitor = createMockMonitor();
 
 describe("useSiteActions Hook", () => {
     beforeEach(() => {
@@ -158,10 +135,7 @@ describe("useSiteActions Hook", () => {
         });
 
         it("should handle stop monitoring with disabled monitoring", async () => {
-            const disabledSite = {
-                ...mockSite,
-                isMonitoringEnabled: false,
-            };
+            const disabledSite = createMockSite({ monitoring: false });
 
             const { result } = renderHook(() =>
                 useSiteActions(disabledSite, mockMonitor)
@@ -232,8 +206,8 @@ describe("useSiteActions Hook", () => {
         });
 
         it("should handle check now with different monitor types", async () => {
-            const httpMonitor = { ...mockMonitor, type: "http" as const };
-            const httpsSite = { ...mockSite, url: "https://example.com" };
+            const httpMonitor = createMockMonitor({ type: "http" });
+            const httpsSite = createMockSite({ name: "HTTPS Site" });
 
             const { result } = renderHook(() =>
                 useSiteActions(httpsSite, httpMonitor)
@@ -336,9 +310,9 @@ describe("useSiteActions Hook", () => {
     describe("Different Site Configurations", () => {
         it("should handle different site types", async () => {
             const sites = [
-                { ...mockSite, url: "https://example.com" },
-                { ...mockSite, url: "https://secure.example.com" },
-                { ...mockSite, url: "https://files.example.com" },
+                createMockSite({ name: "Site 1" }),
+                createMockSite({ name: "Site 2" }),
+                createMockSite({ name: "Site 3" }),
             ];
 
             for (const site of sites) {
@@ -356,8 +330,8 @@ describe("useSiteActions Hook", () => {
 
         it("should handle sites with different monitoring states", async () => {
             const sites = [
-                { ...mockSite, isMonitoringEnabled: true },
-                { ...mockSite, isMonitoringEnabled: false },
+                createMockSite({ monitoring: true }),
+                createMockSite({ monitoring: false }),
             ];
 
             for (const site of sites) {

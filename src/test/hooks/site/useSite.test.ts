@@ -6,14 +6,14 @@
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { useSite } from "../../../hooks/site/useSite";
+import { createMockSite } from "../../utils/mockFactories";
 
 // Define types locally since they are not exported from types
 interface Site {
-    id: string;
+    identifier: string;
     name: string;
-    url: string;
+    monitoring: boolean;
     monitors: any[];
-    dateAdded: number;
 }
 
 // Mock all the sub-hooks
@@ -26,7 +26,7 @@ vi.mock("../../../hooks/site/useSiteMonitor", () => ({
             id: "monitor-1",
             name: "Test Monitor",
             type: "http",
-            isMonitoring: true,
+            monitoring: true,
         },
         selectedMonitorId: "monitor-1",
         monitorIds: ["monitor-1"],
@@ -72,28 +72,10 @@ import { useSiteActions } from "../../../hooks/site/useSiteActions";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
 
 describe("useSite Hook - Coverage Tests", () => {
-    const mockSite: Site = {
-        id: "site-1",
+    const mockSite: Site = createMockSite({
+        identifier: "site-1",
         name: "Test Site",
-        url: "https://example.com",
-        monitors: [
-            {
-                id: "monitor-1",
-                name: "Test Monitor",
-                type: "http",
-                url: "https://example.com",
-                checkInterval: 60000,
-                timeout: 10000,
-                retryAttempts: 3,
-                status: "up",
-                isMonitoring: true,
-                lastChecked: Date.now(),
-                responseTime: 100,
-                history: [],
-            },
-        ],
-        dateAdded: Date.now(),
-    };
+    });
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -115,7 +97,7 @@ describe("useSite Hook - Coverage Tests", () => {
                 id: "monitor-1",
                 name: "Test Monitor",
                 type: "http",
-                isMonitoring: true,
+                monitoring: true,
             });
             expect(useErrorStore).toHaveBeenCalled();
         });
@@ -156,7 +138,7 @@ describe("useSite Hook - Coverage Tests", () => {
                 id: "monitor-2",
                 name: "Custom Monitor",
                 type: "port",
-                isMonitoring: false,
+                monitoring: false,
             };
 
             (useSiteMonitor as any).mockReturnValueOnce({

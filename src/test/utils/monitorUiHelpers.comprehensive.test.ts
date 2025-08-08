@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Mock } from "vitest";
+import type { Monitor } from "../../../shared/types";
 
 /**
  * Test suite for src/utils/monitorUiHelpers.ts
@@ -59,6 +60,21 @@ const getMonitorTypeConfig = mockGetMonitorTypeConfig;
 
 describe("Monitor UI Helpers", () => {
     let originalWindow: any;
+
+    // Helper function to create mock Monitor objects
+    const createMockMonitor = (partial: Partial<Monitor> = {}): Monitor => ({
+        checkInterval: 30000,
+        history: [],
+        id: "test-monitor-id",
+        monitoring: true,
+        responseTime: 100,
+        retryAttempts: 3,
+        status: "up" as const,
+        timeout: 5000,
+        type: "http" as const,
+        url: "https://example.com",
+        ...partial,
+    });
 
     beforeEach(() => {
         originalWindow = globalThis.window;
@@ -206,9 +222,9 @@ describe("Monitor UI Helpers", () => {
                 }
             );
 
-            const result = await formatMonitorTitleSuffix("http", {
+            const result = await formatMonitorTitleSuffix("http", createMockMonitor({
                 url: "https://example.com",
-            });
+            }));
             expect(result).toBe(" (https://example.com)");
         });
 
@@ -219,9 +235,9 @@ describe("Monitor UI Helpers", () => {
 
             globalThis.window = {} as any;
 
-            const result = await formatMonitorTitleSuffix("http", {
+            const result = await formatMonitorTitleSuffix("http", createMockMonitor({
                 url: "https://example.com",
-            });
+            }));
             expect(result).toBe(""); // Fallback to empty string
         });
 
@@ -237,9 +253,9 @@ describe("Monitor UI Helpers", () => {
                 }
             );
 
-            const result = await formatMonitorTitleSuffix("http", {
+            const result = await formatMonitorTitleSuffix("http", createMockMonitor({
                 url: "https://example.com",
-            });
+            }));
             expect(result).toBe(""); // Fallback to empty string
         });
     });

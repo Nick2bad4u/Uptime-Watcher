@@ -299,7 +299,9 @@ describe("HistoryTab", () => {
         it("should display formatted timestamps", () => {
             const monitor = createMockMonitor(1);
             const timestamp = Date.now();
-            monitor.history[0].timestamp = timestamp;
+            if (monitor.history[0]) {
+                monitor.history[0].timestamp = timestamp;
+            }
 
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
@@ -308,7 +310,9 @@ describe("HistoryTab", () => {
 
         it("should display formatted response times", () => {
             const monitor = createMockMonitor(1);
-            monitor.history[0].responseTime = 250;
+            if (monitor.history[0]) {
+                monitor.history[0].responseTime = 250;
+            }
 
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
@@ -317,7 +321,9 @@ describe("HistoryTab", () => {
 
         it("should display formatted status with icons", () => {
             const monitor = createMockMonitor(1);
-            monitor.history[0].status = "up";
+            if (monitor.history[0]) {
+                monitor.history[0].status = "up";
+            }
 
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 

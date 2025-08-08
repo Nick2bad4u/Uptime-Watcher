@@ -373,16 +373,13 @@ describe("eventTypes - Comprehensive Coverage", () => {
         describe("Default case - unknown categories", () => {
             it("should return false for unknown categories", () => {
                 // These will test the default case in the switch statement
-                // @ts-expect-error - intentionally testing unknown category
                 expect(
-                    isEventOfCategory("site:added", "UNKNOWN_CATEGORY")
+                    isEventOfCategory("site:added", "UNKNOWN_CATEGORY" as any)
                 ).toBe(false);
-                // @ts-expect-error - intentionally testing unknown category
                 expect(
-                    isEventOfCategory("monitor:up", "NOT_A_REAL_CATEGORY")
+                    isEventOfCategory("monitor:up", "NOT_A_REAL_CATEGORY" as any)
                 ).toBe(false);
-                // @ts-expect-error - intentionally testing unknown category
-                expect(isEventOfCategory("system:error", "FAKE_CATEGORY")).toBe(
+                expect(isEventOfCategory("system:error", "FAKE_CATEGORY" as any)).toBe(
                     false
                 );
             });

@@ -196,7 +196,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
 
         it("should support type-safe field validation", () => {
             const validateField = (
-                fieldName: string,
+                _fieldName: string,
                 value: unknown,
                 expectedType: string
             ) => {
@@ -259,7 +259,8 @@ describe("Monitor Forms Types Coverage Tests", () => {
     describe("Form Validation", () => {
         it("should validate required fields", () => {
             const requiredFields = ["url"];
-            const optionalFields = ["name", "timeout", "checkInterval"];
+            const _optionalFields = ["name", "timeout", "checkInterval"];
+            void _optionalFields;
 
             const formData = {
                 url: "https://required.com",
