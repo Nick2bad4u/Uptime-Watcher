@@ -30,6 +30,7 @@ applyTo: "**"
 
 Critical Instructions:
 
+- Always track multi-step tasks in a to-do list.
 - Always READ the code before making changes. Understand the FULL context and flow.
 - Always "Super Think" aka "Deep Think" aka "Think Twice" before making changes. Consider the impact on the entire system.
 - Always intergrate new features or changes into the existing architecture and patterns.

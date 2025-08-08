@@ -105,7 +105,6 @@ import * as cssPlugin from "eslint-plugin-css";
 
 // Schema: https://www.schemastore.org/eslintrc.json
 
- 
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 

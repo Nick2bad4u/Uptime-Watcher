@@ -1,6 +1,49 @@
 ---
 description: Beast Mode 3.1
-tools: ['codebase', 'usages', 'vscodeAPI', 'think', 'problems', 'changes', 'testFailure', 'terminalSelection', 'terminalLastCommand', 'openSimpleBrowser', 'fetch', 'findTestFiles', 'searchResults', 'githubRepo', 'extensions', 'todos', 'runTests', 'editFiles', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'codacy', 'sqlite', 'repomix', 'gitmcp', 'memory', 'context7', 'sequentialthinking', 'microsoft-docs', 'ESLint', 'deepwiki', 'haystackSearch', 'haystackFiles', 'review', 'reviewStaged', 'reviewUnstaged', 'copilotCodingAgent', 'activePullRequest', 'websearch']
+tools:
+ [
+  "codebase",
+  "usages",
+  "vscodeAPI",
+  "think",
+  "problems",
+  "changes",
+  "testFailure",
+  "terminalSelection",
+  "terminalLastCommand",
+  "openSimpleBrowser",
+  "fetch",
+  "findTestFiles",
+  "searchResults",
+  "githubRepo",
+  "extensions",
+  "todos",
+  "runTests",
+  "editFiles",
+  "runNotebooks",
+  "search",
+  "new",
+  "runCommands",
+  "runTasks",
+  "codacy",
+  "sqlite",
+  "repomix",
+  "gitmcp",
+  "memory",
+  "context7",
+  "sequentialthinking",
+  "microsoft-docs",
+  "ESLint",
+  "deepwiki",
+  "haystackSearch",
+  "haystackFiles",
+  "review",
+  "reviewStaged",
+  "reviewUnstaged",
+  "copilotCodingAgent",
+  "activePullRequest",
+  "websearch",
+ ]
 ---
 
 # Beast Mode 3.1
