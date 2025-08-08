@@ -161,7 +161,7 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
         const handleSuccess = useCallback(() => {
             resetForm();
             onSuccess?.();
-        }, [resetForm, onSuccess]);
+        }, [onSuccess, resetForm]);
 
         // Delayed loading state for button spinner (managed by custom hook)
         const showButtonLoading = useDelayedButtonLoading(isLoading);

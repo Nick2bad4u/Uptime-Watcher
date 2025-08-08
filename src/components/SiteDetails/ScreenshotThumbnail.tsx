@@ -77,7 +77,7 @@ export const ScreenshotThumbnail = ({
             return () => clearTimeout(clearTimeoutId);
         }
         return () => {};
-    }, [hovered, clearOverlayVariables]);
+    }, [clearOverlayVariables, hovered]);
 
     function handleClick(event: React.MouseEvent) {
         event.preventDefault();
@@ -132,7 +132,7 @@ export const ScreenshotThumbnail = ({
             return () => clearTimeout(updateTimeoutId);
         }
         return () => {};
-    }, [hovered, url, siteName, updateOverlayPosition]);
+    }, [hovered, siteName, updateOverlayPosition, url]);
 
     // Debounced hover handlers to prevent rapid state changes
     const handleMouseEnter = useCallback(() => {

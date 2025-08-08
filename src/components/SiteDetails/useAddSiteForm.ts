@@ -213,13 +213,13 @@ export function useAddSiteForm(): AddSiteFormActions & AddSiteFormState {
         );
     }, [
         addMode,
-        name,
-        selectedExistingSite,
-        monitorType,
-        url,
-        host,
-        port,
         getFields,
+        host,
+        monitorType,
+        name,
+        port,
+        selectedExistingSite,
+        url,
     ]);
 
     // Reset form to initial state

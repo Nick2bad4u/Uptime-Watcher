@@ -105,18 +105,18 @@ export const SiteCard: React.NamedExoticComponent<SiteCardProperties> =
                 },
             }),
             [
-                isLoading,
+                allMonitorsRunning,
                 handleCheckNow,
                 handleMonitorIdChange,
                 handleStartMonitoring,
                 handleStartSiteMonitoring,
                 handleStopMonitoring,
                 handleStopSiteMonitoring,
-                allMonitorsRunning,
-                monitor,
+                isLoading,
                 isMonitoring,
-                selectedMonitorId,
                 latestSite,
+                monitor,
+                selectedMonitorId,
             ]
         );
 

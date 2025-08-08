@@ -59,7 +59,7 @@ export const AddSiteModal: React.NamedExoticComponent<object> = React.memo(
             return () => {
                 document.removeEventListener("keydown", handleKeyDown);
             };
-        }, [showAddSiteModal, handleClose]);
+        }, [handleClose, showAddSiteModal]);
 
         if (!showAddSiteModal) {
             // eslint-disable-next-line react/jsx-no-useless-fragment

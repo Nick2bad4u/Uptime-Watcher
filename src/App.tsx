@@ -145,7 +145,7 @@ const App = (): JSX.Element => {
         return (): void => {
             clearTimeout(timeoutId);
         };
-    }, [isLoading, clearLoadingOverlay, showLoadingOverlayCallback]);
+    }, [clearLoadingOverlay, isLoading, showLoadingOverlayCallback]);
 
     /**
      * Initialize the application and set up status update subscriptions.
@@ -213,7 +213,7 @@ const App = (): JSX.Element => {
             setUpdateStatus("idle");
             setUpdateError(undefined);
         }
-    }, [updateStatus, applyUpdate, setUpdateStatus, setUpdateError]);
+    }, [applyUpdate, setUpdateError, setUpdateStatus, updateStatus]);
 
     const handleCloseSettings = useCallback(() => {
         setShowSettings(false);
