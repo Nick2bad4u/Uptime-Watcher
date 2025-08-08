@@ -197,13 +197,14 @@ describe("Settings Component", () => {
 
         render(<Settings onClose={mockOnClose} />);
 
-        expect(screen.getByText("⚠️ Test error")).toBeInTheDocument();
+        expect(screen.getByRole("alert")).toBeInTheDocument();
+        expect(screen.getByText("Test error")).toBeInTheDocument();
     });
 
     it("should not show error when no lastError", () => {
         render(<Settings onClose={mockOnClose} />);
 
-        expect(screen.queryByText(/⚠️/)).not.toBeInTheDocument();
+        expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     });
 
     it("should handle history limit changes", async () => {

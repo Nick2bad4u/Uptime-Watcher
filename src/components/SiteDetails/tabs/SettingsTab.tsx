@@ -3,7 +3,7 @@
  * Provides interface for modifying site settings, intervals, and performing site management actions.
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FiSave, FiTrash2 } from "react-icons/fi";
 import {
     MdDangerous,
@@ -143,16 +143,16 @@ export const SettingsTab = ({
 
     const iconColors = getIconColors();
 
-    const loggedHandleSaveName = async () => {
+    const loggedHandleSaveName = useCallback(async () => {
         logger.user.action("Settings: Save site name initiated", {
             newName: localName.trim(),
             oldName: currentSite.name,
             siteId: currentSite.identifier,
         });
         await handleSaveName();
-    };
+    }, [localName, currentSite.name, currentSite.identifier, handleSaveName]);
 
-    const loggedHandleSaveInterval = () => {
+    const loggedHandleSaveInterval = useCallback(() => {
         logger.user.action("Settings: Save check interval", {
             monitorId: selectedMonitor.id,
             newInterval: localCheckInterval,
@@ -160,17 +160,23 @@ export const SettingsTab = ({
             siteId: currentSite.identifier,
         });
         handleSaveInterval();
-    };
+    }, [
+        selectedMonitor.id,
+        localCheckInterval,
+        selectedMonitor.checkInterval,
+        currentSite.identifier,
+        handleSaveInterval,
+    ]);
 
-    const loggedHandleRemoveSite = async () => {
+    const loggedHandleRemoveSite = useCallback(async () => {
         logger.user.action("Settings: Remove site initiated", {
             siteId: currentSite.identifier,
             siteName: currentSite.name,
         });
         await handleRemoveSite();
-    };
+    }, [currentSite.identifier, currentSite.name, handleRemoveSite]);
 
-    const loggedHandleSaveTimeout = async () => {
+    const loggedHandleSaveTimeout = useCallback(async () => {
         logger.user.action("Settings: Save timeout", {
             monitorId: selectedMonitor.id,
             newTimeout: localTimeout,
@@ -178,9 +184,15 @@ export const SettingsTab = ({
             siteId: currentSite.identifier,
         });
         await handleSaveTimeout();
-    };
+    }, [
+        selectedMonitor.id,
+        localTimeout,
+        selectedMonitor.timeout,
+        currentSite.identifier,
+        handleSaveTimeout,
+    ]);
 
-    const loggedHandleSaveRetryAttempts = async () => {
+    const loggedHandleSaveRetryAttempts = useCallback(async () => {
         logger.user.action("Settings: Save retry attempts", {
             monitorId: selectedMonitor.id,
             newRetryAttempts: localRetryAttempts,
@@ -188,7 +200,37 @@ export const SettingsTab = ({
             siteId: currentSite.identifier,
         });
         await handleSaveRetryAttempts();
-    };
+    }, [
+        selectedMonitor.id,
+        localRetryAttempts,
+        selectedMonitor.retryAttempts,
+        currentSite.identifier,
+        handleSaveRetryAttempts,
+    ]);
+
+    // useCallback handlers for jsx-no-bind compliance
+    const handleNameChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            setLocalName(e.target.value);
+        },
+        [setLocalName]
+    );
+
+    const handleSaveNameClick = useCallback(() => {
+        void loggedHandleSaveName();
+    }, [loggedHandleSaveName]);
+
+    const handleSaveTimeoutClick = useCallback(() => {
+        void loggedHandleSaveTimeout();
+    }, [loggedHandleSaveTimeout]);
+
+    const handleSaveRetryAttemptsClick = useCallback(() => {
+        void loggedHandleSaveRetryAttempts();
+    }, [loggedHandleSaveRetryAttempts]);
+
+    const handleRemoveSiteClick = useCallback(() => {
+        void loggedHandleRemoveSite();
+    }, [loggedHandleRemoveSite]);
 
     return (
         <div className="space-y-6" data-testid="settings-tab">
@@ -210,7 +252,7 @@ export const SettingsTab = ({
                         <div className="flex items-center gap-3">
                             <ThemedInput
                                 className="flex-1"
-                                onChange={(e) => setLocalName(e.target.value)}
+                                onChange={handleNameChange}
                                 placeholder="Enter a custom name for this site"
                                 type="text"
                                 value={localName}
@@ -219,7 +261,7 @@ export const SettingsTab = ({
                                 disabled={!hasUnsavedChanges || isLoading}
                                 icon={<FiSave />}
                                 loading={isLoading}
-                                onClick={() => void loggedHandleSaveName()}
+                                onClick={handleSaveNameClick}
                                 size="sm"
                                 variant={
                                     hasUnsavedChanges ? "primary" : "secondary"
@@ -337,7 +379,7 @@ export const SettingsTab = ({
                             <ThemedButton
                                 disabled={!timeoutChanged}
                                 icon={<FiSave />}
-                                onClick={() => void loggedHandleSaveTimeout()}
+                                onClick={handleSaveTimeoutClick}
                                 size="sm"
                                 variant={
                                     timeoutChanged ? "primary" : "secondary"
@@ -374,9 +416,7 @@ export const SettingsTab = ({
                             <ThemedButton
                                 disabled={!retryAttemptsChanged}
                                 icon={<FiSave />}
-                                onClick={() =>
-                                    void loggedHandleSaveRetryAttempts()
-                                }
+                                onClick={handleSaveRetryAttemptsClick}
                                 size="sm"
                                 variant={
                                     retryAttemptsChanged
@@ -490,7 +530,7 @@ export const SettingsTab = ({
                             className="w-full"
                             icon={<FiTrash2 />}
                             loading={isLoading}
-                            onClick={() => void loggedHandleRemoveSite()}
+                            onClick={handleRemoveSiteClick}
                             size="md"
                             variant="error"
                         >

@@ -3,7 +3,7 @@
  * Provides access to monitor type definitions through the IPC bridge.
  */
 
-import { type MonitorFieldDefinition } from "@shared/types";
+import { type MonitorTypeConfig } from "@shared/types/monitorTypes";
 
 import { CacheKeys } from "../../shared/utils/cacheKeys";
 // eslint-disable-next-line import-x/no-unassigned-import -- Global type declarations
@@ -15,41 +15,7 @@ import { withUtilityErrorHandling } from "./errorHandling";
 /**
  * Frontend representation of monitor type configuration.
  */
-export interface MonitorTypeConfig {
-    /** Description of what this monitor checks */
-    description: string;
-    /** Human-readable display name */
-    displayName: string;
-    /** Field definitions for dynamic form generation */
-    fields: MonitorFieldDefinition[];
-    /** Unique identifier for the monitor type */
-    type: string;
-    /** UI display configuration */
-    uiConfig?: {
-        /** Detail label formatter for different contexts */
-        detailFormats?: {
-            /** Format for analytics display */
-            analyticsLabel?: string;
-            // Note: Functions are excluded as they can't be serialized over IPC
-        };
-        /** Display preferences */
-        display?: {
-            showAdvancedMetrics?: boolean;
-            showUrl?: boolean;
-        };
-        /** Help text for form fields */
-        helpTexts?: {
-            primary?: string;
-            secondary?: string;
-        };
-        /** Whether this monitor type supports advanced analytics */
-        supportsAdvancedAnalytics?: boolean;
-        /** Whether this monitor type supports response time analytics */
-        supportsResponseTime?: boolean;
-    };
-    /** Version of the monitor implementation */
-    version: string;
-}
+// MonitorTypeConfig moved to shared/types/monitorTypes to avoid circular imports
 
 /**
  * Clear the monitor type cache.
@@ -98,7 +64,7 @@ export async function getAvailableMonitorTypes(): Promise<MonitorTypeConfig[]> {
             return useMonitorTypesStore.getState().monitorTypes;
         },
         "Fetch monitor types from backend",
-        []
+        [] as MonitorTypeConfig[]
     );
 
     AppCaches.monitorTypes.set(cacheKey, types);

@@ -90,6 +90,7 @@ export const AddSiteModal: React.NamedExoticComponent<object> = React.memo(
                             aria-label="Close modal"
                             onClick={handleClose}
                             size="sm"
+                            title="Close"
                             variant="secondary"
                         >
                             ✕

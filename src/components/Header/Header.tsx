@@ -19,7 +19,7 @@
  */
 
 import { type Monitor, type Site } from "@shared/types";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { type JSX } from "react/jsx-runtime";
 
 import { useSitesStore } from "../../stores/sites/useSitesStore";
@@ -125,6 +125,15 @@ export const Header = (): JSX.Element => {
     // Calculate overall uptime percentage across all monitors
     const uptimePercentage =
         totalMonitors > 0 ? Math.round((upMonitors / totalMonitors) * 100) : 0;
+
+    // Memoized click handlers to prevent unnecessary re-renders
+    const handleShowAddSiteModal = useCallback(() => {
+        setShowAddSiteModal(true);
+    }, [setShowAddSiteModal]);
+
+    const handleShowSettings = useCallback(() => {
+        setShowSettings(true);
+    }, [setShowSettings]);
 
     return (
         <ThemedBox
@@ -331,7 +340,7 @@ export const Header = (): JSX.Element => {
                             <ThemedButton
                                 aria-label="Add new site"
                                 className="themed-button--icon p-2"
-                                onClick={() => setShowAddSiteModal(true)}
+                                onClick={handleShowAddSiteModal}
                                 size="sm"
                                 variant="secondary"
                             >
@@ -367,7 +376,7 @@ export const Header = (): JSX.Element => {
                             <ThemedButton
                                 aria-label="Settings"
                                 className="themed-button--icon p-2"
-                                onClick={() => setShowSettings(true)}
+                                onClick={handleShowSettings}
                                 size="sm"
                                 variant="secondary"
                             >

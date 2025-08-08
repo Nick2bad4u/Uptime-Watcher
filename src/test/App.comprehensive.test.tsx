@@ -315,7 +315,7 @@ describe("App Component - Comprehensive Coverage", () => {
 
             expect(screen.getByRole("alert")).toBeInTheDocument();
             expect(screen.getByText("Test error message")).toBeInTheDocument();
-            expect(screen.getByText("✕")).toBeInTheDocument();
+            expect(screen.getByLabelText("Dismiss error")).toBeInTheDocument();
         });
 
         it("should clear error when close button is clicked", async () => {
@@ -328,7 +328,7 @@ describe("App Component - Comprehensive Coverage", () => {
 
             render(<App />);
 
-            const closeButton = screen.getByText("✕");
+            const closeButton = screen.getByLabelText("Dismiss error");
             await userEvent.click(closeButton);
 
             expect(clearError).toHaveBeenCalledTimes(1);

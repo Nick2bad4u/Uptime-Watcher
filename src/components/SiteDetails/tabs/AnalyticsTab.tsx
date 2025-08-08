@@ -3,6 +3,7 @@
  * Displays advanced metrics, charts, and performance analysis for site monitoring.
  */
 
+import { useCallback } from "react";
 import { FiActivity, FiBarChart2, FiTrendingUp } from "react-icons/fi";
 import { MdAnalytics, MdPieChart, MdSpeed, MdTrendingUp } from "react-icons/md";
 import { type JSX } from "react/jsx-runtime";
@@ -219,6 +220,31 @@ export const AnalyticsTab = ({
     // Map variant to progress/badge variant - "danger" becomes "error" for UI consistency
     const progressVariant = variant === "danger" ? "error" : variant;
 
+    // Memoized event handlers
+    const createTimeRangeHandler = useCallback(
+        (range: ChartTimeRange) => () => {
+            const previousRange = siteDetailsChartTimeRange;
+            logger.user.action("Chart time range changed", {
+                monitorType: monitorType,
+                newRange: range,
+                previousRange: previousRange,
+            });
+            setSiteDetailsChartTimeRange(range);
+        },
+        [monitorType, setSiteDetailsChartTimeRange, siteDetailsChartTimeRange]
+    );
+
+    const handleAdvancedMetricsToggle = useCallback(() => {
+        const previousValue = showAdvancedMetrics;
+        const newValue = !showAdvancedMetrics;
+        logger.user.action("Advanced metrics toggle", {
+            monitorType: monitorType,
+            newValue: newValue,
+            previousValue: previousValue,
+        });
+        setShowAdvancedMetrics(newValue);
+    }, [monitorType, setShowAdvancedMetrics, showAdvancedMetrics]);
+
     return (
         <div className="space-y-6" data-testid="analytics-tab">
             {/* Time Range Selector */}
@@ -231,19 +257,7 @@ export const AnalyticsTab = ({
                         {CHART_TIME_RANGES.map((range) => (
                             <ThemedButton
                                 key={range}
-                                onClick={() => {
-                                    const previousRange =
-                                        siteDetailsChartTimeRange;
-                                    logger.user.action(
-                                        "Chart time range changed",
-                                        {
-                                            monitorType: monitorType,
-                                            newRange: range,
-                                            previousRange: previousRange,
-                                        }
-                                    );
-                                    setSiteDetailsChartTimeRange(range);
-                                }}
+                                onClick={createTimeRangeHandler(range)}
                                 size="sm"
                                 variant={
                                     siteDetailsChartTimeRange === range
@@ -350,19 +364,7 @@ export const AnalyticsTab = ({
                                 Percentile Analysis
                             </ThemedText>
                             <ThemedButton
-                                onClick={() => {
-                                    const previousValue = showAdvancedMetrics;
-                                    const newValue = !showAdvancedMetrics;
-                                    logger.user.action(
-                                        "Advanced metrics toggle",
-                                        {
-                                            monitorType: monitorType,
-                                            newValue: newValue,
-                                            previousValue: previousValue,
-                                        }
-                                    );
-                                    setShowAdvancedMetrics(newValue);
-                                }}
+                                onClick={handleAdvancedMetricsToggle}
                                 size="sm"
                                 variant="ghost"
                             >

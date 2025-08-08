@@ -36,11 +36,12 @@
  * ```
  */
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { FALLBACK_MONITOR_TYPE_OPTIONS } from "../constants";
 import logger from "../services/logger";
 import { getMonitorTypeOptions } from "../utils/monitorTypeHelper";
+import { useMount } from "./useMount";
 
 /**
  * Result interface for the useMonitorTypes hook
@@ -100,9 +101,7 @@ export function useMonitorTypes(): UseMonitorTypesResult {
         await loadMonitorTypes();
     };
 
-    useEffect(() => {
-        void loadMonitorTypes();
-    }, []);
+    useMount(() => loadMonitorTypes());
 
     return {
         error,

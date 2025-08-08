@@ -5,7 +5,7 @@
  */
 
 import { useCallback, useMemo } from "react";
-import { FiSettings } from "react-icons/fi";
+import { FiPlay, FiSettings, FiSquare, FiTrash2 } from "react-icons/fi";
 import {
     MdDomain,
     MdMonitorHeart,
@@ -166,6 +166,19 @@ export const SiteOverviewTab = ({
         () => ({ color: getResponseTimeColor(avgResponseTime) }),
         [avgResponseTime, getResponseTimeColor]
     );
+
+    // useCallback handlers for jsx-no-bind compliance
+    const handleStopSiteMonitoringClick = useCallback(() => {
+        void handleStopSiteMonitoring();
+    }, [handleStopSiteMonitoring]);
+
+    const handleStartSiteMonitoringClick = useCallback(() => {
+        void handleStartSiteMonitoring();
+    }, [handleStartSiteMonitoring]);
+
+    const handleRemoveSiteClick = useCallback(() => {
+        void handleRemoveSite();
+    }, [handleRemoveSite]);
 
     return (
         <div className="space-y-6" data-testid="site-overview-tab">
@@ -387,38 +400,35 @@ export const SiteOverviewTab = ({
                         <ThemedButton
                             className="flex items-center gap-1"
                             disabled={isLoading}
-                            onClick={() => {
-                                void handleStopSiteMonitoring();
-                            }}
+                            onClick={handleStopSiteMonitoringClick}
                             size="sm"
                             variant="error"
                         >
-                            ⏹️ Stop All Monitoring
+                            <FiSquare className="h-4 w-4" />
+                            Stop All Monitoring
                         </ThemedButton>
                     ) : (
                         <ThemedButton
                             className="flex items-center gap-1"
                             disabled={isLoading}
-                            onClick={() => {
-                                void handleStartSiteMonitoring();
-                            }}
+                            onClick={handleStartSiteMonitoringClick}
                             size="sm"
                             variant="success"
                         >
-                            ▶️ Start All Monitoring
+                            <FiPlay className="h-4 w-4" />
+                            Start All Monitoring
                         </ThemedButton>
                     )}
 
                     <ThemedButton
                         className="flex items-center gap-1"
                         disabled={isLoading}
-                        onClick={() => {
-                            void handleRemoveSite();
-                        }}
+                        onClick={handleRemoveSiteClick}
                         size="sm"
                         variant="error"
                     >
-                        �️ Remove Site
+                        <FiTrash2 className="h-4 w-4" />
+                        Remove Site
                     </ThemedButton>
                 </div>
             </ThemedCard>

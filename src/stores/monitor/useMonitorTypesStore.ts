@@ -32,12 +32,12 @@
  * @public
  */
 
+import { type MonitorTypeConfig } from "@shared/types/monitorTypes";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 import { type Monitor, type MonitorType } from "../../../shared/types";
 import { type ValidationResult } from "../../../shared/types/validation";
 import { safeExtractIpcData } from "../../types/ipc";
-import { type MonitorTypeConfig } from "../../utils/monitorTypeHelper";
 import { type BaseStore } from "../types";
 import { logStoreAction, withErrorHandling } from "../utils";
 

@@ -330,8 +330,24 @@ export default [
             "tailwind/migration-from-tailwind-2": "warn",
             "tailwind/no-arbitrary-value": "warn",
             "tailwind/no-contradicting-classname": "warn",
-            "tailwind/no-custom-classname": "off",
+            "tailwind/no-custom-classname": [
+                "warn",
+                {
+                    skipClassAttribute: true,
+                },
+            ],
             "tailwind/no-unnecessary-arbitrary-value": "warn",
+
+            "css/color-hex-style": "warn",
+            "css/named-color": "warn",
+            "css/no-dupe-properties": "warn",
+            "css/no-invalid-color-hex": "warn",
+            "css/no-length-zero-unit": "warn",
+            "css/no-number-trailing-zeros": "warn",
+            "css/no-shorthand-property-overrides": "warn",
+            "css/no-unknown-property": "warn",
+            "css/no-unknown-unit": "warn",
+            "css/no-useless-color-alpha": "warn"
         },
     },
 
@@ -486,11 +502,37 @@ export default [
             ...arrayFunc.configs.all.rules,
 
             "xss/no-location-href-assign": "error",
-            "canonical/no-barrel-import": "error",
-            "canonical/export-specifier-newline": "off",
+
             "canonical/destructuring-property-newline": "off",
-            "canonical/import-specifier-newline": "off",
+            "canonical/export-specifier-newline": "off",
+            "canonical/filename-match-exported": "warn",
+            "canonical/filename-match-regex": "off", // Taken care of by unicorn rules
             "canonical/filename-no-index": "warn",
+            "canonical/import-specifier-newline": "off",
+            "canonical/no-barrel-import": "error",
+            "canonical/no-export-all": "error",
+            "canonical/no-re-export": "warn",
+            "canonical/no-reassign-imports": "error",
+            "canonical/prefer-inline-type-import": "off",
+            "canonical/prefer-use-mount": "warn",
+            "canonical/sort-react-dependencies": "warn",
+            "canonical/prefer-import-alias": [
+                "error",
+                {
+                    aliases: [
+                        {
+                            alias: "@shared/",
+                            matchParent: path.resolve(__dirname, "shared"),
+                            matchPath: String.raw`^shared\/`,
+                        },
+                        {
+                            alias: "@electron/",
+                            matchParent: path.resolve(__dirname, "electron"),
+                            matchPath: String.raw`^electron\/`,
+                        },
+                    ],
+                },
+            ],
 
             "ex/no-unhandled": "warn",
 
@@ -498,6 +540,7 @@ export default [
             "n/no-missing-file-extension": "off", // Allow missing file extensions for imports
             "n/no-missing-import": "off", // Allow missing imports for dynamic imports
             "n/no-unsupported-features/es-syntax": "off", // Allow modern ES2024+ syntax
+
             "no-unsanitized/method": "error",
             "no-unsanitized/property": "error",
 
@@ -668,7 +711,7 @@ export default [
             "unicorn/no-array-for-each": "off", // ForEach is fine
             "unicorn/no-negated-condition": "off", // Sometimes clearer
             "unicorn/prefer-includes": "warn",
-            "unicorn/prefer-module": "off", // CommonJS needed for Electron
+            "unicorn/prefer-module": "warn", // CommonJS needed for Electron
             "unicorn/prefer-node-protocol": "warn",
             "unicorn/prefer-string-slice": "warn",
             "unicorn/prefer-string-starts-ends-with": "warn",
@@ -805,6 +848,108 @@ export default [
                 { default: "array-simple" },
             ], // Prefer T[] for simple types, Array<T> for complex types
 
+            "@typescript-eslint/adjacent-overload-signatures": "warn",
+            "@typescript-eslint/ban-ts-comment": "warn",
+            "@typescript-eslint/ban-tslint-comment": "warn",
+            "@typescript-eslint/class-literal-property-style": "warn",
+            "@typescript-eslint/class-methods-use-this": "off",
+            "@typescript-eslint/consistent-generic-constructors": "warn",
+            "@typescript-eslint/consistent-indexed-object-style": "warn",
+            "@typescript-eslint/consistent-return": "warn",
+            "@typescript-eslint/consistent-type-definitions": "warn",
+            "@typescript-eslint/consistent-type-exports": "warn",
+            "@typescript-eslint/consistent-type-imports": "warn",
+            "@typescript-eslint/default-param-last": "warn",
+            "@typescript-eslint/dot-notation": "warn",
+            "@typescript-eslint/explicit-function-return-type": "warn",
+            "@typescript-eslint/explicit-member-accessibility": "warn",
+            "@typescript-eslint/explicit-module-boundary-types": "warn",
+            "@typescript-eslint/init-declarations": "warn",
+            "@typescript-eslint/max-params": "warn",
+            "@typescript-eslint/member-ordering": "warn",
+            "@typescript-eslint/method-signature-style": "warn",
+            "@typescript-eslint/naming-convention": "warn",
+            "@typescript-eslint/no-array-constructor": "warn",
+            "@typescript-eslint/no-array-delete": "warn",
+            "@typescript-eslint/no-base-to-string": "warn",
+            "@typescript-eslint/no-confusing-non-null-assertion": "warn",
+            "@typescript-eslint/no-confusing-void-expression": "warn",
+            "@typescript-eslint/no-deprecated": "warn",
+            "@typescript-eslint/no-dupe-class-members": "warn",
+            "@typescript-eslint/no-duplicate-enum-values": "warn",
+            "@typescript-eslint/no-duplicate-type-constituents": "warn",
+            "@typescript-eslint/no-dynamic-delete": "warn",
+            "@typescript-eslint/no-extra-non-null-assertion": "warn",
+            "@typescript-eslint/no-extraneous-class": "warn",
+            "@typescript-eslint/no-for-in-array": "warn",
+            "@typescript-eslint/no-implied-eval": "warn",
+            "@typescript-eslint/no-import-type-side-effects": "warn",
+            "@typescript-eslint/no-invalid-this": "warn",
+            "@typescript-eslint/no-invalid-void-type": "warn",
+            "@typescript-eslint/no-loop-func": "warn",
+            "@typescript-eslint/no-magic-numbers": "off",
+            "@typescript-eslint/no-meaningless-void-operator": "warn",
+            "@typescript-eslint/no-misused-new": "warn",
+            "@typescript-eslint/no-misused-spread": "warn",
+            "@typescript-eslint/no-mixed-enums": "warn",
+            "@typescript-eslint/no-namespace": "warn",
+            "@typescript-eslint/no-non-null-asserted-nullish-coalescing": "warn",
+            "@typescript-eslint/no-non-null-asserted-optional-chain": "warn",
+            "@typescript-eslint/no-redeclare": "warn",
+            "@typescript-eslint/no-redundant-type-constituents": "warn",
+            "@typescript-eslint/no-require-imports": "warn",
+            "@typescript-eslint/no-restricted-imports": "warn",
+            "@typescript-eslint/no-shadow": "warn",
+            "@typescript-eslint/no-this-alias": "warn",
+            "@typescript-eslint/no-unnecessary-boolean-literal-compare": "warn",
+            "@typescript-eslint/no-unnecessary-parameter-property-assignment": "warn",
+            "@typescript-eslint/no-unnecessary-qualifier": "warn",
+            "@typescript-eslint/no-unnecessary-template-expression": "warn",
+            "@typescript-eslint/no-unnecessary-type-arguments": "warn",
+            "@typescript-eslint/no-unnecessary-type-constraint": "warn",
+            "@typescript-eslint/no-unnecessary-type-conversion": "warn",
+            "@typescript-eslint/no-unnecessary-type-parameters": "warn",
+
+            "@typescript-eslint/no-unsafe-declaration-merging": "warn",
+            "@typescript-eslint/no-unsafe-enum-comparison": "warn",
+
+            "@typescript-eslint/no-unsafe-type-assertion": "warn",
+            "@typescript-eslint/no-unsafe-unary-minus": "warn",
+            "@typescript-eslint/no-unused-expressions": "warn",
+            "@typescript-eslint/no-unused-vars": "warn",
+            // Disabled: Function declarations are hoisted in JS/TS, and this rule creates unnecessary constraints
+            // for Electron projects that often organize helper functions after main functions for better readability
+            "@typescript-eslint/no-use-before-define": "off",
+            "@typescript-eslint/no-useless-constructor": "warn",
+            "@typescript-eslint/no-useless-empty-export": "warn",
+            "@typescript-eslint/non-nullable-type-assertion-style": "warn",
+            "@typescript-eslint/only-throw-error": "warn",
+            "@typescript-eslint/parameter-properties": "warn",
+            "@typescript-eslint/prefer-as-const": "warn",
+            "@typescript-eslint/prefer-destructuring": "warn",
+            "@typescript-eslint/prefer-enum-initializers": "warn",
+            "@typescript-eslint/prefer-find": "warn",
+            "@typescript-eslint/prefer-for-of": "warn",
+            "@typescript-eslint/prefer-includes": "warn",
+            "@typescript-eslint/prefer-literal-enum-member": "warn",
+            "@typescript-eslint/prefer-namespace-keyword": "warn",
+            "@typescript-eslint/prefer-promise-reject-errors": "warn",
+            "@typescript-eslint/prefer-readonly-parameter-types": "warn",
+            "@typescript-eslint/prefer-reduce-type-parameter": "warn",
+            "@typescript-eslint/prefer-regexp-exec": "warn",
+            "@typescript-eslint/prefer-return-this-type": "warn",
+            "@typescript-eslint/prefer-string-starts-ends-with": "warn",
+            "@typescript-eslint/promise-function-async": "warn",
+            "@typescript-eslint/related-getter-setter-pairs": "warn",
+            "@typescript-eslint/require-array-sort-compare": "warn",
+            "@typescript-eslint/restrict-plus-operands": "warn",
+            "@typescript-eslint/restrict-template-expressions": "warn",
+            "@typescript-eslint/strict-boolean-expressions": "warn",
+            "@typescript-eslint/triple-slash-reference": "warn",
+            "@typescript-eslint/unbound-method": "warn",
+            "@typescript-eslint/unified-signatures": "warn",
+            "@typescript-eslint/use-unknown-in-catch-callback-variable": "warn",
+
             // React
             "react/boolean-prop-naming": "warn",
             "react/button-has-type": "warn",
@@ -841,7 +986,7 @@ export default [
             "react/jsx-max-depth": ["warn", { max: 7 }], // Warn on deeply nested JSX to encourage component extraction
             "react/jsx-max-props-per-line": "off",
             "react/jsx-newline": "off",
-            "react/jsx-no-bind": "off", // Allow inline functions for development speed
+            "react/jsx-no-bind": "warn", // Allow inline functions for development speed
             "react/jsx-no-constructed-context-values": "warn",
             "react/jsx-no-leaked-render": "warn",
             "react/jsx-no-literals": "off",
@@ -861,7 +1006,7 @@ export default [
             "react/no-did-mount-set-state": "warn",
             "react/no-did-update-set-state": "warn",
             "react/no-invalid-html-attribute": "warn",
-            "react/no-multi-comp": "off",
+            "react/no-multi-comp": "warn",
             "react/no-namespace": "warn",
             "react/no-object-type-as-default-prop": "warn",
             "react/no-redundant-should-component-update": "warn",
@@ -966,10 +1111,10 @@ export default [
             "import-x/no-named-default": "warn",
             "import-x/no-named-export": "off",
             "import-x/no-namespace": "off",
-            "import-x/no-nodejs-modules": "error",
+            "import-x/no-nodejs-modules": "error", // Dont allow on frontend or shared
             "import-x/no-relative-packages": "warn",
             "import-x/no-relative-parent-imports": "off",
-            "import-x/no-rename-default": "off",
+            "import-x/no-rename-default": "warn",
             "import-x/no-restricted-paths": "warn",
             "import-x/no-self-import": "warn",
             "import-x/no-unresolved": "warn",
@@ -1172,11 +1317,36 @@ export default [
 
             "xss/no-location-href-assign": "error",
 
-            "canonical/no-barrel-import": "error",
-            "canonical/export-specifier-newline": "off",
             "canonical/destructuring-property-newline": "off",
-            "canonical/import-specifier-newline": "off",
+            "canonical/export-specifier-newline": "off",
+            "canonical/filename-match-exported": "warn",
+            "canonical/filename-match-regex": "off", // Taken care of by unicorn rules
             "canonical/filename-no-index": "warn",
+            "canonical/import-specifier-newline": "off",
+            "canonical/no-barrel-import": "error",
+            "canonical/no-export-all": "error",
+            "canonical/no-re-export": "warn",
+            "canonical/no-reassign-imports": "error",
+            "canonical/prefer-inline-type-import": "error",
+            "canonical/prefer-use-mount": "warn",
+            "canonical/sort-react-dependencies": "warn",
+            "canonical/prefer-import-alias": [
+                "error",
+                {
+                    aliases: [
+                        {
+                            alias: "@shared/",
+                            matchParent: path.resolve(__dirname, "shared"),
+                            matchPath: String.raw`^shared\/`,
+                        },
+                        {
+                            alias: "@app/",
+                            matchParent: path.resolve(__dirname, "src"),
+                            matchPath: String.raw`^src\/`,
+                        },
+                    ],
+                },
+            ],
 
             "ex/no-unhandled": "warn",
 
@@ -1314,7 +1484,7 @@ export default [
                     checkProperties: false,
                 },
             ],
-            "unicorn/prefer-module": "off", // CommonJS required for Electron
+            "unicorn/prefer-module": "warn", // CommonJS required for Electron
             "unicorn/prefer-node-protocol": "error", // Enforce for backend
             "unicorn/prefer-top-level-await": "off", // Not suitable for Electron main
 
@@ -1503,18 +1673,17 @@ export default [
             "import-x/no-named-default": "warn",
             "import-x/no-named-export": "off",
             "import-x/no-namespace": "off",
-            "import-x/no-nodejs-modules": "off",
+            "import-x/no-nodejs-modules": "off", // Allow Node.js modules for Electron backend
             "import-x/no-relative-packages": "warn",
             "import-x/no-relative-parent-imports": "off",
-            "import-x/no-rename-default": "off",
+            "import-x/no-rename-default": "warn",
             "import-x/no-restricted-paths": "warn",
             "import-x/no-self-import": "warn",
-            "import-x/no-unassigned-import": "warn",
             "import-x/no-unresolved": "warn",
             "import-x/no-unused-modules": "warn",
             "import-x/no-useless-path-segments": "warn",
             "import-x/no-webpack-loader-syntax": "warn",
-            "import-x/order": "off",
+            "import-x/order": "off", // Conflicts with other rules
             "import-x/prefer-default-export": "off",
             "import-x/prefer-namespace-import": "warn",
             "import-x/unambiguous": "warn",
@@ -2388,6 +2557,36 @@ export default [
                 node: true,
             },
             react: { version: "19" },
+        },
+    },
+
+    // Override for barrel files - allow re-exports in intentional barrel/index files
+    {
+        files: [
+            "**/types.ts",
+            "**/interfaces.ts",
+            "**/schemas.ts",
+            "**/monitorTypes.ts",
+            "**/monitorValidation.ts",
+            "**/ConfigurationManager.ts"
+        ],
+        rules: {
+            "canonical/no-re-export": "off",
+        },
+    },
+
+    // Override for component library files - allow multiple components per file
+    {
+        files: [
+            "**/theme/components.tsx",
+            "**/components/AddSiteForm/FormFields.tsx",
+            "**/components/AddSiteForm/DynamicMonitorFields.tsx",
+            "**/components/SiteDetails/SiteDetailsHeader.tsx",
+            "**/components/SiteDetails/charts/ChartComponents.tsx",
+            "**/stores/error/ErrorBoundary.tsx"
+        ],
+        rules: {
+            "react/no-multi-comp": "off",
         },
     },
 

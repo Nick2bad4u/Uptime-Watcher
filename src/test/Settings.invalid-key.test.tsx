@@ -252,7 +252,7 @@ describe("Settings Component - Invalid Key Coverage", () => {
 
         // Get the Settings component from the render result
         const settingsComponent = screen
-            .getByRole("button", { name: /Close/i })
+            .getByRole("button", { name: "Close settings" })
             .closest(".modal-container");
         expect(settingsComponent).toBeTruthy();
 

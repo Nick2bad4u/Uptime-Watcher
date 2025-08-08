@@ -79,16 +79,16 @@ export const SiteDetailsNavigation = ({
      * @param tab - The tab name being changed to
      * @param additionalData - Optional additional data to include in the log
      */
-    const logTabChange = (
-        tab: string,
-        additionalData?: Record<string, unknown>
-    ) => {
-        logger.user.action("Site details tab changed", {
-            siteId: currentSite.identifier,
-            tab,
-            ...additionalData,
-        });
-    };
+    const logTabChange = useCallback(
+        (tab: string, additionalData?: Record<string, unknown>) => {
+            logger.user.action("Site details tab changed", {
+                siteId: currentSite.identifier,
+                tab,
+                ...additionalData,
+            });
+        },
+        [currentSite.identifier]
+    );
 
     // Memoized handlers to prevent unnecessary re-renders of SiteMonitoringButton
     const handleStartSiteMonitoringMemoized = useCallback(() => {
@@ -116,6 +116,45 @@ export const SiteDetailsNavigation = ({
     const BUTTON_VARIANT_PRIMARY = "primary";
     const BUTTON_VARIANT_SECONDARY = "secondary";
 
+    // Memoized tab click handlers
+    const handleSiteOverviewClick = useCallback(() => {
+        setActiveSiteDetailsTab("site-overview");
+        logTabChange("site-overview");
+    }, [logTabChange, setActiveSiteDetailsTab]);
+
+    const handleHistoryClick = useCallback(() => {
+        setActiveSiteDetailsTab("history");
+        logTabChange("history");
+    }, [logTabChange, setActiveSiteDetailsTab]);
+
+    const handleSettingsClick = useCallback(() => {
+        setActiveSiteDetailsTab("settings");
+        logTabChange("settings");
+    }, [logTabChange, setActiveSiteDetailsTab]);
+
+    // Additional handlers for monitor-specific tabs and actions
+    const handleMonitorOverviewClick = useCallback(() => {
+        setActiveSiteDetailsTab("monitor-overview");
+        logTabChange("monitor-overview", {
+            monitorId: selectedMonitorId,
+        });
+    }, [logTabChange, selectedMonitorId, setActiveSiteDetailsTab]);
+
+    const handleMonitorAnalyticsClick = useCallback(() => {
+        setActiveSiteDetailsTab(`${selectedMonitorId}-analytics`);
+        logTabChange("monitor-analytics", {
+            monitorId: selectedMonitorId,
+        });
+    }, [logTabChange, selectedMonitorId, setActiveSiteDetailsTab]);
+
+    const handleStopMonitoringClick = useCallback(() => {
+        void handleStopMonitoring();
+    }, [handleStopMonitoring]);
+
+    const handleStartMonitoringClick = useCallback(() => {
+        void handleStartMonitoring();
+    }, [handleStartMonitoring]);
+
     return (
         <ThemedBox
             className="space-y-4 border-b"
@@ -127,10 +166,7 @@ export const SiteDetailsNavigation = ({
                 {/* Tab navigation buttons (left) */}
                 <div className="flex flex-wrap items-center gap-2">
                     <ThemedButton
-                        onClick={() => {
-                            setActiveSiteDetailsTab("site-overview");
-                            logTabChange("site-overview");
-                        }}
+                        onClick={handleSiteOverviewClick}
                         size="sm"
                         variant={
                             activeSiteDetailsTab === "site-overview"
@@ -141,10 +177,7 @@ export const SiteDetailsNavigation = ({
                         🏠 Site Overview
                     </ThemedButton>
                     <ThemedButton
-                        onClick={() => {
-                            setActiveSiteDetailsTab("monitor-overview");
-                            logTabChange("monitor-overview");
-                        }}
+                        onClick={handleMonitorOverviewClick}
                         size="sm"
                         variant={
                             activeSiteDetailsTab === "monitor-overview"
@@ -156,14 +189,7 @@ export const SiteDetailsNavigation = ({
                     </ThemedButton>
                     {/* Render analytics tab for selected monitor type only */}
                     <ThemedButton
-                        onClick={() => {
-                            setActiveSiteDetailsTab(
-                                `${selectedMonitorId}-analytics`
-                            );
-                            logTabChange("analytics", {
-                                monitorId: selectedMonitorId,
-                            });
-                        }}
+                        onClick={handleMonitorAnalyticsClick}
                         size="sm"
                         variant={
                             activeSiteDetailsTab ===
@@ -175,10 +201,7 @@ export const SiteDetailsNavigation = ({
                         {`📈 ${monitorTypeLabel} Analytics`}
                     </ThemedButton>
                     <ThemedButton
-                        onClick={() => {
-                            setActiveSiteDetailsTab("history");
-                            logTabChange("history");
-                        }}
+                        onClick={handleHistoryClick}
                         size="sm"
                         variant={
                             activeSiteDetailsTab === "history"
@@ -189,10 +212,7 @@ export const SiteDetailsNavigation = ({
                         📜 History
                     </ThemedButton>
                     <ThemedButton
-                        onClick={() => {
-                            setActiveSiteDetailsTab("settings");
-                            logTabChange("settings");
-                        }}
+                        onClick={handleSettingsClick}
                         size="sm"
                         variant={
                             activeSiteDetailsTab === "settings"
@@ -224,9 +244,7 @@ export const SiteDetailsNavigation = ({
                             <ThemedButton
                                 aria-label="Stop Monitoring"
                                 className="flex items-center gap-1"
-                                onClick={() => {
-                                    void handleStopMonitoring();
-                                }}
+                                onClick={handleStopMonitoringClick}
                                 size="sm"
                                 variant="warning"
                             >
@@ -239,9 +257,7 @@ export const SiteDetailsNavigation = ({
                             <ThemedButton
                                 aria-label="Start Monitoring"
                                 className="flex items-center gap-1"
-                                onClick={() => {
-                                    void handleStartMonitoring();
-                                }}
+                                onClick={handleStartMonitoringClick}
                                 size="sm"
                                 variant="success"
                             >

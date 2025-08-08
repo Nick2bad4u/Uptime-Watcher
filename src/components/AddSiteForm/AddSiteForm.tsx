@@ -23,8 +23,8 @@ import logger from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { ThemedBox, ThemedButton, ThemedText } from "../../theme/components";
-import { useTheme } from "../../theme/useTheme";
 import { generateUuid } from "../../utils/data/generateUuid";
+import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
 import { useAddSiteForm } from "../SiteDetails/useAddSiteForm";
 import { DynamicMonitorFields } from "./DynamicMonitorFields";
 import { RadioGroup, SelectField, TextField } from "./FormFields";
@@ -97,7 +97,6 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
         // Combine store calls to avoid duplicates and improve performance
         const { clearError, isLoading, lastError } = useErrorStore();
         const { addMonitorToSite, createSite, sites } = useSitesStore();
-        const { isDark } = useTheme();
 
         // Load monitor types from backend
         const {
@@ -220,11 +219,17 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
         );
 
         /**
-         * Clears both global and local form errors.
+         * Handles form submission events for the form element.
          *
-         * @remarks
-         * Invokes the error store's clearError and resets local form error state.
+         * @param e - The form submission event
          */
+        const handleFormSubmit = useCallback(
+            (e: React.FormEvent) => {
+                e.preventDefault();
+                void onSubmit(e);
+            },
+            [onSubmit]
+        );
         const onClearError = useCallback(() => {
             clearError();
             setFormError(undefined);
@@ -267,13 +272,7 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
                 rounded="lg"
                 surface="base"
             >
-                <form
-                    className="space-y-4"
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        void onSubmit(e);
-                    }}
-                >
+                <form className="space-y-4" onSubmit={handleFormSubmit}>
                     {/* Add mode toggle */}
                     <RadioGroup
                         disabled={isLoading}
@@ -380,29 +379,11 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
 
                     {/* Error Message */}
                     {(lastError ?? formError) ? (
-                        <ThemedBox
-                            className={`error-alert ${isDark ? "dark" : ""}`}
-                            padding="md"
-                            rounded="md"
-                            surface="base"
-                        >
-                            <div className="flex items-center">
-                                <ThemedText
-                                    className={`error-alert__text ${isDark ? "dark" : ""}`}
-                                    size="sm"
-                                >
-                                    ❌ {formError ?? lastError}
-                                </ThemedText>
-                                <ThemedButton
-                                    className={`error-alert__close ${isDark ? "dark" : ""}`}
-                                    onClick={onClearError}
-                                    size="xs"
-                                    variant="secondary"
-                                >
-                                    ✕
-                                </ThemedButton>
-                            </div>
-                        </ThemedBox>
+                        <ErrorAlert
+                            message={formError ?? lastError ?? ""}
+                            onDismiss={onClearError}
+                            variant="error"
+                        />
                     ) : null}
 
                     <div className="space-y-1">

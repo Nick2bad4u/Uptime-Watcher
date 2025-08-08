@@ -28,6 +28,7 @@ import {
 import { ThemeName } from "../../theme/types";
 import { useTheme } from "../../theme/useTheme";
 import { ensureError } from "../../utils/errorHandling";
+import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
 
 /**
  * Allowed settings keys that can be updated
@@ -77,51 +78,54 @@ export const Settings = ({
         useSettingsStore();
     const { downloadSQLiteBackup, fullSyncFromBackend } = useSitesStore();
 
-    const { availableThemes, isDark, setTheme } = useTheme();
+    const { availableThemes, setTheme } = useTheme();
 
     // Delayed loading state for button spinners (managed by custom hook)
     const showButtonLoading = useDelayedButtonLoading(isLoading);
     // Local state for sync success message
     const [syncSuccess, setSyncSuccess] = useState(false);
 
-    const handleSettingChange = (
-        key: keyof typeof settings,
-        value: unknown
-    ) => {
-        if (!ALLOWED_SETTINGS_KEYS.has(key)) {
-            logger.warn("Attempted to update invalid settings key", key);
-            return;
-        }
+    const handleSettingChange = useCallback(
+        (key: keyof typeof settings, value: unknown) => {
+            if (!ALLOWED_SETTINGS_KEYS.has(key)) {
+                logger.warn("Attempted to update invalid settings key", key);
+                return;
+            }
 
-        const oldValue = settings[key];
-        updateSettings({ [key]: value });
-        logger.user.settingsChange(key, oldValue, value);
-    };
+            const oldValue = settings[key];
+            updateSettings({ [key]: value });
+            logger.user.settingsChange(key, oldValue, value);
+        },
+        [settings, updateSettings]
+    );
 
-    const handleHistoryLimitChange = async (limit: number) => {
-        try {
-            // Get the actual primitive value from settings using safe conversion
-            const oldLimit = safeInteger(
-                settings.historyLimit,
-                DEFAULT_HISTORY_LIMIT,
-                1,
-                50_000
-            );
+    const handleHistoryLimitChange = useCallback(
+        async (limit: number) => {
+            try {
+                // Get the actual primitive value from settings using safe conversion
+                const oldLimit = safeInteger(
+                    settings.historyLimit,
+                    DEFAULT_HISTORY_LIMIT,
+                    1,
+                    50_000
+                );
 
-            await updateHistoryLimitValue(limit);
+                await updateHistoryLimitValue(limit);
 
-            // Log the change after successful update
-            logger.user.settingsChange("historyLimit", oldLimit, limit);
-        } catch (error) {
-            logger.error(
-                "Failed to update history limit from settings",
-                ensureError(error)
-            );
-            // Error is already handled by the store action
-        }
-    };
+                // Log the change after successful update
+                logger.user.settingsChange("historyLimit", oldLimit, limit);
+            } catch (error) {
+                logger.error(
+                    "Failed to update history limit from settings",
+                    ensureError(error)
+                );
+                // Error is already handled by the store action
+            }
+        },
+        [settings.historyLimit, updateHistoryLimitValue]
+    );
 
-    const handleReset = () => {
+    const handleReset = useCallback(() => {
         // Use window.confirm instead of globalThis for better React compatibility
         if (
             window.confirm(
@@ -132,13 +136,59 @@ export const Settings = ({
             clearError(); // Clear any errors when resetting
             logger.user.action("Reset settings to defaults");
         }
-    };
+    }, [clearError, resetSettings]);
 
-    const handleThemeChange = (themeName: string) => {
-        const oldTheme = settings.theme;
-        setTheme(themeName as ThemeName);
-        logger.user.settingsChange("theme", oldTheme, themeName);
-    };
+    const handleThemeChange = useCallback(
+        (themeName: string) => {
+            const oldTheme = settings.theme;
+            setTheme(themeName as ThemeName);
+            logger.user.settingsChange("theme", oldTheme, themeName);
+        },
+        [setTheme, settings.theme]
+    );
+
+    // Memoized event handlers to prevent unnecessary re-renders
+    const handleHistoryLimitSelectChange = useCallback(
+        (event: React.ChangeEvent<HTMLSelectElement>) => {
+            void handleHistoryLimitChange(Number(event.target.value));
+        },
+        [handleHistoryLimitChange]
+    );
+
+    const handleNotificationsChange = useCallback(
+        (event: React.ChangeEvent<HTMLInputElement>) => {
+            handleSettingChange("notifications", event.target.checked);
+        },
+        [handleSettingChange]
+    );
+
+    const handleSoundAlertsChange = useCallback(
+        (event: React.ChangeEvent<HTMLInputElement>) => {
+            handleSettingChange("soundAlerts", event.target.checked);
+        },
+        [handleSettingChange]
+    );
+
+    const handleAutoStartChange = useCallback(
+        (event: React.ChangeEvent<HTMLInputElement>) => {
+            handleSettingChange("autoStart", event.target.checked);
+        },
+        [handleSettingChange]
+    );
+
+    const handleMinimizeToTrayChange = useCallback(
+        (event: React.ChangeEvent<HTMLInputElement>) => {
+            handleSettingChange("minimizeToTray", event.target.checked);
+        },
+        [handleSettingChange]
+    );
+
+    const handleThemeSelectChange = useCallback(
+        (event: React.ChangeEvent<HTMLSelectElement>) => {
+            handleThemeChange(event.target.value);
+        },
+        [handleThemeChange]
+    );
 
     // Manual Sync Now handler (moved from Header)
     const handleSyncNow = useCallback(async () => {
@@ -162,7 +212,7 @@ export const Settings = ({
         }
     }, [fullSyncFromBackend, setError]);
 
-    const handleDownloadSQLite = async () => {
+    const handleDownloadSQLite = useCallback(async () => {
         clearError();
         try {
             await downloadSQLiteBackup();
@@ -180,7 +230,16 @@ export const Settings = ({
                 }`
             );
         }
-    };
+    }, [clearError, downloadSQLiteBackup, setError]);
+
+    // Click handlers for buttons
+    const handleSyncNowClick = useCallback(() => {
+        void handleSyncNow();
+    }, [handleSyncNow]);
+
+    const handleDownloadSQLiteClick = useCallback(() => {
+        void handleDownloadSQLite();
+    }, [handleDownloadSQLite]);
 
     return (
         <div className="modal-overlay">
@@ -204,9 +263,11 @@ export const Settings = ({
                             ⚙️ Settings
                         </ThemedText>
                         <ThemedButton
+                            aria-label="Close settings"
                             className="hover-opacity"
                             onClick={onClose}
                             size="sm"
+                            title="Close settings"
                             variant="secondary"
                         >
                             ✕
@@ -216,30 +277,11 @@ export const Settings = ({
 
                 {/* Error Display */}
                 {lastError ? (
-                    <ThemedBox
-                        className={`error-alert ${isDark ? "dark" : ""}`}
-                        padding="md"
-                        rounded="md"
-                        surface="base"
-                    >
-                        <div className="flex items-center justify-between">
-                            <ThemedText
-                                className={`error-alert__text ${isDark ? "dark" : ""}`}
-                                size="sm"
-                                variant="primary"
-                            >
-                                ⚠️ {lastError}
-                            </ThemedText>
-                            <ThemedButton
-                                className={`error-alert__close ${isDark ? "dark" : ""}`}
-                                onClick={clearError}
-                                size="xs"
-                                variant="secondary"
-                            >
-                                ✕
-                            </ThemedButton>
-                        </div>
-                    </ThemedBox>
+                    <ErrorAlert
+                        message={lastError}
+                        onDismiss={clearError}
+                        variant="error"
+                    />
                 ) : null}
                 {/* Sync Success Display */}
                 {syncSuccess && !lastError ? (
@@ -275,11 +317,7 @@ export const Settings = ({
                                 <ThemedSelect
                                     aria-label="Maximum number of history records to keep per site"
                                     disabled={isLoading}
-                                    onChange={(event) => {
-                                        void handleHistoryLimitChange(
-                                            Number(event.target.value)
-                                        );
-                                    }}
+                                    onChange={handleHistoryLimitSelectChange}
                                     value={settings.historyLimit}
                                 >
                                     {HISTORY_LIMIT_OPTIONS.map((option) => (
@@ -331,12 +369,7 @@ export const Settings = ({
                                     aria-label="Enable desktop notifications"
                                     checked={settings.notifications}
                                     disabled={isLoading}
-                                    onChange={(event) =>
-                                        handleSettingChange(
-                                            "notifications",
-                                            event.target.checked
-                                        )
-                                    }
+                                    onChange={handleNotificationsChange}
                                 />
                             </div>
 
@@ -361,12 +394,7 @@ export const Settings = ({
                                     aria-label="Enable sound alerts"
                                     checked={settings.soundAlerts}
                                     disabled={isLoading}
-                                    onChange={(event) =>
-                                        handleSettingChange(
-                                            "soundAlerts",
-                                            event.target.checked
-                                        )
-                                    }
+                                    onChange={handleSoundAlertsChange}
                                 />
                             </div>
                         </div>
@@ -390,9 +418,7 @@ export const Settings = ({
                                 <ThemedSelect
                                     aria-label="Select application theme"
                                     disabled={isLoading}
-                                    onChange={(event) =>
-                                        handleThemeChange(event.target.value)
-                                    }
+                                    onChange={handleThemeSelectChange}
                                     value={settings.theme}
                                 >
                                     {availableThemes.map((theme) => (
@@ -437,12 +463,7 @@ export const Settings = ({
                                     aria-label="Enable auto-start with system"
                                     checked={settings.autoStart}
                                     disabled={isLoading}
-                                    onChange={(event) =>
-                                        handleSettingChange(
-                                            "autoStart",
-                                            event.target.checked
-                                        )
-                                    }
+                                    onChange={handleAutoStartChange}
                                 />
                             </div>
 
@@ -468,12 +489,7 @@ export const Settings = ({
                                     aria-label="Enable minimize to system tray"
                                     checked={settings.minimizeToTray}
                                     disabled={isLoading}
-                                    onChange={(event) =>
-                                        handleSettingChange(
-                                            "minimizeToTray",
-                                            event.target.checked
-                                        )
-                                    }
+                                    onChange={handleMinimizeToTrayChange}
                                 />
                             </div>
                         </div>
@@ -490,9 +506,7 @@ export const Settings = ({
                                 className="w-full"
                                 disabled={isLoading}
                                 loading={showButtonLoading}
-                                onClick={() => {
-                                    void handleSyncNow();
-                                }}
+                                onClick={handleSyncNowClick}
                                 size="sm"
                                 variant="secondary"
                             >
@@ -512,9 +526,7 @@ export const Settings = ({
                                 <ThemedButton
                                     disabled={isLoading || showButtonLoading}
                                     loading={showButtonLoading}
-                                    onClick={() => {
-                                        void handleDownloadSQLite();
-                                    }}
+                                    onClick={handleDownloadSQLiteClick}
                                     size="sm"
                                     variant="primary"
                                 >

@@ -25,7 +25,7 @@
  * @public
  */
 
-import React from "react";
+import React, { useCallback } from "react";
 
 import { ThemedButton } from "../../../theme/components";
 
@@ -104,16 +104,30 @@ export const SiteMonitoringButton: React.NamedExoticComponent<SiteMonitoringButt
         onStartSiteMonitoring,
         onStopSiteMonitoring,
     }: SiteMonitoringButtonProperties) {
+        // useCallback handlers for jsx-no-bind compliance
+        const handleStopClick = useCallback(
+            (event?: React.MouseEvent<HTMLButtonElement>) => {
+                event?.stopPropagation();
+                onStopSiteMonitoring();
+            },
+            [onStopSiteMonitoring]
+        );
+
+        const handleStartClick = useCallback(
+            (event?: React.MouseEvent<HTMLButtonElement>) => {
+                event?.stopPropagation();
+                onStartSiteMonitoring();
+            },
+            [onStartSiteMonitoring]
+        );
+
         if (allMonitorsRunning) {
             return (
                 <ThemedButton
                     aria-label="Stop All Monitoring"
                     className={`flex items-center gap-1 ${className}`}
                     disabled={isLoading}
-                    onClick={(event) => {
-                        event?.stopPropagation();
-                        onStopSiteMonitoring();
-                    }}
+                    onClick={handleStopClick}
                     size="sm"
                     variant="error"
                 >
@@ -132,10 +146,7 @@ export const SiteMonitoringButton: React.NamedExoticComponent<SiteMonitoringButt
                 aria-label="Start All Monitoring"
                 className={`flex items-center gap-1 ${className}`}
                 disabled={isLoading}
-                onClick={(event) => {
-                    event?.stopPropagation();
-                    onStartSiteMonitoring();
-                }}
+                onClick={handleStartClick}
                 size="sm"
                 variant="success"
             >

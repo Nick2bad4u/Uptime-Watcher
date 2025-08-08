@@ -3,17 +3,19 @@
  * Manages global state, modals, notifications, and renders the main application layout.
  */
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { type JSX } from "react/jsx-runtime";
 
 import { isDevelopment, isProduction } from "../shared/utils/environment";
 import { AddSiteModal } from "./components/AddSiteForm/AddSiteModal";
+import { ErrorAlert } from "./components/common/ErrorAlert/ErrorAlert";
 import { SiteList } from "./components/Dashboard/SiteList/SiteList";
 import { Header } from "./components/Header/Header";
 import { Settings } from "./components/Settings/Settings";
 import { SiteDetails } from "./components/SiteDetails/SiteDetails";
 import { UI_DELAYS } from "./constants";
 import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
+import { useMount } from "./hooks/useMount";
 import { useSelectedSite } from "./hooks/useSelectedSite";
 import logger from "./services/logger";
 import { ErrorBoundary } from "./stores/error/ErrorBoundary";
@@ -34,7 +36,7 @@ import { setupCacheSync } from "./utils/cacheSync";
 
 // UI Message constants for consistency and future localization
 const UI_MESSAGES = {
-    ERROR_CLOSE_BUTTON: "✕",
+    ERROR_CLOSE_BUTTON: "Close",
     LOADING: "Loading...",
     SITE_COUNT_LABEL: "Monitored Sites",
     UPDATE_AVAILABLE: "A new update is available. Downloading...",
@@ -111,6 +113,9 @@ const App = (): JSX.Element => {
     const [showLoadingOverlay, setShowLoadingOverlay] =
         useState<boolean>(false);
 
+    // Ref to store cache sync cleanup function
+    const cacheSyncCleanupRef = useRef<(() => void) | null>(null);
+
     // Create stable callbacks to avoid direct setState in useEffect
     const clearLoadingOverlay = useCallback(
         () => setShowLoadingOverlay(false),
@@ -155,10 +160,8 @@ const App = (): JSX.Element => {
      * - Status update subscription with smart incremental updates
      * - Cleanup on component unmount
      */
-    useEffect(() => {
-        let cacheSyncCleanup: (() => void) | undefined;
-
-        const initializeApp = async () => {
+    useMount(
+        async () => {
             if (isProduction()) {
                 logger.app.started();
             }
@@ -173,9 +176,10 @@ const App = (): JSX.Element => {
                 settingsStore.initializeSettings(),
             ]);
 
-            // Set up cache synchronization with backend
+            // Set up cache synchronization with backend and store cleanup function
             // eslint-disable-next-line n/no-sync -- Function name contains 'sync' but is not a synchronous file operation
-            cacheSyncCleanup = setupCacheSync();
+            const cacheSyncCleanup = setupCacheSync();
+            cacheSyncCleanupRef.current = cacheSyncCleanup;
 
             // Subscribe to status updates
             sitesStore.subscribeToStatusUpdates((update: StatusUpdate) => {
@@ -187,17 +191,18 @@ const App = (): JSX.Element => {
                     );
                 }
             });
-        };
-
-        void initializeApp();
-
-        // Cleanup
-        return () => {
+        },
+        () => {
             const currentSitesStore = useSitesStore.getState();
             currentSitesStore.unsubscribeFromStatusUpdates();
-            cacheSyncCleanup?.();
-        };
-    }, []); // Empty dependency array - this should only run once
+
+            // Clean up cache sync
+            if (cacheSyncCleanupRef.current) {
+                cacheSyncCleanupRef.current();
+                cacheSyncCleanupRef.current = null;
+            }
+        }
+    );
 
     // Focus-based state synchronization (disabled by default for performance)
     // eslint-disable-next-line n/no-sync -- Function name contains 'sync' but is not a synchronous file operation
@@ -252,35 +257,12 @@ const App = (): JSX.Element => {
 
                     {/* Global Error Notification */}
                     {lastError ? (
-                        <div
-                            aria-live="assertive"
-                            className="fixed top-0 right-0 left-0 z-50"
-                            role="alert"
-                        >
-                            <ThemedBox
-                                className="error-alert"
-                                padding="md"
-                                surface="elevated"
-                            >
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
-                                        <div className="error-alert__icon">
-                                            ⚠️
-                                        </div>
-                                        <ThemedText size="sm" variant="error">
-                                            {lastError}
-                                        </ThemedText>
-                                    </div>
-                                    <ThemedButton
-                                        className="error-alert__close ml-4"
-                                        onClick={clearError}
-                                        size="sm"
-                                        variant="secondary"
-                                    >
-                                        {UI_MESSAGES.ERROR_CLOSE_BUTTON}
-                                    </ThemedButton>
-                                </div>
-                            </ThemedBox>
+                        <div className="fixed top-0 right-0 left-0 z-50 p-4">
+                            <ErrorAlert
+                                message={lastError}
+                                onDismiss={clearError}
+                                variant="error"
+                            />
                         </div>
                     ) : null}
 

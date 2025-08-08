@@ -35,7 +35,7 @@
 
 /* eslint-disable tailwind/no-arbitrary-value -- Modal component with specific layout requirements */
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { type JSX } from "react/jsx-runtime";
 
 import { useSiteDetails } from "../../hooks/site/useSiteDetails";
@@ -242,6 +242,19 @@ export const SiteDetails = ({
         [analytics.upCount, analytics.downCount, currentTheme]
     );
 
+    // Memoized event handlers to prevent unnecessary re-renders
+    const handleToggleCollapse = useCallback(() => {
+        setIsHeaderCollapsed(!isHeaderCollapsed);
+    }, [isHeaderCollapsed]);
+
+    const handleCheckNowClick = useCallback(() => {
+        void handleCheckNow();
+    }, [handleCheckNow]);
+
+    const handleSaveIntervalClick = useCallback(() => {
+        void handleSaveInterval();
+    }, [handleSaveInterval]);
+
     // Don't render if site doesn't exist
     if (!siteExists) {
         return null;
@@ -271,9 +284,7 @@ export const SiteDetails = ({
                         site={currentSite}
                         {...(selectedMonitor ? { selectedMonitor } : {})}
                         isCollapsed={isHeaderCollapsed}
-                        onToggleCollapse={() =>
-                            setIsHeaderCollapsed(!isHeaderCollapsed)
-                        }
+                        onToggleCollapse={handleToggleCollapse}
                     />
 
                     <SiteDetailsNavigation
@@ -328,9 +339,7 @@ export const SiteDetails = ({
                                 isLoading={isLoading}
                                 localCheckInterval={localCheckInterval}
                                 localTimeout={localTimeout}
-                                onCheckNow={() => {
-                                    void handleCheckNow();
-                                }}
+                                onCheckNow={handleCheckNowClick}
                                 selectedMonitor={selectedMonitor}
                                 slowestResponse={analytics.slowestResponse}
                                 timeoutChanged={timeoutChanged}
@@ -396,9 +405,7 @@ export const SiteDetails = ({
                                 handleRetryAttemptsChange={
                                     handleRetryAttemptsChange
                                 }
-                                handleSaveInterval={() => {
-                                    void handleSaveInterval();
-                                }}
+                                handleSaveInterval={handleSaveIntervalClick}
                                 handleSaveName={handleSaveName}
                                 handleSaveRetryAttempts={
                                     handleSaveRetryAttempts

@@ -31,7 +31,9 @@
  * ```
  */
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+
+import { useMount } from "./useMount";
 
 /**
  * Theme styles interface for CSS-in-JS styling
@@ -78,43 +80,55 @@ export function useThemeStyles(isCollapsed = false): ThemeStyles {
         }
     });
 
+    // Refs to store media query and handler for cleanup
+    const mediaQueryRef = useRef<MediaQueryList | null>(null);
+    const handlerRef = useRef<((e: MediaQueryListEvent) => void) | null>(null);
+
     // Set up media query listener for theme changes
-    useEffect(() => {
-        if (
-            typeof window === "undefined" ||
-            typeof window.matchMedia !== "function"
-        ) {
-            return; // Skip in SSR environments
-        }
-
-        let mediaQuery: MediaQueryList | undefined;
-        let handleThemeChange: ((e: MediaQueryListEvent) => void) | undefined;
-
-        try {
-            mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-            handleThemeChange = (e: MediaQueryListEvent) => {
-                setIsDarkMode(e.matches);
-            };
-
-            // Use modern addEventListener API
-            // eslint-disable-next-line @eslint-react/web-api/no-leaked-event-listener
-            mediaQuery.addEventListener("change", handleThemeChange);
-        } catch {
-            // Fallback if matchMedia throws an error
-            mediaQuery = undefined;
-            handleThemeChange = undefined;
-        }
-
-        // Use a cleanup variable to satisfy TypeScript
-        const cleanup = () => {
-            if (mediaQuery && handleThemeChange) {
-                mediaQuery.removeEventListener("change", handleThemeChange);
+    useMount(
+        () => {
+            // Skip in SSR environments
+            if (
+                typeof window === "undefined" ||
+                typeof window.matchMedia !== "function"
+            ) {
+                return;
             }
-        };
 
-        // eslint-disable-next-line consistent-return
-        return cleanup;
-    }, []);
+            try {
+                const mediaQuery = window.matchMedia(
+                    "(prefers-color-scheme: dark)"
+                );
+                const handleThemeChange = (e: MediaQueryListEvent) => {
+                    setIsDarkMode(e.matches);
+                };
+
+                // Store references for cleanup
+                mediaQueryRef.current = mediaQuery;
+                handlerRef.current = handleThemeChange;
+
+                mediaQuery.addEventListener("change", handleThemeChange);
+            } catch {
+                // Fallback if matchMedia throws an error
+                // No setup needed
+            }
+        },
+        () => {
+            // Cleanup media query listener on unmount
+            if (mediaQueryRef.current && handlerRef.current) {
+                try {
+                    mediaQueryRef.current.removeEventListener(
+                        "change",
+                        handlerRef.current
+                    );
+                } catch {
+                    // Ignore cleanup errors
+                }
+                mediaQueryRef.current = null;
+                handlerRef.current = null;
+            }
+        }
+    );
 
     const styles = useMemo<ThemeStyles>(
         () => ({

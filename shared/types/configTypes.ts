@@ -9,8 +9,8 @@
  * @packageDocumentation
  */
 
-import { type MonitorTypeConfig } from "../../src/utils/monitorTypeHelper";
 import { type MonitorConfig } from "./monitorConfig";
+import { type MonitorTypeConfig } from "./monitorTypes";
 import { type BaseValidationResult } from "./validation";
 
 /**

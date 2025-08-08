@@ -3,6 +3,7 @@
  * Displays key metrics, statistics, and actions for a monitored site.
  */
 
+import { useCallback } from "react";
 import { FaListOl } from "react-icons/fa";
 import { FiTrash2 } from "react-icons/fi";
 import {
@@ -156,6 +157,29 @@ export const OverviewTab = ({
 
     const iconColors = getIconColors();
 
+    // Click handlers to avoid inline functions in JSX
+    const handleSaveIntervalClick = useCallback(() => {
+        void handleSaveInterval();
+    }, [handleSaveInterval]);
+
+    const handleSaveTimeoutClick = useCallback(() => {
+        void handleSaveTimeout();
+    }, [handleSaveTimeout]);
+
+    const handleRemoveClick = useCallback(() => {
+        logger.user.action("Monitor removal button clicked from overview tab", {
+            monitorId: selectedMonitor.id,
+            monitorType: selectedMonitor.type,
+            monitorUrl: selectedMonitor.url,
+        });
+        void handleRemoveMonitor();
+    }, [
+        handleRemoveMonitor,
+        selectedMonitor.id,
+        selectedMonitor.type,
+        selectedMonitor.url,
+    ]);
+
     return (
         <div className="space-y-6" data-testid="overview-tab">
             {/* Key Metrics Grid */}
@@ -294,7 +318,7 @@ export const OverviewTab = ({
                         {intervalChanged ? (
                             <ThemedButton
                                 disabled={isLoading}
-                                onClick={() => void handleSaveInterval()}
+                                onClick={handleSaveIntervalClick}
                                 size="xs"
                                 variant="primary"
                             >
@@ -325,7 +349,7 @@ export const OverviewTab = ({
                         {timeoutChanged ? (
                             <ThemedButton
                                 disabled={isLoading}
-                                onClick={() => void handleSaveTimeout()}
+                                onClick={handleSaveTimeoutClick}
                                 size="xs"
                                 variant="primary"
                             >
@@ -351,19 +375,7 @@ export const OverviewTab = ({
                     <ThemedButton
                         disabled={isLoading}
                         icon={<FiTrash2 />}
-                        onClick={() => {
-                            logger.user.action(
-                                "Monitor removal button clicked from overview tab",
-                                {
-                                    monitorId: selectedMonitor.id,
-                                    monitorType: selectedMonitor.type,
-                                    monitorUrl:
-                                        selectedMonitor.url ??
-                                        selectedMonitor.host,
-                                }
-                            );
-                            void handleRemoveMonitor();
-                        }}
+                        onClick={handleRemoveClick}
                         size="sm"
                         variant="error"
                     >

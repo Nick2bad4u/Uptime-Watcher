@@ -3,14 +3,15 @@
  * Provides both client-side and server-side validation support.
  */
 
-import { type Monitor, type MonitorType } from "@shared/types";
-import {
-    type HttpFormData,
-    type MonitorFormData,
-    type PingFormData,
-    type PortFormData,
+import type { Monitor, MonitorType } from "@shared/types";
+import type {
+    HttpFormData,
+    MonitorFormData,
+    PingFormData,
+    PortFormData,
 } from "@shared/types/formData";
-import { type ValidationResult } from "@shared/types/validation";
+import type { ValidationResult } from "@shared/types/validation";
+
 // Import shared validation functions for client-side validation
 import {
     validateMonitorData as sharedValidateMonitorData,

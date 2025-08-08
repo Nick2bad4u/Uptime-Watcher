@@ -254,7 +254,7 @@ describe("AnalyticsTab", () => {
             expect(
                 screen.getByText("Analytics Time Range")
             ).toBeInTheDocument();
-            
+
             // Check for actual sections that exist in the component
             expect(screen.getByText("Availability")).toBeInTheDocument();
             expect(screen.getByText("Avg Response")).toBeInTheDocument();
@@ -300,10 +300,10 @@ describe("AnalyticsTab", () => {
             // Check both elements exist - they will both show 99.5%
             const progressElement = screen.getByTestId("themed-progress");
             expect(progressElement).toHaveAttribute("data-value", "99.5");
-            
+
             const badgeElement = screen.getByTestId("themed-badge");
             expect(badgeElement).toHaveTextContent("99.5%");
-            
+
             expect(screen.getByText("Excellent")).toBeInTheDocument();
             expect(props.getAvailabilityDescription).toHaveBeenCalledWith(99.5);
         });
@@ -316,9 +316,11 @@ describe("AnalyticsTab", () => {
             render(<AnalyticsTab {...props} />);
 
             // Use getAllByTestId since there are multiple conditional response time elements
-            const responseTimeElements = screen.getAllByTestId("conditional-response-time");
+            const responseTimeElements = screen.getAllByTestId(
+                "conditional-response-time"
+            );
             expect(responseTimeElements.length).toBeGreaterThan(0);
-            
+
             // Look for the actual response time text (just 150ms, not "150ms for http")
             expect(screen.getByText("150ms")).toBeInTheDocument();
         });
@@ -348,11 +350,11 @@ describe("AnalyticsTab", () => {
             expect(
                 screen.getByText("Mean Time To Recovery")
             ).toBeInTheDocument();
-            
+
             // Use getAllByText since there might be multiple "5m" texts
             const fiveMinTexts = screen.getAllByText("5m");
             expect(fiveMinTexts.length).toBeGreaterThan(0);
-            
+
             expect(props.formatDuration).toHaveBeenCalledWith(300000);
         });
     });
@@ -384,9 +386,7 @@ describe("AnalyticsTab", () => {
 
             render(<AnalyticsTab {...props} />);
 
-            expect(
-                screen.getByText("Percentile Analysis")
-            ).toBeInTheDocument();
+            expect(screen.getByText("Percentile Analysis")).toBeInTheDocument();
             expect(screen.getByText("P50")).toBeInTheDocument();
             expect(screen.getByText("P95")).toBeInTheDocument();
             expect(screen.getByText("P99")).toBeInTheDocument();
@@ -402,7 +402,9 @@ describe("AnalyticsTab", () => {
             // Percentile Analysis section is always shown
             expect(screen.getByText("Percentile Analysis")).toBeInTheDocument();
             // But advanced MTTR section should be hidden
-            expect(screen.queryByText("Mean Time To Recovery")).not.toBeInTheDocument();
+            expect(
+                screen.queryByText("Mean Time To Recovery")
+            ).not.toBeInTheDocument();
             expect(screen.queryByText("Incidents")).not.toBeInTheDocument();
         });
     });
@@ -540,11 +542,11 @@ describe("AnalyticsTab", () => {
             });
 
             render(<AnalyticsTab {...props} />);
-            
+
             // Use more specific selectors to avoid multiple matches
             const progressElement = screen.getByTestId("themed-progress");
             expect(progressElement).toHaveAttribute("data-value", "100");
-            
+
             const badgeElement = screen.getByTestId("themed-badge");
             expect(badgeElement).toHaveTextContent("100%");
         });

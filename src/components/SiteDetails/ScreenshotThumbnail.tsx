@@ -11,6 +11,7 @@ import { createPortal } from "react-dom";
 import { type JSX } from "react/jsx-runtime";
 
 import { UI_DELAYS } from "../../constants";
+import { useMount } from "../../hooks/useMount";
 import { useUIStore } from "../../stores/ui/useUiStore";
 import { useTheme } from "../../theme/useTheme";
 
@@ -41,8 +42,11 @@ export const ScreenshotThumbnail = ({
     const screenshotUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`;
 
     // Clean up portal overlay on unmount and state changes
-    useEffect(() => {
-        return () => {
+    useMount(
+        () => {
+            // No initialization needed, just setup cleanup
+        },
+        () => {
             // Clear any pending timeouts
             if (hoverTimeoutReference.current) {
                 clearTimeout(hoverTimeoutReference.current);
@@ -52,8 +56,8 @@ export const ScreenshotThumbnail = ({
             // Reset state
             setHovered(false);
             setOverlayVariables({});
-        };
-    }, []);
+        }
+    );
 
     // Create stable callbacks to avoid direct setState in useEffect
     const clearOverlayVariables = useCallback(
@@ -79,10 +83,13 @@ export const ScreenshotThumbnail = ({
         return () => {};
     }, [clearOverlayVariables, hovered]);
 
-    function handleClick(event: React.MouseEvent) {
-        event.preventDefault();
-        openExternal(url, { siteName });
-    }
+    const handleClick = useCallback(
+        (event: React.MouseEvent) => {
+            event.preventDefault();
+            openExternal(url, { siteName });
+        },
+        [openExternal, siteName, url]
+    );
 
     const updateOverlayPosition = useCallback(() => {
         if (hovered && linkReference.current) {

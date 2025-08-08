@@ -10,7 +10,7 @@
  */
 
 import { type MonitorStatus, type SiteStatus } from "@shared/types";
-import React from "react";
+import React, { useCallback } from "react";
 import { type JSX } from "react/jsx-runtime";
 
 import { ARIA_LABEL, TRANSITION_ALL } from "../constants";
@@ -667,6 +667,14 @@ export const ThemedButton = ({
         .filter(Boolean)
         .join(" ");
 
+    // useCallback handler for jsx-no-bind compliance
+    const handleClick = useCallback(
+        (e: React.MouseEvent<HTMLButtonElement>) => {
+            onClick?.(e);
+        },
+        [onClick]
+    );
+
     // eslint-disable-next-line sonarjs/function-return-type -- React component can return different node types
     const renderContent = () => {
         if (loading) {
@@ -709,7 +717,7 @@ export const ThemedButton = ({
             aria-label={ariaLabel}
             className={classNames}
             disabled={disabled || loading}
-            onClick={(e) => onClick?.(e)}
+            onClick={handleClick}
             style={style}
             title={title}
             // eslint-disable-next-line react/button-has-type -- Type is correctly typed with default value

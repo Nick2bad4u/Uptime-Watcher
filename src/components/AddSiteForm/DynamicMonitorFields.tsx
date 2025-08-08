@@ -17,6 +17,7 @@ import { type JSX } from "react/jsx-runtime";
 import logger from "../../services/logger";
 import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore";
 import { ThemedText } from "../../theme/components";
+import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
 import { TextField } from "./FormFields";
 
 /**
@@ -122,17 +123,19 @@ export const DynamicMonitorFields = ({
 
     if (lastError) {
         return (
-            <ThemedText variant="error">
-                Error loading monitor fields: {lastError}
-            </ThemedText>
+            <ErrorAlert
+                message={`Error loading monitor fields: ${lastError}`}
+                variant="error"
+            />
         );
     }
 
     if (!config) {
         return (
-            <ThemedText variant="error">
-                Unknown monitor type: {monitorType}
-            </ThemedText>
+            <ErrorAlert
+                message={`Unknown monitor type: ${monitorType}`}
+                variant="error"
+            />
         );
     }
 

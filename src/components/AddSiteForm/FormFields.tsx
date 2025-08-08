@@ -8,7 +8,7 @@
  * Use these components to ensure form fields are rendered with proper labeling, error handling, and ARIA attributes.
  */
 
-import React from "react";
+import React, { useCallback } from "react";
 
 import { ThemedInput, ThemedSelect, ThemedText } from "../../theme/components";
 
@@ -187,6 +187,13 @@ export const TextField: React.NamedExoticComponent<TextFieldProperties> =
         type = "text",
         value,
     }: TextFieldProperties) {
+        const handleChange = useCallback(
+            (event: React.ChangeEvent<HTMLInputElement>) => {
+                onChange(event.target.value);
+            },
+            [onChange]
+        );
+
         return (
             <FormField
                 {...(error !== undefined && { error })}
@@ -211,9 +218,7 @@ export const TextField: React.NamedExoticComponent<TextFieldProperties> =
                     id={id}
                     {...(max !== undefined && { max })}
                     {...(min !== undefined && { min })}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        onChange(event.target.value);
-                    }}
+                    onChange={handleChange}
                     {...(placeholder !== undefined && { placeholder })}
                     required={required}
                     type={type}
@@ -292,6 +297,13 @@ export const SelectField: React.NamedExoticComponent<SelectFieldProperties> =
         required = false,
         value,
     }: SelectFieldProperties) {
+        const handleChange = useCallback(
+            (event: React.ChangeEvent<HTMLSelectElement>) => {
+                onChange(event.target.value);
+            },
+            [onChange]
+        );
+
         return (
             <FormField
                 {...(error !== undefined && { error })}
@@ -314,7 +326,7 @@ export const SelectField: React.NamedExoticComponent<SelectFieldProperties> =
                     aria-label={createAriaLabel(label, required)}
                     disabled={disabled}
                     id={id}
-                    onChange={(event) => onChange(event.target.value)}
+                    onChange={handleChange}
                     required={required}
                     title={createAriaLabel(label, required)}
                     value={value}
@@ -406,6 +418,11 @@ export const RadioGroup: React.NamedExoticComponent<RadioGroupProperties> =
         required = false,
         value,
     }: RadioGroupProperties) {
+        const createChangeHandler = useCallback(
+            (optionValue: string) => () => onChange(optionValue),
+            [onChange]
+        );
+
         return (
             <FormField
                 {...(error !== undefined && { error })}
@@ -424,7 +441,7 @@ export const RadioGroup: React.NamedExoticComponent<RadioGroupProperties> =
                                 checked={value === option.value}
                                 disabled={disabled}
                                 name={name}
-                                onChange={() => onChange(option.value)}
+                                onChange={createChangeHandler(option.value)}
                                 required={required}
                                 type="radio"
                                 value={option.value}

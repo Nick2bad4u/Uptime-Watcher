@@ -3,7 +3,7 @@
  * Provides filtering, pagination, and detailed history records view.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FiFilter, FiInbox } from "react-icons/fi";
 import { MdHistory } from "react-icons/md";
 import { type JSX } from "react/jsx-runtime";
@@ -38,11 +38,16 @@ export interface HistoryTabProperties {
 }
 
 /**
+ * Filter type for history records
+ */
+type HistoryFilter = "all" | "down" | "up";
+
+/**
  * Get the formatted label for filter buttons
  * @param filter - The filter type
  * @returns The formatted label for the filter button
  */
-function getFilterButtonLabel(filter: "all" | "down" | "up"): string {
+function getFilterButtonLabel(filter: HistoryFilter): string {
     if (filter === "all") {
         return "All";
     }
@@ -177,6 +182,37 @@ export const HistoryTab = ({
         );
     }
 
+    // Memoized event handlers
+    const createFilterHandler = useCallback(
+        (filter: "all" | "down" | "up") => () => {
+            setHistoryFilter(filter);
+            logger.user.action("History filter changed", {
+                filter: filter,
+                monitorId: selectedMonitor.id,
+                monitorType: selectedMonitor.type,
+                totalRecords: historyLength,
+            });
+        },
+        [historyLength, selectedMonitor.id, selectedMonitor.type]
+    );
+
+    const handleHistoryLimitChange = useCallback(
+        (event: React.ChangeEvent<HTMLSelectElement>) => {
+            const newLimit = Math.min(
+                Number.parseInt(event.target.value, 10),
+                backendLimit,
+                historyLength
+            );
+            setUserHistoryLimit(newLimit);
+            logger.user.action("History limit changed", {
+                monitorId: selectedMonitor.id,
+                newLimit: newLimit,
+                totalRecords: historyLength,
+            });
+        },
+        [backendLimit, historyLength, selectedMonitor.id]
+    );
+
     return (
         <div className="space-y-6" data-testid="history-tab">
             {/* History Controls */}
@@ -194,19 +230,7 @@ export const HistoryTab = ({
                                 <ThemedButton
                                     className="capitalize"
                                     key={filter}
-                                    onClick={() => {
-                                        setHistoryFilter(filter);
-                                        logger.user.action(
-                                            "History filter changed",
-                                            {
-                                                filter: filter,
-                                                monitorId: selectedMonitor.id,
-                                                monitorType:
-                                                    selectedMonitor.type,
-                                                totalRecords: historyLength,
-                                            }
-                                        );
-                                    }}
+                                    onClick={createFilterHandler(filter)}
                                     size="xs"
                                     variant={
                                         historyFilter === filter
@@ -225,19 +249,7 @@ export const HistoryTab = ({
                             Show:
                         </ThemedText>
                         <ThemedSelect
-                            onChange={(event) => {
-                                const newLimit = Math.min(
-                                    Number.parseInt(event.target.value, 10),
-                                    backendLimit,
-                                    historyLength
-                                );
-                                setUserHistoryLimit(newLimit);
-                                logger.user.action("History limit changed", {
-                                    monitorId: selectedMonitor.id,
-                                    newLimit: newLimit,
-                                    totalRecords: historyLength,
-                                });
-                            }}
+                            onChange={handleHistoryLimitChange}
                             value={safeHistoryLimit}
                         >
                             {showOptions.map((option) => (

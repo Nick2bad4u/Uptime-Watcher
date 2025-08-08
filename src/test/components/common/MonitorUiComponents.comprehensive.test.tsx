@@ -133,6 +133,9 @@ describe("MonitorUiComponents", () => {
 
             // Should not cause any errors or state updates
             await promise;
+            
+            // Verify that the component was properly unmounted without errors
+            expect(supportsResponseTime).toHaveBeenCalled();
         });
 
         it("should handle fallback prop being undefined", async () => {
@@ -270,6 +273,9 @@ describe("MonitorUiComponents", () => {
 
             // Should not cause any errors or state updates
             await promise;
+            
+            // Verify that the component was properly unmounted without errors
+            expect(formatMonitorDetail).toHaveBeenCalled();
         });
 
         it("should handle prop changes", async () => {

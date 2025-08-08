@@ -7,6 +7,50 @@
  */
 
 /**
+ * Shared representation of a monitor type configuration used by frontend and backend.
+ *
+ * @remarks
+ * Mirrors the structure provided by the backend registry and consumed by the
+ * renderer. Kept in shared types to avoid circular dependencies between src/utils
+ * helpers and Zustand stores.
+ */
+export interface MonitorTypeConfig {
+    /** Description of what this monitor checks */
+    description: string;
+    /** Human-readable display name */
+    displayName: string;
+    /** Field definitions for dynamic form generation */
+    fields: Array<import("../types").MonitorFieldDefinition>;
+    /** Unique identifier for the monitor type */
+    type: string;
+    /** UI display configuration */
+    uiConfig?: {
+        /** Detail label formatter for different contexts */
+        detailFormats?: {
+            /** Format for analytics display */
+            analyticsLabel?: string;
+            // Note: Functions are excluded as they can't be serialized over IPC
+        };
+        /** Display preferences */
+        display?: {
+            showAdvancedMetrics?: boolean;
+            showUrl?: boolean;
+        };
+        /** Help text for form fields */
+        helpTexts?: {
+            primary?: string;
+            secondary?: string;
+        };
+        /** Whether this monitor type supports advanced analytics */
+        supportsAdvancedAnalytics?: boolean;
+        /** Whether this monitor type supports response time analytics */
+        supportsResponseTime?: boolean;
+    };
+    /** Version of the monitor implementation */
+    version: string;
+}
+
+/**
  * Common display configuration for monitor types.
  *
  * @remarks

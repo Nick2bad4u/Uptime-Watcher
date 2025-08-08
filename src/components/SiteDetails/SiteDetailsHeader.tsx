@@ -5,6 +5,7 @@
  * in a visually appealing header with gradient background and accent styling.
  */
 
+import { useCallback } from "react";
 import { MdExpandLess, MdExpandMore } from "react-icons/md";
 import { type JSX } from "react/jsx-runtime";
 
@@ -67,6 +68,18 @@ export const SiteDetailsHeader = ({
             : "";
     }
 
+    // Memoized click handler for URL link
+    const handleUrlClick = useCallback(
+        (event: React.MouseEvent) => {
+            event.preventDefault();
+            const url = selectedMonitor?.url ?? "";
+            openExternal(url, {
+                siteName: site.name,
+            });
+        },
+        [openExternal, selectedMonitor?.url, site.name]
+    );
+
     return (
         <div style={styles.headerStyle}>
             <div style={styles.overlayStyle} />
@@ -105,13 +118,7 @@ export const SiteDetailsHeader = ({
                                     aria-label={`Open ${selectedMonitor.url} in browser`}
                                     className="site-details-url truncate"
                                     href={selectedMonitor.url}
-                                    onClick={(event) => {
-                                        event.preventDefault();
-                                        const url = selectedMonitor.url ?? "";
-                                        openExternal(url, {
-                                            siteName: site.name,
-                                        });
-                                    }}
+                                    onClick={handleUrlClick}
                                     rel="noopener noreferrer"
                                     tabIndex={0}
                                     target="_blank"
