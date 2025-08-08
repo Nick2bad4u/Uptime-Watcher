@@ -9,12 +9,7 @@
  * @public
  */
 
-import {
-    type Monitor,
-    type MonitorStatus,
-    type Site,
-    type StatusUpdate,
-} from "@shared/types";
+import type { Monitor, MonitorStatus, Site, StatusUpdate } from "@shared/types";
 
 import { isDevelopment } from "../../../../shared/utils/environment";
 import logger from "../../../services/logger";
@@ -120,7 +115,7 @@ export class StatusUpdateManager {
      * Initializes the manager with the required dependencies for status update handling.
      * Does not start listening for events until subscribe() is called.
      */
-    constructor(options: StatusUpdateHandlerOptions) {
+    public constructor(options: StatusUpdateHandlerOptions) {
         this.fullSyncFromBackend = options.fullSyncFromBackend;
         this.getSites = options.getSites;
         this.setSites = options.setSites;
@@ -135,7 +130,7 @@ export class StatusUpdateManager {
      * @remarks
      * Returns true when event listeners are active.
      */
-    isSubscribed(): boolean {
+    public isSubscribed(): boolean {
         return this.isListenerAttached;
     }
 
@@ -152,7 +147,7 @@ export class StatusUpdateManager {
      * manager.subscribe();
      * ```
      */
-    subscribe(): void {
+    public subscribe(): void {
         // Cleanup existing subscriptions if any
         this.unsubscribe();
 
@@ -239,7 +234,7 @@ export class StatusUpdateManager {
      * console.log(manager.isSubscribed()); // false
      * ```
      */
-    unsubscribe(): void {
+    public unsubscribe(): void {
         // Clean up all event listeners
         for (const cleanup of this.cleanupFunctions) {
             cleanup();

@@ -36,7 +36,8 @@
  * ```
  */
 
-import { type MonitorFieldDefinition } from "@shared/types";
+import type { MonitorFieldDefinition } from "@shared/types";
+
 import { useCallback, useEffect } from "react";
 
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";

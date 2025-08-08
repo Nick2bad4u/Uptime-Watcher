@@ -12,15 +12,16 @@
  * @see {@link EnhancedMonitoringServices} for the preferred enhanced implementation
  */
 
+import type { UptimeEvents } from "../../events/eventTypes";
+import type { TypedEventBus } from "../../events/TypedEventBus";
+import type { DatabaseService } from "../../services/database/DatabaseService";
+import type { MonitorRepository } from "../../services/database/MonitorRepository";
+import type { MonitorScheduler } from "../../services/monitoring/MonitorScheduler";
+import type { Site } from "../../types";
+import type { StandardizedCache } from "../cache/StandardizedCache";
+import type { Logger } from "../interfaces";
+
 import { MONITOR_STATUS } from "../../../shared/types";
-import { UptimeEvents } from "../../events/eventTypes";
-import { TypedEventBus } from "../../events/TypedEventBus";
-import { DatabaseService } from "../../services/database/DatabaseService";
-import { MonitorRepository } from "../../services/database/MonitorRepository";
-import { MonitorScheduler } from "../../services/monitoring/MonitorScheduler";
-import { Site } from "../../types";
-import { StandardizedCache } from "../cache/StandardizedCache";
-import { type Logger } from "../interfaces";
 import { withDatabaseOperation } from "../operationalHooks";
 
 /**
@@ -191,7 +192,7 @@ export async function stopAllMonitoring(
     // to indicate monitoring has been stopped system-wide
     for (const site of config.sites.getAll()) {
         for (const monitor of site.monitors) {
-            if (monitor.id && monitor.monitoring !== false) {
+            if (monitor.id && monitor.monitoring) {
                 try {
                     // Use operational hooks for database update
                     await withDatabaseOperation(

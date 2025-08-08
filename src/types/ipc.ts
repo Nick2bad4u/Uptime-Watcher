@@ -1,10 +1,34 @@
 /**
- * IPC Response type definitions for frontend-backend communication.
+ * IPC response type definitions and utilities for type-safe frontend-backend communication.
  *
  * @remarks
- * These types mirror the backend IpcResponse interface to ensure type safety
- * across the IPC boundary. All standardized IPC handlers return responses
- * in this format.
+ * This module provides TypeScript interfaces and utility functions that mirror the backend
+ * IpcResponse interface, ensuring type safety across the Electron IPC boundary. All
+ * standardized IPC handlers in the application return responses in the defined format.
+ *
+ * The module includes:
+ * - Standardized response format interface
+ * - Type guards for runtime type checking
+ * - Data extraction utilities with error handling
+ * - Safe fallback mechanisms for failed operations
+ *
+ * These utilities are essential for maintaining type safety when communicating between
+ * the renderer process (frontend) and main process (backend) in the Electron application.
+ *
+ * @example
+ * ```typescript
+ * // Type-safe IPC response handling
+ * const response = await window.electronAPI.getSites();
+ * if (isIpcResponse<Site[]>(response)) {
+ *   const sites = extractIpcData<Site[]>(response);
+ *   setSites(sites);
+ * }
+ *
+ * // Safe extraction with fallback
+ * const sites = safeExtractIpcData(response, []);
+ * ```
+ *
+ * @packageDocumentation
  */
 
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
@@ -38,6 +62,7 @@ export interface IpcResponse<T> {
  *
  * @public
  */
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 export function extractIpcData<T>(response: unknown): T {
     if (!isIpcResponse<T>(response)) {
         throw new Error(ERROR_CATALOG.ipc.INVALID_RESPONSE_FORMAT);

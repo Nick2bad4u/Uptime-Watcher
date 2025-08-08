@@ -60,22 +60,19 @@
  * @packageDocumentation
  */
 
+import type { UptimeEvents } from "../../events/eventTypes";
+import type { TypedEventBus } from "../../events/TypedEventBus";
+import type { HistoryRepository } from "../../services/database/HistoryRepository";
+import type { MonitorRepository } from "../../services/database/MonitorRepository";
+import type { SettingsRepository } from "../../services/database/SettingsRepository";
+import type { SiteRepository } from "../../services/database/SiteRepository";
+import type { SiteRow } from "../../services/database/utils/siteMapper";
+import type { Site } from "../../types";
+import type { StandardizedCache } from "../cache/StandardizedCache";
+import type { Logger, MonitoringConfig, SiteLoadingConfig } from "./interfaces";
+
 import { DEFAULT_SITE_NAME } from "../../constants";
-import { UptimeEvents } from "../../events/eventTypes";
-import { TypedEventBus } from "../../events/TypedEventBus";
-import { HistoryRepository } from "../../services/database/HistoryRepository";
-import { MonitorRepository } from "../../services/database/MonitorRepository";
-import { SettingsRepository } from "../../services/database/SettingsRepository";
-import { SiteRepository } from "../../services/database/SiteRepository";
-import { SiteRow } from "../../services/database/utils/siteMapper";
-import { Site } from "../../types";
-import { StandardizedCache } from "../cache/StandardizedCache";
-import {
-    Logger,
-    MonitoringConfig,
-    SiteLoadingConfig,
-    SiteLoadingError,
-} from "./interfaces";
+import { SiteLoadingError } from "./interfaces";
 
 /**
  * Orchestrates the complete site loading process.
@@ -84,7 +81,7 @@ import {
 export class SiteLoadingOrchestrator {
     private readonly siteRepositoryService: SiteRepositoryService;
 
-    constructor(siteRepositoryService: SiteRepositoryService) {
+    public constructor(siteRepositoryService: SiteRepositoryService) {
         this.siteRepositoryService = siteRepositoryService;
     }
 
@@ -92,7 +89,7 @@ export class SiteLoadingOrchestrator {
      * Load sites from database and start monitoring.
      * Coordinates all aspects of site loading process.
      */
-    async loadSitesFromDatabase(
+    public async loadSitesFromDatabase(
         siteCache: StandardizedCache<Site>,
         monitoringConfig: MonitoringConfig
     ): Promise<{ message: string; sitesLoaded: number; success: boolean }> {
@@ -157,7 +154,7 @@ export class SiteRepositoryService {
      * logging, and event communication. All dependencies are required
      * for proper operation and comprehensive functionality.
      */
-    constructor(config: SiteLoadingConfig) {
+    public constructor(config: SiteLoadingConfig) {
         this.repositories = config.repositories;
         this.logger = config.logger;
         this.eventEmitter = config.eventEmitter;
@@ -167,7 +164,7 @@ export class SiteRepositoryService {
      * Apply history limit setting.
      * Side effect operation separated from data loading.
      */
-    async applyHistoryLimitSetting(
+    public async applyHistoryLimitSetting(
         monitoringConfig: MonitoringConfig
     ): Promise<void> {
         const limit = await this.getHistoryLimitSetting();
@@ -181,7 +178,7 @@ export class SiteRepositoryService {
      * Load history limit setting from database.
      * Pure data operation without side effects.
      */
-    async getHistoryLimitSetting(): Promise<number | undefined> {
+    public async getHistoryLimitSetting(): Promise<number | undefined> {
         try {
             const historyLimitSetting =
                 await this.repositories.settings.get("historyLimit");
@@ -223,7 +220,7 @@ export class SiteRepositoryService {
      * associated monitors, and historical data in an efficient manner while
      * maintaining proper error handling throughout the process.
      */
-    async getSitesFromDatabase(): Promise<Site[]> {
+    public async getSitesFromDatabase(): Promise<Site[]> {
         try {
             const siteRows = await this.repositories.site.findAll();
             const sites: Site[] = [];
@@ -249,7 +246,7 @@ export class SiteRepositoryService {
      * Load sites into cache.
      * Pure data operation that populates the cache.
      */
-    async loadSitesIntoCache(
+    public async loadSitesIntoCache(
         siteCache: StandardizedCache<Site>
     ): Promise<void> {
         try {

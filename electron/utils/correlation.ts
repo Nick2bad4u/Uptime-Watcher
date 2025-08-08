@@ -20,9 +20,15 @@ import { randomBytes } from "node:crypto";
  * ```
  */
 export class ValidationError extends Error {
-    constructor(public errors: string[]) {
+    /**
+     * Array of validation error messages
+     */
+    public errors: string[];
+
+    public constructor(errors: string[]) {
         super(`Validation failed: ${errors.join(", ")}`);
         this.name = "ValidationError";
+        this.errors = errors;
     }
 }
 

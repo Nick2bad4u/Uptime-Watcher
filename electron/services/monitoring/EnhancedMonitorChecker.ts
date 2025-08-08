@@ -27,37 +27,38 @@
  * @public
  */
 
-import { Monitor, Site, StatusUpdate } from "../../../shared/types";
+import type { Monitor, Site, StatusUpdate } from "../../../shared/types";
+import type { UptimeEvents } from "../../events/eventTypes";
+import type { TypedEventBus } from "../../events/TypedEventBus";
+import type { Site as SiteType } from "../../types";
+import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
+import type { HistoryRepository } from "../database/HistoryRepository";
+import type { MonitorRepository } from "../database/MonitorRepository";
+import type { SiteRepository } from "../database/SiteRepository";
+import type { MonitorOperationRegistry } from "./MonitorOperationRegistry";
+import type {
+    MonitorStatusUpdateService,
+    StatusUpdateMonitorCheckResult,
+} from "./MonitorStatusUpdateService";
+import type { OperationTimeoutManager } from "./OperationTimeoutManager";
+import type {
+    IMonitorService,
+    MonitorCheckResult as ServiceMonitorCheckResult,
+} from "./types";
+
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "../../../shared/utils/logTemplates";
-import { UptimeEvents } from "../../events/eventTypes";
-import { TypedEventBus } from "../../events/TypedEventBus";
-import { Site as SiteType } from "../../types";
-import { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import { monitorLogger as logger } from "../../utils/logger";
-import { HistoryRepository } from "../database/HistoryRepository";
-import { MonitorRepository } from "../database/MonitorRepository";
-import { SiteRepository } from "../database/SiteRepository";
 import {
     DEFAULT_MONITOR_TIMEOUT_SECONDS,
     MONITOR_TIMEOUT_BUFFER_MS,
     SECONDS_TO_MS_MULTIPLIER,
 } from "./constants";
 import { HttpMonitor } from "./HttpMonitor";
-import { MonitorOperationRegistry } from "./MonitorOperationRegistry";
-import {
-    MonitorStatusUpdateService,
-    type StatusUpdateMonitorCheckResult,
-} from "./MonitorStatusUpdateService";
-import { OperationTimeoutManager } from "./OperationTimeoutManager";
 import { PingMonitor } from "./PingMonitor";
 import { PortMonitor } from "./PortMonitor";
-import {
-    IMonitorService,
-    type MonitorCheckResult as ServiceMonitorCheckResult,
-} from "./types";
 
 /**
  * Configuration interface for enhanced monitor checking with comprehensive service dependencies.
@@ -228,11 +229,14 @@ export interface EnhancedMonitorCheckConfig {
  * @public
  */
 export class EnhancedMonitorChecker {
+    private readonly config: EnhancedMonitorCheckConfig;
+
     private readonly httpMonitor: HttpMonitor;
     private readonly pingMonitor: PingMonitor;
     private readonly portMonitor: PortMonitor;
 
-    constructor(private readonly config: EnhancedMonitorCheckConfig) {
+    public constructor(config: EnhancedMonitorCheckConfig) {
+        this.config = config;
         // Initialize monitor services
         this.httpMonitor = new HttpMonitor({});
         this.pingMonitor = new PingMonitor({});
@@ -304,14 +308,12 @@ export class EnhancedMonitorChecker {
      *
      * @public
      */
-    async checkMonitor(
+    public async checkMonitor(
         site: Site,
         monitorId: string,
         isManualCheck = false
     ): Promise<StatusUpdate | undefined> {
-        const monitor = site.monitors.find(
-            (m) => String(m.id) === String(monitorId)
-        );
+        const monitor = site.monitors.find((m) => m.id === monitorId);
 
         if (!this.validateMonitorForCheck(monitor, site, monitorId)) {
             return undefined;
@@ -338,7 +340,7 @@ export class EnhancedMonitorChecker {
      * @param monitorId - Monitor ID
      * @returns Promise resolving to true if started successfully
      */
-    async startMonitoring(
+    public async startMonitoring(
         siteIdentifier: string,
         monitorId: string
     ): Promise<boolean> {
@@ -387,7 +389,7 @@ export class EnhancedMonitorChecker {
      * @param monitorId - Monitor ID
      * @returns Promise resolving to true if stopped successfully
      */
-    async stopMonitoring(
+    public async stopMonitoring(
         siteIdentifier: string,
         monitorId: string
     ): Promise<boolean> {
@@ -754,6 +756,29 @@ export class EnhancedMonitorChecker {
     }
 
     /**
+     * Performs monitor checks with proper error handling.
+     */
+    private async performMonitorCheck(
+        monitorService: IMonitorService,
+        monitor: Monitor
+    ): Promise<ServiceMonitorCheckResult> {
+        try {
+            const result = await monitorService.check(monitor);
+            return result;
+        } catch (error) {
+            logger.error(`Monitor check failed for ${monitor.id}`, error);
+            return {
+                details:
+                    error instanceof Error
+                        ? error.message
+                        : "Unknown error occurred",
+                responseTime: 0,
+                status: "down",
+            };
+        }
+    }
+
+    /**
      * Perform type-specific check based on monitor configuration.
      *
      * @param monitor - Monitor to check
@@ -762,20 +787,15 @@ export class EnhancedMonitorChecker {
     private async performTypeSpecificCheck(
         monitor: Monitor
     ): Promise<ServiceMonitorCheckResult> {
-        let monitorService: IMonitorService;
-
         switch (monitor.type) {
             case "http": {
-                monitorService = this.httpMonitor;
-                break;
+                return this.performMonitorCheck(this.httpMonitor, monitor);
             }
             case "ping": {
-                monitorService = this.pingMonitor;
-                break;
+                return this.performMonitorCheck(this.pingMonitor, monitor);
             }
             case "port": {
-                monitorService = this.portMonitor;
-                break;
+                return this.performMonitorCheck(this.portMonitor, monitor);
             }
             default: {
                 logger.warn(
@@ -787,26 +807,11 @@ export class EnhancedMonitorChecker {
                     )
                 );
                 return {
-                    details: `Unknown monitor type: ${monitor.type}`,
+                    details: `Unknown monitor type: ${monitor.type as string}`,
                     responseTime: 0,
                     status: "down",
                 };
             }
-        }
-
-        try {
-            const result = await monitorService.check(monitor);
-            return result;
-        } catch (error) {
-            logger.error(`Monitor check failed for ${monitor.id}`, error);
-            return {
-                details:
-                    error instanceof Error
-                        ? error.message
-                        : "Monitor check failed",
-                responseTime: 0,
-                status: "down",
-            };
         }
     }
 

@@ -18,9 +18,10 @@
  * Displays uptime statistics, theme toggle, and settings access.
  */
 
-import { type Monitor, type Site } from "@shared/types";
+import type { Monitor, Site } from "@shared/types";
+import type { JSX } from "react/jsx-runtime";
+
 import { useCallback, useMemo } from "react";
-import { type JSX } from "react/jsx-runtime";
 
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { useUIStore } from "../../stores/ui/useUiStore";

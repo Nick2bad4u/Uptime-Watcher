@@ -6,13 +6,9 @@
 import { DEFAULT_MONITOR_STATUS } from "@shared/types";
 import { useCallback, useMemo } from "react";
 
+import type { Monitor, MonitorStatus, Site, StatusHistory } from "../../types";
+
 import { useSitesStore } from "../../stores/sites/useSitesStore";
-import {
-    type Monitor,
-    type MonitorStatus,
-    type Site,
-    type StatusHistory,
-} from "../../types";
 import { getDefaultMonitorId } from "../../utils/monitorUiHelpers";
 
 /**
@@ -122,8 +118,23 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
     }, [monitor]);
 
     // Fix: Explicitly check for monitor existence before checking monitoring status
-    // Only return true if monitor exists AND monitoring is not explicitly false
-    const isMonitoring = monitor ? monitor.monitoring !== false : false;
+    // Default to true when monitoring is undefined (monitors are active by default)
+    // Note: Handle runtime case where monitoring property might be missing despite types
+    let isMonitoring = false;
+    if (monitor) {
+        // Handle potential undefined monitoring value (e.g., in test scenarios)
+        // Use Object.hasOwnProperty to safely check for property existence
+        const hasMonitoringProperty = Object.prototype.hasOwnProperty.call(
+            monitor,
+            "monitoring"
+        );
+        if (hasMonitoringProperty) {
+            isMonitoring = monitor.monitoring;
+        } else {
+            // Default to true when monitoring property is missing
+            isMonitoring = true;
+        }
+    }
 
     // Handler for changing the monitor - memoized to prevent recreation
     const handleMonitorIdChange = useCallback(

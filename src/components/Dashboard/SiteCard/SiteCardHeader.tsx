@@ -5,8 +5,9 @@
 
 import React from "react";
 
+import type { Site } from "../../../types";
+
 import { ThemedText } from "../../../theme/components";
-import { Site } from "../../../types";
 import { ActionButtonGroup } from "./components/ActionButtonGroup";
 import { MonitorSelector } from "./components/MonitorSelector";
 

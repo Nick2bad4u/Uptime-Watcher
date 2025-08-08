@@ -8,9 +8,10 @@
 
 import { useMemo } from "react";
 
+import type { Theme } from "../../theme/types";
+import type { Monitor, StatusHistory } from "../../types";
+
 import { CHART_TIME_PERIODS } from "../../constants";
-import { type Theme } from "../../theme/types";
-import { Monitor, StatusHistory } from "../../types";
 import { TIME_PERIOD_LABELS, type TimePeriod } from "../../utils/time";
 
 /** Chart data structure for line charts */
@@ -301,8 +302,8 @@ function calculateDowntimePeriods(
     filteredHistory: StatusHistory[]
 ): DowntimePeriod[] {
     const downtimePeriods: DowntimePeriod[] = [];
-    let downtimeEnd: number | undefined; // Most recent "down" timestamp
-    let downtimeStart: number | undefined; // Earliest "down" timestamp in the period
+    let downtimeEnd: number | undefined = undefined; // Most recent "down" timestamp
+    let downtimeStart: number | undefined = undefined; // Earliest "down" timestamp in the period
 
     // Process in reverse chronological order (newest to oldest)
     for (let i = filteredHistory.length - 1; i >= 0; i--) {

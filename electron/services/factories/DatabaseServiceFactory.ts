@@ -7,19 +7,23 @@
  * @public
  */
 
-import { UptimeEvents } from "../../events/eventTypes";
-import { TypedEventBus } from "../../events/TypedEventBus";
-import { Site } from "../../types";
+import type { UptimeEvents } from "../../events/eventTypes";
+import type { TypedEventBus } from "../../events/TypedEventBus";
+import type { Site } from "../../types";
+import type { DatabaseService } from "../database/DatabaseService";
+import type { HistoryRepository } from "../database/HistoryRepository";
+import type { MonitorRepository } from "../database/MonitorRepository";
+import type { SettingsRepository } from "../database/SettingsRepository";
+import type { SiteRepository } from "../database/SiteRepository";
+
 import { DataBackupService } from "../../utils/database/DataBackupService";
-import { DataImportExportService } from "../../utils/database/DataImportExportService";
+import {
+    DataImportExportService,
+    type ImportSite,
+} from "../../utils/database/DataImportExportService";
 import { LoggerAdapter } from "../../utils/database/serviceFactory";
 import { SiteRepositoryService } from "../../utils/database/SiteRepositoryService";
 import { monitorLogger } from "../../utils/logger";
-import { DatabaseService } from "../database/DatabaseService";
-import { HistoryRepository } from "../database/HistoryRepository";
-import { MonitorRepository } from "../database/MonitorRepository";
-import { SettingsRepository } from "../database/SettingsRepository";
-import { SiteRepository } from "../database/SiteRepository";
 
 /**
  * Defines the dependencies required by the {@link DatabaseServiceFactory} for service creation.
@@ -49,7 +53,7 @@ export interface DatabaseServiceFactoryDependencies {
  * @public
  */
 export interface IDataBackupService {
-    downloadDatabaseBackup(): Promise<{ buffer: Buffer; fileName: string }>;
+    downloadDatabaseBackup: () => Promise<{ buffer: Buffer; fileName: string }>;
 }
 
 /**
@@ -61,14 +65,14 @@ export interface IDataBackupService {
  * @public
  */
 export interface IDataImportExportService {
-    exportAllData(): Promise<string>;
-    importDataFromJson(
+    exportAllData: () => Promise<string>;
+    importDataFromJson: (
         data: string
-    ): Promise<{ settings: Record<string, string>; sites: unknown[] }>;
-    persistImportedData(
-        sites: unknown[],
+    ) => Promise<{ settings: Record<string, string>; sites: ImportSite[] }>;
+    persistImportedData: (
+        sites: ImportSite[],
         settings: Record<string, string>
-    ): Promise<void>;
+    ) => Promise<void>;
 }
 
 /**
@@ -80,7 +84,7 @@ export interface IDataImportExportService {
  * @public
  */
 export interface ISiteRepositoryService {
-    getSitesFromDatabase(): Promise<Site[]>;
+    getSitesFromDatabase: () => Promise<Site[]>;
 }
 
 /**
@@ -103,7 +107,7 @@ export class DatabaseServiceFactory {
      *
      * @param dependencies - The {@link DatabaseServiceFactoryDependencies} required for service creation.
      */
-    constructor(dependencies: DatabaseServiceFactoryDependencies) {
+    public constructor(dependencies: DatabaseServiceFactoryDependencies) {
         this.dependencies = dependencies;
         this.loggerAdapter = new LoggerAdapter(monitorLogger);
     }

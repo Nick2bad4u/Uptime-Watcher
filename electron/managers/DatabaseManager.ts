@@ -6,29 +6,30 @@
  * Uses the new service-based architecture for all operations.
  */
 
+import type { UptimeEvents } from "../events/eventTypes";
+import type { TypedEventBus } from "../events/TypedEventBus";
+import type { DatabaseService } from "../services/database/DatabaseService";
+import type { HistoryRepository } from "../services/database/HistoryRepository";
+import type { MonitorRepository } from "../services/database/MonitorRepository";
+import type { SettingsRepository } from "../services/database/SettingsRepository";
+import type { SiteRepository } from "../services/database/SiteRepository";
+import type { Site } from "../types";
+import type { ConfigurationManager } from "./ConfigurationManager";
+
 import { withErrorHandling } from "../../shared/utils/errorHandling";
 import { DEFAULT_HISTORY_LIMIT } from "../constants";
-import { UptimeEvents } from "../events/eventTypes";
-import { TypedEventBus } from "../events/TypedEventBus";
 import {
     DatabaseCommandExecutor,
     DownloadBackupCommand,
     ExportDataCommand,
     ImportDataCommand,
 } from "../services/commands/DatabaseCommands";
-import { DatabaseService } from "../services/database/DatabaseService";
-import { HistoryRepository } from "../services/database/HistoryRepository";
-import { MonitorRepository } from "../services/database/MonitorRepository";
-import { SettingsRepository } from "../services/database/SettingsRepository";
-import { SiteRepository } from "../services/database/SiteRepository";
 import { DatabaseServiceFactory } from "../services/factories/DatabaseServiceFactory";
-import { Site } from "../types";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
 import { setHistoryLimit as setHistoryLimitUtil } from "../utils/database/historyLimitManager";
 import { createSiteCache } from "../utils/database/serviceFactory";
 import { SiteLoadingOrchestrator } from "../utils/database/SiteRepositoryService";
 import { monitorLogger } from "../utils/logger";
-import { ConfigurationManager } from "./ConfigurationManager";
 
 /**
  * Defines the dependencies required to construct a {@link DatabaseManager} instance.
@@ -167,7 +168,7 @@ export class DatabaseManager {
      *
      * @param dependencies - The set of dependencies required for all database operations.
      */
-    constructor(dependencies: DatabaseManagerDependencies) {
+    public constructor(dependencies: DatabaseManagerDependencies) {
         this.dependencies = dependencies;
         this.configurationManager = dependencies.configurationManager;
         this.eventEmitter = dependencies.eventEmitter;
@@ -496,12 +497,14 @@ export class DatabaseManager {
             setHistoryLimit: (newLimit) => {
                 this.historyLimit = newLimit;
                 // Use centralized event emission (fire and forget)
-                this.emitHistoryLimitUpdated(newLimit).catch((error) => {
-                    monitorLogger.error(
-                        "[DatabaseManager] Failed to emit history limit updated event:",
-                        error
-                    );
-                });
+                this.emitHistoryLimitUpdated(newLimit).catch(
+                    (error: unknown) => {
+                        monitorLogger.error(
+                            "[DatabaseManager] Failed to emit history limit updated event:",
+                            error
+                        );
+                    }
+                );
             },
         });
     }

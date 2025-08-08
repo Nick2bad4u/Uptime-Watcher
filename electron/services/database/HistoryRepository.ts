@@ -1,10 +1,11 @@
-import { Database } from "node-sqlite3-wasm";
+import type { Database } from "node-sqlite3-wasm";
+
+import type { StatusHistory } from "../../types";
+import type { DatabaseService } from "./DatabaseService";
 
 import { isDev } from "../../electronUtils";
-import { StatusHistory } from "../../types";
 import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
-import { DatabaseService } from "./DatabaseService";
 import {
     addHistoryEntry,
     deleteAllHistory,
@@ -73,7 +74,7 @@ export class HistoryRepository {
      * const repo = new HistoryRepository({ databaseService });
      * ```
      */
-    constructor(dependencies: HistoryRepositoryDependencies) {
+    public constructor(dependencies: HistoryRepositoryDependencies) {
         this.databaseService = dependencies.databaseService;
     }
 
@@ -124,7 +125,7 @@ export class HistoryRepository {
         entry: StatusHistory,
         details?: string
     ): void {
-        return addHistoryEntry(db, monitorId, entry, details);
+        addHistoryEntry(db, monitorId, entry, details);
     }
 
     /**
@@ -209,7 +210,7 @@ export class HistoryRepository {
      * **IMPORTANT**: This method must be called within an existing transaction context. The operation is destructive and irreversible. Proper error handling is delegated to the calling transaction context.
      */
     public deleteAllInternal(db: Database): void {
-        return deleteAllHistory(db);
+        deleteAllHistory(db);
     }
 
     /**
@@ -246,7 +247,7 @@ export class HistoryRepository {
      * Use this method only when already within a transaction context.
      */
     public deleteByMonitorIdInternal(db: Database, monitorId: string): void {
-        return deleteHistoryByMonitorId(db, monitorId);
+        deleteHistoryByMonitorId(db, monitorId);
     }
 
     /**
@@ -364,7 +365,7 @@ export class HistoryRepository {
                         if (excessEntries.length > 0) {
                             // Convert numeric IDs to ensure type safety and validate they are numbers
                             const excessIds = excessEntries
-                                .map((e) => Number(e.id))
+                                .map((e) => e.id)
                                 .filter((id) => Number.isFinite(id) && id > 0);
 
                             if (excessIds.length > 0) {
@@ -410,7 +411,7 @@ export class HistoryRepository {
         // Prune history for each monitor
         for (const row of monitorRows) {
             // Validate monitor ID is a positive number before using it
-            const monitorId = Number(row.id);
+            const monitorId = row.id;
             if (Number.isFinite(monitorId) && monitorId > 0) {
                 pruneHistoryForMonitor(db, String(monitorId), limit);
             }

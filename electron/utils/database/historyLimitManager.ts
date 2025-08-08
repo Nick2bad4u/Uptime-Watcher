@@ -1,10 +1,11 @@
-import { type DatabaseService } from "../../services/database/DatabaseService";
+import type { DatabaseService } from "../../services/database/DatabaseService";
 /**
  * Utility for managing history limits in the database.
  */
-import { type HistoryRepository } from "../../services/database/HistoryRepository";
-import { type SettingsRepository } from "../../services/database/SettingsRepository";
-import { type Logger } from "../interfaces";
+import type { HistoryRepository } from "../../services/database/HistoryRepository";
+import type { SettingsRepository } from "../../services/database/SettingsRepository";
+import type { Logger } from "../interfaces";
+
 import { withDatabaseOperation } from "../operationalHooks";
 
 /**
@@ -73,8 +74,13 @@ export function getHistoryLimit(getHistoryLimitFn: () => number): number {
 export async function setHistoryLimit(
     params: SetHistoryLimitParams
 ): Promise<void> {
-    const { databaseService, limit, logger, repositories, setHistoryLimit } =
-        params;
+    const {
+        databaseService,
+        limit,
+        logger,
+        repositories,
+        setHistoryLimit: updateHistoryLimit,
+    } = params;
 
     // Determine the appropriate limit value
     // Special case: 0 or negative disables history retention (unlimited)
@@ -82,7 +88,7 @@ export async function setHistoryLimit(
     const finalLimit = limit <= 0 ? 0 : Math.max(10, limit);
 
     // Update the internal limit
-    setHistoryLimit(finalLimit);
+    updateHistoryLimit(finalLimit);
 
     // Use single transaction for atomicity - either both operations succeed or both fail
     await withDatabaseOperation(

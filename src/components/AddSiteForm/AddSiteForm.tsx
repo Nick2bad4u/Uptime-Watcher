@@ -344,12 +344,15 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
                         isLoading={isLoading}
                         monitorType={monitorType}
                         onChange={{
-                            host: (value: number | string) =>
-                                setHost(String(value)),
-                            port: (value: number | string) =>
-                                setPort(String(value)),
-                            url: (value: number | string) =>
-                                setUrl(String(value)),
+                            host: (value: number | string) => {
+                                setHost(String(value));
+                            },
+                            port: (value: number | string) => {
+                                setPort(String(value));
+                            },
+                            url: (value: number | string) => {
+                                setUrl(String(value));
+                            },
                         }}
                         values={{
                             host: host,

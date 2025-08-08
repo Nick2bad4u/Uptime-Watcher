@@ -1,9 +1,10 @@
 import { useCallback } from "react";
 
+import type { Monitor, Site } from "../../types";
+
 import logger from "../../services/logger";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { useUIStore } from "../../stores/ui/useUiStore";
-import { Monitor, Site } from "../../types";
 import { ensureError } from "../../utils/errorHandling";
 
 /**

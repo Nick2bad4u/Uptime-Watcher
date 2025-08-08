@@ -7,13 +7,13 @@
  * All validation logic is centralized here for consistency and maintainability.
  */
 
-import {
-    type BaseMonitorSchemaType,
-    type HttpMonitorSchemaType,
-    type MonitorSchemaType,
-    type PingMonitorSchemaType,
-    type PortMonitorSchemaType,
-    type SiteSchemaType,
+import type {
+    BaseMonitorSchemaType,
+    HttpMonitorSchemaType,
+    MonitorSchemaType,
+    PingMonitorSchemaType,
+    PortMonitorSchemaType,
+    SiteSchemaType,
 } from "@shared/types/schemaTypes";
 /**
  * Result object returned by validation functions.
@@ -22,7 +22,8 @@ import {
  * Contains the validated data (if successful), errors, warnings, and metadata.
  */
 // Import from unified validation system
-import { type ValidationResult } from "@shared/types/validation";
+import type { ValidationResult } from "@shared/types/validation";
+
 import validator from "validator";
 import { z } from "zod";
 

@@ -28,8 +28,9 @@ interface Logger {
  */
 function createLogger(prefix: string): Logger {
     return {
-        debug: (message: string, ...args: unknown[]): void =>
-            log.debug(`[${prefix}] ${message}`, ...args),
+        debug: (message: string, ...args: unknown[]): void => {
+            log.debug(`[${prefix}] ${message}`, ...args);
+        },
         error: (message: string, error?: unknown, ...args: unknown[]): void => {
             if (error instanceof Error) {
                 log.error(
@@ -41,10 +42,12 @@ function createLogger(prefix: string): Logger {
                 log.error(`[${prefix}] ${message}`, error, ...args);
             }
         },
-        info: (message: string, ...args: unknown[]): void =>
-            log.info(`[${prefix}] ${message}`, ...args),
-        warn: (message: string, ...args: unknown[]): void =>
-            log.warn(`[${prefix}] ${message}`, ...args),
+        info: (message: string, ...args: unknown[]): void => {
+            log.info(`[${prefix}] ${message}`, ...args);
+        },
+        warn: (message: string, ...args: unknown[]): void => {
+            log.warn(`[${prefix}] ${message}`, ...args);
+        },
     };
 }
 

@@ -8,21 +8,22 @@
  *
  * @public
  */
-import { Database } from "node-sqlite3-wasm";
+import type { Database } from "node-sqlite3-wasm";
 
-import { type MonitorRow } from "../../../shared/types/database";
+import type { MonitorRow } from "../../../shared/types/database";
+import type { Monitor, Site } from "../../types";
+import type { DatabaseService } from "./DatabaseService";
+import type { DbValue } from "./utils/valueConverters";
+
 import { isDev } from "../../electronUtils";
-import { type Monitor, type Site } from "../../types";
 import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
-import { DatabaseService } from "./DatabaseService";
 import { generateSqlParameters, mapMonitorToRow } from "./utils/dynamicSchema";
 import {
     buildMonitorParameters,
     rowsToMonitors,
     rowToMonitorOrUndefined,
 } from "./utils/monitorMapper";
-import { DbValue } from "./utils/valueConverters";
 
 /**
  * Repository dependencies for managing monitor data persistence.
@@ -88,7 +89,7 @@ export class MonitorRepository {
      * const repo = new MonitorRepository({ databaseService });
      * ```
      */
-    constructor(dependencies: MonitorRepositoryDependencies) {
+    public constructor(dependencies: MonitorRepositoryDependencies) {
         this.databaseService = dependencies.databaseService;
     }
 

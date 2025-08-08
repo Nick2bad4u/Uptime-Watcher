@@ -21,7 +21,14 @@
  * @public
  */
 
-import { AxiosInstance, AxiosResponse } from "axios";
+import type { AxiosInstance, AxiosResponse } from "axios";
+
+import type { Site } from "../../types";
+import type {
+    IMonitorService,
+    MonitorCheckResult,
+    MonitorConfig,
+} from "./types";
 
 import {
     interpolateLogTemplate,
@@ -33,11 +40,9 @@ import {
     USER_AGENT,
 } from "../../constants";
 import { isDev } from "../../electronUtils";
-import { Site } from "../../types";
 import { logger } from "../../utils/logger";
 import { withOperationalHooks } from "../../utils/operationalHooks";
 import { DEFAULT_RETRY_ATTEMPTS } from "./constants";
-import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
 import { createErrorResult, handleCheckError } from "./utils/errorHandling";
 import { createHttpClient } from "./utils/httpClient";
 import { determineMonitorStatus } from "./utils/httpStatusUtils";
@@ -133,7 +138,7 @@ export class HttpMonitor implements IMonitorService {
      * @defaultValue timeout: DEFAULT_REQUEST_TIMEOUT, userAgent: USER_AGENT
      * @public
      */
-    constructor(config: MonitorConfig = {}) {
+    public constructor(config: MonitorConfig = {}) {
         this.config = {
             timeout: DEFAULT_REQUEST_TIMEOUT,
             userAgent: USER_AGENT,

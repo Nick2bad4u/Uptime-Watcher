@@ -32,8 +32,9 @@
 
 import { useEffect, useState } from "react";
 
+import type { MonitorType } from "../types";
+
 import logger from "../services/logger";
-import { type MonitorType } from "../types";
 import { getMonitorHelpTexts } from "../utils/monitorUiHelpers";
 
 /**
@@ -86,15 +87,17 @@ export function useDynamicHelpText(
                     setHelpTexts(texts);
                     setIsLoading(false);
                 }
-            } catch (error) {
+            } catch (caughtError) {
                 logger.warn(
                     "Failed to load help texts",
-                    error instanceof Error ? error : new Error(String(error))
+                    caughtError instanceof Error
+                        ? caughtError
+                        : new Error(String(caughtError))
                 );
                 if (!isCancelled) {
                     const errorMessage =
-                        error instanceof Error
-                            ? error.message
+                        caughtError instanceof Error
+                            ? caughtError.message
                             : "Help text unavailable";
                     setError(errorMessage);
                     setHelpTexts({

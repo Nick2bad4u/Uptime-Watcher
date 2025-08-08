@@ -3,7 +3,8 @@
  * Provides consistent data transformation between database rows and Settings objects.
  */
 
-import { type SettingsRow as DatabaseSettingsRow } from "../../../../shared/types/database";
+import type { SettingsRow as DatabaseSettingsRow } from "../../../../shared/types/database";
+
 import { LOG_TEMPLATES } from "../../../../shared/utils/logTemplates";
 import { safeStringify } from "../../../../shared/utils/stringConversion";
 import { isNonEmptyString } from "../../../../shared/validation/validatorUtils";
@@ -65,13 +66,13 @@ export function rowsToSettings(rows: DatabaseSettingsRow[]): SettingRow[] {
 export function rowToSetting(row: DatabaseSettingsRow): SettingRow {
     try {
         // Handle key (required field) with validator-based checking
-        const key = row.key;
+        const { key } = row;
         if (!isNonEmptyString(key)) {
             throw new Error(`[SettingsMapper] Invalid setting key: ${key}`);
         }
 
         // Handle value (required field)
-        const value = row.value;
+        const { value } = row;
 
         const setting: SettingRow = {
             key,

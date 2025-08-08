@@ -13,13 +13,15 @@
  *
  * @public
  */
-import { UptimeEvents } from "../events/eventTypes";
+import type { UptimeEvents } from "../events/eventTypes";
+import type { IMonitoringOperations } from "../managers/SiteManager";
+import type { Site } from "../types";
+
 import { TypedEventBus } from "../events/TypedEventBus";
 import { ConfigurationManager } from "../managers/ConfigurationManager";
 import { DatabaseManager } from "../managers/DatabaseManager";
 import { MonitorManager } from "../managers/MonitorManager";
-import { IMonitoringOperations, SiteManager } from "../managers/SiteManager";
-import { Site } from "../types";
+import { SiteManager } from "../managers/SiteManager";
 import { UptimeOrchestrator } from "../UptimeOrchestrator";
 import { logger } from "../utils/logger";
 import { DatabaseService } from "./database/DatabaseService";

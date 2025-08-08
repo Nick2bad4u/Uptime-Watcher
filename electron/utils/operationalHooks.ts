@@ -3,8 +3,9 @@
  * Provides consistent patterns for async operations with observability.
  */
 
-import { UptimeEvents } from "../events/eventTypes";
-import { TypedEventBus } from "../events/TypedEventBus";
+import type { UptimeEvents } from "../events/eventTypes";
+import type { TypedEventBus } from "../events/TypedEventBus";
+
 import { logger } from "./logger";
 
 /**

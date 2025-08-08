@@ -1,9 +1,44 @@
 /**
  * StatusBadge component for displaying status with optional icon and customizable styling.
- * Provides consistent status display throughout the application.
+ *
+ * @remarks
+ * This component provides a standardized way to display monitor and site status
+ * throughout the application. It combines visual status indicators with text labels
+ * to create an accessible and consistent user experience.
+ *
+ * The component is optimized for performance using React.memo and is designed to be
+ * reusable across different contexts while maintaining visual consistency. It supports
+ * various sizing options and can be customized with different formatting functions.
+ *
+ * Features:
+ * - Consistent status visualization across the application
+ * - Accessibility-compliant with proper ARIA attributes
+ * - Performance optimized with memoization
+ * - Customizable sizing and styling options
+ * - Optional custom formatting for different display contexts
+ *
+ * @param props - Component configuration properties
+ * @returns Themed status badge with icon and text
+ *
+ * @example
+ * ```tsx
+ * // Basic usage
+ * <StatusBadge label="Monitor Status" status="up" />
+ *
+ * // With custom formatting
+ * <StatusBadge
+ *   label="Site Status"
+ *   status="down"
+ *   formatter={(label, status) => `${label}: ${status.toUpperCase()}`}
+ *   size="lg"
+ * />
+ * ```
+ *
+ * @public
  */
 
-import { type MonitorStatus } from "@shared/types";
+import type { MonitorStatus } from "@shared/types";
+
 import React from "react";
 
 import { StatusIndicator, ThemedText } from "../../theme/components";

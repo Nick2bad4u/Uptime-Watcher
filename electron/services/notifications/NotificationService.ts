@@ -1,7 +1,8 @@
 import { Notification } from "electron";
 
+import type { Site } from "../../types";
+
 import { LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
-import { Site } from "../../types";
 import { logger } from "../../utils/logger";
 
 /**
@@ -81,7 +82,7 @@ export class NotificationService {
      * If no configuration is provided, both down and up alerts are enabled by default.
      * The configuration can be updated later using {@link NotificationService.updateConfig}.
      */
-    constructor(config?: NotificationConfig) {
+    public constructor(config?: NotificationConfig) {
         this.config = config ?? { showDownAlerts: true, showUpAlerts: true };
     }
 

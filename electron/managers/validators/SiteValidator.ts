@@ -21,9 +21,10 @@
  * ```
  */
 
+import type { Site } from "../../types";
+import type { ValidationResult } from "./interfaces";
+
 import { isNonEmptyString } from "../../../shared/validation/validatorUtils";
-import { Site } from "../../types";
-import { ValidationResult } from "./interfaces";
 import { MonitorValidator } from "./MonitorValidator";
 
 /**
@@ -60,7 +61,7 @@ export class SiteValidator {
      * @remarks
      * Instantiates a {@link MonitorValidator} for monitor validation delegation.
      */
-    constructor() {
+    public constructor() {
         this.monitorValidator = new MonitorValidator();
     }
 

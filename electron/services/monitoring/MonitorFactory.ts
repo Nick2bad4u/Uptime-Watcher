@@ -1,15 +1,16 @@
+import type { MonitorType } from "../../types";
+import type { IMonitorService, MonitorConfig } from "./types";
+
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "../../../shared/utils/logTemplates";
-import { MonitorType } from "../../types";
 import { logger } from "../../utils/logger";
 import {
     getMonitorServiceFactory,
     getRegisteredMonitorTypes,
     isValidMonitorType,
 } from "./MonitorTypeRegistry";
-import { IMonitorService, MonitorConfig } from "./types";
 
 /**
  * Result of monitor service retrieval with configuration status.
@@ -190,7 +191,7 @@ export function getMonitorWithResult(
 
     // Track configuration application status
     let configurationApplied = true;
-    let configurationError: string | undefined;
+    let configurationError: string | undefined = undefined;
 
     // Apply configuration if provided and either forcing update or instance is new
     if (

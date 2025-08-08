@@ -4,7 +4,7 @@
  */
 
 // Import shared Monitor type from shared validation schemas
-import { Monitor } from "@shared/types";
+import type { Monitor } from "@shared/types";
 
 /**
  * Type for monitor title suffix formatter functions
@@ -23,12 +23,12 @@ export type TitleSuffixFormatter = (monitor: Monitor) => string;
  */
 const titleSuffixFormatters: Record<string, TitleSuffixFormatter> = {
     http: (monitor: Monitor) => {
-        const url = monitor.url as string;
+        const { url } = monitor;
         return url ? ` (${url})` : "";
     },
     port: (monitor: Monitor) => {
-        const host = monitor.host as string;
-        const port = monitor.port as number;
+        const { host } = monitor;
+        const { port } = monitor;
         return host && port ? ` (${host}:${port})` : "";
     },
 };

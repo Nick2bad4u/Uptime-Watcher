@@ -7,11 +7,11 @@
  * @public
  */
 
-import { UptimeEvents } from "../../events/eventTypes";
-import { TypedEventBus } from "../../events/TypedEventBus";
-import { Site } from "../../types";
-import { StandardizedCache } from "../../utils/cache/StandardizedCache";
-import { DatabaseServiceFactory } from "../factories/DatabaseServiceFactory";
+import type { UptimeEvents } from "../../events/eventTypes";
+import type { TypedEventBus } from "../../events/TypedEventBus";
+import type { Site } from "../../types";
+import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
+import type { DatabaseServiceFactory } from "../factories/DatabaseServiceFactory";
 
 /**
  * Base interface for all database commands.
@@ -32,14 +32,14 @@ export interface IDatabaseCommand<TResult = void> {
      * @returns Promise resolving to the operation result.
      * @throws When command execution fails.
      */
-    execute(): Promise<TResult>;
+    execute: () => Promise<TResult>;
 
     /**
      * Gets a description of the command for logging and debugging.
      *
      * @returns Human-readable command description.
      */
-    getDescription(): string;
+    getDescription: () => string;
 
     /**
      * Rolls back the command operation if possible.
@@ -49,7 +49,7 @@ export interface IDatabaseCommand<TResult = void> {
      *
      * @returns Promise resolving when rollback is complete.
      */
-    rollback(): Promise<void>;
+    rollback: () => Promise<void>;
 
     /**
      * Validates the command before execution.
@@ -59,7 +59,7 @@ export interface IDatabaseCommand<TResult = void> {
      *
      * @returns Promise resolving to validation result.
      */
-    validate(): Promise<{ errors: string[]; isValid: boolean }>;
+    validate: () => Promise<{ errors: string[]; isValid: boolean }>;
 }
 
 /**
@@ -75,7 +75,7 @@ export abstract class DatabaseCommand<TResult = void>
     protected readonly eventEmitter: TypedEventBus<UptimeEvents>;
     protected readonly serviceFactory: DatabaseServiceFactory;
 
-    constructor(
+    public constructor(
         serviceFactory: DatabaseServiceFactory,
         eventEmitter: TypedEventBus<UptimeEvents>,
         cache: StandardizedCache<Site>
@@ -274,9 +274,8 @@ export class DownloadBackupCommand extends DatabaseCommand<{
      *
      * @returns Resolved promise since backup operations are read-only and do not require rollback.
      */
-    public rollback(): Promise<void> {
-        // Backup operations don't need rollback - return resolved promise
-        return Promise.resolve();
+    public async rollback(): Promise<void> {
+        // Backup operations don't need rollback
     }
 
     /**
@@ -287,9 +286,10 @@ export class DownloadBackupCommand extends DatabaseCommand<{
      *
      * @returns Resolved promise with validation result indicating success.
      */
-    public validate(): Promise<{ errors: string[]; isValid: boolean }> {
-        // No specific validation needed for backup - return resolved promise
-        return Promise.resolve({ errors: [], isValid: true });
+    public async validate(): Promise<{ errors: string[]; isValid: boolean }> {
+        // No specific validation needed for backup
+        await Promise.resolve();
+        return { errors: [], isValid: true };
     }
 }
 
@@ -323,9 +323,10 @@ export class ExportDataCommand extends DatabaseCommand<string> {
         // Export operations don't need rollback
     }
 
-    public validate(): Promise<{ errors: string[]; isValid: boolean }> {
+    public async validate(): Promise<{ errors: string[]; isValid: boolean }> {
         // No specific validation needed for export
-        return Promise.resolve({ errors: [], isValid: true });
+        await Promise.resolve();
+        return { errors: [], isValid: true };
     }
 }
 
@@ -341,7 +342,7 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
     private backupSites: Site[] = [];
     private readonly data: string;
 
-    constructor(
+    public constructor(
         serviceFactory: DatabaseServiceFactory,
         eventEmitter: TypedEventBus<UptimeEvents>,
         cache: StandardizedCache<Site>,
@@ -386,16 +387,16 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
         return "Import application data from JSON";
     }
 
-    public rollback(): Promise<void> {
+    public async rollback(): Promise<void> {
         // Restore cache from backup
         this.cache.clear();
         for (const site of this.backupSites) {
             this.cache.set(site.identifier, site);
         }
-        return Promise.resolve();
+        await Promise.resolve();
     }
 
-    public validate(): Promise<{ errors: string[]; isValid: boolean }> {
+    public async validate(): Promise<{ errors: string[]; isValid: boolean }> {
         const errors: string[] = [];
 
         if (!this.data || this.data.trim() === "") {
@@ -408,10 +409,12 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
             errors.push("Import data must be valid JSON");
         }
 
-        return Promise.resolve({
+        // Use microtask to satisfy async requirement
+        await Promise.resolve();
+        return {
             errors,
             isValid: errors.length === 0,
-        });
+        };
     }
 }
 
@@ -460,13 +463,13 @@ export class LoadSitesCommand extends DatabaseCommand<Site[]> {
      * cache and restoring the backup state. Returns a resolved promise to satisfy
      * the IDatabaseCommand interface contract.
      */
-    public rollback(): Promise<void> {
+    public async rollback(): Promise<void> {
         // Restore original cache state
         this.cache.clear();
         for (const [key, site] of this.originalCacheState) {
             this.cache.set(key, site);
         }
-        return Promise.resolve();
+        await Promise.resolve();
     }
 
     /**
@@ -478,8 +481,9 @@ export class LoadSitesCommand extends DatabaseCommand<Site[]> {
      * Site loading operations have minimal prerequisites, so validation always succeeds.
      * Returns a resolved promise to satisfy the IDatabaseCommand interface contract.
      */
-    public validate(): Promise<{ errors: string[]; isValid: boolean }> {
-        // No specific validation needed for loading - return resolved promise
-        return Promise.resolve({ errors: [], isValid: true });
+    public async validate(): Promise<{ errors: string[]; isValid: boolean }> {
+        // No specific validation needed for loading
+        await Promise.resolve();
+        return { errors: [], isValid: true };
     }
 }

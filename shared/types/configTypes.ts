@@ -9,9 +9,9 @@
  * @packageDocumentation
  */
 
-import { type MonitorConfig } from "./monitorConfig";
-import { type MonitorTypeConfig } from "./monitorTypes";
-import { type BaseValidationResult } from "./validation";
+import type { MonitorConfig } from "./monitorConfig";
+import type { MonitorTypeConfig } from "./monitorTypes";
+import type { BaseValidationResult } from "./validation";
 
 /**
  * Cache value types for different cache domains.

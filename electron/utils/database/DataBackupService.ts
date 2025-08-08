@@ -8,11 +8,13 @@
 import { app } from "electron";
 import path from "node:path";
 
+import type { UptimeEvents } from "../../events/eventTypes";
+import type { TypedEventBus } from "../../events/TypedEventBus";
+import type { Logger } from "./interfaces";
+
 import { DB_FILE_NAME } from "../../constants";
-import { UptimeEvents } from "../../events/eventTypes";
-import { TypedEventBus } from "../../events/TypedEventBus";
 import { createDatabaseBackup } from "../../services/database/utils/databaseBackup";
-import { Logger, SiteLoadingError } from "./interfaces";
+import { SiteLoadingError } from "./interfaces";
 
 /**
  * Configuration for data backup operations.
@@ -33,7 +35,7 @@ export class DataBackupService {
     private readonly eventEmitter: TypedEventBus<UptimeEvents>;
     private readonly logger: Logger;
 
-    constructor(config: DataBackupConfig) {
+    public constructor(config: DataBackupConfig) {
         this.logger = config.logger;
         this.eventEmitter = config.eventEmitter;
     }
@@ -46,7 +48,7 @@ export class DataBackupService {
      * @returns Promise resolving to backup buffer and filename
      * @throws SiteLoadingError when backup creation fails
      */
-    async downloadDatabaseBackup(): Promise<{
+    public async downloadDatabaseBackup(): Promise<{
         buffer: Buffer;
         fileName: string;
     }> {

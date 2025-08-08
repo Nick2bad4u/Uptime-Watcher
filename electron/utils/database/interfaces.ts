@@ -2,14 +2,14 @@
  * Interfaces for database utilities to support dependency injection and testing.
  */
 
-import { UptimeEvents } from "../../events/eventTypes";
-import { TypedEventBus } from "../../events/TypedEventBus";
-import { HistoryRepository } from "../../services/database/HistoryRepository";
-import { MonitorRepository } from "../../services/database/MonitorRepository";
-import { SettingsRepository } from "../../services/database/SettingsRepository";
-import { SiteRepository } from "../../services/database/SiteRepository";
-import { Site } from "../../types";
-import { type Logger } from "../interfaces";
+import type { UptimeEvents } from "../../events/eventTypes";
+import type { TypedEventBus } from "../../events/TypedEventBus";
+import type { HistoryRepository } from "../../services/database/HistoryRepository";
+import type { MonitorRepository } from "../../services/database/MonitorRepository";
+import type { SettingsRepository } from "../../services/database/SettingsRepository";
+import type { SiteRepository } from "../../services/database/SiteRepository";
+import type { Site } from "../../types";
+import type { Logger } from "../interfaces";
 
 // Re-export Logger for database services
 export type { Logger } from "../interfaces";
@@ -73,7 +73,7 @@ export class SiteLoadingError extends Error {
      * @param message - Descriptive error message
      * @param cause - Optional underlying error that caused this failure
      */
-    constructor(message: string, cause?: Error) {
+    public constructor(message: string, cause?: Error) {
         super(`Failed to load sites: ${message}`);
         this.name = "SiteLoadingError";
         if (cause?.stack) {
@@ -98,7 +98,7 @@ export class SiteNotFoundError extends Error {
      *
      * @param identifier - The site identifier that was not found
      */
-    constructor(identifier: string) {
+    public constructor(identifier: string) {
         super(`Site not found: ${identifier}`);
         this.name = "SiteNotFoundError";
     }

@@ -1,15 +1,16 @@
 import { BrowserWindow, ipcMain } from "electron";
 
+import type { Monitor, Site } from "../../types";
+import type { UptimeOrchestrator } from "../../UptimeOrchestrator";
+import type { AutoUpdaterService } from "../updater/AutoUpdaterService";
+
 import { LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
-import { type Monitor, Site } from "../../types";
-import { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import { logger } from "../../utils/logger";
 import {
     getAllMonitorTypeConfigs,
     getMonitorTypeConfig,
     validateMonitorData,
 } from "../monitoring/MonitorTypeRegistry";
-import { AutoUpdaterService } from "../updater/AutoUpdaterService";
 import {
     createValidationResponse,
     registerStandardizedIpcHandler,
@@ -220,7 +221,7 @@ export class IpcService {
      *
      * @public
      */
-    constructor(
+    public constructor(
         uptimeOrchestrator: UptimeOrchestrator,
         autoUpdaterService: AutoUpdaterService
     ) {
@@ -542,8 +543,7 @@ export class IpcService {
         registerStandardizedIpcHandler(
             "validate-monitor-data",
             (...args: unknown[]) => {
-                const monitorType = args[0] as string;
-                const data = args[1];
+                const [monitorType, data] = args as [string, unknown];
 
                 // Use the validation function from the registry
                 const result = validateMonitorData(monitorType.trim(), data);

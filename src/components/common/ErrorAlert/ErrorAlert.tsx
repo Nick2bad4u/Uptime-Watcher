@@ -21,9 +21,10 @@
  * @public
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import { useCallback } from "react";
 import { FiAlertCircle, FiAlertTriangle, FiInfo, FiX } from "react-icons/fi";
-import { type JSX } from "react/jsx-runtime";
 
 /**
  * Props for the ErrorAlert component.

@@ -10,16 +10,17 @@
  * @packageDocumentation
  */
 
-import { Monitor } from "../../../shared/types";
+import type { Monitor } from "../../../shared/types";
+import type { Site } from "../../types";
+import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
+import type { MonitorRepository } from "../database/MonitorRepository";
+import type { MonitorOperationRegistry } from "./MonitorOperationRegistry";
+
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "../../../shared/utils/logTemplates";
-import { Site } from "../../types";
-import { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import { monitorLogger as logger } from "../../utils/logger";
-import { MonitorRepository } from "../database/MonitorRepository";
-import { MonitorOperationRegistry } from "./MonitorOperationRegistry";
 
 /**
  * Unified monitor check result interface for status updates.
@@ -57,17 +58,36 @@ export interface StatusUpdateMonitorCheckResult {
  */
 export class MonitorStatusUpdateService {
     /**
+     * Repository for monitor operations
+     */
+    private readonly monitorRepository: MonitorRepository;
+
+    /**
+     * Registry for validating operations
+     */
+    private readonly operationRegistry: MonitorOperationRegistry;
+
+    /**
+     * Site cache for updating cached monitor states
+     */
+    private readonly sites: StandardizedCache<Site>;
+
+    /**
      * Creates a new MonitorStatusUpdateService.
      *
      * @param operationRegistry - Registry for validating operations
      * @param monitorRepository - Repository for monitor operations
      * @param sites - Site cache for updating cached monitor states
      */
-    constructor(
-        private readonly operationRegistry: MonitorOperationRegistry,
-        private readonly monitorRepository: MonitorRepository,
-        private readonly sites: StandardizedCache<Site>
-    ) {}
+    public constructor(
+        operationRegistry: MonitorOperationRegistry,
+        monitorRepository: MonitorRepository,
+        sites: StandardizedCache<Site>
+    ) {
+        this.operationRegistry = operationRegistry;
+        this.monitorRepository = monitorRepository;
+        this.sites = sites;
+    }
 
     /**
      * Update monitor status only if the operation is still valid.
@@ -75,7 +95,7 @@ export class MonitorStatusUpdateService {
      * @param result - Check result with operation correlation
      * @returns Promise resolving to true if update was applied, false if ignored
      */
-    async updateMonitorStatus(
+    public async updateMonitorStatus(
         result: StatusUpdateMonitorCheckResult
     ): Promise<boolean> {
         // Validate operation is still valid

@@ -65,7 +65,8 @@ export function addNumberField(
 ): void {
     if (value !== undefined) {
         updateFields.push(`${fieldName} = ?`);
-        updateValues.push(Number(value));
+        const convertedValue = safeNumberConvert(value);
+        updateValues.push(convertedValue ?? value);
     }
 }
 
@@ -96,7 +97,9 @@ export function addStringField(
 ): void {
     if (value !== undefined) {
         updateFields.push(`${fieldName} = ?`);
-        updateValues.push(String(value));
+        // Handle runtime type coercion for tests that pass non-string values
+        const stringValue = typeof value === "string" ? value : String(value);
+        updateValues.push(stringValue);
     }
 }
 
@@ -130,7 +133,7 @@ export function convertDateForDb(
         }
         return value.toISOString();
     }
-    return String(value);
+    return value;
 }
 
 /**

@@ -3,8 +3,11 @@
  * Manages global state, modals, notifications, and renders the main application layout.
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import { useCallback, useEffect, useRef, useState } from "react";
-import { type JSX } from "react/jsx-runtime";
+
+import type { StatusUpdate } from "./types";
 
 import { isDevelopment, isProduction } from "../shared/utils/environment";
 import { AddSiteModal } from "./components/AddSiteForm/AddSiteModal";
@@ -31,7 +34,6 @@ import {
     ThemeProvider,
 } from "./theme/components";
 import { useTheme } from "./theme/useTheme";
-import { type StatusUpdate } from "./types";
 import { setupCacheSync } from "./utils/cacheSync";
 
 // UI Message constants for consistency and future localization
@@ -117,14 +119,12 @@ const App = (): JSX.Element => {
     const cacheSyncCleanupRef = useRef<(() => void) | null>(null);
 
     // Create stable callbacks to avoid direct setState in useEffect
-    const clearLoadingOverlay = useCallback(
-        () => setShowLoadingOverlay(false),
-        []
-    );
-    const showLoadingOverlayCallback = useCallback(
-        () => setShowLoadingOverlay(true),
-        []
-    );
+    const clearLoadingOverlay = useCallback(() => {
+        setShowLoadingOverlay(false);
+    }, []);
+    const showLoadingOverlayCallback = useCallback(() => {
+        setShowLoadingOverlay(true);
+    }, []);
 
     /**
      * Only show loading overlay if loading takes more than 100ms

@@ -5,8 +5,9 @@
 
 import React, { useMemo } from "react";
 
+import type { Monitor, StatusHistory } from "../../../types";
+
 import { useMonitorTypes } from "../../../hooks/useMonitorTypes";
-import { Monitor, StatusHistory } from "../../../types";
 import { formatTitleSuffix } from "../../../utils/monitorTitleFormatters";
 import { HistoryChart } from "../../common/HistoryChart";
 

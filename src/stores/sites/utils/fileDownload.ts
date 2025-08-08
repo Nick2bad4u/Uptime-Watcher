@@ -67,7 +67,7 @@ export function generateBackupFileName(
     prefix = "backup",
     extension = "sqlite"
 ): string {
-    const timestamp = new Date().toISOString().split("T")[0];
+    const [timestamp] = new Date().toISOString().split("T");
     return `${prefix}-${timestamp}.${extension}`;
 }
 
@@ -156,7 +156,7 @@ function createAndTriggerDownload(
     mimeType: string
 ): void {
     const blob = new Blob([buffer], { type: mimeType });
-    let objectURL: string | undefined;
+    let objectURL: string | undefined = undefined;
 
     try {
         objectURL = URL.createObjectURL(blob);
@@ -166,7 +166,7 @@ function createAndTriggerDownload(
         anchor.style.display = "none";
 
         // Safe DOM manipulation
-        const body = document.body;
+        const { body } = document;
         // No need to check if body exists; it's always present in browser environments
         try {
             body.append(anchor);

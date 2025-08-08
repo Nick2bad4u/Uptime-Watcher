@@ -5,14 +5,15 @@
 
 import { ipcMain } from "electron";
 
+import type {
+    IpcParameterValidator,
+    IpcResponse,
+    IpcValidationResponse,
+} from "./types";
+
 import { isNonEmptyString } from "../../../shared/validation/validatorUtils";
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
-import {
-    type IpcParameterValidator,
-    type IpcResponse,
-    type IpcValidationResponse,
-} from "./types";
 
 /**
  * Standard parameter validation utilities for common IPC operations.

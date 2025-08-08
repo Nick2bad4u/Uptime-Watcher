@@ -16,13 +16,14 @@
  * @public
  */
 
+import type { Site } from "../../types";
+import type { ValidationResult } from "./interfaces";
+
 import {
     getRegisteredMonitorTypes,
     isValidMonitorType,
     validateMonitorData,
 } from "../../services/monitoring/MonitorTypeRegistry";
-import { Site } from "../../types";
-import { ValidationResult } from "./interfaces";
 
 /**
  * Validates monitor configuration according to business rules and shared Zod schemas.

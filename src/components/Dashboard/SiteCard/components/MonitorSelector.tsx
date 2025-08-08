@@ -5,8 +5,9 @@
 
 import React, { useCallback } from "react";
 
+import type { Monitor } from "../../../../types";
+
 import { ThemedSelect } from "../../../../theme/components";
-import { Monitor } from "../../../../types";
 
 /**
  * Props for the MonitorSelector component.

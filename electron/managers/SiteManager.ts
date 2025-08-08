@@ -43,25 +43,26 @@
  * @packageDocumentation
  */
 
+import type { UptimeEvents } from "../events/eventTypes";
+import type { TypedEventBus } from "../events/TypedEventBus";
+import type { DatabaseService } from "../services/database/DatabaseService";
+import type { HistoryRepository } from "../services/database/HistoryRepository";
+import type { MonitorRepository } from "../services/database/MonitorRepository";
+import type { SettingsRepository } from "../services/database/SettingsRepository";
+import type { SiteRepository } from "../services/database/SiteRepository";
+import type { Site } from "../types";
+import type { MonitoringConfig } from "../utils/database/interfaces";
+import type { ConfigurationManager } from "./ConfigurationManager";
+
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "../../shared/utils/logTemplates";
-import { UptimeEvents } from "../events/eventTypes";
-import { TypedEventBus } from "../events/TypedEventBus";
-import { DatabaseService } from "../services/database/DatabaseService";
-import { HistoryRepository } from "../services/database/HistoryRepository";
-import { MonitorRepository } from "../services/database/MonitorRepository";
-import { SettingsRepository } from "../services/database/SettingsRepository";
-import { SiteRepository } from "../services/database/SiteRepository";
-import { Site } from "../types";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
-import { MonitoringConfig } from "../utils/database/interfaces";
 import { LoggerAdapter } from "../utils/database/serviceFactory";
 import { SiteRepositoryService } from "../utils/database/SiteRepositoryService";
 import { SiteWriterService } from "../utils/database/SiteWriterService";
 import { logger } from "../utils/logger";
-import { ConfigurationManager } from "./ConfigurationManager";
 
 /**
  * @public
@@ -180,7 +181,7 @@ export class SiteManager {
      * const siteManager = new SiteManager({ ... });
      * ```
      */
-    constructor(dependencies: SiteManagerDependencies) {
+    public constructor(dependencies: SiteManagerDependencies) {
         this.configurationManager = dependencies.configurationManager;
         this.repositories = {
             databaseService: dependencies.databaseService,

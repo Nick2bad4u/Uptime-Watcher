@@ -8,12 +8,13 @@
  * @packageDocumentation
  */
 
+import type { MonitorOperationRegistry } from "./MonitorOperationRegistry";
+
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "../../../shared/utils/logTemplates";
 import { monitorLogger as logger } from "../../utils/logger";
-import { MonitorOperationRegistry } from "./MonitorOperationRegistry";
 
 /**
  * Manages timeouts for monitoring operations.
@@ -25,6 +26,11 @@ import { MonitorOperationRegistry } from "./MonitorOperationRegistry";
  * @public
  */
 export class OperationTimeoutManager {
+    /**
+     * Registry for managing operations
+     */
+    private readonly operationRegistry: MonitorOperationRegistry;
+
     private readonly timeouts = new Map<string, NodeJS.Timeout>();
 
     /**
@@ -32,14 +38,16 @@ export class OperationTimeoutManager {
      *
      * @param operationRegistry - Registry for managing operations
      */
-    constructor(private readonly operationRegistry: MonitorOperationRegistry) {}
+    public constructor(operationRegistry: MonitorOperationRegistry) {
+        this.operationRegistry = operationRegistry;
+    }
 
     /**
      * Clear a timeout for a specific operation.
      *
      * @param operationId - ID of operation to clear timeout for
      */
-    clearTimeout(operationId: string): void {
+    public clearTimeout(operationId: string): void {
         const timeout = this.timeouts.get(operationId);
         if (timeout) {
             clearTimeout(timeout);
@@ -54,7 +62,7 @@ export class OperationTimeoutManager {
      * @param operationId - ID of operation to timeout
      * @param timeoutMs - Timeout duration in milliseconds
      */
-    scheduleTimeout(operationId: string, timeoutMs: number): void {
+    public scheduleTimeout(operationId: string, timeoutMs: number): void {
         const timeout = setTimeout(() => {
             this.handleTimeout(operationId);
         }, timeoutMs);

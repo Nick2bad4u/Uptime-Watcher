@@ -86,7 +86,12 @@ export function setupCacheSync(): () => void {
  * This makes it easy to add new cache types without modifying the core logic.
  */
 const CACHE_CLEARERS = new Map<string, (identifier?: string) => void>([
-    ["monitorType", () => clearMonitorTypeCache()],
+    [
+        "monitorType",
+        () => {
+            clearMonitorTypeCache();
+        },
+    ],
     // Add new cache types here as they're implemented
     // ["siteData", (id) => clearSiteDataCache(id)],
     // ["monitorHistory", (id) => clearMonitorHistoryCache(id)],

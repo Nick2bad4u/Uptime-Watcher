@@ -34,11 +34,12 @@
 
 import * as ping from "ping";
 
+import type { MonitorCheckResult } from "../types";
+
 import { RETRY_BACKOFF } from "../../../constants";
 import { isDev } from "../../../electronUtils";
 import { logger } from "../../../utils/logger";
 import { withOperationalHooks } from "../../../utils/operationalHooks";
-import { MonitorCheckResult } from "../types";
 import { handlePingCheckError } from "./pingErrorHandling";
 
 /**

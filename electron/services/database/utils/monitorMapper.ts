@@ -7,20 +7,21 @@
  * All mapping functions are type-safe and log errors with full context.
  */
 
-import { type MonitorRow as DatabaseMonitorRow } from "../../../../shared/types/database";
+import type { MonitorRow as DatabaseMonitorRow } from "../../../../shared/types/database";
+import type { Monitor, Site } from "../../../types";
+import type { DbValue } from "./valueConverters";
+
 import { LOG_TEMPLATES } from "../../../../shared/utils/logTemplates";
 import {
     isValidIdentifierArray,
     safeInteger,
 } from "../../../../shared/validation/validatorUtils";
-import { type Monitor, type Site } from "../../../types";
 import { logger } from "../../../utils/logger";
 import {
     generateSqlParameters,
     mapMonitorToRow,
     mapRowToMonitor,
 } from "./dynamicSchema";
-import { DbValue } from "./valueConverters";
 
 /**
  * Represents a monitor row as stored in the database.
@@ -270,7 +271,7 @@ function createBaseMonitor(dynamicMonitor: Monitor): Site["monitors"][0] {
         activeOperations: dynamicMonitor.activeOperations ?? [],
         checkInterval: safeInteger(dynamicMonitor.checkInterval, 300_000, 5000),
         history: [], // History will be loaded separately
-        id: String(dynamicMonitor.id || "-1"),
+        id: dynamicMonitor.id || "-1",
         monitoring: dynamicMonitor.monitoring,
         responseTime: safeInteger(dynamicMonitor.responseTime, -1, -1),
         retryAttempts: safeInteger(dynamicMonitor.retryAttempts, 3, 0, 10),
@@ -303,7 +304,7 @@ function parseActiveOperations(row: DatabaseMonitorRow): string[] {
     }
 
     try {
-        const parsed: unknown = JSON.parse(String(row.active_operations));
+        const parsed: unknown = JSON.parse(row.active_operations);
 
         if (isValidIdentifierArray(parsed)) {
             return parsed;

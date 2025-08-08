@@ -5,9 +5,10 @@
 
 import React, { useMemo } from "react";
 
+import type { Site } from "../../../types";
+
 import { useSite } from "../../../hooks/site/useSite";
 import { ThemedBox } from "../../../theme/components";
-import { Site } from "../../../types";
 import { SiteCardFooter } from "./SiteCardFooter";
 import { SiteCardHeader } from "./SiteCardHeader";
 import { SiteCardHistory } from "./SiteCardHistory";
@@ -78,7 +79,7 @@ export const SiteCard: React.NamedExoticComponent<SiteCardProperties> =
         // Calculate if all monitors are running for the site monitoring button
         const allMonitorsRunning =
             latestSite.monitors.length > 0 &&
-            latestSite.monitors.every((monitor) => monitor.monitoring === true);
+            latestSite.monitors.every((mon) => mon.monitoring);
 
         // Memoize the complete props object to prevent unnecessary re-renders
         const siteCardHeaderProps = useMemo(

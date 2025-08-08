@@ -9,9 +9,10 @@
  * Note: className is a standard React prop and should not be renamed.
  */
 
-import { type MonitorStatus, type SiteStatus } from "@shared/types";
+import type { MonitorStatus, SiteStatus } from "@shared/types";
+import type { JSX } from "react/jsx-runtime";
+
 import React, { useCallback } from "react";
-import { type JSX } from "react/jsx-runtime";
 
 import { ARIA_LABEL, TRANSITION_ALL } from "../constants";
 import { getStatusIcon } from "../utils/status";
@@ -612,7 +613,9 @@ export const ThemedBox = ({
     const elementProperties = {
         className: classNames,
         onClick: onClick
-            ? (e: React.MouseEvent<HTMLElement>) => onClick(e)
+            ? (e: React.MouseEvent<HTMLElement>) => {
+                  onClick(e);
+              }
             : undefined,
         onMouseEnter,
         onMouseLeave,
@@ -686,7 +689,7 @@ export const ThemedButton = ({
             );
         }
         if (icon) {
-            let iconElement: React.ReactNode;
+            let iconElement: React.ReactNode = null;
             if (React.isValidElement(icon) && iconColor) {
                 iconElement = renderColoredIcon(icon, iconColor);
             } else if (iconColor) {
@@ -1206,7 +1209,10 @@ function getIconColorClass(color?: string): string | undefined {
  *
  * @internal
  */
-function renderColoredIcon(icon: React.ReactNode, color?: string) {
+function renderColoredIcon(
+    icon: React.ReactNode,
+    color?: string
+): React.ReactNode {
     if (!icon) {
         return icon;
     }

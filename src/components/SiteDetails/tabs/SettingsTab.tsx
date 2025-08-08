@@ -3,6 +3,8 @@
  * Provides interface for modifying site settings, intervals, and performing site management actions.
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import React, { useCallback, useEffect, useState } from "react";
 import { FiSave, FiTrash2 } from "react-icons/fi";
 import {
@@ -11,7 +13,8 @@ import {
     MdSettings,
     MdTimer,
 } from "react-icons/md";
-import { type JSX } from "react/jsx-runtime";
+
+import type { Monitor, Site } from "../../../types";
 
 import {
     CHECK_INTERVALS,
@@ -29,7 +32,6 @@ import {
     ThemedText,
 } from "../../../theme/components";
 import { useTheme } from "../../../theme/useTheme";
-import { Monitor, Site } from "../../../types";
 import { calculateMaxDuration } from "../../../utils/duration";
 import { withUtilityErrorHandling } from "../../../utils/errorHandling";
 import {

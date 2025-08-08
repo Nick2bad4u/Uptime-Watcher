@@ -5,7 +5,7 @@
  * Uses centralized error store for consistent error handling across the application.
  */
 
-import { type Monitor, type MonitorType, type Site } from "@shared/types";
+import type { Monitor, MonitorType, Site } from "@shared/types";
 
 import { isDevelopment } from "../../../shared/utils/environment";
 import { ERROR_CATALOG } from "../../../shared/utils/errorCatalog";
@@ -96,12 +96,15 @@ export const createSiteOperationsActions = (
                 await deps.syncSitesFromBackend();
             },
             {
-                clearError: () =>
-                    errorStore.clearStoreError("sites-operations"),
-                setError: (error) =>
-                    errorStore.setStoreError("sites-operations", error),
-                setLoading: (loading) =>
-                    errorStore.setOperationLoading("addMonitorToSite", loading),
+                clearError: () => {
+                    errorStore.clearStoreError("sites-operations");
+                },
+                setError: (error) => {
+                    errorStore.setStoreError("sites-operations", error);
+                },
+                setLoading: (loading) => {
+                    errorStore.setOperationLoading("addMonitorToSite", loading);
+                },
             }
         );
     },
@@ -140,12 +143,15 @@ export const createSiteOperationsActions = (
                 deps.addSite(newSite);
             },
             {
-                clearError: () =>
-                    errorStore.clearStoreError("sites-operations"),
-                setError: (error) =>
-                    errorStore.setStoreError("sites-operations", error),
-                setLoading: (loading) =>
-                    errorStore.setOperationLoading("createSite", loading),
+                clearError: () => {
+                    errorStore.clearStoreError("sites-operations");
+                },
+                setError: (error) => {
+                    errorStore.setStoreError("sites-operations", error);
+                },
+                setLoading: (loading) => {
+                    errorStore.setOperationLoading("createSite", loading);
+                },
             }
         );
     },
@@ -184,12 +190,15 @@ export const createSiteOperationsActions = (
                 deps.removeSite(identifier);
             },
             {
-                clearError: () =>
-                    errorStore.clearStoreError("sites-operations"),
-                setError: (error) =>
-                    errorStore.setStoreError("sites-operations", error),
-                setLoading: (loading) =>
-                    errorStore.setOperationLoading("deleteSite", loading),
+                clearError: () => {
+                    errorStore.clearStoreError("sites-operations");
+                },
+                setError: (error) => {
+                    errorStore.setStoreError("sites-operations", error);
+                },
+                setLoading: (loading) => {
+                    errorStore.setOperationLoading("deleteSite", loading);
+                },
             }
         );
     },
@@ -216,15 +225,18 @@ export const createSiteOperationsActions = (
                 });
             },
             {
-                clearError: () =>
-                    errorStore.clearStoreError("sites-operations"),
-                setError: (error) =>
-                    errorStore.setStoreError("sites-operations", error),
-                setLoading: (loading) =>
+                clearError: () => {
+                    errorStore.clearStoreError("sites-operations");
+                },
+                setError: (error) => {
+                    errorStore.setStoreError("sites-operations", error);
+                },
+                setLoading: (loading) => {
                     errorStore.setOperationLoading(
                         "downloadSQLiteBackup",
                         loading
-                    ),
+                    );
+                },
             }
         );
 
@@ -247,12 +259,15 @@ export const createSiteOperationsActions = (
                 };
             },
             {
-                clearError: () =>
-                    errorStore.clearStoreError("sites-operations"),
-                setError: (error) =>
-                    errorStore.setStoreError("sites-operations", error),
-                setLoading: (loading) =>
-                    errorStore.setOperationLoading("initializeSites", loading),
+                clearError: () => {
+                    errorStore.clearStoreError("sites-operations");
+                },
+                setError: (error) => {
+                    errorStore.setStoreError("sites-operations", error);
+                },
+                setLoading: (loading) => {
+                    errorStore.setOperationLoading("initializeSites", loading);
+                },
             }
         );
 
@@ -274,12 +289,15 @@ export const createSiteOperationsActions = (
                 await deps.syncSitesFromBackend();
             },
             {
-                clearError: () =>
-                    errorStore.clearStoreError("sites-operations"),
-                setError: (error) =>
-                    errorStore.setStoreError("sites-operations", error),
-                setLoading: (loading) =>
-                    errorStore.setOperationLoading("modifySite", loading),
+                clearError: () => {
+                    errorStore.clearStoreError("sites-operations");
+                },
+                setError: (error) => {
+                    errorStore.setStoreError("sites-operations", error);
+                },
+                setLoading: (loading) => {
+                    errorStore.setOperationLoading("modifySite", loading);
+                },
             }
         );
     },
@@ -330,15 +348,18 @@ export const createSiteOperationsActions = (
                 await deps.syncSitesFromBackend();
             },
             {
-                clearError: () =>
-                    errorStore.clearStoreError("sites-operations"),
-                setError: (error) =>
-                    errorStore.setStoreError("sites-operations", error),
-                setLoading: (loading) =>
+                clearError: () => {
+                    errorStore.clearStoreError("sites-operations");
+                },
+                setError: (error) => {
+                    errorStore.setStoreError("sites-operations", error);
+                },
+                setLoading: (loading) => {
                     errorStore.setOperationLoading(
                         "removeMonitorFromSite",
                         loading
-                    ),
+                    );
+                },
             }
         );
     },
@@ -380,15 +401,18 @@ export const createSiteOperationsActions = (
                 await deps.syncSitesFromBackend();
             },
             {
-                clearError: () =>
-                    errorStore.clearStoreError("sites-operations"),
-                setError: (error) =>
-                    errorStore.setStoreError("sites-operations", error),
-                setLoading: (loading) =>
+                clearError: () => {
+                    errorStore.clearStoreError("sites-operations");
+                },
+                setError: (error) => {
+                    errorStore.setStoreError("sites-operations", error);
+                },
+                setLoading: (loading) => {
                     errorStore.setOperationLoading(
                         "updateMonitorRetryAttempts",
                         loading
-                    ),
+                    );
+                },
             }
         );
     },
@@ -430,15 +454,18 @@ export const createSiteOperationsActions = (
                 await deps.syncSitesFromBackend();
             },
             {
-                clearError: () =>
-                    errorStore.clearStoreError("sites-operations"),
-                setError: (error) =>
-                    errorStore.setStoreError("sites-operations", error),
-                setLoading: (loading) =>
+                clearError: () => {
+                    errorStore.clearStoreError("sites-operations");
+                },
+                setError: (error) => {
+                    errorStore.setStoreError("sites-operations", error);
+                },
+                setLoading: (loading) => {
                     errorStore.setOperationLoading(
                         "updateMonitorTimeout",
                         loading
-                    ),
+                    );
+                },
             }
         );
     },
@@ -472,15 +499,18 @@ export const createSiteOperationsActions = (
                 await deps.syncSitesFromBackend();
             },
             {
-                clearError: () =>
-                    errorStore.clearStoreError("sites-operations"),
-                setError: (error) =>
-                    errorStore.setStoreError("sites-operations", error),
-                setLoading: (loading) =>
+                clearError: () => {
+                    errorStore.clearStoreError("sites-operations");
+                },
+                setError: (error) => {
+                    errorStore.setStoreError("sites-operations", error);
+                },
+                setLoading: (loading) => {
                     errorStore.setOperationLoading(
                         "updateSiteCheckInterval",
                         loading
-                    ),
+                    );
+                },
             }
         );
     },

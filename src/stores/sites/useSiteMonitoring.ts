@@ -48,12 +48,15 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
                 // Backend will emit 'monitor:status-changed', which will trigger incremental update
             },
             {
-                clearError: () =>
-                    errorStore.clearStoreError("sites-monitoring"),
-                setError: (error) =>
-                    errorStore.setStoreError("sites-monitoring", error),
-                setLoading: (loading) =>
-                    errorStore.setOperationLoading("checkSiteNow", loading),
+                clearError: () => {
+                    errorStore.clearStoreError("sites-monitoring");
+                },
+                setError: (error) => {
+                    errorStore.setStoreError("sites-monitoring", error);
+                },
+                setLoading: (loading) => {
+                    errorStore.setOperationLoading("checkSiteNow", loading);
+                },
             }
         );
     },
@@ -69,15 +72,18 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
                 // No need for manual sync - StatusUpdateHandler will update UI via events
             },
             {
-                clearError: () =>
-                    errorStore.clearStoreError("sites-monitoring"),
-                setError: (error) =>
-                    errorStore.setStoreError("sites-monitoring", error),
-                setLoading: (loading) =>
+                clearError: () => {
+                    errorStore.clearStoreError("sites-monitoring");
+                },
+                setError: (error) => {
+                    errorStore.setStoreError("sites-monitoring", error);
+                },
+                setLoading: (loading) => {
                     errorStore.setOperationLoading(
                         "startSiteMonitoring",
                         loading
-                    ),
+                    );
+                },
             }
         );
     },
@@ -97,15 +103,18 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
                 // No need for manual sync - StatusUpdateHandler will update UI via events
             },
             {
-                clearError: () =>
-                    errorStore.clearStoreError("sites-monitoring"),
-                setError: (error) =>
-                    errorStore.setStoreError("sites-monitoring", error),
-                setLoading: (loading) =>
+                clearError: () => {
+                    errorStore.clearStoreError("sites-monitoring");
+                },
+                setError: (error) => {
+                    errorStore.setStoreError("sites-monitoring", error);
+                },
+                setLoading: (loading) => {
                     errorStore.setOperationLoading(
                         "startSiteMonitorMonitoring",
                         loading
-                    ),
+                    );
+                },
             }
         );
     },
@@ -121,15 +130,18 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
                 // No need for manual sync - StatusUpdateHandler will update UI via events
             },
             {
-                clearError: () =>
-                    errorStore.clearStoreError("sites-monitoring"),
-                setError: (error) =>
-                    errorStore.setStoreError("sites-monitoring", error),
-                setLoading: (loading) =>
+                clearError: () => {
+                    errorStore.clearStoreError("sites-monitoring");
+                },
+                setError: (error) => {
+                    errorStore.setStoreError("sites-monitoring", error);
+                },
+                setLoading: (loading) => {
                     errorStore.setOperationLoading(
                         "stopSiteMonitoring",
                         loading
-                    ),
+                    );
+                },
             }
         );
     },
@@ -149,15 +161,18 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
                 // No need for manual sync - StatusUpdateHandler will update UI via events
             },
             {
-                clearError: () =>
-                    errorStore.clearStoreError("sites-monitoring"),
-                setError: (error) =>
-                    errorStore.setStoreError("sites-monitoring", error),
-                setLoading: (loading) =>
+                clearError: () => {
+                    errorStore.clearStoreError("sites-monitoring");
+                },
+                setError: (error) => {
+                    errorStore.setStoreError("sites-monitoring", error);
+                },
+                setLoading: (loading) => {
                     errorStore.setOperationLoading(
                         "stopSiteMonitorMonitoring",
                         loading
-                    ),
+                    );
+                },
             }
         );
     },

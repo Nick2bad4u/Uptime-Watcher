@@ -16,17 +16,15 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import type { ChartTimeRange } from "../../constants";
+import type { Monitor, Site } from "../../types";
+
 import { safeInteger } from "../../../shared/validation/validatorUtils";
-import {
-    ChartTimeRange,
-    DEFAULT_CHECK_INTERVAL,
-    RETRY_CONSTRAINTS,
-} from "../../constants";
+import { DEFAULT_CHECK_INTERVAL, RETRY_CONSTRAINTS } from "../../constants";
 import logger from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { useUIStore } from "../../stores/ui/useUiStore";
-import { Monitor, Site } from "../../types";
 import { withUtilityErrorHandling } from "../../utils/errorHandling";
 import { getDefaultMonitorId } from "../../utils/monitorUiHelpers";
 import { validateMonitorFieldClientSide } from "../../utils/monitorValidation";
@@ -193,9 +191,7 @@ export function useSiteDetails({
         setSelectedMonitorId,
     ]);
 
-    const isMonitoring = selectedMonitor
-        ? selectedMonitor.monitoring !== false
-        : false;
+    const isMonitoring = selectedMonitor ? selectedMonitor.monitoring : false;
 
     // Check interval state - track user edits separately from monitor defaults
     const [userEditedCheckInterval, setUserEditedCheckInterval] =

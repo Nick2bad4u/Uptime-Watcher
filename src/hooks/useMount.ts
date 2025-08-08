@@ -1,40 +1,66 @@
+/**
+ * React hook for mount and unmount lifecycle management with StrictMode compatibility.
+ *
+ * @remarks
+ * This hook provides a clean alternative to useEffect with an empty dependency array
+ * for component lifecycle management. It's specifically designed to handle React's
+ * StrictMode development behavior where effects can run multiple times.
+ *
+ * Key features:
+ * - Prevents duplicate execution in React StrictMode
+ * - Supports both synchronous and asynchronous mount callbacks
+ * - Provides automatic error handling with logging
+ * - Ensures cleanup functions run exactly once on unmount
+ * - Maintains callback reference stability to prevent stale closures
+ *
+ * The hook is particularly useful for:
+ * - Initializing data subscriptions
+ * - Setting up event listeners
+ * - Performing one-time setup operations
+ * - Managing component lifecycle in a predictable way
+ *
+ * @param mountCallback - Function to execute on component mount (can be async)
+ * @param unmountCallback - Optional cleanup function for component unmount
+ *
+ * @example
+ * ```tsx
+ * // Basic usage with sync operations
+ * useMount(
+ *   () => {
+ *     console.log('Component mounted');
+ *     setupEventListeners();
+ *   },
+ *   () => {
+ *     console.log('Component unmounting');
+ *     cleanupEventListeners();
+ *   }
+ * );
+ *
+ * // With async operations
+ * useMount(
+ *   async () => {
+ *     const data = await fetchInitialData();
+ *     updateState(data);
+ *   },
+ *   () => {
+ *     cancelPendingRequests();
+ *   }
+ * );
+ * ```
+ *
+ * @public
+ */
+
 import { useEffect, useRef } from "react";
 
 import logger from "../services/logger";
 import { ensureError } from "../utils/errorHandling";
 
-/**
- * A React hook that provides mount and unmount functionality similar to useEffect
- * with an empty dependency array, but with better StrictMode compatibility.
- *
- * This hook ensures that:
- * - The mount callback runs once on component mount
- * - The unmount callback (if provided) runs once on component unmount
- * - Handles React StrictMode properly by preventing duplicate execution
- *
- * @param mountCallback - Function to run on mount. Can be async.
- * @param unmountCallback - Optional function to run on unmount
- *
- * @example
- * ```tsx
- * useMount(
- *   async () => {
- *     // This runs once on mount
- *     await fetchData();
- *   },
- *   () => {
- *     // This runs once on unmount
- *     cleanup();
- *   }
- * );
- * ```
- */
 export function useMount(
     mountCallback: () => Promise<void> | void,
     unmountCallback?: () => void
 ): void {
     const hasMountedRef = useRef(false);
-    const cleanupRef = useRef<(() => void) | undefined>(undefined);
     const mountCallbackRef = useRef(mountCallback);
     const unmountCallbackRef = useRef(unmountCallback);
 
@@ -46,7 +72,10 @@ export function useMount(
     useEffect(() => {
         // Prevent duplicate mount in StrictMode
         if (hasMountedRef.current) {
-            return;
+            // Return empty cleanup function for consistency
+            return () => {
+                // No-op cleanup for duplicate mount prevention
+            };
         }
 
         hasMountedRef.current = true;
@@ -66,16 +95,12 @@ export function useMount(
 
         void executeMountCallback();
 
-        // Set up cleanup function
-        if (unmountCallbackRef.current) {
-            cleanupRef.current = unmountCallbackRef.current;
-        }
-
-        // Return cleanup function
-        // eslint-disable-next-line consistent-return -- Cleanup function is optional
+        // Always return cleanup function for consistent return pattern
         return () => {
-            // Call cleanup function on unmount
-            cleanupRef.current?.();
+            // Only call unmount callback if it exists
+            if (unmountCallbackRef.current) {
+                unmountCallbackRef.current();
+            }
         };
     }, []);
 }

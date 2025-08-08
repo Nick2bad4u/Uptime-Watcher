@@ -1,10 +1,11 @@
-import { Database } from "node-sqlite3-wasm";
+import type { Database } from "node-sqlite3-wasm";
 
-import { type SettingsRow as DatabaseSettingsRow } from "../../../shared/types/database";
+import type { SettingsRow as DatabaseSettingsRow } from "../../../shared/types/database";
+import type { DatabaseService } from "./DatabaseService";
+
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
-import { DatabaseService } from "./DatabaseService";
 import {
     rowsToSettings,
     rowToSettingValue,
@@ -68,7 +69,7 @@ export class SettingsRepository {
      * const repo = new SettingsRepository({ databaseService });
      * ```
      */
-    constructor(dependencies: SettingsRepositoryDependencies) {
+    public constructor(dependencies: SettingsRepositoryDependencies) {
         this.databaseService = dependencies.databaseService;
     }
 
@@ -131,7 +132,7 @@ export class SettingsRepository {
 
         try {
             for (const [key, value] of entries) {
-                stmt.run([key, String(value)]);
+                stmt.run([key, value]);
             }
 
             logger.info(

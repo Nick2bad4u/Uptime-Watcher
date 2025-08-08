@@ -3,8 +3,9 @@
  * Contains predefined light and dark theme configurations with complete styling properties.
  */
 
+import type { Theme } from "./types";
+
 import { FONT_FAMILY_MONO, FONT_FAMILY_SANS } from "../constants";
-import { Theme } from "./types";
 import { deepMergeTheme } from "./utils/themeMerging";
 
 /**

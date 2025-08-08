@@ -1,5 +1,6 @@
+import type { Site } from "../../types";
+
 import { isDev } from "../../electronUtils";
-import { Site } from "../../types";
 import { logger } from "../../utils/logger";
 import { MIN_CHECK_INTERVAL } from "./constants";
 

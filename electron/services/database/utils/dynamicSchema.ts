@@ -7,12 +7,13 @@
  * @public
  */
 
-import {
-    type Monitor,
-    type MonitorStatus,
-    type MonitorType,
+import type {
+    Monitor,
+    MonitorStatus,
+    MonitorType,
 } from "../../../../shared/types";
-import { type MonitorRow } from "../../../../shared/types/database";
+import type { MonitorRow } from "../../../../shared/types/database";
+
 import { safeGetRowProperty } from "../../../../shared/types/database";
 import { safeStringify } from "../../../../shared/utils/stringConversion";
 import { isValidIdentifierArray } from "../../../../shared/validation/validatorUtils";
@@ -409,8 +410,7 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
  * @internal
  */
 function convertEnabledField(monitor: Record<string, unknown>): number {
-    const monitoring = monitor["monitoring"];
-    const enabled = monitor["enabled"];
+    const { enabled, monitoring } = monitor;
     return monitoring === true || enabled === true ? 1 : 0;
 }
 

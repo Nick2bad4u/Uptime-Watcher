@@ -1,14 +1,40 @@
 /**
- * Application settings component
+ * Application settings component providing comprehensive configuration interface.
  *
- * Provides a comprehensive settings interface for configuring application
- * behavior, theme preferences, monitoring settings, and data management.
- * Includes data synchronization and SQLite backup functionality.
+ * @remarks
+ * This component serves as the primary settings interface for the entire application,
+ * offering both basic user preferences and advanced system configuration options.
+ * It integrates with multiple stores to provide a centralized configuration experience.
+ *
+ * The component handles both local preference updates and backend data synchronization,
+ * ensuring settings are properly persisted across application sessions. Error handling
+ * is integrated throughout to provide user feedback on any configuration issues.
+ *
+ * Key architectural features:
+ * - Uses Zustand stores for state management with persistence
+ * - Implements optimistic updates with error rollback
+ * - Provides data export/import capabilities for backup scenarios
+ * - Integrates with system theme preferences
+ *
+ * @param props - Component configuration properties
+ * @returns Fully configured settings interface component
+ *
+ * @example
+ * ```tsx
+ * // In a modal or dedicated settings view
+ * <Settings onClose={() => setSettingsOpen(false)} />
+ * ```
+ *
+ * @public
  */
+
+import type { JSX } from "react/jsx-runtime";
 
 import { safeInteger } from "@shared/validation/validatorUtils";
 import { useCallback, useState } from "react";
-import { type JSX } from "react/jsx-runtime";
+
+import type { AppSettings } from "../../stores/types";
+import type { ThemeName } from "../../theme/types";
 
 import { DEFAULT_HISTORY_LIMIT, HISTORY_LIMIT_OPTIONS } from "../../constants";
 import { useDelayedButtonLoading } from "../../hooks/useDelayedButtonLoading";
@@ -16,7 +42,6 @@ import logger from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSettingsStore } from "../../stores/settings/useSettingsStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
-import { type AppSettings } from "../../stores/types";
 import {
     StatusIndicator,
     ThemedBox,
@@ -25,7 +50,6 @@ import {
     ThemedSelect,
     ThemedText,
 } from "../../theme/components";
-import { ThemeName } from "../../theme/types";
 import { useTheme } from "../../theme/useTheme";
 import { ensureError } from "../../utils/errorHandling";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";

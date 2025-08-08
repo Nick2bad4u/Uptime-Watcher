@@ -9,11 +9,13 @@
  * @public
  */
 
-import axios, { AxiosInstance } from "axios";
+import type { AxiosInstance } from "axios";
+
+import axios from "axios";
 import * as http from "node:http";
 import * as https from "node:https";
 
-import { MonitorConfig } from "../types";
+import type { MonitorConfig } from "../types";
 
 /**
  * Creates a configured Axios instance optimized for HTTP monitoring.

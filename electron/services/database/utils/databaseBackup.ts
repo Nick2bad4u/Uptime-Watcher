@@ -1,3 +1,5 @@
+import type { promises as fsPromises } from "node:fs";
+
 import { LOG_TEMPLATES } from "../../../../shared/utils/logTemplates";
 import { BACKUP_DB_FILE_NAME } from "../../../constants";
 import { logger } from "../../../utils/logger";
@@ -90,7 +92,7 @@ export async function createDatabaseBackup(
 ): Promise<DatabaseBackupResult> {
     try {
         // Enhanced dynamic import error handling
-        let fs: typeof import("node:fs/promises");
+        let fs: typeof fsPromises | undefined = undefined;
         try {
             fs = await import(
                 /* webpackChunkName: "node-fs-promises" */ "node:fs/promises"

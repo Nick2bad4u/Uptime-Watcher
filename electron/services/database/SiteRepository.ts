@@ -1,9 +1,10 @@
-import { Database } from "node-sqlite3-wasm";
+import type { Database } from "node-sqlite3-wasm";
 
-import { type SiteRow as DatabaseSiteRow } from "../../../shared/types/database";
+import type { SiteRow as DatabaseSiteRow } from "../../../shared/types/database";
+import type { DatabaseService } from "./DatabaseService";
+
 import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
-import { DatabaseService } from "./DatabaseService";
 import { rowsToSites, rowToSite, type SiteRow } from "./utils/siteMapper";
 
 /**
@@ -72,7 +73,7 @@ export class SiteRepository {
      * const repo = new SiteRepository({ databaseService });
      * ```
      */
-    constructor(dependencies: SiteRepositoryDependencies) {
+    public constructor(dependencies: SiteRepositoryDependencies) {
         this.databaseService = dependencies.databaseService;
     }
 
@@ -401,7 +402,7 @@ export class SiteRepository {
         site: Pick<SiteRow, "identifier" | "monitoring" | "name">
     ): void {
         // Apply consistent data normalization
-        const identifier = site.identifier;
+        const { identifier } = site;
         const name = site.name ?? SITE_DEFAULTS.NAME;
         const monitoring = site.monitoring ?? SITE_DEFAULTS.MONITORING;
         const monitoringValue = monitoring ? 1 : 0;

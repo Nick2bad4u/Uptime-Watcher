@@ -6,7 +6,7 @@
  * This is the single source of truth for status calculations, used by both frontend and backend.
  */
 
-import { type SiteForStatus, type SiteStatus } from "@shared/types";
+import type { SiteForStatus, SiteStatus } from "@shared/types";
 
 /**
  * Calculates the overall monitoring state for a site based on its monitors.
@@ -29,15 +29,13 @@ import { type SiteForStatus, type SiteStatus } from "@shared/types";
 export function calculateSiteMonitoringStatus(
     site: SiteForStatus
 ): "partial" | "running" | "stopped" {
-    const monitors = site.monitors;
+    const { monitors } = site;
 
     if (monitors.length === 0) {
         return "stopped";
     }
 
-    const monitoringCount = monitors.filter(
-        (m) => m.monitoring === true
-    ).length;
+    const monitoringCount = monitors.filter((m) => m.monitoring).length;
 
     if (monitoringCount === 0) {
         return "stopped";
@@ -72,7 +70,7 @@ export function calculateSiteMonitoringStatus(
  * ```
  */
 export function calculateSiteStatus(site: SiteForStatus): SiteStatus {
-    const monitors = site.monitors;
+    const { monitors } = site;
 
     if (monitors.length === 0) {
         return "unknown";
@@ -150,9 +148,7 @@ export function getSiteDisplayStatus(site: SiteForStatus): SiteStatus {
 export function getSiteStatusDescription(site: SiteForStatus): string {
     const status = getSiteDisplayStatus(site);
     const monitorCount = site.monitors.length;
-    const runningCount = site.monitors.filter(
-        (m) => m.monitoring === true
-    ).length;
+    const runningCount = site.monitors.filter((m) => m.monitoring).length;
 
     switch (status) {
         case "down": {

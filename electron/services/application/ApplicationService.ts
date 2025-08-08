@@ -46,7 +46,7 @@ export class ApplicationService {
      * ```
      * @public
      */
-    constructor() {
+    public constructor() {
         logger.info(LOG_TEMPLATES.services.APPLICATION_INITIALIZING);
 
         // Get service container instance

@@ -1,20 +1,43 @@
 /**
  * Centralized utility functions for time and formatting.
- * Provides consistent time formatting throughout the application.
+ *
+ * @remarks
+ * Provides consistent time formatting throughout the application with support for
+ * various time scales: milliseconds for precise measurements, seconds/minutes/hours
+ * for human-readable durations, and relative timestamps for recent events.
+ *
+ * All functions handle edge cases gracefully and provide fallback values for
+ * invalid inputs. Time formatting is optimized for readability in monitoring contexts.
+ *
+ * @packageDocumentation
  */
 
-import { CHART_TIME_PERIODS } from "../constants";
+import type { CHART_TIME_PERIODS } from "../constants";
+
 import { UiDefaults } from "./fallbacks";
 
 /**
- * Type for time period keys
+ * Type for time period keys used in chart configurations.
  */
 export type TimePeriod = keyof typeof CHART_TIME_PERIODS;
 
 /**
- * Format duration in a human-readable format
+ * Formats duration in a human-readable format with appropriate time units.
+ *
+ * @remarks
+ * Automatically selects the most appropriate time units for readability.
+ * Shows hours and minutes for longer durations, minutes and seconds for
+ * medium durations, and seconds only for short durations.
+ *
  * @param ms - Duration in milliseconds
- * @returns Formatted duration string (e.g., "2h 15m", "45s")
+ * @returns Formatted duration string
+ *
+ * @example
+ * ```typescript
+ * formatDuration(7200000); // "2h 0m"
+ * formatDuration(135000);  // "2m 15s"
+ * formatDuration(45000);   // "45s"
+ * ```
  */
 export function formatDuration(ms: number): string {
     const seconds = Math.floor(ms / 1000);
@@ -31,19 +54,42 @@ export function formatDuration(ms: number): string {
 }
 
 /**
- * Format timestamp as a full date/time string
+ * Formats timestamp as a full localized date/time string.
+ *
+ * @remarks
+ * Uses the user's locale settings to format the timestamp according to
+ * their regional preferences. Suitable for displaying detailed timestamp
+ * information in logs or detailed views.
+ *
  * @param timestamp - Unix timestamp in milliseconds
- * @returns Formatted date/time string
+ * @returns Localized date/time string
+ *
+ * @example
+ * ```typescript
+ * formatFullTimestamp(1640995200000); // "12/31/2021, 4:00:00 PM" (US locale)
+ * ```
  */
 export function formatFullTimestamp(timestamp: number): string {
     return new Date(timestamp).toLocaleString();
 }
 
 /**
- * Format time duration for monitoring intervals (simple format).
- * Used for displaying check intervals in a concise format.
+ * Formats time duration for monitoring intervals in a concise format.
+ *
+ * @remarks
+ * Used for displaying check intervals in monitoring contexts where space is limited.
+ * Automatically selects the most appropriate unit (seconds, minutes, or hours) and
+ * rounds to whole numbers for simplicity.
+ *
  * @param milliseconds - Time duration in milliseconds
- * @returns Formatted time string (e.g., "30s", "5m", "1h")
+ * @returns Concise formatted time string
+ *
+ * @example
+ * ```typescript
+ * formatIntervalDuration(30000);   // "30s"
+ * formatIntervalDuration(300000);  // "5m"
+ * formatIntervalDuration(3600000); // "1h"
+ * ```
  */
 export function formatIntervalDuration(milliseconds: number): string {
     if (milliseconds < 60_000) {
@@ -56,11 +102,23 @@ export function formatIntervalDuration(milliseconds: number): string {
 }
 
 /**
- * Format timestamp in a human-readable relative format.
- * Shows how long ago the timestamp occurred.
+ * Formats timestamp in a human-readable relative format.
+ *
+ * @remarks
+ * Shows how long ago the timestamp occurred relative to the current time.
+ * Provides appropriate granularity based on the time difference: days for
+ * old events, hours and minutes for recent events, and "Just now" for
+ * very recent events.
  *
  * @param timestamp - Unix timestamp in milliseconds
- * @returns Formatted relative timestamp string (e.g., "2 minutes ago")
+ * @returns Relative time description
+ *
+ * @example
+ * ```typescript
+ * formatRelativeTimestamp(Date.now() - 120000); // "2 minutes ago"
+ * formatRelativeTimestamp(Date.now() - 86400000); // "1 day ago"
+ * formatRelativeTimestamp(Date.now() - 10000); // "Just now"
+ * ```
  */
 export function formatRelativeTimestamp(timestamp: number): string {
     const now = Date.now();
@@ -106,11 +164,23 @@ export function formatResponseDuration(milliseconds: number): string {
 }
 
 /**
- * Format response time in a human-readable format.
- * Automatically chooses between milliseconds and seconds based on magnitude.
+ * Formats response time in a human-readable format with automatic unit selection.
  *
- * @param time - Response time in milliseconds
- * @returns Formatted time string (e.g., "234ms" or "1.23s")
+ * @remarks
+ * Automatically chooses between milliseconds and seconds based on the magnitude
+ * of the response time. Provides a fallback message for undefined or null values.
+ * Optimized for displaying network response times in monitoring interfaces.
+ *
+ * @param time - Response time in milliseconds (optional)
+ * @returns Formatted time string or fallback message
+ *
+ * @example
+ * ```typescript
+ * formatResponseTime(234);    // "234ms"
+ * formatResponseTime(1230);   // "1.23s"
+ * formatResponseTime(0);      // "0ms"
+ * formatResponseTime(null);   // "N/A" (or configured fallback)
+ * ```
  */
 export function formatResponseTime(time?: number): string {
     if (!time && time !== 0) {

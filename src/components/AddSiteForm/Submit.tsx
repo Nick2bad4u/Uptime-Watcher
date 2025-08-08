@@ -9,20 +9,21 @@
  * @packageDocumentation
  */
 
-import { type Monitor, type MonitorType } from "@shared/types";
+import type { Monitor, MonitorType } from "@shared/types";
+
+import type { Logger } from "../../services/logger";
+import type {
+    AddSiteFormActions,
+    AddSiteFormState,
+} from "../SiteDetails/useAddSiteForm";
 
 import { DEFAULT_REQUEST_TIMEOUT, RETRY_CONSTRAINTS } from "../../constants";
-import { type Logger } from "../../services/logger";
 import { withUtilityErrorHandling } from "../../utils/errorHandling";
 import { truncateForLogging } from "../../utils/fallbacks";
 import {
     validateMonitorFieldClientSide,
     validateMonitorFormData,
 } from "../../utils/monitorValidation";
-import {
-    type AddSiteFormActions,
-    type AddSiteFormState,
-} from "../SiteDetails/useAddSiteForm";
 
 /**
  * Properties interface for form submission handling.

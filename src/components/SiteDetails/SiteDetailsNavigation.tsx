@@ -4,8 +4,11 @@
  * and navigating between different detail views.
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import React, { useCallback } from "react";
-import { type JSX } from "react/jsx-runtime";
+
+import type { Site } from "../../types";
 
 import logger from "../../services/logger";
 import {
@@ -14,7 +17,6 @@ import {
     ThemedSelect,
     ThemedText,
 } from "../../theme/components";
-import { Site } from "../../types";
 import { SiteMonitoringButton } from "../common/SiteMonitoringButton/SiteMonitoringButton";
 
 /**
@@ -102,7 +104,7 @@ export const SiteDetailsNavigation = ({
     // Site-level monitoring state calculation
     const allMonitorsRunning =
         currentSite.monitors.length > 0 &&
-        currentSite.monitors.every((monitor) => monitor.monitoring === true);
+        currentSite.monitors.every((monitor) => monitor.monitoring);
 
     // Find selected monitor to get its type for better labeling
     const selectedMonitor = currentSite.monitors.find(

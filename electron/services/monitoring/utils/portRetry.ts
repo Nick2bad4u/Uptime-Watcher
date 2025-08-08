@@ -13,11 +13,12 @@
  * @public
  */
 
+import type { MonitorCheckResult } from "../types";
+
 import { RETRY_BACKOFF } from "../../../constants";
 import { isDev } from "../../../electronUtils";
 import { logger } from "../../../utils/logger";
 import { withOperationalHooks } from "../../../utils/operationalHooks";
-import { MonitorCheckResult } from "../types";
 import { performSinglePortCheck } from "./portChecker";
 import { handlePortCheckError } from "./portErrorHandling";
 

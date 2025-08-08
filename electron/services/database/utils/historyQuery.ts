@@ -1,11 +1,12 @@
-import { Database } from "node-sqlite3-wasm";
+import type { Database } from "node-sqlite3-wasm";
 
-import { type HistoryRow as DatabaseHistoryRow } from "../../../../shared/types/database";
+import type { HistoryRow as DatabaseHistoryRow } from "../../../../shared/types/database";
+import type { StatusHistory } from "../../../types";
+
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "../../../../shared/utils/logTemplates";
-import { StatusHistory } from "../../../types";
 import { logger } from "../../../utils/logger";
 import { rowToHistoryEntry } from "./historyMapper";
 

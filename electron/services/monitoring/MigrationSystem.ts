@@ -120,16 +120,22 @@ export interface VersionInfo {
  * @public
  */
 class MigrationOrchestrator {
+    private readonly registry: MigrationRegistry;
+    private readonly versionManager: VersionManager;
+
     /**
      * Constructs a new {@link MigrationOrchestrator}.
      *
      * @param registry - The migration registry instance.
      * @param versionManager - The version manager instance.
      */
-    constructor(
-        private readonly registry: MigrationRegistry,
-        private readonly versionManager: VersionManager
-    ) {}
+    public constructor(
+        registry: MigrationRegistry,
+        versionManager: VersionManager
+    ) {
+        this.registry = registry;
+        this.versionManager = versionManager;
+    }
 
     /**
      * Migrates monitor configuration data from one version to another.
@@ -149,7 +155,7 @@ class MigrationOrchestrator {
      * const result = await orchestrator.migrateMonitorData("http", config, "1.0.0", "1.1.0");
      * ```
      */
-    async migrateMonitorData(
+    public async migrateMonitorData(
         monitorType: string,
         data: Record<string, unknown>,
         fromVersion: string,
@@ -248,7 +254,7 @@ class MigrationOrchestrator {
                 warnings,
             };
         } catch (error) {
-            const errorMessage = `Migration orchestration failed: ${error}`;
+            const errorMessage = `Migration orchestration failed: ${error instanceof Error ? error.message : String(error)}`;
             errors.push(errorMessage);
             logger.error(errorMessage, error);
 
@@ -285,7 +291,7 @@ class MigrationRegistry {
      * @param toVersion - The target version.
      * @returns True if migration is possible, false otherwise.
      */
-    canMigrate(
+    public canMigrate(
         monitorType: string,
         fromVersion: string,
         toVersion: string
@@ -314,7 +320,7 @@ class MigrationRegistry {
      * @returns Array of migration rules to apply in order.
      * @throws {@link Error} If no migration path exists, circular path detected, or path exceeds maximum steps.
      */
-    getMigrationPath(
+    public getMigrationPath(
         monitorType: string,
         fromVersion: string,
         toVersion: string
@@ -340,8 +346,9 @@ class MigrationRegistry {
             }
 
             // Find next migration rule
+            const currentVersionForSearch = currentVersion;
             const nextRule = rules.find(
-                (rule) => rule.fromVersion === currentVersion
+                (rule) => rule.fromVersion === currentVersionForSearch
             );
 
             if (!nextRule) {
@@ -382,7 +389,7 @@ class MigrationRegistry {
      * @param rule - The migration rule to register.
      * @throws Throws if migration rules cannot be created for the monitor type.
      */
-    registerMigration(monitorType: string, rule: MigrationRule): void {
+    public registerMigration(monitorType: string, rule: MigrationRule): void {
         if (!this.migrations.has(monitorType)) {
             this.migrations.set(monitorType, []);
         }
@@ -510,7 +517,7 @@ class VersionManager {
      *
      * @returns Map of monitor type to version info. Keys are monitor type strings, values are {@link VersionInfo} objects.
      */
-    getAllVersions(): Map<string, VersionInfo> {
+    public getAllVersions(): Map<string, VersionInfo> {
         return new Map(this.versions);
     }
 
@@ -520,7 +527,7 @@ class VersionManager {
      * @param monitorType - The monitor type.
      * @returns The version string, or undefined if not set for this monitor type.
      */
-    getVersion(monitorType: string): string | undefined {
+    public getVersion(monitorType: string): string | undefined {
         return this.versions.get(monitorType)?.version;
     }
 
@@ -531,7 +538,7 @@ class VersionManager {
      * @param version - The version string to check.
      * @returns True if the version is applied, false otherwise.
      */
-    isVersionApplied(monitorType: string, version: string): boolean {
+    public isVersionApplied(monitorType: string, version: string): boolean {
         const info = this.versions.get(monitorType);
         return info?.version === version && info.applied;
     }
@@ -544,7 +551,7 @@ class VersionManager {
      * @remarks
      * Updates the version info and timestamp for the given monitor type.
      */
-    setVersion(monitorType: string, version: string): void {
+    public setVersion(monitorType: string, version: string): void {
         this.versions.set(monitorType, {
             applied: true,
             timestamp: Date.now(),

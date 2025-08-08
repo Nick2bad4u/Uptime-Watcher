@@ -3,13 +3,14 @@
  * Handles complex site loading with related entities (monitors and history).
  */
 
+import type { Site } from "../../types";
+import type { DatabaseService } from "../database/DatabaseService";
+import type { HistoryRepository } from "../database/HistoryRepository";
+import type { MonitorRepository } from "../database/MonitorRepository";
+import type { SiteRepository } from "../database/SiteRepository";
+
 import { withErrorHandling } from "../../../shared/utils/errorHandling";
-import { Site } from "../../types";
 import { logger } from "../../utils/logger";
-import { DatabaseService } from "../database/DatabaseService";
-import { HistoryRepository } from "../database/HistoryRepository";
-import { MonitorRepository } from "../database/MonitorRepository";
-import { SiteRepository } from "../database/SiteRepository";
 
 /**
  * Defines the dependencies required by {@link SiteService} for site operations.
@@ -56,7 +57,7 @@ export class SiteService {
      *
      * @param dependencies - The {@link SiteServiceDependencies} required for service operations.
      */
-    constructor(dependencies: SiteServiceDependencies) {
+    public constructor(dependencies: SiteServiceDependencies) {
         this.databaseService = dependencies.databaseService;
         this.historyRepository = dependencies.historyRepository;
         this.monitorRepository = dependencies.monitorRepository;
@@ -106,7 +107,7 @@ export class SiteService {
                             );
                         } catch (error) {
                             throw new Error(
-                                `Failed to delete history for monitor ${monitor.id} in site ${identifier}: ${error}`
+                                `Failed to delete history for monitor ${monitor.id} in site ${identifier}: ${error instanceof Error ? error.message : String(error)}`
                             );
                         }
                     }
@@ -121,7 +122,7 @@ export class SiteService {
                         );
                     } catch (error) {
                         throw new Error(
-                            `Failed to delete monitors for site ${identifier}: ${error}`
+                            `Failed to delete monitors for site ${identifier}: ${error instanceof Error ? error.message : String(error)}`
                         );
                     }
                     logger.debug(
@@ -205,6 +206,7 @@ export class SiteService {
                 logger.debug(
                     `[SiteService] Found site ${identifier} with ${monitors.length} monitors`
                 );
+                // eslint-disable-next-line @typescript-eslint/consistent-return
                 return site;
             },
             {

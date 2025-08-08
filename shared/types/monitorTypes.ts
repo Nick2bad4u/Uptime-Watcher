@@ -6,6 +6,8 @@
  * ensuring consistency between frontend and backend implementations.
  */
 
+import type { MonitorFieldDefinition } from "@shared/types";
+
 /**
  * Shared representation of a monitor type configuration used by frontend and backend.
  *
@@ -20,7 +22,7 @@ export interface MonitorTypeConfig {
     /** Human-readable display name */
     displayName: string;
     /** Field definitions for dynamic form generation */
-    fields: Array<import("../types").MonitorFieldDefinition>;
+    fields: MonitorFieldDefinition[];
     /** Unique identifier for the monitor type */
     type: string;
     /** UI display configuration */

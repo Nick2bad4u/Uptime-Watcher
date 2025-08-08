@@ -1,5 +1,6 @@
+import type { Site } from "../../types";
+
 import { useErrorStore } from "../../stores/error/useErrorStore";
-import { Site } from "../../types";
 import { type SiteActionsResult, useSiteActions } from "./useSiteActions";
 import { type SiteMonitorResult, useSiteMonitor } from "./useSiteMonitor";
 import { type SiteStats, useSiteStats } from "./useSiteStats";

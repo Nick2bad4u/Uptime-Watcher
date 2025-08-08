@@ -5,9 +5,12 @@
  * in a visually appealing header with gradient background and accent styling.
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import { useCallback } from "react";
 import { MdExpandLess, MdExpandMore } from "react-icons/md";
-import { type JSX } from "react/jsx-runtime";
+
+import type { Monitor, Site } from "../../types";
 
 import { useThemeStyles } from "../../hooks/useThemeStyles";
 import { useUIStore } from "../../stores/ui/useUiStore";
@@ -17,7 +20,6 @@ import {
     ThemedBox,
     ThemedText,
 } from "../../theme/components";
-import { Monitor, Site } from "../../types";
 import {
     isValidUrl,
     safeGetHostname,
@@ -202,7 +204,7 @@ const MonitoringStatusDisplay = ({
     }
 
     const runningCount = monitors.filter(
-        (monitor) => monitor.monitoring === true
+        (monitor) => monitor.monitoring
     ).length;
     const totalCount = monitors.length;
 

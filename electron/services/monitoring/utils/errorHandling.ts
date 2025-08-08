@@ -8,11 +8,14 @@
  * @public
  */
 
-import axios, { AxiosError } from "axios";
+import type { AxiosError } from "axios";
+
+import axios from "axios";
+
+import type { MonitorCheckResult } from "../types";
 
 import { isDev } from "../../../electronUtils";
 import { logger } from "../../../utils/logger";
-import { MonitorCheckResult } from "../types";
 
 /**
  * Constructs a standardized error result for monitor checks.

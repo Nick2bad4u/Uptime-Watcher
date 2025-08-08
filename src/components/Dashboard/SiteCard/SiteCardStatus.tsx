@@ -3,7 +3,8 @@
  * Provides visual status indicator for site monitoring state.
  */
 
-import { type MonitorStatus } from "@shared/types";
+import type { MonitorStatus } from "@shared/types";
+
 import React from "react";
 
 import { StatusBadge } from "../../common/StatusBadge";
@@ -48,7 +49,7 @@ export const SiteCardStatus: React.NamedExoticComponent<SiteCardStatusProperties
         status,
     }: SiteCardStatusProperties) {
         // Ensure selectedMonitorId is a string to prevent runtime errors
-        const safeMonitorId = String(selectedMonitorId || "unknown");
+        const safeMonitorId = selectedMonitorId || "unknown";
 
         return (
             <StatusBadge

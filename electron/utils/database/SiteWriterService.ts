@@ -20,22 +20,19 @@
  * - Empty strings should NOT be treated as valid monitor IDs for database operations
  */
 
-import { Database } from "node-sqlite3-wasm";
+import type { Database } from "node-sqlite3-wasm";
 
-import { type MonitorRow } from "../../../shared/types/database";
-import { DatabaseService } from "../../services/database/DatabaseService";
-import { MonitorRepository } from "../../services/database/MonitorRepository";
-import { SiteRepository } from "../../services/database/SiteRepository";
+import type { MonitorRow } from "../../../shared/types/database";
+import type { DatabaseService } from "../../services/database/DatabaseService";
+import type { MonitorRepository } from "../../services/database/MonitorRepository";
+import type { SiteRepository } from "../../services/database/SiteRepository";
+import type { Monitor, Site } from "../../types";
+import type { StandardizedCache } from "../cache/StandardizedCache";
+import type { Logger, MonitoringConfig, SiteWritingConfig } from "./interfaces";
+
 import { rowsToMonitors } from "../../services/database/utils/monitorMapper";
-import { Monitor, Site } from "../../types";
-import { StandardizedCache } from "../cache/StandardizedCache";
 import { withDatabaseOperation } from "../operationalHooks";
-import {
-    Logger,
-    MonitoringConfig,
-    SiteNotFoundError,
-    SiteWritingConfig,
-} from "./interfaces";
+import { SiteNotFoundError } from "./interfaces";
 
 /**
  * Service for handling site writing operations.
@@ -61,7 +58,7 @@ export class SiteWriterService {
         site: SiteRepository;
     };
 
-    constructor(
+    public constructor(
         config: SiteWritingConfig & { databaseService: DatabaseService }
     ) {
         this.repositories = config.repositories;
@@ -112,7 +109,7 @@ export class SiteWriterService {
      * console.log(newSite.monitors[0].id); // Generated ID like 'mon_123'
      * ```
      */
-    async createSite(siteData: Site): Promise<Site> {
+    public async createSite(siteData: Site): Promise<Site> {
         return withDatabaseOperation(
             async () => {
                 this.logger.info(
@@ -192,7 +189,7 @@ export class SiteWriterService {
      * }
      * ```
      */
-    async deleteSite(
+    public async deleteSite(
         sitesCache: StandardizedCache<Site>,
         identifier: string
     ): Promise<boolean> {
@@ -283,7 +280,7 @@ export class SiteWriterService {
      * Handle monitoring state changes when monitor intervals are modified.
      * Side effect operation separated from data updates.
      */
-    async handleMonitorIntervalChanges(
+    public async handleMonitorIntervalChanges(
         identifier: string,
         originalSite: Site,
         newMonitors: Site["monitors"],
@@ -378,7 +375,7 @@ export class SiteWriterService {
      * });
      * ```
      */
-    async updateSite(
+    public async updateSite(
         sitesCache: StandardizedCache<Site>,
         identifier: string,
         updates: Partial<Site>

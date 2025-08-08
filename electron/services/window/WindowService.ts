@@ -83,7 +83,7 @@ export class WindowService {
      * Initializes the service with proper defaults and prepares for window creation.
      * Windows are not created automatically - call createMainWindow() to create the main window.
      */
-    constructor() {
+    public constructor() {
         if (isDev()) {
             logger.debug(
                 "[WindowService] Created WindowService in development mode"
@@ -417,10 +417,9 @@ export class WindowService {
             try {
                 // Create AbortController for fetch timeout
                 const controller = new AbortController();
-                const timeoutId = setTimeout(
-                    () => controller.abort(),
-                    FETCH_TIMEOUT
-                );
+                const timeoutId = setTimeout(() => {
+                    controller.abort();
+                }, FETCH_TIMEOUT);
 
                 const response = await fetch(SERVER_URL, {
                     signal: controller.signal,

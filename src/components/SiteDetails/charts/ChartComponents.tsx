@@ -11,20 +11,18 @@
  * - Each component is typed for its specific chart type (line, doughnut, bar)
  */
 
-import { memo, type MemoExoticComponent } from "react";
-import { type JSX } from "react/jsx-runtime";
+import type { JSX } from "react/jsx-runtime";
 
-import {
+import { memo, type MemoExoticComponent } from "react";
+
+import type {
     ResponseTimeChartData,
     StatusBarChartData,
     UptimeChartData,
 } from "../../../services/chartConfig";
-import {
-    Bar,
-    ChartOptions,
-    Doughnut,
-    Line,
-} from "../../../services/chartSetup";
+import type { ChartOptions } from "../../../services/chartSetup";
+
+import { Bar, Doughnut, Line } from "../../../services/chartSetup";
 
 /**
  * Response time line chart component with memoization for performance optimization.

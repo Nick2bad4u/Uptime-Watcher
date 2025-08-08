@@ -5,7 +5,7 @@
  * when no sites have been added. Applies theme-aware styling with dividers.
  */
 
-import { type JSX } from "react/jsx-runtime";
+import type { JSX } from "react/jsx-runtime";
 
 import { useSitesStore } from "../../../stores/sites/useSitesStore";
 import { useTheme } from "../../../theme/useTheme";

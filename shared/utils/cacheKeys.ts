@@ -301,7 +301,7 @@ export function isStandardizedCacheKey(
         return false;
     }
 
-    const prefix = parts[0];
+    const [prefix] = parts;
     if (!prefix) {
         return false;
     }
@@ -332,8 +332,7 @@ export function parseCacheKey(key: StandardizedCacheKey): {
     const parts = key.split(KEY_SEPARATOR);
 
     if (parts.length === 2) {
-        const prefix = parts[0];
-        const identifier = parts[1];
+        const [prefix, identifier] = parts;
 
         if (!prefix || !identifier) {
             throw new Error(`Invalid cache key format: ${key}`);
@@ -345,9 +344,7 @@ export function parseCacheKey(key: StandardizedCacheKey): {
         };
     }
 
-    const prefix = parts[0];
-    const operation = parts[1];
-    const identifier = parts[2];
+    const [prefix, operation, identifier] = parts;
 
     if (!prefix || !operation || !identifier) {
         throw new Error(`Invalid cache key format: ${key}`);

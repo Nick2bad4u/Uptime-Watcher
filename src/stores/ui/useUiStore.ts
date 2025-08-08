@@ -29,14 +29,16 @@
  * @public
  */
 
-import { type Site } from "@shared/types";
+import type { Site } from "@shared/types";
+
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
+import type { ChartTimeRange } from "../types";
+import type { UIStore } from "./types";
+
 import logger from "../../services/logger";
-import { type ChartTimeRange } from "../types";
 import { logStoreAction } from "../utils";
-import { type UIStore } from "./types";
 
 /**
  * Interface for the UI store with persistence capabilities.

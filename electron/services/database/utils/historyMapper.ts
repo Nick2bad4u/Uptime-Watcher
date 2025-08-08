@@ -9,8 +9,9 @@
  * @public
  */
 
-import { type StatusHistory } from "../../../../shared/types";
-import { type HistoryRow as DatabaseHistoryRow } from "../../../../shared/types/database";
+import type { StatusHistory } from "../../../../shared/types";
+import type { HistoryRow as DatabaseHistoryRow } from "../../../../shared/types/database";
+
 import { LOG_TEMPLATES } from "../../../../shared/utils/logTemplates";
 import { logger } from "../../../utils/logger";
 
@@ -93,7 +94,7 @@ export function isValidHistoryRow(row: DatabaseHistoryRow): boolean {
         row.timestamp !== undefined &&
         typeof row.monitorId === "string" &&
         (row.status === "up" || row.status === "down") &&
-        !Number.isNaN(Number(row.timestamp))
+        !Number.isNaN(row.timestamp)
     );
 }
 

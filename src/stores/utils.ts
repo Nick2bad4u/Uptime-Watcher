@@ -9,9 +9,10 @@
  * @packageDocumentation
  */
 
+import type { BaseStore } from "./types";
+
 import { isDevelopment } from "../../shared/utils/environment";
 import logger from "../services/logger";
-import { BaseStore } from "./types";
 
 /**
  * Creates a base store slice with common error handling functionality.
@@ -40,12 +41,17 @@ export const createBaseStore = <T extends BaseStore>(
     T,
     "clearError" | "isLoading" | "lastError" | "setError" | "setLoading"
 > => ({
-    clearError: () => set({ lastError: undefined } as Partial<T>),
+    clearError: () => {
+        set({ lastError: undefined } as Partial<T>);
+    },
     isLoading: false,
     lastError: undefined,
-    setError: (error: string | undefined) =>
-        set({ lastError: error } as Partial<T>),
-    setLoading: (loading: boolean) => set({ isLoading: loading } as Partial<T>),
+    setError: (error: string | undefined) => {
+        set({ lastError: error } as Partial<T>);
+    },
+    setLoading: (loading: boolean) => {
+        set({ isLoading: loading } as Partial<T>);
+    },
 });
 
 // Re-export shared error handling utility for frontend stores
@@ -78,7 +84,10 @@ export { withErrorHandling } from "@shared/utils/errorHandling";
 export const createPersistConfig = <T>(
     name: string,
     partialize?: (state: T) => Partial<T>
-) => ({
+): {
+    name: string;
+    partialize: ((state: T) => Partial<T>) | undefined;
+} => ({
     name: `uptime-watcher-${name}`,
     partialize: partialize as ((state: T) => Partial<T>) | undefined,
 });

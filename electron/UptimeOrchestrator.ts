@@ -72,16 +72,17 @@
  * ```
  */
 
-import { type UptimeEvents } from "./events/eventTypes";
+import type { UptimeEvents } from "./events/eventTypes";
+import type { DatabaseManager } from "./managers/DatabaseManager";
+import type { MonitorManager } from "./managers/MonitorManager";
+import type { SiteManager } from "./managers/SiteManager";
+import type { Monitor, Site, StatusUpdate } from "./types";
+
 import {
     createErrorHandlingMiddleware,
     createLoggingMiddleware,
 } from "./events/middleware";
 import { TypedEventBus } from "./events/TypedEventBus";
-import { DatabaseManager } from "./managers/DatabaseManager";
-import { MonitorManager } from "./managers/MonitorManager";
-import { SiteManager } from "./managers/SiteManager";
-import { Monitor, Site, StatusUpdate } from "./types";
 import { logger } from "./utils/logger";
 
 /**
@@ -221,7 +222,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * await orchestrator.initialize();
      * ```
      */
-    constructor(dependencies?: UptimeOrchestratorDependencies) {
+    public constructor(dependencies?: UptimeOrchestratorDependencies) {
         super("UptimeOrchestrator");
 
         this.setupMiddleware();
@@ -252,7 +253,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @throws When site cleanup fails after monitoring setup failure
      */
     public async addSite(siteData: Site): Promise<Site> {
-        let site: Site | undefined;
+        let site: Site | undefined = undefined;
 
         try {
             // Step 1: Add the site

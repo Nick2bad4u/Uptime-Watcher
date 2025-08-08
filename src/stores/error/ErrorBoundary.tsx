@@ -1,14 +1,45 @@
 /**
- * Error boundary component for store-related errors.
+ * Error boundary component for graceful error handling in React component trees.
  *
  * @remarks
- * Provides fallback UI when store operations fail. Catches errors in child components and displays a fallback component or UI. Used to prevent the entire app from crashing due to store or rendering errors.
+ * This component implements React's error boundary pattern to catch JavaScript errors
+ * anywhere in the child component tree, log those errors, and display a fallback UI
+ * instead of the component tree that crashed. It's specifically designed for store-related
+ * and critical UI error scenarios.
+ *
+ * Key features:
+ * - Automatic error logging with contextual information
+ * - Customizable fallback UI for different error scenarios
+ * - Retry mechanism that remounts failed components
+ * - Integration with application logging infrastructure
+ * - TypeScript support with proper error type handling
+ *
+ * The error boundary follows React's best practices and provides a user-friendly way
+ * to handle unexpected errors without crashing the entire application. It's particularly
+ * useful around store-connected components where state errors might occur.
+ *
+ * @example
+ * ```tsx
+ * // Basic usage with default fallback
+ * <ErrorBoundary>
+ *   <StoreConnectedComponent />
+ * </ErrorBoundary>
+ *
+ * // With custom fallback and error handler
+ * <ErrorBoundary
+ *   fallback={CustomErrorFallback}
+ *   onError={(error, errorInfo) => reportToErrorService(error, errorInfo)}
+ * >
+ *   <CriticalComponent />
+ * </ErrorBoundary>
+ * ```
  *
  * @public
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import React from "react";
-import { type JSX } from "react/jsx-runtime";
 
 import { DefaultErrorFallback } from "../../components/error/DefaultErrorFallback";
 import logger from "../../services/logger";
@@ -76,7 +107,7 @@ export class ErrorBoundary extends React.Component<
     ErrorBoundaryState
 > {
     // eslint-disable-next-line react/sort-comp -- Constructor needs to be before lifecycle methods
-    constructor(properties: ErrorBoundaryProperties) {
+    public constructor(properties: ErrorBoundaryProperties) {
         super(properties);
         this.state = {
             hasError: false,
@@ -84,7 +115,7 @@ export class ErrorBoundary extends React.Component<
         };
     }
 
-    static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    public static getDerivedStateFromError(error: Error): ErrorBoundaryState {
         return {
             error,
             hasError: true,
@@ -92,7 +123,10 @@ export class ErrorBoundary extends React.Component<
         };
     }
 
-    override componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
+    public override componentDidCatch(
+        error: Error,
+        errorInfo: React.ErrorInfo
+    ): void {
         logger.error("Store Error Boundary caught an error", error);
 
         // eslint-disable-next-line react/no-set-state -- Required for error boundary functionality
@@ -105,7 +139,7 @@ export class ErrorBoundary extends React.Component<
         onError?.(error, errorInfo);
     }
 
-    handleRetry = (): void => {
+    public handleRetry = (): void => {
         // eslint-disable-next-line react/no-set-state -- Required for error recovery functionality
         this.setState((prevState) => ({
             error: undefined,
@@ -114,7 +148,7 @@ export class ErrorBoundary extends React.Component<
         }));
     };
 
-    override render(): JSX.Element {
+    public override render(): JSX.Element {
         const { error, hasError, retryCount } = this.state;
         const { children, fallback } = this.props;
 

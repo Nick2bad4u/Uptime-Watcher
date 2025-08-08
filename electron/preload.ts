@@ -10,15 +10,15 @@
 
 import { contextBridge, ipcRenderer } from "electron";
 
-import {
-    type CacheInvalidatedEventData,
-    type MonitorDownEventData,
-    type MonitoringControlEventData,
-    type MonitorUpEventData,
-    type TestEventData,
-    type UpdateStatusEventData,
+import type {
+    CacheInvalidatedEventData,
+    MonitorDownEventData,
+    MonitoringControlEventData,
+    MonitorUpEventData,
+    TestEventData,
+    UpdateStatusEventData,
 } from "../shared/types/events";
-import { type Site } from "./types";
+import type { Monitor, Site } from "./types";
 
 /**
  * Site management API methods for CRUD operations.
@@ -437,7 +437,9 @@ const systemAPI = {
      *
      * Note: Uses ipcRenderer.send instead of invoke because no response is needed from the main process.
      */
-    quitAndInstall: () => ipcRenderer.send("quit-and-install"),
+    quitAndInstall: () => {
+        ipcRenderer.send("quit-and-install");
+    },
 };
 
 /**
@@ -519,10 +521,8 @@ const monitorTypesAPI = {
      * @param monitor - Monitor data
      * @returns Promise resolving to formatted title suffix
      */
-    formatMonitorTitleSuffix: (
-        type: string,
-        monitor: import("../shared/types").Monitor
-    ) => ipcRenderer.invoke("format-monitor-title-suffix", type, monitor),
+    formatMonitorTitleSuffix: (type: string, monitor: Monitor) =>
+        ipcRenderer.invoke("format-monitor-title-suffix", type, monitor),
 
     /**
      * Get all available monitor types from backend registry.

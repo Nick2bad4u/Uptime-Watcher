@@ -4,6 +4,8 @@
  * and site-level actions.
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import { useCallback, useMemo } from "react";
 import { FiPlay, FiSettings, FiSquare, FiTrash2 } from "react-icons/fi";
 import {
@@ -12,7 +14,8 @@ import {
     MdOutlineFactCheck,
     MdSpeed,
 } from "react-icons/md";
-import { type JSX } from "react/jsx-runtime";
+
+import type { Monitor, Site } from "../../../types";
 
 import {
     StatusIndicator,
@@ -24,7 +27,6 @@ import {
     ThemedText,
 } from "../../../theme/components";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
-import { Monitor, Site } from "../../../types";
 import { getSiteDisplayStatus } from "../../../utils/siteStatus";
 import { formatDuration, formatResponseTime } from "../../../utils/time";
 
@@ -83,9 +85,9 @@ export const SiteOverviewTab = ({
     const siteDisplayStatus = getSiteDisplayStatus(site);
     const allMonitorsRunning =
         site.monitors.length > 0 &&
-        site.monitors.every((monitor) => monitor.monitoring === true);
+        site.monitors.every((monitor) => monitor.monitoring);
     const runningMonitors = site.monitors.filter(
-        (monitor) => monitor.monitoring === true
+        (monitor) => monitor.monitoring
     );
 
     /**

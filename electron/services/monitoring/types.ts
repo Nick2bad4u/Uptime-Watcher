@@ -39,7 +39,7 @@
  *
  * @see {@link Site} in shared/types for complete interface definition
  */
-import { type Site } from "../../types";
+import type { Site } from "../../types";
 
 /**
  * Interface for monitor services that perform health checks.
@@ -64,7 +64,7 @@ export interface IMonitorService {
      * Failed checks should return a result with `status: "down"` rather than throwing,
      * unless the monitor configuration itself is invalid.
      */
-    check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult>;
+    check: (monitor: Site["monitors"][0]) => Promise<MonitorCheckResult>;
 
     /**
      * Get the type of monitor this service handles.
@@ -75,7 +75,7 @@ export interface IMonitorService {
      * Used by the monitor factory to route checks to the appropriate service.
      * Must match one of the values in the monitor's `type` field.
      */
-    getType(): Site["monitors"][0]["type"];
+    getType: () => Site["monitors"][0]["type"];
 
     /**
      * Update the configuration for this monitor service.
@@ -86,7 +86,7 @@ export interface IMonitorService {
      * Allows runtime configuration updates without recreating the service instance.
      * Only the provided configuration properties will be updated.
      */
-    updateConfig(config: Partial<MonitorConfig>): void;
+    updateConfig: (config: Partial<MonitorConfig>) => void;
 }
 
 /**

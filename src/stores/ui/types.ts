@@ -8,9 +8,9 @@
  * All state mutations must be performed via store actions.
  */
 
-import { type Site } from "@shared/types";
+import type { Site } from "@shared/types";
 
-import { type ChartTimeRange } from "../types";
+import type { ChartTimeRange } from "../types";
 
 /**
  * Interface for the UI store.

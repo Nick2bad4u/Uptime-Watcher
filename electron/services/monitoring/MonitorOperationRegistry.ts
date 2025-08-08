@@ -76,7 +76,7 @@ export class MonitorOperationRegistry {
      *
      * @param monitorId - ID of monitor to cancel operations for
      */
-    cancelOperations(monitorId: string): void {
+    public cancelOperations(monitorId: string): void {
         let cancelledCount = 0;
         for (const [, operation] of this.activeOperations) {
             if (operation.monitorId === monitorId) {
@@ -100,7 +100,7 @@ export class MonitorOperationRegistry {
      *
      * @param operationId - ID of operation to complete
      */
-    completeOperation(operationId: string): void {
+    public completeOperation(operationId: string): void {
         const operation = this.activeOperations.get(operationId);
         if (operation) {
             this.activeOperations.delete(operationId);
@@ -121,7 +121,7 @@ export class MonitorOperationRegistry {
      *
      * @returns Map of all active operations
      */
-    getActiveOperations(): Map<string, MonitorCheckOperation> {
+    public getActiveOperations(): Map<string, MonitorCheckOperation> {
         return this.activeOperations;
     }
 
@@ -131,7 +131,9 @@ export class MonitorOperationRegistry {
      * @param operationId - ID of operation to retrieve
      * @returns Operation if found, undefined otherwise
      */
-    getOperation(operationId: string): MonitorCheckOperation | undefined {
+    public getOperation(
+        operationId: string
+    ): MonitorCheckOperation | undefined {
         return this.activeOperations.get(operationId);
     }
 
@@ -141,8 +143,8 @@ export class MonitorOperationRegistry {
      * @param monitorId - ID of monitor to check
      * @returns Unique operation ID
      */
-    initiateCheck(monitorId: string): string {
-        let operationId: string;
+    public initiateCheck(monitorId: string): string {
+        let operationId = "";
         let attempts = 0;
         do {
             operationId = crypto.randomUUID();
@@ -176,7 +178,7 @@ export class MonitorOperationRegistry {
      * @param operationId - ID of operation to validate
      * @returns True if operation is valid and not cancelled
      */
-    validateOperation(operationId: string): boolean {
+    public validateOperation(operationId: string): boolean {
         const operation = this.activeOperations.get(operationId);
         return Boolean(operation && !operation.cancelled);
     }

@@ -3,9 +3,10 @@
  * Handles database setup and site loading with proper error handling.
  */
 
-import { UptimeEvents } from "../../events/eventTypes";
-import { TypedEventBus } from "../../events/TypedEventBus";
-import { DatabaseService } from "../../services/database/DatabaseService";
+import type { UptimeEvents } from "../../events/eventTypes";
+import type { TypedEventBus } from "../../events/TypedEventBus";
+import type { DatabaseService } from "../../services/database/DatabaseService";
+
 import { monitorLogger as logger } from "../logger";
 import { withDatabaseOperation } from "../operationalHooks";
 

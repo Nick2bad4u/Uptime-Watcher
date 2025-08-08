@@ -2,9 +2,10 @@
  * Factory functions to create services with proper dependency injection.
  */
 
-import { Site } from "../../types";
+import type { Site } from "../../types";
+import type { monitorLogger } from "../logger";
+
 import { StandardizedCache } from "../cache/StandardizedCache";
-import { monitorLogger } from "../logger";
 
 /**
  * Adapter for the logger to implement Logger interface.
@@ -18,23 +19,23 @@ import { monitorLogger } from "../logger";
 export class LoggerAdapter {
     private readonly logger: typeof monitorLogger;
 
-    constructor(logger: typeof monitorLogger) {
+    public constructor(logger: typeof monitorLogger) {
         this.logger = logger;
     }
 
-    debug(message: string, ...args: unknown[]): void {
+    public debug(message: string, ...args: unknown[]): void {
         this.logger.debug(message, ...args);
     }
 
-    error(message: string, error?: unknown, ...args: unknown[]): void {
+    public error(message: string, error?: unknown, ...args: unknown[]): void {
         this.logger.error(message, error, ...args);
     }
 
-    info(message: string, ...args: unknown[]): void {
+    public info(message: string, ...args: unknown[]): void {
         this.logger.info(message, ...args);
     }
 
-    warn(message: string, ...args: unknown[]): void {
+    public warn(message: string, ...args: unknown[]): void {
         this.logger.warn(message, ...args);
     }
 }

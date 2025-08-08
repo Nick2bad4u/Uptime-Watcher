@@ -5,8 +5,9 @@
  * invalidation strategies across the entire application.
  */
 
-import { UptimeEvents } from "../../events/eventTypes";
-import { TypedEventBus } from "../../events/TypedEventBus";
+import type { UptimeEvents } from "../../events/eventTypes";
+import type { TypedEventBus } from "../../events/TypedEventBus";
+
 import { logger } from "../logger";
 
 /**
@@ -73,7 +74,7 @@ export class StandardizedCache<T> {
     /**
      * Get current cache size.
      */
-    get size(): number {
+    public get size(): number {
         return this.cache.size;
     }
     private readonly cache = new Map<string, CacheEntry<T>>();
@@ -93,7 +94,7 @@ export class StandardizedCache<T> {
         size: 0,
     };
 
-    constructor(config: CacheConfig) {
+    public constructor(config: CacheConfig) {
         this.config = {
             defaultTTL: config.defaultTTL ?? 300_000, // 5 minutes
             enableStats: config.enableStats ?? true,
@@ -113,7 +114,9 @@ export class StandardizedCache<T> {
      * Note: Emits only a single bulk-updated event for performance.
      * Individual item cache events are not emitted during bulk operations.
      */
-    bulkUpdate(items: Array<{ data: T; key: string; ttl?: number }>): void {
+    public bulkUpdate(
+        items: Array<{ data: T; key: string; ttl?: number }>
+    ): void {
         logger.debug(
             `[Cache:${this.config.name}] Bulk updating ${items.length} items`
         );
@@ -130,7 +133,7 @@ export class StandardizedCache<T> {
     /**
      * Clean up expired entries.
      */
-    cleanup(): number {
+    public cleanup(): number {
         const now = Date.now();
         let cleaned = 0;
         const cleanedKeys: string[] = [];
@@ -164,8 +167,8 @@ export class StandardizedCache<T> {
     /**
      * Clear all items from cache.
      */
-    clear(): void {
-        const size = this.cache.size;
+    public clear(): void {
+        const { size } = this.cache;
         this.cache.clear();
         this.updateSize();
 
@@ -183,7 +186,7 @@ export class StandardizedCache<T> {
     /**
      * Delete item from cache.
      */
-    delete(key: string): boolean {
+    public delete(key: string): boolean {
         const deleted = this.cache.delete(key);
 
         if (deleted) {
@@ -199,7 +202,7 @@ export class StandardizedCache<T> {
     /**
      * Get cache entries iterator.
      */
-    entries(): IterableIterator<[string, T]> {
+    public entries(): IterableIterator<[string, T]> {
         const entries: Array<[string, T]> = [];
         const expiredKeys: string[] = [];
         const now = Date.now();
@@ -229,7 +232,7 @@ export class StandardizedCache<T> {
     /**
      * Get item from cache.
      */
-    get(key: string): T | undefined {
+    public get(key: string): T | undefined {
         const entry = this.cache.get(key);
 
         if (!entry) {
@@ -258,7 +261,7 @@ export class StandardizedCache<T> {
     /**
      * Get all cached values.
      */
-    getAll(): T[] {
+    public getAll(): T[] {
         const values: T[] = [];
         const expiredKeys: string[] = [];
         const now = Date.now();
@@ -287,14 +290,14 @@ export class StandardizedCache<T> {
      * Get cache statistics.
      * Returns a snapshot of the current statistics, not a live reference.
      */
-    getStats(): CacheStats {
+    public getStats(): CacheStats {
         return { ...this.stats };
     }
 
     /**
      * Check if key exists in cache.
      */
-    has(key: string): boolean {
+    public has(key: string): boolean {
         const entry = this.cache.get(key);
 
         if (!entry) {
@@ -315,7 +318,7 @@ export class StandardizedCache<T> {
     /**
      * Invalidate specific key.
      */
-    invalidate(key: string): void {
+    public invalidate(key: string): void {
         const deleted = this.delete(key);
 
         if (deleted) {
@@ -328,8 +331,8 @@ export class StandardizedCache<T> {
     /**
      * Invalidate all keys.
      */
-    invalidateAll(): void {
-        const size = this.cache.size;
+    public invalidateAll(): void {
+        const { size } = this.cache;
         this.clear();
 
         logger.debug(
@@ -343,7 +346,7 @@ export class StandardizedCache<T> {
      * Get all cache keys.
      * Filters out expired keys automatically.
      */
-    keys(): string[] {
+    public keys(): string[] {
         const validKeys: string[] = [];
         const expiredKeys: string[] = [];
         const now = Date.now();
@@ -376,7 +379,7 @@ export class StandardizedCache<T> {
      *                   or with undefined when all items are invalidated.
      * @returns Cleanup function to remove the callback
      */
-    onInvalidation(callback: (key?: string) => void): () => void {
+    public onInvalidation(callback: (key?: string) => void): () => void {
         this.invalidationCallbacks.add(callback);
         logger.debug(
             `[Cache:${this.config.name}] Invalidation callback registered`
@@ -398,7 +401,7 @@ export class StandardizedCache<T> {
      * @param data - The data to cache
      * @param ttl - Time to live in milliseconds. If 0 or negative, the item will not expire.
      */
-    set(key: string, data: T, ttl?: number): void {
+    public set(key: string, data: T, ttl?: number): void {
         // Evict if at capacity and this is a new key
         if (this.cache.size >= this.config.maxSize && !this.cache.has(key)) {
             this.evictLRU();
@@ -443,7 +446,7 @@ export class StandardizedCache<T> {
      * Evict least recently used item.
      */
     private evictLRU(): void {
-        let oldestKey: string | undefined;
+        let oldestKey: string | undefined = undefined;
         let oldestTime = Number.POSITIVE_INFINITY;
 
         for (const [key, entry] of this.cache.entries()) {

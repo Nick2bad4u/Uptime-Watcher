@@ -14,14 +14,14 @@
  * in monitor creation and editing workflows.
  */
 // Import types for global declarations
-import { type Monitor, type Site, type StatusUpdate } from "@shared/types";
-import {
-    type CacheInvalidatedEventData,
-    type MonitorDownEventData,
-    type MonitoringControlEventData,
-    type MonitorUpEventData,
-    type TestEventData,
-    type UpdateStatusEventData,
+import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type {
+    CacheInvalidatedEventData,
+    MonitorDownEventData,
+    MonitoringControlEventData,
+    MonitorUpEventData,
+    TestEventData,
+    UpdateStatusEventData,
 } from "@shared/types/events";
 
 export * from "./types/monitor-forms";

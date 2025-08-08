@@ -150,7 +150,7 @@ export class TypedEventBus<
      * @param options - Optional configuration options.
      * @throws Error when `maxMiddleware` is not positive.
      */
-    constructor(name?: string, options?: { maxMiddleware?: number }) {
+    public constructor(name?: string, options?: { maxMiddleware?: number }) {
         super();
         this.busId = name ?? generateCorrelationId();
 
@@ -178,7 +178,7 @@ export class TypedEventBus<
      * Removes all middleware functions from the processing chain.
      * Events will be emitted directly without middleware processing.
      */
-    clearMiddleware(): void {
+    public clearMiddleware(): void {
         const count = this.middlewares.length;
         this.middlewares.length = 0;
         logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_CLEARED, {
@@ -229,7 +229,7 @@ export class TypedEventBus<
      * @returns A promise that resolves when the event has been emitted.
      * @throws Error when middleware processing fails.
      */
-    async emitTyped<K extends keyof EventMap>(
+    public async emitTyped<K extends keyof EventMap>(
         event: K,
         data: EventMap[K]
     ): Promise<void> {
@@ -280,7 +280,7 @@ export class TypedEventBus<
      *
      * @returns Diagnostic data including listener counts and middleware information.
      */
-    getDiagnostics(): EventBusDiagnostics {
+    public getDiagnostics(): EventBusDiagnostics {
         const listenerCounts: Record<string, number> = {};
         for (const eventName of this.eventNames()) {
             listenerCounts[eventName as string] = this.listenerCount(eventName);
@@ -319,7 +319,7 @@ export class TypedEventBus<
      * bus.offTyped('user:login', myListener); // Remove specific listener
      * ```
      */
-    offTyped<K extends keyof EventMap>(
+    public offTyped<K extends keyof EventMap>(
         event: K,
         listener?: (data: EventMap[K] & { _meta: EventMetadata }) => void
     ): this {
@@ -355,7 +355,7 @@ export class TypedEventBus<
      * });
      * ```
      */
-    onceTyped<K extends keyof EventMap>(
+    public onceTyped<K extends keyof EventMap>(
         event: K,
         listener: (data: EventMap[K] & { _meta: EventMetadata }) => void
     ): this {
@@ -381,7 +381,7 @@ export class TypedEventBus<
      * @param listener - Function to call when the event is emitted.
      * @returns This event bus instance for chaining.
      */
-    onTyped<K extends keyof EventMap>(
+    public onTyped<K extends keyof EventMap>(
         event: K,
         listener: (data: EventMap[K] & { _meta: EventMetadata }) => void
     ): this {
@@ -404,7 +404,7 @@ export class TypedEventBus<
      * @param middleware - The middleware function to remove.
      * @returns `true` if middleware was found and removed, `false` otherwise.
      */
-    removeMiddleware(middleware: EventMiddleware): boolean {
+    public removeMiddleware(middleware: EventMiddleware): boolean {
         const index = this.middlewares.indexOf(middleware);
         if (index !== -1) {
             this.middlewares.splice(index, 1);
@@ -431,7 +431,7 @@ export class TypedEventBus<
      * @throws Error when the maximum middleware limit is exceeded.
      */
     // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
-    use(middleware: EventMiddleware): void {
+    public use(middleware: EventMiddleware): void {
         if (this.middlewares.length >= this.maxMiddleware) {
             throw new Error(
                 `Maximum middleware limit (${this.maxMiddleware}) exceeded. ` +

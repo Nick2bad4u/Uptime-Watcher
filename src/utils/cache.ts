@@ -3,7 +3,7 @@
  * Provides type-safe caching with TTL support and proper cleanup.
  */
 
-import { type CacheValue } from "../../shared/types/configTypes";
+import type { CacheValue } from "../../shared/types/configTypes";
 
 /**
  * Configuration options for cache instances.
@@ -65,7 +65,7 @@ export class TypedCache<K, V> {
      *
      * @returns Number of entries currently in the cache
      */
-    get size(): number {
+    public get size(): number {
         return this.cache.size;
     }
     private readonly cache = new Map<K, CacheEntry<V>>();
@@ -78,7 +78,7 @@ export class TypedCache<K, V> {
      *
      * @param options - Cache configuration options including maxSize and ttl
      */
-    constructor(options: CacheOptions = {}) {
+    public constructor(options: CacheOptions = {}) {
         this.maxSize = options.maxSize ?? 100;
         this.defaultTtl = options.ttl;
     }
@@ -87,7 +87,7 @@ export class TypedCache<K, V> {
      * Clean up expired entries.
      * Removes all entries that have exceeded their TTL.
      */
-    cleanup(): void {
+    public cleanup(): void {
         const now = Date.now();
         for (const [key, entry] of this.cache.entries()) {
             const ttl = entry.ttl ?? this.defaultTtl;
@@ -101,7 +101,7 @@ export class TypedCache<K, V> {
      * Clear all cached entries.
      * Removes all entries from the cache.
      */
-    clear(): void {
+    public clear(): void {
         this.cache.clear();
     }
 
@@ -111,7 +111,7 @@ export class TypedCache<K, V> {
      * @param key - The key to delete from the cache
      * @returns True if the key existed and was deleted, false otherwise
      */
-    delete(key: K): boolean {
+    public delete(key: K): boolean {
         return this.cache.delete(key);
     }
 
@@ -122,7 +122,7 @@ export class TypedCache<K, V> {
      * @param key - The key to retrieve from the cache
      * @returns The cached value if found and not expired, undefined otherwise
      */
-    get(key: K): undefined | V {
+    public get(key: K): undefined | V {
         const entry = this.cache.get(key);
         if (!entry) {
             return undefined;
@@ -147,7 +147,7 @@ export class TypedCache<K, V> {
      * @param key - The key to check for existence
      * @returns True if the key exists and has not expired, false otherwise
      */
-    has(key: K): boolean {
+    public has(key: K): boolean {
         return this.get(key) !== undefined;
     }
 
@@ -160,10 +160,10 @@ export class TypedCache<K, V> {
      * For large caches (\>1000 entries), consider using a more efficient
      * LRU implementation with doubly-linked list for O(1) eviction.
      */
-    set(key: K, value: V, ttl?: number): void {
+    public set(key: K, value: V, ttl?: number): void {
         // Enforce max size by removing least recently used entries
         if (this.cache.size >= this.maxSize) {
-            let lruKey: K | undefined;
+            let lruKey: K | undefined = undefined;
             let oldestAccessTime = Number.POSITIVE_INFINITY;
 
             // Find the least recently used entry (O(n) operation)

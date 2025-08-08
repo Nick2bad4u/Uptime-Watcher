@@ -3,7 +3,7 @@
  *
  * @remarks
  * Provides comprehensive site synchronization functionality including:
- * - Full backend synchronization
+ * - Full backend synchroni    let statusUpdateManager: StatusUpdateManager | undefined = undefined;ation
  * - Real-time status updates via event subscriptions
  * - Sync status monitoring and reporting
  * - Centralized error handling through the error store
@@ -14,8 +14,9 @@
  * @packageDocumentation
  */
 
+import type { Site, StatusUpdate } from "../../types";
+
 import logger from "../../services/logger";
-import { type Site, type StatusUpdate } from "../../types";
 import { safeExtractIpcData } from "../../types/ipc";
 import { ensureError } from "../../utils/errorHandling";
 import { useErrorStore } from "../error/useErrorStore";
@@ -163,6 +164,7 @@ export interface SiteSyncDependencies {
 }
 
 // Create a shared status update manager instance - will be initialized when first used
+// eslint-disable-next-line @typescript-eslint/init-declarations
 let statusUpdateManager: StatusUpdateManager | undefined;
 
 /**
@@ -218,15 +220,18 @@ export const createSiteSyncActions = (
                         return status;
                     },
                     {
-                        clearError: () =>
-                            errorStore.clearStoreError("sites-sync"),
-                        setError: (error) =>
-                            errorStore.setStoreError("sites-sync", error),
-                        setLoading: (loading) =>
+                        clearError: () => {
+                            errorStore.clearStoreError("sites-sync");
+                        },
+                        setError: (error) => {
+                            errorStore.setStoreError("sites-sync", error);
+                        },
+                        setLoading: (loading) => {
                             errorStore.setOperationLoading(
                                 "getSyncStatus",
                                 loading
-                            ),
+                            );
+                        },
                     }
                 );
             } catch {
@@ -326,14 +331,18 @@ export const createSiteSyncActions = (
                     });
                 },
                 {
-                    clearError: () => errorStore.clearStoreError("sites-sync"),
-                    setError: (error) =>
-                        errorStore.setStoreError("sites-sync", error),
-                    setLoading: (loading) =>
+                    clearError: () => {
+                        errorStore.clearStoreError("sites-sync");
+                    },
+                    setError: (error) => {
+                        errorStore.setStoreError("sites-sync", error);
+                    },
+                    setLoading: (loading) => {
                         errorStore.setOperationLoading(
                             "syncSitesFromBackend",
                             loading
-                        ),
+                        );
+                    },
                 }
             );
         },

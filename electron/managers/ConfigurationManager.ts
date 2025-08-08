@@ -3,7 +3,10 @@
  * Centralizes business logic for configuration decisions and caches validation results.
  */
 
-import { type ConfigValue } from "../../shared/types/configTypes";
+import type { ConfigValue } from "../../shared/types/configTypes";
+import type { Site } from "../types";
+import type { ValidationResult } from "./validators/interfaces";
+
 import { CacheKeys } from "../../shared/utils/cacheKeys";
 import {
     CACHE_SIZE_LIMITS,
@@ -12,9 +15,7 @@ import {
     DEFAULT_HISTORY_LIMIT,
 } from "../constants";
 import { isDev } from "../electronUtils";
-import { Site } from "../types";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
-import { type ValidationResult } from "./validators/interfaces";
 import { MonitorValidator } from "./validators/MonitorValidator";
 import { SiteValidator } from "./validators/SiteValidator";
 
@@ -112,7 +113,7 @@ export class ConfigurationManager {
      * @remarks
      * Instantiates specialized validators and initializes standardized caches for configuration and validation results.
      */
-    constructor() {
+    public constructor() {
         this.siteValidator = new SiteValidator();
         this.monitorValidator = new MonitorValidator();
 

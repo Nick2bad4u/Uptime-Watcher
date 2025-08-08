@@ -34,10 +34,15 @@
  * @see {@link performPingCheckWithRetry} - Core ping checking functionality
  */
 
+import type { MonitorType, Site } from "../../types";
+import type {
+    IMonitorService,
+    MonitorCheckResult,
+    MonitorConfig,
+} from "./types";
+
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
-import { MonitorType, Site } from "../../types";
 import { DEFAULT_RETRY_ATTEMPTS } from "./constants";
-import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
 import {
     getMonitorRetryAttempts,
     getMonitorTimeout,
@@ -108,7 +113,7 @@ export class PingMonitor implements IMonitorService {
      * });
      * ```
      */
-    constructor(config: MonitorConfig = {}) {
+    public constructor(config: MonitorConfig = {}) {
         this.config = {
             timeout: DEFAULT_REQUEST_TIMEOUT,
             ...config,

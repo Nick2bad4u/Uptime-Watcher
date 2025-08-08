@@ -105,7 +105,7 @@ export class PortCheckError extends Error {
      * Sets the error name to "PortCheckError" and preserves the response time for analysis.
      * @public
      */
-    constructor(message: string, responseTime: number) {
+    public constructor(message: string, responseTime: number) {
         super(message);
         this.name = "PortCheckError";
         this.responseTime = responseTime;

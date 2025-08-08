@@ -7,23 +7,24 @@
  * @public
  */
 
+import type { UptimeEvents } from "../events/eventTypes";
+import type { TypedEventBus } from "../events/TypedEventBus";
+import type { DatabaseService } from "../services/database/DatabaseService";
+import type { HistoryRepository } from "../services/database/HistoryRepository";
+import type { MonitorRepository } from "../services/database/MonitorRepository";
+import type { SiteRepository } from "../services/database/SiteRepository";
+import type { EnhancedMonitoringServices } from "../services/monitoring/EnhancedMonitoringServiceFactory";
+import type { SiteService } from "../services/site/SiteService";
+import type { Site, StatusUpdate } from "../types";
+import type { StandardizedCache } from "../utils/cache/StandardizedCache";
+
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "../../shared/utils/logTemplates";
 import { DEFAULT_CHECK_INTERVAL } from "../constants";
 import { isDev } from "../electronUtils";
-import { UptimeEvents } from "../events/eventTypes";
-import { TypedEventBus } from "../events/TypedEventBus";
-import { DatabaseService } from "../services/database/DatabaseService";
-import { HistoryRepository } from "../services/database/HistoryRepository";
-import { MonitorRepository } from "../services/database/MonitorRepository";
-import { SiteRepository } from "../services/database/SiteRepository";
-import { EnhancedMonitoringServices } from "../services/monitoring/EnhancedMonitoringServiceFactory";
 import { MonitorScheduler } from "../services/monitoring/MonitorScheduler";
-import { SiteService } from "../services/site/SiteService";
-import { Site, StatusUpdate } from "../types";
-import { StandardizedCache } from "../utils/cache/StandardizedCache";
 import { logger } from "../utils/logger";
 import {
     startAllMonitoring,
@@ -183,7 +184,7 @@ export class MonitorManager {
      *
      * @public
      */
-    constructor(
+    public constructor(
         dependencies: MonitorManagerDependencies,
         enhancedServices: EnhancedMonitoringServices
     ) {
@@ -227,17 +228,20 @@ export class MonitorManager {
                         true
                     );
 
-                // Emit manual check completed event
-                await this.eventEmitter.emitTyped(
-                    "internal:monitor:manual-check-completed",
-                    {
-                        identifier,
-                        monitorId,
-                        operation: "manual-check-completed",
-                        result: result as StatusUpdate,
-                        timestamp: Date.now(),
-                    }
-                );
+                // Only emit event if result is available
+                if (result) {
+                    // Emit manual check completed event
+                    await this.eventEmitter.emitTyped(
+                        "internal:monitor:manual-check-completed",
+                        {
+                            identifier,
+                            monitorId,
+                            operation: "manual-check-completed",
+                            result,
+                            timestamp: Date.now(),
+                        }
+                    );
+                }
 
                 return result;
             }
@@ -256,7 +260,7 @@ export class MonitorManager {
         }
 
         // Check the first monitor (or could iterate through all)
-        const firstMonitor = site.monitors[0];
+        const [firstMonitor] = site.monitors;
         if (firstMonitor?.id) {
             return this.checkSiteManually(identifier, firstMonitor.id);
         }
@@ -731,7 +735,7 @@ export class MonitorManager {
         );
 
         // Site-level monitoring acts as a master switch
-        if (site.monitoring === false) {
+        if (!site.monitoring) {
             logger.debug(
                 `[MonitorManager] Site monitoring disabled, skipping all monitors for site: ${site.identifier}`
             );
@@ -902,7 +906,9 @@ export class MonitorManager {
 
         // Auto-start monitoring for new monitors if appropriate
         // Note: Initial checks are handled by MonitorScheduler when monitoring starts
-        if (site.monitoring === false) {
+        if (site.monitoring) {
+            await this.autoStartNewMonitors(site, newMonitors);
+        } else {
             logger.debug(
                 interpolateLogTemplate(
                     LOG_TEMPLATES.debug.MONITOR_MANAGER_SKIP_AUTO_START,
@@ -911,8 +917,6 @@ export class MonitorManager {
                     }
                 )
             );
-        } else {
-            await this.autoStartNewMonitors(site, newMonitors);
         }
     }
 

@@ -7,7 +7,10 @@
  * in multiple files.
  */
 
-import { z } from "zod";
+import type { z } from "zod";
+
+import type { MonitorType } from "./monitorTypes";
+import type { IMonitorService } from "./types";
 
 import {
     type Monitor,
@@ -28,7 +31,6 @@ import {
     migrationRegistry,
     versionManager,
 } from "./MigrationSystem";
-import { type MonitorType } from "./monitorTypes";
 import { PingMonitor } from "./PingMonitor";
 import { PortMonitor } from "./PortMonitor";
 
@@ -60,7 +62,7 @@ export interface BaseMonitorConfig {
     /** Field definitions for dynamic form generation */
     readonly fields: MonitorFieldDefinition[];
     /** Factory function to create monitor service instances */
-    readonly serviceFactory: () => import("./types").IMonitorService;
+    readonly serviceFactory: () => IMonitorService;
     /** Unique identifier for the monitor type */
     readonly type: string;
     /** UI display configuration */
@@ -155,7 +157,7 @@ export function getAllMonitorTypeConfigs(): BaseMonitorConfig[] {
  */
 export function getMonitorServiceFactory(
     type: string
-): (() => import("./types").IMonitorService) | undefined {
+): (() => IMonitorService) | undefined {
     const config = getMonitorTypeConfig(type);
     return config?.serviceFactory;
 }

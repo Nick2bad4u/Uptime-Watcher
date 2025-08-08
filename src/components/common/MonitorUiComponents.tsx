@@ -4,11 +4,13 @@
  * consistent UI behavior across different monitor types.
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import React, { useEffect, useState } from "react";
-import { type JSX } from "react/jsx-runtime";
+
+import type { MonitorType } from "../../types";
 
 import logger from "../../services/logger";
-import { type MonitorType } from "../../types";
 import {
     supportsResponseTime as checkSupportsResponseTime,
     formatMonitorDetail,

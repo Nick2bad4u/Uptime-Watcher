@@ -7,7 +7,7 @@
  * All backend communication is performed via IPC and follows strict typing.
  */
 
-import { type Site } from "@shared/types";
+import type { Site } from "@shared/types";
 
 import { safeExtractIpcData } from "../../../types/ipc";
 import { waitForElectronAPI } from "../../utils";

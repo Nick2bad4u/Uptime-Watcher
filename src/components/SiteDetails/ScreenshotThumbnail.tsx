@@ -6,9 +6,10 @@
  * React portals for the overlay positioning.
  */
 
+import type { JSX } from "react/jsx-runtime";
+
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { type JSX } from "react/jsx-runtime";
 
 import { UI_DELAYS } from "../../constants";
 import { useMount } from "../../hooks/useMount";
@@ -60,10 +61,9 @@ export const ScreenshotThumbnail = ({
     );
 
     // Create stable callbacks to avoid direct setState in useEffect
-    const clearOverlayVariables = useCallback(
-        () => setOverlayVariables({}),
-        []
-    );
+    const clearOverlayVariables = useCallback(() => {
+        setOverlayVariables({});
+    }, []);
 
     // Additional cleanup on hovered state changes
     useEffect(() => {
@@ -78,7 +78,9 @@ export const ScreenshotThumbnail = ({
                 clearOverlayVariables,
                 UI_DELAYS.STATE_UPDATE_DEFER
             );
-            return () => clearTimeout(clearTimeoutId);
+            return () => {
+                clearTimeout(clearTimeoutId);
+            };
         }
         return () => {};
     }, [clearOverlayVariables, hovered]);
@@ -136,7 +138,9 @@ export const ScreenshotThumbnail = ({
                 updateOverlayPosition,
                 UI_DELAYS.STATE_UPDATE_DEFER
             );
-            return () => clearTimeout(updateTimeoutId);
+            return () => {
+                clearTimeout(updateTimeoutId);
+            };
         }
         return () => {};
     }, [hovered, siteName, updateOverlayPosition, url]);

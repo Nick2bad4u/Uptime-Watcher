@@ -23,8 +23,8 @@
  * @packageDocumentation
  */
 
-import { Theme } from "../theme/types";
-import { ChartData, ChartOptions } from "./chartSetup";
+import type { Theme } from "../theme/types";
+import type { ChartData, ChartOptions } from "./chartSetup";
 
 /**
  * Interface for chart configuration return type.
@@ -100,7 +100,7 @@ export class ChartConfigService {
      * @param theme - Theme instance containing colors, typography, and spacing
      * @public
      */
-    constructor(theme: Theme) {
+    public constructor(theme: Theme) {
         this.theme = theme;
     }
 
@@ -110,7 +110,7 @@ export class ChartConfigService {
      * @returns Chart configuration options for bar charts
      * @public
      */
-    getBarChartConfig(): ChartOptions<"bar"> {
+    public getBarChartConfig(): ChartOptions<"bar"> {
         return {
             ...this.getBaseConfig(),
             plugins: {
@@ -136,7 +136,9 @@ export class ChartConfigService {
      * @returns Chart configuration options for doughnut charts
      * @public
      */
-    getDoughnutChartConfig(totalChecks: number): ChartOptions<"doughnut"> {
+    public getDoughnutChartConfig(
+        totalChecks: number
+    ): ChartOptions<"doughnut"> {
         // Store base config to avoid redundant calls
         const baseConfig = this.getBaseConfig();
 
@@ -177,7 +179,7 @@ export class ChartConfigService {
      * @returns Chart configuration options for line charts with responsive scaling
      * @public
      */
-    getLineChartConfig(): ChartOptions<"line"> {
+    public getLineChartConfig(): ChartOptions<"line"> {
         return {
             ...this.getBaseConfig(),
             interaction: {

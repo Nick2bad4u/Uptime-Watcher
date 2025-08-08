@@ -10,8 +10,9 @@
  * @public
  */
 
+import type { MonitorCheckResult } from "../types";
+
 import { logger } from "../../../utils/logger";
-import { MonitorCheckResult } from "../types";
 
 /**
  * Context information for ping operations.

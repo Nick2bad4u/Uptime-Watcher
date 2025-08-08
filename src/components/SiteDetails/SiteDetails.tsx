@@ -35,16 +35,18 @@
 
 /* eslint-disable tailwind/no-arbitrary-value -- Modal component with specific layout requirements */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { type JSX } from "react/jsx-runtime";
+import type { JSX } from "react/jsx-runtime";
 
-import { useSiteDetails } from "../../hooks/site/useSiteDetails";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+import type { Site } from "../../types";
+
 // eslint-disable-next-line import-x/no-unassigned-import -- Chart.js initialization
 import "../../services/chartSetup";
+import { useSiteDetails } from "../../hooks/site/useSiteDetails";
 import { ChartConfigService } from "../../services/chartConfig";
 import { ThemedBox } from "../../theme/components";
 import { useTheme } from "../../theme/useTheme";
-import { Site } from "../../types";
 import { parseUptimeValue } from "../../utils/monitoring/dataValidation";
 import { formatStatusWithIcon } from "../../utils/status";
 import "./SiteDetails.css";

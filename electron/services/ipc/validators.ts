@@ -10,7 +10,8 @@
  * @public
  */
 
-import { type IpcParameterValidator } from "./types";
+import type { IpcParameterValidator } from "./types";
+
 import { IpcValidators } from "./utils";
 
 /**

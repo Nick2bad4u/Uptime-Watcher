@@ -406,7 +406,24 @@ interface Logger {
  * logger.debug(`Processing site ${siteId} with custom logic`);
  * ```
  */
-export function createTemplateLogger(baseLogger: Logger) {
+export function createTemplateLogger(baseLogger: Logger): {
+    debug: (
+        message: string,
+        variables?: Record<string, number | string>
+    ) => void;
+    error: (
+        message: string,
+        variables?: Record<string, number | string>
+    ) => void;
+    info: (
+        message: string,
+        variables?: Record<string, number | string>
+    ) => void;
+    warn: (
+        message: string,
+        variables?: Record<string, number | string>
+    ) => void;
+} {
     return {
         debug: (
             message: string,

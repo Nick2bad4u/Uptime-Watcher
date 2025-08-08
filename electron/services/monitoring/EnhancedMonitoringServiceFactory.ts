@@ -38,21 +38,18 @@
  * @public
  */
 
-import { UptimeEvents } from "../../events/eventTypes";
-import { TypedEventBus } from "../../events/TypedEventBus";
-import { Site } from "../../types";
-import { StandardizedCache } from "../../utils/cache/StandardizedCache";
-import { HistoryRepository } from "../database/HistoryRepository";
-import { MonitorRepository } from "../database/MonitorRepository";
-import { SiteRepository } from "../database/SiteRepository";
-import {
-    EnhancedMonitorCheckConfig,
-    EnhancedMonitorChecker,
-} from "./EnhancedMonitorChecker";
-import {
-    MonitorOperationRegistry,
-    operationRegistry,
-} from "./MonitorOperationRegistry";
+import type { UptimeEvents } from "../../events/eventTypes";
+import type { TypedEventBus } from "../../events/TypedEventBus";
+import type { Site } from "../../types";
+import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
+import type { HistoryRepository } from "../database/HistoryRepository";
+import type { MonitorRepository } from "../database/MonitorRepository";
+import type { SiteRepository } from "../database/SiteRepository";
+import type { EnhancedMonitorCheckConfig } from "./EnhancedMonitorChecker";
+import type { MonitorOperationRegistry } from "./MonitorOperationRegistry";
+
+import { EnhancedMonitorChecker } from "./EnhancedMonitorChecker";
+import { operationRegistry } from "./MonitorOperationRegistry";
 import { MonitorStatusUpdateService } from "./MonitorStatusUpdateService";
 import { OperationTimeoutManager } from "./OperationTimeoutManager";
 

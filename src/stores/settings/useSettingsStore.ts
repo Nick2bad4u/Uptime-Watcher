@@ -34,12 +34,13 @@
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
+import type { AppSettings } from "../types";
+import type { SettingsStore } from "./types";
+
 import { DEFAULT_HISTORY_LIMIT } from "../../constants";
 import { safeExtractIpcData } from "../../types/ipc";
 import { useErrorStore } from "../error/useErrorStore";
-import { type AppSettings } from "../types";
 import { logStoreAction, withErrorHandling } from "../utils";
-import { type SettingsStore } from "./types";
 
 const defaultSettings: AppSettings = {
     autoStart: false,
@@ -137,15 +138,18 @@ export const useSettingsStore: UseBoundStore<
                         };
                     },
                     {
-                        clearError: () =>
-                            errorStore.clearStoreError("settings"),
-                        setError: (error) =>
-                            errorStore.setStoreError("settings", error),
-                        setLoading: (loading) =>
+                        clearError: () => {
+                            errorStore.clearStoreError("settings");
+                        },
+                        setError: (error) => {
+                            errorStore.setStoreError("settings", error);
+                        },
+                        setLoading: (loading) => {
                             errorStore.setOperationLoading(
                                 "initializeSettings",
                                 loading
-                            ),
+                            );
+                        },
                     }
                 );
 
@@ -186,15 +190,18 @@ export const useSettingsStore: UseBoundStore<
                         };
                     },
                     {
-                        clearError: () =>
-                            errorStore.clearStoreError("settings"),
-                        setError: (error) =>
-                            errorStore.setStoreError("settings", error),
-                        setLoading: (loading) =>
+                        clearError: () => {
+                            errorStore.clearStoreError("settings");
+                        },
+                        setError: (error) => {
+                            errorStore.setStoreError("settings", error);
+                        },
+                        setLoading: (loading) => {
                             errorStore.setOperationLoading(
                                 "resetSettings",
                                 loading
-                            ),
+                            );
+                        },
                     }
                 );
 
@@ -233,15 +240,18 @@ export const useSettingsStore: UseBoundStore<
                         };
                     },
                     {
-                        clearError: () =>
-                            errorStore.clearStoreError("settings"),
-                        setError: (error) =>
-                            errorStore.setStoreError("settings", error),
-                        setLoading: (loading) =>
+                        clearError: () => {
+                            errorStore.clearStoreError("settings");
+                        },
+                        setError: (error) => {
+                            errorStore.setStoreError("settings", error);
+                        },
+                        setLoading: (loading) => {
                             errorStore.setOperationLoading(
                                 "syncFromBackend",
                                 loading
-                            ),
+                            );
+                        },
                     }
                 );
 
@@ -285,8 +295,9 @@ export const useSettingsStore: UseBoundStore<
                         });
                     },
                     {
-                        clearError: () =>
-                            errorStore.clearStoreError("settings"),
+                        clearError: () => {
+                            errorStore.clearStoreError("settings");
+                        },
                         setError: (error) => {
                             // Revert to previous state on error instead of using default
                             errorStore.setStoreError("settings", error);
@@ -294,11 +305,12 @@ export const useSettingsStore: UseBoundStore<
                                 historyLimit: currentSettings.historyLimit,
                             });
                         },
-                        setLoading: (loading) =>
+                        setLoading: (loading) => {
                             errorStore.setOperationLoading(
                                 "updateHistoryLimit",
                                 loading
-                            ),
+                            );
+                        },
                     }
                 );
             },

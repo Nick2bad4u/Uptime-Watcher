@@ -1,11 +1,12 @@
-import { Database } from "node-sqlite3-wasm";
+import type { Database } from "node-sqlite3-wasm";
+
+import type { StatusHistory } from "../../../types";
 
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "../../../../shared/utils/logTemplates";
 import { isDev } from "../../../electronUtils";
-import { StatusHistory } from "../../../types";
 import { logger } from "../../../utils/logger";
 
 /**
@@ -264,7 +265,7 @@ export function pruneHistoryForMonitor(
         if (excess.length > 0) {
             // Convert numeric IDs to ensure type safety and validate they are numbers
             const excessIds = excess
-                .map((row) => Number(row.id))
+                .map((row) => row.id)
                 .filter((id) => Number.isFinite(id) && id > 0);
 
             if (excessIds.length > 0) {

@@ -419,7 +419,9 @@ export const RadioGroup: React.NamedExoticComponent<RadioGroupProperties> =
         value,
     }: RadioGroupProperties) {
         const createChangeHandler = useCallback(
-            (optionValue: string) => () => onChange(optionValue),
+            (optionValue: string) => () => {
+                onChange(optionValue);
+            },
             [onChange]
         );
 

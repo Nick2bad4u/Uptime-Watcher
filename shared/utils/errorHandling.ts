@@ -145,8 +145,12 @@ async function handleFrontendOperation<T>(
     store: ErrorHandlingFrontendStore
 ): Promise<T> {
     // Prepare store state
-    safeStoreOperation(() => store.clearError(), "clear error state");
-    safeStoreOperation(() => store.setLoading(true), "set loading state");
+    safeStoreOperation(() => {
+        store.clearError();
+    }, "clear error state");
+    safeStoreOperation(() => {
+        store.setLoading(true);
+    }, "set loading state");
 
     try {
         const result = await operation();
@@ -156,17 +160,18 @@ async function handleFrontendOperation<T>(
         const errorMessage =
             error instanceof Error ? error.message : String(error);
         safeStoreOperation(
-            () => store.setError(errorMessage),
+            () => {
+                store.setError(errorMessage);
+            },
             "set error state",
             error
         );
         throw error;
     } finally {
         // Always clear loading state
-        safeStoreOperation(
-            () => store.setLoading(false),
-            "clear loading state in finally block"
-        );
+        safeStoreOperation(() => {
+            store.setLoading(false);
+        }, "clear loading state in finally block");
     }
 }
 

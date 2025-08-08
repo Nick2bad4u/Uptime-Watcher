@@ -287,7 +287,7 @@ export function isValidSettingsRow(obj: unknown): obj is SettingsRow {
         row["key"] !== undefined &&
         row["key"] !== null &&
         typeof row["key"] === "string" &&
-        String(row["key"]).length > 0
+        row["key"].length > 0
     );
 }
 
@@ -311,7 +311,7 @@ export function isValidSiteRow(obj: unknown): obj is SiteRow {
         row["identifier"] !== undefined &&
         row["identifier"] !== null &&
         typeof row["identifier"] === "string" &&
-        String(row["identifier"]).trim().length > 0
+        row["identifier"].trim().length > 0
     );
 }
 

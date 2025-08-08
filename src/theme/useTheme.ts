@@ -12,10 +12,11 @@ import {
 } from "@shared/types";
 import { useCallback, useEffect, useState } from "react";
 
+import type { Theme, ThemeName } from "./types";
+
 import { UI_DELAYS } from "../constants";
 import { useSettingsStore } from "../stores/settings/useSettingsStore";
 import { themeManager, type ThemeManager } from "./ThemeManager";
-import { Theme, ThemeName } from "./types";
 
 /**
  * Interface for useAvailabilityColors hook return type.
@@ -232,7 +233,9 @@ export function useTheme(): UseThemeReturn {
             updateCurrentTheme,
             UI_DELAYS.STATE_UPDATE_DEFER
         );
-        return () => clearTimeout(updateTimeoutId);
+        return () => {
+            clearTimeout(updateTimeoutId);
+        };
     }, [settings.theme, systemTheme, updateCurrentTheme]);
 
     // Listen for system theme changes
@@ -242,20 +245,19 @@ export function useTheme(): UseThemeReturn {
         const cleanup = themeManager.onSystemThemeChange((isDark) => {
             const newSystemTheme = isDark ? "dark" : "light";
             // Use timeout to defer state update to avoid direct call in useEffect
-            const timeoutId = setTimeout(
-                () => updateSystemTheme(newSystemTheme),
-                UI_DELAYS.STATE_UPDATE_DEFER
-            );
+            const timeoutId = setTimeout(() => {
+                updateSystemTheme(newSystemTheme);
+            }, UI_DELAYS.STATE_UPDATE_DEFER);
             timeoutIds.push(timeoutId);
         });
 
         // Set initial system theme using timeout
-        const initialTheme = themeManager.getSystemThemePreference();
+        const initialTheme: "dark" | "light" =
+            themeManager.getSystemThemePreference();
         // eslint-disable-next-line @eslint-react/web-api/no-leaked-timeout -- Timeout is properly cleaned up in the forEach loop below
-        const initialTimeoutId = setTimeout(
-            () => updateSystemTheme(initialTheme),
-            UI_DELAYS.STATE_UPDATE_DEFER
-        );
+        const initialTimeoutId = setTimeout(() => {
+            updateSystemTheme(initialTheme);
+        }, UI_DELAYS.STATE_UPDATE_DEFER);
         timeoutIds.push(initialTimeoutId);
 
         return () => {

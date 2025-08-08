@@ -31,8 +31,8 @@ const configureLogging = () => {
     const infoFlag = args.has("--log-info");
 
     // Determine log level based on flags and environment
-    let consoleLevel: string;
-    let fileLevel: string;
+    let consoleLevel = "";
+    let fileLevel = "";
 
     if (debugFlag) {
         consoleLevel = "debug";
@@ -52,11 +52,11 @@ const configureLogging = () => {
         );
     } else {
         // Default development behavior
-        const isDev = !app.isPackaged;
-        consoleLevel = isDev ? "debug" : "info";
-        fileLevel = isDev ? "info" : "warn";
+        const isDevMode = !app.isPackaged;
+        consoleLevel = isDevMode ? "debug" : "info";
+        fileLevel = isDevMode ? "info" : "warn";
         console.log(
-            `[LOGGING] Default logging: console=${consoleLevel}, file=${fileLevel} (isDev=${isDev})`
+            `[LOGGING] Default logging: console=${consoleLevel}, file=${fileLevel} (isDev=${isDevMode})`
         );
     }
 
@@ -116,7 +116,7 @@ class Main {
      *
      * @throws {@link Error} If cleanup fails, the error is logged and re-thrown.
      */
-    constructor() {
+    public constructor() {
         logger.info("Starting Uptime Watcher application");
         this.applicationService = new ApplicationService();
 
@@ -126,7 +126,7 @@ class Main {
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             if (!cleanedUp && this.applicationService?.cleanup) {
                 cleanedUp = true;
-                this.applicationService.cleanup().catch((error) => {
+                this.applicationService.cleanup().catch((error: unknown) => {
                     logger.error("[Main] Cleanup failed", error);
                     throw error;
                 });

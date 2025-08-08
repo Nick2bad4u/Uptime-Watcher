@@ -28,10 +28,15 @@
  * @packageDocumentation
  */
 
+import type { MonitorType, Site } from "../../types";
+import type {
+    IMonitorService,
+    MonitorCheckResult,
+    MonitorConfig,
+} from "./types";
+
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
-import { MonitorType, Site } from "../../types";
 import { DEFAULT_RETRY_ATTEMPTS } from "./constants";
-import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
 import {
     getMonitorRetryAttempts,
     getMonitorTimeout,
@@ -64,7 +69,7 @@ export class PortMonitor implements IMonitorService {
      * provided configuration options. Safe to instantiate multiple times
      * with different configurations for various monitoring needs.
      */
-    constructor(config: MonitorConfig = {}) {
+    public constructor(config: MonitorConfig = {}) {
         this.config = {
             timeout: DEFAULT_REQUEST_TIMEOUT, // Use consistent default timeout
             ...config,

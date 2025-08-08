@@ -5,23 +5,25 @@
  * Handles importing and exporting sites, monitors, history, and settings data.
  */
 
-import { Database } from "node-sqlite3-wasm";
+import type { Database } from "node-sqlite3-wasm";
+
+import type { UptimeEvents } from "../../events/eventTypes";
+import type { TypedEventBus } from "../../events/TypedEventBus";
+import type { DatabaseService } from "../../services/database/DatabaseService";
+import type { HistoryRepository } from "../../services/database/HistoryRepository";
+import type { MonitorRepository } from "../../services/database/MonitorRepository";
+import type { SettingsRepository } from "../../services/database/SettingsRepository";
+import type { SiteRepository } from "../../services/database/SiteRepository";
+import type { Site, StatusHistory } from "../../types";
+import type { Logger } from "./interfaces";
 
 import { ERROR_CATALOG } from "../../../shared/utils/errorCatalog";
 import {
     safeJsonParse,
     safeJsonStringifyWithFallback,
 } from "../../../shared/utils/jsonSafety";
-import { UptimeEvents } from "../../events/eventTypes";
-import { TypedEventBus } from "../../events/TypedEventBus";
-import { DatabaseService } from "../../services/database/DatabaseService";
-import { HistoryRepository } from "../../services/database/HistoryRepository";
-import { MonitorRepository } from "../../services/database/MonitorRepository";
-import { SettingsRepository } from "../../services/database/SettingsRepository";
-import { SiteRepository } from "../../services/database/SiteRepository";
-import { Site, StatusHistory } from "../../types";
 import { withDatabaseOperation } from "../operationalHooks";
-import { Logger, SiteLoadingError } from "./interfaces";
+import { SiteLoadingError } from "./interfaces";
 
 /**
  * Configuration for data import/export operations.
@@ -69,7 +71,7 @@ export class DataImportExportService {
         site: SiteRepository;
     };
 
-    constructor(config: DataImportExportConfig) {
+    public constructor(config: DataImportExportConfig) {
         this.repositories = config.repositories;
         this.databaseService = config.databaseService;
         this.logger = config.logger;
@@ -80,7 +82,7 @@ export class DataImportExportService {
      * Export all application data as JSON string.
      * Pure data operation without side effects.
      */
-    async exportAllData(): Promise<string> {
+    public async exportAllData(): Promise<string> {
         try {
             // Export all sites and settings using repositories
             const sites = await this.repositories.site.exportAll();
@@ -122,7 +124,7 @@ export class DataImportExportService {
      * Import data from JSON string.
      * Pure data operation that returns the imported data.
      */
-    async importDataFromJson(
+    public async importDataFromJson(
         jsonData: string
     ): Promise<{ settings: Record<string, string>; sites: ImportSite[] }> {
         try {
@@ -168,7 +170,7 @@ export class DataImportExportService {
      * Import sites and settings into database.
      * Database operation that persists the imported data.
      */
-    async persistImportedData(
+    public async persistImportedData(
         sites: ImportSite[],
         settings: Record<string, string>
     ): Promise<void> {
