@@ -121,9 +121,9 @@ export type EventMiddleware<T = unknown> = (
  *
  * @public
  */
-// eslint-disable-next-line unicorn/prefer-event-target -- Required for Node.js EventEmitter compatibility
 export class TypedEventBus<
     EventMap extends Record<string, unknown>,
+    // eslint-disable-next-line unicorn/prefer-event-target -- Required for Node.js EventEmitter compatibility
 > extends EventEmitter {
     private readonly busId: string;
     private readonly maxMiddleware: number;

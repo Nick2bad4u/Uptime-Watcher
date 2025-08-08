@@ -264,10 +264,10 @@ export const HistoryTab = ({
                 icon={<MdHistory color={iconColors.history} />}
                 title="Check History"
             >
-                <div className="space-y-2 overflow-y-auto max-h-96">
+                <div className="max-h-96 space-y-2 overflow-y-auto">
                     {filteredHistoryRecords.map((record) => (
                         <div
-                            className="flex items-center justify-between p-3 transition-colors rounded-lg hover:bg-surface-elevated"
+                            className="hover:bg-surface-elevated flex items-center justify-between rounded-lg p-3 transition-colors"
                             key={record.timestamp}
                         >
                             <div className="flex items-center space-x-3">

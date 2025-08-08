@@ -267,7 +267,7 @@ export const Settings = ({
                         <div className="space-y-4">
                             <div>
                                 <ThemedText
-                                    className="block mb-2"
+                                    className="mb-2 block"
                                     size="sm"
                                     variant="secondary"
                                     weight="medium"
@@ -382,7 +382,7 @@ export const Settings = ({
                         <div className="space-y-4">
                             <div>
                                 <ThemedText
-                                    className="block mb-2"
+                                    className="mb-2 block"
                                     size="sm"
                                     variant="secondary"
                                     weight="medium"
@@ -404,7 +404,7 @@ export const Settings = ({
                                         </option>
                                     ))}
                                 </ThemedSelect>
-                                <div className="flex items-center gap-2 mt-2">
+                                <div className="mt-2 flex items-center gap-2">
                                     <ThemedText size="xs" variant="tertiary">
                                         Current theme preview:
                                     </ThemedText>
@@ -504,7 +504,7 @@ export const Settings = ({
                             {/* SQLite direct download */}
                             <div>
                                 <ThemedText
-                                    className="block mb-2"
+                                    className="mb-2 block"
                                     size="sm"
                                     variant="secondary"
                                     weight="medium"
@@ -523,7 +523,7 @@ export const Settings = ({
                                     Download SQLite Backup
                                 </ThemedButton>
                                 <ThemedText
-                                    className="block mt-1"
+                                    className="mt-1 block"
                                     size="xs"
                                     variant="tertiary"
                                 >

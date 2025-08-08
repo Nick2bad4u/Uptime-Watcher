@@ -11,7 +11,7 @@ export const DefaultErrorFallback: React.FC<{
     readonly error?: Error;
     readonly onRetry: () => void;
 }> = ({ error, onRetry }) => (
-    <div className="flex flex-col items-center justify-center p-8 border border-red-200 rounded-lg bg-red-50">
+    <div className="flex flex-col items-center justify-center rounded-lg border border-red-200 bg-red-50 p-8">
         <div className="mb-4 text-red-600">
             <h2 className="mb-2 text-lg font-semibold">Something went wrong</h2>
             <p className="text-sm">
@@ -24,14 +24,14 @@ export const DefaultErrorFallback: React.FC<{
         </div>
         <div className="flex gap-4">
             <button
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700"
+                className="rounded bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
                 onClick={onRetry}
                 type="button"
             >
                 Try Again
             </button>
             <button
-                className="px-4 py-2 text-sm font-medium text-red-600 border border-red-600 rounded hover:bg-red-50"
+                className="rounded border border-red-600 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
                 onClick={() => window.location.reload()}
                 type="button"
             >

@@ -12,6 +12,8 @@
 /* https://github.com/tailwindlabs/tailwindcss-forms */
 @plugin "@tailwindcss/forms";
 
+@config "../tailwind.config.js";
+
 :root {
     /* Define gray color palette for compatibility */
     --color-gray-50: oklch(98.4% 0.003 247.858deg);

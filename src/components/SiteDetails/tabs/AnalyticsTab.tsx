@@ -169,6 +169,39 @@ export const AnalyticsTab = ({
     // Parse uptime value once with validation
     const uptimeValue = parseUptimeValue(uptime);
 
+    // Error-safe wrapper functions to handle formatter errors gracefully
+    const safeDurationFormat = (ms: number): string => {
+        try {
+            return formatDuration(ms);
+        } catch (error) {
+            logger.error("Error formatting duration", error as Error);
+            return `${Math.round(ms / 1000)}s`; // Fallback format
+        }
+    };
+
+    const safeResponseTimeFormat = (time: number): string => {
+        try {
+            return formatResponseTime(time);
+        } catch (error) {
+            logger.error("Error formatting response time", error as Error);
+            return `${time}ms`; // Fallback format
+        }
+    };
+
+    const safeAvailabilityDescription = (percentage: number): string => {
+        try {
+            return getAvailabilityDescription(percentage);
+        } catch (error) {
+            logger.error(
+                "Error getting availability description",
+                error as Error
+            );
+            if (percentage >= 99) return "Good";
+            if (percentage >= 95) return "Fair";
+            return "Poor"; // Fallback descriptions
+        }
+    };
+
     // Icon colors configuration
     const getIconColors = () => {
         const availabilityColor = getColor(uptimeValue);
@@ -246,7 +279,7 @@ export const AnalyticsTab = ({
                             {uptime}%
                         </ThemedBadge>
                         <ThemedText size="xs" variant="secondary">
-                            {getAvailabilityDescription(uptimeValue)}
+                            {safeAvailabilityDescription(uptimeValue)}
                         </ThemedText>
                     </div>
                 </ThemedCard>
@@ -262,7 +295,7 @@ export const AnalyticsTab = ({
                     >
                         <div className="flex flex-col items-center space-y-1">
                             <ThemedText size="xl" weight="bold">
-                                {formatResponseTime(avgResponseTime)}
+                                {safeResponseTimeFormat(avgResponseTime)}
                             </ThemedText>
                             <ThemedText size="xs" variant="secondary">
                                 {totalChecks} checks
@@ -280,7 +313,7 @@ export const AnalyticsTab = ({
                 >
                     <div className="flex flex-col items-center space-y-1">
                         <ThemedText size="xl" variant="error" weight="bold">
-                            {formatDuration(totalDowntime)}
+                            {safeDurationFormat(totalDowntime)}
                         </ThemedText>
                         <ThemedText size="xs" variant="secondary">
                             {downtimePeriods.length} incidents
@@ -352,7 +385,7 @@ export const AnalyticsTab = ({
                                     style={{ color: getResponseTimeColor(p50) }}
                                     weight="medium"
                                 >
-                                    {formatResponseTime(p50)}
+                                    {safeResponseTimeFormat(p50)}
                                 </ThemedText>
                             </div>
                             <div className="flex flex-col items-center text-center">
@@ -368,7 +401,7 @@ export const AnalyticsTab = ({
                                     style={{ color: getResponseTimeColor(p95) }}
                                     weight="medium"
                                 >
-                                    {formatResponseTime(p95)}
+                                    {safeResponseTimeFormat(p95)}
                                 </ThemedText>
                             </div>
                             <div className="flex flex-col items-center text-center">
@@ -384,13 +417,13 @@ export const AnalyticsTab = ({
                                     style={{ color: getResponseTimeColor(p99) }}
                                     weight="medium"
                                 >
-                                    {formatResponseTime(p99)}
+                                    {safeResponseTimeFormat(p99)}
                                 </ThemedText>
                             </div>
                         </div>
 
                         {showAdvancedMetrics ? (
-                            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-primary/20">
+                            <div className="border-primary/20 grid grid-cols-2 gap-4 border-t pt-4">
                                 <div className="flex flex-col items-center text-center">
                                     <ThemedText
                                         className="mb-2"
@@ -409,7 +442,7 @@ export const AnalyticsTab = ({
                                         }}
                                         weight="medium"
                                     >
-                                        {formatDuration(mttr)}
+                                        {safeDurationFormat(mttr)}
                                     </ThemedText>
                                 </div>
                                 <div className="flex flex-col items-center text-center">

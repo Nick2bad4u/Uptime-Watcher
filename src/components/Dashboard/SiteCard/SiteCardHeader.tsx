@@ -105,16 +105,27 @@ export const SiteCardHeader: React.NamedExoticComponent<SiteCardHeaderProps> =
         monitoring,
         site,
     }: SiteCardHeaderProps) {
+        // Alias interaction handlers to satisfy react/jsx-handler-names rule
+        const {
+            onCheckNow: handleCheckNow,
+            onMonitorIdChange: handleChange,
+            onStartMonitoring: handleStartMonitoring,
+            onStartSiteMonitoring: handleStartSiteMonitoring,
+            onStopMonitoring: handleStopMonitoring,
+            onStopSiteMonitoring: handleStopSiteMonitoring,
+        } = interactions;
+
         return (
             <div className="flex items-center justify-between">
                 <ThemedText size="lg" variant="primary" weight="semibold">
                     {site.site.name}
                 </ThemedText>
 
-                <div className="flex items-center gap-2 min-w-[180px]">
+                {/* eslint-disable-next-line tailwind/no-arbitrary-value -- Specific design requirement for monitor selector width */}
+                <div className="header-title-box flex min-w-[180px] items-center gap-2 px-4 py-1">
                     <MonitorSelector
                         monitors={site.site.monitors}
-                        onChange={interactions.onMonitorIdChange}
+                        onChange={handleChange}
                         selectedMonitorId={monitoring.selectedMonitorId}
                     />
 
@@ -123,13 +134,11 @@ export const SiteCardHeader: React.NamedExoticComponent<SiteCardHeaderProps> =
                         disabled={!monitoring.hasMonitor}
                         isLoading={display.isLoading}
                         isMonitoring={monitoring.isMonitoring}
-                        onCheckNow={interactions.onCheckNow}
-                        onStartMonitoring={interactions.onStartMonitoring}
-                        onStartSiteMonitoring={
-                            interactions.onStartSiteMonitoring
-                        }
-                        onStopMonitoring={interactions.onStopMonitoring}
-                        onStopSiteMonitoring={interactions.onStopSiteMonitoring}
+                        onCheckNow={handleCheckNow}
+                        onStartMonitoring={handleStartMonitoring}
+                        onStartSiteMonitoring={handleStartSiteMonitoring}
+                        onStopMonitoring={handleStopMonitoring}
+                        onStopSiteMonitoring={handleStopSiteMonitoring}
                     />
                 </div>
             </div>

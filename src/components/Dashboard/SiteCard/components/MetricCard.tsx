@@ -61,7 +61,7 @@ export const MetricCard: React.NamedExoticComponent<MetricCardProperties> =
                 className={`flex flex-col items-center text-center ${className}`}
             >
                 <ThemedText
-                    className="block mb-1"
+                    className="mb-1 block"
                     size="xs"
                     variant="secondary"
                 >

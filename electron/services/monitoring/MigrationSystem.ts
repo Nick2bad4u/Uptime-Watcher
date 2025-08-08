@@ -7,6 +7,8 @@
  * @public
  */
 
+import isSemVer from "validator/lib/isSemVer";
+
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -466,20 +468,24 @@ class MigrationRegistry {
             );
         }
 
-        // Basic semantic version validation: x.y.z where x, y, z are non-negative integers
-        // eslint-disable-next-line security/detect-unsafe-regex, regexp/require-unicode-sets-regexp -- Simple semver pattern, safe for our use case
-        const versionPattern =
-            /^\d+\.\d+\.\d+(?:-[\da-z\-]+)?(?:\+[\da-z\-]+)?$/i;
-        if (!versionPattern.test(version)) {
+        // Use validator.js' isSemVer for spec-compliant validation (SemVer 2.0.0)
+        if (!isSemVer(version)) {
             throw new Error(
                 `${parameterName} "${version}" is not a valid semantic version. Expected format: x.y.z (e.g., "1.0.0")`
             );
         }
 
         // Additional validation: ensure numeric parts are reasonable (prevent overflow)
-        const parts = version.split(".").slice(0, 3).map(Number);
+        // Extract strictly the numeric MAJOR.MINOR.PATCH, ignoring any pre-release/build metadata
+        const baseWithoutPre = version.split("-")[0] ?? version;
+        const base = baseWithoutPre.split("+")[0] ?? baseWithoutPre;
+        const parts = base.split(".").slice(0, 3).map(Number);
         for (const part of parts) {
-            if (part < 0 || part > Number.MAX_SAFE_INTEGER) {
+            if (
+                Number.isNaN(part) ||
+                part < 0 ||
+                part > Number.MAX_SAFE_INTEGER
+            ) {
                 throw new Error(
                     `${parameterName} "${version}" contains invalid numeric parts`
                 );

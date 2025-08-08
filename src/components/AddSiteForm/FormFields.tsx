@@ -94,7 +94,7 @@ export const FormField: React.NamedExoticComponent<FormFieldProperties> =
     }: FormFieldProperties) {
         return (
             <div>
-                <label className="block mb-1" htmlFor={id}>
+                <label className="mb-1 block" htmlFor={id}>
                     <ThemedText size="sm" variant="secondary" weight="medium">
                         {label} {required ? "*" : null}
                     </ThemedText>

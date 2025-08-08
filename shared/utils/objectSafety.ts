@@ -107,10 +107,25 @@ export function safeObjectOmit<
     K extends keyof T,
 >(obj: T, keys: readonly K[]): Omit<T, K> {
     const keysToOmit = new Set(keys);
-    const entries = Object.entries(obj).filter(
-        ([key]) => !keysToOmit.has(key as K)
-    );
-    return Object.fromEntries(entries) as Omit<T, K>;
+
+    // Handle both string/number keys and symbol keys
+    const result = {} as Omit<T, K>;
+
+    // Copy enumerable string/number properties
+    for (const [key, value] of Object.entries(obj)) {
+        if (!keysToOmit.has(key as K)) {
+            (result as Record<PropertyKey, unknown>)[key] = value;
+        }
+    }
+
+    // Copy symbol properties
+    for (const symbol of Object.getOwnPropertySymbols(obj)) {
+        if (!keysToOmit.has(symbol as K)) {
+            (result as Record<PropertyKey, unknown>)[symbol] = obj[symbol];
+        }
+    }
+
+    return result;
 }
 
 /**

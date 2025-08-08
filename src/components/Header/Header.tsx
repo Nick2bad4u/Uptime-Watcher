@@ -137,12 +137,13 @@ export const Header = (): JSX.Element => {
             <div className="header-container">
                 <div className="flex flex-wrap items-center justify-between gap-4 py-4">
                     {/* Left: App Title & Status Summary */}
-                    <div className="flex flex-wrap items-center flex-shrink min-w-0 gap-6">
+                    <div className="flex min-w-0 shrink flex-wrap items-center gap-6">
                         {/* App Title with subtle background and border */}
-                        <span className="flex items-center gap-2 min-w-[180px] px-4 py-1 header-title-box">
+                        {/* eslint-disable-next-line tailwind/no-arbitrary-value -- Specific design requirement */}
+                        <span className="header-title-box flex min-w-[180px] items-center gap-2 px-4 py-1">
                             <span className="text-2xl select-none">📊</span>
                             <ThemedText
-                                className="truncate header-title-accent"
+                                className="header-title-accent truncate"
                                 size="2xl"
                                 weight="bold"
                             >
@@ -152,7 +153,7 @@ export const Header = (): JSX.Element => {
 
                         {/* Status Summary - Enhanced */}
                         <ThemedBox
-                            className="flex items-center space-x-3 transition-all duration-300 min-w-[340px] header-status-summary-box"
+                            className="header-status-summary-box flex min-w-[340px] items-center space-x-3 transition-all duration-300" // eslint-disable-line tailwind/no-arbitrary-value
                             padding="sm"
                             rounded="lg"
                             shadow="sm"
@@ -161,13 +162,13 @@ export const Header = (): JSX.Element => {
                             {/* Overall Health Badge */}
                             {totalMonitors > 0 && (
                                 <div
-                                    className="flex items-center space-x-2 px-3 py-1 rounded-md group transition-all duration-200 health-badge"
+                                    className="group health-badge flex items-center space-x-2 rounded-md px-3 py-1 transition-all duration-200"
                                     data-health-color={getAvailabilityColor(
                                         uptimePercentage
                                     )}
                                 >
                                     <div
-                                        className="w-3 h-3 rounded-full animate-pulse health-dot"
+                                        className="health-dot h-3 w-3 animate-pulse rounded-full"
                                         data-health-color={getAvailabilityColor(
                                             uptimePercentage
                                         )}
@@ -195,11 +196,11 @@ export const Header = (): JSX.Element => {
                             )}
 
                             {totalMonitors > 0 && (
-                                <div className="w-px h-8 bg-current opacity-20" />
+                                <div className="h-8 w-px bg-current opacity-20" />
                             )}
 
                             {/* Up Status */}
-                            <div className="flex items-center px-2 py-1 space-x-2 transition-all duration-200 rounded-md group status-up-badge">
+                            <div className="group status-up-badge flex items-center space-x-2 rounded-md px-2 py-1 transition-all duration-200">
                                 <StatusIndicator size="sm" status="up" />
                                 <div className="flex flex-col">
                                     <ThemedText
@@ -220,10 +221,10 @@ export const Header = (): JSX.Element => {
                             </div>
 
                             {/* Divider */}
-                            <div className="w-px h-8 bg-current opacity-20" />
+                            <div className="h-8 w-px bg-current opacity-20" />
 
                             {/* Down Status */}
-                            <div className="flex items-center px-2 py-1 space-x-2 transition-all duration-200 rounded-md group status-down-badge">
+                            <div className="group status-down-badge flex items-center space-x-2 rounded-md px-2 py-1 transition-all duration-200">
                                 <StatusIndicator size="sm" status="down" />
                                 <div className="flex flex-col">
                                     <ThemedText
@@ -244,10 +245,10 @@ export const Header = (): JSX.Element => {
                             </div>
 
                             {/* Divider */}
-                            <div className="w-px h-8 bg-current opacity-20" />
+                            <div className="h-8 w-px bg-current opacity-20" />
 
                             {/* Pending Status */}
-                            <div className="flex items-center px-2 py-1 space-x-2 transition-all duration-200 rounded-md group status-pending-badge">
+                            <div className="group status-pending-badge flex items-center space-x-2 rounded-md px-2 py-1 transition-all duration-200">
                                 <StatusIndicator size="sm" status="pending" />
                                 <div className="flex flex-col">
                                     <ThemedText
@@ -268,10 +269,10 @@ export const Header = (): JSX.Element => {
                             </div>
 
                             {/* Divider */}
-                            <div className="w-px h-8 bg-current opacity-20" />
+                            <div className="h-8 w-px bg-current opacity-20" />
 
                             {/* Paused Status */}
-                            <div className="flex items-center px-2 py-1 space-x-2 transition-all duration-200 rounded-md group status-paused-badge">
+                            <div className="group status-paused-badge flex items-center space-x-2 rounded-md px-2 py-1 transition-all duration-200">
                                 <StatusIndicator size="sm" status="paused" />
                                 <div className="flex flex-col">
                                     <ThemedText
@@ -294,9 +295,9 @@ export const Header = (): JSX.Element => {
                             {/* Total Sites Badge */}
                             {totalMonitors > 0 && (
                                 <>
-                                    <div className="w-px h-8 bg-current opacity-20" />
-                                    <div className="flex items-center px-2 py-1 space-x-2 rounded-md bg-opacity-10 total-sites-badge">
-                                        <div className="w-2 h-2 bg-current rounded-full opacity-50" />
+                                    <div className="h-8 w-px bg-current opacity-20" />
+                                    <div className="total-sites-badge flex items-center space-x-2 rounded-md bg-gray-500/10 px-2 py-1">
+                                        <div className="h-2 w-2 rounded-full bg-current opacity-50" />
                                         <div className="flex flex-col">
                                             <ThemedText
                                                 size="sm"
@@ -323,14 +324,14 @@ export const Header = (): JSX.Element => {
                     <div className="flex flex-wrap items-center gap-3">
                         {/* Add Site Button */}
                         <ThemedBox
-                            className="flex items-center header-controls-box"
+                            className="header-controls-box flex items-center"
                             padding="xs"
                             rounded="md"
                             variant="tertiary"
                         >
                             <ThemedButton
                                 aria-label="Add new site"
-                                className="p-2 themed-button--icon"
+                                className="themed-button--icon p-2"
                                 onClick={() => setShowAddSiteModal(true)}
                                 size="sm"
                                 variant="secondary"
@@ -341,14 +342,14 @@ export const Header = (): JSX.Element => {
 
                         {/* Theme Toggle */}
                         <ThemedBox
-                            className="flex items-center header-controls-box"
+                            className="header-controls-box flex items-center"
                             padding="xs"
                             rounded="md"
                             variant="tertiary"
                         >
                             <ThemedButton
                                 aria-label="Toggle theme"
-                                className="p-2 themed-button--icon"
+                                className="themed-button--icon p-2"
                                 onClick={toggleTheme}
                                 size="sm"
                                 variant="secondary"
@@ -359,14 +360,14 @@ export const Header = (): JSX.Element => {
 
                         {/* Settings Button */}
                         <ThemedBox
-                            className="flex items-center header-controls-box"
+                            className="header-controls-box flex items-center"
                             padding="xs"
                             rounded="md"
                             variant="tertiary"
                         >
                             <ThemedButton
                                 aria-label="Settings"
-                                className="p-2 themed-button--icon"
+                                className="themed-button--icon p-2"
                                 onClick={() => setShowSettings(true)}
                                 size="sm"
                                 variant="secondary"

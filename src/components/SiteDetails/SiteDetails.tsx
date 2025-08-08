@@ -33,6 +33,8 @@
  * @public
  */
 
+/* eslint-disable tailwind/no-arbitrary-value -- Modal component with specific layout requirements */
+
 import type { JSX } from "react/jsx-runtime";
 
 import { useEffect, useMemo, useState } from "react";
@@ -247,20 +249,20 @@ export const SiteDetails = ({
     }
 
     return (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 md:p-8 bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm md:p-8">
             <button
                 aria-label="Close modal"
-                className="absolute inset-0 bg-transparent border-none cursor-pointer"
+                className="absolute inset-0 cursor-pointer border-none bg-transparent"
                 onClick={onClose}
                 type="button"
             />
             <dialog
                 aria-label="Site details"
-                className="relative w-full max-w-[1400px] max-h-[90vh] mx-auto flex flex-col sm:max-w-[calc(100vw-2rem)] md:max-w-[calc(100vw-4rem)] lg:max-w-[1400px]"
+                className="relative mx-auto flex max-h-[90vh] w-full max-w-[1400px] flex-col sm:max-w-[calc(100vw-2rem)] md:max-w-[calc(100vw-4rem)] lg:max-w-[1400px]"
                 open
             >
                 <ThemedBox
-                    className="flex flex-col h-[90vh] overflow-hidden"
+                    className="flex h-[90vh] flex-col overflow-hidden"
                     padding="lg"
                     rounded="lg"
                     shadow="xl"
@@ -291,7 +293,7 @@ export const SiteDetails = ({
 
                     {/* Tab Content */}
                     <ThemedBox
-                        className={`flex-1 overflow-y-auto custom-scrollbar ${currentTheme.isDark ? "dark" : ""}`}
+                        className={`custom-scrollbar flex-1 overflow-y-auto ${currentTheme.isDark ? "dark" : ""}`}
                         padding="lg"
                         variant="primary"
                     >
@@ -439,3 +441,5 @@ function getAvailabilityDescription(percentage: number): string {
     }
     return "Poor";
 }
+
+/* eslint-enable tailwind/no-arbitrary-value */

@@ -130,7 +130,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
             for (const value of testValues) {
                 expect(() => {
                     // Type checks and operations
-                    const typeResult = typeof value;
+                    const typeResult = typeof value; // eslint-disable-line unicorn/no-keyword-prefix
                     const isArray = Array.isArray(value);
                     const isNullish = value == null;
                     const isNull = value === null;
@@ -149,7 +149,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
                     }
 
                     // Use the results to avoid unused variable warnings
-                    expect(typeof typeResult).toBe("string");
+                    expect(typeof typeResult).toBe("string"); // eslint-disable-line unicorn/no-keyword-prefix
                     expect(typeof isArray).toBe("boolean");
                     expect(typeof isNullish).toBe("boolean");
                     expect(typeof isNull).toBe("boolean");

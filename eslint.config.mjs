@@ -12,7 +12,7 @@
  */
 
 /* eslint-disable no-underscore-dangle */
-/* eslint-disable no-unused-vars */
+
 /* eslint-disable no-magic-numbers */
 /* eslint-disable no-inline-comments */
 /* eslint-disable n/no-unpublished-import */
@@ -105,7 +105,11 @@ import * as cssPlugin from "eslint-plugin-css";
 
 // Schema: https://www.schemastore.org/eslintrc.json
 
-const __dirname = import.meta.dirname;
+ 
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default [
     importX.flatConfigs.typescript,
@@ -262,6 +266,73 @@ export default [
         languageOptions: {
             parser: tomlEslintParser,
             parserOptions: { tomlVersion: "1.0.0" },
+        },
+    },
+
+    // TSX Tailwind Linting files
+    {
+        files: [
+            "src/**/*.tsx",
+        ],
+        ignores: [],
+        languageOptions: {
+            parser: tseslintParser,
+            parserOptions: {
+                ecmaVersion: "latest",
+                project: "tsconfig.json",
+                sourceType: "module",
+                tsconfigRootDir: import.meta.dirname,
+                ecmaFeatures: {
+                    jsx: true,
+                },
+                experimentalDecorators: true,
+                JSDocParsingMode: "all",
+                jsxFragmentName: "React.Fragment",
+                jsxPragma: "React",
+                warnOnUnsupportedTypeScriptVersion: true,
+            },
+            globals: {
+                ...globals.browser,
+                ...globals.node,
+                document: "readonly",
+                globalThis: "readonly",
+                window: "readonly",
+            },
+        },
+        settings: {
+            tailwindcss: {
+                config: `${__dirname}/src/index.css`,
+            },
+            react: { version: "19" },
+            "boundaries/elements": [
+                { type: "app", pattern: "src/App.tsx" },
+                { type: "components", pattern: "src/components/**/*" },
+                { type: "stores", pattern: "src/stores/**/*" },
+                { type: "hooks", pattern: "src/hooks/**/*" },
+                { type: "services", pattern: "src/services/**/*" },
+                { type: "theme", pattern: "src/theme/**/*" },
+                { type: "utils", pattern: "src/utils/**/*" },
+                { type: "types", pattern: "src/types.ts" },
+            ],
+        },
+        plugins: {
+            css: cssPlugin,
+            tailwind: tailwind,
+        },
+        rules: {
+            // TypeScript rules
+            ...tailwind.configs["flat/recommended"].rules,
+            ...cssPlugin.configs["flat/standard"].rules,
+
+            // Tailwind CSS
+            "tailwind/classnames-order": "warn",
+            "tailwind/enforces-negative-arbitrary-values": "warn",
+            "tailwind/enforces-shorthand": "warn",
+            "tailwind/migration-from-tailwind-2": "warn",
+            "tailwind/no-arbitrary-value": "warn",
+            "tailwind/no-contradicting-classname": "warn",
+            "tailwind/no-custom-classname": "off",
+            "tailwind/no-unnecessary-arbitrary-value": "warn",
         },
     },
 
@@ -493,10 +564,10 @@ export default [
             ],
             "react/jsx-key": "error",
             "react/jsx-no-useless-fragment": "warn",
-            "react/jsx-uses-react": "off",
+            "react/jsx-uses-react": "warn",
             "react/no-array-index-key": "warn",
             "react/no-unstable-nested-components": "error",
-            "react/prop-types": "off",
+            "react/prop-types": "warn",
             "react/react-in-jsx-scope": "off",
             "react/self-closing-comp": "warn",
 
@@ -776,7 +847,7 @@ export default [
             "react/jsx-no-leaked-render": "warn",
             "react/jsx-no-literals": "off",
             "react/jsx-no-script-url": "warn",
-            "react/jsx-one-expression-per-line": "off",
+            "react/jsx-one-expression-per-line": "warn",
             "react/jsx-pascal-case": "warn",
             "react/jsx-props-no-multi-spaces": "warn",
             "react/jsx-props-no-spread-multi": "warn",
@@ -795,7 +866,7 @@ export default [
             "react/no-namespace": "warn",
             "react/no-object-type-as-default-prop": "warn",
             "react/no-redundant-should-component-update": "warn",
-            "react/no-set-state": "off",
+            "react/no-set-state": "warn",
             "react/no-this-in-sfc": "warn",
             "react/no-typos": "warn",
             "react/no-unused-class-component-methods": "warn",
@@ -836,11 +907,11 @@ export default [
             "regexp/require-unicode-regexp": "off",
             "regexp/require-unicode-sets-regexp": "warn",
             "regexp/sort-alternatives": "warn",
-            "regexp/sort-character-class-elements": "off",
+            "regexp/sort-character-class-elements": "warn",
             "regexp/unicode-escape": "warn",
             "regexp/unicode-property": "warn",
 
-            // Tailwind CSS
+            // // Tailwind CSS
             // "tailwind/classnames-order": "warn",
             // "tailwind/enforces-negative-arbitrary-values": "warn",
             // "tailwind/enforces-shorthand": "warn",
@@ -896,7 +967,7 @@ export default [
             "import-x/no-named-default": "warn",
             "import-x/no-named-export": "off",
             "import-x/no-namespace": "off",
-            "import-x/no-nodejs-modules": "off",
+            "import-x/no-nodejs-modules": "error",
             "import-x/no-relative-packages": "warn",
             "import-x/no-relative-parent-imports": "off",
             "import-x/no-rename-default": "off",
@@ -906,7 +977,7 @@ export default [
             "import-x/no-unused-modules": "warn",
             "import-x/no-useless-path-segments": "warn",
             "import-x/no-webpack-loader-syntax": "warn",
-            "import-x/order": "off",
+            "import-x/order": "off", // Conflicts with other rules
             "import-x/prefer-default-export": "off",
             "import-x/prefer-namespace-import": "warn",
             "import-x/unambiguous": "warn",
@@ -1358,7 +1429,10 @@ export default [
             ],
             "@typescript-eslint/prefer-optional-chain": "error", // Use optional chaining instead of logical AND,
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
-            "@typescript-eslint/array-type": "off",
+            "@typescript-eslint/array-type": [
+                "error",
+                { default: "array-simple" },
+            ], // Prefer T[] for simple types, Array<T> for complex types
 
             // RegExp
             "regexp/grapheme-string-literal": "warn",
@@ -1646,7 +1720,17 @@ export default [
             "@typescript-eslint/no-non-null-assertion": "off",
             "@typescript-eslint/no-unused-vars": "off",
 
-            "unicorn/no-keyword-prefix": "off", // Allow "class" prefix for className and other legitimate uses
+            "unicorn/no-keyword-prefix": [
+                "error",
+                {
+                    disallowedPrefixes: [
+                        "interface",
+                        "type",
+                        "enum",
+                    ],
+                    checkProperties: false,
+                },
+            ], // Allow "class" prefix for className and other legitimate uses
             "unicorn/no-useless-undefined": "off", // Allow undefined in test setups
             "unicorn/consistent-function-scoping": "off", // Tests often use different scoping
             "unicorn/no-unused-properties": "off", // Allow unused properties in test setups
@@ -2080,8 +2164,10 @@ export default [
             ],
             "@typescript-eslint/prefer-optional-chain": "error", // Use optional chaining instead of logical AND
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
-            "@typescript-eslint/array-type": "off",
-
+            "@typescript-eslint/array-type": [
+                "error",
+                { default: "array-simple" },
+            ], // Prefer T[] for simple types, Array<T> for complex types
             // RegExp
             "regexp/grapheme-string-literal": "warn",
             "regexp/hexadecimal-escape": "warn",
@@ -2271,7 +2357,17 @@ export default [
             ...depend.configs["flat/recommended"].rules,
             ...eslintPluginMath.configs.recommended.rules,
 
-            "unicorn/no-keyword-prefix": "off", // Allow "class" prefix for className and other legitimate uses
+            "unicorn/no-keyword-prefix": [
+                "error",
+                {
+                    disallowedPrefixes: [
+                        "interface",
+                        "type",
+                        "enum",
+                    ],
+                    checkProperties: false,
+                },
+            ], // Allow "class" prefix for className and other legitimate uses
             "unicorn/no-useless-undefined": "off", // Allow undefined in config setups
             "unicorn/consistent-function-scoping": "off", // Configs often use different scoping
             "unicorn/no-unused-properties": "off", // Allow unused properties in config setups

@@ -96,6 +96,7 @@ export class ErrorBoundary extends React.Component<
     override componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
         logger.error("Store Error Boundary caught an error", error);
 
+        // eslint-disable-next-line react/no-set-state -- Required for error boundary functionality
         this.setState({
             error,
         });
@@ -106,6 +107,7 @@ export class ErrorBoundary extends React.Component<
     }
 
     handleRetry = (): void => {
+        // eslint-disable-next-line react/no-set-state -- Required for error recovery functionality
         this.setState((prevState) => ({
             error: undefined,
             hasError: false,

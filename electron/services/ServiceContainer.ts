@@ -340,8 +340,8 @@ export class ServiceContainer {
      *
      * @returns Array of objects containing service names and their instances.
      */
-    public getInitializedServices(): { name: string; service: unknown }[] {
-        const services: { name: string; service: unknown }[] = [];
+    public getInitializedServices(): Array<{ name: string; service: unknown }> {
+        const services: Array<{ name: string; service: unknown }> = [];
         const serviceMap: Record<string, unknown> = {
             AutoUpdaterService: this.autoUpdaterService,
             ConfigurationManager: this.configurationManager,

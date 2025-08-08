@@ -123,7 +123,7 @@ export const SiteCard: React.NamedExoticComponent<SiteCardProperties> =
         return (
             <ThemedBox
                 aria-label={`View details for ${latestSite.name}`}
-                className="group flex flex-col w-full gap-2 text-left cursor-pointer site-card"
+                className="group site-card flex w-full cursor-pointer flex-col gap-2 text-left"
                 onClick={handleCardClick}
                 padding="md"
                 rounded="md"

@@ -59,12 +59,12 @@ export const HistoryChart: React.NamedExoticComponent<HistoryChartProps> =
 
         return (
             <div className={`mb-3 w-full ${className}`}>
-                <div className="flex items-center justify-end mb-2">
+                <div className="mb-2 flex items-center justify-end">
                     <ThemedText size="xs" variant="secondary">
                         {title}
                     </ThemedText>
                 </div>
-                <div className="flex items-center justify-end flex-shrink min-w-0 gap-1 overflow-hidden">
+                <div className="flex min-w-0 shrink items-center justify-end gap-1 overflow-hidden">
                     {displayedHistory.map((record) => (
                         <MiniChartBar
                             key={`${record.timestamp}-${record.status}-${record.responseTime}`}

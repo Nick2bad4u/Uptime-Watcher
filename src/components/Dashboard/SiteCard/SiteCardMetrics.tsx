@@ -78,7 +78,7 @@ export const SiteCardMetrics: React.NamedExoticComponent<SiteCardMetricsProperti
         );
 
         return (
-            <div className="grid grid-cols-4 gap-4 mb-4">
+            <div className="mb-4 grid grid-cols-4 gap-4">
                 {metrics.map((metric) => (
                     <MetricCard
                         key={metric.label}

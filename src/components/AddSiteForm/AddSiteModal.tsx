@@ -69,20 +69,20 @@ export const AddSiteModal: React.NamedExoticComponent<object> = React.memo(
         return (
             /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
             <div
-                className={`fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-opacity-30 ${
+                className={`fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm ${
                     isDark ? "dark" : ""
                 }`}
                 onClick={handleBackdropClick}
             >
                 <ThemedBox
-                    className="w-full max-w-2xl max-h-[90vh] overflow-y-auto m-4"
+                    className="m-4 max-h-screen w-full max-w-2xl overflow-y-auto"
                     padding="lg"
                     rounded="lg"
                     shadow="lg"
                     surface="elevated"
                 >
                     {/* Modal Header */}
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="mb-6 flex items-center justify-between">
                         <ThemedText size="xl" weight="medium">
                             Add New Site
                         </ThemedText>

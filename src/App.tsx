@@ -256,7 +256,7 @@ const App = (): JSX.Element => {
                     {lastError ? (
                         <div
                             aria-live="assertive"
-                            className="fixed top-0 left-0 right-0 z-50"
+                            className="fixed top-0 right-0 left-0 z-50"
                             role="alert"
                         >
                             <ThemedBox
@@ -274,7 +274,7 @@ const App = (): JSX.Element => {
                                         </ThemedText>
                                     </div>
                                     <ThemedButton
-                                        className="ml-4 error-alert__close"
+                                        className="error-alert__close ml-4"
                                         onClick={clearError}
                                         size="sm"
                                         variant="secondary"
@@ -294,7 +294,7 @@ const App = (): JSX.Element => {
                         (updateStatus === "error" ? (
                             <div
                                 aria-live="assertive"
-                                className="fixed left-0 right-0 z-50 top-12"
+                                className="fixed top-12 right-0 left-0 z-50"
                                 role="alert"
                             >
                                 <ThemedBox
@@ -316,7 +316,7 @@ const App = (): JSX.Element => {
                                             </ThemedText>
                                         </div>
                                         <ThemedButton
-                                            className="ml-4 update-alert__action"
+                                            className="update-alert__action ml-4"
                                             onClick={handleUpdateAction}
                                             size="sm"
                                             variant="secondary"
@@ -329,7 +329,7 @@ const App = (): JSX.Element => {
                         ) : (
                             <output
                                 aria-live="polite"
-                                className="fixed left-0 right-0 z-50 top-12"
+                                className="fixed top-12 right-0 left-0 z-50"
                             >
                                 <ThemedBox
                                     className={`update-alert update-alert--${updateStatus}`}
@@ -362,7 +362,7 @@ const App = (): JSX.Element => {
                                         </div>
                                         {updateStatus === "downloaded" && (
                                             <ThemedButton
-                                                className="ml-4 update-alert__action"
+                                                className="update-alert__action ml-4"
                                                 onClick={handleUpdateAction}
                                                 size="sm"
                                                 variant="secondary"

@@ -3,6 +3,8 @@
  * Provides a unified interface for site check, start/stop monitoring actions.
  */
 
+/* eslint-disable tailwind/no-arbitrary-value -- Specific button sizing requirements */
+
 import React, { useCallback } from "react";
 
 import { ThemedButton } from "../../../../theme/components";
@@ -150,3 +152,5 @@ export const ActionButtonGroup: React.NamedExoticComponent<ActionButtonGroupProp
             </div>
         );
     });
+
+/* eslint-enable tailwind/no-arbitrary-value */

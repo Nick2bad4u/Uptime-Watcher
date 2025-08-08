@@ -145,7 +145,7 @@ export abstract class DatabaseCommand<TResult = void>
  * @public
  */
 export class DatabaseCommandExecutor {
-    private readonly executedCommands: IDatabaseCommand<unknown>[] = [];
+    private readonly executedCommands: Array<IDatabaseCommand<unknown>> = [];
 
     /**
      * Clears the command history without performing rollback.

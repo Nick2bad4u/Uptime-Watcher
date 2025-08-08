@@ -396,7 +396,7 @@ export const SettingsTab = ({
                     {/* Total monitoring time indicator */}
                     {localRetryAttempts > 0 && (
                         <ThemedBox
-                            className="bg-surface-elevated border border-primary/20"
+                            className="bg-surface-elevated border-primary/20 border"
                             padding="md"
                             rounded="lg"
                             variant="tertiary"
@@ -465,7 +465,7 @@ export const SettingsTab = ({
 
             {/* Danger Zone */}
             <ThemedCard
-                className="border-2 border-error/30 bg-error/5"
+                className="border-error/30 bg-error/5 border-2"
                 icon={<MdDangerous color={iconColors.danger} />}
                 title="Danger Zone"
             >

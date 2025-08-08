@@ -262,7 +262,7 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
 
         return (
             <ThemedBox
-                className="max-w-md mx-auto"
+                className="mx-auto max-w-md"
                 padding="lg"
                 rounded="lg"
                 surface="base"

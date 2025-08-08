@@ -109,12 +109,12 @@ export class MonitorRepository {
      */
     public async bulkCreate(
         siteIdentifier: string,
-        monitors: Site["monitors"][0][]
-    ): Promise<Site["monitors"][0][]> {
+        monitors: Array<Site["monitors"][0]>
+    ): Promise<Array<Site["monitors"][0]>> {
         return withDatabaseOperation(
             async () => {
                 // Use executeTransaction for atomic bulk create operation
-                const createdMonitors: Site["monitors"][0][] = [];
+                const createdMonitors: Array<Site["monitors"][0]> = [];
 
                 await this.databaseService.executeTransaction((db) => {
                     for (const monitor of monitors) {
@@ -412,9 +412,9 @@ export class MonitorRepository {
         // Get all monitor IDs for this site
         const monitorRows = db.all(MONITOR_QUERIES.SELECT_IDS_BY_SITE, [
             siteIdentifier,
-        ]) as {
+        ]) as Array<{
             id: number;
-        }[];
+        }>;
 
         // Delete history for all monitors
         for (const row of monitorRows) {
@@ -512,12 +512,12 @@ export class MonitorRepository {
      * const ids = await repo.getAllMonitorIds();
      * ```
      */
-    public async getAllMonitorIds(): Promise<{ id: number }[]> {
+    public async getAllMonitorIds(): Promise<Array<{ id: number }>> {
         return withDatabaseOperation(() => {
             const db = this.getDb();
-            const rows = db.all(MONITOR_QUERIES.SELECT_ALL_IDS) as {
+            const rows = db.all(MONITOR_QUERIES.SELECT_ALL_IDS) as Array<{
                 id: number;
-            }[];
+            }>;
             return Promise.resolve(rows);
         }, "monitor-get-all-ids");
     }

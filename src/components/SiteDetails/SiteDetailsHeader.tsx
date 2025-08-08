@@ -74,9 +74,9 @@ export const SiteDetailsHeader = ({
             <div style={styles.contentStyle}>
                 {/* Left accent bar */}
                 <div className="site-details-header-accent" />
-                <div className="flex items-start justify-between w-full gap-6 site-details-header-info">
+                <div className="site-details-header-info flex w-full items-start justify-between gap-6">
                     {/* Left side: Screenshot, Status, and Site Info */}
-                    <div className="flex items-center flex-1 min-w-0 gap-4">
+                    <div className="flex min-w-0 flex-1 items-center gap-4">
                         {/* Website Screenshot Thumbnail - Only show URL for HTTP monitors */}
                         {!isCollapsed && (
                             <ScreenshotThumbnail
@@ -90,9 +90,9 @@ export const SiteDetailsHeader = ({
                                 status={selectedMonitor?.status ?? "unknown"}
                             />
                         </div>
-                        <div className="flex-1 min-w-0">
+                        <div className="min-w-0 flex-1">
                             <ThemedText
-                                className="truncate site-details-title"
+                                className="site-details-title truncate"
                                 size="2xl"
                                 weight="bold"
                             >
@@ -104,7 +104,7 @@ export const SiteDetailsHeader = ({
                             selectedMonitor.url ? (
                                 <a
                                     aria-label={`Open ${selectedMonitor.url} in browser`}
-                                    className="truncate site-details-url"
+                                    className="site-details-url truncate"
                                     href={selectedMonitor.url}
                                     onClick={(event) => {
                                         event.preventDefault();
@@ -129,7 +129,7 @@ export const SiteDetailsHeader = ({
                         </div>
                     </div>
                     {/* Right side: Monitoring Status Display and Collapse Button */}
-                    <div className="flex items-center self-start flex-shrink-0 gap-2">
+                    <div className="flex shrink-0 items-center gap-2 self-start">
                         {!isCollapsed && (
                             <MonitoringStatusDisplay monitors={site.monitors} />
                         )}
@@ -150,9 +150,9 @@ export const SiteDetailsHeader = ({
                                 type="button"
                             >
                                 {isCollapsed ? (
-                                    <MdExpandMore className="w-5 h-5 themed-text-secondary" />
+                                    <MdExpandMore className="themed-text-secondary h-5 w-5" />
                                 ) : (
-                                    <MdExpandLess className="w-5 h-5 themed-text-secondary" />
+                                    <MdExpandLess className="themed-text-secondary h-5 w-5" />
                                 )}
                             </button>
                         ) : null}
@@ -222,7 +222,7 @@ const MonitoringStatusDisplay = ({
                         {runningCount}/{totalCount} active
                     </ThemedBadge>
                 </div>
-                <div className="flex flex-col gap-1 overflow-y-auto max-h-32">
+                <div className="flex max-h-32 flex-col gap-1 overflow-y-auto">
                     {monitors.map((monitor) => (
                         <div
                             className="flex items-center gap-2"
@@ -237,7 +237,7 @@ const MonitoringStatusDisplay = ({
                             >
                                 <div className="flex items-center gap-1">
                                     <div
-                                        className={`w-2 h-2 rounded-full ${
+                                        className={`h-2 w-2 rounded-full ${
                                             monitor.monitoring
                                                 ? "themed-status-up"
                                                 : "themed-status-paused"
@@ -250,7 +250,7 @@ const MonitoringStatusDisplay = ({
                                 </div>
                             </ThemedBadge>
                             <ThemedText
-                                className="flex-1 min-w-0"
+                                className="min-w-0 flex-1"
                                 size="xs"
                                 variant="secondary"
                             >

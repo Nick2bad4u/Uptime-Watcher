@@ -141,7 +141,7 @@ export class HistoryRepository {
      */
     public async bulkInsert(
         monitorId: string,
-        historyEntries: (StatusHistory & { details?: string })[]
+        historyEntries: Array<StatusHistory & { details?: string }>
     ): Promise<void> {
         if (historyEntries.length === 0) {
             return;
@@ -352,7 +352,7 @@ export class HistoryRepository {
                 await this.databaseService.executeTransaction((db) => {
                     const monitors = db.all(
                         HISTORY_QUERIES.SELECT_MONITOR_IDS
-                    ) as { id: number }[];
+                    ) as Array<{ id: number }>;
                     for (const monitor of monitors) {
                         const excessEntries = db.all(
                             HISTORY_QUERIES.SELECT_EXCESS_ENTRIES,
@@ -360,7 +360,7 @@ export class HistoryRepository {
                                 String(monitor.id),
                                 limit,
                             ]
-                        ) as { id: number }[];
+                        ) as Array<{ id: number }>;
                         if (excessEntries.length > 0) {
                             // Convert numeric IDs to ensure type safety and validate they are numbers
                             const excessIds = excessEntries
@@ -401,9 +401,11 @@ export class HistoryRepository {
         }
 
         // Get all monitor IDs
-        const monitorRows = db.all(HISTORY_QUERIES.SELECT_MONITOR_IDS) as {
+        const monitorRows = db.all(
+            HISTORY_QUERIES.SELECT_MONITOR_IDS
+        ) as Array<{
             id: number;
-        }[];
+        }>;
 
         // Prune history for each monitor
         for (const row of monitorRows) {

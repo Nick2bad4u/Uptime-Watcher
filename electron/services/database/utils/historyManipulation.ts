@@ -111,7 +111,7 @@ export function addHistoryEntry(
 export function bulkInsertHistory(
     db: Database,
     monitorId: string,
-    historyEntries: (StatusHistory & { details?: string })[]
+    historyEntries: Array<StatusHistory & { details?: string }>
 ): void {
     if (historyEntries.length === 0) {
         return;
@@ -257,9 +257,9 @@ export function pruneHistoryForMonitor(
         const excess = db.all(
             HISTORY_MANIPULATION_QUERIES.SELECT_EXCESS_ENTRIES,
             [monitorId, limit]
-        ) as {
+        ) as Array<{
             id: number;
-        }[];
+        }>;
 
         if (excess.length > 0) {
             // Convert numeric IDs to ensure type safety and validate they are numbers

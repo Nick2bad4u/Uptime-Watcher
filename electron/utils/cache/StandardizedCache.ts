@@ -113,7 +113,7 @@ export class StandardizedCache<T> {
      * Note: Emits only a single bulk-updated event for performance.
      * Individual item cache events are not emitted during bulk operations.
      */
-    bulkUpdate(items: { data: T; key: string; ttl?: number }[]): void {
+    bulkUpdate(items: Array<{ data: T; key: string; ttl?: number }>): void {
         logger.debug(
             `[Cache:${this.config.name}] Bulk updating ${items.length} items`
         );
@@ -200,7 +200,7 @@ export class StandardizedCache<T> {
      * Get cache entries iterator.
      */
     entries(): IterableIterator<[string, T]> {
-        const entries: [string, T][] = [];
+        const entries: Array<[string, T]> = [];
         const expiredKeys: string[] = [];
         const now = Date.now();
 

@@ -201,8 +201,8 @@ export const createSiteSyncActions = (
             try {
                 return await withErrorHandling(
                     async () => {
-                        // eslint-disable-next-line n/no-sync -- Method name contains 'sync' but is not a synchronous file operation
                         const response =
+                            // eslint-disable-next-line n/no-sync -- Method name contains 'sync' but is not a synchronous file operation
                             await window.electronAPI.stateSync.getSyncStatus();
                         const status = safeExtractIpcData(response, {
                             lastSync: undefined,
