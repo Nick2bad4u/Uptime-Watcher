@@ -72,8 +72,7 @@
  * ```
  */
 
-import type { UptimeEvents } from "./events/eventTypes";
-
+import { type UptimeEvents } from "./events/eventTypes";
 import {
     createErrorHandlingMiddleware,
     createLoggingMiddleware,

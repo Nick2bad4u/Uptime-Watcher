@@ -3,7 +3,7 @@
  * Provides access to monitor type definitions through the IPC bridge.
  */
 
-import type { MonitorFieldDefinition } from "@shared/types";
+import { type MonitorFieldDefinition } from "@shared/types";
 
 import { CacheKeys } from "../../shared/utils/cacheKeys";
 // eslint-disable-next-line import-x/no-unassigned-import -- Global type declarations

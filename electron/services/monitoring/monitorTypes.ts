@@ -13,8 +13,7 @@
  * @see {@link MonitorType} for type definition
  */
 
-import type { MonitorType } from "../../types";
-
+import { type MonitorType } from "../../types";
 import { BASE_MONITOR_TYPES } from "../../types";
 
 // Import and re-export the core types from the main types file

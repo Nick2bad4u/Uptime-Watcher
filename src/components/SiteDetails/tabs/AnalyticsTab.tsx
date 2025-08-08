@@ -3,10 +3,9 @@
  * Displays advanced metrics, charts, and performance analysis for site monitoring.
  */
 
-import type { JSX } from "react/jsx-runtime";
-
 import { FiActivity, FiBarChart2, FiTrendingUp } from "react-icons/fi";
 import { MdAnalytics, MdPieChart, MdSpeed, MdTrendingUp } from "react-icons/md";
+import { type JSX } from "react/jsx-runtime";
 
 import { CHART_TIME_RANGES, ChartTimeRange } from "../../../constants";
 import { DowntimePeriod } from "../../../hooks/site/useSiteAnalytics";

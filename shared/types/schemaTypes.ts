@@ -9,7 +9,7 @@
  * @packageDocumentation
  */
 
-import type { z } from "zod";
+import { type z } from "zod";
 
 /**
  * Type definition for base monitor schema.

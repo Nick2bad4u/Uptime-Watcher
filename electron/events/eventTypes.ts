@@ -10,7 +10,7 @@
  * @public
  */
 
-import type { Monitor, Site, StatusUpdate } from "../types";
+import { type Monitor, type Site, type StatusUpdate } from "../types";
 
 /**
  * Category for grouping related events by functional domain.

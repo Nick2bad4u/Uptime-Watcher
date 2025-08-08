@@ -9,7 +9,7 @@
  * @packageDocumentation
  */
 
-import type { MonitorType } from "@shared/types";
+import { type MonitorType } from "@shared/types";
 
 /**
  * Add site form state interface.

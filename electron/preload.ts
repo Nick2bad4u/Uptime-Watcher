@@ -10,15 +10,15 @@
 
 import { contextBridge, ipcRenderer } from "electron";
 
-import type {
-    CacheInvalidatedEventData,
-    MonitorDownEventData,
-    MonitoringControlEventData,
-    MonitorUpEventData,
-    TestEventData,
-    UpdateStatusEventData,
+import {
+    type CacheInvalidatedEventData,
+    type MonitorDownEventData,
+    type MonitoringControlEventData,
+    type MonitorUpEventData,
+    type TestEventData,
+    type UpdateStatusEventData,
 } from "../shared/types/events";
-import type { Site } from "./types";
+import { type Site } from "./types";
 
 /**
  * Site management API methods for CRUD operations.

@@ -8,7 +8,7 @@
  * @packageDocumentation
  */
 
-import type { ThemeName } from "../theme/types";
+import { type ThemeName } from "../theme/types";
 
 /**
  * Application settings interface.

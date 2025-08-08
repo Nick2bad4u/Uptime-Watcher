@@ -3,11 +3,8 @@
  * Manages global state, modals, notifications, and renders the main application layout.
  */
 
-import type { JSX } from "react/jsx-runtime";
-
 import { useCallback, useEffect, useState } from "react";
-
-import type { StatusUpdate } from "./types";
+import { type JSX } from "react/jsx-runtime";
 
 import { isDevelopment, isProduction } from "../shared/utils/environment";
 import { AddSiteModal } from "./components/AddSiteForm/AddSiteModal";
@@ -32,6 +29,7 @@ import {
     ThemeProvider,
 } from "./theme/components";
 import { useTheme } from "./theme/useTheme";
+import { type StatusUpdate } from "./types";
 import { setupCacheSync } from "./utils/cacheSync";
 
 // UI Message constants for consistency and future localization

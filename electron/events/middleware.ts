@@ -8,10 +8,9 @@
  * @packageDocumentation
  */
 
-import type { EventMiddleware } from "./TypedEventBus";
-
 import { isDevelopment } from "../../shared/utils/environment";
 import { logger as baseLogger } from "../utils/logger";
+import { type EventMiddleware } from "./TypedEventBus";
 
 // Helper functions for metrics middleware (reduces complexity by composition)
 type MetricsCallback = (metric: {

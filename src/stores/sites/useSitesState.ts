@@ -3,8 +3,7 @@
  * Handles core state operations for sites, selected site, and monitor selections.
  */
 
-import type { Site } from "../../types";
-
+import { type Site } from "../../types";
 import { logStoreAction } from "../utils";
 
 export interface SitesState {

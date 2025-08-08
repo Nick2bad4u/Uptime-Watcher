@@ -3,7 +3,7 @@
  * These utilities eliminate hardcoded monitor type checks throughout the frontend.
  */
 
-import type { Monitor, MonitorType } from "@shared/types";
+import { type Monitor, type MonitorType } from "@shared/types";
 
 import { CacheKeys } from "../../shared/utils/cacheKeys";
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";

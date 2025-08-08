@@ -3,8 +3,7 @@
  * Provides consistent status display throughout the application.
  */
 
-import type { MonitorStatus } from "@shared/types";
-
+import { type MonitorStatus } from "@shared/types";
 import React from "react";
 
 import { StatusIndicator, ThemedText } from "../../theme/components";

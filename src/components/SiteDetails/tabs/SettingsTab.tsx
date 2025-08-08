@@ -3,8 +3,6 @@
  * Provides interface for modifying site settings, intervals, and performing site management actions.
  */
 
-import type { JSX } from "react/jsx-runtime";
-
 import React, { useEffect, useState } from "react";
 import { FiSave, FiTrash2 } from "react-icons/fi";
 import {
@@ -13,6 +11,7 @@ import {
     MdSettings,
     MdTimer,
 } from "react-icons/md";
+import { type JSX } from "react/jsx-runtime";
 
 import {
     CHECK_INTERVALS,

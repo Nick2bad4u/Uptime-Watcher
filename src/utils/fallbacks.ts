@@ -3,9 +3,8 @@
  * Provides type-safe fallback handling across the application.
  */
 
-import type { Monitor } from "../types";
-
 import logger from "../services/logger";
+import { type Monitor } from "../types";
 import { ensureError, withUtilityErrorHandling } from "./errorHandling";
 
 /**

@@ -6,12 +6,9 @@
  * Includes data synchronization and SQLite backup functionality.
  */
 
-import type { JSX } from "react/jsx-runtime";
-
 import { safeInteger } from "@shared/validation/validatorUtils";
 import { useCallback, useState } from "react";
-
-import type { AppSettings } from "../../stores/types";
+import { type JSX } from "react/jsx-runtime";
 
 import { DEFAULT_HISTORY_LIMIT, HISTORY_LIMIT_OPTIONS } from "../../constants";
 import { useDelayedButtonLoading } from "../../hooks/useDelayedButtonLoading";
@@ -19,6 +16,7 @@ import logger from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSettingsStore } from "../../stores/settings/useSettingsStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
+import { type AppSettings } from "../../stores/types";
 import {
     StatusIndicator,
     ThemedBox,

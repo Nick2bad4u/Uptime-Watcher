@@ -3,7 +3,7 @@
  * Manages application updates and update notifications.
  */
 
-import type { UpdateStatus } from "../types";
+import { type UpdateStatus } from "../types";
 
 /**
  * Update information interface.

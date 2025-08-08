@@ -3,7 +3,7 @@
  * Replaces generic `unknown` types in IPC event callbacks.
  */
 
-import type { Monitor, Site } from "@shared/types";
+import { type Monitor, type Site } from "@shared/types";
 
 /**
  * Event data for cache invalidation

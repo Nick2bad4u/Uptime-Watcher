@@ -3,8 +3,7 @@
  * Provides consistent data transformation between database rows and Settings objects.
  */
 
-import type { SettingsRow as DatabaseSettingsRow } from "../../../../shared/types/database";
-
+import { type SettingsRow as DatabaseSettingsRow } from "../../../../shared/types/database";
 import { LOG_TEMPLATES } from "../../../../shared/utils/logTemplates";
 import { safeStringify } from "../../../../shared/utils/stringConversion";
 import { isNonEmptyString } from "../../../../shared/validation/validatorUtils";

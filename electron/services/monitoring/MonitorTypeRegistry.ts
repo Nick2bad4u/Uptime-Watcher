@@ -9,8 +9,6 @@
 
 import { z } from "zod";
 
-import type { MonitorType } from "./monitorTypes";
-
 import {
     type Monitor,
     MONITOR_STATUS,
@@ -30,6 +28,7 @@ import {
     migrationRegistry,
     versionManager,
 } from "./MigrationSystem";
+import { type MonitorType } from "./monitorTypes";
 import { PingMonitor } from "./PingMonitor";
 import { PortMonitor } from "./PortMonitor";
 

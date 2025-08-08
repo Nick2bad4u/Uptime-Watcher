@@ -3,11 +3,10 @@
  * Provides filtering, pagination, and detailed history records view.
  */
 
-import type { JSX } from "react/jsx-runtime";
-
 import { useEffect, useRef, useState } from "react";
 import { FiFilter, FiInbox } from "react-icons/fi";
 import { MdHistory } from "react-icons/md";
+import { type JSX } from "react/jsx-runtime";
 
 import logger from "../../../services/logger";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";

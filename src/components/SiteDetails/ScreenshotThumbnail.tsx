@@ -6,10 +6,9 @@
  * React portals for the overlay positioning.
  */
 
-import type { JSX } from "react/jsx-runtime";
-
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { type JSX } from "react/jsx-runtime";
 
 import { UI_DELAYS } from "../../constants";
 import { useUIStore } from "../../stores/ui/useUiStore";

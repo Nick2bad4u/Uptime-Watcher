@@ -12,10 +12,9 @@
 
 import { useCallback, useState } from "react";
 
-import type { MonitorType } from "../../types";
-
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { useMonitorFields } from "../../hooks/useMonitorFields";
+import { type MonitorType } from "../../types";
 import { generateUuid } from "../../utils/data/generateUuid";
 
 /**

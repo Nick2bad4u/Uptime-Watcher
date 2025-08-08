@@ -3,9 +3,7 @@
  * Centralizes business logic for configuration decisions and caches validation results.
  */
 
-import type { ConfigValue } from "../../shared/types/configTypes";
-import type { ValidationResult } from "./validators/interfaces";
-
+import { type ConfigValue } from "../../shared/types/configTypes";
 import { CacheKeys } from "../../shared/utils/cacheKeys";
 import {
     CACHE_SIZE_LIMITS,
@@ -16,6 +14,7 @@ import {
 import { isDev } from "../electronUtils";
 import { Site } from "../types";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
+import { type ValidationResult } from "./validators/interfaces";
 import { MonitorValidator } from "./validators/MonitorValidator";
 import { SiteValidator } from "./validators/SiteValidator";
 

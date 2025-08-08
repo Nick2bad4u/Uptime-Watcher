@@ -34,13 +34,12 @@
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
-import type { AppSettings } from "../types";
-import type { SettingsStore } from "./types";
-
 import { DEFAULT_HISTORY_LIMIT } from "../../constants";
 import { safeExtractIpcData } from "../../types/ipc";
 import { useErrorStore } from "../error/useErrorStore";
+import { type AppSettings } from "../types";
 import { logStoreAction, withErrorHandling } from "../utils";
+import { type SettingsStore } from "./types";
 
 const defaultSettings: AppSettings = {
     autoStart: false,

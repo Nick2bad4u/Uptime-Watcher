@@ -1,7 +1,6 @@
 import { Database } from "node-sqlite3-wasm";
 
-import type { SettingsRow as DatabaseSettingsRow } from "../../../shared/types/database";
-
+import { type SettingsRow as DatabaseSettingsRow } from "../../../shared/types/database";
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";

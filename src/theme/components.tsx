@@ -9,10 +9,9 @@
  * Note: className is a standard React prop and should not be renamed.
  */
 
-import type { MonitorStatus, SiteStatus } from "@shared/types";
-import type { JSX } from "react/jsx-runtime";
-
+import { type MonitorStatus, type SiteStatus } from "@shared/types";
 import React from "react";
+import { type JSX } from "react/jsx-runtime";
 
 import { ARIA_LABEL, TRANSITION_ALL } from "../constants";
 import { getStatusIcon } from "../utils/status";

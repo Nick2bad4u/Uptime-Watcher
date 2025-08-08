@@ -5,7 +5,6 @@ import {
     AnalyticsTab,
     type AnalyticsTabProperties,
 } from "../../../../components/SiteDetails/tabs/AnalyticsTab";
-import { CHART_TIME_RANGES } from "../../../../constants";
 import type { DowntimePeriod } from "../../../../hooks/site/useSiteAnalytics";
 import type {
     ResponseTimeChartData,

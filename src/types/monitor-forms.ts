@@ -3,7 +3,7 @@
  * Replaces generic `Record<string, unknown>` patterns.
  */
 
-import type { MonitorType } from "@shared/types";
+import { type MonitorType } from "@shared/types";
 
 /**
  * Base monitor fields common to all monitor types

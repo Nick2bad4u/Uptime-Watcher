@@ -38,10 +38,9 @@
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
-import type { UpdateStatus } from "../types";
-import type { UpdateInfo, UpdatesStore } from "./types";
-
+import { type UpdateStatus } from "../types";
 import { logStoreAction } from "../utils";
+import { type UpdateInfo, type UpdatesStore } from "./types";
 
 /**
  * Interface for the updates store with persistence capabilities.

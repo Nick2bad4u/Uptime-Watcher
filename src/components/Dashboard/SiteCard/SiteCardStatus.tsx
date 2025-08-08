@@ -3,8 +3,7 @@
  * Provides visual status indicator for site monitoring state.
  */
 
-import type { MonitorStatus } from "@shared/types";
-
+import { type MonitorStatus } from "@shared/types";
 import React from "react";
 
 import { StatusBadge } from "../../common/StatusBadge";

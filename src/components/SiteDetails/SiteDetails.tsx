@@ -35,9 +35,8 @@
 
 /* eslint-disable tailwind/no-arbitrary-value -- Modal component with specific layout requirements */
 
-import type { JSX } from "react/jsx-runtime";
-
 import { useEffect, useMemo, useState } from "react";
+import { type JSX } from "react/jsx-runtime";
 
 import { useSiteDetails } from "../../hooks/site/useSiteDetails";
 // eslint-disable-next-line import-x/no-unassigned-import -- Chart.js initialization

@@ -5,7 +5,7 @@
  * These interfaces replace generic `unknown` types, ensuring strict typing for all event payloads exchanged between the Electron main process and renderer.
  */
 
-import type { Monitor, Site } from "@shared/types";
+import { type Monitor, type Site } from "@shared/types";
 
 /**
  * Payload for cache invalidation events.

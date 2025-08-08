@@ -3,7 +3,7 @@
  * Provides type-safe caching with TTL support and proper cleanup.
  */
 
-import type { CacheValue } from "../../shared/types/configTypes";
+import { type CacheValue } from "../../shared/types/configTypes";
 
 /**
  * Configuration options for cache instances.

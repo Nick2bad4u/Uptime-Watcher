@@ -7,13 +7,12 @@
  * @public
  */
 
-import type {
-    Monitor,
-    MonitorStatus,
-    MonitorType,
+import {
+    type Monitor,
+    type MonitorStatus,
+    type MonitorType,
 } from "../../../../shared/types";
-import type { MonitorRow } from "../../../../shared/types/database";
-
+import { type MonitorRow } from "../../../../shared/types/database";
 import { safeGetRowProperty } from "../../../../shared/types/database";
 import { safeStringify } from "../../../../shared/utils/stringConversion";
 import { isValidIdentifierArray } from "../../../../shared/validation/validatorUtils";

@@ -12,8 +12,7 @@
  * @packageDocumentation
  */
 
-import type { RendererLogger } from "electron-log";
-
+import { type RendererLogger } from "electron-log";
 import log from "electron-log/renderer";
 
 /**

@@ -6,7 +6,7 @@
  * This is the single source of truth for status calculations, used by both frontend and backend.
  */
 
-import type { SiteForStatus, SiteStatus } from "@shared/types";
+import { type SiteForStatus, type SiteStatus } from "@shared/types";
 
 /**
  * Calculates the overall monitoring state for a site based on its monitors.

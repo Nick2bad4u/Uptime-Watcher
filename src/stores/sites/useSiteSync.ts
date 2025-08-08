@@ -14,9 +14,8 @@
  * @packageDocumentation
  */
 
-import type { Site, StatusUpdate } from "../../types";
-
 import logger from "../../services/logger";
+import { type Site, type StatusUpdate } from "../../types";
 import { safeExtractIpcData } from "../../types/ipc";
 import { ensureError } from "../../utils/errorHandling";
 import { useErrorStore } from "../error/useErrorStore";

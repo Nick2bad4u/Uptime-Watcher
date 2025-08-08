@@ -6,9 +6,13 @@
 import { DEFAULT_MONITOR_STATUS } from "@shared/types";
 import { useCallback, useMemo } from "react";
 
-import type { Monitor, MonitorStatus, Site, StatusHistory } from "../../types";
-
 import { useSitesStore } from "../../stores/sites/useSitesStore";
+import {
+    type Monitor,
+    type MonitorStatus,
+    type Site,
+    type StatusHistory,
+} from "../../types";
 import { getDefaultMonitorId } from "../../utils/monitorUiHelpers";
 
 /**

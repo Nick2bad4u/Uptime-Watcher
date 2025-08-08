@@ -9,7 +9,7 @@
  * @packageDocumentation
  */
 
-import type { AppSettings } from "../types";
+import { type AppSettings } from "../types";
 
 /**
  * Settings store interface for managing application configuration.

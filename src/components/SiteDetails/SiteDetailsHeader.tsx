@@ -5,9 +5,8 @@
  * in a visually appealing header with gradient background and accent styling.
  */
 
-import type { JSX } from "react/jsx-runtime";
-
 import { MdExpandLess, MdExpandMore } from "react-icons/md";
+import { type JSX } from "react/jsx-runtime";
 
 import { useThemeStyles } from "../../hooks/useThemeStyles";
 import { useUIStore } from "../../stores/ui/useUiStore";

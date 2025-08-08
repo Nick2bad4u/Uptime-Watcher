@@ -4,9 +4,8 @@
  * and navigating between different detail views.
  */
 
-import type { JSX } from "react/jsx-runtime";
-
 import React, { useCallback } from "react";
+import { type JSX } from "react/jsx-runtime";
 
 import logger from "../../services/logger";
 import {

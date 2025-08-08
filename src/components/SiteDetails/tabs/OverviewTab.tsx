@@ -3,8 +3,6 @@
  * Displays key metrics, statistics, and actions for a monitored site.
  */
 
-import type { JSX } from "react/jsx-runtime";
-
 import { FaListOl } from "react-icons/fa";
 import { FiTrash2 } from "react-icons/fi";
 import {
@@ -13,6 +11,7 @@ import {
     MdOutlineFactCheck,
     MdSpeed,
 } from "react-icons/md";
+import { type JSX } from "react/jsx-runtime";
 
 import { CHECK_INTERVALS, TIMEOUT_CONSTRAINTS } from "../../../constants";
 import logger from "../../../services/logger";

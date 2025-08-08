@@ -11,9 +11,8 @@
  * - Each component is typed for its specific chart type (line, doughnut, bar)
  */
 
-import type { JSX } from "react/jsx-runtime";
-
 import { memo, type MemoExoticComponent } from "react";
+import { type JSX } from "react/jsx-runtime";
 
 import {
     ResponseTimeChartData,

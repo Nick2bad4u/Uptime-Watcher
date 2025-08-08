@@ -5,7 +5,7 @@
  * @packageDocumentation
  */
 
-import type { Theme } from "../types";
+import { type Theme } from "../types";
 
 // Helper functions for theme merging (reduces function length by composition)
 const mergeColors = (

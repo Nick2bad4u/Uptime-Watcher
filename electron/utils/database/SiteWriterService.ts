@@ -22,8 +22,7 @@
 
 import { Database } from "node-sqlite3-wasm";
 
-import type { MonitorRow } from "../../../shared/types/database";
-
+import { type MonitorRow } from "../../../shared/types/database";
 import { DatabaseService } from "../../services/database/DatabaseService";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { SiteRepository } from "../../services/database/SiteRepository";

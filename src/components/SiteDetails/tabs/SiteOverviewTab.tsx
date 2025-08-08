@@ -4,8 +4,6 @@
  * and site-level actions.
  */
 
-import type { JSX } from "react/jsx-runtime";
-
 import { useCallback, useMemo } from "react";
 import { FiSettings } from "react-icons/fi";
 import {
@@ -14,6 +12,7 @@ import {
     MdOutlineFactCheck,
     MdSpeed,
 } from "react-icons/md";
+import { type JSX } from "react/jsx-runtime";
 
 import {
     StatusIndicator,

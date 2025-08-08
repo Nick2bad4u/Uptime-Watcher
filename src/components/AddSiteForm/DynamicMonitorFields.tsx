@@ -10,10 +10,9 @@
  * @packageDocumentation
  */
 
-import type { MonitorFieldDefinition } from "@shared/types";
-import type { JSX } from "react/jsx-runtime";
-
+import { type MonitorFieldDefinition } from "@shared/types";
 import { useCallback, useEffect } from "react";
+import { type JSX } from "react/jsx-runtime";
 
 import logger from "../../services/logger";
 import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore";

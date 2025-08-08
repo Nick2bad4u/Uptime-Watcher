@@ -1,11 +1,10 @@
-import type { DatabaseService } from "../../services/database/DatabaseService";
+import { type DatabaseService } from "../../services/database/DatabaseService";
 /**
  * Utility for managing history limits in the database.
  */
-import type { HistoryRepository } from "../../services/database/HistoryRepository";
-import type { SettingsRepository } from "../../services/database/SettingsRepository";
-import type { Logger } from "../interfaces";
-
+import { type HistoryRepository } from "../../services/database/HistoryRepository";
+import { type SettingsRepository } from "../../services/database/SettingsRepository";
+import { type Logger } from "../interfaces";
 import { withDatabaseOperation } from "../operationalHooks";
 
 /**

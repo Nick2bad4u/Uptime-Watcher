@@ -7,9 +7,8 @@
  * @public
  */
 
-import type { JSX } from "react/jsx-runtime";
-
 import React from "react";
+import { type JSX } from "react/jsx-runtime";
 
 import { DefaultErrorFallback } from "../../components/error/DefaultErrorFallback";
 import logger from "../../services/logger";

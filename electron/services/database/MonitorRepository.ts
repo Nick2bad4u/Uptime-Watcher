@@ -10,10 +10,9 @@
  */
 import { Database } from "node-sqlite3-wasm";
 
-import type { MonitorRow } from "../../../shared/types/database";
-import type { Monitor, Site } from "../../types";
-
+import { type MonitorRow } from "../../../shared/types/database";
 import { isDev } from "../../electronUtils";
+import { type Monitor, type Site } from "../../types";
 import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
 import { DatabaseService } from "./DatabaseService";
