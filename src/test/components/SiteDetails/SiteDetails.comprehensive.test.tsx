@@ -4,9 +4,13 @@
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { BrowserRouter } from "react-router-dom";
 import { SiteDetails } from "../../../components/SiteDetails/SiteDetails";
 import { useSiteDetails } from "../../../hooks/site/useSiteDetails";
+
+// Mock BrowserRouter to avoid react-router-dom dependency
+const MockBrowserRouter = ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+);
 
 // Mock window.matchMedia before other imports
 Object.defineProperty(window, "matchMedia", {
@@ -261,13 +265,13 @@ const mockUseSiteDetailsReturn = {
 
 const renderSiteDetails = (site = mockSite, onClose = vi.fn()) => {
     return render(
-        <BrowserRouter>
+        <MockBrowserRouter>
             <SiteDetails site={site} onClose={onClose} />
-        </BrowserRouter>
+        </MockBrowserRouter>
     );
 };
 
-describe("SiteDetails Component", () => {
+describe("SiteDetails", () => {
     beforeEach(() => {
         // Clear only specific mocks, not all mocks
         vi.mocked(useSiteDetails).mockClear();
@@ -572,9 +576,9 @@ describe("SiteDetails Component", () => {
 
             // Rerender with different site
             rerender(
-                <BrowserRouter>
+                <MockBrowserRouter>
                     <SiteDetails site={updatedSite} onClose={vi.fn()} />
-                </BrowserRouter>
+                </MockBrowserRouter>
             );
 
             await waitFor(() => {
@@ -615,9 +619,9 @@ describe("SiteDetails Component", () => {
 
             // Re-render with same props
             rerender(
-                <BrowserRouter>
+                <MockBrowserRouter>
                     <SiteDetails site={mockSite} onClose={vi.fn()} />
-                </BrowserRouter>
+                </MockBrowserRouter>
             );
 
             // Component should still render correctly

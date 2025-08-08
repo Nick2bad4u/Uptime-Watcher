@@ -7,9 +7,6 @@
  * All validation logic is centralized here for consistency and maintainability.
  */
 
-import validator from "validator";
-import { z } from "zod";
-
 import type {
     BaseMonitorSchemaType,
     HttpMonitorSchemaType,
@@ -17,7 +14,11 @@ import type {
     PingMonitorSchemaType,
     PortMonitorSchemaType,
     SiteSchemaType,
-} from "../types/schemaTypes";
+} from "@shared/types/schemaTypes";
+
+import validator from "validator";
+import { z } from "zod";
+
 /**
  * Result object returned by validation functions.
  *

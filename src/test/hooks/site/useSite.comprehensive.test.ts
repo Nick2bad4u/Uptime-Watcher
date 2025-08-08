@@ -7,29 +7,36 @@ import { renderHook } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import { useSite } from "../../../hooks/site/useSite";
-import type { Monitor, Site } from "../../../../shared/types";
+import type { Site, Monitor } from "../../../../shared/types";
 
-// Mock all the related hooks
-const mockUseErrorStore = vi.fn();
-const mockUseSiteActions = vi.fn();
-const mockUseSiteMonitor = vi.fn();
-const mockUseSiteStats = vi.fn();
-
-vi.mock("../../../stores/error/useErrorStore", () => ({
-    useErrorStore: mockUseErrorStore,
-}));
-
-vi.mock("../../../hooks/site/useSiteActions", () => ({
-    useSiteActions: mockUseSiteActions,
-}));
-
+// Mock all the sub-hooks
 vi.mock("../../../hooks/site/useSiteMonitor", () => ({
-    useSiteMonitor: mockUseSiteMonitor,
+    useSiteMonitor: vi.fn(),
 }));
 
 vi.mock("../../../hooks/site/useSiteStats", () => ({
-    useSiteStats: mockUseSiteStats,
+    useSiteStats: vi.fn(),
 }));
+
+vi.mock("../../../hooks/site/useSiteActions", () => ({
+    useSiteActions: vi.fn(),
+}));
+
+vi.mock("../../../stores/error/useErrorStore", () => ({
+    useErrorStore: vi.fn(),
+}));
+
+// Import the mocked modules
+import { useSiteMonitor } from "../../../hooks/site/useSiteMonitor";
+import { useSiteStats } from "../../../hooks/site/useSiteStats";
+import { useSiteActions } from "../../../hooks/site/useSiteActions";
+import { useErrorStore } from "../../../stores/error/useErrorStore";
+
+// Create typed mock references
+const mockUseSiteMonitor = vi.mocked(useSiteMonitor);
+const mockUseSiteStats = vi.mocked(useSiteStats);
+const mockUseSiteActions = vi.mocked(useSiteActions);
+const mockUseErrorStore = vi.mocked(useErrorStore);
 
 describe("useSite Hook", () => {
     // Sample site data for testing
@@ -40,15 +47,15 @@ describe("useSite Hook", () => {
         monitors: [
             {
                 id: "monitor-1",
-                type: "http" as const,
+                type: "http",
                 url: "https://example.com",
-                checkInterval: 300000,
+                checkInterval: 60000,
                 timeout: 10000,
                 retryAttempts: 3,
+                status: "up",
                 monitoring: true,
-                status: "up" as const,
                 lastChecked: new Date(),
-                responseTime: 150,
+                responseTime: 100,
                 history: [],
             },
         ],
@@ -110,7 +117,10 @@ describe("useSite Hook", () => {
 
             expect(mockUseSiteMonitor).toHaveBeenCalledWith(mockSite);
             expect(mockUseSiteStats).toHaveBeenCalledWith([]);
-            expect(mockUseSiteActions).toHaveBeenCalledWith(mockSite, null);
+            expect(mockUseSiteActions).toHaveBeenCalledWith(
+                mockSite,
+                undefined
+            );
             expect(mockUseErrorStore).toHaveBeenCalled();
         });
 
@@ -122,13 +132,14 @@ describe("useSite Hook", () => {
 
             mockUseSiteMonitor.mockReturnValueOnce({
                 monitor: mockMonitor,
-                selectedMonitor: mockMonitor,
-                monitors: [mockMonitor],
+                selectedMonitorId: "monitor-1",
+                monitorIds: ["monitor-1"],
                 filteredHistory: mockHistory,
-                setSelectedMonitor: vi.fn(),
+                handleMonitorIdChange: vi.fn(),
                 status: "online" as const,
-                lastChecked: Date.now(),
                 responseTime: 150,
+                isMonitoring: true,
+                latestSite: mockSite,
             });
 
             renderHook(() => useSite(mockSite));
@@ -139,13 +150,14 @@ describe("useSite Hook", () => {
         it("should pass monitor from monitor hook to actions", () => {
             mockUseSiteMonitor.mockReturnValueOnce({
                 monitor: mockMonitor,
-                selectedMonitor: mockMonitor,
-                monitors: [mockMonitor],
+                selectedMonitorId: "monitor-1",
+                monitorIds: ["monitor-1"],
                 filteredHistory: [],
-                setSelectedMonitor: vi.fn(),
+                handleMonitorIdChange: vi.fn(),
                 status: "online" as const,
-                lastChecked: Date.now(),
                 responseTime: 150,
+                isMonitoring: true,
+                latestSite: mockSite,
             });
 
             renderHook(() => useSite(mockSite));
@@ -161,47 +173,29 @@ describe("useSite Hook", () => {
         it("should return combined data from all hooks", () => {
             const mockMonitorData = {
                 monitor: mockMonitor,
-                selectedMonitor: mockMonitor,
-                monitors: [mockMonitor],
+                selectedMonitorId: "monitor-1",
+                monitorIds: ["monitor-1"],
                 filteredHistory: [],
-                setSelectedMonitor: vi.fn(),
+                handleMonitorIdChange: vi.fn(),
                 status: "online" as const,
-                lastChecked: Date.now(),
                 responseTime: 150,
+                isMonitoring: true,
+                latestSite: mockSite,
             };
 
             const mockStatsData = {
-                uptime: 95.5,
-                downtimeCount: 2,
-                avgResponseTime: 145,
-                lastIncident: {
-                    timestamp: Date.now() - 86400000,
-                    status: "offline" as const,
-                },
-                totalChecks: 100,
-                successfulChecks: 95,
-                failedChecks: 5,
-                longestDowntime: null,
-                shortestDowntime: null,
-                currentStreak: 50,
-                longestStreak: 75,
-                recentIncidents: [],
-                todayStats: {
-                    checks: 24,
-                    successful: 23,
-                    failed: 1,
-                    avgResponseTime: 145,
-                    uptime: 95.8,
-                },
+                uptime: 95,
+                checkCount: 100,
+                averageResponseTime: 145,
             };
 
             const mockActionsData = {
+                handleCardClick: vi.fn(),
                 handleStartMonitoring: vi.fn(),
                 handleStopMonitoring: vi.fn(),
                 handleCheckNow: vi.fn(),
-                handleDelete: vi.fn(),
-                handleEdit: vi.fn(),
-                isActionInProgress: false,
+                handleStartSiteMonitoring: vi.fn(),
+                handleStopSiteMonitoring: vi.fn(),
             };
 
             const mockLoadingData = {
@@ -220,36 +214,27 @@ describe("useSite Hook", () => {
                 expect.objectContaining({
                     // Monitor data
                     monitor: mockMonitor,
-                    selectedMonitor: mockMonitor,
-                    monitors: [mockMonitor],
+                    selectedMonitorId: "monitor-1",
+                    monitorIds: ["monitor-1"],
                     filteredHistory: [],
-                    setSelectedMonitor: expect.any(Function),
+                    handleMonitorIdChange: expect.any(Function),
                     status: "online",
-                    lastChecked: expect.any(Number),
                     responseTime: 150,
+                    isMonitoring: true,
+                    latestSite: expect.any(Object),
 
                     // Stats data
-                    uptime: 95.5,
-                    downtimeCount: 2,
-                    avgResponseTime: 145,
-                    lastIncident: expect.any(Object),
-                    totalChecks: 100,
-                    successfulChecks: 95,
-                    failedChecks: 5,
-                    longestDowntime: null,
-                    shortestDowntime: null,
-                    currentStreak: 50,
-                    longestStreak: 75,
-                    recentIncidents: [],
-                    todayStats: expect.any(Object),
+                    uptime: 95,
+                    checkCount: 100,
+                    averageResponseTime: 145,
 
                     // Actions data
+                    handleCardClick: expect.any(Function),
                     handleStartMonitoring: expect.any(Function),
                     handleStopMonitoring: expect.any(Function),
                     handleCheckNow: expect.any(Function),
-                    handleDelete: expect.any(Function),
-                    handleEdit: expect.any(Function),
-                    isActionInProgress: false,
+                    handleStartSiteMonitoring: expect.any(Function),
+                    handleStopSiteMonitoring: expect.any(Function),
 
                     // Loading state
                     isLoading: true,
@@ -275,13 +260,14 @@ describe("useSite Hook", () => {
 
             mockUseSiteMonitor.mockReturnValueOnce({
                 monitor: null,
-                selectedMonitor: null,
-                monitors: [],
+                selectedMonitorId: "",
+                monitorIds: [],
                 filteredHistory: [],
-                setSelectedMonitor: vi.fn(),
+                handleMonitorIdChange: vi.fn(),
                 status: "offline" as const,
-                lastChecked: null,
-                responseTime: null,
+                responseTime: undefined,
+                isMonitoring: false,
+                latestSite: siteWithNoMonitors,
             });
 
             const { result } = renderHook(() => useSite(siteWithNoMonitors));
@@ -310,13 +296,14 @@ describe("useSite Hook", () => {
 
             mockUseSiteMonitor.mockReturnValueOnce({
                 monitor: { ...mockMonitor, monitoring: false },
-                selectedMonitor: null,
-                monitors: [{ ...mockMonitor, monitoring: false }],
+                selectedMonitorId: "monitor-1",
+                monitorIds: ["monitor-1"],
                 filteredHistory: [],
-                setSelectedMonitor: vi.fn(),
+                handleMonitorIdChange: vi.fn(),
                 status: "offline" as const,
-                lastChecked: null,
-                responseTime: null,
+                responseTime: undefined,
+                isMonitoring: false,
+                latestSite: disabledMonitoringSite,
             });
 
             const { result } = renderHook(() =>
@@ -343,7 +330,7 @@ describe("useSite Hook", () => {
             rerender({ site: newSite });
 
             expect(mockUseSiteMonitor).toHaveBeenCalledWith(newSite);
-            expect(mockUseSiteActions).toHaveBeenCalledWith(newSite, null);
+            expect(mockUseSiteActions).toHaveBeenCalledWith(newSite, undefined);
         });
 
         it("should maintain referential stability for functions", () => {
@@ -420,13 +407,12 @@ describe("useSite Hook", () => {
             };
 
             mockUseSiteActions.mockReturnValueOnce({
-                ...conflictingData,
+                handleCardClick: vi.fn(),
                 handleStartMonitoring: vi.fn(),
                 handleStopMonitoring: vi.fn(),
                 handleCheckNow: vi.fn(),
-                handleDelete: vi.fn(),
-                handleEdit: vi.fn(),
-                isActionInProgress: false,
+                handleStartSiteMonitoring: vi.fn(),
+                handleStopSiteMonitoring: vi.fn(),
             });
 
             mockUseErrorStore.mockReturnValueOnce({

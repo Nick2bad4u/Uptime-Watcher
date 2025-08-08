@@ -5,8 +5,12 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { BrowserRouter } from "react-router-dom";
 import { SiteDetailsNavigation } from "../../../components/SiteDetails/SiteDetailsNavigation";
+
+// Mock BrowserRouter to avoid react-router-dom dependency
+const MockBrowserRouter = ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+);
 
 // Mock the logger
 vi.mock("../../../services/logger", () => ({
@@ -132,13 +136,13 @@ const defaultProps = {
 const renderSiteDetailsNavigation = (props = {}) => {
     const finalProps = { ...defaultProps, ...props };
     return render(
-        <BrowserRouter>
+        <MockBrowserRouter>
             <SiteDetailsNavigation {...finalProps} />
-        </BrowserRouter>
+        </MockBrowserRouter>
     );
 };
 
-describe("SiteDetailsNavigation Component", () => {
+describe("SiteDetailsNavigation Navigation Tests", () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });

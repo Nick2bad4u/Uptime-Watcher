@@ -9,7 +9,7 @@ import {
     type MonitorType,
     type Site,
     validateMonitor,
-} from "../types";
+} from "@shared/types";
 
 /**
  * Gets validation errors for monitor fields based on monitor type.

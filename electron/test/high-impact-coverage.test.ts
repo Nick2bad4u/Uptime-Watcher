@@ -310,9 +310,11 @@ describe("High-Impact Branch Coverage Tests", () => {
     describe("Type Guard Branches", () => {
         it("should test all type guard edge cases", async () => {
             try {
-                const typeGuardsModule = await import( // eslint-disable-line unicorn/no-keyword-prefix
+                // eslint-disable-next-line unicorn/no-keyword-prefix
+                const typeGuardsModule = await import(
                     "../../shared/utils/typeGuards.js"
                 );
+                // eslint-enable-next-line unicorn/no-keyword-prefix
 
                 if (typeGuardsModule.isError) {
                     // Test Error instances
