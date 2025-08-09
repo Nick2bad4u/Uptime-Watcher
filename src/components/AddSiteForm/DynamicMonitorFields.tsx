@@ -134,7 +134,7 @@ const DynamicMonitorFields = ({
                         key={field.name}
                         onChange={
                             fieldOnChange ??
-                            (() => {
+                            ((): void => {
                                 logger.warn(
                                     `No onChange handler provided for field: ${field.name}`
                                 );

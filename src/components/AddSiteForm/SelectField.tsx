@@ -144,7 +144,7 @@ const SelectField: React.NamedExoticComponent<SelectFieldProperties> =
                 required={required}
             >
                 <ThemedSelect
-                    {...(() => {
+                    {...((): Record<string, unknown> => {
                         const ariaDescribedBy = getAriaDescribedBy(
                             id,
                             error,

@@ -11,7 +11,7 @@ import type { Theme } from "../types";
 const mergeColors = (
     baseColors: Theme["colors"],
     overrideColors?: Partial<Theme["colors"]>
-) => ({
+): Theme["colors"] => ({
     ...baseColors,
     ...overrideColors,
     background: {
@@ -47,7 +47,7 @@ const mergeColors = (
 const mergeTypography = (
     baseTypography: Theme["typography"],
     overrideTypography?: Partial<Theme["typography"]>
-) => ({
+): Theme["typography"] => ({
     ...baseTypography,
     ...overrideTypography,
     fontFamily: {

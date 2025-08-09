@@ -74,7 +74,7 @@ export interface SiteOperationsDependencies {
 export const createSiteOperationsActions = (
     deps: SiteOperationsDependencies
 ): SiteOperationsActions => ({
-    addMonitorToSite: async (siteId, monitor) => {
+    addMonitorToSite: async (siteId, monitor): Promise<void> => {
         logStoreAction("SitesStore", "addMonitorToSite", { monitor, siteId });
 
         const errorStore = useErrorStore.getState();
@@ -108,7 +108,7 @@ export const createSiteOperationsActions = (
             }
         );
     },
-    createSite: async (siteData) => {
+    createSite: async (siteData): Promise<void> => {
         logStoreAction("SitesStore", "createSite", { siteData });
 
         const errorStore = useErrorStore.getState();
@@ -155,7 +155,7 @@ export const createSiteOperationsActions = (
             }
         );
     },
-    deleteSite: async (identifier: string) => {
+    deleteSite: async (identifier: string): Promise<void> => {
         logStoreAction("SitesStore", "deleteSite", { identifier });
 
         const errorStore = useErrorStore.getState();
@@ -202,7 +202,7 @@ export const createSiteOperationsActions = (
             }
         );
     },
-    downloadSQLiteBackup: async () => {
+    downloadSQLiteBackup: async (): Promise<void> => {
         const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
@@ -245,7 +245,11 @@ export const createSiteOperationsActions = (
             success: true,
         });
     },
-    initializeSites: async () => {
+    initializeSites: async (): Promise<{
+        message: string;
+        sitesLoaded: number;
+        success: boolean;
+    }> => {
         const errorStore = useErrorStore.getState();
         const result = await withErrorHandling(
             async () => {
@@ -279,7 +283,10 @@ export const createSiteOperationsActions = (
 
         return result;
     },
-    modifySite: async (identifier: string, updates: Partial<Site>) => {
+    modifySite: async (
+        identifier: string,
+        updates: Partial<Site>
+    ): Promise<void> => {
         logStoreAction("SitesStore", "modifySite", { identifier, updates });
 
         const errorStore = useErrorStore.getState();
@@ -301,7 +308,7 @@ export const createSiteOperationsActions = (
             }
         );
     },
-    removeMonitorFromSite: async (siteId, monitorId) => {
+    removeMonitorFromSite: async (siteId, monitorId): Promise<void> => {
         logStoreAction("SitesStore", "removeMonitorFromSite", {
             monitorId,
             siteId,
@@ -367,7 +374,7 @@ export const createSiteOperationsActions = (
         siteId: string,
         monitorId: string,
         retryAttempts: number | undefined
-    ) => {
+    ): Promise<void> => {
         logStoreAction("SitesStore", "updateMonitorRetryAttempts", {
             monitorId,
             retryAttempts,
@@ -420,7 +427,7 @@ export const createSiteOperationsActions = (
         siteId: string,
         monitorId: string,
         timeout: number | undefined
-    ) => {
+    ): Promise<void> => {
         logStoreAction("SitesStore", "updateMonitorTimeout", {
             monitorId,
             siteId,
@@ -473,7 +480,7 @@ export const createSiteOperationsActions = (
         siteId: string,
         monitorId: string,
         interval: number
-    ) => {
+    ): Promise<void> => {
         logStoreAction("SitesStore", "updateSiteCheckInterval", {
             interval,
             monitorId,

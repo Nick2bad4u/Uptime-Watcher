@@ -290,7 +290,7 @@ export class SiteManager {
 
         if (!site) {
             // Emit cache miss event
-            void (async () => {
+            void (async (): Promise<void> => {
                 try {
                     await this.eventEmitter.emitTyped("site:cache-miss", {
                         backgroundLoading: true,
@@ -307,7 +307,7 @@ export class SiteManager {
             })();
 
             // Trigger background loading without blocking
-            void (async () => {
+            void (async (): Promise<void> => {
                 try {
                     await this.loadSiteInBackground(identifier);
                 } catch (error) {
@@ -673,7 +673,7 @@ export class SiteManager {
      */
     private createMonitoringConfig(): MonitoringConfig {
         return {
-            setHistoryLimit: (limit: number) => {
+            setHistoryLimit: (limit: number): void => {
                 if (!this.monitoringOperations) {
                     throw new Error(
                         "MonitoringOperations not available but required for setHistoryLimit"
@@ -681,7 +681,7 @@ export class SiteManager {
                 }
                 const operations = this.monitoringOperations;
                 // Execute but don't await the promise
-                void (async () => {
+                void (async (): Promise<void> => {
                     try {
                         await operations.setHistoryLimit(limit);
                     } catch (error) {
@@ -692,7 +692,10 @@ export class SiteManager {
                     }
                 })();
             },
-            setupNewMonitors: async (site: Site, newMonitorIds: string[]) => {
+            setupNewMonitors: async (
+                site: Site,
+                newMonitorIds: string[]
+            ): Promise<void> => {
                 if (!this.monitoringOperations) {
                     throw new Error(
                         "MonitoringOperations not available but required for setupNewMonitors"
@@ -703,7 +706,10 @@ export class SiteManager {
                     newMonitorIds
                 );
             },
-            startMonitoring: async (identifier: string, monitorId: string) => {
+            startMonitoring: async (
+                identifier: string,
+                monitorId: string
+            ): Promise<boolean> => {
                 if (!this.monitoringOperations) {
                     throw new Error(
                         "MonitoringOperations not available but required for startMonitoring"
@@ -714,7 +720,10 @@ export class SiteManager {
                     monitorId
                 );
             },
-            stopMonitoring: async (identifier: string, monitorId: string) => {
+            stopMonitoring: async (
+                identifier: string,
+                monitorId: string
+            ): Promise<boolean> => {
                 if (!this.monitoringOperations) {
                     throw new Error(
                         "MonitoringOperations not available but required for stopMonitoring"

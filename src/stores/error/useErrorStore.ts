@@ -39,18 +39,18 @@ import { logStoreAction } from "../shared/utils";
 export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
     create<ErrorStore>()((set, get) => ({
         // Actions
-        clearAllErrors: () => {
+        clearAllErrors: (): void => {
             logStoreAction("ErrorStore", "clearAllErrors");
             set({
                 lastError: undefined,
                 storeErrors: {},
             });
         },
-        clearError: () => {
+        clearError: (): void => {
             logStoreAction("ErrorStore", "clearError");
             set({ lastError: undefined });
         },
-        clearStoreError: (store: string) => {
+        clearStoreError: (store: string): void => {
             logStoreAction("ErrorStore", "clearStoreError", { store });
             set((state) => {
                 const newStoreErrors = {
@@ -65,12 +65,12 @@ export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
                 return { storeErrors: remainingErrors };
             });
         },
-        getOperationLoading: (operation: string) => {
+        getOperationLoading: (operation: string): boolean => {
             const loading = get().operationLoading;
 
             return loading[operation] ?? false;
         },
-        getStoreError: (store: string) => {
+        getStoreError: (store: string): string | undefined => {
             const errors = get().storeErrors;
 
             return errors[store];
@@ -79,15 +79,15 @@ export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
         isLoading: false,
         lastError: undefined,
         operationLoading: {},
-        setError: (error: string | undefined) => {
+        setError: (error: string | undefined): void => {
             logStoreAction("ErrorStore", "setError", { error });
             set({ lastError: error });
         },
-        setLoading: (loading: boolean) => {
+        setLoading: (loading: boolean): void => {
             logStoreAction("ErrorStore", "setLoading", { loading });
             set({ isLoading: loading });
         },
-        setOperationLoading: (operation: string, loading: boolean) => {
+        setOperationLoading: (operation: string, loading: boolean): void => {
             logStoreAction("ErrorStore", "setOperationLoading", {
                 loading,
                 operation,
@@ -99,7 +99,7 @@ export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
                 },
             }));
         },
-        setStoreError: (store: string, error: string | undefined) => {
+        setStoreError: (store: string, error: string | undefined): void => {
             logStoreAction("ErrorStore", "setStoreError", { error, store });
             set((state) => ({
                 storeErrors: {

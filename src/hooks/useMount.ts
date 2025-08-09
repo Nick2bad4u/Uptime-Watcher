@@ -73,7 +73,7 @@ export function useMount(
         // Prevent duplicate mount in StrictMode
         if (hasMountedRef.current) {
             // Return empty cleanup function for consistency
-            return () => {
+            return (): void => {
                 // No-op cleanup for duplicate mount prevention
             };
         }
@@ -81,7 +81,7 @@ export function useMount(
         hasMountedRef.current = true;
 
         // Execute mount callback with proper async/await handling
-        const executeMountCallback = async () => {
+        const executeMountCallback = async (): Promise<void> => {
             try {
                 const result = mountCallbackRef.current();
                 // If mountCallback returns a Promise, await it
@@ -96,7 +96,7 @@ export function useMount(
         void executeMountCallback();
 
         // Always return cleanup function for consistent return pattern
-        return () => {
+        return (): void => {
             // Only call unmount callback if it exists
             if (unmountCallbackRef.current) {
                 unmountCallbackRef.current();

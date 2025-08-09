@@ -155,7 +155,7 @@ export class ThemeManager {
         }
 
         const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-        const handler = (e: MediaQueryListEvent) => {
+        const handler = (e: MediaQueryListEvent): void => {
             callback(e.matches);
         };
 

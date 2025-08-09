@@ -51,12 +51,14 @@ const defaultSettings: AppSettings = {
     theme: "system",
 };
 
-const syncSettingsAfterRehydration = (state: SettingsStore | undefined) => {
+const syncSettingsAfterRehydration = (
+    state: SettingsStore | undefined
+): void => {
     if (state) {
         // Use setTimeout to avoid blocking the rehydration process
         setTimeout(() => {
             // Use an IIFE to handle the async operation properly
-            void (async () => {
+            void (async (): Promise<void> => {
                 try {
                     const response =
                         await window.electronAPI.settings.getHistoryLimit();
@@ -110,7 +112,11 @@ export const useSettingsStore: UseBoundStore<
     persist(
         (set, get) => ({
             // Actions
-            initializeSettings: async () => {
+            initializeSettings: async (): Promise<{
+                message: string;
+                settingsLoaded: boolean;
+                success: boolean;
+            }> => {
                 const errorStore = useErrorStore.getState();
                 const result = await withErrorHandling(
                     async () => {
@@ -161,7 +167,10 @@ export const useSettingsStore: UseBoundStore<
 
                 return result;
             },
-            resetSettings: async () => {
+            resetSettings: async (): Promise<{
+                message: string;
+                success: boolean;
+            }> => {
                 const errorStore = useErrorStore.getState();
                 const result = await withErrorHandling(
                     async () => {
@@ -215,7 +224,10 @@ export const useSettingsStore: UseBoundStore<
             // State
             settings: defaultSettings,
             // Force sync settings from backend (useful for debugging persistence issues)
-            syncFromBackend: async () => {
+            syncFromBackend: async (): Promise<{
+                message: string;
+                success: boolean;
+            }> => {
                 const errorStore = useErrorStore.getState();
                 const result = await withErrorHandling(
                     async () => {
@@ -257,7 +269,7 @@ export const useSettingsStore: UseBoundStore<
 
                 return result;
             },
-            updateHistoryLimitValue: async (limit: number) => {
+            updateHistoryLimitValue: async (limit: number): Promise<void> => {
                 logStoreAction("SettingsStore", "updateHistoryLimitValue", {
                     limit,
                 });
@@ -314,7 +326,7 @@ export const useSettingsStore: UseBoundStore<
                     }
                 );
             },
-            updateSettings: (newSettings: Partial<AppSettings>) => {
+            updateSettings: (newSettings: Partial<AppSettings>): void => {
                 logStoreAction("SettingsStore", "updateSettings", {
                     newSettings,
                 });

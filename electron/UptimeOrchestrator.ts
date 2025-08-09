@@ -706,8 +706,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     private setupDatabaseEventHandlers(): void {
         this.on(
             "internal:database:update-sites-cache-requested",
-            (data: UpdateSitesCacheRequestData) => {
-                void (async () => {
+            (data: UpdateSitesCacheRequestData): void => {
+                void (async (): Promise<void> => {
                     try {
                         await this.handleUpdateSitesCacheRequest(data);
                     } catch (error) {
@@ -720,21 +720,24 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             }
         );
 
-        this.on("internal:database:get-sites-from-cache-requested", () => {
-            void (async () => {
-                try {
-                    await this.handleGetSitesFromCacheRequest();
-                } catch (error) {
-                    logger.error(
-                        "[UptimeOrchestrator] Error handling get-sites-from-cache-requested:",
-                        error
-                    );
-                }
-            })();
-        });
+        this.on(
+            "internal:database:get-sites-from-cache-requested",
+            (): void => {
+                void (async (): Promise<void> => {
+                    try {
+                        await this.handleGetSitesFromCacheRequest();
+                    } catch (error) {
+                        logger.error(
+                            "[UptimeOrchestrator] Error handling get-sites-from-cache-requested:",
+                            error
+                        );
+                    }
+                })();
+            }
+        );
 
-        this.on("internal:database:initialized", () => {
-            void (async () => {
+        this.on("internal:database:initialized", (): void => {
+            void (async (): Promise<void> => {
                 try {
                     await this.handleDatabaseInitialized();
                 } catch (error) {
@@ -753,8 +756,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     private setupEventForwarding(): void {
         this.on(
             "internal:site:added",
-            (data: SiteEventData & { _meta?: unknown }) => {
-                void (async () => {
+            (data: SiteEventData & { _meta?: unknown }): void => {
+                void (async (): Promise<void> => {
                     // Extract original data without _meta to prevent conflicts
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     const { _meta, ...originalData } = data;
@@ -769,8 +772,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
         this.on(
             "internal:site:removed",
-            (data: SiteEventData & { _meta?: unknown }) => {
-                void (async () => {
+            (data: SiteEventData & { _meta?: unknown }): void => {
+                void (async (): Promise<void> => {
                     // Extract original data without _meta to prevent conflicts
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     const { _meta, ...originalData } = data;
@@ -790,8 +793,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             "internal:site:updated",
             (
                 data: SiteEventData & { _meta?: unknown; previousSite?: Site }
-            ) => {
-                void (async () => {
+            ): void => {
+                void (async (): Promise<void> => {
                     // Extract original data without _meta to prevent conflicts
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     const { _meta, ...originalData } = data;
@@ -834,8 +837,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Set up monitoring event handlers.
      */
     private setupMonitoringEventHandlers(): void {
-        this.on("internal:monitor:started", () => {
-            void (async () => {
+        this.on("internal:monitor:started", (): void => {
+            void (async (): Promise<void> => {
                 try {
                     const sites = this.siteManager.getSitesFromCache();
                     const totalMonitors = sites.reduce(
@@ -858,8 +861,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             })();
         });
 
-        this.on("internal:monitor:stopped", () => {
-            void (async () => {
+        this.on("internal:monitor:stopped", (): void => {
+            void (async (): Promise<void> => {
                 try {
                     const activeMonitors =
                         this.monitorManager.isMonitoringActive()
@@ -887,8 +890,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     private setupSiteEventHandlers(): void {
         this.on(
             "internal:site:start-monitoring-requested",
-            (data: StartMonitoringRequestData) => {
-                void (async () => {
+            (data: StartMonitoringRequestData): void => {
+                void (async (): Promise<void> => {
                     try {
                         const success =
                             await this.monitorManager.startMonitoringForSite(
@@ -927,8 +930,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
         this.on(
             "internal:site:stop-monitoring-requested",
-            (data: StopMonitoringRequestData) => {
-                void (async () => {
+            (data: StopMonitoringRequestData): void => {
+                void (async (): Promise<void> => {
                     try {
                         const success =
                             await this.monitorManager.stopMonitoringForSite(
@@ -967,8 +970,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
         this.on(
             "internal:site:is-monitoring-active-requested",
-            (data: IsMonitoringActiveRequestData) => {
-                void (async () => {
+            (data: IsMonitoringActiveRequestData): void => {
+                void (async (): Promise<void> => {
                     const isActive =
                         this.monitorManager.isMonitorActiveInScheduler(
                             data.identifier,
@@ -990,8 +993,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
         this.on(
             "internal:site:restart-monitoring-requested",
-            (data: RestartMonitoringRequestData) => {
-                void (async () => {
+            (data: RestartMonitoringRequestData): void => {
+                void (async (): Promise<void> => {
                     try {
                         // Note: restartMonitorWithNewConfig is intentionally synchronous
                         // as it only updates scheduler configuration without async I/O

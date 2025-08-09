@@ -202,7 +202,13 @@ export const AnalyticsTab = ({
     };
 
     // Icon colors configuration
-    const getIconColors = () => {
+    const getIconColors = (): {
+        analytics: string;
+        charts: string;
+        downtime: string;
+        performance: string;
+        uptime: string;
+    } => {
         const availabilityColor = getColor(uptimeValue);
         const responseTimeColor = getResponseTimeColor(avgResponseTime);
         return {
@@ -221,7 +227,7 @@ export const AnalyticsTab = ({
 
     // Memoized event handlers
     const createTimeRangeHandler = useCallback(
-        (range: ChartTimeRange) => () => {
+        (range: ChartTimeRange) => (): void => {
             const previousRange = siteDetailsChartTimeRange;
             logger.user.action("Chart time range changed", {
                 monitorType: monitorType,

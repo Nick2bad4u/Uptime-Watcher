@@ -243,7 +243,7 @@ export class WindowService {
             void this.loadDevelopmentContent();
         } else {
             logger.debug("[WindowService] Production mode: loading from dist");
-            void (async () => {
+            void (async (): Promise<void> => {
                 try {
                     if (this.mainWindow) {
                         await this.mainWindow.loadFile(

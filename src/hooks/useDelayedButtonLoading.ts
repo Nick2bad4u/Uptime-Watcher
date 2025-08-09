@@ -50,7 +50,7 @@ export function useDelayedButtonLoading(isLoading: boolean): boolean {
                 clearButtonLoading,
                 UI_DELAYS.STATE_UPDATE_DEFER
             );
-            return () => {
+            return (): void => {
                 clearTimeout(clearTimeoutId);
             };
         }
@@ -60,7 +60,7 @@ export function useDelayedButtonLoading(isLoading: boolean): boolean {
             UI_DELAYS.LOADING_BUTTON
         );
 
-        return () => {
+        return (): void => {
             clearTimeout(timeoutId);
         };
     }, [clearButtonLoading, isLoading, showButtonLoadingCallback]);

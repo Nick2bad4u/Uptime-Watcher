@@ -30,7 +30,12 @@ const StatusIndicator = ({
 }: StatusIndicatorProperties): JSX.Element => {
     const { currentTheme, getStatusColor } = useTheme();
 
-    const getSizeStyles = () => {
+    const getSizeStyles = (): {
+        fontSize?: string;
+        height?: string;
+        iconSize: string;
+        width?: string;
+    } => {
         switch (size) {
             case "lg": {
                 return {

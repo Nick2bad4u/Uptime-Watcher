@@ -95,7 +95,7 @@ const ThemedBox = ({
     const elementProperties = {
         className: classNames,
         onClick: onClick
-            ? (e: React.MouseEvent<HTMLElement>) => {
+            ? (e: React.MouseEvent<HTMLElement>): void => {
                   onClick(e);
               }
             : undefined,
@@ -105,7 +105,7 @@ const ThemedBox = ({
         ...(isInteractive &&
             Component === "div" && {
                 "aria-label": ariaLabel,
-                onKeyDown: (e: React.KeyboardEvent) => {
+                onKeyDown: (e: React.KeyboardEvent): void => {
                     if ((e.key === "Enter" || e.key === " ") && onClick) {
                         e.preventDefault();
                         onClick();

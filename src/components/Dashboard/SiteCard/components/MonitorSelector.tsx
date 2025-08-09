@@ -65,9 +65,9 @@ export const MonitorSelector: React.NamedExoticComponent<MonitorSelectorProperti
         }, []);
 
         // Memoize the option formatting to avoid recalculation
-        const formatMonitorOption = useCallback((monitor: Monitor) => {
+        const formatMonitorOption = useCallback((monitor: Monitor): string => {
             const monitorLabel = monitor.type.toUpperCase();
-            const getDetail = () => {
+            const getDetail = (): string => {
                 if (monitor.port) {
                     return `: ${monitor.port}`;
                 }

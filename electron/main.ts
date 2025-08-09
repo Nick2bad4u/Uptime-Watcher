@@ -22,7 +22,7 @@ import { logger } from "./utils/logger";
 
 // Configure electron-log for main process
 // Configure logging based on environment and command line arguments
-const configureLogging = () => {
+const configureLogging = (): { consoleLevel: string; fileLevel: string } => {
     // Check for debug flag in command line arguments
     const args = new Set(process.argv.slice(2));
     const debugFlag = args.has("--debug") || args.has("--log-debug");
@@ -122,7 +122,7 @@ class Main {
 
         // Ensure cleanup is only called once to prevent double-cleanup errors
         let cleanedUp = false;
-        const safeCleanup = () => {
+        const safeCleanup = (): void => {
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             if (!cleanedUp && this.applicationService?.cleanup) {
                 cleanedUp = true;
@@ -161,14 +161,14 @@ if (process.versions.electron) {
      * Extensions are installed only after {@link app.whenReady} to ensure the Electron environment is fully initialized,
      * as extension installation requires the app to be ready. In development, these extensions enhance debugging capabilities.
      *
-     * @returns Promise\<ExtensionReference[]\> The installed extension references, or an empty array in production or on failure.
+     * @returns Promise\<Array\<\{id: string; name: string\}\>\> The installed extension references, or an empty array in production or on failure.
      *
      * @example
      * ```typescript
      * // Extensions are installed automatically in development mode.
      * ```
      */
-    void (async () => {
+    void (async (): Promise<Array<{ id: string; name: string }>> => {
         await app.whenReady();
         // Wait a bit for the main window to be created and ready
         await new Promise((resolve) => setTimeout(resolve, 1));

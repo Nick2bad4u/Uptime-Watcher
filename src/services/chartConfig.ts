@@ -225,7 +225,12 @@ export class ChartConfigService {
     /**
      * Get common axis title configuration
      */
-    private getAxisTitle(text: string) {
+    private getAxisTitle(text: string): {
+        color: string;
+        display: boolean;
+        font: { family: string; size: number };
+        text: string;
+    } {
         return {
             color: this.theme.colors.text.secondary,
             display: true,
@@ -276,7 +281,10 @@ export class ChartConfigService {
     /**
      * Get base scale configuration
      */
-    private getBaseScale() {
+    private getBaseScale(): {
+        grid: { color: string };
+        ticks: { color: string; font: { family: string; size: number } };
+    } {
         return {
             grid: {
                 color: this.theme.colors.border.secondary,
@@ -294,7 +302,14 @@ export class ChartConfigService {
     /**
      * Get common font configuration used across charts
      */
-    private getChartFont(size = 12, weight = "normal") {
+    private getChartFont(
+        size = 12,
+        weight = "normal"
+    ): {
+        family: string;
+        size: number;
+        weight: string;
+    } {
         return {
             family: this.theme.typography.fontFamily.sans.join(", "),
             size,
@@ -305,7 +320,12 @@ export class ChartConfigService {
     /**
      * Get common title configuration for charts
      */
-    private getChartTitle(text: string) {
+    private getChartTitle(text: string): {
+        color: string;
+        display: boolean;
+        font: { family: string; size: number; weight: string };
+        text: string;
+    } {
         return {
             color: this.theme.colors.text.primary,
             display: true,

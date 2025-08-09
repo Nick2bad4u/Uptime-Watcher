@@ -34,7 +34,7 @@ const trackEventCount = (
     event: string,
     eventCounts: Map<string, number>,
     metricsCallback?: MetricsCallback
-) => {
+): void => {
     const count = eventCounts.get(event) ?? 0;
     const newCount = count + 1;
     eventCounts.set(event, newCount);
@@ -53,7 +53,7 @@ const trackEventTiming = (
     duration: number,
     eventTimings: Map<string, number[]>,
     metricsCallback?: MetricsCallback
-) => {
+): void => {
     const timings = eventTimings.get(event) ?? [];
     timings.push(duration);
     eventTimings.set(event, timings);

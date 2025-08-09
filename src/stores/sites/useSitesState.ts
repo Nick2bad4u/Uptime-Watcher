@@ -46,11 +46,11 @@ export const createSitesStateActions = (
     set: (function_: (state: SitesState) => Partial<SitesState>) => void,
     get: () => SitesState
 ): SitesStateActions => ({
-    addSite: (site: Site) => {
+    addSite: (site: Site): void => {
         logStoreAction("SitesStore", "addSite", { site });
         set((state) => ({ sites: [...state.sites, site] }));
     },
-    getSelectedMonitorId: (siteId: string) => {
+    getSelectedMonitorId: (siteId: string): string | undefined => {
         const ids = get().selectedMonitorIds;
 
         return ids[siteId];
@@ -62,7 +62,7 @@ export const createSitesStateActions = (
         }
         return sites.find((s) => s.identifier === selectedSiteId) ?? undefined;
     },
-    removeSite: (identifier: string) => {
+    removeSite: (identifier: string): void => {
         logStoreAction("SitesStore", "removeSite", { identifier });
         set((state) => {
             // Remove the monitor selection for the removed site
@@ -86,7 +86,7 @@ export const createSitesStateActions = (
             };
         });
     },
-    setSelectedMonitorId: (siteId: string, monitorId: string) => {
+    setSelectedMonitorId: (siteId: string, monitorId: string): void => {
         logStoreAction("SitesStore", "setSelectedMonitorId", {
             monitorId,
             siteId,
@@ -98,11 +98,11 @@ export const createSitesStateActions = (
             },
         }));
     },
-    setSelectedSite: (site: Site | undefined) => {
+    setSelectedSite: (site: Site | undefined): void => {
         logStoreAction("SitesStore", "setSelectedSite", { site });
         set(() => ({ selectedSiteId: site ? site.identifier : undefined }));
     },
-    setSites: (sites: Site[]) => {
+    setSites: (sites: Site[]): void => {
         logStoreAction("SitesStore", "setSites", { count: sites.length });
         set(() => ({ sites }));
     },

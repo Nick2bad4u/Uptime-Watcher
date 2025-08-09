@@ -98,11 +98,17 @@ export const SiteOverviewTab = ({
     };
 
     // Icon colors configuration
-    const getIconColors = () => {
+    const getIconColors = (): {
+        actions: string;
+        monitors: string;
+        response: string;
+        site: string;
+        uptime: string;
+    } => {
         const availabilityColor = getAvailabilityColor(uptime);
         const responseColor = getResponseTimeColor(avgResponseTime);
         // Use getColor to safely access theme colors with proper validation
-        const siteStatusColor = (() => {
+        const siteStatusColor = ((): string => {
             switch (siteDisplayStatus) {
                 case "down": {
                     return currentTheme.colors.status.down;

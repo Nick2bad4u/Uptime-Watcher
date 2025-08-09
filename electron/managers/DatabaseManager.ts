@@ -583,12 +583,15 @@ export class DatabaseManager {
 
         // Create monitoring configuration
         const monitoringConfig = {
-            setHistoryLimit: async (limit: number) => {
+            setHistoryLimit: async (limit: number): Promise<void> => {
                 this.historyLimit = limit;
                 // Centralized history limit event emission
                 await this.emitHistoryLimitUpdated(limit);
             },
-            setupNewMonitors: (site: Site, newMonitorIds: string[]) => {
+            setupNewMonitors: (
+                site: Site,
+                newMonitorIds: string[]
+            ): Promise<void> => {
                 // For database loading, we don't need to setup new monitors
                 // This is only used during site updates
                 monitorLogger.debug(
@@ -596,7 +599,10 @@ export class DatabaseManager {
                 );
                 return Promise.resolve();
             },
-            startMonitoring: async (identifier: string, monitorId: string) => {
+            startMonitoring: async (
+                identifier: string,
+                monitorId: string
+            ): Promise<boolean> => {
                 // First update the cache so monitoring can find the sites
                 await this.emitSitesCacheUpdateRequested();
 
@@ -613,7 +619,10 @@ export class DatabaseManager {
 
                 return true; // Always return true for the interface
             },
-            stopMonitoring: async (identifier: string, monitorId: string) => {
+            stopMonitoring: async (
+                identifier: string,
+                monitorId: string
+            ): Promise<boolean> => {
                 // Request monitoring stop via events
                 await this.eventEmitter.emitTyped(
                     "internal:site:stop-monitoring-requested",

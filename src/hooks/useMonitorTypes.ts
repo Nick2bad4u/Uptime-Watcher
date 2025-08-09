@@ -71,7 +71,7 @@ export function useMonitorTypes(): UseMonitorTypesResult {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | undefined>();
 
-    const loadMonitorTypes = async () => {
+    const loadMonitorTypes = async (): Promise<void> => {
         try {
             setIsLoading(true);
             setError(undefined);
@@ -97,7 +97,7 @@ export function useMonitorTypes(): UseMonitorTypesResult {
         }
     };
 
-    const refresh = async () => {
+    const refresh = async (): Promise<void> => {
         await loadMonitorTypes();
     };
 

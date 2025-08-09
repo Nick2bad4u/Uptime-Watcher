@@ -233,7 +233,7 @@ export function useTheme(): UseThemeReturn {
             updateCurrentTheme,
             UI_DELAYS.STATE_UPDATE_DEFER
         );
-        return () => {
+        return (): void => {
             clearTimeout(updateTimeoutId);
         };
     }, [settings.theme, systemTheme, updateCurrentTheme]);
@@ -260,7 +260,7 @@ export function useTheme(): UseThemeReturn {
         }, UI_DELAYS.STATE_UPDATE_DEFER);
         timeoutIds.push(initialTimeoutId);
 
-        return () => {
+        return (): void => {
             cleanup();
             // Clean up all pending timeouts
             timeoutIds.forEach((timeoutId) => {
@@ -401,7 +401,7 @@ export function useThemeClasses(): UseThemeClassesReturn {
 
     const getBackgroundClass = (
         variant: "primary" | "secondary" | "tertiary" = "primary"
-    ) => {
+    ): { backgroundColor: string } => {
         return {
             backgroundColor: `var(--color-background-${variant})`,
         };
@@ -409,7 +409,7 @@ export function useThemeClasses(): UseThemeClassesReturn {
 
     const getTextClass = (
         variant: "inverse" | "primary" | "secondary" | "tertiary" = "primary"
-    ) => {
+    ): { color: string } => {
         return {
             color: `var(--color-text-${variant})`,
         };
@@ -417,7 +417,7 @@ export function useThemeClasses(): UseThemeClassesReturn {
 
     const getBorderClass = (
         variant: "focus" | "primary" | "secondary" = "primary"
-    ) => {
+    ): { borderColor: string } => {
         return {
             borderColor: `var(--color-border-${variant})`,
         };
@@ -425,13 +425,15 @@ export function useThemeClasses(): UseThemeClassesReturn {
 
     const getSurfaceClass = (
         variant: "base" | "elevated" | "overlay" = "base"
-    ) => {
+    ): { backgroundColor: string } => {
         return {
             backgroundColor: `var(--color-surface-${variant})`,
         };
     };
 
-    const getStatusClass = (status: MonitorStatus | SiteStatus) => {
+    const getStatusClass = (
+        status: MonitorStatus | SiteStatus
+    ): { color: string } => {
         return {
             color: `var(--color-status-${status})`,
         };

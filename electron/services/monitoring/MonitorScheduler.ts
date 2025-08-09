@@ -213,8 +213,8 @@ export class MonitorScheduler {
         }
 
         // Start interval immediately
-        const interval = setInterval(() => {
-            void (async () => {
+        const interval = setInterval((): void => {
+            void (async (): Promise<void> => {
                 if (this.onCheckCallback) {
                     try {
                         await this.onCheckCallback(siteIdentifier, monitor.id);
@@ -232,7 +232,7 @@ export class MonitorScheduler {
 
         // Perform immediate check when starting (without waiting for interval)
         if (this.onCheckCallback) {
-            void (async () => {
+            void (async (): Promise<void> => {
                 try {
                     await this.performImmediateCheck(
                         siteIdentifier,

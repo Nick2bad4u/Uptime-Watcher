@@ -72,7 +72,7 @@ export async function performPortCheckWithRetry(
         const config = isDev()
             ? {
                   ...baseConfig,
-                  onRetry: (attempt: number, error: Error) => {
+                  onRetry: (attempt: number, error: Error): void => {
                       const errorMessage =
                           error instanceof Error
                               ? error.message

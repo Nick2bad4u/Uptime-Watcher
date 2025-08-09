@@ -16,6 +16,7 @@
 import type { UptimeEvents } from "../events/eventTypes";
 import type { IMonitoringOperations } from "../managers/SiteManager";
 import type { Site } from "../types";
+import type { StandardizedCache } from "../utils/cache/StandardizedCache";
 
 import { TypedEventBus } from "../events/TypedEventBus";
 import { ConfigurationManager } from "../managers/ConfigurationManager";
@@ -410,7 +411,7 @@ export class ServiceContainer {
             );
 
             // Get sites cache function
-            const getSitesCache = () => {
+            const getSitesCache = (): StandardizedCache<Site> => {
                 if (!this.siteManager) {
                     throw new Error(
                         "Service dependency error: SiteManager not fully initialized. " +
@@ -437,7 +438,7 @@ export class ServiceContainer {
                 {
                     databaseService: this.getDatabaseService(),
                     eventEmitter: monitorEventBus,
-                    getHistoryLimit: () => {
+                    getHistoryLimit: (): number => {
                         return this.getDatabaseManager().getHistoryLimit();
                     },
                     getSitesCache,
@@ -781,7 +782,7 @@ export class ServiceContainer {
             managerEventBus.on(eventType, (data: unknown) => {
                 const mainOrchestrator = this.getMainOrchestrator();
                 if (mainOrchestrator) {
-                    void (async () => {
+                    void (async (): Promise<void> => {
                         try {
                             await mainOrchestrator.emitTyped(
                                 eventType,

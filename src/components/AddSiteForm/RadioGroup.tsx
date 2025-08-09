@@ -130,9 +130,10 @@ const RadioGroup: React.NamedExoticComponent<RadioGroupProperties> = React.memo(
         value,
     }: RadioGroupProperties) {
         const createChangeHandler = useCallback(
-            (optionValue: string) => () => {
-                onChange(optionValue);
-            },
+            (optionValue: string): (() => void) =>
+                (): void => {
+                    onChange(optionValue);
+                },
             [onChange]
         );
 

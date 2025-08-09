@@ -78,11 +78,11 @@ export const ScreenshotThumbnail = ({
                 clearOverlayVariables,
                 UI_DELAYS.STATE_UPDATE_DEFER
             );
-            return () => {
+            return (): void => {
                 clearTimeout(clearTimeoutId);
             };
         }
-        return () => {};
+        return (): void => {};
     }, [clearOverlayVariables, hovered]);
 
     const handleClick = useCallback(
@@ -138,11 +138,11 @@ export const ScreenshotThumbnail = ({
                 updateOverlayPosition,
                 UI_DELAYS.STATE_UPDATE_DEFER
             );
-            return () => {
+            return (): void => {
                 clearTimeout(updateTimeoutId);
             };
         }
-        return () => {};
+        return (): void => {};
     }, [hovered, siteName, updateOverlayPosition, url]);
 
     // Debounced hover handlers to prevent rapid state changes

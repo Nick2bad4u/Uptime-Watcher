@@ -38,7 +38,7 @@ export interface SiteMonitoringActions {
  * @returns Object containing all site monitoring action functions
  */
 export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
-    checkSiteNow: async (siteId: string, monitorId: string) => {
+    checkSiteNow: async (siteId: string, monitorId: string): Promise<void> => {
         logStoreAction("SitesStore", "checkSiteNow", { monitorId, siteId });
 
         const errorStore = useErrorStore.getState();
@@ -60,7 +60,7 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
             }
         );
     },
-    startSiteMonitoring: async (siteId: string) => {
+    startSiteMonitoring: async (siteId: string): Promise<void> => {
         logStoreAction("SitesStore", "startSiteMonitoring", { siteId });
 
         const errorStore = useErrorStore.getState();
@@ -87,7 +87,10 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
             }
         );
     },
-    startSiteMonitorMonitoring: async (siteId: string, monitorId: string) => {
+    startSiteMonitorMonitoring: async (
+        siteId: string,
+        monitorId: string
+    ): Promise<void> => {
         logStoreAction("SitesStore", "startSiteMonitorMonitoring", {
             monitorId,
             siteId,
@@ -118,7 +121,7 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
             }
         );
     },
-    stopSiteMonitoring: async (siteId: string) => {
+    stopSiteMonitoring: async (siteId: string): Promise<void> => {
         logStoreAction("SitesStore", "stopSiteMonitoring", { siteId });
 
         const errorStore = useErrorStore.getState();
@@ -145,7 +148,10 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
             }
         );
     },
-    stopSiteMonitorMonitoring: async (siteId: string, monitorId: string) => {
+    stopSiteMonitorMonitoring: async (
+        siteId: string,
+        monitorId: string
+    ): Promise<void> => {
         logStoreAction("SitesStore", "stopSiteMonitorMonitoring", {
             monitorId,
             siteId,

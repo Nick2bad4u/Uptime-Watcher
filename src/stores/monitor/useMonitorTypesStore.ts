@@ -213,13 +213,16 @@ export type MonitorTypesStore = BaseStore &
 export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
     create<MonitorTypesStore>()((set, get) => ({
         // Base store actions
-        clearError: () => {
+        clearError: (): void => {
             set({ lastError: undefined });
         },
         // Initial state
         fieldConfigs: {},
         // Monitor types actions
-        formatMonitorDetail: async (type: string, details: string) => {
+        formatMonitorDetail: async (
+            type: string,
+            details: string
+        ): Promise<string> => {
             const state = get();
 
             return withErrorHandling(async () => {
@@ -245,7 +248,10 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                 return formattedDetail;
             }, state);
         },
-        formatMonitorTitleSuffix: async (type: string, monitor: Monitor) => {
+        formatMonitorTitleSuffix: async (
+            type: string,
+            monitor: Monitor
+        ): Promise<string> => {
             const state = get();
 
             return withErrorHandling(async () => {
@@ -277,7 +283,9 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                 return formattedSuffix;
             }, state);
         },
-        getFieldConfig: (type: MonitorType) => {
+        getFieldConfig: (
+            type: MonitorType
+        ): MonitorTypeConfig["fields"] | undefined => {
             const state = get();
             return state.fieldConfigs[type];
         },
@@ -288,7 +296,7 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
 
         lastError: undefined,
 
-        loadMonitorTypes: async () => {
+        loadMonitorTypes: async (): Promise<void> => {
             const state = get();
 
             // Skip if already loaded and no error
@@ -328,7 +336,7 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
 
         monitorTypes: [],
 
-        refreshMonitorTypes: async () => {
+        refreshMonitorTypes: async (): Promise<void> => {
             const state = get();
 
             logStoreAction("MonitorTypesStore", "refreshMonitorTypes", {});
@@ -343,15 +351,18 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
             await state.loadMonitorTypes();
         },
 
-        setError: (error: string | undefined) => {
+        setError: (error: string | undefined): void => {
             set({ lastError: error });
         },
 
-        setLoading: (loading: boolean) => {
+        setLoading: (loading: boolean): void => {
             set({ isLoading: loading });
         },
 
-        validateMonitorData: async (type: string, data: unknown) => {
+        validateMonitorData: async (
+            type: string,
+            data: unknown
+        ): Promise<ValidationResult> => {
             const state = get();
 
             return withErrorHandling(async () => {

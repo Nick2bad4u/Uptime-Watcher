@@ -88,7 +88,7 @@ export function setupCacheSync(): () => void {
 const CACHE_CLEARERS = new Map<string, (identifier?: string) => void>([
     [
         "monitorType",
-        () => {
+        (): void => {
             clearMonitorTypeCache();
         },
     ],

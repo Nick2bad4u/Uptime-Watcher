@@ -140,8 +140,8 @@ export function useSiteActions(
     }, [monitor, site.identifier, site.name, stopSiteMonitorMonitoring]);
 
     // Start monitoring for all monitors in the site with proper logging
-    const handleStartSiteMonitoring = useCallback(() => {
-        void (async () => {
+    const handleStartSiteMonitoring = useCallback((): void => {
+        void (async (): Promise<void> => {
             try {
                 await startSiteMonitoring(site.identifier);
                 logger.user.action("Started site-wide monitoring", {
@@ -156,8 +156,8 @@ export function useSiteActions(
     }, [site.identifier, site.name, site.monitors.length, startSiteMonitoring]);
 
     // Stop monitoring for all monitors in the site with proper logging
-    const handleStopSiteMonitoring = useCallback(() => {
-        void (async () => {
+    const handleStopSiteMonitoring = useCallback((): void => {
+        void (async (): Promise<void> => {
             try {
                 await stopSiteMonitoring(site.identifier);
                 logger.user.action("Stopped site-wide monitoring", {
@@ -172,7 +172,7 @@ export function useSiteActions(
     }, [site.identifier, site.name, site.monitors.length, stopSiteMonitoring]);
 
     // Perform an immediate status check with enhanced logging
-    const handleCheckNow = useCallback(() => {
+    const handleCheckNow = useCallback((): void => {
         if (!monitor) {
             logger.site.error(
                 site.identifier,
@@ -192,7 +192,7 @@ export function useSiteActions(
 
         // Handle async operation with proper error handling
         // Note: This is a fire-and-forget operation that continues after component unmount
-        void (async () => {
+        void (async (): Promise<void> => {
             try {
                 await checkSiteNow(site.identifier, monitor.id);
                 logger.user.action("Manual site check completed successfully", {

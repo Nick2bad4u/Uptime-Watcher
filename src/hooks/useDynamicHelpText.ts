@@ -78,7 +78,7 @@ export function useDynamicHelpText(
     useEffect(() => {
         let isCancelled = false;
 
-        const loadHelpTexts = async () => {
+        const loadHelpTexts = async (): Promise<void> => {
             try {
                 setIsLoading(true);
                 setError(undefined);
@@ -111,7 +111,7 @@ export function useDynamicHelpText(
 
         void loadHelpTexts();
 
-        return () => {
+        return (): void => {
             isCancelled = true;
         };
     }, [monitorType]);

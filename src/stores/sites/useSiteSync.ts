@@ -295,7 +295,7 @@ export const createSiteSyncActions = (
                         case "delete":
                         case "update": {
                             // For single site updates, trigger a full sync
-                            void (async () => {
+                            void (async (): Promise<void> => {
                                 try {
                                     await actions.syncSitesFromBackend();
                                 } catch (error: unknown) {

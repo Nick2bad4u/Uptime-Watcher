@@ -160,7 +160,7 @@ const ThemedButton = ({
     );
 
     // eslint-disable-next-line sonarjs/function-return-type -- React component can return different node types
-    const renderContent = () => {
+    const renderContent = (): React.ReactNode => {
         if (loading) {
             return (
                 <div className="themed-button__loading">

@@ -151,8 +151,8 @@ export class ApplicationService {
      * @internal
      */
     private setupApplication(): void {
-        app.on("ready", () => {
-            void (async () => {
+        app.on("ready", (): void => {
+            void (async (): Promise<void> => {
                 try {
                     await this.onAppReady();
                 } catch (error) {
@@ -203,7 +203,7 @@ export class ApplicationService {
         });
 
         autoUpdater.initialize();
-        void (async () => {
+        void (async (): Promise<void> => {
             try {
                 await autoUpdater.checkForUpdates();
             } catch (error) {

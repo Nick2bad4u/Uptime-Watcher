@@ -33,7 +33,13 @@ import "./Header.css";
 import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
 
 // Helper functions for monitor counting (reduces complexity by composition)
-const initializeMonitorCounts = () => ({
+const initializeMonitorCounts = (): {
+    down: number;
+    paused: number;
+    pending: number;
+    total: number;
+    up: number;
+} => ({
     down: 0,
     paused: 0,
     pending: 0,
@@ -44,7 +50,7 @@ const initializeMonitorCounts = () => ({
 const incrementCountByStatus = (
     counts: ReturnType<typeof initializeMonitorCounts>,
     status: string
-) => {
+): void => {
     counts.total++;
     switch (status) {
         case "down": {
@@ -66,7 +72,9 @@ const incrementCountByStatus = (
     }
 };
 
-const countMonitorsInSite = (site: Site) => {
+const countMonitorsInSite = (
+    site: Site
+): ReturnType<typeof initializeMonitorCounts> => {
     const counts = initializeMonitorCounts();
     const monitors = (site.monitors as Monitor[] | null | undefined) ?? [];
 
@@ -77,7 +85,9 @@ const countMonitorsInSite = (site: Site) => {
     return counts;
 };
 
-const aggregateMonitorCounts = (sites: Site[]) => {
+const aggregateMonitorCounts = (
+    sites: Site[]
+): ReturnType<typeof initializeMonitorCounts> => {
     const totalCounts = initializeMonitorCounts();
 
     for (const site of sites) {

@@ -127,7 +127,15 @@ export const OverviewTab = ({
     const progressVariant = mapAvailabilityToBadgeVariant(uptimeValue);
 
     // Icon colors configuration
-    const getIconColors = () => {
+    const getIconColors = (): {
+        checks: string;
+        fastest: string;
+        quickAction: string;
+        response: string;
+        slowest: string;
+        status: string;
+        uptime: string;
+    } => {
         const availabilityColor = getAvailabilityColor(uptimeValue);
         const responseColor = getResponseTimeColor(avgResponseTime);
         return {

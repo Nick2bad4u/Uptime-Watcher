@@ -132,7 +132,13 @@ export const SettingsTab = ({
     const { currentTheme } = useTheme();
 
     // Icon colors configuration
-    const getIconColors = () => ({
+    const getIconColors = (): {
+        danger: string;
+        info: string;
+        monitoring: string;
+        settings: string;
+        timing: string;
+    } => ({
         danger: currentTheme.colors.error,
         info: currentTheme.colors.info,
         monitoring: currentTheme.colors.primary[600],
@@ -589,13 +595,17 @@ async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
 /**
  * Component that displays the identifier label for a monitor type.
  */
-function IdentifierLabel({ selectedMonitor }: { selectedMonitor: Monitor }) {
+function IdentifierLabel({
+    selectedMonitor,
+}: {
+    selectedMonitor: Monitor;
+}): string {
     const [label, setLabel] = useState<string>(UiDefaults.loadingLabel);
 
     useEffect(() => {
         let isCancelled = false;
 
-        const loadLabel = async () => {
+        const loadLabel = async (): Promise<void> => {
             const identifierLabel = await getIdentifierLabel(selectedMonitor);
             if (!isCancelled) {
                 setLabel(identifierLabel);
@@ -604,7 +614,7 @@ function IdentifierLabel({ selectedMonitor }: { selectedMonitor: Monitor }) {
 
         void loadLabel();
 
-        return () => {
+        return (): void => {
             isCancelled = true;
         };
     }, [selectedMonitor]);

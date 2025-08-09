@@ -41,15 +41,15 @@ export const createBaseStore = <T extends BaseStore>(
     T,
     "clearError" | "isLoading" | "lastError" | "setError" | "setLoading"
 > => ({
-    clearError: () => {
+    clearError: (): void => {
         set({ lastError: undefined } as Partial<T>);
     },
     isLoading: false,
     lastError: undefined,
-    setError: (error: string | undefined) => {
+    setError: (error: string | undefined): void => {
         set({ lastError: error } as Partial<T>);
     },
-    setLoading: (loading: boolean) => {
+    setLoading: (loading: boolean): void => {
         set({ isLoading: loading } as Partial<T>);
     },
 });

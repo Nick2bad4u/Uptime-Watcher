@@ -53,7 +53,7 @@ const STANDARD_FIELD_MAPPINGS: FieldMapping[] = [
         dbField: "active_operations",
         defaultValue: "[]",
         sourceField: "activeOperations",
-        transform: (value) => {
+        transform: (value): string => {
             const activeOps = Array.isArray(value) ? value : [];
             return JSON.stringify(activeOps);
         },
@@ -348,7 +348,7 @@ export function mapMonitorToRow(monitor: Monitor): MonitorRow {
  */
 export function mapRowToMonitor(row: MonitorRow): Monitor {
     // Parse activeOperations safely
-    const activeOperations = (() => {
+    const activeOperations = ((): string[] => {
         if (
             !row.active_operations ||
             typeof row.active_operations !== "string"

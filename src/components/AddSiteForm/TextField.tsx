@@ -147,7 +147,7 @@ const TextField: React.NamedExoticComponent<TextFieldProperties> = React.memo(
                 required={required}
             >
                 <ThemedInput
-                    {...(() => {
+                    {...((): Record<string, unknown> => {
                         const ariaDescribedBy = getAriaDescribedBy(
                             id,
                             error,

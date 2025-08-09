@@ -84,36 +84,36 @@ export const useUpdatesStore: UpdatesStoreWithPersist = create<UpdatesStore>()(
     persist(
         (set) => ({
             // Actions
-            applyUpdate: () => {
+            applyUpdate: (): void => {
                 window.electronAPI.system.quitAndInstall();
                 logStoreAction("UpdatesStore", "applyUpdate", {
                     message: "Applying update and restarting application",
                     success: true,
                 });
             },
-            clearUpdateError: () => {
+            clearUpdateError: (): void => {
                 set({ updateError: undefined });
                 logStoreAction("UpdatesStore", "clearUpdateError", {
                     message: "Update error cleared",
                     success: true,
                 });
             },
-            setUpdateError: (error: string | undefined) => {
+            setUpdateError: (error: string | undefined): void => {
                 logStoreAction("UpdatesStore", "setUpdateError", { error });
                 set({ updateError: error });
             },
-            setUpdateInfo: (info) => {
+            setUpdateInfo: (info): void => {
                 logStoreAction("UpdatesStore", "setUpdateInfo", { info });
                 set({ updateInfo: info });
             },
 
-            setUpdateProgress: (progress: number) => {
+            setUpdateProgress: (progress: number): void => {
                 logStoreAction("UpdatesStore", "setUpdateProgress", {
                     progress,
                 });
                 set({ updateProgress: progress });
             },
-            setUpdateStatus: (status: UpdateStatus) => {
+            setUpdateStatus: (status: UpdateStatus): void => {
                 logStoreAction("UpdatesStore", "setUpdateStatus", { status });
                 set({ updateStatus: status });
             },

@@ -311,7 +311,7 @@ export class HttpMonitor implements IMonitorService {
                     maxRetries: totalAttempts,
                     operationName: `HTTP check for ${url}`,
                     ...(isDev() && {
-                        onRetry: (attempt: number, error: Error) => {
+                        onRetry: (attempt: number, error: Error): void => {
                             const errorMessage =
                                 error instanceof Error
                                     ? error.message

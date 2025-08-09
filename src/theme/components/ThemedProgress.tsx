@@ -38,7 +38,7 @@ const ThemedProgress = ({
 
     const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
 
-    const getVariantColor = () => {
+    const getVariantColor = (): string => {
         switch (variant) {
             case "error": {
                 return currentTheme.colors.error;
@@ -58,7 +58,7 @@ const ThemedProgress = ({
         }
     };
 
-    const getHeight = () => {
+    const getHeight = (): string => {
         switch (size) {
             case "lg": {
                 return "12px";

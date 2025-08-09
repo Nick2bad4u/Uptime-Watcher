@@ -44,7 +44,7 @@ const withErrorBoundary = <P extends object>(
     Component: React.ComponentType<P>,
     fallback?: React.ComponentType<{ error?: Error; onRetry: () => void }>
 ): WrappedErrorBoundaryComponent<P> => {
-    const WrappedComponent = (properties: P) => (
+    const WrappedComponent = (properties: P): React.ReactElement => (
         <ErrorBoundary {...(fallback ? { fallback } : {})}>
             <Component {...properties} />
         </ErrorBoundary>

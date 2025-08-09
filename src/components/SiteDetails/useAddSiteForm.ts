@@ -1,13 +1,42 @@
 /**
  * Custom hook for managing add site form state and validation.
  *
- * Provides comprehensive form state management for creating new sites and adding monitors to existing sites.
- * Supports real-time validation, automatic UUID generation, and error handling.
- *
  * @remarks
- * This hook uses render-time state management with previous value tracking to handle
- * state resets when the selected monitor changes, following modern React patterns
- * that avoid direct setState calls in useEffect hooks.
+ * Provides comprehensive form state management for creating new sites and adding
+ * monitors to existing sites. Supports real-time validation, automatic UUID generation,
+ * and error handling. This hook uses render-time state management with previous value
+ * tracking to handle state resets when the selected monitor changes, following modern
+ * React patterns that avoid direct setState calls in useEffect hooks.
+ *
+ * The hook manages two distinct operation modes:
+ * - "new": Creates a new site with the first monitor
+ * - "existing": Adds a monitor to an existing site
+ *
+ * @example
+ * Basic usage in a form component:
+ * ```typescript
+ * function AddSiteForm() {
+ *   const {
+ *     addMode,
+ *     setAddMode,
+ *     isFormValid,
+ *     resetForm,
+ *     // ... other properties
+ *   } = useAddSiteForm();
+ *
+ *   const handleSubmit = () => {
+ *     if (isFormValid()) {
+ *       // Process form data
+ *     }
+ *   };
+ *
+ *   return (
+ *     // Form JSX using the hook's state and actions
+ *   );
+ * }
+ * ```
+ *
+ * @public
  */
 
 import { useCallback, useState } from "react";
@@ -20,6 +49,13 @@ import { generateUuid } from "../../utils/data/generateUuid";
 
 /**
  * Form actions interface containing all form manipulation functions.
+ *
+ * @remarks
+ * Provides a complete set of methods for manipulating form state, including
+ * validation, field updates, and form lifecycle management. All setter methods
+ * trigger re-renders and validation updates.
+ *
+ * @public
  */
 export interface AddSiteFormActions {
     /** Whether the form is currently valid */
@@ -50,6 +86,13 @@ export interface AddSiteFormActions {
 
 /**
  * Form state interface containing all form field values and UI state.
+ *
+ * @remarks
+ * Represents the complete state of the add site form, including field values,
+ * validation state, and operation mode. Field visibility and requirements
+ * change based on the selected monitor type and operation mode.
+ *
+ * @public
  */
 export interface AddSiteFormState {
     /** Form operation mode (new site vs existing site) */
@@ -74,7 +117,9 @@ export interface AddSiteFormState {
     url: string;
 }
 
-/** Form operation mode */
+/**
+ * Form operation mode type.
+ */
 export type FormMode = "existing" | "new";
 
 // Helper functions for add site form logic (reduces function length by composition)
@@ -85,7 +130,7 @@ const resetFieldsForMonitorType = (
         setPort: (value: string) => void;
         setUrl: (value: string) => void;
     }
-) => {
+): void => {
     // Reset fields that are not used by the current monitor type
     if (!currentFieldNames.has("url")) {
         setters.setUrl("");
@@ -104,7 +149,7 @@ const resetFieldsForModeChange = (
         setName: (value: string) => void;
         setSiteId: (value: string) => void;
     }
-) => {
+): void => {
     if (addMode === "new") {
         setters.setName("");
         setters.setSiteId(generateUuid());
@@ -113,6 +158,24 @@ const resetFieldsForModeChange = (
     }
 };
 
+/**
+ * Validates form fields based on operation mode and monitor type requirements.
+ *
+ * @remarks
+ * Performs comprehensive validation including mode-specific checks (site name for new sites,
+ * existing site selection for existing sites) and dynamic field validation based on the
+ * selected monitor type's required fields.
+ *
+ * @param addMode - Form operation mode (new site vs existing site)
+ * @param name - Site name for new sites
+ * @param selectedExistingSite - Selected existing site for monitor addition
+ * @param monitorType - Type of monitor being configured
+ * @param fieldValues - Current field values from the form
+ * @param getFields - Function to get required fields for monitor type
+ * @returns True if form data is valid, false otherwise
+ *
+ * @internal
+ */
 const validateFormFields = (
     addMode: FormMode,
     name: string,
@@ -120,7 +183,7 @@ const validateFormFields = (
     monitorType: MonitorType,
     fieldValues: { host: string; port: string; url: string },
     getFields: (type: MonitorType) => Array<{ name: string; required: boolean }>
-) => {
+): boolean => {
     // Basic validation for mode and name
     if (addMode === "new" && !name.trim()) {
         return false;

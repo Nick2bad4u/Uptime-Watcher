@@ -99,7 +99,7 @@ export function useThemeStyles(isCollapsed = false): ThemeStyles {
                 const mediaQuery = window.matchMedia(
                     "(prefers-color-scheme: dark)"
                 );
-                const handleThemeChange = (e: MediaQueryListEvent) => {
+                const handleThemeChange = (e: MediaQueryListEvent): void => {
                     setIsDarkMode(e.matches);
                 };
 

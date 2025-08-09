@@ -47,8 +47,8 @@ export const AddSiteModal: React.NamedExoticComponent<object> = React.memo(
         );
 
         // Handle escape key for modal
-        useEffect(() => {
-            const handleKeyDown = (event: KeyboardEvent) => {
+        useEffect((): (() => void) => {
+            const handleKeyDown = (event: KeyboardEvent): void => {
                 if (event.key === "Escape" && showAddSiteModal) {
                     handleClose();
                 }
@@ -58,7 +58,7 @@ export const AddSiteModal: React.NamedExoticComponent<object> = React.memo(
                 document.addEventListener("keydown", handleKeyDown);
             }
 
-            return () => {
+            return (): void => {
                 document.removeEventListener("keydown", handleKeyDown);
             };
         }, [handleClose, showAddSiteModal]);

@@ -1,6 +1,25 @@
 /**
  * History tab component for displaying monitor check history.
- * Provides filtering, pagination, and detailed history records view.
+ *
+ * @remarks
+ * Provides comprehensive monitoring history visualization with filtering,
+ * pagination, and detailed record display. Shows status changes over time
+ * with support for different status types (up, down, all) and configurable
+ * history limits from user settings.
+ *
+ * Features include:
+ * - Real-time status filtering (all, up, down)
+ * - Configurable history display limits
+ * - Detailed record information with response times
+ * - Monitor type-specific detail formatting
+ * - Accessible keyboard navigation and ARIA labels
+ *
+ * @example
+ * ```tsx
+ * <HistoryTab selectedMonitor={monitor} />
+ * ```
+ *
+ * @public
  */
 
 import type { Monitor, StatusHistory } from "@shared/types";
@@ -23,6 +42,11 @@ import { DetailLabel } from "../../common/MonitorUiComponents";
 /**
  * Props for the HistoryTab component.
  *
+ * @remarks
+ * Defines the required properties for rendering the history tab, including
+ * formatting functions for consistent display and the monitor whose history
+ * should be displayed.
+ *
  * @public
  */
 export interface HistoryTabProperties {
@@ -37,14 +61,23 @@ export interface HistoryTabProperties {
 }
 
 /**
- * Filter type for history records
+ * Filter type for history records.
+ *
+ * @remarks
+ * Defines the available filter options for displaying monitor history records.
+ * Used to control which records are visible in the history display.
+ *
+ * @public
  */
 type HistoryFilter = "all" | "down" | "up";
 
 /**
- * Get the formatted label for filter buttons
- * @param filter - The filter type
- * @returns The formatted label for the filter button
+ * Get the formatted label for filter buttons.
+ *
+ * @param filter - The filter type to get the label for
+ * @returns The human-readable label for the filter button
+ *
+ * @internal
  */
 function getFilterButtonLabel(filter: HistoryFilter): string {
     if (filter === "all") {
@@ -88,7 +121,11 @@ export const HistoryTab = ({
     const lastLoggedMonitorId = useRef<null | string>(null);
 
     // Icon colors configuration
-    const getIconColors = () => ({
+    const getIconColors = (): {
+        filters: string;
+        history: string;
+        timeline: string;
+    } => ({
         filters: currentTheme.colors.primary[600],
         history: currentTheme.colors.primary[500],
         timeline: currentTheme.colors.warning,
@@ -168,7 +205,7 @@ export const HistoryTab = ({
         .slice(0, safeHistoryLimit);
 
     // Helper to render details with label using dynamic formatting
-    function renderDetails(record: StatusHistory) {
+    function renderDetails(record: StatusHistory): null | React.ReactElement {
         if (!record.details) {
             return null;
         }
@@ -183,7 +220,7 @@ export const HistoryTab = ({
 
     // Memoized event handlers
     const createFilterHandler = useCallback(
-        (filter: "all" | "down" | "up") => () => {
+        (filter: "all" | "down" | "up") => (): void => {
             setHistoryFilter(filter);
             logger.user.action("History filter changed", {
                 filter: filter,

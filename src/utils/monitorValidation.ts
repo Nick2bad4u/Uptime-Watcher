@@ -213,7 +213,7 @@ export async function validateMonitorFieldClientSide(
 }
 
 // Helper functions for monitor form validation (reduces complexity by composition)
-const validateHttpMonitorFormData = (data: Partial<HttpFormData>) => {
+const validateHttpMonitorFormData = (data: Partial<HttpFormData>): string[] => {
     const errors: string[] = [];
 
     if (!data.url || typeof data.url !== "string") {
@@ -227,7 +227,7 @@ const validateHttpMonitorFormData = (data: Partial<HttpFormData>) => {
     return errors;
 };
 
-const validatePortMonitorFormData = (data: Partial<PortFormData>) => {
+const validatePortMonitorFormData = (data: Partial<PortFormData>): string[] => {
     const errors: string[] = [];
 
     if (!data.host || typeof data.host !== "string") {
@@ -267,7 +267,7 @@ const validatePortMonitorFormData = (data: Partial<PortFormData>) => {
  * Ping monitors require a host field that must be a valid hostname, IP address, or localhost.
  * Uses shared validation to ensure consistency with backend validation rules.
  */
-const validatePingMonitorFormData = (data: Partial<PingFormData>) => {
+const validatePingMonitorFormData = (data: Partial<PingFormData>): string[] => {
     const errors: string[] = [];
 
     if (!data.host || typeof data.host !== "string") {
@@ -288,7 +288,7 @@ const validatePingMonitorFormData = (data: Partial<PingFormData>) => {
 const validateMonitorFormDataByType = (
     type: MonitorType,
     data: Partial<MonitorFormData>
-) => {
+): string[] => {
     const errors: string[] = [];
 
     // Validate type-specific required fields only

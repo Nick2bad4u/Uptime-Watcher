@@ -83,7 +83,10 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             // State
             activeSiteDetailsTab: "site-overview",
             // Actions
-            openExternal: (url: string, context?: { siteName?: string }) => {
+            openExternal: (
+                url: string,
+                context?: { siteName?: string }
+            ): void => {
                 logStoreAction("UIStore", "openExternal", { context, url });
 
                 // Log user action for analytics
@@ -102,31 +105,31 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 }
             },
             selectedSiteId: undefined,
-            setActiveSiteDetailsTab: (tab: string) => {
+            setActiveSiteDetailsTab: (tab: string): void => {
                 logStoreAction("UIStore", "setActiveSiteDetailsTab", { tab });
                 set({ activeSiteDetailsTab: tab });
             },
-            setSelectedSite: (site: Site | undefined) => {
+            setSelectedSite: (site: Site | undefined): void => {
                 logStoreAction("UIStore", "setSelectedSite", { site });
                 set({ selectedSiteId: site ? site.identifier : undefined });
             },
-            setShowAddSiteModal: (show: boolean) => {
+            setShowAddSiteModal: (show: boolean): void => {
                 logStoreAction("UIStore", "setShowAddSiteModal", { show });
                 set({ showAddSiteModal: show });
             },
-            setShowAdvancedMetrics: (show: boolean) => {
+            setShowAdvancedMetrics: (show: boolean): void => {
                 logStoreAction("UIStore", "setShowAdvancedMetrics", { show });
                 set({ showAdvancedMetrics: show });
             },
-            setShowSettings: (show: boolean) => {
+            setShowSettings: (show: boolean): void => {
                 logStoreAction("UIStore", "setShowSettings", { show });
                 set({ showSettings: show });
             },
-            setShowSiteDetails: (show: boolean) => {
+            setShowSiteDetails: (show: boolean): void => {
                 logStoreAction("UIStore", "setShowSiteDetails", { show });
                 set({ showSiteDetails: show });
             },
-            setSiteDetailsChartTimeRange: (range: ChartTimeRange) => {
+            setSiteDetailsChartTimeRange: (range: ChartTimeRange): void => {
                 logStoreAction("UIStore", "setSiteDetailsChartTimeRange", {
                     range,
                 });

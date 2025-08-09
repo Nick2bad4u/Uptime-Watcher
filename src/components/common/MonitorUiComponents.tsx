@@ -52,7 +52,7 @@ export function ConditionalResponseTime({
     useEffect(() => {
         let isCancelled = false;
 
-        const checkSupport = async () => {
+        const checkSupport = async (): Promise<void> => {
             try {
                 const supports = await checkSupportsResponseTime(monitorType);
                 if (!isCancelled) {
@@ -77,7 +77,7 @@ export function ConditionalResponseTime({
 
         void checkSupport();
 
-        return () => {
+        return (): void => {
             isCancelled = true;
         };
     }, [monitorType]);
@@ -99,7 +99,7 @@ export const DetailLabel = ({
     useEffect(() => {
         let isCancelled = false;
 
-        const formatLabel = async () => {
+        const formatLabel = async (): Promise<void> => {
             try {
                 const formatted = await formatMonitorDetail(
                     monitorType,
@@ -122,7 +122,7 @@ export const DetailLabel = ({
 
         void formatLabel();
 
-        return () => {
+        return (): void => {
             isCancelled = true;
         };
     }, [details, fallback, monitorType]);

@@ -39,7 +39,7 @@ const ThemedIconButton = ({
     tooltip,
     variant = "ghost",
 }: ThemedIconButtonProperties): React.JSX.Element => {
-    const getSize = () => {
+    const getSize = (): string => {
         switch (size) {
             case "lg": {
                 return "48px";

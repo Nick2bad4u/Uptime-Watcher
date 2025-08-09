@@ -101,14 +101,14 @@ export const SiteDetails = ({
 
     // Add global escape key handler
     useEffect(() => {
-        const handleGlobalKeyDown = (event: KeyboardEvent) => {
+        const handleGlobalKeyDown = (event: KeyboardEvent): void => {
             if (event.key === "Escape") {
                 onClose();
             }
         };
 
         document.addEventListener("keydown", handleGlobalKeyDown);
-        return () => {
+        return (): void => {
             document.removeEventListener("keydown", handleGlobalKeyDown);
         };
     }, [onClose]);

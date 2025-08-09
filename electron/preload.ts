@@ -30,7 +30,8 @@ const siteAPI = {
      * @param site - Complete site object with monitors
      * @returns Promise resolving to the created site with assigned IDs
      */
-    addSite: (site: Site) => ipcRenderer.invoke("add-site", site),
+    addSite: (site: Site): Promise<Site> =>
+        ipcRenderer.invoke("add-site", site),
 
     /**
      * Trigger an immediate health check for a specific monitor.
@@ -39,7 +40,7 @@ const siteAPI = {
      * @param monitorId - Unique monitor identifier
      * @returns Promise resolving when check is complete
      */
-    checkSiteNow: (identifier: string, monitorId: string) =>
+    checkSiteNow: (identifier: string, monitorId: string): Promise<void> =>
         ipcRenderer.invoke("check-site-now", identifier, monitorId),
 
     /**
@@ -47,7 +48,7 @@ const siteAPI = {
      *
      * @returns Promise resolving to array of all sites with their monitors
      */
-    getSites: () => ipcRenderer.invoke("get-sites"),
+    getSites: (): Promise<Site[]> => ipcRenderer.invoke("get-sites"),
 
     /**
      * Remove a specific monitor from a site.
@@ -56,7 +57,7 @@ const siteAPI = {
      * @param monitorId - Unique monitor identifier to remove
      * @returns Promise resolving when monitor is removed
      */
-    removeMonitor: (siteIdentifier: string, monitorId: string) =>
+    removeMonitor: (siteIdentifier: string, monitorId: string): Promise<void> =>
         ipcRenderer.invoke("remove-monitor", siteIdentifier, monitorId),
 
     /**
@@ -65,7 +66,7 @@ const siteAPI = {
      * @param identifier - Unique site identifier
      * @returns Promise resolving when site is completely removed
      */
-    removeSite: (identifier: string) =>
+    removeSite: (identifier: string): Promise<void> =>
         ipcRenderer.invoke("remove-site", identifier),
 
     /**
@@ -75,7 +76,7 @@ const siteAPI = {
      * @param updates - Partial site object with properties to update
      * @returns Promise resolving when update is complete
      */
-    updateSite: (identifier: string, updates: Partial<Site>) =>
+    updateSite: (identifier: string, updates: Partial<Site>): Promise<void> =>
         ipcRenderer.invoke("update-site", identifier, updates),
 };
 
@@ -93,7 +94,8 @@ const monitoringAPI = {
      *
      * @returns Promise resolving when all monitors are started
      */
-    startMonitoring: () => ipcRenderer.invoke("start-monitoring"),
+    startMonitoring: (): Promise<void> =>
+        ipcRenderer.invoke("start-monitoring"),
 
     /**
      * Start monitoring for a specific site or individual monitor.
@@ -102,7 +104,10 @@ const monitoringAPI = {
      * @param monitorId - Optional specific monitor ID (if omitted, starts all monitors for the site)
      * @returns Promise resolving when monitoring is started
      */
-    startMonitoringForSite: (identifier: string, monitorId?: string) =>
+    startMonitoringForSite: (
+        identifier: string,
+        monitorId?: string
+    ): Promise<void> =>
         ipcRenderer.invoke("start-monitoring-for-site", identifier, monitorId),
 
     /**
@@ -110,7 +115,7 @@ const monitoringAPI = {
      *
      * @returns Promise resolving when all monitors are stopped
      */
-    stopMonitoring: () => ipcRenderer.invoke("stop-monitoring"),
+    stopMonitoring: (): Promise<void> => ipcRenderer.invoke("stop-monitoring"),
 
     /**
      * Stop monitoring for a specific site or individual monitor.
@@ -119,7 +124,10 @@ const monitoringAPI = {
      * @param monitorId - Optional specific monitor ID (if omitted, stops all monitors for the site)
      * @returns Promise resolving when monitoring is stopped
      */
-    stopMonitoringForSite: (identifier: string, monitorId?: string) =>
+    stopMonitoringForSite: (
+        identifier: string,
+        monitorId?: string
+    ): Promise<void> =>
         ipcRenderer.invoke("stop-monitoring-for-site", identifier, monitorId),
 };
 
@@ -158,7 +166,7 @@ const dataAPI = {
      *
      * @returns Promise resolving to JSON string containing all sites, monitors, and settings
      */
-    exportData: () => ipcRenderer.invoke("export-data"),
+    exportData: (): Promise<string> => ipcRenderer.invoke("export-data"),
 
     /**
      * Import application data from JSON string.
@@ -166,7 +174,8 @@ const dataAPI = {
      * @param data - JSON string containing application data to import
      * @returns Promise resolving to true if import was successful, false otherwise
      */
-    importData: (data: string) => ipcRenderer.invoke("import-data", data),
+    importData: (data: string): Promise<boolean> =>
+        ipcRenderer.invoke("import-data", data),
 };
 
 /**
@@ -182,7 +191,8 @@ const settingsAPI = {
      *
      * @returns Promise resolving to the number of history records kept per monitor
      */
-    getHistoryLimit: () => ipcRenderer.invoke("get-history-limit"),
+    getHistoryLimit: (): Promise<number> =>
+        ipcRenderer.invoke("get-history-limit"),
 
     /**
      * Reset all application settings to their default values.
@@ -195,7 +205,7 @@ const settingsAPI = {
      * - Any other persisted settings to their defaults
      * The operation is performed atomically within a database transaction.
      */
-    resetSettings: () => ipcRenderer.invoke("reset-settings"),
+    resetSettings: (): Promise<void> => ipcRenderer.invoke("reset-settings"),
 
     /**
      * Update the history retention limit and prune existing history.
@@ -207,7 +217,7 @@ const settingsAPI = {
      * This operation will immediately prune history records that exceed the new limit
      * across all monitors to free up storage space.
      */
-    updateHistoryLimit: (limit: number) =>
+    updateHistoryLimit: (limit: number): Promise<void> =>
         ipcRenderer.invoke("update-history-limit", limit),
 };
 
@@ -245,15 +255,17 @@ const eventsAPI = {
      */
     onCacheInvalidated: (
         callback: (data: CacheInvalidatedEventData) => void
-    ) => {
+    ): (() => void) => {
         const handler = (
             _: Electron.IpcRendererEvent,
             data: CacheInvalidatedEventData
-        ) => {
+        ): void => {
             callback(data);
         };
         ipcRenderer.on("cache:invalidated", handler);
-        return () => ipcRenderer.removeListener("cache:invalidated", handler);
+        return (): void => {
+            ipcRenderer.removeListener("cache:invalidated", handler);
+        };
     },
 
     /**
@@ -265,15 +277,19 @@ const eventsAPI = {
      * @remarks
      * Called when a monitor detects a failure.
      */
-    onMonitorDown: (callback: (data: MonitorDownEventData) => void) => {
+    onMonitorDown: (
+        callback: (data: MonitorDownEventData) => void
+    ): (() => void) => {
         const handler = (
             _: Electron.IpcRendererEvent,
             data: MonitorDownEventData
-        ) => {
+        ): void => {
             callback(data);
         };
         ipcRenderer.on("monitor:down", handler);
-        return () => ipcRenderer.removeListener("monitor:down", handler);
+        return (): void => {
+            ipcRenderer.removeListener("monitor:down", handler);
+        };
     },
 
     /**
@@ -291,11 +307,13 @@ const eventsAPI = {
         const handler = (
             _: Electron.IpcRendererEvent,
             data: MonitoringControlEventData
-        ) => {
+        ): void => {
             callback(data);
         };
         ipcRenderer.on("monitoring:started", handler);
-        return () => ipcRenderer.removeListener("monitoring:started", handler);
+        return (): void => {
+            ipcRenderer.removeListener("monitoring:started", handler);
+        };
     },
 
     /**
@@ -313,11 +331,13 @@ const eventsAPI = {
         const handler = (
             _: Electron.IpcRendererEvent,
             data: MonitoringControlEventData
-        ) => {
+        ): void => {
             callback(data);
         };
         ipcRenderer.on("monitoring:stopped", handler);
-        return () => ipcRenderer.removeListener("monitoring:stopped", handler);
+        return (): void => {
+            ipcRenderer.removeListener("monitoring:stopped", handler);
+        };
     },
 
     /**
@@ -330,13 +350,16 @@ const eventsAPI = {
      * This is the primary way to receive real-time updates about monitor
      * status changes for UI updates and notifications.
      */
-    onMonitorStatusChanged: (callback: (data: unknown) => void) => {
-        const handler = (_: Electron.IpcRendererEvent, data: unknown) => {
+    onMonitorStatusChanged: (
+        callback: (data: unknown) => void
+    ): (() => void) => {
+        const handler = (_: Electron.IpcRendererEvent, data: unknown): void => {
             callback(data);
         };
         ipcRenderer.on("monitor:status-changed", handler);
-        return () =>
+        return (): void => {
             ipcRenderer.removeListener("monitor:status-changed", handler);
+        };
     },
 
     /**
@@ -348,15 +371,19 @@ const eventsAPI = {
      * @remarks
      * Called when a monitor recovers from a down state.
      */
-    onMonitorUp: (callback: (data: MonitorUpEventData) => void) => {
+    onMonitorUp: (
+        callback: (data: MonitorUpEventData) => void
+    ): (() => void) => {
         const handler = (
             _: Electron.IpcRendererEvent,
             data: MonitorUpEventData
-        ) => {
+        ): void => {
             callback(data);
         };
         ipcRenderer.on("monitor:up", handler);
-        return () => ipcRenderer.removeListener("monitor:up", handler);
+        return (): void => {
+            ipcRenderer.removeListener("monitor:up", handler);
+        };
     },
 
     /**
@@ -368,12 +395,17 @@ const eventsAPI = {
      * @remarks
      * Used primarily for development and debugging purposes.
      */
-    onTestEvent: (callback: (data: TestEventData) => void) => {
-        const handler = (_: Electron.IpcRendererEvent, data: TestEventData) => {
+    onTestEvent: (callback: (data: TestEventData) => void): (() => void) => {
+        const handler = (
+            _: Electron.IpcRendererEvent,
+            data: TestEventData
+        ): void => {
             callback(data);
         };
         ipcRenderer.on("test-event", handler);
-        return () => ipcRenderer.removeListener("test-event", handler);
+        return (): void => {
+            ipcRenderer.removeListener("test-event", handler);
+        };
     },
 
     /**
@@ -385,15 +417,19 @@ const eventsAPI = {
      * @remarks
      * Receives events about application updates (checking, downloading, ready to install).
      */
-    onUpdateStatus: (callback: (data: UpdateStatusEventData) => void) => {
+    onUpdateStatus: (
+        callback: (data: UpdateStatusEventData) => void
+    ): (() => void) => {
         const handler = (
             _: Electron.IpcRendererEvent,
             data: UpdateStatusEventData
-        ) => {
+        ): void => {
             callback(data);
         };
         ipcRenderer.on("update-status", handler);
-        return () => ipcRenderer.removeListener("update-status", handler);
+        return (): void => {
+            ipcRenderer.removeListener("update-status", handler);
+        };
     },
 
     /**
@@ -404,7 +440,7 @@ const eventsAPI = {
      * @remarks
      * Use this for cleanup when components unmount to prevent memory leaks.
      */
-    removeAllListeners: (channel: string) => {
+    removeAllListeners: (channel: string): void => {
         ipcRenderer.removeAllListeners(channel);
     },
 };
@@ -426,7 +462,8 @@ const systemAPI = {
      * Provides a secure way to open external links without navigating
      * away from the application.
      */
-    openExternal: (url: string) => ipcRenderer.invoke("open-external", url),
+    openExternal: (url: string): Promise<void> =>
+        ipcRenderer.invoke("open-external", url),
 
     /**
      * Quit the application and install a pending update.
@@ -437,7 +474,7 @@ const systemAPI = {
      *
      * Note: Uses ipcRenderer.send instead of invoke because no response is needed from the main process.
      */
-    quitAndInstall: () => {
+    quitAndInstall: (): void => {
         ipcRenderer.send("quit-and-install");
     },
 };
@@ -480,11 +517,13 @@ const stateSyncAPI = {
         const handler = (
             _event: Electron.IpcRendererEvent,
             eventData: Parameters<typeof callback>[0]
-        ) => {
+        ): void => {
             callback(eventData);
         };
         ipcRenderer.on("state-sync-event", handler);
-        return () => ipcRenderer.removeListener("state-sync-event", handler);
+        return (): void => {
+            ipcRenderer.removeListener("state-sync-event", handler);
+        };
     },
 
     /**
@@ -511,7 +550,7 @@ const monitorTypesAPI = {
      * @param details - Detail value to format
      * @returns Promise resolving to formatted detail string
      */
-    formatMonitorDetail: (type: string, details: string) =>
+    formatMonitorDetail: (type: string, details: string): Promise<string> =>
         ipcRenderer.invoke("format-monitor-detail", type, details),
 
     /**
@@ -521,7 +560,10 @@ const monitorTypesAPI = {
      * @param monitor - Monitor data
      * @returns Promise resolving to formatted title suffix
      */
-    formatMonitorTitleSuffix: (type: string, monitor: Monitor) =>
+    formatMonitorTitleSuffix: (
+        type: string,
+        monitor: Monitor
+    ): Promise<string> =>
         ipcRenderer.invoke("format-monitor-title-suffix", type, monitor),
 
     /**
@@ -529,7 +571,16 @@ const monitorTypesAPI = {
      *
      * @returns Promise resolving to array of monitor type configurations
      */
-    getMonitorTypes: () => ipcRenderer.invoke("get-monitor-types"),
+    getMonitorTypes: (): Promise<
+        Array<{
+            description: string;
+            displayName: string;
+            fields: unknown[];
+            type: string;
+            uiConfig: unknown;
+            version: string;
+        }>
+    > => ipcRenderer.invoke("get-monitor-types"),
 
     /**
      * Validate monitor data using backend registry.
@@ -538,7 +589,7 @@ const monitorTypesAPI = {
      * @param data - Monitor data to validate
      * @returns Promise resolving to validation result
      */
-    validateMonitorData: (type: string, data: unknown) =>
+    validateMonitorData: (type: string, data: unknown): Promise<unknown> =>
         ipcRenderer.invoke("validate-monitor-data", type, data),
 };
 
