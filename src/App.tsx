@@ -7,8 +7,6 @@ import type { JSX } from "react/jsx-runtime";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import type { StatusUpdate } from "./types";
-
 import { isDevelopment, isProduction } from "../shared/utils/environment";
 import { AddSiteModal } from "./components/AddSiteForm/AddSiteModal";
 import { ErrorAlert } from "./components/common/ErrorAlert/ErrorAlert";
@@ -21,18 +19,16 @@ import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
 import { useMount } from "./hooks/useMount";
 import { useSelectedSite } from "./hooks/useSelectedSite";
 import logger from "./services/logger";
-import { ErrorBoundary } from "./stores/error/ErrorBoundary";
+import ErrorBoundary from "./stores/error/ErrorBoundary";
 import { useErrorStore } from "./stores/error/useErrorStore";
 import { useSettingsStore } from "./stores/settings/useSettingsStore";
 import { useSitesStore } from "./stores/sites/useSitesStore";
 import { useUIStore } from "./stores/ui/useUiStore";
 import { useUpdatesStore } from "./stores/updates/useUpdatesStore";
-import {
-    ThemedBox,
-    ThemedButton,
-    ThemedText,
-    ThemeProvider,
-} from "./theme/components";
+import ThemedBox from "./theme/components/ThemedBox";
+import ThemedButton from "./theme/components/ThemedButton";
+import ThemedText from "./theme/components/ThemedText";
+import ThemeProvider from "./theme/components/ThemeProvider";
 import { useTheme } from "./theme/useTheme";
 import { setupCacheSync } from "./utils/cacheSync";
 
@@ -182,7 +178,7 @@ const App = (): JSX.Element => {
             cacheSyncCleanupRef.current = cacheSyncCleanup;
 
             // Subscribe to status updates
-            sitesStore.subscribeToStatusUpdates((update: StatusUpdate) => {
+            sitesStore.subscribeToStatusUpdates((update) => {
                 // Optional callback for additional processing if needed
                 if (isDevelopment()) {
                     const timestamp = new Date().toLocaleTimeString();

@@ -14,10 +14,11 @@
  * value comparison and user edit state to provide responsive UI feedback.
  */
 
+import type { Monitor, Site } from "@shared/types";
+
 import { useCallback, useEffect, useState } from "react";
 
 import type { ChartTimeRange } from "../../constants";
-import type { Monitor, Site } from "../../types";
 
 import { safeInteger } from "../../../shared/validation/validatorUtils";
 import { DEFAULT_CHECK_INTERVAL, RETRY_CONSTRAINTS } from "../../constants";

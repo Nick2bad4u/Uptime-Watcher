@@ -20,36 +20,6 @@ vi.mock("../../../../stores/settings/useSettingsStore", () => ({
     })),
 }));
 
-vi.mock("../../../../theme/useTheme", () => ({
-    useTheme: vi.fn(() => ({
-        availableThemes: ["light", "dark"],
-        currentTheme: {
-            colors: {
-                primary: { 500: "#3B82F6" },
-                warning: "#F59E0B",
-                background: { primary: "#FFFFFF", secondary: "#F8FAFC" },
-                border: { primary: "#E2E8F0", secondary: "#CBD5E1" },
-                error: { 50: "#FEF2F2", 500: "#EF4444", 600: "#DC2626" },
-                errorAlert: "#DC2626",
-                info: "#3B82F6",
-                success: "#10B981",
-                successAlert: "#059669",
-                text: { primary: "#1F2937", secondary: "#6B7280" },
-                warningAlert: "#D97706",
-            },
-        },
-        getColor: vi.fn(),
-        getStatusColor: vi.fn(),
-        isDark: false,
-        setTheme: vi.fn(),
-        systemTheme: "light",
-        themeManager: {},
-        themeName: "light",
-        themeVersion: 1,
-        toggleTheme: vi.fn(),
-    })),
-}));
-
 vi.mock("../../../../services/logger", () => ({
     default: {
         error: vi.fn(),
@@ -62,22 +32,34 @@ vi.mock("../../../../services/logger", () => ({
     },
 }));
 
-vi.mock("../../../../theme/components", () => ({
-    StatusIndicator: ({ children, ...props }: any) => (
+vi.mock("../../../../theme/components/StatusIndicator", () => ({
+    default: ({ children, ...props }: any) => (
         <div data-testid="status-indicator" {...props}>
             {children}
         </div>
     ),
-    ThemedButton: ({ children, ...props }: any) => (
+}));
+
+vi.mock("../../../../theme/components/ThemedButton", () => ({
+    default: ({ children, ...props }: any) => (
         <button {...props}>{children}</button>
     ),
-    ThemedCard: ({ children, ...props }: any) => (
+}));
+
+vi.mock("../../../../theme/components/ThemedCard", () => ({
+    default: ({ children, ...props }: any) => (
         <div {...props}>{children}</div>
     ),
-    ThemedSelect: ({ children, ...props }: any) => (
+}));
+
+vi.mock("../../../../theme/components/ThemedSelect", () => ({
+    default: ({ children, ...props }: any) => (
         <select {...props}>{children}</select>
     ),
-    ThemedText: ({ children, ...props }: any) => (
+}));
+
+vi.mock("../../../../theme/components/ThemedText", () => ({
+    default: ({ children, ...props }: any) => (
         <span {...props}>{children}</span>
     ),
 }));

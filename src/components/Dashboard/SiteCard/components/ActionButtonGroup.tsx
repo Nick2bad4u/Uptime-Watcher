@@ -7,7 +7,7 @@
 
 import React, { useCallback } from "react";
 
-import { ThemedButton } from "../../../../theme/components";
+import ThemedButton from "../../../../theme/components/ThemedButton";
 import { SiteMonitoringButton } from "../../../common/SiteMonitoringButton/SiteMonitoringButton";
 
 /**

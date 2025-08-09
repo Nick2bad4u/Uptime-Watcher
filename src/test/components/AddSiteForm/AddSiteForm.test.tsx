@@ -60,17 +60,6 @@ vi.mock("../../../hooks/useMonitorTypes", () => ({
     })),
 }));
 
-vi.mock("../../../theme/useTheme", () => ({
-    useTheme: vi.fn(() => ({
-        theme: {
-            colors: {
-                background: "#ffffff",
-                text: "#000000",
-            },
-        },
-    })),
-}));
-
 vi.mock("../../../hooks/useDynamicHelpText", () => ({
     useDynamicHelpText: vi.fn(() => ({
         helpText: "Default help text",
@@ -101,7 +90,7 @@ vi.mock("../../../components/AddSiteForm/FormFields", () => ({
 }));
 
 vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
-    DynamicMonitorFields: () => (
+    default: () => (
         <div data-testid="dynamic-monitor-fields">Dynamic fields</div>
     ),
 }));

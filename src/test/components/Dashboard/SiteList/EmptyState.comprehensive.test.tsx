@@ -47,12 +47,12 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
     it("should render with correct structure and content", () => {
         render(<EmptyState />);
 
-        // Should render the main container
-        const container = screen.getByTestId("themed-box");
+        // Should render the main container with correct CSS classes
+        const container = document.querySelector(".themed-box");
         expect(container).toBeInTheDocument();
-        expect(container).toHaveAttribute("data-classname", "text-center");
-        expect(container).toHaveAttribute("data-padding", "xl");
-        expect(container).toHaveAttribute("data-surface", "base");
+        expect(container).toHaveClass("text-center");
+        expect(container).toHaveClass("themed-box--padding-xl");
+        expect(container).toHaveClass("themed-box--surface-base");
     });
 
     it("should render the icon with correct emoji", () => {
@@ -68,14 +68,10 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
 
         const heading = screen.getByText("No sites to monitor");
         expect(heading).toBeInTheDocument();
-
-        const themedTexts = screen.getAllByTestId("themed-text");
-        const headingElement = themedTexts.find(
-            (el) => el.getAttribute("data-classname") === "mb-2"
-        );
-        expect(headingElement).toHaveAttribute("data-classname", "mb-2");
-        expect(headingElement).toHaveAttribute("data-size", "lg");
-        expect(headingElement).toHaveAttribute("data-weight", "medium");
+        expect(heading).toHaveClass("themed-text--primary");
+        expect(heading).toHaveClass("themed-text--size-lg");
+        expect(heading).toHaveClass("themed-text--weight-medium");
+        expect(heading).toHaveClass("mb-2");
     });
 
     it("should render the descriptive text", () => {
@@ -85,16 +81,9 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
             "Add your first website to start monitoring its uptime."
         );
         expect(description).toBeInTheDocument();
-
-        // Find the themed text elements and check the secondary one
-        const themedTexts = screen.getAllByTestId("themed-text");
-        const secondaryText = themedTexts.find(
-            (el) => el.getAttribute("data-variant") === "secondary"
-        );
-        expect(secondaryText).toBeInTheDocument();
-        expect(secondaryText).toHaveTextContent(
-            "Add your first website to start monitoring its uptime."
-        );
+        expect(description).toHaveClass("themed-text--secondary");
+        expect(description).toHaveClass("themed-text--size-base");
+        expect(description).toHaveClass("themed-text--weight-normal");
     });
 
     it("should have correct CSS classes for styling", () => {
@@ -104,26 +93,26 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         const iconContainer = screen.getByText("🌐").closest("div");
         expect(iconContainer).toHaveClass("empty-state-icon");
 
-        // Check main container attributes
-        const container = screen.getByTestId("themed-box");
-        expect(container).toHaveAttribute("data-classname", "text-center");
-        expect(container).toHaveAttribute("data-padding", "xl");
-        expect(container).toHaveAttribute("data-surface", "base");
+        // Check main container CSS classes
+        const container = document.querySelector(".themed-box");
+        expect(container).toHaveClass("text-center");
+        expect(container).toHaveClass("themed-box--padding-xl");
+        expect(container).toHaveClass("themed-box--surface-base");
     });
 
     it("should render all elements in correct hierarchy", () => {
         render(<EmptyState />);
 
-        const container = screen.getByTestId("themed-box");
+        const container = document.querySelector(".themed-box");
 
         // Check that all child elements are present within the container
         expect(container).toContainElement(
             screen.getByText("🌐").closest("div")
         );
 
-        const themedTexts = screen.getAllByTestId("themed-text");
+        const themedTexts = document.querySelectorAll(".themed-text");
         themedTexts.forEach((element) => {
-            expect(container).toContainElement(element);
+            expect(container).toContainElement(element as HTMLElement);
         });
     });
 
@@ -143,23 +132,17 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
     it("should maintain consistent prop structure", () => {
         render(<EmptyState />);
 
-        const themedTexts = screen.getAllByTestId("themed-text");
-
-        // Main heading should have specific props
-        const heading = themedTexts.find(
-            (el) => el.textContent === "No sites to monitor"
-        );
-        expect(heading).toHaveAttribute("data-classname", "mb-2");
-        expect(heading).toHaveAttribute("data-size", "lg");
-        expect(heading).toHaveAttribute("data-weight", "medium");
+        // Main heading should have specific CSS classes
+        const heading = screen.getByText("No sites to monitor");
+        expect(heading).toHaveClass("mb-2");
+        expect(heading).toHaveClass("themed-text--size-lg");
+        expect(heading).toHaveClass("themed-text--weight-medium");
 
         // Description should have variant prop
-        const description = themedTexts.find(
-            (el) =>
-                el.textContent ===
-                "Add your first website to start monitoring its uptime."
+        const description = screen.getByText(
+            "Add your first website to start monitoring its uptime."
         );
-        expect(description).toHaveAttribute("data-variant", "secondary");
+        expect(description).toHaveClass("themed-text--secondary");
     });
 
     it("should be accessible and semantic", () => {
@@ -181,11 +164,11 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         render(<EmptyState />);
 
         // Should use ThemedBox for container
-        const container = screen.getByTestId("themed-box");
+        const container = document.querySelector(".themed-box");
         expect(container).toBeInTheDocument();
 
         // Should use ThemedText for text elements
-        const themedTexts = screen.getAllByTestId("themed-text");
+        const themedTexts = document.querySelectorAll(".themed-text");
         expect(themedTexts).toHaveLength(2);
     });
 });

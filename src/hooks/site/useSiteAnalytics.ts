@@ -6,10 +6,11 @@
  * All calculations are memoized for performance optimization.
  */
 
+import type { Monitor, StatusHistory } from "@shared/types";
+
 import { useMemo } from "react";
 
 import type { Theme } from "../../theme/types";
-import type { Monitor, StatusHistory } from "../../types";
 
 import { CHART_TIME_PERIODS } from "../../constants";
 import { TIME_PERIOD_LABELS, type TimePeriod } from "../../utils/time";

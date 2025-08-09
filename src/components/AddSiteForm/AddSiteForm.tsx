@@ -22,13 +22,17 @@ import { useMonitorTypes } from "../../hooks/useMonitorTypes";
 import logger from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
-import { ThemedBox, ThemedButton, ThemedText } from "../../theme/components";
+import ThemedBox from "../../theme/components/ThemedBox";
+import ThemedButton from "../../theme/components/ThemedButton";
+import ThemedText from "../../theme/components/ThemedText";
 import { generateUuid } from "../../utils/data/generateUuid";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
 import { useAddSiteForm } from "../SiteDetails/useAddSiteForm";
-import { DynamicMonitorFields } from "./DynamicMonitorFields";
-import { RadioGroup, SelectField, TextField } from "./FormFields";
+import DynamicMonitorFields from "./DynamicMonitorFields";
+import RadioGroup from "./RadioGroup";
+import SelectField from "./SelectField";
 import { handleSubmit } from "./Submit";
+import TextField from "./TextField";
 
 /**
  * Props for the AddSiteForm component.

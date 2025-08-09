@@ -3,12 +3,12 @@
  * Composed of multiple sub-components for maintainability and reusability.
  */
 
+import type { Site } from "@shared/types";
+
 import React, { useMemo } from "react";
 
-import type { Site } from "../../../types";
-
 import { useSite } from "../../../hooks/site/useSite";
-import { ThemedBox } from "../../../theme/components";
+import ThemedBox from "../../../theme/components/ThemedBox";
 import { SiteCardFooter } from "./SiteCardFooter";
 import { SiteCardHeader } from "./SiteCardHeader";
 import { SiteCardHistory } from "./SiteCardHistory";

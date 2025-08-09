@@ -4,6 +4,7 @@
  * and site-level actions.
  */
 
+import type { Monitor, Site } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
 import { useCallback, useMemo } from "react";
@@ -15,17 +16,13 @@ import {
     MdSpeed,
 } from "react-icons/md";
 
-import type { Monitor, Site } from "../../../types";
-
-import {
-    StatusIndicator,
-    ThemedBadge,
-    ThemedBox,
-    ThemedButton,
-    ThemedCard,
-    ThemedProgress,
-    ThemedText,
-} from "../../../theme/components";
+import StatusIndicator from "../../../theme/components/StatusIndicator";
+import ThemedBadge from "../../../theme/components/ThemedBadge";
+import ThemedBox from "../../../theme/components/ThemedBox";
+import ThemedButton from "../../../theme/components/ThemedButton";
+import ThemedCard from "../../../theme/components/ThemedCard";
+import ThemedProgress from "../../../theme/components/ThemedProgress";
+import ThemedText from "../../../theme/components/ThemedText";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
 import { getSiteDisplayStatus } from "../../../utils/siteStatus";
 import { formatDuration, formatResponseTime } from "../../../utils/time";

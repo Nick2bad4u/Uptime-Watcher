@@ -14,7 +14,7 @@
  * @packageDocumentation
  */
 
-import type { Site, StatusUpdate } from "../../types";
+import type { Site, StatusUpdate } from "@shared/types";
 
 import logger from "../../services/logger";
 import { safeExtractIpcData } from "../../types/ipc";

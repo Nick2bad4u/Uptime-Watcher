@@ -3,10 +3,15 @@
  * Provides monitor state, statistics, and selection handling for sites.
  */
 
+import type {
+    Monitor,
+    MonitorStatus,
+    Site,
+    StatusHistory,
+} from "@shared/types";
+
 import { DEFAULT_MONITOR_STATUS } from "@shared/types";
 import { useCallback, useMemo } from "react";
-
-import type { Monitor, MonitorStatus, Site, StatusHistory } from "../../types";
 
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { getDefaultMonitorId } from "../../utils/monitorUiHelpers";

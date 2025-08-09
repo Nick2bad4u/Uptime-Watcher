@@ -10,15 +10,14 @@
  * These functions only handle the base built-in types.
  *
  * @see {@link MonitorTypeRegistry} for runtime type registration
- * @see {@link MonitorType} for type definition
+ * @see {@link MonitorType} for type definition - import from ../../types
  */
 
 import type { MonitorType } from "../../types";
 
 import { BASE_MONITOR_TYPES } from "../../types";
 
-// Import and re-export the core types from the main types file
-export type { MonitorType } from "../../types";
+// MonitorType is available via import from ../../types - no re-export needed
 
 /**
  * Get all base monitor types as an array.

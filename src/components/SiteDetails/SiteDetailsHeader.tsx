@@ -5,25 +5,18 @@
  * in a visually appealing header with gradient background and accent styling.
  */
 
+import type { Monitor, Site } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
 import { useCallback } from "react";
 import { MdExpandLess, MdExpandMore } from "react-icons/md";
 
-import type { Monitor, Site } from "../../types";
-
 import { useThemeStyles } from "../../hooks/useThemeStyles";
 import { useUIStore } from "../../stores/ui/useUiStore";
-import {
-    StatusIndicator,
-    ThemedBadge,
-    ThemedBox,
-    ThemedText,
-} from "../../theme/components";
-import {
-    isValidUrl,
-    safeGetHostname,
-} from "../../utils/monitoring/dataValidation";
+import StatusIndicator from "../../theme/components/StatusIndicator";
+import ThemedText from "../../theme/components/ThemedText";
+import { isValidUrl } from "../../utils/monitoring/dataValidation";
+import MonitoringStatusDisplay from "./MonitoringStatusDisplay";
 import { ScreenshotThumbnail } from "./ScreenshotThumbnail";
 
 /**
@@ -52,7 +45,7 @@ export interface SiteDetailsHeaderProperties {
  * @param props - Component props containing site data and control handlers
  * @returns JSX element containing the site details header
  */
-export const SiteDetailsHeader = ({
+const SiteDetailsHeader = ({
     isCollapsed,
     onToggleCollapse,
     selectedMonitor,
@@ -171,116 +164,4 @@ export const SiteDetailsHeader = ({
     );
 };
 
-/**
- * Type guard to check if the window.electronAPI has openExternal method.
-/**
- * Enhanced monitoring status display component for the site details header.
- *
- * Shows larger indicators with monitor names and types using the theme system.
- * Displays monitor status, type, and connection information with proper error handling
- * for URL parsing.
- *
- * @param monitors - Array of monitors to display status for
- * @returns JSX element with enhanced monitoring status indicators
- */
-const MonitoringStatusDisplay = ({
-    monitors,
-}: {
-    readonly monitors: Monitor[];
-}) => {
-    if (monitors.length === 0) {
-        return (
-            <ThemedBox
-                data-testid="monitoring-status-display"
-                padding="sm"
-                rounded="md"
-                variant="secondary"
-            >
-                <ThemedText size="sm" variant="secondary">
-                    No monitors configured
-                </ThemedText>
-            </ThemedBox>
-        );
-    }
-
-    const runningCount = monitors.filter(
-        (monitor) => monitor.monitoring
-    ).length;
-    const totalCount = monitors.length;
-
-    return (
-        <ThemedBox
-            className="min-w-0"
-            data-testid="monitoring-status-display"
-            padding="md"
-            rounded="lg"
-            shadow="sm"
-            surface="elevated"
-            variant="primary"
-        >
-            <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                    <ThemedText size="sm" variant="primary" weight="semibold">
-                        Monitor Status
-                    </ThemedText>
-                    <ThemedBadge
-                        size="sm"
-                        variant={runningCount > 0 ? "success" : "secondary"}
-                    >
-                        {runningCount}/{totalCount} active
-                    </ThemedBadge>
-                </div>
-                <div className="flex max-h-32 flex-col gap-1 overflow-y-auto">
-                    {monitors.map((monitor) => (
-                        <div
-                            className="flex items-center gap-2"
-                            data-testid={`monitor-status-${monitor.id}`}
-                            key={monitor.id}
-                        >
-                            <ThemedBadge
-                                size="xs"
-                                variant={
-                                    monitor.monitoring ? "success" : "secondary"
-                                }
-                            >
-                                <div className="flex items-center gap-1">
-                                    <div
-                                        className={`h-2 w-2 rounded-full ${
-                                            monitor.monitoring
-                                                ? "themed-status-up"
-                                                : "themed-status-paused"
-                                        }`}
-                                        title={`${monitor.type.toUpperCase()}: ${monitor.monitoring ? "Running" : "Stopped"}`}
-                                    />
-                                    <ThemedText size="xs" weight="medium">
-                                        {monitor.type.toUpperCase()}
-                                    </ThemedText>
-                                </div>
-                            </ThemedBadge>
-                            <ThemedText
-                                className="min-w-0 flex-1"
-                                size="xs"
-                                variant="secondary"
-                            >
-                                {/* Display appropriate connection info based on monitor type */}
-                                {monitor.type === "http" && monitor.url ? (
-                                    <span className="block truncate">
-                                        {safeGetHostname(monitor.url) ||
-                                            monitor.url}
-                                    </span>
-                                ) : null}
-                                {monitor.type === "port" &&
-                                monitor.host &&
-                                monitor.port ? (
-                                    <span className="block truncate">
-                                        {monitor.host}:{monitor.port}
-                                    </span>
-                                ) : null}
-                            </ThemedText>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </ThemedBox>
-    );
-};
+export default SiteDetailsHeader;

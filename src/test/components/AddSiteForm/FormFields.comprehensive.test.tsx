@@ -1,28 +1,30 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom";
-import {
-    FormField,
-    TextField,
-    SelectField,
-    RadioGroup,
-} from "../../../components/AddSiteForm/FormFields";
-import type {
-    FormFieldProperties,
-    TextFieldProperties,
-    SelectFieldProperties,
-    RadioGroupProperties,
-} from "../../../components/AddSiteForm/FormFields";
+import FormField from "../../../components/AddSiteForm/FormField";
+import TextField from "../../../components/AddSiteForm/TextField";
+import SelectField from "../../../components/AddSiteForm/SelectField";
+import RadioGroup from "../../../components/AddSiteForm/RadioGroup";
+import type { FormFieldProperties } from "../../../components/AddSiteForm/FormField";
+import type { TextFieldProperties } from "../../../components/AddSiteForm/TextField";
+import type { SelectFieldProperties } from "../../../components/AddSiteForm/SelectField";
+import type { RadioGroupProperties } from "../../../components/AddSiteForm/RadioGroup";
 
 // Mock all dependencies
-vi.mock("../../../theme/components", () => ({
-    ThemedBox: vi.fn(({ children, ...props }) => (
-        <div {...props}>{children}</div>
+vi.mock("../../../theme/components/ThemedBox", () => ({
+    default: vi.fn(({ children, ...props }) => (
+        <div data-testid="themed-box" {...props}>{children}</div>
     )),
-    ThemedText: vi.fn(({ children, ...props }) => (
-        <span {...props}>{children}</span>
+}));
+
+vi.mock("../../../theme/components/ThemedText", () => ({
+    default: vi.fn(({ children, ...props }) => (
+        <span data-testid="themed-text" {...props}>{children}</span>
     )),
-    ThemedInput: vi.fn(({ onChange, value, placeholder, ...props }) => (
+}));
+
+vi.mock("../../../theme/components/ThemedInput", () => ({
+    default: vi.fn(({ onChange, value, placeholder, ...props }) => (
         <input
             {...props}
             value={value || ""}
@@ -31,7 +33,10 @@ vi.mock("../../../theme/components", () => ({
             data-testid="themed-input"
         />
     )),
-    ThemedSelect: vi.fn(({ children, value, onChange, ...props }) => (
+}));
+
+vi.mock("../../../theme/components/ThemedSelect", () => ({
+    default: vi.fn(({ children, value, onChange, ...props }) => (
         <select
             {...props}
             value={value}
@@ -41,12 +46,10 @@ vi.mock("../../../theme/components", () => ({
             {children}
         </select>
     )),
-    ThemedOption: vi.fn(({ children, value, ...props }) => (
-        <option {...props} value={value}>
-            {children}
-        </option>
-    )),
-    ThemedButton: vi.fn(({ children, onClick, ...props }) => (
+}));
+
+vi.mock("../../../theme/components/ThemedButton", () => ({
+    default: vi.fn(({ children, onClick, ...props }) => (
         <button {...props} onClick={onClick} data-testid="themed-button">
             {children}
         </button>

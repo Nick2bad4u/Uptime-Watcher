@@ -1,5 +1,6 @@
 /**
  * Dynamic form component that generates monitor fields based on type configuration.
+ * Loads field definitions from backend and renders appropriate form fields.
  *
  * @remarks
  * - Loads monitor field definitions from the backend using the monitor type.
@@ -10,42 +11,15 @@
  * @packageDocumentation
  */
 
-import type { MonitorFieldDefinition } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 
 import logger from "../../services/logger";
 import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore";
-import { ThemedText } from "../../theme/components";
+import ThemedText from "../../theme/components/ThemedText";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
-import { TextField } from "./FormFields";
-
-/**
- * Props for the {@link DynamicField} component.
- *
- * @public
- */
-export interface DynamicFieldProps {
-    /**
-     * Whether the field is disabled.
-     */
-    readonly disabled?: boolean;
-    /**
-     * Field definition describing the field's properties.
-     */
-    readonly field: MonitorFieldDefinition;
-    /**
-     * Change handler for the field value.
-     *
-     * @param value - The new value for the field.
-     */
-    readonly onChange: (value: number | string) => void;
-    /**
-     * Current value of the field.
-     */
-    readonly value: number | string;
-}
+import DynamicField from "./DynamicField";
 
 /**
  * Props for the {@link DynamicMonitorFields} component.
@@ -95,7 +69,7 @@ export interface DynamicMonitorFieldsProps {
  * />
  * ```
  */
-export const DynamicMonitorFields = ({
+const DynamicMonitorFields = ({
     isLoading = false,
     monitorType,
     onChange,
@@ -174,105 +148,4 @@ export const DynamicMonitorFields = ({
     );
 };
 
-/**
- * Renders a single form field based on its definition.
- *
- * @remarks
- * - Supports "number", "text", and "url" field types.
- * - For unsupported field types, displays an error message.
- * - Handles conversion and validation for numeric fields.
- *
- * @param props - {@link DynamicFieldProps}
- * @returns The rendered field as a React element.
- *
- * @example
- * ```tsx
- * <DynamicField
- *   disabled={false}
- *   field={{ name: "port", label: "Port", type: "number", required: true }}
- *   onChange={setPort}
- *   value={8080}
- * />
- * ```
- */
-const DynamicField = ({
-    disabled = false,
-    field,
-    onChange,
-    value,
-}: DynamicFieldProps) => {
-    const handleChange = useCallback(
-        (newValue: number | string) => {
-            onChange(newValue);
-        },
-        [onChange]
-    );
-
-    const handleNumericChange = useCallback(
-        (val: string) => {
-            const numericValue = Number(val);
-            if (val === "" || !Number.isNaN(numericValue)) {
-                handleChange(val === "" ? 0 : numericValue);
-            } else {
-                logger.error(`Invalid numeric input: ${val}`);
-            }
-        },
-        [handleChange]
-    );
-
-    const handleStringChange = useCallback(
-        (val: string) => {
-            handleChange(val);
-        },
-        [handleChange]
-    );
-
-    switch (field.type) {
-        case "number": {
-            return (
-                <TextField
-                    disabled={disabled}
-                    {...(field.helpText && { helpText: field.helpText })}
-                    id={field.name}
-                    label={field.label}
-                    {...(field.max !== undefined && { max: field.max })}
-                    {...(field.min !== undefined && { min: field.min })}
-                    onChange={handleNumericChange}
-                    {...(field.placeholder && {
-                        placeholder: field.placeholder,
-                    })}
-                    required={field.required}
-                    type="number"
-                    value={String(value)}
-                />
-            );
-        }
-        case "text":
-
-        case "url": {
-            return (
-                <TextField
-                    disabled={disabled}
-                    {...(field.helpText && { helpText: field.helpText })}
-                    id={field.name}
-                    label={field.label}
-                    onChange={handleStringChange}
-                    {...(field.placeholder && {
-                        placeholder: field.placeholder,
-                    })}
-                    required={field.required}
-                    type={field.type}
-                    value={String(value)}
-                />
-            );
-        }
-
-        default: {
-            return (
-                <ThemedText variant="error">
-                    Unsupported field type: {field.type}
-                </ThemedText>
-            );
-        }
-    }
-};
+export default DynamicMonitorFields;

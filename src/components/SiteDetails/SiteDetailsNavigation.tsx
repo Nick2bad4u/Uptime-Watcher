@@ -4,19 +4,16 @@
  * and navigating between different detail views.
  */
 
+import type { Site } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
 import React, { useCallback } from "react";
 
-import type { Site } from "../../types";
-
 import logger from "../../services/logger";
-import {
-    ThemedBox,
-    ThemedButton,
-    ThemedSelect,
-    ThemedText,
-} from "../../theme/components";
+import ThemedBox from "../../theme/components/ThemedBox";
+import ThemedButton from "../../theme/components/ThemedButton";
+import ThemedSelect from "../../theme/components/ThemedSelect";
+import ThemedText from "../../theme/components/ThemedText";
 import { SiteMonitoringButton } from "../common/SiteMonitoringButton/SiteMonitoringButton";
 
 /**

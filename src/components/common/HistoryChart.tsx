@@ -7,7 +7,8 @@ import React from "react";
 
 import type { StatusHistory } from "../../types";
 
-import { MiniChartBar, ThemedText } from "../../theme/components";
+import MiniChartBar from "../../theme/components/MiniChartBar";
+import ThemedText from "../../theme/components/ThemedText";
 
 /**
  * Props for the HistoryChart component

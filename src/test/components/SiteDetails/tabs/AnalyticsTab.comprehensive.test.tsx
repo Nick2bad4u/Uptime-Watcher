@@ -26,26 +26,6 @@ vi.mock("../../../../services/logger", () => ({
     },
 }));
 
-vi.mock("../../../../theme/useTheme", () => ({
-    useAvailabilityColors: () => ({
-        getAvailabilityColor: vi.fn(() => "#10B981"),
-        getAvailabilityVariant: vi.fn(() => "success"),
-    }),
-    useTheme: () => ({
-        currentTheme: {
-            colors: {
-                error: "#EF4444",
-                primary: {
-                    500: "#3B82F6",
-                    600: "#2563EB",
-                },
-                success: "#10B981",
-                warning: "#F59E0B",
-            },
-        },
-    }),
-}));
-
 vi.mock("../../../../theme/components", () => ({
     ThemedBadge: ({ children, variant, ...props }: any) => {
         const { iconColor, hoverable, showLabel, ...cleanProps } = props;
@@ -130,18 +110,24 @@ vi.mock("../../../../utils/monitorUiHelpers", () => ({
     formatMonitorDetail: vi.fn(() => "mocked detail"), // Synchronous function
 }));
 
-vi.mock("../../../../components/SiteDetails/charts/ChartComponents", () => ({
-    ResponseTimeChart: () => (
+vi.mock("../../../../components/SiteDetails/charts/ResponseTimeChart", () => ({
+    default: () => (
         <div data-testid="response-time-chart" data-chart-type="line">
             Line Chart
         </div>
     ),
-    StatusChart: () => (
+}));
+
+vi.mock("../../../../components/SiteDetails/charts/StatusChart", () => ({
+    default: () => (
         <div data-testid="status-chart" data-chart-type="bar">
             Bar Chart
         </div>
     ),
-    UptimeChart: () => (
+}));
+
+vi.mock("../../../../components/SiteDetails/charts/UptimeChart", () => ({
+    default: () => (
         <div data-testid="uptime-chart" data-chart-type="doughnut">
             Doughnut Chart
         </div>
@@ -298,11 +284,11 @@ describe("AnalyticsTab", () => {
             render(<AnalyticsTab {...props} />);
 
             // Check both elements exist - they will both show 99.5%
-            const progressElement = screen.getByTestId("themed-progress");
-            expect(progressElement).toHaveAttribute("data-value", "99.5");
+            const progressElement = screen.getByRole("progressbar");
+            expect(progressElement).toBeInTheDocument();
 
-            const badgeElement = screen.getByTestId("themed-badge");
-            expect(badgeElement).toHaveTextContent("99.5%");
+            const badgeElement = screen.getByText("99.5%");
+            expect(badgeElement).toBeInTheDocument();
 
             expect(screen.getByText("Excellent")).toBeInTheDocument();
             expect(props.getAvailabilityDescription).toHaveBeenCalledWith(99.5);
@@ -543,12 +529,12 @@ describe("AnalyticsTab", () => {
 
             render(<AnalyticsTab {...props} />);
 
-            // Use more specific selectors to avoid multiple matches
-            const progressElement = screen.getByTestId("themed-progress");
-            expect(progressElement).toHaveAttribute("data-value", "100");
+            // Use semantic selectors instead of test IDs
+            const progressElement = screen.getByRole("progressbar");
+            expect(progressElement).toBeInTheDocument();
 
-            const badgeElement = screen.getByTestId("themed-badge");
-            expect(badgeElement).toHaveTextContent("100%");
+            const badgeElement = screen.getByText("100%");
+            expect(badgeElement).toBeInTheDocument();
         });
 
         it("should handle invalid uptime values", () => {

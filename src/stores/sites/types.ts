@@ -2,7 +2,7 @@
  * Sites store types and interfaces.
  */
 
-import type { Monitor, Site, StatusUpdate } from "../../types";
+import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
 export interface SitesActions {
     /** Add a monitor to an existing site */

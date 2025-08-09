@@ -3,11 +3,11 @@
  * Provides the top section of each site card with interactive controls.
  */
 
+import type { Site } from "@shared/types";
+
 import React from "react";
 
-import type { Site } from "../../../types";
-
-import { ThemedText } from "../../../theme/components";
+import ThemedText from "../../../theme/components/ThemedText";
 import { ActionButtonGroup } from "./components/ActionButtonGroup";
 import { MonitorSelector } from "./components/MonitorSelector";
 

@@ -5,8 +5,9 @@
  * Note: Empty constructor and no-op functions are intentional design patterns.
  */
 
+import type { Theme, ThemeName } from "./types";
+
 import { themes } from "./themes";
-import { Theme, ThemeName } from "./types";
 import { deepMergeTheme } from "./utils/themeMerging";
 
 /**
@@ -31,7 +32,7 @@ export class ThemeManager {
     /**
      * Apply theme to document
      */
-    applyTheme(theme: Theme): void {
+    public applyTheme(theme: Theme): void {
         if (typeof document === "undefined") {
             return;
         }
@@ -58,14 +59,17 @@ export class ThemeManager {
      * ensuring that nested objects are properly merged rather than replaced entirely.
      * This allows for granular customization while preserving unmodified properties.
      */
-    createCustomTheme(baseTheme: Theme, overrides: Partial<Theme>): Theme {
+    public createCustomTheme(
+        baseTheme: Theme,
+        overrides: Partial<Theme>
+    ): Theme {
         return deepMergeTheme(baseTheme, overrides);
     }
 
     /**
      * Generate CSS variables string for a theme
      */
-    generateCSSVariables(theme: Theme): string {
+    public generateCSSVariables(theme: Theme): string {
         const variables: string[] = [];
 
         this.addColorVariables(theme, variables);
@@ -86,7 +90,7 @@ export class ThemeManager {
      * Dynamically generates the list from the themes object to ensure consistency.
      * Always includes "system" for automatic theme detection.
      */
-    getAvailableThemes(): ThemeName[] {
+    public getAvailableThemes(): ThemeName[] {
         const themeNames = Object.keys(themes) as ThemeName[];
         return [...themeNames, "system"];
     }
@@ -102,7 +106,7 @@ export class ThemeManager {
      * this method will fallback to "light" theme as the default.
      * This ensures safe operation across all deployment environments.
      */
-    getSystemThemePreference(): "dark" | "light" {
+    public getSystemThemePreference(): "dark" | "light" {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (typeof window !== "undefined" && window.matchMedia) {
             return window.matchMedia("(prefers-color-scheme: dark)").matches
@@ -119,7 +123,7 @@ export class ThemeManager {
      * @param name - Theme name to retrieve
      * @returns Theme object containing colors, typography, and spacing
      */
-    getTheme(name: ThemeName): Theme {
+    public getTheme(name: ThemeName): Theme {
         if (name === "system") {
             const systemPreference = this.getSystemThemePreference();
 
@@ -132,7 +136,7 @@ export class ThemeManager {
     /**
      * Validate if theme name is valid
      */
-    isValidThemeName(name: string): name is ThemeName {
+    public isValidThemeName(name: string): name is ThemeName {
         return this.getAvailableThemes().includes(name as ThemeName);
     }
 
@@ -143,18 +147,24 @@ export class ThemeManager {
      * @param callback - Function to call when system theme changes
      * @returns Cleanup function to remove the event listener
      */
-    onSystemThemeChange(callback: (isDark: boolean) => void): () => void {
+    public onSystemThemeChange(
+        callback: (isDark: boolean) => void
+    ): () => void {
         if (typeof window === "undefined") {
             return () => {};
         }
 
         const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-        const handler = (e: MediaQueryListEvent) => callback(e.matches);
+        const handler = (e: MediaQueryListEvent) => {
+            callback(e.matches);
+        };
 
         mediaQuery.addEventListener("change", handler);
 
         // Return cleanup function
-        return () => mediaQuery.removeEventListener("change", handler);
+        return () => {
+            mediaQuery.removeEventListener("change", handler);
+        };
     }
 
     /**
@@ -281,13 +291,13 @@ export class ThemeManager {
                     )) {
                         root.style.setProperty(
                             `--color-${category}-${key}`,
-                            String(value)
+                            value
                         );
                     }
                 } else {
                     root.style.setProperty(
                         `--color-${category}`,
-                        String(colorValue)
+                        colorValue as string
                     );
                 }
             }
@@ -361,7 +371,7 @@ export class ThemeManager {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (typography?.fontSize) {
             for (const [size, value] of Object.entries(typography.fontSize)) {
-                root.style.setProperty(`--font-size-${size}`, String(value));
+                root.style.setProperty(`--font-size-${size}`, value);
             }
         }
 
@@ -370,10 +380,7 @@ export class ThemeManager {
             for (const [weight, value] of Object.entries(
                 typography.fontWeight
             )) {
-                root.style.setProperty(
-                    `--font-weight-${weight}`,
-                    String(value)
-                );
+                root.style.setProperty(`--font-weight-${weight}`, value);
             }
         }
 
@@ -382,10 +389,7 @@ export class ThemeManager {
             for (const [height, value] of Object.entries(
                 typography.lineHeight
             )) {
-                root.style.setProperty(
-                    `--line-height-${height}`,
-                    String(value)
-                );
+                root.style.setProperty(`--line-height-${height}`, value);
             }
         }
     }

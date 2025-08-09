@@ -15,7 +15,7 @@ import type { MonitorRepository } from "../../services/database/MonitorRepositor
 import type { SettingsRepository } from "../../services/database/SettingsRepository";
 import type { SiteRepository } from "../../services/database/SiteRepository";
 import type { Site, StatusHistory } from "../../types";
-import type { Logger } from "./interfaces";
+import type { Logger } from "../interfaces";
 
 import { ERROR_CATALOG } from "../../../shared/utils/errorCatalog";
 import {

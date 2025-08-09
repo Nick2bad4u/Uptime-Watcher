@@ -30,7 +30,8 @@
 
 import type { JSX } from "react/jsx-runtime";
 
-import { ThemedBox, ThemedText } from "../../../theme/components";
+import ThemedBox from "../../../theme/components/ThemedBox";
+import ThemedText from "../../../theme/components/ThemedText";
 
 export const EmptyState = (): JSX.Element => {
     return (

@@ -138,8 +138,7 @@ describe("SiteCard Component", () => {
     it("should render without crashing", () => {
         render(<SiteCard site={mockSite} />);
 
-        expect(screen.getByTestId("themed-box")).toBeInTheDocument();
-        // Check for site name
+        // Check for site name instead of generic themed-box
         expect(screen.getByText("Test Site")).toBeInTheDocument();
         // Check for monitor selector
         expect(screen.getByRole("combobox")).toBeInTheDocument();

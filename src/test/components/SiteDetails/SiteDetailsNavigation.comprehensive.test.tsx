@@ -154,7 +154,8 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
         it("should render navigation container", () => {
             renderSiteDetailsNavigation();
 
-            expect(screen.getByTestId("themed-box")).toBeInTheDocument();
+            // Use CSS class selector instead of data-testid
+            expect(document.querySelector('.themed-box')).toBeInTheDocument();
         });
 
         it("should render site overview tab", () => {
@@ -192,13 +193,15 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
         it("should render monitor selector", () => {
             renderSiteDetailsNavigation();
 
-            expect(screen.getByTestId("monitor-select")).toBeInTheDocument();
+            // Use CSS class selector instead of data-testid
+            expect(document.querySelector('.themed-select')).toBeInTheDocument();
         });
 
         it("should show selected monitor in selector", () => {
             renderSiteDetailsNavigation();
 
-            const selector = screen.getByTestId("monitor-select");
+            // Use CSS class selector and getByRole for semantic selection
+            const selector = document.querySelector('.themed-select') as HTMLSelectElement;
             expect(selector).toHaveValue("monitor-1");
         });
 
@@ -215,7 +218,8 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
                 handleMonitorIdChange,
             });
 
-            const selector = screen.getByTestId("monitor-select");
+            // Use CSS class selector instead of data-testid
+            const selector = document.querySelector('.themed-select') as HTMLSelectElement;
             fireEvent.change(selector, { target: { value: "monitor-2" } });
 
             expect(handleMonitorIdChange).toHaveBeenCalled();
@@ -292,10 +296,8 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             });
 
             const siteOverviewButton = screen.getByText(/Site Overview/);
-            expect(siteOverviewButton).toHaveAttribute(
-                "data-variant",
-                "primary"
-            );
+            // Check for CSS class instead of data attribute
+            expect(siteOverviewButton).toHaveClass("themed-button--primary");
         });
 
         it("should highlight settings tab when active", () => {
@@ -304,7 +306,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             });
 
             const settingsButton = screen.getByText(/Settings/);
-            expect(settingsButton).toHaveAttribute("data-variant", "primary");
+            expect(settingsButton).toHaveClass("themed-button--primary");
         });
 
         it("should highlight history tab when active", () => {
@@ -313,7 +315,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             });
 
             const historyButton = screen.getByText(/History/);
-            expect(historyButton).toHaveAttribute("data-variant", "primary");
+            expect(historyButton).toHaveClass("themed-button--primary");
         });
 
         it("should highlight monitor analytics tab when active", () => {
@@ -322,7 +324,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             });
 
             const monitorButton = screen.getByText(/HTTP Analytics/);
-            expect(monitorButton).toHaveAttribute("data-variant", "primary");
+            expect(monitorButton).toHaveClass("themed-button--primary");
         });
     });
 

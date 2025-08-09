@@ -13,7 +13,9 @@
 import React, { useCallback, useEffect } from "react";
 
 import { useUIStore } from "../../stores/ui/useUiStore";
-import { ThemedBox, ThemedButton, ThemedText } from "../../theme/components";
+import ThemedBox from "../../theme/components/ThemedBox";
+import ThemedButton from "../../theme/components/ThemedButton";
+import ThemedText from "../../theme/components/ThemedText";
 import { useTheme } from "../../theme/useTheme";
 import { AddSiteForm } from "./AddSiteForm";
 

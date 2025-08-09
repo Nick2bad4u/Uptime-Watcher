@@ -77,16 +77,6 @@ export interface ErrorBoundaryState {
 }
 
 /**
- * Interface for the wrapped component returned by withErrorBoundary.
- */
-interface WrappedErrorBoundaryComponent<P extends object> {
-    (properties: P): JSX.Element;
-    // Set display name for better debugging experience in React DevTools
-    // This helps developers identify wrapped components in the component tree
-    displayName: string;
-}
-
-/**
  * Error boundary component for wrapping store-connected components.
  *
  * @remarks
@@ -102,7 +92,7 @@ interface WrappedErrorBoundaryComponent<P extends object> {
  * @public
  */
 // eslint-disable-next-line react/require-optimization -- ErrorBoundary should always re-render on error state changes
-export class ErrorBoundary extends React.Component<
+class ErrorBoundary extends React.Component<
     ErrorBoundaryProperties,
     ErrorBoundaryState
 > {
@@ -167,35 +157,4 @@ export class ErrorBoundary extends React.Component<
     }
 }
 
-/**
- * Higher-order component for wrapping components with error boundary protection.
- *
- * @remarks
- * Returns a new component that wraps the given component in an {@link ErrorBoundary}. Supports custom fallback components for error display. Sets a display name for easier debugging in React DevTools.
- *
- * @typeParam P - The props type for the wrapped component.
- * @param Component - The component to wrap with error boundary protection.
- * @param fallback - Optional custom fallback component for error display.
- * @returns Wrapped component with error boundary functionality.
- * @example
- * ```tsx
- * const SafeComponent = withErrorBoundary(MyComponent, CustomErrorFallback);
- * ```
- * @public
- */
-export const withErrorBoundary = <P extends object>(
-    Component: React.ComponentType<P>,
-    fallback?: React.ComponentType<{ error?: Error; onRetry: () => void }>
-): WrappedErrorBoundaryComponent<P> => {
-    const WrappedComponent = (properties: P) => (
-        <ErrorBoundary {...(fallback ? { fallback } : {})}>
-            <Component {...properties} />
-        </ErrorBoundary>
-    );
-
-    // Set display name for better debugging experience in React DevTools
-    // This helps developers identify wrapped components in the component tree
-    WrappedComponent.displayName = `withErrorBoundary(${Component.displayName ?? Component.name})`;
-
-    return WrappedComponent;
-};
+export default ErrorBoundary;

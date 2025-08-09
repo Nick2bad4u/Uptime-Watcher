@@ -3,7 +3,7 @@
  * Provides type-safe fallback handling across the application.
  */
 
-import type { Monitor } from "../types";
+import type { Monitor } from "@shared/types";
 
 import logger from "../services/logger";
 import { ensureError, withUtilityErrorHandling } from "./errorHandling";

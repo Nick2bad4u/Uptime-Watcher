@@ -7,13 +7,11 @@ import { render } from "@testing-library/react";
 import { vi } from "vitest";
 import "@testing-library/jest-dom";
 
-import {
-    StatusIndicator,
-    ThemedBadge,
-    ThemedInput,
-    ThemedProgress,
-    ThemedSelect,
-} from "../../theme/components";
+import StatusIndicator from "../../theme/components/StatusIndicator";
+import ThemedBadge from "../../theme/components/ThemedBadge";
+import ThemedInput from "../../theme/components/ThemedInput";
+import ThemedProgress from "../../theme/components/ThemedProgress";
+import ThemedSelect from "../../theme/components/ThemedSelect";
 
 // Mock theme hooks with factory function to avoid hoisting issues
 vi.mock("../../theme/useTheme", () => ({

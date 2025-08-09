@@ -6,7 +6,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
-import { DynamicMonitorFields } from "../../../components/AddSiteForm/DynamicMonitorFields";
+import DynamicMonitorFields from "../../../components/AddSiteForm/DynamicMonitorFields";
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
 
 // Mock the monitor types store

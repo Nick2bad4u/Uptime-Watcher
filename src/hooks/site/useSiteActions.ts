@@ -1,6 +1,6 @@
-import { useCallback } from "react";
+import type { Monitor, Site } from "@shared/types";
 
-import type { Monitor, Site } from "../../types";
+import { useCallback } from "react";
 
 import logger from "../../services/logger";
 import { useSitesStore } from "../../stores/sites/useSitesStore";

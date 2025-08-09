@@ -3,11 +3,11 @@
  * Provides interface for selecting between multiple monitors for a site.
  */
 
+import type { Monitor } from "@shared/types";
+
 import React, { useCallback } from "react";
 
-import type { Monitor } from "../../../../types";
-
-import { ThemedSelect } from "../../../../theme/components";
+import ThemedSelect from "../../../../theme/components/ThemedSelect";
 
 /**
  * Props for the MonitorSelector component.

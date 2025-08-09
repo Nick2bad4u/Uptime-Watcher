@@ -15,7 +15,6 @@ import type { Monitor } from "../../../../../shared/types";
 
 // Mock dependencies
 vi.mock("../../../../stores/settings/useSettingsStore");
-vi.mock("../../../../theme/useTheme");
 vi.mock("../../../../services/logger");
 
 // Mock icon imports

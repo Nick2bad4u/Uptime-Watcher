@@ -35,17 +35,16 @@
 
 /* eslint-disable tailwind/no-arbitrary-value -- Modal component with specific layout requirements */
 
+import type { Site } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-
-import type { Site } from "../../types";
 
 // eslint-disable-next-line import-x/no-unassigned-import -- Chart.js initialization
 import "../../services/chartSetup";
 import { useSiteDetails } from "../../hooks/site/useSiteDetails";
 import { ChartConfigService } from "../../services/chartConfig";
-import { ThemedBox } from "../../theme/components";
+import ThemedBox from "../../theme/components/ThemedBox";
 import { useTheme } from "../../theme/useTheme";
 import { parseUptimeValue } from "../../utils/monitoring/dataValidation";
 import { formatStatusWithIcon } from "../../utils/status";
@@ -55,7 +54,7 @@ import {
     formatFullTimestamp,
     formatResponseTime,
 } from "../../utils/time";
-import { SiteDetailsHeader } from "./SiteDetailsHeader";
+import SiteDetailsHeader from "./SiteDetailsHeader";
 import { SiteDetailsNavigation } from "./SiteDetailsNavigation";
 import { AnalyticsTab } from "./tabs/AnalyticsTab";
 import { HistoryTab } from "./tabs/HistoryTab";

@@ -21,8 +21,7 @@ import {
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { withUtilityErrorHandling } from "./errorHandling";
 
-// Re-export ValidationResult for convenience
-export type { ValidationResult } from "@shared/types/validation";
+// ValidationResult type available via direct import from @shared/types/validation
 
 /**
  * Required fields for monitor creation, ensuring type safety.

@@ -42,14 +42,12 @@ import logger from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSettingsStore } from "../../stores/settings/useSettingsStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
-import {
-    StatusIndicator,
-    ThemedBox,
-    ThemedButton,
-    ThemedCheckbox,
-    ThemedSelect,
-    ThemedText,
-} from "../../theme/components";
+import StatusIndicator from "../../theme/components/StatusIndicator";
+import ThemedBox from "../../theme/components/ThemedBox";
+import ThemedButton from "../../theme/components/ThemedButton";
+import ThemedCheckbox from "../../theme/components/ThemedCheckbox";
+import ThemedSelect from "../../theme/components/ThemedSelect";
+import ThemedText from "../../theme/components/ThemedText";
 import { useTheme } from "../../theme/useTheme";
 import { ensureError } from "../../utils/errorHandling";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";

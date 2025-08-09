@@ -1,3 +1,6 @@
+/* Import theme components CSS for styled components */
+@import "./theme/components.css";
+
 @import "tailwindcss";
 
 /* https://github.com/reslear/tailwind-scrollbar-hide */

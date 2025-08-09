@@ -11,8 +11,7 @@ import type { SiteRepository } from "../../services/database/SiteRepository";
 import type { Site } from "../../types";
 import type { Logger } from "../interfaces";
 
-// Re-export Logger for database services
-export type { Logger } from "../interfaces";
+// Logger type available for internal use - external consumers should import from ../interfaces
 
 /**
  * Configuration for monitoring operations.

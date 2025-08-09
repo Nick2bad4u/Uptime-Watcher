@@ -111,7 +111,7 @@ vi.mock("../../../hooks/site/useSiteDetails", () => ({
 }));
 
 vi.mock("../../../components/SiteDetails/SiteDetailsHeader", () => ({
-    SiteDetailsHeader: vi.fn(({ site, selectedMonitor }) => (
+    default: vi.fn(({ site, selectedMonitor }) => (
         <div data-testid="site-details-header">
             <span>Site: {site?.name || "Unknown"}</span>
             {selectedMonitor && <span>Monitor: {selectedMonitor.id}</span>}

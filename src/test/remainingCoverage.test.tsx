@@ -6,7 +6,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-import { ThemedIconButton } from "../theme/components";
+import ThemedIconButton from "../theme/components/ThemedIconButton";
 
 // Mock the stores and other dependencies
 vi.mock("../stores", () => ({

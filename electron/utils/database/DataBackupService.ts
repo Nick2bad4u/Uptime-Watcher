@@ -10,7 +10,7 @@ import path from "node:path";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
-import type { Logger } from "./interfaces";
+import type { Logger } from "../interfaces";
 
 import { DB_FILE_NAME } from "../../constants";
 import { createDatabaseBackup } from "../../services/database/utils/databaseBackup";

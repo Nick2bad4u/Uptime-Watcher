@@ -3,9 +3,9 @@
  * Displays monitor history data using a chart component.
  */
 
-import React, { useMemo } from "react";
+import type { Monitor, StatusHistory } from "@shared/types";
 
-import type { Monitor, StatusHistory } from "../../../types";
+import React, { useMemo } from "react";
 
 import { useMonitorTypes } from "../../../hooks/useMonitorTypes";
 import { formatTitleSuffix } from "../../../utils/monitorTitleFormatters";

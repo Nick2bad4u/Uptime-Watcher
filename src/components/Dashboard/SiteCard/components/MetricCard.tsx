@@ -5,7 +5,7 @@
 
 import React from "react";
 
-import { ThemedText } from "../../../../theme/components";
+import ThemedText from "../../../../theme/components/ThemedText";
 
 /**
  * Props for the MetricCard component.

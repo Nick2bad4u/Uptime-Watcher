@@ -41,7 +41,8 @@ import type { MonitorStatus } from "@shared/types";
 
 import React from "react";
 
-import { StatusIndicator, ThemedText } from "../../theme/components";
+import StatusIndicator from "../../theme/components/StatusIndicator";
+import ThemedText from "../../theme/components/ThemedText";
 
 /**
  * Props for the StatusBadge component

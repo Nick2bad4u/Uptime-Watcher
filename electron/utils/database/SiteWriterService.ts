@@ -28,7 +28,8 @@ import type { MonitorRepository } from "../../services/database/MonitorRepositor
 import type { SiteRepository } from "../../services/database/SiteRepository";
 import type { Monitor, Site } from "../../types";
 import type { StandardizedCache } from "../cache/StandardizedCache";
-import type { Logger, MonitoringConfig, SiteWritingConfig } from "./interfaces";
+import type { Logger } from "../interfaces";
+import type { MonitoringConfig, SiteWritingConfig } from "./interfaces";
 
 import { rowsToMonitors } from "../../services/database/utils/monitorMapper";
 import { withDatabaseOperation } from "../operationalHooks";

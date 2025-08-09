@@ -25,12 +25,10 @@ import { useCallback, useMemo } from "react";
 
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { useUIStore } from "../../stores/ui/useUiStore";
-import {
-    StatusIndicator,
-    ThemedBox,
-    ThemedButton,
-    ThemedText,
-} from "../../theme/components";
+import StatusIndicator from "../../theme/components/StatusIndicator";
+import ThemedBox from "../../theme/components/ThemedBox";
+import ThemedButton from "../../theme/components/ThemedButton";
+import ThemedText from "../../theme/components/ThemedText";
 import "./Header.css";
 import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
 

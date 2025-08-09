@@ -9,7 +9,7 @@
 
 import type { z } from "zod";
 
-import type { MonitorType } from "./monitorTypes";
+import type { MonitorType } from "../../types";
 import type { IMonitorService } from "./types";
 
 import {

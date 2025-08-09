@@ -19,8 +19,8 @@ import { StandardizedCache } from "../utils/cache/StandardizedCache";
 import { MonitorValidator } from "./validators/MonitorValidator";
 import { SiteValidator } from "./validators/SiteValidator";
 
-// Re-export ValidationResult for use in manager index
-export type { ValidationResult } from "./validators/interfaces";
+// ValidationResult type available for internal use via direct import
+// External consumers should import directly from shared/types/validation
 
 /**
  * Describes the configuration for history retention limits.

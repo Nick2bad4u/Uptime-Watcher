@@ -3,6 +3,7 @@
  * Displays key metrics, statistics, and actions for a monitored site.
  */
 
+import type { Monitor } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
 import { useCallback } from "react";
@@ -15,20 +16,16 @@ import {
     MdSpeed,
 } from "react-icons/md";
 
-import type { Monitor } from "../../../types";
-
 import { CHECK_INTERVALS, TIMEOUT_CONSTRAINTS } from "../../../constants";
 import logger from "../../../services/logger";
-import {
-    StatusIndicator,
-    ThemedBadge,
-    ThemedButton,
-    ThemedCard,
-    ThemedInput,
-    ThemedProgress,
-    ThemedSelect,
-    ThemedText,
-} from "../../../theme/components";
+import StatusIndicator from "../../../theme/components/StatusIndicator";
+import ThemedBadge from "../../../theme/components/ThemedBadge";
+import ThemedButton from "../../../theme/components/ThemedButton";
+import ThemedCard from "../../../theme/components/ThemedCard";
+import ThemedInput from "../../../theme/components/ThemedInput";
+import ThemedProgress from "../../../theme/components/ThemedProgress";
+import ThemedSelect from "../../../theme/components/ThemedSelect";
+import ThemedText from "../../../theme/components/ThemedText";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
 import { parseUptimeValue } from "../../../utils/monitoring/dataValidation";
 import { getIntervalLabel } from "../../../utils/time";

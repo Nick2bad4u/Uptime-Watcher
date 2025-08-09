@@ -9,18 +9,16 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { vi } from "vitest";
 import "@testing-library/jest-dom";
 
-import {
-    ThemedBox,
-    ThemedButton,
-    ThemedCard,
-    ThemedCheckbox,
-    ThemedIconButton,
-    ThemeProvider,
-    type ThemedButtonProperties,
-    type ThemedCardProperties,
-    type ThemedCheckboxProperties,
-    type ThemedIconButtonProperties,
-} from "../../theme/components";
+import ThemedBox from "../../theme/components/ThemedBox";
+import ThemedButton from "../../theme/components/ThemedButton";
+import ThemedCard from "../../theme/components/ThemedCard";
+import ThemedCheckbox from "../../theme/components/ThemedCheckbox";
+import ThemedIconButton from "../../theme/components/ThemedIconButton";
+import ThemeProvider from "../../theme/components/ThemeProvider";
+import type { ThemedButtonProperties } from "../../theme/components/ThemedButton";
+import type { ThemedCardProperties } from "../../theme/components/ThemedCard";
+import type { ThemedCheckboxProperties } from "../../theme/components/ThemedCheckbox";
+import type { ThemedIconButtonProperties } from "../../theme/components/ThemedIconButton";
 
 // Mock the theme hook
 const mockUseTheme = vi.fn();

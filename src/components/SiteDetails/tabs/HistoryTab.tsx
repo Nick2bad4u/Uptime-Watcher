@@ -3,23 +3,20 @@
  * Provides filtering, pagination, and detailed history records view.
  */
 
+import type { Monitor, StatusHistory } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FiFilter, FiInbox } from "react-icons/fi";
 import { MdHistory } from "react-icons/md";
 
-import type { Monitor, StatusHistory } from "../../../types";
-
 import logger from "../../../services/logger";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
-import {
-    StatusIndicator,
-    ThemedButton,
-    ThemedCard,
-    ThemedSelect,
-    ThemedText,
-} from "../../../theme/components";
+import StatusIndicator from "../../../theme/components/StatusIndicator";
+import ThemedButton from "../../../theme/components/ThemedButton";
+import ThemedCard from "../../../theme/components/ThemedCard";
+import ThemedSelect from "../../../theme/components/ThemedSelect";
+import ThemedText from "../../../theme/components/ThemedText";
 import { useTheme } from "../../../theme/useTheme";
 import { DetailLabel } from "../../common/MonitorUiComponents";
 

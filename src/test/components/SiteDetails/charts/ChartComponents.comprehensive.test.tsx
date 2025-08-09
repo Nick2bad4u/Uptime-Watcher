@@ -1,11 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import {
-    ResponseTimeChart,
-    StatusChart,
-    UptimeChart,
-} from "../../../../components/SiteDetails/charts/ChartComponents";
+import ResponseTimeChart from "../../../../components/SiteDetails/charts/ResponseTimeChart";
+import StatusChart from "../../../../components/SiteDetails/charts/StatusChart";
+import UptimeChart from "../../../../components/SiteDetails/charts/UptimeChart";
 import type {
     ResponseTimeChartData,
     StatusBarChartData,

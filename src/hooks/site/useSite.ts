@@ -1,4 +1,4 @@
-import type { Site } from "../../types";
+import type { Site } from "@shared/types";
 
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { type SiteActionsResult, useSiteActions } from "./useSiteActions";

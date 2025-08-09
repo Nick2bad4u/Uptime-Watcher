@@ -3,6 +3,17 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
 
 // Mock external dependencies
+vi.mock("../../../constants", async (importOriginal) => {
+    const actual = await importOriginal<typeof import("../../../constants")>();
+    return {
+        ...actual,
+        CHECK_INTERVALS: [
+            { label: "1 minute", value: 60000 },
+            { label: "5 minutes", value: 300000 },
+            { label: "10 minutes", value: 600000 },
+        ],
+    };
+});
 vi.mock("../../../hooks/useDynamicHelpText", () => ({
     useDynamicHelpText: vi.fn(() => ({
         helpText: "Default help text",
@@ -37,12 +48,15 @@ vi.mock("../../../stores/sites/useSitesStore", () => ({
         sites: [
             {
                 id: "1",
+                identifier: "1",
                 url: "https://example.com",
                 name: "Example Site",
                 monitors: [],
             },
         ],
         addSite: vi.fn(),
+        addMonitorToSite: vi.fn(),
+        createSite: vi.fn(),
         isLoading: false,
     })),
 }));
@@ -86,22 +100,6 @@ vi.mock("../../../utils/data/generateUuid", () => ({
 
 vi.mock("../../../components/AddSiteForm/Submit", () => ({
     handleSubmit: vi.fn(),
-}));
-
-vi.mock("../../../theme/useTheme", () => ({
-    useTheme: vi.fn(() => ({
-        theme: {
-            colors: {
-                background: "#ffffff",
-                text: "#000000",
-                primary: "#007bff",
-            },
-            spacing: {
-                small: "8px",
-                medium: "16px",
-            },
-        },
-    })),
 }));
 
 // Mock FormFields components
@@ -153,35 +151,10 @@ vi.mock("../../../components/AddSiteForm/FormFields", () => ({
 }));
 
 vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
-    DynamicMonitorFields: ({ monitorType }: { monitorType: string }) => (
+    default: ({ monitorType }: { monitorType: string }) => (
         <div data-testid="dynamic-monitor-fields">
             Dynamic fields for {monitorType}
         </div>
-    ),
-}));
-
-vi.mock("../../../theme/components", () => ({
-    ThemedBox: ({ children, ...props }: { children: React.ReactNode }) => (
-        <div data-testid="themed-box" {...props}>
-            {children}
-        </div>
-    ),
-    ThemedButton: ({
-        children,
-        onClick,
-        ...props
-    }: {
-        children: React.ReactNode;
-        onClick?: () => void;
-    }) => (
-        <button data-testid="themed-button" onClick={onClick} {...props}>
-            {children}
-        </button>
-    ),
-    ThemedText: ({ children, ...props }: { children: React.ReactNode }) => (
-        <span data-testid="themed-text" {...props}>
-            {children}
-        </span>
     ),
 }));
 

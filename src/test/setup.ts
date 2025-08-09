@@ -292,5 +292,232 @@ vi.mock("electron-log/renderer", () => ({
     },
 }));
 
-// Export mock for use in individual tests
-export { mockElectronAPI };
+// Mock comprehensive theme for testing
+const mockTheme = {
+    borderRadius: {
+        full: "9999px",
+        lg: "0.5rem",
+        md: "0.375rem",
+        none: "0",
+        sm: "0.125rem",
+        xl: "0.75rem",
+    },
+    colors: {
+        background: {
+            modal: "rgba(0, 0, 0, 0.5)",
+            primary: "#ffffff",
+            secondary: "#f9fafb",
+            tertiary: "#f3f4f6",
+        },
+        border: {
+            focus: "#3b82f6",
+            primary: "#e5e7eb",
+            secondary: "#d1d5db",
+        },
+        error: "#ef4444",
+        errorAlert: "#991b1b",
+        hover: {
+            dark: "rgba(0, 0, 0, 0.08)",
+            light: "rgba(0, 0, 0, 0.03)",
+            medium: "rgba(0, 0, 0, 0.05)",
+        },
+        info: "#3b82f6",
+        primary: {
+            50: "#eff6ff",
+            100: "#dbeafe",
+            200: "#bfdbfe",
+            300: "#93c5fd",
+            400: "#60a5fa",
+            500: "#3b82f6",
+            600: "#2563eb",
+            700: "#1d4ed8",
+            800: "#1e40af",
+            900: "#1e3a8a",
+        },
+        status: {
+            down: "#ef4444",
+            mixed: "#8b5cf6",
+            paused: "#6b7280",
+            pending: "#f59e0b",
+            unknown: "#6b7280",
+            up: "#10b981",
+        },
+        success: "#10b981",
+        surface: {
+            base: "#ffffff",
+            elevated: "#ffffff",
+            overlay: "#f9fafb",
+        },
+        text: {
+            inverse: "#ffffff",
+            primary: "#111827",
+            secondary: "#6b7280",
+            tertiary: "#9ca3af",
+        },
+        warning: "#f59e0b",
+    },
+    isDark: false,
+    name: "light" as const,
+    shadows: {
+        inner: "inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)",
+        lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+        md: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+        sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+        xl: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+    },
+    spacing: {
+        "2xl": "3rem",
+        "3xl": "4rem",
+        lg: "1.5rem",
+        md: "1rem",
+        sm: "0.5rem",
+        xl: "2rem",
+        xs: "0.25rem",
+    },
+    typography: {
+        fontFamily: {
+            mono: [
+                "SF Mono",
+                "Monaco",
+                "Inconsolata",
+                "Roboto Mono",
+                "monospace",
+            ] as const,
+            sans: [
+                "Inter",
+                "system-ui",
+                "Avenir",
+                "Helvetica",
+                "Arial",
+                "sans-serif",
+            ] as const,
+        },
+        fontSize: {
+            xs: "0.75rem",
+            sm: "0.875rem",
+            base: "1rem",
+            lg: "1.125rem",
+            xl: "1.25rem",
+            "2xl": "1.5rem",
+            "3xl": "1.875rem",
+            "4xl": "2.25rem",
+            "5xl": "3rem",
+            "6xl": "3.75rem",
+        },
+        fontWeight: {
+            thin: 100,
+            extralight: 200,
+            light: 300,
+            normal: 400,
+            medium: 500,
+            semibold: 600,
+            bold: 700,
+            extrabold: 800,
+            black: 900,
+        },
+        lineHeight: {
+            none: 1,
+            tight: 1.25,
+            snug: 1.375,
+            normal: 1.5,
+            relaxed: 1.625,
+            loose: 2,
+        },
+    },
+};
+
+// Mock theme context globally with complete functionality
+vi.mock("../theme/useTheme", () => ({
+    useTheme: () => ({
+        ...mockTheme,
+        availableThemes: ["light", "dark", "system"],
+        currentTheme: mockTheme,
+        getColor: vi.fn((path: string) => {
+            const keys = path.split(".");
+            let value: any = mockTheme.colors;
+            for (const key of keys) {
+                if (value && typeof value === "object" && key in value) {
+                    value = value[key];
+                } else {
+                    value = undefined;
+                    break;
+                }
+            }
+            return typeof value === "string" ? value : mockTheme.colors.text.primary;
+        }),
+        getStatusColor: vi.fn((status: string) => {
+            return mockTheme.colors.status[status as keyof typeof mockTheme.colors.status] || mockTheme.colors.text.secondary;
+        }),
+        isDark: false,
+        setTheme: vi.fn(),
+        systemTheme: "light" as const,
+        themeManager: {
+            getTheme: vi.fn(() => mockTheme),
+            applyTheme: vi.fn(),
+            getAvailableThemes: vi.fn(() => ["light", "dark", "system"]),
+            onSystemThemeChange: vi.fn(() => vi.fn()),
+            getSystemThemePreference: vi.fn(() => "light"),
+        },
+        themeName: "light" as const,
+        themeVersion: 1,
+        toggleTheme: vi.fn(),
+    }),
+    useAvailabilityColors: () => ({
+        getAvailabilityColor: vi.fn((percentage: number) => {
+            if (percentage >= 95) return mockTheme.colors.status.up;
+            if (percentage >= 80) return mockTheme.colors.warning;
+            return mockTheme.colors.error;
+        }),
+        getAvailabilityDescription: vi.fn((percentage: number) => {
+            if (percentage >= 99.9) return "Excellent";
+            if (percentage >= 95) return "Good";
+            if (percentage >= 80) return "Fair";
+            return "Poor";
+        }),
+        getAvailabilityVariant: vi.fn((percentage: number) => {
+            if (percentage >= 95) return "success";
+            if (percentage >= 80) return "warning";
+            return "danger";
+        }),
+    }),
+    useStatusColors: () => ({
+        down: mockTheme.colors.status.down,
+        pending: mockTheme.colors.status.pending,
+        unknown: mockTheme.colors.status.unknown,
+        up: mockTheme.colors.status.up,
+    }),
+    useThemeClasses: () => ({
+        getBackgroundClass: vi.fn((variant = "primary") => ({
+            backgroundColor: `var(--color-background-${variant})`,
+        })),
+        getBorderClass: vi.fn((variant = "primary") => ({
+            borderColor: `var(--color-border-${variant})`,
+        })),
+        getColor: vi.fn((path: string) => {
+            const keys = path.split(".");
+            let value: any = mockTheme.colors;
+            for (const key of keys) {
+                if (value && typeof value === "object" && key in value) {
+                    value = value[key];
+                } else {
+                    value = undefined;
+                    break;
+                }
+            }
+            return typeof value === "string" ? value : mockTheme.colors.text.primary;
+        }),
+        getStatusClass: vi.fn((status: string) => ({
+            color: `var(--color-status-${status})`,
+        })),
+        getSurfaceClass: vi.fn((variant = "base") => ({
+            backgroundColor: `var(--color-surface-${variant})`,
+        })),
+        getTextClass: vi.fn((variant = "primary") => ({
+            color: `var(--color-text-${variant})`,
+        })),
+    }),
+    useThemeValue: vi.fn((selector) => selector(mockTheme)),
+}));
+
+// Export mocks for use in individual tests
+export { mockElectronAPI, mockTheme };

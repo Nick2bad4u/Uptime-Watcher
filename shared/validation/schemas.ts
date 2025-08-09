@@ -273,8 +273,7 @@ export type PortMonitor = z.infer<typeof portMonitorSchema>;
  */
 export type Site = z.infer<typeof siteSchema>;
 
-// Re-export ValidationResult for consumers of this module
-export type { ValidationResult } from "../types/validation";
+// ValidationResult type available for consumers via direct import from ../types/validation
 
 /**
  * Validates monitor data using the appropriate Zod schema.

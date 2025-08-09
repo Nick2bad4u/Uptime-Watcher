@@ -3,6 +3,7 @@
  * Provides interface for modifying site settings, intervals, and performing site management actions.
  */
 
+import type { Monitor, Site } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
 import React, { useCallback, useEffect, useState } from "react";
@@ -14,23 +15,19 @@ import {
     MdTimer,
 } from "react-icons/md";
 
-import type { Monitor, Site } from "../../../types";
-
 import {
     CHECK_INTERVALS,
     RETRY_CONSTRAINTS,
     TIMEOUT_CONSTRAINTS,
 } from "../../../constants";
 import logger from "../../../services/logger";
-import {
-    ThemedBadge,
-    ThemedBox,
-    ThemedButton,
-    ThemedCard,
-    ThemedInput,
-    ThemedSelect,
-    ThemedText,
-} from "../../../theme/components";
+import ThemedBadge from "../../../theme/components/ThemedBadge";
+import ThemedBox from "../../../theme/components/ThemedBox";
+import ThemedButton from "../../../theme/components/ThemedButton";
+import ThemedCard from "../../../theme/components/ThemedCard";
+import ThemedInput from "../../../theme/components/ThemedInput";
+import ThemedSelect from "../../../theme/components/ThemedSelect";
+import ThemedText from "../../../theme/components/ThemedText";
 import { useTheme } from "../../../theme/useTheme";
 import { calculateMaxDuration } from "../../../utils/duration";
 import { withUtilityErrorHandling } from "../../../utils/errorHandling";

@@ -7,18 +7,16 @@ import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
-import {
-    ThemedBox,
-    ThemedButton,
-    ThemedInput,
-    ThemedText,
-    ThemedCheckbox,
-    ThemedSelect,
-    ThemedCard,
-    ThemedBadge,
-    StatusIndicator,
-    MiniChartBar,
-} from "../../theme/components";
+import ThemedBox from "../../theme/components/ThemedBox";
+import ThemedButton from "../../theme/components/ThemedButton";
+import ThemedInput from "../../theme/components/ThemedInput";
+import ThemedText from "../../theme/components/ThemedText";
+import ThemedCheckbox from "../../theme/components/ThemedCheckbox";
+import ThemedSelect from "../../theme/components/ThemedSelect";
+import ThemedCard from "../../theme/components/ThemedCard";
+import ThemedBadge from "../../theme/components/ThemedBadge";
+import StatusIndicator from "../../theme/components/StatusIndicator";
+import MiniChartBar from "../../theme/components/MiniChartBar";
 
 // Mock functions for testing
 const mockOnClick = vi.fn();

@@ -28,9 +28,9 @@
  * @public
  */
 
-import { useMemo } from "react";
+import type { Site } from "@shared/types";
 
-import type { Site } from "../types";
+import { useMemo } from "react";
 
 import { useSitesStore } from "../stores/sites/useSitesStore";
 import { useUIStore } from "../stores/ui/useUiStore";
