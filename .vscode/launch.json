@@ -1,50 +1,5 @@
 {
     "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Launch Uptime Watcher",
-            "type": "node",
-            "request": "launch",
-            "runtimeExecutable": "npm",
-            "runtimeArgs": ["start"],
-            "console": "integratedTerminal",
-            "skipFiles": ["<node_internals>/**"],
-            "env": {
-                "NODE_ENV": "development"
-            }
-        },
-        {
-            "name": "Launch with PowerShell",
-            "type": "PowerShell",
-            "request": "launch",
-            "script": "npm start",
-            "cwd": "${workspaceFolder}"
-        },
-        {
-            "name": "Debug Electron Main Process",
-            "type": "node",
-            "request": "launch",
-            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
-            "args": ["${workspaceFolder}/dist-electron/main.js"],
-            "console": "integratedTerminal",
-            "skipFiles": ["<node_internals>/**"],
-            "env": {
-                "NODE_ENV": "development"
-            },
-            "preLaunchTask": "Build Electron Main (Dev)",
-            "outFiles": ["${workspaceFolder}/dist-electron/**/*.js"]
-        },
-        {
-            "name": "Run Vite Dev Server",
-            "type": "node",
-            "request": "launch",
-            "runtimeExecutable": "npm",
-            "runtimeArgs": ["run", "dev:with-sqlite3"],
-            "cwd": "${workspaceFolder}",
-            "console": "integratedTerminal",
-            "skipFiles": ["<node_internals>/**"]
-        }
-    ],
     "compounds": [
         {
             "name": "Dev: Vite + Electron Main",
@@ -53,6 +8,127 @@
                 "Debug Electron Main Process"
             ],
             "stopAll": true
+        }
+    ],
+    "configurations": [
+        {
+            "console": "integratedTerminal",
+            "name": "Launch Uptime Watcher",
+            "request": "launch",
+            "runtimeExecutable": "npm",
+            "type": "node",
+            "env": {
+                "NODE_ENV": "development"
+            },
+            "runtimeArgs": [
+                "start"
+            ],
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "console": "integratedTerminal",
+            "name": "Debug Electron Main Process",
+            "preLaunchTask": "Build Electron Main (Dev)",
+            "request": "launch",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+            "type": "node",
+            "args": [
+                "${workspaceFolder}/dist-electron/main.js"
+            ],
+            "env": {
+                "NODE_ENV": "development"
+            },
+            "outFiles": [
+                "${workspaceFolder}/dist-electron/**/*.js"
+            ],
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "name": "Run Vite Dev Server",
+            "request": "launch",
+            "runtimeExecutable": "npm",
+            "type": "node",
+            "runtimeArgs": [
+                "run",
+                "dev:with-sqlite3"
+            ],
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "name": "Debug Electron Main (ts)",
+            "preLaunchTask": "Build (Vite + Electron)",
+            "program": "${workspaceFolder}/dist-electron/main.js",
+            "request": "launch",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+            "type": "node",
+            "args": [],
+            "env": {
+                "NODE_ENV": "development"
+            },
+            "outFiles": [
+                "${workspaceFolder}/dist-electron/**/*.js"
+            ],
+            "windows": {
+                "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
+            }
+        },
+        {
+            "name": "Debug Electron Main (break on start)",
+            "program": "${workspaceFolder}/dist-electron/main.js",
+            "request": "launch",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+            "type": "node",
+            "env": {
+                "NODE_ENV": "development"
+            },
+            "runtimeArgs": [
+                "--inspect-brk=5858"
+            ]
+        },
+        {
+            "port": 5858,
+            "name": "Attach Electron Main",
+            "request": "attach",
+            "type": "node",
+            "restart": true
+        },
+        {
+            "name": "Debug Renderer (Vite)",
+            "preLaunchTask": "Start App (Dev)",
+            "request": "launch",
+            "type": "chrome",
+            "url": "http://localhost:5173",
+            "webRoot": "${workspaceFolder}/src"
+        },
+        {
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "name": "Vitest Debug",
+            "program": "${workspaceFolder}/node_modules/vitest/vitest.mjs",
+            "request": "launch",
+            "type": "node",
+            "args": [
+                "--ui"
+            ]
+        },
+        {
+            "console": "integratedTerminal",
+            "name": "Run npm test",
+            "request": "launch",
+            "runtimeExecutable": "npm",
+            "type": "node",
+            "runtimeArgs": [
+                "run",
+                "test"
+            ]
         }
     ]
 }

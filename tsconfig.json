@@ -1,17 +1,14 @@
 {
     "$schema": "https://www.schemastore.org/tsconfig.json",
-    "typeAcquisition": {
-        "enable": true
-    },
     "compilerOptions": {
-        "incremental": true,
-        "tsBuildInfoFile": "./dist-electron/tsconfig.tsbuildinfo",
         "baseUrl": ".",
         "jsx": "react-jsx",
         "module": "ESNext",
+        "moduleDetection": "auto",
         "moduleResolution": "bundler",
         "outDir": "dist",
         "target": "ES2024",
+        "tsBuildInfoFile": "./dist-electron/tsconfig.tsbuildinfo",
         "lib": [
             "DOM.Iterable",
             "DOM",
@@ -32,11 +29,11 @@
             "@/*": [
                 "src/*"
             ],
-            "@shared/*": [
-                "shared/*"
-            ],
             "@electron/*": [
                 "electron/*"
+            ],
+            "@shared/*": [
+                "shared/*"
             ]
         },
         "plugins": [
@@ -56,9 +53,8 @@
         ],
         "allowJs": false,
         "allowSyntheticDefaultImports": true,
+        "allowUmdGlobalAccess": false,
         "allowUnreachableCode": false,
-        "noImplicitUseStrict": false,
-        "moduleDetection": "auto",
         "allowUnusedLabels": false,
         "alwaysStrict": true,
         "declaration": true,
@@ -68,35 +64,36 @@
         "esModuleInterop": true,
         "exactOptionalPropertyTypes": true,
         "forceConsistentCasingInFileNames": true,
-        "isolatedModules": true,
+        "incremental": true,
         "isolatedDeclarations": true,
+        "isolatedModules": true,
+        "noCheck": false,
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
         "noImplicitOverride": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,
+        "noImplicitUseStrict": false,
         "noPropertyAccessFromIndexSignature": true,
         "noUncheckedIndexedAccess": true,
+        "noUncheckedSideEffectImports": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
+        "pretty": true,
         "resolveJsonModule": true,
+        "resolvePackageJsonExports": true,
+        "resolvePackageJsonImports": true,
         "skipDefaultLibCheck": true,
         "skipLibCheck": true,
         "sourceMap": true,
-        "noCheck": false,
         "strict": true,
-        "resolvePackageJsonExports": true,
-        "resolvePackageJsonImports": true,
-        "allowUmdGlobalAccess": false,
         "strictBindCallApply": true,
         "strictBuiltinIteratorReturn": true,
         "strictFunctionTypes": true,
         "strictNullChecks": true,
         "strictPropertyInitialization": true,
         "useDefineForClassFields": true,
-        "useUnknownInCatchVariables": true,
-        "noUncheckedSideEffectImports": true,
-        "pretty": true
+        "useUnknownInCatchVariables": true
     },
     "exclude": [
         "**/dist-electron",
@@ -139,5 +136,8 @@
         "vite.config.ts",
         "vite/client",
         "vitest.config.ts"
-    ]
+    ],
+    "typeAcquisition": {
+        "enable": true
+    }
 }

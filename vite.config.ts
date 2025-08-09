@@ -246,7 +246,6 @@ export default defineConfig(() => {
                 },
             },
             environment: "jsdom", // Default for React components
-
             // Test file patterns - exclude electron tests as they have their own config
             exclude: [
                 "**/node_modules/**",
@@ -257,6 +256,7 @@ export default defineConfig(() => {
                 "**/coverage/**",
                 "**/docs/**",
             ],
+
             globals: true, // Enable global test functions (describe, it, expect)
             include: [
                 "src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
@@ -276,6 +276,7 @@ export default defineConfig(() => {
                     singleThread: false, // Enable multi-threading
                 },
             },
+            projects: ["vitest.config.ts", "vitest.electron.config.ts"],
             // Improve test output
             reporters: ["default", "json", "verbose", "hanging-process"],
             setupFiles: ["./src/test/setup.ts"], // Setup file for testing

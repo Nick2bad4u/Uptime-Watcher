@@ -2,64 +2,195 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Start Vite Dev Server",
-            "type": "npm",
-            "script": "dev",
             "group": "build",
+            "label": "Start Vite Dev Server",
+            "script": "dev",
+            "type": "npm",
             "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
                 "panel": "shared",
-                "showReuseMessage": true,
-                "clear": false
+                "reveal": "always",
+                "clear": false,
+                "echo": true,
+                "focus": false,
+                "showReuseMessage": true
             },
-            "isBackground": true,
             "problemMatcher": {
                 "owner": "vite",
-                "pattern": { "regexp": ".*" },
                 "background": {
-                    "activeOnStart": true,
                     "beginsPattern": ".*VITE v.*",
-                    "endsPattern": ".*ready in.*"
+                    "endsPattern": ".*ready in.*",
+                    "activeOnStart": true
+                },
+                "pattern": {
+                    "regexp": ".*"
                 }
-            }
+            },
+            "isBackground": true
         },
         {
+            "group": "build",
             "label": "Install Dependencies",
-            "type": "npm",
             "script": "install",
-            "group": "build",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared"
-            }
-        },
-        {
-            "label": "Build Application",
             "type": "npm",
-            "script": "build",
-            "group": "build",
             "presentation": {
-                "echo": true,
+                "panel": "shared",
                 "reveal": "always",
-                "focus": false,
-                "panel": "shared"
+                "echo": true,
+                "focus": false
             }
         },
         {
-            "label": "Build Electron Main (Dev)",
-            "type": "shell",
+            "group": "build",
+            "label": "Build Application",
+            "script": "build",
+            "type": "npm",
+            "presentation": {
+                "panel": "shared",
+                "reveal": "always",
+                "echo": true,
+                "focus": false
+            }
+        },
+        {
             "command": "npx tsc -p tsconfig.json && npm run postbuild",
             "group": "build",
+            "label": "Build Electron Main (Dev)",
+            "type": "shell",
             "presentation": {
-                "echo": true,
+                "panel": "shared",
                 "reveal": "always",
-                "focus": false,
-                "panel": "shared"
+                "echo": true,
+                "focus": false
             }
+        },
+        {
+            "group": "build",
+            "label": "Start Vite Dev Server",
+            "script": "dev",
+            "type": "npm",
+            "presentation": {
+                "panel": "shared",
+                "reveal": "always",
+                "clear": false,
+                "echo": true,
+                "focus": false,
+                "showReuseMessage": true
+            },
+            "problemMatcher": {
+                "owner": "vite",
+                "background": {
+                    "beginsPattern": ".*VITE v.*",
+                    "endsPattern": ".*ready in.*",
+                    "activeOnStart": true
+                },
+                "pattern": {
+                    "regexp": ".*"
+                }
+            },
+            "isBackground": true
+        },
+        {
+            "command": "npm run build",
+            "label": "Build (Vite + Electron)",
+            "type": "shell",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "command": "npm run clean",
+            "label": "Clean All",
+            "type": "shell"
+        },
+        {
+            "command": "npm run start",
+            "label": "Start App (Dev)",
+            "type": "shell",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
+        },
+        {
+            "command": "npm run start:electron",
+            "label": "Start Electron Only",
+            "type": "shell"
+        },
+        {
+            "command": "npm run start-both",
+            "label": "Start Both (Dev + Electron)",
+            "type": "shell"
+        },
+        {
+            "command": "npm run debug:electron",
+            "label": "Debug Electron",
+            "type": "shell"
+        },
+        {
+            "command": "npm run type-check:all",
+            "label": "Type Check (All)",
+            "type": "shell"
+        },
+        {
+            "command": "npm run lint:all:check",
+            "label": "Lint All",
+            "type": "shell"
+        },
+        {
+            "command": "npm run lint:all:fix",
+            "label": "Lint All (Fix)",
+            "type": "shell"
+        },
+        {
+            "command": "npm run test:all",
+            "label": "Test All",
+            "type": "shell"
+        },
+        {
+            "command": "npm run test:electron",
+            "label": "Test Electron",
+            "type": "shell"
+        },
+        {
+            "command": "npm run test:coverage",
+            "label": "Test Coverage",
+            "type": "shell"
+        },
+        {
+            "command": "npm run docs:build",
+            "label": "Docs Build",
+            "type": "shell"
+        },
+        {
+            "command": "npm run docs:preview",
+            "label": "Docs Preview",
+            "type": "shell"
+        },
+        {
+            "command": "npm run dep:check",
+            "label": "Dependency Check",
+            "type": "shell"
+        },
+        {
+            "command": "npm run dep:update",
+            "label": "Dependency Update",
+            "type": "shell"
+        },
+        {
+            "command": "npm run format",
+            "label": "Format All",
+            "type": "shell"
+        },
+        {
+            "command": "npm run context",
+            "label": "Context Compress",
+            "type": "shell"
+        },
+        {
+            "command": "npm run quality:check",
+            "label": "Quality Check",
+            "type": "shell"
         }
     ]
 }

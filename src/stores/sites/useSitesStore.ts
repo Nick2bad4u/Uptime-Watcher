@@ -32,6 +32,8 @@
  * @packageDocumentation
  */
 
+import type { Site } from "@shared/types";
+
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 import type { SitesStore } from "./types";
@@ -61,7 +63,7 @@ export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
         const stateActions = createSitesStateActions(set, get);
 
         // Shared getSites function - eliminates duplication and improves testability
-        const getSites = () => get().sites;
+        const getSites = (): Site[] => get().sites;
 
         // Create sync actions (needed by other modules)
         const syncActions = createSiteSyncActions({

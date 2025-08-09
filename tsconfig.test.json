@@ -1,14 +1,24 @@
 {
     "extends": "./tsconfig.json",
     "compilerOptions": {
+        "tsBuildInfoFile": "./dist-electron/tsconfig.test.tsbuildinfo",
         "paths": {
-            "@/*": ["electron/*"],
-            "@shared/*": ["shared/*"],
-            "@app/*": ["src/*"]
+            "@/*": [
+                "electron/*"
+            ],
+            "@app/*": [
+                "src/*"
+            ],
+            "@shared/*": [
+                "shared/*"
+            ]
         },
-        "incremental": true,
-        "tsBuildInfoFile": "./dist-electron/tsconfig.test.tsbuildinfo"
+        "incremental": true
     },
+    "exclude": [
+        "electron/**/*.test.ts",
+        "electron/**/*.test.tsx"
+    ],
     "include": [
         "*.config.js",
         "*.config.mjs",
@@ -34,9 +44,5 @@
         "vitest.config.ts",
         "src/test/**/*.ts",
         "src/test/**/*.tsx"
-    ],
-    "exclude": [
-        "electron/**/*.test.ts",
-        "electron/**/*.test.tsx"
     ]
 }

@@ -1,27 +1,12 @@
 {
     "$schema": "https://typedoc.org/schema.json",
-    "entryPoints": ["electron/**/*.*", "shared/**/*.*"],
-    "out": "docs/docusaurus/docs/electron",
     "docsPath": "docs/docusaurus/docs/electron",
-    "plugin": [
-        "typedoc-plugin-markdown",
-        "typedoc-docusaurus-theme",
-        "typedoc-plugin-mdn-links",
-        "typedoc-plugin-zod",
-        "typedoc-plugin-dt-links",
-        "typedoc-plugin-external-package-links"
-    ],
+    "out": "docs/docusaurus/docs/electron",
     "tsconfig": "tsconfig.electron.json",
-    "pretty": true,
-    "externalSymbolLinkMappings": {
-        "@types/react": {
-            "React.Component.setState": "https://react.dev/reference/react/Component#setstate",
-            "React.StaticLifecycle.getDerivedStateFromProps": "https://react.dev/reference/react/Component#getderivedstatefromprops",
-            "React.ComponentLifecycle.componentDidMount": "https://react.dev/reference/react/Component#componentdidmount",
-            "React.NewLifecycle.getSnapshotBeforeUpdate": "https://react.dev/reference/react/Component#getsnapshotbeforeupdate",
-            "React.Component.render": "https://react.dev/reference/react/Component#render"
-        }
-    },
+    "entryPoints": [
+        "electron/**/*.*",
+        "shared/**/*.*"
+    ],
     "exclude": [
         "**/dist",
         "**/dist/**",
@@ -43,5 +28,23 @@
         "**/specs/**",
         "**/examples",
         "**/examples/**"
-    ]
+    ],
+    "externalSymbolLinkMappings": {
+        "@types/react": {
+            "React.Component.render": "https://react.dev/reference/react/Component#render",
+            "React.Component.setState": "https://react.dev/reference/react/Component#setstate",
+            "React.ComponentLifecycle.componentDidMount": "https://react.dev/reference/react/Component#componentdidmount",
+            "React.NewLifecycle.getSnapshotBeforeUpdate": "https://react.dev/reference/react/Component#getsnapshotbeforeupdate",
+            "React.StaticLifecycle.getDerivedStateFromProps": "https://react.dev/reference/react/Component#getderivedstatefromprops"
+        }
+    },
+    "plugin": [
+        "typedoc-plugin-markdown",
+        "typedoc-docusaurus-theme",
+        "typedoc-plugin-mdn-links",
+        "typedoc-plugin-zod",
+        "typedoc-plugin-dt-links",
+        "typedoc-plugin-external-package-links"
+    ],
+    "pretty": true
 }

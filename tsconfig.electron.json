@@ -2,13 +2,19 @@
     "extends": "./tsconfig.json",
     "compilerOptions": {
         "outDir": "dist-electron",
+        "tsBuildInfoFile": "./dist-electron/tsconfig.electron.tsbuildinfo",
         "paths": {
-            "@/*": ["electron/*"],
-            "@shared/*": ["shared/*"],
-            "@app/*": ["src/*"]
+            "@/*": [
+                "electron/*"
+            ],
+            "@app/*": [
+                "src/*"
+            ],
+            "@shared/*": [
+                "shared/*"
+            ]
         },
-        "incremental": true,
-        "tsBuildInfoFile": "./dist-electron/tsconfig.electron.tsbuildinfo"
+        "incremental": true
     },
     "exclude": [
         "electron/**/*.spec.ts",

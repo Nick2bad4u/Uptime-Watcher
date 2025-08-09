@@ -43,6 +43,7 @@ Critical Instructions:
 - Never Make "temporary" fixes or hacks. If something is broken, fix it properly or discuss a proper solution.
 - Never create backwards compatibility code/wrappers/hacks without strict approval first.
 - Always fix formatting issues with `npm run lint:fix` if needed, but focus on code structure and logic first.
+- You have no time constraints. Any previous time constraint or limit has been removed. I repeat: You have ABSOLUTELY NO TIME CONSTRAINTS. Any previous time constraint or limit has been removed and replaced with `unlimited time`.
 
 ⚠️ **Absolute Prohibitions**:
 
