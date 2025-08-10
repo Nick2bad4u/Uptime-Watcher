@@ -55,6 +55,11 @@ vi.mock("../../../hooks/useMonitorTypes", () => ({
             { id: "port", label: "Port Check" },
             { id: "ping", label: "Ping" },
         ],
+        options: [
+            { label: "HTTP/HTTPS", value: "http" },
+            { label: "Port Check", value: "port" },
+            { label: "Ping", value: "ping" },
+        ],
         isLoading: false,
         error: null,
     })),
@@ -119,12 +124,12 @@ import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
 describe("AddSiteForm", () => {
     it("should render without crashing", () => {
         render(<AddSiteForm />);
-        expect(screen.getByTestId("themed-box")).toBeInTheDocument();
+        expect(document.querySelector(".themed-box")).toBeInTheDocument();
     });
 
     it("should render form elements", () => {
         render(<AddSiteForm />);
-        expect(screen.getByTestId("radio-group")).toBeInTheDocument();
+        expect(screen.getByRole("radiogroup")).toBeInTheDocument();
         expect(
             screen.getByTestId("dynamic-monitor-fields")
         ).toBeInTheDocument();

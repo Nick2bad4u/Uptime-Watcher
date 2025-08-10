@@ -29,6 +29,11 @@ vi.mock("../../../hooks/useMonitorTypes", () => ({
             { id: "port", label: "Port Check" },
             { id: "ping", label: "Ping" },
         ],
+        options: [
+            { label: "HTTP/HTTPS", value: "http" },
+            { label: "Port Check", value: "port" },
+            { label: "Ping", value: "ping" },
+        ],
         isLoading: false,
         error: null,
         refreshMonitorTypes: vi.fn(),
@@ -167,17 +172,17 @@ describe("AddSiteForm Component", () => {
         it("should render the form without errors", () => {
             render(<AddSiteForm />);
 
-            expect(screen.getByTestId("themed-box")).toBeInTheDocument();
-            expect(screen.getByTestId("radio-group")).toBeInTheDocument();
+            expect(document.querySelector(".themed-box")).toBeInTheDocument();
+            expect(screen.getByRole("radiogroup")).toBeInTheDocument();
         });
 
         it("should render all required form elements", () => {
             render(<AddSiteForm />);
 
             // Check for main form elements
-            expect(screen.getByTestId("radio-group")).toBeInTheDocument();
+            expect(screen.getByRole("radiogroup")).toBeInTheDocument();
             expect(
-                screen.getAllByTestId("select-field")[0]
+                document.querySelectorAll(".themed-select")[0]
             ).toBeInTheDocument();
             expect(
                 screen.getByTestId("dynamic-monitor-fields")
@@ -187,7 +192,7 @@ describe("AddSiteForm Component", () => {
         it("should render submit button", () => {
             render(<AddSiteForm />);
 
-            const submitButton = screen.getByTestId("themed-button");
+            const submitButton = document.querySelector(".themed-button");
             expect(submitButton).toBeInTheDocument();
         });
     });
@@ -214,7 +219,7 @@ describe("AddSiteForm Component", () => {
             const onSuccess = vi.fn();
             render(<AddSiteForm onSuccess={onSuccess} />);
 
-            const submitButton = screen.getByTestId("themed-button");
+            const submitButton = document.querySelector(".themed-button");
             fireEvent.click(submitButton);
 
             await waitFor(() => {
@@ -228,13 +233,13 @@ describe("AddSiteForm Component", () => {
             const onSuccess = vi.fn();
             render(<AddSiteForm onSuccess={onSuccess} />);
 
-            expect(screen.getByTestId("themed-box")).toBeInTheDocument();
+            expect(document.querySelector(".themed-box")).toBeInTheDocument();
         });
 
         it("should work without onSuccess callback", () => {
             render(<AddSiteForm />);
 
-            expect(screen.getByTestId("themed-box")).toBeInTheDocument();
+            expect(document.querySelector(".themed-box")).toBeInTheDocument();
         });
     });
 
@@ -243,21 +248,21 @@ describe("AddSiteForm Component", () => {
             render(<AddSiteForm />);
 
             // Test that error store integration works
-            expect(screen.getByTestId("themed-box")).toBeInTheDocument();
+            expect(document.querySelector(".themed-box")).toBeInTheDocument();
         });
 
         it("should integrate with sites store", () => {
             render(<AddSiteForm />);
 
             // Test that sites store integration works
-            expect(screen.getByTestId("themed-box")).toBeInTheDocument();
+            expect(document.querySelector(".themed-box")).toBeInTheDocument();
         });
 
         it("should integrate with form hooks", () => {
             render(<AddSiteForm />);
 
             // Test that form hooks integration works
-            expect(screen.getByTestId("themed-box")).toBeInTheDocument();
+            expect(document.querySelector(".themed-box")).toBeInTheDocument();
         });
     });
 
@@ -265,10 +270,10 @@ describe("AddSiteForm Component", () => {
         it("should apply theme styling", () => {
             render(<AddSiteForm />);
 
-            const themedBox = screen.getByTestId("themed-box");
+            const themedBox = document.querySelector(".themed-box");
             expect(themedBox).toBeInTheDocument();
 
-            const themedButton = screen.getByTestId("themed-button");
+            const themedButton = document.querySelector(".themed-button");
             expect(themedButton).toBeInTheDocument();
         });
 
@@ -276,7 +281,7 @@ describe("AddSiteForm Component", () => {
             render(<AddSiteForm />);
 
             // Test theme integration
-            expect(screen.getAllByTestId("themed-text")[0]).toBeInTheDocument();
+            expect(document.querySelectorAll(".themed-text")[0]).toBeInTheDocument();
         });
     });
 
@@ -285,14 +290,14 @@ describe("AddSiteForm Component", () => {
             // Test error boundaries and error handling
             render(<AddSiteForm />);
 
-            expect(screen.getByTestId("themed-box")).toBeInTheDocument();
+            expect(document.querySelector(".themed-box")).toBeInTheDocument();
         });
 
         it("should display validation errors", () => {
             render(<AddSiteForm />);
 
             // Test validation error display
-            expect(screen.getByTestId("themed-box")).toBeInTheDocument();
+            expect(document.querySelector(".themed-box")).toBeInTheDocument();
         });
     });
 
@@ -301,16 +306,16 @@ describe("AddSiteForm Component", () => {
             render(<AddSiteForm />);
 
             // Check for accessibility labels
-            expect(screen.getByTestId("radio-group")).toBeInTheDocument();
+            expect(screen.getByRole("radiogroup")).toBeInTheDocument();
             expect(
-                screen.getAllByTestId("select-field")[0]
+                document.querySelectorAll(".themed-select")[0]
             ).toBeInTheDocument();
         });
 
         it("should support keyboard navigation", () => {
             render(<AddSiteForm />);
 
-            const submitButton = screen.getByTestId("themed-button");
+            const submitButton = document.querySelector(".themed-button");
             expect(submitButton).toBeInTheDocument();
         });
     });
@@ -319,7 +324,7 @@ describe("AddSiteForm Component", () => {
         it("should handle empty form data", () => {
             render(<AddSiteForm />);
 
-            expect(screen.getByTestId("themed-box")).toBeInTheDocument();
+            expect(document.querySelector(".themed-box")).toBeInTheDocument();
         });
 
         it("should handle missing monitor types", () => {
@@ -333,7 +338,7 @@ describe("AddSiteForm Component", () => {
         it("should handle loading states", () => {
             render(<AddSiteForm />);
 
-            expect(screen.getByTestId("themed-box")).toBeInTheDocument();
+            expect(document.querySelector(".themed-box")).toBeInTheDocument();
         });
     });
 });

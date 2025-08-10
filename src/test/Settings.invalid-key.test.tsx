@@ -14,6 +14,19 @@ import { Settings } from "../components/Settings/Settings";
 import logger from "../services/logger";
 import { ThemeName } from "../theme/types";
 
+// Mock constants
+vi.mock("../constants", () => ({
+    ARIA_LABEL: "aria-label",
+    DEFAULT_HISTORY_LIMIT: 100,
+    HISTORY_LIMIT_OPTIONS: [50, 100, 200, 500, 1000],
+    TRANSITION_ALL: "all 0.2s ease-in-out",
+    UI_DELAYS: {
+        LOADING_BUTTON: 100,
+        LOADING_OVERLAY: 100,
+        STATE_UPDATE_DEFER: 0,
+    },
+}));
+
 // Mock logger
 vi.mock("../services/logger", () => ({
     default: {
@@ -113,6 +126,18 @@ const mockUseTheme = {
             sm: "0.5rem",
             xl: "2rem",
             xs: "0.25rem",
+        },
+        borderRadius: {
+            sm: "4px",
+            md: "8px",
+            lg: "12px",
+            xl: "16px",
+        },
+        shadows: {
+            sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+            md: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+            lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+            xl: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
         },
         typography: {
             fontFamily: {

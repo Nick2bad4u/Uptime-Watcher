@@ -74,7 +74,10 @@ vi.mock("../../theme/useTheme", () => ({
                 xl: "32px",
             },
             typography: {
-                fontFamily: "Arial, sans-serif",
+                fontFamily: {
+                    sans: ["Arial", "sans-serif"],
+                    mono: ["monospace"],
+                },
                 fontSize: {
                     xs: "12px",
                     sm: "14px",
@@ -83,6 +86,11 @@ vi.mock("../../theme/useTheme", () => ({
                 },
                 fontWeight: {
                     medium: "500",
+                },
+                lineHeight: {
+                    normal: "1.5",
+                    relaxed: "1.75",
+                    tight: "1.25",
                 },
             },
         },

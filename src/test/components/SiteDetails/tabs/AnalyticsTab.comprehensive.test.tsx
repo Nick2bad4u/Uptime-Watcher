@@ -287,8 +287,9 @@ describe("AnalyticsTab", () => {
             const progressElement = screen.getByRole("progressbar");
             expect(progressElement).toBeInTheDocument();
 
-            const badgeElement = screen.getByText("99.5%");
-            expect(badgeElement).toBeInTheDocument();
+            // Get all elements with the percentage text since there are multiple
+            const percentageElements = screen.getAllByText("99.5%");
+            expect(percentageElements.length).toBeGreaterThanOrEqual(1);
 
             expect(screen.getByText("Excellent")).toBeInTheDocument();
             expect(props.getAvailabilityDescription).toHaveBeenCalledWith(99.5);

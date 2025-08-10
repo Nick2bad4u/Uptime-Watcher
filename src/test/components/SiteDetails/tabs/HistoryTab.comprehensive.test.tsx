@@ -10,12 +10,26 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { HistoryTab } from "../../../../components/SiteDetails/tabs/HistoryTab";
 import type { HistoryTabProperties } from "../../../../components/SiteDetails/tabs/HistoryTab";
 import { useSettingsStore } from "../../../../stores/settings/useSettingsStore";
-import { useTheme } from "../../../../theme/useTheme";
+import { useTheme, useThemeClasses } from "../../../../theme/useTheme";
 import type { Monitor } from "../../../../../shared/types";
 
 // Mock dependencies
 vi.mock("../../../../stores/settings/useSettingsStore");
 vi.mock("../../../../services/logger");
+vi.mock("../../../../theme/useTheme", () => ({
+    useTheme: vi.fn(),
+    useThemeClasses: vi.fn(() => ({
+        getBackgroundClass: vi.fn((variant: string) => ({
+            backgroundColor: `var(--color-background-${variant})`,
+        })),
+        getTextClass: vi.fn((variant: string) => ({
+            color: `var(--color-text-${variant})`,
+        })),
+        getBorderClass: vi.fn((variant: string) => ({
+            borderColor: `var(--color-border-${variant})`,
+        })),
+    })),
+}));
 
 // Mock icon imports
 vi.mock("react-icons/fi", () => ({
@@ -70,6 +84,11 @@ vi.mock("../../../../components/common/MonitorUiComponents", () => ({
     ),
 }));
 
+// Get mocked functions
+const mockUseSettingsStore = vi.mocked(useSettingsStore);
+const mockUseTheme = vi.mocked(useTheme);
+const mockUseThemeClasses = vi.mocked(useThemeClasses);
+
 describe("HistoryTab", () => {
     const mockFormatFullTimestamp = vi.fn((timestamp: number) =>
         new Date(timestamp).toISOString()
@@ -107,7 +126,7 @@ describe("HistoryTab", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        (useSettingsStore as any).mockReturnValue({
+        mockUseSettingsStore.mockReturnValue({
             settings: { historyLimit: 25 },
             initializeSettings: vi.fn(),
             updateSettings: vi.fn(),
@@ -115,7 +134,7 @@ describe("HistoryTab", () => {
             importSettings: vi.fn(),
         });
 
-        (useTheme as any).mockReturnValue({
+        mockUseTheme.mockReturnValue({
             availableThemes: ["light", "dark"],
             currentTheme: {
                 colors: {
@@ -142,6 +161,49 @@ describe("HistoryTab", () => {
                     text: { primary: "#1F2937", secondary: "#6B7280" },
                     warningAlert: "#D97706",
                 },
+                spacing: {
+                    xs: "4px",
+                    sm: "8px",
+                    md: "16px",
+                    lg: "24px",
+                    xl: "32px",
+                },
+                borderRadius: {
+                    sm: "4px",
+                    md: "8px",
+                    lg: "12px",
+                    xl: "16px",
+                },
+                shadows: {
+                    sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+                    md: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                    lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+                    xl: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+                },
+                typography: {
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                        mono: ["Fira Code", "monospace"],
+                    },
+                    fontSize: {
+                        xs: "12px",
+                        sm: "14px",
+                        md: "16px",
+                        lg: "18px",
+                        xl: "20px",
+                    },
+                    fontWeight: {
+                        normal: "400",
+                        medium: "500",
+                        semibold: "600",
+                        bold: "700",
+                    },
+                    lineHeight: {
+                        normal: "1.5",
+                        relaxed: "1.75",
+                        tight: "1.25",
+                    },
+                },
             } as any,
             getColor: vi.fn(),
             getStatusColor: vi.fn(),
@@ -159,7 +221,7 @@ describe("HistoryTab", () => {
         it("should render history tab with all main sections", () => {
             render(<HistoryTab {...defaultProps} />);
 
-            expect(screen.getAllByTestId("themed-card")).toHaveLength(2); // History Filters and Check History cards
+            expect(document.querySelectorAll(".themed-card")).toHaveLength(2); // History Filters and Check History cards
             expect(screen.getByTestId("history-tab")).toBeInTheDocument();
             expect(
                 screen.getByRole("button", { name: "All" })
@@ -169,7 +231,7 @@ describe("HistoryTab", () => {
         it("should display filter buttons for all, up, and down", () => {
             render(<HistoryTab {...defaultProps} />);
 
-            const buttons = screen.getAllByTestId("themed-button");
+            const buttons = document.querySelectorAll(".themed-button");
             expect(buttons).toHaveLength(3); // All, Up, Down filter buttons
         });
 
@@ -178,7 +240,7 @@ describe("HistoryTab", () => {
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
             // Should show history records
-            expect(screen.getAllByTestId("status-indicator")).toHaveLength(3);
+            expect(document.querySelectorAll(".themed-status-indicator")).toHaveLength(3);
         });
 
         it("should display empty state when no history available", () => {
@@ -196,7 +258,7 @@ describe("HistoryTab", () => {
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
             // Should show all 4 history records
-            expect(screen.getAllByTestId("status-indicator")).toHaveLength(4);
+            expect(document.querySelectorAll(".themed-status-indicator")).toHaveLength(4);
         });
 
         it("should filter history to show only 'up' status", async () => {
@@ -207,7 +269,7 @@ describe("HistoryTab", () => {
             await userEvent.click(upButton);
 
             // Should show only up status records (every even index)
-            expect(screen.getAllByTestId("status-indicator")).toHaveLength(2);
+            expect(document.querySelectorAll(".themed-status-indicator")).toHaveLength(2);
         });
 
         it("should filter history to show only 'down' status", async () => {
@@ -219,7 +281,7 @@ describe("HistoryTab", () => {
             await userEvent.click(downButton);
 
             // Should show only down status records (every odd index)
-            expect(screen.getAllByTestId("status-indicator")).toHaveLength(2);
+            expect(document.querySelectorAll(".themed-status-indicator")).toHaveLength(2);
         });
 
         it("should switch back to all records when 'all' filter is selected", async () => {
@@ -229,12 +291,12 @@ describe("HistoryTab", () => {
             // First filter to up
             const upButton = screen.getByRole("button", { name: /up/i });
             await userEvent.click(upButton);
-            expect(screen.getAllByTestId("status-indicator")).toHaveLength(2);
+            expect(document.querySelectorAll(".themed-status-indicator")).toHaveLength(2);
 
             // Then switch back to all
             const allButton = screen.getByRole("button", { name: /all/i });
             await userEvent.click(allButton);
-            expect(screen.getAllByTestId("status-indicator")).toHaveLength(4);
+            expect(document.querySelectorAll(".themed-status-indicator")).toHaveLength(4);
         });
     });
 
@@ -252,7 +314,7 @@ describe("HistoryTab", () => {
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
             // Should show only up to history limit
-            expect(screen.getAllByTestId("status-indicator")).toHaveLength(10);
+            expect(document.querySelectorAll(".themed-status-indicator")).toHaveLength(10);
         });
 
         it("should show all available records when history is less than limit", () => {
@@ -267,21 +329,21 @@ describe("HistoryTab", () => {
             const monitor = createMockMonitor(5);
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
-            expect(screen.getAllByTestId("status-indicator")).toHaveLength(5);
+            expect(document.querySelectorAll(".themed-status-indicator")).toHaveLength(5);
         });
 
         it("should handle display limit dropdown changes", async () => {
             const monitor = createMockMonitor(50);
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
-            const select = screen.getByTestId("themed-select");
+            const select = document.querySelector(".themed-select");
             expect(select).toBeInTheDocument();
 
             // Change display limit
             fireEvent.change(select, { target: { value: "10" } });
 
             // Should now show only 10 records
-            expect(screen.getAllByTestId("status-indicator")).toHaveLength(10);
+            expect(document.querySelectorAll(".themed-status-indicator")).toHaveLength(10);
         });
     });
 
@@ -375,6 +437,49 @@ describe("HistoryTab", () => {
                         successAlert: "#059669",
                         text: { primary: "#F9FAFB", secondary: "#D1D5DB" },
                         warningAlert: "#D97706",
+                    },
+                    spacing: {
+                        xs: "4px",
+                        sm: "8px",
+                        md: "16px",
+                        lg: "24px",
+                        xl: "32px",
+                    },
+                    borderRadius: {
+                        sm: "4px",
+                        md: "8px",
+                        lg: "12px",
+                        xl: "16px",
+                    },
+                    shadows: {
+                        sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+                        md: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                        lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+                        xl: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+                    },
+                    typography: {
+                        fontFamily: {
+                            sans: ["Inter", "sans-serif"],
+                            mono: ["Fira Code", "monospace"],
+                        },
+                        fontSize: {
+                            xs: "12px",
+                            sm: "14px",
+                            md: "16px",
+                            lg: "18px",
+                            xl: "20px",
+                        },
+                        fontWeight: {
+                            normal: "400",
+                            medium: "500",
+                            semibold: "600",
+                            bold: "700",
+                        },
+                        lineHeight: {
+                            normal: "1.5",
+                            relaxed: "1.75",
+                            tight: "1.25",
+                        },
                     },
                 } as any,
                 getColor: vi.fn(),
@@ -479,7 +584,7 @@ describe("HistoryTab", () => {
             await userEvent.click(downButton);
 
             // Should handle rapid state changes gracefully
-            expect(screen.getAllByTestId("themed-card")).toHaveLength(2);
+            expect(document.querySelectorAll(".themed-card")).toHaveLength(2);
         });
     });
 
@@ -487,7 +592,7 @@ describe("HistoryTab", () => {
         it("should provide accessible filter buttons", () => {
             render(<HistoryTab {...defaultProps} />);
 
-            const buttons = screen.getAllByTestId("themed-button");
+            const buttons = document.querySelectorAll(".themed-button");
             buttons.forEach((button) => {
                 expect(button).toBeInTheDocument();
                 expect(button.tagName).toBe("BUTTON");
@@ -497,7 +602,7 @@ describe("HistoryTab", () => {
         it("should provide accessible select dropdown", () => {
             render(<HistoryTab {...defaultProps} />);
 
-            const select = screen.getByTestId("themed-select");
+            const select = document.querySelector(".themed-select");
             expect(select).toBeInTheDocument();
             expect(select.tagName).toBe("SELECT");
         });

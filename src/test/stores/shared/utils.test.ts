@@ -7,7 +7,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 // Mock the logger
 vi.mock("../../../services/logger", () => ({
     default: {
-        debug: vi.fn(),
+        info: vi.fn(),
     },
 }));
 
@@ -16,7 +16,7 @@ vi.mock("../../../../shared/utils/environment", () => ({
     isDevelopment: vi.fn(),
 }));
 
-import { logStoreAction } from "../../../stores/shared/utils";
+import { logStoreAction } from "../../../stores/utils";
 import { isDevelopment } from "../../../../shared/utils/environment";
 import logger from "../../../services/logger";
 
@@ -35,7 +35,7 @@ describe("Store Utils", () => {
 
             logStoreAction("TestStore", "testAction");
 
-            expect(mockLogger.debug).toHaveBeenCalledWith(
+            expect(mockLogger.info).toHaveBeenCalledWith(
                 "[TestStore] testAction"
             );
         });
@@ -46,7 +46,7 @@ describe("Store Utils", () => {
 
             logStoreAction("TestStore", "testAction", payload);
 
-            expect(mockLogger.debug).toHaveBeenCalledWith(
+            expect(mockLogger.info).toHaveBeenCalledWith(
                 "[TestStore] testAction",
                 payload
             );
@@ -57,7 +57,7 @@ describe("Store Utils", () => {
 
             logStoreAction("TestStore", "testAction");
 
-            expect(mockLogger.debug).not.toHaveBeenCalled();
+            expect(mockLogger.info).not.toHaveBeenCalled();
         });
 
         it("should not log action with payload in production", () => {
@@ -66,7 +66,7 @@ describe("Store Utils", () => {
 
             logStoreAction("TestStore", "testAction", payload);
 
-            expect(mockLogger.debug).not.toHaveBeenCalled();
+            expect(mockLogger.info).not.toHaveBeenCalled();
         });
 
         it("should handle undefined payload explicitly", () => {
@@ -74,7 +74,7 @@ describe("Store Utils", () => {
 
             logStoreAction("TestStore", "testAction", undefined);
 
-            expect(mockLogger.debug).toHaveBeenCalledWith(
+            expect(mockLogger.info).toHaveBeenCalledWith(
                 "[TestStore] testAction"
             );
         });
@@ -84,7 +84,7 @@ describe("Store Utils", () => {
 
             logStoreAction("TestStore", "testAction", null);
 
-            expect(mockLogger.debug).toHaveBeenCalledWith(
+            expect(mockLogger.info).toHaveBeenCalledWith(
                 "[TestStore] testAction",
                 null
             );
@@ -95,7 +95,7 @@ describe("Store Utils", () => {
 
             logStoreAction("TestStore", "testAction", "");
 
-            expect(mockLogger.debug).toHaveBeenCalledWith(
+            expect(mockLogger.info).toHaveBeenCalledWith(
                 "[TestStore] testAction",
                 ""
             );
@@ -106,7 +106,7 @@ describe("Store Utils", () => {
 
             logStoreAction("TestStore", "testAction", 42);
 
-            expect(mockLogger.debug).toHaveBeenCalledWith(
+            expect(mockLogger.info).toHaveBeenCalledWith(
                 "[TestStore] testAction",
                 42
             );
@@ -117,7 +117,7 @@ describe("Store Utils", () => {
 
             logStoreAction("TestStore", "testAction", true);
 
-            expect(mockLogger.debug).toHaveBeenCalledWith(
+            expect(mockLogger.info).toHaveBeenCalledWith(
                 "[TestStore] testAction",
                 true
             );

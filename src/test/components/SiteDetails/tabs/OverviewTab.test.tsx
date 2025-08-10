@@ -11,8 +11,10 @@ import type { Monitor } from "../../../../../shared/types";
 
 // Mock all external dependencies
 vi.mock("../../../../constants", () => ({
+    ARIA_LABEL: "aria-label",
     CHECK_INTERVALS: [30000, 60000, 300000, 600000],
     TIMEOUT_CONSTRAINTS: { MIN: 1000, MAX: 30000 },
+    TRANSITION_ALL: "all 0.2s ease-in-out",
 }));
 
 vi.mock("../../../../services/logger", () => ({
@@ -44,6 +46,48 @@ vi.mock("../../../../theme/useTheme", () => ({
                 text: { primary: "#1F2937", secondary: "#6B7280" },
                 warningAlert: "#D97706",
             },
+            spacing: {
+                xs: "4px",
+                sm: "8px",
+                md: "16px",
+                lg: "24px",
+                xl: "32px",
+            },
+            borderRadius: {
+                sm: "4px",
+                md: "8px",
+                lg: "12px",
+                xl: "16px",
+            },
+            shadows: {
+                sm: "0 1px 2px rgba(0,0,0,0.05)",
+                md: "0 4px 6px rgba(0,0,0,0.1)",
+                lg: "0 10px 15px rgba(0,0,0,0.1)",
+            },
+            typography: {
+                fontFamily: {
+                    sans: ["Inter", "sans-serif"],
+                    mono: ["Fira Code", "monospace"],
+                },
+                fontSize: {
+                    xs: "12px",
+                    sm: "14px",
+                    md: "16px",
+                    lg: "18px",
+                    xl: "20px",
+                },
+                fontWeight: {
+                    normal: "400",
+                    medium: "500",
+                    semibold: "600",
+                    bold: "700",
+                },
+                lineHeight: {
+                    normal: "1.5",
+                    relaxed: "1.75",
+                    tight: "1.25",
+                },
+            },
         },
         getColor: vi.fn(),
         getStatusColor: vi.fn(),
@@ -54,6 +98,11 @@ vi.mock("../../../../theme/useTheme", () => ({
         themeName: "light",
         themeVersion: 1,
         toggleTheme: vi.fn(),
+    })),
+    useThemeClasses: vi.fn(() => ({
+        getBackgroundClass: vi.fn(),
+        getBorderClass: vi.fn(),
+        getTextClass: vi.fn(),
     })),
     useAvailabilityColors: vi.fn(() => ({
         excellent: "#10B981",
@@ -178,18 +227,18 @@ describe("OverviewTab", () => {
             render(<OverviewTab {...baseProps} />);
 
             // Check basic elements are present
-            expect(screen.getByTestId("status-indicator")).toBeInTheDocument();
+            expect(document.querySelector(".themed-status-indicator")).toBeInTheDocument();
             expect(
-                screen.getAllByTestId("themed-card").length
+                document.querySelectorAll(".themed-card").length
             ).toBeGreaterThanOrEqual(2); // Should have multiple cards
-            expect(screen.getByTestId("themed-progress")).toBeInTheDocument();
+            expect(document.querySelector(".themed-progress")).toBeInTheDocument();
         });
 
         it("should display uptime percentage correctly", () => {
             render(<OverviewTab {...baseProps} />);
 
             // Check if uptime is displayed
-            expect(screen.getByText("99.5%")).toBeInTheDocument();
+            expect(screen.getAllByText("99.5%")[0]).toBeInTheDocument();
         });
 
         it("should show response time statistics", () => {
@@ -211,7 +260,7 @@ describe("OverviewTab", () => {
         it("should render control buttons", () => {
             render(<OverviewTab {...baseProps} />);
 
-            const buttons = screen.getAllByTestId("themed-button");
+            const buttons = document.querySelectorAll(".themed-button");
             expect(buttons.length).toBeGreaterThan(0);
         });
     });
@@ -240,7 +289,7 @@ describe("OverviewTab", () => {
         it("should handle interval change", () => {
             render(<OverviewTab {...baseProps} />);
 
-            const intervalSelect = screen.getByTestId("themed-select");
+            const intervalSelect = document.querySelector(".themed-select");
             fireEvent.change(intervalSelect, { target: { value: "300000" } });
 
             expect(mockHandleIntervalChange).toHaveBeenCalledTimes(1);
@@ -249,7 +298,7 @@ describe("OverviewTab", () => {
         it("should handle timeout change", () => {
             render(<OverviewTab {...baseProps} />);
 
-            const timeoutInput = screen.getByTestId("themed-input");
+            const timeoutInput = document.querySelector(".themed-input");
             fireEvent.change(timeoutInput, { target: { value: "10000" } });
 
             expect(mockHandleTimeoutChange).toHaveBeenCalledTimes(1);
@@ -305,7 +354,7 @@ describe("OverviewTab", () => {
                 <OverviewTab {...baseProps} selectedMonitor={portMonitor} />
             );
 
-            expect(screen.getByTestId("status-indicator")).toBeInTheDocument();
+            expect(document.querySelector(".themed-status-indicator")).toBeInTheDocument();
         });
 
         it("should handle down status monitor", () => {
@@ -318,7 +367,7 @@ describe("OverviewTab", () => {
                 <OverviewTab {...baseProps} selectedMonitor={downMonitor} />
             );
 
-            expect(screen.getByTestId("status-indicator")).toBeInTheDocument();
+            expect(document.querySelector(".themed-status-indicator")).toBeInTheDocument();
         });
 
         it("should handle monitor without last check", () => {
@@ -331,7 +380,7 @@ describe("OverviewTab", () => {
                 />
             );
 
-            expect(screen.getByTestId("status-indicator")).toBeInTheDocument();
+            expect(document.querySelector(".themed-status-indicator")).toBeInTheDocument();
         });
     });
 
@@ -373,25 +422,25 @@ describe("OverviewTab", () => {
         it("should handle 100% uptime", () => {
             render(<OverviewTab {...baseProps} uptime="100.0" />);
 
-            expect(screen.getByText("100.0%")).toBeInTheDocument();
+            expect(screen.getAllByText("100.0%")[0]).toBeInTheDocument();
         });
 
         it("should handle 0% uptime", () => {
             render(<OverviewTab {...baseProps} uptime="0.0" />);
 
-            expect(screen.getByText("0.0%")).toBeInTheDocument();
+            expect(screen.getAllByText("0.0%")[0]).toBeInTheDocument();
         });
 
         it("should handle extreme interval values", () => {
             render(<OverviewTab {...baseProps} localCheckInterval={30000} />);
 
-            expect(screen.getByTestId("themed-select")).toBeInTheDocument();
+            expect(document.querySelector(".themed-select")).toBeInTheDocument();
         });
 
         it("should handle extreme timeout values", () => {
             render(<OverviewTab {...baseProps} localTimeout={30000} />);
 
-            expect(screen.getByTestId("themed-input")).toBeInTheDocument();
+            expect(document.querySelector(".themed-input")).toBeInTheDocument();
         });
     });
 

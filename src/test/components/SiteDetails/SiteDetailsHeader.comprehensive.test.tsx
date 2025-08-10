@@ -141,8 +141,7 @@ describe("SiteDetailsHeader", () => {
                     selectedMonitor={mockHttpMonitor}
                 />
             );
-            const statusIndicator = screen.getByRole("img", { hidden: true }) || 
-                                  document.querySelector(".themed-status-indicator");
+            const statusIndicator = document.querySelector(".themed-status-indicator");
             expect(statusIndicator).toBeInTheDocument();
         });
 
