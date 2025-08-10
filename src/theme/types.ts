@@ -117,14 +117,6 @@ export interface ThemeColors {
     warning: string;
 }
 
-/** Available theme names in the application */
-export type ThemeName =
-    | "custom"
-    | "dark"
-    | "high-contrast"
-    | "light"
-    | "system";
-
 /**
  * Shadow system interface for elevation and depth.
  * Defines consistent shadow styles for UI components.
@@ -215,3 +207,11 @@ export interface ThemeTypography {
         tight: string;
     };
 }
+
+/** Available theme names in the application */
+export type ThemeName =
+    | "custom"
+    | "dark"
+    | "high-contrast"
+    | "light"
+    | "system";

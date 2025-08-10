@@ -20,16 +20,6 @@ export interface IpcHandlerConfig<TParams = unknown[], TResult = unknown> {
 }
 
 /**
- * Validation function type for IPC parameters.
- *
- * @param params - The parameters to validate
- * @returns Array of error messages, or null if validation passes
- *
- * @public
- */
-export type IpcParameterValidator = (params: unknown[]) => null | string[];
-
-/**
  * Base IPC response interface for consistent communication between main and renderer processes.
  *
  * @remarks
@@ -80,3 +70,13 @@ export interface IpcValidationResponse extends IpcResponse<ValidationResult> {
     /** Whether validation passed (required for validation responses) */
     success: boolean;
 }
+
+/**
+ * Validation function type for IPC parameters.
+ *
+ * @param params - The parameters to validate
+ * @returns Array of error messages, or null if validation passes
+ *
+ * @public
+ */
+export type IpcParameterValidator = (params: unknown[]) => null | string[];

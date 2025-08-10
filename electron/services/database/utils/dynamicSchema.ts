@@ -173,6 +173,222 @@ export interface DatabaseFieldDefinition {
 }
 
 /**
+ * Converts enabled/monitoring fields to a database-compatible integer value.
+ *
+ * @remarks
+ * Used internally to map boolean or truthy `enabled`/`monitoring` fields to SQLite integer format (1 for true, 0 for false).
+ *
+ * @param monitor - Monitor object containing `enabled` and/or `monitoring` properties.
+ * @returns Database value: 1 for true, 0 for false.
+ * @internal
+ */
+function convertEnabledField(monitor: Record<string, unknown>): number {
+    const { enabled, monitoring } = monitor;
+    return monitoring === true || enabled === true ? 1 : 0;
+}
+
+/**
+ * Converts a database value to its corresponding JavaScript type.
+ *
+ * @remarks
+ * Handles INTEGER and TEXT types; defaults to raw value for unknown types. Used internally for dynamic field mapping.
+ *
+ * @param value - Value from the database.
+ * @param sqlType - SQL type of the value (e.g., "INTEGER", "TEXT").
+ * @returns Converted JavaScript value.
+ * @example
+ * ```typescript
+ * const jsValue = convertFromDatabase(dbValue, "INTEGER");
+ * ```
+ * @internal
+ */
+function convertFromDatabase(value: unknown, sqlType: string): unknown {
+    if (value === null || value === undefined) {
+        return undefined;
+    }
+
+    switch (sqlType) {
+        case "INTEGER": {
+            return Number(value);
+        }
+        case "TEXT": {
+            return safeStringify(value);
+        }
+        default: {
+            return value;
+        }
+    }
+}
+
+/**
+ * Converts a `lastChecked` value to a database-compatible timestamp.
+ *
+ * @remarks
+ * Used internally to ensure `lastChecked` is stored as a number (timestamp) or null.
+ *
+ * @param lastChecked - Value to convert (Date, number, or other).
+ * @returns Timestamp as number, or null if not convertible.
+ * @internal
+ */
+function convertLastCheckedField(lastChecked: unknown): null | number {
+    if (lastChecked instanceof Date) {
+        return lastChecked.getTime();
+    }
+    if (typeof lastChecked === "number") {
+        return lastChecked;
+    }
+    return null;
+}
+
+/**
+ * Converts a JavaScript value to a database-compatible format for storage.
+ *
+ * @remarks
+ * Handles INTEGER and TEXT types; defaults to stringified value for unknown types. Used internally for dynamic field mapping.
+ *
+ * @param value - JavaScript value to convert.
+ * @param sqlType - SQL type for the database column (e.g., "INTEGER", "TEXT").
+ * @returns Value suitable for database storage.
+ * @example
+ * ```typescript
+ * const dbValue = convertToDatabase(jsValue, "TEXT");
+ * ```
+ * @internal
+ */
+function convertToDatabase(value: unknown, sqlType: string): unknown {
+    if (value === undefined || value === null) {
+        return null;
+    }
+
+    switch (sqlType) {
+        case "INTEGER": {
+            return Number(value);
+        }
+        case "TEXT": {
+            return safeStringify(value);
+        }
+        default: {
+            return safeStringify(value);
+        } // Convert anything else to string to avoid object binding errors
+    }
+}
+
+/**
+ * Maps a monitor field type to its corresponding SQL data type for SQLite.
+ *
+ * @remarks
+ * Unknown field types default to TEXT for safety. Supported types: "number" → INTEGER, "text"/"url" → TEXT.
+ *
+ * @param fieldType - Field type from monitor configuration.
+ * @returns SQL data type for SQLite.
+ * @example
+ * ```typescript
+ * const sqlType = getSqlTypeFromFieldType("number");
+ * ```
+ * @internal
+ */
+function getSqlTypeFromFieldType(fieldType: string): string {
+    switch (fieldType) {
+        case "number": {
+            return "INTEGER";
+        }
+        case "text":
+        case "url": {
+            return "TEXT";
+        }
+        default: {
+            return "TEXT"; // Safe default for unknown types
+        }
+    }
+}
+
+/**
+ * Maps dynamic monitor type-specific fields from a monitor object to a database row.
+ *
+ * @remarks
+ * Used internally to populate a database row with dynamic fields based on monitor type definitions.
+ *
+ * @param monitor - Monitor object to map.
+ * @param row - Database row object to populate.
+ * @internal
+ */
+function mapDynamicFields(
+    monitor: Record<string, unknown>,
+    row: Record<string, unknown>
+): void {
+    const fieldDefs = generateDatabaseFieldDefinitions();
+    for (const fieldDef of fieldDefs) {
+        if (monitor[fieldDef.sourceField] !== undefined) {
+            row[fieldDef.columnName] = convertToDatabase(
+                monitor[fieldDef.sourceField],
+                fieldDef.sqlType
+            );
+        }
+    }
+}
+
+/**
+ * Maps standard monitor fields from a monitor object to a database row.
+ *
+ * @remarks
+ * Uses a configuration-driven approach to map fields, reducing complexity and improving maintainability.
+ *
+ * @param monitor - Monitor object to map.
+ * @param row - Database row object to populate.
+ * @internal
+ */
+function mapStandardFields(
+    monitor: Record<string, unknown>,
+    row: Record<string, unknown>
+): void {
+    // Handle enabled/monitoring fields specially since they map to the same db field
+    if (
+        monitor["monitoring"] !== undefined ||
+        monitor["enabled"] !== undefined
+    ) {
+        row["enabled"] = convertEnabledField(monitor);
+    }
+
+    // Process all other standard field mappings
+    for (const mapping of STANDARD_FIELD_MAPPINGS) {
+        if (monitor[mapping.sourceField] !== undefined) {
+            const value = mapping.transform
+                ? mapping.transform(monitor[mapping.sourceField], monitor)
+                : safeGetRowProperty(
+                      monitor,
+                      mapping.sourceField,
+                      mapping.defaultValue
+                  );
+
+            row[mapping.dbField] = value;
+        }
+    }
+}
+
+/**
+ * Converts a camelCase or PascalCase string to snake_case for database columns.
+ *
+ * @remarks
+ * Handles leading uppercase characters to avoid leading underscores. Used internally for dynamic schema generation.
+ *
+ * @param str - String to convert.
+ * @returns Snake_case version of the string.
+ * @example
+ * ```typescript
+ * const snake = toSnakeCase("SiteIdentifier"); // "site_identifier"
+ * ```
+ * @internal
+ */
+function toSnakeCase(str: string): string {
+    if (!str || typeof str !== "string") return str;
+
+    // Handle leading uppercase to avoid leading underscore
+    return str
+        .replace(/^[A-Z]/v, (match) => match.toLowerCase())
+        .replaceAll(/[A-Z]/gv, (letter) => `_${letter.toLowerCase()}`);
+}
+
+/**
  * Generates database field definitions from the monitor type registry.
  *
  * @remarks
@@ -397,220 +613,4 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
     }
 
     return monitor;
-}
-
-/**
- * Converts enabled/monitoring fields to a database-compatible integer value.
- *
- * @remarks
- * Used internally to map boolean or truthy `enabled`/`monitoring` fields to SQLite integer format (1 for true, 0 for false).
- *
- * @param monitor - Monitor object containing `enabled` and/or `monitoring` properties.
- * @returns Database value: 1 for true, 0 for false.
- * @internal
- */
-function convertEnabledField(monitor: Record<string, unknown>): number {
-    const { enabled, monitoring } = monitor;
-    return monitoring === true || enabled === true ? 1 : 0;
-}
-
-/**
- * Converts a database value to its corresponding JavaScript type.
- *
- * @remarks
- * Handles INTEGER and TEXT types; defaults to raw value for unknown types. Used internally for dynamic field mapping.
- *
- * @param value - Value from the database.
- * @param sqlType - SQL type of the value (e.g., "INTEGER", "TEXT").
- * @returns Converted JavaScript value.
- * @example
- * ```typescript
- * const jsValue = convertFromDatabase(dbValue, "INTEGER");
- * ```
- * @internal
- */
-function convertFromDatabase(value: unknown, sqlType: string): unknown {
-    if (value === null || value === undefined) {
-        return undefined;
-    }
-
-    switch (sqlType) {
-        case "INTEGER": {
-            return Number(value);
-        }
-        case "TEXT": {
-            return safeStringify(value);
-        }
-        default: {
-            return value;
-        }
-    }
-}
-
-/**
- * Converts a `lastChecked` value to a database-compatible timestamp.
- *
- * @remarks
- * Used internally to ensure `lastChecked` is stored as a number (timestamp) or null.
- *
- * @param lastChecked - Value to convert (Date, number, or other).
- * @returns Timestamp as number, or null if not convertible.
- * @internal
- */
-function convertLastCheckedField(lastChecked: unknown): null | number {
-    if (lastChecked instanceof Date) {
-        return lastChecked.getTime();
-    }
-    if (typeof lastChecked === "number") {
-        return lastChecked;
-    }
-    return null;
-}
-
-/**
- * Converts a JavaScript value to a database-compatible format for storage.
- *
- * @remarks
- * Handles INTEGER and TEXT types; defaults to stringified value for unknown types. Used internally for dynamic field mapping.
- *
- * @param value - JavaScript value to convert.
- * @param sqlType - SQL type for the database column (e.g., "INTEGER", "TEXT").
- * @returns Value suitable for database storage.
- * @example
- * ```typescript
- * const dbValue = convertToDatabase(jsValue, "TEXT");
- * ```
- * @internal
- */
-function convertToDatabase(value: unknown, sqlType: string): unknown {
-    if (value === undefined || value === null) {
-        return null;
-    }
-
-    switch (sqlType) {
-        case "INTEGER": {
-            return Number(value);
-        }
-        case "TEXT": {
-            return safeStringify(value);
-        }
-        default: {
-            return safeStringify(value);
-        } // Convert anything else to string to avoid object binding errors
-    }
-}
-
-/**
- * Maps a monitor field type to its corresponding SQL data type for SQLite.
- *
- * @remarks
- * Unknown field types default to TEXT for safety. Supported types: "number" → INTEGER, "text"/"url" → TEXT.
- *
- * @param fieldType - Field type from monitor configuration.
- * @returns SQL data type for SQLite.
- * @example
- * ```typescript
- * const sqlType = getSqlTypeFromFieldType("number");
- * ```
- * @internal
- */
-function getSqlTypeFromFieldType(fieldType: string): string {
-    switch (fieldType) {
-        case "number": {
-            return "INTEGER";
-        }
-        case "text":
-        case "url": {
-            return "TEXT";
-        }
-        default: {
-            return "TEXT"; // Safe default for unknown types
-        }
-    }
-}
-
-/**
- * Maps dynamic monitor type-specific fields from a monitor object to a database row.
- *
- * @remarks
- * Used internally to populate a database row with dynamic fields based on monitor type definitions.
- *
- * @param monitor - Monitor object to map.
- * @param row - Database row object to populate.
- * @internal
- */
-function mapDynamicFields(
-    monitor: Record<string, unknown>,
-    row: Record<string, unknown>
-): void {
-    const fieldDefs = generateDatabaseFieldDefinitions();
-    for (const fieldDef of fieldDefs) {
-        if (monitor[fieldDef.sourceField] !== undefined) {
-            row[fieldDef.columnName] = convertToDatabase(
-                monitor[fieldDef.sourceField],
-                fieldDef.sqlType
-            );
-        }
-    }
-}
-
-/**
- * Maps standard monitor fields from a monitor object to a database row.
- *
- * @remarks
- * Uses a configuration-driven approach to map fields, reducing complexity and improving maintainability.
- *
- * @param monitor - Monitor object to map.
- * @param row - Database row object to populate.
- * @internal
- */
-function mapStandardFields(
-    monitor: Record<string, unknown>,
-    row: Record<string, unknown>
-): void {
-    // Handle enabled/monitoring fields specially since they map to the same db field
-    if (
-        monitor["monitoring"] !== undefined ||
-        monitor["enabled"] !== undefined
-    ) {
-        row["enabled"] = convertEnabledField(monitor);
-    }
-
-    // Process all other standard field mappings
-    for (const mapping of STANDARD_FIELD_MAPPINGS) {
-        if (monitor[mapping.sourceField] !== undefined) {
-            const value = mapping.transform
-                ? mapping.transform(monitor[mapping.sourceField], monitor)
-                : safeGetRowProperty(
-                      monitor,
-                      mapping.sourceField,
-                      mapping.defaultValue
-                  );
-
-            row[mapping.dbField] = value;
-        }
-    }
-}
-
-/**
- * Converts a camelCase or PascalCase string to snake_case for database columns.
- *
- * @remarks
- * Handles leading uppercase characters to avoid leading underscores. Used internally for dynamic schema generation.
- *
- * @param str - String to convert.
- * @returns Snake_case version of the string.
- * @example
- * ```typescript
- * const snake = toSnakeCase("SiteIdentifier"); // "site_identifier"
- * ```
- * @internal
- */
-function toSnakeCase(str: string): string {
-    if (!str || typeof str !== "string") return str;
-
-    // Handle leading uppercase to avoid leading underscore
-    return str
-        .replace(/^[A-Z]/v, (match) => match.toLowerCase())
-        .replaceAll(/[A-Z]/gv, (letter) => `_${letter.toLowerCase()}`);
 }

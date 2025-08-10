@@ -86,24 +86,6 @@ import { TypedEventBus } from "./events/TypedEventBus";
 import { logger } from "./utils/logger";
 
 /**
- * Dependencies for UptimeOrchestrator.
- *
- * @remarks
- * Following the repository pattern and service layer architecture,
- * these managers encapsulate domain-specific operations and provide
- * a clean separation between data access and business logic.
- *
- * Each manager implements the service layer pattern with underlying
- * repository pattern for data persistence, ensuring consistent
- * transaction handling and domain boundaries.
- */
-export interface UptimeOrchestratorDependencies {
-    databaseManager: DatabaseManager;
-    monitorManager: MonitorManager;
-    siteManager: SiteManager;
-}
-
-/**
  * Data structure for internal monitoring status check events.
  *
  * @remarks Internal use only for coordinating between managers.
@@ -114,15 +96,6 @@ interface IsMonitoringActiveRequestData {
     /** Specific monitor ID to check */
     monitorId: string;
 }
-
-/**
- * Combined event interface for the orchestrator.
- *
- * @remarks
- * Supports both internal manager events and public frontend events,
- * providing a unified event system for the entire application.
- */
-type OrchestratorEvents = UptimeEvents;
 
 /**
  * Data structure for internal monitor restart events.
@@ -176,6 +149,33 @@ interface UpdateSitesCacheRequestData {
     /** Updated sites array for cache synchronization */
     sites: Site[];
 }
+
+/**
+ * Dependencies for UptimeOrchestrator.
+ *
+ * @remarks
+ * Following the repository pattern and service layer architecture,
+ * these managers encapsulate domain-specific operations and provide
+ * a clean separation between data access and business logic.
+ *
+ * Each manager implements the service layer pattern with underlying
+ * repository pattern for data persistence, ensuring consistent
+ * transaction handling and domain boundaries.
+ */
+export interface UptimeOrchestratorDependencies {
+    databaseManager: DatabaseManager;
+    monitorManager: MonitorManager;
+    siteManager: SiteManager;
+}
+
+/**
+ * Combined event interface for the orchestrator.
+ *
+ * @remarks
+ * Supports both internal manager events and public frontend events,
+ * providing a unified event system for the entire application.
+ */
+type OrchestratorEvents = UptimeEvents;
 
 export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     /**

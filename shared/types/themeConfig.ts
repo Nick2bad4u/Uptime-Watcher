@@ -442,24 +442,6 @@ export interface ThemeConfigWithModes {
 }
 
 /**
- * Theme mode type.
- *
- * @public
- */
-export type ThemeMode = "dark" | "light";
-
-/**
- * Theme validation result interface.
- *
- * @remarks
- * Used to return validation results for theme configurations.
- *
- * @public
- */
-// Import from unified validation system
-export type { ThemeValidationResult } from "./validation";
-
-/**
  * Theme override configuration interface.
  *
  * @remarks
@@ -483,6 +465,17 @@ export interface ThemeOverride {
     /** Typography overrides */
     typography?: Partial<TypographyConfig>;
 }
+
+/**
+ * Theme validation result interface.
+ *
+ * @remarks
+ * Used to return validation results for theme configurations.
+ *
+ * @public
+ */
+// Import from unified validation system
+export type { ThemeValidationResult } from "./validation";
 
 /**
  * Typography configuration interface.
@@ -527,6 +520,13 @@ export interface TypographyConfig {
         tight: string;
     };
 }
+
+/**
+ * Theme mode type.
+ *
+ * @public
+ */
+export type ThemeMode = "dark" | "light";
 
 /**
  * Type guard to check if an object is a valid color palette.

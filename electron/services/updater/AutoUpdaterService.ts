@@ -8,6 +8,14 @@ import { autoUpdater } from "electron-updater";
 import { logger } from "../../utils/logger";
 
 /**
+ * Data structure for update status information.
+ */
+export interface UpdateStatusData {
+    error?: string;
+    status: UpdateStatus;
+}
+
+/**
  * Status of the application update process.
  */
 export type UpdateStatus =
@@ -17,14 +25,6 @@ export type UpdateStatus =
     | "downloading"
     | "error"
     | "idle";
-
-/**
- * Data structure for update status information.
- */
-export interface UpdateStatusData {
-    error?: string;
-    status: UpdateStatus;
-}
 
 /**
  * Service responsible for handling application auto-updates.

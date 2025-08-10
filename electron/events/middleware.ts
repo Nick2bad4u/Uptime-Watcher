@@ -13,13 +13,6 @@ import type { EventMiddleware } from "./TypedEventBus";
 import { isDevelopment } from "../../shared/utils/environment";
 import { logger as baseLogger } from "../utils/logger";
 
-// Helper functions for metrics middleware (reduces complexity by composition)
-type MetricsCallback = (metric: {
-    name: string;
-    type: "counter" | "timing";
-    value: number;
-}) => void;
-
 /**
  * Interface for middleware stack functions.
  */
@@ -29,6 +22,13 @@ interface MiddlewareStacks {
     production: () => EventMiddleware;
     testing: () => EventMiddleware;
 }
+
+// Helper functions for metrics middleware (reduces complexity by composition)
+type MetricsCallback = (metric: {
+    name: string;
+    type: "counter" | "timing";
+    value: number;
+}) => void;
 
 const trackEventCount = (
     event: string,

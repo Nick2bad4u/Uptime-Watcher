@@ -13,104 +13,6 @@
 import type { Monitor, Site, StatusUpdate } from "../types";
 
 /**
- * Category for grouping related events by functional domain.
- *
- * @remarks
- * Used for event filtering, routing, and middleware processing.
- *
- * @example
- * ```typescript
- * const category: EventCategory = "database";
- * ```
- * @public
- */
-export type EventCategory = "database" | "monitoring" | "system" | "ui";
-
-/**
- * Type of monitoring check that triggered an event.
- *
- * @remarks
- * Indicates whether a monitoring event was triggered manually or by a scheduled process.
- *
- * @example
- * ```typescript
- * const checkType: EventCheckType = "manual";
- * ```
- * @public
- */
-export type EventCheckType = "manual" | "scheduled";
-
-/**
- * Runtime environment where the event occurred.
- *
- * @remarks
- * Used for distinguishing between development, production, and test environments in event payloads.
- *
- * @example
- * ```typescript
- * const env: EventEnvironment = "production";
- * ```
- * @public
- */
-export type EventEnvironment = "development" | "production" | "test";
-
-/**
- * Reason for an event occurrence.
- *
- * @remarks
- * Used to indicate the cause or initiator of an event, such as user action or system error.
- *
- * @example
- * ```typescript
- * const reason: EventReason = "user";
- * ```
- * @public
- */
-export type EventReason = "error" | "shutdown" | "user";
-
-/**
- * Severity level of an event for prioritization and alerting.
- *
- * @remarks
- * Used to prioritize event handling and alerting in middleware and UI.
- *
- * @example
- * ```typescript
- * const severity: EventSeverity = "critical";
- * ```
- * @public
- */
-export type EventSeverity = "critical" | "high" | "low" | "medium";
-
-/**
- * Source that triggered an event.
- *
- * @remarks
- * Indicates the origin of an event, such as user action, system process, or data migration.
- *
- * @example
- * ```typescript
- * const source: EventSource = "system";
- * ```
- * @public
- */
-export type EventSource = "import" | "migration" | "system" | "user";
-
-/**
- * What triggered a monitoring or system event.
- *
- * @remarks
- * Used to distinguish between manual, scheduled, or shutdown triggers for events.
- *
- * @example
- * ```typescript
- * const trigger: EventTriggerType = "scheduled";
- * ```
- * @public
- */
-export type EventTriggerType = "manual" | "scheduled" | "shutdown";
-
-/**
  * Comprehensive event map for the Uptime Watcher application.
  *
  * @remarks
@@ -903,6 +805,104 @@ export interface UptimeEvents extends Record<string, unknown> {
         version: string;
     };
 }
+
+/**
+ * Category for grouping related events by functional domain.
+ *
+ * @remarks
+ * Used for event filtering, routing, and middleware processing.
+ *
+ * @example
+ * ```typescript
+ * const category: EventCategory = "database";
+ * ```
+ * @public
+ */
+export type EventCategory = "database" | "monitoring" | "system" | "ui";
+
+/**
+ * Type of monitoring check that triggered an event.
+ *
+ * @remarks
+ * Indicates whether a monitoring event was triggered manually or by a scheduled process.
+ *
+ * @example
+ * ```typescript
+ * const checkType: EventCheckType = "manual";
+ * ```
+ * @public
+ */
+export type EventCheckType = "manual" | "scheduled";
+
+/**
+ * Runtime environment where the event occurred.
+ *
+ * @remarks
+ * Used for distinguishing between development, production, and test environments in event payloads.
+ *
+ * @example
+ * ```typescript
+ * const env: EventEnvironment = "production";
+ * ```
+ * @public
+ */
+export type EventEnvironment = "development" | "production" | "test";
+
+/**
+ * Reason for an event occurrence.
+ *
+ * @remarks
+ * Used to indicate the cause or initiator of an event, such as user action or system error.
+ *
+ * @example
+ * ```typescript
+ * const reason: EventReason = "user";
+ * ```
+ * @public
+ */
+export type EventReason = "error" | "shutdown" | "user";
+
+/**
+ * Severity level of an event for prioritization and alerting.
+ *
+ * @remarks
+ * Used to prioritize event handling and alerting in middleware and UI.
+ *
+ * @example
+ * ```typescript
+ * const severity: EventSeverity = "critical";
+ * ```
+ * @public
+ */
+export type EventSeverity = "critical" | "high" | "low" | "medium";
+
+/**
+ * Source that triggered an event.
+ *
+ * @remarks
+ * Indicates the origin of an event, such as user action, system process, or data migration.
+ *
+ * @example
+ * ```typescript
+ * const source: EventSource = "system";
+ * ```
+ * @public
+ */
+export type EventSource = "import" | "migration" | "system" | "user";
+
+/**
+ * What triggered a monitoring or system event.
+ *
+ * @remarks
+ * Used to distinguish between manual, scheduled, or shutdown triggers for events.
+ *
+ * @example
+ * ```typescript
+ * const trigger: EventTriggerType = "scheduled";
+ * ```
+ * @public
+ */
+export type EventTriggerType = "manual" | "scheduled" | "shutdown";
 
 /**
  * Event categories for filtering and middleware processing.

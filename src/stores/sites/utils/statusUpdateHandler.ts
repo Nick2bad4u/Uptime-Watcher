@@ -19,6 +19,22 @@ import {
 } from "../../../utils/errorHandling";
 
 /**
+ * Monitor status changed event data structure.
+ *
+ * @remarks
+ * This represents the actual data structure sent from the backend
+ * when a monitor's status changes. Used for efficient incremental updates.
+ *
+ * @internal
+ */
+interface MonitorStatusChangedEvent {
+    monitorId: string;
+    newStatus: MonitorStatus;
+    previousStatus: MonitorStatus;
+    siteId: string;
+}
+
+/**
  * Configuration options for status update handler operations.
  *
  * @remarks
@@ -59,22 +75,6 @@ export interface StatusUpdateHandlerOptions {
      * Should update the store with the new sites array.
      */
     setSites: (sites: Site[]) => void;
-}
-
-/**
- * Monitor status changed event data structure.
- *
- * @remarks
- * This represents the actual data structure sent from the backend
- * when a monitor's status changes. Used for efficient incremental updates.
- *
- * @internal
- */
-interface MonitorStatusChangedEvent {
-    monitorId: string;
-    newStatus: MonitorStatus;
-    previousStatus: MonitorStatus;
-    siteId: string;
 }
 
 /**

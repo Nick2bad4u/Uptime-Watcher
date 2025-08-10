@@ -64,14 +64,6 @@ export interface MonitorFieldValues {
 }
 
 /**
- * Union type for all monitor field types
- */
-export type MonitorFormFields =
-    | HttpMonitorFields
-    | PingMonitorFields
-    | PortMonitorFields;
-
-/**
  * Monitor validation result with specific error types
  *
  * @deprecated Use ValidationResult from unified validation system instead
@@ -114,6 +106,14 @@ export interface PortMonitorFields extends BaseMonitorFields {
     /** Port number */
     port: number;
 }
+
+/**
+ * Union type for all monitor field types
+ */
+export type MonitorFormFields =
+    | HttpMonitorFields
+    | PingMonitorFields
+    | PortMonitorFields;
 
 /**
  * Helper to get default fields for a monitor type.

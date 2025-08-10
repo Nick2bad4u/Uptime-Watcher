@@ -48,11 +48,6 @@ export interface HttpFormData extends BaseFormData {
 }
 
 /**
- * Union type for all supported monitor form data types.
- */
-export type MonitorFormData = HttpFormData | PingFormData | PortFormData;
-
-/**
  * Form data for ping monitors.
  */
 export interface PingFormData extends BaseFormData {
@@ -71,6 +66,11 @@ export interface PortFormData extends BaseFormData {
     port: number;
     type: "port";
 }
+
+/**
+ * Union type for all supported monitor form data types.
+ */
+export type MonitorFormData = HttpFormData | PingFormData | PortFormData;
 
 /**
  * Create default form data for a specific monitor type.

@@ -104,14 +104,19 @@ class ErrorBoundary extends React.Component<
             retryCount: 0,
         };
     }
-
-    public static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+public static getDerivedStateFromError(error: Error): ErrorBoundaryState {
         return {
             error,
             hasError: true,
             retryCount: 0,
         };
     }
+
+
+
+
+
+    
 
     public override componentDidCatch(
         error: Error,
@@ -128,8 +133,7 @@ class ErrorBoundary extends React.Component<
         const { onError } = this.props;
         onError?.(error, errorInfo);
     }
-
-    public handleRetry = (): void => {
+public handleRetry = (): void => {
         // eslint-disable-next-line react/no-set-state -- Required for error recovery functionality
         this.setState((prevState) => ({
             error: undefined,
@@ -137,6 +141,12 @@ class ErrorBoundary extends React.Component<
             retryCount: prevState.retryCount + 1,
         }));
     };
+
+
+
+
+
+    
 
     public override render(): JSX.Element {
         const { error, hasError, retryCount } = this.state;

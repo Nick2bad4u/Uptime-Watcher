@@ -25,24 +25,6 @@ import { MONITOR_STATUS } from "../../../shared/types";
 import { withDatabaseOperation } from "../operationalHooks";
 
 /**
- * Type for the monitoring lifecycle callback functions.
- *
- * @param identifier - Site identifier for the monitoring operation
- * @param monitorId - Optional specific monitor ID, if not provided operates on all site monitors
- * @returns Promise resolving to true if operation succeeded, false otherwise
- *
- * @remarks
- * Used for recursive calls in monitoring operations. The callback should handle
- * both individual monitor operations (when monitorId is provided) and bulk
- * operations (when monitorId is undefined). Error handling should be managed
- * within the callback implementation.
- */
-export type MonitoringCallback = (
-    identifier: string,
-    monitorId?: string
-) => Promise<boolean>;
-
-/**
  * Configuration object for monitoring lifecycle functions.
  */
 export interface MonitoringLifecycleConfig {
@@ -67,203 +49,22 @@ export interface MonitoringLifecycleConfig {
 }
 
 /**
- * Start monitoring for all sites.
+ * Type for the monitoring lifecycle callback functions.
  *
- * @param config - Configuration object with required dependencies
- * @param isMonitoring - Current monitoring state
- * @returns Promise<boolean> - New monitoring state
- *
- * @remarks
- * **Side Effects:**
- * - Sets all monitors to "pending" status regardless of previous state
- * - Enables monitoring flag for all monitors
- * - Starts monitor scheduling for all sites
- *
- * This intentionally sets all monitors to "pending" to indicate they are being
- * initialized for monitoring startup, providing a clear signal that the system
- * is transitioning to an active monitoring state.
- */
-export async function startAllMonitoring(
-    config: MonitoringLifecycleConfig,
-    isMonitoring: boolean
-): Promise<boolean> {
-    if (isMonitoring) {
-        config.logger.debug("Monitoring already running");
-        return isMonitoring;
-    }
-
-    config.logger.info(
-        `Starting monitoring with ${config.sites.size} sites (per-site intervals)`
-    );
-
-    // Set all monitors to pending status and enable monitoring
-    // Note: Intentionally sets all monitors to "pending" regardless of previous state
-    // to indicate they are being initialized for monitoring startup
-    for (const site of config.sites.getAll()) {
-        for (const monitor of site.monitors) {
-            if (monitor.id) {
-                try {
-                    // Use operational hooks for database update
-                    await withDatabaseOperation(
-                        () => {
-                            const db = config.databaseService.getDatabase();
-                            if (monitor.id) {
-                                config.monitorRepository.updateInternal(
-                                    db,
-                                    monitor.id,
-                                    {
-                                        monitoring: true,
-                                        status: MONITOR_STATUS.PENDING,
-                                    }
-                                );
-                            }
-                            return Promise.resolve();
-                        },
-                        "monitor-start-all-update",
-                        config.eventEmitter,
-                        { monitorId: monitor.id }
-                    );
-                } catch (error) {
-                    config.logger.error(
-                        `Failed to update monitor ${monitor.id} to ${MONITOR_STATUS.PENDING} status`,
-                        error
-                    );
-                }
-            }
-        }
-        config.monitorScheduler.startSite(site);
-    }
-
-    config.logger.info(
-        `Started all monitoring operations and set monitors to ${MONITOR_STATUS.PENDING}`
-    );
-    return true;
-}
-
-/**
- * Start monitoring for a specific site or monitor.
- *
- * @param config - Configuration object with required dependencies
- * @param identifier - Site identifier
- * @param monitorId - Optional monitor ID (if not provided, starts all monitors for the site)
- * @param callback - Callback function for recursive calls
- * @returns Promise<boolean> - True if monitoring was started successfully
- */
-export async function startMonitoringForSite(
-    config: MonitoringLifecycleConfig,
-    identifier: string,
-    monitorId?: string,
-    callback?: MonitoringCallback
-): Promise<boolean> {
-    const site = config.sites.get(identifier);
-    if (!site) {
-        config.logger.warn(`Site not found for monitoring: ${identifier}`);
-        return false;
-    }
-
-    return monitorId
-        ? startSpecificMonitor(config, site, identifier, monitorId)
-        : startAllSiteMonitors(config, site, identifier, callback);
-}
-
-/**
- * Stop all monitoring and return updated monitoring state.
- *
- * @param config - Configuration object with required dependencies
- * @returns boolean - New monitoring state (always false)
+ * @param identifier - Site identifier for the monitoring operation
+ * @param monitorId - Optional specific monitor ID, if not provided operates on all site monitors
+ * @returns Promise resolving to true if operation succeeded, false otherwise
  *
  * @remarks
- * **Side Effects:**
- * - Sets all monitors to "paused" status regardless of previous state
- * - Disables monitoring flag for all actively monitoring monitors
- * - Stops all monitor scheduling system-wide
- *
- * This intentionally sets all monitors to "paused" to indicate that monitoring
- * has been stopped system-wide, providing a clear signal that the system is
- * transitioning to an inactive monitoring state.
+ * Used for recursive calls in monitoring operations. The callback should handle
+ * both individual monitor operations (when monitorId is provided) and bulk
+ * operations (when monitorId is undefined). Error handling should be managed
+ * within the callback implementation.
  */
-export async function stopAllMonitoring(
-    config: MonitoringLifecycleConfig
-): Promise<boolean> {
-    config.monitorScheduler.stopAll();
-
-    // Set all monitors to paused status
-    // Note: Intentionally sets all monitors to "paused" regardless of previous state
-    // to indicate monitoring has been stopped system-wide
-    for (const site of config.sites.getAll()) {
-        for (const monitor of site.monitors) {
-            if (monitor.id && monitor.monitoring) {
-                try {
-                    // Use operational hooks for database update
-                    await withDatabaseOperation(
-                        () => {
-                            const db = config.databaseService.getDatabase();
-                            if (monitor.id) {
-                                // Update monitor status to paused
-                                config.monitorRepository.updateInternal(
-                                    db,
-                                    monitor.id,
-                                    {
-                                        monitoring: false,
-                                        status: MONITOR_STATUS.PAUSED,
-                                    }
-                                );
-
-                                // Clear active operations when stopping monitoring
-                                config.monitorRepository.clearActiveOperationsInternal(
-                                    db,
-                                    monitor.id
-                                );
-                            }
-                            return Promise.resolve();
-                        },
-                        "monitor-stop-all-update",
-                        config.eventEmitter,
-                        { monitorId: monitor.id }
-                    );
-                } catch (error) {
-                    config.logger.error(
-                        `Failed to update monitor ${monitor.id} to ${MONITOR_STATUS.PAUSED} status`,
-                        error
-                    );
-                }
-            }
-        }
-    }
-
-    config.logger.info(
-        `Stopped all site monitoring intervals and set monitors to ${MONITOR_STATUS.PAUSED}`
-    );
-    return false;
-}
-
-/**
- * Stop monitoring for a specific site or monitor.
- *
- * @param config - Configuration object with required dependencies
- * @param identifier - Site identifier
- * @param monitorId - Optional monitor ID (if not provided, stops all monitors for the site)
- * @param callback - Callback function for recursive calls
- * @returns Promise<boolean> - True if monitoring was stopped successfully
- */
-export async function stopMonitoringForSite(
-    config: MonitoringLifecycleConfig,
+export type MonitoringCallback = (
     identifier: string,
-    monitorId?: string,
-    callback?: MonitoringCallback
-): Promise<boolean> {
-    const site = config.sites.get(identifier);
-    if (!site) {
-        config.logger.warn(
-            `Site not found for stopping monitoring: ${identifier}`
-        );
-        return false;
-    }
-
-    return monitorId
-        ? stopSpecificMonitor(config, site, identifier, monitorId)
-        : stopAllSiteMonitors(config, site, identifier, callback);
-}
+    monitorId?: string
+) => Promise<boolean>;
 
 /**
  * Helper function to find a monitor by ID within a site.
@@ -286,6 +87,37 @@ function findMonitorById(
         return null;
     }
     return monitor;
+}
+
+/**
+ * Validate monitor check interval.
+ *
+ * @param monitor - Monitor to validate
+ * @param identifier - Site identifier for logging
+ * @param config - Configuration object for logging
+ * @returns True if interval is valid, false otherwise
+ *
+ * @remarks
+ * Checks for falsy values that indicate no valid interval is set.
+ * This includes undefined, null, 0 (invalid - would cause infinite polling),
+ * and empty string. A checkInterval of 0 is intentionally treated as invalid
+ * since it would result in continuous polling without delay.
+ */
+function validateCheckInterval(
+    monitor: Site["monitors"][0],
+    identifier: string,
+    config: MonitoringLifecycleConfig
+): boolean {
+    // Check for falsy values that indicate no interval set
+    // This includes undefined, null, 0, and empty string
+    // Note: 0 is intentionally invalid as it would cause infinite polling
+    if (!monitor.checkInterval) {
+        config.logger.warn(
+            `Monitor ${identifier}:${monitor.id} has no valid check interval set`
+        );
+        return false;
+    }
+    return true;
 }
 
 /**
@@ -534,32 +366,200 @@ async function stopSpecificMonitor(
 }
 
 /**
- * Validate monitor check interval.
+ * Start monitoring for all sites.
  *
- * @param monitor - Monitor to validate
- * @param identifier - Site identifier for logging
- * @param config - Configuration object for logging
- * @returns True if interval is valid, false otherwise
+ * @param config - Configuration object with required dependencies
+ * @param isMonitoring - Current monitoring state
+ * @returns Promise<boolean> - New monitoring state
  *
  * @remarks
- * Checks for falsy values that indicate no valid interval is set.
- * This includes undefined, null, 0 (invalid - would cause infinite polling),
- * and empty string. A checkInterval of 0 is intentionally treated as invalid
- * since it would result in continuous polling without delay.
+ * **Side Effects:**
+ * - Sets all monitors to "pending" status regardless of previous state
+ * - Enables monitoring flag for all monitors
+ * - Starts monitor scheduling for all sites
+ *
+ * This intentionally sets all monitors to "pending" to indicate they are being
+ * initialized for monitoring startup, providing a clear signal that the system
+ * is transitioning to an active monitoring state.
  */
-function validateCheckInterval(
-    monitor: Site["monitors"][0],
+export async function startAllMonitoring(
+    config: MonitoringLifecycleConfig,
+    isMonitoring: boolean
+): Promise<boolean> {
+    if (isMonitoring) {
+        config.logger.debug("Monitoring already running");
+        return isMonitoring;
+    }
+
+    config.logger.info(
+        `Starting monitoring with ${config.sites.size} sites (per-site intervals)`
+    );
+
+    // Set all monitors to pending status and enable monitoring
+    // Note: Intentionally sets all monitors to "pending" regardless of previous state
+    // to indicate they are being initialized for monitoring startup
+    for (const site of config.sites.getAll()) {
+        for (const monitor of site.monitors) {
+            if (monitor.id) {
+                try {
+                    // Use operational hooks for database update
+                    await withDatabaseOperation(
+                        () => {
+                            const db = config.databaseService.getDatabase();
+                            if (monitor.id) {
+                                config.monitorRepository.updateInternal(
+                                    db,
+                                    monitor.id,
+                                    {
+                                        monitoring: true,
+                                        status: MONITOR_STATUS.PENDING,
+                                    }
+                                );
+                            }
+                            return Promise.resolve();
+                        },
+                        "monitor-start-all-update",
+                        config.eventEmitter,
+                        { monitorId: monitor.id }
+                    );
+                } catch (error) {
+                    config.logger.error(
+                        `Failed to update monitor ${monitor.id} to ${MONITOR_STATUS.PENDING} status`,
+                        error
+                    );
+                }
+            }
+        }
+        config.monitorScheduler.startSite(site);
+    }
+
+    config.logger.info(
+        `Started all monitoring operations and set monitors to ${MONITOR_STATUS.PENDING}`
+    );
+    return true;
+}
+
+/**
+ * Start monitoring for a specific site or monitor.
+ *
+ * @param config - Configuration object with required dependencies
+ * @param identifier - Site identifier
+ * @param monitorId - Optional monitor ID (if not provided, starts all monitors for the site)
+ * @param callback - Callback function for recursive calls
+ * @returns Promise<boolean> - True if monitoring was started successfully
+ */
+export async function startMonitoringForSite(
+    config: MonitoringLifecycleConfig,
     identifier: string,
+    monitorId?: string,
+    callback?: MonitoringCallback
+): Promise<boolean> {
+    const site = config.sites.get(identifier);
+    if (!site) {
+        config.logger.warn(`Site not found for monitoring: ${identifier}`);
+        return false;
+    }
+
+    return monitorId
+        ? startSpecificMonitor(config, site, identifier, monitorId)
+        : startAllSiteMonitors(config, site, identifier, callback);
+}
+
+/**
+ * Stop all monitoring and return updated monitoring state.
+ *
+ * @param config - Configuration object with required dependencies
+ * @returns boolean - New monitoring state (always false)
+ *
+ * @remarks
+ * **Side Effects:**
+ * - Sets all monitors to "paused" status regardless of previous state
+ * - Disables monitoring flag for all actively monitoring monitors
+ * - Stops all monitor scheduling system-wide
+ *
+ * This intentionally sets all monitors to "paused" to indicate that monitoring
+ * has been stopped system-wide, providing a clear signal that the system is
+ * transitioning to an inactive monitoring state.
+ */
+export async function stopAllMonitoring(
     config: MonitoringLifecycleConfig
-): boolean {
-    // Check for falsy values that indicate no interval set
-    // This includes undefined, null, 0, and empty string
-    // Note: 0 is intentionally invalid as it would cause infinite polling
-    if (!monitor.checkInterval) {
+): Promise<boolean> {
+    config.monitorScheduler.stopAll();
+
+    // Set all monitors to paused status
+    // Note: Intentionally sets all monitors to "paused" regardless of previous state
+    // to indicate monitoring has been stopped system-wide
+    for (const site of config.sites.getAll()) {
+        for (const monitor of site.monitors) {
+            if (monitor.id && monitor.monitoring) {
+                try {
+                    // Use operational hooks for database update
+                    await withDatabaseOperation(
+                        () => {
+                            const db = config.databaseService.getDatabase();
+                            if (monitor.id) {
+                                // Update monitor status to paused
+                                config.monitorRepository.updateInternal(
+                                    db,
+                                    monitor.id,
+                                    {
+                                        monitoring: false,
+                                        status: MONITOR_STATUS.PAUSED,
+                                    }
+                                );
+
+                                // Clear active operations when stopping monitoring
+                                config.monitorRepository.clearActiveOperationsInternal(
+                                    db,
+                                    monitor.id
+                                );
+                            }
+                            return Promise.resolve();
+                        },
+                        "monitor-stop-all-update",
+                        config.eventEmitter,
+                        { monitorId: monitor.id }
+                    );
+                } catch (error) {
+                    config.logger.error(
+                        `Failed to update monitor ${monitor.id} to ${MONITOR_STATUS.PAUSED} status`,
+                        error
+                    );
+                }
+            }
+        }
+    }
+
+    config.logger.info(
+        `Stopped all site monitoring intervals and set monitors to ${MONITOR_STATUS.PAUSED}`
+    );
+    return false;
+}
+
+/**
+ * Stop monitoring for a specific site or monitor.
+ *
+ * @param config - Configuration object with required dependencies
+ * @param identifier - Site identifier
+ * @param monitorId - Optional monitor ID (if not provided, stops all monitors for the site)
+ * @param callback - Callback function for recursive calls
+ * @returns Promise<boolean> - True if monitoring was stopped successfully
+ */
+export async function stopMonitoringForSite(
+    config: MonitoringLifecycleConfig,
+    identifier: string,
+    monitorId?: string,
+    callback?: MonitoringCallback
+): Promise<boolean> {
+    const site = config.sites.get(identifier);
+    if (!site) {
         config.logger.warn(
-            `Monitor ${identifier}:${monitor.id} has no valid check interval set`
+            `Site not found for stopping monitoring: ${identifier}`
         );
         return false;
     }
-    return true;
+
+    return monitorId
+        ? stopSpecificMonitor(config, site, identifier, monitorId)
+        : stopAllSiteMonitors(config, site, identifier, callback);
 }

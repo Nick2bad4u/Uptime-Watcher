@@ -24,6 +24,116 @@ import {
 } from "./dynamicSchema";
 
 /**
+ * Copies dynamic fields to monitor object.
+ *
+ * @param monitor - Base monitor object
+ * @param dynamicMonitor - Dynamic monitor data
+ */
+function copyDynamicFields(
+    monitor: Site["monitors"][0],
+    dynamicMonitor: Monitor
+): void {
+    const excludedFields = new Set([
+        "checkInterval",
+        "createdAt",
+        "enabled",
+        "history",
+        "id",
+        "lastChecked",
+        "lastError",
+        "monitoring",
+        "name",
+        "nextCheck",
+        "responseTime",
+        "retryAttempts",
+        "siteIdentifier",
+        "status",
+        "timeout",
+        "type",
+        "updatedAt",
+    ]);
+
+    // Copy monitor-type specific fields
+    for (const [key, value] of Object.entries(dynamicMonitor)) {
+        if (!excludedFields.has(key)) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment -- Dynamic field assignment required for monitor type system. Key is validated from dynamicMonitor which comes from typed database mapping.
+            (monitor as any)[key] = value;
+        }
+    }
+}
+
+/**
+ * Creates base monitor object from dynamic monitor data using safe validation.
+ *
+ * @remarks
+ * Uses centralized validation utilities for safe integer conversion with bounds checking.
+ * Replaces manual Number() conversions with validator-based safeInteger() function
+ * to prevent invalid data from reaching the application layer.
+ *
+ * @param dynamicMonitor - Mapped monitor data from database
+ * @returns Base monitor object with validated fields
+ *
+ * @see {@link safeInteger} - Safe integer conversion utility
+ */
+function createBaseMonitor(dynamicMonitor: Monitor): Site["monitors"][0] {
+    return {
+        activeOperations: dynamicMonitor.activeOperations ?? [],
+        checkInterval: safeInteger(dynamicMonitor.checkInterval, 300_000, 5000),
+        history: [], // History will be loaded separately
+        id: dynamicMonitor.id || "-1",
+        monitoring: dynamicMonitor.monitoring,
+        responseTime: safeInteger(dynamicMonitor.responseTime, -1, -1),
+        retryAttempts: safeInteger(dynamicMonitor.retryAttempts, 3, 0, 10),
+        status: dynamicMonitor.status,
+        timeout: safeInteger(dynamicMonitor.timeout, 5000, 1000, 300_000),
+        type: dynamicMonitor.type,
+        // Include optional fields if present
+        ...(dynamicMonitor.host && { host: dynamicMonitor.host }),
+        ...(dynamicMonitor.port && { port: dynamicMonitor.port }),
+        ...(dynamicMonitor.url && { url: dynamicMonitor.url }),
+    };
+}
+
+/**
+ * Safely parses activeOperations from database row using validator package for security.
+ *
+ * @remarks
+ * Uses the centralized validator utilities to ensure consistent validation
+ * across the application. Replaces manual regex validation with well-tested
+ * validator.js functions for improved security and reliability.
+ *
+ * @param row - Database row
+ * @returns Array of validated operation IDs
+ *
+ * @see {@link isValidIdentifierArray} - Validation function used
+ */
+function parseActiveOperations(row: DatabaseMonitorRow): string[] {
+    if (!row.active_operations || typeof row.active_operations !== "string") {
+        return [];
+    }
+
+    try {
+        const parsed: unknown = JSON.parse(row.active_operations);
+
+        if (isValidIdentifierArray(parsed)) {
+            return parsed;
+        } else {
+            logger.warn(
+                LOG_TEMPLATES.warnings.MONITOR_ACTIVE_OPERATIONS_INVALID,
+                { parsed }
+            );
+            return [];
+        }
+    } catch (error) {
+        logger.warn(
+            LOG_TEMPLATES.warnings.MONITOR_ACTIVE_OPERATIONS_PARSE_FAILED,
+            error
+        );
+        return [];
+    }
+}
+
+/**
  * Represents a monitor row as stored in the database.
  *
  * @remarks
@@ -212,114 +322,4 @@ export function rowToMonitorOrUndefined(
     }
 
     return rowToMonitor(row);
-}
-
-/**
- * Copies dynamic fields to monitor object.
- *
- * @param monitor - Base monitor object
- * @param dynamicMonitor - Dynamic monitor data
- */
-function copyDynamicFields(
-    monitor: Site["monitors"][0],
-    dynamicMonitor: Monitor
-): void {
-    const excludedFields = new Set([
-        "checkInterval",
-        "createdAt",
-        "enabled",
-        "history",
-        "id",
-        "lastChecked",
-        "lastError",
-        "monitoring",
-        "name",
-        "nextCheck",
-        "responseTime",
-        "retryAttempts",
-        "siteIdentifier",
-        "status",
-        "timeout",
-        "type",
-        "updatedAt",
-    ]);
-
-    // Copy monitor-type specific fields
-    for (const [key, value] of Object.entries(dynamicMonitor)) {
-        if (!excludedFields.has(key)) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment -- Dynamic field assignment required for monitor type system. Key is validated from dynamicMonitor which comes from typed database mapping.
-            (monitor as any)[key] = value;
-        }
-    }
-}
-
-/**
- * Creates base monitor object from dynamic monitor data using safe validation.
- *
- * @remarks
- * Uses centralized validation utilities for safe integer conversion with bounds checking.
- * Replaces manual Number() conversions with validator-based safeInteger() function
- * to prevent invalid data from reaching the application layer.
- *
- * @param dynamicMonitor - Mapped monitor data from database
- * @returns Base monitor object with validated fields
- *
- * @see {@link safeInteger} - Safe integer conversion utility
- */
-function createBaseMonitor(dynamicMonitor: Monitor): Site["monitors"][0] {
-    return {
-        activeOperations: dynamicMonitor.activeOperations ?? [],
-        checkInterval: safeInteger(dynamicMonitor.checkInterval, 300_000, 5000),
-        history: [], // History will be loaded separately
-        id: dynamicMonitor.id || "-1",
-        monitoring: dynamicMonitor.monitoring,
-        responseTime: safeInteger(dynamicMonitor.responseTime, -1, -1),
-        retryAttempts: safeInteger(dynamicMonitor.retryAttempts, 3, 0, 10),
-        status: dynamicMonitor.status,
-        timeout: safeInteger(dynamicMonitor.timeout, 5000, 1000, 300_000),
-        type: dynamicMonitor.type,
-        // Include optional fields if present
-        ...(dynamicMonitor.host && { host: dynamicMonitor.host }),
-        ...(dynamicMonitor.port && { port: dynamicMonitor.port }),
-        ...(dynamicMonitor.url && { url: dynamicMonitor.url }),
-    };
-}
-
-/**
- * Safely parses activeOperations from database row using validator package for security.
- *
- * @remarks
- * Uses the centralized validator utilities to ensure consistent validation
- * across the application. Replaces manual regex validation with well-tested
- * validator.js functions for improved security and reliability.
- *
- * @param row - Database row
- * @returns Array of validated operation IDs
- *
- * @see {@link isValidIdentifierArray} - Validation function used
- */
-function parseActiveOperations(row: DatabaseMonitorRow): string[] {
-    if (!row.active_operations || typeof row.active_operations !== "string") {
-        return [];
-    }
-
-    try {
-        const parsed: unknown = JSON.parse(row.active_operations);
-
-        if (isValidIdentifierArray(parsed)) {
-            return parsed;
-        } else {
-            logger.warn(
-                LOG_TEMPLATES.warnings.MONITOR_ACTIVE_OPERATIONS_INVALID,
-                { parsed }
-            );
-            return [];
-        }
-    } catch (error) {
-        logger.warn(
-            LOG_TEMPLATES.warnings.MONITOR_ACTIVE_OPERATIONS_PARSE_FAILED,
-            error
-        );
-        return [];
-    }
 }

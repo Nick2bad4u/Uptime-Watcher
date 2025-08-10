@@ -21,123 +21,6 @@ export interface FileDownloadOptions {
 }
 
 /**
- * Triggers a file download in the browser.
- *
- * @remarks
- * This function creates a Blob from the provided buffer and initiates a download using an anchor element.
- * If the primary method fails, a fallback strategy is attempted.
- *
- * @param options - The file download options including buffer, fileName, and optional mimeType.
- * @throws {@link Error} If the download fails due to browser API issues or DOM manipulation errors.
- * @example
- * ```typescript
- * downloadFile({
- *   buffer: myArrayBuffer,
- *   fileName: "report.txt",
- *   mimeType: "text/plain"
- * });
- * ```
- */
-export function downloadFile(options: FileDownloadOptions): void {
-    const { buffer, fileName, mimeType = "application/octet-stream" } = options;
-
-    try {
-        createAndTriggerDownload(buffer, fileName, mimeType);
-    } catch (error) {
-        handleDownloadError(error, buffer, fileName, mimeType);
-    }
-}
-
-/**
- * Generates a default backup filename with a timestamp.
- *
- * @remarks
- * The filename is formatted as `${prefix}-${YYYY-MM-DD}.${extension}`.
- *
- * @param prefix - The prefix for the filename (default: "backup").
- * @param extension - The file extension (default: "sqlite").
- * @returns The generated filename string.
- * @example
- * ```typescript
- * const fileName = generateBackupFileName("db", "sqlite3");
- * // "db-2024-06-01.sqlite3"
- * ```
- */
-export function generateBackupFileName(
-    prefix = "backup",
-    extension = "sqlite"
-): string {
-    const [timestamp] = new Date().toISOString().split("T");
-    return `${prefix}-${timestamp}.${extension}`;
-}
-
-/**
- * Handles downloading SQLite backup data as a file.
- *
- * @remarks
- * This function retrieves backup data using the provided function, validates it, and triggers a browser download.
- * The download is performed using a Blob and anchor element with proper object URL lifecycle management.
- *
- * @param downloadFunction - An async function that returns the backup data as a Uint8Array
- * @throws TypeError if the backup data is not a Uint8Array
- * @throws Error if the download fails due to browser API or DOM errors
- * @example
- * ```typescript
- * await handleSQLiteBackupDownload(() => fetchBackupData());
- * ```
- */
-/* eslint-disable n/no-unsupported-features/node-builtins -- URL.createObjectURL is always available in modern browsers in Node */
-export async function handleSQLiteBackupDownload(
-    downloadFunction: () => Promise<Uint8Array>
-): Promise<void> {
-    // Get the backup data
-    const backupData = await downloadFunction();
-
-    // Validate the backup data
-    if (!(backupData instanceof Uint8Array)) {
-        throw new TypeError("Invalid backup data received");
-    }
-
-    // Create blob from the backup data
-    // Create a new Uint8Array to ensure proper typing for Blob constructor
-    const blobData = new Uint8Array(backupData);
-    const blob = new Blob([blobData], {
-        type: "application/x-sqlite3",
-    });
-
-    // Create object URL
-    // URL.createObjectURL is always available in modern browsers
-    const objectURL = URL.createObjectURL(blob);
-
-    try {
-        // Create anchor element for download
-        const anchor = document.createElement("a");
-        anchor.href = objectURL;
-        anchor.download = generateBackupFileName("uptime-watcher", "db");
-
-        // Trigger download
-        try {
-            anchor.click();
-        } catch (clickError) {
-            // Log the click error for debugging and add context
-            logger.error(
-                "Failed to trigger download click",
-                clickError instanceof Error
-                    ? clickError
-                    : new Error(String(clickError))
-            );
-            // Re-throw with more context
-            throw new Error(
-                `Download trigger failed: ${clickError instanceof Error ? clickError.message : "Unknown error"}`
-            );
-        }
-    } finally {
-        // Clean up object URL
-        URL.revokeObjectURL(objectURL);
-    }
-}
-
-/**
  * Helper function to create and trigger a file download.
  *
  * @remarks
@@ -189,7 +72,6 @@ function createAndTriggerDownload(
         }
     }
 }
-/* eslint-enable n/no-unsupported-features/node-builtins -- Re-add rule for Consistency */
 
 /**
  * Handles download errors and applies fallback strategies if possible.
@@ -273,5 +155,121 @@ function tryFallbackDownload(
                 : new Error(String(fallbackError))
         );
         throw new Error("File download failed");
+    }
+}
+
+/**
+ * Triggers a file download in the browser.
+ *
+ * @remarks
+ * This function creates a Blob from the provided buffer and initiates a download using an anchor element.
+ * If the primary method fails, a fallback strategy is attempted.
+ *
+ * @param options - The file download options including buffer, fileName, and optional mimeType.
+ * @throws {@link Error} If the download fails due to browser API issues or DOM manipulation errors.
+ * @example
+ * ```typescript
+ * downloadFile({
+ *   buffer: myArrayBuffer,
+ *   fileName: "report.txt",
+ *   mimeType: "text/plain"
+ * });
+ * ```
+ */
+export function downloadFile(options: FileDownloadOptions): void {
+    const { buffer, fileName, mimeType = "application/octet-stream" } = options;
+
+    try {
+        createAndTriggerDownload(buffer, fileName, mimeType);
+    } catch (error) {
+        handleDownloadError(error, buffer, fileName, mimeType);
+    }
+}
+
+/**
+ * Generates a default backup filename with a timestamp.
+ *
+ * @remarks
+ * The filename is formatted as `${prefix}-${YYYY-MM-DD}.${extension}`.
+ *
+ * @param prefix - The prefix for the filename (default: "backup").
+ * @param extension - The file extension (default: "sqlite").
+ * @returns The generated filename string.
+ * @example
+ * ```typescript
+ * const fileName = generateBackupFileName("db", "sqlite3");
+ * // "db-2024-06-01.sqlite3"
+ * ```
+ */
+export function generateBackupFileName(
+    prefix = "backup",
+    extension = "sqlite"
+): string {
+    const [timestamp] = new Date().toISOString().split("T");
+    return `${prefix}-${timestamp}.${extension}`;
+}
+
+/**
+ * Handles downloading SQLite backup data as a file.
+ *
+ * @remarks
+ * This function retrieves backup data using the provided function, validates it, and triggers a browser download.
+ * The download is performed using a Blob and anchor element with proper object URL lifecycle management.
+ *
+ * @param downloadFunction - An async function that returns the backup data as a Uint8Array
+ * @throws TypeError if the backup data is not a Uint8Array
+ * @throws Error if the download fails due to browser API or DOM errors
+ * @example
+ * ```typescript
+ * await handleSQLiteBackupDownload(() => fetchBackupData());
+ * ```
+ */
+export async function handleSQLiteBackupDownload(
+    downloadFunction: () => Promise<Uint8Array>
+): Promise<void> {
+    // Get the backup data
+    const backupData = await downloadFunction();
+
+    // Validate the backup data
+    if (!(backupData instanceof Uint8Array)) {
+        throw new TypeError("Invalid backup data received");
+    }
+
+    // Create blob from the backup data
+    // Create a new Uint8Array to ensure proper typing for Blob constructor
+    const blobData = new Uint8Array(backupData);
+    const blob = new Blob([blobData], {
+        type: "application/x-sqlite3",
+    });
+
+    // Create object URL
+    // URL.createObjectURL is always available in modern browsers
+    const objectURL = URL.createObjectURL(blob);
+
+    try {
+        // Create anchor element for download
+        const anchor = document.createElement("a");
+        anchor.href = objectURL;
+        anchor.download = generateBackupFileName("uptime-watcher", "db");
+
+        // Trigger download
+        try {
+            anchor.click();
+        } catch (clickError) {
+            // Log the click error for debugging and add context
+            logger.error(
+                "Failed to trigger download click",
+                clickError instanceof Error
+                    ? clickError
+                    : new Error(String(clickError))
+            );
+            // Re-throw with more context
+            throw new Error(
+                `Download trigger failed: ${clickError instanceof Error ? clickError.message : "Unknown error"}`
+            );
+        }
+    } finally {
+        // Clean up object URL
+        URL.revokeObjectURL(objectURL);
     }
 }

@@ -18,6 +18,26 @@ import * as https from "node:https";
 import type { MonitorConfig } from "../types";
 
 /**
+ * Ensures an unknown value is an Error instance.
+ *
+ * @remarks
+ * Converts non-Error values to Error instances for consistent error handling. Used internally by interceptors to guarantee error type safety.
+ *
+ * @param error - The unknown error value.
+ * @returns An {@link Error} instance for consistent error handling.
+ *
+ * @example
+ * ```typescript
+ * throw ensureErrorInstance("Something went wrong");
+ * ```
+ *
+ * @public
+ */
+function ensureErrorInstance(error: unknown): Error {
+    return error instanceof Error ? error : new Error(String(error));
+}
+
+/**
  * Creates a configured Axios instance optimized for HTTP monitoring.
  *
  * @remarks
@@ -133,24 +153,4 @@ export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
             return Promise.reject(ensureErrorInstance(error));
         }
     );
-}
-
-/**
- * Ensures an unknown value is an Error instance.
- *
- * @remarks
- * Converts non-Error values to Error instances for consistent error handling. Used internally by interceptors to guarantee error type safety.
- *
- * @param error - The unknown error value.
- * @returns An {@link Error} instance for consistent error handling.
- *
- * @example
- * ```typescript
- * throw ensureErrorInstance("Something went wrong");
- * ```
- *
- * @public
- */
-function ensureErrorInstance(error: unknown): Error {
-    return error instanceof Error ? error : new Error(String(error));
 }

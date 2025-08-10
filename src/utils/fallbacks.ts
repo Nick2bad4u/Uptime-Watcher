@@ -131,6 +131,21 @@ const MONITOR_IDENTIFIER_GENERATORS = new Map<
 ]);
 
 /**
+ * Generate identifier from common monitor fields.
+ * Extracted to reduce complexity of main function.
+ */
+function getGenericIdentifier(monitor: Monitor): string | undefined {
+    // Check common identifier fields in order of preference
+    if (monitor.url) {
+        return monitor.url;
+    }
+    if (monitor.host) {
+        return monitor.port ? `${monitor.host}:${monitor.port}` : monitor.host;
+    }
+    return undefined;
+}
+
+/**
  * Generate display identifier for a monitor dynamically.
  * Replaces hardcoded backward compatibility patterns.
  *
@@ -180,21 +195,6 @@ export function getMonitorDisplayIdentifier(
         "Generate monitor display identifier",
         siteFallback
     );
-}
-
-/**
- * Generate identifier from common monitor fields.
- * Extracted to reduce complexity of main function.
- */
-function getGenericIdentifier(monitor: Monitor): string | undefined {
-    // Check common identifier fields in order of preference
-    if (monitor.url) {
-        return monitor.url;
-    }
-    if (monitor.host) {
-        return monitor.port ? `${monitor.host}:${monitor.port}` : monitor.host;
-    }
-    return undefined;
 }
 
 /**

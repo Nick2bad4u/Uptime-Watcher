@@ -105,19 +105,6 @@ export interface DatabaseErrorEventData {
 }
 
 /**
- * Database operation types used in event payloads.
- *
- * @public
- */
-export type DatabaseOperation =
-    | "connect"
-    | "create"
-    | "delete"
-    | "insert"
-    | "query"
-    | "update";
-
-/**
  * Payload for database retry events.
  *
  * @remarks
@@ -303,23 +290,6 @@ export interface MonitorUpEventData {
 }
 
 /**
- * Payload for test events (used in development/testing).
- *
- * @remarks
- * Used for development or testing purposes to transmit arbitrary data.
- *
- * @example
- * // Example: Sending a test event with custom data
- * ```typescript
- * const event: TestEventData = {
- *   foo: 'bar',
- *   count: 42
- * };
- * ```
- */
-export type TestEventData = Record<string, unknown>;
-
-/**
  * Payload for update status change events.
  *
  * @remarks
@@ -352,3 +322,33 @@ export interface UpdateStatusEventData {
         | "error"
         | "idle";
 }
+
+/**
+ * Database operation types used in event payloads.
+ *
+ * @public
+ */
+export type DatabaseOperation =
+    | "connect"
+    | "create"
+    | "delete"
+    | "insert"
+    | "query"
+    | "update";
+
+/**
+ * Payload for test events (used in development/testing).
+ *
+ * @remarks
+ * Used for development or testing purposes to transmit arbitrary data.
+ *
+ * @example
+ * // Example: Sending a test event with custom data
+ * ```typescript
+ * const event: TestEventData = {
+ *   foo: 'bar',
+ *   count: 42
+ * };
+ * ```
+ */
+export type TestEventData = Record<string, unknown>;

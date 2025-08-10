@@ -6,18 +6,6 @@
 import type { CacheValue } from "../../shared/types/configTypes";
 
 /**
- * Configuration options for cache instances.
- *
- * @public
- */
-export interface CacheOptions {
-    /** Maximum number of entries */
-    maxSize?: number;
-    /** Time to live in milliseconds */
-    ttl?: number;
-}
-
-/**
  * Interface for application cache collection.
  */
 interface AppCachesInterface {
@@ -46,6 +34,18 @@ interface CacheEntry<T> {
 }
 
 /**
+ * Configuration options for cache instances.
+ *
+ * @public
+ */
+export interface CacheOptions {
+    /** Maximum number of entries */
+    maxSize?: number;
+    /** Time to live in milliseconds */
+    ttl?: number;
+}
+
+/**
  * Generic cache implementation with TTL support and LRU eviction.
  *
  * @remarks
@@ -60,17 +60,8 @@ interface CacheEntry<T> {
  * - V: Type of cached values
  */
 export class TypedCache<K, V> {
-    /**
-     * Get cache size.
-     *
-     * @returns Number of entries currently in the cache
-     */
-    public get size(): number {
-        return this.cache.size;
-    }
     private readonly cache = new Map<K, CacheEntry<V>>();
     private readonly defaultTtl: number | undefined;
-
     private readonly maxSize: number;
 
     /**
@@ -81,6 +72,14 @@ export class TypedCache<K, V> {
     public constructor(options: CacheOptions = {}) {
         this.maxSize = options.maxSize ?? 100;
         this.defaultTtl = options.ttl;
+    }
+    /**
+     * Get cache size.
+     *
+     * @returns Number of entries currently in the cache
+     */
+    public get size(): number {
+        return this.cache.size;
     }
 
     /**

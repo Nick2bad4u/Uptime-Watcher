@@ -14,40 +14,6 @@ import type { MonitorTypeConfig } from "./monitorTypes";
 import type { BaseValidationResult } from "./validation";
 
 /**
- * Cache value types for different cache domains.
- *
- * @remarks
- * Provides better typing for cached values based on their usage domain.
- * Includes support for MonitorTypeConfig and arrays of monitor configurations.
- * All unknown types have been replaced with specific type unions for type safety.
- *
- * @public
- */
-export type CacheValue =
-    | BaseValidationResult
-    | ConfigValue
-    | ErrorInfo
-    | MonitorData
-    | MonitorTypeConfig
-    | MonitorTypeConfigArray
-    | UIState
-    | ValidationResultArray;
-
-/**
- * Union type representing all possible configuration values.
- *
- * @remarks
- * Configuration values are stored as strings in the database but can represent:
- * - Strings: theme names, language codes, etc.
- * - Numbers: history limits, timeouts, etc. (stored as string representations)
- * - Booleans: feature flags, etc. (stored as "true"/"false")
- * - Arrays: stored as JSON strings
- *
- * @public
- */
-export type ConfigValue = boolean | null | number | string | string[];
-
-/**
  * Error information for caching.
  *
  * @public
@@ -117,20 +83,6 @@ export interface MonitorData {
 }
 
 /**
- * Monitor status information.
- *
- * @public
- */
-export type MonitorStatus = "down" | "paused" | "pending" | "up";
-
-/**
- * Array of MonitorTypeConfig objects for caching.
- *
- * @public
- */
-export type MonitorTypeConfigArray = MonitorTypeConfig[];
-
-/**
  * UI state that can be cached.
  *
  * @public
@@ -143,6 +95,54 @@ export interface UIState {
     /** View state */
     viewState?: Record<string, unknown>;
 }
+
+/**
+ * Cache value types for different cache domains.
+ *
+ * @remarks
+ * Provides better typing for cached values based on their usage domain.
+ * Includes support for MonitorTypeConfig and arrays of monitor configurations.
+ * All unknown types have been replaced with specific type unions for type safety.
+ *
+ * @public
+ */
+export type CacheValue =
+    | BaseValidationResult
+    | ConfigValue
+    | ErrorInfo
+    | MonitorData
+    | MonitorTypeConfig
+    | MonitorTypeConfigArray
+    | UIState
+    | ValidationResultArray;
+
+/**
+ * Union type representing all possible configuration values.
+ *
+ * @remarks
+ * Configuration values are stored as strings in the database but can represent:
+ * - Strings: theme names, language codes, etc.
+ * - Numbers: history limits, timeouts, etc. (stored as string representations)
+ * - Booleans: feature flags, etc. (stored as "true"/"false")
+ * - Arrays: stored as JSON strings
+ *
+ * @public
+ */
+export type ConfigValue = boolean | null | number | string | string[];
+
+/**
+ * Monitor status information.
+ *
+ * @public
+ */
+export type MonitorStatus = "down" | "paused" | "pending" | "up";
+
+/**
+ * Array of MonitorTypeConfig objects for caching.
+ *
+ * @public
+ */
+export type MonitorTypeConfigArray = MonitorTypeConfig[];
 
 /**
  * Array of validation results for caching.

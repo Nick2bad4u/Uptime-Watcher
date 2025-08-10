@@ -19,6 +19,23 @@ export interface SettingRow {
 }
 
 /**
+ * Validate that a SettingRow object is properly formed.
+ *
+ * @param setting - SettingRow object to validate
+ * @returns True if setting is valid
+ *
+ * @remarks
+ * Validates SettingRow objects that have already been mapped from database rows.
+ * Only checks key validity since value field is always processed appropriately.
+ * Uses simplified validation since SettingRow interface already enforces string types.
+ *
+ * @internal
+ */
+function isValidSettingObject(setting: SettingRow): boolean {
+    return isNonEmptyString(setting.key);
+}
+
+/**
  * Validate that a row contains the minimum required fields for a setting.
  *
  * @param row - Database row to validate
@@ -156,21 +173,4 @@ export function settingsToRecord(
     }
 
     return result;
-}
-
-/**
- * Validate that a SettingRow object is properly formed.
- *
- * @param setting - SettingRow object to validate
- * @returns True if setting is valid
- *
- * @remarks
- * Validates SettingRow objects that have already been mapped from database rows.
- * Only checks key validity since value field is always processed appropriately.
- * Uses simplified validation since SettingRow interface already enforces string types.
- *
- * @internal
- */
-function isValidSettingObject(setting: SettingRow): boolean {
-    return isNonEmptyString(setting.key);
 }

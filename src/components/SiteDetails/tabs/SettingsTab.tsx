@@ -565,34 +565,6 @@ function getDisplayIdentifier(
 }
 
 /**
- * Generate a display label for the identifier field based on monitor type.
- */
-async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
-    return withUtilityErrorHandling(
-        async () => {
-            const config = await getMonitorTypeConfig(selectedMonitor.type);
-            if (config?.fields) {
-                // Generate label based on primary field(s)
-                const primaryField = config.fields.find(
-                    (field) => field.required
-                );
-                if (primaryField) {
-                    return primaryField.label;
-                }
-                // Fallback to first field
-                if (config.fields.length > 0 && config.fields[0]) {
-                    return config.fields[0].label;
-                }
-            }
-            // Use dynamic utility instead of hardcoded backward compatibility patterns
-            return getMonitorTypeDisplayLabel(selectedMonitor.type);
-        },
-        "Get identifier label for monitor type",
-        UiDefaults.unknownLabel
-    );
-}
-
-/**
  * Component that displays the identifier label for a monitor type.
  */
 function IdentifierLabel({
@@ -620,4 +592,32 @@ function IdentifierLabel({
     }, [selectedMonitor]);
 
     return label;
+}
+
+/**
+ * Generate a display label for the identifier field based on monitor type.
+ */
+async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
+    return withUtilityErrorHandling(
+        async () => {
+            const config = await getMonitorTypeConfig(selectedMonitor.type);
+            if (config?.fields) {
+                // Generate label based on primary field(s)
+                const primaryField = config.fields.find(
+                    (field) => field.required
+                );
+                if (primaryField) {
+                    return primaryField.label;
+                }
+                // Fallback to first field
+                if (config.fields.length > 0 && config.fields[0]) {
+                    return config.fields[0].label;
+                }
+            }
+            // Use dynamic utility instead of hardcoded backward compatibility patterns
+            return getMonitorTypeDisplayLabel(selectedMonitor.type);
+        },
+        "Get identifier label for monitor type",
+        UiDefaults.unknownLabel
+    );
 }

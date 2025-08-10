@@ -182,6 +182,29 @@ export interface StatusUpdate {
     timestamp: string;
 }
 
+/**
+ * Helper to validate that all elements in activeOperations are valid identifiers.
+ *
+ * @param activeOperations - Array to validate
+ * @returns True if all elements are valid identifiers
+ */
+function isValidActiveOperations(
+    activeOperations: unknown
+): activeOperations is string[] {
+    if (!Array.isArray(activeOperations)) {
+        return false;
+    }
+
+    // Use more permissive validation since we import validator in the backend
+    // For shared types, we'll keep the simple validation
+    for (const op of activeOperations) {
+        if (typeof op !== "string" || op.trim().length === 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
 export function isComputedSiteStatus(
     status: string
 ): status is "mixed" | "unknown" {
@@ -221,27 +244,4 @@ export function validateMonitor(monitor: Partial<Monitor>): monitor is Monitor {
         Array.isArray(monitor.history) &&
         isValidActiveOperations(monitor.activeOperations)
     );
-}
-
-/**
- * Helper to validate that all elements in activeOperations are valid identifiers.
- *
- * @param activeOperations - Array to validate
- * @returns True if all elements are valid identifiers
- */
-function isValidActiveOperations(
-    activeOperations: unknown
-): activeOperations is string[] {
-    if (!Array.isArray(activeOperations)) {
-        return false;
-    }
-
-    // Use more permissive validation since we import validator in the backend
-    // For shared types, we'll keep the simple validation
-    for (const op of activeOperations) {
-        if (typeof op !== "string" || op.trim().length === 0) {
-            return false;
-        }
-    }
-    return true;
 }

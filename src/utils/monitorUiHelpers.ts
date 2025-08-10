@@ -16,6 +16,53 @@ import {
 } from "./monitorTypeHelper";
 
 /**
+ * Get monitor type configuration with caching
+ */
+async function getConfig(
+    monitorType: MonitorType
+): Promise<MonitorTypeConfig | undefined> {
+    const cacheKey = CacheKeys.config.byName(`monitor-config-${monitorType}`);
+
+    // Try to get from cache first
+    const cached = AppCaches.uiHelpers.get(cacheKey) as
+        | MonitorTypeConfig
+        | undefined;
+    if (cached) {
+        return cached;
+    }
+
+    // Get from backend and cache
+    const config = await getMonitorTypeConfig(monitorType);
+    if (config) {
+        AppCaches.uiHelpers.set(cacheKey, config);
+    }
+
+    return config;
+}
+
+/**
+ * Clear the configuration cache. Useful for testing or when monitor types change.
+ */
+export function clearConfigCache(): void {
+    AppCaches.uiHelpers.clear();
+}
+
+/**
+ * Get the default monitor ID from a list of monitor IDs.
+ *
+ * @param monitorIds - Array of monitor IDs
+ * @returns Default monitor ID (first valid ID in array) or empty string if array is empty or contains no valid IDs
+ *
+ * @remarks
+ * This function returns the first element of the array if it exists, otherwise an empty string.
+ * It does not validate whether the IDs are actually valid monitor identifiers - that should
+ * be done by the caller if needed. Empty arrays return an empty string as a safe fallback.
+ */
+export function getDefaultMonitorId(monitorIds: string[]): string {
+    return monitorIds[0] ?? "";
+}
+
+/**
  * Check if all monitor types in array support advanced analytics.
  * Useful for conditional rendering of advanced analytics components.
  *
@@ -57,13 +104,6 @@ export async function allSupportsResponseTime(
         "Check response time support for multiple types",
         false
     );
-}
-
-/**
- * Clear the configuration cache. Useful for testing or when monitor types change.
- */
-export function clearConfigCache(): void {
-    AppCaches.uiHelpers.clear();
 }
 
 /**
@@ -144,21 +184,6 @@ export async function getAnalyticsLabel(
         `Get analytics label for ${monitorType}`,
         `${monitorType.toUpperCase()} Response Time`
     );
-}
-
-/**
- * Get the default monitor ID from a list of monitor IDs.
- *
- * @param monitorIds - Array of monitor IDs
- * @returns Default monitor ID (first valid ID in array) or empty string if array is empty or contains no valid IDs
- *
- * @remarks
- * This function returns the first element of the array if it exists, otherwise an empty string.
- * It does not validate whether the IDs are actually valid monitor identifiers - that should
- * be done by the caller if needed. Empty arrays return an empty string as a safe fallback.
- */
-export function getDefaultMonitorId(monitorIds: string[]): string {
-    return monitorIds[0] ?? "";
 }
 
 /**
@@ -268,31 +293,6 @@ export async function supportsResponseTime(
         `Check response time support for ${monitorType}`,
         false
     );
-}
-
-/**
- * Get monitor type configuration with caching
- */
-async function getConfig(
-    monitorType: MonitorType
-): Promise<MonitorTypeConfig | undefined> {
-    const cacheKey = CacheKeys.config.byName(`monitor-config-${monitorType}`);
-
-    // Try to get from cache first
-    const cached = AppCaches.uiHelpers.get(cacheKey) as
-        | MonitorTypeConfig
-        | undefined;
-    if (cached) {
-        return cached;
-    }
-
-    // Get from backend and cache
-    const config = await getMonitorTypeConfig(monitorType);
-    if (config) {
-        AppCaches.uiHelpers.set(cacheKey, config);
-    }
-
-    return config;
 }
 
 /**

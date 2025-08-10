@@ -70,6 +70,30 @@ const SCHEMA_QUERIES = {
 } as const;
 
 /**
+ * Validates a generated SQL schema string before execution.
+ *
+ * @remarks
+ * Performs validation checks to ensure the schema is a non-empty string, contains the required table definition, and does not include placeholder values that indicate generation errors. Prevents runtime failures from malformed SQL.
+ *
+ * @param schema - The generated SQL schema string to validate.
+ * @throws {@link Error} When schema validation fails due to missing or invalid content.
+ * @internal
+ */
+function validateGeneratedSchema(schema: string): void {
+    if (!schema || typeof schema !== "string") {
+        throw new Error("Generated schema is empty or invalid");
+    }
+    if (!schema.includes("CREATE TABLE IF NOT EXISTS monitors")) {
+        throw new Error(
+            "Generated schema missing required monitors table definition"
+        );
+    }
+    if (schema.includes("undefined") || schema.includes("null")) {
+        throw new Error("Generated schema contains undefined or null values");
+    }
+}
+
+/**
  * Creates database indexes for improved query performance.
  *
  * @remarks
@@ -232,29 +256,5 @@ export function setupMonitorTypeValidation(): void {
         logger.warn(
             LOG_TEMPLATES.warnings.DATABASE_MONITOR_VALIDATION_CONTINUE
         );
-    }
-}
-
-/**
- * Validates a generated SQL schema string before execution.
- *
- * @remarks
- * Performs validation checks to ensure the schema is a non-empty string, contains the required table definition, and does not include placeholder values that indicate generation errors. Prevents runtime failures from malformed SQL.
- *
- * @param schema - The generated SQL schema string to validate.
- * @throws {@link Error} When schema validation fails due to missing or invalid content.
- * @internal
- */
-function validateGeneratedSchema(schema: string): void {
-    if (!schema || typeof schema !== "string") {
-        throw new Error("Generated schema is empty or invalid");
-    }
-    if (!schema.includes("CREATE TABLE IF NOT EXISTS monitors")) {
-        throw new Error(
-            "Generated schema missing required monitors table definition"
-        );
-    }
-    if (schema.includes("undefined") || schema.includes("null")) {
-        throw new Error("Generated schema contains undefined or null values");
     }
 }

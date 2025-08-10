@@ -12,76 +12,6 @@ import {
 } from "@shared/types";
 
 /**
- * Gets validation errors for monitor fields based on monitor type.
- *
- * @param monitor - Partial monitor data to validate
- * @returns Array of validation error messages (empty if valid)
- *
- * @remarks
- * Validates required fields and type-specific constraints for monitors.
- * Returns descriptive error messages for any validation failures.
- */
-export function getMonitorValidationErrors(
-    monitor: Partial<Monitor>
-): string[] {
-    const errors: string[] = [];
-
-    // Validate basic required fields
-    validateBasicMonitorFields(monitor, errors);
-
-    // Validate type-specific requirements
-    validateTypeSpecificFields(monitor, errors);
-
-    return errors;
-}
-
-/**
- * Validates monitor type.
- *
- * @param type - Value to check as monitor type
- * @returns Type predicate indicating if the value is a valid MonitorType
- *
- * @remarks
- * Supports all monitor types: HTTP, port, and ping monitors.
- */
-export function validateMonitorType(type: unknown): type is MonitorType {
-    return (
-        typeof type === "string" &&
-        (type === "http" || type === "port" || type === "ping")
-    );
-}
-
-/**
- * Validates site data structure.
- *
- * @param site - Partial site data to validate
- * @returns Type predicate indicating if the site is valid
- *
- * @remarks
- * Performs comprehensive validation of site structure including all monitors.
- * Uses proper type guards to ensure runtime safety.
- */
-export function validateSite(site: Partial<Site>): site is Site {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (typeof site !== "object" || !site) {
-        return false;
-    }
-
-    return (
-        typeof site.identifier === "string" &&
-        site.identifier.length > 0 &&
-        typeof site.name === "string" &&
-        site.name.length > 0 &&
-        typeof site.monitoring === "boolean" &&
-        Array.isArray(site.monitors) &&
-        site.monitors.every(
-            (monitor: unknown) =>
-                isPartialMonitor(monitor) && validateMonitor(monitor)
-        )
-    );
-}
-
-/**
  * Type guard to check if a value is a partial monitor object.
  *
  * @param value - Value to check
@@ -247,4 +177,74 @@ function validateTypeSpecificFields(
             break;
         }
     }
+}
+
+/**
+ * Gets validation errors for monitor fields based on monitor type.
+ *
+ * @param monitor - Partial monitor data to validate
+ * @returns Array of validation error messages (empty if valid)
+ *
+ * @remarks
+ * Validates required fields and type-specific constraints for monitors.
+ * Returns descriptive error messages for any validation failures.
+ */
+export function getMonitorValidationErrors(
+    monitor: Partial<Monitor>
+): string[] {
+    const errors: string[] = [];
+
+    // Validate basic required fields
+    validateBasicMonitorFields(monitor, errors);
+
+    // Validate type-specific requirements
+    validateTypeSpecificFields(monitor, errors);
+
+    return errors;
+}
+
+/**
+ * Validates monitor type.
+ *
+ * @param type - Value to check as monitor type
+ * @returns Type predicate indicating if the value is a valid MonitorType
+ *
+ * @remarks
+ * Supports all monitor types: HTTP, port, and ping monitors.
+ */
+export function validateMonitorType(type: unknown): type is MonitorType {
+    return (
+        typeof type === "string" &&
+        (type === "http" || type === "port" || type === "ping")
+    );
+}
+
+/**
+ * Validates site data structure.
+ *
+ * @param site - Partial site data to validate
+ * @returns Type predicate indicating if the site is valid
+ *
+ * @remarks
+ * Performs comprehensive validation of site structure including all monitors.
+ * Uses proper type guards to ensure runtime safety.
+ */
+export function validateSite(site: Partial<Site>): site is Site {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (typeof site !== "object" || !site) {
+        return false;
+    }
+
+    return (
+        typeof site.identifier === "string" &&
+        site.identifier.length > 0 &&
+        typeof site.name === "string" &&
+        site.name.length > 0 &&
+        typeof site.monitoring === "boolean" &&
+        Array.isArray(site.monitors) &&
+        site.monitors.every(
+            (monitor: unknown) =>
+                isPartialMonitor(monitor) && validateMonitor(monitor)
+        )
+    );
 }

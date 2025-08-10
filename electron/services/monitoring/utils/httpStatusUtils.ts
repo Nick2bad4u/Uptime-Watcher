@@ -9,6 +9,22 @@
  */
 
 /**
+ * Validates that a value is a valid HTTP status code (100–599).
+ *
+ * @remarks
+ * Used internally to ensure only valid HTTP status codes are evaluated for monitor status. Returns true for integer values in the 100–599 range.
+ *
+ * @param httpStatus - The HTTP status code to validate.
+ * @returns True if the code is a valid HTTP status code, false otherwise.
+ * @internal
+ */
+function isValidHttpStatus(httpStatus: number): boolean {
+    return (
+        Number.isInteger(httpStatus) && httpStatus >= 100 && httpStatus <= 599
+    );
+}
+
+/**
  * Determines monitor status ("up" or "down") from an HTTP status code.
  *
  * @remarks
@@ -37,20 +53,4 @@ export function determineMonitorStatus(httpStatus: number): "down" | "up" {
 
     // 5xx = server error (down), all others are considered "up" (responding)
     return httpStatus >= 500 && httpStatus < 600 ? "down" : "up";
-}
-
-/**
- * Validates that a value is a valid HTTP status code (100–599).
- *
- * @remarks
- * Used internally to ensure only valid HTTP status codes are evaluated for monitor status. Returns true for integer values in the 100–599 range.
- *
- * @param httpStatus - The HTTP status code to validate.
- * @returns True if the code is a valid HTTP status code, false otherwise.
- * @internal
- */
-function isValidHttpStatus(httpStatus: number): boolean {
-    return (
-        Number.isInteger(httpStatus) && httpStatus >= 100 && httpStatus <= 599
-    );
 }

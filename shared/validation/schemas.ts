@@ -276,6 +276,69 @@ export type Site = z.infer<typeof siteSchema>;
 // ValidationResult type available for consumers via direct import from ../types/validation
 
 /**
+ * Gets the appropriate Zod schema for a monitor type.
+ *
+ * @remarks
+ * Uses the central schema registry for dynamic schema lookup.
+ * Returns `undefined` if the type is not recognized.
+ *
+ * @param type - The monitor type string (any supported monitor type).
+ * @returns The Zod schema for the monitor type, or `undefined` if unknown.
+ */
+function getMonitorSchema(
+    type: string
+): (typeof monitorSchemas)[keyof typeof monitorSchemas] | undefined {
+    return monitorSchemas[type as keyof typeof monitorSchemas];
+}
+
+/**
+ * Validates a specific field using the appropriate monitor schema.
+ *
+ * @remarks
+ * Internal helper that creates a test object and validates the specific field.
+ * Throws if the field is not recognized for the given monitor type.
+ *
+ * @param type - The monitor type string ("http" or "port").
+ * @param fieldName - The name of the field to validate.
+ * @param value - The value of the field to validate.
+ * @returns An object containing the validated field.
+ *
+ * @throws Error If the field name is unknown for the monitor type.
+ * @throws {@link z.ZodError} If validation fails.
+ */
+function validateFieldWithSchema(
+    type: string,
+    fieldName: string,
+    value: unknown
+): Record<string, unknown> {
+    const testData = {
+        [fieldName]: value,
+    };
+
+    // Get the schema for the monitor type
+    const schema = getMonitorSchema(type);
+    if (schema && fieldName in schema.shape) {
+        // Use the specific schema's field definition
+        const fieldSchema =
+            schema.shape[fieldName as keyof typeof schema.shape];
+        return z.object({ [fieldName]: fieldSchema }).parse(testData);
+    }
+
+    // Fallback to base schema for common fields
+    const commonFields = baseMonitorSchema.shape;
+    if (fieldName in commonFields) {
+        return z
+            .object({
+                [fieldName]:
+                    commonFields[fieldName as keyof typeof commonFields],
+            })
+            .parse(testData);
+    }
+
+    throw new Error(`Unknown field: ${fieldName}`);
+}
+
+/**
  * Validates monitor data using the appropriate Zod schema.
  *
  * @remarks
@@ -483,67 +546,4 @@ export function validateSiteData(data: unknown): ValidationResult {
             warnings: [],
         };
     }
-}
-
-/**
- * Gets the appropriate Zod schema for a monitor type.
- *
- * @remarks
- * Uses the central schema registry for dynamic schema lookup.
- * Returns `undefined` if the type is not recognized.
- *
- * @param type - The monitor type string (any supported monitor type).
- * @returns The Zod schema for the monitor type, or `undefined` if unknown.
- */
-function getMonitorSchema(
-    type: string
-): (typeof monitorSchemas)[keyof typeof monitorSchemas] | undefined {
-    return monitorSchemas[type as keyof typeof monitorSchemas];
-}
-
-/**
- * Validates a specific field using the appropriate monitor schema.
- *
- * @remarks
- * Internal helper that creates a test object and validates the specific field.
- * Throws if the field is not recognized for the given monitor type.
- *
- * @param type - The monitor type string ("http" or "port").
- * @param fieldName - The name of the field to validate.
- * @param value - The value of the field to validate.
- * @returns An object containing the validated field.
- *
- * @throws Error If the field name is unknown for the monitor type.
- * @throws {@link z.ZodError} If validation fails.
- */
-function validateFieldWithSchema(
-    type: string,
-    fieldName: string,
-    value: unknown
-): Record<string, unknown> {
-    const testData = {
-        [fieldName]: value,
-    };
-
-    // Get the schema for the monitor type
-    const schema = getMonitorSchema(type);
-    if (schema && fieldName in schema.shape) {
-        // Use the specific schema's field definition
-        const fieldSchema =
-            schema.shape[fieldName as keyof typeof schema.shape];
-        return z.object({ [fieldName]: fieldSchema }).parse(testData);
-    }
-
-    // Fallback to base schema for common fields
-    const commonFields = baseMonitorSchema.shape;
-    if (fieldName in commonFields) {
-        return z
-            .object({
-                [fieldName]:
-                    commonFields[fieldName as keyof typeof commonFields],
-            })
-            .parse(testData);
-    }
-
-    throw new Error(`Unknown field: ${fieldName}`);
 }

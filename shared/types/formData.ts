@@ -95,16 +95,6 @@ export interface DefaultFormData {
 }
 
 /**
- * Form mode enum for add site form.
- *
- * @remarks
- * Determines whether the form is creating a new site or adding to an existing one.
- *
- * @public
- */
-export type FormMode = "existing" | "new";
-
-/**
  * Form data interface for HTTP monitors.
  *
  * @remarks
@@ -159,17 +149,6 @@ export interface MonitorFieldValidation {
 }
 
 /**
- * Union type representing all possible monitor form data types.
- *
- * @remarks
- * Use this type when you need to handle form data for any monitor type.
- * TypeScript will ensure type safety through discriminated unions based on the `type` field.
- *
- * @public
- */
-export type MonitorFormData = HttpFormData | PingFormData | PortFormData;
-
-/**
  * Form data interface for ping monitors.
  *
  * @remarks
@@ -208,17 +187,6 @@ export interface PortFormData extends BaseFormData {
 }
 
 /**
- * Validation result interface for form validation.
- *
- * @remarks
- * Used to return validation results with success status and error details.
- *
- * @public
- */
-// Import from unified validation system
-export type { FormValidationResult as ValidationResult } from "./validation";
-
-/**
  * Complete site form data including site information and monitor configuration.
  *
  * @remarks
@@ -234,6 +202,38 @@ export interface SiteFormData {
     /** The human-readable name for the site */
     name: string;
 }
+
+/**
+ * Form mode enum for add site form.
+ *
+ * @remarks
+ * Determines whether the form is creating a new site or adding to an existing one.
+ *
+ * @public
+ */
+export type FormMode = "existing" | "new";
+
+/**
+ * Validation result interface for form validation.
+ *
+ * @remarks
+ * Used to return validation results with success status and error details.
+ *
+ * @public
+ */
+// Import from unified validation system
+export type { FormValidationResult as ValidationResult } from "./validation";
+
+/**
+ * Union type representing all possible monitor form data types.
+ *
+ * @remarks
+ * Use this type when you need to handle form data for any monitor type.
+ * TypeScript will ensure type safety through discriminated unions based on the `type` field.
+ *
+ * @public
+ */
+export type MonitorFormData = HttpFormData | PingFormData | PortFormData;
 
 /**
  * Type guard to check if form data is for HTTP monitors.

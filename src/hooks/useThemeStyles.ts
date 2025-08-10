@@ -62,90 +62,6 @@ export interface ThemeStyles {
  */
 const TRANSITION_EASING = "0.3s cubic-bezier(0.4, 0, 0.2, 1)";
 
-export function useThemeStyles(isCollapsed = false): ThemeStyles {
-    // Use state to track theme changes for reactivity
-    const [isDarkMode, setIsDarkMode] = useState(() => {
-        // SSR-safe initialization
-        if (
-            typeof window === "undefined" ||
-            typeof window.matchMedia !== "function"
-        ) {
-            return false; // Default to light mode for SSR
-        }
-        try {
-            return window.matchMedia("(prefers-color-scheme: dark)").matches;
-        } catch {
-            // Fallback if matchMedia throws an error
-            return false;
-        }
-    });
-
-    // Refs to store media query and handler for cleanup
-    const mediaQueryRef = useRef<MediaQueryList | null>(null);
-    const handlerRef = useRef<((e: MediaQueryListEvent) => void) | null>(null);
-
-    // Set up media query listener for theme changes
-    useMount(
-        () => {
-            // Skip in SSR environments
-            if (
-                typeof window === "undefined" ||
-                typeof window.matchMedia !== "function"
-            ) {
-                return;
-            }
-
-            try {
-                const mediaQuery = window.matchMedia(
-                    "(prefers-color-scheme: dark)"
-                );
-                const handleThemeChange = (e: MediaQueryListEvent): void => {
-                    setIsDarkMode(e.matches);
-                };
-
-                // Store references for cleanup
-                mediaQueryRef.current = mediaQuery;
-                handlerRef.current = handleThemeChange;
-
-                mediaQuery.addEventListener("change", handleThemeChange);
-            } catch {
-                // Fallback if matchMedia throws an error
-                // No setup needed
-            }
-        },
-        () => {
-            // Cleanup media query listener on unmount
-            if (mediaQueryRef.current && handlerRef.current) {
-                try {
-                    mediaQueryRef.current.removeEventListener(
-                        "change",
-                        handlerRef.current
-                    );
-                } catch {
-                    // Ignore cleanup errors
-                }
-                mediaQueryRef.current = null;
-                handlerRef.current = null;
-            }
-        }
-    );
-
-    const styles = useMemo<ThemeStyles>(
-        () => ({
-            collapseButtonStyle: getCollapseButtonStyle(isDarkMode),
-            contentStyle: getContentStyle(isCollapsed),
-            headerStyle: getHeaderStyle(isCollapsed, isDarkMode),
-            metaStyle: getMetaStyle(isDarkMode),
-            overlayStyle: getOverlayStyle(isDarkMode),
-            titleStyle: getTitleStyle(isDarkMode),
-            urlStyle: getUrlStyle(isDarkMode),
-        }),
-        [isCollapsed, isDarkMode]
-    );
-
-    return styles;
-}
-
 /**
  * Generates collapse button styles based on theme
  *
@@ -309,4 +225,88 @@ function getUrlStyle(isDarkMode: boolean): React.CSSProperties {
         transition: `color ${TRANSITION_EASING}, opacity ${TRANSITION_EASING}`,
         wordBreak: "break-all",
     };
+}
+
+export function useThemeStyles(isCollapsed = false): ThemeStyles {
+    // Use state to track theme changes for reactivity
+    const [isDarkMode, setIsDarkMode] = useState(() => {
+        // SSR-safe initialization
+        if (
+            typeof window === "undefined" ||
+            typeof window.matchMedia !== "function"
+        ) {
+            return false; // Default to light mode for SSR
+        }
+        try {
+            return window.matchMedia("(prefers-color-scheme: dark)").matches;
+        } catch {
+            // Fallback if matchMedia throws an error
+            return false;
+        }
+    });
+
+    // Refs to store media query and handler for cleanup
+    const mediaQueryRef = useRef<MediaQueryList | null>(null);
+    const handlerRef = useRef<((e: MediaQueryListEvent) => void) | null>(null);
+
+    // Set up media query listener for theme changes
+    useMount(
+        () => {
+            // Skip in SSR environments
+            if (
+                typeof window === "undefined" ||
+                typeof window.matchMedia !== "function"
+            ) {
+                return;
+            }
+
+            try {
+                const mediaQuery = window.matchMedia(
+                    "(prefers-color-scheme: dark)"
+                );
+                const handleThemeChange = (e: MediaQueryListEvent): void => {
+                    setIsDarkMode(e.matches);
+                };
+
+                // Store references for cleanup
+                mediaQueryRef.current = mediaQuery;
+                handlerRef.current = handleThemeChange;
+
+                mediaQuery.addEventListener("change", handleThemeChange);
+            } catch {
+                // Fallback if matchMedia throws an error
+                // No setup needed
+            }
+        },
+        () => {
+            // Cleanup media query listener on unmount
+            if (mediaQueryRef.current && handlerRef.current) {
+                try {
+                    mediaQueryRef.current.removeEventListener(
+                        "change",
+                        handlerRef.current
+                    );
+                } catch {
+                    // Ignore cleanup errors
+                }
+                mediaQueryRef.current = null;
+                handlerRef.current = null;
+            }
+        }
+    );
+
+    const styles = useMemo<ThemeStyles>(
+        () => ({
+            collapseButtonStyle: getCollapseButtonStyle(isDarkMode),
+            contentStyle: getContentStyle(isCollapsed),
+            headerStyle: getHeaderStyle(isCollapsed, isDarkMode),
+            metaStyle: getMetaStyle(isDarkMode),
+            overlayStyle: getOverlayStyle(isDarkMode),
+            titleStyle: getTitleStyle(isDarkMode),
+            urlStyle: getUrlStyle(isDarkMode),
+        }),
+        [isCollapsed, isDarkMode]
+    );
+
+    return styles;
 }

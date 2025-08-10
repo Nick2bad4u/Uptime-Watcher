@@ -13,6 +13,17 @@ export interface SafeJsonResult<T> {
 }
 
 /**
+ * Ensures an error object is properly typed and formatted.
+ *
+ * @internal
+ * @param error - Unknown error value to convert to Error instance
+ * @returns Properly typed Error object
+ */
+function ensureError(error: unknown): Error {
+    return error instanceof Error ? error : new Error(String(error));
+}
+
+/**
  * Safely parse JSON string with type validation.
  *
  * @param json - JSON string to parse
@@ -207,15 +218,4 @@ export function safeJsonStringifyWithFallback(
 ): string {
     const result = safeJsonStringify(value, space);
     return result.success && result.data !== undefined ? result.data : fallback;
-}
-
-/**
- * Ensures an error object is properly typed and formatted.
- *
- * @internal
- * @param error - Unknown error value to convert to Error instance
- * @returns Properly typed Error object
- */
-function ensureError(error: unknown): Error {
-    return error instanceof Error ? error : new Error(String(error));
 }

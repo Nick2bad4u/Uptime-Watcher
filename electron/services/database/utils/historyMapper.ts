@@ -40,6 +40,45 @@ export interface HistoryRow {
 }
 
 /**
+ * Safely converts a value to a number, returning a fallback if conversion fails.
+ *
+ * @remarks
+ * Used internally to ensure numeric fields are valid numbers.
+ *
+ * @param value - The value to convert to a number.
+ * @param fallback - The fallback value to use if conversion fails.
+ * @returns The converted number, or the fallback value if conversion fails.
+ *
+ * @defaultValue 0
+ * @internal
+ */
+function safeNumber(value: unknown, fallback: number = 0): number {
+    if (typeof value === "number" && !Number.isNaN(value)) return value;
+    if (typeof value === "string") {
+        const parsed = Number(value);
+        if (!Number.isNaN(parsed)) return parsed;
+    }
+    return fallback;
+}
+
+/**
+ * Validates and converts a status value to a valid {@link StatusHistory.status} value.
+ *
+ * @remarks
+ * If the value is not "up" or "down", logs a warning and returns "down".
+ *
+ * @param status - The status value to validate.
+ * @returns The validated status value ("up" or "down").
+ *
+ * @internal
+ */
+function validateStatus(status: unknown): StatusHistory["status"] {
+    if (status === "up" || status === "down") return status;
+    logger.warn(LOG_TEMPLATES.warnings.HISTORY_INVALID_STATUS, { status });
+    return "down";
+}
+
+/**
  * Converts a {@link StatusHistory} object to a database row format.
  *
  * @remarks
@@ -186,43 +225,4 @@ export function rowToHistoryEntryOrUndefined(
         return undefined;
     }
     return rowToHistoryEntry(row);
-}
-
-/**
- * Safely converts a value to a number, returning a fallback if conversion fails.
- *
- * @remarks
- * Used internally to ensure numeric fields are valid numbers.
- *
- * @param value - The value to convert to a number.
- * @param fallback - The fallback value to use if conversion fails.
- * @returns The converted number, or the fallback value if conversion fails.
- *
- * @defaultValue 0
- * @internal
- */
-function safeNumber(value: unknown, fallback: number = 0): number {
-    if (typeof value === "number" && !Number.isNaN(value)) return value;
-    if (typeof value === "string") {
-        const parsed = Number(value);
-        if (!Number.isNaN(parsed)) return parsed;
-    }
-    return fallback;
-}
-
-/**
- * Validates and converts a status value to a valid {@link StatusHistory.status} value.
- *
- * @remarks
- * If the value is not "up" or "down", logs a warning and returns "down".
- *
- * @param status - The status value to validate.
- * @returns The validated status value ("up" or "down").
- *
- * @internal
- */
-function validateStatus(status: unknown): StatusHistory["status"] {
-    if (status === "up" || status === "down") return status;
-    logger.warn(LOG_TEMPLATES.warnings.HISTORY_INVALID_STATUS, { status });
-    return "down";
 }

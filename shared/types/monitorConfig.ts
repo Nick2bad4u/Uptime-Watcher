@@ -161,20 +161,6 @@ export interface HttpMonitorConfig extends BaseMonitorConfig {
 }
 
 /**
- * Union type representing all possible monitor configurations.
- *
- * @remarks
- * Use this type when you need to handle configuration for any monitor type.
- * TypeScript will ensure type safety through discriminated unions based on the `type` field.
- *
- * @public
- */
-export type MonitorConfig =
-    | HttpMonitorConfig
-    | PingMonitorConfig
-    | PortMonitorConfig;
-
-/**
  * Monitor configuration template interface.
  *
  * @remarks
@@ -196,17 +182,6 @@ export interface MonitorConfigTemplate {
     /** Tags for filtering templates */
     tags: string[];
 }
-
-/**
- * Monitor configuration validation result.
- *
- * @remarks
- * Used to return validation results for monitor configurations.
- *
- * @public
- */
-// Import from unified validation system
-export type { MonitorConfigValidationResult } from "./validation";
 
 /**
  * Configuration interface for ping monitors.
@@ -231,6 +206,17 @@ export interface PingMonitorConfig extends BaseMonitorConfig {
     packetSize: number;
     type: "ping";
 }
+
+/**
+ * Monitor configuration validation result.
+ *
+ * @remarks
+ * Used to return validation results for monitor configurations.
+ *
+ * @public
+ */
+// Import from unified validation system
+export type { MonitorConfigValidationResult } from "./validation";
 
 /**
  * Configuration interface for port monitors.
@@ -260,6 +246,20 @@ export interface PortMonitorConfig extends BaseMonitorConfig {
     };
     type: "port";
 }
+
+/**
+ * Union type representing all possible monitor configurations.
+ *
+ * @remarks
+ * Use this type when you need to handle configuration for any monitor type.
+ * TypeScript will ensure type safety through discriminated unions based on the `type` field.
+ *
+ * @public
+ */
+export type MonitorConfig =
+    | HttpMonitorConfig
+    | PingMonitorConfig
+    | PortMonitorConfig;
 
 /**
  * Type guard to check if configuration is for HTTP monitors.

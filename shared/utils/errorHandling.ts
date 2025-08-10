@@ -44,47 +44,35 @@ export interface ErrorHandlingFrontendStore {
  */
 
 /**
- * Handle async operations with frontend store or backend context integration.
+ * Safely execute store operations with error logging.
  *
- * @typeParam T - The return type of the async operation
- * @param operation - Async operation to execute with error handling
- * @param storeOrContext - Either frontend store with error/loading state management or backend context with logger
- * @returns Promise resolving to operation result
+ * @param storeOperation - Store operation function to execute safely
+ * @param operationName - Descriptive name for the operation (used in error logging)
+ * @param originalError - Optional original error context for enhanced debugging
  *
  * @remarks
- * - For frontend stores: Automatically manages loading state and error state in the provided store.
- *   Clears error state before operation, sets loading during execution,
- *   and handles error state on failure while preserving the original error.
- * - For backend contexts: Logs operation failures using the provided logger with contextual information.
- *   Preserves original error for upstream handling while ensuring proper logging.
- */
-export async function withErrorHandling<T>(
-    operation: () => Promise<T>,
-    storeOrContext: ErrorHandlingBackendContext | ErrorHandlingFrontendStore
-): Promise<T>;
-
-/**
- * Implementation of the overloaded withErrorHandling function.
- *
- * @typeParam T - The return type of the async operation
- * @param operation - Async operation to execute
- * @param storeOrContext - Either frontend store or backend context
- * @returns Promise resolving to operation result
- *
- * @throws Re-throws the original error after handling (logging or state management)
+ * Protects against store operation failures that could interfere with the main
+ * operation flow. Uses console logging to avoid dependencies on external loggers
+ * in shared utilities. Logs both store operation failures and original error context
+ * when provided for comprehensive debugging information.
  *
  * @internal
  */
-export async function withErrorHandling<T>(
-    operation: () => Promise<T>,
-    storeOrContext: ErrorHandlingBackendContext | ErrorHandlingFrontendStore
-): Promise<T> {
-    // Check if it's a frontend store (has setError, clearError, setLoading methods)
-    return "setError" in storeOrContext &&
-        "clearError" in storeOrContext &&
-        "setLoading" in storeOrContext
-        ? handleFrontendOperation(operation, storeOrContext)
-        : handleBackendOperation(operation, storeOrContext);
+function safeStoreOperation(
+    storeOperation: () => void,
+    operationName: string,
+    originalError?: unknown
+): void {
+    try {
+        storeOperation();
+    } catch (error) {
+        // Use basic console for shared utilities to avoid dependencies
+        // This is acceptable in shared utilities that can't import loggers
+        console.warn("Store operation failed for:", operationName, error);
+        if (originalError) {
+            console.error("Original operation error:", originalError);
+        }
+    }
 }
 
 /**
@@ -176,33 +164,45 @@ async function handleFrontendOperation<T>(
 }
 
 /**
- * Safely execute store operations with error logging.
+ * Handle async operations with frontend store or backend context integration.
  *
- * @param storeOperation - Store operation function to execute safely
- * @param operationName - Descriptive name for the operation (used in error logging)
- * @param originalError - Optional original error context for enhanced debugging
+ * @typeParam T - The return type of the async operation
+ * @param operation - Async operation to execute with error handling
+ * @param storeOrContext - Either frontend store with error/loading state management or backend context with logger
+ * @returns Promise resolving to operation result
  *
  * @remarks
- * Protects against store operation failures that could interfere with the main
- * operation flow. Uses console logging to avoid dependencies on external loggers
- * in shared utilities. Logs both store operation failures and original error context
- * when provided for comprehensive debugging information.
+ * - For frontend stores: Automatically manages loading state and error state in the provided store.
+ *   Clears error state before operation, sets loading during execution,
+ *   and handles error state on failure while preserving the original error.
+ * - For backend contexts: Logs operation failures using the provided logger with contextual information.
+ *   Preserves original error for upstream handling while ensuring proper logging.
+ */
+export async function withErrorHandling<T>(
+    operation: () => Promise<T>,
+    storeOrContext: ErrorHandlingBackendContext | ErrorHandlingFrontendStore
+): Promise<T>;
+
+/**
+ * Implementation of the overloaded withErrorHandling function.
+ *
+ * @typeParam T - The return type of the async operation
+ * @param operation - Async operation to execute
+ * @param storeOrContext - Either frontend store or backend context
+ * @returns Promise resolving to operation result
+ *
+ * @throws Re-throws the original error after handling (logging or state management)
  *
  * @internal
  */
-function safeStoreOperation(
-    storeOperation: () => void,
-    operationName: string,
-    originalError?: unknown
-): void {
-    try {
-        storeOperation();
-    } catch (error) {
-        // Use basic console for shared utilities to avoid dependencies
-        // This is acceptable in shared utilities that can't import loggers
-        console.warn("Store operation failed for:", operationName, error);
-        if (originalError) {
-            console.error("Original operation error:", originalError);
-        }
-    }
+export async function withErrorHandling<T>(
+    operation: () => Promise<T>,
+    storeOrContext: ErrorHandlingBackendContext | ErrorHandlingFrontendStore
+): Promise<T> {
+    // Check if it's a frontend store (has setError, clearError, setLoading methods)
+    return "setError" in storeOrContext &&
+        "clearError" in storeOrContext &&
+        "setLoading" in storeOrContext
+        ? handleFrontendOperation(operation, storeOrContext)
+        : handleBackendOperation(operation, storeOrContext);
 }

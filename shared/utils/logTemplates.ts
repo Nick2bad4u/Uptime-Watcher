@@ -372,15 +372,6 @@ export const LOG_TEMPLATES: LogTemplatesInterface = {
 } as const;
 
 /**
- * Type representing all possible log template values.
- */
-export type LogTemplate =
-    | (typeof DEBUG_LOGS)[keyof typeof DEBUG_LOGS]
-    | (typeof ERROR_LOGS)[keyof typeof ERROR_LOGS]
-    | (typeof SERVICE_LOGS)[keyof typeof SERVICE_LOGS]
-    | (typeof WARNING_LOGS)[keyof typeof WARNING_LOGS];
-
-/**
  * Logger interface for type safety.
  */
 interface Logger {
@@ -389,6 +380,15 @@ interface Logger {
     info: (message: string, context?: Record<string, unknown>) => void;
     warn: (message: string, context?: Record<string, unknown>) => void;
 }
+
+/**
+ * Type representing all possible log template values.
+ */
+export type LogTemplate =
+    | (typeof DEBUG_LOGS)[keyof typeof DEBUG_LOGS]
+    | (typeof ERROR_LOGS)[keyof typeof ERROR_LOGS]
+    | (typeof SERVICE_LOGS)[keyof typeof SERVICE_LOGS]
+    | (typeof WARNING_LOGS)[keyof typeof WARNING_LOGS];
 
 /**
  * Enhanced logger wrapper that supports template interpolation.

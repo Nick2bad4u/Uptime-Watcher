@@ -133,6 +133,47 @@ export interface MonitorUIConfig {
 const monitorTypes = new Map<string, BaseMonitorConfig>();
 
 /**
+ * Simple monitor type validation for internal use.
+ *
+ * @remarks
+ * Breaks circular dependency with EnhancedTypeGuards by providing basic validation. Used internally by registry functions that need type validation without importing external validation utilities.
+ *
+ * Validation logic:
+ * - Checks if type is a string
+ * - Verifies type is registered in the monitor registry
+ * - Returns structured result compatible with type guard patterns
+ *
+ * @param type - The monitor type to validate.
+ * @returns Validation result compatible with EnhancedTypeGuard interface.
+ * @internal
+ */
+function validateMonitorTypeInternal(type: unknown): {
+    error?: string;
+    success: boolean;
+    value?: MonitorType;
+} {
+    if (typeof type !== "string") {
+        return {
+            error: "Monitor type must be a string",
+            success: false,
+        };
+    }
+
+    if (!isValidMonitorType(type)) {
+        const validTypes = getRegisteredMonitorTypes();
+        return {
+            error: `Invalid monitor type: ${type}. Valid types: ${validTypes.join(", ")}`,
+            success: false,
+        };
+    }
+
+    return {
+        success: true,
+        value: type as MonitorType,
+    };
+}
+
+/**
  * Gets all registered monitor types with their configurations.
  *
  * @remarks
@@ -248,47 +289,6 @@ export function validateMonitorData(
         metadata: result.metadata ?? {},
         success: result.success,
         warnings: result.warnings ?? [],
-    };
-}
-
-/**
- * Simple monitor type validation for internal use.
- *
- * @remarks
- * Breaks circular dependency with EnhancedTypeGuards by providing basic validation. Used internally by registry functions that need type validation without importing external validation utilities.
- *
- * Validation logic:
- * - Checks if type is a string
- * - Verifies type is registered in the monitor registry
- * - Returns structured result compatible with type guard patterns
- *
- * @param type - The monitor type to validate.
- * @returns Validation result compatible with EnhancedTypeGuard interface.
- * @internal
- */
-function validateMonitorTypeInternal(type: unknown): {
-    error?: string;
-    success: boolean;
-    value?: MonitorType;
-} {
-    if (typeof type !== "string") {
-        return {
-            error: "Monitor type must be a string",
-            success: false,
-        };
-    }
-
-    if (!isValidMonitorType(type)) {
-        const validTypes = getRegisteredMonitorTypes();
-        return {
-            error: `Invalid monitor type: ${type}. Valid types: ${validTypes.join(", ")}`,
-            success: false,
-        };
-    }
-
-    return {
-        success: true,
-        value: type as MonitorType,
     };
 }
 
