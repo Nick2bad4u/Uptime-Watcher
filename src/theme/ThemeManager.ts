@@ -172,7 +172,7 @@ export class ThemeManager {
      */
     private addBorderRadiusVariables(theme: Theme, variables: string[]): void {
         // Border radius - all themes have borderRadius property
-        if (theme.borderRadius && typeof theme.borderRadius === 'object') {
+        if (theme.borderRadius && typeof theme.borderRadius === "object") {
             for (const [size, value] of Object.entries(theme.borderRadius)) {
                 variables.push(`  --radius-${size}: ${value};`);
             }
@@ -183,14 +183,16 @@ export class ThemeManager {
      * Add color CSS variables from theme.
      */
     private addColorVariables(theme: Theme, variables: string[]): void {
-        if (theme.colors && typeof theme.colors === 'object') {
+        if (theme.colors && typeof theme.colors === "object") {
             for (const [category, colors] of Object.entries(theme.colors)) {
                 if (typeof colors === "object" && colors !== null) {
                     // Type-safe access to color values - colors are either string or nested color objects
                     for (const [key, value] of Object.entries(
                         colors as Record<string, string>
                     )) {
-                        variables.push(`  --color-${category}-${key}: ${value};`);
+                        variables.push(
+                            `  --color-${category}-${key}: ${value};`
+                        );
                     }
                 } else {
                     variables.push(`  --color-${category}: ${colors};`);
@@ -204,7 +206,7 @@ export class ThemeManager {
      */
     private addShadowVariables(theme: Theme, variables: string[]): void {
         // Shadows - all themes have shadows property
-        if (theme.shadows && typeof theme.shadows === 'object') {
+        if (theme.shadows && typeof theme.shadows === "object") {
             for (const [size, value] of Object.entries(theme.shadows)) {
                 variables.push(`  --shadow-${size}: ${value};`);
             }
@@ -216,7 +218,7 @@ export class ThemeManager {
      */
     private addSpacingVariables(theme: Theme, variables: string[]): void {
         // Spacing - all themes have spacing property
-        if (theme.spacing && typeof theme.spacing === 'object') {
+        if (theme.spacing && typeof theme.spacing === "object") {
             for (const [size, value] of Object.entries(theme.spacing)) {
                 variables.push(`  --spacing-${size}: ${value};`);
             }
@@ -228,14 +230,22 @@ export class ThemeManager {
      */
     private addTypographyVariables(theme: Theme, variables: string[]): void {
         // Typography - all themes have typography property with required sub-properties
-        if (theme.typography && typeof theme.typography === 'object') {
-            if (theme.typography.fontSize && typeof theme.typography.fontSize === 'object') {
-                for (const [size, value] of Object.entries(theme.typography.fontSize)) {
+        if (theme.typography && typeof theme.typography === "object") {
+            if (
+                theme.typography.fontSize &&
+                typeof theme.typography.fontSize === "object"
+            ) {
+                for (const [size, value] of Object.entries(
+                    theme.typography.fontSize
+                )) {
                     variables.push(`  --font-size-${size}: ${value};`);
                 }
             }
 
-            if (theme.typography.fontWeight && typeof theme.typography.fontWeight === 'object') {
+            if (
+                theme.typography.fontWeight &&
+                typeof theme.typography.fontWeight === "object"
+            ) {
                 for (const [weight, value] of Object.entries(
                     theme.typography.fontWeight
                 )) {
@@ -243,7 +253,10 @@ export class ThemeManager {
                 }
             }
 
-            if (theme.typography.lineHeight && typeof theme.typography.lineHeight === 'object') {
+            if (
+                theme.typography.lineHeight &&
+                typeof theme.typography.lineHeight === "object"
+            ) {
                 for (const [height, value] of Object.entries(
                     theme.typography.lineHeight
                 )) {
@@ -260,7 +273,7 @@ export class ThemeManager {
         root: HTMLElement,
         borderRadius: Theme["borderRadius"]
     ): void {
-        if (borderRadius && typeof borderRadius === 'object') {
+        if (borderRadius && typeof borderRadius === "object") {
             for (const [size, value] of Object.entries(borderRadius)) {
                 root.style.setProperty(`--radius-${size}`, String(value));
             }
@@ -271,14 +284,17 @@ export class ThemeManager {
      * Apply color CSS custom properties
      */
     private applyColors(root: HTMLElement, colors: Theme["colors"]): void {
-        if (colors && typeof colors === 'object') {
+        if (colors && typeof colors === "object") {
             for (const [category, colorValue] of Object.entries(colors)) {
                 if (typeof colorValue === "object" && colorValue !== null) {
                     // Type-safe access to color values - colorValue is a nested color object with string values
                     for (const [key, value] of Object.entries(
                         colorValue as Record<string, string>
                     )) {
-                        root.style.setProperty(`--color-${category}-${key}`, value);
+                        root.style.setProperty(
+                            `--color-${category}-${key}`,
+                            value
+                        );
                     }
                 } else {
                     root.style.setProperty(
@@ -294,7 +310,7 @@ export class ThemeManager {
      * Apply shadow CSS custom properties
      */
     private applyShadows(root: HTMLElement, shadows: Theme["shadows"]): void {
-        if (shadows && typeof shadows === 'object') {
+        if (shadows && typeof shadows === "object") {
             for (const [size, value] of Object.entries(shadows)) {
                 root.style.setProperty(`--shadow-${size}`, String(value));
             }
@@ -305,7 +321,7 @@ export class ThemeManager {
      * Apply spacing CSS custom properties
      */
     private applySpacing(root: HTMLElement, spacing: Theme["spacing"]): void {
-        if (spacing && typeof spacing === 'object') {
+        if (spacing && typeof spacing === "object") {
             for (const [size, value] of Object.entries(spacing)) {
                 root.style.setProperty(`--spacing-${size}`, String(value));
             }
@@ -352,21 +368,36 @@ export class ThemeManager {
         root: HTMLElement,
         typography: Theme["typography"]
     ): void {
-        if (typography && typeof typography === 'object') {
-            if (typography.fontSize && typeof typography.fontSize === 'object') {
-                for (const [size, value] of Object.entries(typography.fontSize)) {
+        if (typography && typeof typography === "object") {
+            if (
+                typography.fontSize &&
+                typeof typography.fontSize === "object"
+            ) {
+                for (const [size, value] of Object.entries(
+                    typography.fontSize
+                )) {
                     root.style.setProperty(`--font-size-${size}`, value);
                 }
             }
 
-            if (typography.fontWeight && typeof typography.fontWeight === 'object') {
-                for (const [weight, value] of Object.entries(typography.fontWeight)) {
+            if (
+                typography.fontWeight &&
+                typeof typography.fontWeight === "object"
+            ) {
+                for (const [weight, value] of Object.entries(
+                    typography.fontWeight
+                )) {
                     root.style.setProperty(`--font-weight-${weight}`, value);
                 }
             }
 
-            if (typography.lineHeight && typeof typography.lineHeight === 'object') {
-                for (const [height, value] of Object.entries(typography.lineHeight)) {
+            if (
+                typography.lineHeight &&
+                typeof typography.lineHeight === "object"
+            ) {
+                for (const [height, value] of Object.entries(
+                    typography.lineHeight
+                )) {
                     root.style.setProperty(`--line-height-${height}`, value);
                 }
             }

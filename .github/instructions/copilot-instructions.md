@@ -96,15 +96,15 @@ Available parameters for structured thinking:
 
 ### SQLite MCP Server
 
-| Tool               | Description                          | Parameters                          |
-|--------------------|--------------------------------------|-------------------------------------|
-| `read_query`       | Execute SELECT queries              | `query`: SQL SELECT statement       |
-| `write_query`      | Execute INSERT/UPDATE/DELETE queries| `query`: SQL modification statement |
-| `create_table`     | Create new tables                   | `query`: CREATE TABLE statement     |
-| `alter_table`      | Modify table schema                 | `query`: ALTER TABLE statement      |
-| `drop_table`       | Remove a table                      | `table_name`, `confirm: true`       |
-| `list_tables`      | List all tables                     | None                                |
-| `describe_table`   | View table schema                   | `table_name`                        |
-| `export_query`     | Export query results as CSV/JSON    | `query`, `format: "csv" or "json"`  |
-| `append_insight`   | Add business insight                | `insight`: Text                     |
-| `list_insights`    | List all insights                   | None                                |
+| Tool             | Description                          | Parameters                          |
+| ---------------- | ------------------------------------ | ----------------------------------- |
+| `read_query`     | Execute SELECT queries               | `query`: SQL SELECT statement       |
+| `write_query`    | Execute INSERT/UPDATE/DELETE queries | `query`: SQL modification statement |
+| `create_table`   | Create new tables                    | `query`: CREATE TABLE statement     |
+| `alter_table`    | Modify table schema                  | `query`: ALTER TABLE statement      |
+| `drop_table`     | Remove a table                       | `table_name`, `confirm: true`       |
+| `list_tables`    | List all tables                      | None                                |
+| `describe_table` | View table schema                    | `table_name`                        |
+| `export_query`   | Export query results as CSV/JSON     | `query`, `format: "csv" or "json"`  |
+| `append_insight` | Add business insight                 | `insight`: Text                     |
+| `list_insights`  | List all insights                    | None                                |
