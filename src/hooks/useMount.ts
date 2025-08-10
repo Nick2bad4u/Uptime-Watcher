@@ -68,7 +68,7 @@ export function useMount(
     mountCallbackRef.current = mountCallback;
     unmountCallbackRef.current = unmountCallback;
 
-    // eslint-disable-next-line canonical/prefer-use-mount -- This IS the useMount implementation
+    // eslint-disable-next-line canonical/prefer-use-mount -- This IS the useMount hook implementation; cannot use itself
     useEffect(() => {
         // Prevent duplicate mount in StrictMode
         if (hasMountedRef.current) {

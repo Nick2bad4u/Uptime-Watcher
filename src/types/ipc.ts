@@ -79,7 +79,7 @@ export function isIpcResponse<T>(value: unknown): value is IpcResponse<T> {
  *
  * @public
  */
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- Type parameter T provides type safety at call site; the generic enables callers to specify return type while maintaining type checking
 export function extractIpcData<T>(response: unknown): T {
     if (!isIpcResponse<T>(response)) {
         throw new Error(ERROR_CATALOG.ipc.INVALID_RESPONSE_FORMAT);

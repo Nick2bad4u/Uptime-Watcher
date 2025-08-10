@@ -39,7 +39,7 @@ export interface DetailLabelProps {
     readonly monitorType: MonitorType;
 }
 
-// eslint-disable-next-line sonarjs/function-return-type -- React component can return different node types
+// eslint-disable-next-line sonarjs/function-return-type -- React components legitimately return different node types (JSX elements, fragments, null, etc.)
 export function ConditionalResponseTime({
     children,
     fallback,

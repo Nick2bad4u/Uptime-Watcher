@@ -760,12 +760,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             (data: SiteEventData & { _meta?: unknown }): void => {
                 void (async (): Promise<void> => {
                     // Extract original data without _meta to prevent conflicts
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    const { _meta, ...originalData } = data;
                     await this.emitTyped("site:added", {
-                        site: originalData.site,
+                        site: data.site,
                         source: "user" as const,
-                        timestamp: originalData.timestamp,
+                        timestamp: data.timestamp,
                     });
                 })();
             }
@@ -776,15 +774,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             (data: SiteEventData & { _meta?: unknown }): void => {
                 void (async (): Promise<void> => {
                     // Extract original data without _meta to prevent conflicts
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    const { _meta, ...originalData } = data;
                     await this.emitTyped("site:removed", {
                         cascade: true,
-                        siteId:
-                            originalData.identifier ??
-                            originalData.site.identifier,
-                        siteName: originalData.site.name,
-                        timestamp: originalData.timestamp,
+                        siteId: data.identifier ?? data.site.identifier,
+                        siteName: data.site.name,
+                        timestamp: data.timestamp,
                     });
                 })();
             }
@@ -797,14 +791,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             ): void => {
                 void (async (): Promise<void> => {
                     // Extract original data without _meta to prevent conflicts
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    const { _meta, ...originalData } = data;
                     await this.emitTyped("site:updated", {
-                        previousSite:
-                            originalData.previousSite ?? originalData.site,
-                        site: originalData.site,
-                        timestamp: originalData.timestamp,
-                        updatedFields: originalData.updatedFields ?? [],
+                        previousSite: data.previousSite ?? data.site,
+                        site: data.site,
+                        timestamp: data.timestamp,
+                        updatedFields: data.updatedFields ?? [],
                     });
                 })();
             }

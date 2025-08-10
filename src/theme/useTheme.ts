@@ -3,7 +3,7 @@
  * Handles theme switching, system theme detection, and provides color/styling utilities.
  */
 
-/* eslint-disable unicorn/consistent-function-scoping -- Hook functions must remain inside hooks for context access */
+/* eslint-disable unicorn/consistent-function-scoping -- Hook utility functions must remain inside hook scope to access current theme state and prevent stale closures */
 
 import {
     isSiteStatus,
@@ -146,7 +146,7 @@ export function useTheme(): UseThemeReturn {
         // Set initial system theme using timeout
         const initialTheme: "dark" | "light" =
             themeManager.getSystemThemePreference();
-        // eslint-disable-next-line @eslint-react/web-api/no-leaked-timeout -- Timeout is properly cleaned up in the forEach loop below
+        // eslint-disable-next-line @eslint-react/web-api/no-leaked-timeout -- Timeout is explicitly tracked in timeoutIds array and cleared in cleanup function below
         const initialTimeoutId = setTimeout(() => {
             updateSystemTheme(initialTheme);
         }, UI_DELAYS.STATE_UPDATE_DEFER);

@@ -194,7 +194,7 @@ export const HistoryTab = ({
             });
             lastLoggedMonitorId.current = selectedMonitor.id;
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally exclude selectedMonitor.history to prevent re-logging on history updates
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- Intentionally exclude selectedMonitor.history.length to prevent re-logging on every history update; only log when monitor ID or type changes
     }, [selectedMonitor.id, selectedMonitor.type]);
 
     const filteredHistoryRecords = selectedMonitor.history

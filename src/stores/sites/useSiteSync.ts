@@ -3,7 +3,7 @@
  *
  * @remarks
  * Provides comprehensive site synchronization functionality including:
- * - Full backend synchroni    let statusUpdateManager: StatusUpdateManager | undefined = undefined;ation
+ * - Full backend synchronization
  * - Real-time status updates via event subscriptions
  * - Sync status monitoring and reporting
  * - Centralized error handling through the error store
@@ -164,7 +164,7 @@ export interface SiteSyncDependencies {
 }
 
 // Create a shared status update manager instance - will be initialized when first used
-// eslint-disable-next-line @typescript-eslint/init-declarations
+// eslint-disable-next-line @typescript-eslint/init-declarations -- Intentional lazy initialization to create singleton instance only when needed, avoiding unnecessary object creation
 let statusUpdateManager: StatusUpdateManager | undefined;
 
 /**

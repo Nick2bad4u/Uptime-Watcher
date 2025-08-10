@@ -156,8 +156,7 @@ export const Header = (): JSX.Element => {
                     {/* Left: App Title & Status Summary */}
                     <div className="flex min-w-0 shrink flex-wrap items-center gap-6">
                         {/* App Title with subtle background and border */}
-                        {/* eslint-disable-next-line tailwind/no-arbitrary-value -- Specific design requirement */}
-                        <span className="header-title-box flex min-w-[180px] items-center gap-2 px-4 py-1">
+                        <span className="header-title-box flex min-w-45 items-center gap-2 px-4 py-1">
                             <span className="text-2xl select-none">📊</span>
                             <ThemedText
                                 className="header-title-accent truncate"
@@ -170,7 +169,7 @@ export const Header = (): JSX.Element => {
 
                         {/* Status Summary - Enhanced */}
                         <ThemedBox
-                            className="header-status-summary-box flex min-w-[340px] items-center space-x-3 transition-all duration-300" // eslint-disable-line tailwind/no-arbitrary-value
+                            className="header-status-summary-box flex min-w-85 items-center space-x-3 transition-all duration-300"
                             padding="sm"
                             rounded="lg"
                             shadow="sm"

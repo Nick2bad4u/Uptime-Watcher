@@ -122,8 +122,8 @@ export const SiteCardHeader: React.NamedExoticComponent<SiteCardHeaderProps> =
                     {site.site.name}
                 </ThemedText>
 
-                {/* eslint-disable-next-line tailwind/no-arbitrary-value -- Specific design requirement for monitor selector width */}
-                <div className="header-title-box flex min-w-[180px] items-center gap-2 px-4 py-1">
+                {/* Monitor selector with proper Tailwind width class */}
+                <div className="header-title-box flex min-w-45 items-center gap-2 px-4 py-1">
                     <MonitorSelector
                         monitors={site.site.monitors}
                         onChange={handleChange}

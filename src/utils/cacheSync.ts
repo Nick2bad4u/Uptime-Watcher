@@ -122,7 +122,7 @@ function clearSiteRelatedCaches(identifier?: string): void {
  */
 export function setupCacheSync(): () => void {
     // Check if we're in an Electron environment with cache invalidation events available
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- window.electronAPI can be undefined outside Electron environments
     if (typeof window === "undefined" || !window.electronAPI?.events) {
         logger.warn(
             "Cache invalidation events not available - frontend cache sync disabled"

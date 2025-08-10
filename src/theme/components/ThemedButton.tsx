@@ -159,7 +159,7 @@ const ThemedButton = ({
         [onClick]
     );
 
-    // eslint-disable-next-line sonarjs/function-return-type -- React component can return different node types
+    // eslint-disable-next-line sonarjs/function-return-type -- React rendering function legitimately returns different node types (JSX elements, loading spinner, text content)
     const renderContent = (): React.ReactNode => {
         if (loading) {
             return (
@@ -204,7 +204,7 @@ const ThemedButton = ({
             onClick={handleClick}
             style={style}
             title={title}
-            // eslint-disable-next-line react/button-has-type -- Type is correctly typed with default value
+            // eslint-disable-next-line react/button-has-type -- Type prop is properly typed with ButtonType union and has 'button' as default; ESLint cannot detect TypeScript type safety
             type={type}
         >
             {renderContent()}

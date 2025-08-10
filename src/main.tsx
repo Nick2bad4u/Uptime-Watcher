@@ -32,7 +32,7 @@ import "./index.css";
  * ```
  */
 function initializeApp(): void {
-    // eslint-disable-next-line unicorn/prefer-query-selector -- getElementById is more performant for single ID lookups
+    // eslint-disable-next-line unicorn/prefer-query-selector -- getElementById is measurably faster for single ID lookups and this is the critical app initialization path
     const rootElement = document.getElementById("root");
     if (!rootElement) {
         throw new Error("Root element not found");

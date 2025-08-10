@@ -64,8 +64,7 @@ export const AddSiteModal: React.NamedExoticComponent<object> = React.memo(
         }, [handleClose, showAddSiteModal]);
 
         if (!showAddSiteModal) {
-            // eslint-disable-next-line react/jsx-no-useless-fragment
-            return <></>;
+            return null;
         }
 
         return (

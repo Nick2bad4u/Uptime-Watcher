@@ -3,8 +3,6 @@
  * Provides a unified interface for site check, start/stop monitoring actions.
  */
 
-/* eslint-disable tailwind/no-arbitrary-value -- Specific button sizing requirements */
-
 import React, { useCallback } from "react";
 
 import ThemedButton from "../../../../theme/components/ThemedButton";
@@ -105,7 +103,7 @@ export const ActionButtonGroup: React.NamedExoticComponent<ActionButtonGroupProp
             <div className="flex items-center gap-2">
                 <ThemedButton
                     aria-label="Check Now"
-                    className="min-w-[32px]"
+                    className="min-w-8"
                     disabled={isLoading || disabled}
                     onClick={handleCheckNowClick}
                     size="sm"
@@ -117,7 +115,7 @@ export const ActionButtonGroup: React.NamedExoticComponent<ActionButtonGroupProp
 
                 <SiteMonitoringButton
                     allMonitorsRunning={allMonitorsRunning}
-                    className="min-w-[32px]"
+                    className="min-w-8"
                     compact
                     isLoading={isLoading || disabled}
                     onStartSiteMonitoring={onStartSiteMonitoring}
@@ -127,7 +125,7 @@ export const ActionButtonGroup: React.NamedExoticComponent<ActionButtonGroupProp
                 {isMonitoring ? (
                     <ThemedButton
                         aria-label="Stop Monitoring"
-                        className="min-w-[32px]"
+                        className="min-w-8"
                         disabled={isLoading || disabled}
                         onClick={handleStopMonitoringClick}
                         size="sm"
@@ -139,7 +137,7 @@ export const ActionButtonGroup: React.NamedExoticComponent<ActionButtonGroupProp
                 ) : (
                     <ThemedButton
                         aria-label="Start Monitoring"
-                        className="min-w-[32px]"
+                        className="min-w-8"
                         disabled={isLoading || disabled}
                         onClick={handleStartMonitoringClick}
                         size="sm"
@@ -152,5 +150,3 @@ export const ActionButtonGroup: React.NamedExoticComponent<ActionButtonGroupProp
             </div>
         );
     });
-
-/* eslint-enable tailwind/no-arbitrary-value */

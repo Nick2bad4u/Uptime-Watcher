@@ -6,7 +6,7 @@
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 
 import { CacheKeys } from "../../shared/utils/cacheKeys";
-// eslint-disable-next-line import-x/no-unassigned-import -- Global type declarations
+// eslint-disable-next-line import-x/no-unassigned-import -- Side-effect import for global type declarations that must be loaded at module level
 import "../types"; // Import global type declarations
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { AppCaches } from "./cache";
