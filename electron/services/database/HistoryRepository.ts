@@ -351,10 +351,14 @@ export class HistoryRepository {
             async () => {
                 // Use executeTransaction for atomic multi-monitor operation
                 await this.databaseService.executeTransaction((db) => {
+                    // Type assertion is safe: SQL query "SELECT id FROM monitors" guarantees { id: number } structure
+
                     const monitors = db.all(
                         HISTORY_QUERIES.SELECT_MONITOR_IDS
                     ) as Array<{ id: number }>;
                     for (const monitor of monitors) {
+                        // Type assertion is safe: SQL query "SELECT id FROM history..." guarantees { id: number } structure
+
                         const excessEntries = db.all(
                             HISTORY_QUERIES.SELECT_EXCESS_ENTRIES,
                             [
@@ -402,6 +406,8 @@ export class HistoryRepository {
         }
 
         // Get all monitor IDs
+        // Type assertion is safe: SQL query "SELECT id FROM monitors" guarantees { id: number } structure
+
         const monitorRows = db.all(
             HISTORY_QUERIES.SELECT_MONITOR_IDS
         ) as Array<{

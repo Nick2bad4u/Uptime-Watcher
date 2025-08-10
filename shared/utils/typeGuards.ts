@@ -80,7 +80,6 @@ export function isArray<T = unknown>(
     }
 
     if (itemValidator) {
-        // eslint-disable-next-line unicorn/no-array-callback-reference -- itemValidator is a proper type guard function
         return value.every(itemValidator);
     }
 

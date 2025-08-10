@@ -151,10 +151,10 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
         const handleCheckIntervalChange = useCallback(
             (value: string) => {
                 const numericValue = Number(value);
-                if (!Number.isNaN(numericValue)) {
-                    setCheckInterval(numericValue);
-                } else {
+                if (Number.isNaN(numericValue)) {
                     logger.error(`Invalid check interval value: ${value}`);
+                } else {
+                    setCheckInterval(numericValue);
                 }
             },
             [setCheckInterval]

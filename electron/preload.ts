@@ -155,6 +155,11 @@ const dataAPI = {
         buffer: ArrayBuffer;
         fileName: string;
     }> => {
+        // This assertion is safe because:
+        // 1. The IPC handler is defined in our codebase with a known return type
+        // 2. This is an internal API call with a well-defined contract
+        // 3. The main process handler guarantees this specific return type structure
+
         return ipcRenderer.invoke("download-sqlite-backup") as Promise<{
             buffer: ArrayBuffer;
             fileName: string;

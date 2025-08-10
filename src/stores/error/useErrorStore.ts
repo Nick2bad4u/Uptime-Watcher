@@ -34,7 +34,7 @@ import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 import type { ErrorStore } from "./types";
 
-import { logStoreAction } from "../shared/utils";
+import { logStoreAction } from "../utils";
 
 export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
     create<ErrorStore>()((set, get) => ({

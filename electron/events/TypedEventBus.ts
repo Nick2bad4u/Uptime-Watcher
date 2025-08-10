@@ -10,9 +10,21 @@
  * ```typescript
  * interface MyEvents {
  *   'user:login': { userId: string; timestamp: number };
- *   'data:updated': { table: string; records: number };
- * }
- *
+ *   'data:updated': { table: string; records: nu        // Handle objects with potential _meta conflicts
+        // Since T extends object, we know data is an object
+        const hasExistingMeta = Object.hasOwn(data, "_meta");
+        if (hasExistingMeta) {
+            logger.debug(
+                `[TypedEventBus:${this.busId}] Event data contains _meta property, preserving as _originalMeta`
+            );
+            // Type-safe access to _meta property
+            const existingMeta = (data as { _meta?: unknown })._meta;
+            return {
+                ...data,
+                _meta: metadata,
+                _originalMeta: existingMeta,
+            } as T & { _meta: EventMetadata };
+        } *
  * const bus = new TypedEventBus<MyEvents>('app-events');
  * bus.onTyped('user:login', (data) => {
  *   console.log(`User ${data.userId} logged in at ${data.timestamp}`);
@@ -117,7 +129,10 @@ export type EventMiddleware<T = unknown> = (
  * middleware processing, and comprehensive debugging capabilities. Events are
  * processed through a middleware chain before emission.
  *
- * @typeParam EventMap - Map of event names to their data types.
+ * **Type Constraints:**
+ * EventMap values must be object types (not primitives) to support metadata enhancement.
+ *
+ * @typeParam EventMap - Map of event names to their data types. Values must be object types.
  *
  * @public
  */
@@ -234,7 +249,7 @@ export class TypedEventBus<
         data: EventMap[K]
     ): Promise<void> {
         const correlationId = generateCorrelationId();
-        const eventName = event as string;
+        const eventName = String(event);
 
         logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_EMISSION_START, {
             busId: this.busId,
@@ -283,7 +298,7 @@ export class TypedEventBus<
     public getDiagnostics(): EventBusDiagnostics {
         const listenerCounts: Record<string, number> = {};
         for (const eventName of this.eventNames()) {
-            listenerCounts[eventName as string] = this.listenerCount(eventName);
+            listenerCounts[String(eventName)] = this.listenerCount(eventName);
         }
 
         return {
@@ -323,7 +338,7 @@ export class TypedEventBus<
         event: K,
         listener?: (data: EventMap[K] & { _meta: EventMetadata }) => void
     ): this {
-        const eventName = event as string;
+        const eventName = String(event);
         if (listener) {
             this.off(eventName, listener);
         } else {
@@ -359,7 +374,7 @@ export class TypedEventBus<
         event: K,
         listener: (data: EventMap[K] & { _meta: EventMetadata }) => void
     ): this {
-        const eventName = event as string;
+        const eventName = String(event);
         this.once(eventName, listener);
 
         logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_ONE_TIME_LISTENER, {
@@ -385,7 +400,7 @@ export class TypedEventBus<
         event: K,
         listener: (data: EventMap[K] & { _meta: EventMetadata }) => void
     ): this {
-        const eventName = event as string;
+        const eventName = String(event);
         this.on(eventName, listener);
 
         logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_LISTENER_REGISTERED, {
@@ -476,13 +491,22 @@ export class TypedEventBus<
      * @param metadata - Metadata to add.
      * @returns Enhanced data with `_meta` property.
      */
-    private createEnhancedData<T>(
-        data: T,
+    private createEnhancedData(
+        data: unknown,
         metadata: EventMetadata
-    ): T & { _meta: EventMetadata } {
+    ): unknown {
+        // Handle primitive types (string, number, boolean, null, undefined)
+        if (typeof data !== "object" || data === null) {
+            return {
+                _meta: metadata,
+                value: data,
+            };
+        }
         // Handle arrays specially to preserve array nature
         if (Array.isArray(data)) {
-            const result = Array.from(data);
+            // For arrays, we need to preserve both the array type and add _meta
+            // This is a legitimate type transformation that requires careful handling
+            const result: unknown[] = Array.from(data);
             // Use defineProperty to add non-enumerable _meta, preserving array immutability expectations
             Object.defineProperty(result, "_meta", {
                 configurable: false,
@@ -490,29 +514,34 @@ export class TypedEventBus<
                 value: metadata,
                 writable: false,
             });
-            return result as T & { _meta: EventMetadata };
+            // This assertion is safe because:
+            // 1. result has the same elements as data (Array.from preserves content)
+            // 2. we've added the required _meta property
+            // 3. defineProperty preserves the array nature
+            // 4. T is known to be an array type (from Array.isArray check)
+
+            return result;
         }
 
         // Handle objects with potential _meta conflicts
-        if (typeof data === "object" && data != null) {
-            const hasExistingMeta = Object.hasOwn(data, "_meta");
-            if (hasExistingMeta) {
-                logger.debug(
-                    `[TypedEventBus:${this.busId}] Event data contains _meta property, preserving as _originalMeta`
-                );
-                return {
-                    ...data,
-                    _meta: metadata,
-                    _originalMeta: (data as Record<string, unknown>)["_meta"],
-                } as T & { _meta: EventMetadata };
-            }
-
-            return { ...data, _meta: metadata } as T & { _meta: EventMetadata };
+        const hasExistingMeta = Object.hasOwn(data, "_meta");
+        if (hasExistingMeta) {
+            logger.debug(
+                `[TypedEventBus:${this.busId}] Event data contains _meta property, preserving as _originalMeta`
+            );
+            // Type-safe access to _meta property
+            const existingMeta = (data as { _meta?: unknown })._meta;
+            return {
+                ...data,
+                _meta: metadata,
+                _originalMeta: existingMeta,
+            };
         }
 
-        // Handle primitives
-        return { _meta: metadata, value: data } as unknown as T & {
-            _meta: EventMetadata;
+        // Safe transformation: spreading object and adding _meta
+        return {
+            ...data,
+            _meta: metadata,
         };
     }
 
@@ -574,7 +603,7 @@ export class TypedEventBus<
  * const bus = createTypedEventBus<MyEvents>('my-bus', { maxMiddleware: 30 });
  * ```
  *
- * @typeParam EventMap - Map of event names to their data types.
+ * @typeParam EventMap - Map of event names to their data types. Values can be any type.
  * @param name - Optional name for the bus (used in logging and diagnostics).
  * @param options - Optional configuration options for the event bus.
  * @returns A new {@link TypedEventBus} instance.

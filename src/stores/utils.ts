@@ -156,10 +156,10 @@ export const logStoreAction = (
     data?: unknown
 ): void => {
     if (isDevelopment()) {
-        if (data !== undefined) {
-            logger.info(`[${storeName}] ${actionName}`, data);
-        } else {
+        if (data === undefined) {
             logger.info(`[${storeName}] ${actionName}`);
+        } else {
+            logger.info(`[${storeName}] ${actionName}`, data);
         }
     }
 };

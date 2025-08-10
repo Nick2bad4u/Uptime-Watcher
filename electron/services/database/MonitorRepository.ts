@@ -24,6 +24,12 @@ import {
     rowsToMonitors,
     rowToMonitorOrUndefined,
 } from "./utils/monitorMapper";
+import {
+    insertWithReturning,
+    queryForIds,
+    queryForRecords,
+    queryForSingleRecord,
+} from "./utils/typedQueries";
 
 /**
  * Repository dependencies for managing monitor data persistence.
@@ -119,17 +125,13 @@ export class MonitorRepository {
                 await this.databaseService.executeTransaction((db) => {
                     for (const monitor of monitors) {
                         // Use RETURNING clause to get the ID directly from the insert
-                        const insertResult = db.get(
+                        const insertResult = insertWithReturning(
+                            db,
                             MONITOR_QUERIES.INSERT_WITH_RETURNING,
                             buildMonitorParameters(siteIdentifier, monitor)
-                        ) as Record<string, unknown> | undefined;
+                        );
 
-                        // Enhanced type safety validation
-                        if (!insertResult || typeof insertResult !== "object") {
-                            throw new Error(
-                                "Failed to create monitor: invalid database response"
-                            );
-                        }
+                        // Validate the returned ID from database
                         if (
                             !("id" in insertResult) ||
                             typeof insertResult["id"] !== "number" ||
@@ -253,6 +255,7 @@ export class MonitorRepository {
     ): string {
         // Generate dynamic SQL and parameters
         const { columns, placeholders } = generateSqlParameters();
+        // Type assertion is safe: buildMonitorParameters doesn't use the id field for INSERT operations
         const parameters = buildMonitorParameters(
             siteIdentifier,
             monitor as Site["monitors"][0]
@@ -260,16 +263,9 @@ export class MonitorRepository {
 
         const insertSql = `INSERT INTO monitors (${columns.join(", ")}) VALUES (${placeholders}) RETURNING id`;
 
-        const insertResult = db.get(insertSql, parameters) as
-            | Record<string, unknown>
-            | undefined;
+        const insertResult = insertWithReturning(db, insertSql, parameters);
 
-        // Enhanced type safety validation
-        if (!insertResult || typeof insertResult !== "object") {
-            throw new Error(
-                `Failed to create monitor for site ${siteIdentifier}: invalid database response`
-            );
-        }
+        // Validate the returned ID from database
         if (
             !("id" in insertResult) ||
             typeof insertResult["id"] !== "number" ||
@@ -410,11 +406,11 @@ export class MonitorRepository {
         siteIdentifier: string
     ): void {
         // Get all monitor IDs for this site
-        const monitorRows = db.all(MONITOR_QUERIES.SELECT_IDS_BY_SITE, [
-            siteIdentifier,
-        ]) as Array<{
-            id: number;
-        }>;
+        const monitorRows = queryForIds(
+            db,
+            MONITOR_QUERIES.SELECT_IDS_BY_SITE,
+            [siteIdentifier]
+        );
 
         // Delete history for all monitors
         for (const row of monitorRows) {
@@ -462,9 +458,11 @@ export class MonitorRepository {
         return withDatabaseOperation(
             () => {
                 const db = this.getDb();
-                const row = db.get(MONITOR_QUERIES.SELECT_BY_ID, [
-                    monitorId,
-                ]) as MonitorRow | undefined;
+                const row = queryForSingleRecord(
+                    db,
+                    MONITOR_QUERIES.SELECT_BY_ID,
+                    [monitorId]
+                ) as MonitorRow | undefined;
 
                 return Promise.resolve(rowToMonitorOrUndefined(row));
             },
@@ -492,9 +490,11 @@ export class MonitorRepository {
     ): Promise<Site["monitors"]> {
         return withDatabaseOperation(() => {
             const db = this.getDb();
-            const monitorRows = db.all(MONITOR_QUERIES.SELECT_BY_SITE, [
-                siteIdentifier,
-            ]) as MonitorRow[];
+            const monitorRows = queryForRecords(
+                db,
+                MONITOR_QUERIES.SELECT_BY_SITE,
+                [siteIdentifier]
+            ) as MonitorRow[];
 
             return Promise.resolve(rowsToMonitors(monitorRows));
         }, `find-monitors-by-site-${siteIdentifier}`);
@@ -515,9 +515,7 @@ export class MonitorRepository {
     public async getAllMonitorIds(): Promise<Array<{ id: number }>> {
         return withDatabaseOperation(() => {
             const db = this.getDb();
-            const rows = db.all(MONITOR_QUERIES.SELECT_ALL_IDS) as Array<{
-                id: number;
-            }>;
+            const rows = queryForIds(db, MONITOR_QUERIES.SELECT_ALL_IDS);
             return Promise.resolve(rows);
         }, "monitor-get-all-ids");
     }

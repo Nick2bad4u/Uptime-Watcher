@@ -1017,15 +1017,6 @@ export const EVENT_PRIORITIES = {
 } as const;
 
 /**
- * Type mapping for event priorities.
- *
- * @remarks
- * Used internally for type-safe mapping of event priorities.
- * @internal
- */
-type EventPriorityMap = typeof EVENT_PRIORITIES;
-
-/**
  * Gets the priority level of an event with type safety.
  *
  * @remarks
@@ -1046,13 +1037,24 @@ type EventPriorityMap = typeof EVENT_PRIORITIES;
 export function getEventPriority(
     eventName: keyof UptimeEvents
 ): keyof typeof EVENT_PRIORITIES {
-    for (const [priority, events] of Object.entries(EVENT_PRIORITIES) as Array<
-        [keyof EventPriorityMap, readonly string[]]
-    >) {
-        if (events.includes(eventName as string)) {
-            return priority;
-        }
+    const eventNameStr = String(eventName);
+
+    // Check each priority level using string-based comparison to avoid type assertion issues
+    if (
+        (EVENT_PRIORITIES.CRITICAL as readonly string[]).includes(eventNameStr)
+    ) {
+        return "CRITICAL";
     }
+    if ((EVENT_PRIORITIES.HIGH as readonly string[]).includes(eventNameStr)) {
+        return "HIGH";
+    }
+    if ((EVENT_PRIORITIES.LOW as readonly string[]).includes(eventNameStr)) {
+        return "LOW";
+    }
+    if ((EVENT_PRIORITIES.MEDIUM as readonly string[]).includes(eventNameStr)) {
+        return "MEDIUM";
+    }
+
     return "MEDIUM"; // Default priority for uncategorized events
 }
 
@@ -1080,44 +1082,64 @@ export function isEventOfCategory(
     eventName: keyof UptimeEvents,
     category: keyof typeof EVENT_CATEGORIES
 ): boolean {
-    // Type-safe category checking using switch statement
+    const eventNameStr = String(eventName);
+
+    // Type-safe category checking using string-based comparison
     switch (category) {
         case "CACHE": {
-            return EVENT_CATEGORIES.CACHE.includes(eventName as never);
+            return (EVENT_CATEGORIES.CACHE as readonly string[]).includes(
+                eventNameStr
+            );
         }
         case "CONFIG": {
-            return EVENT_CATEGORIES.CONFIG.includes(eventName as never);
+            return (EVENT_CATEGORIES.CONFIG as readonly string[]).includes(
+                eventNameStr
+            );
         }
         case "DATABASE": {
-            return EVENT_CATEGORIES.DATABASE.includes(eventName as never);
+            return (EVENT_CATEGORIES.DATABASE as readonly string[]).includes(
+                eventNameStr
+            );
         }
         case "INTERNAL_DATABASE": {
-            return EVENT_CATEGORIES.INTERNAL_DATABASE.includes(
-                eventName as never
-            );
+            return (
+                EVENT_CATEGORIES.INTERNAL_DATABASE as readonly string[]
+            ).includes(eventNameStr);
         }
         case "INTERNAL_MONITOR": {
-            return EVENT_CATEGORIES.INTERNAL_MONITOR.includes(
-                eventName as never
-            );
+            return (
+                EVENT_CATEGORIES.INTERNAL_MONITOR as readonly string[]
+            ).includes(eventNameStr);
         }
         case "INTERNAL_SITE": {
-            return EVENT_CATEGORIES.INTERNAL_SITE.includes(eventName as never);
+            return (
+                EVENT_CATEGORIES.INTERNAL_SITE as readonly string[]
+            ).includes(eventNameStr);
         }
         case "MONITOR": {
-            return EVENT_CATEGORIES.MONITOR.includes(eventName as never);
+            return (EVENT_CATEGORIES.MONITOR as readonly string[]).includes(
+                eventNameStr
+            );
         }
         case "MONITORING": {
-            return EVENT_CATEGORIES.MONITORING.includes(eventName as never);
+            return (EVENT_CATEGORIES.MONITORING as readonly string[]).includes(
+                eventNameStr
+            );
         }
         case "PERFORMANCE": {
-            return EVENT_CATEGORIES.PERFORMANCE.includes(eventName as never);
+            return (EVENT_CATEGORIES.PERFORMANCE as readonly string[]).includes(
+                eventNameStr
+            );
         }
         case "SITE": {
-            return EVENT_CATEGORIES.SITE.includes(eventName as never);
+            return (EVENT_CATEGORIES.SITE as readonly string[]).includes(
+                eventNameStr
+            );
         }
         case "SYSTEM": {
-            return EVENT_CATEGORIES.SYSTEM.includes(eventName as never);
+            return (EVENT_CATEGORIES.SYSTEM as readonly string[]).includes(
+                eventNameStr
+            );
         }
         default: {
             return false;

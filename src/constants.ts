@@ -1,13 +1,23 @@
 /**
  * Centralized constants for the Uptime Watcher application.
- * Contains configuration values, UI constants, and type definitions.
- */
-
-/**
- * Font family constants for theme reuse.
  *
  * @remarks
- * Monospace fonts prioritize consistent character spacing.
+ * Contains configuration values, UI constants, fallback data, and type definitions
+ * used throughout the frontend application. This module serves as the single source
+ * of truth for application-wide constants to ensure consistency and maintainability.
+ *
+ * @example
+ * ```typescript
+ * import { TRANSITION_ALL, FALLBACK_MONITOR_TYPE_OPTIONS } from './constants';
+ *
+ * // Use transition timing for animations
+ * const buttonStyle = { transition: TRANSITION_ALL };
+ *
+ * // Use fallback monitor types when backend is unavailable
+ * const monitorOptions = FALLBACK_MONITOR_TYPE_OPTIONS;
+ * ```
+ *
+ * @packageDocumentation
  */
 
 /**
@@ -15,18 +25,34 @@
  *
  * @remarks
  * Provides consistent transition timing across the application
- * for smooth user interface animations.
+ * for smooth user interface animations. This value ensures all
+ * UI transitions feel cohesive and respond at the same speed.
+ *
+ * @defaultValue "all 0.2s ease-in-out"
+ *
+ * @public
  */
 export const TRANSITION_ALL = "all 0.2s ease-in-out";
 
 /**
  * Fallback monitor type options when backend loading fails.
- * These match the core monitor types available in the system.
  *
  * @remarks
  * Used as a fallback to ensure the UI remains functional even when
  * the backend monitor type registry is unavailable. These should
  * match the BASE_MONITOR_TYPES defined in shared/types.ts.
+ *
+ * @example
+ * ```typescript
+ * const options = FALLBACK_MONITOR_TYPE_OPTIONS;
+ * // Result: [
+ * //   { label: "HTTP (Website/API)", value: "http" },
+ * //   { label: "Port (Host/Port)", value: "port" },
+ * //   { label: "Ping (Host)", value: "ping" }
+ * // ]
+ * ```
+ *
+ * @public
  */
 export const FALLBACK_MONITOR_TYPE_OPTIONS = [
     { label: "HTTP (Website/API)", value: "http" },
@@ -35,10 +61,21 @@ export const FALLBACK_MONITOR_TYPE_OPTIONS = [
 ] as const;
 
 /**
- * Font family constants for theme reuse.
+ * Font family constants for monospace text display.
  *
  * @remarks
- * Monospace fonts prioritize consistent character width for code display.
+ * Monospace fonts prioritize consistent character width for code display,
+ * data tables, and other content where alignment is important. The array
+ * provides fallback fonts for cross-platform compatibility.
+ *
+ * @example
+ * ```typescript
+ * const codeStyle = {
+ *   fontFamily: FONT_FAMILY_MONO.join(', ')
+ * };
+ * ```
+ *
+ * @public
  */
 export const FONT_FAMILY_MONO: string[] = [
     "SF Mono",
@@ -52,7 +89,19 @@ export const FONT_FAMILY_MONO: string[] = [
  * Sans-serif font family constants for general UI text.
  *
  * @remarks
- * Prioritizes system fonts for optimal performance and native appearance.
+ * Provides a modern, readable font stack for body text and UI elements.
+ * The fallback chain ensures consistent display across different operating
+ * systems and environments. Prioritizes system fonts for optimal performance
+ * and native appearance.
+ *
+ * @example
+ * ```typescript
+ * const textStyle = {
+ *   fontFamily: FONT_FAMILY_SANS.join(', ')
+ * };
+ * ```
+ *
+ * @public
  */
 export const FONT_FAMILY_SANS: string[] = [
     "Inter",
@@ -68,6 +117,10 @@ export const FONT_FAMILY_SANS: string[] = [
  *
  * @remarks
  * Provides structured data for time interval selection components.
+ * Used by monitoring configuration forms to present user-friendly
+ * interval options with corresponding millisecond values.
+ *
+ * @public
  */
 export interface IntervalOption {
     /** Human-readable label for the interval */
@@ -78,7 +131,22 @@ export interface IntervalOption {
 
 /**
  * Available check intervals for site monitoring.
+ *
+ * @remarks
  * Ranges from 5 seconds to 30 days with sensible progressions.
+ * Provides a comprehensive set of monitoring intervals from high-frequency
+ * testing to long-term health checks. Values are optimized for different
+ * monitoring scenarios and performance requirements.
+ *
+ * @example
+ * ```typescript
+ * const selectedInterval = CHECK_INTERVALS.find(interval =>
+ *   interval.value === 300000
+ * );
+ * console.log(selectedInterval?.label); // "5 minutes"
+ * ```
+ *
+ * @public
  */
 export const CHECK_INTERVALS: IntervalOption[] = [
     // Seconds

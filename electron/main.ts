@@ -22,7 +22,10 @@ import { logger } from "./utils/logger";
 
 // Configure electron-log for main process
 // Configure logging based on environment and command line arguments
-const configureLogging = (): { consoleLevel: string; fileLevel: string } => {
+const configureLogging = (): {
+    consoleLevel: ElectronLogLevel;
+    fileLevel: ElectronLogLevel;
+} => {
     // Check for debug flag in command line arguments
     const args = new Set(process.argv.slice(2));
     const debugFlag = args.has("--debug") || args.has("--log-debug");
@@ -31,8 +34,10 @@ const configureLogging = (): { consoleLevel: string; fileLevel: string } => {
     const infoFlag = args.has("--log-info");
 
     // Determine log level based on flags and environment
-    let consoleLevel = "";
-    let fileLevel = "";
+    // eslint-disable-next-line @typescript-eslint/init-declarations
+    let consoleLevel: ElectronLogLevel;
+    // eslint-disable-next-line @typescript-eslint/init-declarations
+    let fileLevel: ElectronLogLevel;
 
     if (debugFlag) {
         consoleLevel = "debug";
@@ -81,8 +86,8 @@ const LOG_FILE_FORMAT: string =
 const LOG_CONSOLE_FORMAT: string = "[{h}:{i}:{s}.{ms}] [{level}] {text}";
 
 const { consoleLevel, fileLevel } = configureLogging();
-log.transports.file.level = fileLevel as ElectronLogLevel;
-log.transports.console.level = consoleLevel as ElectronLogLevel;
+log.transports.file.level = fileLevel;
+log.transports.console.level = consoleLevel;
 log.transports.file.fileName = ELECTRON_LOG_FILE;
 log.transports.file.maxSize = LOG_FILE_MAX_SIZE;
 log.transports.file.format = LOG_FILE_FORMAT;
