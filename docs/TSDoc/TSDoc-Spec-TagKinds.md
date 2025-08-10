@@ -25,7 +25,7 @@ appearing prior to the first block tag is interpreted as the special
 
 **Examples of block tags:**
 
-``` ts
+````ts
 /**
  * This is the special summary section.
  *
@@ -42,7 +42,7 @@ appearing prior to the first block tag is interpreted as the special
  * logger.error('Something happened');
  * ```
  */
-```
+````
 
 ## Modifier tags
 
@@ -57,7 +57,7 @@ bottom of the doc comment.
 
 **Examples of modifier tags:**
 
-``` ts
+```ts
 /**
  * This is the special summary section.
  *
@@ -78,7 +78,7 @@ and `@inheritDoc` tags are examples of inline tags.
 
 **Examples of inline tags:**
 
-``` ts
+```ts
 class Book {
   /**
    * Writes the book information into a JSON file.

@@ -146,54 +146,60 @@ const newHashes = {};
 
 // Download and process a single doc page
 function downloadFile(cmd, filePath, logMsg, name) {
-    return /** @type {Promise<void>} */(new Promise((resolve, reject) => {
-        // Ensure parent directory exists before running pandoc
-        const dir = path.dirname(filePath);
-        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    return /** @type {Promise<void>} */ (
+        new Promise((resolve, reject) => {
+            // Ensure parent directory exists before running pandoc
+            const dir = path.dirname(filePath);
+            if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
-        exec(cmd, (err) => {
-            if (err) {
-                console.error(logMsg.replace("✅", "❌") + ` → ${err.message}`);
-                return reject(err);
-            }
-            if (!fs.existsSync(filePath)) {
-                console.error(
-                    logMsg.replace("✅", "❌") + " → File not created."
-                );
-                return reject(new Error("File not created: " + filePath));
-            }
-            let content;
-            try {
-                content = fs.readFileSync(filePath, "utf8");
-            } catch (readErr) {
-                console.error(
-                    logMsg.replace("✅", "❌") +
-                        ` → Failed to read file: ${readErr.message}`
-                );
-                return reject(readErr);
-            }
-            if (!content || content.trim().length === 0) {
-                console.error(logMsg.replace("✅", "❌") + " → File is empty.");
-                return reject(
-                    new Error("Downloaded file is empty: " + filePath)
-                );
-            }
-            try {
-                let processedContent = rewriteLinks(content);
-                processedContent = cleanContent(processedContent);
-                fs.writeFileSync(filePath, processedContent);
-            } catch (writeErr) {
-                console.error(
-                    logMsg.replace("✅", "❌") +
-                        ` → Failed to write file: ${writeErr.message}`
-                );
-                return reject(writeErr);
-            }
-            console.log(logMsg);
-            downloadedFiles.push(name);
-            resolve();
-        });
-    }));
+            exec(cmd, (err) => {
+                if (err) {
+                    console.error(
+                        logMsg.replace("✅", "❌") + ` → ${err.message}`
+                    );
+                    return reject(err);
+                }
+                if (!fs.existsSync(filePath)) {
+                    console.error(
+                        logMsg.replace("✅", "❌") + " → File not created."
+                    );
+                    return reject(new Error("File not created: " + filePath));
+                }
+                let content;
+                try {
+                    content = fs.readFileSync(filePath, "utf8");
+                } catch (readErr) {
+                    console.error(
+                        logMsg.replace("✅", "❌") +
+                            ` → Failed to read file: ${readErr.message}`
+                    );
+                    return reject(readErr);
+                }
+                if (!content || content.trim().length === 0) {
+                    console.error(
+                        logMsg.replace("✅", "❌") + " → File is empty."
+                    );
+                    return reject(
+                        new Error("Downloaded file is empty: " + filePath)
+                    );
+                }
+                try {
+                    let processedContent = rewriteLinks(content);
+                    processedContent = cleanContent(processedContent);
+                    fs.writeFileSync(filePath, processedContent);
+                } catch (writeErr) {
+                    console.error(
+                        logMsg.replace("✅", "❌") +
+                            ` → Failed to write file: ${writeErr.message}`
+                    );
+                    return reject(writeErr);
+                }
+                console.log(logMsg);
+                downloadedFiles.push(name);
+                resolve();
+            });
+        })
+    );
 }
 
 // Build page download promises

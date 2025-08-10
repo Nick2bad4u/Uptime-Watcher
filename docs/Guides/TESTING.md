@@ -76,6 +76,7 @@ npm run test:electron:watch  # Electron tests in watch mode
 ```
 
 Notes:
+
 - `npm run test` executes electron tests followed by all frontend tests.
 - `npm run test:src` runs a targeted subset of frontend tests for fast feedback.
 

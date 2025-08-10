@@ -1672,7 +1672,6 @@ export default [
                 },
             ],
 
-
             "putout/align-spaces": "error",
             "putout/array-element-newline": "off",
             "putout/destructuring-as-function-argument": "off",

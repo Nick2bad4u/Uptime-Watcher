@@ -17,7 +17,7 @@ const BASE_URL = "https://react.dev";
 const PAGES = [
     "learn",
     "learn/start-a-new-react-project",
-    "learn/add-react-to-an-existing-project", 
+    "learn/add-react-to-an-existing-project",
     "learn/editor-setup",
     "learn/react-developer-tools",
     "learn/describing-the-ui",
@@ -32,7 +32,7 @@ const PAGES = [
     "reference/react/useContext",
     "reference/react/useReducer",
     "reference/react/useMemo",
-    "reference/react/useCallback"
+    "reference/react/useCallback",
 ];
 
 const INPUT_FORMAT = "html";
@@ -64,7 +64,9 @@ let previousHashes = {};
 if (fs.existsSync(hashFile)) {
     try {
         previousHashes = JSON.parse(fs.readFileSync(hashFile, "utf8"));
-        console.log(`📁 Loaded ${Object.keys(previousHashes).length} previous hashes.`);
+        console.log(
+            `📁 Loaded ${Object.keys(previousHashes).length} previous hashes.`
+        );
     } catch {
         console.warn("⚠️ Failed to parse previous hashes — starting fresh.");
     }
@@ -80,11 +82,11 @@ const newHashes = {};
 function cleanContent(content) {
     // Remove navigation and footer elements
     let cleaned = content
-        .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, '')
-        .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, '')
-        .replace(/<header[^>]*>[\s\S]*?<\/header>/gi, '')
-        .replace(/class="[^"]*"/gi, '')
-        .replace(/id="[^"]*"/gi, '');
+        .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, "")
+        .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, "")
+        .replace(/<header[^>]*>[\s\S]*?<\/header>/gi, "")
+        .replace(/class="[^"]*"/gi, "")
+        .replace(/id="[^"]*"/gi, "");
 
     return cleaned.trim();
 }
@@ -118,34 +120,46 @@ function downloadFile(cmd, filePath, logMsg, name) {
                 return reject(err);
             }
             if (!fs.existsSync(filePath)) {
-                console.error(logMsg.replace("✅", "❌") + " → File not created.");
+                console.error(
+                    logMsg.replace("✅", "❌") + " → File not created."
+                );
                 return reject(new Error("File not created: " + filePath));
             }
-            
+
             let content;
             try {
                 content = fs.readFileSync(filePath, "utf8");
             } catch (readErr) {
-                console.error(logMsg.replace("✅", "❌") + ` → Failed to read file: ${readErr.message}`);
+                console.error(
+                    logMsg.replace("✅", "❌") +
+                        ` → Failed to read file: ${readErr.message}`
+                );
                 return reject(readErr);
             }
-            
+
             if (!content || content.trim().length === 0) {
-                console.error(logMsg.replace("✅", "❌") + " → Downloaded file is empty.");
-                return reject(new Error("Downloaded file is empty: " + filePath));
+                console.error(
+                    logMsg.replace("✅", "❌") + " → Downloaded file is empty."
+                );
+                return reject(
+                    new Error("Downloaded file is empty: " + filePath)
+                );
             }
 
             // Clean and rewrite content
             const cleanedContent = cleanContent(content);
             const rewrittenContent = rewriteLinks(cleanedContent);
-            
+
             try {
                 fs.writeFileSync(filePath, rewrittenContent, "utf8");
             } catch (writeErr) {
-                console.error(logMsg.replace("✅", "❌") + ` → Failed to write file: ${writeErr.message}`);
+                console.error(
+                    logMsg.replace("✅", "❌") +
+                        ` → Failed to write file: ${writeErr.message}`
+                );
                 return reject(writeErr);
             }
-            
+
             console.log(logMsg);
             downloadedFiles.push(name);
             resolve(undefined);
@@ -158,7 +172,7 @@ const pagePromises = PAGES.map((page) => {
     const fileName = `React-${page.replace(/\//g, "-")}.${OUTPUT_EXT}`;
     const filePath = path.join(outputDir, fileName);
     const cmd = `pandoc "${url}" -f ${INPUT_FORMAT} -t ${OUTPUT_FORMAT} -o "${filePath}"`;
-    
+
     return downloadFile(
         cmd,
         filePath,
@@ -169,14 +183,16 @@ const pagePromises = PAGES.map((page) => {
 
 Promise.all(pagePromises)
     .then(() => {
-        console.log(`\n🎉 Successfully downloaded ${downloadedFiles.length} React documentation files!`);
+        console.log(
+            `\n🎉 Successfully downloaded ${downloadedFiles.length} React documentation files!`
+        );
         console.log(`📁 Files saved to: ${outputDir}`);
-        
+
         if (downloadedFiles.length > 0) {
             console.log("📄 Downloaded files:");
-            downloadedFiles.forEach(file => console.log(`   - ${file}`));
+            downloadedFiles.forEach((file) => console.log(`   - ${file}`));
         }
-        
+
         // Save new hashes
         fs.writeFileSync(hashFile, JSON.stringify(newHashes, null, 2));
         console.log(`💾 Saved ${Object.keys(newHashes).length} file hashes.`);

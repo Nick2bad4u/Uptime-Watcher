@@ -26,7 +26,7 @@ Here's a simple example:
 
 **tsdoc.json**
 
-``` js
+```js
 {
   "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
   "tagDefinitions": [
@@ -44,7 +44,7 @@ will be mixed in with the current file:
 
 **tsdoc.json**
 
-``` js
+```js
 {
   "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
   "extends": [
@@ -63,19 +63,21 @@ will be mixed in with the current file:
 The code sample below illustrates how to invoke the
 **@microsoft/tsdoc-config** API to load a **tsdoc.json** file:
 
-``` ts
-import * as path from 'path';
-import { TSDocParser, TSDocConfiguration } from '@microsoft/tsdoc';
-import { TSDocConfigFile } from '@microsoft/tsdoc-config';
+```ts
+import * as path from "path";
+import { TSDocParser, TSDocConfiguration } from "@microsoft/tsdoc";
+import { TSDocConfigFile } from "@microsoft/tsdoc-config";
 
 // Sample source file to be parsed
-const mySourceFile: string = 'my-project/src/example.ts';
+const mySourceFile: string = "my-project/src/example.ts";
 
 // Load the nearest config file, for example `my-project/tsdoc.json`
-const tsdocConfigFile: TSDocConfigFile = TSDocConfigFile.loadForFolder(path.dirname(mySourceFile));
+const tsdocConfigFile: TSDocConfigFile = TSDocConfigFile.loadForFolder(
+ path.dirname(mySourceFile)
+);
 if (tsdocConfigFile.hasErrors) {
-  // Report any errors
-  console.log(tsdocConfigFile.getErrorSummary());
+ // Report any errors
+ console.log(tsdocConfigFile.getErrorSummary());
 }
 
 // Use the TSDocConfigFile to configure the parser

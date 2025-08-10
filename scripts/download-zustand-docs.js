@@ -17,7 +17,7 @@ const BASE_URL = "https://raw.githubusercontent.com/pmndrs/zustand/main";
 const PAGES = [
     "README.md",
     "docs/getting-started/introduction.md",
-    "docs/getting-started/comparison.md", 
+    "docs/getting-started/comparison.md",
     "docs/guides/updating-state.md",
     "docs/guides/async-actions.md",
     "docs/guides/maps-and-sets-usage.md",
@@ -31,7 +31,7 @@ const PAGES = [
     "docs/integrations/combining-stores.md",
     "docs/integrations/testing.md",
     "docs/integrations/typescript.md",
-    "docs/migrations/migrating-to-v5.md"
+    "docs/migrations/migrating-to-v5.md",
 ];
 
 const INPUT_FORMAT = "gfm";
@@ -63,7 +63,9 @@ let previousHashes = {};
 if (fs.existsSync(hashFile)) {
     try {
         previousHashes = JSON.parse(fs.readFileSync(hashFile, "utf8"));
-        console.log(`📁 Loaded ${Object.keys(previousHashes).length} previous hashes.`);
+        console.log(
+            `📁 Loaded ${Object.keys(previousHashes).length} previous hashes.`
+        );
     } catch {
         console.warn("⚠️ Failed to parse previous hashes — starting fresh.");
     }
@@ -79,8 +81,8 @@ const newHashes = {};
 function cleanContent(content) {
     // GitHub markdown is usually clean, just remove any GitHub-specific elements
     let cleaned = content
-        .replace(/\[!\[.*?\]\(.*?\)\]\(.*?\)/g, '') // Remove badges
-        .replace(/<!--[\s\S]*?-->/g, ''); // Remove comments
+        .replace(/\[!\[.*?\]\(.*?\)\]\(.*?\)/g, "") // Remove badges
+        .replace(/<!--[\s\S]*?-->/g, ""); // Remove comments
 
     return cleaned.trim();
 }
@@ -92,7 +94,7 @@ function cleanContent(content) {
  */
 function rewriteLinks(content) {
     const githubBase = "https://github.com/pmndrs/zustand/blob/main";
-    
+
     return content
         .replace(/]\(\.\/([^)]+)\)/g, `](${githubBase}/$1)`)
         .replace(/]\(\.\.\/([^)]+)\)/g, `](${githubBase}/$1)`)
@@ -116,34 +118,46 @@ function downloadFile(cmd, filePath, logMsg, name) {
                 return reject(err);
             }
             if (!fs.existsSync(filePath)) {
-                console.error(logMsg.replace("✅", "❌") + " → File not created.");
+                console.error(
+                    logMsg.replace("✅", "❌") + " → File not created."
+                );
                 return reject(new Error("File not created: " + filePath));
             }
-            
+
             let content;
             try {
                 content = fs.readFileSync(filePath, "utf8");
             } catch (readErr) {
-                console.error(logMsg.replace("✅", "❌") + ` → Failed to read file: ${readErr.message}`);
+                console.error(
+                    logMsg.replace("✅", "❌") +
+                        ` → Failed to read file: ${readErr.message}`
+                );
                 return reject(readErr);
             }
-            
+
             if (!content || content.trim().length === 0) {
-                console.error(logMsg.replace("✅", "❌") + " → Downloaded file is empty.");
-                return reject(new Error("Downloaded file is empty: " + filePath));
+                console.error(
+                    logMsg.replace("✅", "❌") + " → Downloaded file is empty."
+                );
+                return reject(
+                    new Error("Downloaded file is empty: " + filePath)
+                );
             }
 
             // Clean and rewrite content
             const cleanedContent = cleanContent(content);
             const rewrittenContent = rewriteLinks(cleanedContent);
-            
+
             try {
                 fs.writeFileSync(filePath, rewrittenContent, "utf8");
             } catch (writeErr) {
-                console.error(logMsg.replace("✅", "❌") + ` → Failed to write file: ${writeErr.message}`);
+                console.error(
+                    logMsg.replace("✅", "❌") +
+                        ` → Failed to write file: ${writeErr.message}`
+                );
                 return reject(writeErr);
             }
-            
+
             console.log(logMsg);
             downloadedFiles.push(name);
             resolve(undefined);
@@ -153,10 +167,10 @@ function downloadFile(cmd, filePath, logMsg, name) {
 
 const pagePromises = PAGES.map((page) => {
     const url = `${BASE_URL}/${page}`;
-    const fileName = `Zustand-${page.replace(/docs\//g, '').replace(/\//g, "-")}`;
+    const fileName = `Zustand-${page.replace(/docs\//g, "").replace(/\//g, "-")}`;
     const filePath = path.join(outputDir, fileName);
     const cmd = `pandoc "${url}" -f ${INPUT_FORMAT} -t ${OUTPUT_FORMAT} -o "${filePath}"`;
-    
+
     return downloadFile(
         cmd,
         filePath,
@@ -167,14 +181,16 @@ const pagePromises = PAGES.map((page) => {
 
 Promise.all(pagePromises)
     .then(() => {
-        console.log(`\n🎉 Successfully downloaded ${downloadedFiles.length} Zustand documentation files!`);
+        console.log(
+            `\n🎉 Successfully downloaded ${downloadedFiles.length} Zustand documentation files!`
+        );
         console.log(`📁 Files saved to: ${outputDir}`);
-        
+
         if (downloadedFiles.length > 0) {
             console.log("📄 Downloaded files:");
-            downloadedFiles.forEach(file => console.log(`   - ${file}`));
+            downloadedFiles.forEach((file) => console.log(`   - ${file}`));
         }
-        
+
         // Save new hashes
         fs.writeFileSync(hashFile, JSON.stringify(newHashes, null, 2));
         console.log(`💾 Saved ${Object.keys(newHashes).length} file hashes.`);
