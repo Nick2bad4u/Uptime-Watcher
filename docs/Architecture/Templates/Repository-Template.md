@@ -1,6 +1,6 @@
 # Repository Template
 
-Use this template when creating new repository classes for database access.
+Use this template when creating new repository classes for database access with production-grade safety and performance.
 
 ## File Structure
 
@@ -18,9 +18,33 @@ electron/services/database/
  * Repository for managing [ENTITY] data persistence.
  *
  * @remarks
- * Handles all CRUD operations for [ENTITY] in the database using the repository pattern.
- * All mutations are wrapped in transactions for consistency and error handling.
+ * Implements the repository pattern with comprehensive transaction safety, race condition prevention,
+ * and production-grade error handling. All mutations are wrapped in transactions for consistency.
+ * Uses the dual-method pattern with public async methods creating transactions and internal sync
+ * methods for use within existing transaction contexts.
+ * 
+ * **Key Features:**
+ * - Transaction safety with automatic rollback
+ * - Race condition prevention through synchronous operations
+ * - Comprehensive error handling and logging
+ * - Event emission for monitoring and debugging
+ * - Memory-efficient operations
+ * 
  * [Add any entity-specific remarks here]
+ *
+ * @example
+ * ```typescript
+ * const repository = new ExampleRepository({ databaseService });
+ * 
+ * // Public async method - creates its own transaction
+ * await repository.create(data);
+ * 
+ * // Internal method - for use within existing transactions
+ * await databaseService.executeTransaction((db) => {
+ *   const result = repository.createInternal(db, data);
+ *   // other operations...
+ * });
+ * ```
  *
  * @public
  */
@@ -36,13 +60,18 @@ import { logger } from "../../utils/logger";
  *
  * @remarks
  * Provides the required {@link DatabaseService} for all [ENTITY] operations.
- * This interface is used for dependency injection.
+ * This interface is used for dependency injection and supports testing through mocking.
  *
  * @public
  */
 export interface ExampleRepositoryDependencies {
  /**
-  * The database service used for transactional operations.
+  * The database service used for transactional operations and connection management.
+  * 
+  * @remarks
+  * All repository operations use this service for database access, ensuring
+  * consistent transaction handling and connection management.
+  * 
   * @readonly
   */
  databaseService: DatabaseService;
@@ -53,7 +82,8 @@ export interface ExampleRepositoryDependencies {
  *
  * @remarks
  * Represents the raw database row structure for [ENTITY] records.
- * Used for type safety in repository operations.
+ * Used for type safety in repository operations and ensures consistency
+ * between database schema and TypeScript types.
  *
  * @public
  */
@@ -62,8 +92,10 @@ export interface ExampleRow {
  id: string;
  /** Name of the [ENTITY] */
  name: string;
- /** Timestamp when the [ENTITY] was created */
+ /** Timestamp when the [ENTITY] was created (Unix timestamp) */
  createdAt: number;
+ /** Timestamp when the [ENTITY] was last updated (Unix timestamp) */
+ updatedAt: number;
  /** Additional fields specific to your entity */
  // Add other fields as needed
 }
@@ -72,7 +104,8 @@ export interface ExampleRow {
  * SQL query constants for [ENTITY] operations.
  *
  * @remarks
- * Centralizes query strings for maintainability and consistency.
+ * Centralizes query strings for maintainability, consistency, and performance.
+ * Using constants prevents SQL injection and enables query optimization.
  * This constant is internal to the repository and not exported.
  *
  * @internal

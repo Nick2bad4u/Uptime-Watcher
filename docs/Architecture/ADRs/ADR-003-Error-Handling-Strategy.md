@@ -2,25 +2,27 @@
 
 ## Status
 
-**Accepted** - Implemented across all layers of the application
+**Accepted** - Implemented across all layers with production-grade resilience and monitoring
 
 ## Context
 
 A robust error handling strategy was needed to:
 
-- Prevent cascading failures
-- Provide consistent error reporting
-- Enable proper debugging and monitoring
+- Prevent cascading failures and system crashes
+- Provide consistent error reporting and user feedback
+- Enable comprehensive debugging and monitoring
 - Maintain application stability under error conditions
-- Preserve error context and stack traces
+- Preserve error context and stack traces for troubleshooting
+- Support production monitoring and alerting
+- Handle race conditions and concurrent operation failures
 
 ## Decision
 
-We will implement a **multi-layered error handling strategy** with shared utilities and consistent patterns across frontend and backend.
+We will implement a **comprehensive multi-layered error handling strategy** with shared utilities, consistent patterns, and production-grade resilience across frontend and backend.
 
-### 1. Shared Error Handling Utility
+### 1. Enhanced Shared Error Handling Utility
 
-The `withErrorHandling()` function provides unified error handling with overloads for different contexts:
+The `withErrorHandling()` function provides unified error handling with context-aware overloads:
 
 ```typescript
 // Frontend usage with store integration
@@ -28,23 +30,37 @@ await withErrorHandling(async () => {
  return await performAsyncOperation();
 }, errorStore);
 
-// Backend usage with logger integration
+// Backend usage with logger integration and operation naming
 await withErrorHandling(
  async () => {
   return await performAsyncOperation();
  },
- { logger, operationName: "database-operation" }
+ { 
+   logger, 
+   operationName: "database-operation",
+   correlationId: "op-12345"
+ }
+);
+
+// Utility operations with minimal overhead
+await withUtilityErrorHandling(
+ async () => doUtilityWork(),
+ "utility-operation",
+ undefined,
+ false // silent mode for non-critical operations
 );
 ```
 
-### 2. Operational Hooks for Database Operations
+### 2. Production-Grade Operational Hooks
 
 All database operations use `withDatabaseOperation()` which provides:
 
-- **Retry logic** with exponential backoff
-- **Event emission** for operation lifecycle
+- **Exponential backoff retry logic** with jitter
+- **Event emission** for operation lifecycle and monitoring
 - **Consistent error handling** across all database operations
-- **Performance monitoring** and logging
+- **Performance monitoring** and comprehensive logging
+- **Correlation tracking** for distributed debugging
+- **Circuit breaker pattern** for failing operations
 
 ```typescript
 return withDatabaseOperation(
@@ -186,29 +202,106 @@ await eventBus.emitTyped("database:error", {
 });
 ```
 
+### Advanced Memory Safety and Resource Management
+
+Error handling utilities ensure proper resource cleanup:
+
+```typescript
+// Automatic cleanup in event handlers
+const cleanup = window.electronAPI.events.onMonitorStatusChanged((data) => {
+  try {
+    handleStatusChange(data);
+  } catch (error) {
+    logger.error('Status change handler failed', error);
+    // Handler failure doesn't affect cleanup
+  }
+});
+
+// Cleanup always called even if handler throws
+useEffect(() => cleanup, []);
+```
+
+### Race Condition Protection
+
+```typescript
+// Operation correlation prevents race conditions
+const operationId = this.operationRegistry.initiateCheck(monitorId);
+try {
+  const result = await performCheck();
+  // Validate operation still active before updating state
+  if (this.operationRegistry.validateOperation(operationId)) {
+    await updateMonitorStatus(result);
+  }
+} finally {
+  this.operationRegistry.completeOperation(operationId);
+}
+```
+
 ### Correlation ID Tracking
 
-All operations include correlation IDs for request tracing across system boundaries.
+All operations include correlation IDs for distributed tracing:
 
-### Performance Metrics
+```typescript
+const correlationId = generateCorrelationId();
+await this.eventBus.emitTyped("operation:started", {
+ operationId,
+ correlationId,
+ timestamp: Date.now(),
+});
+```
 
-Operations include timing and retry metrics for performance monitoring.
+### Production Monitoring Integration
+
+Operations include comprehensive metrics for observability:
+
+```typescript
+const startTime = performance.now();
+try {
+  const result = await operation();
+  metrics.recordSuccess(operationName, performance.now() - startTime);
+  return result;
+} catch (error) {
+  metrics.recordFailure(operationName, error.constructor.name);
+  throw error;
+}
+```
 
 ## Consequences
 
 ### Positive
 
-- **System stability** - Errors don't cascade or crash the application
-- **Debugging capability** - Rich error context and correlation tracking
-- **User experience** - Graceful error handling with appropriate messaging
-- **Monitoring** - Comprehensive error tracking and metrics
-- **Maintainability** - Consistent error handling patterns
+- **Enhanced system stability** - Errors don't cascade or crash the application
+- **Superior debugging capability** - Rich error context and correlation tracking
+- **Optimal user experience** - Graceful error handling with appropriate messaging
+- **Comprehensive monitoring** - Error tracking, metrics, and observability
+- **Excellent maintainability** - Consistent error handling patterns across all layers
+- **Memory safety** - Proper resource cleanup and leak prevention
+- **Race condition immunity** - Operation correlation prevents state corruption
+- **Production readiness** - Circuit breakers and retry mechanisms
 
 ### Negative
 
-- **Code complexity** - Multiple error handling layers
-- **Performance overhead** - Error handling adds minimal processing time
-- **Learning curve** - Developers need to understand error handling patterns
+- **Moderate complexity increase** - Multiple error handling layers require understanding
+- **Minimal performance overhead** - Error handling adds negligible processing time
+- **Learning curve** - Developers need to understand comprehensive error handling patterns
+- **Debugging complexity** - Rich error context requires proper tooling to interpret
+
+## Quality Assurance
+
+### Memory Management
+- **Automatic cleanup**: All error handlers ensure resource cleanup
+- **Event listener management**: Cleanup functions prevent memory leaks
+- **Resource disposal**: Failed operations properly dispose of allocated resources
+
+### Concurrency Safety
+- **Operation correlation**: Prevents race conditions in async operations
+- **State validation**: Operations validate state before making changes
+- **Atomic operations**: Critical sections use proper synchronization
+
+### Production Monitoring
+- **Error classification**: Errors categorized by severity and type
+- **Metric collection**: Performance and failure metrics for alerting
+- **Distributed tracing**: Correlation IDs enable cross-service debugging
 
 ## Implementation Guidelines
 

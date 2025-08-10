@@ -1,10 +1,10 @@
 # TSDoc Standardization Guide
 
-This document standardizes inline code examples and TSDoc patterns across the Uptime-Watcher codebase.
+This document standardizes inline code examples and TSDoc patterns across the Uptime-Watcher codebase, reflecting current production-grade documentation practices.
 
 ## TSDoc Standards
 
-### Basic Format
+### Enhanced Basic Format
 
 ````typescript
 /**

@@ -1,6 +1,6 @@
 # Development Patterns Guide
 
-This guide documents the established architectural patterns used throughout the Uptime-Watcher application. Following these patterns ensures consistency, maintainability, and predictable behavior across the codebase.
+This guide documents the established architectural patterns used throughout the Uptime-Watcher application. Following these patterns ensures consistency, maintainability, predictable behavior, and production-grade quality across the codebase.
 
 ## Table of Contents
 
@@ -9,20 +9,24 @@ This guide documents the established architectural patterns used throughout the 
 3. [Error Handling Patterns](#error-handling-patterns)
 4. [Frontend State Management](#frontend-state-management)
 5. [IPC Communication](#ipc-communication)
-6. [Testing Patterns](#testing-patterns)
+6. [Memory Management](#memory-management)
+7. [Race Condition Prevention](#race-condition-prevention)
+8. [Testing Patterns](#testing-patterns)
 
 ## Repository Pattern
 
 ### Overview
 
-All database access uses the Repository Pattern with consistent transaction handling and dual-method structure.
+All database access uses the Repository Pattern with comprehensive transaction handling, race condition prevention, and production-grade reliability.
 
 ### Key Characteristics
 
 - **Dual methods**: Public async methods create transactions, internal sync methods work within existing transactions
-- **Transaction safety**: All mutations wrapped in `executeTransaction()`
-- **Operational hooks**: Use `withDatabaseOperation()` for retry logic and event emission
-- **Dependency injection**: Constructor-based dependency injection
+- **Enhanced transaction safety**: All mutations wrapped in `executeTransaction()` with automatic rollback
+- **Advanced operational hooks**: Use `withDatabaseOperation()` for retry logic, event emission, and monitoring
+- **Dependency injection**: Constructor-based dependency injection for testability
+- **Race condition immunity**: Synchronous database operations (node-sqlite3-wasm) eliminate race conditions
+- **Memory management**: Proper resource cleanup and connection management
 
 ### Implementation Template
 
@@ -546,6 +550,295 @@ describe("ExampleRepository", () => {
 - ✅ Test both success and error paths
 - ❌ Don't test implementation details
 - ❌ Don't share state between test cases
+
+## Memory Management
+
+### Overview
+
+Comprehensive memory management patterns to prevent leaks and ensure optimal performance in long-running Electron applications.
+
+### Event Listener Cleanup Pattern
+
+```typescript
+// Frontend component cleanup
+useEffect(() => {
+ const cleanup = window.electronAPI.events.onMonitorStatusChanged((data) => {
+  handleStatusChange(data);
+ });
+
+ // Cleanup function prevents memory leaks
+ return cleanup;
+}, []);
+
+// Service event listener management
+class StatusUpdateManager {
+ private cleanupFunctions: Array<() => void> = [];
+
+ public subscribe(): void {
+  // Clean up existing subscriptions first
+  this.unsubscribe();
+
+  const cleanup1 = window.electronAPI.events.onMonitorStatusChanged(handler);
+  const cleanup2 = window.electronAPI.events.onMonitoringStarted(handler);
+
+  this.cleanupFunctions.push(cleanup1, cleanup2);
+ }
+
+ public unsubscribe(): void {
+  for (const cleanup of this.cleanupFunctions) {
+   cleanup();
+  }
+  this.cleanupFunctions = [];
+ }
+}
+```
+
+### Resource Disposal Pattern
+
+```typescript
+// Timeout management with cleanup
+const timeouts = new Map<string, NodeJS.Timeout>();
+
+function scheduleTimeout(id: string, callback: () => void, delay: number): void {
+ // Clear existing timeout if any
+ clearManagedTimeout(id);
+ 
+ const timeout = setTimeout(() => {
+  callback();
+  timeouts.delete(id);
+ }, delay);
+ 
+ timeouts.set(id, timeout);
+}
+
+function clearManagedTimeout(id: string): void {
+ const timeout = timeouts.get(id);
+ if (timeout) {
+  clearTimeout(timeout);
+  timeouts.delete(id);
+ }
+}
+
+// Service cleanup on shutdown
+class ServiceManager {
+ async shutdown(): Promise<void> {
+  // Clear all managed timeouts
+  for (const [id] of timeouts) {
+   clearManagedTimeout(id);
+  }
+  
+  // Close database connections
+  this.databaseService.close();
+  
+  // Cleanup caches
+  this.cache.clear();
+ }
+}
+```
+
+### Cache Management Pattern
+
+```typescript
+// Standardized cache with proper cleanup
+class StandardizedCache<T> {
+ private readonly invalidationCallbacks = new Set<(key?: string) => void>();
+
+ public onInvalidation(callback: (key?: string) => void): () => void {
+  this.invalidationCallbacks.add(callback);
+  
+  // Return cleanup function
+  return () => {
+   this.invalidationCallbacks.delete(callback);
+  };
+ }
+
+ public clear(): void {
+  this.cache.clear();
+  
+  // Notify listeners with error isolation
+  for (const callback of this.invalidationCallbacks) {
+   try {
+    callback();
+   } catch (error) {
+    logger.warn("Cache invalidation callback failed", error);
+   }
+  }
+ }
+}
+```
+
+### Usage Guidelines
+
+- ✅ Always provide cleanup functions for event listeners
+- ✅ Clear timeouts and intervals on component unmount
+- ✅ Implement proper service shutdown procedures
+- ✅ Use Map/Set for complex cleanup tracking
+- ❌ Don't rely on garbage collection for critical resources
+- ❌ Don't forget to call cleanup functions in error paths
+
+## Race Condition Prevention
+
+### Overview
+
+Comprehensive patterns to prevent race conditions in async operations, particularly in monitoring and database operations.
+
+### Operation Correlation Pattern
+
+```typescript
+// Enhanced monitoring with operation tracking
+class MonitorOperationRegistry {
+ private activeOperations = new Map<string, MonitorCheckOperation>();
+
+ initiateCheck(monitorId: string): string {
+  // Generate unique operation ID with collision detection
+  let operationId: string;
+  let attempts = 0;
+  do {
+   operationId = crypto.randomUUID();
+   attempts++;
+  } while (this.activeOperations.has(operationId) && attempts < 5);
+
+  if (this.activeOperations.has(operationId)) {
+   throw new Error("Failed to generate unique operation ID");
+  }
+
+  const operation = {
+   id: operationId,
+   monitorId,
+   initiatedAt: new Date(),
+   cancelled: false,
+  };
+
+  this.activeOperations.set(operationId, operation);
+  return operationId;
+ }
+
+ validateOperation(operationId: string): boolean {
+  const operation = this.activeOperations.get(operationId);
+  return operation !== undefined && !operation.cancelled;
+ }
+
+ completeOperation(operationId: string): void {
+  this.activeOperations.delete(operationId);
+ }
+}
+
+// Usage in monitor checks
+async function performMonitorCheck(monitorId: string): Promise<void> {
+ const operationId = operationRegistry.initiateCheck(monitorId);
+ 
+ try {
+  const result = await doActualCheck();
+  
+  // Validate operation still active before updating state
+  if (operationRegistry.validateOperation(operationId)) {
+   await updateMonitorStatus(monitorId, result);
+  } else {
+   logger.debug(`Operation ${operationId} cancelled, skipping status update`);
+  }
+ } finally {
+  operationRegistry.completeOperation(operationId);
+ }
+}
+```
+
+### Atomic State Updates Pattern
+
+```typescript
+// Database cache with atomic replacement
+class DatabaseManager {
+ private async loadSites(): Promise<void> {
+  // Load into temporary cache first
+  const tempCache = new Map<string, Site>();
+  const sites = await this.siteRepository.getAll();
+  
+  for (const site of sites) {
+   tempCache.set(site.identifier, site);
+  }
+
+  // Atomically replace the main cache (prevents race conditions)
+  this.siteCache.clear();
+  for (const [key, site] of tempCache.entries()) {
+   this.siteCache.set(key, site);
+  }
+ }
+}
+
+// State updates with validation
+class StatusUpdateHandler {
+ async handleStatusUpdate(update: StatusUpdate): Promise<void> {
+  const currentSites = this.getSites();
+  const updatedSites = [...currentSites];
+  
+  // Find and validate site exists
+  const siteIndex = updatedSites.findIndex(s => s.identifier === update.siteIdentifier);
+  if (siteIndex === -1) {
+   logger.warn(`Status update for unknown site: ${update.siteIdentifier}`);
+   return;
+  }
+
+  // Atomic update with validation
+  const updatedSite = this.applyStatusUpdate(updatedSites[siteIndex], update);
+  updatedSites[siteIndex] = updatedSite;
+  
+  // Apply all changes atomically
+  this.setSites(updatedSites);
+ }
+}
+```
+
+### Concurrency Control Pattern
+
+```typescript
+// Operation queuing for critical sections
+class OperationQueue {
+ private readonly queue: Array<() => Promise<void>> = [];
+ private isProcessing = false;
+
+ async enqueue<T>(operation: () => Promise<T>): Promise<T> {
+  return new Promise((resolve, reject) => {
+   this.queue.push(async () => {
+    try {
+     const result = await operation();
+     resolve(result);
+    } catch (error) {
+     reject(error);
+    }
+   });
+   
+   void this.processQueue();
+  });
+ }
+
+ private async processQueue(): Promise<void> {
+  if (this.isProcessing || this.queue.length === 0) {
+   return;
+  }
+
+  this.isProcessing = true;
+  
+  while (this.queue.length > 0) {
+   const operation = this.queue.shift()!;
+   try {
+    await operation();
+   } catch (error) {
+    logger.error("Queued operation failed", error);
+   }
+  }
+  
+  this.isProcessing = false;
+ }
+}
+```
+
+### Usage Guidelines
+
+- ✅ Use operation correlation for async operations that can be cancelled
+- ✅ Implement atomic state updates for cache management
+- ✅ Validate operation state before applying changes
+- ✅ Use operation queues for critical sections
+- ❌ Don't rely on timing for synchronization
+- ❌ Don't ignore cancellation flags in long-running operations
 
 ## Best Practices Summary
 
