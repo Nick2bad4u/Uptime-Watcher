@@ -427,7 +427,7 @@ To register some metadata in <code>z.globalRegistry</code> for a schema:
 <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  id: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">&quot;email_address&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
 <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  title: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">&quot;Email address&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
 <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  description: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">&quot;Your email address&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
-<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  examples: [</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">&quot;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4c2a253e3f3862202d3f380c29342d213c2029622f2321">[email&#160;protected]</a>&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">]</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  examples: [</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">&quot;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bfd9d6cdcccb91d3decccbffdac7ded2cfd3da91dcd0d2">[email&#160;protected]</a>&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">]</span></span>
 <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">});</span></span></code></pre>
 
 </div>

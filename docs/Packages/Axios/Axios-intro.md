@@ -9,12 +9,12 @@ HTTP Client for [`node.js`](https://nodejs.org) and the browser. It is
 *[isomorphic](https://www.lullabot.com/articles/what-is-an-isomorphic-application)*
 (= it can run in the browser and node.js with the same codebase). On the
 server-side it uses the native node.js `http` module, while on the
-client (browser) it uses XMLHttpRequests.
+client (browser) it uses XMLHttpRequest.
 
 # Features
 
 - Make
-  [XMLHttpRequests](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest)
+  [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest)
   from the browser
 - Make [http](http://nodejs.org/api/http.html) requests from node.js
 - Supports the

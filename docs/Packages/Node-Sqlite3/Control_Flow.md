@@ -17,123 +17,134 @@ data-a11y-animated-images="system" data-a11y-link-underlines="true"
   <link rel="preconnect" href="https://github.githubassets.com" crossorigin>
   <link rel="preconnect" href="https://avatars.githubusercontent.com">
 
-  <link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/light-d1334f2b22bf.css" /><link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/light_high_contrast-f695a361c6b2.css" /><link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/dark-f73a069fd33e.css" /><link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/dark_high_contrast-3a0d87f72ad4.css" /><link data-color-theme="light" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/light-d1334f2b22bf.css" /><link data-color-theme="light_high_contrast" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/light_high_contrast-f695a361c6b2.css" /><link data-color-theme="light_colorblind" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/light_colorblind-367eb9a4565a.css" /><link data-color-theme="light_colorblind_high_contrast" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/light_colorblind_high_contrast-183adc0db479.css" /><link data-color-theme="light_tritanopia" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/light_tritanopia-2ddc677c041d.css" /><link data-color-theme="light_tritanopia_high_contrast" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/light_tritanopia_high_contrast-649962a5702a.css" /><link data-color-theme="dark" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/dark-f73a069fd33e.css" /><link data-color-theme="dark_high_contrast" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/dark_high_contrast-3a0d87f72ad4.css" /><link data-color-theme="dark_colorblind" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/dark_colorblind-b17a8392e6c4.css" /><link data-color-theme="dark_colorblind_high_contrast" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/dark_colorblind_high_contrast-e9ff47cedc2b.css" /><link data-color-theme="dark_tritanopia" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/dark_tritanopia-a1cc7dba9f73.css" /><link data-color-theme="dark_tritanopia_high_contrast" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/dark_tritanopia_high_contrast-6c4dd39e2b0f.css" /><link data-color-theme="dark_dimmed" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/dark_dimmed-55459b36aa6d.css" /><link data-color-theme="dark_dimmed_high_contrast" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/dark_dimmed_high_contrast-9a0ef6e40ed3.css" />
+  <link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/light-6448649c7147.css" /><link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/light_high_contrast-42fc7e3b06b7.css" /><link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/dark-d17b946fc2c5.css" /><link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/dark_high_contrast-1b924088c83a.css" /><link data-color-theme="light" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/light-6448649c7147.css" /><link data-color-theme="light_high_contrast" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/light_high_contrast-42fc7e3b06b7.css" /><link data-color-theme="light_colorblind" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/light_colorblind-44cfaf0c8f7b.css" /><link data-color-theme="light_colorblind_high_contrast" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/light_colorblind_high_contrast-979217efd93e.css" /><link data-color-theme="light_tritanopia" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/light_tritanopia-4d5383026bfa.css" /><link data-color-theme="light_tritanopia_high_contrast" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/light_tritanopia_high_contrast-ff6ff8532348.css" /><link data-color-theme="dark" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/dark-d17b946fc2c5.css" /><link data-color-theme="dark_high_contrast" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/dark_high_contrast-1b924088c83a.css" /><link data-color-theme="dark_colorblind" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/dark_colorblind-654786382462.css" /><link data-color-theme="dark_colorblind_high_contrast" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/dark_colorblind_high_contrast-ecca008c6f6e.css" /><link data-color-theme="dark_tritanopia" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/dark_tritanopia-fff376053989.css" /><link data-color-theme="dark_tritanopia_high_contrast" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/dark_tritanopia_high_contrast-49adf52571e5.css" /><link data-color-theme="dark_dimmed" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/dark_dimmed-66d97c13c98a.css" /><link data-color-theme="dark_dimmed_high_contrast" crossorigin="anonymous" media="all" rel="stylesheet" data-href="https://github.githubassets.com/assets/dark_dimmed_high_contrast-c58f1d0432b9.css" />
+
+  <style type="text/css">
+    :root {
+      --tab-size-preference: 4;
+    }
+&#10;    pre, code {
+      tab-size: var(--tab-size-preference);
+    }
+  </style>
 
     <link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/primer-primitives-dc7ca6859caf.css" />
     <link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/primer-e11b50dc0d94.css" />
-    <link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/global-f9db63568a75.css" />
-    <link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/github-709c905d887a.css" />
+    <link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/global-9eed6aa4fd31.css" />
+    <link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/github-1936c2fb5b22.css" />
 
-  <link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/repository-b58e401b73ae.css" />
+  <link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/repository-06e1b367189c.css" />
 <link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/wiki-0f9a446f06a3.css" />
 
-  <script type="application/json" id="client-env">{"locale":"en","featureFlags":["alternate_user_config_repo","api_insights_show_missing_data_banner","attestations_filtering","attestations_sorting","client_version_header","code_scanning_security_configuration_ternary_state","codespaces_prebuild_region_target_update","contact_requests_implicit_opt_in","contentful_lp_copilot_extensions","contentful_lp_flex_features","contentful_lp_footnotes","copilot_chat_attach_multiple_images","copilot_chat_group_notifications","copilot_chat_vision_in_claude","copilot_chat_vision_skip_thread_create","copilot_chat_wholearea_dd","copilot_coding_agent_task_creation_banner","copilot_custom_copilots_feature_preview","copilot_custom_copilots_images","copilot_duplicate_thread","copilot_free_to_paid_telem","copilot_ftp_hyperspace_upgrade_prompt","copilot_ftp_settings_upgrade","copilot_ftp_upgrade_to_pro_from_models","copilot_ftp_your_copilot_settings","copilot_immersive_agent_branch_selection","copilot_immersive_draft_issue_template_form_ui","copilot_immersive_structured_model_picker","copilot_no_floating_button","copilot_read_shared_conversation","copilot_spaces_input_menu_select","copilot_spaces_upsert_reload_in_background","copilot_spark_allow_empty_commit","copilot_spark_single_user_iteration","copilot_spark_use_billing_headers","copilot_spark_write_iteration_history_to_git","copilot_task_oriented_assistive_prompts","copilot_workbench_agent_seed_tool","copilot_workbench_cache","copilot_workbench_connection_reload_banner","copilot_workbench_preview_analytics","copilot_workbench_ratelimit_fallback","copilot_workbench_refresh_on_wsod","copilot_workbench_synthetic_generation","custom_copilots_128k_window","custom_copilots_capi_mode","custom_copilots_file_uploads","direct_to_salesforce","dotcom_chat_client_side_skills","failbot_report_error_react_apps_on_page","ghost_pilot_confidence_truncation_25","ghost_pilot_confidence_truncation_40","insert_before_patch","issue_fields_report_usage","issues_catch_non_json_graphql_response","issues_comment_load_user_settings","issues_label_search_url","issues_preserve_tokens_in_urls","issues_react_blur_item_picker_on_close","issues_react_bots_timeline_pagination","issues_react_create_milestone","issues_react_prohibit_title_fallback","issues_react_remove_placeholders","issues_template_picker_redirect","lifecycle_label_name_updates","link_contact_sales_swp_marketo","marketing_fullstory_sampling","marketing_pages_search_explore_provider","memex_mwl_filter_field_delimiter","nonreporting_relay_graphql_status_codes","primer_react_select_panel_with_modern_action_list","remove_child_patch","sample_network_conn_type","scheduled_reminders_updated_limits","site_homepage_contentful","site_msbuild_hide_integrations","site_msbuild_launch","site_msbuild_webgl_hero","spark_commit_on_default_branch","spark_sync_repository_after_iteration","swp_enterprise_contact_form","use_paginated_repo_picker_cost_center_form","viewscreen_sandbox","workbench_default_sonnet4","workbench_store_readonly"],"copilotApiOverrideUrl":null}</script>
+  <script type="application/json" id="client-env">{"locale":"en","featureFlags":["alternate_user_config_repo","api_insights_show_missing_data_banner","attestations_filtering","attestations_sorting","cca_create_session_from_front_end","client_version_header","code_scanning_security_configuration_ternary_state","codespaces_prebuild_region_target_update","contact_requests_implicit_opt_in","contentful_lp_copilot_extensions","contentful_lp_flex_features","contentful_lp_footnotes","copilot_chat_attach_multiple_images","copilot_chat_file_redirect","copilot_chat_group_notifications","copilot_chat_reduce_quota_checks","copilot_chat_search_bar_redirect","copilot_chat_vision_in_claude","copilot_chat_vision_skip_thread_create","copilot_chat_wholearea_dd","copilot_chat_wholearea_dd_overlay","copilot_coding_agent_task_creation_banner","copilot_custom_copilots_feature_preview","copilot_custom_copilots_images","copilot_duplicate_thread","copilot_free_to_paid_telem","copilot_ftp_hyperspace_upgrade_prompt","copilot_ftp_settings_upgrade","copilot_ftp_upgrade_to_pro_from_models","copilot_ftp_your_copilot_settings","copilot_gpt5_promotion_banner","copilot_immersive_agent_branch_selection","copilot_immersive_draft_issue_consolidated_create_handler","copilot_immersive_draft_issue_tree_validation","copilot_immersive_structured_model_picker","copilot_no_floating_button","copilot_read_shared_conversation","copilot_spaces_input_menu_select","copilot_spaces_permissions_tab","copilot_spaces_upsert_reload_in_background","copilot_spark_allow_empty_commit","copilot_spark_single_user_iteration","copilot_spark_use_billing_headers","copilot_spark_write_iteration_history_to_git","copilot_task_oriented_assistive_prompts","copilot_workbench_agent_seed_tool","copilot_workbench_cache","copilot_workbench_connection_reload_banner","copilot_workbench_preview_analytics","copilot_workbench_ratelimit_fallback","copilot_workbench_refresh_on_wsod","copilot_workbench_synthetic_generation","custom_copilots_128k_window","custom_copilots_capi_mode","custom_copilots_file_uploads","direct_to_salesforce","dotcom_chat_client_side_skills","failbot_report_error_react_apps_on_page","ghost_pilot_confidence_truncation_25","ghost_pilot_confidence_truncation_40","github_models_render_external_errors","hpc_improve_dom_insertion_observer","insert_before_patch","issue_fields_report_usage","issues_preserve_tokens_in_urls","issues_react_blur_item_picker_on_close","issues_react_bots_timeline_pagination","issues_react_prohibit_title_fallback","issues_react_remove_placeholders","lifecycle_label_name_updates","link_contact_sales_swp_marketo","marketing_fullstory_sampling","marketing_pages_search_explore_provider","memex_mwl_filter_field_delimiter","nonreporting_relay_graphql_status_codes","primer_react_segmented_control_tooltip","record_sso_banner_metrics","remove_child_patch","sample_network_conn_type","scheduled_reminders_updated_limits","site_copilot_plans_emphasize_pro","site_homepage_contentful","site_msbuild_hide_integrations","site_msbuild_launch","site_msbuild_webgl_hero","spark_commit_on_default_branch","spark_sync_repository_after_iteration","swp_enterprise_contact_form","viewscreen_sandbox","workbench_default_sonnet4","workbench_store_readonly"],"copilotApiOverrideUrl":null}</script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/high-contrast-cookie-84a1cb087855.js"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/high-contrast-cookie-43044cc98e23.js"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/wp-runtime-0f47ec41f303.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/wp-runtime-73502306735a.js" defer="defer"></script>
 
 <script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_oddbird_popover-polyfill_dist_popover-fn_js-a8c266e5f126.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_mini-throttle_dist_index_js-node_modules_stacktrace-parser_dist_s-1d3d52-babac9434833.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_mini-throttle_dist_index_js-node_modules_stacktrace-parser_dist_s-1d3d52-63979392733d.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/ui_packages_failbot_failbot_ts-992dcf80dabf.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/ui_packages_failbot_failbot_ts-290ee401187e.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/environment-17084f3f370f.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/environment-60434be97762.js" defer="defer"></script>
 
 <script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_primer_behaviors_dist_esm_index_mjs-c44edfed7f0d.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_selector-observer_dist_index_esm_js-cdf2757bd188.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_selector-observer_dist_index_esm_js-3bc735efc2fb.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_relative-time-element_dist_index_js-5913bc24f35d.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_relative-time-element_dist_index_js-e43198c9c229.js" defer="defer"></script>
+
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_auto-complete-element_dist_index_js-node_modules_github_catalyst_-8e9f78-c1e2fb329866.js" defer="defer"></script>
 
 <script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_text-expander-element_dist_index_js-e50fb7a5fe8c.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_auto-complete-element_dist_index_js-node_modules_github_catalyst_-8e9f78-bd3e08e767f2.js" defer="defer"></script>
-
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_filter-input-element_dist_index_js-node_modules_github_remote-inp-b5f1d7-514a92c925f0.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_filter-input-element_dist_index_js-node_modules_github_remote-inp-d8c643-251bc3964eb6.js" defer="defer"></script>
 
 <script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_markdown-toolbar-element_dist_index_js-6a8c7d9a08fe.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_file-attachment-element_dist_index_js-node_modules_primer_view-co-f03a40-c631b99b0f08.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_file-attachment-element_dist_index_js-node_modules_primer_view-co-cadbad-11b844dec6f2.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/github-elements-01097d9e7528.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/github-elements-3b6fca56e22b.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/element-registry-719b1c6cd686.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/element-registry-14af068466b6.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_braintree_browser-detection_dist_browser-detection_js-node_modules_githu-bb80ec-34c4b68b1dd3.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_braintree_browser-detection_dist_browser-detection_js-node_modules_githu-bb80ec-422a87d68b40.js" defer="defer"></script>
 
 <script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_lit-html_lit-html_js-b93a87060d31.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_morphdom_dist_morphdom-esm_js-300e8e4e0414.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_morphdom_dist_morphdom-esm_js-65504f81abf2.js" defer="defer"></script>
+
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_fzy_js_index_js-node_modules_github_paste-markdown_dist_index_js-c085e349c548.js" defer="defer"></script>
 
 <script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_turbo_dist_turbo_es2017-esm_js-595819d3686f.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_remote-form_dist_index_js-node_modules_delegated-events_dist_inde-893f9f-5f044d8dcee3.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_remote-form_dist_index_js-node_modules_delegated-events_dist_inde-893f9f-8351bc3b1582.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_quote-selection_dist_index_js-node_modules_github_session-resume_-c39857-68019bebf97d.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_quote-selection_dist_index_js-node_modules_github_session-resume_-dfcc50-71b8e772e6cc.js" defer="defer"></script>
 
 <script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/ui_packages_updatable-content_updatable-content_ts-19a9ffc8367b.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/app_assets_modules_github_behaviors_task-list_ts-app_assets_modules_github_sso_ts-ui_packages-900dde-f953ddf42948.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/app_assets_modules_github_behaviors_task-list_ts-app_assets_modules_github_sso_ts-ui_packages-900dde-f59ef568265a.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/app_assets_modules_github_sticky-scroll-into-view_ts-422e3114b79c.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/app_assets_modules_github_sticky-scroll-into-view_ts-c9618dd6662a.js" defer="defer"></script>
 
 <script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/app_assets_modules_github_behaviors_ajax-error_ts-app_assets_modules_github_behaviors_include-d0d0a6-a7da4270c5f4.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/app_assets_modules_github_behaviors_commenting_edit_ts-app_assets_modules_github_behaviors_ht-83c235-567e0f340e27.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/app_assets_modules_github_behaviors_commenting_edit_ts-app_assets_modules_github_behaviors_ht-83c235-54f5b4a90315.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/behaviors-b74b5fa8164a.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/behaviors-e36ff5aae6c5.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_delegated-events_dist_index_js-node_modules_github_catalyst_lib_index_js-ea8eaa-8918b475538f.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_delegated-events_dist_index_js-node_modules_github_catalyst_lib_index_js-ea8eaa-a4bd0b8e9717.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/notifications-global-ddd47578369b.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/notifications-global-3b61f3f3d9a0.js" defer="defer"></script>
 
 <script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_mini-throttle_dist_index_js-node_modules_virtualized-list_es_inde-5cfb7e-03a3356911e6.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_remote-form_dist_index_js-node_modules_github_details-dialog-elem-308dee-ce03f52f32da.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_remote-form_dist_index_js-node_modules_github_details-dialog-elem-308dee-06450a23e00c.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_mini-throttle_dist_decorators_js-node_modules_delegated-events_di-e161aa-f6ae1abe18dd.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_mini-throttle_dist_decorators_js-node_modules_delegated-events_di-e161aa-a83536fe14ef.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_scroll-anchoring_dist_scroll-anchoring_esm_js-node_modules_github_cataly-30396f-776b588e03e0.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_scroll-anchoring_dist_scroll-anchoring_esm_js-node_modules_github_cataly-30396f-a60f6d8ebd45.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/app_assets_modules_github_ref-selector_ts-c2ba82cb11dd.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/app_assets_modules_github_ref-selector_ts-f091cf23d29d.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/app_assets_modules_github_diffs_blob-lines_ts-app_assets_modules_github_diffs_linkable-line-n-1bee7c-7d51467a62a1.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/app_assets_modules_github_diffs_blob-lines_ts-app_assets_modules_github_diffs_linkable-line-n-1bee7c-5bbc79643988.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/diffs-2d04f831b935.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/diffs-f94a1727762f.js" defer="defer"></script>
 
-  <script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/primer-react-e3f517d7be60.js" defer="defer"></script>
+  <script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/primer-react-e4492b80a191.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/react-core-da8e42da9f7f.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/react-lib-a96d55f9fe4a.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/react-lib-8705026b409a.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/react-core-9ebf98198b65.js" defer="defer"></script>
 
 <script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/octicons-react-d5df7319196a.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_emotion_is-prop-valid_dist_emotion-is-prop-valid_esm_js-node_modules_emo-1fff13-e90c4f4db816.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_emotion_is-prop-valid_dist_emotion-is-prop-valid_esm_js-node_modules_emo-1fff13-da98e83d4f04.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_tanstack_query-core_build_modern_queryClient_js-f747879a83cf.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_tanstack_query-core_build_modern_queryClient_js-e7ffcb92fd6f.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/ui_packages_document-metadata_document-metadata_ts-ui_packages_notifications-subscriptions-me-a61c45-fff89a42d18b.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/ui_packages_document-metadata_document-metadata_ts-ui_packages_notifications-subscriptions-me-a61c45-c439c65bea11.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/notifications-subscriptions-menu-2c26bccb5eb4.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/notifications-subscriptions-menu-105a73d9d7e8.js" defer="defer"></script>
 
-<link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/primer-react.dc5775fb19802964ac0e.module.css" />
+<link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/primer-react.b2a80302b2912cf742ec.module.css" />
 <link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/notifications-subscriptions-menu.4c58e19e87a9dd1b1dfd.module.css" />
 
-  <script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/wiki-77e94e8dbed5.js" defer="defer"></script>
+  <script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/wiki-c4054a939c33.js" defer="defer"></script>
 
   <title>Home · TryGhost/node-sqlite3 Wiki · GitHub</title>
 
   <meta name="route-pattern" content="/:user_id/:repository/wiki(.:format)" data-turbo-transient>
   <meta name="route-controller" content="wiki" data-turbo-transient>
   <meta name="route-action" content="index" data-turbo-transient>
-  <meta name="fetch-nonce" content="v2:7d9eec89-1ec8-b49f-bf8e-f948fbf8b7fa">
+  <meta name="fetch-nonce" content="v2:eefc4475-2c27-c783-588c-465a1d031a6a">
 
   <meta name="current-catalog-service-hash" content="27690012a2eb28b75d0bacab0f2c11870266e8db9e019fa71fea812b82397bd6">
 
-<meta name="request-id" content="C51F:219EF8:3BAF92E:501E23B:6889AFFB" data-pjax-transient="true"/><meta name="html-safe-nonce" content="a0433e696814be6a7a84897792b26d4b9b8a45ea0d548281f4e3ab778de74ee2" data-pjax-transient="true"/><meta name="visitor-payload" content="eyJyZWZlcnJlciI6IiIsInJlcXVlc3RfaWQiOiJDNTFGOjIxOUVGODozQkFGOTJFOjUwMUUyM0I6Njg4OUFGRkIiLCJ2aXNpdG9yX2lkIjoiNjQzMTUwOTM2MDU1MzI4NzYzIiwicmVnaW9uX2VkZ2UiOiJpYWQiLCJyZWdpb25fcmVuZGVyIjoiaWFkIn0=" data-pjax-transient="true"/><meta name="visitor-hmac" content="905e47de46d606e767de76fd5760308e16612860787ab7232d015db08f17b946" data-pjax-transient="true"/>
+<meta name="request-id" content="FAE7:222AC2:71A361:8A79EF:6897FDFD" data-pjax-transient="true"/><meta name="html-safe-nonce" content="0b5d57f8e3b24b5b3d7af42db1f8a4b2d93714fb6ea62657798df3c875edb747" data-pjax-transient="true"/><meta name="visitor-payload" content="eyJyZWZlcnJlciI6IiIsInJlcXVlc3RfaWQiOiJGQUU3OjIyMkFDMjo3MUEzNjE6OEE3OUVGOjY4OTdGREZEIiwidmlzaXRvcl9pZCI6IjI2NDM4MDg2OTE3OTYwNDk0MDUiLCJyZWdpb25fZWRnZSI6ImlhZCIsInJlZ2lvbl9yZW5kZXIiOiJpYWQifQ==" data-pjax-transient="true"/><meta name="visitor-hmac" content="70eb57e85a98be79c4f735e96a78be8b7275d0b6a9b5175d760c0a6221c20ae2" data-pjax-transient="true"/>
 
     <meta name="hovercard-subject-tag" content="repository:1367055" data-turbo-transient>
 
@@ -164,9 +175,9 @@ data-a11y-animated-images="system" data-a11y-link-underlines="true"
     <meta property="fb:app_id" content="1401488693436528">
     <meta name="apple-itunes-app" content="app-id=1477376905, app-argument=https://github.com/TryGhost/node-sqlite3/wiki" />
 
-      <meta name="twitter:image" content="https://opengraph.githubassets.com/cbedfac495b5acc92ee3cf82458a1a4e36aba4b2b7052ff9a7396a1a07124b99/TryGhost/node-sqlite3" /><meta name="twitter:site" content="@github" /><meta name="twitter:card" content="summary_large_image" /><meta name="twitter:title" content="Home" /><meta name="twitter:description" content="SQLite3 bindings for Node.js. Contribute to TryGhost/node-sqlite3 development by creating an account on GitHub." />
+      <meta name="twitter:image" content="https://opengraph.githubassets.com/be65023304ff953052fc40c728ae6a8b3e1665cec1841919b51076160be916b2/TryGhost/node-sqlite3" /><meta name="twitter:site" content="@github" /><meta name="twitter:card" content="summary_large_image" /><meta name="twitter:title" content="Home" /><meta name="twitter:description" content="SQLite3 bindings for Node.js. Contribute to TryGhost/node-sqlite3 development by creating an account on GitHub." />
 
-<meta property="og:image" content="https://opengraph.githubassets.com/cbedfac495b5acc92ee3cf82458a1a4e36aba4b2b7052ff9a7396a1a07124b99/TryGhost/node-sqlite3" /><meta property="og:image:alt" content="SQLite3 bindings for Node.js. Contribute to TryGhost/node-sqlite3 development by creating an account on GitHub." /><meta property="og:image:width" content="1200" /><meta property="og:image:height" content="600" /><meta property="og:site_name" content="GitHub" /><meta property="og:type" content="object" /><meta property="og:title" content="Home" /><meta property="og:url" content="https://github.com/TryGhost/node-sqlite3/wiki/Home" /><meta property="og:description" content="SQLite3 bindings for Node.js. Contribute to TryGhost/node-sqlite3 development by creating an account on GitHub." />
+<meta property="og:image" content="https://opengraph.githubassets.com/be65023304ff953052fc40c728ae6a8b3e1665cec1841919b51076160be916b2/TryGhost/node-sqlite3" /><meta property="og:image:alt" content="SQLite3 bindings for Node.js. Contribute to TryGhost/node-sqlite3 development by creating an account on GitHub." /><meta property="og:image:width" content="1200" /><meta property="og:image:height" content="600" /><meta property="og:site_name" content="GitHub" /><meta property="og:type" content="object" /><meta property="og:title" content="Home" /><meta property="og:url" content="https://github.com/TryGhost/node-sqlite3/wiki/Home" /><meta property="og:description" content="SQLite3 bindings for Node.js. Contribute to TryGhost/node-sqlite3 development by creating an account on GitHub." />
 
       <meta name="hostname" content="github.com">
 
@@ -174,10 +185,10 @@ data-a11y-animated-images="system" data-a11y-link-underlines="true"
 
         <meta name="expected-hostname" content="github.com">
 
-  <meta http-equiv="x-pjax-version" content="b341f425b5281749a0c63d2cd62911f1d0b07fe5e3fd6a4ac174a82b37c4d32a" data-turbo-track="reload">
-  <meta http-equiv="x-pjax-csp-version" content="352e51c42d5f5727a7c545752bf34d1f83f40219e7036c6959817149a51651bc" data-turbo-track="reload">
-  <meta http-equiv="x-pjax-css-version" content="e5647fce2d3cdb1a227dca10e54111406e1db4fb899b1b71816ac3ddb996a86f" data-turbo-track="reload">
-  <meta http-equiv="x-pjax-js-version" content="28f8017c2e81b5cc015b0954000c86523fbf809ff075d3337be301bf9deb43e9" data-turbo-track="reload">
+  <meta http-equiv="x-pjax-version" content="a837985c1243a4e9c9c3dde5936f29f33e7bb84fe2c40900c7eb7784c160f424" data-turbo-track="reload">
+  <meta http-equiv="x-pjax-csp-version" content="8fba9c9418de26103e6176951dd0c38780be21b972f2019085dee08622fdb843" data-turbo-track="reload">
+  <meta http-equiv="x-pjax-css-version" content="682bd362ae4926152d952d8ef54b3b1f0b754fee6dfb6b128d5c3c6b062a7ef2" data-turbo-track="reload">
+  <meta http-equiv="x-pjax-js-version" content="948f5957c8aabda505d757a82f0c6cbd1399af1cb0f95eb9476154a2b4a893de" data-turbo-track="reload">
 
   <meta name="turbo-cache-control" content="no-preview" data-turbo-transient="">
 
@@ -191,7 +202,7 @@ data-a11y-animated-images="system" data-a11y-link-underlines="true"
 
   <meta name="browser-errors-url" content="https://api.github.com/_private/browser/errors">
 
-  <meta name="release" content="bfa2af33c4224df74e50e96d12526f2f068e67fe">
+  <meta name="release" content="dc1e86d6d16022212ecd52cc12a08caf81062da6">
   <meta name="ui-target" content="full">
 
   <link rel="mask-icon" href="https://github.githubassets.com/assets/pinned-octocat-093da3e6fa40.svg" color="#000000">
@@ -216,7 +227,7 @@ data-a11y-animated-images="system" data-a11y-link-underlines="true"
 
 </span>      
 
-      <link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/primer-react.dc5775fb19802964ac0e.module.css" />
+      <link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/primer-react.b2a80302b2912cf742ec.module.css" />
 
 <link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/keyboard-shortcuts-dialog.f8fba3bd67fe74f9227b.module.css" />
 
@@ -235,9 +246,9 @@ data-react-profiling="false"
 
 <script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_gsap_index_js-028cb2a18f5a.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_remote-form_dist_index_js-node_modules_delegated-events_dist_inde-94fd67-b0625c39513c.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_remote-form_dist_index_js-node_modules_delegated-events_dist_inde-94fd67-094296912333.js" defer="defer"></script>
 
-<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/sessions-5e9442c22f33.js" defer="defer"></script>
+<script crossorigin="anonymous" type="application/javascript" src="https://github.githubassets.com/assets/sessions-993c483b0f4e.js" defer="defer"></script>
 
 <header class="HeaderMktg header-logged-out js-details-container js-header Details f4 py-3" role="banner" data-is-top="true" data-color-mode=light data-light-theme=light data-dark-theme=dark>
   <h2 class="sr-only">Navigation Menu</h2>
@@ -278,14 +289,14 @@ data-react-profiling="false"
           </a>
               <div class="AppHeader-appearanceSettings">
     <react-partial-anchor>
-      <button data-target="react-partial-anchor.anchor" id="icon-button-95d547e4-5f8a-43cb-a94f-beae437074c8" aria-labelledby="tooltip-f9615205-be97-4228-9c98-139c23f7d753" type="button" disabled="disabled" data-view-component="true" class="Button Button--iconOnly Button--invisible Button--medium AppHeader-button HeaderMenu-link border cursor-wait">  <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-sliders Button-visual">
+      <button data-target="react-partial-anchor.anchor" id="icon-button-a98c68c6-5543-4b71-b8b6-6d409a311a52" aria-labelledby="tooltip-c68fbb0f-0248-47e1-bb9d-72437a9d248e" type="button" disabled="disabled" data-view-component="true" class="Button Button--iconOnly Button--invisible Button--medium AppHeader-button HeaderMenu-link border cursor-wait">  <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-sliders Button-visual">
     <path d="M15 2.75a.75.75 0 0 1-.75.75h-4a.75.75 0 0 1 0-1.5h4a.75.75 0 0 1 .75.75Zm-8.5.75v1.25a.75.75 0 0 0 1.5 0v-4a.75.75 0 0 0-1.5 0V2H1.75a.75.75 0 0 0 0 1.5H6.5Zm1.25 5.25a.75.75 0 0 0 0-1.5h-6a.75.75 0 0 0 0 1.5h6ZM15 8a.75.75 0 0 1-.75.75H11.5V10a.75.75 0 1 1-1.5 0V6a.75.75 0 0 1 1.5 0v1.25h2.75A.75.75 0 0 1 15 8Zm-9 5.25v-2a.75.75 0 0 0-1.5 0v1.25H1.75a.75.75 0 0 0 0 1.5H4.5v1.25a.75.75 0 0 0 1.5 0v-2Zm9 0a.75.75 0 0 1-.75.75h-6a.75.75 0 0 1 0-1.5h6a.75.75 0 0 1 .75.75Z"></path>
 
 </svg>
-</button><tool-tip id="tooltip-f9615205-be97-4228-9c98-139c23f7d753" for="icon-button-95d547e4-5f8a-43cb-a94f-beae437074c8" popover="manual" data-direction="s" data-type="label" data-view-component="true" class="sr-only position-absolute">Appearance settings</tool-tip>
+</button><tool-tip id="tooltip-c68fbb0f-0248-47e1-bb9d-72437a9d248e" for="icon-button-a98c68c6-5543-4b71-b8b6-6d409a311a52" popover="manual" data-direction="s" data-type="label" data-view-component="true" class="sr-only position-absolute">Appearance settings</tool-tip>
 
       <template data-target="react-partial-anchor.template">
-        <link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/primer-react.dc5775fb19802964ac0e.module.css" />
+        <link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/primer-react.b2a80302b2912cf742ec.module.css" />
 
 <link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/appearance-settings.76259b61ecc822265749.module.css" />
 
@@ -990,7 +1001,7 @@ data-react-profiling="false"
 
         <div class="d-flex flex-column flex-lg-row width-full flex-justify-end flex-lg-items-center text-center mt-3 mt-lg-0 text-lg-left ml-lg-3">
 
-<qbsearch-input class="search-input" data-scope="repo:TryGhost/node-sqlite3" data-custom-scopes-path="/search/custom_scopes" data-delete-custom-scopes-csrf="3HBGRyG6d9aX2HjErJWUIF5jpufR04Kr0o_lAEFR8A-9mU1295s686YRsirTh5T4QzWhQGdLJdxx6fKIqM7Hpg" data-max-custom-scopes="10" data-header-redesign-enabled="false" data-initial-value="" data-blackbird-suggestions-path="/search/suggestions" data-jump-to-suggestions-path="/_graphql/GetSuggestedNavigationDestinations" data-current-repository="TryGhost/node-sqlite3" data-current-org="TryGhost" data-current-owner="" data-logged-in="false" data-copilot-chat-enabled="false" data-nl-search-enabled="false" data-retain-scroll-position="true">
+<qbsearch-input class="search-input" data-scope="repo:TryGhost/node-sqlite3" data-custom-scopes-path="/search/custom_scopes" data-delete-custom-scopes-csrf="rtutGqqYAlwh1JhEK4wItCz3oWgHCXthtv4QlTrC0RH6V1M36WJSAkCPifDXx6p6UQ5PR8mtOECf-NR6FIyY6Q" data-max-custom-scopes="10" data-header-redesign-enabled="false" data-initial-value="" data-blackbird-suggestions-path="/search/suggestions" data-jump-to-suggestions-path="/_graphql/GetSuggestedNavigationDestinations" data-current-repository="TryGhost/node-sqlite3" data-current-org="TryGhost" data-current-owner="" data-logged-in="false" data-copilot-chat-enabled="false" data-nl-search-enabled="false" data-retain-scroll-position="true">
   <div
     class="search-input-container search-with-dialog position-relative d-flex flex-row flex-items-center mr-4 rounded"
     data-action="click:qbsearch-input#searchInputContainerClicked"
@@ -1054,7 +1065,7 @@ data-react-profiling="false"
           ></div>
           <div class="QueryBuilder-InputWrapper">
             <div aria-hidden="true" class="QueryBuilder-Sizer" data-target="query-builder.sizer"></div>
-            <input id="query-builder-test" name="query-builder-test" value="" autocomplete="off" type="text" role="combobox" spellcheck="false" aria-expanded="false" aria-describedby="validation-55a1c71b-bffc-48e0-abba-89e40f4264cf" data-target="query-builder.input" data-action="
+            <input id="query-builder-test" name="query-builder-test" value="" autocomplete="off" type="text" role="combobox" spellcheck="false" aria-expanded="false" aria-describedby="validation-9fc813ae-5c5e-432f-9bf4-506bd1227605" data-target="query-builder.input" data-action="
           input:query-builder#inputChange
           blur:query-builder#inputBlur
           keydown:query-builder#inputKeydown
@@ -1293,7 +1304,7 @@ data-react-profiling="false"
                   tabindex="-1"
                 ></ul>
         </div>
-      <div class="FormControl-inlineValidation" id="validation-55a1c71b-bffc-48e0-abba-89e40f4264cf" hidden="hidden">
+      <div class="FormControl-inlineValidation" id="validation-9fc813ae-5c5e-432f-9bf4-506bd1227605" hidden="hidden">
         <span class="FormControl-inlineValidation--visual">
           <svg aria-hidden="true" height="12" viewBox="0 0 12 12" version="1.1" width="12" data-view-component="true" class="octicon octicon-alert-fill">
     <path d="M4.855.708c.5-.896 1.79-.896 2.29 0l4.675 8.351a1.312 1.312 0 0 1-1.146 1.954H1.33A1.313 1.313 0 0 1 .183 9.058ZM7 7V3H5v4Zm-1 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"></path>
@@ -1339,7 +1350,7 @@ data-react-profiling="false"
 
 </div>
       <scrollable-region data-labelled-by="feedback-dialog-title">
-        <div data-view-component="true" class="Overlay-body">        <!-- '"` --><!-- </textarea></xmp> --></option></form><form id="code-search-feedback-form" data-turbo="false" action="/search/feedback" accept-charset="UTF-8" method="post"><input type="hidden" data-csrf="true" name="authenticity_token" value="npRSmM3jsx0gsPKVDTx63gyhbo/9Su5hPtFKjyd4oDfs72CDHMzPkAzZa83pQwbei080gH2UJY3aIDqm3y1T0A==" />
+        <div data-view-component="true" class="Overlay-body">        <!-- '"` --><!-- </textarea></xmp> --></option></form><form id="code-search-feedback-form" data-turbo="false" action="/search/feedback" accept-charset="UTF-8" method="post"><input type="hidden" data-csrf="true" name="authenticity_token" value="LSRRYcE7o9Xq4Ctvp1Y0sY3Hc5NpG/8Kzz9Uj5+bwLb3ybLZ3zObuszNGEYdoiHPvEP/u4VKAzyDEtGHpdAznQ==" />
           <p>We read every piece of feedback, and take your input very seriously.</p>
           <textarea name="feedback" class="form-control width-full mb-2" style="height: 120px" id="feedback"></textarea>
           <input name="include_email" id="include_email" aria-label="Include my email address so I can be contacted" class="form-control mr-2" type="checkbox">
@@ -1377,7 +1388,7 @@ data-react-profiling="false"
         <div data-view-component="true" class="Overlay-body">        <div data-target="custom-scopes.customScopesModalDialogFlash"></div>
 
         <div hidden class="create-custom-scope-form" data-target="custom-scopes.createCustomScopeForm">
-        <!-- '"` --><!-- </textarea></xmp> --></option></form><form id="custom-scopes-dialog-form" data-turbo="false" action="/search/custom_scopes" accept-charset="UTF-8" method="post"><input type="hidden" data-csrf="true" name="authenticity_token" value="0ZKZPmtxka3XEBUTx4TGqzc9zsCn2glj4ajtwggeSSrlrGWmJekLvmAyItT3jpiNzj9q9aeWmhtHsgI69Njzbw==" />
+        <!-- '"` --><!-- </textarea></xmp> --></option></form><form id="custom-scopes-dialog-form" data-turbo="false" action="/search/custom_scopes" accept-charset="UTF-8" method="post"><input type="hidden" data-csrf="true" name="authenticity_token" value="FuZ91iRqrNldFcVpeClwYVsW5+4YPHwYpQzZtdBQZjfFa5GJ+EB/ev1jxt85A5KIk14uYR+0HilctOqxbw5MmA==" />
           <div data-target="custom-scopes.customScopesModalDialogFlash"></div>
 
           <input type="hidden" id="custom_scope_id" name="custom_scope_id" data-target="custom-scopes.customScopesIdField">
@@ -1395,7 +1406,7 @@ data-react-profiling="false"
                 placeholder="github-ruby"
                 required
                 maxlength="50">
-              <input type="hidden" data-csrf="true" value="WPmiEAesRRd3RZ9WoeJZnioFB5rveQNx0uueqPPgDY5sI/lWjiVgkLMWLzbrdhRbOpJOu8uX7Kcp5qFjgx45fA==" />
+              <input type="hidden" data-csrf="true" value="0Zy1NLAr2MnkAcwUMGlqIx1UxHPmkWFnS/rMIWkNePN4pRWoDqnVw8s2QBJb4+t9JOrC5a/hf2sZdxLwFyWqkQ==" />
             </auto-check>
           </div>
 
@@ -1457,14 +1468,14 @@ data-react-profiling="false"
 
                 <div class="AppHeader-appearanceSettings">
     <react-partial-anchor>
-      <button data-target="react-partial-anchor.anchor" id="icon-button-4a90a527-acd2-4a63-a187-ca27f47c11f1" aria-labelledby="tooltip-4d677931-c413-437b-b36f-1fbca8d8c726" type="button" disabled="disabled" data-view-component="true" class="Button Button--iconOnly Button--invisible Button--medium AppHeader-button HeaderMenu-link border cursor-wait">  <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-sliders Button-visual">
+      <button data-target="react-partial-anchor.anchor" id="icon-button-35642bbb-e1ac-43d1-a81e-f735c3fc0bde" aria-labelledby="tooltip-b172cbed-e3bd-480d-9f97-82c923484764" type="button" disabled="disabled" data-view-component="true" class="Button Button--iconOnly Button--invisible Button--medium AppHeader-button HeaderMenu-link border cursor-wait">  <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-sliders Button-visual">
     <path d="M15 2.75a.75.75 0 0 1-.75.75h-4a.75.75 0 0 1 0-1.5h4a.75.75 0 0 1 .75.75Zm-8.5.75v1.25a.75.75 0 0 0 1.5 0v-4a.75.75 0 0 0-1.5 0V2H1.75a.75.75 0 0 0 0 1.5H6.5Zm1.25 5.25a.75.75 0 0 0 0-1.5h-6a.75.75 0 0 0 0 1.5h6ZM15 8a.75.75 0 0 1-.75.75H11.5V10a.75.75 0 1 1-1.5 0V6a.75.75 0 0 1 1.5 0v1.25h2.75A.75.75 0 0 1 15 8Zm-9 5.25v-2a.75.75 0 0 0-1.5 0v1.25H1.75a.75.75 0 0 0 0 1.5H4.5v1.25a.75.75 0 0 0 1.5 0v-2Zm9 0a.75.75 0 0 1-.75.75h-6a.75.75 0 0 1 0-1.5h6a.75.75 0 0 1 .75.75Z"></path>
 
 </svg>
-</button><tool-tip id="tooltip-4d677931-c413-437b-b36f-1fbca8d8c726" for="icon-button-4a90a527-acd2-4a63-a187-ca27f47c11f1" popover="manual" data-direction="s" data-type="label" data-view-component="true" class="sr-only position-absolute">Appearance settings</tool-tip>
+</button><tool-tip id="tooltip-b172cbed-e3bd-480d-9f97-82c923484764" for="icon-button-35642bbb-e1ac-43d1-a81e-f735c3fc0bde" popover="manual" data-direction="s" data-type="label" data-view-component="true" class="sr-only position-absolute">Appearance settings</tool-tip>
 
       <template data-target="react-partial-anchor.template">
-        <link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/primer-react.dc5775fb19802964ac0e.module.css" />
+        <link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/primer-react.b2a80302b2912cf742ec.module.css" />
 
 <link crossorigin="anonymous" media="all" rel="stylesheet" href="https://github.githubassets.com/assets/appearance-settings.76259b61ecc822265749.module.css" />
 
@@ -1504,11 +1515,11 @@ data-react-profiling="false"
         <span class="js-stale-session-flash-signed-out" hidden>You signed out in another tab or window. <a class="Link--inTextBlock" href="">Reload</a> to refresh your session.</span>
         <span class="js-stale-session-flash-switched" hidden>You switched accounts on another tab or window. <a class="Link--inTextBlock" href="">Reload</a> to refresh your session.</span>
 
-    <button id="icon-button-5265e7ce-892d-4cd1-868d-5d0c2567a453" aria-labelledby="tooltip-2baeae44-94d9-4735-a43d-a50cb543ba08" type="button" data-view-component="true" class="Button Button--iconOnly Button--invisible Button--medium flash-close js-flash-close">  <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-x Button-visual">
+    <button id="icon-button-80eb86da-bfdc-4270-a562-01f0b0a7979b" aria-labelledby="tooltip-fca52d75-184a-4d43-a830-ab11b4e0e764" type="button" data-view-component="true" class="Button Button--iconOnly Button--invisible Button--medium flash-close js-flash-close">  <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-x Button-visual">
     <path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L9.06 8l3.22 3.22a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L8 9.06l-3.22 3.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"></path>
 
 </svg>
-</button><tool-tip id="tooltip-2baeae44-94d9-4735-a43d-a50cb543ba08" for="icon-button-5265e7ce-892d-4cd1-868d-5d0c2567a453" popover="manual" data-direction="s" data-type="label" data-view-component="true" class="sr-only position-absolute">Dismiss alert</tool-tip>
+</button><tool-tip id="tooltip-fca52d75-184a-4d43-a830-ab11b4e0e764" for="icon-button-80eb86da-bfdc-4270-a562-01f0b0a7979b" popover="manual" data-direction="s" data-type="label" data-view-component="true" class="sr-only position-absolute">Dismiss alert</tool-tip>
 
 </div>
     </div>
@@ -1578,7 +1589,7 @@ data-react-profiling="false"
             <ul class="pagehead-actions flex-shrink-0 d-none d-md-inline" style="padding: 2px 0;">
 
         <li>
-          <include-fragment src="/TryGhost/node-sqlite3/sponsor_button" data-nonce="v2:7d9eec89-1ec8-b49f-bf8e-f948fbf8b7fa" data-view-component="true">
+          <include-fragment src="/TryGhost/node-sqlite3/sponsor_button" data-nonce="v2:eefc4475-2c27-c783-588c-465a1d031a6a" data-view-component="true">
 
   <div data-show-on-forbidden-error hidden>
     <div class="Box">
@@ -1600,7 +1611,7 @@ data-react-profiling="false"
             <a href="/login?return_to=%2FTryGhost%2Fnode-sqlite3" rel="nofollow" id="repository-details-watch-button" data-hydro-click="{&quot;event_type&quot;:&quot;authentication.click&quot;,&quot;payload&quot;:{&quot;location_in_page&quot;:&quot;notification subscription menu watch&quot;,&quot;repository_id&quot;:null,&quot;auth_type&quot;:&quot;LOG_IN&quot;,&quot;originating_url&quot;:&quot;https://github.com/TryGhost/node-sqlite3/wiki&quot;,&quot;user_id&quot;:null}}" data-hydro-click-hmac="01addcf8246c2d6bf1e0000960175a39af08a3fe44e7b71160a94007823f69d2" aria-label="You must be signed in to change notification settings" data-view-component="true" class="btn-sm btn">    <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-bell mr-2">
     <path d="M8 16a2 2 0 0 0 1.985-1.75c.017-.137-.097-.25-.235-.25h-3.5c-.138 0-.252.113-.235.25A2 2 0 0 0 8 16ZM3 5a5 5 0 0 1 10 0v2.947c0 .05.015.098.042.139l1.703 2.555A1.519 1.519 0 0 1 13.482 13H2.518a1.516 1.516 0 0 1-1.263-2.36l1.703-2.554A.255.255 0 0 0 3 7.947Zm5-3.5A3.5 3.5 0 0 0 4.5 5v2.947c0 .346-.102.683-.294.97l-1.703 2.556a.017.017 0 0 0-.003.01l.001.006c0 .002.002.004.004.006l.006.004.007.001h10.964l.007-.001.006-.004.004-.006.001-.007a.017.017 0 0 0-.003-.01l-1.703-2.554a1.745 1.745 0 0 1-.294-.97V5A3.5 3.5 0 0 0 8 1.5Z"></path>
 </svg>Notifications
-</a>    <tool-tip id="tooltip-237d4d46-4a4d-4775-961e-8fe05677a6a9" for="repository-details-watch-button" popover="manual" data-direction="s" data-type="description" data-view-component="true" class="sr-only position-absolute">You must be signed in to change notification settings</tool-tip>
+</a>    <tool-tip id="tooltip-73511e6a-466f-4c93-afcd-8d36c7919665" for="repository-details-watch-button" popover="manual" data-direction="s" data-type="description" data-view-component="true" class="sr-only position-absolute">You must be signed in to change notification settings</tool-tip>
 
   </li>
 
@@ -1608,7 +1619,7 @@ data-react-profiling="false"
           <a icon="repo-forked" id="fork-button" href="/login?return_to=%2FTryGhost%2Fnode-sqlite3" rel="nofollow" data-hydro-click="{&quot;event_type&quot;:&quot;authentication.click&quot;,&quot;payload&quot;:{&quot;location_in_page&quot;:&quot;repo details fork button&quot;,&quot;repository_id&quot;:1367055,&quot;auth_type&quot;:&quot;LOG_IN&quot;,&quot;originating_url&quot;:&quot;https://github.com/TryGhost/node-sqlite3/wiki&quot;,&quot;user_id&quot;:null}}" data-hydro-click-hmac="df3946298877447ecc3148127f86811a5827c9b832cec707e5366b3650df125f" data-view-component="true" class="btn-sm btn">    <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-repo-forked mr-2">
     <path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"></path>
 </svg>Fork
-    <span id="repo-network-counter" data-pjax-replace="true" data-turbo-replace="true" title="832" data-view-component="true" class="Counter">832</span>
+    <span id="repo-network-counter" data-pjax-replace="true" data-turbo-replace="true" title="836" data-view-component="true" class="Counter">836</span>
 </a>
   </li>
 
@@ -1618,7 +1629,7 @@ data-react-profiling="false"
     <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Zm0 2.445L6.615 5.5a.75.75 0 0 1-.564.41l-3.097.45 2.24 2.184a.75.75 0 0 1 .216.664l-.528 3.084 2.769-1.456a.75.75 0 0 1 .698 0l2.77 1.456-.53-3.084a.75.75 0 0 1 .216-.664l2.24-2.183-3.096-.45a.75.75 0 0 1-.564-.41L8 2.694Z"></path>
 </svg><span data-view-component="true" class="d-inline">
           Star
-</span>          <span id="repo-stars-counter-star" aria-label="6367 users starred this repository" data-singular-suffix="user starred this repository" data-plural-suffix="users starred this repository" data-turbo-replace="true" title="6,367" data-view-component="true" class="Counter js-social-count">6.4k</span>
+</span>          <span id="repo-stars-counter-star" aria-label="6370 users starred this repository" data-singular-suffix="user starred this repository" data-plural-suffix="users starred this repository" data-turbo-replace="true" title="6,370" data-view-component="true" class="Counter js-social-count">6.4k</span>
 </a></div>
   </li>
 
@@ -1664,7 +1675,7 @@ data-react-profiling="false"
 
 </svg>
         <span data-content="Pull requests">Pull requests</span>
-          <span id="pull-requests-repo-tab-count" data-pjax-replace="" data-turbo-replace="" title="4" data-view-component="true" class="Counter">4</span>
+          <span id="pull-requests-repo-tab-count" data-pjax-replace="" data-turbo-replace="" title="3" data-view-component="true" class="Counter">3</span>
 
 </a></li>
 <li data-view-component="true" class="d-inline-flex">
@@ -1697,7 +1708,7 @@ data-react-profiling="false"
 
 </svg>
         <span data-content="Security">Security</span>
-          <include-fragment src="/TryGhost/node-sqlite3/security/overall-count" accept="text/fragment+html" data-nonce="v2:7d9eec89-1ec8-b49f-bf8e-f948fbf8b7fa" data-view-component="true">
+          <include-fragment src="/TryGhost/node-sqlite3/security/overall-count" accept="text/fragment+html" data-nonce="v2:eefc4475-2c27-c783-588c-465a1d031a6a" data-view-component="true">
 
   <div data-show-on-forbidden-error hidden>
     <div class="Box">
@@ -1730,21 +1741,21 @@ data-react-profiling="false"
 </ul>
     <div style="visibility:hidden;" data-view-component="true" class="UnderlineNav-actions js-responsive-underlinenav-overflow position-absolute pr-3 pr-md-4 pr-lg-5 right-0">      <action-menu data-select-variant="none" data-view-component="true">
   <focus-group direction="vertical" mnemonics retain>
-    <button id="action-menu-a781e8df-bcfd-46c0-b14a-0c83acdfb968-button" popovertarget="action-menu-a781e8df-bcfd-46c0-b14a-0c83acdfb968-overlay" aria-controls="action-menu-a781e8df-bcfd-46c0-b14a-0c83acdfb968-list" aria-haspopup="true" aria-labelledby="tooltip-cdf342a4-24cd-4550-a0d0-fd0d601a0a65" type="button" data-view-component="true" class="Button Button--iconOnly Button--secondary Button--medium UnderlineNav-item">  <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-kebab-horizontal Button-visual">
+    <button id="action-menu-ea0901a5-7fa4-4c91-b938-6d64af571961-button" popovertarget="action-menu-ea0901a5-7fa4-4c91-b938-6d64af571961-overlay" aria-controls="action-menu-ea0901a5-7fa4-4c91-b938-6d64af571961-list" aria-haspopup="true" aria-labelledby="tooltip-5e68d096-e5ad-416f-9504-36a60354b599" type="button" data-view-component="true" class="Button Button--iconOnly Button--secondary Button--medium UnderlineNav-item">  <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-kebab-horizontal Button-visual">
     <path d="M8 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM1.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm13 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"></path>
 </svg>
-</button><tool-tip id="tooltip-cdf342a4-24cd-4550-a0d0-fd0d601a0a65" for="action-menu-a781e8df-bcfd-46c0-b14a-0c83acdfb968-button" popover="manual" data-direction="s" data-type="label" data-view-component="true" class="sr-only position-absolute">Additional navigation options</tool-tip>
+</button><tool-tip id="tooltip-5e68d096-e5ad-416f-9504-36a60354b599" for="action-menu-ea0901a5-7fa4-4c91-b938-6d64af571961-button" popover="manual" data-direction="s" data-type="label" data-view-component="true" class="sr-only position-absolute">Additional navigation options</tool-tip>
 
-<anchored-position data-target="action-menu.overlay" id="action-menu-a781e8df-bcfd-46c0-b14a-0c83acdfb968-overlay" anchor="action-menu-a781e8df-bcfd-46c0-b14a-0c83acdfb968-button" align="start" side="outside-bottom" anchor-offset="normal" popover="auto" data-view-component="true">
+<anchored-position data-target="action-menu.overlay" id="action-menu-ea0901a5-7fa4-4c91-b938-6d64af571961-overlay" anchor="action-menu-ea0901a5-7fa4-4c91-b938-6d64af571961-button" align="start" side="outside-bottom" anchor-offset="normal" popover="auto" data-view-component="true">
   <div data-view-component="true" class="Overlay Overlay--size-auto">
 
       <div data-view-component="true" class="Overlay-body Overlay-body--paddingNone">          <action-list>
 
   <div data-view-component="true">
-    <ul aria-labelledby="action-menu-a781e8df-bcfd-46c0-b14a-0c83acdfb968-button" id="action-menu-a781e8df-bcfd-46c0-b14a-0c83acdfb968-list" role="menu" data-view-component="true" class="ActionListWrap--inset ActionListWrap">
+    <ul aria-labelledby="action-menu-ea0901a5-7fa4-4c91-b938-6d64af571961-button" id="action-menu-ea0901a5-7fa4-4c91-b938-6d64af571961-list" role="menu" data-view-component="true" class="ActionListWrap--inset ActionListWrap">
         <li hidden="hidden" data-menu-item="i0code-tab" data-targets="action-list.items" role="none" data-view-component="true" class="ActionListItem">
 
-    <a tabindex="-1" id="item-b65dbf51-05c1-4441-955f-fd5a1dc281a7" href="/TryGhost/node-sqlite3" role="menuitem" data-view-component="true" class="ActionListContent ActionListContent--visual16">
+    <a tabindex="-1" id="item-e19acb50-30bf-43a9-9a15-26ff0177acd2" href="/TryGhost/node-sqlite3" role="menuitem" data-view-component="true" class="ActionListContent ActionListContent--visual16">
         <span class="ActionListItem-visual ActionListItem-visual--leading">
           <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-code">
     <path d="m11.28 3.22 4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.749.749 0 0 1-1.275-.326.749.749 0 0 1 .215-.734L13.94 8l-3.72-3.72a.749.749 0 0 1 .326-1.275.749.749 0 0 1 .734.215Zm-6.56 0a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042L2.06 8l3.72 3.72a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L.47 8.53a.75.75 0 0 1 0-1.06Z"></path>
@@ -1761,7 +1772,7 @@ data-react-profiling="false"
 </li>
         <li hidden="hidden" data-menu-item="i1issues-tab" data-targets="action-list.items" role="none" data-view-component="true" class="ActionListItem">
 
-    <a tabindex="-1" id="item-0abd90c2-0e8c-4544-8496-1427adb00089" href="/TryGhost/node-sqlite3/issues" role="menuitem" data-view-component="true" class="ActionListContent ActionListContent--visual16">
+    <a tabindex="-1" id="item-23d485c2-817a-4f23-a620-a77abb3f01b1" href="/TryGhost/node-sqlite3/issues" role="menuitem" data-view-component="true" class="ActionListContent ActionListContent--visual16">
         <span class="ActionListItem-visual ActionListItem-visual--leading">
           <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-issue-opened">
     <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"></path><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"></path>
@@ -1778,7 +1789,7 @@ data-react-profiling="false"
 </li>
         <li hidden="hidden" data-menu-item="i2pull-requests-tab" data-targets="action-list.items" role="none" data-view-component="true" class="ActionListItem">
 
-    <a tabindex="-1" id="item-0e2ed540-76f6-4ca4-a6ed-365acf01c40b" href="/TryGhost/node-sqlite3/pulls" role="menuitem" data-view-component="true" class="ActionListContent ActionListContent--visual16">
+    <a tabindex="-1" id="item-22171460-ad67-4771-9834-4c853fd2e4e5" href="/TryGhost/node-sqlite3/pulls" role="menuitem" data-view-component="true" class="ActionListContent ActionListContent--visual16">
         <span class="ActionListItem-visual ActionListItem-visual--leading">
           <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-git-pull-request">
     <path d="M1.5 3.25a2.25 2.25 0 1 1 3 2.122v5.256a2.251 2.251 0 1 1-1.5 0V5.372A2.25 2.25 0 0 1 1.5 3.25Zm5.677-.177L9.573.677A.25.25 0 0 1 10 .854V2.5h1A2.5 2.5 0 0 1 13.5 5v5.628a2.251 2.251 0 1 1-1.5 0V5a1 1 0 0 0-1-1h-1v1.646a.25.25 0 0 1-.427.177L7.177 3.427a.25.25 0 0 1 0-.354ZM3.75 2.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Zm0 9.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Zm8.25.75a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0Z"></path>
@@ -1795,7 +1806,7 @@ data-react-profiling="false"
 </li>
         <li hidden="hidden" data-menu-item="i3actions-tab" data-targets="action-list.items" role="none" data-view-component="true" class="ActionListItem">
 
-    <a tabindex="-1" id="item-f5c48cc6-54e7-4094-80d8-f3cfaddc532d" href="/TryGhost/node-sqlite3/actions" role="menuitem" data-view-component="true" class="ActionListContent ActionListContent--visual16">
+    <a tabindex="-1" id="item-9fe02d72-7ab0-44c4-a029-9d2e1add1bb9" href="/TryGhost/node-sqlite3/actions" role="menuitem" data-view-component="true" class="ActionListContent ActionListContent--visual16">
         <span class="ActionListItem-visual ActionListItem-visual--leading">
           <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-play">
     <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Zm4.879-2.773 4.264 2.559a.25.25 0 0 1 0 .428l-4.264 2.559A.25.25 0 0 1 6 10.559V5.442a.25.25 0 0 1 .379-.215Z"></path>
@@ -1812,7 +1823,7 @@ data-react-profiling="false"
 </li>
         <li hidden="hidden" data-menu-item="i4wiki-tab" data-targets="action-list.items" role="none" data-view-component="true" class="ActionListItem">
 
-    <a tabindex="-1" id="item-8dd2bde1-38b5-4409-8ecb-007275055a25" href="/TryGhost/node-sqlite3/wiki" role="menuitem" data-view-component="true" class="ActionListContent ActionListContent--visual16">
+    <a tabindex="-1" id="item-9cae58ed-8cbe-4cba-a64b-fc2bdf238872" href="/TryGhost/node-sqlite3/wiki" role="menuitem" data-view-component="true" class="ActionListContent ActionListContent--visual16">
         <span class="ActionListItem-visual ActionListItem-visual--leading">
           <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-book">
     <path d="M0 1.75A.75.75 0 0 1 .75 1h4.253c1.227 0 2.317.59 3 1.501A3.743 3.743 0 0 1 11.006 1h4.245a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-4.507a2.25 2.25 0 0 0-1.591.659l-.622.621a.75.75 0 0 1-1.06 0l-.622-.621A2.25 2.25 0 0 0 5.258 13H.75a.75.75 0 0 1-.75-.75Zm7.251 10.324.004-5.073-.002-2.253A2.25 2.25 0 0 0 5.003 2.5H1.5v9h3.757a3.75 3.75 0 0 1 1.994.574ZM8.755 4.75l-.004 7.322a3.752 3.752 0 0 1 1.992-.572H14.5v-9h-3.495a2.25 2.25 0 0 0-2.25 2.25Z"></path>
@@ -1829,7 +1840,7 @@ data-react-profiling="false"
 </li>
         <li hidden="hidden" data-menu-item="i5security-tab" data-targets="action-list.items" role="none" data-view-component="true" class="ActionListItem">
 
-    <a tabindex="-1" id="item-f4956082-a71b-4d0d-b9e5-9eed001b0dc1" href="/TryGhost/node-sqlite3/security" role="menuitem" data-view-component="true" class="ActionListContent ActionListContent--visual16">
+    <a tabindex="-1" id="item-cd7724c0-cbb2-4383-85d1-b7cd60c0dec7" href="/TryGhost/node-sqlite3/security" role="menuitem" data-view-component="true" class="ActionListContent ActionListContent--visual16">
         <span class="ActionListItem-visual ActionListItem-visual--leading">
           <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-shield">
     <path d="M7.467.133a1.748 1.748 0 0 1 1.066 0l5.25 1.68A1.75 1.75 0 0 1 15 3.48V7c0 1.566-.32 3.182-1.303 4.682-.983 1.498-2.585 2.813-5.032 3.855a1.697 1.697 0 0 1-1.33 0c-2.447-1.042-4.049-2.357-5.032-3.855C1.32 10.182 1 8.566 1 7V3.48a1.75 1.75 0 0 1 1.217-1.667Zm.61 1.429a.25.25 0 0 0-.153 0l-5.25 1.68a.25.25 0 0 0-.174.238V7c0 1.358.275 2.666 1.057 3.86.784 1.194 2.121 2.34 4.366 3.297a.196.196 0 0 0 .154 0c2.245-.956 3.582-2.104 4.366-3.298C13.225 9.666 13.5 8.36 13.5 7V3.48a.251.251 0 0 0-.174-.237l-5.25-1.68ZM8.75 4.75v3a.75.75 0 0 1-1.5 0v-3a.75.75 0 0 1 1.5 0ZM9 10.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path>
@@ -1846,7 +1857,7 @@ data-react-profiling="false"
 </li>
         <li hidden="hidden" data-menu-item="i6insights-tab" data-targets="action-list.items" role="none" data-view-component="true" class="ActionListItem">
 
-    <a tabindex="-1" id="item-906364bf-85bf-41e4-9938-0aeb97c79031" href="/TryGhost/node-sqlite3/pulse" role="menuitem" data-view-component="true" class="ActionListContent ActionListContent--visual16">
+    <a tabindex="-1" id="item-477e9363-b891-48c3-98c7-1f3558793452" href="/TryGhost/node-sqlite3/pulse" role="menuitem" data-view-component="true" class="ActionListContent ActionListContent--visual16">
         <span class="ActionListItem-visual ActionListItem-visual--leading">
           <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-graph">
     <path d="M1.5 1.75V13.5h13.75a.75.75 0 0 1 0 1.5H.75a.75.75 0 0 1-.75-.75V1.75a.75.75 0 0 1 1.5 0Zm14.28 2.53-5.25 5.25a.75.75 0 0 1-1.06 0L7 7.06 4.28 9.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.25-3.25a.75.75 0 0 1 1.06 0L10 7.94l4.72-4.72a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042Z"></path>
@@ -1924,10 +1935,10 @@ data-react-profiling="false"
 <div class="Box Box--condensed color-shadow-small">
   <div class="Box-header px-2 py-1 js-wiki-toggle-collapse" style="cursor: pointer">
     <h3 class="Box-title d-flex flex-items-center" id="wiki-pages-box-heading">
-      <button id="icon-button-d5773459-2034-485c-8651-0c872ac53ef9" aria-labelledby="tooltip-c532718a-bc69-4587-8b99-890605e18e05" type="button" data-view-component="true" class="Button Button--iconOnly Button--invisible Button--small js-wiki-sidebar-pages-toggle-chevron js-wiki-sidebar-pages-toggle-chevron-open">  <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-triangle-down Button-visual">
+      <button id="icon-button-96a88637-f129-4703-a248-aeae5128ac79" aria-labelledby="tooltip-3fccb1ab-863f-4eed-9b64-2d29634ceeb7" type="button" data-view-component="true" class="Button Button--iconOnly Button--invisible Button--small js-wiki-sidebar-pages-toggle-chevron js-wiki-sidebar-pages-toggle-chevron-open">  <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-triangle-down Button-visual">
     <path d="m4.427 7.427 3.396 3.396a.25.25 0 0 0 .354 0l3.396-3.396A.25.25 0 0 0 11.396 7H4.604a.25.25 0 0 0-.177.427Z"></path>
 </svg>
-</button><tool-tip id="tooltip-c532718a-bc69-4587-8b99-890605e18e05" for="icon-button-d5773459-2034-485c-8651-0c872ac53ef9" popover="manual" data-direction="s" data-type="label" data-view-component="true" class="sr-only position-absolute">Toggle table of contents</tool-tip>
+</button><tool-tip id="tooltip-3fccb1ab-863f-4eed-9b64-2d29634ceeb7" for="icon-button-96a88637-f129-4703-a248-aeae5128ac79" popover="manual" data-direction="s" data-type="label" data-view-component="true" class="sr-only position-absolute">Toggle table of contents</tool-tip>
 
       <span>Pages <span title="8" data-view-component="true" class="Counter Counter--primary">8</span></span>
     </h3>
@@ -1993,7 +2004,7 @@ data-react-profiling="false"
 </span>    </div>
   </summary>
 
-    <include-fragment loading="lazy" src="https://github.com/TryGhost/node-sqlite3/wiki/API/_toc" data-nonce="v2:7d9eec89-1ec8-b49f-bf8e-f948fbf8b7fa" data-view-component="true" class="js-wiki-sidebar-toc-fragment">
+    <include-fragment loading="lazy" src="https://github.com/TryGhost/node-sqlite3/wiki/API/_toc" data-nonce="v2:eefc4475-2c27-c783-588c-465a1d031a6a" data-view-component="true" class="js-wiki-sidebar-toc-fragment">
 
   <div data-show-on-forbidden-error hidden>
     <div class="Box">
@@ -2033,7 +2044,7 @@ data-react-profiling="false"
 </span>    </div>
   </summary>
 
-    <include-fragment loading="lazy" src="https://github.com/TryGhost/node-sqlite3/wiki/Binaries/_toc" data-nonce="v2:7d9eec89-1ec8-b49f-bf8e-f948fbf8b7fa" data-view-component="true" class="js-wiki-sidebar-toc-fragment">
+    <include-fragment loading="lazy" src="https://github.com/TryGhost/node-sqlite3/wiki/Binaries/_toc" data-nonce="v2:eefc4475-2c27-c783-588c-465a1d031a6a" data-view-component="true" class="js-wiki-sidebar-toc-fragment">
 
   <div data-show-on-forbidden-error hidden>
     <div class="Box">
@@ -2073,7 +2084,7 @@ data-react-profiling="false"
 </span>    </div>
   </summary>
 
-    <include-fragment loading="lazy" src="https://github.com/TryGhost/node-sqlite3/wiki/Caching/_toc" data-nonce="v2:7d9eec89-1ec8-b49f-bf8e-f948fbf8b7fa" data-view-component="true" class="js-wiki-sidebar-toc-fragment">
+    <include-fragment loading="lazy" src="https://github.com/TryGhost/node-sqlite3/wiki/Caching/_toc" data-nonce="v2:eefc4475-2c27-c783-588c-465a1d031a6a" data-view-component="true" class="js-wiki-sidebar-toc-fragment">
 
   <div data-show-on-forbidden-error hidden>
     <div class="Box">
@@ -2113,7 +2124,7 @@ data-react-profiling="false"
 </span>    </div>
   </summary>
 
-    <include-fragment loading="lazy" src="https://github.com/TryGhost/node-sqlite3/wiki/Control-Flow/_toc" data-nonce="v2:7d9eec89-1ec8-b49f-bf8e-f948fbf8b7fa" data-view-component="true" class="js-wiki-sidebar-toc-fragment">
+    <include-fragment loading="lazy" src="https://github.com/TryGhost/node-sqlite3/wiki/Control-Flow/_toc" data-nonce="v2:eefc4475-2c27-c783-588c-465a1d031a6a" data-view-component="true" class="js-wiki-sidebar-toc-fragment">
 
   <div data-show-on-forbidden-error hidden>
     <div class="Box">
@@ -2153,7 +2164,7 @@ data-react-profiling="false"
 </span>    </div>
   </summary>
 
-    <include-fragment loading="lazy" src="https://github.com/TryGhost/node-sqlite3/wiki/Debugging/_toc" data-nonce="v2:7d9eec89-1ec8-b49f-bf8e-f948fbf8b7fa" data-view-component="true" class="js-wiki-sidebar-toc-fragment">
+    <include-fragment loading="lazy" src="https://github.com/TryGhost/node-sqlite3/wiki/Debugging/_toc" data-nonce="v2:eefc4475-2c27-c783-588c-465a1d031a6a" data-view-component="true" class="js-wiki-sidebar-toc-fragment">
 
   <div data-show-on-forbidden-error hidden>
     <div class="Box">
@@ -2193,7 +2204,7 @@ data-react-profiling="false"
 </span>    </div>
   </summary>
 
-    <include-fragment loading="lazy" src="https://github.com/TryGhost/node-sqlite3/wiki/Maintainer-notes/_toc" data-nonce="v2:7d9eec89-1ec8-b49f-bf8e-f948fbf8b7fa" data-view-component="true" class="js-wiki-sidebar-toc-fragment">
+    <include-fragment loading="lazy" src="https://github.com/TryGhost/node-sqlite3/wiki/Maintainer-notes/_toc" data-nonce="v2:eefc4475-2c27-c783-588c-465a1d031a6a" data-view-component="true" class="js-wiki-sidebar-toc-fragment">
 
   <div data-show-on-forbidden-error hidden>
     <div class="Box">
@@ -2233,7 +2244,7 @@ data-react-profiling="false"
 </span>    </div>
   </summary>
 
-    <include-fragment loading="lazy" src="https://github.com/TryGhost/node-sqlite3/wiki/Release-process/_toc" data-nonce="v2:7d9eec89-1ec8-b49f-bf8e-f948fbf8b7fa" data-view-component="true" class="js-wiki-sidebar-toc-fragment">
+    <include-fragment loading="lazy" src="https://github.com/TryGhost/node-sqlite3/wiki/Release-process/_toc" data-nonce="v2:eefc4475-2c27-c783-588c-465a1d031a6a" data-view-component="true" class="js-wiki-sidebar-toc-fragment">
 
   <div data-show-on-forbidden-error hidden>
     <div class="Box">

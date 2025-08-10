@@ -92,7 +92,7 @@ Description
 
 <td class="whitespace-nowrap">
 
-⭐️ 38023
+⭐️ 38156
 </td>
 
 <td>
@@ -111,7 +111,7 @@ Build end-to-end typesafe APIs without GraphQL.
 
 <td class="whitespace-nowrap">
 
-⭐️ 2692
+⭐️ 2962
 </td>
 
 <td>
@@ -130,7 +130,7 @@ Typesafe APIs Made Simple
 
 <td class="whitespace-nowrap">
 
-⭐️ 748
+⭐️ 751
 </td>
 
 <td>
@@ -187,7 +187,7 @@ Weave GraphQL schema and resolvers using Zod.
 
 <td class="whitespace-nowrap">
 
-⭐️ 13
+⭐️ 14
 </td>
 
 <td>
@@ -242,7 +242,7 @@ Description
 
 <td class="whitespace-nowrap">
 
-⭐️ 2569
+⭐️ 2581
 </td>
 
 <td>
@@ -261,7 +261,7 @@ Making SvelteKit forms a pleasure to use!
 
 <td class="whitespace-nowrap">
 
-⭐️ 2384
+⭐️ 2392
 </td>
 
 <td>
@@ -280,7 +280,7 @@ A type-safe form validation library utilizing web fundamentals to progressively 
 
 <td class="whitespace-nowrap">
 
-⭐️ 955
+⭐️ 954
 </td>
 
 <td>
@@ -299,7 +299,7 @@ Generate user-friendly error messages from ZodError instances.
 
 <td class="whitespace-nowrap">
 
-⭐️ 245
+⭐️ 249
 </td>
 
 <td>
@@ -318,7 +318,7 @@ Headless form validation library for Vue.js.
 
 <td class="whitespace-nowrap">
 
-⭐️ 83
+⭐️ 86
 </td>
 
 <td>
@@ -368,12 +368,31 @@ Description
 
 <td>
 
+<a href="https://github.com/omar-dulaimi/prisma-zod-generator"><code class="whitespace-nowrap">prisma-zod-generator</code></a>
+</td>
+
+<td class="whitespace-nowrap">
+
+⭐️ 614
+</td>
+
+<td>
+
+Generate Zod schemas from Prisma schema with full ZodObject method support
+</td>
+
+</tr>
+
+<tr>
+
+<td>
+
 <a href="https://github.com/samchungy/zod-openapi"><code class="whitespace-nowrap">zod-openapi</code></a>
 </td>
 
 <td class="whitespace-nowrap">
 
-⭐️ 478
+⭐️ 489
 </td>
 
 <td>
@@ -392,7 +411,7 @@ Use Zod Schemas to create OpenAPI v3.x documentation
 
 <td class="whitespace-nowrap">
 
-⭐️ 112
+⭐️ 113
 </td>
 
 <td>
@@ -411,7 +430,7 @@ Generate Markdown docs from Zod schemas
 
 <td class="whitespace-nowrap">
 
-⭐️ 101
+⭐️ 104
 </td>
 
 <td>
@@ -466,7 +485,7 @@ Description
 
 <td class="whitespace-nowrap">
 
-⭐️ 4336
+⭐️ 4376
 </td>
 
 <td>
@@ -480,12 +499,12 @@ Generate Zod schemas from OpenAPI schemas
 
 <td>
 
-<a href="https://github.com/hey-api/openapi-ts"><code class="whitespace-nowrap">Hey API</code></a>
+<a href="https://heyapi.dev/openapi-ts/plugins/zod"><code class="whitespace-nowrap">Hey API</code></a>
 </td>
 
 <td class="whitespace-nowrap">
 
-⭐️ 2926
+⭐️ 3001
 </td>
 
 <td>
@@ -504,7 +523,7 @@ The OpenAPI to TypeScript codegen. Generate clients, SDKs, validators, and more.
 
 <td class="whitespace-nowrap">
 
-⭐️ 1289
+⭐️ 1298
 </td>
 
 <td>
@@ -523,7 +542,7 @@ The ultimate toolkit for working with APIs.
 
 <td class="whitespace-nowrap">
 
-⭐️ 45
+⭐️ 48
 </td>
 
 <td>
@@ -597,7 +616,7 @@ Generate mock data from zod schemas. Powered by @faker-js/faker and randexp.js.
 
 <td class="whitespace-nowrap">
 
-⭐️ 49
+⭐️ 54
 </td>
 
 <td>
@@ -652,7 +671,7 @@ Description
 
 <td class="whitespace-nowrap">
 
-⭐️ 718
+⭐️ 720
 </td>
 
 <td>
@@ -745,7 +764,7 @@ Description
 
 <td class="whitespace-nowrap">
 
-⭐️ 83
+⭐️ 85
 </td>
 
 <td>
@@ -764,7 +783,7 @@ Interactive playground for testing and exploring Zod and Zod mini schemas in rea
 
 <td class="whitespace-nowrap">
 
-⭐️ 5
+⭐️ 7
 </td>
 
 <td>

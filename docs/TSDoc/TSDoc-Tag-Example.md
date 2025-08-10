@@ -1,5 +1,5 @@
 ---
-title: "@example"
+title: '@example'
 ---
 
 <!-- prettier-ignore-start -->
