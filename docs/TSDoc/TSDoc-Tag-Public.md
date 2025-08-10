@@ -1,5 +1,5 @@
 ---
-title: "@public"
+title: '@public'
 ---
 
 <!-- prettier-ignore-start -->
@@ -22,16 +22,16 @@ and its signature is guaranteed to be stable (e.g. following Semantic Versioning
  * @public
  */
 export class Book {
- /**
-  * The title of the book.
-  * @internal
-  */
- public get _title(): string;
+  /**
+   * The title of the book.
+   * @internal
+   */
+  public get _title(): string;
 
- /**
-  * The author of the book.
-  */
- public get author(): string;
+  /**
+   * The author of the book.
+   */
+  public get author(): string;
 }
 ```
 

@@ -146,7 +146,7 @@ const newHashes = {};
 
 // Download and process a single doc page
 function downloadFile(cmd, filePath, logMsg, name) {
-    return new Promise((resolve, reject) => {
+    return /** @type {Promise<void>} */(new Promise((resolve, reject) => {
         // Ensure parent directory exists before running pandoc
         const dir = path.dirname(filePath);
         if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
@@ -193,7 +193,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
             downloadedFiles.push(name);
             resolve();
         });
-    });
+    }));
 }
 
 // Build page download promises

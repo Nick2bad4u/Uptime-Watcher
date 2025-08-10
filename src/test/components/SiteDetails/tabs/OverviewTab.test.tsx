@@ -294,7 +294,8 @@ describe("OverviewTab", () => {
             render(<OverviewTab {...baseProps} />);
 
             const intervalSelect = document.querySelector(".themed-select");
-            fireEvent.change(intervalSelect, { target: { value: "300000" } });
+            expect(intervalSelect).toBeInTheDocument();
+            fireEvent.change(intervalSelect!, { target: { value: "300000" } });
 
             expect(mockHandleIntervalChange).toHaveBeenCalledTimes(1);
         });
@@ -303,7 +304,8 @@ describe("OverviewTab", () => {
             render(<OverviewTab {...baseProps} />);
 
             const timeoutInput = document.querySelector(".themed-input");
-            fireEvent.change(timeoutInput, { target: { value: "10000" } });
+            expect(timeoutInput).toBeInTheDocument();
+            fireEvent.change(timeoutInput!, { target: { value: "10000" } });
 
             expect(mockHandleTimeoutChange).toHaveBeenCalledTimes(1);
         });

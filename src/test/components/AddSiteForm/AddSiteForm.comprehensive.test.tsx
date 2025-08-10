@@ -220,7 +220,8 @@ describe("AddSiteForm Component", () => {
             render(<AddSiteForm onSuccess={onSuccess} />);
 
             const submitButton = document.querySelector(".themed-button");
-            fireEvent.click(submitButton);
+            expect(submitButton).toBeInTheDocument();
+            fireEvent.click(submitButton!);
 
             await waitFor(() => {
                 expect(submitButton).toBeInTheDocument();

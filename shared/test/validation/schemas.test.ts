@@ -14,12 +14,12 @@ import {
     validateMonitorData,
     validateMonitorField,
     validateSiteData,
-    type ValidationResult,
     type HttpMonitor,
     type PortMonitor,
     type Monitor,
     type Site,
 } from "../../validation/schemas";
+import type { ValidationResult } from "../../types/validation";
 
 describe("Validation Schemas - Comprehensive Coverage", () => {
     describe("baseMonitorSchema", () => {

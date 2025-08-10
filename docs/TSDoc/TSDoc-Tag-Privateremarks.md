@@ -1,5 +1,5 @@
 ---
-title: "@privateRemarks"
+title: '@privateRemarks'
 ---
 
 <!-- prettier-ignore-start -->

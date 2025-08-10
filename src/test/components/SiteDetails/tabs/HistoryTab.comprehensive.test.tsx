@@ -356,7 +356,7 @@ describe("HistoryTab", () => {
             expect(select).toBeInTheDocument();
 
             // Change display limit
-            fireEvent.change(select, { target: { value: "10" } });
+            fireEvent.change(select!, { target: { value: "10" } });
 
             // Should now show only 10 records
             expect(
@@ -622,7 +622,7 @@ describe("HistoryTab", () => {
 
             const select = document.querySelector(".themed-select");
             expect(select).toBeInTheDocument();
-            expect(select.tagName).toBe("SELECT");
+            expect(select!.tagName).toBe("SELECT");
         });
     });
 });

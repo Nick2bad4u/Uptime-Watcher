@@ -5,10 +5,10 @@
 
 import { describe, it, expect } from "vitest";
 import {
-    type MonitorType,
     getBaseMonitorTypes,
     isBaseMonitorType,
 } from "../../../services/monitoring/monitorTypes";
+import type { MonitorType } from "../../../types";
 
 describe("Monitor Types Utility", () => {
     describe("getBaseMonitorTypes", () => {

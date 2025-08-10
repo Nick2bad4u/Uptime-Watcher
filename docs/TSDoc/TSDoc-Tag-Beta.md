@@ -1,5 +1,5 @@
 ---
-title: "@beta"
+title: '@beta'
 ---
 
 <!-- prettier-ignore-start -->
@@ -25,16 +25,16 @@ developer preview release.
  * @public
  */
 export class Book {
- /**
-  * The title of the book.
-  * @beta
-  */
- public get title(): string;
+  /**
+   * The title of the book.
+   * @beta
+   */
+  public get title(): string;
 
- /**
-  * The author of the book.
-  */
- public get author(): string;
+  /**
+   * The author of the book.
+   */
+  public get author(): string;
 }
 ```
 

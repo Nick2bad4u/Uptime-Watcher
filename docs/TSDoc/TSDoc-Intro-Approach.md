@@ -21,7 +21,7 @@ The TSDoc specification aims to meet these requirements:
   packages that work together and are documented as a set. The
   cross-referencing syntax (e.g. `{@link}` or `{@inheritDoc}`) needs a
   portable way to reference API items imported from other packages. We
-  also define _package.json_ metadata that enables tooling to detect
+  also define *package.json* metadata that enables tooling to detect
   whether a dependency's \*.d.ts doc comments should be parsed as TSDoc
   or not.
 - **Open standard**: TSDoc is an open source, community-driven standard.
@@ -31,12 +31,12 @@ The **@microsoft/tsdoc** library package brings in some additional
 goals:
 
 - **"Strict" and "Lax" modes**: Many projects don't have the time/desire
-  to change their existing code, so they want a "_lax_" mode that makes
+  to change their existing code, so they want a "*lax*" mode that makes
   a best attempt to render their doc comments as-is. Other projects want
-  a "_strict_" mode that ensures consistent syntax everywhere and
+  a "*strict*" mode that ensures consistent syntax everywhere and
   catches typos that might result in rendering errors. Some projects
-  want to be "_strict_" eventually, but they can't migrate everything
-  overnight; they need a "_transitional_" mode similar to tslint
+  want to be "*strict*" eventually, but they can't migrate everything
+  overnight; they need a "*transitional*" mode similar to tslint
   suppressions.
 - **Comment-emitter for roundtripping**: The parser reads doc comments
   as input and produces an abstract syntax tree (AST) as output. This

@@ -24,7 +24,7 @@ All new monitor types must integrate with the **production-grade unified archite
 ✅ **Frontend State Management (ADR-004)**: Zustand stores with proper cleanup  
 ✅ **IPC Communication Protocol (ADR-005)**: Standardized IPC with type safety
 
-### **� Enhanced Monitoring System Integration**
+### **✨ Enhanced Monitoring System Integration**
 
 **PRODUCTION REQUIREMENT**: All monitor types must integrate with the enhanced monitoring system that provides:
 

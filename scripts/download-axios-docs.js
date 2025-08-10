@@ -137,7 +137,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
             }
             console.log(logMsg);
             downloadedFiles.push(name);
-            resolve();
+            resolve(undefined);
         });
     });
 }

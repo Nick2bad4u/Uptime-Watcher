@@ -1,5 +1,5 @@
 ---
-title: "@param"
+title: '@param'
 ---
 
 <!-- prettier-ignore-start -->
@@ -30,7 +30,7 @@ followed by a description.
  * @beta
  */
 function getAverage(x: number, y: number): number {
- return (x + y) / 2.0;
+  return (x + y) / 2.0;
 }
 ```
 
