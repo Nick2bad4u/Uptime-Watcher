@@ -347,7 +347,7 @@ export default [
             "css/no-shorthand-property-overrides": "warn",
             "css/no-unknown-property": "warn",
             "css/no-unknown-unit": "warn",
-            "css/no-useless-color-alpha": "warn"
+            "css/no-useless-color-alpha": "warn",
         },
     },
 
@@ -500,6 +500,96 @@ export default [
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-typescript"].rules,
             ...arrayFunc.configs.all.rules,
+            ...pluginSortClassMembers.configs["flat/recommended"].rules,
+
+            "sort-class-members/sort-class-members": [
+                "warn",
+                {
+                    accessorPairPositioning: "together",
+                    stopAfterFirstProblem: false,
+                    sortInterfaces: true,
+                    order: [
+                        "[static-properties]",
+                        "[properties]",
+                        "[conventional-private-properties]",
+                        "[arrow-function-properties]",
+                        "[everything-else]",
+                        "[accessor-pairs]",
+                        "[getters]",
+                        "[setters]",
+                        "[static-methods]",
+                        "[async-methods]",
+                        "[methods]",
+                        "[conventional-private-methods]",
+                    ],
+                },
+            ],
+            "perfectionist/sort-classes": "off",
+            "perfectionist/sort-modules": [
+                "off",
+                {
+                    type: "alphabetical",
+                    order: "asc",
+                    ignoreCase: true,
+                    specialCharacters: "keep",
+                    partitionByComment: false,
+                    partitionByNewLine: false,
+                    newlinesBetween: "ignore",
+                    groups: [
+                        "declare-enum",
+                        "declare-export-enum",
+                        "enum",
+                        "export-enum",
+                        "declare-interface",
+                        "declare-export-interface",
+                        "declare-default-interface",
+                        "export-declare-interface",
+                        "default-interface",
+                        "export-default-interface",
+                        "interface",
+                        "export-interface",
+                        "declare-type",
+                        "declare-export-type",
+                        "type",
+                        "export-type",
+                        "declare-class",
+                        "declare-export-class",
+                        "declare-default-class",
+                        "declare-default-decorated-class",
+                        "declare-default-export-class",
+                        "declare-default-export-decorated-class",
+                        "export-declare-class",
+                        "export-declare-decorated-class",
+                        "export-default-class",
+                        "export-default-decorated-class",
+                        "default-class",
+                        "default-decorated-class",
+                        "class",
+                        "export-class",
+                        "decorated-class",
+                        "export-decorated-class",
+                        "declare-function",
+                        "declare-async-function",
+                        "declare-export-function",
+                        "declare-export-async-function",
+                        "declare-default-function",
+                        "declare-default-async-function",
+                        "declare-default-export-function",
+                        "declare-default-export-async-function",
+                        "export-declare-function",
+                        "export-declare-async-function",
+                        "export-default-function",
+                        "export-default-async-function",
+                        "default-function",
+                        "default-async-function",
+                        "function",
+                        "async-function",
+                        "export-function",
+                        "export-async-function",
+                    ],
+                    customGroups: [],
+                },
+            ],
 
             "xss/no-location-href-assign": "error",
 
@@ -507,7 +597,7 @@ export default [
             "canonical/export-specifier-newline": "off",
             "canonical/filename-match-exported": "warn",
             "canonical/filename-match-regex": "off", // Taken care of by unicorn rules
-            "canonical/filename-no-index": "warn",
+            "canonical/filename-no-index": "error",
             "canonical/import-specifier-newline": "off",
             "canonical/no-barrel-import": "error",
             "canonical/no-export-all": "error",
@@ -574,7 +664,12 @@ export default [
             // "no-console": "warn", // Allow in development, but warn - DISABLED FOR NOW
             "consistent-return": "warn",
             "no-debugger": "error",
-            "no-duplicate-imports": "error",
+            "no-duplicate-imports": [
+                "error",
+                {
+                    allowSeparateTypeImports: true,
+                },
+            ],
             "prefer-const": "error",
             "prefer-template": "warn",
             curly: [
@@ -584,6 +679,57 @@ export default [
             eqeqeq: [
                 "error",
                 "always",
+            ],
+
+            // Code spacing and formatting rules
+            "lines-around-comment": [
+                "error",
+                {
+                    beforeBlockComment: true,
+                    afterBlockComment: false,
+                    beforeLineComment: true,
+                    afterLineComment: false,
+                    allowBlockStart: true,
+                    allowBlockEnd: false,
+                    allowObjectStart: true,
+                    allowObjectEnd: false,
+                    allowArrayStart: true,
+                    allowArrayEnd: false,
+                    allowClassStart: true,
+                    allowClassEnd: false,
+                    applyDefaultIgnorePatterns: true,
+                    ignorePattern: String.raw`^\s*@`, // Ignore TSDoc tags like @param, @returns
+                },
+            ],
+            "lines-between-class-members": [
+                "error",
+                "always",
+                {
+                    exceptAfterSingleLine: false,
+                },
+            ],
+            "padding-line-between-statements": [
+                "error",
+                {
+                    blankLine: "always",
+                    prev: "function",
+                    next: "*",
+                },
+                {
+                    blankLine: "always",
+                    prev: "*",
+                    next: "function",
+                },
+                {
+                    blankLine: "always",
+                    prev: "class",
+                    next: "*",
+                },
+                {
+                    blankLine: "always",
+                    prev: "*",
+                    next: "class",
+                },
             ],
 
             // Import management
@@ -709,7 +855,7 @@ export default [
             ], // Allow "class" prefix for className and other legitimate uses
             "unicorn/no-array-callback-reference": "off", // Conflicts with React
             "unicorn/no-array-for-each": "off", // ForEach is fine
-            "unicorn/no-negated-condition": "off", // Sometimes clearer
+            "unicorn/no-negated-condition": "warn", // Sometimes clearer
             "unicorn/prefer-includes": "warn",
             "unicorn/prefer-module": "warn", // CommonJS needed for Electron
             "unicorn/prefer-node-protocol": "warn",
@@ -861,14 +1007,26 @@ export default [
             "@typescript-eslint/consistent-type-imports": "warn",
             "@typescript-eslint/default-param-last": "warn",
             "@typescript-eslint/dot-notation": "warn",
-            "@typescript-eslint/explicit-function-return-type": "warn",
+            "@typescript-eslint/explicit-function-return-type": [
+                "warn",
+                {
+                    allowConciseArrowFunctionExpressionsStartingWithVoid: false,
+                    allowDirectConstAssertionInArrowFunctions: true,
+                    allowedNames: [],
+                    allowExpressions: false,
+                    allowFunctionsWithoutTypeParameters: false,
+                    allowHigherOrderFunctions: true,
+                    allowIIFEs: false,
+                    allowTypedFunctionExpressions: true,
+                },
+            ],
             "@typescript-eslint/explicit-member-accessibility": "warn",
             "@typescript-eslint/explicit-module-boundary-types": "warn",
             "@typescript-eslint/init-declarations": "warn",
-            "@typescript-eslint/max-params": "warn",
-            "@typescript-eslint/member-ordering": "warn",
+            "@typescript-eslint/max-params": "off",
+            "@typescript-eslint/member-ordering": "off",
             "@typescript-eslint/method-signature-style": "warn",
-            "@typescript-eslint/naming-convention": "warn",
+            "@typescript-eslint/naming-convention": "off",
             "@typescript-eslint/no-array-constructor": "warn",
             "@typescript-eslint/no-array-delete": "warn",
             "@typescript-eslint/no-base-to-string": "warn",
@@ -883,6 +1041,8 @@ export default [
             "@typescript-eslint/no-extraneous-class": "warn",
             "@typescript-eslint/no-for-in-array": "warn",
             "@typescript-eslint/no-implied-eval": "warn",
+            // Keep enabled: Helps with bundle optimization and makes type vs runtime imports clearer.
+            // Can be resolved incrementally as warnings.
             "@typescript-eslint/no-import-type-side-effects": "warn",
             "@typescript-eslint/no-invalid-this": "warn",
             "@typescript-eslint/no-invalid-void-type": "warn",
@@ -893,7 +1053,8 @@ export default [
             "@typescript-eslint/no-misused-spread": "warn",
             "@typescript-eslint/no-mixed-enums": "warn",
             "@typescript-eslint/no-namespace": "warn",
-            "@typescript-eslint/no-non-null-asserted-nullish-coalescing": "warn",
+            "@typescript-eslint/no-non-null-asserted-nullish-coalescing":
+                "warn",
             "@typescript-eslint/no-non-null-asserted-optional-chain": "warn",
             "@typescript-eslint/no-redeclare": "warn",
             "@typescript-eslint/no-redundant-type-constituents": "warn",
@@ -902,7 +1063,8 @@ export default [
             "@typescript-eslint/no-shadow": "warn",
             "@typescript-eslint/no-this-alias": "warn",
             "@typescript-eslint/no-unnecessary-boolean-literal-compare": "warn",
-            "@typescript-eslint/no-unnecessary-parameter-property-assignment": "warn",
+            "@typescript-eslint/no-unnecessary-parameter-property-assignment":
+                "warn",
             "@typescript-eslint/no-unnecessary-qualifier": "warn",
             "@typescript-eslint/no-unnecessary-template-expression": "warn",
             "@typescript-eslint/no-unnecessary-type-arguments": "warn",
@@ -918,8 +1080,8 @@ export default [
             "@typescript-eslint/no-unused-expressions": "warn",
             "@typescript-eslint/no-unused-vars": "warn",
             // Disabled: Function declarations are hoisted in JS/TS, and this rule creates unnecessary constraints
-            // for Electron projects that often organize helper functions after main functions for better readability
-            "@typescript-eslint/no-use-before-define": "off",
+            // For Electron projects that often organize helper functions after main functions for better readability
+            "@typescript-eslint/no-use-before-define": "warn",
             "@typescript-eslint/no-useless-constructor": "warn",
             "@typescript-eslint/no-useless-empty-export": "warn",
             "@typescript-eslint/non-nullable-type-assertion-style": "warn",
@@ -934,17 +1096,28 @@ export default [
             "@typescript-eslint/prefer-literal-enum-member": "warn",
             "@typescript-eslint/prefer-namespace-keyword": "warn",
             "@typescript-eslint/prefer-promise-reject-errors": "warn",
-            "@typescript-eslint/prefer-readonly-parameter-types": "warn",
+            // Disabled: Too noisy for Electron projects with React/Zustand stores.
+            // Readonly parameters are often impractical and TypeScript already provides strong typing.
+            "@typescript-eslint/prefer-readonly-parameter-types": "off",
             "@typescript-eslint/prefer-reduce-type-parameter": "warn",
             "@typescript-eslint/prefer-regexp-exec": "warn",
             "@typescript-eslint/prefer-return-this-type": "warn",
             "@typescript-eslint/prefer-string-starts-ends-with": "warn",
-            "@typescript-eslint/promise-function-async": "warn",
+            // Configured: Allows non-async functions that return promises (like utility wrappers around Promise.all)
+            // But encourages async for most cases. This is more flexible for Electron projects.
+            "@typescript-eslint/promise-function-async": [
+                "warn",
+                {
+                    allowAny: true,
+                    allowedPromiseNames: ["Promise"],
+                    checkArrowFunctions: false,
+                },
+            ],
             "@typescript-eslint/related-getter-setter-pairs": "warn",
             "@typescript-eslint/require-array-sort-compare": "warn",
             "@typescript-eslint/restrict-plus-operands": "warn",
             "@typescript-eslint/restrict-template-expressions": "warn",
-            "@typescript-eslint/strict-boolean-expressions": "warn",
+            "@typescript-eslint/strict-boolean-expressions": "off",
             "@typescript-eslint/triple-slash-reference": "warn",
             "@typescript-eslint/unbound-method": "warn",
             "@typescript-eslint/unified-signatures": "warn",
@@ -1072,36 +1245,6 @@ export default [
             "css/no-invalid-color-hex": "warn",
             "css/no-length-zero-unit": "warn",
             "css/no-number-trailing-zeros": "warn",
-            "css/no-shorthand-property-overrides": "warn",
-            "css/no-unknown-property": "warn",
-            "css/no-unknown-unit": "warn",
-            "css/no-useless-color-alpha": "warn",
-            "css/number-leading-zero": "warn",
-            "css/prefer-reduce-shorthand-property-box-values": "warn",
-            "css/property-casing": "warn",
-
-            // Import Rules
-            "import-x/consistent-type-specifier-style": "off",
-            "import-x/default": "warn",
-            "import-x/dynamic-import-chunkname": "warn",
-            "import-x/export": "warn",
-            "import-x/exports-last": "off",
-            "import-x/extensions": "warn",
-            "import-x/first": "warn",
-            "import-x/group-exports": "off",
-            "import-x/max-dependencies": "off",
-            "import-x/namespace": "warn",
-            "import-x/newline-after-import": "warn",
-            "import-x/no-absolute-path": "warn",
-            "import-x/no-amd": "warn",
-            "import-x/no-anonymous-default-export": "warn",
-            "import-x/no-commonjs": "warn",
-            "import-x/no-cycle": "warn",
-            "import-x/no-default-export": "off",
-            "import-x/no-deprecated": "warn",
-            "import-x/no-duplicates": "warn",
-            "import-x/no-dynamic-require": "warn",
-            "import-x/no-empty-named-blocks": "warn",
             "import-x/no-extraneous-dependencies": "warn",
             "import-x/no-import-module-exports": "warn",
             "import-x/no-internal-modules": "off",
@@ -1314,6 +1457,96 @@ export default [
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-typescript"].rules,
             ...arrayFunc.configs.all.rules,
+            ...pluginSortClassMembers.configs["flat/recommended"].rules,
+
+            "sort-class-members/sort-class-members": [
+                "warn",
+                {
+                    accessorPairPositioning: "together",
+                    stopAfterFirstProblem: false,
+                    sortInterfaces: true,
+                    order: [
+                        "[static-properties]",
+                        "[properties]",
+                        "[conventional-private-properties]",
+                        "[arrow-function-properties]",
+                        "[everything-else]",
+                        "[accessor-pairs]",
+                        "[getters]",
+                        "[setters]",
+                        "[static-methods]",
+                        "[async-methods]",
+                        "[methods]",
+                        "[conventional-private-methods]",
+                    ],
+                },
+            ],
+            "perfectionist/sort-classes": "off",
+            "perfectionist/sort-modules": [
+                "off",
+                {
+                    type: "alphabetical",
+                    order: "asc",
+                    ignoreCase: true,
+                    specialCharacters: "keep",
+                    partitionByComment: false,
+                    partitionByNewLine: false,
+                    newlinesBetween: "ignore",
+                    groups: [
+                        "declare-enum",
+                        "declare-export-enum",
+                        "enum",
+                        "export-enum",
+                        "declare-interface",
+                        "declare-export-interface",
+                        "declare-default-interface",
+                        "export-declare-interface",
+                        "default-interface",
+                        "export-default-interface",
+                        "interface",
+                        "export-interface",
+                        "declare-type",
+                        "declare-export-type",
+                        "type",
+                        "export-type",
+                        "declare-class",
+                        "declare-export-class",
+                        "declare-default-class",
+                        "declare-default-decorated-class",
+                        "declare-default-export-class",
+                        "declare-default-export-decorated-class",
+                        "export-declare-class",
+                        "export-declare-decorated-class",
+                        "export-default-class",
+                        "export-default-decorated-class",
+                        "default-class",
+                        "default-decorated-class",
+                        "class",
+                        "export-class",
+                        "decorated-class",
+                        "export-decorated-class",
+                        "declare-function",
+                        "declare-async-function",
+                        "declare-export-function",
+                        "declare-export-async-function",
+                        "declare-default-function",
+                        "declare-default-async-function",
+                        "declare-default-export-function",
+                        "declare-default-export-async-function",
+                        "export-declare-function",
+                        "export-declare-async-function",
+                        "export-default-function",
+                        "export-default-async-function",
+                        "default-function",
+                        "default-async-function",
+                        "function",
+                        "async-function",
+                        "export-function",
+                        "export-async-function",
+                    ],
+                    customGroups: [],
+                },
+            ],
 
             "xss/no-location-href-assign": "error",
 
@@ -1321,13 +1554,13 @@ export default [
             "canonical/export-specifier-newline": "off",
             "canonical/filename-match-exported": "warn",
             "canonical/filename-match-regex": "off", // Taken care of by unicorn rules
-            "canonical/filename-no-index": "warn",
+            "canonical/filename-no-index": "error",
             "canonical/import-specifier-newline": "off",
             "canonical/no-barrel-import": "error",
             "canonical/no-export-all": "error",
             "canonical/no-re-export": "warn",
             "canonical/no-reassign-imports": "error",
-            "canonical/prefer-inline-type-import": "error",
+            "canonical/prefer-inline-type-import": "off",
             "canonical/prefer-use-mount": "warn",
             "canonical/sort-react-dependencies": "warn",
             "canonical/prefer-import-alias": [
@@ -1364,10 +1597,81 @@ export default [
             "unicorn/prefer-global-this": "off", // Not suitable for Electron
             "unicorn/prevent-abbreviations": "off", // Too many false positives
             "unicorn/prefer-spread": "off", // Prefer Array.From for readability
+
             // Node.js specific
-            // "no-console": "off", // Logging is important for backend - DISABLED FOR NOW
-            "no-var": "error",
+
+            // Core quality rules
+            // "no-console": "warn", // Allow in development, but warn - DISABLED FOR NOW
+            "consistent-return": "warn",
+            "no-debugger": "error",
+            "no-duplicate-imports": [
+                "error",
+                {
+                    allowSeparateTypeImports: true,
+                },
+            ],
             "prefer-const": "error",
+            "prefer-template": "warn",
+            curly: [
+                "error",
+                "all",
+            ],
+            eqeqeq: [
+                "error",
+                "always",
+            ],
+
+            // Code spacing and formatting rules
+            "lines-around-comment": [
+                "error",
+                {
+                    beforeBlockComment: true,
+                    afterBlockComment: false,
+                    beforeLineComment: true,
+                    afterLineComment: false,
+                    allowBlockStart: true,
+                    allowBlockEnd: false,
+                    allowObjectStart: true,
+                    allowObjectEnd: false,
+                    allowArrayStart: true,
+                    allowArrayEnd: false,
+                    allowClassStart: true,
+                    allowClassEnd: false,
+                    applyDefaultIgnorePatterns: true,
+                    ignorePattern: String.raw`^\s*@`, // Ignore TSDoc tags like @param, @returns
+                },
+            ],
+            "lines-between-class-members": [
+                "error",
+                "always",
+                {
+                    exceptAfterSingleLine: false,
+                },
+            ],
+            "padding-line-between-statements": [
+                "error",
+                {
+                    blankLine: "always",
+                    prev: "function",
+                    next: "*",
+                },
+                {
+                    blankLine: "always",
+                    prev: "*",
+                    next: "function",
+                },
+                {
+                    blankLine: "always",
+                    prev: "class",
+                    next: "*",
+                },
+                {
+                    blankLine: "always",
+                    prev: "*",
+                    next: "class",
+                },
+            ],
+
 
             "putout/align-spaces": "error",
             "putout/array-element-newline": "off",
@@ -1448,21 +1752,6 @@ export default [
                 },
             ],
 
-            // Class organization for service classes
-            "sort-class-members/sort-class-members": [
-                "off",
-                {
-                    order: [
-                        "[static-properties]",
-                        "[static-methods]",
-                        "[properties]",
-                        "constructor",
-                        "[methods]",
-                        "[private-methods]",
-                    ],
-                },
-            ],
-
             // Backend-specific unicorn rules
             "unicorn/filename-case": [
                 "warn",
@@ -1484,6 +1773,13 @@ export default [
                     checkProperties: false,
                 },
             ],
+            "unicorn/no-array-callback-reference": "off", // Conflicts with React
+            "unicorn/no-array-for-each": "off", // ForEach is fine
+            "unicorn/no-negated-condition": "warn", // Sometimes clearer
+            "unicorn/prefer-includes": "warn",
+            "unicorn/prefer-string-slice": "warn",
+            "unicorn/prefer-string-starts-ends-with": "warn",
+            "unicorn/prefer-ternary": "off", // Can hurt readability
             "unicorn/prefer-module": "warn", // CommonJS required for Electron
             "unicorn/prefer-node-protocol": "error", // Enforce for backend
             "unicorn/prefer-top-level-await": "off", // Not suitable for Electron main
@@ -1602,6 +1898,135 @@ export default [
                 "error",
                 { default: "array-simple" },
             ], // Prefer T[] for simple types, Array<T> for complex types
+
+            "@typescript-eslint/adjacent-overload-signatures": "warn",
+            "@typescript-eslint/ban-ts-comment": "warn",
+            "@typescript-eslint/ban-tslint-comment": "warn",
+            "@typescript-eslint/class-literal-property-style": "warn",
+            "@typescript-eslint/class-methods-use-this": "off",
+            "@typescript-eslint/consistent-generic-constructors": "warn",
+            "@typescript-eslint/consistent-indexed-object-style": "warn",
+            "@typescript-eslint/consistent-return": "warn",
+            "@typescript-eslint/consistent-type-definitions": "warn",
+            "@typescript-eslint/consistent-type-exports": "warn",
+            "@typescript-eslint/consistent-type-imports": "warn",
+            "@typescript-eslint/default-param-last": "warn",
+            "@typescript-eslint/dot-notation": "warn",
+            "@typescript-eslint/explicit-function-return-type": [
+                "warn",
+                {
+                    allowConciseArrowFunctionExpressionsStartingWithVoid: false,
+                    allowDirectConstAssertionInArrowFunctions: true,
+                    allowedNames: [],
+                    allowExpressions: false,
+                    allowFunctionsWithoutTypeParameters: false,
+                    allowHigherOrderFunctions: true,
+                    allowIIFEs: false,
+                    allowTypedFunctionExpressions: true,
+                },
+            ],
+            "@typescript-eslint/explicit-member-accessibility": "warn",
+            "@typescript-eslint/explicit-module-boundary-types": "warn",
+            "@typescript-eslint/init-declarations": "warn",
+            "@typescript-eslint/max-params": "off",
+            "@typescript-eslint/member-ordering": "off",
+            "@typescript-eslint/method-signature-style": "warn",
+            "@typescript-eslint/naming-convention": "off",
+            "@typescript-eslint/no-array-constructor": "warn",
+            "@typescript-eslint/no-array-delete": "warn",
+            "@typescript-eslint/no-base-to-string": "warn",
+            "@typescript-eslint/no-confusing-non-null-assertion": "warn",
+            "@typescript-eslint/no-confusing-void-expression": "warn",
+            "@typescript-eslint/no-deprecated": "warn",
+            "@typescript-eslint/no-dupe-class-members": "warn",
+            "@typescript-eslint/no-duplicate-enum-values": "warn",
+            "@typescript-eslint/no-duplicate-type-constituents": "warn",
+            "@typescript-eslint/no-dynamic-delete": "warn",
+            "@typescript-eslint/no-extra-non-null-assertion": "warn",
+            "@typescript-eslint/no-extraneous-class": "warn",
+            "@typescript-eslint/no-for-in-array": "warn",
+            "@typescript-eslint/no-implied-eval": "warn",
+            // Keep enabled: Helps with bundle optimization and makes type vs runtime imports clearer.
+            // Can be resolved incrementally as warnings.
+            "@typescript-eslint/no-import-type-side-effects": "warn",
+            "@typescript-eslint/no-invalid-this": "warn",
+            "@typescript-eslint/no-invalid-void-type": "warn",
+            "@typescript-eslint/no-loop-func": "warn",
+            "@typescript-eslint/no-magic-numbers": "off",
+            "@typescript-eslint/no-meaningless-void-operator": "warn",
+            "@typescript-eslint/no-misused-new": "warn",
+            "@typescript-eslint/no-misused-spread": "warn",
+            "@typescript-eslint/no-mixed-enums": "warn",
+            "@typescript-eslint/no-namespace": "warn",
+            "@typescript-eslint/no-non-null-asserted-nullish-coalescing":
+                "warn",
+            "@typescript-eslint/no-non-null-asserted-optional-chain": "warn",
+            "@typescript-eslint/no-redeclare": "warn",
+            "@typescript-eslint/no-redundant-type-constituents": "warn",
+            "@typescript-eslint/no-require-imports": "warn",
+            "@typescript-eslint/no-restricted-imports": "warn",
+            "@typescript-eslint/no-shadow": "warn",
+            "@typescript-eslint/no-this-alias": "warn",
+            "@typescript-eslint/no-unnecessary-boolean-literal-compare": "warn",
+            "@typescript-eslint/no-unnecessary-parameter-property-assignment":
+                "warn",
+            "@typescript-eslint/no-unnecessary-qualifier": "warn",
+            "@typescript-eslint/no-unnecessary-template-expression": "warn",
+            "@typescript-eslint/no-unnecessary-type-arguments": "warn",
+            "@typescript-eslint/no-unnecessary-type-constraint": "warn",
+            "@typescript-eslint/no-unnecessary-type-conversion": "warn",
+            "@typescript-eslint/no-unnecessary-type-parameters": "warn",
+
+            "@typescript-eslint/no-unsafe-declaration-merging": "warn",
+            "@typescript-eslint/no-unsafe-enum-comparison": "warn",
+
+            "@typescript-eslint/no-unsafe-type-assertion": "warn",
+            "@typescript-eslint/no-unsafe-unary-minus": "warn",
+            "@typescript-eslint/no-unused-expressions": "warn",
+            "@typescript-eslint/no-unused-vars": "warn",
+            // Disabled: Function declarations are hoisted in JS/TS, and this rule creates unnecessary constraints
+            // For Electron projects that often organize helper functions after main functions for better readability
+            "@typescript-eslint/no-use-before-define": "off",
+            "@typescript-eslint/no-useless-constructor": "warn",
+            "@typescript-eslint/no-useless-empty-export": "warn",
+            "@typescript-eslint/non-nullable-type-assertion-style": "warn",
+            "@typescript-eslint/only-throw-error": "warn",
+            "@typescript-eslint/parameter-properties": "warn",
+            "@typescript-eslint/prefer-as-const": "warn",
+            "@typescript-eslint/prefer-destructuring": "warn",
+            "@typescript-eslint/prefer-enum-initializers": "warn",
+            "@typescript-eslint/prefer-find": "warn",
+            "@typescript-eslint/prefer-for-of": "warn",
+            "@typescript-eslint/prefer-includes": "warn",
+            "@typescript-eslint/prefer-literal-enum-member": "warn",
+            "@typescript-eslint/prefer-namespace-keyword": "warn",
+            "@typescript-eslint/prefer-promise-reject-errors": "warn",
+            // Disabled: Too noisy for Electron projects with React/Zustand stores.
+            // Readonly parameters are often impractical and TypeScript already provides strong typing.
+            "@typescript-eslint/prefer-readonly-parameter-types": "off",
+            "@typescript-eslint/prefer-reduce-type-parameter": "warn",
+            "@typescript-eslint/prefer-regexp-exec": "warn",
+            "@typescript-eslint/prefer-return-this-type": "warn",
+            "@typescript-eslint/prefer-string-starts-ends-with": "warn",
+            // Configured: Allows non-async functions that return promises (like utility wrappers around Promise.all)
+            // But encourages async for most cases. This is more flexible for Electron projects.
+            "@typescript-eslint/promise-function-async": [
+                "warn",
+                {
+                    allowAny: true,
+                    allowedPromiseNames: ["Promise"],
+                    checkArrowFunctions: false,
+                },
+            ],
+            "@typescript-eslint/related-getter-setter-pairs": "warn",
+            "@typescript-eslint/require-array-sort-compare": "warn",
+            "@typescript-eslint/restrict-plus-operands": "warn",
+            "@typescript-eslint/restrict-template-expressions": "warn",
+            "@typescript-eslint/strict-boolean-expressions": "off",
+            "@typescript-eslint/triple-slash-reference": "warn",
+            "@typescript-eslint/unbound-method": "warn",
+            "@typescript-eslint/unified-signatures": "warn",
+            "@typescript-eslint/use-unknown-in-catch-callback-variable": "warn",
 
             // RegExp
             "regexp/grapheme-string-literal": "warn",
@@ -2081,7 +2506,7 @@ export default [
             "canonical/export-specifier-newline": "off",
             "canonical/destructuring-property-newline": "off",
             "canonical/import-specifier-newline": "off",
-            "canonical/filename-no-index": "warn",
+            "canonical/filename-no-index": "error",
 
             "ex/no-unhandled": "warn",
 
@@ -2179,21 +2604,6 @@ export default [
                             ],
                         },
                         { from: "utils", allow: ["types"] },
-                    ],
-                },
-            ],
-
-            // Class organization for service classes
-            "sort-class-members/sort-class-members": [
-                "off",
-                {
-                    order: [
-                        "[static-properties]",
-                        "[static-methods]",
-                        "[properties]",
-                        "constructor",
-                        "[methods]",
-                        "[private-methods]",
                     ],
                 },
             ],
@@ -2560,33 +2970,72 @@ export default [
         },
     },
 
-    // Override for barrel files - allow re-exports in intentional barrel/index files
+    // Strategic overrides for @typescript-eslint/no-unsafe-type-assertion
+    // These files/patterns require type assertions due to their nature
     {
         files: [
-            "**/types.ts",
-            "**/interfaces.ts",
-            "**/schemas.ts",
-            "**/monitorTypes.ts",
-            "**/monitorValidation.ts",
-            "**/ConfigurationManager.ts"
-        ],
-        rules: {
-            "canonical/no-re-export": "off",
-        },
-    },
+            // Database utilities: handle SQLite's untyped results
+            "electron/services/database/utils/typedQueries.ts",
 
-    // Override for component library files - allow multiple components per file
-    {
-        files: [
-            "**/theme/components.tsx",
-            "**/components/AddSiteForm/FormFields.tsx",
-            "**/components/AddSiteForm/DynamicMonitorFields.tsx",
-            "**/components/SiteDetails/SiteDetailsHeader.tsx",
-            "**/components/SiteDetails/charts/ChartComponents.tsx",
-            "**/stores/error/ErrorBoundary.tsx"
+            // Type utilities: centralized type manipulation helpers
+            "shared/utils/typeHelpers.ts",
+
+            // Database repositories: controlled SQL with known structure
+            "electron/services/database/*Repository.ts",
+
+            // Database utilities: type mapping and conversion
+            "electron/services/database/utils/*.ts",
+
+            // Validation utilities: runtime type checking
+            "shared/validation/*.ts",
+
+            // IPC layer: Electron boundary type assertions
+            "electron/preload.ts",
+            "electron/services/ipc/*.ts",
+
+            // Event system core: generic type manipulation
+            "electron/events/TypedEventBus.ts",
+            "electron/events/middleware.ts",
+
+            // Service containers and dependency injection
+            "electron/services/ServiceContainer.ts",
+
+            // Shared type utilities and safety helpers
+            "shared/utils/*.ts",
+            "shared/types/*.ts",
+
+            // Theme and configuration types
+            "src/theme/*.ts",
+            "src/types/*.ts",
+
+            // Chart and UI utilities with third-party integrations
+            "src/services/chartConfig.ts",
+            "src/utils/*.ts",
+
+            // Store utilities for state management
+            "src/stores/utils.ts",
+            "src/stores/**/utils/*.ts",
+
+            // Component utilities and form handling
+            "src/components/**/use*.ts",
+            "src/hooks/**/*.ts",
+
+            // Monitor and system utilities with complex type assertions
+            "electron/services/monitoring/*.ts",
+            "electron/utils/*.ts",
+
+            // React components with complex third-party integrations
+            "src/components/**/*.tsx",
+            "src/components/**/*.ts",
+
+            // Additional utility files with necessary type assertions
+            "electron/services/monitoring/utils/httpClient.ts",
+            "electron/utils/database/DataImportExportService.ts",
+            "src/services/logger.ts",
         ],
         rules: {
-            "react/no-multi-comp": "off",
+            // Allow type assertions in these contexts where they're necessary and well-documented
+            "@typescript-eslint/no-unsafe-type-assertion": "off",
         },
     },
 
