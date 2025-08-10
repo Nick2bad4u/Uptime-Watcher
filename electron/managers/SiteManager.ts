@@ -154,8 +154,11 @@ export interface SiteManagerDependencies {
  */
 export class SiteManager {
     private readonly configurationManager: ConfigurationManager;
+
     private readonly eventEmitter: TypedEventBus<UptimeEvents>;
+
     private readonly monitoringOperations: IMonitoringOperations | undefined;
+
     private readonly repositories: {
         databaseService: DatabaseService;
         historyRepository: HistoryRepository;
@@ -163,70 +166,12 @@ export class SiteManager {
         settingsRepository: SettingsRepository;
         siteRepository: SiteRepository;
     };
+
     private readonly siteRepositoryService: SiteRepositoryService;
+
     private readonly sitesCache: StandardizedCache<Site>;
+
     private readonly siteWriterService: SiteWriterService;
-
-    /**
-     * Constructs a new SiteManager instance.
-     *
-     * @param dependencies - Required dependencies for site management operations.
-     * @remarks
-     * Initializes the SiteManager with all required dependencies including repositories,
-     * database service, event emitter, and optional monitoring operations. Creates
-     * internal service orchestrators for coordinated operations and sets up the
-     * in-memory cache for performance optimization.
-     * @example
-     * ```typescript
-     * const siteManager = new SiteManager({ ... });
-     * ```
-     */
-    public constructor(dependencies: SiteManagerDependencies) {
-        this.configurationManager = dependencies.configurationManager;
-        this.repositories = {
-            databaseService: dependencies.databaseService,
-            historyRepository: dependencies.historyRepository,
-            monitorRepository: dependencies.monitorRepository,
-            settingsRepository: dependencies.settingsRepository,
-            siteRepository: dependencies.siteRepository,
-        };
-        this.eventEmitter = dependencies.eventEmitter;
-        this.monitoringOperations = dependencies.monitoringOperations;
-
-        // Initialize StandardizedCache for sites
-        this.sitesCache = new StandardizedCache<Site>({
-            defaultTTL: 600_000, // 10 minutes
-            enableStats: true,
-            eventEmitter: this.eventEmitter,
-            maxSize: 500,
-            name: "sites",
-        });
-
-        // Create the new service-based orchestrators
-        this.siteWriterService = new SiteWriterService({
-            databaseService: this.repositories.databaseService,
-            logger,
-            repositories: {
-                monitor: this.repositories.monitorRepository,
-                site: this.repositories.siteRepository,
-            },
-        });
-
-        // Create SiteRepositoryService with injected dependencies
-        const loggerAdapter = new LoggerAdapter(logger);
-        this.siteRepositoryService = new SiteRepositoryService({
-            eventEmitter: this.eventEmitter,
-            logger: loggerAdapter,
-            repositories: {
-                history: this.repositories.historyRepository,
-                monitor: this.repositories.monitorRepository,
-                settings: this.repositories.settingsRepository,
-                site: this.repositories.siteRepository,
-            },
-        });
-
-        logger.info(LOG_TEMPLATES.services.SITE_MANAGER_INITIALIZED_WITH_CACHE);
-    }
 
     /**
      * Adds a new site to the database and cache.
@@ -274,55 +219,6 @@ export class SiteManager {
     }
 
     /**
-     * Gets a specific site from cache with smart background loading.
-     *
-     * @param identifier - The site identifier to retrieve.
-     * @returns The site object if found in cache, otherwise undefined.
-     * @remarks
-     * If the site is not found in cache, triggers background loading and emits a cache miss event.
-     * @example
-     * ```typescript
-     * const site = siteManager.getSiteFromCache("site_123");
-     * ```
-     */
-    public getSiteFromCache(identifier: string): Site | undefined {
-        const site = this.sitesCache.get(identifier);
-
-        if (!site) {
-            // Emit cache miss event
-            void (async (): Promise<void> => {
-                try {
-                    await this.eventEmitter.emitTyped("site:cache-miss", {
-                        backgroundLoading: true,
-                        identifier,
-                        operation: "cache-lookup",
-                        timestamp: Date.now(),
-                    });
-                } catch (error) {
-                    logger.debug(
-                        LOG_TEMPLATES.debug.SITE_CACHE_MISS_ERROR,
-                        error
-                    );
-                }
-            })();
-
-            // Trigger background loading without blocking
-            void (async (): Promise<void> => {
-                try {
-                    await this.loadSiteInBackground(identifier);
-                } catch (error) {
-                    logger.debug(
-                        LOG_TEMPLATES.debug.SITE_LOADING_ERROR_IGNORED,
-                        error
-                    );
-                }
-            })();
-        }
-
-        return site;
-    }
-
-    /**
      * Gets all sites from the database with full monitor and history data.
      *
      * @returns Promise resolving to array of complete site objects.
@@ -343,34 +239,6 @@ export class SiteManager {
         // Keep cache synchronized with database
         await this.updateSitesCache(sites);
         return sites;
-    }
-
-    /**
-     * Gets the standardized sites cache (for internal use by other managers).
-     *
-     * @returns The standardized cache instance for sites.
-     * @remarks
-     * Used for internal coordination between managers. External consumers should use getSites().
-     */
-    public getSitesCache(): StandardizedCache<Site> {
-        return this.sitesCache;
-    }
-
-    /**
-     * Gets sites from in-memory cache for fast access.
-     *
-     * @returns Array of site objects currently in cache.
-     * @remarks
-     * Returns the in-memory cache containing all sites for high-performance
-     * access patterns. The cache is automatically synchronized with database
-     * changes through event handling. Use this for internal operations and
-     * when performance is critical.
-     *
-     * Internal use only - external components should use getSites() for
-     * guaranteed fresh data or subscribe to cache update events.
-     */
-    public getSitesFromCache(): Site[] {
-        return this.sitesCache.getAll();
     }
 
     /**
@@ -662,82 +530,6 @@ export class SiteManager {
     }
 
     /**
-     * Creates monitoring configuration for site operations.
-     *
-     * @remarks
-     * Used internally for coordinated monitoring actions during site updates. Throws if monitoring operations are not available but required.
-     *
-     * @returns Configuration for managing monitoring operations.
-     * @throws When monitoring operations are not available but required.
-     * @internal
-     */
-    private createMonitoringConfig(): MonitoringConfig {
-        return {
-            setHistoryLimit: (limit: number): void => {
-                if (!this.monitoringOperations) {
-                    throw new Error(
-                        "MonitoringOperations not available but required for setHistoryLimit"
-                    );
-                }
-                const operations = this.monitoringOperations;
-                // Execute but don't await the promise
-                void (async (): Promise<void> => {
-                    try {
-                        await operations.setHistoryLimit(limit);
-                    } catch (error) {
-                        logger.error(
-                            LOG_TEMPLATES.errors.SITE_HISTORY_LIMIT_FAILED,
-                            error
-                        );
-                    }
-                })();
-            },
-            setupNewMonitors: async (
-                site: Site,
-                newMonitorIds: string[]
-            ): Promise<void> => {
-                if (!this.monitoringOperations) {
-                    throw new Error(
-                        "MonitoringOperations not available but required for setupNewMonitors"
-                    );
-                }
-                await this.monitoringOperations.setupNewMonitors(
-                    site,
-                    newMonitorIds
-                );
-            },
-            startMonitoring: async (
-                identifier: string,
-                monitorId: string
-            ): Promise<boolean> => {
-                if (!this.monitoringOperations) {
-                    throw new Error(
-                        "MonitoringOperations not available but required for startMonitoring"
-                    );
-                }
-                return this.monitoringOperations.startMonitoringForSite(
-                    identifier,
-                    monitorId
-                );
-            },
-            stopMonitoring: async (
-                identifier: string,
-                monitorId: string
-            ): Promise<boolean> => {
-                if (!this.monitoringOperations) {
-                    throw new Error(
-                        "MonitoringOperations not available but required for stopMonitoring"
-                    );
-                }
-                return this.monitoringOperations.stopMonitoringForSite(
-                    identifier,
-                    monitorId
-                );
-            },
-        };
-    }
-
-    /**
      * Executes monitor deletion from the database.
      *
      * @remarks
@@ -752,27 +544,6 @@ export class SiteManager {
         // MonitorRepository.delete() already handles its own transaction,
         // so we don't need to wrap it in another transaction
         return this.repositories.monitorRepository.delete(monitorId);
-    }
-
-    /**
-     * Formats validation errors for better readability.
-     *
-     * @remarks
-     * Used internally to format error messages for display or logging.
-     *
-     * @param errors - Array of error messages.
-     * @returns Formatted error string.
-     * @internal
-     */
-    private formatValidationErrors(errors: string[] | undefined): string {
-        if (!errors || errors.length === 0) {
-            return "";
-        }
-        if (errors.length === 1) {
-            // Ensure fallback to empty string if errors[0] is undefined
-            return errors[0] ?? "";
-        }
-        return `\n  - ${errors.join("\n  - ")}`;
     }
 
     /**
@@ -876,5 +647,240 @@ export class SiteManager {
                 `Site validation failed for '${site.identifier}': ${this.formatValidationErrors(validationResult.errors)}`
             );
         }
+    }
+
+    /**
+     * Constructs a new SiteManager instance.
+     *
+     * @param dependencies - Required dependencies for site management operations.
+     * @remarks
+     * Initializes the SiteManager with all required dependencies including repositories,
+     * database service, event emitter, and optional monitoring operations. Creates
+     * internal service orchestrators for coordinated operations and sets up the
+     * in-memory cache for performance optimization.
+     * @example
+     * ```typescript
+     * const siteManager = new SiteManager({ ... });
+     * ```
+     */
+    public constructor(dependencies: SiteManagerDependencies) {
+        this.configurationManager = dependencies.configurationManager;
+        this.repositories = {
+            databaseService: dependencies.databaseService,
+            historyRepository: dependencies.historyRepository,
+            monitorRepository: dependencies.monitorRepository,
+            settingsRepository: dependencies.settingsRepository,
+            siteRepository: dependencies.siteRepository,
+        };
+        this.eventEmitter = dependencies.eventEmitter;
+        this.monitoringOperations = dependencies.monitoringOperations;
+
+        // Initialize StandardizedCache for sites
+        this.sitesCache = new StandardizedCache<Site>({
+            defaultTTL: 600_000, // 10 minutes
+            enableStats: true,
+            eventEmitter: this.eventEmitter,
+            maxSize: 500,
+            name: "sites",
+        });
+
+        // Create the new service-based orchestrators
+        this.siteWriterService = new SiteWriterService({
+            databaseService: this.repositories.databaseService,
+            logger,
+            repositories: {
+                monitor: this.repositories.monitorRepository,
+                site: this.repositories.siteRepository,
+            },
+        });
+
+        // Create SiteRepositoryService with injected dependencies
+        const loggerAdapter = new LoggerAdapter(logger);
+        this.siteRepositoryService = new SiteRepositoryService({
+            eventEmitter: this.eventEmitter,
+            logger: loggerAdapter,
+            repositories: {
+                history: this.repositories.historyRepository,
+                monitor: this.repositories.monitorRepository,
+                settings: this.repositories.settingsRepository,
+                site: this.repositories.siteRepository,
+            },
+        });
+
+        logger.info(LOG_TEMPLATES.services.SITE_MANAGER_INITIALIZED_WITH_CACHE);
+    }
+
+    /**
+     * Gets a specific site from cache with smart background loading.
+     *
+     * @param identifier - The site identifier to retrieve.
+     * @returns The site object if found in cache, otherwise undefined.
+     * @remarks
+     * If the site is not found in cache, triggers background loading and emits a cache miss event.
+     * @example
+     * ```typescript
+     * const site = siteManager.getSiteFromCache("site_123");
+     * ```
+     */
+    public getSiteFromCache(identifier: string): Site | undefined {
+        const site = this.sitesCache.get(identifier);
+
+        if (!site) {
+            // Emit cache miss event
+            void (async (): Promise<void> => {
+                try {
+                    await this.eventEmitter.emitTyped("site:cache-miss", {
+                        backgroundLoading: true,
+                        identifier,
+                        operation: "cache-lookup",
+                        timestamp: Date.now(),
+                    });
+                } catch (error) {
+                    logger.debug(
+                        LOG_TEMPLATES.debug.SITE_CACHE_MISS_ERROR,
+                        error
+                    );
+                }
+            })();
+
+            // Trigger background loading without blocking
+            void (async (): Promise<void> => {
+                try {
+                    await this.loadSiteInBackground(identifier);
+                } catch (error) {
+                    logger.debug(
+                        LOG_TEMPLATES.debug.SITE_LOADING_ERROR_IGNORED,
+                        error
+                    );
+                }
+            })();
+        }
+
+        return site;
+    }
+
+    /**
+     * Gets the standardized sites cache (for internal use by other managers).
+     *
+     * @returns The standardized cache instance for sites.
+     * @remarks
+     * Used for internal coordination between managers. External consumers should use getSites().
+     */
+    public getSitesCache(): StandardizedCache<Site> {
+        return this.sitesCache;
+    }
+
+    /**
+     * Gets sites from in-memory cache for fast access.
+     *
+     * @returns Array of site objects currently in cache.
+     * @remarks
+     * Returns the in-memory cache containing all sites for high-performance
+     * access patterns. The cache is automatically synchronized with database
+     * changes through event handling. Use this for internal operations and
+     * when performance is critical.
+     *
+     * Internal use only - external components should use getSites() for
+     * guaranteed fresh data or subscribe to cache update events.
+     */
+    public getSitesFromCache(): Site[] {
+        return this.sitesCache.getAll();
+    }
+
+    /**
+     * Creates monitoring configuration for site operations.
+     *
+     * @remarks
+     * Used internally for coordinated monitoring actions during site updates. Throws if monitoring operations are not available but required.
+     *
+     * @returns Configuration for managing monitoring operations.
+     * @throws When monitoring operations are not available but required.
+     * @internal
+     */
+    private createMonitoringConfig(): MonitoringConfig {
+        return {
+            setHistoryLimit: (limit: number): void => {
+                if (!this.monitoringOperations) {
+                    throw new Error(
+                        "MonitoringOperations not available but required for setHistoryLimit"
+                    );
+                }
+                const operations = this.monitoringOperations;
+                // Execute but don't await the promise
+                void (async (): Promise<void> => {
+                    try {
+                        await operations.setHistoryLimit(limit);
+                    } catch (error) {
+                        logger.error(
+                            LOG_TEMPLATES.errors.SITE_HISTORY_LIMIT_FAILED,
+                            error
+                        );
+                    }
+                })();
+            },
+            setupNewMonitors: async (
+                site: Site,
+                newMonitorIds: string[]
+            ): Promise<void> => {
+                if (!this.monitoringOperations) {
+                    throw new Error(
+                        "MonitoringOperations not available but required for setupNewMonitors"
+                    );
+                }
+                await this.monitoringOperations.setupNewMonitors(
+                    site,
+                    newMonitorIds
+                );
+            },
+            startMonitoring: async (
+                identifier: string,
+                monitorId: string
+            ): Promise<boolean> => {
+                if (!this.monitoringOperations) {
+                    throw new Error(
+                        "MonitoringOperations not available but required for startMonitoring"
+                    );
+                }
+                return this.monitoringOperations.startMonitoringForSite(
+                    identifier,
+                    monitorId
+                );
+            },
+            stopMonitoring: async (
+                identifier: string,
+                monitorId: string
+            ): Promise<boolean> => {
+                if (!this.monitoringOperations) {
+                    throw new Error(
+                        "MonitoringOperations not available but required for stopMonitoring"
+                    );
+                }
+                return this.monitoringOperations.stopMonitoringForSite(
+                    identifier,
+                    monitorId
+                );
+            },
+        };
+    }
+
+    /**
+     * Formats validation errors for better readability.
+     *
+     * @remarks
+     * Used internally to format error messages for display or logging.
+     *
+     * @param errors - Array of error messages.
+     * @returns Formatted error string.
+     * @internal
+     */
+    private formatValidationErrors(errors: string[] | undefined): string {
+        if (!errors || errors.length === 0) {
+            return "";
+        }
+        if (errors.length === 1) {
+            // Ensure fallback to empty string if errors[0] is undefined
+            return errors[0] ?? "";
+        }
+        return `\n  - ${errors.join("\n  - ")}`;
     }
 }

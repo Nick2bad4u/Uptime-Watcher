@@ -196,28 +196,6 @@ async function addToExistingSite(
 }
 
 /**
- * Performs the actual submission based on add mode.
- */
-async function performSubmission(
-    properties: FormSubmitProperties,
-    monitor: Monitor
-): Promise<void> {
-    const { addMode, logger } = properties;
-
-    if (addMode === "new") {
-        await submitNewSite(properties, monitor);
-    } else {
-        await addToExistingSite(properties, monitor);
-    }
-
-    const { selectedExistingSite, siteId } = properties;
-    const identifier = addMode === "new" ? siteId : selectedExistingSite;
-    logger.info(
-        `Successfully ${addMode === "new" ? "created site" : "added monitor"}: ${identifier}`
-    );
-}
-
-/**
  * Submits a new site with monitor.
  */
 async function submitNewSite(
@@ -241,6 +219,28 @@ async function submitNewSite(
         monitorType: monitor.type,
         name: name.trim(),
     });
+}
+
+/**
+ * Performs the actual submission based on add mode.
+ */
+async function performSubmission(
+    properties: FormSubmitProperties,
+    monitor: Monitor
+): Promise<void> {
+    const { addMode, logger } = properties;
+
+    if (addMode === "new") {
+        await submitNewSite(properties, monitor);
+    } else {
+        await addToExistingSite(properties, monitor);
+    }
+
+    const { selectedExistingSite, siteId } = properties;
+    const identifier = addMode === "new" ? siteId : selectedExistingSite;
+    logger.info(
+        `Successfully ${addMode === "new" ? "created site" : "added monitor"}: ${identifier}`
+    );
 }
 
 /**

@@ -94,6 +94,80 @@ export interface SettingsTabProperties {
 }
 
 /**
+ * Helper function to format retry attempts text.
+ * @param attempts - Number of retry attempts
+ * @returns Formatted retry attempts description
+ */
+/**
+ * Generate a display identifier based on the monitor type.
+ * Uses dynamic utility instead of hardcoded backward compatibility patterns.
+ */
+function getDisplayIdentifier(
+    currentSite: Site,
+    selectedMonitor: Monitor
+): string {
+    return getMonitorDisplayIdentifier(selectedMonitor, currentSite.identifier);
+}
+
+/**
+ * Generate a display label for the identifier field based on monitor type.
+ */
+async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
+    return withUtilityErrorHandling(
+        async () => {
+            const config = await getMonitorTypeConfig(selectedMonitor.type);
+            if (config?.fields) {
+                // Generate label based on primary field(s)
+                const primaryField = config.fields.find(
+                    (field) => field.required
+                );
+                if (primaryField) {
+                    return primaryField.label;
+                }
+                // Fallback to first field
+                if (config.fields.length > 0 && config.fields[0]) {
+                    return config.fields[0].label;
+                }
+            }
+            // Use dynamic utility instead of hardcoded backward compatibility patterns
+            return getMonitorTypeDisplayLabel(selectedMonitor.type);
+        },
+        "Get identifier label for monitor type",
+        UiDefaults.unknownLabel
+    );
+}
+
+/**
+ * Component that displays the identifier label for a monitor type.
+ */
+function IdentifierLabel({
+    selectedMonitor,
+}: {
+    selectedMonitor: Monitor;
+}): string {
+    const [label, setLabel] = useState<string>(UiDefaults.loadingLabel);
+
+    useEffect(() => {
+        let isCancelled = false;
+
+        const loadLabel = async (): Promise<void> => {
+            const identifierLabel = await getIdentifierLabel(selectedMonitor);
+            if (!isCancelled) {
+                setLabel(identifierLabel);
+            }
+        };
+
+        void loadLabel();
+
+        return (): void => {
+            isCancelled = true;
+        };
+    }, [selectedMonitor]);
+
+    return label;
+}
+
+/**
  * Settings tab component providing site configuration interface.
  *
  * Features:
@@ -547,77 +621,3 @@ export const SettingsTab = ({
         </div>
     );
 };
-
-/**
- * Helper function to format retry attempts text.
- * @param attempts - Number of retry attempts
- * @returns Formatted retry attempts description
- */
-/**
- * Generate a display identifier based on the monitor type.
- * Uses dynamic utility instead of hardcoded backward compatibility patterns.
- */
-function getDisplayIdentifier(
-    currentSite: Site,
-    selectedMonitor: Monitor
-): string {
-    return getMonitorDisplayIdentifier(selectedMonitor, currentSite.identifier);
-}
-
-/**
- * Component that displays the identifier label for a monitor type.
- */
-function IdentifierLabel({
-    selectedMonitor,
-}: {
-    selectedMonitor: Monitor;
-}): string {
-    const [label, setLabel] = useState<string>(UiDefaults.loadingLabel);
-
-    useEffect(() => {
-        let isCancelled = false;
-
-        const loadLabel = async (): Promise<void> => {
-            const identifierLabel = await getIdentifierLabel(selectedMonitor);
-            if (!isCancelled) {
-                setLabel(identifierLabel);
-            }
-        };
-
-        void loadLabel();
-
-        return (): void => {
-            isCancelled = true;
-        };
-    }, [selectedMonitor]);
-
-    return label;
-}
-
-/**
- * Generate a display label for the identifier field based on monitor type.
- */
-async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
-    return withUtilityErrorHandling(
-        async () => {
-            const config = await getMonitorTypeConfig(selectedMonitor.type);
-            if (config?.fields) {
-                // Generate label based on primary field(s)
-                const primaryField = config.fields.find(
-                    (field) => field.required
-                );
-                if (primaryField) {
-                    return primaryField.label;
-                }
-                // Fallback to first field
-                if (config.fields.length > 0 && config.fields[0]) {
-                    return config.fields[0].label;
-                }
-            }
-            // Use dynamic utility instead of hardcoded backward compatibility patterns
-            return getMonitorTypeDisplayLabel(selectedMonitor.type);
-        },
-        "Get identifier label for monitor type",
-        UiDefaults.unknownLabel
-    );
-}

@@ -96,15 +96,16 @@ class ErrorBoundary extends React.Component<
     ErrorBoundaryProperties,
     ErrorBoundaryState
 > {
-    // eslint-disable-next-line react/sort-comp -- Constructor needs to be before lifecycle methods
-    public constructor(properties: ErrorBoundaryProperties) {
-        super(properties);
-        this.state = {
+    public handleRetry = (): void => {
+        // eslint-disable-next-line react/no-set-state -- Required for error recovery functionality
+        this.setState((prevState) => ({
+            error: undefined,
             hasError: false,
-            retryCount: 0,
-        };
-    }
-public static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+            retryCount: prevState.retryCount + 1,
+        }));
+    };
+
+    public static getDerivedStateFromError(error: Error): ErrorBoundaryState {
         return {
             error,
             hasError: true,
@@ -112,11 +113,13 @@ public static getDerivedStateFromError(error: Error): ErrorBoundaryState {
         };
     }
 
-
-
-
-
-    
+    public constructor(properties: ErrorBoundaryProperties) {
+        super(properties);
+        this.state = {
+            hasError: false,
+            retryCount: 0,
+        };
+    }
 
     public override componentDidCatch(
         error: Error,
@@ -133,20 +136,6 @@ public static getDerivedStateFromError(error: Error): ErrorBoundaryState {
         const { onError } = this.props;
         onError?.(error, errorInfo);
     }
-public handleRetry = (): void => {
-        // eslint-disable-next-line react/no-set-state -- Required for error recovery functionality
-        this.setState((prevState) => ({
-            error: undefined,
-            hasError: false,
-            retryCount: prevState.retryCount + 1,
-        }));
-    };
-
-
-
-
-
-    
 
     public override render(): JSX.Element {
         const { error, hasError, retryCount } = this.state;

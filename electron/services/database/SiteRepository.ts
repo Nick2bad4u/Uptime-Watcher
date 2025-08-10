@@ -65,19 +65,6 @@ export class SiteRepository {
     private readonly databaseService: DatabaseService;
 
     /**
-     * Constructs a new {@link SiteRepository} instance.
-     *
-     * @param dependencies - The required dependencies for site operations.
-     * @example
-     * ```typescript
-     * const repo = new SiteRepository({ databaseService });
-     * ```
-     */
-    public constructor(dependencies: SiteRepositoryDependencies) {
-        this.databaseService = dependencies.databaseService;
-    }
-
-    /**
      * Bulk inserts sites into the database.
      *
      * @remarks
@@ -109,45 +96,6 @@ export class SiteRepository {
             undefined,
             { count: sites.length }
         );
-    }
-
-    /**
-     * Internal method to bulk insert sites within an existing transaction.
-     *
-     * @remarks
-     * - Must be called within an active transaction context.
-     * - Uses prepared statements for performance.
-     * - Normalizes site data before insertion.
-     *
-     * @param db - Database connection (must be within active transaction).
-     * @param sites - Array of site data to insert.
-     * @returns void
-     * @throws {@link Error} When database operations fail.
-     */
-    public bulkInsertInternal(db: Database, sites: SiteRow[]): void {
-        if (sites.length === 0) {
-            return;
-        }
-
-        // Use consistent INSERT OR IGNORE for conflict handling
-        const stmt = db.prepare(SITE_QUERIES.INSERT);
-
-        try {
-            for (const site of sites) {
-                // Apply consistent data normalization
-                const name = site.name ?? SITE_DEFAULTS.NAME;
-                const monitoring = site.monitoring ?? SITE_DEFAULTS.MONITORING;
-                const monitoringValue = monitoring ? 1 : 0;
-
-                stmt.run([site.identifier, name, monitoringValue]);
-            }
-
-            logger.debug(
-                `[SiteRepository] Bulk inserted ${sites.length} sites (internal)`
-            );
-        } finally {
-            stmt.finalize();
-        }
     }
 
     /**
@@ -194,56 +142,6 @@ export class SiteRepository {
                 return Promise.resolve();
             });
         }, "site-delete-all");
-    }
-
-    /**
-     * Internal method to delete all sites within an existing transaction.
-     *
-     * @remarks
-     * - Must be called within an active transaction context.
-     * - Performs a hard delete of all site records.
-     *
-     * @param db - Database connection (must be within active transaction).
-     * @returns void
-     */
-    public deleteAllInternal(db: Database): void {
-        db.run(SITE_QUERIES.DELETE_ALL);
-        logger.debug("[SiteRepository] All sites deleted (internal)");
-    }
-
-    /**
-     * Internal method to delete a site by identifier within an existing transaction.
-     *
-     * @remarks
-     * - Must be called within an active transaction context.
-     * - Logs deletion status.
-     *
-     * @param db - Database connection (must be within active transaction).
-     * @param identifier - Site identifier to delete.
-     * @returns `true` if the site was deleted, `false` if not found.
-     * @throws {@link Error} When database operations fail.
-     */
-    public deleteInternal(db: Database, identifier: string): boolean {
-        try {
-            const result = db.run(SITE_QUERIES.DELETE_BY_ID, [identifier]);
-            const deleted = result.changes > 0;
-
-            if (deleted) {
-                logger.debug(`[SiteRepository] Deleted site: ${identifier}`);
-            } else {
-                logger.warn(
-                    `[SiteRepository] Site not found for deletion: ${identifier}`
-                );
-            }
-
-            return deleted;
-        } catch (error) {
-            logger.error(
-                `[SiteRepository] Failed to delete site: ${identifier}`,
-                error
-            );
-            throw error;
-        }
     }
 
     /**
@@ -386,6 +284,108 @@ export class SiteRepository {
             undefined,
             { identifier: site.identifier }
         );
+    }
+
+    /**
+     * Constructs a new {@link SiteRepository} instance.
+     *
+     * @param dependencies - The required dependencies for site operations.
+     * @example
+     * ```typescript
+     * const repo = new SiteRepository({ databaseService });
+     * ```
+     */
+    public constructor(dependencies: SiteRepositoryDependencies) {
+        this.databaseService = dependencies.databaseService;
+    }
+
+    /**
+     * Internal method to bulk insert sites within an existing transaction.
+     *
+     * @remarks
+     * - Must be called within an active transaction context.
+     * - Uses prepared statements for performance.
+     * - Normalizes site data before insertion.
+     *
+     * @param db - Database connection (must be within active transaction).
+     * @param sites - Array of site data to insert.
+     * @returns void
+     * @throws {@link Error} When database operations fail.
+     */
+    public bulkInsertInternal(db: Database, sites: SiteRow[]): void {
+        if (sites.length === 0) {
+            return;
+        }
+
+        // Use consistent INSERT OR IGNORE for conflict handling
+        const stmt = db.prepare(SITE_QUERIES.INSERT);
+
+        try {
+            for (const site of sites) {
+                // Apply consistent data normalization
+                const name = site.name ?? SITE_DEFAULTS.NAME;
+                const monitoring = site.monitoring ?? SITE_DEFAULTS.MONITORING;
+                const monitoringValue = monitoring ? 1 : 0;
+
+                stmt.run([site.identifier, name, monitoringValue]);
+            }
+
+            logger.debug(
+                `[SiteRepository] Bulk inserted ${sites.length} sites (internal)`
+            );
+        } finally {
+            stmt.finalize();
+        }
+    }
+
+    /**
+     * Internal method to delete all sites within an existing transaction.
+     *
+     * @remarks
+     * - Must be called within an active transaction context.
+     * - Performs a hard delete of all site records.
+     *
+     * @param db - Database connection (must be within active transaction).
+     * @returns void
+     */
+    public deleteAllInternal(db: Database): void {
+        db.run(SITE_QUERIES.DELETE_ALL);
+        logger.debug("[SiteRepository] All sites deleted (internal)");
+    }
+
+    /**
+     * Internal method to delete a site by identifier within an existing transaction.
+     *
+     * @remarks
+     * - Must be called within an active transaction context.
+     * - Logs deletion status.
+     *
+     * @param db - Database connection (must be within active transaction).
+     * @param identifier - Site identifier to delete.
+     * @returns `true` if the site was deleted, `false` if not found.
+     * @throws {@link Error} When database operations fail.
+     */
+    public deleteInternal(db: Database, identifier: string): boolean {
+        try {
+            const result = db.run(SITE_QUERIES.DELETE_BY_ID, [identifier]);
+            const deleted = result.changes > 0;
+
+            if (deleted) {
+                logger.debug(`[SiteRepository] Deleted site: ${identifier}`);
+            } else {
+                logger.warn(
+                    `[SiteRepository] Site not found for deletion: ${identifier}`
+                );
+            }
+
+            return deleted;
+        } catch (error) {
+            logger.error(
+                `[SiteRepository] Failed to delete site: ${identifier}`,
+                error
+            );
+            throw error;
+        }
     }
 
     /**

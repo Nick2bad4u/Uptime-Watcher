@@ -91,114 +91,6 @@ interface UseThemeReturn {
     toggleTheme: () => void;
 }
 
-// Hook for availability-based colors
-export function useAvailabilityColors(): UseAvailabilityColorsReturn {
-    const { currentTheme } = useTheme();
-
-    const getAvailabilityColor = (percentage: number): string => {
-        // Clamp percentage between 0 and 100
-        const clampedPercentage = Math.max(0, Math.min(100, percentage));
-
-        // Use theme colors for consistency - aligned with description thresholds
-        if (clampedPercentage >= 99.9) {
-            return currentTheme.colors.status.up; // Excellent
-        } else if (clampedPercentage >= 99) {
-            return currentTheme.colors.success; // Very Good
-        } else if (clampedPercentage >= 95) {
-            return currentTheme.colors.success; // Good
-        } else if (clampedPercentage >= 90) {
-            return currentTheme.colors.status.pending; // Fair
-        } else if (clampedPercentage >= 80) {
-            return currentTheme.colors.warning; // Poor
-        } else if (clampedPercentage >= 50) {
-            return currentTheme.colors.error; // Critical
-        } else {
-            return currentTheme.colors.status.down; // Failed
-        }
-    };
-
-    const getAvailabilityVariant = (
-        percentage: number
-    ): "danger" | "success" | "warning" => {
-        const clampedPercentage = Math.max(0, Math.min(100, percentage));
-
-        if (clampedPercentage >= 95) {
-            return "success";
-        } else if (clampedPercentage >= 80) {
-            return "warning";
-        } else {
-            return "danger";
-        }
-    };
-
-    const getAvailabilityDescription = (percentage: number): string => {
-        const clampedPercentage = Math.max(0, Math.min(100, percentage));
-
-        if (clampedPercentage >= 99.9) {
-            return "Excellent";
-        } else if (clampedPercentage >= 99) {
-            return "Very Good";
-        } else if (clampedPercentage >= 95) {
-            return "Good";
-        } else if (clampedPercentage >= 90) {
-            return "Fair";
-        } else if (clampedPercentage >= 80) {
-            return "Poor";
-        } else if (clampedPercentage >= 50) {
-            return "Critical";
-        } else {
-            return "Failed";
-        }
-    };
-
-    return {
-        getAvailabilityColor,
-        getAvailabilityDescription,
-        getAvailabilityVariant,
-    };
-}
-
-/**
- * Hook for accessing theme-aware status colors.
- * @returns Object containing status colors from the current theme
- */
-export function useStatusColors(): UseStatusColorsReturn {
-    const { currentTheme } = useTheme();
-
-    return {
-        down: currentTheme.colors.status.down,
-        pending: currentTheme.colors.status.pending,
-        unknown: currentTheme.colors.status.unknown,
-        up: currentTheme.colors.status.up,
-    };
-}
-
-/**
- * Main theme hook providing comprehensive theme management functionality.
- *
- * @remarks
- * This hook provides a complete theming solution with system integration,
- * color utilities, and automatic updates. It serves as the primary interface
- * for all theme-related operations throughout the application.
- *
- * @public
- *
- * @see {@link ThemeManager} for theme management implementation
- * @see {@link useSettingsStore} for settings integration
- *
- * @example
- * ```typescript
- * const { isDark, toggleTheme, getStatusColor } = useTheme();
- *
- * // Toggle between light and dark themes
- * toggleTheme();
- *
- * // Get status-based colors
- * const upColor = getStatusColor('up');
- * ```
- *
- * @returns Object containing theme state, setters, and utility functions
- */
 export function useTheme(): UseThemeReturn {
     const { settings, updateSettings } = useSettingsStore();
     const [systemTheme, setSystemTheme] = useState<"dark" | "light">("light");
@@ -390,6 +282,115 @@ export function useTheme(): UseThemeReturn {
         toggleTheme,
     };
 }
+
+// Hook for availability-based colors
+export function useAvailabilityColors(): UseAvailabilityColorsReturn {
+    const { currentTheme } = useTheme();
+
+    const getAvailabilityColor = (percentage: number): string => {
+        // Clamp percentage between 0 and 100
+        const clampedPercentage = Math.max(0, Math.min(100, percentage));
+
+        // Use theme colors for consistency - aligned with description thresholds
+        if (clampedPercentage >= 99.9) {
+            return currentTheme.colors.status.up; // Excellent
+        } else if (clampedPercentage >= 99) {
+            return currentTheme.colors.success; // Very Good
+        } else if (clampedPercentage >= 95) {
+            return currentTheme.colors.success; // Good
+        } else if (clampedPercentage >= 90) {
+            return currentTheme.colors.status.pending; // Fair
+        } else if (clampedPercentage >= 80) {
+            return currentTheme.colors.warning; // Poor
+        } else if (clampedPercentage >= 50) {
+            return currentTheme.colors.error; // Critical
+        } else {
+            return currentTheme.colors.status.down; // Failed
+        }
+    };
+
+    const getAvailabilityVariant = (
+        percentage: number
+    ): "danger" | "success" | "warning" => {
+        const clampedPercentage = Math.max(0, Math.min(100, percentage));
+
+        if (clampedPercentage >= 95) {
+            return "success";
+        } else if (clampedPercentage >= 80) {
+            return "warning";
+        } else {
+            return "danger";
+        }
+    };
+
+    const getAvailabilityDescription = (percentage: number): string => {
+        const clampedPercentage = Math.max(0, Math.min(100, percentage));
+
+        if (clampedPercentage >= 99.9) {
+            return "Excellent";
+        } else if (clampedPercentage >= 99) {
+            return "Very Good";
+        } else if (clampedPercentage >= 95) {
+            return "Good";
+        } else if (clampedPercentage >= 90) {
+            return "Fair";
+        } else if (clampedPercentage >= 80) {
+            return "Poor";
+        } else if (clampedPercentage >= 50) {
+            return "Critical";
+        } else {
+            return "Failed";
+        }
+    };
+
+    return {
+        getAvailabilityColor,
+        getAvailabilityDescription,
+        getAvailabilityVariant,
+    };
+}
+
+/**
+ * Hook for accessing theme-aware status colors.
+ * @returns Object containing status colors from the current theme
+ */
+export function useStatusColors(): UseStatusColorsReturn {
+    const { currentTheme } = useTheme();
+
+    return {
+        down: currentTheme.colors.status.down,
+        pending: currentTheme.colors.status.pending,
+        unknown: currentTheme.colors.status.unknown,
+        up: currentTheme.colors.status.up,
+    };
+}
+
+/**
+ * Main theme hook providing comprehensive theme management functionality.
+ *
+ * @remarks
+ * This hook provides a complete theming solution with system integration,
+ * color utilities, and automatic updates. It serves as the primary interface
+ * for all theme-related operations throughout the application.
+ *
+ * @public
+ *
+ * @see {@link ThemeManager} for theme management implementation
+ * @see {@link useSettingsStore} for settings integration
+ *
+ * @example
+ * ```typescript
+ * const { isDark, toggleTheme, getStatusColor } = useTheme();
+ *
+ * // Toggle between light and dark themes
+ * toggleTheme();
+ *
+ * // Get status-based colors
+ * const upColor = getStatusColor('up');
+ * ```
+ *
+ * @returns Object containing theme state, setters, and utility functions
+ */
 
 /**
  * Hook for theme-aware CSS classes using CSS custom properties.

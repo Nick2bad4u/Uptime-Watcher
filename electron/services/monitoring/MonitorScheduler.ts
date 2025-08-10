@@ -49,6 +49,40 @@ export class MonitorScheduler {
     ) => Promise<void>;
 
     /**
+     * Performs an immediate check for a specific monitor by invoking the registered check callback.
+     *
+     * @remarks
+     * Invokes the registered check callback for the specified monitor. Errors are logged and do not interrupt execution. If no callback is set, this method does nothing.
+     *
+     * @param siteIdentifier - Unique identifier for the site.
+     * @param monitorId - Unique identifier for the monitor.
+     * @returns A promise that resolves when the check completes.
+     *
+     * @throws Any error thrown by the callback is caught and logged; errors are not re-thrown.
+     *
+     * @public
+     */
+    public async performImmediateCheck(
+        siteIdentifier: string,
+        monitorId: string
+    ): Promise<void> {
+        if (this.onCheckCallback) {
+            try {
+                await this.onCheckCallback(siteIdentifier, monitorId);
+            } catch (error) {
+                const intervalKey = this.createIntervalKey(
+                    siteIdentifier,
+                    monitorId
+                );
+                logger.error(
+                    `[MonitorScheduler] Error during immediate check for ${intervalKey}`,
+                    error
+                );
+            }
+        }
+    }
+
+    /**
      * Returns the number of currently active monitoring intervals.
      *
      * @returns The number of scheduled monitor intervals.
@@ -82,40 +116,6 @@ export class MonitorScheduler {
     public isMonitoring(siteIdentifier: string, monitorId: string): boolean {
         const intervalKey = this.createIntervalKey(siteIdentifier, monitorId);
         return this.intervals.has(intervalKey);
-    }
-
-    /**
-     * Performs an immediate check for a specific monitor by invoking the registered check callback.
-     *
-     * @remarks
-     * Invokes the registered check callback for the specified monitor. Errors are logged and do not interrupt execution. If no callback is set, this method does nothing.
-     *
-     * @param siteIdentifier - Unique identifier for the site.
-     * @param monitorId - Unique identifier for the monitor.
-     * @returns A promise that resolves when the check completes.
-     *
-     * @throws Any error thrown by the callback is caught and logged; errors are not re-thrown.
-     *
-     * @public
-     */
-    public async performImmediateCheck(
-        siteIdentifier: string,
-        monitorId: string
-    ): Promise<void> {
-        if (this.onCheckCallback) {
-            try {
-                await this.onCheckCallback(siteIdentifier, monitorId);
-            } catch (error) {
-                const intervalKey = this.createIntervalKey(
-                    siteIdentifier,
-                    monitorId
-                );
-                logger.error(
-                    `[MonitorScheduler] Error during immediate check for ${intervalKey}`,
-                    error
-                );
-            }
-        }
     }
 
     /**

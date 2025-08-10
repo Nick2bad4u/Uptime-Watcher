@@ -52,6 +52,25 @@ export interface SiteOverviewTabProperties {
 }
 
 /**
+ * Get monitor badge variant
+ */
+function getMonitorBadgeVariant(
+    monitor: Monitor
+): "error" | "success" | "warning" {
+    return monitor.monitoring ? "success" : "warning";
+}
+
+/**
+ * Get status text for monitor
+ */
+function getMonitorStatusText(monitor: Monitor): string {
+    if (monitor.monitoring) {
+        return "Running";
+    }
+    return "Stopped";
+}
+
+/**
  * Site Overview tab component that displays comprehensive site information.
  *
  * Features:
@@ -96,6 +115,26 @@ export const SiteOverviewTab = ({
         const variant = getAvailabilityVariant(percentage);
         return variant === "danger" ? "error" : variant;
     };
+
+    /**
+     * Get response time color based on value
+     */
+    const getResponseTimeColor = useCallback(
+        (responseTime: number): string => {
+            if (responseTime <= 200) {
+                return currentTheme.colors.success;
+            }
+            if (responseTime <= 1000) {
+                return currentTheme.colors.warning;
+            }
+            return currentTheme.colors.error;
+        },
+        [
+            currentTheme.colors.success,
+            currentTheme.colors.warning,
+            currentTheme.colors.error,
+        ]
+    );
 
     // Icon colors configuration
     const getIconColors = (): {
@@ -142,26 +181,6 @@ export const SiteOverviewTab = ({
             uptime: availabilityColor,
         };
     };
-
-    /**
-     * Get response time color based on value
-     */
-    const getResponseTimeColor = useCallback(
-        (responseTime: number): string => {
-            if (responseTime <= 200) {
-                return currentTheme.colors.success;
-            }
-            if (responseTime <= 1000) {
-                return currentTheme.colors.warning;
-            }
-            return currentTheme.colors.error;
-        },
-        [
-            currentTheme.colors.success,
-            currentTheme.colors.warning,
-            currentTheme.colors.error,
-        ]
-    );
 
     const iconColors = getIconColors();
     const uptimeVariant = getUptimeVariant(uptime);
@@ -440,22 +459,3 @@ export const SiteOverviewTab = ({
         </div>
     );
 };
-
-/**
- * Get monitor badge variant
- */
-function getMonitorBadgeVariant(
-    monitor: Monitor
-): "error" | "success" | "warning" {
-    return monitor.monitoring ? "success" : "warning";
-}
-
-/**
- * Get status text for monitor
- */
-function getMonitorStatusText(monitor: Monitor): string {
-    if (monitor.monitoring) {
-        return "Running";
-    }
-    return "Stopped";
-}

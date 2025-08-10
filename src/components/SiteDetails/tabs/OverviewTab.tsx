@@ -126,6 +126,19 @@ export const OverviewTab = ({
     const uptimeValue = parseUptimeValue(uptime);
     const progressVariant = mapAvailabilityToBadgeVariant(uptimeValue);
 
+    /**
+     * Get response time color based on value
+     */
+    const getResponseTimeColor = (responseTime: number): string => {
+        if (responseTime <= 200) {
+            return currentTheme.colors.success;
+        }
+        if (responseTime <= 1000) {
+            return currentTheme.colors.warning;
+        }
+        return currentTheme.colors.error;
+    };
+
     // Icon colors configuration
     const getIconColors = (): {
         checks: string;
@@ -147,19 +160,6 @@ export const OverviewTab = ({
             status: availabilityColor,
             uptime: availabilityColor,
         };
-    };
-
-    /**
-     * Get response time color based on value
-     */
-    const getResponseTimeColor = (responseTime: number): string => {
-        if (responseTime <= 200) {
-            return currentTheme.colors.success;
-        }
-        if (responseTime <= 1000) {
-            return currentTheme.colors.warning;
-        }
-        return currentTheme.colors.error;
     };
 
     const iconColors = getIconColors();

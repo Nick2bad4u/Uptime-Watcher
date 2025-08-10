@@ -75,6 +75,22 @@ export interface SiteDetailsProperties {
 }
 
 /**
+ * Gets a descriptive label for availability percentage.
+ *
+ * @param percentage - Availability percentage (0-100)
+ * @returns Description string ("Excellent", "Good", or "Poor")
+ */
+function getAvailabilityDescription(percentage: number): string {
+    if (percentage >= 99) {
+        return "Excellent";
+    }
+    if (percentage >= 95) {
+        return "Good";
+    }
+    return "Poor";
+}
+
+/**
  * Site details component with tabbed interface for comprehensive site monitoring.
  * Provides overview, history, analytics, and settings views for a monitored site.
  *
@@ -432,21 +448,5 @@ export const SiteDetails = ({
         </div>
     );
 };
-
-/**
- * Gets a descriptive label for availability percentage.
- *
- * @param percentage - Availability percentage (0-100)
- * @returns Description string ("Excellent", "Good", or "Poor")
- */
-function getAvailabilityDescription(percentage: number): string {
-    if (percentage >= 99) {
-        return "Excellent";
-    }
-    if (percentage >= 95) {
-        return "Good";
-    }
-    return "Poor";
-}
 
 /* eslint-enable tailwind/no-arbitrary-value */

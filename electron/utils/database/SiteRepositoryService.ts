@@ -82,10 +82,6 @@ import { SiteLoadingError } from "./interfaces";
 export class SiteLoadingOrchestrator {
     private readonly siteRepositoryService: SiteRepositoryService;
 
-    public constructor(siteRepositoryService: SiteRepositoryService) {
-        this.siteRepositoryService = siteRepositoryService;
-    }
-
     /**
      * Load sites from database and start monitoring.
      * Coordinates all aspects of site loading process.
@@ -120,6 +116,10 @@ export class SiteLoadingOrchestrator {
             };
         }
     }
+
+    public constructor(siteRepositoryService: SiteRepositoryService) {
+        this.siteRepositoryService = siteRepositoryService;
+    }
 }
 
 /**
@@ -137,29 +137,15 @@ export class SiteLoadingOrchestrator {
  */
 export class SiteRepositoryService {
     private readonly eventEmitter: TypedEventBus<UptimeEvents>;
+
     private readonly logger: Logger;
+
     private readonly repositories: {
         history: HistoryRepository;
         monitor: MonitorRepository;
         settings: SettingsRepository;
         site: SiteRepository;
     };
-
-    /**
-     * Create a new SiteRepositoryService instance.
-     *
-     * @param config - Configuration with required dependencies
-     *
-     * @remarks
-     * Initializes the service with injected dependencies for repositories,
-     * logging, and event communication. All dependencies are required
-     * for proper operation and comprehensive functionality.
-     */
-    public constructor(config: SiteLoadingConfig) {
-        this.repositories = config.repositories;
-        this.logger = config.logger;
-        this.eventEmitter = config.eventEmitter;
-    }
 
     /**
      * Apply history limit setting.
@@ -307,5 +293,21 @@ export class SiteRepositoryService {
         };
 
         return site;
+    }
+
+    /**
+     * Create a new SiteRepositoryService instance.
+     *
+     * @param config - Configuration with required dependencies
+     *
+     * @remarks
+     * Initializes the service with injected dependencies for repositories,
+     * logging, and event communication. All dependencies are required
+     * for proper operation and comprehensive functionality.
+     */
+    public constructor(config: SiteLoadingConfig) {
+        this.repositories = config.repositories;
+        this.logger = config.logger;
+        this.eventEmitter = config.eventEmitter;
     }
 }

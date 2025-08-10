@@ -60,23 +60,6 @@ export class PortMonitor implements IMonitorService {
     private config: MonitorConfig;
 
     /**
-     * Create a new PortMonitor instance.
-     *
-     * @param config - Configuration options for the monitor
-     *
-     * @remarks
-     * Initializes the monitor with default timeout values and merges any
-     * provided configuration options. Safe to instantiate multiple times
-     * with different configurations for various monitoring needs.
-     */
-    public constructor(config: MonitorConfig = {}) {
-        this.config = {
-            timeout: DEFAULT_REQUEST_TIMEOUT, // Use consistent default timeout
-            ...config,
-        };
-    }
-
-    /**
      * Perform a port connectivity check on the given monitor.
      *
      * @param monitor - Monitor configuration of type {@link Site}["monitors"][0] containing host, port, and connection settings
@@ -130,6 +113,23 @@ export class PortMonitor implements IMonitorService {
             timeout,
             retryAttempts
         );
+    }
+
+    /**
+     * Create a new PortMonitor instance.
+     *
+     * @param config - Configuration options for the monitor
+     *
+     * @remarks
+     * Initializes the monitor with default timeout values and merges any
+     * provided configuration options. Safe to instantiate multiple times
+     * with different configurations for various monitoring needs.
+     */
+    public constructor(config: MonitorConfig = {}) {
+        this.config = {
+            timeout: DEFAULT_REQUEST_TIMEOUT, // Use consistent default timeout
+            ...config,
+        };
     }
 
     /**

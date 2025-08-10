@@ -54,6 +54,23 @@ export interface IpcResponse<T> {
 }
 
 /**
+ * Type guard to check if a value is an IPC response.
+ *
+ * @param value - The value to check
+ * @returns True if the value is an IPC response
+ *
+ * @public
+ */
+export function isIpcResponse<T>(value: unknown): value is IpcResponse<T> {
+    return (
+        typeof value === "object" &&
+        value !== null &&
+        "success" in value &&
+        typeof (value as { success: unknown }).success === "boolean"
+    );
+}
+
+/**
  * Extracts data from an IPC response or throws an error.
  *
  * @param response - The IPC response to extract data from
@@ -75,23 +92,6 @@ export function extractIpcData<T>(response: unknown): T {
     }
 
     return response.data as T;
-}
-
-/**
- * Type guard to check if a value is an IPC response.
- *
- * @param value - The value to check
- * @returns True if the value is an IPC response
- *
- * @public
- */
-export function isIpcResponse<T>(value: unknown): value is IpcResponse<T> {
-    return (
-        typeof value === "object" &&
-        value !== null &&
-        "success" in value &&
-        typeof (value as { success: unknown }).success === "boolean"
-    );
 }
 
 /**

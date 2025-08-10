@@ -72,23 +72,10 @@ export abstract class DatabaseCommand<TResult = void>
     implements IDatabaseCommand<TResult>
 {
     protected readonly cache: StandardizedCache<Site>;
+
     protected readonly eventEmitter: TypedEventBus<UptimeEvents>;
+
     protected readonly serviceFactory: DatabaseServiceFactory;
-
-    public constructor(
-        serviceFactory: DatabaseServiceFactory,
-        eventEmitter: TypedEventBus<UptimeEvents>,
-        cache: StandardizedCache<Site>
-    ) {
-        this.serviceFactory = serviceFactory;
-        this.eventEmitter = eventEmitter;
-        this.cache = cache;
-    }
-
-    public abstract execute(): Promise<TResult>;
-    public abstract getDescription(): string;
-    public abstract rollback(): Promise<void>;
-    public abstract validate(): Promise<{ errors: string[]; isValid: boolean }>;
 
     /**
      * Emits a failure event for the command operation.
@@ -134,6 +121,24 @@ export abstract class DatabaseCommand<TResult = void>
             ...data,
         } as UptimeEvents[keyof UptimeEvents]);
     }
+
+    public constructor(
+        serviceFactory: DatabaseServiceFactory,
+        eventEmitter: TypedEventBus<UptimeEvents>,
+        cache: StandardizedCache<Site>
+    ) {
+        this.serviceFactory = serviceFactory;
+        this.eventEmitter = eventEmitter;
+        this.cache = cache;
+    }
+
+    public abstract execute(): Promise<TResult>;
+
+    public abstract getDescription(): string;
+
+    public abstract rollback(): Promise<void>;
+
+    public abstract validate(): Promise<{ errors: string[]; isValid: boolean }>;
 }
 
 /**
@@ -146,17 +151,6 @@ export abstract class DatabaseCommand<TResult = void>
  */
 export class DatabaseCommandExecutor {
     private readonly executedCommands: Array<IDatabaseCommand<unknown>> = [];
-
-    /**
-     * Clears the command history without performing rollback.
-     *
-     * @remarks
-     * Removes all references to previously executed commands. Does not attempt to revert any changes.
-     * @public
-     */
-    public clear(): void {
-        this.executedCommands.length = 0;
-    }
 
     /**
      * Executes a command with automatic rollback on failure.
@@ -236,6 +230,17 @@ export class DatabaseCommandExecutor {
             );
         }
     }
+
+    /**
+     * Clears the command history without performing rollback.
+     *
+     * @remarks
+     * Removes all references to previously executed commands. Does not attempt to revert any changes.
+     * @public
+     */
+    public clear(): void {
+        this.executedCommands.length = 0;
+    }
 }
 
 /**
@@ -260,10 +265,6 @@ export class DownloadBackupCommand extends DatabaseCommand<{
         });
 
         return result;
-    }
-
-    public getDescription(): string {
-        return "Download SQLite database backup";
     }
 
     /**
@@ -291,6 +292,10 @@ export class DownloadBackupCommand extends DatabaseCommand<{
         await Promise.resolve();
         return { errors: [], isValid: true };
     }
+
+    public getDescription(): string {
+        return "Download SQLite database backup";
+    }
 }
 
 /**
@@ -315,10 +320,6 @@ export class ExportDataCommand extends DatabaseCommand<string> {
         return result;
     }
 
-    public getDescription(): string {
-        return "Export all application data to JSON";
-    }
-
     public async rollback(): Promise<void> {
         // Export operations don't need rollback
     }
@@ -327,6 +328,10 @@ export class ExportDataCommand extends DatabaseCommand<string> {
         // No specific validation needed for export
         await Promise.resolve();
         return { errors: [], isValid: true };
+    }
+
+    public getDescription(): string {
+        return "Export all application data to JSON";
     }
 }
 
@@ -340,17 +345,8 @@ export class ExportDataCommand extends DatabaseCommand<string> {
  */
 export class ImportDataCommand extends DatabaseCommand<boolean> {
     private backupSites: Site[] = [];
-    private readonly data: string;
 
-    public constructor(
-        serviceFactory: DatabaseServiceFactory,
-        eventEmitter: TypedEventBus<UptimeEvents>,
-        cache: StandardizedCache<Site>,
-        data: string
-    ) {
-        super(serviceFactory, eventEmitter, cache);
-        this.data = data;
-    }
+    private readonly data: string;
 
     public async execute(): Promise<boolean> {
         // Create backup of current sites
@@ -383,10 +379,6 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
         return true;
     }
 
-    public getDescription(): string {
-        return "Import application data from JSON";
-    }
-
     public async rollback(): Promise<void> {
         // Restore cache from backup
         this.cache.clear();
@@ -415,6 +407,20 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
             errors,
             isValid: errors.length === 0,
         };
+    }
+
+    public constructor(
+        serviceFactory: DatabaseServiceFactory,
+        eventEmitter: TypedEventBus<UptimeEvents>,
+        cache: StandardizedCache<Site>,
+        data: string
+    ) {
+        super(serviceFactory, eventEmitter, cache);
+        this.data = data;
+    }
+
+    public getDescription(): string {
+        return "Import application data from JSON";
     }
 }
 
@@ -449,10 +455,6 @@ export class LoadSitesCommand extends DatabaseCommand<Site[]> {
         return sites;
     }
 
-    public getDescription(): string {
-        return "Load sites from database into cache";
-    }
-
     /**
      * Restores the cache to its previous state.
      *
@@ -485,5 +487,9 @@ export class LoadSitesCommand extends DatabaseCommand<Site[]> {
         // No specific validation needed for loading
         await Promise.resolve();
         return { errors: [], isValid: true };
+    }
+
+    public getDescription(): string {
+        return "Load sites from database into cache";
     }
 }

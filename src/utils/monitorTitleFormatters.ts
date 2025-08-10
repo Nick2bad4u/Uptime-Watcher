@@ -34,6 +34,24 @@ const titleSuffixFormatters: Record<string, TitleSuffixFormatter> = {
 };
 
 /**
+ * Get title suffix formatter for a monitor type
+ *
+ * @param monitorType - Type of monitor to get formatter for
+ * @returns Formatter function if available, undefined otherwise
+ *
+ * @remarks
+ * Used internally by formatTitleSuffix to retrieve the appropriate
+ * formatter function for a given monitor type.
+ *
+ * @public
+ */
+export function getTitleSuffixFormatter(
+    monitorType: string
+): TitleSuffixFormatter | undefined {
+    return titleSuffixFormatters[monitorType];
+}
+
+/**
  * Format title suffix for a monitor dynamically
  *
  * @param monitor - Monitor object to generate suffix for
@@ -53,24 +71,6 @@ export function formatTitleSuffix(monitor: Monitor): string {
 
     // Fallback to empty string if no formatter is registered
     return "";
-}
-
-/**
- * Get title suffix formatter for a monitor type
- *
- * @param monitorType - Type of monitor to get formatter for
- * @returns Formatter function if available, undefined otherwise
- *
- * @remarks
- * Used internally by formatTitleSuffix to retrieve the appropriate
- * formatter function for a given monitor type.
- *
- * @public
- */
-export function getTitleSuffixFormatter(
-    monitorType: string
-): TitleSuffixFormatter | undefined {
-    return titleSuffixFormatters[monitorType];
 }
 
 /**

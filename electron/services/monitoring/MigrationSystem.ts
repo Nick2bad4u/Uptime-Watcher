@@ -121,21 +121,8 @@ export interface VersionInfo {
  */
 class MigrationOrchestrator {
     private readonly registry: MigrationRegistry;
-    private readonly versionManager: VersionManager;
 
-    /**
-     * Constructs a new {@link MigrationOrchestrator}.
-     *
-     * @param registry - The migration registry instance.
-     * @param versionManager - The version manager instance.
-     */
-    public constructor(
-        registry: MigrationRegistry,
-        versionManager: VersionManager
-    ) {
-        this.registry = registry;
-        this.versionManager = versionManager;
-    }
+    private readonly versionManager: VersionManager;
 
     /**
      * Migrates monitor configuration data from one version to another.
@@ -266,6 +253,20 @@ class MigrationOrchestrator {
                 warnings,
             };
         }
+    }
+
+    /**
+     * Constructs a new {@link MigrationOrchestrator}.
+     *
+     * @param registry - The migration registry instance.
+     * @param versionManager - The version manager instance.
+     */
+    public constructor(
+        registry: MigrationRegistry,
+        versionManager: VersionManager
+    ) {
+        this.registry = registry;
+        this.versionManager = versionManager;
     }
 }
 

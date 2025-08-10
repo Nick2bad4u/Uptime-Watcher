@@ -77,6 +77,163 @@ export class WindowService {
     private mainWindow: BrowserWindow | null = null;
 
     /**
+     * Load development content after waiting for Vite server.
+     *
+     * @returns Promise that resolves when content is loaded or rejects on error
+     *
+     * @remarks
+     * Handles the complete development content loading workflow:
+     *
+     * **Process:**
+     * 1. Waits for Vite dev server using exponential backoff retry
+     * 2. Loads content from localhost:5173 when server is ready
+     * 3. Opens DevTools after 1s delay for better UX
+     *
+     * **Error Propagation:**
+     * - Server connection errors are logged and re-thrown
+     * - Content loading errors include URL and timing context
+     * - DevTools opening errors are non-fatal and logged only
+     *
+     * **Timing Considerations:**
+     * - DevTools delay prevents race conditions with renderer setup
+     * - Server wait timeout prevents indefinite hanging
+     * - All timeouts are configurable via constants
+     *
+     * **Recovery Strategy:**
+     * - Method continues even if DevTools fail to open
+     * - Window remains functional if content loads but DevTools fail
+     * - Full error context provided for debugging server issues
+     */
+    private async loadDevelopmentContent(): Promise<void> {
+        try {
+            await this.waitForViteServer();
+
+            if (!this.mainWindow || this.mainWindow.isDestroyed()) {
+                throw new Error(
+                    "Main window was destroyed while waiting for Vite server"
+                );
+            }
+
+            await this.mainWindow.loadURL(
+                WindowService.VITE_SERVER_CONFIG.SERVER_URL
+            );
+
+            // Delay opening DevTools to ensure renderer is ready
+            setTimeout(() => {
+                if (this.mainWindow && !this.mainWindow.isDestroyed()) {
+                    try {
+                        this.mainWindow.webContents.openDevTools();
+                    } catch (error) {
+                        logger.warn("[WindowService] Failed to open DevTools", {
+                            error:
+                                error instanceof Error
+                                    ? error.message
+                                    : String(error),
+                            windowState: this.mainWindow.isDestroyed()
+                                ? "destroyed"
+                                : "active",
+                        });
+                    }
+                }
+            }, 1000);
+        } catch (error) {
+            const errorContext = {
+                environment: getNodeEnv(),
+                error: error instanceof Error ? error.message : String(error),
+                serverUrl: WindowService.VITE_SERVER_CONFIG.SERVER_URL,
+                windowState: this.mainWindow?.isDestroyed()
+                    ? "destroyed"
+                    : "active",
+            };
+
+            logger.error(
+                "[WindowService] Failed to load development content",
+                errorContext
+            );
+            throw error; // Re-throw to allow caller to handle
+        }
+    }
+
+    /**
+     * Wait for Vite dev server to be ready with exponential backoff.
+     *
+     * @returns Promise that resolves when server is ready
+     * @throws When server doesn't become available within timeout
+     *
+     * @remarks
+     * Uses exponential backoff strategy for efficient server detection:
+     * - First attempt: 500ms delay
+     * - Subsequent attempts: exponentially increasing delay up to 10s max
+     * - Each fetch has 5s timeout to prevent hanging
+     * - Total attempts: up to 20 retries
+     *
+     * This approach provides fast response when server starts quickly while
+     * being patient for slower startup scenarios.
+     */
+    private async waitForViteServer(): Promise<void> {
+        const {
+            BASE_DELAY,
+            FETCH_TIMEOUT,
+            MAX_DELAY,
+            MAX_RETRIES,
+            SERVER_URL,
+        } = WindowService.VITE_SERVER_CONFIG;
+
+        for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+            try {
+                // Create AbortController for fetch timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => {
+                    controller.abort();
+                }, FETCH_TIMEOUT);
+
+                const response = await fetch(SERVER_URL, {
+                    signal: controller.signal,
+                });
+
+                clearTimeout(timeoutId);
+
+                if (response.ok) {
+                    logger.debug("[WindowService] Vite dev server is ready");
+                    return;
+                }
+            } catch (error) {
+                // Log only significant errors or last attempt
+                if (
+                    attempt === MAX_RETRIES - 1 ||
+                    !(error instanceof Error && error.name === "AbortError")
+                ) {
+                    logger.debug(
+                        `[WindowService] Vite server not ready (attempt ${attempt + 1}/${MAX_RETRIES}): ${error instanceof Error ? error.message : "Unknown error"}`
+                    );
+                }
+            }
+
+            if (attempt < MAX_RETRIES - 1) {
+                // Don't wait after the last attempt
+                // Calculate exponential backoff delay with jitter
+                const exponentialDelay = Math.min(
+                    BASE_DELAY * 2 ** attempt,
+                    MAX_DELAY
+                );
+                // Using crypto for better randomness would be overkill for jitter - Math.random is sufficient
+                // eslint-disable-next-line sonarjs/pseudo-random -- dev only
+                const jitter = Math.random() * 200; // Add up to 200ms jitter
+                const totalDelay = exponentialDelay + jitter;
+
+                logger.debug(
+                    `[WindowService] Waiting ${Math.round(totalDelay)}ms before retry ${attempt + 2}/${MAX_RETRIES}`
+                );
+                await new Promise((resolve) => setTimeout(resolve, totalDelay));
+            }
+        }
+
+        throw new Error(
+            `Vite dev server did not become available after ${MAX_RETRIES} attempts`
+        );
+    }
+
+    /**
      * Create a new WindowService instance.
      *
      * @remarks
@@ -273,84 +430,6 @@ export class WindowService {
     }
 
     /**
-     * Load development content after waiting for Vite server.
-     *
-     * @returns Promise that resolves when content is loaded or rejects on error
-     *
-     * @remarks
-     * Handles the complete development content loading workflow:
-     *
-     * **Process:**
-     * 1. Waits for Vite dev server using exponential backoff retry
-     * 2. Loads content from localhost:5173 when server is ready
-     * 3. Opens DevTools after 1s delay for better UX
-     *
-     * **Error Propagation:**
-     * - Server connection errors are logged and re-thrown
-     * - Content loading errors include URL and timing context
-     * - DevTools opening errors are non-fatal and logged only
-     *
-     * **Timing Considerations:**
-     * - DevTools delay prevents race conditions with renderer setup
-     * - Server wait timeout prevents indefinite hanging
-     * - All timeouts are configurable via constants
-     *
-     * **Recovery Strategy:**
-     * - Method continues even if DevTools fail to open
-     * - Window remains functional if content loads but DevTools fail
-     * - Full error context provided for debugging server issues
-     */
-    private async loadDevelopmentContent(): Promise<void> {
-        try {
-            await this.waitForViteServer();
-
-            if (!this.mainWindow || this.mainWindow.isDestroyed()) {
-                throw new Error(
-                    "Main window was destroyed while waiting for Vite server"
-                );
-            }
-
-            await this.mainWindow.loadURL(
-                WindowService.VITE_SERVER_CONFIG.SERVER_URL
-            );
-
-            // Delay opening DevTools to ensure renderer is ready
-            setTimeout(() => {
-                if (this.mainWindow && !this.mainWindow.isDestroyed()) {
-                    try {
-                        this.mainWindow.webContents.openDevTools();
-                    } catch (error) {
-                        logger.warn("[WindowService] Failed to open DevTools", {
-                            error:
-                                error instanceof Error
-                                    ? error.message
-                                    : String(error),
-                            windowState: this.mainWindow.isDestroyed()
-                                ? "destroyed"
-                                : "active",
-                        });
-                    }
-                }
-            }, 1000);
-        } catch (error) {
-            const errorContext = {
-                environment: getNodeEnv(),
-                error: error instanceof Error ? error.message : String(error),
-                serverUrl: WindowService.VITE_SERVER_CONFIG.SERVER_URL,
-                windowState: this.mainWindow?.isDestroyed()
-                    ? "destroyed"
-                    : "active",
-            };
-
-            logger.error(
-                "[WindowService] Failed to load development content",
-                errorContext
-            );
-            throw error; // Re-throw to allow caller to handle
-        }
-    }
-
-    /**
      * Setup window event handlers.
      *
      * @remarks
@@ -386,84 +465,5 @@ export class WindowService {
             logger.info("[WindowService] Main window closed");
             this.mainWindow = null;
         });
-    }
-
-    /**
-     * Wait for Vite dev server to be ready with exponential backoff.
-     *
-     * @returns Promise that resolves when server is ready
-     * @throws When server doesn't become available within timeout
-     *
-     * @remarks
-     * Uses exponential backoff strategy for efficient server detection:
-     * - First attempt: 500ms delay
-     * - Subsequent attempts: exponentially increasing delay up to 10s max
-     * - Each fetch has 5s timeout to prevent hanging
-     * - Total attempts: up to 20 retries
-     *
-     * This approach provides fast response when server starts quickly while
-     * being patient for slower startup scenarios.
-     */
-    private async waitForViteServer(): Promise<void> {
-        const {
-            BASE_DELAY,
-            FETCH_TIMEOUT,
-            MAX_DELAY,
-            MAX_RETRIES,
-            SERVER_URL,
-        } = WindowService.VITE_SERVER_CONFIG;
-
-        for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-            try {
-                // Create AbortController for fetch timeout
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => {
-                    controller.abort();
-                }, FETCH_TIMEOUT);
-
-                const response = await fetch(SERVER_URL, {
-                    signal: controller.signal,
-                });
-
-                clearTimeout(timeoutId);
-
-                if (response.ok) {
-                    logger.debug("[WindowService] Vite dev server is ready");
-                    return;
-                }
-            } catch (error) {
-                // Log only significant errors or last attempt
-                if (
-                    attempt === MAX_RETRIES - 1 ||
-                    !(error instanceof Error && error.name === "AbortError")
-                ) {
-                    logger.debug(
-                        `[WindowService] Vite server not ready (attempt ${attempt + 1}/${MAX_RETRIES}): ${error instanceof Error ? error.message : "Unknown error"}`
-                    );
-                }
-            }
-
-            if (attempt < MAX_RETRIES - 1) {
-                // Don't wait after the last attempt
-                // Calculate exponential backoff delay with jitter
-                const exponentialDelay = Math.min(
-                    BASE_DELAY * 2 ** attempt,
-                    MAX_DELAY
-                );
-                // Using crypto for better randomness would be overkill for jitter - Math.random is sufficient
-                // eslint-disable-next-line sonarjs/pseudo-random -- dev only
-                const jitter = Math.random() * 200; // Add up to 200ms jitter
-                const totalDelay = exponentialDelay + jitter;
-
-                logger.debug(
-                    `[WindowService] Waiting ${Math.round(totalDelay)}ms before retry ${attempt + 2}/${MAX_RETRIES}`
-                );
-                await new Promise((resolve) => setTimeout(resolve, totalDelay));
-            }
-        }
-
-        throw new Error(
-            `Vite dev server did not become available after ${MAX_RETRIES} attempts`
-        );
     }
 }

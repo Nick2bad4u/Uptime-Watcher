@@ -11,6 +11,32 @@ import { hasScales as hasScalesInternal } from "@shared/types/chartConfig";
 export { hasScales } from "@shared/types/chartConfig";
 
 /**
+ * Safely get scale configuration.
+ *
+ * @param config - Chart configuration
+ * @param axis - Axis name ("x" or "y")
+ * @returns Scale configuration or undefined
+ */
+export function getScaleConfig(
+    config: unknown,
+    axis: "x" | "y"
+): Record<string, unknown> | undefined {
+    if (!hasScalesInternal(config)) {
+        return undefined;
+    }
+
+    const scales = config.scales as Record<string, unknown>;
+    if (axis in scales) {
+        const scale = scales[axis];
+        return typeof scale === "object" && scale !== null
+            ? (scale as Record<string, unknown>)
+            : undefined;
+    }
+
+    return undefined;
+}
+
+/**
  * Safely get nested property from scale configuration.
  *
  * @param config - Chart configuration
@@ -44,32 +70,6 @@ export function getNestedScaleProperty(
     }
 
     return current;
-}
-
-/**
- * Safely get scale configuration.
- *
- * @param config - Chart configuration
- * @param axis - Axis name ("x" or "y")
- * @returns Scale configuration or undefined
- */
-export function getScaleConfig(
-    config: unknown,
-    axis: "x" | "y"
-): Record<string, unknown> | undefined {
-    if (!hasScalesInternal(config)) {
-        return undefined;
-    }
-
-    const scales = config.scales as Record<string, unknown>;
-    if (axis in scales) {
-        const scale = scales[axis];
-        return typeof scale === "object" && scale !== null
-            ? (scale as Record<string, unknown>)
-            : undefined;
-    }
-
-    return undefined;
 }
 
 /**

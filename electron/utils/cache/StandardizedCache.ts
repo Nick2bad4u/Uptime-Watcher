@@ -71,13 +71,8 @@ export interface CacheStats {
  * - Bulk operations
  */
 export class StandardizedCache<T> {
-    /**
-     * Get current cache size.
-     */
-    public get size(): number {
-        return this.cache.size;
-    }
     private readonly cache = new Map<string, CacheEntry<T>>();
+
     private readonly config: {
         defaultTTL: number;
         enableStats: boolean;
@@ -85,6 +80,7 @@ export class StandardizedCache<T> {
         maxSize: number;
         name: string;
     };
+
     private readonly invalidationCallbacks = new Set<(key?: string) => void>();
 
     private readonly stats: CacheStats = {
@@ -93,6 +89,13 @@ export class StandardizedCache<T> {
         misses: 0,
         size: 0,
     };
+
+    /**
+     * Get current cache size.
+     */
+    public get size(): number {
+        return this.cache.size;
+    }
 
     public constructor(config: CacheConfig) {
         this.config = {

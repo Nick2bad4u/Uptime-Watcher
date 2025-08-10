@@ -100,11 +100,96 @@ export interface StatusUpdateHandlerOptions {
  */
 export class StatusUpdateManager {
     private cleanupFunctions: Array<() => void> = [];
+
     private readonly fullSyncFromBackend: () => Promise<void>;
+
     private readonly getSites: () => Site[];
+
     private isListenerAttached = false;
+
     private readonly onUpdate: ((update: StatusUpdate) => void) | undefined;
+
     private readonly setSites: (sites: Site[]) => void;
+
+    /**
+     * Handle incremental status updates efficiently without full sync.
+     *
+     * @param event - Monitor status changed event data
+     *
+     * @remarks
+     * Applies status changes directly to existing site/monitor data in the store.
+     * This is much more efficient than triggering a full sync for every status change.
+     * Falls back to full sync only if the site/monitor cannot be found.
+     *
+     * @internal
+     */
+    private async handleIncrementalStatusUpdate(
+        event: MonitorStatusChangedEvent
+    ): Promise<void> {
+        try {
+            const currentSites = this.getSites();
+            const site = this.findSiteInStore(currentSites, event.siteId);
+
+            if (!site) {
+                if (isDevelopment()) {
+                    logger.debug(
+                        `Site ${event.siteId} not found in store, triggering full sync`
+                    );
+                }
+                await this.fullSyncFromBackend();
+                return;
+            }
+
+            const monitor = this.findMonitorInSite(site, event.monitorId);
+
+            if (!monitor) {
+                if (isDevelopment()) {
+                    logger.debug(
+                        `Monitor ${event.monitorId} not found in site ${event.siteId}, triggering full sync`
+                    );
+                }
+                await this.fullSyncFromBackend();
+                return;
+            }
+
+            const updatedSites = this.applyMonitorStatusUpdate(
+                currentSites,
+                site,
+                monitor,
+                event
+            );
+            this.setSites(updatedSites);
+
+            // Call optional update callback
+            if (this.onUpdate) {
+                const updatedSite = updatedSites.find(
+                    (s) => s.identifier === event.siteId
+                );
+                if (updatedSite) {
+                    this.onUpdate({
+                        monitorId: event.monitorId,
+                        previousStatus: event.previousStatus,
+                        site: updatedSite,
+                        siteIdentifier: event.siteId,
+                        status: event.newStatus,
+                        timestamp: new Date().toISOString(),
+                    });
+                }
+            }
+
+            if (isDevelopment()) {
+                logger.debug(
+                    `Applied incremental status update: site=${event.siteId}, monitor=${event.monitorId}, ${event.previousStatus} → ${event.newStatus}`
+                );
+            }
+        } catch (error) {
+            logger.error(
+                "Failed to apply incremental status update, falling back to full sync",
+                ensureError(error)
+            );
+            await this.fullSyncFromBackend();
+        }
+    }
 
     /**
      * Constructs a new StatusUpdateManager instance.
@@ -307,86 +392,6 @@ export class StatusUpdateManager {
      */
     private findSiteInStore(sites: Site[], siteId: string): Site | undefined {
         return sites.find((site) => site.identifier === siteId);
-    }
-
-    /**
-     * Handle incremental status updates efficiently without full sync.
-     *
-     * @param event - Monitor status changed event data
-     *
-     * @remarks
-     * Applies status changes directly to existing site/monitor data in the store.
-     * This is much more efficient than triggering a full sync for every status change.
-     * Falls back to full sync only if the site/monitor cannot be found.
-     *
-     * @internal
-     */
-    private async handleIncrementalStatusUpdate(
-        event: MonitorStatusChangedEvent
-    ): Promise<void> {
-        try {
-            const currentSites = this.getSites();
-            const site = this.findSiteInStore(currentSites, event.siteId);
-
-            if (!site) {
-                if (isDevelopment()) {
-                    logger.debug(
-                        `Site ${event.siteId} not found in store, triggering full sync`
-                    );
-                }
-                await this.fullSyncFromBackend();
-                return;
-            }
-
-            const monitor = this.findMonitorInSite(site, event.monitorId);
-
-            if (!monitor) {
-                if (isDevelopment()) {
-                    logger.debug(
-                        `Monitor ${event.monitorId} not found in site ${event.siteId}, triggering full sync`
-                    );
-                }
-                await this.fullSyncFromBackend();
-                return;
-            }
-
-            const updatedSites = this.applyMonitorStatusUpdate(
-                currentSites,
-                site,
-                monitor,
-                event
-            );
-            this.setSites(updatedSites);
-
-            // Call optional update callback
-            if (this.onUpdate) {
-                const updatedSite = updatedSites.find(
-                    (s) => s.identifier === event.siteId
-                );
-                if (updatedSite) {
-                    this.onUpdate({
-                        monitorId: event.monitorId,
-                        previousStatus: event.previousStatus,
-                        site: updatedSite,
-                        siteIdentifier: event.siteId,
-                        status: event.newStatus,
-                        timestamp: new Date().toISOString(),
-                    });
-                }
-            }
-
-            if (isDevelopment()) {
-                logger.debug(
-                    `Applied incremental status update: site=${event.siteId}, monitor=${event.monitorId}, ${event.previousStatus} → ${event.newStatus}`
-                );
-            }
-        } catch (error) {
-            logger.error(
-                "Failed to apply incremental status update, falling back to full sync",
-                ensureError(error)
-            );
-            await this.fullSyncFromBackend();
-        }
     }
 
     /**

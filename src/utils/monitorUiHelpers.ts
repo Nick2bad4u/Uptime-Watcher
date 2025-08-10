@@ -63,6 +63,44 @@ export function getDefaultMonitorId(monitorIds: string[]): string {
 }
 
 /**
+ * Check if monitor type supports advanced analytics.
+ *
+ * @param monitorType - Type of monitor
+ * @returns Whether monitor supports advanced analytics
+ */
+export async function supportsAdvancedAnalytics(
+    monitorType: MonitorType
+): Promise<boolean> {
+    return withUtilityErrorHandling(
+        async () => {
+            const config = await getConfig(monitorType);
+            return config?.uiConfig?.supportsAdvancedAnalytics ?? false;
+        },
+        `Check advanced analytics support for ${monitorType}`,
+        false
+    );
+}
+
+/**
+ * Check if monitor type supports response time analytics.
+ *
+ * @param monitorType - Type of monitor
+ * @returns Whether monitor supports response time analytics
+ */
+export async function supportsResponseTime(
+    monitorType: MonitorType
+): Promise<boolean> {
+    return withUtilityErrorHandling(
+        async () => {
+            const config = await getConfig(monitorType);
+            return config?.uiConfig?.supportsResponseTime ?? false;
+        },
+        `Check response time support for ${monitorType}`,
+        false
+    );
+}
+
+/**
  * Check if all monitor types in array support advanced analytics.
  * Useful for conditional rendering of advanced analytics components.
  *
@@ -256,46 +294,3 @@ export async function shouldShowUrl(
         false
     );
 }
-
-/**
- * Check if monitor type supports advanced analytics.
- *
- * @param monitorType - Type of monitor
- * @returns Whether monitor supports advanced analytics
- */
-export async function supportsAdvancedAnalytics(
-    monitorType: MonitorType
-): Promise<boolean> {
-    return withUtilityErrorHandling(
-        async () => {
-            const config = await getConfig(monitorType);
-            return config?.uiConfig?.supportsAdvancedAnalytics ?? false;
-        },
-        `Check advanced analytics support for ${monitorType}`,
-        false
-    );
-}
-
-/**
- * Check if monitor type supports response time analytics.
- *
- * @param monitorType - Type of monitor
- * @returns Whether monitor supports response time analytics
- */
-export async function supportsResponseTime(
-    monitorType: MonitorType
-): Promise<boolean> {
-    return withUtilityErrorHandling(
-        async () => {
-            const config = await getConfig(monitorType);
-            return config?.uiConfig?.supportsResponseTime ?? false;
-        },
-        `Check response time support for ${monitorType}`,
-        false
-    );
-}
-
-/**
- * Validate that electronAPI is available and properly configured.
- * Prevents runtime errors when preload context is missing.
- */

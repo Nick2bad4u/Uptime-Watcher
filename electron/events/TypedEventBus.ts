@@ -141,66 +141,10 @@ export class TypedEventBus<
     // eslint-disable-next-line unicorn/prefer-event-target -- Required for Node.js EventEmitter compatibility
 > extends EventEmitter {
     private readonly busId: string;
+
     private readonly maxMiddleware: number;
+
     private readonly middlewares: EventMiddleware[] = [];
-
-    /**
-     * Create a new typed event bus.
-     *
-     * @remarks
-     * If no name is provided, a unique correlation ID will be generated.
-     * The bus is configured with a reasonable max listener limit for development use.
-     * A maximum middleware limit prevents memory leaks from excessive middleware registration.
-     *
-     * @example
-     * ```typescript
-     * // Default configuration
-     * const bus = new TypedEventBus<MyEvents>('my-bus');
-     *
-     * // Custom middleware limit
-     * const bus = new TypedEventBus<MyEvents>('my-bus', { maxMiddleware: 30 });
-     * ```
-     *
-     * @param name - Optional name for the bus (used in logging and diagnostics).
-     * @param options - Optional configuration options.
-     * @throws Error when `maxMiddleware` is not positive.
-     */
-    public constructor(name?: string, options?: { maxMiddleware?: number }) {
-        super();
-        this.busId = name ?? generateCorrelationId();
-
-        const maxMiddleware = options?.maxMiddleware ?? 20;
-        if (maxMiddleware <= 0) {
-            throw new Error(
-                `maxMiddleware must be positive, got ${maxMiddleware}`
-            );
-        }
-        this.maxMiddleware = maxMiddleware;
-
-        // Set max listeners to prevent warnings in development
-        this.setMaxListeners(50);
-
-        logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_CREATED, {
-            busId: this.busId,
-            maxMiddleware: this.maxMiddleware,
-        });
-    }
-
-    /**
-     * Clear all registered middleware.
-     *
-     * @remarks
-     * Removes all middleware functions from the processing chain.
-     * Events will be emitted directly without middleware processing.
-     */
-    public clearMiddleware(): void {
-        const count = this.middlewares.length;
-        this.middlewares.length = 0;
-        logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_CLEARED, {
-            busId: this.busId,
-            count,
-        });
-    }
 
     /**
      * Emit a typed event through the middleware chain.
@@ -284,6 +228,110 @@ export class TypedEventBus<
             });
             throw error;
         }
+    }
+
+    /**
+     * Process event through middleware chain.
+     *
+     * @remarks
+     * Executes middleware in registration order. If any middleware throws an error,
+     * the chain is aborted and the error is propagated to the caller.
+     *
+     * @param eventName - Name of the event being processed.
+     * @param data - Event data payload.
+     * @param correlationId - Unique ID for tracking this event emission.
+     * @returns A promise that resolves when all middleware have completed.
+     * @throws Error if any middleware in the chain throws.
+     */
+    private async processMiddleware(
+        eventName: string,
+        data: unknown,
+        correlationId: string
+    ): Promise<void> {
+        if (this.middlewares.length === 0) {
+            return;
+        }
+
+        const processNext = async (currentIndex: number): Promise<void> => {
+            if (currentIndex < this.middlewares.length) {
+                const middleware = this.middlewares[currentIndex];
+
+                if (middleware) {
+                    try {
+                        await middleware(eventName, data, () =>
+                            processNext(currentIndex + 1)
+                        );
+                    } catch (error) {
+                        // Use base logger directly for error objects since template logger doesn't support error objects
+                        baseLogger.error(
+                            `[TypedEventBus:${this.busId}] Middleware error for '${eventName}' [${correlationId}]`,
+                            error
+                        );
+                        throw error;
+                    }
+                }
+            }
+        };
+
+        await processNext(0);
+    }
+
+    /**
+     * Create a new typed event bus.
+     *
+     * @remarks
+     * If no name is provided, a unique correlation ID will be generated.
+     * The bus is configured with a reasonable max listener limit for development use.
+     * A maximum middleware limit prevents memory leaks from excessive middleware registration.
+     *
+     * @example
+     * ```typescript
+     * // Default configuration
+     * const bus = new TypedEventBus<MyEvents>('my-bus');
+     *
+     * // Custom middleware limit
+     * const bus = new TypedEventBus<MyEvents>('my-bus', { maxMiddleware: 30 });
+     * ```
+     *
+     * @param name - Optional name for the bus (used in logging and diagnostics).
+     * @param options - Optional configuration options.
+     * @throws Error when `maxMiddleware` is not positive.
+     */
+    public constructor(name?: string, options?: { maxMiddleware?: number }) {
+        super();
+        this.busId = name ?? generateCorrelationId();
+
+        const maxMiddleware = options?.maxMiddleware ?? 20;
+        if (maxMiddleware <= 0) {
+            throw new Error(
+                `maxMiddleware must be positive, got ${maxMiddleware}`
+            );
+        }
+        this.maxMiddleware = maxMiddleware;
+
+        // Set max listeners to prevent warnings in development
+        this.setMaxListeners(50);
+
+        logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_CREATED, {
+            busId: this.busId,
+            maxMiddleware: this.maxMiddleware,
+        });
+    }
+
+    /**
+     * Clear all registered middleware.
+     *
+     * @remarks
+     * Removes all middleware functions from the processing chain.
+     * Events will be emitted directly without middleware processing.
+     */
+    public clearMiddleware(): void {
+        const count = this.middlewares.length;
+        this.middlewares.length = 0;
+        logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_CLEARED, {
+            busId: this.busId,
+            count,
+        });
     }
 
     /**
@@ -543,52 +591,6 @@ export class TypedEventBus<
             ...data,
             _meta: metadata,
         };
-    }
-
-    /**
-     * Process event through middleware chain.
-     *
-     * @remarks
-     * Executes middleware in registration order. If any middleware throws an error,
-     * the chain is aborted and the error is propagated to the caller.
-     *
-     * @param eventName - Name of the event being processed.
-     * @param data - Event data payload.
-     * @param correlationId - Unique ID for tracking this event emission.
-     * @returns A promise that resolves when all middleware have completed.
-     * @throws Error if any middleware in the chain throws.
-     */
-    private async processMiddleware(
-        eventName: string,
-        data: unknown,
-        correlationId: string
-    ): Promise<void> {
-        if (this.middlewares.length === 0) {
-            return;
-        }
-
-        const processNext = async (currentIndex: number): Promise<void> => {
-            if (currentIndex < this.middlewares.length) {
-                const middleware = this.middlewares[currentIndex];
-
-                if (middleware) {
-                    try {
-                        await middleware(eventName, data, () =>
-                            processNext(currentIndex + 1)
-                        );
-                    } catch (error) {
-                        // Use base logger directly for error objects since template logger doesn't support error objects
-                        baseLogger.error(
-                            `[TypedEventBus:${this.busId}] Middleware error for '${eventName}' [${correlationId}]`,
-                            error
-                        );
-                        throw error;
-                    }
-                }
-            }
-        };
-
-        await processNext(0);
     }
 }
 

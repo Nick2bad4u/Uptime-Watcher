@@ -151,53 +151,6 @@ export class MonitorManager {
     private readonly monitorScheduler: MonitorScheduler;
 
     /**
-     * Constructs a new {@link MonitorManager} instance with enhanced monitoring capabilities.
-     *
-     * @remarks
-     * All dependencies are injected to support testability and separation of concerns.
-     * The enhanced monitoring services are required and provide race condition prevention,
-     * operation correlation, and advanced timeout management for all monitoring operations.
-     *
-     * **Architecture Integration:**
-     * - Enhanced services are always provided by the ServiceContainer
-     * - No fallback to legacy monitoring systems
-     * - All monitoring operations use the unified enhanced system
-     * - Operation correlation prevents race conditions across concurrent operations
-     *
-     * @param dependencies - The required {@link MonitorManagerDependencies} for orchestration and data access
-     * @param enhancedServices - The required {@link EnhancedMonitoringServices} for advanced monitoring capabilities
-     *
-     * @example Basic Construction
-     * ```typescript
-     * const manager = new MonitorManager(dependencies, enhancedServices);
-     * ```
-     *
-     * @example Via ServiceContainer (Recommended)
-     * ```typescript
-     * const container = ServiceContainer.getInstance();
-     * const manager = container.getMonitorManager();
-     * // Enhanced services are automatically provided
-     * ```
-     *
-     * @see {@link EnhancedMonitoringServices} for enhanced monitoring capabilities
-     * @see {@link ServiceContainer} for dependency injection and service creation
-     *
-     * @public
-     */
-    public constructor(
-        dependencies: MonitorManagerDependencies,
-        enhancedServices: EnhancedMonitoringServices
-    ) {
-        this.dependencies = dependencies;
-        this.eventEmitter = dependencies.eventEmitter;
-        this.enhancedMonitoringServices = enhancedServices;
-        this.monitorScheduler = new MonitorScheduler();
-        this.monitorScheduler.setCheckCallback(
-            this.handleScheduledCheck.bind(this)
-        );
-    }
-
-    /**
      * Manually checks a site or monitor and returns the resulting status update.
      *
      * @remarks
@@ -266,80 +219,6 @@ export class MonitorManager {
         }
 
         return undefined;
-    }
-
-    /**
-     * Gets the count of active monitors currently being scheduled.
-     *
-     * @remarks
-     * Returns the number of monitors that are currently scheduled for periodic checks.
-     *
-     * @returns The number of active monitors in the scheduler.
-     * @example
-     * ```ts
-     * const count = manager.getActiveMonitorCount();
-     * ```
-     * @public
-     */
-    public getActiveMonitorCount(): number {
-        return this.monitorScheduler.getActiveCount();
-    }
-
-    /**
-     * Checks if a specific monitor is actively being scheduled for checks.
-     *
-     * @remarks
-     * Returns whether the given monitor is currently scheduled for periodic checks by the scheduler.
-     *
-     * @param siteIdentifier - The identifier of the site.
-     * @param monitorId - The monitor ID to check.
-     * @returns `true` if the monitor is active in the scheduler, `false` otherwise.
-     * @example
-     * ```ts
-     * const isActive = manager.isMonitorActiveInScheduler("site-123", "monitor-456");
-     * ```
-     * @public
-     */
-    public isMonitorActiveInScheduler(
-        siteIdentifier: string,
-        monitorId: string
-    ): boolean {
-        return this.monitorScheduler.isMonitoring(siteIdentifier, monitorId);
-    }
-
-    /**
-     * Indicates whether monitoring is currently active for any site or monitor.
-     *
-     * @remarks
-     * Returns the global monitoring state.
-     *
-     * @returns `true` if monitoring is active, `false` otherwise.
-     * @public
-     */
-    public isMonitoringActive(): boolean {
-        return this.isMonitoring;
-    }
-
-    /**
-     * Restarts monitoring for a specific monitor with updated configuration.
-     *
-     * @remarks
-     * Useful when monitor intervals or settings change and need immediate application. Delegates to the {@link MonitorScheduler} for actual restart logic.
-     *
-     * @param siteIdentifier - The identifier of the site containing the monitor.
-     * @param monitor - The monitor object with updated configuration.
-     * @returns `true` if the monitor was successfully restarted, `false` otherwise.
-     * @example
-     * ```ts
-     * const success = manager.restartMonitorWithNewConfig("site-123", monitorObj);
-     * ```
-     * @public
-     */
-    public restartMonitorWithNewConfig(
-        siteIdentifier: string,
-        monitor: Site["monitors"][0]
-    ): boolean {
-        return this.monitorScheduler.restartMonitor(siteIdentifier, monitor);
     }
 
     /**
@@ -918,6 +797,127 @@ export class MonitorManager {
                 )
             );
         }
+    }
+
+    /**
+     * Constructs a new {@link MonitorManager} instance with enhanced monitoring capabilities.
+     *
+     * @remarks
+     * All dependencies are injected to support testability and separation of concerns.
+     * The enhanced monitoring services are required and provide race condition prevention,
+     * operation correlation, and advanced timeout management for all monitoring operations.
+     *
+     * **Architecture Integration:**
+     * - Enhanced services are always provided by the ServiceContainer
+     * - No fallback to legacy monitoring systems
+     * - All monitoring operations use the unified enhanced system
+     * - Operation correlation prevents race conditions across concurrent operations
+     *
+     * @param dependencies - The required {@link MonitorManagerDependencies} for orchestration and data access
+     * @param enhancedServices - The required {@link EnhancedMonitoringServices} for advanced monitoring capabilities
+     *
+     * @example Basic Construction
+     * ```typescript
+     * const manager = new MonitorManager(dependencies, enhancedServices);
+     * ```
+     *
+     * @example Via ServiceContainer (Recommended)
+     * ```typescript
+     * const container = ServiceContainer.getInstance();
+     * const manager = container.getMonitorManager();
+     * // Enhanced services are automatically provided
+     * ```
+     *
+     * @see {@link EnhancedMonitoringServices} for enhanced monitoring capabilities
+     * @see {@link ServiceContainer} for dependency injection and service creation
+     *
+     * @public
+     */
+    public constructor(
+        dependencies: MonitorManagerDependencies,
+        enhancedServices: EnhancedMonitoringServices
+    ) {
+        this.dependencies = dependencies;
+        this.eventEmitter = dependencies.eventEmitter;
+        this.enhancedMonitoringServices = enhancedServices;
+        this.monitorScheduler = new MonitorScheduler();
+        this.monitorScheduler.setCheckCallback(
+            this.handleScheduledCheck.bind(this)
+        );
+    }
+
+    /**
+     * Gets the count of active monitors currently being scheduled.
+     *
+     * @remarks
+     * Returns the number of monitors that are currently scheduled for periodic checks.
+     *
+     * @returns The number of active monitors in the scheduler.
+     * @example
+     * ```ts
+     * const count = manager.getActiveMonitorCount();
+     * ```
+     * @public
+     */
+    public getActiveMonitorCount(): number {
+        return this.monitorScheduler.getActiveCount();
+    }
+
+    /**
+     * Checks if a specific monitor is actively being scheduled for checks.
+     *
+     * @remarks
+     * Returns whether the given monitor is currently scheduled for periodic checks by the scheduler.
+     *
+     * @param siteIdentifier - The identifier of the site.
+     * @param monitorId - The monitor ID to check.
+     * @returns `true` if the monitor is active in the scheduler, `false` otherwise.
+     * @example
+     * ```ts
+     * const isActive = manager.isMonitorActiveInScheduler("site-123", "monitor-456");
+     * ```
+     * @public
+     */
+    public isMonitorActiveInScheduler(
+        siteIdentifier: string,
+        monitorId: string
+    ): boolean {
+        return this.monitorScheduler.isMonitoring(siteIdentifier, monitorId);
+    }
+
+    /**
+     * Indicates whether monitoring is currently active for any site or monitor.
+     *
+     * @remarks
+     * Returns the global monitoring state.
+     *
+     * @returns `true` if monitoring is active, `false` otherwise.
+     * @public
+     */
+    public isMonitoringActive(): boolean {
+        return this.isMonitoring;
+    }
+
+    /**
+     * Restarts monitoring for a specific monitor with updated configuration.
+     *
+     * @remarks
+     * Useful when monitor intervals or settings change and need immediate application. Delegates to the {@link MonitorScheduler} for actual restart logic.
+     *
+     * @param siteIdentifier - The identifier of the site containing the monitor.
+     * @param monitor - The monitor object with updated configuration.
+     * @returns `true` if the monitor was successfully restarted, `false` otherwise.
+     * @example
+     * ```ts
+     * const success = manager.restartMonitorWithNewConfig("site-123", monitorObj);
+     * ```
+     * @public
+     */
+    public restartMonitorWithNewConfig(
+        siteIdentifier: string,
+        monitor: Site["monitors"][0]
+    ): boolean {
+        return this.monitorScheduler.restartMonitor(siteIdentifier, monitor);
     }
 
     /**

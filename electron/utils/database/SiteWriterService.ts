@@ -53,19 +53,13 @@ const SITE_WRITER_QUERIES = {
 
 export class SiteWriterService {
     private readonly databaseService: DatabaseService;
+
     private readonly logger: Logger;
+
     private readonly repositories: {
         monitor: MonitorRepository;
         site: SiteRepository;
     };
-
-    public constructor(
-        config: SiteWritingConfig & { databaseService: DatabaseService }
-    ) {
-        this.repositories = config.repositories;
-        this.logger = config.logger;
-        this.databaseService = config.databaseService;
-    }
 
     /**
      * Create a new site in the database with its monitors.
@@ -231,53 +225,6 @@ export class SiteWriterService {
     }
 
     /**
-     * Detect new monitors that were added to an existing site.
-     *
-     * @param originalMonitors - The original monitors before update
-     * @param updatedMonitors - The updated monitors after update
-     * @returns Array of new monitor IDs (may include empty strings for monitors without IDs)
-     *
-     * @remarks
-     * This method handles two scenarios:
-     * 1. **Monitors with IDs**: Compares IDs to detect new ones
-     * 2. **Monitors without IDs**: Detects new monitors by comparing monitor objects
-     *    since IDs are assigned during database creation
-     *
-     * Monitors without IDs are returned with empty string placeholders to indicate
-     * they need special handling during monitor setup operations.
-     */
-    public detectNewMonitors(
-        originalMonitors: Site["monitors"],
-        updatedMonitors: Site["monitors"]
-    ): string[] {
-        const originalIds = new Set(
-            originalMonitors.map((m) => m.id).filter(Boolean)
-        );
-        const newMonitorIds: string[] = [];
-
-        // Create a comparison set of original monitors for detecting new monitors without IDs
-        const originalMonitorSignatures = new Set(
-            originalMonitors.map((m) => this.createMonitorSignature(m))
-        );
-
-        for (const monitor of updatedMonitors) {
-            if (monitor.id && !originalIds.has(monitor.id)) {
-                // Monitor has ID and is not in original set
-                newMonitorIds.push(monitor.id);
-            } else if (!monitor.id) {
-                // Monitor without ID - check if it's genuinely new by comparing signature
-                const monitorSignature = this.createMonitorSignature(monitor);
-                if (!originalMonitorSignatures.has(monitorSignature)) {
-                    // New monitor without ID - use empty string as placeholder
-                    newMonitorIds.push("");
-                }
-            }
-        }
-
-        return newMonitorIds;
-    }
-
-    /**
      * Handle monitoring state changes when monitor intervals are modified.
      * Side effect operation separated from data updates.
      */
@@ -417,6 +364,61 @@ export class SiteWriterService {
             undefined,
             { identifier }
         );
+    }
+
+    public constructor(
+        config: SiteWritingConfig & { databaseService: DatabaseService }
+    ) {
+        this.repositories = config.repositories;
+        this.logger = config.logger;
+        this.databaseService = config.databaseService;
+    }
+
+    /**
+     * Detect new monitors that were added to an existing site.
+     *
+     * @param originalMonitors - The original monitors before update
+     * @param updatedMonitors - The updated monitors after update
+     * @returns Array of new monitor IDs (may include empty strings for monitors without IDs)
+     *
+     * @remarks
+     * This method handles two scenarios:
+     * 1. **Monitors with IDs**: Compares IDs to detect new ones
+     * 2. **Monitors without IDs**: Detects new monitors by comparing monitor objects
+     *    since IDs are assigned during database creation
+     *
+     * Monitors without IDs are returned with empty string placeholders to indicate
+     * they need special handling during monitor setup operations.
+     */
+    public detectNewMonitors(
+        originalMonitors: Site["monitors"],
+        updatedMonitors: Site["monitors"]
+    ): string[] {
+        const originalIds = new Set(
+            originalMonitors.map((m) => m.id).filter(Boolean)
+        );
+        const newMonitorIds: string[] = [];
+
+        // Create a comparison set of original monitors for detecting new monitors without IDs
+        const originalMonitorSignatures = new Set(
+            originalMonitors.map((m) => this.createMonitorSignature(m))
+        );
+
+        for (const monitor of updatedMonitors) {
+            if (monitor.id && !originalIds.has(monitor.id)) {
+                // Monitor has ID and is not in original set
+                newMonitorIds.push(monitor.id);
+            } else if (!monitor.id) {
+                // Monitor without ID - check if it's genuinely new by comparing signature
+                const monitorSignature = this.createMonitorSignature(monitor);
+                if (!originalMonitorSignatures.has(monitorSignature)) {
+                    // New monitor without ID - use empty string as placeholder
+                    newMonitorIds.push("");
+                }
+            }
+        }
+
+        return newMonitorIds;
     }
 
     /**

@@ -87,19 +87,6 @@ export class MonitorRepository {
     private readonly databaseService: DatabaseService;
 
     /**
-     * Constructs a new MonitorRepository instance.
-     *
-     * @param dependencies - The required dependencies for monitor operations.
-     * @example
-     * ```typescript
-     * const repo = new MonitorRepository({ databaseService });
-     * ```
-     */
-    public constructor(dependencies: MonitorRepositoryDependencies) {
-        this.databaseService = dependencies.databaseService;
-    }
-
-    /**
      * Bulk creates monitors for a site.
      *
      * @param siteIdentifier - The site identifier to associate monitors with.
@@ -184,28 +171,6 @@ export class MonitorRepository {
     }
 
     /**
-     * Internal method to clear all active operations for a monitor.
-     * Must be called within an active transaction.
-     *
-     * @param db - Database connection within active transaction
-     * @param monitorId - The ID of the monitor to clear operations for
-     * @public
-     */
-    public clearActiveOperationsInternal(
-        db: Database,
-        monitorId: string
-    ): void {
-        // Clear all active operations (internal call to avoid nested transaction)
-        this.updateInternal(db, monitorId, { activeOperations: [] });
-
-        if (isDev()) {
-            logger.debug(
-                `[MonitorRepository] Cleared all active operations for monitor ${monitorId}`
-            );
-        }
-    }
-
-    /**
      * Creates a new monitor for a site.
      *
      * @param siteIdentifier - The site identifier to associate the monitor with.
@@ -235,54 +200,6 @@ export class MonitorRepository {
             undefined,
             { siteIdentifier, type: monitor.type }
         );
-    }
-
-    /**
-     * Internal method to create a monitor within an existing transaction.
-     *
-     * @param db - Database connection (must be within active transaction).
-     * @param siteIdentifier - Site identifier to associate monitor with.
-     * @param monitor - Monitor configuration data (without ID).
-     * @returns Generated monitor ID as string.
-     * @throws Error when monitor creation fails or returns invalid ID.
-     * @remarks
-     * Must be called within an active transaction context.
-     */
-    public createInternal(
-        db: Database,
-        siteIdentifier: string,
-        monitor: Omit<Site["monitors"][0], "id">
-    ): string {
-        // Generate dynamic SQL and parameters
-        const { columns, placeholders } = generateSqlParameters();
-        // Type assertion is safe: buildMonitorParameters doesn't use the id field for INSERT operations
-        const parameters = buildMonitorParameters(
-            siteIdentifier,
-            monitor as Site["monitors"][0]
-        );
-
-        const insertSql = `INSERT INTO monitors (${columns.join(", ")}) VALUES (${placeholders}) RETURNING id`;
-
-        const insertResult = insertWithReturning(db, insertSql, parameters);
-
-        // Validate the returned ID from database
-        if (
-            !("id" in insertResult) ||
-            typeof insertResult["id"] !== "number" ||
-            insertResult["id"] <= 0
-        ) {
-            throw new Error(
-                `Failed to create monitor for site ${siteIdentifier}: invalid or missing ID in database response`
-            );
-        }
-
-        if (isDev()) {
-            logger.debug(
-                `[MonitorRepository] Created monitor with id: ${insertResult["id"]} for site: ${siteIdentifier} (internal)`
-            );
-        }
-
-        return String(insertResult["id"]);
     }
 
     /**
@@ -347,19 +264,6 @@ export class MonitorRepository {
     }
 
     /**
-     * Internal method to clear all monitors from the database within an existing transaction.
-     *
-     * @param db - Database connection (must be within active transaction).
-     * @returns void
-     * @remarks
-     * Use this method when already within a transaction context.
-     */
-    public deleteAllInternal(db: Database): void {
-        db.run(MONITOR_QUERIES.DELETE_ALL);
-        logger.debug("[MonitorRepository] Cleared all monitors (internal)");
-    }
-
-    /**
      * Deletes all monitors for a specific site.
      *
      * @param siteIdentifier - The site identifier to delete monitors for.
@@ -390,53 +294,6 @@ export class MonitorRepository {
             undefined,
             { siteIdentifier }
         );
-    }
-
-    /**
-     * Internal method to delete all monitors for a specific site within an existing transaction.
-     *
-     * @param db - Database connection (must be within active transaction).
-     * @param siteIdentifier - The site identifier to delete monitors for.
-     * @returns void
-     * @remarks
-     * Deletes all history for monitors before deleting monitors.
-     */
-    public deleteBySiteIdentifierInternal(
-        db: Database,
-        siteIdentifier: string
-    ): void {
-        // Get all monitor IDs for this site
-        const monitorRows = queryForIds(
-            db,
-            MONITOR_QUERIES.SELECT_IDS_BY_SITE,
-            [siteIdentifier]
-        );
-
-        // Delete history for all monitors
-        for (const row of monitorRows) {
-            db.run(MONITOR_QUERIES.DELETE_HISTORY_BY_MONITOR, [row.id]);
-        }
-
-        // Delete all monitors for this site
-        db.run(MONITOR_QUERIES.DELETE_BY_SITE, [siteIdentifier]);
-    }
-
-    /**
-     * Internal method to delete a monitor and its history within an existing transaction.
-     *
-     * @param db - Database connection (must be within active transaction).
-     * @param monitorId - The monitor ID to delete.
-     * @returns True if deleted, false otherwise.
-     * @remarks
-     * Deletes history before deleting monitor.
-     */
-    public deleteInternal(db: Database, monitorId: string): boolean {
-        // Delete history first (foreign key constraint)
-        db.run(MONITOR_QUERIES.DELETE_HISTORY_BY_MONITOR, [monitorId]);
-
-        // Delete the monitor
-        const deleteResult = db.run(MONITOR_QUERIES.DELETE_BY_ID, [monitorId]);
-        return deleteResult.changes > 0;
     }
 
     /**
@@ -549,6 +406,149 @@ export class MonitorRepository {
             undefined,
             { monitorId }
         );
+    }
+
+    /**
+     * Constructs a new MonitorRepository instance.
+     *
+     * @param dependencies - The required dependencies for monitor operations.
+     * @example
+     * ```typescript
+     * const repo = new MonitorRepository({ databaseService });
+     * ```
+     */
+    public constructor(dependencies: MonitorRepositoryDependencies) {
+        this.databaseService = dependencies.databaseService;
+    }
+
+    /**
+     * Internal method to clear all active operations for a monitor.
+     * Must be called within an active transaction.
+     *
+     * @param db - Database connection within active transaction
+     * @param monitorId - The ID of the monitor to clear operations for
+     * @public
+     */
+    public clearActiveOperationsInternal(
+        db: Database,
+        monitorId: string
+    ): void {
+        // Clear all active operations (internal call to avoid nested transaction)
+        this.updateInternal(db, monitorId, { activeOperations: [] });
+
+        if (isDev()) {
+            logger.debug(
+                `[MonitorRepository] Cleared all active operations for monitor ${monitorId}`
+            );
+        }
+    }
+
+    /**
+     * Internal method to create a monitor within an existing transaction.
+     *
+     * @param db - Database connection (must be within active transaction).
+     * @param siteIdentifier - Site identifier to associate monitor with.
+     * @param monitor - Monitor configuration data (without ID).
+     * @returns Generated monitor ID as string.
+     * @throws Error when monitor creation fails or returns invalid ID.
+     * @remarks
+     * Must be called within an active transaction context.
+     */
+    public createInternal(
+        db: Database,
+        siteIdentifier: string,
+        monitor: Omit<Site["monitors"][0], "id">
+    ): string {
+        // Generate dynamic SQL and parameters
+        const { columns, placeholders } = generateSqlParameters();
+        // Type assertion is safe: buildMonitorParameters doesn't use the id field for INSERT operations
+        const parameters = buildMonitorParameters(
+            siteIdentifier,
+            monitor as Site["monitors"][0]
+        );
+
+        const insertSql = `INSERT INTO monitors (${columns.join(", ")}) VALUES (${placeholders}) RETURNING id`;
+
+        const insertResult = insertWithReturning(db, insertSql, parameters);
+
+        // Validate the returned ID from database
+        if (
+            !("id" in insertResult) ||
+            typeof insertResult["id"] !== "number" ||
+            insertResult["id"] <= 0
+        ) {
+            throw new Error(
+                `Failed to create monitor for site ${siteIdentifier}: invalid or missing ID in database response`
+            );
+        }
+
+        if (isDev()) {
+            logger.debug(
+                `[MonitorRepository] Created monitor with id: ${insertResult["id"]} for site: ${siteIdentifier} (internal)`
+            );
+        }
+
+        return String(insertResult["id"]);
+    }
+
+    /**
+     * Internal method to clear all monitors from the database within an existing transaction.
+     *
+     * @param db - Database connection (must be within active transaction).
+     * @returns void
+     * @remarks
+     * Use this method when already within a transaction context.
+     */
+    public deleteAllInternal(db: Database): void {
+        db.run(MONITOR_QUERIES.DELETE_ALL);
+        logger.debug("[MonitorRepository] Cleared all monitors (internal)");
+    }
+
+    /**
+     * Internal method to delete all monitors for a specific site within an existing transaction.
+     *
+     * @param db - Database connection (must be within active transaction).
+     * @param siteIdentifier - The site identifier to delete monitors for.
+     * @returns void
+     * @remarks
+     * Deletes all history for monitors before deleting monitors.
+     */
+    public deleteBySiteIdentifierInternal(
+        db: Database,
+        siteIdentifier: string
+    ): void {
+        // Get all monitor IDs for this site
+        const monitorRows = queryForIds(
+            db,
+            MONITOR_QUERIES.SELECT_IDS_BY_SITE,
+            [siteIdentifier]
+        );
+
+        // Delete history for all monitors
+        for (const row of monitorRows) {
+            db.run(MONITOR_QUERIES.DELETE_HISTORY_BY_MONITOR, [row.id]);
+        }
+
+        // Delete all monitors for this site
+        db.run(MONITOR_QUERIES.DELETE_BY_SITE, [siteIdentifier]);
+    }
+
+    /**
+     * Internal method to delete a monitor and its history within an existing transaction.
+     *
+     * @param db - Database connection (must be within active transaction).
+     * @param monitorId - The monitor ID to delete.
+     * @returns True if deleted, false otherwise.
+     * @remarks
+     * Deletes history before deleting monitor.
+     */
+    public deleteInternal(db: Database, monitorId: string): boolean {
+        // Delete history first (foreign key constraint)
+        db.run(MONITOR_QUERIES.DELETE_HISTORY_BY_MONITOR, [monitorId]);
+
+        // Delete the monitor
+        const deleteResult = db.run(MONITOR_QUERIES.DELETE_BY_ID, [monitorId]);
+        return deleteResult.changes > 0;
     }
 
     /**

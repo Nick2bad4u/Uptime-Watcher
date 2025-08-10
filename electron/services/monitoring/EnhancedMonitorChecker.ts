@@ -232,16 +232,10 @@ export class EnhancedMonitorChecker {
     private readonly config: EnhancedMonitorCheckConfig;
 
     private readonly httpMonitor: HttpMonitor;
-    private readonly pingMonitor: PingMonitor;
-    private readonly portMonitor: PortMonitor;
 
-    public constructor(config: EnhancedMonitorCheckConfig) {
-        this.config = config;
-        // Initialize monitor services
-        this.httpMonitor = new HttpMonitor({});
-        this.pingMonitor = new PingMonitor({});
-        this.portMonitor = new PortMonitor({});
-    }
+    private readonly pingMonitor: PingMonitor;
+
+    private readonly portMonitor: PortMonitor;
 
     /**
      * Performs a comprehensive monitor status check with advanced operation correlation.
@@ -923,6 +917,14 @@ export class EnhancedMonitorChecker {
             this.config.timeoutManager.clearTimeout(operationId);
             return undefined;
         }
+    }
+
+    public constructor(config: EnhancedMonitorCheckConfig) {
+        this.config = config;
+        // Initialize monitor services
+        this.httpMonitor = new HttpMonitor({});
+        this.pingMonitor = new PingMonitor({});
+        this.portMonitor = new PortMonitor({});
     }
 
     /**

@@ -62,21 +62,17 @@ export class DataImportExportService {
     private static readonly DATABASE_ERROR_EVENT = "database:error" as const;
 
     private readonly databaseService: DatabaseService;
+
     private readonly eventEmitter: TypedEventBus<UptimeEvents>;
+
     private readonly logger: Logger;
+
     private readonly repositories: {
         history: HistoryRepository;
         monitor: MonitorRepository;
         settings: SettingsRepository;
         site: SiteRepository;
     };
-
-    public constructor(config: DataImportExportConfig) {
-        this.repositories = config.repositories;
-        this.databaseService = config.databaseService;
-        this.logger = config.logger;
-        this.eventEmitter = config.eventEmitter;
-    }
 
     /**
      * Export all application data as JSON string.
@@ -213,6 +209,52 @@ export class DataImportExportService {
     }
 
     /**
+     * Import monitors with their history for all sites.
+     * Private helper method for monitor data persistence.
+     */
+    private async importMonitorsWithHistory(
+        db: Database,
+        sites: ImportSite[]
+    ): Promise<void> {
+        for (const site of sites) {
+            if (Array.isArray(site.monitors) && site.monitors.length > 0) {
+                try {
+                    // Create monitors using the async bulkCreate method
+                    const createdMonitors =
+                        await this.repositories.monitor.bulkCreate(
+                            site.identifier,
+                            site.monitors
+                        );
+
+                    // Import history for the created monitors
+                    this.importHistoryForMonitors(
+                        db,
+                        createdMonitors,
+                        site.monitors
+                    );
+
+                    this.logger.debug(
+                        `[DataImportExportService] Imported ${createdMonitors.length} monitors for site: ${site.identifier}`
+                    );
+                } catch (error) {
+                    this.logger.error(
+                        `[DataImportExportService] Failed to import monitors for site ${site.identifier}:`,
+                        error
+                    );
+                    // Continue with other sites even if one fails
+                }
+            }
+        }
+    }
+
+    public constructor(config: DataImportExportConfig) {
+        this.repositories = config.repositories;
+        this.databaseService = config.databaseService;
+        this.logger = config.logger;
+        this.eventEmitter = config.eventEmitter;
+    }
+
+    /**
      * Import history for created monitors by matching with original monitors.
      * Private helper method for history data persistence.
      */
@@ -264,45 +306,6 @@ export class DataImportExportService {
                 },
                 "" // No details available in import data
             );
-        }
-    }
-
-    /**
-     * Import monitors with their history for all sites.
-     * Private helper method for monitor data persistence.
-     */
-    private async importMonitorsWithHistory(
-        db: Database,
-        sites: ImportSite[]
-    ): Promise<void> {
-        for (const site of sites) {
-            if (Array.isArray(site.monitors) && site.monitors.length > 0) {
-                try {
-                    // Create monitors using the async bulkCreate method
-                    const createdMonitors =
-                        await this.repositories.monitor.bulkCreate(
-                            site.identifier,
-                            site.monitors
-                        );
-
-                    // Import history for the created monitors
-                    this.importHistoryForMonitors(
-                        db,
-                        createdMonitors,
-                        site.monitors
-                    );
-
-                    this.logger.debug(
-                        `[DataImportExportService] Imported ${createdMonitors.length} monitors for site: ${site.identifier}`
-                    );
-                } catch (error) {
-                    this.logger.error(
-                        `[DataImportExportService] Failed to import monitors for site ${site.identifier}:`,
-                        error
-                    );
-                    // Continue with other sites even if one fails
-                }
-            }
         }
     }
 }

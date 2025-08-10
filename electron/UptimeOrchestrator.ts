@@ -178,6 +178,13 @@ export interface UptimeOrchestratorDependencies {
 type OrchestratorEvents = UptimeEvents;
 
 export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
+    private readonly databaseManager: DatabaseManager;
+
+    private readonly monitorManager: MonitorManager;
+
+    // Manager instances
+    private readonly siteManager: SiteManager;
+
     /**
      * Gets the current history retention limit.
      *
@@ -190,56 +197,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      */
     public get historyLimit(): number {
         return this.databaseManager.getHistoryLimit();
-    }
-
-    private readonly databaseManager: DatabaseManager;
-    private readonly monitorManager: MonitorManager;
-
-    // Manager instances
-    private readonly siteManager: SiteManager;
-
-    /**
-     * Constructs a new UptimeOrchestrator with injected dependencies.
-     *
-     * @param dependencies - The manager dependencies required for orchestration
-     * @throws When dependencies are not provided or invalid
-     *
-     * @remarks
-     * Sets up event bus middleware and assigns provided managers.
-     * Initialization is performed separately via the initialize() method.
-     *
-     * Dependencies must be injected through the ServiceContainer pattern
-     * rather than creating managers directly. This ensures proper
-     * initialization order and dependency management.
-     *
-     * @example
-     * ```typescript
-     * const orchestrator = new UptimeOrchestrator({
-     *   databaseManager,
-     *   monitorManager,
-     *   siteManager
-     * });
-     * await orchestrator.initialize();
-     * ```
-     */
-    public constructor(dependencies?: UptimeOrchestratorDependencies) {
-        super("UptimeOrchestrator");
-
-        this.setupMiddleware();
-
-        // Dependencies must be injected - no fallback to ServiceContainer
-        if (!dependencies) {
-            throw new Error(
-                "UptimeOrchestrator requires dependencies to be injected. Use ServiceContainer to create instances."
-            );
-        }
-
-        this.databaseManager = dependencies.databaseManager;
-        this.monitorManager = dependencies.monitorManager;
-        this.siteManager = dependencies.siteManager;
-
-        // Set up event-driven communication between managers
-        this.setupEventHandlers();
     }
 
     /**
@@ -325,20 +282,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
-     * Gets the current history retention limit (method version for IPC compatibility).
-     *
-     * @returns The current history limit.
-     *
-     * @remarks
-     * This method provides the same value as the historyLimit getter but
-     * as a callable method. This is required for Electron IPC compatibility
-     * since IPC can serialize method calls but not property access.
-     */
-    public getHistoryLimit(): number {
-        return this.databaseManager.getHistoryLimit();
-    }
-
-    /**
      * Retrieves all sites from the site manager.
      *
      * @returns Promise resolving to an array of Site objects.
@@ -356,8 +299,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     public async importData(data: string): Promise<boolean> {
         return this.databaseManager.importData(data);
     }
-
-    // Site Management Operations
 
     /**
      * Initializes the orchestrator and all its managers.
@@ -494,8 +435,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         return this.siteManager.removeSite(identifier);
     }
 
-    // Monitoring Operations
-
     /**
      * Resets all application settings to their default values.
      *
@@ -567,8 +506,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     public async stopMonitoring(): Promise<void> {
         await this.monitorManager.stopMonitoring();
     }
-
-    // Database Operations
 
     /**
      * Stops monitoring for a specific site and monitor.
@@ -699,6 +636,70 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             );
         }
     }
+
+    /**
+     * Constructs a new UptimeOrchestrator with injected dependencies.
+     *
+     * @param dependencies - The manager dependencies required for orchestration
+     * @throws When dependencies are not provided or invalid
+     *
+     * @remarks
+     * Sets up event bus middleware and assigns provided managers.
+     * Initialization is performed separately via the initialize() method.
+     *
+     * Dependencies must be injected through the ServiceContainer pattern
+     * rather than creating managers directly. This ensures proper
+     * initialization order and dependency management.
+     *
+     * @example
+     * ```typescript
+     * const orchestrator = new UptimeOrchestrator({
+     *   databaseManager,
+     *   monitorManager,
+     *   siteManager
+     * });
+     * await orchestrator.initialize();
+     * ```
+     */
+    public constructor(dependencies?: UptimeOrchestratorDependencies) {
+        super("UptimeOrchestrator");
+
+        this.setupMiddleware();
+
+        // Dependencies must be injected - no fallback to ServiceContainer
+        if (!dependencies) {
+            throw new Error(
+                "UptimeOrchestrator requires dependencies to be injected. Use ServiceContainer to create instances."
+            );
+        }
+
+        this.databaseManager = dependencies.databaseManager;
+        this.monitorManager = dependencies.monitorManager;
+        this.siteManager = dependencies.siteManager;
+
+        // Set up event-driven communication between managers
+        this.setupEventHandlers();
+    }
+
+    /**
+     * Gets the current history retention limit (method version for IPC compatibility).
+     *
+     * @returns The current history limit.
+     *
+     * @remarks
+     * This method provides the same value as the historyLimit getter but
+     * as a callable method. This is required for Electron IPC compatibility
+     * since IPC can serialize method calls but not property access.
+     */
+    public getHistoryLimit(): number {
+        return this.databaseManager.getHistoryLimit();
+    }
+
+    // Site Management Operations
+
+    // Monitoring Operations
+
+    // Database Operations
 
     /**
      * Set up database manager event handlers.

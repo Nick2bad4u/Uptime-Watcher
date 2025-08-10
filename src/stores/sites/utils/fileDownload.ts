@@ -1,3 +1,5 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable n/no-unsupported-features/node-builtins -- using node above 24.0.0 so URL.revokeObjectURL is supported */
 /**
  * File backup utility for handling file download operations.
  * Provides utilities for browser-based file downloads.
@@ -74,44 +76,6 @@ function createAndTriggerDownload(
 }
 
 /**
- * Handles download errors and applies fallback strategies if possible.
- *
- * @remarks
- * Logs errors and attempts fallback download for DOM-related issues.
- *
- * @param error - The error encountered during download.
- * @param buffer - The file buffer.
- * @param fileName - The filename.
- * @param mimeType - The MIME type.
- * @throws {@link Error} Always throws after logging and attempting fallback.
- */
-function handleDownloadError(
-    error: unknown,
-    buffer: ArrayBuffer,
-    fileName: string,
-    mimeType: string
-): void {
-    if (!(error instanceof Error)) {
-        logger.error("File download failed", new Error(String(error)));
-        throw new Error("File download failed");
-    }
-
-    // Re-throw specific errors that should not be retried
-    if (shouldRethrowError(error)) {
-        throw error;
-    }
-
-    // Try fallback for DOM-related errors
-    if (error.message.includes("appendChild")) {
-        tryFallbackDownload(buffer, fileName, mimeType);
-        return;
-    }
-
-    logger.error("File download failed", error);
-    throw new Error("File download failed");
-}
-
-/**
  * Determines if an error should be re-thrown without retry.
  *
  * @param error - The error to check.
@@ -156,6 +120,44 @@ function tryFallbackDownload(
         );
         throw new Error("File download failed");
     }
+}
+
+/**
+ * Handles download errors and applies fallback strategies if possible.
+ *
+ * @remarks
+ * Logs errors and attempts fallback download for DOM-related issues.
+ *
+ * @param error - The error encountered during download.
+ * @param buffer - The file buffer.
+ * @param fileName - The filename.
+ * @param mimeType - The MIME type.
+ * @throws {@link Error} Always throws after logging and attempting fallback.
+ */
+function handleDownloadError(
+    error: unknown,
+    buffer: ArrayBuffer,
+    fileName: string,
+    mimeType: string
+): void {
+    if (!(error instanceof Error)) {
+        logger.error("File download failed", new Error(String(error)));
+        throw new Error("File download failed");
+    }
+
+    // Re-throw specific errors that should not be retried
+    if (shouldRethrowError(error)) {
+        throw error;
+    }
+
+    // Try fallback for DOM-related errors
+    if (error.message.includes("appendChild")) {
+        tryFallbackDownload(buffer, fileName, mimeType);
+        return;
+    }
+
+    logger.error("File download failed", error);
+    throw new Error("File download failed");
 }
 
 /**

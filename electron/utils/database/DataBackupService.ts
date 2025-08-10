@@ -33,12 +33,8 @@ export interface DataBackupConfig {
  */
 export class DataBackupService {
     private readonly eventEmitter: TypedEventBus<UptimeEvents>;
-    private readonly logger: Logger;
 
-    public constructor(config: DataBackupConfig) {
-        this.logger = config.logger;
-        this.eventEmitter = config.eventEmitter;
-    }
+    private readonly logger: Logger;
 
     /**
      * Download SQLite database backup.
@@ -74,5 +70,10 @@ export class DataBackupService {
                 error instanceof Error ? error : new Error(String(error))
             );
         }
+    }
+
+    public constructor(config: DataBackupConfig) {
+        this.logger = config.logger;
+        this.eventEmitter = config.eventEmitter;
     }
 }

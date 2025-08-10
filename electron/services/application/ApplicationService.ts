@@ -35,29 +35,6 @@ export class ApplicationService {
     private readonly serviceContainer: ServiceContainer;
 
     /**
-     * Constructs the {@link ApplicationService} and sets up the service container.
-     *
-     * @remarks
-     * Creates a {@link ServiceContainer} instance with appropriate debug settings and sets up application-level event handlers. This constructor should be called once during application startup.
-     *
-     * @example
-     * ```typescript
-     * const appService = new ApplicationService();
-     * ```
-     * @public
-     */
-    public constructor() {
-        logger.info(LOG_TEMPLATES.services.APPLICATION_INITIALIZING);
-
-        // Get service container instance
-        this.serviceContainer = ServiceContainer.getInstance({
-            enableDebugLogging: isDevelopment(),
-        });
-
-        this.setupApplication();
-    }
-
-    /**
      * Cleans up resources before application shutdown.
      *
      * @remarks
@@ -136,6 +113,29 @@ export class ApplicationService {
         this.setupAutoUpdater();
 
         logger.info(LOG_TEMPLATES.services.APPLICATION_SERVICES_INITIALIZED);
+    }
+
+    /**
+     * Constructs the {@link ApplicationService} and sets up the service container.
+     *
+     * @remarks
+     * Creates a {@link ServiceContainer} instance with appropriate debug settings and sets up application-level event handlers. This constructor should be called once during application startup.
+     *
+     * @example
+     * ```typescript
+     * const appService = new ApplicationService();
+     * ```
+     * @public
+     */
+    public constructor() {
+        logger.info(LOG_TEMPLATES.services.APPLICATION_INITIALIZING);
+
+        // Get service container instance
+        this.serviceContainer = ServiceContainer.getInstance({
+            enableDebugLogging: isDevelopment(),
+        });
+
+        this.setupApplication();
     }
 
     /**

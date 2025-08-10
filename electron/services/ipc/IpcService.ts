@@ -393,11 +393,13 @@ export class IpcService {
      * @internal
      */
     private readonly autoUpdaterService: AutoUpdaterService;
+
     /**
      * Set of registered IPC handler channel names.
      * @internal
      */
     private readonly registeredIpcHandlers = new Set<string>();
+
     /**
      * Core orchestrator for monitoring operations.
      * @internal

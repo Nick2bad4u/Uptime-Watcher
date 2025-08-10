@@ -93,92 +93,92 @@ export class ServiceContainer {
      * @internal
      */
     private autoUpdaterService?: AutoUpdaterService;
+
     private readonly config: ServiceContainerConfig;
+
     /**
      * Singleton instance of {@link ConfigurationManager}.
      * @internal
      */
     private configurationManager?: ConfigurationManager;
+
     /**
      * Singleton instance of {@link DatabaseManager}.
      * @internal
      */
     private databaseManager?: DatabaseManager;
+
     /**
      * Singleton instance of {@link DatabaseService}.
      * @internal
      */
     private databaseService?: DatabaseService;
+
     /**
      * Singleton instance of {@link HistoryRepository}.
      * @internal
      */
     private historyRepository?: HistoryRepository;
+
     /**
      * Singleton instance of {@link IpcService}.
      * @internal
      */
     private ipcService?: IpcService;
+
     /**
      * Singleton instance of {@link MonitorManager}.
      * @internal
      */
     private monitorManager?: MonitorManager;
+
     /**
      * Singleton instance of {@link MonitorRepository}.
      * @internal
      */
     private monitorRepository?: MonitorRepository;
+
     /**
      * Singleton instance of {@link NotificationService}.
      * @internal
      */
     private notificationService?: NotificationService;
+
     /**
      * Singleton instance of {@link SettingsRepository}.
      * @internal
      */
     private settingsRepository?: SettingsRepository;
+
     /**
      * Singleton instance of {@link SiteManager}.
      * @internal
      */
     private siteManager?: SiteManager;
+
     /**
      * Singleton instance of {@link SiteRepository}.
      * @internal
      */
     private siteRepository?: SiteRepository;
+
     /**
      * Singleton instance of {@link SiteService}.
      * @internal
      */
     private siteService?: SiteService;
+
     /**
      * Singleton instance of {@link UptimeOrchestrator}.
      * @internal
      */
     private uptimeOrchestrator?: UptimeOrchestrator;
+
     /**
      * Singleton instance of {@link WindowService}.
      * @internal
      */
     private windowService?: WindowService;
-
-    /**
-     * Constructs a new {@link ServiceContainer}.
-     *
-     * @remarks
-     * Use {@link ServiceContainer.getInstance} to obtain the singleton instance.
-     *
-     * @param config - Optional configuration for service container behavior.
-     */
-    private constructor(config: ServiceContainerConfig = {}) {
-        this.config = config;
-        if (config.enableDebugLogging) {
-            logger.debug("[ServiceContainer] Creating new service container");
-        }
-    }
 
     /**
      * Gets the singleton {@link ServiceContainer} instance.
@@ -214,6 +214,48 @@ export class ServiceContainer {
      */
     public static resetForTesting(): void {
         ServiceContainer.instance = undefined;
+    }
+
+    /**
+     * Initializes all services in the correct order.
+     *
+     * @remarks
+     * Ensures all dependencies are resolved and services are ready for use.
+     * Should be called once during application startup.
+     *
+     * @returns Promise that resolves when all services are initialized.
+     */
+    public async initialize(): Promise<void> {
+        logger.info("[ServiceContainer] Initializing services");
+        this.getDatabaseService().initialize();
+        this.getHistoryRepository();
+        this.getMonitorRepository();
+        this.getSettingsRepository();
+        this.getSiteRepository();
+        this.getSiteService();
+        this.getSiteManager();
+        this.getMonitorManager();
+        const databaseManager = this.getDatabaseManager();
+        await databaseManager.initialize();
+        this.getConfigurationManager();
+        await this.getUptimeOrchestrator().initialize();
+        this.getIpcService().setupHandlers();
+        logger.info("[ServiceContainer] All services initialized successfully");
+    }
+
+    /**
+     * Constructs a new {@link ServiceContainer}.
+     *
+     * @remarks
+     * Use {@link ServiceContainer.getInstance} to obtain the singleton instance.
+     *
+     * @param config - Optional configuration for service container behavior.
+     */
+    private constructor(config: ServiceContainerConfig = {}) {
+        this.config = config;
+        if (config.enableDebugLogging) {
+            logger.debug("[ServiceContainer] Creating new service container");
+        }
     }
 
     /**
@@ -702,33 +744,6 @@ export class ServiceContainer {
             }
         }
         return this.windowService;
-    }
-
-    /**
-     * Initializes all services in the correct order.
-     *
-     * @remarks
-     * Ensures all dependencies are resolved and services are ready for use.
-     * Should be called once during application startup.
-     *
-     * @returns Promise that resolves when all services are initialized.
-     */
-    public async initialize(): Promise<void> {
-        logger.info("[ServiceContainer] Initializing services");
-        this.getDatabaseService().initialize();
-        this.getHistoryRepository();
-        this.getMonitorRepository();
-        this.getSettingsRepository();
-        this.getSiteRepository();
-        this.getSiteService();
-        this.getSiteManager();
-        this.getMonitorManager();
-        const databaseManager = this.getDatabaseManager();
-        await databaseManager.initialize();
-        this.getConfigurationManager();
-        await this.getUptimeOrchestrator().initialize();
-        this.getIpcService().setupHandlers();
-        logger.info("[ServiceContainer] All services initialized successfully");
     }
 
     /**

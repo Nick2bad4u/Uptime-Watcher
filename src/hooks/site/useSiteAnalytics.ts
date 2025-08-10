@@ -84,6 +84,133 @@ export interface SiteAnalytics {
 }
 
 /**
+ * Calculate average response time from filtered history
+ */
+function calculateAverageResponseTime(
+    filteredHistory: StatusHistory[]
+): number {
+    const totalChecks = filteredHistory.length;
+    return totalChecks > 0
+        ? Math.round(
+              filteredHistory.reduce((sum, h) => sum + h.responseTime, 0) /
+                  totalChecks
+          )
+        : 0;
+}
+
+/**
+ * Calculate downtime periods from filtered history
+ */
+function calculateDowntimePeriods(
+    filteredHistory: StatusHistory[]
+): DowntimePeriod[] {
+    const downtimePeriods: DowntimePeriod[] = [];
+    let downtimeEnd: number | undefined = undefined; // Most recent "down" timestamp
+    let downtimeStart: number | undefined = undefined; // Earliest "down" timestamp in the period
+
+    // Process in reverse chronological order (newest to oldest)
+    for (let i = filteredHistory.length - 1; i >= 0; i--) {
+        const record = filteredHistory[i];
+        if (!record) {
+            continue; // Skip if record is undefined
+        }
+
+        if (record.status === "down") {
+            if (downtimeEnd === undefined) {
+                // This is the first "down" we've encountered, so it's the END of the period
+                downtimeEnd = record.timestamp;
+                downtimeStart = record.timestamp;
+            } else {
+                // We're extending the downtime period backwards
+                downtimeStart = record.timestamp;
+            }
+        } else if (downtimeEnd !== undefined && downtimeStart !== undefined) {
+            // We hit an "up" status, so the downtime period is complete
+            const period: DowntimePeriod = {
+                duration: downtimeEnd - downtimeStart,
+                end: downtimeEnd,
+                start: downtimeStart,
+            };
+            downtimePeriods.push(period);
+
+            // Reset for next period
+            downtimeEnd = undefined;
+            downtimeStart = undefined;
+        }
+    }
+
+    // Handle ongoing downtime (reached end of history while in downtime)
+    if (downtimeEnd !== undefined && downtimeStart !== undefined) {
+        const period: DowntimePeriod = {
+            duration: downtimeEnd - downtimeStart,
+            end: downtimeEnd,
+            start: downtimeStart,
+        };
+        downtimePeriods.push(period);
+    }
+
+    return downtimePeriods;
+}
+
+/**
+ * Calculate response time metrics including percentiles
+ */
+function calculateResponseMetrics(filteredHistory: StatusHistory[]): {
+    fastestResponse: number;
+    p50: number;
+    p95: number;
+    p99: number;
+    slowestResponse: number;
+} {
+    const responseTimes = filteredHistory.map((h) => h.responseTime);
+    const fastestResponse =
+        responseTimes.length > 0 ? Math.min(...responseTimes) : 0;
+    const slowestResponse =
+        responseTimes.length > 0 ? Math.max(...responseTimes) : 0;
+
+    // Calculate percentiles
+    const sortedResponseTimes = Array.from(responseTimes).sort((a, b) => a - b);
+    const getPercentile = (p: number): number => {
+        // Ensure p is between 0 and 1
+        const safeP = Math.max(0, Math.min(1, p));
+        const arrayLength = sortedResponseTimes.length;
+        if (arrayLength === 0) {
+            return 0;
+        }
+        const index = Math.floor(arrayLength * safeP);
+        const safeIndex = Math.max(0, Math.min(index, arrayLength - 1));
+
+        return sortedResponseTimes[safeIndex] ?? 0;
+    };
+
+    return {
+        fastestResponse,
+        p50: getPercentile(0.5),
+        p95: getPercentile(0.95),
+        p99: getPercentile(0.99),
+        slowestResponse,
+    };
+}
+
+/**
+ * Filter history records based on time range
+ */
+function filterHistoryByTimeRange(
+    history: StatusHistory[],
+    timeRange: TimePeriod
+): StatusHistory[] {
+    const now = Date.now();
+    // Sanitize timeRange to prevent object injection
+    const allowedTimeRanges = Object.keys(TIME_PERIOD_LABELS) as TimePeriod[];
+    const safeTimeRange = allowedTimeRanges.includes(timeRange)
+        ? timeRange
+        : "24h";
+
+    const cutoff = now - CHART_TIME_PERIODS[safeTimeRange];
+    return history.filter((record) => record.timestamp >= cutoff);
+}
+
+/**
  * Hook for generating chart data
  * Separates data preparation from component logic
  */
@@ -280,130 +407,3 @@ export const SiteAnalyticsUtils = {
         return "critical";
     },
 };
-
-/**
- * Calculate average response time from filtered history
- */
-function calculateAverageResponseTime(
-    filteredHistory: StatusHistory[]
-): number {
-    const totalChecks = filteredHistory.length;
-    return totalChecks > 0
-        ? Math.round(
-              filteredHistory.reduce((sum, h) => sum + h.responseTime, 0) /
-                  totalChecks
-          )
-        : 0;
-}
-
-/**
- * Calculate downtime periods from filtered history
- */
-function calculateDowntimePeriods(
-    filteredHistory: StatusHistory[]
-): DowntimePeriod[] {
-    const downtimePeriods: DowntimePeriod[] = [];
-    let downtimeEnd: number | undefined = undefined; // Most recent "down" timestamp
-    let downtimeStart: number | undefined = undefined; // Earliest "down" timestamp in the period
-
-    // Process in reverse chronological order (newest to oldest)
-    for (let i = filteredHistory.length - 1; i >= 0; i--) {
-        const record = filteredHistory[i];
-        if (!record) {
-            continue; // Skip if record is undefined
-        }
-
-        if (record.status === "down") {
-            if (downtimeEnd === undefined) {
-                // This is the first "down" we've encountered, so it's the END of the period
-                downtimeEnd = record.timestamp;
-                downtimeStart = record.timestamp;
-            } else {
-                // We're extending the downtime period backwards
-                downtimeStart = record.timestamp;
-            }
-        } else if (downtimeEnd !== undefined && downtimeStart !== undefined) {
-            // We hit an "up" status, so the downtime period is complete
-            const period: DowntimePeriod = {
-                duration: downtimeEnd - downtimeStart,
-                end: downtimeEnd,
-                start: downtimeStart,
-            };
-            downtimePeriods.push(period);
-
-            // Reset for next period
-            downtimeEnd = undefined;
-            downtimeStart = undefined;
-        }
-    }
-
-    // Handle ongoing downtime (reached end of history while in downtime)
-    if (downtimeEnd !== undefined && downtimeStart !== undefined) {
-        const period: DowntimePeriod = {
-            duration: downtimeEnd - downtimeStart,
-            end: downtimeEnd,
-            start: downtimeStart,
-        };
-        downtimePeriods.push(period);
-    }
-
-    return downtimePeriods;
-}
-
-/**
- * Calculate response time metrics including percentiles
- */
-function calculateResponseMetrics(filteredHistory: StatusHistory[]): {
-    fastestResponse: number;
-    p50: number;
-    p95: number;
-    p99: number;
-    slowestResponse: number;
-} {
-    const responseTimes = filteredHistory.map((h) => h.responseTime);
-    const fastestResponse =
-        responseTimes.length > 0 ? Math.min(...responseTimes) : 0;
-    const slowestResponse =
-        responseTimes.length > 0 ? Math.max(...responseTimes) : 0;
-
-    // Calculate percentiles
-    const sortedResponseTimes = Array.from(responseTimes).sort((a, b) => a - b);
-    const getPercentile = (p: number): number => {
-        // Ensure p is between 0 and 1
-        const safeP = Math.max(0, Math.min(1, p));
-        const arrayLength = sortedResponseTimes.length;
-        if (arrayLength === 0) {
-            return 0;
-        }
-        const index = Math.floor(arrayLength * safeP);
-        const safeIndex = Math.max(0, Math.min(index, arrayLength - 1));
-
-        return sortedResponseTimes[safeIndex] ?? 0;
-    };
-
-    return {
-        fastestResponse,
-        p50: getPercentile(0.5),
-        p95: getPercentile(0.95),
-        p99: getPercentile(0.99),
-        slowestResponse,
-    };
-}
-
-/**
- * Filter history records based on time range
- */
-function filterHistoryByTimeRange(
-    history: StatusHistory[],
-    timeRange: TimePeriod
-): StatusHistory[] {
-    const now = Date.now();
-    // Sanitize timeRange to prevent object injection
-    const allowedTimeRanges = Object.keys(TIME_PERIOD_LABELS) as TimePeriod[];
-    const safeTimeRange = allowedTimeRanges.includes(timeRange)
-        ? timeRange
-        : "24h";
-
-    const cutoff = now - CHART_TIME_PERIODS[safeTimeRange];
-    return history.filter((record) => record.timestamp >= cutoff);
-}

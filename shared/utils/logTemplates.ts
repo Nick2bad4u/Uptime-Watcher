@@ -24,6 +24,16 @@
  */
 
 /**
+ * Logger interface for type safety.
+ */
+interface Logger {
+    debug: (message: string, context?: Record<string, unknown>) => void;
+    error: (message: string, context?: Record<string, unknown>) => void;
+    info: (message: string, context?: Record<string, unknown>) => void;
+    warn: (message: string, context?: Record<string, unknown>) => void;
+}
+
+/**
  * Service-related log message templates.
  */
 export const SERVICE_LOGS = {
@@ -370,16 +380,6 @@ export const LOG_TEMPLATES: LogTemplatesInterface = {
     services: SERVICE_LOGS,
     warnings: WARNING_LOGS,
 } as const;
-
-/**
- * Logger interface for type safety.
- */
-interface Logger {
-    debug: (message: string, context?: Record<string, unknown>) => void;
-    error: (message: string, context?: Record<string, unknown>) => void;
-    info: (message: string, context?: Record<string, unknown>) => void;
-    warn: (message: string, context?: Record<string, unknown>) => void;
-}
 
 /**
  * Type representing all possible log template values.

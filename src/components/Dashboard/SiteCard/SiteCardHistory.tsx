@@ -27,6 +27,47 @@ export interface SiteCardHistoryProperties {
 }
 
 /**
+ * Compare SiteCardHistory props to determine if re-render is needed.
+ * Broken into smaller functions to reduce complexity.
+ */
+
+function areHistoryPropsEqual(
+    previous: SiteCardHistoryProperties,
+    next: SiteCardHistoryProperties
+): boolean {
+    // Compare history arrays
+    if (previous.filteredHistory.length !== next.filteredHistory.length) {
+        return false;
+    }
+    const prevTimestamp = previous.filteredHistory[0]?.timestamp;
+    const nextTimestamp = next.filteredHistory[0]?.timestamp;
+    if (prevTimestamp !== nextTimestamp) {
+        return false;
+    }
+
+    // Compare monitor objects
+    const prevMonitor = previous.monitor;
+    const nextMonitor = next.monitor;
+    if (prevMonitor === undefined && nextMonitor === undefined) {
+        return true;
+    }
+    if (prevMonitor === undefined || nextMonitor === undefined) {
+        return false;
+    }
+    if (
+        prevMonitor.id !== nextMonitor.id ||
+        prevMonitor.type !== nextMonitor.type
+    ) {
+        return false;
+    }
+    return !(
+        prevMonitor.url !== nextMonitor.url ||
+        prevMonitor.port !== nextMonitor.port ||
+        prevMonitor.host !== nextMonitor.host
+    );
+}
+
+/**
  * History visualization component for site cards displaying monitor status over time.
  *
  * Features:
@@ -88,52 +129,3 @@ export const SiteCardHistory: React.NamedExoticComponent<SiteCardHistoryProperti
             return areHistoryPropsEqual(previousProperties, nextProperties);
         }
     );
-
-/**
- * Compare SiteCardHistory props to determine if re-render is needed.
- * Broken into smaller functions to reduce complexity.
- */
-
-function areHistoryPropsEqual(
-    previous: SiteCardHistoryProperties,
-    next: SiteCardHistoryProperties
-): boolean {
-    // Compare history arrays
-    if (previous.filteredHistory.length !== next.filteredHistory.length) {
-        return false;
-    }
-    const prevTimestamp = previous.filteredHistory[0]?.timestamp;
-    const nextTimestamp = next.filteredHistory[0]?.timestamp;
-    if (prevTimestamp !== nextTimestamp) {
-        return false;
-    }
-
-    // Compare monitor objects
-    const prevMonitor = previous.monitor;
-    const nextMonitor = next.monitor;
-    if (prevMonitor === undefined && nextMonitor === undefined) {
-        return true;
-    }
-    if (prevMonitor === undefined || nextMonitor === undefined) {
-        return false;
-    }
-    if (
-        prevMonitor.id !== nextMonitor.id ||
-        prevMonitor.type !== nextMonitor.type
-    ) {
-        return false;
-    }
-    return !(
-        prevMonitor.url !== nextMonitor.url ||
-        prevMonitor.port !== nextMonitor.port ||
-        prevMonitor.host !== nextMonitor.host
-    );
-}
-
-/**
- * Check if history data has changed in a meaningful way.
- */
-
-/**
- * Check if type-specific properties that affect display have changed.
- */

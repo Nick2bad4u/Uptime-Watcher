@@ -128,32 +128,6 @@ export class HttpMonitor implements IMonitorService {
     private config: MonitorConfig;
 
     /**
-     * Constructs a new {@link HttpMonitor} instance.
-     *
-     * @param config - Optional configuration overrides for HTTP monitoring. See {@link MonitorConfig}.
-     *
-     * @remarks
-     * Initializes Axios instance with timing interceptors and merged configuration. All configuration values are shallow-merged with defaults.
-     *
-     * @defaultValue timeout: DEFAULT_REQUEST_TIMEOUT, userAgent: USER_AGENT
-     * @public
-     */
-    public constructor(config: MonitorConfig = {}) {
-        this.config = {
-            timeout: DEFAULT_REQUEST_TIMEOUT,
-            userAgent: USER_AGENT,
-            ...config,
-        };
-
-        // Create Axios instance with advanced configuration (best practices)
-        this.axiosInstance = createHttpClient({
-            timeout: DEFAULT_REQUEST_TIMEOUT,
-            userAgent: USER_AGENT,
-            ...config,
-        });
-    }
-
-    /**
      * Performs an HTTP health check for the given monitor configuration.
      *
      * @remarks
@@ -201,62 +175,6 @@ export class HttpMonitor implements IMonitorService {
             timeout,
             retryAttempts
         );
-    }
-
-    /**
-     * Returns the current configuration for this monitor service.
-     *
-     * @returns A shallow copy of the current {@link MonitorConfig}.
-     * @public
-     */
-    public getConfig(): MonitorConfig {
-        return { ...this.config };
-    }
-
-    /**
-     * Returns the monitor type handled by this service.
-     *
-     * @returns The string "http".
-     * @remarks
-     * Used by the monitor factory to route checks to the appropriate service.
-     * @public
-     */
-    public getType(): Site["monitors"][0]["type"] {
-        return "http";
-    }
-
-    /**
-     * Updates the configuration for this monitor service.
-     *
-     * @remarks
-     * Performs a shallow merge and recreates the Axios instance. Only validates types, not value ranges. Throws if invalid types are provided.
-     *
-     * @param config - Partial configuration to merge with existing settings.
-     * @throws Error if config contains invalid property types.
-     * @public
-     */
-    public updateConfig(config: Partial<MonitorConfig>): void {
-        // Basic validation of config properties
-        if (
-            config.timeout !== undefined &&
-            (typeof config.timeout !== "number" || config.timeout <= 0)
-        ) {
-            throw new Error("Invalid timeout: must be a positive number");
-        }
-        if (
-            config.userAgent !== undefined &&
-            typeof config.userAgent !== "string"
-        ) {
-            throw new Error("Invalid userAgent: must be a string");
-        }
-
-        this.config = {
-            ...this.config,
-            ...config,
-        };
-
-        // Recreate Axios instance with updated configuration
-        this.axiosInstance = createHttpClient(this.config);
     }
 
     /**
@@ -375,5 +293,87 @@ export class HttpMonitor implements IMonitorService {
             status,
             ...(status === "down" && { error: `HTTP ${response.status}` }),
         };
+    }
+
+    /**
+     * Constructs a new {@link HttpMonitor} instance.
+     *
+     * @param config - Optional configuration overrides for HTTP monitoring. See {@link MonitorConfig}.
+     *
+     * @remarks
+     * Initializes Axios instance with timing interceptors and merged configuration. All configuration values are shallow-merged with defaults.
+     *
+     * @defaultValue timeout: DEFAULT_REQUEST_TIMEOUT, userAgent: USER_AGENT
+     * @public
+     */
+    public constructor(config: MonitorConfig = {}) {
+        this.config = {
+            timeout: DEFAULT_REQUEST_TIMEOUT,
+            userAgent: USER_AGENT,
+            ...config,
+        };
+
+        // Create Axios instance with advanced configuration (best practices)
+        this.axiosInstance = createHttpClient({
+            timeout: DEFAULT_REQUEST_TIMEOUT,
+            userAgent: USER_AGENT,
+            ...config,
+        });
+    }
+
+    /**
+     * Returns the current configuration for this monitor service.
+     *
+     * @returns A shallow copy of the current {@link MonitorConfig}.
+     * @public
+     */
+    public getConfig(): MonitorConfig {
+        return { ...this.config };
+    }
+
+    /**
+     * Returns the monitor type handled by this service.
+     *
+     * @returns The string "http".
+     * @remarks
+     * Used by the monitor factory to route checks to the appropriate service.
+     * @public
+     */
+    public getType(): Site["monitors"][0]["type"] {
+        return "http";
+    }
+
+    /**
+     * Updates the configuration for this monitor service.
+     *
+     * @remarks
+     * Performs a shallow merge and recreates the Axios instance. Only validates types, not value ranges. Throws if invalid types are provided.
+     *
+     * @param config - Partial configuration to merge with existing settings.
+     * @throws Error if config contains invalid property types.
+     * @public
+     */
+    public updateConfig(config: Partial<MonitorConfig>): void {
+        // Basic validation of config properties
+        if (
+            config.timeout !== undefined &&
+            (typeof config.timeout !== "number" || config.timeout <= 0)
+        ) {
+            throw new Error("Invalid timeout: must be a positive number");
+        }
+        if (
+            config.userAgent !== undefined &&
+            typeof config.userAgent !== "string"
+        ) {
+            throw new Error("Invalid userAgent: must be a string");
+        }
+
+        this.config = {
+            ...this.config,
+            ...config,
+        };
+
+        // Recreate Axios instance with updated configuration
+        this.axiosInstance = createHttpClient(this.config);
     }
 }

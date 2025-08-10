@@ -7,24 +7,6 @@
  * display of monitor and site statuses throughout the application interface.
  * All status values are expected to be lowercase single-word strings.
  */
-
-/**
- * Format status with emoji icon and properly capitalized text.
- * Combines status icon with formatted text for display.
- *
- * @param status - The status string to format (expected to be lowercase)
- * @returns Formatted string with emoji and capitalized text (e.g., "✅ Up")
- *
- * @remarks
- * Uses simple capitalization logic suitable for single-word status values.
- * For multi-word statuses, consider using a more sophisticated formatting function.
- */
-export function formatStatusWithIcon(status: string): string {
-    const icon = getStatusIcon(status);
-    const text = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
-    return `${icon} ${text}`;
-}
-
 /**
  * Get the emoji icon for a given status.
  * Provides visual indicators for different monitoring states.
@@ -60,4 +42,21 @@ export function getStatusIcon(status: string): string {
             return "⚪";
         }
     }
+}
+
+/**
+ * Format status with emoji icon and properly capitalized text.
+ * Combines status icon with formatted text for display.
+ *
+ * @param status - The status string to format (expected to be lowercase)
+ * @returns Formatted string with emoji and capitalized text (e.g., "✅ Up")
+ *
+ * @remarks
+ * Uses simple capitalization logic suitable for single-word status values.
+ * For multi-word statuses, consider using a more sophisticated formatting function.
+ */
+export function formatStatusWithIcon(status: string): string {
+    const icon = getStatusIcon(status);
+    const text = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+    return `${icon} ${text}`;
 }

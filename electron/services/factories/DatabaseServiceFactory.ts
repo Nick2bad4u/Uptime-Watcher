@@ -97,6 +97,7 @@ export interface ISiteRepositoryService {
  */
 export class DatabaseServiceFactory {
     private readonly dependencies: DatabaseServiceFactoryDependencies;
+
     private readonly loggerAdapter: LoggerAdapter;
 
     /**

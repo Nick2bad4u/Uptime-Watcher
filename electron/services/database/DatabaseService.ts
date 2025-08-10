@@ -59,16 +59,6 @@ export class DatabaseService {
     private db: Database | undefined;
 
     /**
-     * Private constructor for singleton pattern.
-     *
-     * @remarks
-     * Use {@link DatabaseService.getInstance} to get the service instance.
-     */
-    private constructor() {
-        // Private constructor for singleton pattern
-    }
-
-    /**
      * Gets the singleton database service instance.
      *
      * @returns The shared DatabaseService instance.
@@ -82,45 +72,6 @@ export class DatabaseService {
      */
     public static getInstance(): DatabaseService {
         return DatabaseService.instance;
-    }
-
-    /**
-     * Closes the database connection safely.
-     *
-     * @returns void
-     * @throws {@link Error} When connection close fails.
-     * @remarks
-     * **Safety Considerations:**
-     * - Safe to call multiple times (idempotent operation)
-     * - In node-sqlite3-wasm, pending operations complete before close
-     * - All transactions are completed synchronously before closure
-     * - Should be called during application shutdown for proper cleanup
-     *
-     * **Platform Compatibility:**
-     * - Optimized for Electron main process environment
-     * - Uses node-sqlite3-wasm which is compiled for Node.js compatibility
-     * - No platform-specific caveats for Windows/macOS/Linux
-     * @example
-     * ```typescript
-     * dbService.close();
-     * ```
-     */
-    public close(): void {
-        if (this.db) {
-            try {
-                // node-sqlite3-wasm completes all pending operations before closing
-                this.db.close();
-                this.db = undefined;
-                logger.info(LOG_TEMPLATES.services.DATABASE_CONNECTION_CLOSED);
-            } catch (error) {
-                logger.error(
-                    LOG_TEMPLATES.errors.DATABASE_SCHEMA_FAILED,
-                    error
-                );
-                throw error;
-            }
-        }
-        // Safe to call when already closed - no-op behavior
     }
 
     /**
@@ -170,6 +121,55 @@ export class DatabaseService {
             }
             throw error;
         }
+    }
+
+    /**
+     * Private constructor for singleton pattern.
+     *
+     * @remarks
+     * Use {@link DatabaseService.getInstance} to get the service instance.
+     */
+    private constructor() {
+        // Private constructor for singleton pattern
+    }
+
+    /**
+     * Closes the database connection safely.
+     *
+     * @returns void
+     * @throws {@link Error} When connection close fails.
+     * @remarks
+     * **Safety Considerations:**
+     * - Safe to call multiple times (idempotent operation)
+     * - In node-sqlite3-wasm, pending operations complete before close
+     * - All transactions are completed synchronously before closure
+     * - Should be called during application shutdown for proper cleanup
+     *
+     * **Platform Compatibility:**
+     * - Optimized for Electron main process environment
+     * - Uses node-sqlite3-wasm which is compiled for Node.js compatibility
+     * - No platform-specific caveats for Windows/macOS/Linux
+     * @example
+     * ```typescript
+     * dbService.close();
+     * ```
+     */
+    public close(): void {
+        if (this.db) {
+            try {
+                // node-sqlite3-wasm completes all pending operations before closing
+                this.db.close();
+                this.db = undefined;
+                logger.info(LOG_TEMPLATES.services.DATABASE_CONNECTION_CLOSED);
+            } catch (error) {
+                logger.error(
+                    LOG_TEMPLATES.errors.DATABASE_SCHEMA_FAILED,
+                    error
+                );
+                throw error;
+            }
+        }
+        // Safe to call when already closed - no-op behavior
     }
 
     /**

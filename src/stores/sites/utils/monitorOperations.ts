@@ -26,6 +26,16 @@ import { ERROR_CATALOG } from "../../../../shared/utils/errorCatalog";
 export { validateMonitor } from "@shared/types";
 
 /**
+ * Validates and returns a monitor type or default
+ */
+function validateMonitorType(type: unknown): MonitorType {
+    return typeof type === "string" &&
+        BASE_MONITOR_TYPES.includes(type as MonitorType)
+        ? (type as MonitorType)
+        : BASE_MONITOR_TYPES[0];
+}
+
+/**
  * Adds a monitor to a site
  */
 export function addMonitorToSite(site: Site, monitor: Monitor): Site {
@@ -253,13 +263,3 @@ export const monitorOperations = {
         timeout,
     }),
 };
-
-/**
- * Validates and returns a monitor type or default
- */
-function validateMonitorType(type: unknown): MonitorType {
-    return typeof type === "string" &&
-        BASE_MONITOR_TYPES.includes(type as MonitorType)
-        ? (type as MonitorType)
-        : BASE_MONITOR_TYPES[0];
-}

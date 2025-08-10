@@ -48,21 +48,12 @@ export class SiteService {
     private static readonly DEFAULT_SITE_NAME = "Unnamed Site";
 
     private readonly databaseService: DatabaseService;
-    private readonly historyRepository: HistoryRepository;
-    private readonly monitorRepository: MonitorRepository;
-    private readonly siteRepository: SiteRepository;
 
-    /**
-     * Constructs a new {@link SiteService} instance.
-     *
-     * @param dependencies - The {@link SiteServiceDependencies} required for service operations.
-     */
-    public constructor(dependencies: SiteServiceDependencies) {
-        this.databaseService = dependencies.databaseService;
-        this.historyRepository = dependencies.historyRepository;
-        this.monitorRepository = dependencies.monitorRepository;
-        this.siteRepository = dependencies.siteRepository;
-    }
+    private readonly historyRepository: HistoryRepository;
+
+    private readonly monitorRepository: MonitorRepository;
+
+    private readonly siteRepository: SiteRepository;
 
     /**
      * Deletes a site and all its related data (monitors and history) atomically.
@@ -275,6 +266,18 @@ export class SiteService {
                 operationName: "Get all sites with details",
             }
         );
+    }
+
+    /**
+     * Constructs a new {@link SiteService} instance.
+     *
+     * @param dependencies - The {@link SiteServiceDependencies} required for service operations.
+     */
+    public constructor(dependencies: SiteServiceDependencies) {
+        this.databaseService = dependencies.databaseService;
+        this.historyRepository = dependencies.historyRepository;
+        this.monitorRepository = dependencies.monitorRepository;
+        this.siteRepository = dependencies.siteRepository;
     }
 
     /**

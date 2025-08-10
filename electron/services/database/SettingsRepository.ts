@@ -61,19 +61,6 @@ export class SettingsRepository {
     private readonly databaseService: DatabaseService;
 
     /**
-     * Constructs a new SettingsRepository instance.
-     *
-     * @param dependencies - The required dependencies for settings operations.
-     * @example
-     * ```typescript
-     * const repo = new SettingsRepository({ databaseService });
-     * ```
-     */
-    public constructor(dependencies: SettingsRepositoryDependencies) {
-        this.databaseService = dependencies.databaseService;
-    }
-
-    /**
      * Bulk inserts settings (for import functionality).
      *
      * @param settings - Key-value pairs to insert.
@@ -103,44 +90,6 @@ export class SettingsRepository {
             undefined,
             { count: entries.length }
         );
-    }
-
-    /**
-     * Bulk inserts settings within an existing transaction context.
-     *
-     * @param db - The database connection (must be within an active transaction).
-     * @param settings - Key-value pairs to insert.
-     * @throws Error when database operations fail.
-     * @remarks
-     * **IMPORTANT**: This method must be called within an existing transaction context.
-     *
-     * **Error Handling**: Uses prepared statements which may throw on constraint violations or database errors. All exceptions are propagated to the calling transaction context for proper rollback handling.
-     *
-     * **Performance**: Uses prepared statements for optimal bulk insert performance.
-     */
-    public bulkInsertInternal(
-        db: Database,
-        settings: Record<string, string>
-    ): void {
-        const entries = Object.entries(settings);
-        if (entries.length === 0) {
-            return;
-        }
-
-        // Prepare the statement once for better performance
-        const stmt = db.prepare(SETTINGS_QUERIES.INSERT_OR_REPLACE);
-
-        try {
-            for (const [key, value] of entries) {
-                stmt.run([key, value]);
-            }
-
-            logger.info(
-                `[SettingsRepository] Bulk inserted ${entries.length} settings (internal)`
-            );
-        } finally {
-            stmt.finalize();
-        }
     }
 
     /**
@@ -185,35 +134,6 @@ export class SettingsRepository {
                 return Promise.resolve();
             });
         }, "settings-delete-all");
-    }
-
-    /**
-     * Clears all settings from the database within an existing transaction context.
-     *
-     * @param db - The database connection (must be within an active transaction).
-     * @remarks
-     * Use this method only when already within a transaction context.
-     */
-    public deleteAllInternal(db: Database): void {
-        db.run(SETTINGS_QUERIES.DELETE_ALL);
-        logger.info("[SettingsRepository] All settings deleted (internal)");
-    }
-
-    /**
-     * Deletes a setting by key within an existing transaction context.
-     *
-     * @param db - The database connection (must be within an active transaction).
-     * @param key - The setting key to delete.
-     * @remarks
-     * Use this method only when already within a transaction context.
-     */
-    public deleteInternal(db: Database, key: string): void {
-        db.run(SETTINGS_QUERIES.DELETE_BY_KEY, [key]);
-        if (isDev()) {
-            logger.debug(
-                `[SettingsRepository] Deleted setting (internal): ${key}`
-            );
-        }
     }
 
     /**
@@ -284,6 +204,86 @@ export class SettingsRepository {
             undefined,
             { key }
         );
+    }
+
+    /**
+     * Constructs a new SettingsRepository instance.
+     *
+     * @param dependencies - The required dependencies for settings operations.
+     * @example
+     * ```typescript
+     * const repo = new SettingsRepository({ databaseService });
+     * ```
+     */
+    public constructor(dependencies: SettingsRepositoryDependencies) {
+        this.databaseService = dependencies.databaseService;
+    }
+
+    /**
+     * Bulk inserts settings within an existing transaction context.
+     *
+     * @param db - The database connection (must be within an active transaction).
+     * @param settings - Key-value pairs to insert.
+     * @throws Error when database operations fail.
+     * @remarks
+     * **IMPORTANT**: This method must be called within an existing transaction context.
+     *
+     * **Error Handling**: Uses prepared statements which may throw on constraint violations or database errors. All exceptions are propagated to the calling transaction context for proper rollback handling.
+     *
+     * **Performance**: Uses prepared statements for optimal bulk insert performance.
+     */
+    public bulkInsertInternal(
+        db: Database,
+        settings: Record<string, string>
+    ): void {
+        const entries = Object.entries(settings);
+        if (entries.length === 0) {
+            return;
+        }
+
+        // Prepare the statement once for better performance
+        const stmt = db.prepare(SETTINGS_QUERIES.INSERT_OR_REPLACE);
+
+        try {
+            for (const [key, value] of entries) {
+                stmt.run([key, value]);
+            }
+
+            logger.info(
+                `[SettingsRepository] Bulk inserted ${entries.length} settings (internal)`
+            );
+        } finally {
+            stmt.finalize();
+        }
+    }
+
+    /**
+     * Clears all settings from the database within an existing transaction context.
+     *
+     * @param db - The database connection (must be within an active transaction).
+     * @remarks
+     * Use this method only when already within a transaction context.
+     */
+    public deleteAllInternal(db: Database): void {
+        db.run(SETTINGS_QUERIES.DELETE_ALL);
+        logger.info("[SettingsRepository] All settings deleted (internal)");
+    }
+
+    /**
+     * Deletes a setting by key within an existing transaction context.
+     *
+     * @param db - The database connection (must be within an active transaction).
+     * @param key - The setting key to delete.
+     * @remarks
+     * Use this method only when already within a transaction context.
+     */
+    public deleteInternal(db: Database, key: string): void {
+        db.run(SETTINGS_QUERIES.DELETE_BY_KEY, [key]);
+        if (isDev()) {
+            logger.debug(
+                `[SettingsRepository] Deleted setting (internal): ${key}`
+            );
+        }
     }
 
     /**

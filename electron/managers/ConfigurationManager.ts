@@ -108,6 +108,98 @@ export class ConfigurationManager {
     private readonly validationCache: StandardizedCache<ValidationResult>;
 
     /**
+     * Validates a monitor configuration according to business rules, with caching.
+     *
+     * @param monitor - The monitor configuration to validate. Must be a member of {@link Site.monitors}.
+     * @returns A promise resolving to a {@link ValidationResult} with errors and validity status.
+     *
+     * @remarks
+     * Delegates to {@link MonitorValidator.validateMonitorConfiguration} and caches results for performance.
+     */
+    public async validateMonitorConfiguration(
+        monitor: Site["monitors"][0]
+    ): Promise<ValidationResult> {
+        // Create stable cache key using deterministic JSON serialization
+        const monitorForKey = {
+            checkInterval: monitor.checkInterval,
+            host: monitor.host ?? "",
+            id: monitor.id,
+            lastChecked: monitor.lastChecked?.getTime() ?? null,
+            monitoring: monitor.monitoring,
+            port: monitor.port ?? null,
+            responseTime: monitor.responseTime,
+            retryAttempts: monitor.retryAttempts,
+            status: monitor.status,
+            timeout: monitor.timeout,
+            type: monitor.type,
+            url: monitor.url ?? "",
+        };
+
+        const cacheKey = CacheKeys.validation.byType(
+            "monitor",
+            JSON.stringify(monitorForKey)
+        );
+
+        // Check cache first
+        const cached = this.validationCache.get(cacheKey);
+        if (cached) {
+            return cached;
+        }
+
+        // Perform validation
+        const result = await Promise.resolve(
+            this.monitorValidator.validateMonitorConfiguration(monitor)
+        );
+
+        // Cache the result
+        this.validationCache.set(cacheKey, result);
+
+        return result;
+    }
+
+    /**
+     * Validates a site configuration according to business rules, with caching.
+     *
+     * @param site - The {@link Site} configuration to validate.
+     * @returns A promise resolving to a {@link ValidationResult} with errors and validity status.
+     *
+     * @remarks
+     * Delegates to {@link SiteValidator.validateSiteConfiguration} and caches results for performance.
+     */
+    public async validateSiteConfiguration(
+        site: Site
+    ): Promise<ValidationResult> {
+        // Create stable cache key using deterministic JSON serialization
+        const siteForKey = {
+            identifier: site.identifier,
+            monitorCount: site.monitors.length,
+            monitoring: site.monitoring,
+            name: site.name,
+        };
+
+        const cacheKey = CacheKeys.validation.byType(
+            "site",
+            JSON.stringify(siteForKey)
+        );
+
+        // Check cache first
+        const cached = this.validationCache.get(cacheKey);
+        if (cached) {
+            return cached;
+        }
+
+        // Perform validation
+        const result = await Promise.resolve(
+            this.siteValidator.validateSiteConfiguration(site)
+        );
+
+        // Cache the result
+        this.validationCache.set(cacheKey, result);
+
+        return result;
+    }
+
+    /**
      * Creates a new {@link ConfigurationManager} instance.
      *
      * @remarks
@@ -268,97 +360,5 @@ export class ConfigurationManager {
      */
     public shouldIncludeInExport(site: Site): boolean {
         return this.siteValidator.shouldIncludeInExport(site);
-    }
-
-    /**
-     * Validates a monitor configuration according to business rules, with caching.
-     *
-     * @param monitor - The monitor configuration to validate. Must be a member of {@link Site.monitors}.
-     * @returns A promise resolving to a {@link ValidationResult} with errors and validity status.
-     *
-     * @remarks
-     * Delegates to {@link MonitorValidator.validateMonitorConfiguration} and caches results for performance.
-     */
-    public async validateMonitorConfiguration(
-        monitor: Site["monitors"][0]
-    ): Promise<ValidationResult> {
-        // Create stable cache key using deterministic JSON serialization
-        const monitorForKey = {
-            checkInterval: monitor.checkInterval,
-            host: monitor.host ?? "",
-            id: monitor.id,
-            lastChecked: monitor.lastChecked?.getTime() ?? null,
-            monitoring: monitor.monitoring,
-            port: monitor.port ?? null,
-            responseTime: monitor.responseTime,
-            retryAttempts: monitor.retryAttempts,
-            status: monitor.status,
-            timeout: monitor.timeout,
-            type: monitor.type,
-            url: monitor.url ?? "",
-        };
-
-        const cacheKey = CacheKeys.validation.byType(
-            "monitor",
-            JSON.stringify(monitorForKey)
-        );
-
-        // Check cache first
-        const cached = this.validationCache.get(cacheKey);
-        if (cached) {
-            return cached;
-        }
-
-        // Perform validation
-        const result = await Promise.resolve(
-            this.monitorValidator.validateMonitorConfiguration(monitor)
-        );
-
-        // Cache the result
-        this.validationCache.set(cacheKey, result);
-
-        return result;
-    }
-
-    /**
-     * Validates a site configuration according to business rules, with caching.
-     *
-     * @param site - The {@link Site} configuration to validate.
-     * @returns A promise resolving to a {@link ValidationResult} with errors and validity status.
-     *
-     * @remarks
-     * Delegates to {@link SiteValidator.validateSiteConfiguration} and caches results for performance.
-     */
-    public async validateSiteConfiguration(
-        site: Site
-    ): Promise<ValidationResult> {
-        // Create stable cache key using deterministic JSON serialization
-        const siteForKey = {
-            identifier: site.identifier,
-            monitorCount: site.monitors.length,
-            monitoring: site.monitoring,
-            name: site.name,
-        };
-
-        const cacheKey = CacheKeys.validation.byType(
-            "site",
-            JSON.stringify(siteForKey)
-        );
-
-        // Check cache first
-        const cached = this.validationCache.get(cacheKey);
-        if (cached) {
-            return cached;
-        }
-
-        // Perform validation
-        const result = await Promise.resolve(
-            this.siteValidator.validateSiteConfiguration(site)
-        );
-
-        // Cache the result
-        this.validationCache.set(cacheKey, result);
-
-        return result;
     }
 }

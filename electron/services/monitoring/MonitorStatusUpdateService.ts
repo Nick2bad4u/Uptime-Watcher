@@ -73,23 +73,6 @@ export class MonitorStatusUpdateService {
     private readonly sites: StandardizedCache<Site>;
 
     /**
-     * Creates a new MonitorStatusUpdateService.
-     *
-     * @param operationRegistry - Registry for validating operations
-     * @param monitorRepository - Repository for monitor operations
-     * @param sites - Site cache for updating cached monitor states
-     */
-    public constructor(
-        operationRegistry: MonitorOperationRegistry,
-        monitorRepository: MonitorRepository,
-        sites: StandardizedCache<Site>
-    ) {
-        this.operationRegistry = operationRegistry;
-        this.monitorRepository = monitorRepository;
-        this.sites = sites;
-    }
-
-    /**
      * Update monitor status only if the operation is still valid.
      *
      * @param result - Check result with operation correlation
@@ -221,5 +204,22 @@ export class MonitorStatusUpdateService {
             );
             // Don't throw - cache refresh failure shouldn't break monitor updates
         }
+    }
+
+    /**
+     * Creates a new MonitorStatusUpdateService.
+     *
+     * @param operationRegistry - Registry for validating operations
+     * @param monitorRepository - Repository for monitor operations
+     * @param sites - Site cache for updating cached monitor states
+     */
+    public constructor(
+        operationRegistry: MonitorOperationRegistry,
+        monitorRepository: MonitorRepository,
+        sites: StandardizedCache<Site>
+    ) {
+        this.operationRegistry = operationRegistry;
+        this.monitorRepository = monitorRepository;
+        this.sites = sites;
     }
 }

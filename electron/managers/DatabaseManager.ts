@@ -161,43 +161,6 @@ export class DatabaseManager {
     private readonly siteLoadingOrchestrator: SiteLoadingOrchestrator;
 
     /**
-     * Constructs a new {@link DatabaseManager} instance.
-     *
-     * @remarks
-     * All dependencies are injected for testability and modularity. Services and orchestrators are created using the provided repositories and event emitter.
-     *
-     * @param dependencies - The set of dependencies required for all database operations.
-     */
-    public constructor(dependencies: DatabaseManagerDependencies) {
-        this.dependencies = dependencies;
-        this.configurationManager = dependencies.configurationManager;
-        this.eventEmitter = dependencies.eventEmitter;
-
-        // Create services with injected dependencies (still SOLID compliant)
-        this.siteCache = createSiteCache();
-        this.serviceFactory = new DatabaseServiceFactory({
-            databaseService: dependencies.repositories.database,
-            eventEmitter: dependencies.eventEmitter,
-            repositories: {
-                history: dependencies.repositories.history,
-                monitor: dependencies.repositories.monitor,
-                settings: dependencies.repositories.settings,
-                site: dependencies.repositories.site,
-            },
-        });
-
-        // Create site loading orchestrator
-        const siteRepositoryService =
-            this.serviceFactory.createSiteRepositoryService();
-        this.siteLoadingOrchestrator = new SiteLoadingOrchestrator(
-            siteRepositoryService
-        );
-
-        // Initialize command executor
-        this.commandExecutor = new DatabaseCommandExecutor();
-    }
-
-    /**
      * Downloads a SQLite database backup file.
      *
      * @remarks
@@ -245,15 +208,6 @@ export class DatabaseManager {
             this.siteCache
         );
         return this.commandExecutor.execute(command);
-    }
-
-    /**
-     * Gets the current history limit for status history retention.
-     *
-     * @returns The current history limit value.
-     */
-    public getHistoryLimit(): number {
-        return this.historyLimit;
     }
 
     /**
@@ -660,5 +614,51 @@ export class DatabaseManager {
         monitorLogger.info(
             `[DatabaseManager:${operationId}] Successfully loaded ${result.sitesLoaded} sites from database`
         );
+    }
+
+    /**
+     * Constructs a new {@link DatabaseManager} instance.
+     *
+     * @remarks
+     * All dependencies are injected for testability and modularity. Services and orchestrators are created using the provided repositories and event emitter.
+     *
+     * @param dependencies - The set of dependencies required for all database operations.
+     */
+    public constructor(dependencies: DatabaseManagerDependencies) {
+        this.dependencies = dependencies;
+        this.configurationManager = dependencies.configurationManager;
+        this.eventEmitter = dependencies.eventEmitter;
+
+        // Create services with injected dependencies (still SOLID compliant)
+        this.siteCache = createSiteCache();
+        this.serviceFactory = new DatabaseServiceFactory({
+            databaseService: dependencies.repositories.database,
+            eventEmitter: dependencies.eventEmitter,
+            repositories: {
+                history: dependencies.repositories.history,
+                monitor: dependencies.repositories.monitor,
+                settings: dependencies.repositories.settings,
+                site: dependencies.repositories.site,
+            },
+        });
+
+        // Create site loading orchestrator
+        const siteRepositoryService =
+            this.serviceFactory.createSiteRepositoryService();
+        this.siteLoadingOrchestrator = new SiteLoadingOrchestrator(
+            siteRepositoryService
+        );
+
+        // Initialize command executor
+        this.commandExecutor = new DatabaseCommandExecutor();
+    }
+
+    /**
+     * Gets the current history limit for status history retention.
+     *
+     * @returns The current history limit value.
+     */
+    public getHistoryLimit(): number {
+        return this.historyLimit;
     }
 }

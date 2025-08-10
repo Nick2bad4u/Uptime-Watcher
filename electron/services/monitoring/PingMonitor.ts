@@ -88,39 +88,6 @@ export class PingMonitor implements IMonitorService {
     private config: MonitorConfig;
 
     /**
-     * Creates a new PingMonitor instance with the specified configuration.
-     *
-     * @param config - Configuration options for the monitor service
-     *
-     * @remarks
-     * Initializes the monitor with default timeout and retry values, merging any
-     * provided configuration options. The monitor uses sensible defaults if no
-     * configuration is provided, making it safe to instantiate without parameters.
-     *
-     * Default configuration:
-     * - timeout: 30000ms (30 seconds)
-     * - retryAttempts: 3
-     *
-     * @example
-     * ```typescript
-     * // Use default configuration
-     * const monitor = new PingMonitor();
-     *
-     * // Custom configuration
-     * const monitor = new PingMonitor({
-     *   timeout: 5000,
-     *   retryAttempts: 5
-     * });
-     * ```
-     */
-    public constructor(config: MonitorConfig = {}) {
-        this.config = {
-            timeout: DEFAULT_REQUEST_TIMEOUT,
-            ...config,
-        };
-    }
-
-    /**
      * Performs a ping connectivity check on the specified monitor.
      *
      * @param monitor - Monitor configuration containing host and ping settings
@@ -191,6 +158,39 @@ export class PingMonitor implements IMonitorService {
         );
 
         return performPingCheckWithRetry(monitor.host, timeout, retryAttempts);
+    }
+
+    /**
+     * Creates a new PingMonitor instance with the specified configuration.
+     *
+     * @param config - Configuration options for the monitor service
+     *
+     * @remarks
+     * Initializes the monitor with default timeout and retry values, merging any
+     * provided configuration options. The monitor uses sensible defaults if no
+     * configuration is provided, making it safe to instantiate without parameters.
+     *
+     * Default configuration:
+     * - timeout: 30000ms (30 seconds)
+     * - retryAttempts: 3
+     *
+     * @example
+     * ```typescript
+     * // Use default configuration
+     * const monitor = new PingMonitor();
+     *
+     * // Custom configuration
+     * const monitor = new PingMonitor({
+     *   timeout: 5000,
+     *   retryAttempts: 5
+     * });
+     * ```
+     */
+    public constructor(config: MonitorConfig = {}) {
+        this.config = {
+            timeout: DEFAULT_REQUEST_TIMEOUT,
+            ...config,
+        };
     }
 
     /**

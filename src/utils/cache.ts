@@ -61,7 +61,9 @@ export interface CacheOptions {
  */
 export class TypedCache<K, V> {
     private readonly cache = new Map<K, CacheEntry<V>>();
+
     private readonly defaultTtl: number | undefined;
+
     private readonly maxSize: number;
 
     /**
@@ -73,6 +75,7 @@ export class TypedCache<K, V> {
         this.maxSize = options.maxSize ?? 100;
         this.defaultTtl = options.ttl;
     }
+
     /**
      * Get cache size.
      *
