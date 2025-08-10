@@ -599,15 +599,19 @@ class StatusUpdateManager {
 // Timeout management with cleanup
 const timeouts = new Map<string, NodeJS.Timeout>();
 
-function scheduleTimeout(id: string, callback: () => void, delay: number): void {
+function scheduleTimeout(
+ id: string,
+ callback: () => void,
+ delay: number
+): void {
  // Clear existing timeout if any
  clearManagedTimeout(id);
- 
+
  const timeout = setTimeout(() => {
   callback();
   timeouts.delete(id);
  }, delay);
- 
+
  timeouts.set(id, timeout);
 }
 
@@ -626,10 +630,10 @@ class ServiceManager {
   for (const [id] of timeouts) {
    clearManagedTimeout(id);
   }
-  
+
   // Close database connections
   this.databaseService.close();
-  
+
   // Cleanup caches
   this.cache.clear();
  }
@@ -645,7 +649,7 @@ class StandardizedCache<T> {
 
  public onInvalidation(callback: (key?: string) => void): () => void {
   this.invalidationCallbacks.add(callback);
-  
+
   // Return cleanup function
   return () => {
    this.invalidationCallbacks.delete(callback);
@@ -654,7 +658,7 @@ class StandardizedCache<T> {
 
  public clear(): void {
   this.cache.clear();
-  
+
   // Notify listeners with error isolation
   for (const callback of this.invalidationCallbacks) {
    try {
@@ -726,10 +730,10 @@ class MonitorOperationRegistry {
 // Usage in monitor checks
 async function performMonitorCheck(monitorId: string): Promise<void> {
  const operationId = operationRegistry.initiateCheck(monitorId);
- 
+
  try {
   const result = await doActualCheck();
-  
+
   // Validate operation still active before updating state
   if (operationRegistry.validateOperation(operationId)) {
    await updateMonitorStatus(monitorId, result);
@@ -751,7 +755,7 @@ class DatabaseManager {
   // Load into temporary cache first
   const tempCache = new Map<string, Site>();
   const sites = await this.siteRepository.getAll();
-  
+
   for (const site of sites) {
    tempCache.set(site.identifier, site);
   }
@@ -769,9 +773,11 @@ class StatusUpdateHandler {
  async handleStatusUpdate(update: StatusUpdate): Promise<void> {
   const currentSites = this.getSites();
   const updatedSites = [...currentSites];
-  
+
   // Find and validate site exists
-  const siteIndex = updatedSites.findIndex(s => s.identifier === update.siteIdentifier);
+  const siteIndex = updatedSites.findIndex(
+   (s) => s.identifier === update.siteIdentifier
+  );
   if (siteIndex === -1) {
    logger.warn(`Status update for unknown site: ${update.siteIdentifier}`);
    return;
@@ -780,7 +786,7 @@ class StatusUpdateHandler {
   // Atomic update with validation
   const updatedSite = this.applyStatusUpdate(updatedSites[siteIndex], update);
   updatedSites[siteIndex] = updatedSite;
-  
+
   // Apply all changes atomically
   this.setSites(updatedSites);
  }
@@ -805,7 +811,7 @@ class OperationQueue {
      reject(error);
     }
    });
-   
+
    void this.processQueue();
   });
  }
@@ -816,7 +822,7 @@ class OperationQueue {
   }
 
   this.isProcessing = true;
-  
+
   while (this.queue.length > 0) {
    const operation = this.queue.shift()!;
    try {
@@ -825,7 +831,7 @@ class OperationQueue {
     logger.error("Queued operation failed", error);
    }
   }
-  
+
   this.isProcessing = false;
  }
 }

@@ -63,11 +63,7 @@ vi.mock(
     "../../../components/common/SiteMonitoringButton/SiteMonitoringButton",
     () => ({
         SiteMonitoringButton: vi.fn(
-            ({
-                isLoading,
-                onStartSiteMonitoring,
-                onStopSiteMonitoring,
-            }) => (
+            ({ isLoading, onStartSiteMonitoring, onStopSiteMonitoring }) => (
                 <div data-testid="site-monitoring-button">
                     <button
                         data-testid="start-site-monitoring"
@@ -155,7 +151,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             renderSiteDetailsNavigation();
 
             // Use CSS class selector instead of data-testid
-            expect(document.querySelector('.themed-box')).toBeInTheDocument();
+            expect(document.querySelector(".themed-box")).toBeInTheDocument();
         });
 
         it("should render site overview tab", () => {
@@ -194,14 +190,18 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             renderSiteDetailsNavigation();
 
             // Use CSS class selector instead of data-testid
-            expect(document.querySelector('.themed-select')).toBeInTheDocument();
+            expect(
+                document.querySelector(".themed-select")
+            ).toBeInTheDocument();
         });
 
         it("should show selected monitor in selector", () => {
             renderSiteDetailsNavigation();
 
             // Use CSS class selector and getByRole for semantic selection
-            const selector = document.querySelector('.themed-select') as HTMLSelectElement;
+            const selector = document.querySelector(
+                ".themed-select"
+            ) as HTMLSelectElement;
             expect(selector).toHaveValue("monitor-1");
         });
 
@@ -219,7 +219,9 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             });
 
             // Use CSS class selector instead of data-testid
-            const selector = document.querySelector('.themed-select') as HTMLSelectElement;
+            const selector = document.querySelector(
+                ".themed-select"
+            ) as HTMLSelectElement;
             fireEvent.change(selector, { target: { value: "monitor-2" } });
 
             expect(handleMonitorIdChange).toHaveBeenCalled();

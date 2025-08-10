@@ -1,5 +1,5 @@
 ---
-title: '@returns'
+title: "@returns"
 ---
 
 <!-- prettier-ignore-start -->
@@ -29,7 +29,7 @@ Used to document the return value for a function.
  * @beta
  */
 function getAverage(x: number, y: number): number {
-  return (x + y) / 2.0;
+ return (x + y) / 2.0;
 }
 ```
 

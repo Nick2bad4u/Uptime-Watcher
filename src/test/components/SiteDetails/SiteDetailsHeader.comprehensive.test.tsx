@@ -141,7 +141,9 @@ describe("SiteDetailsHeader", () => {
                     selectedMonitor={mockHttpMonitor}
                 />
             );
-            const statusIndicator = document.querySelector(".themed-status-indicator");
+            const statusIndicator = document.querySelector(
+                ".themed-status-indicator"
+            );
             expect(statusIndicator).toBeInTheDocument();
         });
 
@@ -528,7 +530,9 @@ describe("SiteDetailsHeader", () => {
                     }}
                 />
             );
-            const statusIndicator = document.querySelector(".themed-status-indicator");
+            const statusIndicator = document.querySelector(
+                ".themed-status-indicator"
+            );
             expect(statusIndicator).toBeInTheDocument();
         });
 

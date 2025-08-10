@@ -377,11 +377,14 @@ describe("eventTypes - Comprehensive Coverage", () => {
                     isEventOfCategory("site:added", "UNKNOWN_CATEGORY" as any)
                 ).toBe(false);
                 expect(
-                    isEventOfCategory("monitor:up", "NOT_A_REAL_CATEGORY" as any)
+                    isEventOfCategory(
+                        "monitor:up",
+                        "NOT_A_REAL_CATEGORY" as any
+                    )
                 ).toBe(false);
-                expect(isEventOfCategory("system:error", "FAKE_CATEGORY" as any)).toBe(
-                    false
-                );
+                expect(
+                    isEventOfCategory("system:error", "FAKE_CATEGORY" as any)
+                ).toBe(false);
             });
         });
 

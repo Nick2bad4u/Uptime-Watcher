@@ -108,7 +108,7 @@ describe("Monitor Validation Utilities", () => {
                 url: "https://example.com",
                 timeout: 5000,
                 retryAttempts: 5,
-                ['monitoring']: false,
+                ["monitoring"]: false,
                 status: "up",
             } as any);
 
@@ -139,7 +139,7 @@ describe("Monitor Validation Utilities", () => {
         it("should preserve additional custom fields", () => {
             const result = createMonitorObject("http", {
                 url: "https://example.com",
-                ['customField']: "customValue",
+                ["customField"]: "customValue",
                 anotherField: 123,
             } as any);
 
@@ -895,7 +895,7 @@ describe("Monitor Validation Utilities", () => {
         it("should handle unknown monitor types", async () => {
             const result = await validateMonitorFormData(
                 "unknown" as MonitorType,
-                { ['someField']: "value" } as any
+                { ["someField"]: "value" } as any
             );
 
             expect(result.success).toBe(true);
@@ -957,7 +957,7 @@ describe("Monitor Validation Utilities", () => {
         it("should handle null and undefined values in createMonitorObject", () => {
             const result = createMonitorObject("http", {
                 url: "https://example.com",
-                ['customField']: null,
+                ["customField"]: null,
                 anotherField: undefined,
             } as any);
 

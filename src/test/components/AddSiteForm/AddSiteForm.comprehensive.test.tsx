@@ -281,7 +281,9 @@ describe("AddSiteForm Component", () => {
             render(<AddSiteForm />);
 
             // Test theme integration
-            expect(document.querySelectorAll(".themed-text")[0]).toBeInTheDocument();
+            expect(
+                document.querySelectorAll(".themed-text")[0]
+            ).toBeInTheDocument();
         });
     });
 

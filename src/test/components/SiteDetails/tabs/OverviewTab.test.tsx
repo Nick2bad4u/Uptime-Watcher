@@ -227,11 +227,15 @@ describe("OverviewTab", () => {
             render(<OverviewTab {...baseProps} />);
 
             // Check basic elements are present
-            expect(document.querySelector(".themed-status-indicator")).toBeInTheDocument();
+            expect(
+                document.querySelector(".themed-status-indicator")
+            ).toBeInTheDocument();
             expect(
                 document.querySelectorAll(".themed-card").length
             ).toBeGreaterThanOrEqual(2); // Should have multiple cards
-            expect(document.querySelector(".themed-progress")).toBeInTheDocument();
+            expect(
+                document.querySelector(".themed-progress")
+            ).toBeInTheDocument();
         });
 
         it("should display uptime percentage correctly", () => {
@@ -354,7 +358,9 @@ describe("OverviewTab", () => {
                 <OverviewTab {...baseProps} selectedMonitor={portMonitor} />
             );
 
-            expect(document.querySelector(".themed-status-indicator")).toBeInTheDocument();
+            expect(
+                document.querySelector(".themed-status-indicator")
+            ).toBeInTheDocument();
         });
 
         it("should handle down status monitor", () => {
@@ -367,11 +373,14 @@ describe("OverviewTab", () => {
                 <OverviewTab {...baseProps} selectedMonitor={downMonitor} />
             );
 
-            expect(document.querySelector(".themed-status-indicator")).toBeInTheDocument();
+            expect(
+                document.querySelector(".themed-status-indicator")
+            ).toBeInTheDocument();
         });
 
         it("should handle monitor without last check", () => {
-            const { lastChecked, ...monitorWithoutLastCheck } = createMockMonitor();
+            const { lastChecked, ...monitorWithoutLastCheck } =
+                createMockMonitor();
 
             render(
                 <OverviewTab
@@ -380,7 +389,9 @@ describe("OverviewTab", () => {
                 />
             );
 
-            expect(document.querySelector(".themed-status-indicator")).toBeInTheDocument();
+            expect(
+                document.querySelector(".themed-status-indicator")
+            ).toBeInTheDocument();
         });
     });
 
@@ -434,7 +445,9 @@ describe("OverviewTab", () => {
         it("should handle extreme interval values", () => {
             render(<OverviewTab {...baseProps} localCheckInterval={30000} />);
 
-            expect(document.querySelector(".themed-select")).toBeInTheDocument();
+            expect(
+                document.querySelector(".themed-select")
+            ).toBeInTheDocument();
         });
 
         it("should handle extreme timeout values", () => {

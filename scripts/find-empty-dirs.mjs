@@ -11,24 +11,24 @@
  * ```bash
  * # Find empty directories in default folders (electron, src, shared)
  * node scripts/find-empty-dirs.mjs
- * 
+ *
  * # Find and delete empty directories
  * node scripts/find-empty-dirs.mjs --delete
  * node scripts/find-empty-dirs.mjs -d
- * 
+ *
  * # Specify custom directories to check
  * node scripts/find-empty-dirs.mjs --dirs "src,dist,build"
  * node scripts/find-empty-dirs.mjs --dirs="electron" --dirs="custom-folder"
- * 
+ *
  * # Exclude specific directories from search
  * node scripts/find-empty-dirs.mjs --exclude "node_modules,.git,dist"
- * 
+ *
  * # Quiet mode (only show summary)
  * node scripts/find-empty-dirs.mjs --quiet
- * 
+ *
  * # Verbose mode (show detailed information)
  * node scripts/find-empty-dirs.mjs --verbose
- * 
+ *
  * # JSON output format
  * node scripts/find-empty-dirs.mjs --format json
  * ```
@@ -51,66 +51,77 @@ const ROOT_DIR = process.cwd();
 const DEFAULT_TARGET_DIRS = ["electron", "src", "shared"];
 
 // Parse command line arguments
-import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
 
 const argv = await yargs(hideBin(process.argv))
-    .option('delete', {
-        alias: 'd',
-        type: 'boolean',
-        description: 'Delete empty directories',
-        default: false
+    .option("delete", {
+        alias: "d",
+        type: "boolean",
+        description: "Delete empty directories",
+        default: false,
     })
-    .option('dirs', {
-        type: 'array',
-        description: 'Directories to search (comma-separated or multiple --dirs flags)',
+    .option("dirs", {
+        type: "array",
+        description:
+            "Directories to search (comma-separated or multiple --dirs flags)",
         default: DEFAULT_TARGET_DIRS,
         coerce: (dirs) => {
             // Handle comma-separated values and flatten arrays
-            const flattened = dirs.flatMap((/** @type {string} */ dir) => 
-                typeof dir === 'string' ? dir.split(',').map(d => d.trim()) : dir
+            const flattened = dirs.flatMap((/** @type {string} */ dir) =>
+                typeof dir === "string"
+                    ? dir.split(",").map((d) => d.trim())
+                    : dir
             );
-            return flattened.filter((/** @type {string | any[]} */ d) => d.length > 0);
-        }
+            return flattened.filter(
+                (/** @type {string | any[]} */ d) => d.length > 0
+            );
+        },
     })
-    .option('exclude', {
-        alias: 'x',
-        type: 'array',
-        description: 'Directories to exclude from search (comma-separated or multiple --exclude flags)',
-        default: ['.git', 'node_modules', '.vscode'],
+    .option("exclude", {
+        alias: "x",
+        type: "array",
+        description:
+            "Directories to exclude from search (comma-separated or multiple --exclude flags)",
+        default: [".git", "node_modules", ".vscode"],
         coerce: (excludes) => {
-            const flattened = excludes.flatMap((/** @type {string} */ exclude) => 
-                typeof exclude === 'string' ? exclude.split(',').map(e => e.trim()) : exclude
+            const flattened = excludes.flatMap(
+                (/** @type {string} */ exclude) =>
+                    typeof exclude === "string"
+                        ? exclude.split(",").map((e) => e.trim())
+                        : exclude
             );
-            return flattened.filter((/** @type {string | any[]} */ e) => e.length > 0);
-        }
+            return flattened.filter(
+                (/** @type {string | any[]} */ e) => e.length > 0
+            );
+        },
     })
-    .option('quiet', {
-        alias: 'q',
-        type: 'boolean',
-        description: 'Quiet mode - only show summary',
-        default: false
+    .option("quiet", {
+        alias: "q",
+        type: "boolean",
+        description: "Quiet mode - only show summary",
+        default: false,
     })
-    .option('verbose', {
-        alias: 'v',
-        type: 'boolean',
-        description: 'Verbose mode - show detailed information',
-        default: false
+    .option("verbose", {
+        alias: "v",
+        type: "boolean",
+        description: "Verbose mode - show detailed information",
+        default: false,
     })
-    .option('format', {
-        alias: 'f',
-        type: 'string',
-        choices: ['text', 'json'],
-        description: 'Output format',
-        default: 'text'
+    .option("format", {
+        alias: "f",
+        type: "string",
+        choices: ["text", "json"],
+        description: "Output format",
+        default: "text",
     })
-    .option('check-only', {
-        type: 'boolean',
-        description: 'Only check if directories exist without searching for empty ones',
-        default: false
+    .option("check-only", {
+        type: "boolean",
+        description:
+            "Only check if directories exist without searching for empty ones",
+        default: false,
     })
-    .help()
-    .argv;
+    .help().argv;
 
 const shouldDelete = argv.delete;
 const targetDirs = argv.dirs;
@@ -118,29 +129,35 @@ const excludeDirs = new Set(argv.exclude);
 const isQuiet = argv.quiet;
 const isVerbose = argv.verbose;
 const outputFormat = argv.format;
-const checkOnly = argv['check-only'];
+const checkOnly = argv["check-only"];
 
 // Validate conflicting options
 if (isQuiet && isVerbose) {
-    console.error('❌ Cannot use both --quiet and --verbose flags together');
+    console.error("❌ Cannot use both --quiet and --verbose flags together");
     process.exit(1);
 }
 
-if (shouldDelete && outputFormat === 'json') {
-    console.error('❌ JSON output format is not compatible with delete mode');
+if (shouldDelete && outputFormat === "json") {
+    console.error("❌ JSON output format is not compatible with delete mode");
     process.exit(1);
 }
 
-if (!isQuiet && outputFormat === 'text') {
+if (!isQuiet && outputFormat === "text") {
     if (shouldDelete) {
-        console.log('🗑️  Delete mode enabled - empty directories will be removed');
+        console.log(
+            "🗑️  Delete mode enabled - empty directories will be removed"
+        );
     } else {
-        console.log('🔍 Find mode - empty directories will be listed (use --delete or -d to remove them)');
+        console.log(
+            "🔍 Find mode - empty directories will be listed (use --delete or -d to remove them)"
+        );
     }
-    
+
     if (isVerbose) {
-        console.log(`📁 Target directories: ${targetDirs.join(', ')}`);
-        console.log(`🚫 Excluded directories: ${Array.from(excludeDirs).join(', ')}`);
+        console.log(`📁 Target directories: ${targetDirs.join(", ")}`);
+        console.log(
+            `🚫 Excluded directories: ${Array.from(excludeDirs).join(", ")}`
+        );
     }
 }
 
@@ -152,7 +169,9 @@ for (const dir of targetDirs) {
         const stats = await stat(absPath);
         if (!stats.isDirectory()) {
             if (!isQuiet) {
-                console.warn(`⚠️  Expected directory '${dir}' is not a directory in ${ROOT_DIR}`);
+                console.warn(
+                    `⚠️  Expected directory '${dir}' is not a directory in ${ROOT_DIR}`
+                );
             }
             continue;
         }
@@ -162,7 +181,9 @@ for (const dir of targetDirs) {
         }
     } catch (err) {
         if (!isQuiet) {
-            console.warn(`⚠️  Expected directory '${dir}' not found in ${ROOT_DIR}`);
+            console.warn(
+                `⚠️  Expected directory '${dir}' not found in ${ROOT_DIR}`
+            );
         }
         if (isVerbose) {
             console.log(`   Error: ${err.message}`);
@@ -171,23 +192,33 @@ for (const dir of targetDirs) {
 }
 
 if (validTargetDirs.length === 0) {
-    console.error('❌ No valid target directories found');
+    console.error("❌ No valid target directories found");
     process.exit(1);
 }
 
 if (checkOnly) {
-    if (outputFormat === 'json') {
-        console.log(JSON.stringify({
-            found: validTargetDirs,
-            missing: targetDirs.filter((/** @type {any} */ d) => !validTargetDirs.includes(d)),
-            total: targetDirs.length,
-            valid: validTargetDirs.length
-        }, null, 2));
+    if (outputFormat === "json") {
+        console.log(
+            JSON.stringify(
+                {
+                    found: validTargetDirs,
+                    missing: targetDirs.filter(
+                        (/** @type {any} */ d) => !validTargetDirs.includes(d)
+                    ),
+                    total: targetDirs.length,
+                    valid: validTargetDirs.length,
+                },
+                null,
+                2
+            )
+        );
     } else {
         console.log(`📊 Directory Check Summary:`);
         console.log(`   Total specified: ${targetDirs.length}`);
         console.log(`   Found: ${validTargetDirs.length}`);
-        console.log(`   Missing: ${targetDirs.length - validTargetDirs.length}`);
+        console.log(
+            `   Missing: ${targetDirs.length - validTargetDirs.length}`
+        );
     }
     process.exit(0);
 }
@@ -259,11 +290,13 @@ async function findEmptyDirs(dir) {
     let emptyDirs = [];
 
     // Filter out excluded directories
-    const filteredEntries = entries.filter(entry => !shouldExcludeDir(entry));
-    
+    const filteredEntries = entries.filter((entry) => !shouldExcludeDir(entry));
+
     if (isVerbose && entries.length !== filteredEntries.length) {
-        const excluded = entries.filter(entry => shouldExcludeDir(entry));
-        console.log(`   Excluded from ${relative(ROOT_DIR, dir)}: ${excluded.join(', ')}`);
+        const excluded = entries.filter((entry) => shouldExcludeDir(entry));
+        console.log(
+            `   Excluded from ${relative(ROOT_DIR, dir)}: ${excluded.join(", ")}`
+        );
     }
 
     // Prepare promises for all non-excluded entries
@@ -279,11 +312,13 @@ async function findEmptyDirs(dir) {
     );
 
     // Flatten results and determine if all entries are empty directories
-    emptyDirs = results.filter(r => Array.isArray(r)).flat();
+    emptyDirs = results.filter((r) => Array.isArray(r)).flat();
 
     // Only mark as empty if all entries are directories and those directories are empty
-    const allEntriesAreDirs = results.every(r => r !== null);
-    const allDirsEmpty = allEntriesAreDirs && results.every(r => Array.isArray(r) && r.length > 0);
+    const allEntriesAreDirs = results.every((r) => r !== null);
+    const allDirsEmpty =
+        allEntriesAreDirs &&
+        results.every((r) => Array.isArray(r) && r.length > 0);
 
     if (filteredEntries.length > 0 && allDirsEmpty) {
         emptyDirs.push(relative(ROOT_DIR, dir));
@@ -302,7 +337,9 @@ async function safeDeleteDir(dirPath) {
         // Double-check that the directory is actually empty before deletion
         const entries = await safeReadDir(dirPath);
         if (entries.length > 0) {
-            console.error(`❌ Cannot delete ${relative(ROOT_DIR, dirPath)}: Directory is not empty`);
+            console.error(
+                `❌ Cannot delete ${relative(ROOT_DIR, dirPath)}: Directory is not empty`
+            );
             return false;
         }
 
@@ -311,7 +348,10 @@ async function safeDeleteDir(dirPath) {
         console.log(`✅ Deleted: ${relative(ROOT_DIR, dirPath)}`);
         return true;
     } catch (err) {
-        console.error(`❌ Failed to delete ${relative(ROOT_DIR, dirPath)}:`, err.message || err);
+        console.error(
+            `❌ Failed to delete ${relative(ROOT_DIR, dirPath)}:`,
+            err.message || err
+        );
         return false;
     }
 }
@@ -329,16 +369,16 @@ async function main() {
         } catch {
             continue;
         }
-        
+
         if (isVerbose) {
             console.log(`\n🔍 Searching in: ${target}`);
         }
-        
+
         const emptyDirs = await findEmptyDirs(absTarget);
         results[target] = emptyDirs;
-        
+
         if (emptyDirs.length > 0) {
-            if (!isQuiet && outputFormat === 'text') {
+            if (!isQuiet && outputFormat === "text") {
                 console.log(`\nEmpty directories under '${target}':`);
             }
             totalFound += emptyDirs.length;
@@ -346,9 +386,12 @@ async function main() {
             if (shouldDelete) {
                 // Sort by depth (deepest first) to ensure we delete child directories before parents
                 const sortedDirs = emptyDirs
-                    .map(dir => ({ path: dir, depth: dir.split(/[/\\]/).length }))
+                    .map((dir) => ({
+                        path: dir,
+                        depth: dir.split(/[/\\]/).length,
+                    }))
                     .sort((a, b) => b.depth - a.depth)
-                    .map(item => item.path);
+                    .map((item) => item.path);
 
                 for (const d of sortedDirs) {
                     if (!isQuiet) {
@@ -361,32 +404,34 @@ async function main() {
                 }
             } else {
                 for (const d of emptyDirs) {
-                    if (!isQuiet && outputFormat === 'text') {
+                    if (!isQuiet && outputFormat === "text") {
                         console.log(`🗂️  ${d}`);
                     }
                 }
             }
         } else {
-            if (!isQuiet && outputFormat === 'text') {
+            if (!isQuiet && outputFormat === "text") {
                 console.log(`No empty directories found under '${target}'.`);
             }
         }
     }
 
     // Output results
-    if (outputFormat === 'json') {
+    if (outputFormat === "json") {
         const jsonOutput = {
             summary: {
                 totalFound,
                 totalDeleted: shouldDelete ? totalDeleted : undefined,
-                totalFailed: shouldDelete ? totalFound - totalDeleted : undefined
+                totalFailed: shouldDelete
+                    ? totalFound - totalDeleted
+                    : undefined,
             },
             results,
             options: {
                 delete: shouldDelete,
                 targetDirs: validTargetDirs,
-                excludeDirs: Array.from(excludeDirs)
-            }
+                excludeDirs: Array.from(excludeDirs),
+            },
         };
         console.log(JSON.stringify(jsonOutput, null, 2));
     } else {
@@ -396,13 +441,19 @@ async function main() {
         if (shouldDelete) {
             console.log(`   Deleted: ${totalDeleted} directories`);
             if (totalDeleted < totalFound) {
-                console.log(`   Failed: ${totalFound - totalDeleted} directories (see errors above)`);
+                console.log(
+                    `   Failed: ${totalFound - totalDeleted} directories (see errors above)`
+                );
             }
         }
-        
+
         if (isVerbose) {
-            console.log(`   Searched directories: ${validTargetDirs.join(', ')}`);
-            console.log(`   Excluded patterns: ${Array.from(excludeDirs).join(', ')}`);
+            console.log(
+                `   Searched directories: ${validTargetDirs.join(", ")}`
+            );
+            console.log(
+                `   Excluded patterns: ${Array.from(excludeDirs).join(", ")}`
+            );
         }
     }
 }

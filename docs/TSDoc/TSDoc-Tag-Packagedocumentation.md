@@ -1,5 +1,5 @@
 ---
-title: '@packageDocumentation'
+title: "@packageDocumentation"
 ---
 
 <!-- prettier-ignore-start -->
@@ -36,10 +36,10 @@ a `@packageDocumentation` tag should never be used to describe an individual API
  * @public
  */
 export interface IWidget {
-  /**
-   * Draws the widget on the screen.
-   */
-  render(): void;
+ /**
+  * Draws the widget on the screen.
+  */
+ render(): void;
 }
 ```
 

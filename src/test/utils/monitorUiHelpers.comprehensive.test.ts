@@ -222,9 +222,12 @@ describe("Monitor UI Helpers", () => {
                 }
             );
 
-            const result = await formatMonitorTitleSuffix("http", createMockMonitor({
-                url: "https://example.com",
-            }));
+            const result = await formatMonitorTitleSuffix(
+                "http",
+                createMockMonitor({
+                    url: "https://example.com",
+                })
+            );
             expect(result).toBe(" (https://example.com)");
         });
 
@@ -235,9 +238,12 @@ describe("Monitor UI Helpers", () => {
 
             globalThis.window = {} as any;
 
-            const result = await formatMonitorTitleSuffix("http", createMockMonitor({
-                url: "https://example.com",
-            }));
+            const result = await formatMonitorTitleSuffix(
+                "http",
+                createMockMonitor({
+                    url: "https://example.com",
+                })
+            );
             expect(result).toBe(""); // Fallback to empty string
         });
 
@@ -253,9 +259,12 @@ describe("Monitor UI Helpers", () => {
                 }
             );
 
-            const result = await formatMonitorTitleSuffix("http", createMockMonitor({
-                url: "https://example.com",
-            }));
+            const result = await formatMonitorTitleSuffix(
+                "http",
+                createMockMonitor({
+                    url: "https://example.com",
+                })
+            );
             expect(result).toBe(""); // Fallback to empty string
         });
     });

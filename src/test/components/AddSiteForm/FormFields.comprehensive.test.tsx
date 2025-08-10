@@ -13,13 +13,17 @@ import type { RadioGroupProperties } from "../../../components/AddSiteForm/Radio
 // Mock all dependencies
 vi.mock("../../../theme/components/ThemedBox", () => ({
     default: vi.fn(({ children, ...props }) => (
-        <div data-testid="themed-box" {...props}>{children}</div>
+        <div data-testid="themed-box" {...props}>
+            {children}
+        </div>
     )),
 }));
 
 vi.mock("../../../theme/components/ThemedText", () => ({
     default: vi.fn(({ children, ...props }) => (
-        <span data-testid="themed-text" {...props}>{children}</span>
+        <span data-testid="themed-text" {...props}>
+            {children}
+        </span>
     )),
 }));
 
@@ -440,11 +444,7 @@ describe("FormFields Components - Complete Coverage", () => {
         });
 
         it("should handle radiogroup without error or helpText", () => {
-            render(
-                <RadioGroup
-                    {...defaultRadioGroupProps}
-                />
-            );
+            render(<RadioGroup {...defaultRadioGroupProps} />);
             expect(screen.getByText("Create New Site")).toBeInTheDocument();
         });
 

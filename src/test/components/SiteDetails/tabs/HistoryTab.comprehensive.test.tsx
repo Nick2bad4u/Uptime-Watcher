@@ -240,7 +240,9 @@ describe("HistoryTab", () => {
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
             // Should show history records
-            expect(document.querySelectorAll(".themed-status-indicator")).toHaveLength(3);
+            expect(
+                document.querySelectorAll(".themed-status-indicator")
+            ).toHaveLength(3);
         });
 
         it("should display empty state when no history available", () => {
@@ -258,7 +260,9 @@ describe("HistoryTab", () => {
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
             // Should show all 4 history records
-            expect(document.querySelectorAll(".themed-status-indicator")).toHaveLength(4);
+            expect(
+                document.querySelectorAll(".themed-status-indicator")
+            ).toHaveLength(4);
         });
 
         it("should filter history to show only 'up' status", async () => {
@@ -269,7 +273,9 @@ describe("HistoryTab", () => {
             await userEvent.click(upButton);
 
             // Should show only up status records (every even index)
-            expect(document.querySelectorAll(".themed-status-indicator")).toHaveLength(2);
+            expect(
+                document.querySelectorAll(".themed-status-indicator")
+            ).toHaveLength(2);
         });
 
         it("should filter history to show only 'down' status", async () => {
@@ -281,7 +287,9 @@ describe("HistoryTab", () => {
             await userEvent.click(downButton);
 
             // Should show only down status records (every odd index)
-            expect(document.querySelectorAll(".themed-status-indicator")).toHaveLength(2);
+            expect(
+                document.querySelectorAll(".themed-status-indicator")
+            ).toHaveLength(2);
         });
 
         it("should switch back to all records when 'all' filter is selected", async () => {
@@ -291,12 +299,16 @@ describe("HistoryTab", () => {
             // First filter to up
             const upButton = screen.getByRole("button", { name: /up/i });
             await userEvent.click(upButton);
-            expect(document.querySelectorAll(".themed-status-indicator")).toHaveLength(2);
+            expect(
+                document.querySelectorAll(".themed-status-indicator")
+            ).toHaveLength(2);
 
             // Then switch back to all
             const allButton = screen.getByRole("button", { name: /all/i });
             await userEvent.click(allButton);
-            expect(document.querySelectorAll(".themed-status-indicator")).toHaveLength(4);
+            expect(
+                document.querySelectorAll(".themed-status-indicator")
+            ).toHaveLength(4);
         });
     });
 
@@ -314,7 +326,9 @@ describe("HistoryTab", () => {
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
             // Should show only up to history limit
-            expect(document.querySelectorAll(".themed-status-indicator")).toHaveLength(10);
+            expect(
+                document.querySelectorAll(".themed-status-indicator")
+            ).toHaveLength(10);
         });
 
         it("should show all available records when history is less than limit", () => {
@@ -329,7 +343,9 @@ describe("HistoryTab", () => {
             const monitor = createMockMonitor(5);
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
-            expect(document.querySelectorAll(".themed-status-indicator")).toHaveLength(5);
+            expect(
+                document.querySelectorAll(".themed-status-indicator")
+            ).toHaveLength(5);
         });
 
         it("should handle display limit dropdown changes", async () => {
@@ -343,7 +359,9 @@ describe("HistoryTab", () => {
             fireEvent.change(select, { target: { value: "10" } });
 
             // Should now show only 10 records
-            expect(document.querySelectorAll(".themed-status-indicator")).toHaveLength(10);
+            expect(
+                document.querySelectorAll(".themed-status-indicator")
+            ).toHaveLength(10);
         });
     });
 

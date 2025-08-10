@@ -644,8 +644,18 @@ describe("Component Coverage Boost", () => {
                     if (data.length < 2) return "insufficient-data";
                     const last = data[data.length - 1];
                     const previous = data[data.length - 2];
-                    if (last !== undefined && previous !== undefined && last > previous) return "increasing";
-                    if (last !== undefined && previous !== undefined && last < previous) return "decreasing";
+                    if (
+                        last !== undefined &&
+                        previous !== undefined &&
+                        last > previous
+                    )
+                        return "increasing";
+                    if (
+                        last !== undefined &&
+                        previous !== undefined &&
+                        last < previous
+                    )
+                        return "decreasing";
                     return "stable";
                 },
             };

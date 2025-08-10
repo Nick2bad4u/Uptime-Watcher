@@ -113,7 +113,10 @@ describe("Shared Utils Coverage", () => {
             const cacheOps: CacheOperations = {
                 set: (key: string, value: any, ttl?: number) => {
                     const expires = ttl ? Date.now() + ttl : undefined;
-                    mockCache.set(key, { value, ...(expires !== undefined && { expires }) });
+                    mockCache.set(key, {
+                        value,
+                        ...(expires !== undefined && { expires }),
+                    });
                 },
                 get: (key: string) => {
                     const entry = mockCache.get(key);
@@ -208,7 +211,7 @@ describe("Shared Utils Coverage", () => {
             );
             expect(template.level).toBe("info");
             expect(template.category).toBe("SiteManager");
-            expect(template.context?.['siteId']).toBe("123");
+            expect(template.context?.["siteId"]).toBe("123");
 
             const formatted = logGenerator.formatMessage(template);
             expect(formatted).toContain(
@@ -409,14 +412,14 @@ describe("Shared Utils Coverage", () => {
                 },
             };
 
-            expect(errorCatalog['SITE_NOT_FOUND']?.category).toBe("validation");
-            expect(errorCatalog['NETWORK_TIMEOUT']?.severity).toBe("medium");
-            expect(errorCatalog['DATABASE_CONNECTION_FAILED']?.recoverable).toBe(
-                false
-            );
-            expect(errorCatalog['INVALID_MONITOR_CONFIG']?.suggestions).toContain(
-                "Check required fields"
-            );
+            expect(errorCatalog["SITE_NOT_FOUND"]?.category).toBe("validation");
+            expect(errorCatalog["NETWORK_TIMEOUT"]?.severity).toBe("medium");
+            expect(
+                errorCatalog["DATABASE_CONNECTION_FAILED"]?.recoverable
+            ).toBe(false);
+            expect(
+                errorCatalog["INVALID_MONITOR_CONFIG"]?.suggestions
+            ).toContain("Check required fields");
         });
 
         it("should handle error resolution and recovery", () => {

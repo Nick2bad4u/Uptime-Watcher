@@ -201,7 +201,8 @@ describe("AnalyticsTab", () => {
             avgResponseTime: 150,
             barChartData: mockBarChartData,
             barChartOptions: mockChartOptions as unknown as ChartOptions<"bar">,
-            doughnutOptions: mockChartOptions as unknown as ChartOptions<"doughnut">,
+            doughnutOptions:
+                mockChartOptions as unknown as ChartOptions<"doughnut">,
             downCount: 5,
             downtimePeriods: mockDowntimePeriods,
             formatDuration: vi.fn((ms: number) => `${Math.round(ms / 1000)}s`),

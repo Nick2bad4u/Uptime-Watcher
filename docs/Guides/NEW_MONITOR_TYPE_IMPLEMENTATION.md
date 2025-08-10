@@ -41,45 +41,45 @@ Your monitor service **MUST** return a result matching the `MonitorCheckResult` 
 ```typescript
 /**
  * Standardized result interface for all monitor check operations.
- * 
+ *
  * @remarks
  * This interface ensures consistency across all monitor types and provides
  * the necessary data for history tracking, status updates, and user feedback.
  * All fields are designed to support production monitoring and debugging.
- * 
+ *
  * @public
  */
 export interface MonitorCheckResult {
- /** 
+ /**
   * Optional human-readable details about the check result.
-  * 
+  *
   * @remarks
   * Should provide meaningful context for history display and debugging.
   * Examples: "HTTP 200 OK", "Connection timeout", "DNS resolution successful"
   */
  details?: string;
 
- /** 
+ /**
   * Optional error message if the check failed.
-  * 
+  *
   * @remarks
   * Should contain technical error information for debugging.
   * Examples: "ECONNREFUSED", "DNS_PROBE_FINISHED_NXDOMAIN"
   */
  error?: string;
 
- /** 
+ /**
   * Response time in milliseconds.
-  * 
+  *
   * @remarks
   * REQUIRED field representing actual response time for successful checks
   * or timeout value for failed checks. Used for performance analytics.
   */
  responseTime: number;
 
- /** 
+ /**
   * Status outcome of the check.
-  * 
+  *
   * @remarks
   * REQUIRED field indicating whether the monitored resource is accessible.
   * Used for uptime calculations and alerting.
@@ -150,6 +150,7 @@ The system uses the **unified enhanced monitoring architecture** with the follow
 - **Resource Cleanup**: Proper disposal of network connections and scheduled operations
 
 **Architecture Benefits:**
+
 - **Zero Legacy Systems**: Only enhanced monitoring exists - no fallback complexity
 - **Production Monitoring**: Full observability with correlation IDs and event tracking
 - **Memory Safety**: Automatic cleanup prevents leaks in long-running operations
@@ -161,12 +162,12 @@ The system uses the **unified enhanced monitoring architecture** with the follow
 
 Every monitor type must support these standardized fields:
 
-| Field           | Type     | Range/Validation     | Purpose                              | ADR Reference |
-| --------------- | -------- | -------------------- | ------------------------------------ | ------------- |
-| `checkInterval` | `number` | 5000ms - 30 days     | Monitoring frequency scheduling      | ADR-001       |
-| `retryAttempts` | `number` | 0 - 10 attempts      | Failure retry logic                  | ADR-003       |
-| `timeout`       | `number` | 1000ms - 300000ms    | Request timeout for reliability      | ADR-003       |
-| `details`       | `string` | Non-empty string     | History tracking and user feedback   | ADR-002       |
+| Field           | Type     | Range/Validation  | Purpose                            | ADR Reference |
+| --------------- | -------- | ----------------- | ---------------------------------- | ------------- |
+| `checkInterval` | `number` | 5000ms - 30 days  | Monitoring frequency scheduling    | ADR-001       |
+| `retryAttempts` | `number` | 0 - 10 attempts   | Failure retry logic                | ADR-003       |
+| `timeout`       | `number` | 1000ms - 300000ms | Request timeout for reliability    | ADR-003       |
+| `details`       | `string` | Non-empty string  | History tracking and user feedback | ADR-002       |
 
 ### **🔹 Production Quality Standards**
 
@@ -180,15 +181,15 @@ Every monitor type must support these standardized fields:
 
 All monitor data operations must use the Repository Pattern with transaction safety:
 
-```typescript
+````typescript
 /**
  * Monitor service implementing production-grade monitoring patterns.
- * 
+ *
  * @remarks
  * Integrates with the repository pattern for database operations, enhanced
  * monitoring system for operation correlation, and comprehensive error handling
  * for production reliability.
- * 
+ *
  * @example
  * ```typescript
  * const monitor = new CustomMonitor();
@@ -197,45 +198,45 @@ All monitor data operations must use the Repository Pattern with transaction saf
  * ```
  */
 export class CustomMonitor implements IMonitorService {
-  /**
-   * Performs a monitoring check with comprehensive error handling.
-   * 
-   * @param monitor - Monitor configuration with validated fields
-   * @returns Promise resolving to standardized check result
-   * @throws Error with correlation ID for debugging
-   */
-  async check(monitor: CustomMonitorConfig): Promise<MonitorCheckResult> {
-    return await withErrorHandling(
-      async () => {
-        // Implementation with proper cleanup
-        const startTime = performance.now();
-        try {
-          // Actual monitoring logic
-          const result = await performActualCheck(monitor);
-          
-          return {
-            status: "up",
-            responseTime: performance.now() - startTime,
-            details: `Check successful: ${result.message}`,
-          };
-        } catch (error) {
-          return {
-            status: "down",
-            responseTime: performance.now() - startTime,
-            details: "Check failed",
-            error: error instanceof Error ? error.message : String(error),
-          };
-        }
-      },
-      { 
-        logger, 
-        operationName: "CustomMonitor.check",
-        correlationId: generateCorrelationId()
-      }
-    );
-  }
+ /**
+  * Performs a monitoring check with comprehensive error handling.
+  *
+  * @param monitor - Monitor configuration with validated fields
+  * @returns Promise resolving to standardized check result
+  * @throws Error with correlation ID for debugging
+  */
+ async check(monitor: CustomMonitorConfig): Promise<MonitorCheckResult> {
+  return await withErrorHandling(
+   async () => {
+    // Implementation with proper cleanup
+    const startTime = performance.now();
+    try {
+     // Actual monitoring logic
+     const result = await performActualCheck(monitor);
+
+     return {
+      status: "up",
+      responseTime: performance.now() - startTime,
+      details: `Check successful: ${result.message}`,
+     };
+    } catch (error) {
+     return {
+      status: "down",
+      responseTime: performance.now() - startTime,
+      details: "Check failed",
+      error: error instanceof Error ? error.message : String(error),
+     };
+    }
+   },
+   {
+    logger,
+    operationName: "CustomMonitor.check",
+    correlationId: generateCorrelationId(),
+   }
+  );
+ }
 }
-```
+````
 
 ## 🛡️ Production-Grade Validation Standards
 
@@ -257,39 +258,39 @@ import { withErrorHandling } from "shared/utils/errorHandling";
 
 /**
  * Production-grade validation for custom monitor configuration.
- * 
+ *
  * @remarks
  * Implements comprehensive validation using centralized utilities,
  * ensuring consistency with other monitor types and security best practices.
- * 
+ *
  * @param monitor - Monitor configuration to validate
  * @returns true if valid, throws descriptive error if invalid
  * @throws Error with specific validation failure details
  */
 function validateCustomMonitor(monitor: CustomMonitor): boolean {
  return withErrorHandling(
-   () => {
-     // Core field validation using centralized utilities
-     if (!isValidUrl(monitor.url)) {
-       throw new Error("Invalid URL format");
-     }
-     
-     if (!isValidInteger(monitor.timeout, 1000, 300_000)) {
-       throw new Error("Timeout must be between 1000ms and 300000ms");
-     }
-     
-     if (!isNonEmptyString(monitor.name)) {
-       throw new Error("Monitor name cannot be empty");
-     }
-     
-     // Custom validation logic
-     if (monitor.customField && !isValidCustomField(monitor.customField)) {
-       throw new Error("Custom field validation failed");
-     }
-     
-     return true;
-   },
-   { logger, operationName: "CustomMonitor.validation" }
+  () => {
+   // Core field validation using centralized utilities
+   if (!isValidUrl(monitor.url)) {
+    throw new Error("Invalid URL format");
+   }
+
+   if (!isValidInteger(monitor.timeout, 1000, 300_000)) {
+    throw new Error("Timeout must be between 1000ms and 300000ms");
+   }
+
+   if (!isNonEmptyString(monitor.name)) {
+    throw new Error("Monitor name cannot be empty");
+   }
+
+   // Custom validation logic
+   if (monitor.customField && !isValidCustomField(monitor.customField)) {
+    throw new Error("Custom field validation failed");
+   }
+
+   return true;
+  },
+  { logger, operationName: "CustomMonitor.validation" }
  );
 }
 ```
@@ -297,7 +298,7 @@ function validateCustomMonitor(monitor: CustomMonitor): boolean {
 ### **🔹 Validation Benefits**
 
 - ✅ **Security-Focused**: Uses validator.js package for proven security patterns
-- ✅ **Consistent**: Same validation patterns across all monitor types  
+- ✅ **Consistent**: Same validation patterns across all monitor types
 - ✅ **Type-Safe**: Complete TypeScript integration with proper error types
 - ✅ **Production-Ready**: Comprehensive error handling with correlation IDs
 - ✅ **Enhanced Monitoring Compatible**: Integrates with operation correlation system
@@ -305,20 +306,22 @@ function validateCustomMonitor(monitor: CustomMonitor): boolean {
 ### **🔹 Critical Validation Requirements**
 
 1. **Details Field Validation**:
+
    ```typescript
    // Must ensure details will be populated in results
    if (!isNonEmptyString(result.details)) {
-     logger.warn("Monitor result missing details field");
+    logger.warn("Monitor result missing details field");
    }
    ```
 
 2. **Interface Compliance**:
+
    ```typescript
    // Must implement IMonitorService with proper error handling
    class CustomMonitor implements IMonitorService {
-     async check(monitor: MonitorConfig): Promise<MonitorCheckResult> {
-       // Implementation must handle all error cases
-     }
+    async check(monitor: MonitorConfig): Promise<MonitorCheckResult> {
+     // Implementation must handle all error cases
+    }
    }
    ```
 
@@ -326,10 +329,10 @@ function validateCustomMonitor(monitor: CustomMonitor): boolean {
    ```typescript
    // Results must work with operation correlation
    const result: MonitorCheckResult = {
-     status: determineStatus(),
-     responseTime: measureResponseTime(),
-     details: generateUserFriendlyDetails(),
-     error: captureErrorDetails(),
+    status: determineStatus(),
+    responseTime: measureResponseTime(),
+    details: generateUserFriendlyDetails(),
+    error: captureErrorDetails(),
    };
    ```
 
@@ -340,24 +343,24 @@ function validateCustomMonitor(monitor: CustomMonitor): boolean {
  * Memory-safe validation with proper cleanup.
  */
 function validateWithCleanup(monitor: MonitorConfig): boolean {
-  const validationResources = new Set<() => void>();
-  
-  try {
-    // Validation logic with resource tracking
-    const cleanup1 = setupValidationResource();
-    validationResources.add(cleanup1);
-    
-    return performValidation(monitor);
-  } finally {
-    // Always cleanup resources
-    for (const cleanup of validationResources) {
-      try {
-        cleanup();
-      } catch (error) {
-        logger.warn("Validation cleanup failed", error);
-      }
-    }
+ const validationResources = new Set<() => void>();
+
+ try {
+  // Validation logic with resource tracking
+  const cleanup1 = setupValidationResource();
+  validationResources.add(cleanup1);
+
+  return performValidation(monitor);
+ } finally {
+  // Always cleanup resources
+  for (const cleanup of validationResources) {
+   try {
+    cleanup();
+   } catch (error) {
+    logger.warn("Validation cleanup failed", error);
+   }
   }
+ }
 }
 ```
 
@@ -442,32 +445,33 @@ import { isValidFQDN, isValidUrl } from "../utils/validation";
 
 /**
  * Validation schema for DNS monitor configuration.
- * 
+ *
  * @remarks
  * Extends baseMonitorSchema to inherit core monitoring fields (checkInterval,
  * retryAttempts, timeout) and adds DNS-specific validation using centralized
  * validation utilities for consistency and security.
  */
 export const monitorSchemas = {
-    // ... existing schemas
-    dns: baseMonitorSchema.extend({
-        type: z.literal("dns"),
-        hostname: z
-            .string()
-            .min(1, "Hostname is required")
-            .refine(isValidFQDN, "Must be a valid domain name"),
-        recordType: z.enum(['A', 'AAAA', 'MX', 'CNAME'], {
-            errorMap: () => ({ message: "Must select a valid DNS record type" })
-        }),
-        expectedValue: z.string().optional(),
-        // Core fields (checkInterval, retryAttempts, timeout) automatically inherited
-    }),
+ // ... existing schemas
+ dns: baseMonitorSchema.extend({
+  type: z.literal("dns"),
+  hostname: z
+   .string()
+   .min(1, "Hostname is required")
+   .refine(isValidFQDN, "Must be a valid domain name"),
+  recordType: z.enum(["A", "AAAA", "MX", "CNAME"], {
+   errorMap: () => ({ message: "Must select a valid DNS record type" }),
+  }),
+  expectedValue: z.string().optional(),
+  // Core fields (checkInterval, retryAttempts, timeout) automatically inherited
+ }),
 };
 ```
 
 **⚠️ CRITICAL REQUIREMENTS**:
+
 - **MUST extend `baseMonitorSchema`** which includes required monitoring fields
-- **MUST use centralized validation utilities** for security and consistency  
+- **MUST use centralized validation utilities** for security and consistency
 - **MUST include comprehensive error messages** for user experience
 - **NEVER create schemas from scratch** - always extend the base schema
 
@@ -487,34 +491,34 @@ export const monitorSchemas = {
 
 **Production Template Structure**:
 
-```typescript
+````typescript
 /**
  * DNS monitoring service with production-grade reliability and error handling.
- * 
+ *
  * @remarks
  * Implements the IMonitorService interface with comprehensive error handling,
  * operation correlation for race condition prevention, and proper resource
  * management following ADR-003 error handling strategy.
- * 
+ *
  * Features:
  * - Operation correlation prevents race conditions
  * - Memory-safe resource management
  * - Comprehensive error handling with correlation IDs
  * - Production-grade validation and logging
- * 
+ *
  * @example
  * ```typescript
  * const monitor = new DnsMonitor();
  * const result = await monitor.check(dnsConfig);
  * // Automatically integrates with enhanced monitoring system
  * ```
- * 
+ *
  * @public
  */
 
 import type { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
 import { DEFAULT_RETRY_ATTEMPTS, DEFAULT_TIMEOUT } from "./constants";
-import { 
+import {
  getMonitorRetryAttempts,
  getMonitorTimeout,
 } from "./utils/monitorTypeGuards";
@@ -536,14 +540,14 @@ export class DnsMonitor implements IMonitorService {
 
  /**
   * Performs DNS monitoring check with comprehensive error handling and operation correlation.
-  * 
+  *
   * @param monitor - DNS monitor configuration with validated fields
   * @returns Promise resolving to standardized MonitorCheckResult
   * @throws Error with correlation ID for debugging and operation tracking
   */
  async check(monitor: Monitor): Promise<MonitorCheckResult> {
   const correlationId = generateCorrelationId();
-  
+
   return await withErrorHandling(
    async () => {
     // Type validation
@@ -553,20 +557,20 @@ export class DnsMonitor implements IMonitorService {
 
     // Operation correlation for race condition prevention
     this.activeOperations.add(correlationId);
-    
+
     try {
      // Extract configuration using utility functions for consistency
      const timeout = getMonitorTimeout(monitor, this.config.timeout);
      const retryAttempts = getMonitorRetryAttempts(monitor, this.config.retryAttempts);
-     
+
      // Performance tracking
      const startTime = performance.now();
-     
+
      // DNS resolution logic with timeout and retry
      const result = await this.performDnsCheck(monitor, timeout, retryAttempts);
-     
+
      const responseTime = performance.now() - startTime;
-     
+
      return {
       status: result.success ? "up" : "down",
       responseTime: Math.round(responseTime),
@@ -578,17 +582,17 @@ export class DnsMonitor implements IMonitorService {
      this.activeOperations.delete(correlationId);
     }
    },
-   { 
-    logger, 
+   {
+    logger,
     operationName: "DnsMonitor.check",
-    correlationId 
+    correlationId
    }
   );
  }
 
  /**
   * Updates monitor configuration with validation.
-  * 
+  *
   * @param config - New configuration to apply
   */
  updateConfig(config: MonitorConfig): void {
@@ -597,15 +601,15 @@ export class DnsMonitor implements IMonitorService {
    ...this.config,
    ...config,
   };
-  
-  logger.debug("DNS monitor configuration updated", { 
-   config: this.config 
+
+  logger.debug("DNS monitor configuration updated", {
+   config: this.config
   });
  }
 
  /**
   * Returns the monitor type identifier.
-  * 
+  *
   * @returns The monitor type for DNS monitoring
   */
  getType(): MonitorType {
@@ -614,21 +618,21 @@ export class DnsMonitor implements IMonitorService {
 
  /**
   * Performs the actual DNS check with proper error handling and resource cleanup.
-  * 
+  *
   * @private
   */
  private async performDnsCheck(
-  monitor: Monitor, 
-  timeout: number, 
+  monitor: Monitor,
+  timeout: number,
   retryAttempts: number
  ): Promise<{ success: boolean; details?: string; error?: string }> {
   // DNS implementation with proper cleanup
   const cleanup = new Set<() => void>();
-  
+
   try {
    // Implementation specific to DNS monitoring
    // ... DNS resolution logic
-   
+
    return {
     success: true,
     details: "DNS resolution successful",
@@ -653,7 +657,7 @@ export class DnsMonitor implements IMonitorService {
 
  /**
   * Cleanup method for graceful shutdown.
-  * 
+  *
   * @remarks
   * Called during application shutdown to ensure proper resource cleanup
   * and prevent memory leaks.
@@ -661,7 +665,7 @@ export class DnsMonitor implements IMonitorService {
  async shutdown(): Promise<void> {
   // Cancel any active operations
   this.activeOperations.clear();
-  
+
   logger.debug("DNS monitor shutdown completed");
  }
 
@@ -677,7 +681,7 @@ export class DnsMonitor implements IMonitorService {
   return "dns";
  }
 }
-```
+````
 
 **⚠️ Must Use**: Always use `getMonitorTimeout()` and `getMonitorRetryAttempts()` utilities to safely extract values with fallbacks.
 
@@ -798,7 +802,7 @@ The following components automatically support new monitor types through the reg
 ```typescript
 /**
  * Comprehensive test suite for DNS monitor service.
- * 
+ *
  * @remarks
  * Tests all aspects of the monitor service including error handling,
  * memory management, operation correlation, and edge cases following
@@ -850,13 +854,13 @@ describe("DnsMonitor", () => {
  describe("DNS Resolution Checks", () => {
   it("should return success result for valid DNS resolution", async () => {
    const result = await monitor.check(mockConfig);
-   
+
    expect(result).toMatchObject({
     status: expect.stringMatching(/^(up|down)$/),
     responseTime: expect.any(Number),
     details: expect.any(String),
    });
-   
+
    expect(result.responseTime).toBeGreaterThan(0);
    expect(result.details).toBeTruthy();
   });
@@ -866,9 +870,9 @@ describe("DnsMonitor", () => {
     ...mockConfig,
     hostname: "nonexistent-domain-12345.invalid",
    };
-   
+
    const result = await monitor.check(invalidConfig);
-   
+
    expect(result.status).toBe("down");
    expect(result.details).toContain("failed");
    expect(result.error).toBeDefined();
@@ -879,9 +883,9 @@ describe("DnsMonitor", () => {
     ...mockConfig,
     timeout: 1, // Very short timeout
    };
-   
+
    const result = await monitor.check(timeoutConfig);
-   
+
    expect(result.responseTime).toBeGreaterThan(0);
    expect(result.details).toBeTruthy();
   });
@@ -893,7 +897,7 @@ describe("DnsMonitor", () => {
     ...mockConfig,
     type: "http" as any,
    };
-   
+
    await expect(monitor.check(invalidConfig)).rejects.toThrow(
     "DnsMonitor cannot handle monitor type: http"
    );
@@ -902,7 +906,7 @@ describe("DnsMonitor", () => {
   it("should handle network connectivity issues gracefully", async () => {
    // Test offline/network error scenarios
    const result = await monitor.check(mockConfig);
-   
+
    // Should return a valid result even if network fails
    expect(result).toHaveProperty("status");
    expect(result).toHaveProperty("responseTime");
@@ -915,10 +919,10 @@ describe("DnsMonitor", () => {
     monitor.check(mockConfig),
     monitor.check(mockConfig),
    ];
-   
+
    // Shutdown during operations
    await monitor.shutdown();
-   
+
    // All operations should complete or be cancelled gracefully
    const results = await Promise.allSettled(promises);
    expect(results).toHaveLength(3);
@@ -930,23 +934,21 @@ describe("DnsMonitor", () => {
    // Test that operations are properly tracked and cleaned up
    const promise1 = monitor.check(mockConfig);
    const promise2 = monitor.check(mockConfig);
-   
+
    await Promise.all([promise1, promise2]);
-   
+
    // No memory leaks after operations complete
    expect(() => monitor.shutdown()).not.toThrow();
   });
 
   it("should handle concurrent operations without race conditions", async () => {
    // Test operation correlation prevents race conditions
-   const promises = Array.from({ length: 10 }, () => 
-    monitor.check(mockConfig)
-   );
-   
+   const promises = Array.from({ length: 10 }, () => monitor.check(mockConfig));
+
    const results = await Promise.all(promises);
-   
+
    // All results should be valid and consistent
-   results.forEach(result => {
+   results.forEach((result) => {
     expect(result).toHaveProperty("status");
     expect(result.responseTime).toBeGreaterThan(0);
    });
@@ -957,7 +959,7 @@ describe("DnsMonitor", () => {
   it("should integrate with error handling utilities", async () => {
    // Test that withErrorHandling is used correctly
    const result = await monitor.check(mockConfig);
-   
+
    // Should work seamlessly with enhanced monitoring system
    expect(result).toBeDefined();
   });
@@ -965,7 +967,7 @@ describe("DnsMonitor", () => {
   it("should support operation correlation", async () => {
    // Test that correlation IDs are generated and used
    const result = await monitor.check(mockConfig);
-   
+
    // Operation should complete successfully with correlation
    expect(result.status).toMatch(/^(up|down)$/);
   });
@@ -977,9 +979,9 @@ describe("DnsMonitor", () => {
     ...mockConfig,
     hostname: "", // Invalid empty hostname
    };
-   
+
    const result = await monitor.check(incompleteConfig);
-   
+
    // Should handle validation gracefully
    expect(result.status).toBe("down");
    expect(result.error).toBeDefined();
@@ -1038,11 +1040,12 @@ describe("DNS Monitor Performance", () => {
  });
 });
 ```
-  - Error handling with meaningful error messages
-  - Response time measurement accuracy
-  - **NEW**: Details field validation and content
-  - **NEW**: Enhanced monitoring system compatibility
-  - **NEW**: Interface compliance verification
+
+- Error handling with meaningful error messages
+- Response time measurement accuracy
+- **NEW**: Details field validation and content
+- **NEW**: Enhanced monitoring system compatibility
+- **NEW**: Interface compliance verification
 
 **Critical Details Testing:**
 

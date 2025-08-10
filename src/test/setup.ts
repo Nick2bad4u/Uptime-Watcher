@@ -443,10 +443,16 @@ vi.mock("../theme/useTheme", () => ({
                     break;
                 }
             }
-            return typeof value === "string" ? value : mockTheme.colors.text.primary;
+            return typeof value === "string"
+                ? value
+                : mockTheme.colors.text.primary;
         }),
         getStatusColor: vi.fn((status: string) => {
-            return mockTheme.colors.status[status as keyof typeof mockTheme.colors.status] || mockTheme.colors.text.secondary;
+            return (
+                mockTheme.colors.status[
+                    status as keyof typeof mockTheme.colors.status
+                ] || mockTheme.colors.text.secondary
+            );
         }),
         isDark: false,
         setTheme: vi.fn(),
@@ -504,7 +510,9 @@ vi.mock("../theme/useTheme", () => ({
                     break;
                 }
             }
-            return typeof value === "string" ? value : mockTheme.colors.text.primary;
+            return typeof value === "string"
+                ? value
+                : mockTheme.colors.text.primary;
         }),
         getStatusClass: vi.fn((status: string) => ({
             color: `var(--color-status-${status})`,

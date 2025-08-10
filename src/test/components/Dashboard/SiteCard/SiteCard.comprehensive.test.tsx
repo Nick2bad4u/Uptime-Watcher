@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { createMockSite, createMockMonitor } from "../../../utils/mockFactories";
+import {
+    createMockSite,
+    createMockMonitor,
+} from "../../../utils/mockFactories";
 
 // Mock theme components
 vi.mock("../../../../theme/components", async (importOriginal) => {

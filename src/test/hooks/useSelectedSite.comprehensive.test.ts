@@ -367,7 +367,7 @@ describe("useSelectedSite", () => {
 
             // Change sites array (same ID, different data)
             const updatedSites = [...mockSites];
-            updatedSites[0] = { 
+            updatedSites[0] = {
                 identifier: mockSites[0]!.identifier,
                 name: "Updated Site 1",
                 url: mockSites[0]!.url,

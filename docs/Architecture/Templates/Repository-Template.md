@@ -22,23 +22,23 @@ electron/services/database/
  * and production-grade error handling. All mutations are wrapped in transactions for consistency.
  * Uses the dual-method pattern with public async methods creating transactions and internal sync
  * methods for use within existing transaction contexts.
- * 
+ *
  * **Key Features:**
  * - Transaction safety with automatic rollback
  * - Race condition prevention through synchronous operations
  * - Comprehensive error handling and logging
  * - Event emission for monitoring and debugging
  * - Memory-efficient operations
- * 
+ *
  * [Add any entity-specific remarks here]
  *
  * @example
  * ```typescript
  * const repository = new ExampleRepository({ databaseService });
- * 
+ *
  * // Public async method - creates its own transaction
  * await repository.create(data);
- * 
+ *
  * // Internal method - for use within existing transactions
  * await databaseService.executeTransaction((db) => {
  *   const result = repository.createInternal(db, data);
@@ -67,11 +67,11 @@ import { logger } from "../../utils/logger";
 export interface ExampleRepositoryDependencies {
  /**
   * The database service used for transactional operations and connection management.
-  * 
+  *
   * @remarks
   * All repository operations use this service for database access, ensuring
   * consistent transaction handling and connection management.
-  * 
+  *
   * @readonly
   */
  databaseService: DatabaseService;

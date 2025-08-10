@@ -84,19 +84,23 @@ eventBus.use(async (eventName, data, next) => {
 });
 
 // Rate limiting middleware
-eventBus.use(createRateLimitMiddleware({
- maxEventsPerSecond: 100,
- burstLimit: 10,
- onRateLimit: (eventName, data) => {
-  logger.warn(`Rate limit exceeded for ${eventName}`);
- }
-}));
+eventBus.use(
+ createRateLimitMiddleware({
+  maxEventsPerSecond: 100,
+  burstLimit: 10,
+  onRateLimit: (eventName, data) => {
+   logger.warn(`Rate limit exceeded for ${eventName}`);
+  },
+ })
+);
 
 // Validation middleware
-eventBus.use(createValidationMiddleware({
- "monitor:status-changed": (data) => validateMonitorStatusData(data),
- "sites:added": (data) => validateSiteData(data)
-}));
+eventBus.use(
+ createValidationMiddleware({
+  "monitor:status-changed": (data) => validateMonitorStatusData(data),
+  "sites:added": (data) => validateSiteData(data),
+ })
+);
 ```
 
 ### 5. Memory-Safe IPC Event Forwarding
@@ -183,16 +187,19 @@ Other Backend Services (via event listeners)
 ## Quality Assurance
 
 ### Memory Management
+
 - **Automatic cleanup**: All event listeners return cleanup functions
 - **Configurable limits**: Max listeners and middleware prevent resource exhaustion
 - **Leak prevention**: Proper cleanup in component unmount lifecycle
 
 ### Error Handling
+
 - **Middleware isolation**: Errors in one middleware don't affect others
 - **Event validation**: Type-safe structures prevent runtime errors
 - **Error propagation**: Failed events don't crash the event bus
 
 ### Performance
+
 - **Rate limiting**: Middleware prevents event flooding
 - **Efficient forwarding**: IPC events use optimized serialization
 - **Minimal overhead**: Event processing designed for production use

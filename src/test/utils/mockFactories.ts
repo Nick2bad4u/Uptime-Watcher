@@ -127,7 +127,9 @@ export interface CompleteMonitor {
  *
  * @public
  */
-export const createMockMonitor = (overrides: Partial<CompleteMonitor> = {}): CompleteMonitor => ({
+export const createMockMonitor = (
+    overrides: Partial<CompleteMonitor> = {}
+): CompleteMonitor => ({
     id: "monitor-1",
     type: "http",
     url: "https://example.com",
@@ -169,7 +171,9 @@ export const createMockMonitor = (overrides: Partial<CompleteMonitor> = {}): Com
  *
  * @public
  */
-export const createMockSite = (overrides: Partial<CompleteSite> = {}): CompleteSite => ({
+export const createMockSite = (
+    overrides: Partial<CompleteSite> = {}
+): CompleteSite => ({
     identifier: "site-1",
     name: "Test Site",
     monitoring: true,

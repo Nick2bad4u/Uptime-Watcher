@@ -141,7 +141,9 @@ describe("Shared Types Coverage", () => {
 
             expect(httpMonitor.type).toBe("http");
             expect(httpMonitor.enabled).toBe(true);
-            expect(httpMonitor.configuration["url"]).toBe("https://example.com");
+            expect(httpMonitor.configuration["url"]).toBe(
+                "https://example.com"
+            );
             expect(httpMonitor.alerts?.onFailure).toBe(true);
         });
 
@@ -293,7 +295,8 @@ describe("Shared Types Coverage", () => {
                         pending: "#f59e0b",
                         unknown: "#6b7280",
                     };
-                    return (statusColors[status] ?? statusColors["unknown"]) as string;
+                    return (statusColors[status] ??
+                        statusColors["unknown"]) as string;
                 },
                 getSpacingValue: (size: string) => {
                     const spacing: Record<string, number> = {

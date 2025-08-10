@@ -126,8 +126,16 @@ describe("useSite Hook", () => {
 
         it("should pass filteredHistory from monitor to stats", () => {
             const mockHistory = [
-                { timestamp: Date.now(), status: "up" as const, responseTime: 150 },
-                { timestamp: Date.now() - 3600000, status: "down" as const, responseTime: 200 },
+                {
+                    timestamp: Date.now(),
+                    status: "up" as const,
+                    responseTime: 150,
+                },
+                {
+                    timestamp: Date.now() - 3600000,
+                    status: "down" as const,
+                    responseTime: 200,
+                },
             ];
 
             mockUseSiteMonitor.mockReturnValueOnce({

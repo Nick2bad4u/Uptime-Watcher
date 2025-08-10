@@ -1,5 +1,5 @@
 ---
-title: '@typeParam'
+title: "@typeParam"
 ---
 
 <!-- prettier-ignore-start -->
@@ -31,9 +31,9 @@ type List<T> = Array<T>;
  * @param <H> - Headers
  */
 interface HttpResponse<B, H> {
-  body: B;
-  headers: H;
-  statusCode: number;
+ body: B;
+ headers: H;
+ statusCode: number;
 }
 ```
 

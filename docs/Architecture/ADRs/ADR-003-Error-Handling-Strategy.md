@@ -35,10 +35,10 @@ await withErrorHandling(
  async () => {
   return await performAsyncOperation();
  },
- { 
-   logger, 
-   operationName: "database-operation",
-   correlationId: "op-12345"
+ {
+  logger,
+  operationName: "database-operation",
+  correlationId: "op-12345",
  }
 );
 
@@ -209,12 +209,12 @@ Error handling utilities ensure proper resource cleanup:
 ```typescript
 // Automatic cleanup in event handlers
 const cleanup = window.electronAPI.events.onMonitorStatusChanged((data) => {
-  try {
-    handleStatusChange(data);
-  } catch (error) {
-    logger.error('Status change handler failed', error);
-    // Handler failure doesn't affect cleanup
-  }
+ try {
+  handleStatusChange(data);
+ } catch (error) {
+  logger.error("Status change handler failed", error);
+  // Handler failure doesn't affect cleanup
+ }
 });
 
 // Cleanup always called even if handler throws
@@ -227,13 +227,13 @@ useEffect(() => cleanup, []);
 // Operation correlation prevents race conditions
 const operationId = this.operationRegistry.initiateCheck(monitorId);
 try {
-  const result = await performCheck();
-  // Validate operation still active before updating state
-  if (this.operationRegistry.validateOperation(operationId)) {
-    await updateMonitorStatus(result);
-  }
+ const result = await performCheck();
+ // Validate operation still active before updating state
+ if (this.operationRegistry.validateOperation(operationId)) {
+  await updateMonitorStatus(result);
+ }
 } finally {
-  this.operationRegistry.completeOperation(operationId);
+ this.operationRegistry.completeOperation(operationId);
 }
 ```
 
@@ -257,12 +257,12 @@ Operations include comprehensive metrics for observability:
 ```typescript
 const startTime = performance.now();
 try {
-  const result = await operation();
-  metrics.recordSuccess(operationName, performance.now() - startTime);
-  return result;
+ const result = await operation();
+ metrics.recordSuccess(operationName, performance.now() - startTime);
+ return result;
 } catch (error) {
-  metrics.recordFailure(operationName, error.constructor.name);
-  throw error;
+ metrics.recordFailure(operationName, error.constructor.name);
+ throw error;
 }
 ```
 
@@ -289,16 +289,19 @@ try {
 ## Quality Assurance
 
 ### Memory Management
+
 - **Automatic cleanup**: All error handlers ensure resource cleanup
 - **Event listener management**: Cleanup functions prevent memory leaks
 - **Resource disposal**: Failed operations properly dispose of allocated resources
 
 ### Concurrency Safety
+
 - **Operation correlation**: Prevents race conditions in async operations
 - **State validation**: Operations validate state before making changes
 - **Atomic operations**: Critical sections use proper synchronization
 
 ### Production Monitoring
+
 - **Error classification**: Errors categorized by severity and type
 - **Metric collection**: Performance and failure metrics for alerting
 - **Distributed tracing**: Correlation IDs enable cross-service debugging
