@@ -79,7 +79,7 @@ export class SettingsRepository {
             return;
         }
 
-        return withDatabaseOperation(
+        await withDatabaseOperation(
             async () => {
                 return this.databaseService.executeTransaction((db) => {
                     this.bulkInsertInternal(db, settings);

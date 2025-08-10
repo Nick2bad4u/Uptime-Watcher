@@ -165,7 +165,8 @@ export class SiteService {
                     await this.siteRepository.findByIdentifier(identifier);
                 if (!siteRow) {
                     logger.debug(`[SiteService] Site not found: ${identifier}`);
-                    return;
+                    // eslint-disable-next-line unicorn/no-useless-undefined
+                    return undefined;
                 }
 
                 // Then get monitors for this site
@@ -197,7 +198,6 @@ export class SiteService {
                 logger.debug(
                     `[SiteService] Found site ${identifier} with ${monitors.length} monitors`
                 );
-                // eslint-disable-next-line @typescript-eslint/consistent-return
                 return site;
             },
             {

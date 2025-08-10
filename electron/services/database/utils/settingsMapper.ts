@@ -133,7 +133,7 @@ export function rowToSetting(row: DatabaseSettingsRow): SettingRow {
 export function rowToSettingValue(
     row: DatabaseSettingsRow | undefined
 ): string | undefined {
-    if (row?.value == null) {
+    if (!row?.value) {
         return undefined;
     }
 

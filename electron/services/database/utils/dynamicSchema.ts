@@ -474,7 +474,7 @@ export function generateMonitorTableSchema(): string {
         .join(",\n");
 
     return `CREATE TABLE IF NOT EXISTS monitors (
-${staticFields}${dynamicFields ? ",\n" + dynamicFields : ""}
+${staticFields}${dynamicFields ? `,\n${dynamicFields}` : ""}
     )`;
 }
 
@@ -603,7 +603,8 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
     const fieldDefs = generateDatabaseFieldDefinitions();
     for (const fieldDef of fieldDefs) {
         const value = row[fieldDef.columnName as keyof MonitorRow];
-        if (value != null) {
+        // Check if value exists (handles both null and undefined from SQLite)
+        if (value !== undefined) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- Dynamic field assignment required for extensible monitor type system. fieldDef.sourceField is validated by generateDatabaseFieldDefinitions() from monitor type registry.
             (monitor as any)[fieldDef.sourceField] = convertFromDatabase(
                 value,

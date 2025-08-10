@@ -85,7 +85,7 @@ export class SiteRepository {
             return;
         }
 
-        return withDatabaseOperation(
+        await withDatabaseOperation(
             async () => {
                 return this.databaseService.executeTransaction((db) => {
                     this.bulkInsertInternal(db, sites);

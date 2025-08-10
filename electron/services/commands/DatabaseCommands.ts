@@ -212,7 +212,7 @@ export class DatabaseCommandExecutor {
         for (let i = this.executedCommands.length - 1; i >= 0; i--) {
             try {
                 const command = this.executedCommands[i];
-                if (command != null) {
+                if (command) {
                     await command.rollback();
                 }
             } catch (error) {

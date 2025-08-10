@@ -96,6 +96,7 @@ class ErrorBoundary extends React.Component<
     ErrorBoundaryProperties,
     ErrorBoundaryState
 > {
+    // eslint-disable-next-line react/sort-comp -- handleRetry needs to be accessible before lifecycle methods for proper binding
     public handleRetry = (): void => {
         // eslint-disable-next-line react/no-set-state -- Required for error recovery functionality
         this.setState((prevState) => ({

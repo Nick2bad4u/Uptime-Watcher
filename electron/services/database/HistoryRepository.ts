@@ -116,7 +116,7 @@ export class HistoryRepository {
             return;
         }
 
-        return withDatabaseOperation(
+        await withDatabaseOperation(
             async () => {
                 // Use executeTransaction for atomic bulk insert operation
                 await this.databaseService.executeTransaction((db) => {
@@ -279,7 +279,7 @@ export class HistoryRepository {
     public async pruneAllHistory(limit: number): Promise<void> {
         if (limit <= 0) return;
 
-        return withDatabaseOperation(
+        await withDatabaseOperation(
             async () => {
                 // Use executeTransaction for atomic multi-monitor operation
                 await this.databaseService.executeTransaction((db) => {
