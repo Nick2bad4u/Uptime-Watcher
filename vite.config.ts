@@ -24,7 +24,7 @@ import { getEnvVar as getEnvironmentVariable } from "./shared/utils/environment"
  * Sets up build settings for both renderer (React) and main/preload processes.
  */
 
-export default defineConfig(() => {
+export default defineConfig(({}) => {
     const codecovToken = getEnvironmentVariable("CODECOV_TOKEN");
     return {
         base: "./", // Ensures relative asset paths for Electron
@@ -233,7 +233,6 @@ export default defineConfig(() => {
                 ],
                 experimentalAstAwareRemapping: true, // Enable AST-aware remapping for better accuracy
                 ignoreEmptyLines: true, // Ignore empty lines in coverage reports
-                processingConcurrency: 2, // Reduce concurrency to avoid parsing conflicts
                 provider: "istanbul" as const,
                 reporter: ["text", "json", "lcov", "html"],
                 reportsDirectory: "./coverage",
@@ -243,6 +242,11 @@ export default defineConfig(() => {
                     functions: 80, // Minimum 80% function coverage
                     lines: 80, // Minimum 80% line coverage
                     statements: 80, // Minimum 80% statement coverage
+                },
+            },
+            deps: {
+                optimizer: {
+                    web: { enabled: true },
                 },
             },
             environment: "jsdom", // Default for React components
@@ -263,6 +267,10 @@ export default defineConfig(() => {
                 "shared/**/*.test.ts",
                 "shared/**/*.spec.ts",
             ],
+            name: {
+                color: "cyan",
+                label: "UW Testing Frontend",
+            }, // Custom project name and color for Vitest
             outputFile: {
                 json: "./coverage/test-results.json",
             },
@@ -271,7 +279,7 @@ export default defineConfig(() => {
             poolOptions: {
                 threads: {
                     isolate: true, // Isolate tests for better reliability
-                    maxThreads: 4, // Limit concurrent threads to reduce listener conflicts
+                    maxThreads: 24, // Limit concurrent threads to reduce listener conflicts
                     minThreads: 1, // Ensure at least one thread
                     singleThread: false, // Enable multi-threading
                 },

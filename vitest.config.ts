@@ -17,7 +17,10 @@ export default defineConfig((configEnv) =>
         viteConfig(configEnv),
         defineConfig({
             test: {
-                // ...other test options as needed
+                name: {
+                    color: "cyan",
+                    label: "Frontend",
+                }, // Custom project name and color for Vitest
             },
         })
     )
