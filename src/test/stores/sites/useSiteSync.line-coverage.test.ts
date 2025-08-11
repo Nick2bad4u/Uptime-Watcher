@@ -116,11 +116,14 @@ describe("useSiteSync - Line Coverage Completion", () => {
                 async (_operation, handlers) => {
                     // Call all the handlers to cover lines 224-230
                     const frontendHandlers = handlers as any;
-                    if (frontendHandlers?.clearError) frontendHandlers.clearError();
+                    if (frontendHandlers?.clearError)
+                        frontendHandlers.clearError();
                     if (frontendHandlers?.setError)
                         frontendHandlers.setError(new Error("test"));
-                    if (frontendHandlers?.setLoading) frontendHandlers.setLoading(true);
-                    if (frontendHandlers?.setLoading) frontendHandlers.setLoading(false);
+                    if (frontendHandlers?.setLoading)
+                        frontendHandlers.setLoading(true);
+                    if (frontendHandlers?.setLoading)
+                        frontendHandlers.setLoading(false);
 
                     return {
                         siteCount: 5,
@@ -309,11 +312,14 @@ describe("useSiteSync - Line Coverage Completion", () => {
                 async (operation, handlers) => {
                     // Call all the handlers to cover lines 335-341
                     const frontendHandlers = handlers as any;
-                    if (frontendHandlers?.clearError) frontendHandlers.clearError();
+                    if (frontendHandlers?.clearError)
+                        frontendHandlers.clearError();
                     if (frontendHandlers?.setError)
                         frontendHandlers.setError(new Error("test"));
-                    if (frontendHandlers?.setLoading) frontendHandlers.setLoading(true);
-                    if (frontendHandlers?.setLoading) frontendHandlers.setLoading(false);
+                    if (frontendHandlers?.setLoading)
+                        frontendHandlers.setLoading(true);
+                    if (frontendHandlers?.setLoading)
+                        frontendHandlers.setLoading(false);
 
                     return await operation();
                 }

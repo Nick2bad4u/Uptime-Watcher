@@ -49,47 +49,57 @@ describe("DatabaseManager - Coverage Tests", () => {
     let eventEmitter: ReturnType<typeof createMockEventBus>;
     let mockDependencies: DatabaseManagerDependencies;
     let mockRepositories: ReturnType<typeof createMockRepositories>;
-    let mockConfigurationManager: ReturnType<typeof createMockConfigurationManager>;
-    let mockSiteLoadingOrchestrator: ReturnType<typeof createMockSiteLoadingOrchestrator>;
+    let mockConfigurationManager: ReturnType<
+        typeof createMockConfigurationManager
+    >;
+    let mockSiteLoadingOrchestrator: ReturnType<
+        typeof createMockSiteLoadingOrchestrator
+    >;
 
     beforeEach(async () => {
         vi.clearAllMocks();
-        
+
         // Manually setup the history limit mock
-        const historyLimitManager = await import("../../utils/database/historyLimitManager");
-        vi.mocked(historyLimitManager.setHistoryLimit).mockImplementation(async (params) => {
-            // Call the setHistoryLimit callback with the limit to simulate the real behavior
-            if (params.setHistoryLimit) {
-                params.setHistoryLimit(params.limit);
+        const historyLimitManager = await import(
+            "../../utils/database/historyLimitManager"
+        );
+        vi.mocked(historyLimitManager.setHistoryLimit).mockImplementation(
+            async (params) => {
+                // Call the setHistoryLimit callback with the limit to simulate the real behavior
+                if (params.setHistoryLimit) {
+                    params.setHistoryLimit(params.limit);
+                }
             }
-        });
-        
+        );
+
         eventEmitter = createMockEventBus();
         mockRepositories = createMockRepositories();
         mockConfigurationManager = createMockConfigurationManager();
         mockSiteLoadingOrchestrator = createMockSiteLoadingOrchestrator();
-        
+
         // Ensure getHistoryRetentionRules returns proper structure
         mockConfigurationManager.getHistoryRetentionRules.mockReturnValue({
             defaultLimit: 500,
             maxLimit: 1000,
             minLimit: 25,
         });
-        
+
         // Create test sites that the site loading orchestrator should return
         const testSites = [createTestSite("test1"), createTestSite("test2")];
-        mockSiteLoadingOrchestrator.loadSitesFromDatabase.mockImplementation(async (siteCache: any) => {
-            // Populate the cache with test sites (simulate the real behavior)
-            for (const site of testSites) {
-                siteCache.set(site.identifier, site);
+        mockSiteLoadingOrchestrator.loadSitesFromDatabase.mockImplementation(
+            async (siteCache: any) => {
+                // Populate the cache with test sites (simulate the real behavior)
+                for (const site of testSites) {
+                    siteCache.set(site.identifier, site);
+                }
+
+                return {
+                    success: true,
+                    sitesLoaded: testSites.length,
+                    message: `Successfully loaded ${testSites.length} sites`,
+                };
             }
-            
-            return {
-                success: true,
-                sitesLoaded: testSites.length,
-                message: `Successfully loaded ${testSites.length} sites`,
-            };
-        });
+        );
 
         mockDependencies = {
             configurationManager: mockConfigurationManager as any,
@@ -98,24 +108,25 @@ describe("DatabaseManager - Coverage Tests", () => {
         };
 
         databaseManager = new DatabaseManager(mockDependencies);
-        
+
         // Mock the private siteLoadingOrchestrator
-        (databaseManager as any).siteLoadingOrchestrator = mockSiteLoadingOrchestrator;
-        
+        (databaseManager as any).siteLoadingOrchestrator =
+            mockSiteLoadingOrchestrator;
+
         // Mock the private commandExecutor
         const mockCommandExecutor = {
             execute: vi.fn().mockImplementation(async (command: any) => {
                 // Return different values based on command type
-                if (command.constructor.name === 'DownloadBackupCommand') {
+                if (command.constructor.name === "DownloadBackupCommand") {
                     return {
                         buffer: Buffer.from("test-backup-data"),
                         fileName: "backup-test.db",
                     };
                 }
-                if (command.constructor.name === 'ExportDataCommand') {
+                if (command.constructor.name === "ExportDataCommand") {
                     return '{"test": "data"}';
                 }
-                if (command.constructor.name === 'ImportDataCommand') {
+                if (command.constructor.name === "ImportDataCommand") {
                     return true; // Success by default
                 }
                 return "mock-result";
@@ -134,7 +145,7 @@ describe("DatabaseManager - Coverage Tests", () => {
         it("should update history limit successfully", async () => {
             const newLimit = 1000;
             await databaseManager.setHistoryLimit(newLimit);
-            
+
             // The historyLimit should be set internally
             const retrievedLimit = databaseManager.getHistoryLimit();
             expect(retrievedLimit).toBe(newLimit);
@@ -147,7 +158,9 @@ describe("DatabaseManager - Coverage Tests", () => {
         });
 
         it("should handle negative history limit", async () => {
-            await expect(databaseManager.setHistoryLimit(-100)).rejects.toThrow();
+            await expect(
+                databaseManager.setHistoryLimit(-100)
+            ).rejects.toThrow();
         });
 
         it("should emit event when history limit is updated", async () => {
@@ -214,28 +227,39 @@ describe("DatabaseManager - Coverage Tests", () => {
         });
 
         it("should refresh sites", async () => {
-            const testSites = [createTestSite("test1"), createTestSite("test2")];
-            
+            const testSites = [
+                createTestSite("test1"),
+                createTestSite("test2"),
+            ];
+
             // The orchestrator should populate the cache when called
-            mockSiteLoadingOrchestrator.loadSitesFromDatabase.mockImplementation(async (siteCache: any) => {
-                // Clear and populate the cache with test sites
-                siteCache.clear();
-                for (const site of testSites) {
-                    siteCache.set(site.identifier, site);
+            mockSiteLoadingOrchestrator.loadSitesFromDatabase.mockImplementation(
+                async (siteCache: any) => {
+                    // Clear and populate the cache with test sites
+                    siteCache.clear();
+                    for (const site of testSites) {
+                        siteCache.set(site.identifier, site);
+                    }
+
+                    return {
+                        success: true,
+                        sites: testSites,
+                        errorCount: 0,
+                        metadata: {
+                            totalProcessed: 2,
+                            loadedFromCache: 0,
+                            loadedFromDatabase: 2,
+                        },
+                    };
                 }
-                
-                return {
-                    success: true,
-                    sites: testSites,
-                    errorCount: 0,
-                    metadata: { totalProcessed: 2, loadedFromCache: 0, loadedFromDatabase: 2 },
-                };
-            });
+            );
 
             const result = await databaseManager.refreshSites();
 
             expect(result).toEqual(testSites);
-            expect(mockSiteLoadingOrchestrator.loadSitesFromDatabase).toHaveBeenCalled();
+            expect(
+                mockSiteLoadingOrchestrator.loadSitesFromDatabase
+            ).toHaveBeenCalled();
         });
 
         it("should handle refresh sites error", async () => {
@@ -243,7 +267,9 @@ describe("DatabaseManager - Coverage Tests", () => {
                 new Error("Database error")
             );
 
-            await expect(databaseManager.refreshSites()).rejects.toThrow("Database error");
+            await expect(databaseManager.refreshSites()).rejects.toThrow(
+                "Database error"
+            );
         });
     });
 
@@ -254,7 +280,9 @@ describe("DatabaseManager - Coverage Tests", () => {
             );
 
             // Reset settings swallows errors, so it should resolve but not throw
-            await expect(databaseManager.resetSettings()).resolves.not.toThrow();
+            await expect(
+                databaseManager.resetSettings()
+            ).resolves.not.toThrow();
         });
     });
 
@@ -274,22 +302,28 @@ describe("DatabaseManager - Coverage Tests", () => {
 
         it("should test private method emitSitesCacheUpdateRequested through refresh", async () => {
             const testSites = [createTestSite("test1")];
-            
+
             // The orchestrator should populate the cache when called
-            mockSiteLoadingOrchestrator.loadSitesFromDatabase.mockImplementation(async (siteCache: any) => {
-                // Clear and populate the cache with test sites
-                siteCache.clear();
-                for (const site of testSites) {
-                    siteCache.set(site.identifier, site);
+            mockSiteLoadingOrchestrator.loadSitesFromDatabase.mockImplementation(
+                async (siteCache: any) => {
+                    // Clear and populate the cache with test sites
+                    siteCache.clear();
+                    for (const site of testSites) {
+                        siteCache.set(site.identifier, site);
+                    }
+
+                    return {
+                        success: true,
+                        sites: testSites,
+                        errorCount: 0,
+                        metadata: {
+                            totalProcessed: 1,
+                            loadedFromCache: 0,
+                            loadedFromDatabase: 1,
+                        },
+                    };
                 }
-                
-                return {
-                    success: true,
-                    sites: testSites,
-                    errorCount: 0,
-                    metadata: { totalProcessed: 1, loadedFromCache: 0, loadedFromDatabase: 1 },
-                };
-            });
+            );
 
             await databaseManager.refreshSites();
 
@@ -303,22 +337,28 @@ describe("DatabaseManager - Coverage Tests", () => {
     describe("Event Emission Integration", () => {
         it("should emit multiple events during complex operations", async () => {
             const testSites = [createTestSite("test1")];
-            
+
             // The orchestrator should populate the cache when called
-            mockSiteLoadingOrchestrator.loadSitesFromDatabase.mockImplementation(async (siteCache: any) => {
-                // Clear and populate the cache with test sites
-                siteCache.clear();
-                for (const site of testSites) {
-                    siteCache.set(site.identifier, site);
+            mockSiteLoadingOrchestrator.loadSitesFromDatabase.mockImplementation(
+                async (siteCache: any) => {
+                    // Clear and populate the cache with test sites
+                    siteCache.clear();
+                    for (const site of testSites) {
+                        siteCache.set(site.identifier, site);
+                    }
+
+                    return {
+                        success: true,
+                        sites: testSites,
+                        errorCount: 0,
+                        metadata: {
+                            totalProcessed: 1,
+                            loadedFromCache: 0,
+                            loadedFromDatabase: 1,
+                        },
+                    };
                 }
-                
-                return {
-                    success: true,
-                    sites: testSites,
-                    errorCount: 0,
-                    metadata: { totalProcessed: 1, loadedFromCache: 0, loadedFromDatabase: 1 },
-                };
-            });
+            );
 
             // Perform multiple operations that should emit events
             await databaseManager.setHistoryLimit(999);

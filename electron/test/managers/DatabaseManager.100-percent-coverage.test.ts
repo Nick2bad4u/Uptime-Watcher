@@ -235,7 +235,7 @@ describe("DatabaseManager - 100% Coverage", () => {
 
         // Replace the command executor with our mock
         (databaseManager as any).commandExecutor = mockCommandExecutor;
-        
+
         // Ensure siteCache is properly mocked if it's undefined
         if (!(databaseManager as any).siteCache) {
             (databaseManager as any).siteCache = {
@@ -250,9 +250,12 @@ describe("DatabaseManager - 100% Coverage", () => {
                 values: vi.fn().mockReturnValue([]),
             };
         }
-        
+
         // Ensure siteLoadingOrchestrator is properly mocked if methods are missing
-        if (!(databaseManager as any).siteLoadingOrchestrator?.loadSitesFromDatabase) {
+        if (
+            !(databaseManager as any).siteLoadingOrchestrator
+                ?.loadSitesFromDatabase
+        ) {
             (databaseManager as any).siteLoadingOrchestrator = {
                 loadSitesFromDatabase: vi.fn().mockResolvedValue({
                     success: true,
@@ -822,9 +825,9 @@ describe("DatabaseManager - 100% Coverage", () => {
 
     describe("Error Handling Integration", () => {
         it("should properly wrap operations with error handling", async () => {
-            // This test verifies that error handling is working by ensuring operations 
+            // This test verifies that error handling is working by ensuring operations
             // complete successfully even with potential errors in dependencies
-            
+
             // Act - This should use withErrorHandling internally
             await databaseManager.initialize();
             await databaseManager.refreshSites();

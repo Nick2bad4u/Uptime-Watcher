@@ -28,19 +28,20 @@ describe("SettingsRepository", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         // Spy on withDatabaseOperation and make it just call the operation directly
-        vi.spyOn(operationalHooks, 'withDatabaseOperation')
-            .mockImplementation(async (operation) => {
+        vi.spyOn(operationalHooks, "withDatabaseOperation").mockImplementation(
+            async (operation) => {
                 return await operation();
-            });
-        
+            }
+        );
+
         // Reset database mock implementations
         (mockDatabase.get as any).mockReturnValue(undefined);
         (mockDatabase.all as any).mockReturnValue([]);
         (mockDatabaseService.getDatabase as any).mockReturnValue(mockDatabase);
         mockDatabaseService.executeTransaction.mockResolvedValue(undefined);
-        
+
         repository = new SettingsRepository({
             databaseService: mockDatabaseService as any,
         });
@@ -59,7 +60,7 @@ describe("SettingsRepository", () => {
                 expect.stringContaining("SELECT value FROM settings"),
                 ["test-key"]
             );
-            
+
             // Main assertion
             expect(result).toBe("test-value");
         });

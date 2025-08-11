@@ -12,9 +12,11 @@ import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 /**
  * Creates a properly typed and mocked StandardizedCache instance
  */
-export function createMockStandardizedCache<T>(): Partial<StandardizedCache<T>> {
+export function createMockStandardizedCache<T>(): Partial<
+    StandardizedCache<T>
+> {
     const cache = new Map<string, T>();
-    
+
     return {
         // Cache operations
         get: vi.fn((key: string) => cache.get(key)),
@@ -27,7 +29,7 @@ export function createMockStandardizedCache<T>(): Partial<StandardizedCache<T>> 
         size: cache.size,
         keys: vi.fn(() => [...cache.keys()]),
         entries: vi.fn(() => [...cache.entries()][Symbol.iterator]()),
-        
+
         // Statistics
         getStats: vi.fn(() => ({
             hits: 0,
@@ -35,7 +37,7 @@ export function createMockStandardizedCache<T>(): Partial<StandardizedCache<T>> 
             size: cache.size,
             hitRatio: 0,
         })),
-        
+
         // Bulk operations
         getAll: vi.fn(() => [...cache.values()]),
         bulkUpdate: vi.fn(),
@@ -84,7 +86,10 @@ export function createMockEventBus(): Partial<TypedEventBus<UptimeEvents>> {
 /**
  * Creates test site data with realistic structure
  */
-export function createTestSite(identifier: string, overrides: Partial<Site> = {}): Site {
+export function createTestSite(
+    identifier: string,
+    overrides: Partial<Site> = {}
+): Site {
     return {
         identifier,
         name: `Test Site ${identifier}`,
@@ -97,7 +102,10 @@ export function createTestSite(identifier: string, overrides: Partial<Site> = {}
 /**
  * Creates test monitor data with realistic structure
  */
-export function createTestMonitor(id: string, overrides: Partial<Monitor> = {}): Monitor {
+export function createTestMonitor(
+    id: string,
+    overrides: Partial<Monitor> = {}
+): Monitor {
     return {
         id,
         type: "http",
@@ -125,29 +133,29 @@ export function createMockRepository(): any {
         add: vi.fn().mockResolvedValue(true),
         update: vi.fn().mockResolvedValue(true),
         delete: vi.fn().mockResolvedValue(true),
-        
+
         // Specialized operations (may not exist on all repositories)
         findAll: vi.fn().mockResolvedValue([]),
         findByIdentifier: vi.fn().mockResolvedValue(undefined),
         findBySiteIdentifier: vi.fn().mockResolvedValue([]),
         findByKey: vi.fn().mockResolvedValue(undefined),
-        
+
         // Bulk operations
         bulkInsert: vi.fn().mockResolvedValue(undefined),
         deleteAll: vi.fn().mockResolvedValue(undefined),
         exportAll: vi.fn().mockResolvedValue([]),
-        
+
         // Settings-specific operations
         get: vi.fn().mockResolvedValue("500"),
         set: vi.fn().mockResolvedValue(true),
         getInternal: vi.fn().mockResolvedValue("500"),
         setInternal: vi.fn().mockResolvedValue(true),
         upsert: vi.fn().mockResolvedValue(undefined),
-        
+
         // History-specific operations
         deleteAllHistory: vi.fn().mockResolvedValue(undefined),
         pruneAllHistoryInternal: vi.fn().mockResolvedValue(undefined),
-        
+
         // Monitor-specific operations
         getAllMonitorIds: vi.fn().mockResolvedValue([]),
     };
@@ -162,7 +170,9 @@ export function createMockRepositories(): any {
             close: vi.fn().mockResolvedValue(undefined),
             execute: vi.fn().mockResolvedValue(undefined),
             query: vi.fn().mockResolvedValue([]),
-            executeTransaction: vi.fn().mockImplementation((operation) => operation({})),
+            executeTransaction: vi
+                .fn()
+                .mockImplementation((operation) => operation({})),
             getDatabase: vi.fn().mockReturnValue({}),
             initialize: vi.fn().mockResolvedValue(undefined),
         },
@@ -193,7 +203,9 @@ export function createMockConfigurationManager(): any {
         monitorValidator: {},
         siteValidator: {},
         validationCache: new Map(),
-        validateMonitor: vi.fn().mockResolvedValue({ isValid: true, errors: [] }),
+        validateMonitor: vi
+            .fn()
+            .mockResolvedValue({ isValid: true, errors: [] }),
         validateSite: vi.fn().mockResolvedValue({ isValid: true, errors: [] }),
         initializeValidators: vi.fn().mockResolvedValue(undefined),
         getValidationRules: vi.fn().mockReturnValue({}),

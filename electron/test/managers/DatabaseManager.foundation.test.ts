@@ -6,7 +6,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DatabaseManager } from "../../managers/DatabaseManager";
 import type { DatabaseManagerDependencies } from "../../managers/DatabaseManager";
-import { DownloadBackupCommand, ExportDataCommand, ImportDataCommand } from "../../services/commands/DatabaseCommands";
+import {
+    DownloadBackupCommand,
+    ExportDataCommand,
+    ImportDataCommand,
+} from "../../services/commands/DatabaseCommands";
 
 describe("DatabaseManager Foundation Tests", () => {
     let databaseManager: DatabaseManager;
@@ -84,8 +88,12 @@ describe("DatabaseManager Foundation Tests", () => {
             monitorValidator: {},
             siteValidator: {},
             validationCache: new Map(),
-            validateMonitor: vi.fn().mockResolvedValue({ isValid: true, errors: [] }),
-            validateSite: vi.fn().mockResolvedValue({ isValid: true, errors: [] }),
+            validateMonitor: vi
+                .fn()
+                .mockResolvedValue({ isValid: true, errors: [] }),
+            validateSite: vi
+                .fn()
+                .mockResolvedValue({ isValid: true, errors: [] }),
             initializeValidators: vi.fn().mockResolvedValue(undefined),
             getValidationRules: vi.fn().mockReturnValue({}),
             refreshConfiguration: vi.fn().mockResolvedValue(undefined),
@@ -110,38 +118,56 @@ describe("DatabaseManager Foundation Tests", () => {
         const smartCommandExecutor = {
             execute: vi.fn().mockImplementation(async (command: any) => {
                 // Identify command type and return appropriate response
-                if (command instanceof DownloadBackupCommand || command.constructor.name === 'DownloadBackupCommand') {
+                if (
+                    command instanceof DownloadBackupCommand ||
+                    command.constructor.name === "DownloadBackupCommand"
+                ) {
                     const result = {
                         buffer: Buffer.from("backup-data"),
-                        fileName: "backup-test.db"
+                        fileName: "backup-test.db",
                     };
                     // Emit the expected event
-                    await mockEventEmitter.emitTyped("internal:database:backup-downloaded", {
-                        fileName: result.fileName,
-                        operation: "backup-downloaded",
-                    });
+                    await mockEventEmitter.emitTyped(
+                        "internal:database:backup-downloaded",
+                        {
+                            fileName: result.fileName,
+                            operation: "backup-downloaded",
+                        }
+                    );
                     return result;
                 }
-                
-                if (command instanceof ExportDataCommand || command.constructor.name === 'ExportDataCommand') {
+
+                if (
+                    command instanceof ExportDataCommand ||
+                    command.constructor.name === "ExportDataCommand"
+                ) {
                     const result = '{"sites": [], "settings": []}';
                     // Emit the expected event
-                    await mockEventEmitter.emitTyped("internal:database:data-exported", {
-                        fileName: `export-${Date.now()}.json`,
-                        operation: "data-exported",
-                    });
+                    await mockEventEmitter.emitTyped(
+                        "internal:database:data-exported",
+                        {
+                            fileName: `export-${Date.now()}.json`,
+                            operation: "data-exported",
+                        }
+                    );
                     return result;
                 }
-                
-                if (command instanceof ImportDataCommand || command.constructor.name === 'ImportDataCommand') {
+
+                if (
+                    command instanceof ImportDataCommand ||
+                    command.constructor.name === "ImportDataCommand"
+                ) {
                     const result = true;
                     // Emit the expected event
-                    await mockEventEmitter.emitTyped("internal:database:data-imported", {
-                        operation: "data-imported",
-                    });
+                    await mockEventEmitter.emitTyped(
+                        "internal:database:data-imported",
+                        {
+                            operation: "data-imported",
+                        }
+                    );
                     return result;
                 }
-                
+
                 // Default return for unknown commands
                 return undefined;
             }),
@@ -151,22 +177,23 @@ describe("DatabaseManager Foundation Tests", () => {
 
         // Replace the command executor after construction
         // @ts-expect-error - overriding private property for testing
-        databaseManager['commandExecutor'] = smartCommandExecutor;
+        databaseManager["commandExecutor"] = smartCommandExecutor;
 
         // Create smart site loading orchestrator mock
         const mockSiteLoadingOrchestrator = {
             loadSitesFromDatabase: vi.fn().mockResolvedValue({
                 success: true,
                 sitesLoaded: 0,
-                message: "Sites loaded successfully"
+                message: "Sites loaded successfully",
             }),
         };
-        
+
         // @ts-expect-error - overriding private property for testing
-        databaseManager['siteLoadingOrchestrator'] = mockSiteLoadingOrchestrator;
+        databaseManager["siteLoadingOrchestrator"] =
+            mockSiteLoadingOrchestrator;
 
         // Ensure the site cache has all required methods
-        const siteCache = databaseManager['siteCache'];
+        const siteCache = databaseManager["siteCache"];
         if (siteCache) {
             siteCache.clear = vi.fn();
             siteCache.set = vi.fn();
@@ -184,12 +211,12 @@ describe("DatabaseManager Foundation Tests", () => {
 
         it("should download backup with proper return type and events", async () => {
             const result = await databaseManager.downloadBackup();
-            
+
             expect(result).toEqual({
                 buffer: expect.any(Buffer),
-                fileName: "backup-test.db"
+                fileName: "backup-test.db",
             });
-            
+
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:database:backup-downloaded",
                 expect.objectContaining({
@@ -201,9 +228,9 @@ describe("DatabaseManager Foundation Tests", () => {
 
         it("should export data with proper return type and events", async () => {
             const result = await databaseManager.exportData();
-            
+
             expect(result).toBe('{"sites": [], "settings": []}');
-            
+
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:database:data-exported",
                 expect.objectContaining({
@@ -215,9 +242,9 @@ describe("DatabaseManager Foundation Tests", () => {
         it("should import data with proper return type and events", async () => {
             const testData = '{"sites": [], "settings": []}';
             const result = await databaseManager.importData(testData);
-            
+
             expect(result).toBe(true);
-            
+
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:database:data-imported",
                 expect.objectContaining({
