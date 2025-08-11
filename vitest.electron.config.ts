@@ -7,9 +7,9 @@
  */
 
 import path from "node:path";
-import { defineConfig } from "vitest/config";
+import { defineConfig } from "vite";
 
-export default defineConfig({
+const vitestConfig = defineConfig({
     resolve: {
         alias: {
             "@": path.resolve(import.meta.dirname, "./electron"),
@@ -41,16 +41,18 @@ export default defineConfig({
                 "report/**", // Exclude report files
                 "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
             ],
-
             include: [
                 "electron/**/*.ts", // Include all electron source files
                 "shared/**/*.ts", // Include shared files when testing electron
             ],
+
             provider: "istanbul" as const,
             reporter: ["text", "json", "lcov", "html"],
+            reportOnFailure: true,
             reportsDirectory: "./coverage/electron",
             skipFull: false, // Don't skip full coverage collection
             thresholds: {
+                autoUpdate: true,
                 branches: 80, // Minimum 80% branch coverage for backend
                 functions: 90, // Minimum 90% function coverage for backend
                 lines: 90, // Minimum 90% line coverage for backend
@@ -71,6 +73,9 @@ export default defineConfig({
             "**/coverage/**",
             "**/docs/**",
         ],
+        expect: {
+            requireAssertions: true,
+        },
         globals: true, // Enable global test functions (describe, it, expect)
         include: [
             "electron/**/*.test.ts",
@@ -87,9 +92,10 @@ export default defineConfig({
         poolOptions: {
             threads: {
                 isolate: true, // Isolate tests for better reliability
-                maxThreads: 8, // Limit concurrent threads for electron tests
+                maxThreads: 16, // Limit concurrent threads for electron tests
                 minThreads: 1, // Ensure at least one thread
                 singleThread: false, // Enable multi-threading
+                useAtomics: true,
             },
         },
         reporters: ["default", "json", "verbose", "hanging-process"], // Add hanging-process for improved output
@@ -98,3 +104,5 @@ export default defineConfig({
         testTimeout: 15_000, // Set Vitest timeout to 15 seconds
     },
 });
+
+export default vitestConfig as ReturnType<typeof defineConfig>;

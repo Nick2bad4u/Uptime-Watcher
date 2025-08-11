@@ -3,6 +3,7 @@
     "compilerOptions": {
         "outDir": "dist-electron",
         "tsBuildInfoFile": "./dist-electron/tsconfig.electron.test.tsbuildinfo",
+        "isolatedDeclarations": false,
         "paths": {
             "@/*": [
                 "electron/*"

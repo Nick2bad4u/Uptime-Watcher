@@ -1,6 +1,6 @@
 /**
  * Vite configuration for the Uptime Watcher Electron application.
- * Configures React frontend build and Electron main/preload process compilation.
+ * Configures React frontend build and Electron main/preload proce            cache: true,ss compilation.
  */
 
 import { codecovVitePlugin } from "@codecov/vite-plugin";
@@ -235,9 +235,11 @@ export default defineConfig(({}) => {
                 ignoreEmptyLines: true, // Ignore empty lines in coverage reports
                 provider: "istanbul" as const,
                 reporter: ["text", "json", "lcov", "html"],
+                reportOnFailure: true,
                 reportsDirectory: "./coverage",
                 skipFull: false, // Don't skip full coverage collection
                 thresholds: {
+                    autoUpdate: true,
                     branches: 70, // Minimum 70% branch coverage
                     functions: 80, // Minimum 80% function coverage
                     lines: 80, // Minimum 80% line coverage
@@ -250,6 +252,7 @@ export default defineConfig(({}) => {
                 },
             },
             environment: "jsdom", // Default for React components
+
             // Test file patterns - exclude electron tests as they have their own config
             exclude: [
                 "**/node_modules/**",
@@ -260,7 +263,9 @@ export default defineConfig(({}) => {
                 "**/coverage/**",
                 "**/docs/**",
             ],
-
+            expect: {
+                requireAssertions: true,
+            },
             globals: true, // Enable global test functions (describe, it, expect)
             include: [
                 "src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
@@ -282,6 +287,7 @@ export default defineConfig(({}) => {
                     maxThreads: 24, // Limit concurrent threads to reduce listener conflicts
                     minThreads: 1, // Ensure at least one thread
                     singleThread: false, // Enable multi-threading
+                    useAtomics: true,
                 },
             },
             projects: ["vitest.config.ts", "vitest.electron.config.ts"],
