@@ -7,7 +7,7 @@
  */
 
 import path from "node:path";
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 
 const vitestConfig = defineConfig({
     resolve: {
@@ -102,6 +102,7 @@ const vitestConfig = defineConfig({
         restoreMocks: true,
         setupFiles: ["./electron/test/setup.ts"],
         testTimeout: 15_000, // Set Vitest timeout to 15 seconds
+        typecheck: { enabled: true, tsconfig: "./tsconfig.electron.json" },
     },
 });
 

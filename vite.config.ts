@@ -252,7 +252,6 @@ export default defineConfig(({}) => {
                 },
             },
             environment: "jsdom", // Default for React components
-
             // Test file patterns - exclude electron tests as they have their own config
             exclude: [
                 "**/node_modules/**",
@@ -263,6 +262,7 @@ export default defineConfig(({}) => {
                 "**/coverage/**",
                 "**/docs/**",
             ],
+
             expect: {
                 requireAssertions: true,
             },
@@ -295,6 +295,7 @@ export default defineConfig(({}) => {
             reporters: ["default", "json", "verbose", "hanging-process"],
             setupFiles: ["./src/test/setup.ts"], // Setup file for testing
             testTimeout: 15_000, // Set Vitest timeout to 15 seconds
+            typecheck: { enabled: true, tsconfig: "./tsconfig.json" },
         },
     };
 }) satisfies UserConfigFnObject as UserConfigFnObject;
