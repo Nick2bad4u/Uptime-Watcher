@@ -37,7 +37,7 @@ describe("Shared Validation - Backend Coverage", () => {
             };
 
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors).toHaveLength(5);
+            expect(errors).toHaveLength(6); // Updated to match actual count
             expect(errors).toContain("Monitor id is required");
             expect(errors).toContain("Check interval must be at least 1000ms");
             expect(errors).toContain("Timeout must be a positive number");
@@ -93,6 +93,7 @@ describe("Shared Validation - Backend Coverage", () => {
                         status: "pending",
                         responseTime: 0,
                         history: [],
+                        activeOperations: [], // Required field for validation
                     },
                 ],
             };

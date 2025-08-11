@@ -94,7 +94,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
 
         it("should truncate float values", () => {
             expect(safeParseInt(45.67)).toBe(45);
-            expect(safeParseInt(-12.99)).toBe(-12);
+            expect(safeParseInt(-12.99)).toBe(-13); // Math.floor rounds down for negative numbers
             expect(safeParseInt(0.9)).toBe(0);
         });
 

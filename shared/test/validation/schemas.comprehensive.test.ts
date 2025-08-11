@@ -3,7 +3,7 @@
  * Targeting 98% branch coverage for all validation logic
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
     validateMonitorData,
     validateMonitorField,
@@ -1226,6 +1226,96 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     expect(result.success).toBe(false);
                     expect(result.errors.length).toBeGreaterThan(0);
                 }
+            });
+
+            it("should handle non-Error objects in validateMonitorData", () => {
+                // Mock scenario to trigger non-Error handling (line 422)
+                vi.spyOn(monitorSchemas, "http", "get").mockReturnValue({
+                    ...monitorSchemas.http,
+                    parse: vi.fn().mockImplementation(() => {
+                        throw "String error object"; // Non-Error object
+                    }),
+                });
+
+                const result = validateMonitorData("http", {
+                    id: "test",
+                    type: "http" as const,
+                    url: "https://example.com",
+                    checkInterval: 30_000,
+                    timeout: 5000,
+                    retryAttempts: 3,
+                    monitoring: true,
+                    status: "pending" as const,
+                    responseTime: -1,
+                });
+
+                expect(result.success).toBe(false);
+                expect(result.errors[0]).toContain("String error object");
+
+                vi.restoreAllMocks();
+            });
+
+            it("should handle non-Error objects in validateSiteData", () => {
+                // Mock scenario to trigger non-Error handling (line 540)
+                const originalParse = siteSchema.parse;
+                vi.spyOn(siteSchema, "parse").mockImplementation(() => {
+                    throw "Site validation string error"; // Non-Error object
+                });
+
+                const result = validateSiteData({
+                    identifier: "test",
+                    name: "Test Site",
+                    monitors: [
+                        {
+                            id: "test",
+                            type: "http" as const,
+                            url: "https://example.com",
+                            checkInterval: 30_000,
+                            timeout: 5000,
+                            retryAttempts: 3,
+                            monitoring: true,
+                            status: "pending" as const,
+                            responseTime: -1,
+                        },
+                    ],
+                });
+
+                expect(result.success).toBe(false);
+                expect(result.errors[0]).toContain(
+                    "Site validation string error"
+                );
+
+                siteSchema.parse = originalParse;
+            });
+
+            it("should test fallback to base schema for common fields", () => {
+                // Test the fallback path for common field validation (line 330)
+                // This should use base schema when specific schema doesn't have the field
+                const result = validateMonitorField(
+                    "http",
+                    "checkInterval", // Common field that should exist in base schema
+                    30_000
+                );
+
+                expect(result.success).toBe(true);
+            });
+
+            it("should handle error cases with proper categorization", () => {
+                // Test that errors are categorized correctly (line 408 - else case)
+                const result = validateMonitorData("http", {
+                    id: "", // Empty ID - should be required error, not warning
+                    type: "http" as const,
+                    url: "https://example.com",
+                    checkInterval: 30_000,
+                    timeout: 5000,
+                    retryAttempts: 3,
+                    monitoring: true,
+                    status: "pending" as const,
+                    responseTime: -1,
+                });
+
+                expect(result.success).toBe(false);
+                expect(result.errors.length).toBeGreaterThan(0);
             });
         });
     });

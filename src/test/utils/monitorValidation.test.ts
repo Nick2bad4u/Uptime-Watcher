@@ -37,8 +37,8 @@ import {
     validateMonitorFieldClientSide,
     validateMonitorFormData,
     type MonitorCreationData,
-    type ValidationResult,
 } from "../../utils/monitorValidation";
+import type { ValidationResult } from "../../../shared/types/validation";
 
 // Import mocked functions
 import { withUtilityErrorHandling } from "../../utils/errorHandling";
