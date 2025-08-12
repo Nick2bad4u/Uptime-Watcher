@@ -28,23 +28,7 @@ export const parseUptimeValue = (uptimeString: string): number => {
     return Math.min(100, Math.max(0, parsed));
 };
 
-/**
- * Validates if a string is a valid URL.
- *
- * @param urlString - The string to validate
- * @returns True if the string is a valid URL, false otherwise
- */
-export const isValidUrl = (urlString: string): boolean => {
-    if (!urlString || typeof urlString !== "string") {
-        return false;
-    }
-    try {
-        new URL(urlString);
-        return true;
-    } catch {
-        return false;
-    }
-};
+import { isValidUrl } from "@shared/validation/validatorUtils";
 
 /**
  * Safely extracts hostname from a URL string.

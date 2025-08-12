@@ -19,10 +19,10 @@
 import type { Site } from "../../types";
 import type { ValidationResult } from "./interfaces";
 
+import { validateMonitorData } from "../../../shared/validation/schemas";
 import {
     getRegisteredMonitorTypes,
     isValidMonitorType,
-    validateMonitorData,
 } from "../../services/monitoring/MonitorTypeRegistry";
 
 /**

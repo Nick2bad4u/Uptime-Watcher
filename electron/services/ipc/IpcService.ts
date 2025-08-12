@@ -5,11 +5,11 @@ import type { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import type { AutoUpdaterService } from "../updater/AutoUpdaterService";
 
 import { LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
+import { validateMonitorData } from "../../../shared/validation/schemas";
 import { logger } from "../../utils/logger";
 import {
     getAllMonitorTypeConfigs,
     getMonitorTypeConfig,
-    validateMonitorData,
 } from "../monitoring/MonitorTypeRegistry";
 import {
     createValidationResponse,

@@ -45,7 +45,7 @@ import "../../services/chartSetup";
 import { useSiteDetails } from "../../hooks/site/useSiteDetails";
 import { ChartConfigService } from "../../services/chartConfig";
 import ThemedBox from "../../theme/components/ThemedBox";
-import { useTheme } from "../../theme/useTheme";
+import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
 import { parseUptimeValue } from "../../utils/monitoring/dataValidation";
 import { formatStatusWithIcon } from "../../utils/status";
 import "./SiteDetails.css";
@@ -75,22 +75,6 @@ export interface SiteDetailsProperties {
 }
 
 /**
- * Gets a descriptive label for availability percentage.
- *
- * @param percentage - Availability percentage (0-100)
- * @returns Description string ("Excellent", "Good", or "Poor")
- */
-function getAvailabilityDescription(percentage: number): string {
-    if (percentage >= 99) {
-        return "Excellent";
-    }
-    if (percentage >= 95) {
-        return "Good";
-    }
-    return "Poor";
-}
-
-/**
  * Site details component with tabbed interface for comprehensive site monitoring.
  * Provides overview, history, analytics, and settings views for a monitored site.
  *
@@ -113,6 +97,7 @@ export const SiteDetails = ({
     site,
 }: SiteDetailsProperties): JSX.Element | null => {
     const { currentTheme } = useTheme();
+    const { getAvailabilityDescription } = useAvailabilityColors();
     const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
 
     // Add global escape key handler

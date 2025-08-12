@@ -88,7 +88,9 @@ export function hasValidRetryAttempts(
     monitor: Site["monitors"][0]
 ): monitor is Site["monitors"][0] & { retryAttempts: number } {
     return (
-        typeof monitor.retryAttempts === "number" && monitor.retryAttempts >= 0
+        typeof monitor.retryAttempts === "number" &&
+        monitor.retryAttempts >= 0 &&
+        Number.isFinite(monitor.retryAttempts)
     );
 }
 
@@ -101,7 +103,11 @@ export function hasValidRetryAttempts(
 export function hasValidTimeout(
     monitor: Site["monitors"][0]
 ): monitor is Site["monitors"][0] & { timeout: number } {
-    return typeof monitor.timeout === "number" && monitor.timeout > 0;
+    return (
+        typeof monitor.timeout === "number" &&
+        monitor.timeout > 0 &&
+        Number.isFinite(monitor.timeout)
+    );
 }
 
 /**

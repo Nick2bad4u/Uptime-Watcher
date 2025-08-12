@@ -19,10 +19,7 @@ import {
 } from "../../../shared/types";
 // Import shared validation schemas
 import { withErrorHandling } from "../../../shared/utils/errorHandling";
-import {
-    monitorSchemas,
-    validateMonitorData as sharedValidateMonitorData,
-} from "../../../shared/validation/schemas";
+import { monitorSchemas } from "../../../shared/validation/schemas";
 import { logger } from "../../utils/logger";
 import { HttpMonitor } from "./HttpMonitor";
 import {
@@ -257,39 +254,6 @@ export function isValidMonitorType(type: string): boolean {
  */
 export function registerMonitorType(config: BaseMonitorConfig): void {
     monitorTypes.set(config.type, config);
-}
-
-/**
- * Validates monitor data using shared Zod schemas for the specified monitor type.
- *
- * @remarks
- * Uses the shared validation logic to validate monitor data against the schema for the given type. Returns a structured result with errors, warnings, and metadata.
- *
- * @param type - The monitor type identifier.
- * @param data - The monitor data to validate.
- * @returns Validation result object with data, errors, warnings, metadata, and success flag.
- * @public
- */
-export function validateMonitorData(
-    type: string,
-    data: unknown
-): {
-    data?: unknown;
-    errors: string[];
-    metadata: Record<string, unknown>;
-    success: boolean;
-    warnings: string[];
-} {
-    // Use shared validation logic
-    const result = sharedValidateMonitorData(type, data);
-
-    return {
-        data: result.data,
-        errors: result.errors,
-        metadata: result.metadata ?? {},
-        success: result.success,
-        warnings: result.warnings ?? [],
-    };
 }
 
 // Register existing monitor types with their field definitions and schemas

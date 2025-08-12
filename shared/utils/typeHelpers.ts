@@ -49,19 +49,6 @@ export function isArray(value: unknown): value is unknown[] {
 }
 
 /**
- * Safely checks if an unknown value is a number.
- *
- * @param value - Value to check
- * @returns True if value is a number, false otherwise
- *
- * @remarks
- * Type guard function for numbers. Excludes NaN.
- */
-export function isNumber(value: unknown): value is number {
-    return typeof value === "number" && !Number.isNaN(value);
-}
-
-/**
  * Safely checks if an unknown value is a record (object with string keys).
  *
  * @param value - Value to check
@@ -73,19 +60,6 @@ export function isNumber(value: unknown): value is number {
  */
 export function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-/**
- * Safely checks if an unknown value is a string.
- *
- * @param value - Value to check
- * @returns True if value is a string, false otherwise
- *
- * @remarks
- * Type guard function for strings.
- */
-export function isString(value: unknown): value is string {
-    return typeof value === "string";
 }
 
 /**

@@ -8,6 +8,7 @@
 import type { Monitor, Site } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
+import { isValidUrl } from "@shared/validation/validatorUtils";
 import { useCallback } from "react";
 import { MdExpandLess, MdExpandMore } from "react-icons/md";
 
@@ -15,7 +16,6 @@ import { useThemeStyles } from "../../hooks/useThemeStyles";
 import { useUIStore } from "../../stores/ui/useUiStore";
 import StatusIndicator from "../../theme/components/StatusIndicator";
 import ThemedText from "../../theme/components/ThemedText";
-import { isValidUrl } from "../../utils/monitoring/dataValidation";
 import MonitoringStatusDisplay from "./MonitoringStatusDisplay";
 import { ScreenshotThumbnail } from "./ScreenshotThumbnail";
 

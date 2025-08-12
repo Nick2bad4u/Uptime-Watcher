@@ -246,29 +246,3 @@ export function isValidPort(value: unknown): value is number {
 export function isValidTimestamp(value: unknown): value is number {
     return isNumber(value) && value > 0 && value <= Date.now() + 86_400_000;
 }
-
-/**
- * Determines if a value is a valid URL string.
- *
- * @param value - The value to check.
- * @returns True if `value` is a string representing a valid URL; otherwise, false.
- *
- * @example
- * ```ts
- * if (isValidUrl(str)) {
- *   // str is a valid URL string
- * }
- * ```
- */
-export function isValidUrl(value: unknown): value is string {
-    if (!isString(value)) {
-        return false;
-    }
-
-    try {
-        new URL(value);
-        return true;
-    } catch {
-        return false;
-    }
-}
