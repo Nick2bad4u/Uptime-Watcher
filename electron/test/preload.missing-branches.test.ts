@@ -43,7 +43,6 @@ describe("preload.ts - Missing Branch Coverage", () => {
 
         expect(exposedAPI).toBeDefined();
     });
-
     describe("IPC Error Handling", () => {
         it("should handle invoke errors in sites API", async () => {
             mockIpcRenderer.invoke.mockRejectedValue(new Error("IPC failed"));
@@ -62,7 +61,6 @@ describe("preload.ts - Missing Branch Coverage", () => {
                 "IPC failed"
             );
         });
-
         it("should handle invoke errors in monitoring API", async () => {
             mockIpcRenderer.invoke.mockRejectedValue(
                 new Error("Monitoring failed")
@@ -82,7 +80,6 @@ describe("preload.ts - Missing Branch Coverage", () => {
                 exposedAPI.monitoring.stopMonitoringForSite("test", "monitor1")
             ).rejects.toThrow("Monitoring failed");
         });
-
         it("should handle invoke errors in data API", async () => {
             mockIpcRenderer.invoke.mockRejectedValue(new Error("Data failed"));
 
@@ -97,7 +94,6 @@ describe("preload.ts - Missing Branch Coverage", () => {
                 exposedAPI.data.downloadSQLiteBackup()
             ).rejects.toThrow("Data failed");
         });
-
         it("should handle invoke errors in settings API", async () => {
             mockIpcRenderer.invoke.mockRejectedValue(
                 new Error("Settings failed")
@@ -114,7 +110,6 @@ describe("preload.ts - Missing Branch Coverage", () => {
                 "Settings failed"
             );
         });
-
         it("should handle invoke errors in system API", async () => {
             mockIpcRenderer.invoke.mockRejectedValue(
                 new Error("System failed")
@@ -126,7 +121,6 @@ describe("preload.ts - Missing Branch Coverage", () => {
             ).rejects.toThrow("System failed");
         });
     });
-
     describe("Event Listener Edge Cases", () => {
         it("should handle removeAllListeners errors", async () => {
             // removeAllListeners should not throw
@@ -135,7 +129,6 @@ describe("preload.ts - Missing Branch Coverage", () => {
             ).not.toThrow();
         });
     });
-
     describe("Parameter Validation", () => {
         it("should handle null/undefined parameters", async () => {
             // Test with null/undefined parameters - these should still call invoke
@@ -149,7 +142,6 @@ describe("preload.ts - Missing Branch Coverage", () => {
                 exposedAPI.monitorTypes.validateMonitorData("http", null)
             ).resolves.toBe("success");
         });
-
         it("should handle empty string parameters", async () => {
             // Test with empty string parameters
             await expect(exposedAPI.sites.removeSite("")).resolves.toBe(
@@ -162,7 +154,6 @@ describe("preload.ts - Missing Branch Coverage", () => {
                 exposedAPI.monitoring.stopMonitoringForSite("", "")
             ).resolves.toBe("success");
         });
-
         it("should handle invalid numeric parameters", async () => {
             // Test with invalid numeric parameters
             await expect(
@@ -179,7 +170,6 @@ describe("preload.ts - Missing Branch Coverage", () => {
             ).resolves.toBe("success");
         });
     });
-
     describe("Concurrent Operations", () => {
         it("should handle concurrent API calls", async () => {
             // Test concurrent API calls
@@ -198,7 +188,6 @@ describe("preload.ts - Missing Branch Coverage", () => {
                 "success",
             ]);
         });
-
         it("should handle mixed success/failure scenarios", async () => {
             // Setup mixed responses
             mockIpcRenderer.invoke
@@ -222,19 +211,16 @@ describe("preload.ts - Missing Branch Coverage", () => {
             );
         });
     });
-
     describe("Event System Edge Cases", () => {
         it("should handle event callbacks with errors", async () => {
             const errorCallback = vi.fn(() => {
                 throw new Error("Callback error");
             });
-
             // Should handle callback errors gracefully
             expect(() =>
                 exposedAPI.events.onTestEvent(errorCallback)
             ).not.toThrow();
         });
-
         it("should handle invalid event names", async () => {
             // Test with various invalid event names - test removeAllListeners with invalid channels
             expect(() =>
@@ -247,7 +233,6 @@ describe("preload.ts - Missing Branch Coverage", () => {
                 exposedAPI.events.removeAllListeners(undefined)
             ).not.toThrow();
         });
-
         it("should handle rapid event registration/removal", async () => {
             // Rapid event operations
             for (let i = 0; i < 100; i++) {
@@ -260,7 +245,6 @@ describe("preload.ts - Missing Branch Coverage", () => {
             // Should complete without errors
             expect(true).toBe(true);
         });
-
         it("should handle event listener registration", async () => {
             const callback = vi.fn();
 
@@ -284,7 +268,6 @@ describe("preload.ts - Missing Branch Coverage", () => {
             ).not.toThrow();
         });
     });
-
     describe("Memory Management", () => {
         it("should handle memory pressure scenarios", async () => {
             // Create many callbacks to simulate memory pressure
@@ -303,7 +286,6 @@ describe("preload.ts - Missing Branch Coverage", () => {
             // Should handle memory pressure gracefully
             expect(true).toBe(true);
         });
-
         it("should handle listener cleanup during app shutdown", async () => {
             const callback = vi.fn();
 
@@ -317,9 +299,17 @@ describe("preload.ts - Missing Branch Coverage", () => {
             expect(true).toBe(true);
         });
     });
-
     describe("API Exposure Verification", () => {
-        it("should expose all required API sections", () => {
+        it("should expose all required API sections", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: preload.ts - Missing Branch Coverage",
+                "component"
+            );
+
             expect(exposedAPI.sites).toBeDefined();
             expect(exposedAPI.monitoring).toBeDefined();
             expect(exposedAPI.data).toBeDefined();
@@ -329,8 +319,13 @@ describe("preload.ts - Missing Branch Coverage", () => {
             expect(exposedAPI.monitorTypes).toBeDefined();
             expect(exposedAPI.stateSync).toBeDefined();
         });
+        it("should expose all site API methods", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: preload.ts - Missing Branch Coverage",
+                "component"
+            );
 
-        it("should expose all site API methods", () => {
             expect(typeof exposedAPI.sites.getSites).toBe("function");
             expect(typeof exposedAPI.sites.addSite).toBe("function");
             expect(typeof exposedAPI.sites.updateSite).toBe("function");
@@ -338,8 +333,16 @@ describe("preload.ts - Missing Branch Coverage", () => {
             expect(typeof exposedAPI.sites.removeMonitor).toBe("function");
             expect(typeof exposedAPI.sites.checkSiteNow).toBe("function");
         });
+        it("should expose all monitoring API methods", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: preload.ts - Missing Branch Coverage",
+                "component"
+            );
 
-        it("should expose all monitoring API methods", () => {
             expect(typeof exposedAPI.monitoring.startMonitoring).toBe(
                 "function"
             );

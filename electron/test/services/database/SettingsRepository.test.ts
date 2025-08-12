@@ -1,3 +1,16 @@
+/**
+ * Test suite for SettingsRepository
+ * 
+ * @fileoverview Comprehensive tests for unknown functionality
+ * in the Uptime Watcher application.
+ * 
+ * @author GitHub Copilot
+ * @since 2025-08-11
+ * @category General
+ * @module Unknown
+ * @tags ["test"]
+ */
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Database } from "node-sqlite3-wasm";
@@ -43,10 +56,7 @@ describe("SettingsRepository", () => {
         mockDatabaseService.executeTransaction.mockResolvedValue(undefined);
 
         repository = new SettingsRepository({
-            databaseService: mockDatabaseService as any,
-        });
-    });
-
+            databaseService: mockDatabaseService as any,        });        });
     describe("get", () => {
         it("should return setting value when key exists", async () => {
             const mockSetting = { value: "test-value" };
@@ -62,29 +72,20 @@ describe("SettingsRepository", () => {
             );
 
             // Main assertion
-            expect(result).toBe("test-value");
-        });
-
+            expect(result).toBe("test-value");        });
         it("should return undefined when setting does not exist", async () => {
             (mockDatabase.get as any).mockReturnValue(undefined);
 
             const result = await repository.get("nonexistent-key");
 
-            expect(result).toBeUndefined();
-        });
-
+            expect(result).toBeUndefined();        });
         it("should handle database errors", async () => {
             const error = new Error("Database error");
             (mockDatabase.get as any).mockImplementation(() => {
-                throw error;
-            });
-
+                throw error;        });
             await expect(repository.get("test-key")).rejects.toThrow(
                 "Database error"
-            );
-        });
-    });
-
+            );        });        });
     describe("getAll", () => {
         it("should return all settings as key-value pairs", async () => {
             const mockSettings = [
@@ -97,30 +98,21 @@ describe("SettingsRepository", () => {
 
             expect(result).toEqual({
                 setting1: "value1",
-                setting2: "value2",
-            });
+                setting2: "value2",        });
             expect(mockDatabase.all).toHaveBeenCalledWith(
                 expect.stringContaining("SELECT * FROM settings")
-            );
-        });
-
+            );        });
         it("should return empty object when no settings exist", async () => {
             (mockDatabase.all as any).mockReturnValue([]);
 
             const result = await repository.getAll();
 
-            expect(result).toEqual({});
-        });
-
+            expect(result).toEqual({});        });
         it("should handle database errors", async () => {
             const error = new Error("Database error");
             (mockDatabase.all as any).mockImplementation(() => {
-                throw error;
-            });
-
-            await expect(repository.getAll()).rejects.toThrow("Database error");
-        });
-
+                throw error;        });
+            await expect(repository.getAll()).rejects.toThrow("Database error");        });
         it("should handle null value gracefully", async () => {
             const mockSettings = [
                 { key: "setting1", value: "value1" },
@@ -132,11 +124,7 @@ describe("SettingsRepository", () => {
 
             expect(result).toEqual({
                 setting1: "value1",
-                setting2: "",
-            });
-        });
-    });
-
+                setting2: "",        });        });        });
     describe("set", () => {
         it("should set a setting value successfully", async () => {
             mockDatabaseService.executeTransaction.mockResolvedValue(undefined);
@@ -145,26 +133,20 @@ describe("SettingsRepository", () => {
 
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalledWith(
                 expect.any(Function)
-            );
-        });
-
+            );        });
         it("should handle database errors", async () => {
             const error = new Error("Database error");
             mockDatabaseService.executeTransaction.mockRejectedValue(error);
 
             await expect(
                 repository.set("test-key", "test-value")
-            ).rejects.toThrow("Database error");
-        });
-
+            ).rejects.toThrow("Database error");        });
         it("should handle empty string value", async () => {
             mockDatabaseService.executeTransaction.mockResolvedValue(undefined);
 
             await repository.set("test-key", "");
 
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
-        });
-
+            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();        });
         it("should handle special characters in key and value", async () => {
             mockDatabaseService.executeTransaction.mockResolvedValue(undefined);
 
@@ -173,10 +155,7 @@ describe("SettingsRepository", () => {
                 "value with spaces & symbols"
             );
 
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
-        });
-    });
-
+            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();        });        });
     describe("internal methods", () => {
         describe("setInternal", () => {
             it("should set setting using database run method", () => {
@@ -185,19 +164,14 @@ describe("SettingsRepository", () => {
                 expect(mockDatabase.run).toHaveBeenCalledWith(
                     expect.stringContaining("INSERT OR REPLACE"),
                     ["test-key", "test-value"]
-                );
-            });
-
+                );        });
             it("should handle empty values", () => {
                 repository.setInternal(mockDatabase, "test-key", "");
 
                 expect(mockDatabase.run).toHaveBeenCalledWith(
                     expect.stringContaining("INSERT OR REPLACE"),
                     ["test-key", ""]
-                );
-            });
-        });
-
+                );        });        });
         describe("deleteInternal", () => {
             it("should delete setting by key", () => {
                 repository.deleteInternal(mockDatabase, "test-key");
@@ -205,20 +179,14 @@ describe("SettingsRepository", () => {
                 expect(mockDatabase.run).toHaveBeenCalledWith(
                     expect.stringContaining("DELETE"),
                     ["test-key"]
-                );
-            });
-        });
-
+                );        });        });
         describe("deleteAllInternal", () => {
             it("should delete all settings", () => {
                 repository.deleteAllInternal(mockDatabase);
 
                 expect(mockDatabase.run).toHaveBeenCalledWith(
                     expect.stringContaining("DELETE")
-                );
-            });
-        });
-
+                );        });        });
         describe("bulkInsertInternal", () => {
             it("should bulk insert multiple settings", () => {
                 const mockStatement = {
@@ -229,9 +197,7 @@ describe("SettingsRepository", () => {
 
                 repository.bulkInsertInternal(mockDatabase, {
                     setting1: "value1",
-                    setting2: "value2",
-                });
-
+                    setting2: "value2",        });
                 expect(mockDatabase.prepare).toHaveBeenCalledWith(
                     expect.stringContaining("INSERT OR REPLACE")
                 );
@@ -244,9 +210,7 @@ describe("SettingsRepository", () => {
                     "setting2",
                     "value2",
                 ]);
-                expect(mockStatement.finalize).toHaveBeenCalled();
-            });
-
+                expect(mockStatement.finalize).toHaveBeenCalled();        });
             it("should handle empty settings array", () => {
                 const mockStatement = {
                     run: vi.fn(),
@@ -258,9 +222,7 @@ describe("SettingsRepository", () => {
 
                 expect(mockDatabase.prepare).not.toHaveBeenCalled();
                 expect(mockStatement.run).not.toHaveBeenCalled();
-                expect(mockStatement.finalize).not.toHaveBeenCalled();
-            });
-
+                expect(mockStatement.finalize).not.toHaveBeenCalled();        });
             it("should finalize statement even if error occurs", () => {
                 const settings = { setting1: "value1" };
                 const mockStatement = {
@@ -274,11 +236,7 @@ describe("SettingsRepository", () => {
                 expect(() =>
                     repository.bulkInsertInternal(mockDatabase, settings)
                 ).toThrow("Statement error");
-                expect(mockStatement.finalize).toHaveBeenCalled();
-            });
-        });
-    });
-
+                expect(mockStatement.finalize).toHaveBeenCalled();        });        });        });
     describe("edge cases and error handling", () => {
         it("should handle very long key names", async () => {
             const longKey = "a".repeat(1000);
@@ -287,33 +245,24 @@ describe("SettingsRepository", () => {
             const result = await repository.get(longKey);
 
             expect(result).toBeUndefined();
-            expect(mockDatabaseService.getDatabase).toHaveBeenCalled();
-        });
-
+            expect(mockDatabaseService.getDatabase).toHaveBeenCalled();        });
         it("should handle very long values", async () => {
             const longValue = "x".repeat(10_000);
             mockDatabaseService.executeTransaction.mockResolvedValue(undefined);
 
             await repository.set("test-key", longValue);
 
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
-        });
-
+            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();        });
         it("should handle unicode characters in keys and values", async () => {
             mockDatabaseService.executeTransaction.mockResolvedValue(undefined);
 
             await repository.set("test-🔑", "value-🌟");
 
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
-        });
-
+            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();        });
         it("should handle null key gracefully", async () => {
             (mockDatabase.get as any).mockReturnValueOnce(undefined); // No row found
 
             const result = await repository.get(null as any);
 
             expect(result).toBeUndefined();
-            expect(mockDatabaseService.getDatabase).toHaveBeenCalled();
-        });
-    });
-});
+            expect(mockDatabaseService.getDatabase).toHaveBeenCalled();        });        });        });

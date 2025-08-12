@@ -46,7 +46,13 @@ describe("DatabaseService Coverage Tests", () => {
         vi.clearAllMocks();
     });
 
-    it("should create singleton instance", async () => {
+    it("should create singleton instance", async ({ task, annotate }) => {
+        // Add test metadata
+        await annotate(`Testing: ${task.name}`, "unit");
+        await annotate("Component: DatabaseService", "component");
+        await annotate("Pattern: Singleton", "pattern");
+        await annotate("Priority: Critical", "priority");
+
         const { DatabaseService } = await import(
             "../../../services/database/DatabaseService"
         );
@@ -58,7 +64,13 @@ describe("DatabaseService Coverage Tests", () => {
         expect(instance1).toBeDefined();
     });
 
-    it("should handle initialization", async () => {
+    it("should handle initialization", async ({ task, annotate }) => {
+        // Add test metadata
+        await annotate(`Testing: ${task.name}`, "integration");
+        await annotate("Component: DatabaseService", "component");
+        await annotate("Operation: Initialization", "operation");
+        await annotate("Priority: High", "priority");
+
         const { DatabaseService } = await import(
             "../../../services/database/DatabaseService"
         );
@@ -71,8 +83,7 @@ describe("DatabaseService Coverage Tests", () => {
             // Some initialization errors are expected in test environment
             expect(error).toBeInstanceOf(Error);
         }
-    });
-
+        });
     it("should handle database operations", async () => {
         const { DatabaseService } = await import(
             "../../../services/database/DatabaseService"
@@ -86,8 +97,7 @@ describe("DatabaseService Coverage Tests", () => {
             // Database might not be initialized in test environment
             expect(error).toBeInstanceOf(Error);
         }
-    });
-
+        });
     it("should handle transaction operations", async () => {
         const { DatabaseService } = await import(
             "../../../services/database/DatabaseService"
@@ -98,14 +108,13 @@ describe("DatabaseService Coverage Tests", () => {
             await instance.executeTransaction(() => {
                 // Mock transaction operation
                 return Promise.resolve("success");
-            });
+        });
             expect(true).toBe(true);
         } catch (error) {
             // Transaction might fail in test environment
             expect(error).toBeInstanceOf(Error);
         }
-    });
-
+        });
     it("should handle cleanup operations", async () => {
         const { DatabaseService } = await import(
             "../../../services/database/DatabaseService"
@@ -119,8 +128,7 @@ describe("DatabaseService Coverage Tests", () => {
             // Cleanup might fail if database wasn't initialized
             expect(error).toBeInstanceOf(Error);
         }
-    });
-
+        });
     it("should have proper constants defined", async () => {
         // This will import the file and exercise any top-level code
         const module = await import(
@@ -128,8 +136,7 @@ describe("DatabaseService Coverage Tests", () => {
         );
         expect(module).toBeDefined();
         expect(module.DatabaseService).toBeDefined();
-    });
-
+        });
     it("should handle database path generation", async () => {
         const { DatabaseService } = await import(
             "../../../services/database/DatabaseService"
@@ -142,8 +149,7 @@ describe("DatabaseService Coverage Tests", () => {
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }
-    });
-
+        });
     it("should handle error scenarios", async () => {
         const { DatabaseService } = await import(
             "../../../services/database/DatabaseService"
@@ -156,5 +162,4 @@ describe("DatabaseService Coverage Tests", () => {
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }
-    });
-});
+        });        });

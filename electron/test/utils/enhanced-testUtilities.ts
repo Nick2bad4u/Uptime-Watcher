@@ -196,7 +196,7 @@ export function createMockConfigurationManager(): any {
         }),
         getHistoryRetentionRules: vi.fn().mockReturnValue({
             defaultLimit: 500,
-            maxLimit: 1000,
+            maxLimit: Number.MAX_SAFE_INTEGER,
             minLimit: 25,
         }),
         configCache: new Map(),

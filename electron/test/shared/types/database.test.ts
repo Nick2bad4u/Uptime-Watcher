@@ -18,8 +18,11 @@ import {
 
 describe("Shared Database Types - Backend Coverage", () => {
     describe("isValidHistoryRow", () => {
-        it("should validate correct history row", () => {
-            const validRow: HistoryRow = {
+        it("should validate correct history row", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Shared Database Types - Backend Coverage", "component");
+            
+            
+ const validRow: HistoryRow = {
                 monitorId: "test-monitor",
                 status: "up",
                 timestamp: Date.now(),
@@ -29,9 +32,11 @@ describe("Shared Database Types - Backend Coverage", () => {
 
             expect(isValidHistoryRow(validRow)).toBe(true);
         });
-
-        it("should validate minimal valid history row", () => {
-            const validRow = {
+        it("should validate minimal valid history row", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Shared Database Types - Backend Coverage", "component");
+            
+            
+ const validRow = {
                 monitorId: "test-monitor",
                 status: "down",
                 timestamp: 1_640_995_200_000,
@@ -39,9 +44,11 @@ describe("Shared Database Types - Backend Coverage", () => {
 
             expect(isValidHistoryRow(validRow)).toBe(true);
         });
-
-        it("should reject invalid history rows", () => {
-            expect(isValidHistoryRow(null)).toBe(false);
+        it("should reject invalid history rows", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Shared Database Types - Backend Coverage", "component");
+            
+            
+ expect(isValidHistoryRow(null)).toBe(false);
             expect(isValidHistoryRow(undefined)).toBe(false);
             expect(isValidHistoryRow("string")).toBe(false);
             expect(isValidHistoryRow({})).toBe(false);
@@ -76,21 +83,24 @@ describe("Shared Database Types - Backend Coverage", () => {
                 })
             ).toBe(false);
         });
-
-        it("should handle NaN timestamp", () => {
-            const invalidRow = {
+        it("should handle NaN timestamp", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Shared Database Types - Backend Coverage", "component");
+            
+            
+ const invalidRow = {
                 monitorId: "test",
                 status: "up",
                 timestamp: Number.NaN,
             };
 
             expect(isValidHistoryRow(invalidRow)).toBe(false);
-        });
-    });
-
+        });        });
     describe("isValidMonitorRow", () => {
-        it("should validate correct monitor row", () => {
-            const validRow: MonitorRow = {
+        it("should validate correct monitor row", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Shared Database Types - Backend Coverage", "component");
+            
+            
+ const validRow: MonitorRow = {
                 id: 1,
                 site_identifier: "test-site",
                 type: "http",
@@ -108,9 +118,11 @@ describe("Shared Database Types - Backend Coverage", () => {
 
             expect(isValidMonitorRow(validRow)).toBe(true);
         });
-
-        it("should validate minimal valid monitor row", () => {
-            const validRow = {
+        it("should validate minimal valid monitor row", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Shared Database Types - Backend Coverage", "component");
+            
+            
+ const validRow = {
                 id: "monitor-1",
                 site_identifier: "test-site",
                 type: "port",
@@ -118,9 +130,11 @@ describe("Shared Database Types - Backend Coverage", () => {
 
             expect(isValidMonitorRow(validRow)).toBe(true);
         });
-
-        it("should reject invalid monitor rows", () => {
-            expect(isValidMonitorRow(null)).toBe(false);
+        it("should reject invalid monitor rows", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Shared Database Types - Backend Coverage", "component");
+            
+            
+ expect(isValidMonitorRow(null)).toBe(false);
             expect(isValidMonitorRow(undefined)).toBe(false);
             expect(isValidMonitorRow("string")).toBe(false);
             expect(isValidMonitorRow({})).toBe(false);
@@ -154,12 +168,13 @@ describe("Shared Database Types - Backend Coverage", () => {
                     type: null,
                 })
             ).toBe(false);
-        });
-    });
-
+        });        });
     describe("isValidSettingsRow", () => {
-        it("should validate correct settings row", () => {
-            const validRow: SettingsRow = {
+        it("should validate correct settings row", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Shared Database Types - Backend Coverage", "component");
+            
+            
+ const validRow: SettingsRow = {
                 key: "theme",
                 value: "dark",
                 id: 1,
@@ -167,17 +182,21 @@ describe("Shared Database Types - Backend Coverage", () => {
 
             expect(isValidSettingsRow(validRow)).toBe(true);
         });
-
-        it("should validate minimal valid settings row", () => {
-            const validRow = {
+        it("should validate minimal valid settings row", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Shared Database Types - Backend Coverage", "component");
+            
+            
+ const validRow = {
                 key: "setting-key",
             };
 
             expect(isValidSettingsRow(validRow)).toBe(true);
         });
-
-        it("should reject invalid settings rows", () => {
-            expect(isValidSettingsRow(null)).toBe(false);
+        it("should reject invalid settings rows", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Shared Database Types - Backend Coverage", "component");
+            
+            
+ expect(isValidSettingsRow(null)).toBe(false);
             expect(isValidSettingsRow(undefined)).toBe(false);
             expect(isValidSettingsRow("string")).toBe(false);
             expect(isValidSettingsRow({})).toBe(false);
@@ -188,12 +207,13 @@ describe("Shared Database Types - Backend Coverage", () => {
             expect(isValidSettingsRow({ key: null })).toBe(false);
             expect(isValidSettingsRow({ key: 123 })).toBe(false);
             expect(isValidSettingsRow({ key: "" })).toBe(false);
-        });
-    });
-
+        });        });
     describe("isValidSiteRow", () => {
-        it("should validate correct site row", () => {
-            const validRow: SiteRow = {
+        it("should validate correct site row", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Shared Database Types - Backend Coverage", "component");
+            
+            
+ const validRow: SiteRow = {
                 identifier: "test-site",
                 name: "Test Site",
                 monitoring: 1,
@@ -202,17 +222,21 @@ describe("Shared Database Types - Backend Coverage", () => {
 
             expect(isValidSiteRow(validRow)).toBe(true);
         });
-
-        it("should validate minimal valid site row", () => {
-            const validRow = {
+        it("should validate minimal valid site row", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Shared Database Types - Backend Coverage", "component");
+            
+            
+ const validRow = {
                 identifier: "test-site",
             };
 
             expect(isValidSiteRow(validRow)).toBe(true);
         });
-
-        it("should reject invalid site rows", () => {
-            expect(isValidSiteRow(null)).toBe(false);
+        it("should reject invalid site rows", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Shared Database Types - Backend Coverage", "component");
+            
+            
+ expect(isValidSiteRow(null)).toBe(false);
             expect(isValidSiteRow(undefined)).toBe(false);
             expect(isValidSiteRow("string")).toBe(false);
             expect(isValidSiteRow({})).toBe(false);
@@ -224,12 +248,13 @@ describe("Shared Database Types - Backend Coverage", () => {
             expect(isValidSiteRow({ identifier: 123 })).toBe(false);
             expect(isValidSiteRow({ identifier: "" })).toBe(false);
             expect(isValidSiteRow({ identifier: "   " })).toBe(false);
-        });
-    });
-
+        });        });
     describe("safeGetRowProperty", () => {
-        it("should return property value when it exists", () => {
-            const row = {
+        it("should return property value when it exists", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Shared Database Types - Backend Coverage", "component");
+            
+            
+ const row = {
                 name: "Test Site",
                 enabled: 1,
                 url: "https://example.com",
@@ -247,9 +272,11 @@ describe("Shared Database Types - Backend Coverage", () => {
             expect(safeGetRowProperty(row, "count", -1)).toBe(0);
             expect(safeGetRowProperty(row, "flag", true)).toBe(false);
         });
-
-        it("should return default value when property does not exist", () => {
-            const row = {
+        it("should return default value when property does not exist", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Shared Database Types - Backend Coverage", "component");
+            
+            
+ const row = {
                 name: "Test Site",
             };
 
@@ -259,9 +286,11 @@ describe("Shared Database Types - Backend Coverage", () => {
             expect(safeGetRowProperty(row, "nonexistent", 42)).toBe(42);
             expect(safeGetRowProperty(row, "absent", true)).toBe(true);
         });
-
-        it("should return default value when property is undefined", () => {
-            const row = {
+        it("should return default value when property is undefined", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Shared Database Types - Backend Coverage", "component");
+            
+            
+ const row = {
                 name: "Test Site",
                 undefined_value: undefined,
             };
@@ -270,9 +299,11 @@ describe("Shared Database Types - Backend Coverage", () => {
                 "default"
             );
         });
-
-        it("should handle different property types", () => {
-            const row = {
+        it("should handle different property types", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Shared Database Types - Backend Coverage", "component");
+            
+            
+ const row = {
                 stringProp: "hello",
                 numberProp: 123,
                 booleanProp: true,
@@ -288,16 +319,16 @@ describe("Shared Database Types - Backend Coverage", () => {
             expect(safeGetRowProperty(row, "booleanProp", false)).toBe(true);
             expect(safeGetRowProperty(row, "objectProp", {})).toEqual({
                 nested: "value",
-            });
+        });
             expect(safeGetRowProperty(row, "arrayProp", [])).toEqual([1, 2, 3]);
             expect(safeGetRowProperty(row, "nullProp", "default")).toBe(null);
         });
-
-        it("should handle empty row", () => {
-            const row = {};
+        it("should handle empty row", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Shared Database Types - Backend Coverage", "component");
+            
+            
+ const row = {};
 
             expect(safeGetRowProperty(row, "any", "default")).toBe("default");
             expect(safeGetRowProperty(row, "prop", 42)).toBe(42);
-        });
-    });
-});
+        });        });        });

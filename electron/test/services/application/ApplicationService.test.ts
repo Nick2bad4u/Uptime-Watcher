@@ -119,8 +119,7 @@ const {
         mockFs,
         mockIsDev,
     };
-});
-
+        });
 // Set up all mocks
 vi.mock("electron", () => ({
     BrowserWindow: vi.fn(() => mockBrowserWindow),
@@ -168,20 +167,23 @@ describe("ApplicationService", () => {
         mockUptimeOrchestrator.initialize.mockResolvedValue(undefined);
 
         applicationService = new ApplicationService();
-    });
-
+        });
     afterEach(() => {
         vi.resetAllMocks();
-    });
-
+        });
     describe("Constructor", () => {
-        it("should initialize without errors", () => {
-            expect(applicationService).toBeDefined();
+        it("should initialize without errors", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
+            
+            
+ expect(applicationService).toBeDefined();
             expect(applicationService).toBeInstanceOf(ApplicationService);
         });
-
-        it("should setup app event listeners", () => {
-            expect(mockApp.on).toHaveBeenCalledWith(
+        it("should setup app event listeners", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
+            
+            
+ expect(mockApp.on).toHaveBeenCalledWith(
                 "ready",
                 expect.any(Function)
             );
@@ -193,17 +195,16 @@ describe("ApplicationService", () => {
                 "activate",
                 expect.any(Function)
             );
-        });
-    });
-
+        });        });
     describe("Application Lifecycle", () => {
-        it("should handle window-all-closed event on non-macOS", () => {
+        it("should handle window-all-closed event on non-macOS", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
+            
             // Mock process.platform to be non-darwin
             Object.defineProperty(process, "platform", {
                 value: "win32",
                 configurable: true,
-            });
-
+        });
             const windowAllClosedHandler = mockApp.on.mock.calls.find(
                 (call) => call[0] === "window-all-closed"
             )?.[1] as Function;
@@ -214,14 +215,14 @@ describe("ApplicationService", () => {
                 expect(mockApp.quit).toHaveBeenCalled();
             }
         });
-
-        it("should not quit on window-all-closed on macOS", () => {
+        it("should not quit on window-all-closed on macOS", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
+            
             // Mock process.platform to be darwin
             Object.defineProperty(process, "platform", {
                 value: "darwin",
                 configurable: true,
-            });
-
+        });
             const windowAllClosedHandler = mockApp.on.mock.calls.find(
                 (call) => call[0] === "window-all-closed"
             )?.[1] as Function;
@@ -232,10 +233,7 @@ describe("ApplicationService", () => {
                 expect(mockApp.quit).not.toHaveBeenCalled();
             }
         });
-
         it.skip("BrowserWindow tests disabled - focusing on business logic only", () => {
             // Following user instruction: "WE DO NOT NEED TO TEST LOGGER/DEV TOOLS IN TESTS"
             expect(true).toBe(true);
-        });
-    });
-});
+        });        });        });

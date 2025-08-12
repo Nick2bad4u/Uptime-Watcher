@@ -1,3 +1,16 @@
+/**
+ * Test suite for IpcService.comprehensive
+ * 
+ * @fileoverview Comprehensive tests for unknown functionality
+ * in the Uptime Watcher application.
+ * 
+ * @author GitHub Copilot
+ * @since 2025-08-11
+ * @category General
+ * @module Unknown
+ * @tags ["test", "comprehensive"]
+ */
+
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { ipcMain } from "electron";
 import { IpcService } from "../../../services/ipc/IpcService";
@@ -158,80 +171,54 @@ describe("IpcService", () => {
         ipcService = new IpcService(
             mockUptimeOrchestrator,
             mockAutoUpdaterService
-        );
-    });
-
+        );        });
     afterEach(() => {
         if (ipcService) {
             ipcService.cleanup();
-        }
-    });
-
+        }        });
     describe("Constructor", () => {
         it("should create IpcService instance with dependencies", () => {
-            expect(ipcService).toBeInstanceOf(IpcService);
-        });
-
+            expect(ipcService).toBeInstanceOf(IpcService);        });
         it("should initialize with provided orchestrator", () => {
-            expect(ipcService).toBeDefined();
-        });
-
+            expect(ipcService).toBeDefined();        });
         it("should initialize with provided auto updater service", () => {
-            expect(ipcService).toBeDefined();
-        });
-    });
-
+            expect(ipcService).toBeDefined();        });        });
     describe("Handler Setup", () => {
         it("should setup all handlers", () => {
             ipcService.setupHandlers();
 
             // Verify that setup methods are called by checking if handlers are registered
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });
         it("should setup site handlers", () => {
             ipcService.setupHandlers();
 
             // Verify that site-related IPC handlers are set up
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });
         it("should setup monitoring handlers", () => {
             ipcService.setupHandlers();
 
             // Verify monitoring handlers are registered
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });
         it("should setup data handlers", () => {
             ipcService.setupHandlers();
 
             // Verify data handlers are registered
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });
         it("should setup monitor type handlers", () => {
             ipcService.setupHandlers();
 
             // Verify monitor type handlers are registered
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });
         it("should setup system handlers", () => {
             ipcService.setupHandlers();
 
             // Verify system handlers are registered
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });
         it("should setup state sync handlers", () => {
             ipcService.setupHandlers();
 
             // Verify state sync handlers are registered
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-    });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });        });
     describe("Cleanup", () => {
         it("should remove all registered handlers on cleanup", () => {
             ipcService.setupHandlers();
@@ -240,181 +227,107 @@ describe("IpcService", () => {
             expect(ipcMain.removeHandler).toHaveBeenCalled();
             expect(ipcMain.removeAllListeners).toHaveBeenCalledWith(
                 "quit-and-install"
-            );
-        });
-
+            );        });
         it("should handle cleanup when no handlers are registered", () => {
             ipcService.cleanup();
 
             expect(ipcMain.removeAllListeners).toHaveBeenCalledWith(
                 "quit-and-install"
-            );
-        });
-
+            );        });
         it("should log cleanup operation", () => {
             ipcService.cleanup();
 
             // Verify cleanup logging happens (mocked in beforeEach)
-            expect(ipcService).toBeDefined();
-        });
-    });
-
+            expect(ipcService).toBeDefined();        });        });
     describe("Data Handlers", () => {
         beforeEach(() => {
-            ipcService.setupHandlers();
-        });
-
+            ipcService.setupHandlers();        });
         it("should register export data handler", () => {
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });
         it("should register import data handler", () => {
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });
         it("should register history limit handlers", () => {
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });
         it("should register settings handlers", () => {
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });
         it("should register backup handlers", () => {
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-    });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });        });
     describe("Monitoring Handlers", () => {
         beforeEach(() => {
-            ipcService.setupHandlers();
-        });
-
+            ipcService.setupHandlers();        });
         it("should register global monitoring handlers", () => {
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });
         it("should register site monitoring handlers", () => {
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });
         it("should register monitor-specific handlers", () => {
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });
         it("should register check now handler", () => {
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-    });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });        });
     describe("Site Handlers", () => {
         beforeEach(() => {
-            ipcService.setupHandlers();
-        });
-
+            ipcService.setupHandlers();        });
         it("should register CRUD site handlers", () => {
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });
         it("should register site retrieval handlers", () => {
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-    });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });        });
     describe("Monitor Type Handlers", () => {
         beforeEach(() => {
-            ipcService.setupHandlers();
-        });
-
+            ipcService.setupHandlers();        });
         it("should register monitor type retrieval handlers", () => {
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });
         it("should register monitor validation handlers", () => {
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-    });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });        });
     describe("State Sync Handlers", () => {
         beforeEach(() => {
-            ipcService.setupHandlers();
-        });
-
+            ipcService.setupHandlers();        });
         it("should register status sync handlers", () => {
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });
         it("should register metrics sync handlers", () => {
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });
         it("should register history sync handlers", () => {
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-    });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });        });
     describe("Error Handling", () => {
         it("should handle setup errors when they occur", () => {
             // Mock an error in one of the setup methods
             const mockError = new Error("Setup failed");
             vi.mocked(ipcMain.handle).mockImplementationOnce(() => {
-                throw mockError;
-            });
-
+                throw mockError;        });
             // Should throw during setup when an error occurs
-            expect(() => ipcService.setupHandlers()).toThrow("Setup failed");
-        });
-
+            expect(() => ipcService.setupHandlers()).toThrow("Setup failed");        });
         it("should handle cleanup errors when they occur", () => {
             // Setup first
             ipcService.setupHandlers();
 
             // Mock an error during cleanup
             vi.mocked(ipcMain.removeHandler).mockImplementationOnce(() => {
-                throw new Error("Cleanup failed");
-            });
-
+                throw new Error("Cleanup failed");        });
             // Should throw during cleanup when an error occurs
-            expect(() => ipcService.cleanup()).toThrow("Cleanup failed");
-        });
-    });
-
+            expect(() => ipcService.cleanup()).toThrow("Cleanup failed");        });        });
     describe("Integration", () => {
         it("should properly integrate with UptimeOrchestrator", () => {
             ipcService.setupHandlers();
 
-            expect(mockUptimeOrchestrator).toBeDefined();
-        });
-
+            expect(mockUptimeOrchestrator).toBeDefined();        });
         it("should properly integrate with AutoUpdaterService", () => {
             ipcService.setupHandlers();
 
-            expect(mockAutoUpdaterService).toBeDefined();
-        });
-
+            expect(mockAutoUpdaterService).toBeDefined();        });
         it("should register handlers in correct order", () => {
             ipcService.setupHandlers();
 
             // Verify setup was called
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-    });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });        });
     describe("Handler Registration Tracking", () => {
         it("should track registered handlers for cleanup", () => {
             ipcService.setupHandlers();
             ipcService.cleanup();
 
-            expect(ipcMain.removeHandler).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.removeHandler).toHaveBeenCalled();        });
         it("should handle multiple setup calls", () => {
             ipcService.setupHandlers();
             ipcService.setupHandlers();
 
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });
         it("should handle multiple cleanup calls", () => {
             ipcService.setupHandlers();
             ipcService.cleanup();
@@ -422,30 +335,18 @@ describe("IpcService", () => {
 
             expect(ipcMain.removeAllListeners).toHaveBeenCalledWith(
                 "quit-and-install"
-            );
-        });
-    });
-
+            );        });        });
     describe("Configuration Serialization", () => {
         beforeEach(() => {
-            ipcService.setupHandlers();
-        });
-
+            ipcService.setupHandlers();        });
         it("should handle monitor type config serialization", () => {
             // The serialization is done internally, but we can verify
             // that the monitor type handlers are set up
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });
         it("should handle UI config serialization", () => {
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });
         it("should handle config validation", () => {
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-    });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });        });
     describe("Resource Management", () => {
         it("should properly manage memory on setup and cleanup", () => {
             ipcService.setupHandlers();
@@ -455,37 +356,23 @@ describe("IpcService", () => {
                 .mock.calls.length;
 
             // Should have called removeHandler for each registered handler
-            expect(removeCallsAfterCleanup).toBeGreaterThan(0);
-        });
-
+            expect(removeCallsAfterCleanup).toBeGreaterThan(0);        });
         it("should prevent memory leaks from handlers", () => {
             ipcService.setupHandlers();
             ipcService.cleanup();
 
             expect(ipcMain.removeAllListeners).toHaveBeenCalledWith(
                 "quit-and-install"
-            );
-        });
-    });
-
+            );        });        });
     describe("Validation Integration", () => {
         beforeEach(() => {
-            ipcService.setupHandlers();
-        });
-
+            ipcService.setupHandlers();        });
         it("should integrate with data validators", () => {
             // Validators are integrated via the mock system
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });
         it("should integrate with monitoring validators", () => {
             // Validators are integrated via the mock system
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-
+            expect(ipcMain.handle).toHaveBeenCalled();        });
         it("should integrate with site validators", () => {
             // Validators are integrated via the mock system
-            expect(ipcMain.handle).toHaveBeenCalled();
-        });
-    });
-});
+            expect(ipcMain.handle).toHaveBeenCalled();        });        });        });

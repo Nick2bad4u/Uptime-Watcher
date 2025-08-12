@@ -56,14 +56,9 @@ describe("pingRetry utilities", () => {
 
         // Default operational hooks mock - just calls the function
         mockWithOperationalHooks.mockImplementation(async (fn) => {
-            return fn();
-        });
-    });
-
+            return fn();        });        });
     afterEach(() => {
-        vi.resetAllMocks();
-    });
-
+        vi.resetAllMocks();        });
     describe("performSinglePingCheck", () => {
         const successfulPingResult = {
             alive: true,
@@ -82,9 +77,7 @@ describe("pingRetry utilities", () => {
         beforeEach(() => {
             mockPing.promise = {
                 probe: vi.fn(),
-            };
-        });
-
+            };        });
         it("should successfully ping a reachable host", async () => {
             mockPing.promise.probe.mockResolvedValue(successfulPingResult);
 
@@ -93,16 +86,11 @@ describe("pingRetry utilities", () => {
             expect(result).toEqual({
                 status: "up",
                 responseTime: 26, // Rounded from 25.5
-                details: "Ping successful - packet loss: 0%",
-            });
-
+                details: "Ping successful - packet loss: 0%",        });
             expect(mockPing.promise.probe).toHaveBeenCalledWith("example.com", {
                 numeric: false,
                 timeout: 5, // Converted from milliseconds to seconds
-                min_reply: 1,
-            });
-        });
-
+                min_reply: 1,        });        });
         it("should handle unreachable host", async () => {
             mockPing.promise.probe.mockResolvedValue(failedPingResult);
 
@@ -114,9 +102,7 @@ describe("pingRetry utilities", () => {
             expect(result.status).toBe("down");
             expect(result.details).toBe("Host unreachable");
             expect(result.error).toBe("Ping failed - host unreachable");
-            expect(typeof result.responseTime).toBe("number");
-        });
-
+            expect(typeof result.responseTime).toBe("number");        });
         it("should use measured time when ping library doesn't provide time", async () => {
             const resultWithoutTime = {
                 ...successfulPingResult,
@@ -132,9 +118,7 @@ describe("pingRetry utilities", () => {
             expect(result.responseTime).toBeGreaterThanOrEqual(0);
             expect(result.responseTime).toBeLessThanOrEqual(
                 endTime - startTime + 10
-            ); // Allow 10ms tolerance
-        });
-
+            ); // Allow 10ms tolerance        });
         it("should convert timeout from milliseconds to seconds", async () => {
             mockPing.promise.probe.mockResolvedValue(successfulPingResult);
 
@@ -143,10 +127,7 @@ describe("pingRetry utilities", () => {
             expect(mockPing.promise.probe).toHaveBeenCalledWith("example.com", {
                 numeric: false,
                 timeout: 15, // 15000ms -> 15s
-                min_reply: 1,
-            });
-        });
-
+                min_reply: 1,        });        });
         it("should use minimum timeout of 1 second", async () => {
             mockPing.promise.probe.mockResolvedValue(successfulPingResult);
 
@@ -155,27 +136,20 @@ describe("pingRetry utilities", () => {
             expect(mockPing.promise.probe).toHaveBeenCalledWith("example.com", {
                 numeric: false,
                 timeout: 1, // Minimum 1 second
-                min_reply: 1,
-            });
-        });
-
+                min_reply: 1,        });        });
         it("should throw error on ping library failure", async () => {
             const pingError = new Error("Network unreachable");
             mockPing.promise.probe.mockRejectedValue(pingError);
 
             await expect(
                 performSinglePingCheck("example.com", 5000)
-            ).rejects.toThrow("Ping failed: Network unreachable");
-        });
-
+            ).rejects.toThrow("Ping failed: Network unreachable");        });
         it("should handle non-Error exceptions", async () => {
             mockPing.promise.probe.mockRejectedValue("String error");
 
             await expect(
                 performSinglePingCheck("example.com", 5000)
-            ).rejects.toThrow("Ping failed: String error");
-        });
-
+            ).rejects.toThrow("Ping failed: String error");        });
         it("should use cross-platform ping options only", async () => {
             mockPing.promise.probe.mockResolvedValue(successfulPingResult);
 
@@ -187,16 +161,11 @@ describe("pingRetry utilities", () => {
             expect(callArgs).toEqual({
                 numeric: false,
                 timeout: 5,
-                min_reply: 1,
-            });
-
+                min_reply: 1,        });
             // Verify no platform-specific options
             expect(callArgs).not.toHaveProperty("extra");
             expect(callArgs).not.toHaveProperty("packetSize");
-            expect(callArgs).not.toHaveProperty("deadline");
-        });
-    });
-
+            expect(callArgs).not.toHaveProperty("deadline");        });        });
     describe("performPingCheckWithRetry", () => {
         const mockSingleCheckResult: MonitorCheckResult = {
             status: "up",
@@ -207,10 +176,7 @@ describe("pingRetry utilities", () => {
         beforeEach(() => {
             // Mock operational hooks to just return the result
             mockWithOperationalHooks.mockImplementation(async (fn) => {
-                return fn();
-            });
-        });
-
+                return fn();        });        });
         it("should call withOperationalHooks with correct parameters", async () => {
             mockWithOperationalHooks.mockResolvedValue(mockSingleCheckResult);
 
@@ -223,9 +189,7 @@ describe("pingRetry utilities", () => {
                     maxRetries: 3,
                     operationName: "ping-check",
                 }
-            );
-        });
-
+            );        });
         it("should return successful result on first attempt", async () => {
             mockWithOperationalHooks.mockResolvedValue(mockSingleCheckResult);
 
@@ -235,9 +199,7 @@ describe("pingRetry utilities", () => {
                 3
             );
 
-            expect(result).toEqual(mockSingleCheckResult);
-        });
-
+            expect(result).toEqual(mockSingleCheckResult);        });
         it("should handle retry failure and call error handler", async () => {
             const error = new Error("All ping attempts failed");
             const errorResult: MonitorCheckResult = {
@@ -260,10 +222,7 @@ describe("pingRetry utilities", () => {
             expect(mockHandlePingCheckError).toHaveBeenCalledWith(error, {
                 host: "unreachable.com",
                 timeout: 3000,
-                maxRetries: 2,
-            });
-        });
-
+                maxRetries: 2,        });        });
         it("should handle zero retries (single attempt only)", async () => {
             mockWithOperationalHooks.mockResolvedValue(mockSingleCheckResult);
 
@@ -279,9 +238,7 @@ describe("pingRetry utilities", () => {
                 expect.objectContaining({
                     maxRetries: 0,
                 })
-            );
-        });
-
+            );        });
         it("should handle high retry counts", async () => {
             mockWithOperationalHooks.mockResolvedValue(mockSingleCheckResult);
 
@@ -292,9 +249,7 @@ describe("pingRetry utilities", () => {
                 expect.objectContaining({
                     maxRetries: 10,
                 })
-            );
-        });
-
+            );        });
         it("should handle different host types", async () => {
             mockWithOperationalHooks.mockResolvedValue(mockSingleCheckResult);
 
@@ -317,17 +272,12 @@ describe("pingRetry utilities", () => {
                         operationName: "ping-check",
                     })
                 );
-            }
-        });
-    });
-
+            }        });        });
     describe("cross-platform compatibility", () => {
         beforeEach(() => {
             mockPing.promise = {
                 probe: vi.fn(),
-            };
-        });
-
+            };        });
         it("should use only cross-platform ping options", async () => {
             const successResult = {
                 alive: true,
@@ -348,9 +298,7 @@ describe("pingRetry utilities", () => {
                 min_reply: 1,
             };
 
-            expect(options).toEqual(expectedOptions);
-        });
-
+            expect(options).toEqual(expectedOptions);        });
         it("should not use platform-specific options", async () => {
             const successResult = {
                 alive: true,
@@ -369,33 +317,24 @@ describe("pingRetry utilities", () => {
             expect(options).not.toHaveProperty("deadline");
             expect(options).not.toHaveProperty("packetSize");
             expect(options).not.toHaveProperty("sourceAddr");
-            expect(options).not.toHaveProperty("outInterface");
-        });
-    });
-
+            expect(options).not.toHaveProperty("outInterface");        });        });
     describe("error scenarios", () => {
         beforeEach(() => {
             mockPing.promise = {
                 probe: vi.fn(),
-            };
-        });
-
+            };        });
         it("should handle ping library returning null", async () => {
             mockPing.promise.probe.mockResolvedValue(null);
 
             await expect(
                 performSinglePingCheck("example.com", 5000)
-            ).rejects.toThrow();
-        });
-
+            ).rejects.toThrow();        });
         it("should handle ping library returning undefined", async () => {
             mockPing.promise.probe.mockResolvedValue(undefined);
 
             await expect(
                 performSinglePingCheck("example.com", 5000)
-            ).rejects.toThrow();
-        });
-
+            ).rejects.toThrow();        });
         it("should handle malformed ping result", async () => {
             const malformedResult = {
                 // Missing required properties
@@ -406,7 +345,4 @@ describe("pingRetry utilities", () => {
             const result = await performSinglePingCheck("example.com", 5000);
 
             expect(result.status).toBe("down");
-            expect(result.details).toBe("Host unreachable");
-        });
-    });
-});
+            expect(result.details).toBe("Host unreachable");        });        });        });

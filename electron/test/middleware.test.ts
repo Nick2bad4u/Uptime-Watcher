@@ -1,3 +1,16 @@
+/**
+ * Test suite for middleware
+ * 
+ * @fileoverview Comprehensive tests for unknown functionality
+ * in the Uptime Watcher application.
+ * 
+ * @author GitHub Copilot
+ * @since 2025-08-11
+ * @category General
+ * @module Unknown
+ * @tags ["test"]
+ */
+
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
     createLoggingMiddleware,
@@ -24,44 +37,31 @@ vi.mock("../utils/index", () => ({
 
 describe("middleware.ts", () => {
     beforeEach(() => {
-        vi.clearAllMocks();
-    });
-
+        vi.clearAllMocks();        });
     describe("createLoggingMiddleware", () => {
         it("logs at correct level with data", async () => {
             const next = vi.fn();
             const mw = createLoggingMiddleware({
                 level: "debug",
-                includeData: true,
-            });
+                includeData: true,        });
             await mw("eventA", { foo: 1 }, next);
             expect(logger.debug).toHaveBeenCalledWith(expect.any(String), {
                 data: { foo: 1 },
-                event: "eventA",
-            });
-            expect(next).toHaveBeenCalled();
-        });
-
+                event: "eventA",        });
+            expect(next).toHaveBeenCalled();        });
         it("logs at info level without data", async () => {
             const next = vi.fn();
             const mw = createLoggingMiddleware({ level: "info" });
             await mw("eventB", { bar: 2 }, next);
             expect(logger.info).toHaveBeenCalledWith(expect.any(String), {
-                event: "eventB",
-            });
-        });
-
+                event: "eventB",        });        });
         it("respects filter", async () => {
             const next = vi.fn();
             const mw = createLoggingMiddleware({
-                filter: (e) => e === "allowed",
-            });
+                filter: (e) => e === "allowed",        });
             await mw("blocked", {}, next);
             expect(logger.info).not.toHaveBeenCalled();
-            expect(next).toHaveBeenCalled();
-        });
-    });
-
+            expect(next).toHaveBeenCalled();        });        });
     describe("createMetricsMiddleware", () => {
         it("tracks counts and timings, calls metricsCallback", async () => {
             const metricsCallback = vi.fn();
@@ -80,22 +80,16 @@ describe("middleware.ts", () => {
                     type: "timing",
                 })
             );
-            expect(next).toHaveBeenCalled();
-        });
-
+            expect(next).toHaveBeenCalled();        });
         it("can disable counts or timings", async () => {
             const metricsCallback = vi.fn();
             const next = vi.fn();
             const mw = createMetricsMiddleware({
                 metricsCallback,
                 trackCounts: false,
-                trackTiming: false,
-            });
+                trackTiming: false,        });
             await mw("eventD", {}, next);
-            expect(metricsCallback).not.toHaveBeenCalled();
-        });
-    });
-
+            expect(metricsCallback).not.toHaveBeenCalled();        });        });
     describe("createErrorHandlingMiddleware", () => {
         it("catches errors and logs, calls onError, continues if continueOnError", async () => {
             const onError = vi.fn();
@@ -103,44 +97,33 @@ describe("middleware.ts", () => {
             const next = vi.fn().mockRejectedValue(error);
             const mw = createErrorHandlingMiddleware({
                 onError,
-                continueOnError: true,
-            });
+                continueOnError: true,        });
             await mw("eventE", { x: 1 }, next);
             expect(logger.error).toHaveBeenCalledWith(
                 expect.stringContaining("Middleware error"),
                 expect.any(Object)
             );
-            expect(onError).toHaveBeenCalledWith(error, "eventE", { x: 1 });
-        });
-
+            expect(onError).toHaveBeenCalledWith(error, "eventE", { x: 1 });        });
         it("throws if continueOnError is false", async () => {
             const next = vi.fn().mockRejectedValue(new Error("fail2"));
             const mw = createErrorHandlingMiddleware({
-                continueOnError: false,
-            });
-            await expect(mw("eventF", {}, next)).rejects.toThrow("fail2");
-        });
-    });
-
+                continueOnError: false,        });
+            await expect(mw("eventF", {}, next)).rejects.toThrow("fail2");        });        });
     describe("createRateLimitMiddleware", () => {
         it("allows events under the limit", async () => {
             const next = vi.fn();
             const mw = createRateLimitMiddleware({
                 burstLimit: 2,
-                maxEventsPerSecond: 2,
-            });
+                maxEventsPerSecond: 2,        });
             await mw("eventG", {}, next);
-            expect(next).toHaveBeenCalled();
-        });
-
+            expect(next).toHaveBeenCalled();        });
         it("blocks events over burst limit", async () => {
             const next = vi.fn();
             const onRateLimit = vi.fn();
             const mw = createRateLimitMiddleware({
                 burstLimit: 1,
                 maxEventsPerSecond: 10,
-                onRateLimit,
-            });
+                onRateLimit,        });
             // First call allowed
             await mw("eventH", {}, next);
             // Second call blocked
@@ -148,17 +131,14 @@ describe("middleware.ts", () => {
             expect(logger.warn).toHaveBeenCalledWith(
                 expect.stringContaining("burst limit")
             );
-            expect(onRateLimit).toHaveBeenCalledWith("eventH", {});
-        });
-
+            expect(onRateLimit).toHaveBeenCalledWith("eventH", {});        });
         it("blocks events over rate limit", async () => {
             const next = vi.fn();
             const onRateLimit = vi.fn();
             const mw = createRateLimitMiddleware({
                 burstLimit: 10,
                 maxEventsPerSecond: 1,
-                onRateLimit,
-            });
+                onRateLimit,        });
             // First call allowed
             await mw("eventI", {}, next);
             // Second call blocked (simulate within 1s)
@@ -166,10 +146,7 @@ describe("middleware.ts", () => {
             expect(logger.warn).toHaveBeenCalledWith(
                 expect.stringContaining("rate limit")
             );
-            expect(onRateLimit).toHaveBeenCalledWith("eventI", {});
-        });
-    });
-
+            expect(onRateLimit).toHaveBeenCalledWith("eventI", {});        });        });
     describe("createValidationMiddleware", () => {
         it("passes valid data", async () => {
             const next = vi.fn();
@@ -177,9 +154,7 @@ describe("middleware.ts", () => {
             const mw =
                 createValidationMiddleware<typeof validators>(validators);
             await mw("eventJ", 42, next);
-            expect(next).toHaveBeenCalled();
-        });
-
+            expect(next).toHaveBeenCalled();        });
         it("throws on invalid boolean validator", async () => {
             const next = vi.fn();
             const validators = { eventK: (_data: any) => false };
@@ -188,9 +163,7 @@ describe("middleware.ts", () => {
             await expect(mw("eventK", 1, next)).rejects.toThrow(
                 "Validation failed for event 'eventK'"
             );
-            expect(logger.error).toHaveBeenCalled();
-        });
-
+            expect(logger.error).toHaveBeenCalled();        });
         it("throws on invalid object validator", async () => {
             const next = vi.fn();
             const validators = {
@@ -199,10 +172,7 @@ describe("middleware.ts", () => {
             const mw =
                 createValidationMiddleware<typeof validators>(validators);
             await expect(mw("eventL", 1, next)).rejects.toThrow("bad");
-            expect(logger.error).toHaveBeenCalled();
-        });
-    });
-
+            expect(logger.error).toHaveBeenCalled();        });        });
     describe("createFilterMiddleware", () => {
         it("blocks events not in allowList", async () => {
             const next = vi.fn();
@@ -211,9 +181,7 @@ describe("middleware.ts", () => {
             expect(logger.debug).toHaveBeenCalledWith(
                 expect.stringContaining("allow list")
             );
-            expect(next).not.toHaveBeenCalled();
-        });
-
+            expect(next).not.toHaveBeenCalled();        });
         it("blocks events in blockList", async () => {
             const next = vi.fn();
             const mw = createFilterMiddleware({ blockList: ["eventO"] });
@@ -221,9 +189,7 @@ describe("middleware.ts", () => {
             expect(logger.debug).toHaveBeenCalledWith(
                 expect.stringContaining("block list")
             );
-            expect(next).not.toHaveBeenCalled();
-        });
-
+            expect(next).not.toHaveBeenCalled();        });
         it("blocks by custom condition", async () => {
             const next = vi.fn();
             const mw = createFilterMiddleware({ condition: () => false });
@@ -231,17 +197,12 @@ describe("middleware.ts", () => {
             expect(logger.debug).toHaveBeenCalledWith(
                 expect.stringContaining("custom condition")
             );
-            expect(next).not.toHaveBeenCalled();
-        });
-
+            expect(next).not.toHaveBeenCalled();        });
         it("allows event if not blocked", async () => {
             const next = vi.fn();
             const mw = createFilterMiddleware({});
             await mw("eventQ", {}, next);
-            expect(next).toHaveBeenCalled();
-        });
-    });
-
+            expect(next).toHaveBeenCalled();        });        });
     describe("createDebugMiddleware", () => {
         it("logs debug info when enabled", async () => {
             const next = vi.fn();
@@ -258,18 +219,13 @@ describe("middleware.ts", () => {
             expect(logger.debug).toHaveBeenCalledWith(
                 expect.stringContaining("Completed event 'eventR' in")
             );
-            expect(next).toHaveBeenCalled();
-        });
-
+            expect(next).toHaveBeenCalled();        });
         it("skips logging when not enabled", async () => {
             const next = vi.fn();
             const mw = createDebugMiddleware({ enabled: false });
             await mw("eventS", {}, next);
             expect(logger.debug).not.toHaveBeenCalled();
-            expect(next).toHaveBeenCalled();
-        });
-    });
-
+            expect(next).toHaveBeenCalled();        });        });
     describe("composeMiddleware", () => {
         it("runs all middleware in order", async () => {
             const calls: string[] = [];
@@ -285,17 +241,12 @@ describe("middleware.ts", () => {
             const next = vi.fn();
             await composed("eventT", {}, next);
             expect(calls).toEqual(["mw1", "mw2"]);
-            expect(next).toHaveBeenCalled();
-        });
-
+            expect(next).toHaveBeenCalled();        });
         it("handles empty middleware array", async () => {
             const next = vi.fn();
             const composed = composeMiddleware();
             await composed("eventU", {}, next);
-            expect(next).toHaveBeenCalled();
-        });
-    });
-
+            expect(next).toHaveBeenCalled();        });        });
     describe("MIDDLEWARE_STACKS", () => {
         it("custom stack composes given middleware", async () => {
             const calls: string[] = [];
@@ -307,28 +258,19 @@ describe("middleware.ts", () => {
             const next = vi.fn();
             await stack("eventV", {}, next);
             expect(calls).toEqual(["custom"]);
-            expect(next).toHaveBeenCalled();
-        });
-
+            expect(next).toHaveBeenCalled();        });
         it("development stack runs all middleware", async () => {
             const next = vi.fn();
             const stack = MIDDLEWARE_STACKS.development();
             await stack("eventW", { foo: 1 }, next);
-            expect(next).toHaveBeenCalled();
-        });
-
+            expect(next).toHaveBeenCalled();        });
         it("production stack runs all middleware", async () => {
             const next = vi.fn();
             const stack = MIDDLEWARE_STACKS.production();
             await stack("eventX", { foo: 2 }, next);
-            expect(next).toHaveBeenCalled();
-        });
-
+            expect(next).toHaveBeenCalled();        });
         it("testing stack runs all middleware", async () => {
             const next = vi.fn();
             const stack = MIDDLEWARE_STACKS.testing();
             await stack("eventY", { foo: 3 }, next);
-            expect(next).toHaveBeenCalled();
-        });
-    });
-});
+            expect(next).toHaveBeenCalled();        });        });        });

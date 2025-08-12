@@ -52,10 +52,11 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
         mockDb = createMockDatabase();
         mockGet = mockDb.get as MockedFunction<any>;
         mockAll = mockDb.all as MockedFunction<any>;
-    });
-
+        });
     describe("insertWithReturning", () => {
-        it("should return inserted record with generated fields", () => {
+        it("should return inserted record with generated fields", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             const mockResult = {
                 id: 1,
@@ -78,8 +79,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 ["test"]
             );
         });
-
-        it("should handle INSERT without parameters", () => {
+        it("should handle INSERT without parameters", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             const mockResult = { id: 2, timestamp: Date.now() };
             mockGet.mockReturnValue(mockResult);
@@ -97,8 +99,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 undefined
             );
         });
-
-        it("should handle complex INSERT with multiple values", () => {
+        it("should handle complex INSERT with multiple values", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             const mockResult = {
                 id: 3,
@@ -122,8 +125,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 ["https://example.com", "active", 60_000]
             );
         });
-
-        it("should throw error when INSERT returns no result", () => {
+        it("should throw error when INSERT returns no result", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             mockGet.mockReturnValue(undefined);
 
@@ -136,8 +140,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 );
             }).toThrow("INSERT with RETURNING failed: no result returned");
         });
-
-        it("should throw error when INSERT returns null", () => {
+        it("should throw error when INSERT returns null", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             mockGet.mockReturnValue(null);
 
@@ -150,8 +155,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 );
             }).toThrow("INSERT with RETURNING failed: no result returned");
         });
-
-        it("should handle empty array parameters", () => {
+        it("should handle empty array parameters", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             const mockResult = { id: 4, default_field: "value" };
             mockGet.mockReturnValue(mockResult);
@@ -169,11 +175,11 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 "INSERT INTO settings DEFAULT VALUES RETURNING *",
                 []
             );
-        });
-    });
-
+        });        });
     describe("queryForCount", () => {
-        it("should return count result from COUNT query", () => {
+        it("should return count result from COUNT query", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             const mockResult: CountResult = { count: 5 };
             mockGet.mockReturnValue(mockResult);
@@ -191,8 +197,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 undefined
             );
         });
-
-        it("should return count result with parameters", () => {
+        it("should return count result with parameters", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             const mockResult: CountResult = { count: 3 };
             mockGet.mockReturnValue(mockResult);
@@ -211,8 +218,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 ["active"]
             );
         });
-
-        it("should return undefined when no result found", () => {
+        it("should return undefined when no result found", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             mockGet.mockReturnValue(undefined);
 
@@ -225,8 +233,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
             // Assert
             expect(result).toBeUndefined();
         });
-
-        it("should handle COUNT with complex WHERE conditions", () => {
+        it("should handle COUNT with complex WHERE conditions", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             const mockResult: CountResult = { count: 12 };
             mockGet.mockReturnValue(mockResult);
@@ -245,8 +254,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 [1_640_995_200_000, "online"]
             );
         });
-
-        it("should handle COUNT with zero results", () => {
+        it("should handle COUNT with zero results", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             const mockResult: CountResult = { count: 0 };
             mockGet.mockReturnValue(mockResult);
@@ -260,11 +270,11 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
 
             // Assert
             expect(result).toEqual(mockResult);
-        });
-    });
-
+        });        });
     describe("queryForIds", () => {
-        it("should return array of ID objects", () => {
+        it("should return array of ID objects", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             const mockResults: IdOnlyResult[] = [
                 { id: 1 },
@@ -283,8 +293,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 undefined
             );
         });
-
-        it("should return empty array when no IDs found", () => {
+        it("should return empty array when no IDs found", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             mockAll.mockReturnValue([]);
 
@@ -304,8 +315,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 ["deleted"]
             );
         });
-
-        it("should handle IDs with WHERE conditions", () => {
+        it("should handle IDs with WHERE conditions", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             const mockResults: IdOnlyResult[] = [{ id: 5 }, { id: 8 }];
             mockAll.mockReturnValue(mockResults);
@@ -324,8 +336,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 [30_000]
             );
         });
-
-        it("should handle complex ID queries with multiple conditions", () => {
+        it("should handle complex ID queries with multiple conditions", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             const mockResults: IdOnlyResult[] = [
                 { id: 10 },
@@ -344,8 +357,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
             // Assert
             expect(result).toEqual(mockResults);
         });
-
-        it("should handle single ID result", () => {
+        it("should handle single ID result", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             const mockResults: IdOnlyResult[] = [{ id: 42 }];
             mockAll.mockReturnValue(mockResults);
@@ -359,11 +373,11 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
 
             // Assert
             expect(result).toEqual(mockResults);
-        });
-    });
-
+        });        });
     describe("queryForRecords", () => {
-        it("should return array of typed records", () => {
+        it("should return array of typed records", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             interface SiteRecord extends Record<string, unknown> {
                 id: number;
@@ -389,8 +403,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 undefined
             );
         });
-
-        it("should return empty array for no records", () => {
+        it("should return empty array for no records", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             mockAll.mockReturnValue([]);
 
@@ -400,8 +415,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
             // Assert
             expect(result).toEqual([]);
         });
-
-        it("should handle records with parameters", () => {
+        it("should handle records with parameters", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             interface MonitorRecord extends Record<string, unknown> {
                 id: number;
@@ -429,8 +445,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
             // Assert
             expect(result).toEqual(mockResults);
         });
-
-        it("should handle generic Record type", () => {
+        it("should handle generic Record type", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             const mockResults = [
                 { field1: "value1", field2: 123 },
@@ -447,8 +464,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
             // Assert
             expect(result).toEqual(mockResults);
         });
-
-        it("should handle complex queries with JOINs", () => {
+        it("should handle complex queries with JOINs", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             interface JoinedRecord extends Record<string, unknown> {
                 site_id: number;
@@ -476,8 +494,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
             // Assert
             expect(result).toEqual(mockResults);
         });
-
-        it("should handle records with null/undefined values", () => {
+        it("should handle records with null/undefined values", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             const mockResults = [
                 { id: 1, name: "Test", optional_field: null },
@@ -493,11 +512,11 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
 
             // Assert
             expect(result).toEqual(mockResults);
-        });
-    });
-
+        });        });
     describe("queryForSingleRecord", () => {
-        it("should return single record when found", () => {
+        it("should return single record when found", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             const mockResult = {
                 id: 1,
@@ -520,8 +539,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 [1]
             );
         });
-
-        it("should return undefined when no record found", () => {
+        it("should return undefined when no record found", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             mockGet.mockReturnValue(undefined);
 
@@ -535,8 +555,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
             // Assert
             expect(result).toBeUndefined();
         });
-
-        it("should handle query without parameters", () => {
+        it("should handle query without parameters", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             const mockResult = { setting: "value", timestamp: Date.now() };
             mockGet.mockReturnValue(mockResult);
@@ -554,8 +575,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 undefined
             );
         });
-
-        it("should handle complex single record queries", () => {
+        it("should handle complex single record queries", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             const mockResult = {
                 id: 5,
@@ -576,8 +598,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
             // Assert
             expect(result).toEqual(mockResult);
         });
-
-        it("should handle queries with multiple parameters", () => {
+        it("should handle queries with multiple parameters", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             const mockResult = {
                 id: 10,
@@ -598,8 +621,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
             // Assert
             expect(result).toEqual(mockResult);
         });
-
-        it("should handle empty array parameters", () => {
+        it("should handle empty array parameters", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             const mockResult = { count_total: 42 };
             mockGet.mockReturnValue(mockResult);
@@ -618,8 +642,9 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 []
             );
         });
-
-        it("should handle null return from database", () => {
+        it("should handle null return from database", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             mockGet.mockReturnValue(null);
 
@@ -633,30 +658,30 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
             // Assert
             // Note: The implementation casts result but doesn't convert null to undefined
             expect(result).toBeNull();
-        });
-    });
-
+        });        });
     describe("Type Interfaces", () => {
-        it("should export CountResult interface", () => {
+        it("should export CountResult interface", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Test that CountResult interface is properly typed
             const countResult: CountResult = { count: 10 };
             expect(countResult.count).toBe(10);
         });
-
-        it("should export IdOnlyResult interface", () => {
+        it("should export IdOnlyResult interface", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Test that IdOnlyResult interface is properly typed
             const idResult: IdOnlyResult = { id: 5 };
             expect(idResult.id).toBe(5);
-        });
-    });
-
+        });        });
     describe("Error Handling Edge Cases", () => {
-        it("should handle database exceptions in insertWithReturning", () => {
+        it("should handle database exceptions in insertWithReturning", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             mockGet.mockImplementation(() => {
                 throw new Error("Database connection lost");
-            });
-
+        });
             // Act & Assert
             expect(() => {
                 insertWithReturning(
@@ -666,13 +691,13 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 );
             }).toThrow("Database connection lost");
         });
-
-        it("should handle database exceptions in queryForCount", () => {
+        it("should handle database exceptions in queryForCount", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             mockGet.mockImplementation(() => {
                 throw new Error("Table does not exist");
-            });
-
+        });
             // Act & Assert
             expect(() => {
                 queryForCount(
@@ -681,37 +706,37 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 );
             }).toThrow("Table does not exist");
         });
-
-        it("should handle database exceptions in queryForIds", () => {
+        it("should handle database exceptions in queryForIds", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             mockAll.mockImplementation(() => {
                 throw new Error("SQL syntax error");
-            });
-
+        });
             // Act & Assert
             expect(() => {
                 queryForIds(mockDb, "SELECT id FROM invalid_table");
             }).toThrow("SQL syntax error");
         });
-
-        it("should handle database exceptions in queryForRecords", () => {
+        it("should handle database exceptions in queryForRecords", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             mockAll.mockImplementation(() => {
                 throw new Error("Permission denied");
-            });
-
+        });
             // Act & Assert
             expect(() => {
                 queryForRecords(mockDb, "SELECT * FROM protected_table");
             }).toThrow("Permission denied");
         });
-
-        it("should handle database exceptions in queryForSingleRecord", () => {
+        it("should handle database exceptions in queryForSingleRecord", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: typedQueries - Comprehensive Database Query Helpers", "component");
+            
             // Arrange
             mockGet.mockImplementation(() => {
                 throw new Error("Connection timeout");
-            });
-
+        });
             // Act & Assert
             expect(() => {
                 queryForSingleRecord(
@@ -720,6 +745,4 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     [1]
                 );
             }).toThrow("Connection timeout");
-        });
-    });
-});
+        });        });        });

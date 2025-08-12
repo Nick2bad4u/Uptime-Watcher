@@ -107,19 +107,13 @@ describe("main.ts - Electron Main Process", () => {
         // Set up process.versions.electron to indicate we're in Electron
         Object.defineProperty(process, "versions", {
             value: { ...originalVersions, electron: "25.0.0" },
-            writable: true,
-        });
-    });
-
+            writable: true,        });        });
     afterEach(() => {
         process.argv = originalArgv;
         Object.defineProperty(process, "versions", {
             value: originalVersions,
-            writable: true,
-        });
-        vi.resetModules();
-    });
-
+            writable: true,        });
+        vi.resetModules();        });
     describe("Logging Configuration", () => {
         it("should configure debug logging when --debug flag is present", async () => {
             process.argv = ["node", "main.js", "--debug"];
@@ -129,27 +123,21 @@ describe("main.ts - Electron Main Process", () => {
 
             expect(mockLog.initialize).toHaveBeenCalledWith({ preload: true });
             expect(mockLog.transports.file.level).toBe("debug");
-            expect(mockLog.transports.console.level).toBe("debug");
-        });
-
+            expect(mockLog.transports.console.level).toBe("debug");        });
         it("should configure production logging when --log-production flag is present", async () => {
             process.argv = ["node", "main.js", "--log-production"];
 
             await import("../main");
 
             expect(mockLog.transports.file.level).toBe("warn");
-            expect(mockLog.transports.console.level).toBe("info");
-        });
-
+            expect(mockLog.transports.console.level).toBe("info");        });
         it("should configure info logging when --log-info flag is present", async () => {
             process.argv = ["node", "main.js", "--log-info"];
 
             await import("../main");
 
             expect(mockLog.transports.file.level).toBe("info");
-            expect(mockLog.transports.console.level).toBe("info");
-        });
-
+            expect(mockLog.transports.console.level).toBe("info");        });
         it("should use default development logging when no flags are present", async () => {
             process.argv = ["node", "main.js"];
             (mockApp as any).isPackaged = false;
@@ -157,9 +145,7 @@ describe("main.ts - Electron Main Process", () => {
             await import("../main");
 
             expect(mockLog.transports.file.level).toBe("info");
-            expect(mockLog.transports.console.level).toBe("debug");
-        });
-
+            expect(mockLog.transports.console.level).toBe("debug");        });
         it("should use default production logging when packaged", async () => {
             process.argv = ["node", "main.js"];
             (mockApp as any).isPackaged = true;
@@ -167,28 +153,21 @@ describe("main.ts - Electron Main Process", () => {
             await import("../main");
 
             expect(mockLog.transports.file.level).toBe("warn");
-            expect(mockLog.transports.console.level).toBe("info");
-        });
-
+            expect(mockLog.transports.console.level).toBe("info");        });
         it("should handle --log-prod flag as alias for --log-production", async () => {
             process.argv = ["node", "main.js", "--log-prod"];
 
             await import("../main");
 
             expect(mockLog.transports.file.level).toBe("warn");
-            expect(mockLog.transports.console.level).toBe("info");
-        });
-
+            expect(mockLog.transports.console.level).toBe("info");        });
         it("should handle --log-debug flag as alias for --debug", async () => {
             process.argv = ["node", "main.js", "--log-debug"];
 
             await import("../main");
 
             expect(mockLog.transports.file.level).toBe("debug");
-            expect(mockLog.transports.console.level).toBe("debug");
-        });
-    });
-
+            expect(mockLog.transports.console.level).toBe("debug");        });        });
     describe("Main Class Initialization", () => {
         it("should create ApplicationService instance", async () => {
             const { ApplicationService } = await import(
@@ -200,9 +179,7 @@ describe("main.ts - Electron Main Process", () => {
             expect(ApplicationService).toHaveBeenCalledTimes(1);
             expect(mockLogger.info).toHaveBeenCalledWith(
                 "Starting Uptime Watcher application"
-            );
-        });
-
+            );        });
         it("should set up process cleanup handlers", async () => {
             const processOnSpy = vi.spyOn(process, "on");
 
@@ -215,9 +192,7 @@ describe("main.ts - Electron Main Process", () => {
             expect(mockApp.on).toHaveBeenCalledWith(
                 "will-quit",
                 expect.any(Function)
-            );
-        });
-
+            );        });
         it("should only cleanup once when multiple shutdown events occur", async () => {
             const processOnSpy = vi.spyOn(process, "on");
 
@@ -241,9 +216,7 @@ describe("main.ts - Electron Main Process", () => {
             await new Promise((resolve) => setTimeout(resolve, 10)); // Allow async cleanup to complete
 
             // Cleanup should only be called once
-            expect(mockApplicationService.cleanup).toHaveBeenCalledTimes(1);
-        });
-
+            expect(mockApplicationService.cleanup).toHaveBeenCalledTimes(1);        });
         it("should handle cleanup errors gracefully", async () => {
             mockApplicationService.cleanup.mockRejectedValue(
                 new Error("Cleanup failed")
@@ -269,10 +242,7 @@ describe("main.ts - Electron Main Process", () => {
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "[Main] Cleanup failed",
                 expect.any(Error)
-            );
-        });
-    });
-
+            );        });        });
     describe("DevTools Extension Installation", () => {
         it.skip("should install devtools extensions in development mode", async () => {
             mockIsDev.mockReturnValue(true);
@@ -295,9 +265,7 @@ describe("main.ts - Electron Main Process", () => {
             );
             expect(mockLogger.info).toHaveBeenCalledWith(
                 "[Main] Added Extensions: React Developer Tools, Redux DevTools"
-            );
-        });
-
+            );        });
         it("should not install extensions in production mode", async () => {
             mockIsDev.mockReturnValue(false);
 
@@ -308,9 +276,7 @@ describe("main.ts - Electron Main Process", () => {
                 .value;
             await whenReadyPromise;
 
-            expect(mockInstallExtension).not.toHaveBeenCalled();
-        });
-
+            expect(mockInstallExtension).not.toHaveBeenCalled();        });
         it("should handle extension installation failures gracefully", async () => {
             mockIsDev.mockReturnValue(true);
             mockInstallExtension.mockRejectedValue(
@@ -329,9 +295,7 @@ describe("main.ts - Electron Main Process", () => {
             expect(mockLogger.warn).toHaveBeenCalledWith(
                 "[Main] Failed to install dev extensions (this is normal in production)",
                 expect.any(Error)
-            );
-        });
-
+            );        });
         it("should wait for timing before installing extensions", async () => {
             mockIsDev.mockReturnValue(true);
             const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
@@ -342,33 +306,25 @@ describe("main.ts - Electron Main Process", () => {
                 .value;
             await whenReadyPromise;
 
-            expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 1);
-        });
-    });
-
+            expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 1);        });        });
     describe("Electron Environment Detection", () => {
         it("should only initialize when in Electron environment", async () => {
             // Test with Electron environment
             Object.defineProperty(process, "versions", {
                 value: { ...originalVersions, electron: "25.0.0" },
-                writable: true,
-            });
-
+                writable: true,        });
             const { ApplicationService } = await import(
                 "../services/application/ApplicationService"
             );
 
             await import("../main");
 
-            expect(ApplicationService).toHaveBeenCalled();
-        });
-
+            expect(ApplicationService).toHaveBeenCalled();        });
         it("should not initialize when not in Electron environment", async () => {
             // Test without Electron environment
             Object.defineProperty(process, "versions", {
                 value: { ...originalVersions },
-                writable: true,
-            });
+                writable: true,        });
             delete (process.versions as any).electron;
 
             const { ApplicationService } = await import(
@@ -377,10 +333,7 @@ describe("main.ts - Electron Main Process", () => {
 
             await import("../main");
 
-            expect(ApplicationService).not.toHaveBeenCalled();
-        });
-    });
-
+            expect(ApplicationService).not.toHaveBeenCalled();        });        });
     describe("Main Class Edge Cases", () => {
         it("should handle missing cleanup method gracefully", async () => {
             (mockApplicationService as any).cleanup = undefined;
@@ -395,9 +348,7 @@ describe("main.ts - Electron Main Process", () => {
             // Should not throw when cleanup method is missing
             expect(() => {
                 if (beforeExitHandler) beforeExitHandler();
-            }).not.toThrow();
-        });
-
+            }).not.toThrow();        });
         it("should handle null applicationService gracefully", async () => {
             const { ApplicationService } = await import(
                 "../services/application/ApplicationService"
@@ -415,10 +366,7 @@ describe("main.ts - Electron Main Process", () => {
             // Should not throw when applicationService is null
             expect(() => {
                 if (beforeExitHandler) beforeExitHandler();
-            }).not.toThrow();
-        });
-    });
-
+            }).not.toThrow();        });        });
     describe("Log Transport Configuration", () => {
         it("should configure file transport correctly", async () => {
             await import("../main");
@@ -429,15 +377,10 @@ describe("main.ts - Electron Main Process", () => {
             expect(mockLog.transports.file.maxSize).toBe(1024 * 1024 * 5);
             expect(mockLog.transports.file.format).toBe(
                 "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}"
-            );
-        });
-
+            );        });
         it("should configure console transport correctly", async () => {
             await import("../main");
 
             expect(mockLog.transports.console.format).toBe(
                 "[{h}:{i}:{s}.{ms}] [{level}] {text}"
-            );
-        });
-    });
-});
+            );        });        });        });

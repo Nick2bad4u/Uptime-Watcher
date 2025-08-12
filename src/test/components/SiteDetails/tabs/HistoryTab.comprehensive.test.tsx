@@ -10,7 +10,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { HistoryTab } from "../../../../components/SiteDetails/tabs/HistoryTab";
 import type { HistoryTabProperties } from "../../../../components/SiteDetails/tabs/HistoryTab";
 import { useSettingsStore } from "../../../../stores/settings/useSettingsStore";
-import { useTheme, useThemeClasses } from "../../../../theme/useTheme";
+import { useTheme } from "../../../../theme/useTheme";
 import type { Monitor } from "../../../../../shared/types";
 
 // Mock dependencies
@@ -87,7 +87,6 @@ vi.mock("../../../../components/common/MonitorUiComponents", () => ({
 // Get mocked functions
 const mockUseSettingsStore = vi.mocked(useSettingsStore);
 const mockUseTheme = vi.mocked(useTheme);
-const mockUseThemeClasses = vi.mocked(useThemeClasses);
 
 describe("HistoryTab", () => {
     const mockFormatFullTimestamp = vi.fn((timestamp: number) =>

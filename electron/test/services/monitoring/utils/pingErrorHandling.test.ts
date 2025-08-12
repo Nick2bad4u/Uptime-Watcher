@@ -28,15 +28,16 @@ describe("pingErrorHandling", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockLogger.error = vi.fn();
-    });
-
+        });
     afterEach(() => {
         vi.resetAllMocks();
-    });
-
+        });
     describe("handlePingCheckError", () => {
-        it("should handle Error objects correctly", () => {
-            const error = new Error("Network unreachable");
+        it("should handle Error objects correctly", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: logger", "component");
+            
+            
+ const error = new Error("Network unreachable");
 
             const result = handlePingCheckError(error, defaultContext);
 
@@ -45,11 +46,12 @@ describe("pingErrorHandling", () => {
                 responseTime: 0,
                 details: "Ping failed: Network unreachable",
                 error: "Network unreachable",
-            });
-        });
-
-        it("should handle string errors", () => {
-            const error = "Connection timeout";
+        });        });
+        it("should handle string errors", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: logger", "component");
+            
+            
+ const error = "Connection timeout";
 
             const result = handlePingCheckError(error, defaultContext);
 
@@ -58,11 +60,12 @@ describe("pingErrorHandling", () => {
                 responseTime: 0,
                 details: "Ping failed: Connection timeout",
                 error: "Connection timeout",
-            });
-        });
-
-        it("should handle non-string, non-Error objects", () => {
-            const error = { code: "ENOTFOUND", message: "Host not found" };
+        });        });
+        it("should handle non-string, non-Error objects", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: logger", "component");
+            
+            
+ const error = { code: "ENOTFOUND", message: "Host not found" };
 
             const result = handlePingCheckError(error, defaultContext);
 
@@ -71,11 +74,12 @@ describe("pingErrorHandling", () => {
                 responseTime: 0,
                 details: "Ping failed: [object Object]",
                 error: "[object Object]",
-            });
-        });
-
-        it("should handle null errors", () => {
-            const error = null;
+        });        });
+        it("should handle null errors", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: logger", "component");
+            
+            
+ const error = null;
 
             const result = handlePingCheckError(error, defaultContext);
 
@@ -84,11 +88,12 @@ describe("pingErrorHandling", () => {
                 responseTime: 0,
                 details: "Ping failed: null",
                 error: "null",
-            });
-        });
-
-        it("should handle undefined errors", () => {
-            const error = undefined;
+        });        });
+        it("should handle undefined errors", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: logger", "component");
+            
+            
+ const error = undefined;
 
             const result = handlePingCheckError(error, defaultContext);
 
@@ -97,11 +102,12 @@ describe("pingErrorHandling", () => {
                 responseTime: 0,
                 details: "Ping failed: undefined",
                 error: "undefined",
-            });
-        });
-
-        it("should log error with context information", () => {
-            const error = new Error("Network unreachable");
+        });        });
+        it("should log error with context information", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: logger", "component");
+            
+            
+ const error = new Error("Network unreachable");
             const context: PingOperationContext = {
                 host: "test.example.com",
                 timeout: 10_000,
@@ -115,9 +121,7 @@ describe("pingErrorHandling", () => {
                 host: "test.example.com",
                 timeout: 10_000,
                 maxRetries: 5,
-            });
-        });
-
+        });        });
         it("should always return status 'down'", () => {
             const testCases = [
                 new Error("Network error"),
@@ -134,9 +138,11 @@ describe("pingErrorHandling", () => {
                 expect(result.status).toBe("down");
             }
         });
-
-        it("should always return responseTime 0", () => {
-            const testCases = [
+        it("should always return responseTime 0", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: logger", "component");
+            
+            
+ const testCases = [
                 new Error("Network error"),
                 "String error",
                 { custom: "object" },
@@ -147,9 +153,11 @@ describe("pingErrorHandling", () => {
                 expect(result.responseTime).toBe(0);
             }
         });
-
-        it("should handle common ping error scenarios", () => {
-            const commonErrors = [
+        it("should handle common ping error scenarios", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: logger", "component");
+            
+            
+ const commonErrors = [
                 {
                     error: new Error("ping: cannot resolve example.com"),
                     expectedMessage: "ping: cannot resolve example.com",
@@ -189,9 +197,11 @@ describe("pingErrorHandling", () => {
                 );
             }
         });
-
-        it("should handle errors with different context values", () => {
-            const contexts: PingOperationContext[] = [
+        it("should handle errors with different context values", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: logger", "component");
+            
+            
+ const contexts: PingOperationContext[] = [
                 { host: "google.com", timeout: 1000, maxRetries: 0 },
                 { host: "192.168.1.1", timeout: 30_000, maxRetries: 10 },
                 { host: "localhost", timeout: 5000, maxRetries: 3 },
@@ -208,8 +218,7 @@ describe("pingErrorHandling", () => {
                     responseTime: 0,
                     details: "Ping failed: Test error",
                     error: "Test error",
-                });
-
+        });
                 expect(mockLogger.error).toHaveBeenCalledWith(
                     "Ping check failed",
                     {
@@ -219,9 +228,11 @@ describe("pingErrorHandling", () => {
                 );
             }
         });
-
-        it("should preserve error details for debugging", () => {
-            const detailedError = new Error(
+        it("should preserve error details for debugging", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: logger", "component");
+            
+            
+ const detailedError = new Error(
                 "ICMP socket error: Operation not permitted (you may need to run as root)"
             );
 
@@ -234,9 +245,11 @@ describe("pingErrorHandling", () => {
                 "Ping failed: ICMP socket error: Operation not permitted (you may need to run as root)"
             );
         });
-
-        it("should handle empty string errors", () => {
-            const error = "";
+        it("should handle empty string errors", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: logger", "component");
+            
+            
+ const error = "";
 
             const result = handlePingCheckError(error, defaultContext);
 
@@ -245,11 +258,12 @@ describe("pingErrorHandling", () => {
                 responseTime: 0,
                 details: "Ping failed: ",
                 error: "",
-            });
-        });
-
-        it("should handle errors with special characters", () => {
-            const error = new Error(
+        });        });
+        it("should handle errors with special characters", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: logger", "component");
+            
+            
+ const error = new Error(
                 "Error with émojis 🚫 and spéciàl chars: 漢字"
             );
 
@@ -261,12 +275,13 @@ describe("pingErrorHandling", () => {
             expect(result.details).toBe(
                 "Ping failed: Error with émojis 🚫 and spéciàl chars: 漢字"
             );
-        });
-    });
-
+        });        });
     describe("context validation", () => {
-        it("should accept all required context properties", () => {
-            const completeContext: PingOperationContext = {
+        it("should accept all required context properties", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: logger", "component");
+            
+            
+ const completeContext: PingOperationContext = {
                 host: "example.com",
                 timeout: 5000,
                 maxRetries: 3,
@@ -278,9 +293,11 @@ describe("pingErrorHandling", () => {
                 handlePingCheckError(error, completeContext);
             }).not.toThrow();
         });
-
-        it("should work with minimal context", () => {
-            const minimalContext: PingOperationContext = {
+        it("should work with minimal context", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: logger", "component");
+            
+            
+ const minimalContext: PingOperationContext = {
                 host: "localhost",
                 timeout: 1000,
                 maxRetries: 0,
@@ -295,9 +312,11 @@ describe("pingErrorHandling", () => {
                 expect.objectContaining(minimalContext)
             );
         });
-
-        it("should handle edge case context values", () => {
-            const edgeCaseContext: PingOperationContext = {
+        it("should handle edge case context values", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: logger", "component");
+            
+            
+ const edgeCaseContext: PingOperationContext = {
                 host: "",
                 timeout: 0,
                 maxRetries: 999,
@@ -313,6 +332,4 @@ describe("pingErrorHandling", () => {
                 "Ping check failed",
                 expect.objectContaining(edgeCaseContext)
             );
-        });
-    });
-});
+        });        });        });

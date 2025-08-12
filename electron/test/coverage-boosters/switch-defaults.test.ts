@@ -8,7 +8,16 @@ import { describe, expect, it } from "vitest";
 
 describe("Switch Defaults and Conditional Branch Coverage", () => {
     describe("Error handling instanceof checks", () => {
-        it("should test error instanceof branches", () => {
+        it("should test error instanceof branches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Switch Defaults and Conditional Branch Coverage",
+                "component"
+            );
+
             // Test the common pattern: error instanceof Error
             const testErrorHandling = (error: unknown): string => {
                 try {
@@ -29,9 +38,13 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
             expect(testErrorHandling(undefined)).toBe("undefined");
         });
     });
-
     describe("Switch statement default cases", () => {
-        it("should test switch default branches", () => {
+        it("should test switch default branches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Switch Defaults and Conditional Branch Coverage", "component");
+
             // Common switch pattern with default case
             const handleStatus = (status: string): string => {
                 switch (status) {
@@ -56,8 +69,9 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
             expect(handleStatus("invalid")).toBe("unknown");
             expect(handleStatus("")).toBe("unknown");
         });
+        it("should test environment switches", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Switch Defaults and Conditional Branch Coverage", "component");
 
-        it("should test environment switches", () => {
             const getEnvironmentConfig = (env: string) => {
                 switch (env) {
                     case "production": {
@@ -81,9 +95,13 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
             expect(getEnvironmentConfig("staging").logging).toBe("warn"); // Default case
         });
     });
-
     describe("Conditional logic branches", () => {
-        it("should test ternary operator branches", () => {
+        it("should test ternary operator branches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Switch Defaults and Conditional Branch Coverage", "component");
+
             const getValue = (input: unknown): string => {
                 return typeof input === "string" ? input : String(input);
             };
@@ -94,8 +112,9 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
             expect(getValue(undefined)).toBe("undefined");
             expect(getValue({})).toBe("[object Object]");
         });
+        it("should test nested conditionals", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Switch Defaults and Conditional Branch Coverage", "component");
 
-        it("should test nested conditionals", () => {
             const processValue = (
                 value: unknown
             ): { type: string; isValid: boolean } => {
@@ -137,8 +156,12 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
             });
             expect(processValue({})).toEqual({ type: "other", isValid: false });
         });
+        it("should test logical operator branches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Switch Defaults and Conditional Branch Coverage", "component");
 
-        it("should test logical operator branches", () => {
             const safeAccess = (
                 obj: any,
                 key: string,
@@ -158,9 +181,13 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
             );
         });
     });
-
     describe("Array and object edge cases", () => {
-        it("should test array handling branches", () => {
+        it("should test array handling branches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Switch Defaults and Conditional Branch Coverage", "component");
+
             const processArray = (input: unknown): number => {
                 if (!Array.isArray(input)) {
                     return 0;
@@ -179,8 +206,12 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
             expect(processArray("not array")).toBe(0);
             expect(processArray({})).toBe(0);
         });
+        it("should test object validation branches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Switch Defaults and Conditional Branch Coverage", "component");
 
-        it("should test object validation branches", () => {
             const validateObject = (
                 obj: unknown
             ): { valid: boolean; reason: string } => {
@@ -229,9 +260,13 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
             });
         });
     });
-
     describe("Type guard patterns", () => {
-        it("should test common type guard branches", () => {
+        it("should test common type guard branches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Switch Defaults and Conditional Branch Coverage", "component");
+
             const isStringArray = (value: unknown): value is string[] => {
                 return (
                     Array.isArray(value) &&
@@ -258,9 +293,13 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
             expect(isNumberArray([1, "a"])).toBe(false);
         });
     });
-
     describe("Fallback value patterns", () => {
-        it("should test fallback logic branches", () => {
+        it("should test fallback logic branches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Switch Defaults and Conditional Branch Coverage", "component");
+
             const getWithFallback = <T>(
                 obj: Record<string, unknown>,
                 key: string,

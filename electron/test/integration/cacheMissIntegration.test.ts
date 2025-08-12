@@ -9,7 +9,4 @@ describe("Resilient Database Operations Integration", () => {
     describe("MonitorRepository.findById with Operational Hooks", () => {
         it("should be refactored later", async () => {
             // Placeholder test to avoid empty test suite
-            expect(true).toBe(true);
-        });
-    });
-});
+            expect(true).toBe(true);        });        });        });

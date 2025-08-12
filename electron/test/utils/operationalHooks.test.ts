@@ -16,13 +16,9 @@ describe("Operational Hooks", () => {
             const result = await withOperationalHooks(mockOperation, {
                 operationName: "test-operation",
                 maxRetries: 1,
-                emitEvents: false,
-            });
-
+                emitEvents: false,        });
             expect(result).toBe("success");
-            expect(mockOperation).toHaveBeenCalledTimes(1);
-        });
-
+            expect(mockOperation).toHaveBeenCalledTimes(1);        });
         it("should retry on failure", async () => {
             const mockOperation = vi
                 .fn()
@@ -33,13 +29,9 @@ describe("Operational Hooks", () => {
                 operationName: "test-operation",
                 maxRetries: 2,
                 initialDelay: 1, // Very short delay for testing
-                emitEvents: false,
-            });
-
+                emitEvents: false,        });
             expect(result).toBe("success");
-            expect(mockOperation).toHaveBeenCalledTimes(2);
-        });
-
+            expect(mockOperation).toHaveBeenCalledTimes(2);        });
         it("should fail after max retries", async () => {
             const mockOperation = vi
                 .fn()
@@ -54,9 +46,7 @@ describe("Operational Hooks", () => {
                 })
             ).rejects.toThrow("Persistent failure");
 
-            expect(mockOperation).toHaveBeenCalledTimes(2);
-        });
-
+            expect(mockOperation).toHaveBeenCalledTimes(2);        });
         it("should call callbacks correctly", async () => {
             const mockOperation = vi.fn().mockResolvedValue("success");
             const onSuccess = vi.fn();
@@ -69,15 +59,10 @@ describe("Operational Hooks", () => {
                 emitEvents: false,
                 onSuccess,
                 onRetry,
-                onFailure,
-            });
-
+                onFailure,        });
             expect(onSuccess).toHaveBeenCalledWith("success");
             expect(onRetry).not.toHaveBeenCalled();
-            expect(onFailure).not.toHaveBeenCalled();
-        });
-    });
-
+            expect(onFailure).not.toHaveBeenCalled();        });        });
     describe("withDatabaseOperation", () => {
         it("should be a specialized wrapper with correct defaults", async () => {
             const mockOperation = vi.fn().mockResolvedValue("db-result");
@@ -88,7 +73,4 @@ describe("Operational Hooks", () => {
             );
 
             expect(result).toBe("db-result");
-            expect(mockOperation).toHaveBeenCalledTimes(1);
-        });
-    });
-});
+            expect(mockOperation).toHaveBeenCalledTimes(1);        });        });        });

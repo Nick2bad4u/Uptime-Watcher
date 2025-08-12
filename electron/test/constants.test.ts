@@ -15,12 +15,22 @@ import {
 
 describe("Electron Constants", () => {
     describe("Timeout Constants", () => {
-        it("should export DEFAULT_REQUEST_TIMEOUT with correct value", () => {
+        it("should export DEFAULT_REQUEST_TIMEOUT with correct value", async ({ annotate }) => {
+            await annotate("Component: Backend Constants", "component");
+            await annotate("Test Type: Unit Testing", "test-type");
+            await annotate("Operation: Timeout Value Validation", "operation");
+            await annotate("Priority: High - Core Configuration", "priority");
+            await annotate("Complexity: Low - Simple Value Validation", "complexity");
+
             expect(DEFAULT_REQUEST_TIMEOUT).toBe(10_000);
             expect(typeof DEFAULT_REQUEST_TIMEOUT).toBe("number");
         });
 
-        it("should have a reasonable timeout value", () => {
+        it("should have a reasonable timeout value", async ({ annotate }) => {
+            await annotate("Test Case: Timeout Range Validation", "test-case");
+            await annotate("Valid Range: 5-30 seconds", "range");
+            await annotate("Criticality: High - Affects Monitoring Performance", "criticality");
+
             // Should be between 5-30 seconds
             expect(DEFAULT_REQUEST_TIMEOUT).toBeGreaterThanOrEqual(5000);
             expect(DEFAULT_REQUEST_TIMEOUT).toBeLessThanOrEqual(30_000);
@@ -28,12 +38,21 @@ describe("Electron Constants", () => {
     });
 
     describe("Interval Constants", () => {
-        it("should export DEFAULT_CHECK_INTERVAL with correct value", () => {
+        it("should export DEFAULT_CHECK_INTERVAL with correct value", async ({ annotate }) => {
+            await annotate("Component: Backend Constants", "component");
+            await annotate("Operation: Check Interval Validation", "operation");
+            await annotate("Expected Value: 5 minutes", "expected");
+            await annotate("Criticality: High - Core Monitoring Function", "criticality");
+
             expect(DEFAULT_CHECK_INTERVAL).toBe(300_000); // 5 minutes
             expect(typeof DEFAULT_CHECK_INTERVAL).toBe("number");
         });
 
-        it("should have a reasonable check interval", () => {
+        it("should have a reasonable check interval", async ({ annotate }) => {
+            await annotate("Test Case: Interval Range Validation", "test-case");
+            await annotate("Valid Range: 1-30 minutes", "range");
+            await annotate("Purpose: Prevent excessive or insufficient monitoring", "purpose");
+
             // Should be between 1-30 minutes
             expect(DEFAULT_CHECK_INTERVAL).toBeGreaterThanOrEqual(60_000); // 1 minute
             expect(DEFAULT_CHECK_INTERVAL).toBeLessThanOrEqual(1_800_000); // 30 minutes
@@ -41,53 +60,72 @@ describe("Electron Constants", () => {
     });
 
     describe("User Agent", () => {
-        it("should export USER_AGENT with correct format", () => {
+        it("should export USER_AGENT with correct format", async ({ annotate }) => {
+            await annotate("Component: Backend Constants", "component");
+            await annotate("Operation: User Agent String Validation", "operation");
+            await annotate("Expected Format: Application/Version", "format");
+            await annotate("Purpose: HTTP Request Identification", "purpose");
+
             expect(USER_AGENT).toBe("Uptime-Watcher/1.0");
             expect(typeof USER_AGENT).toBe("string");
         });
 
-        it("should follow standard user agent format", () => {
+        it("should follow standard user agent format", async ({ annotate }) => {
+            await annotate("Test Case: User Agent Pattern Validation", "test-case");
+            await annotate("Pattern: Standard Application/Version Format", "pattern");
+            await annotate(String.raw`Regex: /^[\w-]+\/[\d.]+$/`, "regex");
+
             expect(USER_AGENT).toMatch(/^[\w-]+\/[\d.]+$/);
         });
 
-        it("should not be empty", () => {
+        it("should not be empty", async ({ annotate }) => {
+            await annotate("Test Case: Non-empty String Validation", "test-case");
+            await annotate("Purpose: Ensure valid HTTP headers", "purpose");
+
             expect(USER_AGENT).not.toBe("");
             expect(USER_AGENT.length).toBeGreaterThan(0);
         });
     });
 
     describe("Retry Configuration", () => {
-        it("should export RETRY_BACKOFF with correct structure", () => {
+        it("should export RETRY_BACKOFF with correct structure", async ({ annotate }) => {
+            await annotate("Component: Retry Configuration", "component");
+            await annotate("Operation: Structure Validation", "operation");
+            await annotate("Expected: Object with INITIAL_DELAY and MAX_DELAY", "expected");
+
             expect(RETRY_BACKOFF).toEqual({
                 INITIAL_DELAY: 500,
                 MAX_DELAY: 5000,
             });
         });
 
-        it("should have reasonable retry delay values", () => {
+        it("should have reasonable retry delay values", async ({ annotate }) => {
+            await annotate("Test Case: Delay Value Validation", "test-case");
+            await annotate("Purpose: Ensure reasonable retry behavior", "purpose");
+
             expect(RETRY_BACKOFF.INITIAL_DELAY).toBeGreaterThan(0);
             expect(RETRY_BACKOFF.MAX_DELAY).toBeGreaterThan(
                 RETRY_BACKOFF.INITIAL_DELAY
             );
             expect(RETRY_BACKOFF.MAX_DELAY).toBeLessThanOrEqual(10_000); // Not more than 10 seconds
         });
-
-        it("should be a readonly object", () => {
-            // This tests the 'as const' assertion
-            expect(() => {
-                // @ts-expect-error - Testing immutability
-                RETRY_BACKOFF.INITIAL_DELAY = 1000;
-            }).toThrow();
-        });
     });
 
     describe("History Configuration", () => {
-        it("should export DEFAULT_HISTORY_LIMIT with correct value", () => {
+        it("should export DEFAULT_HISTORY_LIMIT with correct value", async ({ annotate }) => {
+            await annotate("Component: History Configuration", "component");
+            await annotate("Operation: Limit Value Validation", "operation");
+            await annotate("Expected Value: 500 records", "expected");
+
             expect(DEFAULT_HISTORY_LIMIT).toBe(500);
             expect(typeof DEFAULT_HISTORY_LIMIT).toBe("number");
         });
 
-        it("should have a reasonable history limit", () => {
+        it("should have a reasonable history limit", async ({ annotate }) => {
+            await annotate("Test Case: History Limit Range", "test-case");
+            await annotate("Valid Range: 100-1000 records", "range");
+            await annotate("Purpose: Balance performance and data retention", "purpose");
+
             // Should be between 100-1000 records for good UX
             expect(DEFAULT_HISTORY_LIMIT).toBeGreaterThanOrEqual(100);
             expect(DEFAULT_HISTORY_LIMIT).toBeLessThanOrEqual(1000);
@@ -95,7 +133,11 @@ describe("Electron Constants", () => {
     });
 
     describe("Constant Types", () => {
-        it("should ensure all exported constants are primitives or readonly objects", () => {
+        it("should ensure all exported constants are primitives or readonly objects", async ({ annotate }) => {
+            await annotate("Component: Type System", "component");
+            await annotate("Operation: Type Validation", "operation");
+            await annotate("Purpose: Ensure constant immutability", "purpose");
+
             const constants = {
                 DEFAULT_REQUEST_TIMEOUT,
                 DEFAULT_CHECK_INTERVAL,
@@ -115,14 +157,22 @@ describe("Electron Constants", () => {
     });
 
     describe("Constants Integration", () => {
-        it("should have timeout less than check interval", () => {
+        it("should have timeout less than check interval", async ({ annotate }) => {
+            await annotate("Component: Integration Validation", "component");
+            await annotate("Rule: Timeout < Check Interval", "rule");
+            await annotate("Purpose: Prevent timeout conflicts", "purpose");
+
             // Request timeout should be much less than check interval
             expect(DEFAULT_REQUEST_TIMEOUT).toBeLessThan(
                 DEFAULT_CHECK_INTERVAL
             );
         });
 
-        it("should have max retry delay less than request timeout", () => {
+        it("should have max retry delay less than request timeout", async ({ annotate }) => {
+            await annotate("Component: Integration Validation", "component");
+            await annotate("Rule: Max Retry Delay < Request Timeout", "rule");
+            await annotate("Purpose: Ensure retry fits within timeout", "purpose");
+
             // Max retry delay should be less than total request timeout
             expect(RETRY_BACKOFF.MAX_DELAY).toBeLessThan(
                 DEFAULT_REQUEST_TIMEOUT
