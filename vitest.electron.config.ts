@@ -52,7 +52,7 @@ const vitestConfig = defineConfig({
             reportsDirectory: "./coverage/electron",
             skipFull: false, // Don't skip full coverage collection
             thresholds: {
-                autoUpdate: true,
+                autoUpdate: false,
                 branches: 80, // Minimum 80% branch coverage for backend
                 functions: 90, // Minimum 90% function coverage for backend
                 lines: 90, // Minimum 90% line coverage for backend
@@ -98,7 +98,17 @@ const vitestConfig = defineConfig({
                 useAtomics: true,
             },
         },
-        reporters: ["default", "json", "verbose", "hanging-process"], // Add hanging-process for improved output
+        reporters: [
+            "default",
+            "json",
+            "verbose",
+            "hanging-process",
+            "dot",
+            // "tap",
+            // "tap-flat",
+            // "junit",
+            "html",
+        ],
         restoreMocks: true,
         setupFiles: ["./electron/test/setup.ts"],
         testTimeout: 15_000, // Set Vitest timeout to 15 seconds

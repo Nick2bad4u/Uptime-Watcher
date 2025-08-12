@@ -207,6 +207,14 @@ export default defineConfig(({}) => {
             strictPort: true, // Fail if port is taken (prevents silent port changes)
         },
         test: {
+            benchmark: {
+                exclude: ["**/node_modules/**", "**/dist/**"],
+                include: [
+                    "benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
+                ],
+                outputJson: "./coverage/bench-results.json",
+                reporters: ["default", "verbose"],
+            },
             coverage: {
                 all: true, // Include all source files in coverage
                 exclude: [
@@ -239,7 +247,7 @@ export default defineConfig(({}) => {
                 reportsDirectory: "./coverage",
                 skipFull: false, // Don't skip full coverage collection
                 thresholds: {
-                    autoUpdate: true,
+                    autoUpdate: false,
                     branches: 70, // Minimum 70% branch coverage
                     functions: 80, // Minimum 80% function coverage
                     lines: 80, // Minimum 80% line coverage
@@ -252,6 +260,7 @@ export default defineConfig(({}) => {
                 },
             },
             environment: "jsdom", // Default for React components
+
             // Test file patterns - exclude electron tests as they have their own config
             exclude: [
                 "**/node_modules/**",
@@ -262,7 +271,6 @@ export default defineConfig(({}) => {
                 "**/coverage/**",
                 "**/docs/**",
             ],
-
             expect: {
                 requireAssertions: true,
             },
@@ -292,7 +300,17 @@ export default defineConfig(({}) => {
             },
             projects: ["vitest.config.ts", "vitest.electron.config.ts"],
             // Improve test output
-            reporters: ["default", "json", "verbose", "hanging-process"],
+            reporters: [
+                "default",
+                "json",
+                "verbose",
+                "hanging-process",
+                "dot",
+                // "tap",
+                // "tap-flat",
+                // "junit",
+                "html",
+            ],
             setupFiles: ["./src/test/setup.ts"], // Setup file for testing
             testTimeout: 15_000, // Set Vitest timeout to 15 seconds
             typecheck: { enabled: true, tsconfig: "./tsconfig.json" },

@@ -81,9 +81,11 @@ import tomlEslintParser from "toml-eslint-parser";
 import tseslint from "@typescript-eslint/eslint-plugin";
 import tseslintParser from "@typescript-eslint/parser";
 import vitest from "@vitest/eslint-plugin";
-import vitestGlobals from "eslint-plugin-vitest-globals";
 import xss from "eslint-plugin-xss";
 import yamlEslintParser from "yaml-eslint-parser";
+import eslintPluginNoUseExtendNative from "eslint-plugin-no-use-extend-native";
+import pluginMicrosoftSdl from "@microsoft/eslint-plugin-sdl";
+import pluginSortDestructure from "eslint-plugin-sort-destructure-keys";
 
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 
@@ -148,6 +150,7 @@ export default [
             "release/",
             "test/themeTypes.test.tsx",
             "test/types.test.tsx",
+            "coverage-report.json",
             // "**/*.config.{js,mjs,ts}",
         ],
     },
@@ -470,6 +473,9 @@ export default [
             "@eslint-react/naming-convention": eslintReactNamingConvention,
             xss: xss,
             "array-func": arrayFunc,
+            "no-use-extend-native": eslintPluginNoUseExtendNative,
+            "@microsoft/sdl": pluginMicrosoftSdl,
+            "sort-destructure-keys": pluginSortDestructure,
         },
         rules: {
             // TypeScript rules
@@ -479,14 +485,14 @@ export default [
             ...tseslint.configs.strict.rules,
             ...tseslint.configs.stylisticTypeChecked,
             ...tseslint.configs.stylistic.rules,
-            ...pluginRegexp.configs["flat/recommended"].rules,
+            ...pluginRegexp.configs["flat/all"].rules,
             ...reactRefresh.configs.vite.rules,
             ...importX.flatConfigs.typescript.rules,
             ...pluginPromise.configs["flat/recommended"].rules,
-            ...pluginUnicorn.configs.all.rules,
-            ...pluginReact.configs.recommended.rules,
+            ...pluginUnicorn.configs["flat/all"].rules,
+            ...pluginReact.configs.all.rules,
             ...pluginReactHooks.configs["recommended-latest"].rules,
-            ...jsxA11y.flatConfigs.recommended.rules,
+            ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,
             ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginBoundaries.configs.recommended.rules,
@@ -501,6 +507,14 @@ export default [
             ...eslintReact.configs["recommended-typescript"].rules,
             ...arrayFunc.configs.all.rules,
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
+            ...eslintPluginNoUseExtendNative.configs.recommended.rules,
+            ...pluginMicrosoftSdl.configs.required.rules,
+
+            "sort-destructure-keys/sort-destructure-keys": "warn",
+
+            "@eslint-react/naming-convention/component-name": "warn",
+            "@eslint-react/naming-convention/context-name": "warn",
+            "@eslint-react/naming-convention/use-state": "warn",
 
             "sort-class-members/sort-class-members": [
                 "warn",
@@ -1428,6 +1442,9 @@ export default [
             "@eslint-react/naming-convention": eslintReactNamingConvention,
             xss: xss,
             "array-func": arrayFunc,
+            "no-use-extend-native": eslintPluginNoUseExtendNative,
+            "@microsoft/sdl": pluginMicrosoftSdl,
+            "sort-destructure-keys": pluginSortDestructure,
         },
         rules: {
             // TypeScript backend rules
@@ -1437,13 +1454,13 @@ export default [
             ...tseslint.configs.strict.rules,
             ...tseslint.configs.stylisticTypeChecked,
             ...tseslint.configs.stylistic.rules,
-            ...pluginRegexp.configs["flat/recommended"].rules,
+            ...pluginRegexp.configs["flat/all"].rules,
             ...importX.flatConfigs.typescript.rules,
             ...pluginPromise.configs["flat/recommended"].rules,
-            ...pluginUnicorn.configs.all.rules,
-            ...pluginReact.configs.recommended.rules,
+            ...pluginUnicorn.configs["flat/all"].rules,
+            ...pluginReact.configs.all.rules,
             ...pluginReactHooks.configs["recommended-latest"].rules,
-            ...jsxA11y.flatConfigs.recommended.rules,
+            ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,
             ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginBoundaries.configs.recommended.rules,
@@ -1458,6 +1475,14 @@ export default [
             ...eslintReact.configs["recommended-typescript"].rules,
             ...arrayFunc.configs.all.rules,
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
+            ...eslintPluginNoUseExtendNative.configs.recommended.rules,
+            ...pluginMicrosoftSdl.configs.required.rules,
+
+            "sort-destructure-keys/sort-destructure-keys": "warn",
+
+            "@eslint-react/naming-convention/component-name": "warn",
+            "@eslint-react/naming-convention/context-name": "warn",
+            "@eslint-react/naming-convention/use-state": "warn",
 
             "sort-class-members/sort-class-members": [
                 "warn",
@@ -2185,6 +2210,7 @@ export default [
             globals: {
                 ...globals.browser,
                 ...globals.node,
+                ...vitest.environments.env.globals,
                 afterAll: "readonly",
                 afterEach: "readonly",
                 beforeAll: "readonly",
@@ -2223,8 +2249,7 @@ export default [
         },
         plugins: {
             "@typescript-eslint": tseslint,
-            vitest,
-            "vitest-globals": vitestGlobals,
+            vitest: vitest,
             "testing-library": pluginTestingLibrary,
             "import-x": importX,
             "unused-imports": pluginUnusedImports,
@@ -2232,15 +2257,21 @@ export default [
             "react-hooks": pluginReactHooks,
             n: nodePlugin,
             "eslint-comments": pluginComments,
+            unicorn: pluginUnicorn,
         },
+
         rules: {
             ...tseslint.configs.recommended.rules,
-            ...vitest.configs.recommended.rules,
+            ...vitest.configs.all.rules,
             ...pluginComments.configs.recommended.rules,
+            ...pluginTestingLibrary.configs["flat/react"].rules,
+            ...pluginUnicorn.configs["flat/all"].rules,
 
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-non-null-assertion": "off",
             "@typescript-eslint/no-unused-vars": "off",
+
+            "testing-library/no-node-access": "off",
             "testing-library/await-async-queries": "error",
             "testing-library/no-await-sync-queries": "error",
             "testing-library/no-debugging-utils": "off",
@@ -2302,11 +2333,19 @@ export default [
             unicorn: pluginUnicorn,
             vitest: vitest,
             n: nodePlugin,
+            "testing-library": pluginTestingLibrary,
         },
         rules: {
             ...tseslint.configs.recommended.rules,
-            ...vitest.configs.recommended.rules,
-            ...pluginUnicorn.configs.all.rules,
+            ...vitest.configs.all.rules,
+            ...pluginUnicorn.configs["flat/all"].rules,
+            ...pluginTestingLibrary.configs["flat/react"].rules,
+
+            "testing-library/no-node-access": "off",
+            "testing-library/await-async-queries": "error",
+            "testing-library/no-await-sync-queries": "error",
+            "testing-library/no-debugging-utils": "off",
+            "testing-library/prefer-screen-queries": "warn",
 
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-non-null-assertion": "off",
@@ -2394,6 +2433,7 @@ export default [
             },
             globals: {
                 ...globals.node,
+                ...vitest.environments.env.globals,
                 __dirname: "readonly",
                 __filename: "readonly",
                 process: "readonly",
@@ -2478,11 +2518,11 @@ export default [
             ...tseslint.configs.strict.rules,
             ...tseslint.configs.stylisticTypeChecked,
             ...tseslint.configs.stylistic.rules,
-            ...pluginRegexp.configs["flat/recommended"].rules,
+            ...pluginRegexp.configs["flat/all"].rules,
             ...importX.flatConfigs.typescript.rules,
             ...pluginPromise.configs["flat/recommended"].rules,
-            ...pluginUnicorn.configs.all.rules,
-            ...jsxA11y.flatConfigs.recommended.rules,
+            ...pluginUnicorn.configs["flat/all"].rules,
+            ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,
             ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginBoundaries.configs.recommended.rules,
@@ -2919,13 +2959,13 @@ export default [
         },
         rules: {
             ...js.configs.all.rules,
-            ...pluginRegexp.configs["flat/recommended"].rules,
+            ...pluginRegexp.configs["flat/all"].rules,
             ...importX.flatConfigs.typescript.rules,
             ...pluginPromise.configs["flat/recommended"].rules,
-            ...pluginUnicorn.configs.recommended.rules,
-            ...pluginReact.configs.recommended.rules,
+            ...pluginUnicorn.configs["flat/all"].rules,
+            ...pluginReact.configs.all.rules,
             ...pluginReactHooks.configs["recommended-latest"].rules,
-            ...jsxA11y.flatConfigs.recommended.rules,
+            ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,
             ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginRedos.configs.recommended.rules,
