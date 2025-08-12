@@ -1,9 +1,9 @@
 /**
  * Test suite for portChecker
- * 
+ *
  * @fileoverview Comprehensive tests for the performSinglePortCheck function
  * in the Uptime Watcher application.
- * 
+ *
  * @author GitHub Copilot
  * @since 2025-08-11
  * @category Monitoring Utilities
@@ -48,11 +48,14 @@ import isPortReachable from "is-port-reachable";
 import { performSinglePortCheck } from "../../../../services/monitoring/utils/portChecker";
 import { isDev } from "../../../../electronUtils";
 import { logger } from "../../../../utils/logger";
-import { PORT_NOT_REACHABLE, PortCheckError } from "../../../../services/monitoring/utils/portErrorHandling";
+import {
+    PORT_NOT_REACHABLE,
+    PortCheckError,
+} from "../../../../services/monitoring/utils/portErrorHandling";
 
 // Mock performance.now() globally
 const mockPerformanceNow = vi.fn();
-Object.defineProperty(globalThis, 'performance', {
+Object.defineProperty(globalThis, "performance", {
     value: {
         now: mockPerformanceNow,
     },
@@ -62,7 +65,7 @@ Object.defineProperty(globalThis, 'performance', {
 describe("performSinglePortCheck", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         // Set up default mocks
         vi.mocked(isDev).mockReturnValue(false);
         vi.mocked(isPortReachable).mockResolvedValue(true);
@@ -79,7 +82,9 @@ describe("performSinglePortCheck", () => {
             const host = "example.com";
             const port = 80;
             const timeout = 5000;
-            mockPerformanceNow.mockReturnValueOnce(100).mockReturnValueOnce(250); // start=100, end=250, diff=150
+            mockPerformanceNow
+                .mockReturnValueOnce(100)
+                .mockReturnValueOnce(250); // start=100, end=250, diff=150
 
             // Act
             const result = await performSinglePortCheck(host, port, timeout);
@@ -108,7 +113,9 @@ describe("performSinglePortCheck", () => {
             for (const { host, port, timeout } of testCases) {
                 // Arrange
                 vi.clearAllMocks();
-                mockPerformanceNow.mockReturnValueOnce(0).mockReturnValueOnce(100);
+                mockPerformanceNow
+                    .mockReturnValueOnce(0)
+                    .mockReturnValueOnce(100);
 
                 // Act
                 await performSinglePortCheck(host, port, timeout);
@@ -134,10 +141,16 @@ describe("performSinglePortCheck", () => {
                 // Arrange
                 vi.clearAllMocks();
                 vi.mocked(isPortReachable).mockResolvedValue(true);
-                mockPerformanceNow.mockReturnValueOnce(start).mockReturnValueOnce(end);
+                mockPerformanceNow
+                    .mockReturnValueOnce(start)
+                    .mockReturnValueOnce(end);
 
                 // Act
-                const result = await performSinglePortCheck("test.com", 80, 1000);
+                const result = await performSinglePortCheck(
+                    "test.com",
+                    80,
+                    1000
+                );
 
                 // Assert
                 expect(result.responseTime).toBe(expected);
@@ -147,16 +160,29 @@ describe("performSinglePortCheck", () => {
 
         it("should convert port number to string in details", async () => {
             // Test different port numbers
-            const ports = [22, 80, 443, 3000, 8080, 65_535];
+            const ports = [
+                22,
+                80,
+                443,
+                3000,
+                8080,
+                65_535,
+            ];
 
             for (const port of ports) {
                 // Arrange
                 vi.clearAllMocks();
                 vi.mocked(isPortReachable).mockResolvedValue(true);
-                mockPerformanceNow.mockReturnValueOnce(0).mockReturnValueOnce(100);
+                mockPerformanceNow
+                    .mockReturnValueOnce(0)
+                    .mockReturnValueOnce(100);
 
                 // Act
-                const result = await performSinglePortCheck("test.com", port, 1000);
+                const result = await performSinglePortCheck(
+                    "test.com",
+                    port,
+                    1000
+                );
 
                 // Assert
                 expect(result.details).toBe(String(port));
@@ -169,11 +195,16 @@ describe("performSinglePortCheck", () => {
         it("should throw PortCheckError when port is not reachable", async () => {
             // Arrange
             vi.mocked(isPortReachable).mockResolvedValue(false);
-            mockPerformanceNow.mockReturnValueOnce(100).mockReturnValueOnce(350); // 250ms response
+            mockPerformanceNow
+                .mockReturnValueOnce(100)
+                .mockReturnValueOnce(350); // 250ms response
 
             // Act & Assert
-            const error = await performSinglePortCheck("unreachable.com", 80, 3000)
-                .catch(error_ => error_);
+            const error = await performSinglePortCheck(
+                "unreachable.com",
+                80,
+                3000
+            ).catch((error_) => error_);
 
             expect(error).toBeInstanceOf(PortCheckError);
             expect(error.message).toBe(PORT_NOT_REACHABLE);
@@ -192,11 +223,16 @@ describe("performSinglePortCheck", () => {
                 // Arrange
                 vi.clearAllMocks();
                 vi.mocked(isPortReachable).mockResolvedValue(false);
-                mockPerformanceNow.mockReturnValueOnce(start).mockReturnValueOnce(end);
+                mockPerformanceNow
+                    .mockReturnValueOnce(start)
+                    .mockReturnValueOnce(end);
 
                 // Act & Assert
-                const error = await performSinglePortCheck("fail.com", 80, 1000)
-                    .catch(error_ => error_);
+                const error = await performSinglePortCheck(
+                    "fail.com",
+                    80,
+                    1000
+                ).catch((error_) => error_);
 
                 expect(error.responseTime).toBe(expected);
             }
@@ -209,8 +245,9 @@ describe("performSinglePortCheck", () => {
 
             // Act & Assert
             // The function should let the error bubble up since it doesn't catch it
-            await expect(performSinglePortCheck("error.com", 80, 1000))
-                .rejects.toThrow("Network unreachable");
+            await expect(
+                performSinglePortCheck("error.com", 80, 1000)
+            ).rejects.toThrow("Network unreachable");
         });
     });
 
@@ -218,7 +255,9 @@ describe("performSinglePortCheck", () => {
         it("should log debug messages when isDev returns true", async () => {
             // Arrange
             vi.mocked(isDev).mockReturnValue(true);
-            mockPerformanceNow.mockReturnValueOnce(100).mockReturnValueOnce(200); // 200-100 = 100ms
+            mockPerformanceNow
+                .mockReturnValueOnce(100)
+                .mockReturnValueOnce(200); // 200-100 = 100ms
 
             // Act
             await performSinglePortCheck("debug.example.com", 8080, 2000);
@@ -250,8 +289,9 @@ describe("performSinglePortCheck", () => {
             vi.mocked(isPortReachable).mockResolvedValue(false);
 
             // Act
-            await performSinglePortCheck("fail.example.com", 80, 1000)
-                .catch(() => {}); // Ignore the error
+            await performSinglePortCheck("fail.example.com", 80, 1000).catch(
+                () => {}
+            ); // Ignore the error
 
             // Assert
             expect(logger.debug).toHaveBeenCalledWith(
@@ -280,8 +320,9 @@ describe("performSinglePortCheck", () => {
 
             // Act & Assert
             // The function should still work but not log anything
-            await expect(performSinglePortCheck("error.example.com", 80, 1000))
-                .rejects.toThrow("isDev error");
+            await expect(
+                performSinglePortCheck("error.example.com", 80, 1000)
+            ).rejects.toThrow("isDev error");
         });
     });
 
@@ -301,7 +342,9 @@ describe("performSinglePortCheck", () => {
             for (const host of hostFormats) {
                 // Arrange
                 vi.clearAllMocks();
-                mockPerformanceNow.mockReturnValueOnce(0).mockReturnValueOnce(100);
+                mockPerformanceNow
+                    .mockReturnValueOnce(0)
+                    .mockReturnValueOnce(100);
 
                 // Act
                 const result = await performSinglePortCheck(host, 80, 1000);
@@ -316,15 +359,29 @@ describe("performSinglePortCheck", () => {
         });
 
         it("should handle edge case port numbers", async () => {
-            const ports = [1, 22, 80, 443, 3000, 8080, 65_535];
+            const ports = [
+                1,
+                22,
+                80,
+                443,
+                3000,
+                8080,
+                65_535,
+            ];
 
             for (const port of ports) {
                 // Arrange
                 vi.clearAllMocks();
-                mockPerformanceNow.mockReturnValueOnce(0).mockReturnValueOnce(100);
+                mockPerformanceNow
+                    .mockReturnValueOnce(0)
+                    .mockReturnValueOnce(100);
 
                 // Act
-                const result = await performSinglePortCheck("test.com", port, 1000);
+                const result = await performSinglePortCheck(
+                    "test.com",
+                    port,
+                    1000
+                );
 
                 // Assert
                 expect(result.details).toBe(String(port));
@@ -341,7 +398,9 @@ describe("performSinglePortCheck", () => {
             for (const timeout of timeouts) {
                 // Arrange
                 vi.clearAllMocks();
-                mockPerformanceNow.mockReturnValueOnce(0).mockReturnValueOnce(50);
+                mockPerformanceNow
+                    .mockReturnValueOnce(0)
+                    .mockReturnValueOnce(50);
 
                 // Act
                 await performSinglePortCheck("timeout.test", 80, timeout);
@@ -356,10 +415,16 @@ describe("performSinglePortCheck", () => {
 
         it("should handle very large response times", async () => {
             // Arrange
-            mockPerformanceNow.mockReturnValueOnce(0).mockReturnValueOnce(1_000_000);
+            mockPerformanceNow
+                .mockReturnValueOnce(0)
+                .mockReturnValueOnce(1_000_000);
 
             // Act
-            const result = await performSinglePortCheck("slow.example.com", 80, 1_000_000);
+            const result = await performSinglePortCheck(
+                "slow.example.com",
+                80,
+                1_000_000
+            );
 
             // Assert
             expect(result.responseTime).toBe(1_000_000); // Should round to nearest integer
@@ -367,10 +432,16 @@ describe("performSinglePortCheck", () => {
 
         it("should handle zero response time", async () => {
             // Arrange
-            mockPerformanceNow.mockReturnValueOnce(100).mockReturnValueOnce(100);
+            mockPerformanceNow
+                .mockReturnValueOnce(100)
+                .mockReturnValueOnce(100);
 
             // Act
-            const result = await performSinglePortCheck("instant.example.com", 80, 1000);
+            const result = await performSinglePortCheck(
+                "instant.example.com",
+                80,
+                1000
+            );
 
             // Assert
             expect(result.responseTime).toBe(0);
@@ -383,7 +454,11 @@ describe("performSinglePortCheck", () => {
             mockPerformanceNow.mockReturnValueOnce(0).mockReturnValueOnce(120);
 
             // Act
-            const result = await performSinglePortCheck("secure.example.com", 443, 5000);
+            const result = await performSinglePortCheck(
+                "secure.example.com",
+                443,
+                5000
+            );
 
             // Assert
             expect(result).toEqual({
@@ -398,7 +473,11 @@ describe("performSinglePortCheck", () => {
             mockPerformanceNow.mockReturnValueOnce(50).mockReturnValueOnce(180); // 180-50 = 130
 
             // Act
-            const result = await performSinglePortCheck("ssh.example.com", 22, 3000);
+            const result = await performSinglePortCheck(
+                "ssh.example.com",
+                22,
+                3000
+            );
 
             // Assert
             expect(result).toEqual({
@@ -416,33 +495,55 @@ describe("performSinglePortCheck", () => {
             // Act - Test each scenario individually to avoid concurrent execution issues
             // Test case 1: 0 to 100 = 100ms
             mockPerformanceNow.mockReturnValueOnce(0).mockReturnValueOnce(100);
-            const result1 = await performSinglePortCheck("host1.test", 80, 1000);
-            
+            const result1 = await performSinglePortCheck(
+                "host1.test",
+                80,
+                1000
+            );
+
             // Test case 2: 100 to 300 = 200ms
-            mockPerformanceNow.mockReturnValueOnce(100).mockReturnValueOnce(300);
-            const result2 = await performSinglePortCheck("host2.test", 443, 1000);
-            
+            mockPerformanceNow
+                .mockReturnValueOnce(100)
+                .mockReturnValueOnce(300);
+            const result2 = await performSinglePortCheck(
+                "host2.test",
+                443,
+                1000
+            );
+
             // Test case 3: 200 to 250 = 50ms
-            mockPerformanceNow.mockReturnValueOnce(200).mockReturnValueOnce(250);
-            const result3 = await performSinglePortCheck("host3.test", 8080, 1000);
+            mockPerformanceNow
+                .mockReturnValueOnce(200)
+                .mockReturnValueOnce(250);
+            const result3 = await performSinglePortCheck(
+                "host3.test",
+                8080,
+                1000
+            );
 
             // Assert
-            expect(result1.responseTime).toBe(100);  // 100 - 0 = 100
-            expect(result2.responseTime).toBe(200);  // 300 - 100 = 200
-            expect(result3.responseTime).toBe(50);   // 250 - 200 = 50
-            expect([result1, result2, result3].every(r => r.status === "up")).toBe(true);
+            expect(result1.responseTime).toBe(100); // 100 - 0 = 100
+            expect(result2.responseTime).toBe(200); // 300 - 100 = 200
+            expect(result3.responseTime).toBe(50); // 250 - 200 = 50
+            expect(
+                [result1, result2, result3].every((r) => r.status === "up")
+            ).toBe(true);
         });
 
         it("should work correctly when mixing successful and failed checks", async () => {
             // Arrange
             vi.clearAllMocks();
-            
+
             // Test successful check first
             vi.mocked(isPortReachable).mockResolvedValueOnce(true);
             mockPerformanceNow.mockReturnValueOnce(0).mockReturnValueOnce(100);
 
             // Act
-            const successResult = await performSinglePortCheck("success.test", 80, 1000);
+            const successResult = await performSinglePortCheck(
+                "success.test",
+                80,
+                1000
+            );
 
             // Assert
             expect(successResult.status).toBe("up");
@@ -452,8 +553,11 @@ describe("performSinglePortCheck", () => {
             vi.mocked(isPortReachable).mockResolvedValueOnce(false);
             mockPerformanceNow.mockReturnValueOnce(0).mockReturnValueOnce(200);
 
-            const failError = await performSinglePortCheck("fail.test", 80, 1000)
-                .catch(error => error);
+            const failError = await performSinglePortCheck(
+                "fail.test",
+                80,
+                1000
+            ).catch((error) => error);
 
             expect(failError).toBeInstanceOf(PortCheckError);
             expect(failError.responseTime).toBe(200);

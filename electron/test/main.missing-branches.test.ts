@@ -96,16 +96,19 @@ describe("main.ts - Missing Branch Coverage", () => {
         mockInstallExtension.mockResolvedValue([]);
 
         // Clear process.versions.electron to test the conditional
-        delete (process.versions as any).electron;        });
+        delete (process.versions as any).electron;
+    });
     afterEach(() => {
         process.argv = originalArgv;
-        vi.restoreAllMocks();        });
+        vi.restoreAllMocks();
+    });
     describe("Command Line Argument Processing", () => {
         it("should handle --debug flag", async () => {
             process.argv = ["node", "main.js", "--debug"];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",
-                configurable: true,        });
+                configurable: true,
+            });
             mockApp.isPackaged = true; // Simulate production environment
             mockIsDev.mockReturnValue(false);
 
@@ -113,12 +116,14 @@ describe("main.ts - Missing Branch Coverage", () => {
             await import("../main");
 
             expect(mockLog.transports.file.level).toBe("debug");
-            expect(mockLog.transports.console.level).toBe("debug");        });
+            expect(mockLog.transports.console.level).toBe("debug");
+        });
         it("should handle --log-debug flag", async () => {
             process.argv = ["node", "main.js", "--log-debug"];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",
-                configurable: true,        });
+                configurable: true,
+            });
             mockApp.isPackaged = true;
             mockIsDev.mockReturnValue(false);
 
@@ -126,12 +131,14 @@ describe("main.ts - Missing Branch Coverage", () => {
             await import("../main");
 
             expect(mockLog.transports.file.level).toBe("debug");
-            expect(mockLog.transports.console.level).toBe("debug");        });
+            expect(mockLog.transports.console.level).toBe("debug");
+        });
         it("should handle --log-production flag", async () => {
             process.argv = ["node", "main.js", "--log-production"];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",
-                configurable: true,        });
+                configurable: true,
+            });
             mockApp.isPackaged = true;
             mockIsDev.mockReturnValue(false);
 
@@ -139,12 +146,14 @@ describe("main.ts - Missing Branch Coverage", () => {
             await import("../main");
 
             expect(mockLog.transports.file.level).toBe("warn");
-            expect(mockLog.transports.console.level).toBe("info");        });
+            expect(mockLog.transports.console.level).toBe("info");
+        });
         it("should handle --log-info flag", async () => {
             process.argv = ["node", "main.js", "--log-info"];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",
-                configurable: true,        });
+                configurable: true,
+            });
             mockApp.isPackaged = true;
             mockIsDev.mockReturnValue(false);
 
@@ -152,7 +161,8 @@ describe("main.ts - Missing Branch Coverage", () => {
             await import("../main");
 
             expect(mockLog.transports.file.level).toBe("info");
-            expect(mockLog.transports.console.level).toBe("info");        });
+            expect(mockLog.transports.console.level).toBe("info");
+        });
         it("should handle unknown flags gracefully", async () => {
             process.argv = [
                 "node",
@@ -162,7 +172,8 @@ describe("main.ts - Missing Branch Coverage", () => {
             ];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",
-                configurable: true,        });
+                configurable: true,
+            });
             mockApp.isPackaged = false;
             mockIsDev.mockReturnValue(true);
 
@@ -170,25 +181,30 @@ describe("main.ts - Missing Branch Coverage", () => {
             await import("../main");
 
             // Should not crash and use defaults (development mode)
-            expect(mockLog.initialize).toHaveBeenCalled();        });        });
+            expect(mockLog.initialize).toHaveBeenCalled();
+        });
+    });
     describe("Development Extension Loading", () => {
         it("should handle extension loading in development mode", async () => {
             process.argv = ["node", "main.js"];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",
-                configurable: true,        });
+                configurable: true,
+            });
             mockApp.isPackaged = false;
             mockIsDev.mockReturnValue(true);
 
             // Import the module to trigger the configuration logic
             await import("../main");
 
-            expect(mockApp.whenReady).toHaveBeenCalled();        });
+            expect(mockApp.whenReady).toHaveBeenCalled();
+        });
         it("should handle extension loading failure gracefully", async () => {
             process.argv = ["node", "main.js"];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",
-                configurable: true,        });
+                configurable: true,
+            });
             mockApp.isPackaged = false;
             mockIsDev.mockReturnValue(true);
             mockInstallExtension.mockRejectedValue(
@@ -198,42 +214,53 @@ describe("main.ts - Missing Branch Coverage", () => {
             // Import the module to trigger the configuration logic
             await import("../main");
 
-            expect(mockApp.whenReady).toHaveBeenCalled();        });        });
+            expect(mockApp.whenReady).toHaveBeenCalled();
+        });
+    });
     describe("Environment Detection Edge Cases", () => {
         it("should handle production environment correctly", async () => {
             process.argv = ["node", "main.js"];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",
-                configurable: true,        });
+                configurable: true,
+            });
             mockApp.isPackaged = true;
             mockIsDev.mockReturnValue(false);
 
             // Import the module to trigger the configuration logic
             await import("../main");
 
-            expect(mockApp.whenReady).toHaveBeenCalled();        });        });
+            expect(mockApp.whenReady).toHaveBeenCalled();
+        });
+    });
     describe("Application Lifecycle", () => {
         it("should initialize logger", async () => {
             process.argv = ["node", "main.js"];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",
-                configurable: true,        });
+                configurable: true,
+            });
             mockApp.isPackaged = false;
             mockIsDev.mockReturnValue(true);
 
             // Import the module to trigger the configuration logic
             await import("../main");
 
-            expect(mockLog.initialize).toHaveBeenCalled();        });
+            expect(mockLog.initialize).toHaveBeenCalled();
+        });
         it("should handle app ready event", async () => {
             process.argv = ["node", "main.js"];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",
-                configurable: true,        });
+                configurable: true,
+            });
             mockApp.isPackaged = false;
             mockIsDev.mockReturnValue(true);
 
             // Import the module to trigger the configuration logic
             await import("../main");
 
-            expect(mockApp.whenReady).toHaveBeenCalled();        });        });        });
+            expect(mockApp.whenReady).toHaveBeenCalled();
+        });
+    });
+});

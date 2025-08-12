@@ -1,9 +1,9 @@
 /**
  * Test suite for IPC Types
- * 
+ *
  * @fileoverview Comprehensive tests for the IPC types and interfaces
  * in the Uptime Watcher application.
- * 
+ *
  * @author GitHub Copilot
  * @since 2025-08-11
  * @category IPC
@@ -12,11 +12,11 @@
  */
 
 import { describe, it, expect, vi } from "vitest";
-import type { 
-    IpcHandlerConfig, 
-    IpcResponse, 
-    IpcValidationResponse, 
-    IpcParameterValidator 
+import type {
+    IpcHandlerConfig,
+    IpcResponse,
+    IpcValidationResponse,
+    IpcParameterValidator,
 } from "../../../services/ipc/types";
 import type { ValidationResult } from "../../../../shared/types/validation";
 
@@ -109,7 +109,10 @@ describe("IPC Types", () => {
 
             expect(response.success).toBe(true);
             expect(response.data).toBe(42);
-            expect(response.warnings).toEqual(["Deprecated method used", "Performance warning"]);
+            expect(response.warnings).toEqual([
+                "Deprecated method used",
+                "Performance warning",
+            ]);
         });
 
         it("should include metadata in response", () => {
@@ -157,7 +160,13 @@ describe("IPC Types", () => {
         });
 
         it("should support array data types", () => {
-            const arrayData = [1, 2, 3, 4, 5];
+            const arrayData = [
+                1,
+                2,
+                3,
+                4,
+                5,
+            ];
 
             const response: IpcResponse<number[]> = {
                 success: true,
@@ -210,7 +219,10 @@ describe("IPC Types", () => {
 
             expect(response.success).toBe(false);
             expect(response.data).toEqual(validationResult);
-            expect(response.errors).toEqual(["Field is required", "Invalid format"]);
+            expect(response.errors).toEqual([
+                "Field is required",
+                "Invalid format",
+            ]);
         });
 
         it("should extend IpcResponse interface", () => {
@@ -231,7 +243,9 @@ describe("IPC Types", () => {
             // Should have all IpcResponse properties
             expect(response.success).toBe(false);
             expect(response.error).toBe("Validation process failed");
-            expect(response.warnings).toEqual(["Data was modified during validation"]);
+            expect(response.warnings).toEqual([
+                "Data was modified during validation",
+            ]);
             expect(response.metadata).toBeDefined();
 
             // Should have IpcValidationResponse-specific properties
@@ -259,15 +273,15 @@ describe("IPC Types", () => {
         it("should define a function that returns error array for invalid parameters", () => {
             const validator: IpcParameterValidator = (params: unknown[]) => {
                 const errors: string[] = [];
-                
+
                 if (params.length < 2) {
                     errors.push("At least 2 parameters required");
                 }
-                
+
                 if (typeof params[0] !== "string") {
                     errors.push("First parameter must be a string");
                 }
-                
+
                 return errors.length > 0 ? errors : null;
             };
 
@@ -277,12 +291,12 @@ describe("IPC Types", () => {
 
             expect(validResult).toBeNull();
             expect(invalidResult1).toEqual([
-                "At least 2 parameters required", 
-                "First parameter must be a string"
+                "At least 2 parameters required",
+                "First parameter must be a string",
             ]);
             expect(invalidResult2).toEqual([
                 "At least 2 parameters required",
-                "First parameter must be a string"
+                "First parameter must be a string",
             ]);
         });
 
@@ -321,10 +335,16 @@ describe("IPC Types", () => {
             const invalidParam2 = { id: 1 }; // missing name
 
             expect(validator([validParam])).toBeNull();
-            expect(validator([invalidParam1])).toEqual(["Parameter.id must be a number"]);
-            expect(validator([invalidParam2])).toEqual(["Parameter.name must be a string"]);
+            expect(validator([invalidParam1])).toEqual([
+                "Parameter.id must be a number",
+            ]);
+            expect(validator([invalidParam2])).toEqual([
+                "Parameter.name must be a string",
+            ]);
             expect(validator([])).toEqual(["Exactly one parameter required"]);
-            expect(validator([validParam, "extra"])).toEqual(["Exactly one parameter required"]);
+            expect(validator([validParam, "extra"])).toEqual([
+                "Exactly one parameter required",
+            ]);
         });
     });
 
@@ -337,14 +357,17 @@ describe("IPC Types", () => {
 
             const stringResponse = createSuccessResponse("hello");
             const numberResponse = createSuccessResponse(42);
-            const objectResponse = createSuccessResponse({ id: 1, name: "test" });
+            const objectResponse = createSuccessResponse({
+                id: 1,
+                name: "test",
+            });
 
             expect(stringResponse.success).toBe(true);
             expect(stringResponse.data).toBe("hello");
-            
+
             expect(numberResponse.success).toBe(true);
             expect(numberResponse.data).toBe(42);
-            
+
             expect(objectResponse.success).toBe(true);
             expect(objectResponse.data).toEqual({ id: 1, name: "test" });
         });

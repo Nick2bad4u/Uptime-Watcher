@@ -117,9 +117,7 @@ describe("SiteCard Component Coverage Tests", () => {
         });
 
         describe("SiteCard Hook Integration", () => {
-            it("should integrate with useSite hook", async ({
-                annotate,
-            }) => {
+            it("should integrate with useSite hook", async ({ annotate }) => {
                 await annotate("Component: SiteCard", "component");
                 await annotate(
                     "Test Type: Integration - Hook Integration",

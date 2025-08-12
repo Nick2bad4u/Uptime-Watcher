@@ -42,10 +42,11 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
         repository = new MonitorRepository({
             databaseService: mockDatabaseService,
-        });        });
+        });
+    });
     afterEach(() => {
         vi.clearAllMocks();
-        });
+    });
     describe("bulkCreate", () => {
         it("should create multiple monitors successfully", async () => {
             const siteIdentifier = "site-123";
@@ -114,7 +115,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
                     },
                 ])
             ).rejects.toThrow("Transaction failed");
-        });        });
+        });
+    });
     describe("clearActiveOperations", () => {
         it("should clear active operations for a monitor", async () => {
             mockDatabase.run.mockReturnValue({ changes: 1 });
@@ -131,7 +133,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             await expect(
                 repository.clearActiveOperations("monitor-123")
             ).rejects.toThrow("Clear failed");
-        });        });
+        });
+    });
     describe("create", () => {
         it("should create a new monitor successfully", async () => {
             const siteIdentifier = "site-123";
@@ -193,7 +196,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
                     history: [],
                 })
             ).rejects.toThrow("Creation failed");
-        });        });
+        });
+    });
     describe("delete", () => {
         it("should delete a monitor successfully", async () => {
             mockDatabase.run
@@ -222,7 +226,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             await expect(repository.delete("monitor-123")).rejects.toThrow(
                 "Deletion failed"
             );
-        });        });
+        });
+    });
     describe("deleteAll", () => {
         it("should delete all monitors", async () => {
             mockDatabase.run.mockReturnValue({ changes: 5 });
@@ -239,7 +244,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             await expect(repository.deleteAll()).rejects.toThrow(
                 "Delete all failed"
             );
-        });        });
+        });
+    });
     describe("deleteBySiteIdentifier", () => {
         it("should delete monitors by site identifier", async () => {
             // Mock the query for monitor rows first, then the delete operations
@@ -262,7 +268,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             await expect(
                 repository.deleteBySiteIdentifier("site-123")
             ).rejects.toThrow("Site deletion failed");
-        });        });
+        });
+    });
     describe("update", () => {
         it("should update a monitor successfully", async () => {
             const monitorId = "monitor-123";
@@ -312,12 +319,13 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
                     status,
                     responseTime: 100,
                     lastChecked: new Date(),
-        });
+                });
                 expect(
                     mockDatabaseService.executeTransaction
                 ).toHaveBeenCalled();
             }
-        });        });
+        });
+    });
     describe("Edge Cases and Error Handling", () => {
         it("should handle malformed monitor data gracefully", async () => {
             // Test with minimal monitor data
@@ -341,7 +349,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
         it("should handle database connection errors", async () => {
             mockDatabaseService.getDatabase.mockImplementation(() => {
                 throw new Error("Database connection failed");
-        });
+            });
             await expect(
                 repository.findByIdentifier("monitor-123")
             ).rejects.toThrow("Database connection failed");
@@ -377,7 +385,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             const result = await repository.findBySiteIdentifier("large-site");
             expect(result).toHaveLength(1000);
-        });        });
+        });
+    });
     describe("Internal Method Coverage", () => {
         it("should cover clearActiveOperationsInternal through public method", async () => {
             // This tests the internal method through the public interface
@@ -401,9 +410,10 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
                 status: "pending",
                 responseTime: 0,
                 history: [],
-        });
+            });
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
-        });        });
+        });
+    });
     describe("Complex Scenarios", () => {
         it("should handle mixed monitor types in bulk operations", async () => {
             const mixedMonitors: Array<Site["monitors"][0]> = [
@@ -473,4 +483,6 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             ]);
 
             expect(results).toHaveLength(3);
-        });        });        });
+        });
+    });
+});

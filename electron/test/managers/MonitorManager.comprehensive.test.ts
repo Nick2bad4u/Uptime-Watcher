@@ -138,40 +138,85 @@ describe("MonitorManager - Comprehensive Coverage", () => {
     });
 
     describe("Constructor and Basic Methods", () => {
-        it("should construct with all dependencies properly injected", async ({ annotate }) => {
+        it("should construct with all dependencies properly injected", async ({
+            annotate,
+        }) => {
             await annotate("Component: MonitorManager", "component");
-            await annotate("Test Type: Unit - Constructor Validation", "test-type");
-            await annotate("Operation: Dependency Injection Validation", "operation");
-            await annotate("Priority: Critical - Core Initialization", "priority");
-            await annotate("Complexity: Medium - Multi-Dependency Constructor", "complexity");
-            await annotate("Dependencies: Event emitter, scheduler, services", "dependencies");
-            await annotate("Purpose: Ensure MonitorManager is properly constructed with all dependencies", "purpose");
+            await annotate(
+                "Test Type: Unit - Constructor Validation",
+                "test-type"
+            );
+            await annotate(
+                "Operation: Dependency Injection Validation",
+                "operation"
+            );
+            await annotate(
+                "Priority: Critical - Core Initialization",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Medium - Multi-Dependency Constructor",
+                "complexity"
+            );
+            await annotate(
+                "Dependencies: Event emitter, scheduler, services",
+                "dependencies"
+            );
+            await annotate(
+                "Purpose: Ensure MonitorManager is properly constructed with all dependencies",
+                "purpose"
+            );
 
             expect(manager).toBeDefined();
             expect(mockDependencies.eventEmitter).toBeDefined();
         });
 
-        it("should return current active monitor count", async ({ annotate }) => {
+        it("should return current active monitor count", async ({
+            annotate,
+        }) => {
             await annotate("Component: MonitorManager", "component");
             await annotate("Test Type: Unit - State Query", "test-type");
-            await annotate("Operation: Active Monitor Count Retrieval", "operation");
+            await annotate(
+                "Operation: Active Monitor Count Retrieval",
+                "operation"
+            );
             await annotate("Priority: High - Monitoring Status", "priority");
-            await annotate("Complexity: Low - Scheduler Delegation", "complexity");
-            await annotate("Delegation: Delegates to MonitorScheduler", "delegation");
-            await annotate("Purpose: Validate active monitor count reporting", "purpose");
+            await annotate(
+                "Complexity: Low - Scheduler Delegation",
+                "complexity"
+            );
+            await annotate(
+                "Delegation: Delegates to MonitorScheduler",
+                "delegation"
+            );
+            await annotate(
+                "Purpose: Validate active monitor count reporting",
+                "purpose"
+            );
 
             const result = manager.getActiveMonitorCount();
             expect(result).toBe(0);
         });
 
-        it("should check if specific monitor is active in scheduler", async ({ annotate }) => {
+        it("should check if specific monitor is active in scheduler", async ({
+            annotate,
+        }) => {
             await annotate("Component: MonitorManager", "component");
             await annotate("Test Type: Unit - State Query", "test-type");
-            await annotate("Operation: Individual Monitor Status Check", "operation");
-            await annotate("Priority: Medium - Monitor Status Tracking", "priority");
+            await annotate(
+                "Operation: Individual Monitor Status Check",
+                "operation"
+            );
+            await annotate(
+                "Priority: Medium - Monitor Status Tracking",
+                "priority"
+            );
             await annotate("Complexity: Low - Scheduler Query", "complexity");
             await annotate("Scope: Site-specific monitor status", "scope");
-            await annotate("Purpose: Validate individual monitor active status checking", "purpose");
+            await annotate(
+                "Purpose: Validate individual monitor active status checking",
+                "purpose"
+            );
 
             const result = manager.isMonitorActiveInScheduler(
                 "site-1",
@@ -180,26 +225,60 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             expect(result).toBe(false);
         });
 
-        it("should return initial monitoring state as false", async ({ annotate }) => {
+        it("should return initial monitoring state as false", async ({
+            annotate,
+        }) => {
             await annotate("Component: MonitorManager", "component");
             await annotate("Test Type: Unit - Initial State", "test-type");
-            await annotate("Operation: Global Monitoring State Check", "operation");
+            await annotate(
+                "Operation: Global Monitoring State Check",
+                "operation"
+            );
             await annotate("Priority: Medium - System State", "priority");
-            await annotate("Complexity: Low - Boolean State Check", "complexity");
-            await annotate("Initial State: No monitoring active at startup", "initial-state");
-            await annotate("Purpose: Validate initial monitoring state is inactive", "purpose");
+            await annotate(
+                "Complexity: Low - Boolean State Check",
+                "complexity"
+            );
+            await annotate(
+                "Initial State: No monitoring active at startup",
+                "initial-state"
+            );
+            await annotate(
+                "Purpose: Validate initial monitoring state is inactive",
+                "purpose"
+            );
 
             expect(manager.isMonitoringActive()).toBe(false);
         });
 
-        it("should restart monitor with new config successfully", async ({ annotate }) => {
+        it("should restart monitor with new config successfully", async ({
+            annotate,
+        }) => {
             await annotate("Component: MonitorManager", "component");
-            await annotate("Test Type: Unit - Configuration Update", "test-type");
-            await annotate("Operation: Monitor Configuration Restart", "operation");
-            await annotate("Priority: High - Dynamic Configuration", "priority");
-            await annotate("Complexity: Medium - Config Application", "complexity");
-            await annotate("Hot Reload: Apply new config without full restart", "hot-reload");
-            await annotate("Purpose: Validate monitor can be restarted with new configuration", "purpose");
+            await annotate(
+                "Test Type: Unit - Configuration Update",
+                "test-type"
+            );
+            await annotate(
+                "Operation: Monitor Configuration Restart",
+                "operation"
+            );
+            await annotate(
+                "Priority: High - Dynamic Configuration",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Medium - Config Application",
+                "complexity"
+            );
+            await annotate(
+                "Hot Reload: Apply new config without full restart",
+                "hot-reload"
+            );
+            await annotate(
+                "Purpose: Validate monitor can be restarted with new configuration",
+                "purpose"
+            );
 
             const result = manager.restartMonitorWithNewConfig(
                 "site-1",
@@ -210,14 +289,34 @@ describe("MonitorManager - Comprehensive Coverage", () => {
     });
 
     describe("checkSiteManually - Comprehensive Coverage", () => {
-        it("should perform manual check and emit completion event", async ({ annotate }) => {
+        it("should perform manual check and emit completion event", async ({
+            annotate,
+        }) => {
             await annotate("Component: MonitorManager", "component");
-            await annotate("Test Type: Integration - Manual Check Flow", "test-type");
-            await annotate("Operation: Manual Site Check with Event Emission", "operation");
-            await annotate("Priority: Critical - Core Functionality", "priority");
-            await annotate("Complexity: High - Multi-Service Integration", "complexity");
-            await annotate("Event Flow: Check execution -> status update -> event emission", "event-flow");
-            await annotate("Purpose: Validate complete manual check flow with proper event emission", "purpose");
+            await annotate(
+                "Test Type: Integration - Manual Check Flow",
+                "test-type"
+            );
+            await annotate(
+                "Operation: Manual Site Check with Event Emission",
+                "operation"
+            );
+            await annotate(
+                "Priority: Critical - Core Functionality",
+                "priority"
+            );
+            await annotate(
+                "Complexity: High - Multi-Service Integration",
+                "complexity"
+            );
+            await annotate(
+                "Event Flow: Check execution -> status update -> event emission",
+                "event-flow"
+            );
+            await annotate(
+                "Purpose: Validate complete manual check flow with proper event emission",
+                "purpose"
+            );
 
             const mockStatusUpdate: StatusUpdate = {
                 siteIdentifier: "site-1",

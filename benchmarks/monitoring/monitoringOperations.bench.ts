@@ -1,9 +1,9 @@
 /**
  * Benchmark tests for monitoring operations
- * 
+ *
  * @fileoverview Performance benchmarks for monitoring-related computational operations
  * including network operations, data processing, and status calculations.
- * 
+ *
  * @author GitHub Copilot
  * @since 2025-08-11
  * @category Performance
@@ -39,7 +39,7 @@ interface StatusUpdate {
 // Mock data generators for benchmarking
 function generateMonitorConfigs(count: number): MonitorConfig[] {
     const configs: MonitorConfig[] = [];
-    
+
     for (let i = 0; i < count; i++) {
         configs.push({
             timeout: [5000, 10000, 30000][i % 3],
@@ -47,42 +47,42 @@ function generateMonitorConfigs(count: number): MonitorConfig[] {
             checkInterval: [60, 300, 600][i % 3] * 1000,
         });
     }
-    
+
     return configs;
 }
 
 function generateStatusUpdates(count: number): StatusUpdate[] {
     const updates: StatusUpdate[] = [];
     const now = Date.now();
-    
+
     for (let i = 0; i < count; i++) {
         updates.push({
             monitorId: `monitor-${i}`,
             status: Math.random() > 0.05 ? "up" : "down",
             responseTime: Math.floor(Math.random() * 1000) + 50,
-            timestamp: now - (i * 1000),
+            timestamp: now - i * 1000,
             correlationId: `corr-${i}-${Date.now()}`,
         });
     }
-    
+
     return updates;
 }
 
 function generateMonitorCheckResults(count: number): MonitorCheckResult[] {
     const results: MonitorCheckResult[] = [];
     const now = Date.now();
-    
+
     for (let i = 0; i < count; i++) {
         const success = Math.random() > 0.05;
         results.push({
             success,
             responseTime: success ? Math.floor(Math.random() * 1000) + 50 : 0,
-            timestamp: now - (i * 1000),
+            timestamp: now - i * 1000,
             status: success ? "up" : "down",
             error: success ? undefined : `Network error ${i}`,
         });
     }
-    
+
     return results;
 }
 
@@ -92,7 +92,7 @@ function simulatePingCheck(host: string, timeout: number): MonitorCheckResult {
     const latencyFactor = Math.random();
     const simulatedResponseTime = Math.floor(latencyFactor * timeout * 0.5);
     const success = latencyFactor > 0.05; // 95% success rate
-    
+
     return {
         success,
         responseTime: success ? simulatedResponseTime : 0,
@@ -107,7 +107,7 @@ function simulateHttpCheck(url: string, timeout: number): MonitorCheckResult {
     const latencyFactor = Math.random();
     const simulatedResponseTime = Math.floor(latencyFactor * timeout * 0.3);
     const success = latencyFactor > 0.03; // 97% success rate
-    
+
     return {
         success,
         responseTime: success ? simulatedResponseTime : 0,
@@ -117,23 +117,25 @@ function simulateHttpCheck(url: string, timeout: number): MonitorCheckResult {
     };
 }
 
-function processStatusUpdates(updates: StatusUpdate[]): Map<string, StatusUpdate> {
+function processStatusUpdates(
+    updates: StatusUpdate[]
+): Map<string, StatusUpdate> {
     const latestUpdates = new Map<string, StatusUpdate>();
-    
+
     for (const update of updates) {
         const existing = latestUpdates.get(update.monitorId);
         if (!existing || update.timestamp > existing.timestamp) {
             latestUpdates.set(update.monitorId, update);
         }
     }
-    
+
     return latestUpdates;
 }
 
 function calculateUptimeFromResults(results: MonitorCheckResult[]): number {
     if (results.length === 0) return 100;
-    
-    const upCount = results.filter(r => r.status === "up").length;
+
+    const upCount = results.filter((r) => r.status === "up").length;
     return (upCount / results.length) * 100;
 }
 
@@ -144,20 +146,23 @@ function aggregateResponseTimes(results: MonitorCheckResult[]): {
     p95: number;
 } {
     const responseTimes = results
-        .filter(r => r.success)
-        .map(r => r.responseTime)
+        .filter((r) => r.success)
+        .map((r) => r.responseTime)
         .sort((a, b) => a - b);
-    
+
     if (responseTimes.length === 0) {
         return { average: 0, min: 0, max: 0, p95: 0 };
     }
-    
-    const average = responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length;
+
+    const average =
+        responseTimes.reduce((sum, time) => sum + time, 0) /
+        responseTimes.length;
     const min = responseTimes[0];
     const max = responseTimes[responseTimes.length - 1];
     const p95Index = Math.floor(responseTimes.length * 0.95);
-    const p95 = responseTimes[p95Index] || responseTimes[responseTimes.length - 1];
-    
+    const p95 =
+        responseTimes[p95Index] || responseTimes[responseTimes.length - 1];
+
     return { average, min, max, p95 };
 }
 
@@ -175,14 +180,14 @@ function simulateRetryLogic(
     maxRetries: number
 ): MonitorCheckResult {
     let lastResult: MonitorCheckResult;
-    
+
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
         lastResult = checkFunction();
         if (lastResult.success) {
             break;
         }
     }
-    
+
     return lastResult!;
 }
 
@@ -211,133 +216,181 @@ describe("Monitoring Operations Performance Benchmarks", () => {
     });
 
     // Monitor check simulation benchmarks
-    bench("Simulate ping checks - Small batch (50 monitors)", () => {
-        for (const config of smallConfigs) {
-            simulatePingCheck("example.com", config.timeout);
+    bench(
+        "Simulate ping checks - Small batch (50 monitors)",
+        () => {
+            for (const config of smallConfigs) {
+                simulatePingCheck("example.com", config.timeout);
+            }
+        },
+        {
+            time: 1000,
+            iterations: 50,
+            warmupTime: 100,
+            warmupIterations: 3,
         }
-    }, {
-        time: 1000,
-        iterations: 50,
-        warmupTime: 100,
-        warmupIterations: 3,
-    });
+    );
 
-    bench("Simulate HTTP checks - Small batch (50 monitors)", () => {
-        for (const config of smallConfigs) {
-            simulateHttpCheck("https://example.com", config.timeout);
+    bench(
+        "Simulate HTTP checks - Small batch (50 monitors)",
+        () => {
+            for (const config of smallConfigs) {
+                simulateHttpCheck("https://example.com", config.timeout);
+            }
+        },
+        {
+            time: 1000,
+            iterations: 50,
+            warmupTime: 100,
+            warmupIterations: 3,
         }
-    }, {
-        time: 1000,
-        iterations: 50,
-        warmupTime: 100,
-        warmupIterations: 3,
-    });
+    );
 
-    bench("Simulate ping checks - Large batch (2K monitors)", () => {
-        for (const config of largeConfigs) {
-            simulatePingCheck("example.com", config.timeout);
+    bench(
+        "Simulate ping checks - Large batch (2K monitors)",
+        () => {
+            for (const config of largeConfigs) {
+                simulatePingCheck("example.com", config.timeout);
+            }
+        },
+        {
+            time: 2000,
+            iterations: 5,
+            warmupTime: 500,
+            warmupIterations: 1,
         }
-    }, {
-        time: 2000,
-        iterations: 5,
-        warmupTime: 500,
-        warmupIterations: 1,
-    });
+    );
 
     // Status update processing benchmarks
-    bench("Process status updates - Medium dataset (1K updates)", () => {
-        processStatusUpdates(mediumUpdates);
-    }, {
-        time: 1000,
-        iterations: 50,
-        warmupTime: 200,
-        warmupIterations: 3,
-    });
+    bench(
+        "Process status updates - Medium dataset (1K updates)",
+        () => {
+            processStatusUpdates(mediumUpdates);
+        },
+        {
+            time: 1000,
+            iterations: 50,
+            warmupTime: 200,
+            warmupIterations: 3,
+        }
+    );
 
-    bench("Process status updates - Large dataset (10K updates)", () => {
-        processStatusUpdates(largeUpdates);
-    }, {
-        time: 2000,
-        iterations: 10,
-        warmupTime: 500,
-        warmupIterations: 2,
-    });
+    bench(
+        "Process status updates - Large dataset (10K updates)",
+        () => {
+            processStatusUpdates(largeUpdates);
+        },
+        {
+            time: 2000,
+            iterations: 10,
+            warmupTime: 500,
+            warmupIterations: 2,
+        }
+    );
 
     // Statistics calculation benchmarks
-    bench("Calculate uptime from results - Medium dataset (1K results)", () => {
-        calculateUptimeFromResults(mediumResults);
-    }, {
-        time: 1000,
-        iterations: 100,
-        warmupTime: 100,
-        warmupIterations: 5,
-    });
+    bench(
+        "Calculate uptime from results - Medium dataset (1K results)",
+        () => {
+            calculateUptimeFromResults(mediumResults);
+        },
+        {
+            time: 1000,
+            iterations: 100,
+            warmupTime: 100,
+            warmupIterations: 5,
+        }
+    );
 
-    bench("Calculate uptime from results - Large dataset (10K results)", () => {
-        calculateUptimeFromResults(largeResults);
-    }, {
-        time: 1000,
-        iterations: 50,
-        warmupTime: 200,
-        warmupIterations: 3,
-    });
+    bench(
+        "Calculate uptime from results - Large dataset (10K results)",
+        () => {
+            calculateUptimeFromResults(largeResults);
+        },
+        {
+            time: 1000,
+            iterations: 50,
+            warmupTime: 200,
+            warmupIterations: 3,
+        }
+    );
 
-    bench("Aggregate response times - Large dataset (10K results)", () => {
-        aggregateResponseTimes(largeResults);
-    }, {
-        time: 1000,
-        iterations: 30,
-        warmupTime: 200,
-        warmupIterations: 3,
-    });
+    bench(
+        "Aggregate response times - Large dataset (10K results)",
+        () => {
+            aggregateResponseTimes(largeResults);
+        },
+        {
+            time: 1000,
+            iterations: 30,
+            warmupTime: 200,
+            warmupIterations: 3,
+        }
+    );
 
     // Configuration validation benchmarks
-    bench("Validate monitor configs - Large batch (2K configs)", () => {
-        for (const config of largeConfigs) {
-            validateMonitorConfig(config);
+    bench(
+        "Validate monitor configs - Large batch (2K configs)",
+        () => {
+            for (const config of largeConfigs) {
+                validateMonitorConfig(config);
+            }
+        },
+        {
+            time: 1000,
+            iterations: 100,
+            warmupTime: 100,
+            warmupIterations: 5,
         }
-    }, {
-        time: 1000,
-        iterations: 100,
-        warmupTime: 100,
-        warmupIterations: 5,
-    });
+    );
 
     // Retry logic simulation benchmarks
-    bench("Simulate retry logic - Medium batch (500 monitors)", () => {
-        for (let i = 0; i < mediumConfigs.length; i++) {
-            const config = mediumConfigs[i];
-            simulateRetryLogic(
-                () => simulatePingCheck("example.com", config.timeout),
-                config.retryAttempts || 3
-            );
+    bench(
+        "Simulate retry logic - Medium batch (500 monitors)",
+        () => {
+            for (let i = 0; i < mediumConfigs.length; i++) {
+                const config = mediumConfigs[i];
+                simulateRetryLogic(
+                    () => simulatePingCheck("example.com", config.timeout),
+                    config.retryAttempts || 3
+                );
+            }
+        },
+        {
+            time: 2000,
+            iterations: 10,
+            warmupTime: 500,
+            warmupIterations: 2,
         }
-    }, {
-        time: 2000,
-        iterations: 10,
-        warmupTime: 500,
-        warmupIterations: 2,
-    });
+    );
 
     // Complex combined operations
-    bench("Complete monitoring cycle - Large dataset", () => {
-        // Simulate a complete monitoring cycle
-        const results: MonitorCheckResult[] = [];
-        
-        for (const config of mediumConfigs) {
-            const result = simulateRetryLogic(
-                () => simulateHttpCheck("https://example.com", config.timeout),
-                config.retryAttempts || 3
-            );
-            results.push(result);
+    bench(
+        "Complete monitoring cycle - Large dataset",
+        () => {
+            // Simulate a complete monitoring cycle
+            const results: MonitorCheckResult[] = [];
+
+            for (const config of mediumConfigs) {
+                const result = simulateRetryLogic(
+                    () =>
+                        simulateHttpCheck(
+                            "https://example.com",
+                            config.timeout
+                        ),
+                    config.retryAttempts || 3
+                );
+                results.push(result);
+            }
+
+            calculateUptimeFromResults(results);
+            aggregateResponseTimes(results);
+        },
+        {
+            time: 3000,
+            iterations: 3,
+            warmupTime: 1000,
+            warmupIterations: 1,
         }
-        
-        calculateUptimeFromResults(results);
-        aggregateResponseTimes(results);
-    }, {
-        time: 3000,
-        iterations: 3,
-        warmupTime: 1000,
-        warmupIterations: 1,
-    });
+    );
 });

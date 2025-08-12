@@ -18,34 +18,45 @@ describe("ServiceContainer", () => {
         ServiceContainer.resetForTesting();
         container = ServiceContainer.getInstance();
         vi.clearAllMocks();
-        });
+    });
     afterEach(() => {
         ServiceContainer.resetForTesting();
-        });
+    });
     describe("Singleton Pattern", () => {
-        it("should return same instance on multiple calls", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
-            
- const instance1 = ServiceContainer.getInstance();
+        it("should return same instance on multiple calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
+            const instance1 = ServiceContainer.getInstance();
             const instance2 = ServiceContainer.getInstance();
 
             expect(instance1).toBe(instance2);
         });
-        it("should create new instance after reset", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
-            
- const instance1 = ServiceContainer.getInstance();
+        it("should create new instance after reset", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
+            const instance1 = ServiceContainer.getInstance();
             ServiceContainer.resetForTesting();
             const instance2 = ServiceContainer.getInstance();
 
             expect(instance1).not.toBe(instance2);
-        });        });
+        });
+    });
     describe("Configuration Handling", () => {
-        it("should handle default configuration", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
+        it("should handle default configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
             // Test should access simpler services that don't require dependencies first
             expect(() => container.getDatabaseService()).not.toThrow();
             expect(() => container.getNotificationService()).not.toThrow();
@@ -54,11 +65,14 @@ describe("ServiceContainer", () => {
             container.getSiteManager();
             expect(() => container.getUptimeOrchestrator()).not.toThrow();
         });
-        it("should handle custom configuration with debug logging enabled", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
-            
- ServiceContainer.resetForTesting();
+        it("should handle custom configuration with debug logging enabled", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
+            ServiceContainer.resetForTesting();
             const config: ServiceContainerConfig = {
                 enableDebugLogging: true,
                 notificationConfig: {
@@ -77,11 +91,14 @@ describe("ServiceContainer", () => {
             customContainer.getSiteManager();
             expect(() => customContainer.getUptimeOrchestrator()).not.toThrow();
         });
-        it("should handle partial configuration", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
-            
- ServiceContainer.resetForTesting();
+        it("should handle partial configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
+            ServiceContainer.resetForTesting();
             const config: ServiceContainerConfig = {
                 enableDebugLogging: true,
             };
@@ -96,11 +113,14 @@ describe("ServiceContainer", () => {
             customContainer.getSiteManager();
             expect(() => customContainer.getUptimeOrchestrator()).not.toThrow();
         });
-        it("should handle notification config only", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
-            
- ServiceContainer.resetForTesting();
+        it("should handle notification config only", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
+            ServiceContainer.resetForTesting();
             const config: ServiceContainerConfig = {
                 notificationConfig: {
                     showDownAlerts: true,
@@ -117,13 +137,14 @@ describe("ServiceContainer", () => {
             // Complex services should work after initializing dependencies
             customContainer.getSiteManager();
             expect(() => customContainer.getUptimeOrchestrator()).not.toThrow();
-        });        });
+        });
+    });
     describe("Core Service Getters", () => {
         it("should get database service", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
-            
- const service = container.getDatabaseService();
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
+            const service = container.getDatabaseService();
             expect(service).toBeDefined();
 
             // Should return same instance on subsequent calls
@@ -131,8 +152,9 @@ describe("ServiceContainer", () => {
             expect(service).toBe(service2);
         });
         it("should get IPC service", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
             // First initialize the required dependency
             container.getSiteManager();
 
@@ -142,13 +164,14 @@ describe("ServiceContainer", () => {
             // Should return same instance on subsequent calls
             const service2 = container.getIpcService();
             expect(service).toBe(service2);
-        });        });
+        });
+    });
     describe("Repository Service Getters", () => {
         it("should get history repository", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
-            
- const repo = container.getHistoryRepository();
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
+            const repo = container.getHistoryRepository();
             expect(repo).toBeDefined();
 
             // Should return same instance on subsequent calls
@@ -156,10 +179,10 @@ describe("ServiceContainer", () => {
             expect(repo).toBe(repo2);
         });
         it("should get monitor repository", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
-            
- const repo = container.getMonitorRepository();
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
+            const repo = container.getMonitorRepository();
             expect(repo).toBeDefined();
 
             // Should return same instance on subsequent calls
@@ -167,10 +190,10 @@ describe("ServiceContainer", () => {
             expect(repo).toBe(repo2);
         });
         it("should get settings repository", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
-            
- const repo = container.getSettingsRepository();
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
+            const repo = container.getSettingsRepository();
             expect(repo).toBeDefined();
 
             // Should return same instance on subsequent calls
@@ -178,22 +201,23 @@ describe("ServiceContainer", () => {
             expect(repo).toBe(repo2);
         });
         it("should get site repository", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
-            
- const repo = container.getSiteRepository();
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
+            const repo = container.getSiteRepository();
             expect(repo).toBeDefined();
 
             // Should return same instance on subsequent calls
             const repo2 = container.getSiteRepository();
             expect(repo).toBe(repo2);
-        });        });
+        });
+    });
     describe("Manager Service Getters", () => {
         it("should get configuration manager", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
-            
- const manager = container.getConfigurationManager();
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
+            const manager = container.getConfigurationManager();
             expect(manager).toBeDefined();
 
             // Should return same instance on subsequent calls
@@ -201,10 +225,10 @@ describe("ServiceContainer", () => {
             expect(manager).toBe(manager2);
         });
         it("should get database manager", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
-            
- const manager = container.getDatabaseManager();
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
+            const manager = container.getDatabaseManager();
             expect(manager).toBeDefined();
 
             // Should return same instance on subsequent calls
@@ -212,8 +236,9 @@ describe("ServiceContainer", () => {
             expect(manager).toBe(manager2);
         });
         it("should get monitor manager", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
             // First initialize the required dependency
             container.getSiteManager();
 
@@ -225,22 +250,23 @@ describe("ServiceContainer", () => {
             expect(manager).toBe(manager2);
         });
         it("should get site manager", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
-            
- const manager = container.getSiteManager();
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
+            const manager = container.getSiteManager();
             expect(manager).toBeDefined();
 
             // Should return same instance on subsequent calls
             const manager2 = container.getSiteManager();
             expect(manager).toBe(manager2);
-        });        });
+        });
+    });
     describe("Feature Service Getters", () => {
         it("should get notification service", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
-            
- const service = container.getNotificationService();
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
+            const service = container.getNotificationService();
             expect(service).toBeDefined();
 
             // Should return same instance on subsequent calls
@@ -248,22 +274,23 @@ describe("ServiceContainer", () => {
             expect(service).toBe(service2);
         });
         it("should get site service", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
-            
- const service = container.getSiteService();
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
+            const service = container.getSiteService();
             expect(service).toBeDefined();
 
             // Should return same instance on subsequent calls
             const service2 = container.getSiteService();
             expect(service).toBe(service2);
-        });        });
+        });
+    });
     describe("Utility Service Getters", () => {
         it("should get auto updater service", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
-            
- const service = container.getAutoUpdaterService();
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
+            const service = container.getAutoUpdaterService();
             expect(service).toBeDefined();
 
             // Should return same instance on subsequent calls
@@ -271,20 +298,22 @@ describe("ServiceContainer", () => {
             expect(service).toBe(service2);
         });
         it("should get window service", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
-            
- const service = container.getWindowService();
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
+            const service = container.getWindowService();
             expect(service).toBeDefined();
 
             // Should return same instance on subsequent calls
             const service2 = container.getWindowService();
             expect(service).toBe(service2);
-        });        });
+        });
+    });
     describe("Main Orchestrator", () => {
         it("should get uptime orchestrator", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
             // First initialize the required dependency
             container.getSiteManager();
 
@@ -295,20 +324,29 @@ describe("ServiceContainer", () => {
             const orchestrator2 = container.getUptimeOrchestrator();
             expect(orchestrator).toBe(orchestrator2);
         });
-        it("should initialize orchestrator with proper dependencies", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
+        it("should initialize orchestrator with proper dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
             // First initialize the required dependency
             container.getSiteManager();
 
             const orchestrator = container.getUptimeOrchestrator();
             // Just verify orchestrator is created - mocking constructors would be complex
             expect(orchestrator).toBeDefined();
-        });        });
+        });
+    });
     describe("Service Introspection", () => {
-        it("should provide initialization status", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
+        it("should provide initialization status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
             // Initialize some services
             container.getDatabaseService();
             container.getNotificationService();
@@ -320,9 +358,13 @@ describe("ServiceContainer", () => {
             expect(status["NotificationService"]).toBe(true);
             expect(status["UptimeOrchestrator"]).toBe(false); // Not initialized yet
         });
-        it("should provide list of initialized services", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
+        it("should provide list of initialized services", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
             // Initialize some services
             container.getDatabaseService();
             container.getNotificationService();
@@ -335,7 +377,8 @@ describe("ServiceContainer", () => {
             const serviceNames = services.map((s) => s.name);
             expect(serviceNames).toContain("DatabaseService");
             expect(serviceNames).toContain("NotificationService");
-        });        });
+        });
+    });
     describe("Initialization Process", () => {
         it("should handle full initialization", async () => {
             // Just verify the method exists and can be called
@@ -343,11 +386,16 @@ describe("ServiceContainer", () => {
 
             // The actual initialization might fail in test environment due to missing dependencies
             // but we can verify the method structure
-        });        });
+        });
+    });
     describe("Complex Service Interactions", () => {
-        it("should handle multiple service requests in different orders", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
+        it("should handle multiple service requests in different orders", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
             // Request simpler services that don't require dependencies first
             const notification = container.getNotificationService();
             const database = container.getDatabaseService();
@@ -373,13 +421,17 @@ describe("ServiceContainer", () => {
 
             expect(services).toBeDefined();
             expect(services.length).toBe(3);
-        });        });
+        });
+    });
     describe("Configuration Edge Cases", () => {
-        it("should handle empty configuration object", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
-            
- ServiceContainer.resetForTesting();
+        it("should handle empty configuration object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
+            ServiceContainer.resetForTesting();
             const config: ServiceContainerConfig = {};
 
             const customContainer = ServiceContainer.getInstance(config);
@@ -392,11 +444,14 @@ describe("ServiceContainer", () => {
             customContainer.getSiteManager();
             expect(() => customContainer.getUptimeOrchestrator()).not.toThrow();
         });
-        it("should handle configuration with only enableDebugLogging false", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
-            
- ServiceContainer.resetForTesting();
+        it("should handle configuration with only enableDebugLogging false", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
+            ServiceContainer.resetForTesting();
             const config: ServiceContainerConfig = {
                 enableDebugLogging: false,
             };
@@ -411,11 +466,14 @@ describe("ServiceContainer", () => {
             customContainer.getSiteManager();
             expect(() => customContainer.getUptimeOrchestrator()).not.toThrow();
         });
-        it("should handle configuration with all notification options disabled", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
-            
- ServiceContainer.resetForTesting();
+        it("should handle configuration with all notification options disabled", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
+            ServiceContainer.resetForTesting();
             const config: ServiceContainerConfig = {
                 notificationConfig: {
                     showDownAlerts: false,
@@ -428,21 +486,29 @@ describe("ServiceContainer", () => {
                 customContainer.getNotificationService()
             ).not.toThrow();
         });
-        it("should handle undefined configuration", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
-            
- ServiceContainer.resetForTesting();
+        it("should handle undefined configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
+            ServiceContainer.resetForTesting();
 
             const customContainer = ServiceContainer.getInstance(undefined);
             expect(() =>
                 customContainer.getNotificationService()
             ).not.toThrow();
-        });        });
+        });
+    });
     describe("Service Interdependencies", () => {
-        it("should handle circular dependency prevention", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
+        it("should handle circular dependency prevention", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
             // Test that services that might depend on each other are handled correctly
             const siteManager = container.getSiteManager();
             const monitorManager = container.getMonitorManager();
@@ -452,9 +518,13 @@ describe("ServiceContainer", () => {
             expect(monitorManager).toBeDefined();
             expect(databaseManager).toBeDefined();
         });
-        it("should ensure proper service initialization without circular references", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
+        it("should ensure proper service initialization without circular references", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
             // Test services that can be initialized without dependencies
             const basicServices = [
                 container.getDatabaseService(),
@@ -480,11 +550,16 @@ describe("ServiceContainer", () => {
             expect(() => container.getIpcService()).not.toThrow();
             expect(() => container.getMonitorManager()).not.toThrow();
             expect(() => container.getUptimeOrchestrator()).not.toThrow();
-        });        });
+        });
+    });
     describe("Debugging and Monitoring Features", () => {
-        it("should track initialization status correctly", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
+        it("should track initialization status correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
             // const statusBefore = container.getInitializationStatus(); // Currently unused
 
             // Initialize a service
@@ -496,11 +571,14 @@ describe("ServiceContainer", () => {
             expect(statusAfter["DatabaseService"]).toBe(true);
             expect(Object.keys(statusAfter).length).toBeGreaterThan(0);
         });
-        it("should handle debug logging configuration", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ServiceContainer", "component");
-            
-            
- ServiceContainer.resetForTesting();
+        it("should handle debug logging configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+
+            ServiceContainer.resetForTesting();
             const config: ServiceContainerConfig = {
                 enableDebugLogging: true,
             };
@@ -512,4 +590,6 @@ describe("ServiceContainer", () => {
                 debugContainer.getDatabaseService();
                 debugContainer.getNotificationService();
             }).not.toThrow();
-        });        });        });
+        });
+    });
+});

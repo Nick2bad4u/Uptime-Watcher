@@ -1,9 +1,9 @@
 /**
  * Test suite for SiteManager
- * 
+ *
  * @fileoverview Comprehensive tests for unknown functionality
  * in the Uptime Watcher application.
- * 
+ *
  * @author GitHub Copilot
  * @since 2025-08-11
  * @category General
@@ -56,7 +56,8 @@ describe("SiteManager", () => {
                 deleteBySiteIdentifierInternal: vi.fn(), // Add the missing internal method
                 delete: vi.fn().mockResolvedValue(true), // Add missing delete method
             },
-            monitoringOperations: { // Add the missing monitoringOperations
+            monitoringOperations: {
+                // Add the missing monitoringOperations
                 setHistoryLimit: vi.fn().mockResolvedValue(undefined),
                 setupNewMonitors: vi.fn().mockResolvedValue(undefined),
                 startMonitoringForSite: vi.fn().mockResolvedValue(true),
@@ -77,16 +78,31 @@ describe("SiteManager", () => {
             },
         };
         manager = new SiteManager(mockDependencies);
-        });
+    });
     describe("constructor", () => {
         it("should construct without error", async ({ annotate }) => {
             await annotate("Component: SiteManager", "component");
-            await annotate("Test Type: Unit - Constructor Validation", "test-type");
+            await annotate(
+                "Test Type: Unit - Constructor Validation",
+                "test-type"
+            );
             await annotate("Operation: Manager Instantiation", "operation");
-            await annotate("Priority: Critical - Core Component Initialization", "priority");
-            await annotate("Complexity: Low - Basic Constructor Test", "complexity");
-            await annotate("Dependencies: Injected repository and service dependencies", "dependencies");
-            await annotate("Purpose: Ensure SiteManager can be instantiated without errors", "purpose");
+            await annotate(
+                "Priority: Critical - Core Component Initialization",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Low - Basic Constructor Test",
+                "complexity"
+            );
+            await annotate(
+                "Dependencies: Injected repository and service dependencies",
+                "dependencies"
+            );
+            await annotate(
+                "Purpose: Ensure SiteManager can be instantiated without errors",
+                "purpose"
+            );
 
             expect(manager).toBeDefined();
         });
@@ -96,11 +112,26 @@ describe("SiteManager", () => {
         it("should add a new site successfully", async ({ annotate }) => {
             await annotate("Component: SiteManager", "component");
             await annotate("Test Type: Unit - Business Logic", "test-type");
-            await annotate("Operation: Site Creation with Transaction", "operation");
-            await annotate("Priority: Critical - Core Site Management", "priority");
-            await annotate("Complexity: High - Multi-step Transaction", "complexity");
-            await annotate("Business Logic: Create site, monitors, emit events", "business-logic");
-            await annotate("Purpose: Ensure sites can be added with proper transaction handling", "purpose");
+            await annotate(
+                "Operation: Site Creation with Transaction",
+                "operation"
+            );
+            await annotate(
+                "Priority: Critical - Core Site Management",
+                "priority"
+            );
+            await annotate(
+                "Complexity: High - Multi-step Transaction",
+                "complexity"
+            );
+            await annotate(
+                "Business Logic: Create site, monitors, emit events",
+                "business-logic"
+            );
+            await annotate(
+                "Purpose: Ensure sites can be added with proper transaction handling",
+                "purpose"
+            );
 
             const newSite = {
                 identifier: "test-site-1",
@@ -147,14 +178,31 @@ describe("SiteManager", () => {
             expect(result).toEqual(newSite);
         });
 
-        it("should handle database errors during site addition", async ({ annotate }) => {
+        it("should handle database errors during site addition", async ({
+            annotate,
+        }) => {
             await annotate("Component: SiteManager", "component");
             await annotate("Test Type: Unit - Error Handling", "test-type");
-            await annotate("Operation: Site Addition Error Handling", "operation");
-            await annotate("Priority: High - Transaction Error Recovery", "priority");
-            await annotate("Complexity: Medium - Database Error Simulation", "complexity");
-            await annotate("Error Case: Database transaction failure during site creation", "error-case");
-            await annotate("Purpose: Ensure database errors are properly propagated", "purpose");
+            await annotate(
+                "Operation: Site Addition Error Handling",
+                "operation"
+            );
+            await annotate(
+                "Priority: High - Transaction Error Recovery",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Medium - Database Error Simulation",
+                "complexity"
+            );
+            await annotate(
+                "Error Case: Database transaction failure during site creation",
+                "error-case"
+            );
+            await annotate(
+                "Purpose: Ensure database errors are properly propagated",
+                "purpose"
+            );
 
             const newSite = {
                 identifier: "test-site-2",
@@ -173,14 +221,28 @@ describe("SiteManager", () => {
         });
     });
     describe("getSites", () => {
-        it("should return all sites from cache when available", async ({ annotate }) => {
+        it("should return all sites from cache when available", async ({
+            annotate,
+        }) => {
             await annotate("Component: SiteManager", "component");
             await annotate("Test Type: Unit - Cache Operations", "test-type");
             await annotate("Operation: Site Retrieval from Cache", "operation");
-            await annotate("Priority: High - Data Access Performance", "priority");
-            await annotate("Complexity: Medium - Cache Layer Testing", "complexity");
-            await annotate("Cache Strategy: Return cached data when available", "cache-strategy");
-            await annotate("Purpose: Ensure sites can be retrieved efficiently from cache", "purpose");
+            await annotate(
+                "Priority: High - Data Access Performance",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Medium - Cache Layer Testing",
+                "complexity"
+            );
+            await annotate(
+                "Cache Strategy: Return cached data when available",
+                "cache-strategy"
+            );
+            await annotate(
+                "Purpose: Ensure sites can be retrieved efficiently from cache",
+                "purpose"
+            );
 
             const cachedSites = [
                 {
@@ -202,14 +264,28 @@ describe("SiteManager", () => {
             expect(result).toEqual(cachedSites);
         });
 
-        it("should fetch from database when cache is empty", async ({ annotate }) => {
+        it("should fetch from database when cache is empty", async ({
+            annotate,
+        }) => {
             await annotate("Component: SiteManager", "component");
             await annotate("Test Type: Unit - Database Fallback", "test-type");
-            await annotate("Operation: Site Retrieval from Database", "operation");
+            await annotate(
+                "Operation: Site Retrieval from Database",
+                "operation"
+            );
             await annotate("Priority: Critical - Data Persistence", "priority");
-            await annotate("Complexity: Medium - Database Query Fallback", "complexity");
-            await annotate("Fallback Strategy: Query database when cache is empty", "fallback-strategy");
-            await annotate("Purpose: Ensure sites can be retrieved from database when cache is empty", "purpose");
+            await annotate(
+                "Complexity: Medium - Database Query Fallback",
+                "complexity"
+            );
+            await annotate(
+                "Fallback Strategy: Query database when cache is empty",
+                "fallback-strategy"
+            );
+            await annotate(
+                "Purpose: Ensure sites can be retrieved from database when cache is empty",
+                "purpose"
+            );
 
             const dbSites = [
                 {
@@ -237,11 +313,23 @@ describe("SiteManager", () => {
         it("should remove an existing site", async ({ annotate }) => {
             await annotate("Component: SiteManager", "component");
             await annotate("Test Type: Unit - Data Deletion", "test-type");
-            await annotate("Operation: Site Removal with Transaction", "operation");
+            await annotate(
+                "Operation: Site Removal with Transaction",
+                "operation"
+            );
             await annotate("Priority: Critical - Data Management", "priority");
-            await annotate("Complexity: High - Multi-step Deletion Process", "complexity");
-            await annotate("Business Logic: Delete site, monitors, history, emit events", "business-logic");
-            await annotate("Purpose: Ensure sites can be completely removed with proper cleanup", "purpose");
+            await annotate(
+                "Complexity: High - Multi-step Deletion Process",
+                "complexity"
+            );
+            await annotate(
+                "Business Logic: Delete site, monitors, history, emit events",
+                "business-logic"
+            );
+            await annotate(
+                "Purpose: Ensure sites can be completely removed with proper cleanup",
+                "purpose"
+            );
 
             // Mock the siteWriterService.deleteSite method directly
             const mockDeleteSite = vi
@@ -268,11 +356,26 @@ describe("SiteManager", () => {
         it("should return false when site not found", async ({ annotate }) => {
             await annotate("Component: SiteManager", "component");
             await annotate("Test Type: Unit - Edge Case Handling", "test-type");
-            await annotate("Operation: Non-existent Site Deletion", "operation");
-            await annotate("Priority: Medium - Error Case Validation", "priority");
-            await annotate("Complexity: Medium - Missing Data Handling", "complexity");
-            await annotate("Edge Case: Attempting to delete non-existent site", "edge-case");
-            await annotate("Purpose: Ensure graceful handling when deleting non-existent sites", "purpose");
+            await annotate(
+                "Operation: Non-existent Site Deletion",
+                "operation"
+            );
+            await annotate(
+                "Priority: Medium - Error Case Validation",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Medium - Missing Data Handling",
+                "complexity"
+            );
+            await annotate(
+                "Edge Case: Attempting to delete non-existent site",
+                "edge-case"
+            );
+            await annotate(
+                "Purpose: Ensure graceful handling when deleting non-existent sites",
+                "purpose"
+            );
 
             mockDependencies.siteRepository.delete.mockResolvedValue(false);
             mockDependencies.databaseService.executeTransaction.mockImplementation(
@@ -293,9 +396,18 @@ describe("SiteManager", () => {
             await annotate("Test Type: Unit - Data Modification", "test-type");
             await annotate("Operation: Site Property Updates", "operation");
             await annotate("Priority: Critical - Data Management", "priority");
-            await annotate("Complexity: High - Complex Update Logic", "complexity");
-            await annotate("Business Logic: Update site properties, maintain data integrity", "business-logic");
-            await annotate("Purpose: Ensure site properties can be updated correctly", "purpose");
+            await annotate(
+                "Complexity: High - Complex Update Logic",
+                "complexity"
+            );
+            await annotate(
+                "Business Logic: Update site properties, maintain data integrity",
+                "business-logic"
+            );
+            await annotate(
+                "Purpose: Ensure site properties can be updated correctly",
+                "purpose"
+            );
 
             const existingSite = {
                 identifier: "site1",
@@ -336,7 +448,7 @@ describe("SiteManager", () => {
                 value: mockCache,
                 writable: true,
                 configurable: true,
-        });
+            });
             // Mock the siteWriterService.updateSite method
             const mockUpdateSite = vi
                 .spyOn(manager["siteWriterService"], "updateSite")
@@ -365,7 +477,8 @@ describe("SiteManager", () => {
             );
             expect(mockGetSitesFromDatabase).toHaveBeenCalled();
             expect(result).toEqual(updatedSite);
-        });        });
+        });
+    });
     describe("removeMonitor", () => {
         it("should remove a monitor from a site", async () => {
             mockDependencies.databaseService.executeTransaction.mockImplementation(
@@ -379,7 +492,7 @@ describe("SiteManager", () => {
                     id: "mon1",
                     type: "http",
                     url: "https://example.com",
-        });
+                });
             // Mock the getSitesFromDatabase method that will be called during removeMonitor
             const mockSites = [
                 {
@@ -400,7 +513,8 @@ describe("SiteManager", () => {
             const result = await manager.removeMonitor("site1", "mon1");
 
             expect(result).toBe(true);
-        });        });
+        });
+    });
     describe("updateSitesCache", () => {
         it("should update the sites cache", async () => {
             const sites = [
@@ -420,7 +534,8 @@ describe("SiteManager", () => {
 
             expect(clearSpy).toHaveBeenCalled();
             expect(setSpy).toHaveBeenCalledWith("site1", sites[0]);
-        });        });
+        });
+    });
     describe("initialize", () => {
         it("should initialize without error", async () => {
             await expect(manager.initialize()).resolves.not.toThrow();
@@ -429,11 +544,12 @@ describe("SiteManager", () => {
             // Mock an error in the initialization process
             vi.spyOn(manager["sitesCache"], "clear").mockImplementation(() => {
                 throw new Error("Cache initialization failed");
-        });
+            });
             await expect(manager.initialize()).rejects.toThrow(
                 "Cache initialization failed"
             );
-        });        });
+        });
+    });
     describe("getSiteFromCache", () => {
         it("should return site from cache when it exists", () => {
             const testSite = {
@@ -458,7 +574,8 @@ describe("SiteManager", () => {
             const result = manager.getSiteFromCache("nonexistent");
 
             expect(result).toBeUndefined();
-        });        });
+        });
+    });
     describe("getSitesFromCache", () => {
         it("should return all sites from cache", () => {
             const testSites = [
@@ -494,7 +611,8 @@ describe("SiteManager", () => {
             const result = manager.getSitesFromCache();
 
             expect(result).toEqual([]);
-        });        });
+        });
+    });
     describe("getSitesCache", () => {
         it("should return the sites cache instance", () => {
             const cache = manager.getSitesCache();
@@ -507,7 +625,8 @@ describe("SiteManager", () => {
 
             // Check that it's a StandardizedCache instance
             expect(cache.constructor.name).toBe("StandardizedCache");
-        });        });
+        });
+    });
     describe("Private Method Coverage", () => {
         describe("validateSite", () => {
             it("should pass validation for valid site", async () => {
@@ -523,7 +642,7 @@ describe("SiteManager", () => {
                 await expect(
                     manager["validateSite"](validSite)
                 ).resolves.not.toThrow();
-        });
+            });
             it("should throw validation error for invalid site", async () => {
                 const invalidSite = {
                     identifier: "",
@@ -534,14 +653,21 @@ describe("SiteManager", () => {
                 };
 
                 // Mock the configuration manager to return validation failure
-                mockDependencies.configurationManager.validateSiteConfiguration.mockResolvedValueOnce({
-                    success: false,
-                    errors: ["Invalid site identifier", "Invalid site name", "Invalid URL format"]
-        });
+                mockDependencies.configurationManager.validateSiteConfiguration.mockResolvedValueOnce(
+                    {
+                        success: false,
+                        errors: [
+                            "Invalid site identifier",
+                            "Invalid site name",
+                            "Invalid URL format",
+                        ],
+                    }
+                );
                 await expect(
                     manager["validateSite"](invalidSite)
                 ).rejects.toThrow();
-        });        });
+            });
+        });
         describe("createMonitoringConfig", () => {
             it("should create monitoring configuration", () => {
                 const config = manager["createMonitoringConfig"]();
@@ -551,7 +677,7 @@ describe("SiteManager", () => {
                 expect(typeof config.setupNewMonitors).toBe("function");
                 expect(typeof config.startMonitoring).toBe("function");
                 expect(typeof config.stopMonitoring).toBe("function");
-        });
+            });
             it("should create config with proper methods", () => {
                 const config = manager["createMonitoringConfig"]();
 
@@ -566,7 +692,8 @@ describe("SiteManager", () => {
                 expect(() =>
                     config.stopMonitoring("site1", "monitor1")
                 ).not.toThrow();
-        });        });
+            });
+        });
         describe("formatValidationErrors", () => {
             it("should format validation errors array", () => {
                 const errors = ["Error 1", "Error 2", "Error 3"];
@@ -575,17 +702,18 @@ describe("SiteManager", () => {
                 expect(formatted).toContain("Error 1");
                 expect(formatted).toContain("Error 2");
                 expect(formatted).toContain("Error 3");
-        });
+            });
             it("should handle empty errors array", () => {
                 const formatted = manager["formatValidationErrors"]([]);
 
                 expect(formatted).toBe("");
-        });
+            });
             it("should handle undefined errors", () => {
                 const formatted = manager["formatValidationErrors"](undefined);
 
                 expect(formatted).toBe("");
-        });        });
+            });
+        });
         describe("executeMonitorDeletion", () => {
             it("should delete monitor successfully", async () => {
                 // Mock the monitor repository
@@ -601,7 +729,7 @@ describe("SiteManager", () => {
                 expect(
                     manager["repositories"].monitorRepository.delete
                 ).toHaveBeenCalledWith("monitor1");
-        });
+            });
             it("should handle monitor deletion failure", async () => {
                 vi.spyOn(
                     manager["repositories"].monitorRepository,
@@ -612,7 +740,7 @@ describe("SiteManager", () => {
                     await manager["executeMonitorDeletion"]("monitor1");
 
                 expect(result).toBe(false);
-        });
+            });
             it("should handle monitor deletion errors", async () => {
                 vi.spyOn(
                     manager["repositories"].monitorRepository,
@@ -622,7 +750,8 @@ describe("SiteManager", () => {
                 await expect(
                     manager["executeMonitorDeletion"]("monitor1")
                 ).rejects.toThrow("Deletion failed");
-        });        });
+            });
+        });
         describe("loadSiteInBackground", () => {
             it("should load site in background successfully", async () => {
                 const testSite = {
@@ -653,11 +782,11 @@ describe("SiteManager", () => {
                     "site1",
                     testSite
                 );
-        });
+            });
             it("should handle site not found in background load", async () => {
                 // Set up cache spy for this test
                 const cacheSpy = vi.spyOn(manager["sitesCache"], "set");
-                
+
                 vi.spyOn(
                     manager["siteRepositoryService"],
                     "getSitesFromDatabase"
@@ -669,7 +798,7 @@ describe("SiteManager", () => {
 
                 // Should not attempt to set cache when site is not found
                 expect(cacheSpy).not.toHaveBeenCalled();
-        });
+            });
             it("should handle background load errors", async () => {
                 vi.spyOn(
                     manager["siteRepositoryService"],
@@ -680,7 +809,9 @@ describe("SiteManager", () => {
                 await expect(
                     manager["loadSiteInBackground"]("site1")
                 ).resolves.not.toThrow();
-        });        });        });
+            });
+        });
+    });
     describe("Edge Cases and Error Scenarios", () => {
         it("should handle concurrent site operations", async () => {
             const testSite = {
@@ -753,11 +884,18 @@ describe("SiteManager", () => {
             } as any;
 
             // Mock the configuration manager to return validation failure for malformed data
-            mockDependencies.configurationManager.validateSiteConfiguration.mockResolvedValueOnce({
-                success: false,
-                errors: ["Missing required identifier field", "Missing required monitoring field"]
-        });
+            mockDependencies.configurationManager.validateSiteConfiguration.mockResolvedValueOnce(
+                {
+                    success: false,
+                    errors: [
+                        "Missing required identifier field",
+                        "Missing required monitoring field",
+                    ],
+                }
+            );
             await expect(
                 manager["validateSite"](malformedSite)
             ).rejects.toThrow();
-        });        });        });
+        });
+    });
+});

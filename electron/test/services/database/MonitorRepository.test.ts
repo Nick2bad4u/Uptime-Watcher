@@ -1,9 +1,9 @@
 /**
  * Test suite for MonitorRepository
- * 
+ *
  * @fileoverview Comprehensive tests for unknown functionality
  * in the Uptime Watcher application.
- * 
+ *
  * @author GitHub Copilot
  * @since 2025-08-11
  * @category General
@@ -41,7 +41,9 @@ describe("MonitorRepository", () => {
         };
 
         repository = new MonitorRepository({
-            databaseService: mockDatabaseService,        });        });
+            databaseService: mockDatabaseService,
+        });
+    });
     describe("findBySiteIdentifier", () => {
         it("should find all monitors for a site", async () => {
             const mockMonitors = [
@@ -63,14 +65,18 @@ describe("MonitorRepository", () => {
 
             expect(mockDatabaseService.getDatabase).toHaveBeenCalled();
             expect(mockDb.all).toHaveBeenCalled();
-            expect(result).toBeDefined();        });
+            expect(result).toBeDefined();
+        });
         it("should handle errors when finding monitors by site", async () => {
             const mockDb = mockDatabaseService.getDatabase();
             mockDb.all.mockImplementation(() => {
-                throw new Error("Database error");        });
+                throw new Error("Database error");
+            });
             await expect(
                 repository.findBySiteIdentifier("site1")
-            ).rejects.toThrow("Database error");        });        });
+            ).rejects.toThrow("Database error");
+        });
+    });
     describe("findByIdentifier", () => {
         it("should find a monitor by id", async () => {
             const mockMonitor = {
@@ -85,14 +91,17 @@ describe("MonitorRepository", () => {
             const result = await repository.findByIdentifier("mon1");
 
             expect(mockDatabaseService.getDatabase).toHaveBeenCalled();
-            expect(result).toBeDefined();        });
+            expect(result).toBeDefined();
+        });
         it("should return undefined when monitor not found", async () => {
             const mockDb = mockDatabaseService.getDatabase();
             mockDb.get.mockReturnValue(undefined);
 
             const result = await repository.findByIdentifier("nonexistent");
 
-            expect(result).toBeUndefined();        });        });
+            expect(result).toBeUndefined();
+        });
+    });
     describe("getAllMonitorIds", () => {
         it("should return all monitor ids", async () => {
             const mockIds = [{ monitor_id: "mon1" }, { monitor_id: "mon2" }];
@@ -102,4 +111,7 @@ describe("MonitorRepository", () => {
             const result = await repository.getAllMonitorIds();
 
             expect(mockDatabaseService.getDatabase).toHaveBeenCalled();
-            expect(result).toBeDefined();        });        });        });
+            expect(result).toBeDefined();
+        });
+    });
+});

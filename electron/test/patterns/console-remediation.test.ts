@@ -98,7 +98,7 @@ describe("Console Statement Remediation", () => {
                     content: line.trim(),
                     type,
                     context,
-        });
+                });
             }
         }
 
@@ -203,11 +203,14 @@ describe("Console Statement Remediation", () => {
     }
 
     describe("Console Statement Analysis", () => {
-        it("should find and categorize all console statements", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: logger", "component");
-            
-            
- const allFiles = srcDirs.flatMap((dir) => findTSFiles(dir));
+        it("should find and categorize all console statements", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+
+            const allFiles = srcDirs.flatMap((dir) => findTSFiles(dir));
             const analysisResults: {
                 file: string;
                 statements: ReturnType<typeof extractConsoleStatements>;
@@ -264,7 +267,7 @@ describe("Console Statement Remediation", () => {
                         file: path.relative(projectRoot, file),
                         statements,
                         categorized,
-        });
+                    });
                     totalStatements += statements.length;
                     totalLegitimate += categorized.legitimate;
                     totalNeedsReplacement += categorized.needsReplacement;
@@ -297,11 +300,14 @@ describe("Console Statement Remediation", () => {
             expect(analysisResults.length).toBeGreaterThanOrEqual(0);
             expect(totalStatements).toBeGreaterThanOrEqual(0);
         });
-        it("should provide specific replacement recommendations", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: logger", "component");
-            
-            
- const allFiles = srcDirs.flatMap((dir) => findTSFiles(dir));
+        it("should provide specific replacement recommendations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+
+            const allFiles = srcDirs.flatMap((dir) => findTSFiles(dir));
             const replacementRecommendations: {
                 file: string;
                 line: number;
@@ -330,7 +336,7 @@ describe("Console Statement Remediation", () => {
                             original: statement.content,
                             replacement: category.replacement,
                             reason: category.reason,
-        });
+                        });
                     }
                 }
             }
@@ -362,13 +368,17 @@ describe("Console Statement Remediation", () => {
             }
 
             expect(replacementRecommendations.length).toBeGreaterThanOrEqual(0);
-        });        });
+        });
+    });
     describe("Logger Implementation Guidelines", () => {
-        it("should provide logger usage guidelines", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: logger", "component");
-            
-            
- const guidelines = [
+        it("should provide logger usage guidelines", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+
+            const guidelines = [
                 {
                     level: "error",
                     usage: "For errors that need investigation",
@@ -410,10 +420,10 @@ describe("Console Statement Remediation", () => {
             expect(guidelines.length).toBe(4);
         });
         it("should provide migration strategy", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: logger", "component");
-            
-            
- const migrationSteps = [
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+
+            const migrationSteps = [
                 {
                     step: 1,
                     title: "Audit Current Console Usage",
@@ -460,13 +470,17 @@ describe("Console Statement Remediation", () => {
             }
 
             expect(migrationSteps.length).toBe(5);
-        });        });
+        });
+    });
     describe("Automated Fixes", () => {
-        it("should generate replacement scripts", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: logger", "component");
-            
-            
- const replacementPatterns = [
+        it("should generate replacement scripts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+
+            const replacementPatterns = [
                 {
                     pattern: /console\.error\\((.+)\\);?/g,
                     replacement: "logger.error($1);",
@@ -539,4 +553,6 @@ function replaceConsoleStatements(fileContent: string): string {
             const script = generateReplacementScript();
             expect(script.length).toBeGreaterThan(0);
             expect(replacementPatterns.length).toBe(5);
-        });        });        });
+        });
+    });
+});

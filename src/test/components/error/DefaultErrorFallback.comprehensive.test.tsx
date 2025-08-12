@@ -60,6 +60,7 @@ describe("DefaultErrorFallback", () => {
         });
 
         it("should display default message when error message is empty", () => {
+            // eslint-disable-next-line unicorn/error-message -- testing empty error message
             const error = new Error("");
             render(
                 <DefaultErrorFallback error={error} onRetry={mockOnRetry} />

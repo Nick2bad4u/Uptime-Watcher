@@ -20,12 +20,17 @@ import {
 
 describe("Electron Constants", () => {
     describe("Timeout Constants", () => {
-        it("should export DEFAULT_REQUEST_TIMEOUT with correct value", async ({ annotate }) => {
+        it("should export DEFAULT_REQUEST_TIMEOUT with correct value", async ({
+            annotate,
+        }) => {
             await annotate("Component: Backend Constants", "component");
             await annotate("Test Type: Unit Testing", "test-type");
             await annotate("Operation: Timeout Value Validation", "operation");
             await annotate("Priority: High - Core Configuration", "priority");
-            await annotate("Complexity: Low - Simple Value Validation", "complexity");
+            await annotate(
+                "Complexity: Low - Simple Value Validation",
+                "complexity"
+            );
 
             expect(DEFAULT_REQUEST_TIMEOUT).toBe(10_000);
             expect(typeof DEFAULT_REQUEST_TIMEOUT).toBe("number");
@@ -34,7 +39,10 @@ describe("Electron Constants", () => {
         it("should have a reasonable timeout value", async ({ annotate }) => {
             await annotate("Test Case: Timeout Range Validation", "test-case");
             await annotate("Valid Range: 5-30 seconds", "range");
-            await annotate("Criticality: High - Affects Monitoring Performance", "criticality");
+            await annotate(
+                "Criticality: High - Affects Monitoring Performance",
+                "criticality"
+            );
 
             // Should be between 5-30 seconds
             expect(DEFAULT_REQUEST_TIMEOUT).toBeGreaterThanOrEqual(5000);
@@ -43,11 +51,16 @@ describe("Electron Constants", () => {
     });
 
     describe("Interval Constants", () => {
-        it("should export DEFAULT_CHECK_INTERVAL with correct value", async ({ annotate }) => {
+        it("should export DEFAULT_CHECK_INTERVAL with correct value", async ({
+            annotate,
+        }) => {
             await annotate("Component: Backend Constants", "component");
             await annotate("Operation: Check Interval Validation", "operation");
             await annotate("Expected Value: 5 minutes", "expected");
-            await annotate("Criticality: High - Core Monitoring Function", "criticality");
+            await annotate(
+                "Criticality: High - Core Monitoring Function",
+                "criticality"
+            );
 
             expect(DEFAULT_CHECK_INTERVAL).toBe(300_000); // 5 minutes
             expect(typeof DEFAULT_CHECK_INTERVAL).toBe("number");
@@ -56,7 +69,10 @@ describe("Electron Constants", () => {
         it("should have a reasonable check interval", async ({ annotate }) => {
             await annotate("Test Case: Interval Range Validation", "test-case");
             await annotate("Valid Range: 1-30 minutes", "range");
-            await annotate("Purpose: Prevent excessive or insufficient monitoring", "purpose");
+            await annotate(
+                "Purpose: Prevent excessive or insufficient monitoring",
+                "purpose"
+            );
 
             // Should be between 1-30 minutes
             expect(DEFAULT_CHECK_INTERVAL).toBeGreaterThanOrEqual(60_000); // 1 minute
@@ -65,9 +81,14 @@ describe("Electron Constants", () => {
     });
 
     describe("User Agent", () => {
-        it("should export USER_AGENT with correct format", async ({ annotate }) => {
+        it("should export USER_AGENT with correct format", async ({
+            annotate,
+        }) => {
             await annotate("Component: Backend Constants", "component");
-            await annotate("Operation: User Agent String Validation", "operation");
+            await annotate(
+                "Operation: User Agent String Validation",
+                "operation"
+            );
             await annotate("Expected Format: Application/Version", "format");
             await annotate("Purpose: HTTP Request Identification", "purpose");
 
@@ -76,15 +97,24 @@ describe("Electron Constants", () => {
         });
 
         it("should follow standard user agent format", async ({ annotate }) => {
-            await annotate("Test Case: User Agent Pattern Validation", "test-case");
-            await annotate("Pattern: Standard Application/Version Format", "pattern");
+            await annotate(
+                "Test Case: User Agent Pattern Validation",
+                "test-case"
+            );
+            await annotate(
+                "Pattern: Standard Application/Version Format",
+                "pattern"
+            );
             await annotate(String.raw`Regex: /^[\w-]+\/[\d.]+$/`, "regex");
 
             expect(USER_AGENT).toMatch(/^[\w-]+\/[\d.]+$/);
         });
 
         it("should not be empty", async ({ annotate }) => {
-            await annotate("Test Case: Non-empty String Validation", "test-case");
+            await annotate(
+                "Test Case: Non-empty String Validation",
+                "test-case"
+            );
             await annotate("Purpose: Ensure valid HTTP headers", "purpose");
 
             expect(USER_AGENT).not.toBe("");
@@ -93,10 +123,15 @@ describe("Electron Constants", () => {
     });
 
     describe("Retry Configuration", () => {
-        it("should export RETRY_BACKOFF with correct structure", async ({ annotate }) => {
+        it("should export RETRY_BACKOFF with correct structure", async ({
+            annotate,
+        }) => {
             await annotate("Component: Retry Configuration", "component");
             await annotate("Operation: Structure Validation", "operation");
-            await annotate("Expected: Object with INITIAL_DELAY and MAX_DELAY", "expected");
+            await annotate(
+                "Expected: Object with INITIAL_DELAY and MAX_DELAY",
+                "expected"
+            );
 
             expect(RETRY_BACKOFF).toEqual({
                 INITIAL_DELAY: 500,
@@ -104,9 +139,14 @@ describe("Electron Constants", () => {
             });
         });
 
-        it("should have reasonable retry delay values", async ({ annotate }) => {
+        it("should have reasonable retry delay values", async ({
+            annotate,
+        }) => {
             await annotate("Test Case: Delay Value Validation", "test-case");
-            await annotate("Purpose: Ensure reasonable retry behavior", "purpose");
+            await annotate(
+                "Purpose: Ensure reasonable retry behavior",
+                "purpose"
+            );
 
             expect(RETRY_BACKOFF.INITIAL_DELAY).toBeGreaterThan(0);
             expect(RETRY_BACKOFF.MAX_DELAY).toBeGreaterThan(
@@ -117,7 +157,9 @@ describe("Electron Constants", () => {
     });
 
     describe("History Configuration", () => {
-        it("should export DEFAULT_HISTORY_LIMIT with correct value", async ({ annotate }) => {
+        it("should export DEFAULT_HISTORY_LIMIT with correct value", async ({
+            annotate,
+        }) => {
             await annotate("Component: History Configuration", "component");
             await annotate("Operation: Limit Value Validation", "operation");
             await annotate("Expected Value: 500 records", "expected");
@@ -129,7 +171,10 @@ describe("Electron Constants", () => {
         it("should have a reasonable history limit", async ({ annotate }) => {
             await annotate("Test Case: History Limit Range", "test-case");
             await annotate("Valid Range: 100-1000 records", "range");
-            await annotate("Purpose: Balance performance and data retention", "purpose");
+            await annotate(
+                "Purpose: Balance performance and data retention",
+                "purpose"
+            );
 
             // Should be between 100-1000 records for good UX
             expect(DEFAULT_HISTORY_LIMIT).toBeGreaterThanOrEqual(100);
@@ -138,68 +183,107 @@ describe("Electron Constants", () => {
     });
 
     describe("Cache Configuration", () => {
-        it("should export CACHE_TTL with correct structure and values", async ({ annotate }) => {
+        it("should export CACHE_TTL with correct structure and values", async ({
+            annotate,
+        }) => {
             await annotate("Component: Backend Constants", "component");
             await annotate("Operation: Cache TTL Validation", "operation");
-            await annotate("Expected Values: 30 min config, 5 min validation", "expected");
-            await annotate("Priority: Medium - Performance Configuration", "priority");
+            await annotate(
+                "Expected Values: 30 min config, 5 min validation",
+                "expected"
+            );
+            await annotate(
+                "Priority: Medium - Performance Configuration",
+                "priority"
+            );
 
             expect(CACHE_TTL).toBeDefined();
             expect(typeof CACHE_TTL).toBe("object");
             expect(CACHE_TTL.CONFIGURATION_VALUES).toBe(1_800_000); // 30 minutes
             expect(CACHE_TTL.VALIDATION_RESULTS).toBe(300_000); // 5 minutes
-            
+
             // Verify object is frozen
             expect(Object.isFrozen(CACHE_TTL)).toBe(true);
         });
 
-        it("should export CACHE_SIZE_LIMITS with correct structure and values", async ({ annotate }) => {
+        it("should export CACHE_SIZE_LIMITS with correct structure and values", async ({
+            annotate,
+        }) => {
             await annotate("Component: Backend Constants", "component");
-            await annotate("Operation: Cache Size Limits Validation", "operation");
-            await annotate("Expected Values: 50 config, 100 validation", "expected");
+            await annotate(
+                "Operation: Cache Size Limits Validation",
+                "operation"
+            );
+            await annotate(
+                "Expected Values: 50 config, 100 validation",
+                "expected"
+            );
             await annotate("Priority: Medium - Memory Management", "priority");
 
             expect(CACHE_SIZE_LIMITS).toBeDefined();
             expect(typeof CACHE_SIZE_LIMITS).toBe("object");
             expect(CACHE_SIZE_LIMITS.CONFIGURATION_VALUES).toBe(50);
             expect(CACHE_SIZE_LIMITS.VALIDATION_RESULTS).toBe(100);
-            
+
             // Verify object is frozen
             expect(Object.isFrozen(CACHE_SIZE_LIMITS)).toBe(true);
         });
 
         it("should have reasonable cache TTL values", async ({ annotate }) => {
-            await annotate("Test Case: Cache TTL Range Validation", "test-case");
+            await annotate(
+                "Test Case: Cache TTL Range Validation",
+                "test-case"
+            );
             await annotate("Valid Range: TTLs should be > 0", "range");
-            await annotate("Performance Impact: High - Affects Cache Efficiency", "performance");
+            await annotate(
+                "Performance Impact: High - Affects Cache Efficiency",
+                "performance"
+            );
 
             // All TTL values should be positive
             expect(CACHE_TTL.CONFIGURATION_VALUES).toBeGreaterThan(0);
             expect(CACHE_TTL.VALIDATION_RESULTS).toBeGreaterThan(0);
-            
+
             // Configuration TTL should be longer than validation TTL (more stable data)
-            expect(CACHE_TTL.CONFIGURATION_VALUES).toBeGreaterThan(CACHE_TTL.VALIDATION_RESULTS);
+            expect(CACHE_TTL.CONFIGURATION_VALUES).toBeGreaterThan(
+                CACHE_TTL.VALIDATION_RESULTS
+            );
         });
 
         it("should have reasonable cache size limits", async ({ annotate }) => {
-            await annotate("Test Case: Cache Size Range Validation", "test-case");
+            await annotate(
+                "Test Case: Cache Size Range Validation",
+                "test-case"
+            );
             await annotate("Valid Range: Sizes should be > 0", "range");
-            await annotate("Memory Impact: Medium - Affects Memory Usage", "memory");
+            await annotate(
+                "Memory Impact: Medium - Affects Memory Usage",
+                "memory"
+            );
 
             // All size limits should be positive
             expect(CACHE_SIZE_LIMITS.CONFIGURATION_VALUES).toBeGreaterThan(0);
             expect(CACHE_SIZE_LIMITS.VALIDATION_RESULTS).toBeGreaterThan(0);
-            
+
             // Size limits should be reasonable (not too large)
-            expect(CACHE_SIZE_LIMITS.CONFIGURATION_VALUES).toBeLessThanOrEqual(1000);
-            expect(CACHE_SIZE_LIMITS.VALIDATION_RESULTS).toBeLessThanOrEqual(1000);
+            expect(CACHE_SIZE_LIMITS.CONFIGURATION_VALUES).toBeLessThanOrEqual(
+                1000
+            );
+            expect(CACHE_SIZE_LIMITS.VALIDATION_RESULTS).toBeLessThanOrEqual(
+                1000
+            );
         });
     });
 
     describe("Database Configuration", () => {
-        it("should export DB_FILE_NAME with correct value", async ({ annotate }) => {
+        it("should export DB_FILE_NAME with correct value", async ({
+            annotate,
+        }) => {
             await annotate("Component: Backend Constants", "component");
-            await annotate("Operation: Database File Name Validation", "operation");
+            await annotate(
+                "Operation: Database File Name Validation",
+                "operation"
+            );
             await annotate("Expected Value: uptime-watcher.sqlite", "expected");
             await annotate("Priority: High - Core Data Storage", "priority");
 
@@ -208,10 +292,18 @@ describe("Electron Constants", () => {
             expect(DB_FILE_NAME.length).toBeGreaterThan(0);
         });
 
-        it("should export BACKUP_DB_FILE_NAME with correct value", async ({ annotate }) => {
+        it("should export BACKUP_DB_FILE_NAME with correct value", async ({
+            annotate,
+        }) => {
             await annotate("Component: Backend Constants", "component");
-            await annotate("Operation: Backup Database File Name Validation", "operation");
-            await annotate("Expected Value: uptime-watcher-backup.sqlite", "expected");
+            await annotate(
+                "Operation: Backup Database File Name Validation",
+                "operation"
+            );
+            await annotate(
+                "Expected Value: uptime-watcher-backup.sqlite",
+                "expected"
+            );
             await annotate("Priority: Medium - Data Backup", "priority");
 
             expect(BACKUP_DB_FILE_NAME).toBe("uptime-watcher-backup.sqlite");
@@ -219,17 +311,30 @@ describe("Electron Constants", () => {
             expect(BACKUP_DB_FILE_NAME.length).toBeGreaterThan(0);
         });
 
-        it("should have valid database file extensions", async ({ annotate }) => {
-            await annotate("Test Case: Database File Extension Validation", "test-case");
+        it("should have valid database file extensions", async ({
+            annotate,
+        }) => {
+            await annotate(
+                "Test Case: Database File Extension Validation",
+                "test-case"
+            );
             await annotate("Expected Extension: .sqlite", "extension");
-            await annotate("Standard Compliance: SQLite File Convention", "compliance");
+            await annotate(
+                "Standard Compliance: SQLite File Convention",
+                "compliance"
+            );
 
             expect(DB_FILE_NAME.endsWith(".sqlite")).toBe(true);
             expect(BACKUP_DB_FILE_NAME.endsWith(".sqlite")).toBe(true);
         });
 
-        it("should have different main and backup database file names", async ({ annotate }) => {
-            await annotate("Test Case: Database File Name Uniqueness", "test-case");
+        it("should have different main and backup database file names", async ({
+            annotate,
+        }) => {
+            await annotate(
+                "Test Case: Database File Name Uniqueness",
+                "test-case"
+            );
             await annotate("Purpose: Prevent File Conflicts", "purpose");
             await annotate("Risk: Data Loss Prevention", "risk");
 
@@ -238,9 +343,14 @@ describe("Electron Constants", () => {
     });
 
     describe("Site Configuration", () => {
-        it("should export DEFAULT_SITE_NAME with correct value", async ({ annotate }) => {
+        it("should export DEFAULT_SITE_NAME with correct value", async ({
+            annotate,
+        }) => {
             await annotate("Component: Backend Constants", "component");
-            await annotate("Operation: Default Site Name Validation", "operation");
+            await annotate(
+                "Operation: Default Site Name Validation",
+                "operation"
+            );
             await annotate("Expected Value: Unnamed Site", "expected");
             await annotate("Priority: Low - UI Fallback", "priority");
 
@@ -249,7 +359,9 @@ describe("Electron Constants", () => {
             expect(DEFAULT_SITE_NAME.length).toBeGreaterThan(0);
         });
 
-        it("should have a user-friendly default site name", async ({ annotate }) => {
+        it("should have a user-friendly default site name", async ({
+            annotate,
+        }) => {
             await annotate("Test Case: Site Name User Experience", "test-case");
             await annotate("UX Requirement: Clear Fallback Label", "ux");
             await annotate("User Impact: Medium - UI Clarity", "impact");
@@ -257,14 +369,16 @@ describe("Electron Constants", () => {
             // Should not be empty or just whitespace
             expect(DEFAULT_SITE_NAME.trim()).toBe(DEFAULT_SITE_NAME);
             expect(DEFAULT_SITE_NAME.trim().length).toBeGreaterThan(0);
-            
+
             // Should be human-readable (contains letter characters)
             expect(DEFAULT_SITE_NAME).toMatch(/[A-Za-z]/);
         });
     });
 
     describe("Constant Types", () => {
-        it("should ensure all exported constants are primitives or readonly objects", async ({ annotate }) => {
+        it("should ensure all exported constants are primitives or readonly objects", async ({
+            annotate,
+        }) => {
             await annotate("Component: Type System", "component");
             await annotate("Operation: Type Validation", "operation");
             await annotate("Purpose: Ensure constant immutability", "purpose");
@@ -293,7 +407,9 @@ describe("Electron Constants", () => {
     });
 
     describe("Constants Integration", () => {
-        it("should have timeout less than check interval", async ({ annotate }) => {
+        it("should have timeout less than check interval", async ({
+            annotate,
+        }) => {
             await annotate("Component: Integration Validation", "component");
             await annotate("Rule: Timeout < Check Interval", "rule");
             await annotate("Purpose: Prevent timeout conflicts", "purpose");
@@ -304,10 +420,15 @@ describe("Electron Constants", () => {
             );
         });
 
-        it("should have max retry delay less than request timeout", async ({ annotate }) => {
+        it("should have max retry delay less than request timeout", async ({
+            annotate,
+        }) => {
             await annotate("Component: Integration Validation", "component");
             await annotate("Rule: Max Retry Delay < Request Timeout", "rule");
-            await annotate("Purpose: Ensure retry fits within timeout", "purpose");
+            await annotate(
+                "Purpose: Ensure retry fits within timeout",
+                "purpose"
+            );
 
             // Max retry delay should be less than total request timeout
             expect(RETRY_BACKOFF.MAX_DELAY).toBeLessThan(

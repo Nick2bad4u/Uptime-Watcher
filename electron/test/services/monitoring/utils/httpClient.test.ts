@@ -43,11 +43,15 @@ describe("HTTP Client Utils", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockAxiosCreate.mockReturnValue(mockAxiosInstance);
-        });
+    });
     describe("createHttpClient", () => {
-        it("should create axios instance with default config", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: types", "component");
-            
+        it("should create axios instance with default config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+
             // Arrange
             const config: MonitorConfig = {
                 userAgent: "test-agent",
@@ -71,10 +75,15 @@ describe("HTTP Client Utils", () => {
                 responseType: "text",
                 timeout: 5000,
                 validateStatus: expect.any(Function),
-        });        });
-        it("should create axios instance with minimal config", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: types", "component");
-            
+            });
+        });
+        it("should create axios instance with minimal config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+
             // Arrange
             const config: MonitorConfig = {};
 
@@ -92,10 +101,15 @@ describe("HTTP Client Utils", () => {
                 maxRedirects: 5,
                 responseType: "text",
                 validateStatus: expect.any(Function),
-        });        });
-        it("should configure validateStatus to always return true", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: types", "component");
-            
+            });
+        });
+        it("should configure validateStatus to always return true", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+
             // Arrange
             const config: MonitorConfig = {
                 timeout: 5000,
@@ -113,8 +127,9 @@ describe("HTTP Client Utils", () => {
             expect(axiosConfig?.validateStatus!(500)).toBe(true);
         });
         it("should setup timing interceptors", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: types", "component");
-            
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+
             // Arrange
             const config: MonitorConfig = {
                 timeout: 5000,
@@ -130,11 +145,16 @@ describe("HTTP Client Utils", () => {
             expect(
                 mockAxiosInstance.interceptors.response.use
             ).toHaveBeenCalled();
-        });        });
+        });
+    });
     describe("setupTimingInterceptors", () => {
-        it("should setup request and response interceptors", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: types", "component");
-            
+        it("should setup request and response interceptors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+
             // Arrange
             const mockInstance = {
                 interceptors: {
@@ -160,9 +180,13 @@ describe("HTTP Client Utils", () => {
                 expect.any(Function)
             );
         });
-        it("should add start time metadata to request config", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: types", "component");
-            
+        it("should add start time metadata to request config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+
             // Arrange
             const mockInstance = {
                 interceptors: {
@@ -192,10 +216,15 @@ describe("HTTP Client Utils", () => {
                 metadata: {
                     startTime: 1_234_567_890,
                 },
-        });        });
-        it("should calculate response time for successful response", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: types", "component");
-            
+            });
+        });
+        it("should calculate response time for successful response", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+
             // Arrange
             const mockInstance = {
                 interceptors: {
@@ -232,9 +261,13 @@ describe("HTTP Client Utils", () => {
             // Assert
             expect(result.responseTime).toBe(500); // 1500 - 1000
         });
-        it("should not calculate response time if no start time", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: types", "component");
-            
+        it("should not calculate response time if no start time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+
             // Arrange
             const mockInstance = {
                 interceptors: {
@@ -346,4 +379,6 @@ describe("HTTP Client Utils", () => {
 
             // The error should have been modified with response time
             expect(error.responseTime).toBe(750); // 1750 - 1000
-        });        });        });
+        });
+    });
+});

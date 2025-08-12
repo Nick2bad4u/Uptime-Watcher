@@ -1,9 +1,9 @@
 /**
  * Test suite for MonitorManager
- * 
+ *
  * @fileoverview Comprehensive tests for monitoring service management
  * in the Uptime Watcher application.
- * 
+ *
  * @author GitHub Copilot
  * @since 2025-08-11
  * @category Monitoring
@@ -54,9 +54,18 @@ describe("MonitorManager", () => {
         await annotate("Test Type: Unit - Constructor", "test-type");
         await annotate("Operation: Manager Instantiation", "operation");
         await annotate("Priority: Critical - Object Creation", "priority");
-        await annotate("Complexity: Low - Basic Constructor Test", "complexity");
-        await annotate("Dependencies: Database, event emitter, services", "dependencies");
-        await annotate("Purpose: Ensure MonitorManager can be instantiated properly", "purpose");
+        await annotate(
+            "Complexity: Low - Basic Constructor Test",
+            "complexity"
+        );
+        await annotate(
+            "Dependencies: Database, event emitter, services",
+            "dependencies"
+        );
+        await annotate(
+            "Purpose: Ensure MonitorManager can be instantiated properly",
+            "purpose"
+        );
 
         expect(manager).toBeDefined();
     });
@@ -64,11 +73,20 @@ describe("MonitorManager", () => {
     it("should get active monitor count (default 0)", async ({ annotate }) => {
         await annotate("Component: MonitorManager", "component");
         await annotate("Test Type: Unit - State Query", "test-type");
-        await annotate("Operation: Active Monitor Count Retrieval", "operation");
+        await annotate(
+            "Operation: Active Monitor Count Retrieval",
+            "operation"
+        );
         await annotate("Priority: Medium - Status Monitoring", "priority");
         await annotate("Complexity: Low - Simple State Query", "complexity");
-        await annotate("Initial State: No active monitors at startup", "initial-state");
-        await annotate("Purpose: Validate initial active monitor count is zero", "purpose");
+        await annotate(
+            "Initial State: No active monitors at startup",
+            "initial-state"
+        );
+        await annotate(
+            "Purpose: Validate initial active monitor count is zero",
+            "purpose"
+        );
 
         expect(manager.getActiveMonitorCount()).toBe(0);
     });
@@ -76,23 +94,50 @@ describe("MonitorManager", () => {
     it("should return false for isMonitoringActive()", async ({ annotate }) => {
         await annotate("Component: MonitorManager", "component");
         await annotate("Test Type: Unit - State Query", "test-type");
-        await annotate("Operation: Monitoring Active Status Check", "operation");
+        await annotate(
+            "Operation: Monitoring Active Status Check",
+            "operation"
+        );
         await annotate("Priority: Medium - Status Monitoring", "priority");
         await annotate("Complexity: Low - Boolean State Check", "complexity");
-        await annotate("Initial State: Monitoring is inactive at startup", "initial-state");
-        await annotate("Purpose: Validate monitoring is inactive by default", "purpose");
+        await annotate(
+            "Initial State: Monitoring is inactive at startup",
+            "initial-state"
+        );
+        await annotate(
+            "Purpose: Validate monitoring is inactive by default",
+            "purpose"
+        );
 
         expect(manager.isMonitoringActive()).toBe(false);
     });
 
     it("should call checkSiteManually and emit event", async ({ annotate }) => {
         await annotate("Component: MonitorManager", "component");
-        await annotate("Test Type: Integration - Manual Check Flow", "test-type");
-        await annotate("Operation: Manual Site Check with Event Emission", "operation");
-        await annotate("Priority: Critical - Core Monitoring Functionality", "priority");
-        await annotate("Complexity: High - Multi-Service Integration", "complexity");
-        await annotate("Event Flow: Check monitor -> emit status update event", "event-flow");
-        await annotate("Purpose: Validate manual site checking triggers proper event flow", "purpose");
+        await annotate(
+            "Test Type: Integration - Manual Check Flow",
+            "test-type"
+        );
+        await annotate(
+            "Operation: Manual Site Check with Event Emission",
+            "operation"
+        );
+        await annotate(
+            "Priority: Critical - Core Monitoring Functionality",
+            "priority"
+        );
+        await annotate(
+            "Complexity: High - Multi-Service Integration",
+            "complexity"
+        );
+        await annotate(
+            "Event Flow: Check monitor -> emit status update event",
+            "event-flow"
+        );
+        await annotate(
+            "Purpose: Validate manual site checking triggers proper event flow",
+            "purpose"
+        );
 
         const mockSite = {
             identifier: "site-1",

@@ -32,11 +32,19 @@ describe("Electron Types", () => {
     });
 
     describe("Monitor Interface", () => {
-        it("should validate a complete HTTP monitor object", async ({ annotate }) => {
+        it("should validate a complete HTTP monitor object", async ({
+            annotate,
+        }) => {
             await annotate("Component: Monitor Interface", "component");
-            await annotate("Test Type: Unit - Structure Validation", "test-type");
+            await annotate(
+                "Test Type: Unit - Structure Validation",
+                "test-type"
+            );
             await annotate("Operation: HTTP Monitor Validation", "operation");
-            await annotate("Priority: Critical - Core Data Structure", "priority");
+            await annotate(
+                "Priority: Critical - Core Data Structure",
+                "priority"
+            );
             await annotate("Complexity: Medium - Complex Object", "complexity");
             await annotate("Monitor Type: HTTP", "monitor-type");
 
@@ -61,11 +69,19 @@ describe("Electron Types", () => {
             expect(monitor.history).toEqual([]);
         });
 
-        it("should validate a complete port monitor object", async ({ annotate }) => {
+        it("should validate a complete port monitor object", async ({
+            annotate,
+        }) => {
             await annotate("Component: Monitor Interface", "component");
-            await annotate("Test Type: Unit - Structure Validation", "test-type");
+            await annotate(
+                "Test Type: Unit - Structure Validation",
+                "test-type"
+            );
             await annotate("Operation: Port Monitor Validation", "operation");
-            await annotate("Priority: Critical - Core Data Structure", "priority");
+            await annotate(
+                "Priority: Critical - Core Data Structure",
+                "priority"
+            );
             await annotate("Complexity: Medium - Complex Object", "complexity");
             await annotate("Monitor Type: Port", "monitor-type");
 
@@ -94,7 +110,10 @@ describe("Electron Types", () => {
         it("should validate minimal monitor object", async ({ annotate }) => {
             await annotate("Component: Monitor Interface", "component");
             await annotate("Test Type: Unit - Minimal Structure", "test-type");
-            await annotate("Operation: Minimal Monitor Validation", "operation");
+            await annotate(
+                "Operation: Minimal Monitor Validation",
+                "operation"
+            );
             await annotate("Priority: High - Edge Case Handling", "priority");
             await annotate("Complexity: Low - Minimal Object", "complexity");
             await annotate("Purpose: Test required fields only", "purpose");
@@ -123,8 +142,14 @@ describe("Electron Types", () => {
             await annotate("Operation: Status Value Validation", "operation");
             await annotate("Priority: Critical - Status Accuracy", "priority");
             await annotate("Complexity: Low - Simple Enum Check", "complexity");
-            await annotate("Valid Status Values: up, down, pending", "valid-values");
-            await annotate("Purpose: Ensure only valid status values are accepted", "purpose");
+            await annotate(
+                "Valid Status Values: up, down, pending",
+                "valid-values"
+            );
+            await annotate(
+                "Purpose: Ensure only valid status values are accepted",
+                "purpose"
+            );
 
             const validStatuses = ["up", "down", "pending"];
 
@@ -149,12 +174,30 @@ describe("Electron Types", () => {
     describe("Site Interface", () => {
         it("should validate a complete site object", async ({ annotate }) => {
             await annotate("Component: Site Interface", "component");
-            await annotate("Test Type: Unit - Structure Validation", "test-type");
-            await annotate("Operation: Complete Site Object Validation", "operation");
-            await annotate("Priority: Critical - Core Data Structure", "priority");
-            await annotate("Complexity: Medium - Complex Nested Object", "complexity");
-            await annotate("Contains: Site metadata and nested monitors", "contains");
-            await annotate("Purpose: Validate site with associated monitors", "purpose");
+            await annotate(
+                "Test Type: Unit - Structure Validation",
+                "test-type"
+            );
+            await annotate(
+                "Operation: Complete Site Object Validation",
+                "operation"
+            );
+            await annotate(
+                "Priority: Critical - Core Data Structure",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Medium - Complex Nested Object",
+                "complexity"
+            );
+            await annotate(
+                "Contains: Site metadata and nested monitors",
+                "contains"
+            );
+            await annotate(
+                "Purpose: Validate site with associated monitors",
+                "purpose"
+            );
 
             const site: Site = {
                 identifier: "test-site-789",
@@ -198,11 +241,20 @@ describe("Electron Types", () => {
         it("should validate minimal site object", async ({ annotate }) => {
             await annotate("Component: Site Interface", "component");
             await annotate("Test Type: Unit - Minimal Structure", "test-type");
-            await annotate("Operation: Minimal Site Object Validation", "operation");
+            await annotate(
+                "Operation: Minimal Site Object Validation",
+                "operation"
+            );
             await annotate("Priority: High - Edge Case Handling", "priority");
-            await annotate("Complexity: Low - Simple Required Fields", "complexity");
+            await annotate(
+                "Complexity: Low - Simple Required Fields",
+                "complexity"
+            );
             await annotate("Contains: Required fields only", "contains");
-            await annotate("Purpose: Test minimum viable site object", "purpose");
+            await annotate(
+                "Purpose: Test minimum viable site object",
+                "purpose"
+            );
 
             const site: Site = {
                 identifier: "minimal-site",
@@ -215,14 +267,25 @@ describe("Electron Types", () => {
             expect(site.monitors).toEqual([]);
         });
 
-        it("should allow site with empty monitors array", async ({ annotate }) => {
+        it("should allow site with empty monitors array", async ({
+            annotate,
+        }) => {
             await annotate("Component: Site Interface", "component");
             await annotate("Test Type: Unit - Empty Collection", "test-type");
-            await annotate("Operation: Empty Monitors Array Validation", "operation");
+            await annotate(
+                "Operation: Empty Monitors Array Validation",
+                "operation"
+            );
             await annotate("Priority: Medium - Edge Case Handling", "priority");
-            await annotate("Complexity: Low - Simple Array Check", "complexity");
+            await annotate(
+                "Complexity: Low - Simple Array Check",
+                "complexity"
+            );
             await annotate("Edge Case: Site without any monitors", "edge-case");
-            await annotate("Purpose: Ensure sites can exist without monitors", "purpose");
+            await annotate(
+                "Purpose: Ensure sites can exist without monitors",
+                "purpose"
+            );
 
             const site: Site = {
                 identifier: "empty-monitors-site",
@@ -239,12 +302,30 @@ describe("Electron Types", () => {
     describe("StatusHistory Interface", () => {
         it("should validate status history object", async ({ annotate }) => {
             await annotate("Component: StatusHistory Interface", "component");
-            await annotate("Test Type: Unit - Structure Validation", "test-type");
-            await annotate("Operation: Complete Status History Validation", "operation");
-            await annotate("Priority: Critical - Historical Data Integrity", "priority");
-            await annotate("Complexity: Low - Simple Data Structure", "complexity");
-            await annotate("Contains: Timestamp, status, response time, details", "contains");
-            await annotate("Purpose: Validate historical monitoring data structure", "purpose");
+            await annotate(
+                "Test Type: Unit - Structure Validation",
+                "test-type"
+            );
+            await annotate(
+                "Operation: Complete Status History Validation",
+                "operation"
+            );
+            await annotate(
+                "Priority: Critical - Historical Data Integrity",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Low - Simple Data Structure",
+                "complexity"
+            );
+            await annotate(
+                "Contains: Timestamp, status, response time, details",
+                "contains"
+            );
+            await annotate(
+                "Purpose: Validate historical monitoring data structure",
+                "purpose"
+            );
 
             const history: StatusHistory = {
                 timestamp: 1_640_995_200_000, // 2022-01-01
@@ -259,14 +340,22 @@ describe("Electron Types", () => {
             expect(history.details).toBe("OK - 200 response");
         });
 
-        it("should validate minimal status history object", async ({ annotate }) => {
+        it("should validate minimal status history object", async ({
+            annotate,
+        }) => {
             await annotate("Component: StatusHistory Interface", "component");
             await annotate("Test Type: Unit - Minimal Structure", "test-type");
-            await annotate("Operation: Minimal History Object Validation", "operation");
+            await annotate(
+                "Operation: Minimal History Object Validation",
+                "operation"
+            );
             await annotate("Priority: High - Required Fields Only", "priority");
             await annotate("Complexity: Low - Essential Fields", "complexity");
             await annotate("Contains: Core monitoring data only", "contains");
-            await annotate("Purpose: Test minimum required historical data", "purpose");
+            await annotate(
+                "Purpose: Test minimum required historical data",
+                "purpose"
+            );
 
             const history: StatusHistory = {
                 timestamp: Date.now(),
@@ -279,14 +368,22 @@ describe("Electron Types", () => {
             expect(history.responseTime).toBe(0);
         });
 
-        it("should validate status history status values", async ({ annotate }) => {
+        it("should validate status history status values", async ({
+            annotate,
+        }) => {
             await annotate("Component: StatusHistory Interface", "component");
             await annotate("Test Type: Unit - Enum Validation", "test-type");
-            await annotate("Operation: History Status Values Validation", "operation");
+            await annotate(
+                "Operation: History Status Values Validation",
+                "operation"
+            );
             await annotate("Priority: Critical - Data Consistency", "priority");
             await annotate("Complexity: Low - Status Enum Check", "complexity");
             await annotate("Valid Status Values: up, down", "valid-values");
-            await annotate("Purpose: Ensure historical status consistency", "purpose");
+            await annotate(
+                "Purpose: Ensure historical status consistency",
+                "purpose"
+            );
 
             const validStatuses = ["up", "down"];
 
@@ -305,12 +402,27 @@ describe("Electron Types", () => {
     describe("StatusUpdate Interface", () => {
         it("should validate status update object", async ({ annotate }) => {
             await annotate("Component: StatusUpdate Interface", "component");
-            await annotate("Test Type: Unit - Structure Validation", "test-type");
+            await annotate(
+                "Test Type: Unit - Structure Validation",
+                "test-type"
+            );
             await annotate("Operation: Status Update Validation", "operation");
-            await annotate("Priority: Critical - Event Data Structure", "priority");
-            await annotate("Complexity: Medium - Complex Event Object", "complexity");
-            await annotate("Contains: Site, status change, timestamp", "contains");
-            await annotate("Purpose: Validate status change notification structure", "purpose");
+            await annotate(
+                "Priority: Critical - Event Data Structure",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Medium - Complex Event Object",
+                "complexity"
+            );
+            await annotate(
+                "Contains: Site, status change, timestamp",
+                "contains"
+            );
+            await annotate(
+                "Purpose: Validate status change notification structure",
+                "purpose"
+            );
 
             const update: StatusUpdate = {
                 site: {
@@ -330,14 +442,31 @@ describe("Electron Types", () => {
             expect(update.previousStatus).toBe("down");
         });
 
-        it("should validate status update without previous status", async ({ annotate }) => {
+        it("should validate status update without previous status", async ({
+            annotate,
+        }) => {
             await annotate("Component: StatusUpdate Interface", "component");
             await annotate("Test Type: Unit - Optional Field", "test-type");
-            await annotate("Operation: New Status Update Validation", "operation");
-            await annotate("Priority: High - Initial Status Handling", "priority");
-            await annotate("Complexity: Medium - Optional Field Logic", "complexity");
-            await annotate("Edge Case: First status update for new sites", "edge-case");
-            await annotate("Purpose: Handle initial status updates without history", "purpose");
+            await annotate(
+                "Operation: New Status Update Validation",
+                "operation"
+            );
+            await annotate(
+                "Priority: High - Initial Status Handling",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Medium - Optional Field Logic",
+                "complexity"
+            );
+            await annotate(
+                "Edge Case: First status update for new sites",
+                "edge-case"
+            );
+            await annotate(
+                "Purpose: Handle initial status updates without history",
+                "purpose"
+            );
 
             const update: StatusUpdate = {
                 site: {
@@ -358,14 +487,28 @@ describe("Electron Types", () => {
     });
 
     describe("Type Relationships", () => {
-        it("should ensure monitor types are consistent with their properties", async ({ annotate }) => {
+        it("should ensure monitor types are consistent with their properties", async ({
+            annotate,
+        }) => {
             await annotate("Component: Type System", "component");
             await annotate("Test Type: Unit - Type Consistency", "test-type");
-            await annotate("Operation: Monitor Type Property Validation", "operation");
+            await annotate(
+                "Operation: Monitor Type Property Validation",
+                "operation"
+            );
             await annotate("Priority: Critical - Type Safety", "priority");
-            await annotate("Complexity: Medium - Type Relationship Validation", "complexity");
-            await annotate("Rule: HTTP monitors must have URL property", "rule");
-            await annotate("Purpose: Ensure type-specific properties are enforced", "purpose");
+            await annotate(
+                "Complexity: Medium - Type Relationship Validation",
+                "complexity"
+            );
+            await annotate(
+                "Rule: HTTP monitors must have URL property",
+                "rule"
+            );
+            await annotate(
+                "Purpose: Ensure type-specific properties are enforced",
+                "purpose"
+            );
 
             // HTTP monitor should have URL
             const httpMonitor: Monitor = {
@@ -404,14 +547,28 @@ describe("Electron Types", () => {
             expect(portMonitor.port).toBeDefined();
         });
 
-        it("should ensure site contains valid monitors", async ({ annotate }) => {
+        it("should ensure site contains valid monitors", async ({
+            annotate,
+        }) => {
             await annotate("Component: Type System", "component");
-            await annotate("Test Type: Unit - Relationship Validation", "test-type");
+            await annotate(
+                "Test Type: Unit - Relationship Validation",
+                "test-type"
+            );
             await annotate("Operation: Site Monitor Validation", "operation");
             await annotate("Priority: Critical - Data Integrity", "priority");
-            await annotate("Complexity: Medium - Collection Validation", "complexity");
-            await annotate("Rule: Sites must contain valid monitor objects", "rule");
-            await annotate("Purpose: Ensure site-monitor relationship consistency", "purpose");
+            await annotate(
+                "Complexity: Medium - Collection Validation",
+                "complexity"
+            );
+            await annotate(
+                "Rule: Sites must contain valid monitor objects",
+                "rule"
+            );
+            await annotate(
+                "Purpose: Ensure site-monitor relationship consistency",
+                "purpose"
+            );
 
             const site: Site = {
                 identifier: "multi-monitor-site",
@@ -451,14 +608,31 @@ describe("Electron Types", () => {
             expect(site.monitors[1]?.type).toBe("port");
         });
 
-        it("should ensure status update contains valid site", async ({ annotate }) => {
+        it("should ensure status update contains valid site", async ({
+            annotate,
+        }) => {
             await annotate("Component: Type System", "component");
             await annotate("Test Type: Unit - Event Relationship", "test-type");
-            await annotate("Operation: Status Update Site Validation", "operation");
-            await annotate("Priority: Critical - Event Data Integrity", "priority");
-            await annotate("Complexity: Medium - Event-Site Relationship", "complexity");
-            await annotate("Rule: Status updates must reference valid sites", "rule");
-            await annotate("Purpose: Ensure status change events contain valid site data", "purpose");
+            await annotate(
+                "Operation: Status Update Site Validation",
+                "operation"
+            );
+            await annotate(
+                "Priority: Critical - Event Data Integrity",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Medium - Event-Site Relationship",
+                "complexity"
+            );
+            await annotate(
+                "Rule: Status updates must reference valid sites",
+                "rule"
+            );
+            await annotate(
+                "Purpose: Ensure status change events contain valid site data",
+                "purpose"
+            );
 
             const site: Site = {
                 identifier: "status-update-site",
@@ -495,13 +669,24 @@ describe("Electron Types", () => {
     });
 
     describe("Type Safety", () => {
-        it("should prevent invalid monitor status values at runtime", async ({ annotate }) => {
+        it("should prevent invalid monitor status values at runtime", async ({
+            annotate,
+        }) => {
             await annotate("Component: Type System", "component");
-            await annotate("Test Type: Unit - Runtime Type Safety", "test-type");
+            await annotate(
+                "Test Type: Unit - Runtime Type Safety",
+                "test-type"
+            );
             await annotate("Operation: Status Value Type Safety", "operation");
             await annotate("Priority: Critical - Runtime Safety", "priority");
-            await annotate("Complexity: Low - Type Assertion Validation", "complexity");
-            await annotate("Safety Check: Prevent invalid status values", "safety-check");
+            await annotate(
+                "Complexity: Low - Type Assertion Validation",
+                "complexity"
+            );
+            await annotate(
+                "Safety Check: Prevent invalid status values",
+                "safety-check"
+            );
             await annotate("Purpose: Ensure type safety at runtime", "purpose");
 
             const createMonitorWithStatus = (status: string) => ({
@@ -517,14 +702,28 @@ describe("Electron Types", () => {
             expect(() => createMonitorWithStatus("pending")).not.toThrow();
         });
 
-        it("should validate timestamp as number in StatusHistory", async ({ annotate }) => {
+        it("should validate timestamp as number in StatusHistory", async ({
+            annotate,
+        }) => {
             await annotate("Component: Type System", "component");
-            await annotate("Test Type: Unit - Data Type Validation", "test-type");
+            await annotate(
+                "Test Type: Unit - Data Type Validation",
+                "test-type"
+            );
             await annotate("Operation: Timestamp Type Validation", "operation");
-            await annotate("Priority: High - Temporal Data Integrity", "priority");
-            await annotate("Complexity: Low - Primitive Type Check", "complexity");
+            await annotate(
+                "Priority: High - Temporal Data Integrity",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Low - Primitive Type Check",
+                "complexity"
+            );
             await annotate("Data Type: Number (Unix timestamp)", "data-type");
-            await annotate("Purpose: Ensure temporal data is stored as numbers", "purpose");
+            await annotate(
+                "Purpose: Ensure temporal data is stored as numbers",
+                "purpose"
+            );
 
             const history: StatusHistory = {
                 timestamp: Date.now(),

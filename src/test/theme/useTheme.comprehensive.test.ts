@@ -1,9 +1,9 @@
 /**
  * Comprehensive tests for theme hooks
- * 
- * @fileoverview Tests for useTheme, useAvailabilityColors, useStatusColors, 
+ *
+ * @fileoverview Tests for useTheme, useAvailabilityColors, useStatusColors,
  * useThemeClasses, and useThemeValue hooks to achieve 100% coverage
- * 
+ *
  * @author GitHub Copilot
  * @since 2025-01-15
  * @category Theme
@@ -11,8 +11,8 @@
  * @tags ["test", "theme", "hooks", "coverage"]
  */
 
-import { act, renderHook } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, renderHook } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
     useAvailabilityColors,
@@ -20,141 +20,155 @@ import {
     useTheme,
     useThemeClasses,
     useThemeValue,
-} from '../../theme/useTheme';
-import { useSettingsStore } from '../../stores/settings/useSettingsStore';
+} from "../../theme/useTheme";
+import { useSettingsStore } from "../../stores/settings/useSettingsStore";
 
 // Mock the settings store
-vi.mock('../../stores/settings/useSettingsStore');
+vi.mock("../../stores/settings/useSettingsStore");
 
 // Mock ThemeManager
 const mockThemeManager = {
     getTheme: vi.fn().mockReturnValue({
-        name: 'light',
+        name: "light",
         isDark: false,
         colors: {
             background: {
-                primary: '#ffffff',
-                secondary: '#f9fafb',
-                tertiary: '#f3f4f6',
-                modal: 'rgba(0, 0, 0, 0.5)',
+                primary: "#ffffff",
+                secondary: "#f9fafb",
+                tertiary: "#f3f4f6",
+                modal: "rgba(0, 0, 0, 0.5)",
             },
             text: {
-                primary: '#111827',
-                secondary: '#6b7280',
-                tertiary: '#9ca3af',
-                inverse: '#ffffff',
+                primary: "#111827",
+                secondary: "#6b7280",
+                tertiary: "#9ca3af",
+                inverse: "#ffffff",
             },
             border: {
-                primary: '#e5e7eb',
-                secondary: '#d1d5db',
-                focus: '#3b82f6',
+                primary: "#e5e7eb",
+                secondary: "#d1d5db",
+                focus: "#3b82f6",
             },
             surface: {
-                base: '#ffffff',
-                elevated: '#ffffff',
-                overlay: '#f9fafb',
+                base: "#ffffff",
+                elevated: "#ffffff",
+                overlay: "#f9fafb",
             },
             status: {
-                up: '#10b981',
-                down: '#ef4444',
-                pending: '#f59e0b',
-                unknown: '#6b7280',
-                mixed: '#8b5cf6',
-                paused: '#6b7280',
+                up: "#10b981",
+                down: "#ef4444",
+                pending: "#f59e0b",
+                unknown: "#6b7280",
+                mixed: "#8b5cf6",
+                paused: "#6b7280",
             },
-            success: '#10b981',
-            warning: '#f59e0b',
-            error: '#ef4444',
-            errorAlert: '#991b1b',
-            info: '#3b82f6',
+            success: "#10b981",
+            warning: "#f59e0b",
+            error: "#ef4444",
+            errorAlert: "#991b1b",
+            info: "#3b82f6",
             primary: {
-                50: '#eff6ff',
-                100: '#dbeafe',
-                200: '#bfdbfe',
-                300: '#93c5fd',
-                400: '#60a5fa',
-                500: '#3b82f6',
-                600: '#2563eb',
-                700: '#1d4ed8',
-                800: '#1e40af',
-                900: '#1e3a8a',
+                50: "#eff6ff",
+                100: "#dbeafe",
+                200: "#bfdbfe",
+                300: "#93c5fd",
+                400: "#60a5fa",
+                500: "#3b82f6",
+                600: "#2563eb",
+                700: "#1d4ed8",
+                800: "#1e40af",
+                900: "#1e3a8a",
             },
             hover: {
-                dark: 'rgba(0, 0, 0, 0.08)',
-                light: 'rgba(0, 0, 0, 0.03)',
-                medium: 'rgba(0, 0, 0, 0.05)',
+                dark: "rgba(0, 0, 0, 0.08)",
+                light: "rgba(0, 0, 0, 0.03)",
+                medium: "rgba(0, 0, 0, 0.05)",
             },
         },
         typography: {
             fontFamily: {
-                mono: ['Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
-                sans: ['Inter', 'system-ui', 'Avenir', 'Helvetica', 'Arial', 'sans-serif'],
+                mono: [
+                    "Menlo",
+                    "Monaco",
+                    "Consolas",
+                    "Liberation Mono",
+                    "Courier New",
+                    "monospace",
+                ],
+                sans: [
+                    "Inter",
+                    "system-ui",
+                    "Avenir",
+                    "Helvetica",
+                    "Arial",
+                    "sans-serif",
+                ],
             },
             fontSize: {
-                xs: '0.75rem',
-                sm: '0.875rem',
-                base: '1rem',
-                lg: '1.125rem',
-                xl: '1.25rem',
-                '2xl': '1.5rem',
-                '3xl': '1.875rem',
-                '4xl': '2.25rem',
+                xs: "0.75rem",
+                sm: "0.875rem",
+                base: "1rem",
+                lg: "1.125rem",
+                xl: "1.25rem",
+                "2xl": "1.5rem",
+                "3xl": "1.875rem",
+                "4xl": "2.25rem",
             },
             fontWeight: {
-                normal: '400',
-                medium: '500',
-                semibold: '600',
-                bold: '700',
+                normal: "400",
+                medium: "500",
+                semibold: "600",
+                bold: "700",
             },
             lineHeight: {
-                tight: '1.25',
-                normal: '1.5',
-                relaxed: '1.75',
+                tight: "1.25",
+                normal: "1.5",
+                relaxed: "1.75",
             },
         },
         spacing: {
-            xs: '0.25rem',
-            sm: '0.5rem',
-            md: '1rem',
-            lg: '1.5rem',
-            xl: '2rem',
-            '2xl': '3rem',
-            '3xl': '4rem',
+            xs: "0.25rem",
+            sm: "0.5rem",
+            md: "1rem",
+            lg: "1.5rem",
+            xl: "2rem",
+            "2xl": "3rem",
+            "3xl": "4rem",
         },
         shadows: {
-            sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-            md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-            lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-            xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-            inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
+            sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+            md: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+            lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+            xl: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+            inner: "inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)",
         },
         borderRadius: {
-            none: '0',
-            sm: '0.125rem',
-            md: '0.375rem',
-            lg: '0.5rem',
-            xl: '0.75rem',
-            full: '9999px',
+            none: "0",
+            sm: "0.125rem",
+            md: "0.375rem",
+            lg: "0.5rem",
+            xl: "0.75rem",
+            full: "9999px",
         },
     }),
     applyTheme: vi.fn(),
-    getAvailableThemes: vi.fn().mockReturnValue(['light', 'dark', 'system']),
+    getAvailableThemes: vi.fn().mockReturnValue(["light", "dark", "system"]),
     onSystemThemeChange: vi.fn().mockImplementation((callback) => {
         // Store the callback so tests can trigger it
         mockThemeManager._systemThemeCallback = callback;
         return () => {}; // Return cleanup function
     }),
-    getSystemThemePreference: vi.fn().mockReturnValue('light'),
+    getSystemThemePreference: vi.fn().mockReturnValue("light"),
     _systemThemeCallback: undefined as ((isDark: boolean) => void) | undefined,
 };
 
-vi.mock('../../theme/ThemeManager', () => ({
+vi.mock("../../theme/ThemeManager", () => ({
     themeManager: mockThemeManager,
 }));
 
 // Mock UI_DELAYS
-vi.mock('../../constants', async (importOriginal) => {
-    const actual = await importOriginal() as Record<string, unknown>;
+vi.mock("../../constants", async (importOriginal) => {
+    const actual = (await importOriginal()) as Record<string, unknown>;
     return {
         ...actual,
         UI_DELAYS: {
@@ -164,49 +178,53 @@ vi.mock('../../constants', async (importOriginal) => {
 });
 
 // Mock site status type guard
-const mockIsSiteStatus = vi.fn((status: string) => 
-    ['up', 'down', 'pending', 'unknown'].includes(status)
+const mockIsSiteStatus = vi.fn((status: string) =>
+    ["up", "down", "pending", "unknown"].includes(status)
 );
 
-vi.mock('../../../shared/utils/typeHelpers', () => ({
+vi.mock("../../../shared/utils/typeHelpers", () => ({
     isSiteStatus: mockIsSiteStatus,
 }));
 
 const mockUpdateSettings = vi.fn();
 const mockUseSettingsStore = vi.mocked(useSettingsStore);
 
-describe('Theme Hooks - Comprehensive Coverage', () => {
+describe("Theme Hooks - Comprehensive Coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockUseSettingsStore.mockReturnValue({
-            settings: { theme: 'light' },
+            settings: { theme: "light" },
             updateSettings: mockUpdateSettings,
         } as any);
     });
 
-    describe('useTheme', () => {
-        it('should initialize with correct default values', () => {
+    describe("useTheme", () => {
+        it("should initialize with correct default values", () => {
             const { result } = renderHook(() => useTheme());
 
-            expect(result.current.themeName).toBe('light');
+            expect(result.current.themeName).toBe("light");
             expect(result.current.isDark).toBe(false);
-            expect(result.current.availableThemes).toEqual(['light', 'dark', 'system']);
-            expect(result.current.currentTheme.name).toBe('light');
-            expect(result.current.systemTheme).toBe('light');
+            expect(result.current.availableThemes).toEqual([
+                "light",
+                "dark",
+                "system",
+            ]);
+            expect(result.current.currentTheme.name).toBe("light");
+            expect(result.current.systemTheme).toBe("light");
             expect(result.current.themeVersion).toBe(1);
         });
 
-        it('should provide setTheme function that updates settings', () => {
+        it("should provide setTheme function that updates settings", () => {
             const { result } = renderHook(() => useTheme());
 
             act(() => {
-                result.current.setTheme('dark');
+                result.current.setTheme("dark");
             });
 
-            expect(mockUpdateSettings).toHaveBeenCalledWith({ theme: 'dark' });
+            expect(mockUpdateSettings).toHaveBeenCalledWith({ theme: "dark" });
         });
 
-        it('should provide toggleTheme function that switches between light and dark', () => {
+        it("should provide toggleTheme function that switches between light and dark", () => {
             const { result } = renderHook(() => useTheme());
 
             // Current theme is light (isDark: false), should toggle to dark
@@ -214,18 +232,23 @@ describe('Theme Hooks - Comprehensive Coverage', () => {
                 result.current.toggleTheme();
             });
 
-            expect(mockUpdateSettings).toHaveBeenCalledWith({ theme: 'dark' });
+            expect(mockUpdateSettings).toHaveBeenCalledWith({ theme: "dark" });
         });
 
-        it('should provide toggleTheme function that switches from dark to light', () => {
+        it("should provide toggleTheme function that switches from dark to light", () => {
             // Mock dark theme
             mockThemeManager.getTheme.mockReturnValue({
-                name: 'dark',
+                name: "dark",
                 isDark: true,
                 colors: {
-                    background: { primary: '#000000' },
-                    text: { primary: '#ffffff', secondary: '#cccccc' },
-                    status: { up: '#10b981', down: '#ef4444', pending: '#f59e0b', unknown: '#6b7280' },
+                    background: { primary: "#000000" },
+                    text: { primary: "#ffffff", secondary: "#cccccc" },
+                    status: {
+                        up: "#10b981",
+                        down: "#ef4444",
+                        pending: "#f59e0b",
+                        unknown: "#6b7280",
+                    },
                 },
             });
 
@@ -236,77 +259,81 @@ describe('Theme Hooks - Comprehensive Coverage', () => {
                 result.current.toggleTheme();
             });
 
-            expect(mockUpdateSettings).toHaveBeenCalledWith({ theme: 'light' });
+            expect(mockUpdateSettings).toHaveBeenCalledWith({ theme: "light" });
         });
 
-        it('should provide getColor function for dot-notation paths', () => {
+        it("should provide getColor function for dot-notation paths", () => {
             const { result } = renderHook(() => useTheme());
 
-            const upColor = result.current.getColor('status.up');
-            expect(upColor).toBe('#10b981');
+            const upColor = result.current.getColor("status.up");
+            expect(upColor).toBe("#10b981");
 
-            const primaryBg = result.current.getColor('background.primary');
-            expect(primaryBg).toBe('#ffffff');
+            const primaryBg = result.current.getColor("background.primary");
+            expect(primaryBg).toBe("#ffffff");
 
-            const textColor = result.current.getColor('text.primary');
-            expect(textColor).toBe('#111827');
+            const textColor = result.current.getColor("text.primary");
+            expect(textColor).toBe("#111827");
         });
 
-        it('should return fallback color for invalid paths in getColor', () => {
+        it("should return fallback color for invalid paths in getColor", () => {
             const { result } = renderHook(() => useTheme());
 
-            const invalidColor = result.current.getColor('invalid.path');
-            expect(invalidColor).toBe('#111827'); // Falls back to text.primary
+            const invalidColor = result.current.getColor("invalid.path");
+            expect(invalidColor).toBe("#111827"); // Falls back to text.primary
 
-            const emptyPath = result.current.getColor('');
-            expect(emptyPath).toBe('#000000');
+            const emptyPath = result.current.getColor("");
+            expect(emptyPath).toBe("#000000");
 
-            const nullPath = result.current.getColor('status.nonexistent');
-            expect(nullPath).toBe('#000000');
+            const nullPath = result.current.getColor("status.nonexistent");
+            expect(nullPath).toBe("#000000");
         });
 
-        it('should provide getStatusColor function for valid statuses', () => {
+        it("should provide getStatusColor function for valid statuses", () => {
             const { result } = renderHook(() => useTheme());
 
-            expect(result.current.getStatusColor('up')).toBe('#10b981');
-            expect(result.current.getStatusColor('down')).toBe('#ef4444');
-            expect(result.current.getStatusColor('pending')).toBe('#f59e0b');
-            expect(result.current.getStatusColor('unknown')).toBe('#6b7280');
+            expect(result.current.getStatusColor("up")).toBe("#10b981");
+            expect(result.current.getStatusColor("down")).toBe("#ef4444");
+            expect(result.current.getStatusColor("pending")).toBe("#f59e0b");
+            expect(result.current.getStatusColor("unknown")).toBe("#6b7280");
         });
 
-        it('should return fallback color for invalid status in getStatusColor', () => {
+        it("should return fallback color for invalid status in getStatusColor", () => {
             mockIsSiteStatus.mockReturnValue(false);
 
             const { result } = renderHook(() => useTheme());
 
-            const invalidStatus = result.current.getStatusColor('invalid' as any);
-            expect(invalidStatus).toBe('#6b7280'); // Falls back to text.secondary
+            const invalidStatus = result.current.getStatusColor(
+                "invalid" as any
+            );
+            expect(invalidStatus).toBe("#6b7280"); // Falls back to text.secondary
         });
 
-        it('should update theme when settings change', async () => {
+        it("should update theme when settings change", async () => {
             const { rerender } = renderHook(() => useTheme());
 
             // Change settings
             mockUseSettingsStore.mockReturnValue({
-                settings: { theme: 'dark' },
+                settings: { theme: "dark" },
                 updateSettings: mockUpdateSettings,
             } as any);
 
             rerender();
             // Wait for timeout to complete
-            await new Promise(resolve => setTimeout(resolve, 1));
+            await new Promise((resolve) => setTimeout(resolve, 1));
 
             // The theme should have been applied
             expect(mockThemeManager.applyTheme).toHaveBeenCalled();
         });
 
-        it('should handle system theme changes', () => {
+        it("should handle system theme changes", () => {
             let systemThemeChangeCallback: (isDark: boolean) => void;
-            
-            mockThemeManager.onSystemThemeChange.mockImplementation((callback: (isDark: boolean) => void) => {
-                systemThemeChangeCallback = callback;
-                return () => {}; // cleanup function
-            });
+
+            mockThemeManager.onSystemThemeChange.mockImplementation(
+                (callback: (isDark: boolean) => void) => {
+                    systemThemeChangeCallback = callback;
+                    return () => {}; // cleanup function
+                }
+            );
 
             const { result } = renderHook(() => useTheme());
 
@@ -316,11 +343,11 @@ describe('Theme Hooks - Comprehensive Coverage', () => {
             });
 
             // Should update system theme
-            expect(result.current.systemTheme).toBe('light'); // Initial value, will update after timeout
+            expect(result.current.systemTheme).toBe("light"); // Initial value, will update after timeout
         });
 
-        it('should cleanup timeouts on unmount', () => {
-            const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
+        it("should cleanup timeouts on unmount", () => {
+            const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
             const { unmount } = renderHook(() => useTheme());
 
             unmount();
@@ -329,247 +356,267 @@ describe('Theme Hooks - Comprehensive Coverage', () => {
             clearTimeoutSpy.mockRestore();
         });
 
-        it('should provide themeManager instance', () => {
+        it("should provide themeManager instance", () => {
             const { result } = renderHook(() => useTheme());
 
             expect(result.current.themeManager).toBeDefined();
-            expect(result.current.themeManager.getAvailableThemes).toBeDefined();
+            expect(
+                result.current.themeManager.getAvailableThemes
+            ).toBeDefined();
         });
 
-        it('should increment themeVersion when theme updates', async () => {
+        it("should increment themeVersion when theme updates", async () => {
             const { result, rerender } = renderHook(() => useTheme());
             const initialVersion = result.current.themeVersion;
 
             // Change settings to trigger theme update
             mockUseSettingsStore.mockReturnValue({
-                settings: { theme: 'dark' },
+                settings: { theme: "dark" },
                 updateSettings: mockUpdateSettings,
             } as any);
 
             rerender();
-            await new Promise(resolve => setTimeout(resolve, 1));
+            await new Promise((resolve) => setTimeout(resolve, 1));
 
             // Version should have incremented
             expect(result.current.themeVersion).toBe(initialVersion + 1);
         });
     });
 
-    describe('useAvailabilityColors', () => {
-        it('should return correct colors for different availability percentages', () => {
+    describe("useAvailabilityColors", () => {
+        it("should return correct colors for different availability percentages", () => {
             const { result } = renderHook(() => useAvailabilityColors());
 
             // Excellent (>= 99.9%)
-            expect(result.current.getAvailabilityColor(100)).toBe('#10b981');
-            expect(result.current.getAvailabilityColor(99.9)).toBe('#10b981');
+            expect(result.current.getAvailabilityColor(100)).toBe("#10b981");
+            expect(result.current.getAvailabilityColor(99.9)).toBe("#10b981");
 
             // Very Good (>= 99%)
-            expect(result.current.getAvailabilityColor(99.5)).toBe('#10b981');
-            expect(result.current.getAvailabilityColor(99)).toBe('#10b981');
+            expect(result.current.getAvailabilityColor(99.5)).toBe("#10b981");
+            expect(result.current.getAvailabilityColor(99)).toBe("#10b981");
 
             // Good (>= 95%)
-            expect(result.current.getAvailabilityColor(98)).toBe('#10b981');
-            expect(result.current.getAvailabilityColor(95)).toBe('#10b981');
+            expect(result.current.getAvailabilityColor(98)).toBe("#10b981");
+            expect(result.current.getAvailabilityColor(95)).toBe("#10b981");
 
             // Fair (>= 90%)
-            expect(result.current.getAvailabilityColor(92)).toBe('#f59e0b');
-            expect(result.current.getAvailabilityColor(90)).toBe('#f59e0b');
+            expect(result.current.getAvailabilityColor(92)).toBe("#f59e0b");
+            expect(result.current.getAvailabilityColor(90)).toBe("#f59e0b");
 
             // Poor (>= 80%)
-            expect(result.current.getAvailabilityColor(85)).toBe('#f59e0b');
-            expect(result.current.getAvailabilityColor(80)).toBe('#f59e0b');
+            expect(result.current.getAvailabilityColor(85)).toBe("#f59e0b");
+            expect(result.current.getAvailabilityColor(80)).toBe("#f59e0b");
 
             // Critical (>= 50%)
-            expect(result.current.getAvailabilityColor(65)).toBe('#ef4444');
-            expect(result.current.getAvailabilityColor(50)).toBe('#ef4444');
+            expect(result.current.getAvailabilityColor(65)).toBe("#ef4444");
+            expect(result.current.getAvailabilityColor(50)).toBe("#ef4444");
 
             // Failed (< 50%)
-            expect(result.current.getAvailabilityColor(30)).toBe('#ef4444');
-            expect(result.current.getAvailabilityColor(0)).toBe('#ef4444');
+            expect(result.current.getAvailabilityColor(30)).toBe("#ef4444");
+            expect(result.current.getAvailabilityColor(0)).toBe("#ef4444");
         });
 
-        it('should clamp percentage values to 0-100 range', () => {
+        it("should clamp percentage values to 0-100 range", () => {
             const { result } = renderHook(() => useAvailabilityColors());
 
             // Values above 100 should be clamped to 100
-            expect(result.current.getAvailabilityColor(150)).toBe('#10b981');
+            expect(result.current.getAvailabilityColor(150)).toBe("#10b981");
 
             // Values below 0 should be clamped to 0
-            expect(result.current.getAvailabilityColor(-10)).toBe('#ef4444');
+            expect(result.current.getAvailabilityColor(-10)).toBe("#ef4444");
         });
 
-        it('should return correct variants for different availability percentages', () => {
+        it("should return correct variants for different availability percentages", () => {
             const { result } = renderHook(() => useAvailabilityColors());
 
             // Success (>= 95%)
-            expect(result.current.getAvailabilityVariant(100)).toBe('success');
-            expect(result.current.getAvailabilityVariant(95)).toBe('success');
+            expect(result.current.getAvailabilityVariant(100)).toBe("success");
+            expect(result.current.getAvailabilityVariant(95)).toBe("success");
 
             // Warning (>= 80%)
-            expect(result.current.getAvailabilityVariant(90)).toBe('warning');
-            expect(result.current.getAvailabilityVariant(80)).toBe('warning');
+            expect(result.current.getAvailabilityVariant(90)).toBe("warning");
+            expect(result.current.getAvailabilityVariant(80)).toBe("warning");
 
             // Danger (< 80%)
-            expect(result.current.getAvailabilityVariant(70)).toBe('danger');
-            expect(result.current.getAvailabilityVariant(0)).toBe('danger');
+            expect(result.current.getAvailabilityVariant(70)).toBe("danger");
+            expect(result.current.getAvailabilityVariant(0)).toBe("danger");
         });
 
-        it('should clamp percentage values for variants', () => {
+        it("should clamp percentage values for variants", () => {
             const { result } = renderHook(() => useAvailabilityColors());
 
-            expect(result.current.getAvailabilityVariant(150)).toBe('success');
-            expect(result.current.getAvailabilityVariant(-10)).toBe('danger');
+            expect(result.current.getAvailabilityVariant(150)).toBe("success");
+            expect(result.current.getAvailabilityVariant(-10)).toBe("danger");
         });
 
-        it('should return correct descriptions for different availability percentages', () => {
+        it("should return correct descriptions for different availability percentages", () => {
             const { result } = renderHook(() => useAvailabilityColors());
 
-            expect(result.current.getAvailabilityDescription(100)).toBe('Excellent');
-            expect(result.current.getAvailabilityDescription(99.9)).toBe('Excellent');
-            expect(result.current.getAvailabilityDescription(99.5)).toBe('Very Good');
-            expect(result.current.getAvailabilityDescription(99)).toBe('Very Good');
-            expect(result.current.getAvailabilityDescription(98)).toBe('Good');
-            expect(result.current.getAvailabilityDescription(95)).toBe('Good');
-            expect(result.current.getAvailabilityDescription(92)).toBe('Fair');
-            expect(result.current.getAvailabilityDescription(90)).toBe('Fair');
-            expect(result.current.getAvailabilityDescription(85)).toBe('Poor');
-            expect(result.current.getAvailabilityDescription(80)).toBe('Poor');
-            expect(result.current.getAvailabilityDescription(65)).toBe('Critical');
-            expect(result.current.getAvailabilityDescription(50)).toBe('Critical');
-            expect(result.current.getAvailabilityDescription(30)).toBe('Failed');
-            expect(result.current.getAvailabilityDescription(0)).toBe('Failed');
+            expect(result.current.getAvailabilityDescription(100)).toBe(
+                "Excellent"
+            );
+            expect(result.current.getAvailabilityDescription(99.9)).toBe(
+                "Excellent"
+            );
+            expect(result.current.getAvailabilityDescription(99.5)).toBe(
+                "Very Good"
+            );
+            expect(result.current.getAvailabilityDescription(99)).toBe(
+                "Very Good"
+            );
+            expect(result.current.getAvailabilityDescription(98)).toBe("Good");
+            expect(result.current.getAvailabilityDescription(95)).toBe("Good");
+            expect(result.current.getAvailabilityDescription(92)).toBe("Fair");
+            expect(result.current.getAvailabilityDescription(90)).toBe("Fair");
+            expect(result.current.getAvailabilityDescription(85)).toBe("Poor");
+            expect(result.current.getAvailabilityDescription(80)).toBe("Poor");
+            expect(result.current.getAvailabilityDescription(65)).toBe(
+                "Critical"
+            );
+            expect(result.current.getAvailabilityDescription(50)).toBe(
+                "Critical"
+            );
+            expect(result.current.getAvailabilityDescription(30)).toBe(
+                "Failed"
+            );
+            expect(result.current.getAvailabilityDescription(0)).toBe("Failed");
         });
 
-        it('should clamp percentage values for descriptions', () => {
+        it("should clamp percentage values for descriptions", () => {
             const { result } = renderHook(() => useAvailabilityColors());
 
-            expect(result.current.getAvailabilityDescription(150)).toBe('Excellent');
-            expect(result.current.getAvailabilityDescription(-10)).toBe('Failed');
+            expect(result.current.getAvailabilityDescription(150)).toBe(
+                "Excellent"
+            );
+            expect(result.current.getAvailabilityDescription(-10)).toBe(
+                "Failed"
+            );
         });
     });
 
-    describe('useStatusColors', () => {
-        it('should return all status colors from current theme', () => {
+    describe("useStatusColors", () => {
+        it("should return all status colors from current theme", () => {
             const { result } = renderHook(() => useStatusColors());
 
-            expect(result.current.up).toBe('#10b981');
-            expect(result.current.down).toBe('#ef4444');
-            expect(result.current.pending).toBe('#f59e0b');
-            expect(result.current.unknown).toBe('#6b7280');
+            expect(result.current.up).toBe("#10b981");
+            expect(result.current.down).toBe("#ef4444");
+            expect(result.current.pending).toBe("#f59e0b");
+            expect(result.current.unknown).toBe("#6b7280");
         });
     });
 
-    describe('useThemeClasses', () => {
-        it('should return background classes with CSS custom properties', () => {
+    describe("useThemeClasses", () => {
+        it("should return background classes with CSS custom properties", () => {
             const { result } = renderHook(() => useThemeClasses());
 
             expect(result.current.getBackgroundClass()).toEqual({
-                backgroundColor: 'var(--color-background-primary)'
+                backgroundColor: "var(--color-background-primary)",
             });
-            expect(result.current.getBackgroundClass('secondary')).toEqual({
-                backgroundColor: 'var(--color-background-secondary)'
+            expect(result.current.getBackgroundClass("secondary")).toEqual({
+                backgroundColor: "var(--color-background-secondary)",
             });
-            expect(result.current.getBackgroundClass('tertiary')).toEqual({
-                backgroundColor: 'var(--color-background-tertiary)'
+            expect(result.current.getBackgroundClass("tertiary")).toEqual({
+                backgroundColor: "var(--color-background-tertiary)",
             });
         });
 
-        it('should return text classes with CSS custom properties', () => {
+        it("should return text classes with CSS custom properties", () => {
             const { result } = renderHook(() => useThemeClasses());
 
             expect(result.current.getTextClass()).toEqual({
-                color: 'var(--color-text-primary)'
+                color: "var(--color-text-primary)",
             });
-            expect(result.current.getTextClass('secondary')).toEqual({
-                color: 'var(--color-text-secondary)'
+            expect(result.current.getTextClass("secondary")).toEqual({
+                color: "var(--color-text-secondary)",
             });
-            expect(result.current.getTextClass('tertiary')).toEqual({
-                color: 'var(--color-text-tertiary)'
+            expect(result.current.getTextClass("tertiary")).toEqual({
+                color: "var(--color-text-tertiary)",
             });
-            expect(result.current.getTextClass('inverse')).toEqual({
-                color: 'var(--color-text-inverse)'
+            expect(result.current.getTextClass("inverse")).toEqual({
+                color: "var(--color-text-inverse)",
             });
         });
 
-        it('should return border classes with CSS custom properties', () => {
+        it("should return border classes with CSS custom properties", () => {
             const { result } = renderHook(() => useThemeClasses());
 
             expect(result.current.getBorderClass()).toEqual({
-                borderColor: 'var(--color-border-primary)'
+                borderColor: "var(--color-border-primary)",
             });
-            expect(result.current.getBorderClass('secondary')).toEqual({
-                borderColor: 'var(--color-border-secondary)'
+            expect(result.current.getBorderClass("secondary")).toEqual({
+                borderColor: "var(--color-border-secondary)",
             });
-            expect(result.current.getBorderClass('focus')).toEqual({
-                borderColor: 'var(--color-border-focus)'
+            expect(result.current.getBorderClass("focus")).toEqual({
+                borderColor: "var(--color-border-focus)",
             });
         });
 
-        it('should return surface classes with CSS custom properties', () => {
+        it("should return surface classes with CSS custom properties", () => {
             const { result } = renderHook(() => useThemeClasses());
 
             expect(result.current.getSurfaceClass()).toEqual({
-                backgroundColor: 'var(--color-surface-base)'
+                backgroundColor: "var(--color-surface-base)",
             });
-            expect(result.current.getSurfaceClass('elevated')).toEqual({
-                backgroundColor: 'var(--color-surface-elevated)'
+            expect(result.current.getSurfaceClass("elevated")).toEqual({
+                backgroundColor: "var(--color-surface-elevated)",
             });
-            expect(result.current.getSurfaceClass('overlay')).toEqual({
-                backgroundColor: 'var(--color-surface-overlay)'
+            expect(result.current.getSurfaceClass("overlay")).toEqual({
+                backgroundColor: "var(--color-surface-overlay)",
             });
         });
 
-        it('should return status classes with CSS custom properties', () => {
+        it("should return status classes with CSS custom properties", () => {
             const { result } = renderHook(() => useThemeClasses());
 
-            expect(result.current.getStatusClass('up')).toEqual({
-                color: 'var(--color-status-up)'
+            expect(result.current.getStatusClass("up")).toEqual({
+                color: "var(--color-status-up)",
             });
-            expect(result.current.getStatusClass('down')).toEqual({
-                color: 'var(--color-status-down)'
+            expect(result.current.getStatusClass("down")).toEqual({
+                color: "var(--color-status-down)",
             });
-            expect(result.current.getStatusClass('pending')).toEqual({
-                color: 'var(--color-status-pending)'
+            expect(result.current.getStatusClass("pending")).toEqual({
+                color: "var(--color-status-pending)",
             });
-            expect(result.current.getStatusClass('unknown')).toEqual({
-                color: 'var(--color-status-unknown)'
+            expect(result.current.getStatusClass("unknown")).toEqual({
+                color: "var(--color-status-unknown)",
             });
         });
 
-        it('should provide getColor function', () => {
+        it("should provide getColor function", () => {
             const { result } = renderHook(() => useThemeClasses());
             expect(result.current.getColor).toBeDefined();
-            expect(typeof result.current.getColor).toBe('function');
+            expect(typeof result.current.getColor).toBe("function");
         });
     });
 
-    describe('useThemeValue', () => {
-        it('should return selected value from current theme', () => {
-            const { result } = renderHook(() => 
-                useThemeValue(theme => theme.isDark)
+    describe("useThemeValue", () => {
+        it("should return selected value from current theme", () => {
+            const { result } = renderHook(() =>
+                useThemeValue((theme) => theme.isDark)
             );
 
             expect(result.current).toBe(false);
         });
 
-        it('should return theme name from selector', () => {
-            const { result } = renderHook(() => 
-                useThemeValue(theme => theme.name)
+        it("should return theme name from selector", () => {
+            const { result } = renderHook(() =>
+                useThemeValue((theme) => theme.name)
             );
 
-            expect(result.current).toBe('light');
+            expect(result.current).toBe("light");
         });
 
-        it('should return nested color values from selector', () => {
-            const { result } = renderHook(() => 
-                useThemeValue(theme => theme.colors.status.up)
+        it("should return nested color values from selector", () => {
+            const { result } = renderHook(() =>
+                useThemeValue((theme) => theme.colors.status.up)
             );
 
-            expect(result.current).toBe('#10b981');
+            expect(result.current).toBe("#10b981");
         });
 
-        it('should work with complex selectors', () => {
-            const { result } = renderHook(() => 
-                useThemeValue(theme => ({
+        it("should work with complex selectors", () => {
+            const { result } = renderHook(() =>
+                useThemeValue((theme) => ({
                     isDark: theme.isDark,
                     upColor: theme.colors.status.up,
                     bgColor: theme.colors.background.primary,
@@ -578,42 +625,52 @@ describe('Theme Hooks - Comprehensive Coverage', () => {
 
             expect(result.current).toEqual({
                 isDark: false,
-                upColor: '#10b981',
-                bgColor: '#ffffff',
+                upColor: "#10b981",
+                bgColor: "#ffffff",
             });
         });
     });
 
-    describe('Edge Cases and Integration', () => {
-        it('should handle multiple hook instances consistently', () => {
+    describe("Edge Cases and Integration", () => {
+        it("should handle multiple hook instances consistently", () => {
             const { result: themeResult } = renderHook(() => useTheme());
-            const { result: statusResult } = renderHook(() => useStatusColors());
-            const { result: availabilityResult } = renderHook(() => useAvailabilityColors());
+            const { result: statusResult } = renderHook(() =>
+                useStatusColors()
+            );
+            const { result: availabilityResult } = renderHook(() =>
+                useAvailabilityColors()
+            );
 
             // All hooks should use the same theme data
-            expect(themeResult.current.currentTheme.colors.status.up).toBe('#10b981');
-            expect(statusResult.current.up).toBe('#10b981');
-            expect(availabilityResult.current.getAvailabilityColor(100)).toBe('#10b981');
+            expect(themeResult.current.currentTheme.colors.status.up).toBe(
+                "#10b981"
+            );
+            expect(statusResult.current.up).toBe("#10b981");
+            expect(availabilityResult.current.getAvailabilityColor(100)).toBe(
+                "#10b981"
+            );
         });
 
-        it('should handle rapid theme changes gracefully', async () => {
+        it("should handle rapid theme changes gracefully", async () => {
             const { result } = renderHook(() => useTheme());
 
             await act(async () => {
-                result.current.setTheme('dark');
-                result.current.setTheme('light');
-                result.current.setTheme('system');
+                result.current.setTheme("dark");
+                result.current.setTheme("light");
+                result.current.setTheme("system");
             });
 
             expect(mockUpdateSettings).toHaveBeenCalledTimes(3);
         });
 
-        it('should handle system theme detection on initialization', () => {
-            mockThemeManager.getSystemThemePreference.mockReturnValue('dark');
+        it("should handle system theme detection on initialization", () => {
+            mockThemeManager.getSystemThemePreference.mockReturnValue("dark");
 
             renderHook(() => useTheme());
 
-            expect(mockThemeManager.getSystemThemePreference).toHaveBeenCalled();
+            expect(
+                mockThemeManager.getSystemThemePreference
+            ).toHaveBeenCalled();
         });
     });
 });

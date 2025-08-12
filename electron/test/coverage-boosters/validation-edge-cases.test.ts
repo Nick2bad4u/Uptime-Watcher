@@ -8,11 +8,17 @@ import { describe, expect, it } from "vitest";
 
 describe("Validation Error Paths and Edge Cases", () => {
     describe("URL validation edge cases", () => {
-        it("should test URL validation branches", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Validation Error Paths and Edge Cases", "component");
-            
-            
- const validateUrl = (
+        it("should test URL validation branches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Validation Error Paths and Edge Cases",
+                "component"
+            );
+
+            const validateUrl = (
                 url: string
             ): { valid: boolean; protocol?: string } => {
                 try {
@@ -26,23 +32,31 @@ describe("Validation Error Paths and Edge Cases", () => {
             expect(validateUrl("https://example.com")).toEqual({
                 valid: true,
                 protocol: "https:",
-        });
+            });
             expect(validateUrl("https://secure.example.com")).toEqual({
                 valid: true,
                 protocol: "https:",
-        });
+            });
             expect(validateUrl("invalid-url")).toEqual({ valid: false });
             expect(validateUrl("")).toEqual({ valid: false });
             expect(validateUrl("ftp://example.com")).toEqual({
                 valid: true,
                 protocol: "ftp:",
-        });        });        });
+            });
+        });
+    });
     describe("Timeout and interval validation", () => {
-        it("should test timeout validation branches", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Validation Error Paths and Edge Cases", "component");
-            
-            
- const validateTimeout = (timeout: unknown): number => {
+        it("should test timeout validation branches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Validation Error Paths and Edge Cases",
+                "component"
+            );
+
+            const validateTimeout = (timeout: unknown): number => {
                 if (typeof timeout !== "number") {
                     return 5000; // Default timeout
                 }
@@ -66,11 +80,17 @@ describe("Validation Error Paths and Edge Cases", () => {
             expect(validateTimeout(0)).toBe(1000);
             expect(validateTimeout(-100)).toBe(1000);
         });
-        it("should test interval validation branches", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Validation Error Paths and Edge Cases", "component");
-            
-            
- const validateInterval = (interval: unknown): number => {
+        it("should test interval validation branches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Validation Error Paths and Edge Cases",
+                "component"
+            );
+
+            const validateInterval = (interval: unknown): number => {
                 if (typeof interval !== "number") {
                     return 30_000; // Default 30 seconds
                 }
@@ -91,13 +111,20 @@ describe("Validation Error Paths and Edge Cases", () => {
             expect(validateInterval(1000)).toBe(5000);
             expect(validateInterval(60_000)).toBe(60_000);
             expect(validateInterval(7_200_000)).toBe(3_600_000);
-        });        });
+        });
+    });
     describe("Status validation and mapping", () => {
-        it("should test status mapping branches", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Validation Error Paths and Edge Cases", "component");
-            
-            
- const mapMonitorStatus = (
+        it("should test status mapping branches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Validation Error Paths and Edge Cases",
+                "component"
+            );
+
+            const mapMonitorStatus = (
                 status: string
             ): {
                 display: string;
@@ -154,48 +181,56 @@ describe("Validation Error Paths and Edge Cases", () => {
                 display: "Online",
                 color: "green",
                 severity: 0,
-        });
+            });
             expect(mapMonitorStatus("down")).toEqual({
                 display: "Offline",
                 color: "red",
                 severity: 3,
-        });
+            });
             expect(mapMonitorStatus("degraded")).toEqual({
                 display: "Degraded",
                 color: "yellow",
                 severity: 2,
-        });
+            });
             expect(mapMonitorStatus("maintenance")).toEqual({
                 display: "Maintenance",
                 color: "blue",
                 severity: 1,
-        });
+            });
             expect(mapMonitorStatus("pending")).toEqual({
                 display: "Checking",
                 color: "gray",
                 severity: 1,
-        });
+            });
             expect(mapMonitorStatus("unknown")).toEqual({
                 display: "Unknown",
                 color: "gray",
                 severity: 1,
-        });
+            });
             expect(mapMonitorStatus("")).toEqual({
                 display: "Unknown",
                 color: "gray",
                 severity: 1,
-        });
+            });
             expect(mapMonitorStatus("invalid")).toEqual({
                 display: "Unknown",
                 color: "gray",
                 severity: 1,
-        });        });        });
+            });
+        });
+    });
     describe("Data parsing and transformation edge cases", () => {
-        it("should test JSON parsing with fallbacks", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Validation Error Paths and Edge Cases", "component");
-            
-            
- const safeJsonParse = <T>(json: string, fallback: T): T => {
+        it("should test JSON parsing with fallbacks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Validation Error Paths and Edge Cases",
+                "component"
+            );
+
+            const safeJsonParse = <T>(json: string, fallback: T): T => {
                 try {
                     const parsed = JSON.parse(json);
                     return parsed as T;
@@ -206,19 +241,25 @@ describe("Validation Error Paths and Edge Cases", () => {
 
             expect(safeJsonParse('{"test": "value"}', {})).toEqual({
                 test: "value",
-        });
+            });
             expect(safeJsonParse("invalid json", { default: true })).toEqual({
                 default: true,
-        });
+            });
             expect(safeJsonParse("", [])).toEqual([]);
             expect(safeJsonParse("null", { fallback: true })).toBe(null);
             expect(safeJsonParse("undefined", "fallback")).toBe("fallback");
         });
-        it("should test number parsing with validation", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Validation Error Paths and Edge Cases", "component");
-            
-            
- const parseNumber = (
+        it("should test number parsing with validation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Validation Error Paths and Edge Cases",
+                "component"
+            );
+
+            const parseNumber = (
                 value: unknown,
                 min?: number,
                 max?: number
@@ -260,13 +301,20 @@ describe("Validation Error Paths and Edge Cases", () => {
             expect(parseNumber(25, 20, 30)).toBe(25); // Within range
             expect(parseNumber(15, 20, 30)).toBeNull(); // Below min
             expect(parseNumber(35, 20, 30)).toBeNull(); // Above max
-        });        });
+        });
+    });
     describe("Array processing edge cases", () => {
-        it("should test array filtering with type guards", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Validation Error Paths and Edge Cases", "component");
-            
-            
- const filterValidItems = <T>(
+        it("should test array filtering with type guards", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Validation Error Paths and Edge Cases",
+                "component"
+            );
+
+            const filterValidItems = <T>(
                 items: unknown[],
                 validator: (item: unknown) => item is T
             ): T[] => {
@@ -301,11 +349,17 @@ describe("Validation Error Paths and Edge Cases", () => {
             expect(filterValidItems([], isString)).toEqual([]);
             expect(filterValidItems([null, undefined], isString)).toEqual([]);
         });
-        it("should test array chunking with edge cases", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Validation Error Paths and Edge Cases", "component");
-            
-            
- const chunkArray = <T>(array: T[], size: number): T[][] => {
+        it("should test array chunking with edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Validation Error Paths and Edge Cases",
+                "component"
+            );
+
+            const chunkArray = <T>(array: T[], size: number): T[][] => {
                 if (!Array.isArray(array) || array.length === 0) {
                     return [];
                 }
@@ -339,13 +393,20 @@ describe("Validation Error Paths and Edge Cases", () => {
             expect(chunkArray([], 2)).toEqual([]);
             expect(chunkArray([1, 2, 3], 0)).toEqual([[1, 2, 3]]);
             expect(chunkArray([1, 2, 3], -1)).toEqual([[1, 2, 3]]);
-        });        });
+        });
+    });
     describe("Date and time validation", () => {
-        it("should test date parsing with fallbacks", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Validation Error Paths and Edge Cases", "component");
-            
-            
- const parseDate = (input: unknown): Date | null => {
+        it("should test date parsing with fallbacks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Validation Error Paths and Edge Cases",
+                "component"
+            );
+
+            const parseDate = (input: unknown): Date | null => {
                 if (input instanceof Date) {
                     return Number.isNaN(input.getTime()) ? null : input;
                 }
@@ -372,11 +433,17 @@ describe("Validation Error Paths and Edge Cases", () => {
             expect(parseDate(undefined)).toBeNull();
             expect(parseDate({})).toBeNull();
         });
-        it("should test time formatting edge cases", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Validation Error Paths and Edge Cases", "component");
-            
-            
- const formatDuration = (ms: number): string => {
+        it("should test time formatting edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Validation Error Paths and Edge Cases",
+                "component"
+            );
+
+            const formatDuration = (ms: number): string => {
                 if (!Number.isFinite(ms) || ms < 0) {
                     return "Invalid";
                 }
@@ -403,13 +470,20 @@ describe("Validation Error Paths and Edge Cases", () => {
             expect(formatDuration(-1000)).toBe("Invalid");
             expect(formatDuration(Number.POSITIVE_INFINITY)).toBe("Invalid");
             expect(formatDuration(Number.NaN)).toBe("Invalid");
-        });        });
+        });
+    });
     describe("Configuration validation edge cases", () => {
-        it("should test configuration merging with defaults", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Validation Error Paths and Edge Cases", "component");
-            
-            
- interface Config {
+        it("should test configuration merging with defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Validation Error Paths and Edge Cases",
+                "component"
+            );
+
+            interface Config {
                 timeout: number;
                 retries: number;
                 enabled: boolean;
@@ -439,25 +513,28 @@ describe("Validation Error Paths and Edge Cases", () => {
                 timeout: 5000,
                 retries: 3,
                 enabled: true,
-        });
+            });
             expect(mergeConfig(undefined)).toEqual({
                 timeout: 5000,
                 retries: 3,
                 enabled: true,
-        });
+            });
             expect(mergeConfig({})).toEqual({
                 timeout: 5000,
                 retries: 3,
                 enabled: true,
-        });
+            });
             expect(mergeConfig({ timeout: 1000 })).toEqual({
                 timeout: 1000,
                 retries: 3,
                 enabled: true,
-        });
+            });
             expect(mergeConfig({ url: "https://example.com" })).toEqual({
                 timeout: 5000,
                 retries: 3,
                 enabled: true,
                 url: "https://example.com",
-        });        });        });        });
+            });
+        });
+    });
+});

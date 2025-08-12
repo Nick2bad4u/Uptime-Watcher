@@ -315,26 +315,25 @@ describe("cacheKeys utilities", () => {
             ];
 
             for (const {
-                    fn,
-                    expectedPrefix,
-                    expectedOperation,
-                    expectedIdentifier,
-                } of testData) {
-                    const key = fn();
-                    expect(isStandardizedCacheKey(key)).toBe(true);
+                fn,
+                expectedPrefix,
+                expectedOperation,
+                expectedIdentifier,
+            } of testData) {
+                const key = fn();
+                expect(isStandardizedCacheKey(key)).toBe(true);
 
-                    const parsed = parseCacheKey(key);
-                    expect(parsed.prefix).toBe(expectedPrefix);
+                const parsed = parseCacheKey(key);
+                expect(parsed.prefix).toBe(expectedPrefix);
 
-                    if (expectedOperation) {
-                        expect(parsed.operation).toBe(expectedOperation);
-                    }
-
-                    if (expectedIdentifier) {
-                        expect(parsed.identifier).toBe(expectedIdentifier);
-                    }
+                if (expectedOperation) {
+                    expect(parsed.operation).toBe(expectedOperation);
                 }
-            
+
+                if (expectedIdentifier) {
+                    expect(parsed.identifier).toBe(expectedIdentifier);
+                }
+            }
         });
     });
 });

@@ -27,8 +27,16 @@ describe("useSiteStats Edge Cases", () => {
             let proxyAccessCount = 0;
 
             const baseHistory: StatusHistory[] = [
-                { responseTime: 100, status: "up", timestamp: 1_640_995_200_000 },
-                { responseTime: 200, status: "up", timestamp: 1_640_991_600_000 },
+                {
+                    responseTime: 100,
+                    status: "up",
+                    timestamp: 1_640_995_200_000,
+                },
+                {
+                    responseTime: 200,
+                    status: "up",
+                    timestamp: 1_640_991_600_000,
+                },
             ];
 
             // Create a Proxy that intercepts responseTime access
@@ -62,8 +70,16 @@ describe("useSiteStats Edge Cases", () => {
         it("should handle Object.freeze edge case that could affect responseTime access", () => {
             // Test another potential edge case where responseTime access might be affected
             const history: StatusHistory[] = [
-                { responseTime: 150, status: "up", timestamp: 1_640_995_200_000 },
-                { responseTime: 250, status: "up", timestamp: 1_640_991_600_000 },
+                {
+                    responseTime: 150,
+                    status: "up",
+                    timestamp: 1_640_995_200_000,
+                },
+                {
+                    responseTime: 250,
+                    status: "up",
+                    timestamp: 1_640_991_600_000,
+                },
             ];
 
             // Freeze objects to test defensive programming
@@ -96,9 +112,17 @@ describe("useSiteStats Edge Cases", () => {
         it("should handle empty upRecordsWithResponseTime array correctly", () => {
             // Test when no records pass the filter (targets the ternary operator)
             const history: StatusHistory[] = [
-                { responseTime: 100, status: "down", timestamp: 1_640_995_200_000 },
+                {
+                    responseTime: 100,
+                    status: "down",
+                    timestamp: 1_640_995_200_000,
+                },
                 { responseTime: 0, status: "up", timestamp: 1_640_991_600_000 }, // filtered out
-                { responseTime: -1, status: "up", timestamp: 1_640_988_000_000 }, // filtered out
+                {
+                    responseTime: -1,
+                    status: "up",
+                    timestamp: 1_640_988_000_000,
+                }, // filtered out
             ];
 
             const { result } = renderHook(() => useSiteStats(history));
@@ -111,11 +135,31 @@ describe("useSiteStats Edge Cases", () => {
 
         it("should handle records with various status types for uptime calculation", () => {
             const history: StatusHistory[] = [
-                { responseTime: 100, status: "up", timestamp: 1_640_995_200_000 },
-                { responseTime: 0, status: "down", timestamp: 1_640_991_600_000 },
-                { responseTime: 200, status: "up", timestamp: 1_640_988_000_000 },
-                { responseTime: 0, status: "down", timestamp: 1_640_984_400_000 },
-                { responseTime: 300, status: "up", timestamp: 1_640_980_800_000 },
+                {
+                    responseTime: 100,
+                    status: "up",
+                    timestamp: 1_640_995_200_000,
+                },
+                {
+                    responseTime: 0,
+                    status: "down",
+                    timestamp: 1_640_991_600_000,
+                },
+                {
+                    responseTime: 200,
+                    status: "up",
+                    timestamp: 1_640_988_000_000,
+                },
+                {
+                    responseTime: 0,
+                    status: "down",
+                    timestamp: 1_640_984_400_000,
+                },
+                {
+                    responseTime: 300,
+                    status: "up",
+                    timestamp: 1_640_980_800_000,
+                },
             ];
 
             const { result } = renderHook(() => useSiteStats(history));

@@ -1,9 +1,9 @@
 /**
  * Test suite for validatorComposition
- * 
+ *
  * @fileoverview Comprehensive tests for unknown functionality
  * in the Uptime Watcher application.
- * 
+ *
  * @author GitHub Copilot
  * @since 2025-08-11
  * @category General
@@ -61,11 +61,13 @@ describe("Validator Composition Utilities", () => {
     describe("createParameterCountValidator", () => {
         it("should validate correct parameter count", () => {
             const validator = createParameterCountValidator(2);
-            expect(validator(["a", "b"])).toBeNull();        });
+            expect(validator(["a", "b"])).toBeNull();
+        });
         it("should reject incorrect parameter count", () => {
             const validator = createParameterCountValidator(2);
             const result = validator(["a"]);
-            expect(result).toEqual(["Expected exactly 2 parameters"]);        });
+            expect(result).toEqual(["Expected exactly 2 parameters"]);
+        });
         it("should handle singular vs plural messaging", () => {
             const singleValidator = createParameterCountValidator(1);
             const multiValidator = createParameterCountValidator(3);
@@ -75,14 +77,17 @@ describe("Validator Composition Utilities", () => {
             ]);
             expect(multiValidator([])).toEqual([
                 "Expected exactly 3 parameters",
-            ]);        });        });
+            ]);
+        });
+    });
     describe("composeValidators", () => {
         it("should pass when all validators pass", () => {
             const validator1: IpcParameterValidator = () => null;
             const validator2: IpcParameterValidator = () => null;
 
             const composed = composeValidators([validator1, validator2]);
-            expect(composed(["test"])).toBeNull();        });
+            expect(composed(["test"])).toBeNull();
+        });
         it("should collect errors from all validators", () => {
             const validator1: IpcParameterValidator = () => ["Error 1"];
             const validator2: IpcParameterValidator = () => [
@@ -93,10 +98,12 @@ describe("Validator Composition Utilities", () => {
             const composed = composeValidators([validator1, validator2]);
             const result = composed(["test"]);
 
-            expect(result).toEqual(["Error 1", "Error 2", "Error 3"]);        });
+            expect(result).toEqual(["Error 1", "Error 2", "Error 3"]);
+        });
         it("should handle empty validators array", () => {
             const composed = composeValidators([]);
-            expect(composed(["test"])).toBeNull();        });
+            expect(composed(["test"])).toBeNull();
+        });
         it("should handle mix of passing and failing validators", () => {
             const passingValidator: IpcParameterValidator = () => null;
             const failingValidator: IpcParameterValidator = () => ["Error"];
@@ -107,7 +114,9 @@ describe("Validator Composition Utilities", () => {
             ]);
             const result = composed(["test"]);
 
-            expect(result).toEqual(["Error"]);        });        });
+            expect(result).toEqual(["Error"]);
+        });
+    });
     describe("Refactored createTwoStringValidator simulation", () => {
         it("should validate two string parameters correctly", () => {
             const firstStringValidator = createMockStringValidator("first");
@@ -130,7 +139,8 @@ describe("Validator Composition Utilities", () => {
             const invalidStringResult = twoStringValidator(["", "world"]);
             expect(invalidStringResult).toContain(
                 "first must be a non-empty string"
-            );        });
+            );
+        });
         it("should demonstrate complexity reduction", () => {
             // Old approach would have had many nested conditions
             // New approach uses composition of simple validators
@@ -151,7 +161,9 @@ describe("Validator Composition Utilities", () => {
                 (params: unknown[]) => stringValidator2([params[1]]),
             ]);
 
-            expect(composed(["hello", "world"])).toBeNull();        });        });
+            expect(composed(["hello", "world"])).toBeNull();
+        });
+    });
     describe("Integration with existing patterns", () => {
         it("should maintain the null-for-success, array-for-errors pattern", () => {
             const validator = composeValidators([
@@ -165,7 +177,8 @@ describe("Validator Composition Utilities", () => {
             // Error case
             const errors = validator([""]);
             expect(Array.isArray(errors)).toBe(true);
-            expect(errors?.length).toBeGreaterThan(0);        });
+            expect(errors?.length).toBeGreaterThan(0);
+        });
         it("should be compatible with existing IpcParameterValidator interface", () => {
             const validator: IpcParameterValidator = composeValidators([
                 createParameterCountValidator(1),
@@ -173,4 +186,7 @@ describe("Validator Composition Utilities", () => {
 
             // Should match the IpcParameterValidator type signature
             const result = validator(["test"]);
-            expect(result === null || Array.isArray(result)).toBe(true);        });        });        });
+            expect(result === null || Array.isArray(result)).toBe(true);
+        });
+    });
+});

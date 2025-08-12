@@ -646,7 +646,9 @@ describe("Fallback Utilities", () => {
 
             it("should handle newlines and special characters", () => {
                 const text = String.raw`line1\nline2\ttab`;
-                expect(truncateForLogging(text, 10)).toBe(String.raw`line1\nlin`);
+                expect(truncateForLogging(text, 10)).toBe(
+                    String.raw`line1\nlin`
+                );
             });
         });
 

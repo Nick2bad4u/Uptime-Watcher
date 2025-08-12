@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ['All Tools']
+tools: ["All Tools"]
 description: "Add Metadata and Benchmarks to existing tests"
 ---
 
@@ -31,7 +31,7 @@ Always have meaningful metadata that aligns with the project.
 - Vitest Snapshot (Optional (Recommended for creating test snapshots))
 
 6. Always pull the links below for more detailed information or examples.
-7. You can use CLI to filter test files by name, so you can test specific files: 
+7. You can use CLI to filter test files by name, so you can test specific files:
    - Example: `npx vitest basic`: Will only execute test files that contain basic: `basic.test.ts` `basic-foo.test.ts` `basic/foo.test.ts`
 
 ### Vitest API Reference
@@ -162,4 +162,4 @@ Always have meaningful metadata that aligns with the project.
 
 ## Test Assertions
 
--  A long list can be found here: [Vitest Test Assertion API](https://vitest.dev/api/assert.html)
+- A long list can be found here: [Vitest Test Assertion API](https://vitest.dev/api/assert.html)

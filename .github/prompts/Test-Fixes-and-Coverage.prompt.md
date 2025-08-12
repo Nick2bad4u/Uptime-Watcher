@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ['All Tools']
+tools: ["All Tools"]
 description: "Fix failing tests and improve test coverage"
 ---
 

@@ -1,9 +1,9 @@
 /**
  * Test suite for electronUtils
- * 
+ *
  * @fileoverview Comprehensive tests for Electron utility functions
  * in the Uptime Watcher application.
- * 
+ *
  * @author GitHub Copilot
  * @since 2025-08-11
  * @category Electron Utilities
@@ -139,18 +139,38 @@ describe("ElectronUtils", () => {
         it("should properly use logical AND operation", () => {
             // Arrange & Act & Assert - test all truth table combinations
             const testCases = [
-                { isDevelopmentResult: true, isPackaged: false, expected: true },
-                { isDevelopmentResult: true, isPackaged: true, expected: false },
-                { isDevelopmentResult: false, isPackaged: false, expected: false },
-                { isDevelopmentResult: false, isPackaged: true, expected: false },
+                {
+                    isDevelopmentResult: true,
+                    isPackaged: false,
+                    expected: true,
+                },
+                {
+                    isDevelopmentResult: true,
+                    isPackaged: true,
+                    expected: false,
+                },
+                {
+                    isDevelopmentResult: false,
+                    isPackaged: false,
+                    expected: false,
+                },
+                {
+                    isDevelopmentResult: false,
+                    isPackaged: true,
+                    expected: false,
+                },
             ];
 
-            for (const { isDevelopmentResult, isPackaged, expected } of testCases) {
+            for (const {
+                isDevelopmentResult,
+                isPackaged,
+                expected,
+            } of testCases) {
                 vi.mocked(isDevelopment).mockReturnValue(isDevelopmentResult);
                 (app as any).isPackaged = isPackaged;
 
                 const result = isDev();
-                
+
                 expect(result).toBe(expected);
                 expect(isDevelopment).toHaveBeenCalled();
             }
@@ -217,7 +237,10 @@ describe("ElectronUtils", () => {
                 { isDev: false, isPackaged: true },
             ];
 
-            for (const { isDev: isDevelopmentResult, isPackaged } of testCases) {
+            for (const {
+                isDev: isDevelopmentResult,
+                isPackaged,
+            } of testCases) {
                 vi.mocked(isDevelopment).mockReturnValue(isDevelopmentResult);
                 (app as any).isPackaged = isPackaged;
 
@@ -255,7 +278,7 @@ describe("ElectronUtils", () => {
 
             // Assert
             expect(results).toHaveLength(100);
-            expect(results.every(result => result === true)).toBe(true);
+            expect(results.every((result) => result === true)).toBe(true);
             expect(isDevelopment).toHaveBeenCalledTimes(100);
         });
     });

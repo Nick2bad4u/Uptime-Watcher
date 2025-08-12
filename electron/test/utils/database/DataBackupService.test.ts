@@ -1,9 +1,9 @@
 /**
  * Test suite for DataBackupService
- * 
+ *
  * @fileoverview Comprehensive tests for the DataBackupService class
  * in the Uptime Watcher application.
- * 
+ *
  * @author GitHub Copilot
  * @since 2025-08-11
  * @category Database Utilities
@@ -65,10 +65,10 @@ describe("DataBackupService", () => {
         vi.clearAllMocks();
         mockEventEmitter = createMockEventEmitter();
         mockLogger = createMockLogger();
-        
+
         // Reset app.getPath mock
         vi.mocked(app.getPath).mockReturnValue("/test/userdata");
-        
+
         // Reset createDatabaseBackup mock
         vi.mocked(createDatabaseBackup).mockResolvedValue({
             buffer: Buffer.from("test database content"),
@@ -77,7 +77,7 @@ describe("DataBackupService", () => {
                 createdAt: Date.now(),
                 originalPath: "/test/userdata/uptime-watcher.sqlite",
                 sizeBytes: 1024,
-            }
+            },
         });
 
         dataBackupService = new DataBackupService({
@@ -121,7 +121,7 @@ describe("DataBackupService", () => {
                     createdAt: Date.now(),
                     originalPath: "/test/userdata/uptime-watcher.sqlite",
                     sizeBytes: 1024,
-                }
+                },
             };
             vi.mocked(createDatabaseBackup).mockResolvedValue(mockResult);
 
@@ -162,9 +162,11 @@ describe("DataBackupService", () => {
                     createdAt: 1_234_567_890,
                     originalPath: "/test/path",
                     sizeBytes: 2048,
-                }
+                },
             };
-            vi.mocked(createDatabaseBackup).mockResolvedValue(customBackupResult);
+            vi.mocked(createDatabaseBackup).mockResolvedValue(
+                customBackupResult
+            );
 
             // Act
             const result = await dataBackupService.downloadDatabaseBackup();
@@ -183,18 +185,24 @@ describe("DataBackupService", () => {
             vi.mocked(createDatabaseBackup).mockRejectedValue(testError);
 
             // Act & Assert
-            await expect(dataBackupService.downloadDatabaseBackup()).rejects.toThrow(SiteLoadingError);
+            await expect(
+                dataBackupService.downloadDatabaseBackup()
+            ).rejects.toThrow(SiteLoadingError);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to download backup: Backup creation failed",
                 testError
             );
-            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith("database:error", {
-                details: "Failed to download backup: Backup creation failed",
-                error: testError,
-                operation: "download-backup",
-                timestamp: expect.any(Number),
-            });
+            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
+                "database:error",
+                {
+                    details:
+                        "Failed to download backup: Backup creation failed",
+                    error: testError,
+                    operation: "download-backup",
+                    timestamp: expect.any(Number),
+                }
+            );
         });
 
         it("should handle createDatabaseBackup throwing non-Error object", async () => {
@@ -203,18 +211,23 @@ describe("DataBackupService", () => {
             vi.mocked(createDatabaseBackup).mockRejectedValue(testError);
 
             // Act & Assert
-            await expect(dataBackupService.downloadDatabaseBackup()).rejects.toThrow(SiteLoadingError);
+            await expect(
+                dataBackupService.downloadDatabaseBackup()
+            ).rejects.toThrow(SiteLoadingError);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to download backup: String error message",
                 testError
             );
-            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith("database:error", {
-                details: "Failed to download backup: String error message",
-                error: new Error("String error message"),
-                operation: "download-backup",
-                timestamp: expect.any(Number),
-            });
+            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
+                "database:error",
+                {
+                    details: "Failed to download backup: String error message",
+                    error: new Error("String error message"),
+                    operation: "download-backup",
+                    timestamp: expect.any(Number),
+                }
+            );
         });
 
         it("should throw SiteLoadingError with correct message and cause", async () => {
@@ -228,7 +241,9 @@ describe("DataBackupService", () => {
                 expect.fail("Should have thrown SiteLoadingError");
             } catch (error) {
                 expect(error).toBeInstanceOf(SiteLoadingError);
-                expect(error.message).toBe("Failed to load sites: Failed to download backup: Original error");
+                expect(error.message).toBe(
+                    "Failed to load sites: Failed to download backup: Original error"
+                );
                 expect(error.stack).toContain("Caused by:");
             }
         });
@@ -249,12 +264,15 @@ describe("DataBackupService", () => {
             const afterTime = Date.now();
 
             // Assert
-            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith("database:error", {
-                details: "Failed to download backup: Test error",
-                error: testError,
-                operation: "download-backup",
-                timestamp: expect.any(Number),
-            });
+            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
+                "database:error",
+                {
+                    details: "Failed to download backup: Test error",
+                    error: testError,
+                    operation: "download-backup",
+                    timestamp: expect.any(Number),
+                }
+            );
 
             const emittedEvent = mockEventEmitter.emitTyped.mock.calls[0]![1];
             expect(emittedEvent.timestamp).toBeGreaterThanOrEqual(beforeTime);
@@ -266,18 +284,23 @@ describe("DataBackupService", () => {
             vi.mocked(createDatabaseBackup).mockRejectedValue(null);
 
             // Act & Assert
-            await expect(dataBackupService.downloadDatabaseBackup()).rejects.toThrow(SiteLoadingError);
+            await expect(
+                dataBackupService.downloadDatabaseBackup()
+            ).rejects.toThrow(SiteLoadingError);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to download backup: null",
                 null
             );
-            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith("database:error", {
-                details: "Failed to download backup: null",
-                error: new Error("null"),
-                operation: "download-backup",
-                timestamp: expect.any(Number),
-            });
+            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
+                "database:error",
+                {
+                    details: "Failed to download backup: null",
+                    error: new Error("null"),
+                    operation: "download-backup",
+                    timestamp: expect.any(Number),
+                }
+            );
         });
 
         it("should handle empty buffer results", async () => {
@@ -289,7 +312,7 @@ describe("DataBackupService", () => {
                     createdAt: Date.now(),
                     originalPath: "/test/path",
                     sizeBytes: 0,
-                }
+                },
             });
 
             // Act
@@ -313,7 +336,7 @@ describe("DataBackupService", () => {
                     createdAt: Date.now(),
                     originalPath: "/test/path",
                     sizeBytes: largeBuffer.length,
-                }
+                },
             });
 
             // Act
@@ -333,7 +356,7 @@ describe("DataBackupService", () => {
                     createdAt: 1_234_567_890,
                     originalPath: "/original/path",
                     sizeBytes: 12,
-                }
+                },
             };
             vi.mocked(createDatabaseBackup).mockResolvedValue(backupResult);
 
@@ -356,7 +379,9 @@ describe("DataBackupService", () => {
             });
 
             // Act & Assert
-            await expect(dataBackupService.downloadDatabaseBackup()).rejects.toThrow(SiteLoadingError);
+            await expect(
+                dataBackupService.downloadDatabaseBackup()
+            ).rejects.toThrow(SiteLoadingError);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to download backup: Cannot access user data path",
@@ -373,7 +398,9 @@ describe("DataBackupService", () => {
 
             // Act & Assert
             // When event emission fails, the emission error is thrown instead of SiteLoadingError
-            await expect(dataBackupService.downloadDatabaseBackup()).rejects.toThrow("Event emission failed");
+            await expect(
+                dataBackupService.downloadDatabaseBackup()
+            ).rejects.toThrow("Event emission failed");
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to download backup: Backup failed",
@@ -408,10 +435,12 @@ describe("DataBackupService", () => {
         it("should handle concurrent backup requests", async () => {
             // Arrange
             let resolveBackup: (value: any) => void;
-            const backupPromise = new Promise(resolve => {
+            const backupPromise = new Promise((resolve) => {
                 resolveBackup = resolve;
             });
-            vi.mocked(createDatabaseBackup).mockReturnValue(backupPromise as any);
+            vi.mocked(createDatabaseBackup).mockReturnValue(
+                backupPromise as any
+            );
 
             // Act
             const promise1 = dataBackupService.downloadDatabaseBackup();
@@ -421,7 +450,11 @@ describe("DataBackupService", () => {
             resolveBackup!({
                 buffer: Buffer.from("concurrent backup"),
                 fileName: "concurrent-backup.sqlite",
-                metadata: { createdAt: Date.now(), originalPath: "/test", sizeBytes: 17 }
+                metadata: {
+                    createdAt: Date.now(),
+                    originalPath: "/test",
+                    sizeBytes: 17,
+                },
             });
 
             const [result1, result2] = await Promise.all([promise1, promise2]);

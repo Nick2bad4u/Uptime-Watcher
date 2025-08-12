@@ -57,43 +57,65 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         });
         mockMiddleware2 = vi.fn(async (_event, _data, next) => {
             await next();
-        });        });
+        });
+    });
     afterEach(() => {
         eventBus.removeAllListeners();
         eventBus.clearMiddleware();
-        });
+    });
     describe("Constructor and Configuration", () => {
-        it("should create with default name when none provided", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
-            
- const bus = new TypedEventBus<TestEvents>();
+        it("should create with default name when none provided", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
+            const bus = new TypedEventBus<TestEvents>();
             const diagnostics = bus.getDiagnostics();
             expect(diagnostics.busId).toBe("test-correlation-id");
         });
         it("should create with custom name", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
-            
- const bus = new TypedEventBus<TestEvents>("custom-name");
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
+            const bus = new TypedEventBus<TestEvents>("custom-name");
             const diagnostics = bus.getDiagnostics();
             expect(diagnostics.busId).toBe("custom-name");
         });
-        it("should use custom maxMiddleware option", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
-            
- const bus = new TypedEventBus<TestEvents>("test", {
+        it("should use custom maxMiddleware option", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
+            const bus = new TypedEventBus<TestEvents>("test", {
                 maxMiddleware: 5,
-        });
+            });
             const diagnostics = bus.getDiagnostics();
             expect(diagnostics.maxMiddleware).toBe(5);
         });
-        it("should throw error for invalid maxMiddleware", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
-            
- expect(
+        it("should throw error for invalid maxMiddleware", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
+            expect(
                 () =>
                     new TypedEventBus<TestEvents>("test", { maxMiddleware: 0 })
             ).toThrow("maxMiddleware must be positive, got 0");
@@ -102,39 +124,65 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                     new TypedEventBus<TestEvents>("test", { maxMiddleware: -1 })
             ).toThrow("maxMiddleware must be positive, got -1");
         });
-        it("should set max listeners to 50 by default", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
-            
- const bus = new TypedEventBus<TestEvents>();
+        it("should set max listeners to 50 by default", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
+            const bus = new TypedEventBus<TestEvents>();
             expect(bus.getMaxListeners()).toBe(50);
-        });        });
-    describe("Factory Function", () => {
-        it("should create TypedEventBus instance via factory", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
-            
- const bus = createTypedEventBus<TestEvents>("factory-test", {
-                maxMiddleware: 15,
         });
+    });
+    describe("Factory Function", () => {
+        it("should create TypedEventBus instance via factory", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
+            const bus = createTypedEventBus<TestEvents>("factory-test", {
+                maxMiddleware: 15,
+            });
             expect(bus).toBeInstanceOf(TypedEventBus);
             const diagnostics = bus.getDiagnostics();
             expect(diagnostics.busId).toBe("factory-test");
             expect(diagnostics.maxMiddleware).toBe(15);
         });
-        it("should create with default options via factory", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
-            
- const bus = createTypedEventBus<TestEvents>();
+        it("should create with default options via factory", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
+            const bus = createTypedEventBus<TestEvents>();
             expect(bus).toBeInstanceOf(TypedEventBus);
-        });        });
+        });
+    });
     describe("Middleware System", () => {
-        it("should register middleware successfully", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
-            
- eventBus.use(mockMiddleware);
+        it("should register middleware successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
+            eventBus.use(mockMiddleware);
             const diagnostics = eventBus.getDiagnostics();
             expect(diagnostics.middlewareCount).toBe(1);
             expect(diagnostics.middlewareUtilization).toBe(5); // 1/20 * 100
@@ -177,13 +225,19 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             );
             expect(mockListener).toHaveBeenCalled();
         });
-        it("should throw error when middleware limit exceeded", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
-            
- const bus = new TypedEventBus<TestEvents>("test", {
+        it("should throw error when middleware limit exceeded", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
+            const bus = new TypedEventBus<TestEvents>("test", {
                 maxMiddleware: 2,
-        });
+            });
             bus.use(mockMiddleware);
             bus.use(mockMiddleware2);
 
@@ -194,7 +248,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should handle middleware errors and abort emission", async () => {
             const errorMiddleware: EventMiddleware = vi.fn(async () => {
                 throw new Error("Middleware error");
-        });
+            });
             eventBus.use(errorMiddleware);
             eventBus.use(mockMiddleware2); // This should not be called
             eventBus.onTyped("string-event", mockListener);
@@ -223,10 +277,13 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(mockListener).toHaveBeenCalled();
         });
         it("should remove specific middleware", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
-            
- eventBus.use(mockMiddleware);
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
+            eventBus.use(mockMiddleware);
             eventBus.use(mockMiddleware2);
 
             expect(eventBus.getDiagnostics().middlewareCount).toBe(2);
@@ -235,11 +292,17 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(removed).toBe(true);
             expect(eventBus.getDiagnostics().middlewareCount).toBe(1);
         });
-        it("should return false when removing non-existent middleware", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
-            
- eventBus.use(mockMiddleware);
+        it("should return false when removing non-existent middleware", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
+            eventBus.use(mockMiddleware);
             const nonExistentMiddleware = vi.fn();
 
             const removed = eventBus.removeMiddleware(nonExistentMiddleware);
@@ -247,10 +310,13 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(eventBus.getDiagnostics().middlewareCount).toBe(1);
         });
         it("should clear all middleware", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
-            
- eventBus.use(mockMiddleware);
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
+            eventBus.use(mockMiddleware);
             eventBus.use(mockMiddleware2);
 
             expect(eventBus.getDiagnostics().middlewareCount).toBe(2);
@@ -269,7 +335,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                     _meta: expect.any(Object),
                 })
             );
-        });        });
+        });
+    });
     describe("Data Type Transformations", () => {
         it("should handle string primitives correctly", async () => {
             eventBus.onTyped("string-event", mockListener);
@@ -284,7 +351,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                     eventName: "string-event",
                     timestamp: expect.any(Number),
                 }),
-        });        });
+            });
+        });
         it("should handle number primitives correctly", async () => {
             eventBus.onTyped("number-event", mockListener);
 
@@ -293,7 +361,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(mockListener).toHaveBeenCalledWith({
                 value: 42,
                 _meta: expect.any(Object),
-        });        });
+            });
+        });
         it("should handle boolean primitives correctly", async () => {
             eventBus.onTyped("primitive-boolean", mockListener);
 
@@ -302,7 +371,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(mockListener).toHaveBeenCalledWith({
                 value: true,
                 _meta: expect.any(Object),
-        });        });
+            });
+        });
         it("should handle null values correctly", async () => {
             eventBus.onTyped("null-event", mockListener);
 
@@ -311,7 +381,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(mockListener).toHaveBeenCalledWith({
                 value: null,
                 _meta: expect.any(Object),
-        });        });
+            });
+        });
         it("should handle undefined values correctly", async () => {
             eventBus.onTyped("undefined-event", mockListener);
 
@@ -320,7 +391,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(mockListener).toHaveBeenCalledWith({
                 value: undefined,
                 _meta: expect.any(Object),
-        });        });
+            });
+        });
         it("should handle objects without _meta property", async () => {
             eventBus.onTyped("object-event", mockListener);
 
@@ -331,7 +403,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                 data: "test",
                 nested: { value: 123 },
                 _meta: expect.any(Object),
-        });        });
+            });
+        });
         it("should handle objects with existing _meta property", async () => {
             eventBus.onTyped("object-with-meta", mockListener);
 
@@ -342,7 +415,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                 data: "test",
                 _meta: expect.any(Object),
                 _originalMeta: "existing-meta",
-        });        });
+            });
+        });
         it("should handle arrays correctly", async () => {
             eventBus.onTyped("array-event", mockListener);
 
@@ -391,7 +465,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                     { name: "item2", value: 20 },
                 ],
                 _meta: expect.any(Object),
-        });        });        });
+            });
+        });
+    });
     describe("Typed Event Methods", () => {
         it("should support onTyped method", async () => {
             eventBus.onTyped("string-event", mockListener);
@@ -428,13 +504,20 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
             expect(listener1).not.toHaveBeenCalled();
             expect(listener2).not.toHaveBeenCalled();
-        });        });
+        });
+    });
     describe("Diagnostics", () => {
-        it("should provide accurate diagnostics", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
-            
- const listener1 = vi.fn();
+        it("should provide accurate diagnostics", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
+            const listener1 = vi.fn();
             const listener2 = vi.fn();
 
             eventBus.onTyped("string-event", listener1);
@@ -456,12 +539,16 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                 maxMiddleware: 20,
                 middlewareCount: 2,
                 middlewareUtilization: 10, // 2/20 * 100
-        });        });
+            });
+        });
         it("should handle empty diagnostics", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
-            
- const diagnostics = eventBus.getDiagnostics();
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
+            const diagnostics = eventBus.getDiagnostics();
 
             expect(diagnostics).toEqual({
                 busId: "test-bus",
@@ -470,33 +557,48 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                 maxMiddleware: 20,
                 middlewareCount: 0,
                 middlewareUtilization: 0,
-        });        });
-        it("should calculate middleware utilization correctly", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
-            
- const bus = new TypedEventBus<TestEvents>("test", {
-                maxMiddleware: 4,
+            });
         });
+        it("should calculate middleware utilization correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
+            const bus = new TypedEventBus<TestEvents>("test", {
+                maxMiddleware: 4,
+            });
             bus.use(mockMiddleware);
             bus.use(mockMiddleware2);
 
             const diagnostics = bus.getDiagnostics();
             expect(diagnostics.middlewareUtilization).toBe(50); // 2/4 * 100
         });
-        it("should handle maxMiddleware of 0 in utilization calculation", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
+        it("should handle maxMiddleware of 0 in utilization calculation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
             // This tests the edge case protection in getDiagnostics
             const bus = new TypedEventBus<TestEvents>("test", {
                 maxMiddleware: 1,
-        });
+            });
             // Manually set maxMiddleware to 0 to test the protection
             (bus as any).maxMiddleware = 0;
 
             const diagnostics = bus.getDiagnostics();
             expect(diagnostics.middlewareUtilization).toBe(0);
-        });        });
+        });
+    });
     describe("Error Handling and Edge Cases", () => {
         it("should handle middleware that doesn't call next", async () => {
             const badMiddleware: EventMiddleware = vi.fn(); // Doesn't call next()
@@ -592,7 +694,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(mockListener).toHaveBeenCalledWith({
                 value: null,
                 _meta: expect.any(Object),
-        });        });
+            });
+        });
         it("should handle undefined values correctly", async () => {
             eventBus.onTyped("string-event", mockListener);
 
@@ -601,7 +704,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(mockListener).toHaveBeenCalledWith({
                 value: undefined,
                 _meta: expect.any(Object),
-        });        });
+            });
+        });
         it("should handle zero as a valid number", async () => {
             eventBus.onTyped("number-event", mockListener);
 
@@ -610,7 +714,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(mockListener).toHaveBeenCalledWith({
                 value: 0,
                 _meta: expect.any(Object),
-        });        });
+            });
+        });
         it("should handle empty string", async () => {
             eventBus.onTyped("string-event", mockListener);
 
@@ -619,14 +724,15 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(mockListener).toHaveBeenCalledWith({
                 value: "",
                 _meta: expect.any(Object),
-        });        });
+            });
+        });
         it("should handle empty object", async () => {
             eventBus.onTyped("object-event", mockListener);
 
             await eventBus.emitTyped("object-event", {
                 data: "",
                 nested: { value: 0 },
-        });
+            });
             expect(mockListener).toHaveBeenCalledWith(
                 expect.objectContaining({
                     data: "",
@@ -644,44 +750,76 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(Array.isArray(receivedData)).toBe(true);
             expect(receivedData.length).toBe(0);
             expect(receivedData._meta).toEqual(expect.any(Object));
-        });        });
+        });
+    });
     describe("Chaining Support", () => {
-        it("should support method chaining for onTyped", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
-            
- const result = eventBus.onTyped("string-event", mockListener);
+        it("should support method chaining for onTyped", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
+            const result = eventBus.onTyped("string-event", mockListener);
             expect(result).toBe(eventBus);
         });
-        it("should support method chaining for onceTyped", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
-            
- const result = eventBus.onceTyped("string-event", mockListener);
+        it("should support method chaining for onceTyped", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
+            const result = eventBus.onceTyped("string-event", mockListener);
             expect(result).toBe(eventBus);
         });
-        it("should support method chaining for offTyped", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
-            
- const result = eventBus.offTyped("string-event", mockListener);
+        it("should support method chaining for offTyped", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
+            const result = eventBus.offTyped("string-event", mockListener);
             expect(result).toBe(eventBus);
-        });        });
+        });
+    });
     describe("Advanced Edge Cases and Coverage", () => {
-        it("should handle constructor with maxMiddleware of 0", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
-            
- expect(
+        it("should handle constructor with maxMiddleware of 0", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
+            expect(
                 () =>
                     new TypedEventBus<TestEvents>("test", { maxMiddleware: 0 })
             ).toThrow("maxMiddleware must be positive, got 0");
         });
-        it("should handle constructor with negative maxMiddleware", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
-            
- expect(
+        it("should handle constructor with negative maxMiddleware", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
+            expect(
                 () =>
                     new TypedEventBus<TestEvents>("test", { maxMiddleware: -1 })
             ).toThrow("maxMiddleware must be positive, got -1");
@@ -712,7 +850,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                 enumerable: false,
                 writable: true,
                 configurable: true,
-        });
+            });
             await eventBus.emitTyped("array-event", arr);
 
             const receivedData = mockListener.mock.calls[0]?.[0];
@@ -723,7 +861,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should handle middleware that throws non-Error objects", async () => {
             const badMiddleware: EventMiddleware = vi.fn(async () => {
                 throw "String error"; // Non-Error thrown
-        });
+            });
             eventBus.use(badMiddleware);
             eventBus.onTyped("string-event", mockListener);
 
@@ -764,7 +902,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(mockListener).toHaveBeenCalledWith({
                 value: bigIntValue,
                 _meta: expect.any(Object),
-        });        });
+            });
+        });
         it("should handle Symbol values", async () => {
             eventBus.onTyped("string-event", mockListener);
 
@@ -775,7 +914,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(mockListener).toHaveBeenCalledWith({
                 value: symbolValue,
                 _meta: expect.any(Object),
-        });        });
+            });
+        });
         it("should handle Date objects correctly", async () => {
             eventBus.onTyped("object-event", mockListener);
 
@@ -859,11 +999,17 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(asyncMiddleware).toHaveBeenCalled();
             expect(mockListener).toHaveBeenCalled();
         });
-        it("should handle removeMiddleware with multiple occurrences", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
-            
- const duplicateMiddleware = vi.fn();
+        it("should handle removeMiddleware with multiple occurrences", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
+            const duplicateMiddleware = vi.fn();
 
             eventBus.use(duplicateMiddleware);
             eventBus.use(mockMiddleware);
@@ -893,7 +1039,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(mockListener).toHaveBeenCalledWith({
                 value: "test",
                 _meta: expect.any(Object),
-        });        });
+            });
+        });
         it("should handle createEnhancedData with object that has non-configurable properties", async () => {
             eventBus.onTyped("object-event", mockListener);
 
@@ -907,7 +1054,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                 configurable: false,
                 enumerable: true,
                 writable: false,
-        });
+            });
             await eventBus.emitTyped("object-event", obj);
 
             expect(mockListener).toHaveBeenCalledWith(
@@ -919,13 +1066,19 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                 })
             );
         });
-        it("should handle middleware utilization calculation edge cases", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: TypedEventBus - Comprehensive Coverage", "component");
-            
-            
- const bus = new TypedEventBus<TestEvents>("test", {
+        it("should handle middleware utilization calculation edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: TypedEventBus - Comprehensive Coverage",
+                "component"
+            );
+
+            const bus = new TypedEventBus<TestEvents>("test", {
                 maxMiddleware: 1,
-        });
+            });
             // Test 100% utilization
             bus.use(mockMiddleware);
             expect(bus.getDiagnostics().middlewareUtilization).toBe(100);
@@ -939,4 +1092,6 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
             const diagnostics = bus.getDiagnostics();
             expect(diagnostics.middlewareUtilization).toBeLessThanOrEqual(100);
-        });        });        });
+        });
+    });
+});

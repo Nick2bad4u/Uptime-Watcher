@@ -29,10 +29,10 @@ describe("electronUtils.ts - Branch Coverage", () => {
     beforeEach(async () => {
         vi.clearAllMocks();
         electronUtils = await import("../electronUtils.js");
-        });
+    });
     afterEach(() => {
         vi.resetAllMocks();
-        });
+    });
     describe("isDev Function - All Branch Combinations", () => {
         it("should return true when NODE_ENV is development AND app is not packaged", async () => {
             // Mock isDevelopment to return true
@@ -85,7 +85,8 @@ describe("electronUtils.ts - Branch Coverage", () => {
 
             const result = electronUtils.isDev();
             expect(result).toBe(false);
-        });        });
+        });
+    });
     describe("Edge Cases and Boundary Conditions", () => {
         it("should handle undefined NODE_ENV (falsy) and not packaged", async () => {
             const { isDevelopment } = await import(
@@ -126,7 +127,8 @@ describe("electronUtils.ts - Branch Coverage", () => {
             // Test with test environment
             (isDevelopment as any).mockReturnValue(false);
             expect(electronUtils.isDev()).toBe(false);
-        });        });
+        });
+    });
     describe("Integration with app.isPackaged", () => {
         it("should correctly evaluate app packaging status in all scenarios", async () => {
             const { isDevelopment } = await import(
@@ -148,7 +150,8 @@ describe("electronUtils.ts - Branch Coverage", () => {
                 const result = electronUtils.isDev();
                 expect(result).toBe(testCase.expected);
             }
-        });        });
+        });
+    });
     describe("Real-world Usage Scenarios", () => {
         it("should behave correctly in typical development setup", async () => {
             // Typical development: NODE_ENV=development, unpackaged
@@ -179,13 +182,20 @@ describe("electronUtils.ts - Branch Coverage", () => {
             mockApp.isPackaged = false;
 
             expect(electronUtils.isDev()).toBe(false);
-        });        });
+        });
+    });
     describe("Function Behavior Validation", () => {
-        it("should have the correct function signature", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: electronUtils.ts - Branch Coverage", "component");
-            
-            
- expect(typeof electronUtils.isDev).toBe("function");
+        it("should have the correct function signature", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: electronUtils.ts - Branch Coverage",
+                "component"
+            );
+
+            expect(typeof electronUtils.isDev).toBe("function");
             expect(electronUtils.isDev.length).toBe(0); // No parameters
         });
         it("should return a boolean value consistently", async () => {
@@ -206,4 +216,6 @@ describe("electronUtils.ts - Branch Coverage", () => {
             expect(typeof result3).toBe("boolean");
             expect(result1).toBe(result2);
             expect(result2).toBe(result3);
-        });        });        });
+        });
+    });
+});

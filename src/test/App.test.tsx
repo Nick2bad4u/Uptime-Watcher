@@ -148,12 +148,18 @@ describe.skip("App Component", () => {
 
     it("should render without crashing", async ({ annotate }) => {
         await annotate("Component: App", "component");
-        await annotate("Test Type: Integration - Component Rendering", "test-type");
+        await annotate(
+            "Test Type: Integration - Component Rendering",
+            "test-type"
+        );
         await annotate("Operation: Basic App Render", "operation");
         await annotate("Priority: Critical - Core Component", "priority");
         await annotate("Complexity: High - Full App Integration", "complexity");
         await annotate("Scope: Main application container component", "scope");
-        await annotate("Purpose: Ensure main app component renders without errors", "purpose");
+        await annotate(
+            "Purpose: Ensure main app component renders without errors",
+            "purpose"
+        );
 
         const { container } = render(<App />);
         expect(container).toBeInTheDocument();
@@ -161,12 +167,27 @@ describe.skip("App Component", () => {
 
     it("should render with proper structure", async ({ annotate }) => {
         await annotate("Component: App", "component");
-        await annotate("Test Type: Integration - Structure Validation", "test-type");
+        await annotate(
+            "Test Type: Integration - Structure Validation",
+            "test-type"
+        );
         await annotate("Operation: App Structure Verification", "operation");
-        await annotate("Priority: Critical - Component Architecture", "priority");
-        await annotate("Complexity: Medium - Structure Validation", "complexity");
-        await annotate("Dependencies: ErrorBoundary, ThemeProvider", "dependencies");
-        await annotate("Purpose: Validate essential wrapper components are present", "purpose");
+        await annotate(
+            "Priority: Critical - Component Architecture",
+            "priority"
+        );
+        await annotate(
+            "Complexity: Medium - Structure Validation",
+            "complexity"
+        );
+        await annotate(
+            "Dependencies: ErrorBoundary, ThemeProvider",
+            "dependencies"
+        );
+        await annotate(
+            "Purpose: Validate essential wrapper components are present",
+            "purpose"
+        );
 
         render(<App />);
 
@@ -181,7 +202,10 @@ describe.skip("App Component", () => {
         await annotate("Priority: High - UI Navigation", "priority");
         await annotate("Complexity: Low - Child Component Check", "complexity");
         await annotate("UI Element: Main application header", "ui-element");
-        await annotate("Purpose: Ensure header component is rendered", "purpose");
+        await annotate(
+            "Purpose: Ensure header component is rendered",
+            "purpose"
+        );
 
         render(<App />);
         expect(screen.getByTestId("header")).toBeInTheDocument();
@@ -194,7 +218,10 @@ describe.skip("App Component", () => {
         await annotate("Priority: Critical - Core Functionality", "priority");
         await annotate("Complexity: Low - Child Component Check", "complexity");
         await annotate("UI Element: Site monitoring dashboard", "ui-element");
-        await annotate("Purpose: Ensure site list dashboard is rendered", "purpose");
+        await annotate(
+            "Purpose: Ensure site list dashboard is rendered",
+            "purpose"
+        );
 
         render(<App />);
         expect(screen.getByTestId("site-list")).toBeInTheDocument();
@@ -207,7 +234,10 @@ describe.skip("App Component", () => {
         await annotate("Priority: High - Site Management", "priority");
         await annotate("Complexity: Low - Child Component Check", "complexity");
         await annotate("UI Element: Site creation form", "ui-element");
-        await annotate("Purpose: Ensure site creation form is rendered", "purpose");
+        await annotate(
+            "Purpose: Ensure site creation form is rendered",
+            "purpose"
+        );
 
         render(<App />);
         expect(screen.getByTestId("add-site-form")).toBeInTheDocument();
@@ -215,12 +245,21 @@ describe.skip("App Component", () => {
 
     it("should have correct app container class", async ({ annotate }) => {
         await annotate("Component: App", "component");
-        await annotate("Test Type: Integration - CSS Class Validation", "test-type");
-        await annotate("Operation: App Container CSS Verification", "operation");
+        await annotate(
+            "Test Type: Integration - CSS Class Validation",
+            "test-type"
+        );
+        await annotate(
+            "Operation: App Container CSS Verification",
+            "operation"
+        );
         await annotate("Priority: Medium - UI Styling", "priority");
         await annotate("Complexity: Low - CSS Class Check", "complexity");
         await annotate("CSS Class: app-container", "css-class");
-        await annotate("Purpose: Ensure proper CSS classes are applied", "purpose");
+        await annotate(
+            "Purpose: Ensure proper CSS classes are applied",
+            "purpose"
+        );
 
         render(<App />);
         const appContainer = screen.getByRole("main");

@@ -2295,7 +2295,6 @@ export default [
             "testing-library/no-await-sync-queries": "error",
             "testing-library/no-debugging-utils": "off",
             "testing-library/prefer-screen-queries": "warn",
-            "unused-imports/no-unused-imports": "error",
 
             // Relaxed function rules for tests (explicit for clarity)
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common

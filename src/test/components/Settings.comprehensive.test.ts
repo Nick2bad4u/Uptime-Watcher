@@ -290,11 +290,16 @@ describe("Settings Component Coverage Tests", () => {
                 }, // Invalid
             ];
 
-            for (const { input, min, max, default: defaultValue, expected } of testCases) {
-                    const result = safeInteger(input, min, max, defaultValue);
-                    expect(result).toBe(expected);
-                }
-            
+            for (const {
+                input,
+                min,
+                max,
+                default: defaultValue,
+                expected,
+            } of testCases) {
+                const result = safeInteger(input, min, max, defaultValue);
+                expect(result).toBe(expected);
+            }
         });
     });
 

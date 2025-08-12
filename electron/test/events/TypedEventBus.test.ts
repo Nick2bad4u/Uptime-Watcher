@@ -1,9 +1,9 @@
 /**
  * Test suite for TypedEventBus
- * 
+ *
  * @fileoverview Comprehensive tests for unknown functionality
  * in the Uptime Watcher application.
- * 
+ *
  * @author GitHub Copilot
  * @since 2025-08-11
  * @category General
@@ -24,17 +24,20 @@ describe("TypedEventBus", () => {
     let eventBus: TypedEventBus<TestEvents>;
 
     beforeEach(() => {
-        eventBus = new TypedEventBus<TestEvents>();        });
+        eventBus = new TypedEventBus<TestEvents>();
+    });
     describe("basic functionality", () => {
         it("should create an instance without error", () => {
-            expect(eventBus).toBeInstanceOf(TypedEventBus);        });
+            expect(eventBus).toBeInstanceOf(TypedEventBus);
+        });
         it("should emit and listen to events", () => {
             const listener = vi.fn();
 
             eventBus.on("test-event", listener);
             eventBus.emit("test-event", { data: "test" });
 
-            expect(listener).toHaveBeenCalledWith({ data: "test" });        });
+            expect(listener).toHaveBeenCalledWith({ data: "test" });
+        });
         it("should support multiple listeners for the same event", () => {
             const listener1 = vi.fn();
             const listener2 = vi.fn();
@@ -44,7 +47,8 @@ describe("TypedEventBus", () => {
             eventBus.emit("test-event", { data: "test" });
 
             expect(listener1).toHaveBeenCalledWith({ data: "test" });
-            expect(listener2).toHaveBeenCalledWith({ data: "test" });        });
+            expect(listener2).toHaveBeenCalledWith({ data: "test" });
+        });
         it("should remove listeners", () => {
             const listener = vi.fn();
 
@@ -52,7 +56,8 @@ describe("TypedEventBus", () => {
             eventBus.off("test-event", listener);
             eventBus.emit("test-event", { data: "test" });
 
-            expect(listener).not.toHaveBeenCalled();        });
+            expect(listener).not.toHaveBeenCalled();
+        });
         it("should support once listeners", () => {
             const listener = vi.fn();
 
@@ -61,7 +66,8 @@ describe("TypedEventBus", () => {
             eventBus.emit("test-event", { data: "test2" });
 
             expect(listener).toHaveBeenCalledTimes(1);
-            expect(listener).toHaveBeenCalledWith({ data: "test1" });        });
+            expect(listener).toHaveBeenCalledWith({ data: "test1" });
+        });
         it("should handle different event types", () => {
             const testListener = vi.fn();
             const anotherListener = vi.fn();
@@ -73,11 +79,14 @@ describe("TypedEventBus", () => {
             eventBus.emit("another-event", { value: 42 });
 
             expect(testListener).toHaveBeenCalledWith({ data: "test" });
-            expect(anotherListener).toHaveBeenCalledWith({ value: 42 });        });        });
+            expect(anotherListener).toHaveBeenCalledWith({ value: 42 });
+        });
+    });
     describe("error handling", () => {
         it("should propagate listener errors correctly", () => {
             const errorListener = vi.fn(() => {
-                throw new Error("Listener error");        });
+                throw new Error("Listener error");
+            });
             const normalListener = vi.fn();
 
             eventBus.on("test-event", errorListener);
@@ -89,10 +98,12 @@ describe("TypedEventBus", () => {
             }).toThrow("Listener error");
 
             expect(errorListener).toHaveBeenCalled();
-            // Normal listener won't be called if error listener throws first        });
+            // Normal listener won't be called if error listener throws first
+        });
         it("should handle multiple listeners with error in first one", () => {
             const errorListener = vi.fn(() => {
-                throw new Error("First listener error");        });
+                throw new Error("First listener error");
+            });
             const normalListener = vi.fn();
 
             eventBus.on("test-event", errorListener);
@@ -102,10 +113,12 @@ describe("TypedEventBus", () => {
                 eventBus.emit("test-event", { data: "test" });
             }).toThrow("First listener error");
 
-            expect(errorListener).toHaveBeenCalled();        });
+            expect(errorListener).toHaveBeenCalled();
+        });
         it("should handle errors in async emitTyped", async () => {
             const errorListener = vi.fn(() => {
-                throw new Error("Async listener error");        });
+                throw new Error("Async listener error");
+            });
             eventBus.on("test-event", errorListener);
 
             // emitTyped should also propagate errors
@@ -113,7 +126,9 @@ describe("TypedEventBus", () => {
                 await eventBus.emitTyped("test-event", { data: "test" });
             }).rejects.toThrow("Async listener error");
 
-            expect(errorListener).toHaveBeenCalled();        });        });
+            expect(errorListener).toHaveBeenCalled();
+        });
+    });
     describe("event introspection", () => {
         it("should provide listener count", () => {
             const listener1 = vi.fn();
@@ -122,31 +137,39 @@ describe("TypedEventBus", () => {
             eventBus.on("test-event", listener1);
             eventBus.on("test-event", listener2);
 
-            expect(eventBus.listenerCount("test-event")).toBe(2);        });
+            expect(eventBus.listenerCount("test-event")).toBe(2);
+        });
         it("should provide event names", () => {
             eventBus.on("test-event", vi.fn());
             eventBus.on("another-event", vi.fn());
 
             const eventNames = eventBus.eventNames();
             expect(eventNames).toContain("test-event");
-            expect(eventNames).toContain("another-event");        });
+            expect(eventNames).toContain("another-event");
+        });
         it("should provide max listeners setting", () => {
             const maxListeners = eventBus.getMaxListeners();
             expect(typeof maxListeners).toBe("number");
-            expect(maxListeners).toBeGreaterThan(0);        });
+            expect(maxListeners).toBeGreaterThan(0);
+        });
         it("should allow setting max listeners", () => {
             eventBus.setMaxListeners(20);
-            expect(eventBus.getMaxListeners()).toBe(20);        });        });
+            expect(eventBus.getMaxListeners()).toBe(20);
+        });
+    });
     describe("edge cases", () => {
         it("should handle emitting events with no listeners", () => {
             expect(() => {
                 eventBus.emit("test-event", { data: "test" });
-            }).not.toThrow();        });
+            }).not.toThrow();
+        });
         it("should handle removing non-existent listeners", () => {
             const listener = vi.fn();
             expect(() => {
                 eventBus.off("test-event", listener);
-            }).not.toThrow();        });        });
+            }).not.toThrow();
+        });
+    });
     describe("cleanup", () => {
         it("should remove all listeners", () => {
             const listener1 = vi.fn();
@@ -161,7 +184,8 @@ describe("TypedEventBus", () => {
             eventBus.emit("another-event", { value: 42 });
 
             expect(listener1).not.toHaveBeenCalled();
-            expect(listener2).not.toHaveBeenCalled();        });
+            expect(listener2).not.toHaveBeenCalled();
+        });
         it("should remove listeners for specific event", () => {
             const listener1 = vi.fn();
             const listener2 = vi.fn();
@@ -175,7 +199,9 @@ describe("TypedEventBus", () => {
             eventBus.emit("another-event", { value: 42 });
 
             expect(listener1).not.toHaveBeenCalled();
-            expect(listener2).toHaveBeenCalled();        });        });
+            expect(listener2).toHaveBeenCalled();
+        });
+    });
     describe("typed methods", () => {
         it("should support typed emit and on methods", async () => {
             const listener = vi.fn();
@@ -193,7 +219,8 @@ describe("TypedEventBus", () => {
                         timestamp: expect.any(Number),
                     }),
                 })
-            );        });
+            );
+        });
         it("should support typed once method", async () => {
             const listener = vi.fn();
 
@@ -207,7 +234,8 @@ describe("TypedEventBus", () => {
                     data: "once-test",
                     _meta: expect.any(Object),
                 })
-            );        });
+            );
+        });
         it("should support typed off method", async () => {
             const listener = vi.fn();
 
@@ -215,4 +243,7 @@ describe("TypedEventBus", () => {
             eventBus.offTyped("test-event", listener);
             await eventBus.emitTyped("test-event", { data: "off-test" });
 
-            expect(listener).not.toHaveBeenCalled();        });        });        });
+            expect(listener).not.toHaveBeenCalled();
+        });
+    });
+});

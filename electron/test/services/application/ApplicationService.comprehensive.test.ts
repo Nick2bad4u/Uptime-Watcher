@@ -259,11 +259,14 @@ describe("ApplicationService", () => {
             // Basic task metadata usage
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(`Task ID: ${task.id}`, "task-id");
-            await annotate(`Suite: ${task.suite?.name || 'Unknown'}`, "suite");
-            await annotate(`File: ${task.file?.name || 'Unknown'}`, "file");
+            await annotate(`Suite: ${task.suite?.name || "Unknown"}`, "suite");
+            await annotate(`File: ${task.file?.name || "Unknown"}`, "file");
             await annotate(`Mode: ${task.mode}`, "mode");
-            await annotate(`Concurrent: ${task.concurrent || false}`, "concurrent");
-            
+            await annotate(
+                `Concurrent: ${task.concurrent || false}`,
+                "concurrent"
+            );
+
             // Component and feature info
             await annotate("Component: ApplicationService", "component");
             await annotate("Feature: Electron app event binding", "feature");
@@ -271,8 +274,11 @@ describe("ApplicationService", () => {
             await annotate("Category: Event system setup", "category");
 
             // Conditional logic based on task properties
-            if (task.mode === 'only') {
-                await annotate("⚠️ Running in ONLY mode - isolated test", "warning");
+            if (task.mode === "only") {
+                await annotate(
+                    "⚠️ Running in ONLY mode - isolated test",
+                    "warning"
+                );
             }
 
             // Act
@@ -298,23 +304,32 @@ describe("ApplicationService", () => {
         }) => {
             // Advanced task metadata usage
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(`Task hierarchy: ${task.suite?.name} > ${task.name}`, "hierarchy");
-            
+            await annotate(
+                `Task hierarchy: ${task.suite?.name} > ${task.name}`,
+                "hierarchy"
+            );
+
             // Extract test context from task name for dynamic behavior
-            const isReadyEventTest = task.name.includes('ready event');
-            await annotate(`Ready event test: ${isReadyEventTest}`, "test-type");
-            
+            const isReadyEventTest = task.name.includes("ready event");
+            await annotate(
+                `Ready event test: ${isReadyEventTest}`,
+                "test-type"
+            );
+
             await annotate("Component: ApplicationService", "component");
             await annotate("Feature: Auto-updater initialization", "feature");
             await annotate("Priority: High", "priority");
 
             // Use task metadata for conditional test logic
             const taskInfo = {
-                isSkipped: task.mode === 'skip',
-                isOnly: task.mode === 'only',
-                isConcurrent: task.concurrent || false
+                isSkipped: task.mode === "skip",
+                isOnly: task.mode === "only",
+                isConcurrent: task.concurrent || false,
             };
-            await annotate(`Task info: ${JSON.stringify(taskInfo)}`, "task-info");
+            await annotate(
+                `Task info: ${JSON.stringify(taskInfo)}`,
+                "task-info"
+            );
 
             // Arrange
             applicationService = new ApplicationService();
@@ -497,14 +512,17 @@ describe("ApplicationService", () => {
                 () =>
                     new Promise((resolve, reject) => {
                         // Simulate async operation that can be cancelled
-                        const timeout = setTimeout(() => resolve(undefined), 1000);
-                        
+                        const timeout = setTimeout(
+                            () => resolve(undefined),
+                            1000
+                        );
+
                         // Handle cancellation properly
                         customSignal.addEventListener("abort", () => {
                             clearTimeout(timeout);
                             reject(new Error("Operation aborted"));
                         });
-                        
+
                         // If already aborted when this runs
                         if (customSignal.aborted) {
                             clearTimeout(timeout);

@@ -21,7 +21,11 @@ describe("useSiteStats", () => {
 
         it("should calculate stats for single record", () => {
             const history: StatusHistory[] = [
-                { responseTime: 200, status: "up", timestamp: 1_640_995_200_000 },
+                {
+                    responseTime: 200,
+                    status: "up",
+                    timestamp: 1_640_995_200_000,
+                },
             ];
 
             const { result } = renderHook(() => useSiteStats(history));
@@ -35,9 +39,21 @@ describe("useSiteStats", () => {
     describe("Uptime Calculation", () => {
         it("should calculate 100% uptime for all up records", () => {
             const history: StatusHistory[] = [
-                { responseTime: 200, status: "up", timestamp: 1_640_995_200_000 },
-                { responseTime: 150, status: "up", timestamp: 1_640_991_600_000 },
-                { responseTime: 180, status: "up", timestamp: 1_640_988_000_000 },
+                {
+                    responseTime: 200,
+                    status: "up",
+                    timestamp: 1_640_995_200_000,
+                },
+                {
+                    responseTime: 150,
+                    status: "up",
+                    timestamp: 1_640_991_600_000,
+                },
+                {
+                    responseTime: 180,
+                    status: "up",
+                    timestamp: 1_640_988_000_000,
+                },
             ];
 
             const { result } = renderHook(() => useSiteStats(history));
@@ -48,8 +64,16 @@ describe("useSiteStats", () => {
 
         it("should calculate 0% uptime for all down records", () => {
             const history: StatusHistory[] = [
-                { responseTime: 0, status: "down", timestamp: 1_640_995_200_000 },
-                { responseTime: 0, status: "down", timestamp: 1_640_991_600_000 },
+                {
+                    responseTime: 0,
+                    status: "down",
+                    timestamp: 1_640_995_200_000,
+                },
+                {
+                    responseTime: 0,
+                    status: "down",
+                    timestamp: 1_640_991_600_000,
+                },
             ];
 
             const { result } = renderHook(() => useSiteStats(history));
@@ -60,8 +84,16 @@ describe("useSiteStats", () => {
 
         it("should calculate 50% uptime for mixed records", () => {
             const history: StatusHistory[] = [
-                { responseTime: 200, status: "up", timestamp: 1_640_995_200_000 },
-                { responseTime: 0, status: "down", timestamp: 1_640_991_600_000 },
+                {
+                    responseTime: 200,
+                    status: "up",
+                    timestamp: 1_640_995_200_000,
+                },
+                {
+                    responseTime: 0,
+                    status: "down",
+                    timestamp: 1_640_991_600_000,
+                },
             ];
 
             const { result } = renderHook(() => useSiteStats(history));
@@ -73,9 +105,21 @@ describe("useSiteStats", () => {
         it("should round uptime to nearest integer", () => {
             // 2 up out of 3 total = 66.666... -> 67
             const history: StatusHistory[] = [
-                { responseTime: 200, status: "up", timestamp: 1_640_995_200_000 },
-                { responseTime: 150, status: "up", timestamp: 1_640_991_600_000 },
-                { responseTime: 0, status: "down", timestamp: 1_640_988_000_000 },
+                {
+                    responseTime: 200,
+                    status: "up",
+                    timestamp: 1_640_995_200_000,
+                },
+                {
+                    responseTime: 150,
+                    status: "up",
+                    timestamp: 1_640_991_600_000,
+                },
+                {
+                    responseTime: 0,
+                    status: "down",
+                    timestamp: 1_640_988_000_000,
+                },
             ];
 
             const { result } = renderHook(() => useSiteStats(history));
@@ -86,9 +130,21 @@ describe("useSiteStats", () => {
 
         it("should handle 1 up out of 3 total = 33%", () => {
             const history: StatusHistory[] = [
-                { responseTime: 200, status: "up", timestamp: 1_640_995_200_000 },
-                { responseTime: 0, status: "down", timestamp: 1_640_991_600_000 },
-                { responseTime: 0, status: "down", timestamp: 1_640_988_000_000 },
+                {
+                    responseTime: 200,
+                    status: "up",
+                    timestamp: 1_640_995_200_000,
+                },
+                {
+                    responseTime: 0,
+                    status: "down",
+                    timestamp: 1_640_991_600_000,
+                },
+                {
+                    responseTime: 0,
+                    status: "down",
+                    timestamp: 1_640_988_000_000,
+                },
             ];
 
             const { result } = renderHook(() => useSiteStats(history));
@@ -101,9 +157,21 @@ describe("useSiteStats", () => {
     describe("Response Time Calculation", () => {
         it("should calculate average response time", () => {
             const history: StatusHistory[] = [
-                { responseTime: 200, status: "up", timestamp: 1_640_995_200_000 },
-                { responseTime: 300, status: "up", timestamp: 1_640_991_600_000 },
-                { responseTime: 100, status: "up", timestamp: 1_640_988_000_000 },
+                {
+                    responseTime: 200,
+                    status: "up",
+                    timestamp: 1_640_995_200_000,
+                },
+                {
+                    responseTime: 300,
+                    status: "up",
+                    timestamp: 1_640_991_600_000,
+                },
+                {
+                    responseTime: 100,
+                    status: "up",
+                    timestamp: 1_640_988_000_000,
+                },
             ];
 
             const { result } = renderHook(() => useSiteStats(history));
@@ -113,9 +181,21 @@ describe("useSiteStats", () => {
 
         it("should ignore zero response times from down status", () => {
             const history: StatusHistory[] = [
-                { responseTime: 200, status: "up", timestamp: 1_640_995_200_000 },
-                { responseTime: 0, status: "down", timestamp: 1_640_991_600_000 },
-                { responseTime: 300, status: "up", timestamp: 1_640_988_000_000 },
+                {
+                    responseTime: 200,
+                    status: "up",
+                    timestamp: 1_640_995_200_000,
+                },
+                {
+                    responseTime: 0,
+                    status: "down",
+                    timestamp: 1_640_991_600_000,
+                },
+                {
+                    responseTime: 300,
+                    status: "up",
+                    timestamp: 1_640_988_000_000,
+                },
             ];
 
             const { result } = renderHook(() => useSiteStats(history));
@@ -125,8 +205,16 @@ describe("useSiteStats", () => {
 
         it("should handle all zero response times", () => {
             const history: StatusHistory[] = [
-                { responseTime: 0, status: "down", timestamp: 1_640_995_200_000 },
-                { responseTime: 0, status: "down", timestamp: 1_640_991_600_000 },
+                {
+                    responseTime: 0,
+                    status: "down",
+                    timestamp: 1_640_995_200_000,
+                },
+                {
+                    responseTime: 0,
+                    status: "down",
+                    timestamp: 1_640_991_600_000,
+                },
             ];
 
             const { result } = renderHook(() => useSiteStats(history));
@@ -136,9 +224,21 @@ describe("useSiteStats", () => {
 
         it("should round average response time", () => {
             const history: StatusHistory[] = [
-                { responseTime: 100, status: "up", timestamp: 1_640_995_200_000 },
-                { responseTime: 200, status: "up", timestamp: 1_640_991_600_000 },
-                { responseTime: 200, status: "up", timestamp: 1_640_988_000_000 },
+                {
+                    responseTime: 100,
+                    status: "up",
+                    timestamp: 1_640_995_200_000,
+                },
+                {
+                    responseTime: 200,
+                    status: "up",
+                    timestamp: 1_640_991_600_000,
+                },
+                {
+                    responseTime: 200,
+                    status: "up",
+                    timestamp: 1_640_988_000_000,
+                },
             ];
 
             const { result } = renderHook(() => useSiteStats(history));
@@ -148,13 +248,21 @@ describe("useSiteStats", () => {
 
         it("should handle undefined response times", () => {
             const history: StatusHistory[] = [
-                { responseTime: 200, status: "up", timestamp: 1_640_995_200_000 },
+                {
+                    responseTime: 200,
+                    status: "up",
+                    timestamp: 1_640_995_200_000,
+                },
                 {
                     responseTime: undefined as any,
                     status: "up",
                     timestamp: 1_640_991_600_000,
                 },
-                { responseTime: 300, status: "up", timestamp: 1_640_988_000_000 },
+                {
+                    responseTime: 300,
+                    status: "up",
+                    timestamp: 1_640_988_000_000,
+                },
             ];
 
             const { result } = renderHook(() => useSiteStats(history));
@@ -164,13 +272,21 @@ describe("useSiteStats", () => {
 
         it("should handle non-numeric response times", () => {
             const history: StatusHistory[] = [
-                { responseTime: 200, status: "up", timestamp: 1_640_995_200_000 },
+                {
+                    responseTime: 200,
+                    status: "up",
+                    timestamp: 1_640_995_200_000,
+                },
                 {
                     responseTime: "invalid" as any,
                     status: "up",
                     timestamp: 1_640_991_600_000,
                 },
-                { responseTime: 300, status: "up", timestamp: 1_640_988_000_000 },
+                {
+                    responseTime: 300,
+                    status: "up",
+                    timestamp: 1_640_988_000_000,
+                },
             ];
 
             const { result } = renderHook(() => useSiteStats(history));
@@ -182,11 +298,31 @@ describe("useSiteStats", () => {
     describe("Check Count", () => {
         it("should count all history records", () => {
             const history: StatusHistory[] = [
-                { responseTime: 200, status: "up", timestamp: 1_640_995_200_000 },
-                { responseTime: 0, status: "down", timestamp: 1_640_991_600_000 },
-                { responseTime: 150, status: "up", timestamp: 1_640_988_000_000 },
-                { responseTime: 0, status: "down", timestamp: 1_640_984_400_000 },
-                { responseTime: 180, status: "up", timestamp: 1_640_980_800_000 },
+                {
+                    responseTime: 200,
+                    status: "up",
+                    timestamp: 1_640_995_200_000,
+                },
+                {
+                    responseTime: 0,
+                    status: "down",
+                    timestamp: 1_640_991_600_000,
+                },
+                {
+                    responseTime: 150,
+                    status: "up",
+                    timestamp: 1_640_988_000_000,
+                },
+                {
+                    responseTime: 0,
+                    status: "down",
+                    timestamp: 1_640_984_400_000,
+                },
+                {
+                    responseTime: 180,
+                    status: "up",
+                    timestamp: 1_640_980_800_000,
+                },
             ];
 
             const { result } = renderHook(() => useSiteStats(history));
@@ -196,7 +332,11 @@ describe("useSiteStats", () => {
 
         it("should handle single record", () => {
             const history: StatusHistory[] = [
-                { responseTime: 200, status: "up", timestamp: 1_640_995_200_000 },
+                {
+                    responseTime: 200,
+                    status: "up",
+                    timestamp: 1_640_995_200_000,
+                },
             ];
 
             const { result } = renderHook(() => useSiteStats(history));
@@ -208,8 +348,16 @@ describe("useSiteStats", () => {
     describe("Memoization", () => {
         it("should not recalculate when history reference is the same", () => {
             const history: StatusHistory[] = [
-                { responseTime: 200, status: "up", timestamp: 1_640_995_200_000 },
-                { responseTime: 0, status: "down", timestamp: 1_640_991_600_000 },
+                {
+                    responseTime: 200,
+                    status: "up",
+                    timestamp: 1_640_995_200_000,
+                },
+                {
+                    responseTime: 0,
+                    status: "down",
+                    timestamp: 1_640_991_600_000,
+                },
             ];
 
             const { rerender, result } = renderHook(
@@ -230,12 +378,24 @@ describe("useSiteStats", () => {
 
         it("should recalculate when history changes", () => {
             const history1: StatusHistory[] = [
-                { responseTime: 200, status: "up", timestamp: 1_640_995_200_000 },
+                {
+                    responseTime: 200,
+                    status: "up",
+                    timestamp: 1_640_995_200_000,
+                },
             ];
 
             const history2: StatusHistory[] = [
-                { responseTime: 200, status: "up", timestamp: 1_640_995_200_000 },
-                { responseTime: 0, status: "down", timestamp: 1_640_991_600_000 },
+                {
+                    responseTime: 200,
+                    status: "up",
+                    timestamp: 1_640_995_200_000,
+                },
+                {
+                    responseTime: 0,
+                    status: "down",
+                    timestamp: 1_640_991_600_000,
+                },
             ];
 
             const { rerender, result } = renderHook(
@@ -276,8 +436,16 @@ describe("useSiteStats", () => {
 
         it("should handle decimal response times", () => {
             const history: StatusHistory[] = [
-                { responseTime: 200.5, status: "up", timestamp: 1_640_995_200_000 },
-                { responseTime: 299.7, status: "up", timestamp: 1_640_991_600_000 },
+                {
+                    responseTime: 200.5,
+                    status: "up",
+                    timestamp: 1_640_995_200_000,
+                },
+                {
+                    responseTime: 299.7,
+                    status: "up",
+                    timestamp: 1_640_991_600_000,
+                },
             ];
 
             const { result } = renderHook(() => useSiteStats(history));
@@ -287,8 +455,16 @@ describe("useSiteStats", () => {
 
         it("should handle very small response times", () => {
             const history: StatusHistory[] = [
-                { responseTime: 0.1, status: "up", timestamp: 1_640_995_200_000 },
-                { responseTime: 0.9, status: "up", timestamp: 1_640_991_600_000 },
+                {
+                    responseTime: 0.1,
+                    status: "up",
+                    timestamp: 1_640_995_200_000,
+                },
+                {
+                    responseTime: 0.9,
+                    status: "up",
+                    timestamp: 1_640_991_600_000,
+                },
             ];
 
             const { result } = renderHook(() => useSiteStats(history));
@@ -300,8 +476,16 @@ describe("useSiteStats", () => {
             // Test a scenario where the || 0 fallback might be needed
             // Even though this is defensive code, we'll document its presence
             const history: StatusHistory[] = [
-                { responseTime: 200, status: "up", timestamp: 1_640_995_200_000 },
-                { responseTime: 300, status: "up", timestamp: 1_640_991_600_000 },
+                {
+                    responseTime: 200,
+                    status: "up",
+                    timestamp: 1_640_995_200_000,
+                },
+                {
+                    responseTime: 300,
+                    status: "up",
+                    timestamp: 1_640_991_600_000,
+                },
             ];
 
             const { result } = renderHook(() => useSiteStats(history));

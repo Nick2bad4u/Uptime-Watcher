@@ -90,7 +90,7 @@ const {
             return mockGetAllMonitorTypeConfigs()[0];
         }
         return null;
-        });
+    });
     const mockValidateMonitorData = vi.fn(() => ({
         success: true,
         errors: [],
@@ -106,7 +106,7 @@ const {
         mockGetMonitorTypeConfig,
         mockValidateMonitorData,
     };
-        });
+});
 // Set up mocks
 vi.mock("electron", () => ({
     ipcMain: mockIpcMain,
@@ -147,34 +147,41 @@ describe("IpcService", () => {
             mockUptimeOrchestrator as any,
             mockAutoUpdaterService as any
         );
-        });
+    });
     afterEach(() => {
         vi.resetAllMocks();
-        });
+    });
     describe("Constructor", () => {
-        it("should initialize with required dependencies", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: IpcService", "component");
-            
-            
- expect(ipcService).toBeDefined();
+        it("should initialize with required dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+
+            expect(ipcService).toBeDefined();
             expect(ipcService).toBeInstanceOf(IpcService);
-        });        });
+        });
+    });
     describe("setupHandlers", () => {
-        it("should register all handler categories", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: IpcService", "component");
-            
-            
- ipcService.setupHandlers();
+        it("should register all handler categories", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+
+            ipcService.setupHandlers();
 
             // Verify that ipcMain.handle was called multiple times for different handlers
             expect(mockIpcMain.handle).toHaveBeenCalledTimes(22);
             expect(mockIpcMain.on).toHaveBeenCalled();
         });
         it("should setup site handlers", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: IpcService", "component");
-            
-            
- ipcService.setupHandlers();
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+
+            ipcService.setupHandlers();
 
             // Verify site-related handlers are registered
             const handleCalls = mockIpcMain.handle.mock.calls.map(
@@ -186,10 +193,10 @@ describe("IpcService", () => {
             expect(handleCalls).toContain("update-site");
         });
         it("should setup monitoring handlers", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: IpcService", "component");
-            
-            
- ipcService.setupHandlers();
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+
+            ipcService.setupHandlers();
 
             const handleCalls = mockIpcMain.handle.mock.calls.map(
                 (call) => call[0]
@@ -199,10 +206,10 @@ describe("IpcService", () => {
             expect(handleCalls).toContain("check-site-now");
         });
         it("should setup monitor type handlers", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: IpcService", "component");
-            
-            
- ipcService.setupHandlers();
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+
+            ipcService.setupHandlers();
 
             const handleCalls = mockIpcMain.handle.mock.calls.map(
                 (call) => call[0]
@@ -212,10 +219,10 @@ describe("IpcService", () => {
             expect(handleCalls).toContain("format-monitor-title-suffix");
         });
         it("should setup data handlers", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: IpcService", "component");
-            
-            
- ipcService.setupHandlers();
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+
+            ipcService.setupHandlers();
 
             const handleCalls = mockIpcMain.handle.mock.calls.map(
                 (call) => call[0]
@@ -225,10 +232,10 @@ describe("IpcService", () => {
             expect(handleCalls).toContain("import-data");
         });
         it("should setup system handlers", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: IpcService", "component");
-            
-            
- ipcService.setupHandlers();
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+
+            ipcService.setupHandlers();
 
             // System handlers only use ipcMain.on, not ipcMain.handle
             // Check for quit-and-install listener
@@ -236,23 +243,27 @@ describe("IpcService", () => {
             expect(onCalls).toContain("quit-and-install");
         });
         it("should setup state sync handlers", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: IpcService", "component");
-            
-            
- ipcService.setupHandlers();
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+
+            ipcService.setupHandlers();
 
             const handleCalls = mockIpcMain.handle.mock.calls.map(
                 (call) => call[0]
             );
             expect(handleCalls).toContain("get-history-limit");
             expect(handleCalls).toContain("update-history-limit");
-        });        });
+        });
+    });
     describe("cleanup", () => {
-        it("should remove all registered handlers", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: IpcService", "component");
-            
-            
- ipcService.setupHandlers();
+        it("should remove all registered handlers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+
+            ipcService.setupHandlers();
 
             // Get the number of handlers that were registered
             // const registeredHandlerCount = mockIpcMain.handle.mock.calls.length; // Currently unused
@@ -264,16 +275,20 @@ describe("IpcService", () => {
                 "quit-and-install"
             );
         });
-        it("should handle cleanup when no handlers are registered", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: IpcService", "component");
-            
-            
- ipcService.cleanup();
+        it("should handle cleanup when no handlers are registered", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+
+            ipcService.cleanup();
 
             expect(mockIpcMain.removeAllListeners).toHaveBeenCalledWith(
                 "quit-and-install"
             );
-        });        });
+        });
+    });
     describe("serializeMonitorTypeConfig", () => {
         beforeEach(() => {
             ipcService.setupHandlers();
@@ -291,9 +306,9 @@ describe("IpcService", () => {
                     success: true,
                     data: expect.any(Array),
                     metadata: expect.objectContaining({
-                        handler: "get-monitor-types"
-                    })
-        });
+                        handler: "get-monitor-types",
+                    }),
+                });
                 // Check that the data is an array with monitor type configs
                 expect(Array.isArray(result.data)).toBe(true);
                 expect(result.data.length).toBeGreaterThan(0);
@@ -329,7 +344,8 @@ describe("IpcService", () => {
             } else {
                 expect.fail("Handler not found for get-monitor-types");
             }
-        });        });
+        });
+    });
     describe("Handler Implementation", () => {
         beforeEach(() => {
             ipcService.setupHandlers();
@@ -353,13 +369,13 @@ describe("IpcService", () => {
 
             if (getHandler) {
                 const result = await getHandler();
-                expect(result).toEqual({ 
-                    success: true, 
+                expect(result).toEqual({
+                    success: true,
                     data: mockSites,
                     metadata: expect.objectContaining({
-                        handler: "get-sites"
-                    })
-        });
+                        handler: "get-sites",
+                    }),
+                });
                 expect(mockUptimeOrchestrator.getSites).toHaveBeenCalled();
             } else {
                 expect.fail("Handler not found for get-sites");
@@ -382,13 +398,13 @@ describe("IpcService", () => {
                             description: expect.any(String),
                             version: "1.0.0",
                             fields: expect.any(Array),
-                            uiConfig: expect.any(Object)
-                        })
+                            uiConfig: expect.any(Object),
+                        }),
                     ]),
                     metadata: expect.objectContaining({
-                        handler: "get-monitor-types"
-                    })
-        });
+                        handler: "get-monitor-types",
+                    }),
+                });
                 // Remove mock call expectation since we're using real implementation
                 expect(Array.isArray(result.data)).toBe(true);
                 expect(result.data.length).toBeGreaterThan(0);
@@ -412,31 +428,38 @@ describe("IpcService", () => {
                     retryAttempts: 3,
                     responseTime: 100,
                     status: "up",
-                    monitoring: true
+                    monitoring: true,
                 };
 
-                const result = await validateHandler({}, "http", validMonitorData);
+                const result = await validateHandler(
+                    {},
+                    "http",
+                    validMonitorData
+                );
 
-                expect(result).toEqual({ 
-                    success: true, 
+                expect(result).toEqual({
+                    success: true,
                     data: expect.objectContaining({
-                        success: true, 
-                        errors: []
+                        success: true,
+                        errors: [],
                     }),
                     metadata: expect.objectContaining({
-                        handler: "validate-monitor-data"
-                    })
-        });
+                        handler: "validate-monitor-data",
+                    }),
+                });
                 // Remove mock call expectation since we're using real implementation
             } else {
                 expect.fail("Handler not found for validate-monitor-data");
             }
         });
-        it("should handle quit-and-install listener", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: IpcService", "component");
-            
-            
- const quitAndInstallListener = mockIpcMain.on.mock.calls.find(
+        it("should handle quit-and-install listener", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+
+            const quitAndInstallListener = mockIpcMain.on.mock.calls.find(
                 (call) => call[0] === "quit-and-install"
             )?.[1];
 
@@ -451,7 +474,9 @@ describe("IpcService", () => {
         });
         it("should handle state:get-history-limit requests", async () => {
             // Set up the mock to return 500
-            vi.mocked(mockUptimeOrchestrator.getHistoryLimit).mockReturnValue(500);
+            vi.mocked(mockUptimeOrchestrator.getHistoryLimit).mockReturnValue(
+                500
+            );
 
             const getHistoryLimitHandler = mockIpcMain.handle.mock.calls.find(
                 (call) => call[0] === "get-history-limit"
@@ -459,14 +484,16 @@ describe("IpcService", () => {
 
             if (getHistoryLimitHandler) {
                 const result = await getHistoryLimitHandler();
-                expect(result).toEqual({ 
-                    success: true, 
+                expect(result).toEqual({
+                    success: true,
                     data: 500,
                     metadata: expect.objectContaining({
-                        handler: "get-history-limit"
-                    })
-        });
-                expect(mockUptimeOrchestrator.getHistoryLimit).toHaveBeenCalled();
+                        handler: "get-history-limit",
+                    }),
+                });
+                expect(
+                    mockUptimeOrchestrator.getHistoryLimit
+                ).toHaveBeenCalled();
             } else {
                 expect.fail("Handler not found for get-history-limit");
             }
@@ -482,17 +509,18 @@ describe("IpcService", () => {
 
             if (getHandler) {
                 const result = await getHandler();
-                expect(result).toEqual({ 
-                    success: false, 
+                expect(result).toEqual({
+                    success: false,
                     error: "Database error",
                     metadata: expect.objectContaining({
-                        handler: "get-sites"
-                    })
-        });
+                        handler: "get-sites",
+                    }),
+                });
             } else {
                 expect.fail("Handler not found for get-sites");
             }
-        });        });
+        });
+    });
     describe("Monitor Type Config Edge Cases", () => {
         beforeEach(() => {
             ipcService.setupHandlers();
@@ -511,9 +539,9 @@ describe("IpcService", () => {
                     success: true,
                     data: expect.any(Array), // Returns all monitor types
                     metadata: expect.objectContaining({
-                        handler: "get-monitor-types"
-                    })
-        });
+                        handler: "get-monitor-types",
+                    }),
+                });
                 // Remove mock expectation since we're using real implementation
                 expect(Array.isArray(result.data)).toBe(true);
             } else {
@@ -536,15 +564,17 @@ describe("IpcService", () => {
                             displayName: expect.any(String),
                             uiConfig: expect.objectContaining({
                                 display: expect.any(Object),
-                                helpTexts: expect.any(Object)
-                            })
-                        })
+                                helpTexts: expect.any(Object),
+                            }),
+                        }),
                     ]),
                     metadata: expect.objectContaining({
-                        handler: "get-monitor-types"
-                    })
-        });
+                        handler: "get-monitor-types",
+                    }),
+                });
             } else {
                 expect.fail("Handler not found for get-monitor-types");
             }
-        });        });        });
+        });
+    });
+});

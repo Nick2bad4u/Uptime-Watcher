@@ -1,9 +1,9 @@
 /**
  * IPC Communication Performance Benchmarks
- * 
+ *
  * @fileoverview Performance benchmarks for IPC communication including serialization,
  * deserialization, message passing, and validation operations.
- * 
+ *
  * @author GitHub Copilot
  * @since 2025-08-11
  * @category Performance
@@ -73,7 +73,7 @@ function generateTestHistory(count: number): StatusHistory[] {
     return Array.from({ length: count }, (_, i) => ({
         id: `history-${i}`,
         monitorId: `monitor-${i % 500}`,
-        status: Math.random() > 0.1 ? "up" : "down" as const,
+        status: Math.random() > 0.1 ? "up" : ("down" as const),
         responseTime: Math.random() * 1000,
         timestamp: Date.now() - i * 60_000,
     }));
@@ -89,15 +89,17 @@ function deserializeData(jsonString: string): any {
 }
 
 function validateSiteStructure(site: Site): boolean {
-    return Boolean(site.identifier && site.name && Array.isArray(site.monitors));
+    return Boolean(
+        site.identifier && site.name && Array.isArray(site.monitors)
+    );
 }
 
 function validateMonitorData(monitor: Monitor): boolean {
     return Boolean(
-        monitor.id && 
-        monitor.type && 
-        typeof monitor.checkInterval === "number" &&
-        typeof monitor.timeout === "number"
+        monitor.id &&
+            monitor.type &&
+            typeof monitor.checkInterval === "number" &&
+            typeof monitor.timeout === "number"
     );
 }
 
@@ -107,7 +109,7 @@ describe("IPC Communication Performance Benchmarks", () => {
     const largeSites = generateTestSites(1000);
     const testMonitors = generateTestMonitors(500);
     const testHistory = generateTestHistory(10_000);
-    
+
     // Pre-serialized data for deserialization benchmarks
     const serializedSmallSites = serializeData(smallSites);
     const serializedLargeSites = serializeData(largeSites);
@@ -115,119 +117,178 @@ describe("IPC Communication Performance Benchmarks", () => {
     const serializedHistory = serializeData(testHistory);
 
     describe("Message Serialization Benchmarks", () => {
-        bench("serialize small site object", () => {
-            serializeData(smallSites[0]);
-        }, {
-            time: 1000,
-            iterations: 1000,
-        });
+        bench(
+            "serialize small site object",
+            () => {
+                serializeData(smallSites[0]);
+            },
+            {
+                time: 1000,
+                iterations: 1000,
+            }
+        );
 
-        bench("serialize large sites array", () => {
-            serializeData(largeSites);
-        }, {
-            time: 2000,
-            iterations: 100,
-        });
+        bench(
+            "serialize large sites array",
+            () => {
+                serializeData(largeSites);
+            },
+            {
+                time: 2000,
+                iterations: 100,
+            }
+        );
 
-        bench("serialize monitors with history", () => {
-            const monitorsWithHistory = testMonitors.slice(0, 50).map(monitor => ({
-                ...monitor,
-                history: testHistory.filter(h => h.monitorId === monitor.id).slice(0, 100),
-            }));
-            serializeData(monitorsWithHistory);
-        }, {
-            time: 2000,
-            iterations: 100,
-        });
+        bench(
+            "serialize monitors with history",
+            () => {
+                const monitorsWithHistory = testMonitors
+                    .slice(0, 50)
+                    .map((monitor) => ({
+                        ...monitor,
+                        history: testHistory
+                            .filter((h) => h.monitorId === monitor.id)
+                            .slice(0, 100),
+                    }));
+                serializeData(monitorsWithHistory);
+            },
+            {
+                time: 2000,
+                iterations: 100,
+            }
+        );
 
-        bench("serialize status history bulk", () => {
-            serializeData(testHistory);
-        }, {
-            time: 3000,
-            iterations: 50,
-        });
+        bench(
+            "serialize status history bulk",
+            () => {
+                serializeData(testHistory);
+            },
+            {
+                time: 3000,
+                iterations: 50,
+            }
+        );
     });
 
     describe("Message Deserialization Benchmarks", () => {
-        bench("deserialize small sites array", () => {
-            deserializeData(serializedSmallSites);
-        }, {
-            time: 1000,
-            iterations: 1000,
-        });
+        bench(
+            "deserialize small sites array",
+            () => {
+                deserializeData(serializedSmallSites);
+            },
+            {
+                time: 1000,
+                iterations: 1000,
+            }
+        );
 
-        bench("deserialize large sites array", () => {
-            deserializeData(serializedLargeSites);
-        }, {
-            time: 2000,
-            iterations: 100,
-        });
+        bench(
+            "deserialize large sites array",
+            () => {
+                deserializeData(serializedLargeSites);
+            },
+            {
+                time: 2000,
+                iterations: 100,
+            }
+        );
 
-        bench("deserialize monitors array", () => {
-            deserializeData(serializedMonitors);
-        }, {
-            time: 2000,
-            iterations: 100,
-        });
+        bench(
+            "deserialize monitors array",
+            () => {
+                deserializeData(serializedMonitors);
+            },
+            {
+                time: 2000,
+                iterations: 100,
+            }
+        );
 
-        bench("deserialize history array", () => {
-            deserializeData(serializedHistory);
-        }, {
-            time: 3000,
-            iterations: 50,
-        });
+        bench(
+            "deserialize history array",
+            () => {
+                deserializeData(serializedHistory);
+            },
+            {
+                time: 3000,
+                iterations: 50,
+            }
+        );
     });
 
     describe("Data Validation Performance", () => {
-        bench("validate site structure", () => {
-            validateSiteStructure(smallSites[0]);
-        }, {
-            time: 1000,
-            iterations: 10000,
-        });
+        bench(
+            "validate site structure",
+            () => {
+                validateSiteStructure(smallSites[0]);
+            },
+            {
+                time: 1000,
+                iterations: 10000,
+            }
+        );
 
-        bench("validate bulk sites", () => {
-            largeSites.every(site => validateSiteStructure(site));
-        }, {
-            time: 2000,
-            iterations: 100,
-        });
+        bench(
+            "validate bulk sites",
+            () => {
+                largeSites.every((site) => validateSiteStructure(site));
+            },
+            {
+                time: 2000,
+                iterations: 100,
+            }
+        );
 
-        bench("validate complex monitor data", () => {
-            testMonitors.every(monitor => validateMonitorData(monitor));
-        }, {
-            time: 2000,
-            iterations: 100,
-        });
+        bench(
+            "validate complex monitor data",
+            () => {
+                testMonitors.every((monitor) => validateMonitorData(monitor));
+            },
+            {
+                time: 2000,
+                iterations: 100,
+            }
+        );
     });
 
     describe("Error Handling Performance", () => {
-        bench("handle serialization errors gracefully", () => {
-            const circularObj: any = {};
-            circularObj.self = circularObj;
-            
-            try {
-                serializeData(circularObj);
-            } catch (error) {
-                const errorMessage = error instanceof Error ? error.message : "Unknown error";
-                Boolean(errorMessage);
-            }
-        }, {
-            time: 1000,
-            iterations: 1000,
-        });
+        bench(
+            "handle serialization errors gracefully",
+            () => {
+                const circularObj: any = {};
+                circularObj.self = circularObj;
 
-        bench("recover from malformed JSON", () => {
-            const malformedData = '{"incomplete": json';
-            try {
-                deserializeData(malformedData);
-            } catch {
-                const fallback = { success: false, error: "Invalid JSON" };
-                serializeData(fallback);
+                try {
+                    serializeData(circularObj);
+                } catch (error) {
+                    const errorMessage =
+                        error instanceof Error
+                            ? error.message
+                            : "Unknown error";
+                    Boolean(errorMessage);
+                }
+            },
+            {
+                time: 1000,
+                iterations: 1000,
             }
-        }, {
-            time: 1000,
-            iterations: 1000,
-        });
+        );
+
+        bench(
+            "recover from malformed JSON",
+            () => {
+                const malformedData = '{"incomplete": json';
+                try {
+                    deserializeData(malformedData);
+                } catch {
+                    const fallback = { success: false, error: "Invalid JSON" };
+                    serializeData(fallback);
+                }
+            },
+            {
+                time: 1000,
+                iterations: 1000,
+            }
+        );
     });
 });

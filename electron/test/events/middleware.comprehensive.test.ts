@@ -34,13 +34,15 @@ import { logger as mockLogger } from "../../utils/logger";
 
 describe("middleware.ts - Additional Coverage", () => {
     beforeEach(() => {
-        vi.clearAllMocks();        });
+        vi.clearAllMocks();
+    });
     describe("createLoggingMiddleware - Additional Branch Coverage", () => {
         it("should log at warn level", async () => {
             const next = vi.fn();
             const mw = createLoggingMiddleware({
                 level: "warn",
-                includeData: true,        });
+                includeData: true,
+            });
             await mw("test:event", { data: "test" }, next);
 
             expect(mockLogger.warn).toHaveBeenCalledWith(
@@ -50,12 +52,14 @@ describe("middleware.ts - Additional Coverage", () => {
                     data: { data: "test" },
                 })
             );
-            expect(next).toHaveBeenCalled();        });
+            expect(next).toHaveBeenCalled();
+        });
         it("should log at error level", async () => {
             const next = vi.fn();
             const mw = createLoggingMiddleware({
                 level: "error",
-                includeData: false,        });
+                includeData: false,
+            });
             await mw("error:event", { error: "something" }, next);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
@@ -64,12 +68,14 @@ describe("middleware.ts - Additional Coverage", () => {
                     event: "error:event",
                 })
             );
-            expect(next).toHaveBeenCalled();        });
+            expect(next).toHaveBeenCalled();
+        });
         it("should handle complex data with circular references in logging", async () => {
             const next = vi.fn();
             const mw = createLoggingMiddleware({
                 level: "debug",
-                includeData: true,        });
+                includeData: true,
+            });
             // Create object with circular reference
             const circularObj: any = { name: "test" };
             circularObj.self = circularObj;
@@ -83,12 +89,14 @@ describe("middleware.ts - Additional Coverage", () => {
                     data: expect.any(Object), // The actual circular object is logged
                 })
             );
-            expect(next).toHaveBeenCalled();        });
+            expect(next).toHaveBeenCalled();
+        });
         it("should handle non-serializable data types in logging", async () => {
             const next = vi.fn();
             const mw = createLoggingMiddleware({
                 level: "info",
-                includeData: true,        });
+                includeData: true,
+            });
             // Test with function (non-serializable)
             const functionData = () => "test";
 
@@ -101,7 +109,9 @@ describe("middleware.ts - Additional Coverage", () => {
                     data: expect.any(Function), // Function is preserved as-is
                 })
             );
-            expect(next).toHaveBeenCalled();        });        });
+            expect(next).toHaveBeenCalled();
+        });
+    });
     describe("createValidationMiddleware - Error Handling Coverage", () => {
         it("should handle validation result with isValid false and error message", async () => {
             const next = vi.fn();
@@ -128,7 +138,8 @@ describe("middleware.ts - Additional Coverage", () => {
                     data: { data: "invalid" },
                 })
             );
-            expect(next).not.toHaveBeenCalled();        });
+            expect(next).not.toHaveBeenCalled();
+        });
         it("should handle validation result with isValid false and no error message", async () => {
             const next = vi.fn();
             const validators = {
@@ -151,7 +162,8 @@ describe("middleware.ts - Additional Coverage", () => {
                     data: { data: "invalid" },
                 })
             );
-            expect(next).not.toHaveBeenCalled();        });
+            expect(next).not.toHaveBeenCalled();
+        });
         it("should handle validator throwing non-Error objects", async () => {
             const next = vi.fn();
             const validators = {
@@ -177,7 +189,8 @@ describe("middleware.ts - Additional Coverage", () => {
                     error: expect.any(Error),
                 })
             );
-            expect(next).not.toHaveBeenCalled();        });
+            expect(next).not.toHaveBeenCalled();
+        });
         it("should re-throw validation errors as-is", async () => {
             const next = vi.fn();
             const validators = {
@@ -191,7 +204,8 @@ describe("middleware.ts - Additional Coverage", () => {
                 mw("test:event", { data: "test" }, next)
             ).rejects.toThrow("Validation failed for custom reason");
 
-            expect(next).not.toHaveBeenCalled();        });
+            expect(next).not.toHaveBeenCalled();
+        });
         it("should handle validators with undefined validator function", async () => {
             const next = vi.fn();
             const validators = {
@@ -201,7 +215,8 @@ describe("middleware.ts - Additional Coverage", () => {
 
             await mw("test:event", { data: "test" }, next);
 
-            expect(next).toHaveBeenCalled();        });
+            expect(next).toHaveBeenCalled();
+        });
         it("should handle data with circular references in validation errors", async () => {
             const next = vi.fn();
             const validators = {
@@ -226,7 +241,9 @@ describe("middleware.ts - Additional Coverage", () => {
                     data: "[Circular Reference or Non-Serializable Object]",
                 })
             );
-            expect(next).not.toHaveBeenCalled();        });        });
+            expect(next).not.toHaveBeenCalled();
+        });
+    });
     describe("createDebugMiddleware - Verbose Mode Coverage", () => {
         it("should log verbose debug info when verbose=true", async () => {
             const next = vi.fn();
@@ -251,7 +268,8 @@ describe("middleware.ts - Additional Coverage", () => {
                 )
             );
 
-            expect(next).toHaveBeenCalled();        });
+            expect(next).toHaveBeenCalled();
+        });
         it("should log simple debug info when verbose=false", async () => {
             const next = vi.fn();
             const mw = createDebugMiddleware({ enabled: true, verbose: false });
@@ -268,7 +286,8 @@ describe("middleware.ts - Additional Coverage", () => {
                 expect.stringMatching(/Completed event 'simple:event' in \d+ms/)
             );
 
-            expect(next).toHaveBeenCalled();        });
+            expect(next).toHaveBeenCalled();
+        });
         it("should use isDevelopment() when enabled is not specified", async () => {
             const { isDevelopment } = await import(
                 "../../../shared/utils/environment"
@@ -281,13 +300,16 @@ describe("middleware.ts - Additional Coverage", () => {
             await mw("auto:event", {}, next);
 
             expect(mockLogger.debug).toHaveBeenCalled();
-            expect(next).toHaveBeenCalled();        });        });
+            expect(next).toHaveBeenCalled();
+        });
+    });
     describe("safeSerialize Edge Cases", () => {
         it("should handle null and undefined correctly", async () => {
             const next = vi.fn();
             const mw = createLoggingMiddleware({
                 level: "debug",
-                includeData: true,        });
+                includeData: true,
+            });
             await mw("null:event", null, next);
             await mw("undefined:event", undefined, next);
 
@@ -305,12 +327,14 @@ describe("middleware.ts - Additional Coverage", () => {
                     event: "undefined:event",
                     data: undefined,
                 })
-            );        });
+            );
+        });
         it("should handle primitive types correctly", async () => {
             const next = vi.fn();
             const mw = createLoggingMiddleware({
                 level: "debug",
-                includeData: true,        });
+                includeData: true,
+            });
             await mw("string:event", "test string", next);
             await mw("number:event", 42, next);
             await mw("boolean:event", true, next);
@@ -337,12 +361,14 @@ describe("middleware.ts - Additional Coverage", () => {
                     event: "boolean:event",
                     data: true,
                 })
-            );        });
+            );
+        });
         it("should handle symbols and other exotic types", async () => {
             const next = vi.fn();
             const mw = createLoggingMiddleware({
                 level: "debug",
-                includeData: true,        });
+                includeData: true,
+            });
             const symbolData = Symbol("test");
 
             await mw("symbol:event", symbolData, next);
@@ -353,12 +379,14 @@ describe("middleware.ts - Additional Coverage", () => {
                     event: "symbol:event",
                     data: symbolData, // Use the exact same symbol reference
                 }
-            );        });
+            );
+        });
         it("should handle BigInt and other special types", async () => {
             const next = vi.fn();
             const mw = createLoggingMiddleware({
                 level: "debug",
-                includeData: true,        });
+                includeData: true,
+            });
             const bigintData = BigInt(123);
 
             await mw("bigint:event", bigintData, next);
@@ -369,7 +397,9 @@ describe("middleware.ts - Additional Coverage", () => {
                     event: "bigint:event",
                     data: bigintData, // Use the exact same BigInt reference
                 }
-            );        });        });
+            );
+        });
+    });
     describe("composeMiddleware Edge Cases", () => {
         it("should handle middleware that doesn't call next", async () => {
             const next = vi.fn();
@@ -386,7 +416,8 @@ describe("middleware.ts - Additional Coverage", () => {
             await composed("test:event", {}, next);
 
             expect(secondMiddleware).not.toHaveBeenCalled();
-            expect(next).not.toHaveBeenCalled();        });
+            expect(next).not.toHaveBeenCalled();
+        });
         it("should handle async middleware correctly", async () => {
             const executionOrder: string[] = [];
             const next = vi.fn();
@@ -426,17 +457,21 @@ describe("middleware.ts - Additional Coverage", () => {
                 "start-2",
                 "end-2",
             ]);
-            expect(next).toHaveBeenCalled();        });        });
+            expect(next).toHaveBeenCalled();
+        });
+    });
     describe("createErrorHandlingMiddleware Edge Cases", () => {
         it.skip("should handle middleware throwing non-Error objects", async () => {
             // TODO: Fix test expectation - the actual error message format has changed
             const next = vi.fn().mockImplementation(() => {
-                throw "String error";        });
+                throw "String error";
+            });
             const onError = vi.fn();
 
             const mw = createErrorHandlingMiddleware({
                 continueOnError: true,
-                onError,        });
+                onError,
+            });
             await mw("test:event", {}, next);
 
             expect(onError).toHaveBeenCalledWith(
@@ -452,12 +487,15 @@ describe("middleware.ts - Additional Coverage", () => {
                     error: expect.any(Error),
                     event: "test:event",
                 })
-            );        });
+            );
+        });
         it("should handle circular reference data in error logging", async () => {
             const next = vi.fn().mockImplementation(() => {
-                throw new Error("Test error");        });
+                throw new Error("Test error");
+            });
             const mw = createErrorHandlingMiddleware({
-                continueOnError: false,        });
+                continueOnError: false,
+            });
             // Create circular reference data
             const circularData: any = { name: "test" };
             circularData.self = circularData;
@@ -473,7 +511,9 @@ describe("middleware.ts - Additional Coverage", () => {
                     data: "[Circular Reference or Non-Serializable Object]",
                     error: expect.any(Error),
                 })
-            );        });        });
+            );
+        });
+    });
     describe("MIDDLEWARE_STACKS comprehensive testing", () => {
         it("should handle custom stack with multiple middleware", async () => {
             const executionOrder: string[] = [];
@@ -493,11 +533,15 @@ describe("middleware.ts - Additional Coverage", () => {
             await stack("test:event", {}, next);
 
             expect(executionOrder).toEqual(["mw1", "mw2"]);
-            expect(next).toHaveBeenCalled();        });
+            expect(next).toHaveBeenCalled();
+        });
         it("should handle empty custom stack", async () => {
             const next = vi.fn();
             const stack = MIDDLEWARE_STACKS.custom([]);
 
             await stack("test:event", {}, next);
 
-            expect(next).toHaveBeenCalled();        });        });        });
+            expect(next).toHaveBeenCalled();
+        });
+    });
+});

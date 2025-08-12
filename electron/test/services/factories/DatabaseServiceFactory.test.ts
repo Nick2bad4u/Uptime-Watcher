@@ -1,9 +1,9 @@
 /**
  * Test suite for DatabaseServiceFactory
- * 
+ *
  * @fileoverview Comprehensive tests for the DatabaseServiceFactory class
  * in the Uptime Watcher application.
- * 
+ *
  * @author GitHub Copilot
  * @since 2025-08-11
  * @category Services
@@ -12,7 +12,13 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { DatabaseServiceFactory, type DatabaseServiceFactoryDependencies, type IDataBackupService, type IDataImportExportService, type ISiteRepositoryService } from "../../../services/factories/DatabaseServiceFactory";
+import {
+    DatabaseServiceFactory,
+    type DatabaseServiceFactoryDependencies,
+    type IDataBackupService,
+    type IDataImportExportService,
+    type ISiteRepositoryService,
+} from "../../../services/factories/DatabaseServiceFactory";
 import type { UptimeEvents } from "../../../events/eventTypes";
 import type { TypedEventBus } from "../../../events/TypedEventBus";
 import type { DatabaseService } from "../../../services/database/DatabaseService";
@@ -109,7 +115,7 @@ describe("DatabaseServiceFactory", () => {
         });
 
         it("should store dependencies internally", () => {
-            // Since dependencies are private, we can verify they were stored by 
+            // Since dependencies are private, we can verify they were stored by
             // checking that services can be created successfully
             expect(() => factory.createBackupService()).not.toThrow();
             expect(() => factory.createImportExportService()).not.toThrow();
@@ -120,23 +126,27 @@ describe("DatabaseServiceFactory", () => {
     describe("createBackupService", () => {
         it("should create a data backup service instance", () => {
             const backupService = factory.createBackupService();
-            
+
             expect(backupService).toBeDefined();
-            expect(typeof backupService.downloadDatabaseBackup).toBe("function");
+            expect(typeof backupService.downloadDatabaseBackup).toBe(
+                "function"
+            );
         });
 
         it("should return a service that implements IDataBackupService interface", () => {
             const backupService = factory.createBackupService();
-            
+
             // Verify the service has the required interface methods
             expect(backupService).toHaveProperty("downloadDatabaseBackup");
-            expect(typeof backupService.downloadDatabaseBackup).toBe("function");
+            expect(typeof backupService.downloadDatabaseBackup).toBe(
+                "function"
+            );
         });
 
         it("should create a new instance each time", () => {
             const service1 = factory.createBackupService();
             const service2 = factory.createBackupService();
-            
+
             expect(service1).not.toBe(service2);
         });
     });
@@ -144,29 +154,37 @@ describe("DatabaseServiceFactory", () => {
     describe("createImportExportService", () => {
         it("should create a data import/export service instance", () => {
             const importExportService = factory.createImportExportService();
-            
+
             expect(importExportService).toBeDefined();
             expect(typeof importExportService.exportAllData).toBe("function");
-            expect(typeof importExportService.importDataFromJson).toBe("function");
-            expect(typeof importExportService.persistImportedData).toBe("function");
+            expect(typeof importExportService.importDataFromJson).toBe(
+                "function"
+            );
+            expect(typeof importExportService.persistImportedData).toBe(
+                "function"
+            );
         });
 
         it("should return a service that implements IDataImportExportService interface", () => {
             const importExportService = factory.createImportExportService();
-            
+
             // Verify the service has the required interface methods
             expect(importExportService).toHaveProperty("exportAllData");
             expect(importExportService).toHaveProperty("importDataFromJson");
             expect(importExportService).toHaveProperty("persistImportedData");
             expect(typeof importExportService.exportAllData).toBe("function");
-            expect(typeof importExportService.importDataFromJson).toBe("function");
-            expect(typeof importExportService.persistImportedData).toBe("function");
+            expect(typeof importExportService.importDataFromJson).toBe(
+                "function"
+            );
+            expect(typeof importExportService.persistImportedData).toBe(
+                "function"
+            );
         });
 
         it("should create a new instance each time", () => {
             const service1 = factory.createImportExportService();
             const service2 = factory.createImportExportService();
-            
+
             expect(service1).not.toBe(service2);
         });
     });
@@ -174,23 +192,29 @@ describe("DatabaseServiceFactory", () => {
     describe("createSiteRepositoryService", () => {
         it("should create a site repository service instance", () => {
             const siteRepositoryService = factory.createSiteRepositoryService();
-            
+
             expect(siteRepositoryService).toBeDefined();
-            expect(typeof siteRepositoryService.getSitesFromDatabase).toBe("function");
+            expect(typeof siteRepositoryService.getSitesFromDatabase).toBe(
+                "function"
+            );
         });
 
         it("should return a service that implements ISiteRepositoryService interface", () => {
             const siteRepositoryService = factory.createSiteRepositoryService();
-            
+
             // Verify the service has the required interface methods
-            expect(siteRepositoryService).toHaveProperty("getSitesFromDatabase");
-            expect(typeof siteRepositoryService.getSitesFromDatabase).toBe("function");
+            expect(siteRepositoryService).toHaveProperty(
+                "getSitesFromDatabase"
+            );
+            expect(typeof siteRepositoryService.getSitesFromDatabase).toBe(
+                "function"
+            );
         });
 
         it("should create a new instance each time", () => {
             const service1 = factory.createSiteRepositoryService();
             const service2 = factory.createSiteRepositoryService();
-            
+
             expect(service1).not.toBe(service2);
         });
     });
@@ -201,7 +225,7 @@ describe("DatabaseServiceFactory", () => {
             const backupService = factory.createBackupService();
             const importExportService = factory.createImportExportService();
             const siteRepositoryService = factory.createSiteRepositoryService();
-            
+
             // Since we're using mocks, we verify the services are created successfully
             expect(backupService).toBeDefined();
             expect(importExportService).toBeDefined();
@@ -210,7 +234,7 @@ describe("DatabaseServiceFactory", () => {
 
         it("should pass database service to import/export service", () => {
             const importExportService = factory.createImportExportService();
-            
+
             expect(importExportService).toBeDefined();
             // The database service dependency is verified through successful creation
         });
@@ -218,7 +242,7 @@ describe("DatabaseServiceFactory", () => {
         it("should pass repositories to import/export and site repository services", () => {
             const importExportService = factory.createImportExportService();
             const siteRepositoryService = factory.createSiteRepositoryService();
-            
+
             expect(importExportService).toBeDefined();
             expect(siteRepositoryService).toBeDefined();
             // The repositories dependency is verified through successful creation
@@ -227,28 +251,39 @@ describe("DatabaseServiceFactory", () => {
 
     describe("interface compliance", () => {
         it("should ensure backup service matches IDataBackupService interface", () => {
-            const backupService: IDataBackupService = factory.createBackupService();
-            
+            const backupService: IDataBackupService =
+                factory.createBackupService();
+
             expect(backupService.downloadDatabaseBackup).toBeDefined();
-            expect(typeof backupService.downloadDatabaseBackup).toBe("function");
+            expect(typeof backupService.downloadDatabaseBackup).toBe(
+                "function"
+            );
         });
 
         it("should ensure import/export service matches IDataImportExportService interface", () => {
-            const importExportService: IDataImportExportService = factory.createImportExportService();
-            
+            const importExportService: IDataImportExportService =
+                factory.createImportExportService();
+
             expect(importExportService.exportAllData).toBeDefined();
             expect(importExportService.importDataFromJson).toBeDefined();
             expect(importExportService.persistImportedData).toBeDefined();
             expect(typeof importExportService.exportAllData).toBe("function");
-            expect(typeof importExportService.importDataFromJson).toBe("function");
-            expect(typeof importExportService.persistImportedData).toBe("function");
+            expect(typeof importExportService.importDataFromJson).toBe(
+                "function"
+            );
+            expect(typeof importExportService.persistImportedData).toBe(
+                "function"
+            );
         });
 
         it("should ensure site repository service matches ISiteRepositoryService interface", () => {
-            const siteRepositoryService: ISiteRepositoryService = factory.createSiteRepositoryService();
-            
+            const siteRepositoryService: ISiteRepositoryService =
+                factory.createSiteRepositoryService();
+
             expect(siteRepositoryService.getSitesFromDatabase).toBeDefined();
-            expect(typeof siteRepositoryService.getSitesFromDatabase).toBe("function");
+            expect(typeof siteRepositoryService.getSitesFromDatabase).toBe(
+                "function"
+            );
         });
     });
 

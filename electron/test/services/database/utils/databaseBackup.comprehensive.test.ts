@@ -31,18 +31,20 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         // Create fresh mocks for each test
         mockFs = {
             readFile: vi.fn(),
         };
 
         // Mock the dynamic import of fs/promises
-        vi.doMock("node:fs/promises", () => mockFs);        });
+        vi.doMock("node:fs/promises", () => mockFs);
+    });
     afterEach(() => {
         vi.clearAllMocks();
         vi.resetAllMocks();
-        vi.doUnmock("node:fs/promises");        });
+        vi.doUnmock("node:fs/promises");
+    });
     describe("createDatabaseBackup - Success scenarios", () => {
         it("should create database backup with default filename", async () => {
             mockFs.readFile.mockResolvedValue(testBuffer);
@@ -56,7 +58,8 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 metadata: {
                     originalPath: testDbPath,
                     sizeBytes: testBuffer.length,
-                },        });
+                },
+            });
             expect(result.metadata.createdAt).toBeGreaterThanOrEqual(startTime);
             expect(result.metadata.createdAt).toBeLessThanOrEqual(Date.now());
             expect(mockFs.readFile).toHaveBeenCalledWith(testDbPath);
@@ -68,12 +71,16 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                     sizeBytes: testBuffer.length,
                     createdAt: expect.any(Number),
                 })
-            );        });
+            );
+        });
         it("should create database backup with custom filename", async () => {
             const customFileName = "custom-backup.sqlite";
             mockFs.readFile.mockResolvedValue(testBuffer);
 
-            const result = await createDatabaseBackup(testDbPath, customFileName);
+            const result = await createDatabaseBackup(
+                testDbPath,
+                customFileName
+            );
 
             expect(result.fileName).toBe(customFileName);
             expect(result.buffer).toBe(testBuffer);
@@ -85,7 +92,8 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                     sizeBytes: testBuffer.length,
                     createdAt: expect.any(Number),
                 })
-            );        });
+            );
+        });
         it("should handle empty database file", async () => {
             const emptyBuffer = Buffer.alloc(0);
             mockFs.readFile.mockResolvedValue(emptyBuffer);
@@ -102,7 +110,8 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                     fileName: BACKUP_DB_FILE_NAME,
                     createdAt: expect.any(Number),
                 })
-            );        });
+            );
+        });
         it("should handle large database file", async () => {
             const largeBuffer = Buffer.alloc(1024 * 1024 * 10); // 10MB
             largeBuffer.fill(42); // Fill with test data
@@ -120,7 +129,8 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                     fileName: BACKUP_DB_FILE_NAME,
                     createdAt: expect.any(Number),
                 })
-            );        });
+            );
+        });
         it("should handle special characters in path", async () => {
             const specialPath = "/test/path with spaces/database-файл.sqlite";
             mockFs.readFile.mockResolvedValue(testBuffer);
@@ -128,33 +138,52 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             const result = await createDatabaseBackup(specialPath);
 
             expect(result.metadata.originalPath).toBe(specialPath);
-            expect(mockFs.readFile).toHaveBeenCalledWith(specialPath);        });
+            expect(mockFs.readFile).toHaveBeenCalledWith(specialPath);
+        });
         it("should preserve buffer content integrity", async () => {
-            const binaryData = Buffer.from([0x00, 0xFF, 0xAB, 0xCD, 0xEF]);
+            const binaryData = Buffer.from([
+                0x00,
+                0xff,
+                0xab,
+                0xcd,
+                0xef,
+            ]);
             mockFs.readFile.mockResolvedValue(binaryData);
 
             const result = await createDatabaseBackup(testDbPath);
 
             expect(result.buffer).toStrictEqual(binaryData);
-            expect([...result.buffer]).toEqual([0x00, 0xFF, 0xAB, 0xCD, 0xEF]);        });        });
+            expect([...result.buffer]).toEqual([
+                0x00,
+                0xff,
+                0xab,
+                0xcd,
+                0xef,
+            ]);
+        });
+    });
     describe("createDatabaseBackup - Error scenarios", () => {
         it.skip("should handle fs/promises import failure", async () => {
             // This test is skipped due to Vitest mocking limitations with dynamic imports
             // The actual fs module import cannot be reliably mocked during dynamic import()
             // This scenario would be better tested through integration testing where
-            // the module is actually unavailable, but for unit testing we skip this edge case        });
+            // the module is actually unavailable, but for unit testing we skip this edge case
+        });
         it.skip("should handle fs/promises import with non-Error exception", async () => {
             // This test is skipped due to Vitest mocking limitations with dynamic imports
             // The actual fs module import cannot be reliably mocked during dynamic import()
             // This scenario would be better tested through integration testing where
-            // the module is actually unavailable, but for unit testing we skip this edge case        });
+            // the module is actually unavailable, but for unit testing we skip this edge case
+        });
         it("should handle file read errors", async () => {
             const fileError = new Error("ENOENT: no such file or directory");
             fileError.name = "ENOENT";
             mockFs.readFile.mockRejectedValue(fileError);
 
-            await expect(createDatabaseBackup(testDbPath)).rejects.toThrow(fileError);
-            
+            await expect(createDatabaseBackup(testDbPath)).rejects.toThrow(
+                fileError
+            );
+
             expect(logger.error).toHaveBeenCalledWith(
                 "[DatabaseBackup] Failed to create database backup",
                 expect.objectContaining({
@@ -163,14 +192,17 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                     fileName: BACKUP_DB_FILE_NAME,
                     stack: expect.any(String),
                 })
-            );        });
+            );
+        });
         it("should handle permission errors", async () => {
             const permissionError = new Error("EACCES: permission denied");
             permissionError.name = "EACCES";
             mockFs.readFile.mockRejectedValue(permissionError);
 
-            await expect(createDatabaseBackup(testDbPath)).rejects.toThrow(permissionError);
-            
+            await expect(createDatabaseBackup(testDbPath)).rejects.toThrow(
+                permissionError
+            );
+
             expect(logger.error).toHaveBeenCalledWith(
                 "[DatabaseBackup] Failed to create database backup",
                 expect.objectContaining({
@@ -179,12 +211,15 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                     fileName: BACKUP_DB_FILE_NAME,
                     stack: expect.any(String),
                 })
-            );        });
+            );
+        });
         it("should handle non-Error exceptions from readFile", async () => {
             mockFs.readFile.mockRejectedValue("String error");
 
-            await expect(createDatabaseBackup(testDbPath)).rejects.toBe("String error");
-            
+            await expect(createDatabaseBackup(testDbPath)).rejects.toBe(
+                "String error"
+            );
+
             expect(logger.error).toHaveBeenCalledWith(
                 "[DatabaseBackup] Failed to create database backup",
                 expect.objectContaining({
@@ -193,14 +228,17 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                     dbPath: testDbPath,
                     fileName: BACKUP_DB_FILE_NAME,
                 })
-            );        });
+            );
+        });
         it("should handle file read timeout", async () => {
             const timeoutError = new Error("Operation timed out");
             timeoutError.name = "TIMEOUT";
             mockFs.readFile.mockRejectedValue(timeoutError);
 
-            await expect(createDatabaseBackup(testDbPath)).rejects.toThrow(timeoutError);
-            
+            await expect(createDatabaseBackup(testDbPath)).rejects.toThrow(
+                timeoutError
+            );
+
             expect(logger.error).toHaveBeenCalledWith(
                 "[DatabaseBackup] Failed to create database backup",
                 expect.objectContaining({
@@ -209,14 +247,17 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                     fileName: BACKUP_DB_FILE_NAME,
                     stack: expect.any(String),
                 })
-            );        });
+            );
+        });
         it("should handle custom filename with errors", async () => {
             const customFileName = "error-backup.sqlite";
             const error = new Error("File system error");
             mockFs.readFile.mockRejectedValue(error);
 
-            await expect(createDatabaseBackup(testDbPath, customFileName)).rejects.toThrow(error);
-            
+            await expect(
+                createDatabaseBackup(testDbPath, customFileName)
+            ).rejects.toThrow(error);
+
             expect(logger.error).toHaveBeenCalledWith(
                 "[DatabaseBackup] Failed to create database backup",
                 expect.objectContaining({
@@ -225,7 +266,9 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                     dbPath: testDbPath,
                     stack: expect.any(String),
                 })
-            );        });        });
+            );
+        });
+    });
     describe("createDatabaseBackup - Edge cases and boundary conditions", () => {
         it("should handle empty string paths", async () => {
             mockFs.readFile.mockResolvedValue(testBuffer);
@@ -233,15 +276,18 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             const result = await createDatabaseBackup("");
 
             expect(mockFs.readFile).toHaveBeenCalledWith("");
-            expect(result.metadata.originalPath).toBe("");        });
+            expect(result.metadata.originalPath).toBe("");
+        });
         it("should handle very long file paths", async () => {
-            const longPath = "/very/long/path/" + "x".repeat(1000) + "/database.sqlite";
+            const longPath =
+                "/very/long/path/" + "x".repeat(1000) + "/database.sqlite";
             mockFs.readFile.mockResolvedValue(testBuffer);
 
             const result = await createDatabaseBackup(longPath);
 
             expect(result.metadata.originalPath).toBe(longPath);
-            expect(mockFs.readFile).toHaveBeenCalledWith(longPath);        });
+            expect(mockFs.readFile).toHaveBeenCalledWith(longPath);
+        });
         it("should handle empty custom filename", async () => {
             mockFs.readFile.mockResolvedValue(testBuffer);
 
@@ -256,36 +302,46 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                     sizeBytes: testBuffer.length,
                     createdAt: expect.any(Number),
                 })
-            );        });
+            );
+        });
         it("should handle very long custom filename", async () => {
-            const longFileName = "very-long-filename-" + "x".repeat(1000) + ".sqlite";
+            const longFileName =
+                "very-long-filename-" + "x".repeat(1000) + ".sqlite";
             mockFs.readFile.mockResolvedValue(testBuffer);
 
             const result = await createDatabaseBackup(testDbPath, longFileName);
 
-            expect(result.fileName).toBe(longFileName);        });
+            expect(result.fileName).toBe(longFileName);
+        });
         it("should handle unicode characters in filename", async () => {
             const unicodeFileName = "backup-файл-数据库-🗃️.sqlite";
             mockFs.readFile.mockResolvedValue(testBuffer);
 
-            const result = await createDatabaseBackup(testDbPath, unicodeFileName);
+            const result = await createDatabaseBackup(
+                testDbPath,
+                unicodeFileName
+            );
 
-            expect(result.fileName).toBe(unicodeFileName);        });
+            expect(result.fileName).toBe(unicodeFileName);
+        });
         it("should ensure timestamp precision", async () => {
             mockFs.readFile.mockResolvedValue(testBuffer);
-            
+
             const before = Date.now();
             const result = await createDatabaseBackup(testDbPath);
             const after = Date.now();
 
             expect(result.metadata.createdAt).toBeGreaterThanOrEqual(before);
             expect(result.metadata.createdAt).toBeLessThanOrEqual(after);
-            expect(Number.isInteger(result.metadata.createdAt)).toBe(true);        });
+            expect(Number.isInteger(result.metadata.createdAt)).toBe(true);
+        });
         it.skip("should handle multiple concurrent backup operations", async () => {
             // This test is skipped because mocking dynamic imports with Vitest is problematic
             // The actual fs.readFile calls bypass our mocks when using dynamic import()
             // In real usage, concurrent operations work fine as each call gets its own import
-            // but for testing, the mock framework cannot intercept the dynamic imports reliably        });        });
+            // but for testing, the mock framework cannot intercept the dynamic imports reliably
+        });
+    });
     describe("createDatabaseBackup - Type safety and interface compliance", () => {
         it("should return correctly typed DatabaseBackupResult", async () => {
             mockFs.readFile.mockResolvedValue(testBuffer);
@@ -302,15 +358,20 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
             // Interface compliance
             const expectedInterface: DatabaseBackupResult = result;
-            expect(expectedInterface).toBeDefined();        });
+            expect(expectedInterface).toBeDefined();
+        });
         it("should validate metadata consistency", async () => {
             mockFs.readFile.mockResolvedValue(testBuffer);
 
-            const result = await createDatabaseBackup(testDbPath, "test.sqlite");
+            const result = await createDatabaseBackup(
+                testDbPath,
+                "test.sqlite"
+            );
 
             expect(result.metadata.sizeBytes).toBe(result.buffer.length);
             expect(result.metadata.originalPath).toBe(testDbPath);
-            expect(result.fileName).toBe("test.sqlite");        });
+            expect(result.fileName).toBe("test.sqlite");
+        });
         it("should handle buffer edge cases", async () => {
             // Test with various buffer types
             const testCases = [
@@ -318,14 +379,23 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 Buffer.alloc(1, 0), // Single zero byte
                 Buffer.alloc(1, 255), // Single max byte
                 Buffer.from("test"), // String buffer
-                Buffer.from([1, 2, 3, 4, 5]), // Array buffer
+                Buffer.from([
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                ]), // Array buffer
             ];
 
             for (const testCase of testCases) {
                 mockFs.readFile.mockResolvedValue(testCase);
-                
+
                 const result = await createDatabaseBackup(testDbPath);
-                
+
                 expect(result.buffer).toBe(testCase);
                 expect(result.metadata.sizeBytes).toBe(testCase.length);
-            }        });        });        });
+            }
+        });
+    });
+});

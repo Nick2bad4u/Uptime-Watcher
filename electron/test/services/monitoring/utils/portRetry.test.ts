@@ -1,9 +1,9 @@
 /**
  * Test suite for portRetry
- * 
+ *
  * @fileoverview Comprehensive tests for the performPortCheckWithRetry function
  * in the Uptime Watcher application.
- * 
+ *
  * @author GitHub Copilot
  * @since 2025-08-11
  * @category Monitoring Utilities
@@ -71,7 +71,7 @@ describe("performPortCheckWithRetry", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         // Set up default mocks
         vi.mocked(isDev).mockReturnValue(false);
         vi.mocked(withOperationalHooks).mockResolvedValue(mockResult);
@@ -92,7 +92,12 @@ describe("performPortCheckWithRetry", () => {
             const maxRetries = 2;
 
             // Act
-            const result = await performPortCheckWithRetry(host, port, timeout, maxRetries);
+            const result = await performPortCheckWithRetry(
+                host,
+                port,
+                timeout,
+                maxRetries
+            );
 
             // Assert
             expect(result).toEqual(mockResult);
@@ -120,7 +125,12 @@ describe("performPortCheckWithRetry", () => {
                 vi.clearAllMocks();
 
                 // Act
-                await performPortCheckWithRetry("test.com", 443, 5000, maxRetries);
+                await performPortCheckWithRetry(
+                    "test.com",
+                    443,
+                    5000,
+                    maxRetries
+                );
 
                 // Assert
                 expect(withOperationalHooks).toHaveBeenCalledWith(
@@ -148,10 +158,15 @@ describe("performPortCheckWithRetry", () => {
             );
 
             // Extract and test the function passed to withOperationalHooks
-            const hookFunction = vi.mocked(withOperationalHooks).mock.calls[0]![0];
+            const hookFunction =
+                vi.mocked(withOperationalHooks).mock.calls[0]![0];
             await hookFunction();
-            
-            expect(performSinglePortCheck).toHaveBeenCalledWith(host, port, timeout);
+
+            expect(performSinglePortCheck).toHaveBeenCalledWith(
+                host,
+                port,
+                timeout
+            );
         });
     });
 
@@ -197,8 +212,11 @@ describe("performPortCheckWithRetry", () => {
 
             // Extract the onRetry function and call it
             const config = vi.mocked(withOperationalHooks).mock.calls[0]![1];
-            const onRetryFunction = config.onRetry as (attempt: number, error: Error) => void;
-            
+            const onRetryFunction = config.onRetry as (
+                attempt: number,
+                error: Error
+            ) => void;
+
             onRetryFunction(2, testError);
 
             // Assert
@@ -216,8 +234,11 @@ describe("performPortCheckWithRetry", () => {
 
             // Extract the onRetry function and call it with non-Error
             const config = vi.mocked(withOperationalHooks).mock.calls[0]![1];
-            const onRetryFunction = config.onRetry as (attempt: number, error: Error) => void;
-            
+            const onRetryFunction = config.onRetry as (
+                attempt: number,
+                error: Error
+            ) => void;
+
             onRetryFunction(1, "String error" as any);
 
             // Assert
@@ -234,11 +255,20 @@ describe("performPortCheckWithRetry", () => {
             vi.mocked(withOperationalHooks).mockRejectedValue(testError);
 
             // Act
-            const result = await performPortCheckWithRetry("error.example.com", 80, 3000, 2);
+            const result = await performPortCheckWithRetry(
+                "error.example.com",
+                80,
+                3000,
+                2
+            );
 
             // Assert
             expect(result).toEqual(mockErrorResult);
-            expect(handlePortCheckError).toHaveBeenCalledWith(testError, "error.example.com", 80);
+            expect(handlePortCheckError).toHaveBeenCalledWith(
+                testError,
+                "error.example.com",
+                80
+            );
         });
 
         it("should handle different types of errors", async () => {
@@ -257,11 +287,20 @@ describe("performPortCheckWithRetry", () => {
                 vi.mocked(withOperationalHooks).mockRejectedValue(testError);
 
                 // Act
-                const result = await performPortCheckWithRetry("test.com", 443, 1000, 1);
+                const result = await performPortCheckWithRetry(
+                    "test.com",
+                    443,
+                    1000,
+                    1
+                );
 
                 // Assert
                 expect(result).toEqual(mockErrorResult);
-                expect(handlePortCheckError).toHaveBeenCalledWith(testError, "test.com", 443);
+                expect(handlePortCheckError).toHaveBeenCalledWith(
+                    testError,
+                    "test.com",
+                    443
+                );
             }
         });
 
@@ -273,11 +312,18 @@ describe("performPortCheckWithRetry", () => {
                 error: "Custom error message",
                 details: "443",
             };
-            vi.mocked(withOperationalHooks).mockRejectedValue(new Error("Test error"));
+            vi.mocked(withOperationalHooks).mockRejectedValue(
+                new Error("Test error")
+            );
             vi.mocked(handlePortCheckError).mockReturnValue(customErrorResult);
 
             // Act
-            const result = await performPortCheckWithRetry("custom.example.com", 443, 1000, 0);
+            const result = await performPortCheckWithRetry(
+                "custom.example.com",
+                443,
+                1000,
+                0
+            );
 
             // Assert
             expect(result).toEqual(customErrorResult);
@@ -301,7 +347,7 @@ describe("performPortCheckWithRetry", () => {
         it("should handle different host formats", async () => {
             const hostFormats = [
                 "example.com",
-                "sub.example.com", 
+                "sub.example.com",
                 "192.168.1.1",
                 "::1",
                 "localhost",
@@ -326,7 +372,14 @@ describe("performPortCheckWithRetry", () => {
         });
 
         it("should handle different port numbers", async () => {
-            const ports = [22, 80, 443, 3000, 8080, 65_535];
+            const ports = [
+                22,
+                80,
+                443,
+                3000,
+                8080,
+                65_535,
+            ];
 
             for (const port of ports) {
                 // Arrange
@@ -356,11 +409,16 @@ describe("performPortCheckWithRetry", () => {
                 await performPortCheckWithRetry("timeout.test", 80, timeout, 0);
 
                 // Extract and call the function to verify timeout is passed correctly
-                const hookFunction = vi.mocked(withOperationalHooks).mock.calls[0]![0];
+                const hookFunction =
+                    vi.mocked(withOperationalHooks).mock.calls[0]![0];
                 await hookFunction();
 
                 // Assert
-                expect(performSinglePortCheck).toHaveBeenCalledWith("timeout.test", 80, timeout);
+                expect(performSinglePortCheck).toHaveBeenCalledWith(
+                    "timeout.test",
+                    80,
+                    timeout
+                );
             }
         });
 
@@ -426,7 +484,12 @@ describe("performPortCheckWithRetry", () => {
             vi.mocked(withOperationalHooks).mockResolvedValue(successResult);
 
             // Act
-            const result = await performPortCheckWithRetry("success.example.com", 443, 3000, 2);
+            const result = await performPortCheckWithRetry(
+                "success.example.com",
+                443,
+                3000,
+                2
+            );
 
             // Assert
             expect(result).toEqual(successResult);
@@ -438,9 +501,13 @@ describe("performPortCheckWithRetry", () => {
             const results = [
                 { status: "up" as const, responseTime: 100 },
                 { status: "up" as const, responseTime: 200 },
-                { status: "down" as const, responseTime: 5000, error: "Timeout" },
+                {
+                    status: "down" as const,
+                    responseTime: 5000,
+                    error: "Timeout",
+                },
             ];
-            
+
             vi.mocked(withOperationalHooks)
                 .mockResolvedValueOnce(results[0])
                 .mockResolvedValueOnce(results[1])
@@ -449,7 +516,7 @@ describe("performPortCheckWithRetry", () => {
             // Act
             const promises = [
                 performPortCheckWithRetry("host1.test", 80, 1000, 1),
-                performPortCheckWithRetry("host2.test", 443, 1000, 1), 
+                performPortCheckWithRetry("host2.test", 443, 1000, 1),
                 performPortCheckWithRetry("host3.test", 8080, 1000, 1),
             ];
 

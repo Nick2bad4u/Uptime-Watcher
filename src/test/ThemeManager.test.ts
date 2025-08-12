@@ -200,7 +200,9 @@ describe("ThemeManager", () => {
                 removeEventListener: vi.fn(),
             };
 
-            vi.mocked(globalThis.matchMedia).mockReturnValue(mockMediaQuery as any);
+            vi.mocked(globalThis.matchMedia).mockReturnValue(
+                mockMediaQuery as any
+            );
 
             const cleanup = themeManager.onSystemThemeChange(callback);
 

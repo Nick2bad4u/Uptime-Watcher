@@ -34,9 +34,11 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             emitTyped: vi.fn().mockResolvedValue(undefined),
         };
 
-        operationalHooks = await import("../../utils/operationalHooks.js");        });
+        operationalHooks = await import("../../utils/operationalHooks.js");
+    });
     afterEach(() => {
-        vi.resetAllMocks();        });
+        vi.resetAllMocks();
+    });
     describe("withOperationalHooks - Success Paths", () => {
         it("should execute operation successfully on first attempt", async () => {
             const mockOperation = vi.fn().mockResolvedValue("success");
@@ -50,7 +52,8 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             );
 
             expect(result).toBe("success");
-            expect(mockOperation).toHaveBeenCalledTimes(1);        });
+            expect(mockOperation).toHaveBeenCalledTimes(1);
+        });
         it("should handle operation with event emission", async () => {
             const mockOperation = vi.fn().mockResolvedValue("success");
 
@@ -65,7 +68,8 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             );
 
             expect(result).toBe("success");
-            expect(mockEventEmitter.emitTyped).toHaveBeenCalled();        });
+            expect(mockEventEmitter.emitTyped).toHaveBeenCalled();
+        });
         it("should handle operation without event emission", async () => {
             const mockOperation = vi.fn().mockResolvedValue("success");
 
@@ -79,7 +83,9 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             );
 
             expect(result).toBe("success");
-            expect(mockEventEmitter.emit).not.toHaveBeenCalled();        });        });
+            expect(mockEventEmitter.emit).not.toHaveBeenCalled();
+        });
+    });
     describe("withOperationalHooks - Retry Logic", () => {
         it("should retry on failure and eventually succeed", async () => {
             const mockOperation = vi
@@ -98,7 +104,8 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             );
 
             expect(result).toBe("success");
-            expect(mockOperation).toHaveBeenCalledTimes(3);        });
+            expect(mockOperation).toHaveBeenCalledTimes(3);
+        });
         it("should handle all retries exhausted - throwOnFailure=true", async () => {
             const mockOperation = vi
                 .fn()
@@ -113,7 +120,8 @@ describe("operationalHooks.ts - Branch Coverage", () => {
                 })
             ).rejects.toThrow("Persistent failure");
 
-            expect(mockOperation).toHaveBeenCalledTimes(2);        });
+            expect(mockOperation).toHaveBeenCalledTimes(2);
+        });
         it("should handle all retries exhausted - throwOnFailure=false", async () => {
             const mockOperation = vi
                 .fn()
@@ -130,7 +138,9 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             );
 
             expect(result).toBeNull();
-            expect(mockOperation).toHaveBeenCalledTimes(2);        });        });
+            expect(mockOperation).toHaveBeenCalledTimes(2);
+        });
+    });
     describe("withOperationalHooks - Backoff Strategies", () => {
         it("should handle exponential backoff", async () => {
             const mockOperation = vi
@@ -149,7 +159,8 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             );
 
             expect(result).toBe("success");
-            expect(mockOperation).toHaveBeenCalledTimes(2);        });
+            expect(mockOperation).toHaveBeenCalledTimes(2);
+        });
         it("should handle linear backoff", async () => {
             const mockOperation = vi
                 .fn()
@@ -167,7 +178,9 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             );
 
             expect(result).toBe("success");
-            expect(mockOperation).toHaveBeenCalledTimes(2);        });        });
+            expect(mockOperation).toHaveBeenCalledTimes(2);
+        });
+    });
     describe("withOperationalHooks - Callback Handling", () => {
         it("should call onSuccess callback", async () => {
             const mockOperation = vi.fn().mockResolvedValue("success");
@@ -183,7 +196,8 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             );
 
             expect(result).toBe("success");
-            expect(onSuccess).toHaveBeenCalledWith("success");        });
+            expect(onSuccess).toHaveBeenCalledWith("success");
+        });
         it("should call onRetry callback", async () => {
             const mockOperation = vi
                 .fn()
@@ -202,7 +216,8 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             );
 
             expect(result).toBe("success");
-            expect(onRetry).toHaveBeenCalledWith(1, expect.any(Error));        });
+            expect(onRetry).toHaveBeenCalledWith(1, expect.any(Error));
+        });
         it("should call onFailure callback when all retries exhausted", async () => {
             const mockOperation = vi
                 .fn()
@@ -218,7 +233,9 @@ describe("operationalHooks.ts - Branch Coverage", () => {
                 })
             ).rejects.toThrow();
 
-            expect(onFailure).toHaveBeenCalledWith(expect.any(Error), 2);        });        });
+            expect(onFailure).toHaveBeenCalledWith(expect.any(Error), 2);
+        });
+    });
     describe("withOperationalHooks - Error Handling Edge Cases", () => {
         it("should handle non-Error objects thrown", async () => {
             const mockOperation = vi.fn().mockRejectedValue("string error");
@@ -229,7 +246,8 @@ describe("operationalHooks.ts - Branch Coverage", () => {
                     maxRetries: 1,
                     initialDelay: 10,
                 })
-            ).rejects.toThrow("string error");        });
+            ).rejects.toThrow("string error");
+        });
         it("should handle null/undefined thrown", async () => {
             const mockOperation = vi.fn().mockRejectedValue(null);
 
@@ -239,7 +257,8 @@ describe("operationalHooks.ts - Branch Coverage", () => {
                     maxRetries: 1,
                     initialDelay: 10,
                 })
-            ).rejects.toThrow("null");        });
+            ).rejects.toThrow("null");
+        });
         it("should handle callback errors gracefully", async () => {
             const mockOperation = vi.fn().mockResolvedValue("success");
             const onSuccess = vi
@@ -256,7 +275,9 @@ describe("operationalHooks.ts - Branch Coverage", () => {
                 }
             );
 
-            expect(result).toBe("success");        });        });
+            expect(result).toBe("success");
+        });
+    });
     describe("withDatabaseOperation - Specialized Wrapper", () => {
         it("should execute database operation successfully", async () => {
             const mockOperation = vi
@@ -269,7 +290,8 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             );
 
             expect(result).toEqual({ id: 1, name: "test" });
-            expect(mockOperation).toHaveBeenCalledTimes(1);        });
+            expect(mockOperation).toHaveBeenCalledTimes(1);
+        });
         it("should handle database operation with event emitter", async () => {
             const mockOperation = vi.fn().mockResolvedValue({ id: 1 });
 
@@ -280,7 +302,8 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             );
 
             expect(result).toEqual({ id: 1 });
-            expect(mockEventEmitter.emitTyped).toHaveBeenCalled();        });
+            expect(mockEventEmitter.emitTyped).toHaveBeenCalled();
+        });
         it("should handle database operation with context", async () => {
             const mockOperation = vi.fn().mockResolvedValue({ success: true });
             const context = { siteId: "123", userId: "456" };
@@ -293,7 +316,8 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             );
 
             expect(result).toEqual({ success: true });
-            expect(mockEventEmitter.emitTyped).toHaveBeenCalled();        });
+            expect(mockEventEmitter.emitTyped).toHaveBeenCalled();
+        });
         it("should handle database operation failures with retries", async () => {
             const mockOperation = vi
                 .fn()
@@ -306,7 +330,8 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             );
 
             expect(result).toEqual({ recovered: true });
-            expect(mockOperation).toHaveBeenCalledTimes(2);        });
+            expect(mockOperation).toHaveBeenCalledTimes(2);
+        });
         it("should use database-specific defaults", async () => {
             const mockOperation = vi.fn().mockResolvedValue("success");
 
@@ -318,7 +343,9 @@ describe("operationalHooks.ts - Branch Coverage", () => {
 
             expect(result).toBe("success");
             // The operation name should be prefixed with "database:"
-            // This is tested implicitly through the function behavior        });        });
+            // This is tested implicitly through the function behavior
+        });
+    });
     describe("Configuration Edge Cases", () => {
         it("should handle minimal configuration", async () => {
             const mockOperation = vi.fn().mockResolvedValue("minimal");
@@ -330,7 +357,8 @@ describe("operationalHooks.ts - Branch Coverage", () => {
                 }
             );
 
-            expect(result).toBe("minimal");        });
+            expect(result).toBe("minimal");
+        });
         it("should handle maximum configuration", async () => {
             const mockOperation = vi.fn().mockResolvedValue("maximal");
             const onSuccess = vi.fn();
@@ -355,7 +383,8 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             );
 
             expect(result).toBe("maximal");
-            expect(onSuccess).toHaveBeenCalledWith("maximal");        });
+            expect(onSuccess).toHaveBeenCalledWith("maximal");
+        });
         it("should handle undefined/null context gracefully", async () => {
             const mockOperation = vi.fn().mockResolvedValue("success");
 
@@ -367,7 +396,9 @@ describe("operationalHooks.ts - Branch Coverage", () => {
                 }
             );
 
-            expect(result).toBe("success");        });        });
+            expect(result).toBe("success");
+        });
+    });
     describe("Event Emission Edge Cases", () => {
         it("should handle event emission failures gracefully", async () => {
             const mockOperation = vi.fn().mockResolvedValue("success");
@@ -390,7 +421,8 @@ describe("operationalHooks.ts - Branch Coverage", () => {
                 }
             );
 
-            expect(result).toBe("success");        });
+            expect(result).toBe("success");
+        });
         it("should handle event emitter without emit method", async () => {
             const mockOperation = vi.fn().mockResolvedValue("success");
             const invalidEventEmitter = {};
@@ -404,4 +436,7 @@ describe("operationalHooks.ts - Branch Coverage", () => {
                 }
             );
 
-            expect(result).toBe("success");        });        });        });
+            expect(result).toBe("success");
+        });
+    });
+});

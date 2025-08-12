@@ -30,7 +30,8 @@ vi.mock("electron", () => ({
 
 describe("Targeted Coverage for Missing Branches", () => {
     beforeEach(() => {
-        vi.clearAllMocks();        });
+        vi.clearAllMocks();
+    });
     describe("Development Environment Branches", () => {
         it("should handle isDev function edge cases", async () => {
             const { isDev } = await import("../electronUtils.js");
@@ -54,7 +55,9 @@ describe("Targeted Coverage for Missing Branches", () => {
             expect(typeof isDev()).toBe("boolean");
 
             // Restore
-            process.env["NODE_ENV"] = originalEnv;        });        });
+            process.env["NODE_ENV"] = originalEnv;
+        });
+    });
     describe("Error Handling Branches", () => {
         it("should test error handling in module imports", async () => {
             // Test that imports handle errors gracefully
@@ -74,7 +77,9 @@ describe("Targeted Coverage for Missing Branches", () => {
             } catch (error) {
                 // This branch handles import errors
                 expect(error).toBeDefined();
-            }        });        });
+            }
+        });
+    });
     describe("Configuration Branches", () => {
         it("should handle different configuration states", async () => {
             // Test configuration edge cases that might not be covered
@@ -103,7 +108,9 @@ describe("Targeted Coverage for Missing Branches", () => {
             } catch (error) {
                 // Test import error handling branch
                 expect(error).toBeDefined();
-            }        });        });
+            }
+        });
+    });
     describe("Type System Branches", () => {
         it("should handle type checking edge cases", async () => {
             try {
@@ -114,7 +121,9 @@ describe("Targeted Coverage for Missing Branches", () => {
             } catch (error) {
                 // Test type import error branch
                 expect(error).toBeDefined();
-            }        });        });
+            }
+        });
+    });
     describe("Service Container Branches", () => {
         it("should handle service container edge cases", async () => {
             try {
@@ -131,9 +140,13 @@ describe("Targeted Coverage for Missing Branches", () => {
 
                 // Test with different configurations
                 const container3 = ServiceContainer.getInstance({
-                    enableDebugLogging: true,        });
+                    enableDebugLogging: true,
+                });
                 expect(container3).toBeDefined();
             } catch (error) {
                 // Test import/initialization error branch
                 expect(error).toBeDefined();
-            }        });        });        });
+            }
+        });
+    });
+});

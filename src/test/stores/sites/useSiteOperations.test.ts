@@ -354,7 +354,11 @@ describe("createSiteOperationsActions", () => {
         it("should update monitor timeout", async () => {
             mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
 
-            await actions.updateMonitorTimeout("test-site", "monitor-1", 10_000);
+            await actions.updateMonitorTimeout(
+                "test-site",
+                "monitor-1",
+                10_000
+            );
 
             expect(mockElectronAPI.sites.updateSite).toHaveBeenCalled();
             expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();

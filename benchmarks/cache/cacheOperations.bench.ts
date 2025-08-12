@@ -1,9 +1,9 @@
 /**
  * Benchmark tests for cache operations
- * 
+ *
  * @fileoverview Performance benchmarks for cache operations including
  * cache lookups, insertions, LRU evictions, and TTL cleanups.
- * 
+ *
  * @author GitHub Copilot
  * @since 2025-08-11
  * @category Performance
@@ -53,7 +53,7 @@ class BenchmarkCache<K, V> {
         if (!entry) return undefined;
 
         const now = Date.now();
-        
+
         // Check TTL expiration
         if (entry.ttl && now - entry.timestamp > entry.ttl) {
             this.cache.delete(key);
@@ -123,7 +123,7 @@ function generateCacheValues(count: number): object[] {
         data: `value-${i}`,
         timestamp: Date.now(),
         metadata: {
-            type: 'benchmark',
+            type: "benchmark",
             size: Math.floor(Math.random() * 1000),
         },
     }));
@@ -134,11 +134,11 @@ describe("Cache Operations Performance Benchmarks", () => {
     let smallCache: BenchmarkCache<string, object>;
     let mediumCache: BenchmarkCache<string, object>;
     let largeCache: BenchmarkCache<string, object>;
-    
+
     let smallKeys: string[];
     let mediumKeys: string[];
     let largeKeys: string[];
-    
+
     let smallValues: object[];
     let mediumValues: object[];
     let largeValues: object[];
@@ -188,19 +188,19 @@ describe("Cache Operations Performance Benchmarks", () => {
 
     // Cache Get Operations
     bench("Cache get - Small dataset (100 entries)", () => {
-        smallKeys.forEach(key => {
+        smallKeys.forEach((key) => {
             smallCache.get(key);
         });
     });
 
     bench("Cache get - Medium dataset (1K entries)", () => {
-        mediumKeys.forEach(key => {
+        mediumKeys.forEach((key) => {
             mediumCache.get(key);
         });
     });
 
     bench("Cache get - Large dataset (10K entries)", () => {
-        largeKeys.forEach(key => {
+        largeKeys.forEach((key) => {
             largeCache.get(key);
         });
     });
@@ -208,9 +208,10 @@ describe("Cache Operations Performance Benchmarks", () => {
     // Cache Hit/Miss Operations
     bench("Cache mixed operations - 80% hits (Medium dataset)", () => {
         for (let i = 0; i < 1000; i++) {
-            const key = Math.random() < 0.8 
-                ? mediumKeys[Math.floor(Math.random() * mediumKeys.length)]
-                : `miss-key-${i}`;
+            const key =
+                Math.random() < 0.8
+                    ? mediumKeys[Math.floor(Math.random() * mediumKeys.length)]
+                    : `miss-key-${i}`;
             mediumCache.get(key);
         }
     });
@@ -218,7 +219,7 @@ describe("Cache Operations Performance Benchmarks", () => {
     // LRU Eviction Stress Test
     bench("LRU eviction stress test - Small cache", () => {
         const cache = new BenchmarkCache<string, object>(50); // Small cache for forced evictions
-        
+
         for (let i = 0; i < 200; i++) {
             cache.set(`stress-key-${i}`, { data: `stress-value-${i}` });
         }
@@ -227,12 +228,12 @@ describe("Cache Operations Performance Benchmarks", () => {
     // TTL Cleanup Operations
     bench("TTL cleanup - Medium dataset", () => {
         const cache = new BenchmarkCache<string, object>(2000, 1); // Very short TTL
-        
+
         // Set entries with expired TTL
         mediumKeys.forEach((key, i) => {
             cache.set(key, mediumValues[i], 1);
         });
-        
+
         // Wait for expiration (simulated)
         setTimeout(() => {
             cache.cleanup();
@@ -242,12 +243,12 @@ describe("Cache Operations Performance Benchmarks", () => {
     // Bulk Operations
     bench("Bulk cache operations - Mixed workload", () => {
         const cache = new BenchmarkCache<string, object>(5000);
-        
+
         // Mix of sets, gets, and deletes
         for (let i = 0; i < 1000; i++) {
             const operation = Math.random();
             const key = `bulk-key-${i % 100}`;
-            
+
             if (operation < 0.6) {
                 // 60% gets
                 cache.get(key);
@@ -264,7 +265,7 @@ describe("Cache Operations Performance Benchmarks", () => {
     // Memory-intensive operations
     bench("Large object caching - Complex data structures", () => {
         const cache = new BenchmarkCache<string, object>(100);
-        
+
         for (let i = 0; i < 100; i++) {
             const largeObject = {
                 id: i,
@@ -282,7 +283,7 @@ describe("Cache Operations Performance Benchmarks", () => {
                     checksum: `checksum-${i}`,
                 },
             };
-            
+
             cache.set(`large-key-${i}`, largeObject);
         }
     });
@@ -290,16 +291,16 @@ describe("Cache Operations Performance Benchmarks", () => {
     // Cache size and memory management
     bench("Cache size management - Dynamic sizing", () => {
         const cache = new BenchmarkCache<string, object>(1000);
-        
+
         // Fill cache to capacity
         for (let i = 0; i < 1000; i++) {
             cache.set(`size-key-${i}`, { data: `value-${i}` });
         }
-        
+
         // Check size and perform cleanup
         cache.size();
         cache.cleanup();
-        
+
         // Add more entries to trigger eviction
         for (let i = 1000; i < 1200; i++) {
             cache.set(`size-key-${i}`, { data: `value-${i}` });

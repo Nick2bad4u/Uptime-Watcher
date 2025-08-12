@@ -1,9 +1,9 @@
 /**
  * Test suite for correlation
- * 
+ *
  * @fileoverview Comprehensive tests for unknown functionality
  * in the Uptime Watcher application.
- * 
+ *
  * @author GitHub Copilot
  * @since 2025-08-11
  * @category General
@@ -23,22 +23,26 @@ describe("Correlation Utility", () => {
             const id = generateCorrelationId();
 
             expect(id).toBeDefined();
-            expect(typeof id).toBe("string");        });
+            expect(typeof id).toBe("string");
+        });
         it("should generate IDs with correct length", () => {
             const id = generateCorrelationId();
 
             // randomBytes(8) => 8 bytes => 16 hex characters
-            expect(id).toHaveLength(16);        });
+            expect(id).toHaveLength(16);
+        });
         it("should generate unique IDs", () => {
             const id1 = generateCorrelationId();
             const id2 = generateCorrelationId();
 
-            expect(id1).not.toBe(id2);        });
+            expect(id1).not.toBe(id2);
+        });
         it("should generate hex string", () => {
             const id = generateCorrelationId();
 
             // Should only contain hex characters (0-9, a-f)
-            expect(id).toMatch(/^[\da-f]+$/);        });
+            expect(id).toMatch(/^[\da-f]+$/);
+        });
         it("should generate multiple unique IDs", () => {
             const ids = new Set();
             const count = 100;
@@ -48,12 +52,14 @@ describe("Correlation Utility", () => {
             }
 
             // All IDs should be unique
-            expect(ids.size).toBe(count);        });
+            expect(ids.size).toBe(count);
+        });
         it("should always return lowercase hex", () => {
             for (let i = 0; i < 10; i++) {
                 const id = generateCorrelationId();
                 expect(id).toBe(id.toLowerCase());
-            }        });
+            }
+        });
         it("should be cryptographically random", () => {
             const ids = Array.from({ length: 1000 })
                 .fill(0)
@@ -79,7 +85,9 @@ describe("Correlation Utility", () => {
                 for (const count of Object.values(charCounts)) {
                     expect(count / ids.length).toBeLessThan(0.8);
                 }
-            }        });        });
+            }
+        });
+    });
     describe("ValidationError", () => {
         it("should create ValidationError with single error", () => {
             const error = new ValidationError(["Invalid email"]);
@@ -88,7 +96,8 @@ describe("Correlation Utility", () => {
             expect(error).toBeInstanceOf(ValidationError);
             expect(error.name).toBe("ValidationError");
             expect(error.message).toBe("Validation failed: Invalid email");
-            expect(error.errors).toEqual(["Invalid email"]);        });
+            expect(error.errors).toEqual(["Invalid email"]);
+        });
         it("should create ValidationError with multiple errors", () => {
             const errors = [
                 "Invalid email",
@@ -100,18 +109,21 @@ describe("Correlation Utility", () => {
             expect(error.message).toBe(
                 "Validation failed: Invalid email, Password too short, Name required"
             );
-            expect(error.errors).toEqual(errors);        });
+            expect(error.errors).toEqual(errors);
+        });
         it("should create ValidationError with empty errors array", () => {
             const error = new ValidationError([]);
 
             expect(error.message).toBe("Validation failed: ");
-            expect(error.errors).toEqual([]);        });
+            expect(error.errors).toEqual([]);
+        });
         it("should preserve errors array as provided", () => {
             const errors = ["Error 1", "Error 2"];
             const error = new ValidationError(errors);
 
             // Should be the same reference
-            expect(error.errors).toBe(errors);        });
+            expect(error.errors).toBe(errors);
+        });
         it("should handle special characters in error messages", () => {
             const errors = [
                 'Error with "quotes"',
@@ -123,7 +135,8 @@ describe("Correlation Utility", () => {
             expect(error.errors).toEqual(errors);
             expect(error.message).toContain('Error with "quotes"');
             expect(error.message).toContain("Error with 'apostrophes'");
-            expect(error.message).toContain("Error with <tags>");        });
+            expect(error.message).toContain("Error with <tags>");
+        });
         it("should handle unicode characters in error messages", () => {
             const errors = [
                 "Error with emoji 🚨",
@@ -135,7 +148,8 @@ describe("Correlation Utility", () => {
             expect(error.errors).toEqual(errors);
             expect(error.message).toContain("🚨");
             expect(error.message).toContain("café");
-            expect(error.message).toContain("ñ§∆");        });
+            expect(error.message).toContain("ñ§∆");
+        });
         it("should be catchable as Error", () => {
             try {
                 throw new ValidationError(["Test error"]);
@@ -144,7 +158,8 @@ describe("Correlation Utility", () => {
                 expect((error as ValidationError).errors).toEqual([
                     "Test error",
                 ]);
-            }        });
+            }
+        });
         it("should be catchable as ValidationError", () => {
             try {
                 throw new ValidationError(["Test error"]);
@@ -154,18 +169,21 @@ describe("Correlation Utility", () => {
                 } else {
                     fail("Should be instance of ValidationError");
                 }
-            }        });
+            }
+        });
         it("should have stack trace", () => {
             const error = new ValidationError(["Test error"]);
 
             expect(error.stack).toBeDefined();
-            expect(error.stack).toContain("ValidationError");        });
+            expect(error.stack).toContain("ValidationError");
+        });
         it("should handle very long error messages", () => {
             const longError = "A".repeat(1000);
             const error = new ValidationError([longError]);
 
             expect(error.errors[0]).toBe(longError);
-            expect(error.message).toContain(longError);        });
+            expect(error.message).toContain(longError);
+        });
         it("should handle many errors", () => {
             const manyErrors = Array.from(
                 { length: 100 },
@@ -175,4 +193,7 @@ describe("Correlation Utility", () => {
 
             expect(error.errors).toHaveLength(100);
             expect(error.message).toContain("Error 1");
-            expect(error.message).toContain("Error 100");        });        });        });
+            expect(error.message).toContain("Error 100");
+        });
+    });
+});

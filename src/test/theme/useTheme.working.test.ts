@@ -20,12 +20,10 @@ beforeEach(() => {
     Object.defineProperty(globalThis, "electronAPI", {
         value: {
             settings: {
-                get: vi
-                    .fn()
-                    .mockResolvedValue({
-                        success: true,
-                        data: { theme: "light" },
-                    }),
+                get: vi.fn().mockResolvedValue({
+                    success: true,
+                    data: { theme: "light" },
+                }),
                 set: vi.fn().mockResolvedValue({ success: true }),
             },
         },

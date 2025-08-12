@@ -858,7 +858,8 @@ describe("Theme Components - Complete Coverage", () => {
             render(<StatusIndicator status="up" />);
 
             // Use text content or role when available
-            const indicator = screen.getByText(/up/i) || screen.getByRole("status");
+            const indicator =
+                screen.getByText(/up/i) || screen.getByRole("status");
             expect(indicator).toBeInTheDocument();
         });
 
@@ -870,7 +871,8 @@ describe("Theme Components - Complete Coverage", () => {
                     <StatusIndicator status="up" size={size} />
                 );
 
-                const indicator = screen.getByText(/up/i) || screen.getByRole("status");
+                const indicator =
+                    screen.getByText(/up/i) || screen.getByRole("status");
                 expect(indicator).toBeInTheDocument();
 
                 unmount();
@@ -888,12 +890,11 @@ describe("Theme Components - Complete Coverage", () => {
             const statuses = ["up", "down", "unknown"] as const;
 
             for (const status of statuses) {
-                const { unmount } = render(
-                    <StatusIndicator status={status} />
-                );
+                const { unmount } = render(<StatusIndicator status={status} />);
 
-                const indicator = screen.getByText(new RegExp(status, 'i')) || 
-                               screen.getByRole("status");
+                const indicator =
+                    screen.getByText(new RegExp(status, "i")) ||
+                    screen.getByRole("status");
                 expect(indicator).toBeInTheDocument();
 
                 unmount();
@@ -906,8 +907,9 @@ describe("Theme Components - Complete Coverage", () => {
             render(<MiniChartBar status="up" timestamp={new Date()} />);
 
             // For chart components, we can look for presentations or specific content
-            const bar = screen.getByRole("presentation") || 
-                       document.querySelector(".themed-mini-chart-bar");
+            const bar =
+                screen.getByRole("presentation") ||
+                document.querySelector(".themed-mini-chart-bar");
             expect(bar).toBeInTheDocument();
         });
 
@@ -920,8 +922,9 @@ describe("Theme Components - Complete Coverage", () => {
                 />
             );
 
-            const bar = screen.getByRole("presentation") || 
-                       document.querySelector(".themed-mini-chart-bar");
+            const bar =
+                screen.getByRole("presentation") ||
+                document.querySelector(".themed-mini-chart-bar");
             expect(bar).toBeInTheDocument();
         });
 
@@ -933,8 +936,9 @@ describe("Theme Components - Complete Coverage", () => {
                     <MiniChartBar status={status} timestamp={new Date()} />
                 );
 
-                const bar = screen.getByRole("presentation") || 
-                           document.querySelector(".themed-mini-chart-bar");
+                const bar =
+                    screen.getByRole("presentation") ||
+                    document.querySelector(".themed-mini-chart-bar");
                 expect(bar).toBeInTheDocument();
 
                 unmount();
@@ -946,18 +950,18 @@ describe("Theme Components - Complete Coverage", () => {
                 <MiniChartBar status="up" timestamp="2024-01-01T00:00:00Z" />
             );
 
-            const bar = screen.getByRole("presentation") || 
-                       document.querySelector(".themed-mini-chart-bar");
+            const bar =
+                screen.getByRole("presentation") ||
+                document.querySelector(".themed-mini-chart-bar");
             expect(bar).toBeInTheDocument();
         });
 
         it("should handle number timestamp", () => {
-            render(
-                <MiniChartBar status="up" timestamp={Date.now()} />
-            );
+            render(<MiniChartBar status="up" timestamp={Date.now()} />);
 
-            const bar = screen.getByRole("presentation") || 
-                       document.querySelector(".themed-mini-chart-bar");
+            const bar =
+                screen.getByRole("presentation") ||
+                document.querySelector(".themed-mini-chart-bar");
             expect(bar).toBeInTheDocument();
         });
     });

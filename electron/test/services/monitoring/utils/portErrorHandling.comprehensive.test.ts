@@ -1,10 +1,10 @@
 /**
  * Test suite for portErrorHandling
- * 
+ *
  * @fileoverview Comprehensive tests for port error handling utilities
  * in the Uptime Watcher application, including error constants, result interfaces,
  * custom error classes, and error handling functions.
- * 
+ *
  * @author GitHub Copilot
  * @since 2025-08-11
  * @category Port Monitoring
@@ -103,8 +103,15 @@ describe("Port Error Handling", () => {
         });
 
         it("should validate error result with different port numbers", () => {
-            const ports = ["22", "80", "443", "3000", "8080", "65535"];
-            
+            const ports = [
+                "22",
+                "80",
+                "443",
+                "3000",
+                "8080",
+                "65535",
+            ];
+
             for (const port of ports) {
                 const errorResult: PortCheckErrorResult = {
                     details: port,
@@ -169,22 +176,24 @@ describe("Port Error Handling", () => {
 
         it("should have readonly responseTime property", () => {
             const error = new PortCheckError("Test", 100);
-            
+
             expect(error.responseTime).toBe(100);
-            
+
             // In JavaScript, properties are not truly readonly at runtime
             // This test validates that TypeScript declares it as readonly,
             // but at runtime the property can still be modified
             // The key is that TypeScript should prevent this at compile time
-            
+
             // The property exists and has the expected value
             expect(error.responseTime).toBe(100);
-            expect(Object.hasOwnProperty.call(error, 'responseTime')).toBe(true);
+            expect(Object.hasOwnProperty.call(error, "responseTime")).toBe(
+                true
+            );
         });
 
         it("should handle empty string message", () => {
             const error = new PortCheckError("", 1000);
-            
+
             expect(error.message).toBe("");
             expect(error.responseTime).toBe(1000);
             expect(error.name).toBe("PortCheckError");
@@ -193,7 +202,7 @@ describe("Port Error Handling", () => {
         it("should handle very long error messages", () => {
             const longMessage = "x".repeat(1000);
             const error = new PortCheckError(longMessage, 500);
-            
+
             expect(error.message).toBe(longMessage);
             expect(error.responseTime).toBe(500);
         });
@@ -203,10 +212,13 @@ describe("Port Error Handling", () => {
         describe("PortCheckError input", () => {
             it("should handle PortCheckError with preserved response time", () => {
                 const responseTime = 1200;
-                const error = new PortCheckError(PORT_NOT_REACHABLE, responseTime);
-                
+                const error = new PortCheckError(
+                    PORT_NOT_REACHABLE,
+                    responseTime
+                );
+
                 const result = handlePortCheckError(error, "example.com", 443);
-                
+
                 expect(result).toEqual({
                     details: "443",
                     error: PORT_NOT_REACHABLE,
@@ -219,9 +231,9 @@ describe("Port Error Handling", () => {
                 const customMessage = "Connection timed out";
                 const responseTime = 5000;
                 const error = new PortCheckError(customMessage, responseTime);
-                
+
                 const result = handlePortCheckError(error, "test.com", 80);
-                
+
                 expect(result).toEqual({
                     details: "80",
                     error: customMessage,
@@ -234,9 +246,9 @@ describe("Port Error Handling", () => {
         describe("Standard Error input", () => {
             it("should handle standard Error with -1 response time", () => {
                 const error = new Error("Network unreachable");
-                
+
                 const result = handlePortCheckError(error, "localhost", 3000);
-                
+
                 expect(result).toEqual({
                     details: "3000",
                     error: "Network unreachable",
@@ -247,9 +259,9 @@ describe("Port Error Handling", () => {
 
             it("should handle Error with PORT_NOT_REACHABLE message", () => {
                 const error = new Error(PORT_NOT_REACHABLE);
-                
+
                 const result = handlePortCheckError(error, "test.host", 22);
-                
+
                 expect(result).toEqual({
                     details: "22",
                     error: PORT_NOT_REACHABLE,
@@ -261,8 +273,12 @@ describe("Port Error Handling", () => {
 
         describe("Non-Error input", () => {
             it("should handle string error", () => {
-                const result = handlePortCheckError("String error", "host.com", 8080);
-                
+                const result = handlePortCheckError(
+                    "String error",
+                    "host.com",
+                    8080
+                );
+
                 expect(result).toEqual({
                     details: "8080",
                     error: "Unknown error",
@@ -273,7 +289,7 @@ describe("Port Error Handling", () => {
 
             it("should handle number error", () => {
                 const result = handlePortCheckError(404, "api.test", 443);
-                
+
                 expect(result).toEqual({
                     details: "443",
                     error: "Unknown error",
@@ -284,7 +300,7 @@ describe("Port Error Handling", () => {
 
             it("should handle null error", () => {
                 const result = handlePortCheckError(null, "null.test", 80);
-                
+
                 expect(result).toEqual({
                     details: "80",
                     error: "Unknown error",
@@ -294,8 +310,12 @@ describe("Port Error Handling", () => {
             });
 
             it("should handle undefined error", () => {
-                const result = handlePortCheckError(undefined, "undefined.test", 443);
-                
+                const result = handlePortCheckError(
+                    undefined,
+                    "undefined.test",
+                    443
+                );
+
                 expect(result).toEqual({
                     details: "443",
                     error: "Unknown error",
@@ -305,9 +325,16 @@ describe("Port Error Handling", () => {
             });
 
             it("should handle object error", () => {
-                const objectError = { code: "ECONNREFUSED", message: "Connection refused" };
-                const result = handlePortCheckError(objectError, "object.test", 22);
-                
+                const objectError = {
+                    code: "ECONNREFUSED",
+                    message: "Connection refused",
+                };
+                const result = handlePortCheckError(
+                    objectError,
+                    "object.test",
+                    22
+                );
+
                 expect(result).toEqual({
                     details: "22",
                     error: "Unknown error",
@@ -330,7 +357,11 @@ describe("Port Error Handling", () => {
                 ];
 
                 for (const testCase of testCases) {
-                    const result = handlePortCheckError(error, "test.com", testCase.port);
+                    const result = handlePortCheckError(
+                        error,
+                        "test.com",
+                        testCase.port
+                    );
                     expect(result.details).toBe(testCase.details);
                     expect(result.status).toBe("down");
                 }
@@ -361,9 +392,9 @@ describe("Port Error Handling", () => {
             it("should log debug message when isDev returns true", () => {
                 vi.mocked(isDev).mockReturnValue(true);
                 const error = new Error("Connection failed");
-                
+
                 handlePortCheckError(error, "debug.test", 443);
-                
+
                 expect(logger.debug).toHaveBeenCalledWith(
                     "[PortMonitor] Final error for debug.test:443: Connection failed"
                 );
@@ -372,18 +403,18 @@ describe("Port Error Handling", () => {
             it("should not log debug message when isDev returns false", () => {
                 vi.mocked(isDev).mockReturnValue(false);
                 const error = new Error("Connection failed");
-                
+
                 handlePortCheckError(error, "prod.test", 80);
-                
+
                 expect(logger.debug).not.toHaveBeenCalled();
             });
 
             it("should log debug message with PortCheckError", () => {
                 vi.mocked(isDev).mockReturnValue(true);
                 const error = new PortCheckError(PORT_NOT_REACHABLE, 1000);
-                
+
                 handlePortCheckError(error, "port-error.test", 22);
-                
+
                 expect(logger.debug).toHaveBeenCalledWith(
                     `[PortMonitor] Final error for port-error.test:22: ${PORT_NOT_REACHABLE}`
                 );
@@ -391,9 +422,9 @@ describe("Port Error Handling", () => {
 
             it("should log debug message with non-Error input", () => {
                 vi.mocked(isDev).mockReturnValue(true);
-                
+
                 handlePortCheckError("String error", "string.test", 3000);
-                
+
                 expect(logger.debug).toHaveBeenCalledWith(
                     "[PortMonitor] Final error for string.test:3000: Unknown error"
                 );
@@ -403,9 +434,9 @@ describe("Port Error Handling", () => {
                 vi.mocked(isDev).mockImplementation(() => {
                     throw new Error("isDev failed");
                 });
-                
+
                 const error = new Error("Test error");
-                
+
                 // The function should throw because isDev() throws and there's no error handling
                 expect(() => {
                     handlePortCheckError(error, "error.test", 80);
@@ -416,27 +447,27 @@ describe("Port Error Handling", () => {
         describe("Message normalization", () => {
             it("should preserve PORT_NOT_REACHABLE message when it matches exactly", () => {
                 const error = new Error(PORT_NOT_REACHABLE);
-                
+
                 const result = handlePortCheckError(error, "exact.test", 443);
-                
+
                 expect(result.error).toBe(PORT_NOT_REACHABLE);
             });
 
             it("should preserve custom error messages that are not PORT_NOT_REACHABLE", () => {
                 const customMessage = "Custom connection error";
                 const error = new Error(customMessage);
-                
+
                 const result = handlePortCheckError(error, "custom.test", 80);
-                
+
                 expect(result.error).toBe(customMessage);
             });
 
             it("should handle empty error message", () => {
                 // eslint-disable-next-line unicorn/error-message -- testing empty error message
                 const error = new Error("");
-                
+
                 const result = handlePortCheckError(error, "empty.test", 22);
-                
+
                 expect(result.error).toBe("");
                 expect(result.status).toBe("down");
             });
@@ -444,9 +475,9 @@ describe("Port Error Handling", () => {
             it("should handle very long error messages", () => {
                 const longMessage = "Error: " + "x".repeat(1000);
                 const error = new Error(longMessage);
-                
+
                 const result = handlePortCheckError(error, "long.test", 443);
-                
+
                 expect(result.error).toBe(longMessage);
             });
         });
@@ -455,33 +486,41 @@ describe("Port Error Handling", () => {
             it("should preserve response time from PortCheckError", () => {
                 const responseTime = 2500;
                 const error = new PortCheckError("Test", responseTime);
-                
+
                 const result = handlePortCheckError(error, "time.test", 80);
-                
+
                 expect(result.responseTime).toBe(responseTime);
             });
 
             it("should use -1 for non-PortCheckError", () => {
                 const error = new Error("Standard error");
-                
-                const result = handlePortCheckError(error, "standard.test", 443);
-                
+
+                const result = handlePortCheckError(
+                    error,
+                    "standard.test",
+                    443
+                );
+
                 expect(result.responseTime).toBe(-1);
             });
 
             it("should handle PortCheckError with zero response time", () => {
                 const error = new PortCheckError("Zero time", 0);
-                
+
                 const result = handlePortCheckError(error, "zero.test", 22);
-                
+
                 expect(result.responseTime).toBe(0);
             });
 
             it("should handle PortCheckError with negative response time", () => {
                 const error = new PortCheckError("Negative time", -100);
-                
-                const result = handlePortCheckError(error, "negative.test", 3000);
-                
+
+                const result = handlePortCheckError(
+                    error,
+                    "negative.test",
+                    3000
+                );
+
                 expect(result.responseTime).toBe(-100);
             });
         });
@@ -489,15 +528,27 @@ describe("Port Error Handling", () => {
         describe("Edge cases and integration", () => {
             it("should handle all combinations consistently", () => {
                 const testMatrix = [
-                    { error: new PortCheckError(PORT_NOT_REACHABLE, 1000), host: "matrix1.test", port: 80 },
-                    { error: new Error("Standard error"), host: "matrix2.test", port: 443 },
+                    {
+                        error: new PortCheckError(PORT_NOT_REACHABLE, 1000),
+                        host: "matrix1.test",
+                        port: 80,
+                    },
+                    {
+                        error: new Error("Standard error"),
+                        host: "matrix2.test",
+                        port: 443,
+                    },
                     { error: "String error", host: "matrix3.test", port: 22 },
                     { error: null, host: "matrix4.test", port: 3000 },
                 ];
 
                 for (const testCase of testMatrix) {
-                    const result = handlePortCheckError(testCase.error, testCase.host, testCase.port);
-                    
+                    const result = handlePortCheckError(
+                        testCase.error,
+                        testCase.host,
+                        testCase.port
+                    );
+
                     expect(result.status).toBe("down");
                     expect(result.details).toBe(String(testCase.port));
                     expect(typeof result.error).toBe("string");
@@ -507,17 +558,25 @@ describe("Port Error Handling", () => {
 
             it("should produce consistent results for the same input", () => {
                 const error = new PortCheckError("Consistent test", 1500);
-                
-                const result1 = handlePortCheckError(error, "consistent.test", 80);
-                const result2 = handlePortCheckError(error, "consistent.test", 80);
-                
+
+                const result1 = handlePortCheckError(
+                    error,
+                    "consistent.test",
+                    80
+                );
+                const result2 = handlePortCheckError(
+                    error,
+                    "consistent.test",
+                    80
+                );
+
                 expect(result1).toEqual(result2);
             });
 
             it("should work with all interface properties properly typed", () => {
                 const error = new PortCheckError(PORT_NOT_REACHABLE, 2000);
                 const result = handlePortCheckError(error, "typed.test", 443);
-                
+
                 // Verify TypeScript interface compliance
                 const typedResult: PortCheckErrorResult = result;
                 expect(typedResult.details).toBe("443");

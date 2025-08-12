@@ -79,11 +79,11 @@ describe("WindowService", () => {
     beforeEach(() => {
         // Reset all mocks
         vi.clearAllMocks();
-        
+
         // Setup default mock returns
         vi.mocked(isDev).mockReturnValue(false);
         vi.mocked(BrowserWindow.getAllWindows).mockReturnValue([]);
-        
+
         // Create new service instance
         windowService = new WindowService();
     });
@@ -95,9 +95,9 @@ describe("WindowService", () => {
 
         it("should log debug message in development mode", () => {
             vi.mocked(isDev).mockReturnValue(true);
-            
+
             new WindowService();
-            
+
             expect(logger.debug).toHaveBeenCalledWith(
                 "[WindowService] Created WindowService in development mode"
             );
@@ -105,9 +105,9 @@ describe("WindowService", () => {
 
         it("should not log debug message in production mode", () => {
             vi.mocked(isDev).mockReturnValue(false);
-            
+
             new WindowService();
-            
+
             expect(logger.debug).not.toHaveBeenCalledWith(
                 "[WindowService] Created WindowService in development mode"
             );
@@ -138,11 +138,26 @@ describe("WindowService", () => {
         it("should setup window events", () => {
             const window = windowService.createMainWindow();
 
-            expect(window.once).toHaveBeenCalledWith("ready-to-show", expect.any(Function));
-            expect(window.webContents.once).toHaveBeenCalledWith("dom-ready", expect.any(Function));
-            expect(window.webContents.once).toHaveBeenCalledWith("did-finish-load", expect.any(Function));
-            expect(window.webContents.on).toHaveBeenCalledWith("did-fail-load", expect.any(Function));
-            expect(window.on).toHaveBeenCalledWith("closed", expect.any(Function));
+            expect(window.once).toHaveBeenCalledWith(
+                "ready-to-show",
+                expect.any(Function)
+            );
+            expect(window.webContents.once).toHaveBeenCalledWith(
+                "dom-ready",
+                expect.any(Function)
+            );
+            expect(window.webContents.once).toHaveBeenCalledWith(
+                "did-finish-load",
+                expect.any(Function)
+            );
+            expect(window.webContents.on).toHaveBeenCalledWith(
+                "did-fail-load",
+                expect.any(Function)
+            );
+            expect(window.on).toHaveBeenCalledWith(
+                "closed",
+                expect.any(Function)
+            );
         });
 
         it("should return the created window", () => {
@@ -170,14 +185,14 @@ describe("WindowService", () => {
         it("should return true when window exists and is not destroyed", () => {
             const window = windowService.createMainWindow();
             vi.mocked(window.isDestroyed).mockReturnValue(false);
-            
+
             expect(windowService.hasMainWindow()).toBe(true);
         });
 
         it("should return false when window is destroyed", () => {
             const window = windowService.createMainWindow();
             vi.mocked(window.isDestroyed).mockReturnValue(true);
-            
+
             expect(windowService.hasMainWindow()).toBe(false);
         });
     });
@@ -186,9 +201,9 @@ describe("WindowService", () => {
         it("should close the main window if it exists", () => {
             const window = windowService.createMainWindow();
             vi.mocked(window.isDestroyed).mockReturnValue(false);
-            
+
             windowService.closeMainWindow();
-            
+
             expect(window.close).toHaveBeenCalled();
         });
 
@@ -199,9 +214,9 @@ describe("WindowService", () => {
         it("should not close if window is destroyed", () => {
             const window = windowService.createMainWindow();
             vi.mocked(window.isDestroyed).mockReturnValue(true);
-            
+
             windowService.closeMainWindow();
-            
+
             expect(window.close).not.toHaveBeenCalled();
         });
     });
@@ -210,9 +225,9 @@ describe("WindowService", () => {
         it("should send message to renderer when window exists", () => {
             const window = windowService.createMainWindow();
             vi.mocked(window.isDestroyed).mockReturnValue(false);
-            
+
             windowService.sendToRenderer("test-channel", { data: "test" });
-            
+
             expect(logger.debug).toHaveBeenCalledWith(
                 "[WindowService] Sending to renderer: test-channel"
             );
@@ -225,9 +240,9 @@ describe("WindowService", () => {
         it("should send message without data", () => {
             const window = windowService.createMainWindow();
             vi.mocked(window.isDestroyed).mockReturnValue(false);
-            
+
             windowService.sendToRenderer("test-channel");
-            
+
             expect(window.webContents.send).toHaveBeenCalledWith(
                 "test-channel",
                 undefined
@@ -236,7 +251,7 @@ describe("WindowService", () => {
 
         it("should log warning when no window exists", () => {
             windowService.sendToRenderer("test-channel", { data: "test" });
-            
+
             expect(logger.warn).toHaveBeenCalledWith(
                 "[WindowService] Cannot send to renderer (no main window): test-channel"
             );
@@ -245,9 +260,9 @@ describe("WindowService", () => {
         it("should log warning when window is destroyed", () => {
             const window = windowService.createMainWindow();
             vi.mocked(window.isDestroyed).mockReturnValue(true);
-            
+
             windowService.sendToRenderer("test-channel");
-            
+
             expect(logger.warn).toHaveBeenCalledWith(
                 "[WindowService] Cannot send to renderer (no main window): test-channel"
             );
@@ -257,10 +272,12 @@ describe("WindowService", () => {
     describe("getAllWindows", () => {
         it("should return all browser windows", () => {
             const mockWindows = [vi.fn(), vi.fn()];
-            vi.mocked(BrowserWindow.getAllWindows).mockReturnValue(mockWindows as unknown as BrowserWindow[]);
-            
+            vi.mocked(BrowserWindow.getAllWindows).mockReturnValue(
+                mockWindows as unknown as BrowserWindow[]
+            );
+
             const windows = windowService.getAllWindows();
-            
+
             expect(windows).toBe(mockWindows);
             expect(BrowserWindow.getAllWindows).toHaveBeenCalled();
         });
@@ -269,15 +286,17 @@ describe("WindowService", () => {
     describe("window events", () => {
         it("should handle ready-to-show event", () => {
             const window = windowService.createMainWindow();
-            
+
             // Get the callback and call it
-            const readyCallback = (vi.mocked(window.once).mock.calls as any[]).find(
+            const readyCallback = (
+                vi.mocked(window.once).mock.calls as any[]
+            ).find(
                 (call: any) => call[0] === "ready-to-show"
             )?.[1] as () => void;
-            
+
             expect(readyCallback).toBeDefined();
             readyCallback();
-            
+
             expect(logger.info).toHaveBeenCalledWith(
                 "[WindowService] Main window ready to show"
             );
@@ -286,15 +305,15 @@ describe("WindowService", () => {
 
         it("should handle dom-ready event", () => {
             const window = windowService.createMainWindow();
-            
+
             // Get the callback and call it
-            const domReadyCallback = (vi.mocked(window.webContents.once).mock.calls as any[]).find(
-                (call: any) => call[0] === "dom-ready"
-            )?.[1] as () => void;
-            
+            const domReadyCallback = (
+                vi.mocked(window.webContents.once).mock.calls as any[]
+            ).find((call: any) => call[0] === "dom-ready")?.[1] as () => void;
+
             expect(domReadyCallback).toBeDefined();
             domReadyCallback();
-            
+
             expect(logger.debug).toHaveBeenCalledWith(
                 "[WindowService] DOM ready in renderer"
             );
@@ -302,15 +321,17 @@ describe("WindowService", () => {
 
         it("should handle did-finish-load event", () => {
             const window = windowService.createMainWindow();
-            
+
             // Get the callback and call it
-            const finishLoadCallback = (vi.mocked(window.webContents.once).mock.calls as any[]).find(
+            const finishLoadCallback = (
+                vi.mocked(window.webContents.once).mock.calls as any[]
+            ).find(
                 (call: any) => call[0] === "did-finish-load"
             )?.[1] as () => void;
-            
+
             expect(finishLoadCallback).toBeDefined();
             finishLoadCallback();
-            
+
             expect(logger.debug).toHaveBeenCalledWith(
                 "[WindowService] Renderer finished loading"
             );
@@ -318,15 +339,19 @@ describe("WindowService", () => {
 
         it("should handle did-fail-load event", () => {
             const window = windowService.createMainWindow();
-            
+
             // Get the callback and call it
-            const failLoadCallback = (vi.mocked(window.webContents.on).mock.calls as any[]).find(
-                (call: any) => call[0] === "did-fail-load"
-            )?.[1] as (event: any, errorCode: number, errorDescription: string) => void;
-            
+            const failLoadCallback = (
+                vi.mocked(window.webContents.on).mock.calls as any[]
+            ).find((call: any) => call[0] === "did-fail-load")?.[1] as (
+                event: any,
+                errorCode: number,
+                errorDescription: string
+            ) => void;
+
             expect(failLoadCallback).toBeDefined();
             failLoadCallback(null, 404, "Not Found");
-            
+
             expect(logger.error).toHaveBeenCalledWith(
                 "[WindowService] Failed to load renderer: 404 - Not Found"
             );
@@ -335,15 +360,15 @@ describe("WindowService", () => {
         it("should handle closed event", () => {
             const window = windowService.createMainWindow();
             expect(windowService.getMainWindow()).toBe(window);
-            
+
             // Get the callback and call it
-            const closedCallback = (vi.mocked(window.on).mock.calls as any[]).find(
-                (call: any) => call[0] === "closed"
-            )?.[1] as () => void;
-            
+            const closedCallback = (
+                vi.mocked(window.on).mock.calls as any[]
+            ).find((call: any) => call[0] === "closed")?.[1] as () => void;
+
             expect(closedCallback).toBeDefined();
             closedCallback();
-            
+
             expect(logger.info).toHaveBeenCalledWith(
                 "[WindowService] Main window closed"
             );
@@ -359,7 +384,7 @@ describe("WindowService", () => {
 
             it("should load from file in production mode", () => {
                 windowService.createMainWindow();
-                
+
                 expect(logger.debug).toHaveBeenCalledWith(
                     "[WindowService] Production mode: loading from dist"
                 );
@@ -369,10 +394,10 @@ describe("WindowService", () => {
                 const window = windowService.createMainWindow();
                 const error = new Error("File not found");
                 vi.mocked(window.loadFile).mockRejectedValue(error);
-                
+
                 // Trigger the content loading
                 await (windowService as any).loadContent();
-                
+
                 expect(logger.error).toHaveBeenCalledWith(
                     "[WindowService] Failed to load production file",
                     expect.objectContaining({
@@ -394,7 +419,7 @@ describe("WindowService", () => {
 
             it("should load from Vite server in development mode", () => {
                 windowService.createMainWindow();
-                
+
                 expect(logger.debug).toHaveBeenCalledWith(
                     "[WindowService] Development mode: waiting for Vite dev server"
                 );
@@ -402,10 +427,10 @@ describe("WindowService", () => {
 
             it("should wait for Vite server to be ready", async () => {
                 windowService.createMainWindow();
-                
+
                 // Wait for the async operation
-                await new Promise(resolve => setTimeout(resolve, 0));
-                
+                await new Promise((resolve) => setTimeout(resolve, 0));
+
                 expect(globalThis.fetch).toHaveBeenCalledWith(
                     "http://localhost:5173",
                     expect.objectContaining({
@@ -416,35 +441,46 @@ describe("WindowService", () => {
 
             it("should load URL when server is ready", async () => {
                 const window = windowService.createMainWindow();
-                
+
                 // Wait for the async operations
-                await new Promise(resolve => setTimeout(resolve, 0));
-                
-                expect(window.loadURL).toHaveBeenCalledWith("http://localhost:5173");
+                await new Promise((resolve) => setTimeout(resolve, 0));
+
+                expect(window.loadURL).toHaveBeenCalledWith(
+                    "http://localhost:5173"
+                );
             });
 
             it("should handle Vite server connection errors", async () => {
                 vi.mocked(isDev).mockReturnValue(true);
                 const error = new Error("Connection refused");
                 vi.mocked(globalThis.fetch).mockRejectedValue(error);
-                
+
                 // Create a new service just for this test to avoid affecting others
                 const testWindowService = new WindowService();
-                
+
                 // Mock waitForViteServer to fail immediately
-                const waitForViteServerSpy = vi.spyOn(testWindowService as any, 'waitForViteServer')
-                    .mockRejectedValue(new Error("Vite dev server did not become available after 20 attempts"));
-                
+                const waitForViteServerSpy = vi
+                    .spyOn(testWindowService as any, "waitForViteServer")
+                    .mockRejectedValue(
+                        new Error(
+                            "Vite dev server did not become available after 20 attempts"
+                        )
+                    );
+
                 testWindowService.createMainWindow();
-                
+
                 // Directly call loadDevelopmentContent to catch errors
-                await expect((testWindowService as any).loadDevelopmentContent()).rejects.toThrow();
-                
+                await expect(
+                    (testWindowService as any).loadDevelopmentContent()
+                ).rejects.toThrow();
+
                 expect(waitForViteServerSpy).toHaveBeenCalled();
                 expect(logger.error).toHaveBeenCalledWith(
                     "[WindowService] Failed to load development content",
                     expect.objectContaining({
-                        error: expect.stringContaining("Vite dev server did not become available"),
+                        error: expect.stringContaining(
+                            "Vite dev server did not become available"
+                        ),
                         serverUrl: "http://localhost:5173",
                     })
                 );
@@ -452,21 +488,24 @@ describe("WindowService", () => {
 
             it("should handle window destruction during Vite wait", async () => {
                 vi.mocked(isDev).mockReturnValue(true);
-                
+
                 // Create a new service just for this test
                 const testWindowService = new WindowService();
                 const window = testWindowService.createMainWindow();
-                
+
                 // Mock waitForViteServer to succeed but then simulate window destruction check
-                const waitForViteServerSpy = vi.spyOn(testWindowService as any, 'waitForViteServer')
+                const waitForViteServerSpy = vi
+                    .spyOn(testWindowService as any, "waitForViteServer")
                     .mockResolvedValue(undefined);
-                
+
                 // Simulate window being destroyed after server is ready but before load
                 vi.mocked(window.isDestroyed).mockReturnValue(true);
-                
+
                 // Directly call loadDevelopmentContent to catch errors
-                await expect((testWindowService as any).loadDevelopmentContent()).rejects.toThrow();
-                
+                await expect(
+                    (testWindowService as any).loadDevelopmentContent()
+                ).rejects.toThrow();
+
                 expect(logger.error).toHaveBeenCalledWith(
                     "[WindowService] Failed to load development content",
                     expect.objectContaining({
@@ -480,13 +519,15 @@ describe("WindowService", () => {
     describe("preload path resolution", () => {
         it("should resolve development preload path", () => {
             vi.mocked(isDev).mockReturnValue(true);
-            
+
             windowService.createMainWindow();
-            
+
             expect(BrowserWindow).toHaveBeenCalledWith(
                 expect.objectContaining({
                     webPreferences: expect.objectContaining({
-                        preload: expect.stringContaining("dist-electron/preload.js"),
+                        preload: expect.stringContaining(
+                            "dist-electron/preload.js"
+                        ),
                     }),
                 })
             );
@@ -494,9 +535,9 @@ describe("WindowService", () => {
 
         it("should resolve production preload path", () => {
             vi.mocked(isDev).mockReturnValue(false);
-            
+
             windowService.createMainWindow();
-            
+
             expect(BrowserWindow).toHaveBeenCalledWith(
                 expect.objectContaining({
                     webPreferences: expect.objectContaining({
@@ -511,16 +552,16 @@ describe("WindowService", () => {
         it("should handle missing main window in loadContent", () => {
             // Create service but don't call createMainWindow
             const service = new WindowService();
-            
+
             // Try to trigger loadContent without a window
             // This is a private method, so we test it indirectly through createMainWindow
             // but first nullify the window
             service.createMainWindow();
             (service as any).mainWindow = null;
-            
+
             // Call loadContent via reflection
             (service as any).loadContent();
-            
+
             expect(logger.error).toHaveBeenCalledWith(
                 "[WindowService] Cannot load content: main window not initialized"
             );
@@ -528,24 +569,33 @@ describe("WindowService", () => {
 
         it("should handle timeout during fetch", async () => {
             vi.mocked(isDev).mockReturnValue(true);
-            
+
             // Create a new service just for this test
             const testWindowService = new WindowService();
-            
+
             // Mock waitForViteServer to fail with timeout
-            const waitForViteServerSpy = vi.spyOn(testWindowService as any, 'waitForViteServer')
-                .mockRejectedValue(new Error("Vite dev server did not become available after 20 attempts"));
-            
+            const waitForViteServerSpy = vi
+                .spyOn(testWindowService as any, "waitForViteServer")
+                .mockRejectedValue(
+                    new Error(
+                        "Vite dev server did not become available after 20 attempts"
+                    )
+                );
+
             testWindowService.createMainWindow();
-            
+
             // Directly call loadDevelopmentContent to catch errors
-            await expect((testWindowService as any).loadDevelopmentContent()).rejects.toThrow();
-            
+            await expect(
+                (testWindowService as any).loadDevelopmentContent()
+            ).rejects.toThrow();
+
             expect(waitForViteServerSpy).toHaveBeenCalled();
             expect(logger.error).toHaveBeenCalledWith(
                 "[WindowService] Failed to load development content",
                 expect.objectContaining({
-                    error: expect.stringContaining("Vite dev server did not become available"),
+                    error: expect.stringContaining(
+                        "Vite dev server did not become available"
+                    ),
                 })
             );
         });
@@ -555,9 +605,9 @@ describe("WindowService", () => {
         it("should handle null window in sendToRenderer safety check", () => {
             windowService.createMainWindow();
             (windowService as any).mainWindow = null;
-            
+
             windowService.sendToRenderer("test");
-            
+
             expect(logger.warn).toHaveBeenCalledWith(
                 "[WindowService] Cannot send to renderer (no main window): test"
             );
@@ -565,16 +615,18 @@ describe("WindowService", () => {
 
         it("should handle destroyed window in ready-to-show event", () => {
             const window = windowService.createMainWindow();
-            
+
             // Get the ready-to-show callback
-            const readyCallback = (vi.mocked(window.once).mock.calls as any[]).find(
+            const readyCallback = (
+                vi.mocked(window.once).mock.calls as any[]
+            ).find(
                 (call: any) => call[0] === "ready-to-show"
             )?.[1] as () => void;
-            
+
             // Simulate window being destroyed before ready-to-show
             vi.mocked(window.isDestroyed).mockReturnValue(true);
             (windowService as any).mainWindow = null;
-            
+
             // Should not crash when trying to show destroyed window
             expect(() => readyCallback()).not.toThrow();
         });

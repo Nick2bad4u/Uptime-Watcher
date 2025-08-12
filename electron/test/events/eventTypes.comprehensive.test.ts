@@ -14,11 +14,17 @@ import {
 
 describe("eventTypes - Comprehensive Coverage", () => {
     describe("EVENT_CATEGORIES constant", () => {
-        it("should have all expected category keys", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-            
- const expectedCategories = [
+        it("should have all expected category keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: eventTypes - Comprehensive Coverage",
+                "component"
+            );
+
+            const expectedCategories = [
                 "CACHE",
                 "CONFIG",
                 "DATABASE",
@@ -38,9 +44,16 @@ describe("eventTypes - Comprehensive Coverage", () => {
             );
             expect(actualCategories.length).toBe(expectedCategories.length);
         });
-        it("should contain expected events in each category", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
+        it("should contain expected events in each category", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: eventTypes - Comprehensive Coverage",
+                "component"
+            );
+
             // Test specific events are in their correct categories
             expect(EVENT_CATEGORIES.CACHE).toContain("cache:invalidated");
             expect(EVENT_CATEGORIES.CONFIG).toContain("config:changed");
@@ -63,35 +76,55 @@ describe("eventTypes - Comprehensive Coverage", () => {
             );
             expect(EVENT_CATEGORIES.SITE).toContain("site:added");
             expect(EVENT_CATEGORIES.SYSTEM).toContain("system:error");
-        });        });
+        });
+    });
     describe("EVENT_PRIORITIES constant", () => {
-        it("should have all expected priority levels", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-            
- const expectedPriorities = ["CRITICAL", "HIGH", "LOW", "MEDIUM"];
+        it("should have all expected priority levels", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: eventTypes - Comprehensive Coverage",
+                "component"
+            );
+
+            const expectedPriorities = ["CRITICAL", "HIGH", "LOW", "MEDIUM"];
             const actualPriorities = Object.keys(EVENT_PRIORITIES);
             expect(actualPriorities).toEqual(
                 expect.arrayContaining(expectedPriorities)
             );
             expect(actualPriorities.length).toBe(expectedPriorities.length);
         });
-        it("should categorize events correctly by priority", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-            
- expect(EVENT_PRIORITIES.CRITICAL).toContain("system:error");
+        it("should categorize events correctly by priority", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: eventTypes - Comprehensive Coverage",
+                "component"
+            );
+
+            expect(EVENT_PRIORITIES.CRITICAL).toContain("system:error");
             expect(EVENT_PRIORITIES.HIGH).toContain("monitor:status-changed");
             expect(EVENT_PRIORITIES.LOW).toContain("performance:metric");
             expect(EVENT_PRIORITIES.MEDIUM).toContain("site:added");
-        });        });
+        });
+    });
     describe("isEventOfCategory - Complete Branch Coverage", () => {
         describe("CACHE category", () => {
-            it("should return true for cache events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(isEventOfCategory("cache:invalidated", "CACHE")).toBe(
+            it("should return true for cache events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(isEventOfCategory("cache:invalidated", "CACHE")).toBe(
                     true
                 );
                 expect(isEventOfCategory("site:cache-miss", "CACHE")).toBe(
@@ -100,36 +133,62 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 expect(isEventOfCategory("site:cache-updated", "CACHE")).toBe(
                     true
                 );
-        });
-            it("should return false for non-cache events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(isEventOfCategory("site:added", "CACHE")).toBe(false);
+            });
+            it("should return false for non-cache events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(isEventOfCategory("site:added", "CACHE")).toBe(false);
                 expect(isEventOfCategory("monitor:up", "CACHE")).toBe(false);
-        });        });
+            });
+        });
         describe("CONFIG category", () => {
-            it("should return true for config events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(isEventOfCategory("config:changed", "CONFIG")).toBe(
+            it("should return true for config events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(isEventOfCategory("config:changed", "CONFIG")).toBe(
                     true
                 );
-        });
-            it("should return false for non-config events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(isEventOfCategory("site:added", "CONFIG")).toBe(false);
+            });
+            it("should return false for non-config events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(isEventOfCategory("site:added", "CONFIG")).toBe(false);
                 expect(isEventOfCategory("monitor:up", "CONFIG")).toBe(false);
-        });        });
+            });
+        });
         describe("DATABASE category", () => {
-            it("should return true for database events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(
+            it("should return true for database events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(
                     isEventOfCategory("database:backup-created", "DATABASE")
                 ).toBe(true);
                 expect(isEventOfCategory("database:error", "DATABASE")).toBe(
@@ -147,25 +206,38 @@ describe("eventTypes - Comprehensive Coverage", () => {
                         "DATABASE"
                     )
                 ).toBe(true);
-        });
-            it("should return false for non-database events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(isEventOfCategory("site:added", "DATABASE")).toBe(false);
+            });
+            it("should return false for non-database events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(isEventOfCategory("site:added", "DATABASE")).toBe(false);
                 expect(
                     isEventOfCategory(
                         "internal:database:initialized",
                         "DATABASE"
                     )
                 ).toBe(false);
-        });        });
+            });
+        });
         describe("INTERNAL_DATABASE category", () => {
-            it("should return true for internal database events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(
+            it("should return true for internal database events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(
                     isEventOfCategory(
                         "internal:database:backup-downloaded",
                         "INTERNAL_DATABASE"
@@ -195,24 +267,37 @@ describe("eventTypes - Comprehensive Coverage", () => {
                         "INTERNAL_DATABASE"
                     )
                 ).toBe(true);
-        });
-            it("should return false for non-internal database events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(
+            });
+            it("should return false for non-internal database events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(
                     isEventOfCategory("database:error", "INTERNAL_DATABASE")
                 ).toBe(false);
                 expect(
                     isEventOfCategory("site:added", "INTERNAL_DATABASE")
                 ).toBe(false);
-        });        });
+            });
+        });
         describe("INTERNAL_MONITOR category", () => {
-            it("should return true for internal monitor events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(
+            it("should return true for internal monitor events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(
                     isEventOfCategory(
                         "internal:monitor:all-started",
                         "INTERNAL_MONITOR"
@@ -242,24 +327,37 @@ describe("eventTypes - Comprehensive Coverage", () => {
                         "INTERNAL_MONITOR"
                     )
                 ).toBe(true);
-        });
-            it("should return false for non-internal monitor events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(
+            });
+            it("should return false for non-internal monitor events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(
                     isEventOfCategory("monitor:up", "INTERNAL_MONITOR")
                 ).toBe(false);
                 expect(
                     isEventOfCategory("site:added", "INTERNAL_MONITOR")
                 ).toBe(false);
-        });        });
+            });
+        });
         describe("INTERNAL_SITE category", () => {
-            it("should return true for internal site events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(
+            it("should return true for internal site events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(
                     isEventOfCategory("internal:site:added", "INTERNAL_SITE")
                 ).toBe(true);
                 expect(
@@ -280,24 +378,37 @@ describe("eventTypes - Comprehensive Coverage", () => {
                         "INTERNAL_SITE"
                     )
                 ).toBe(true);
-        });
-            it("should return false for non-internal site events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(isEventOfCategory("site:added", "INTERNAL_SITE")).toBe(
+            });
+            it("should return false for non-internal site events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(isEventOfCategory("site:added", "INTERNAL_SITE")).toBe(
                     false
                 );
                 expect(isEventOfCategory("monitor:up", "INTERNAL_SITE")).toBe(
                     false
                 );
-        });        });
+            });
+        });
         describe("MONITOR category", () => {
-            it("should return true for monitor events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(isEventOfCategory("monitor:added", "MONITOR")).toBe(
+            it("should return true for monitor events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(isEventOfCategory("monitor:added", "MONITOR")).toBe(
                     true
                 );
                 expect(
@@ -311,107 +422,173 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 ).toBe(true);
                 expect(isEventOfCategory("monitor:up", "MONITOR")).toBe(true);
                 expect(isEventOfCategory("monitor:down", "MONITOR")).toBe(true);
-        });
-            it("should return false for non-monitor events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(isEventOfCategory("site:added", "MONITOR")).toBe(false);
+            });
+            it("should return false for non-monitor events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(isEventOfCategory("site:added", "MONITOR")).toBe(false);
                 expect(
                     isEventOfCategory("internal:monitor:started", "MONITOR")
                 ).toBe(false);
-        });        });
+            });
+        });
         describe("MONITORING category", () => {
-            it("should return true for monitoring events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(
+            it("should return true for monitoring events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(
                     isEventOfCategory("monitoring:started", "MONITORING")
                 ).toBe(true);
                 expect(
                     isEventOfCategory("monitoring:stopped", "MONITORING")
                 ).toBe(true);
-        });
-            it("should return false for non-monitoring events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(isEventOfCategory("monitor:up", "MONITORING")).toBe(
+            });
+            it("should return false for non-monitoring events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(isEventOfCategory("monitor:up", "MONITORING")).toBe(
                     false
                 );
                 expect(isEventOfCategory("site:added", "MONITORING")).toBe(
                     false
                 );
-        });        });
+            });
+        });
         describe("PERFORMANCE category", () => {
-            it("should return true for performance events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(
+            it("should return true for performance events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(
                     isEventOfCategory("performance:metric", "PERFORMANCE")
                 ).toBe(true);
                 expect(
                     isEventOfCategory("performance:warning", "PERFORMANCE")
                 ).toBe(true);
-        });
-            it("should return false for non-performance events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(isEventOfCategory("monitor:up", "PERFORMANCE")).toBe(
+            });
+            it("should return false for non-performance events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(isEventOfCategory("monitor:up", "PERFORMANCE")).toBe(
                     false
                 );
                 expect(isEventOfCategory("site:added", "PERFORMANCE")).toBe(
                     false
                 );
-        });        });
+            });
+        });
         describe("SITE category", () => {
-            it("should return true for site events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(isEventOfCategory("site:added", "SITE")).toBe(true);
+            it("should return true for site events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(isEventOfCategory("site:added", "SITE")).toBe(true);
                 expect(isEventOfCategory("site:removed", "SITE")).toBe(true);
                 expect(isEventOfCategory("site:updated", "SITE")).toBe(true);
                 expect(
                     isEventOfCategory("sites:state-synchronized", "SITE")
                 ).toBe(true);
-        });
-            it("should return false for non-site events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(isEventOfCategory("monitor:up", "SITE")).toBe(false);
+            });
+            it("should return false for non-site events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(isEventOfCategory("monitor:up", "SITE")).toBe(false);
                 expect(isEventOfCategory("internal:site:added", "SITE")).toBe(
                     false
                 );
-        });        });
+            });
+        });
         describe("SYSTEM category", () => {
-            it("should return true for system events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(isEventOfCategory("system:error", "SYSTEM")).toBe(true);
+            it("should return true for system events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(isEventOfCategory("system:error", "SYSTEM")).toBe(true);
                 expect(isEventOfCategory("system:shutdown", "SYSTEM")).toBe(
                     true
                 );
                 expect(isEventOfCategory("system:startup", "SYSTEM")).toBe(
                     true
                 );
-        });
-            it("should return false for non-system events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(isEventOfCategory("monitor:up", "SYSTEM")).toBe(false);
+            });
+            it("should return false for non-system events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(isEventOfCategory("monitor:up", "SYSTEM")).toBe(false);
                 expect(isEventOfCategory("site:added", "SYSTEM")).toBe(false);
-        });        });
+            });
+        });
         describe("Default case - unknown categories", () => {
-            it("should return false for unknown categories", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
+            it("should return false for unknown categories", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
                 // These will test the default case in the switch statement
                 expect(
                     isEventOfCategory("site:added", "UNKNOWN_CATEGORY" as any)
@@ -425,11 +602,19 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 expect(
                     isEventOfCategory("system:error", "FAKE_CATEGORY" as any)
                 ).toBe(false);
-        });        });
+            });
+        });
         describe("Edge cases", () => {
-            it("should handle events not in any category", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
+            it("should handle events not in any category", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
                 // Test with valid event names that might not be in categories
                 const result1 = isEventOfCategory(
                     "cache:invalidated",
@@ -441,10 +626,17 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 );
                 expect(result1).toBe(false);
                 expect(result2).toBe(false);
-        });
-            it("should handle all category combinations", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
+            });
+            it("should handle all category combinations", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
                 // This ensures we test all branches thoroughly
                 const categories = Object.keys(EVENT_CATEGORIES) as Array<
                     keyof typeof EVENT_CATEGORIES
@@ -459,53 +651,90 @@ describe("eventTypes - Comprehensive Coverage", () => {
                         expect(result).toBe(false);
                     }
                 }
-        });        });        });
+            });
+        });
+    });
     describe("getEventPriority - Complete Coverage", () => {
         describe("CRITICAL priority events", () => {
-            it("should return CRITICAL for critical events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(getEventPriority("performance:warning")).toBe(
+            it("should return CRITICAL for critical events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(getEventPriority("performance:warning")).toBe(
                     "CRITICAL"
                 );
                 expect(getEventPriority("system:error")).toBe("CRITICAL");
                 expect(getEventPriority("system:shutdown")).toBe("CRITICAL");
-        });        });
+            });
+        });
         describe("HIGH priority events", () => {
-            it("should return HIGH for high priority events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(getEventPriority("database:transaction-completed")).toBe(
+            it("should return HIGH for high priority events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(getEventPriority("database:transaction-completed")).toBe(
                     "HIGH"
                 );
                 expect(getEventPriority("monitor:status-changed")).toBe("HIGH");
                 expect(getEventPriority("monitor:up")).toBe("HIGH");
                 expect(getEventPriority("monitor:down")).toBe("HIGH");
                 expect(getEventPriority("site:removed")).toBe("HIGH");
-        });        });
+            });
+        });
         describe("LOW priority events", () => {
-            it("should return LOW for low priority events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(getEventPriority("performance:metric")).toBe("LOW");
-        });        });
+            it("should return LOW for low priority events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(getEventPriority("performance:metric")).toBe("LOW");
+            });
+        });
         describe("MEDIUM priority events", () => {
-            it("should return MEDIUM for medium priority events", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
-                
- expect(getEventPriority("config:changed")).toBe("MEDIUM");
+            it("should return MEDIUM for medium priority events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
+                expect(getEventPriority("config:changed")).toBe("MEDIUM");
                 expect(getEventPriority("monitor:added")).toBe("MEDIUM");
                 expect(getEventPriority("site:added")).toBe("MEDIUM");
                 expect(getEventPriority("site:updated")).toBe("MEDIUM");
-        });        });
+            });
+        });
         describe("Default priority for unknown events", () => {
-            it("should return MEDIUM for events not in any priority category", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
+            it("should return MEDIUM for events not in any priority category", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
                 // Test events that exist but are not explicitly categorized in priorities
                 expect(getEventPriority("cache:invalidated")).toBe("MEDIUM");
                 expect(getEventPriority("database:error")).toBe("MEDIUM");
@@ -518,11 +747,19 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 expect(
                     getEventPriority("unknown:event" as keyof UptimeEvents)
                 ).toBe("MEDIUM");
-        });        });
+            });
+        });
         describe("All priority categories iteration", () => {
-            it("should iterate through all priority entries correctly", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
+            it("should iterate through all priority entries correctly", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
                 // This test ensures the for loop in getEventPriority processes all entries
                 const allPriorityEvents =
                     Object.values(EVENT_PRIORITIES).flat();
@@ -537,11 +774,19 @@ describe("eventTypes - Comprehensive Coverage", () => {
                         priority
                     );
                 }
-        });        });
+            });
+        });
         describe("Edge cases and comprehensive testing", () => {
-            it("should handle all events from all categories", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
+            it("should handle all events from all categories", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
                 // Test a selection of events from each category to ensure comprehensive coverage
                 const testEvents: Array<keyof UptimeEvents> = [
                     // CACHE
@@ -580,10 +825,17 @@ describe("eventTypes - Comprehensive Coverage", () => {
                         priority
                     );
                 }
-        });
-            it("should maintain consistency between constants and functions", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
+            });
+            it("should maintain consistency between constants and functions", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: eventTypes - Comprehensive Coverage",
+                    "component"
+                );
+
                 // Verify that all events in priority categories actually exist in event categories
                 const allCategoryEvents =
                     Object.values(EVENT_CATEGORIES).flat();
@@ -593,11 +845,17 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 for (const priorityEvent of allPriorityEvents) {
                     expect(allCategoryEvents).toContain(priorityEvent as any);
                 }
-        });        });        });
+            });
+        });
+    });
     describe("Type Safety and Integration", () => {
         it("should work with typed event names", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: eventTypes - Comprehensive Coverage",
+                "component"
+            );
+
             // This test ensures types work correctly
             const eventName: keyof UptimeEvents = "site:added";
             const category: keyof typeof EVENT_CATEGORIES = "SITE";
@@ -605,9 +863,16 @@ describe("eventTypes - Comprehensive Coverage", () => {
             expect(isEventOfCategory(eventName, category)).toBe(true);
             expect(getEventPriority(eventName)).toBe("MEDIUM");
         });
-        it("should maintain readonly contracts for constants", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: eventTypes - Comprehensive Coverage", "component");
-            
+        it("should maintain readonly contracts for constants", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: eventTypes - Comprehensive Coverage",
+                "component"
+            );
+
             // Verify that the constants are properly readonly
             expect(() => {
                 // Runtime mutation attempt (TypeScript should prevent this at compile time)
@@ -618,4 +883,6 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 // Runtime mutation attempt (TypeScript should prevent this at compile time)
                 (EVENT_PRIORITIES.HIGH as any).push("new:event");
             }).not.toThrow(); // Runtime doesn't prevent this, but TypeScript should
-        });        });        });
+        });
+    });
+});

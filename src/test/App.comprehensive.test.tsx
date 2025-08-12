@@ -588,7 +588,7 @@ describe("App Component - Comprehensive Coverage", () => {
             await waitFor(() => {
                 expect(initializeSites).toHaveBeenCalledTimes(1);
             });
-            
+
             await waitFor(() => {
                 expect(initializeSettings).toHaveBeenCalledTimes(1);
             });

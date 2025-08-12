@@ -1,9 +1,9 @@
 /**
  * Test suite for SiteRepository
- * 
+ *
  * @fileoverview Comprehensive tests for unknown functionality
  * in the Uptime Watcher application.
- * 
+ *
  * @author GitHub Copilot
  * @since 2025-08-11
  * @category General
@@ -41,7 +41,9 @@ describe("SiteRepository", () => {
         };
 
         repository = new SiteRepository({
-            databaseService: mockDatabaseService,        });        });
+            databaseService: mockDatabaseService,
+        });
+    });
     describe("findAll", () => {
         it("should find all sites", async () => {
             const mockSites = [
@@ -56,14 +58,18 @@ describe("SiteRepository", () => {
 
             expect(mockDatabaseService.getDatabase).toHaveBeenCalled();
             expect(mockDb.all).toHaveBeenCalled();
-            expect(result).toBeDefined();        });
+            expect(result).toBeDefined();
+        });
         it("should handle errors when finding all sites", async () => {
             const mockDb = mockDatabaseService.getDatabase();
             mockDb.all.mockImplementation(() => {
-                throw new Error("Database error");        });
+                throw new Error("Database error");
+            });
             await expect(repository.findAll()).rejects.toThrow(
                 "Database error"
-            );        });        });
+            );
+        });
+    });
     describe("findByIdentifier", () => {
         it("should find a site by identifier", async () => {
             const mockSite = {
@@ -80,13 +86,16 @@ describe("SiteRepository", () => {
                 expect.stringContaining("SELECT"),
                 ["site1"]
             );
-            expect(result).toEqual(mockSite);        });
+            expect(result).toEqual(mockSite);
+        });
         it("should return undefined when site not found", async () => {
             mockDatabase.get.mockReturnValue(undefined);
 
             const result = await repository.findByIdentifier("nonexistent");
 
-            expect(result).toBeUndefined();        });        });
+            expect(result).toBeUndefined();
+        });
+    });
     describe("upsert", () => {
         it("should upsert a site", async () => {
             const siteData = {
@@ -106,7 +115,8 @@ describe("SiteRepository", () => {
             expect(mockDatabase.run).toHaveBeenCalledWith(
                 expect.stringContaining("INSERT"),
                 expect.any(Array)
-            );        });
+            );
+        });
         it("should handle upsert errors", async () => {
             const siteData = {
                 identifier: "site1",
@@ -116,15 +126,19 @@ describe("SiteRepository", () => {
 
             // Mock getDatabase to throw an error
             mockDatabaseService.getDatabase.mockImplementation(() => {
-                throw new Error("Upsert failed");        });
+                throw new Error("Upsert failed");
+            });
             await expect(repository.upsert(siteData)).rejects.toThrow(
                 "Upsert failed"
-            );        });        });
+            );
+        });
+    });
     describe("delete", () => {
         it("should delete a site", async () => {
             const mockPrepare = vi.fn().mockReturnValue({
                 run: vi.fn().mockReturnValue({ changes: 1 }),
-                finalize: vi.fn(),        });
+                finalize: vi.fn(),
+            });
             mockDatabaseService.executeTransaction.mockImplementation(
                 (callback: any) => {
                     const mockDb = {
@@ -137,11 +151,13 @@ describe("SiteRepository", () => {
 
             const result = await repository.delete("site1");
 
-            expect(result).toBe(true);        });
+            expect(result).toBe(true);
+        });
         it("should return false when site not found", async () => {
             const mockPrepare = vi.fn().mockReturnValue({
                 run: vi.fn().mockReturnValue({ changes: 0 }),
-                finalize: vi.fn(),        });
+                finalize: vi.fn(),
+            });
             mockDatabaseService.executeTransaction.mockImplementation(
                 (callback: any) => {
                     const mockDb = {
@@ -154,18 +170,23 @@ describe("SiteRepository", () => {
 
             const result = await repository.delete("nonexistent");
 
-            expect(result).toBe(false);        });
+            expect(result).toBe(false);
+        });
         it("should handle deletion errors", async () => {
             mockDatabaseService.executeTransaction.mockImplementation(() => {
-                throw new Error("Delete failed");        });
+                throw new Error("Delete failed");
+            });
             await expect(repository.delete("site1")).rejects.toThrow(
                 "Delete failed"
-            );        });        });
+            );
+        });
+    });
     describe("deleteAll", () => {
         it("should delete all sites", async () => {
             const mockPrepare = vi.fn().mockReturnValue({
                 run: vi.fn().mockReturnValue({ changes: 3 }),
-                finalize: vi.fn(),        });
+                finalize: vi.fn(),
+            });
             const mockRun = vi.fn();
 
             mockDatabaseService.executeTransaction.mockImplementation(
@@ -182,7 +203,9 @@ describe("SiteRepository", () => {
 
             expect(mockRun).toHaveBeenCalledWith(
                 expect.stringContaining("DELETE")
-            );        });        });
+            );
+        });
+    });
     describe("exists", () => {
         it("should return true when site exists", async () => {
             const mockSite = {
@@ -193,25 +216,32 @@ describe("SiteRepository", () => {
 
             const mockPrepare = vi.fn().mockReturnValue({
                 get: vi.fn().mockReturnValue(mockSite),
-                finalize: vi.fn(),        });
+                finalize: vi.fn(),
+            });
             const mockGet = vi.fn().mockReturnValue(mockSite);
             mockDatabaseService.getDatabase.mockReturnValue({
                 prepare: mockPrepare,
-                get: mockGet,        });
+                get: mockGet,
+            });
             const result = await repository.exists("site1");
 
-            expect(result).toBe(true);        });
+            expect(result).toBe(true);
+        });
         it("should return false when site does not exist", async () => {
             const mockPrepare = vi.fn().mockReturnValue({
                 get: vi.fn().mockReturnValue(undefined),
-                finalize: vi.fn(),        });
+                finalize: vi.fn(),
+            });
             const mockGet = vi.fn().mockReturnValue(undefined);
             mockDatabaseService.getDatabase.mockReturnValue({
                 prepare: mockPrepare,
-                get: mockGet,        });
+                get: mockGet,
+            });
             const result = await repository.exists("nonexistent");
 
-            expect(result).toBe(false);        });        });
+            expect(result).toBe(false);
+        });
+    });
     describe("bulkInsert", () => {
         it("should insert multiple sites", async () => {
             const sites = [
@@ -221,7 +251,8 @@ describe("SiteRepository", () => {
 
             const mockPrepare = vi.fn().mockReturnValue({
                 run: vi.fn().mockReturnValue({ changes: 1 }),
-                finalize: vi.fn(),        });
+                finalize: vi.fn(),
+            });
             mockDatabaseService.executeTransaction.mockImplementation(
                 (callback: any) => {
                     const mockDb = { prepare: mockPrepare };
@@ -233,17 +264,21 @@ describe("SiteRepository", () => {
 
             expect(mockPrepare).toHaveBeenCalledWith(
                 expect.stringContaining("INSERT")
-            );        });
+            );
+        });
         it("should handle bulk insert errors", async () => {
             const sites = [
                 { identifier: "site1", name: "Site 1", monitoring: true },
             ];
 
             mockDatabaseService.executeTransaction.mockImplementation(() => {
-                throw new Error("Bulk insert failed");        });
+                throw new Error("Bulk insert failed");
+            });
             await expect(repository.bulkInsert(sites)).rejects.toThrow(
                 "Bulk insert failed"
-            );        });        });
+            );
+        });
+    });
     describe("exportAll", () => {
         it("should export all sites", async () => {
             const mockSites = [
@@ -253,11 +288,16 @@ describe("SiteRepository", () => {
 
             const mockPrepare = vi.fn().mockReturnValue({
                 all: vi.fn().mockReturnValue(mockSites),
-                finalize: vi.fn(),        });
+                finalize: vi.fn(),
+            });
             const mockAll = vi.fn().mockReturnValue(mockSites);
             mockDatabaseService.getDatabase.mockReturnValue({
                 prepare: mockPrepare,
-                all: mockAll,        });
+                all: mockAll,
+            });
             const result = await repository.exportAll();
 
-            expect(result).toEqual(mockSites);        });        });        });
+            expect(result).toEqual(mockSites);
+        });
+    });
+});

@@ -1,9 +1,9 @@
 /**
  * Test suite for retry
- * 
+ *
  * @fileoverview Comprehensive tests for unknown functionality
  * in the Uptime Watcher application.
- * 
+ *
  * @author GitHub Copilot
  * @since 2025-08-11
  * @category General
@@ -60,7 +60,9 @@ describe("withRetry", () => {
             if (reason === "String error") {
                 // Also expected from our retry tests
                 return;
-            }        });        });
+            }
+        });
+    });
     afterEach(() => {
         vi.useRealTimers();
 
@@ -70,10 +72,13 @@ describe("withRetry", () => {
 
         // eslint-disable-next-line unicorn/no-array-for-each
         originalHandlers.unhandledRejection.forEach((handler: any) => {
-            process.on("unhandledRejection", handler);        });
+            process.on("unhandledRejection", handler);
+        });
         // eslint-disable-next-line unicorn/no-array-for-each
         originalHandlers.rejectionHandled.forEach((handler: any) => {
-            process.on("rejectionHandled", handler);        });        });
+            process.on("rejectionHandled", handler);
+        });
+    });
     it("should return result immediately on successful operation", async () => {
         const operation = vi.fn().mockResolvedValue("success");
 
@@ -81,7 +86,8 @@ describe("withRetry", () => {
 
         expect(result).toBe("success");
         expect(operation).toHaveBeenCalledTimes(1);
-        expect(dbLogger.error).not.toHaveBeenCalled();        });
+        expect(dbLogger.error).not.toHaveBeenCalled();
+    });
     it("should retry operation when it fails and eventually succeed", async () => {
         const operation = vi
             .fn()
@@ -98,7 +104,8 @@ describe("withRetry", () => {
 
         expect(result).toBe("success");
         expect(operation).toHaveBeenCalledTimes(3);
-        expect(dbLogger.error).toHaveBeenCalledTimes(2);        });
+        expect(dbLogger.error).toHaveBeenCalledTimes(2);
+    });
     it("should fail after max retries are exhausted", async () => {
         const error = new Error("Persistent failure");
         const operation = vi.fn().mockRejectedValue(error);
@@ -110,7 +117,8 @@ describe("withRetry", () => {
 
         await expect(promise).rejects.toThrow("Persistent failure");
         expect(operation).toHaveBeenCalledTimes(3);
-        expect(dbLogger.error).toHaveBeenCalledTimes(4); // 3 attempts + 1 final failure        });
+        expect(dbLogger.error).toHaveBeenCalledTimes(4); // 3 attempts + 1 final failure
+    });
     it("should use custom delay between retries", async () => {
         const operation = vi
             .fn()
@@ -127,7 +135,8 @@ describe("withRetry", () => {
 
         const result = await promise;
         expect(result).toBe("success");
-        expect(operation).toHaveBeenCalledTimes(2);        });
+        expect(operation).toHaveBeenCalledTimes(2);
+    });
     it("should use custom maxRetries value", async () => {
         const error = new Error("Always fails");
         const operation = vi.fn().mockRejectedValue(error);
@@ -137,7 +146,8 @@ describe("withRetry", () => {
         await vi.advanceTimersByTimeAsync(20);
 
         await expect(promise).rejects.toThrow("Always fails");
-        expect(operation).toHaveBeenCalledTimes(2);        });
+        expect(operation).toHaveBeenCalledTimes(2);
+    });
     it("should call custom onError callback when provided", async () => {
         const onError = vi.fn();
         const error = new Error("Custom error");
@@ -153,7 +163,8 @@ describe("withRetry", () => {
         const result = await promise;
         expect(result).toBe("success");
         expect(onError).toHaveBeenCalledWith(error, 1);
-        expect(dbLogger.error).not.toHaveBeenCalled(); // Should not log when custom onError is provided        });
+        expect(dbLogger.error).not.toHaveBeenCalled(); // Should not log when custom onError is provided
+    });
     it("should use custom operation name in logs", async () => {
         const error = new Error("Test error");
         const operation = vi.fn().mockRejectedValue(error);
@@ -161,7 +172,8 @@ describe("withRetry", () => {
         const promise = withRetry(operation, {
             maxRetries: 1,
             operationName: "database-connection",
-            delayMs: 10,        });
+            delayMs: 10,
+        });
         await vi.advanceTimersByTimeAsync(20);
 
         await expect(promise).rejects.toThrow("Test error");
@@ -173,7 +185,8 @@ describe("withRetry", () => {
         expect(dbLogger.error).toHaveBeenCalledWith(
             "Persistent failure after 1 retries for database-connection",
             error
-        );        });
+        );
+    });
     it("should use default values when no options provided", async () => {
         const error = new Error("Default test");
         const operation = vi.fn().mockRejectedValue(error);
@@ -190,7 +203,8 @@ describe("withRetry", () => {
         expect(dbLogger.error).toHaveBeenCalledWith(
             "operation failed (attempt 1/5)",
             error
-        );        });
+        );
+    });
     it("should handle async operations that throw non-Error objects", async () => {
         const stringError = "String error";
         const operation = vi.fn().mockRejectedValue(stringError);
@@ -203,7 +217,8 @@ describe("withRetry", () => {
         expect(dbLogger.error).toHaveBeenCalledWith(
             "operation failed (attempt 1/1)",
             stringError
-        );        });
+        );
+    });
     it("should not delay after the last failed attempt", async () => {
         const error = new Error("Final error");
         const operation = vi.fn().mockRejectedValue(error);
@@ -214,7 +229,8 @@ describe("withRetry", () => {
         await vi.advanceTimersByTimeAsync(100);
 
         await expect(promise).rejects.toThrow("Final error");
-        expect(operation).toHaveBeenCalledTimes(2);        });
+        expect(operation).toHaveBeenCalledTimes(2);
+    });
     it("should accumulate all errors and throw the last one", async () => {
         const firstError = new Error("First error");
         const secondError = new Error("Second error");
@@ -231,13 +247,17 @@ describe("withRetry", () => {
         await vi.advanceTimersByTimeAsync(150);
 
         await expect(promise).rejects.toThrow("Third error");
-        expect(operation).toHaveBeenCalledTimes(3);        });        });
+        expect(operation).toHaveBeenCalledTimes(3);
+    });
+});
 describe("withDbRetry", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        vi.useFakeTimers();        });
+        vi.useFakeTimers();
+    });
     afterEach(() => {
-        vi.useRealTimers();        });
+        vi.useRealTimers();
+    });
     it("should return result immediately on successful operation", async () => {
         const operation = vi.fn().mockResolvedValue("database result");
 
@@ -245,7 +265,8 @@ describe("withDbRetry", () => {
 
         expect(result).toBe("database result");
         expect(operation).toHaveBeenCalledTimes(1);
-        expect(dbLogger.error).not.toHaveBeenCalled();        });
+        expect(dbLogger.error).not.toHaveBeenCalled();
+    });
     it("should retry operation when it fails and eventually succeed", async () => {
         const operation = vi
             .fn()
@@ -266,7 +287,8 @@ describe("withDbRetry", () => {
         expect(dbLogger.error).toHaveBeenCalledWith(
             "database-query failed (attempt 1/5)",
             expect.any(Error)
-        );        });
+        );
+    });
     it("should fail after max retries are exhausted", async () => {
         const error = new Error("Database is down");
         const operation = vi.fn().mockRejectedValue(error);
@@ -338,4 +360,6 @@ describe("withDbRetry", () => {
 
         const result = await promise;
         expect(result).toBe("success");
-        expect(operation).toHaveBeenCalledTimes(2);        });        });
+        expect(operation).toHaveBeenCalledTimes(2);
+    });
+});

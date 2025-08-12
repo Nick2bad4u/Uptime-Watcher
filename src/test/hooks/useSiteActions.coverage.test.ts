@@ -6,14 +6,31 @@ import { describe, expect, it, vi } from "vitest";
 
 describe("useSiteActions Hook Coverage Tests", () => {
     describe("Hook Interface", () => {
-        it("should define SiteActionsResult interface", async ({ annotate }) => {
+        it("should define SiteActionsResult interface", async ({
+            annotate,
+        }) => {
             await annotate("Component: useSiteActions", "component");
-            await annotate("Test Type: Unit - Interface Validation", "test-type");
-            await annotate("Operation: Hook Interface Definition Check", "operation");
+            await annotate(
+                "Test Type: Unit - Interface Validation",
+                "test-type"
+            );
+            await annotate(
+                "Operation: Hook Interface Definition Check",
+                "operation"
+            );
             await annotate("Priority: Critical - Hook Contract", "priority");
-            await annotate("Complexity: Low - Interface Structure Check", "complexity");
-            await annotate("React Hook: Site actions handler interface", "react-hook");
-            await annotate("Purpose: Validate useSiteActions hook exposes required action handlers", "purpose");
+            await annotate(
+                "Complexity: Low - Interface Structure Check",
+                "complexity"
+            );
+            await annotate(
+                "React Hook: Site actions handler interface",
+                "react-hook"
+            );
+            await annotate(
+                "Purpose: Validate useSiteActions hook exposes required action handlers",
+                "purpose"
+            );
 
             const siteActionsResult = {
                 handleCardClick: vi.fn(),
@@ -45,12 +62,24 @@ describe("useSiteActions Hook Coverage Tests", () => {
     describe("Store Integration", () => {
         it("should integrate with useSitesStore", async ({ annotate }) => {
             await annotate("Component: useSiteActions", "component");
-            await annotate("Test Type: Integration - Store Integration", "test-type");
+            await annotate(
+                "Test Type: Integration - Store Integration",
+                "test-type"
+            );
             await annotate("Operation: Zustand Store Integration", "operation");
             await annotate("Priority: Critical - State Management", "priority");
-            await annotate("Complexity: Medium - Store Action Binding", "complexity");
-            await annotate("Store: useSitesStore integration validation", "store");
-            await annotate("Purpose: Validate useSiteActions integrates with Zustand store properly", "purpose");
+            await annotate(
+                "Complexity: Medium - Store Action Binding",
+                "complexity"
+            );
+            await annotate(
+                "Store: useSitesStore integration validation",
+                "store"
+            );
+            await annotate(
+                "Purpose: Validate useSiteActions integrates with Zustand store properly",
+                "purpose"
+            );
 
             const sitesStore = {
                 checkSiteNow: vi.fn(),
@@ -95,12 +124,27 @@ describe("useSiteActions Hook Coverage Tests", () => {
 
         it("should integrate with useUIStore", async ({ annotate }) => {
             await annotate("Component: useSiteActions", "component");
-            await annotate("Test Type: Integration - UI Store Integration", "test-type");
-            await annotate("Operation: UI State Store Integration", "operation");
+            await annotate(
+                "Test Type: Integration - UI Store Integration",
+                "test-type"
+            );
+            await annotate(
+                "Operation: UI State Store Integration",
+                "operation"
+            );
             await annotate("Priority: High - UI State Management", "priority");
-            await annotate("Complexity: Medium - Cross-Store Integration", "complexity");
-            await annotate("UI Store: Site selection and details display", "ui-store");
-            await annotate("Purpose: Validate useSiteActions integrates with UI store for site selection", "purpose");
+            await annotate(
+                "Complexity: Medium - Cross-Store Integration",
+                "complexity"
+            );
+            await annotate(
+                "UI Store: Site selection and details display",
+                "ui-store"
+            );
+            await annotate(
+                "Purpose: Validate useSiteActions integrates with UI store for site selection",
+                "purpose"
+            );
 
             const uiStore = {
                 setSelectedSite: vi.fn(),

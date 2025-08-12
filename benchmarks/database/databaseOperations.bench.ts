@@ -1,9 +1,9 @@
 /**
  * Benchmark tests for database operations
- * 
+ *
  * @fileoverview Performance benchmarks for heavy computational database operations
  * including bulk insertions, data mapping, and query processing.
- * 
+ *
  * @author GitHub Copilot
  * @since 2025-08-11
  * @category Performance
@@ -59,22 +59,22 @@ interface Monitor {
 function generateHistoryEntries(count: number): StatusHistory[] {
     const entries: StatusHistory[] = [];
     const now = Date.now();
-    
+
     for (let i = 0; i < count; i++) {
         entries.push({
-            timestamp: now - (i * 30000), // 30 second intervals
+            timestamp: now - i * 30000, // 30 second intervals
             status: Math.random() > 0.05 ? "up" : "down", // 95% uptime
             responseTime: Math.floor(Math.random() * 1000) + 50,
             details: Math.random() > 0.8 ? `Error details ${i}` : undefined,
         });
     }
-    
+
     return entries;
 }
 
 function generateDatabaseRows(count: number): DatabaseMonitorRow[] {
     const rows: DatabaseMonitorRow[] = [];
-    
+
     for (let i = 0; i < count; i++) {
         rows.push({
             id: `monitor-${i}`,
@@ -96,7 +96,7 @@ function generateDatabaseRows(count: number): DatabaseMonitorRow[] {
             ]),
         });
     }
-    
+
     return rows;
 }
 
@@ -112,7 +112,7 @@ function simulateBulkHistoryInsert(entries: StatusHistory[]): void {
             entry.responseTime,
             entry.details ?? null,
         ];
-        
+
         // Simulate some processing time
         JSON.stringify(params);
     }
@@ -122,10 +122,13 @@ function parseActiveOperations(activeOperationsJson: string): string[] {
     if (!activeOperationsJson) {
         return [];
     }
-    
+
     try {
         const parsed = JSON.parse(activeOperationsJson);
-        if (Array.isArray(parsed) && parsed.every(op => typeof op === "string")) {
+        if (
+            Array.isArray(parsed) &&
+            parsed.every((op) => typeof op === "string")
+        ) {
             return parsed;
         }
         return [];
@@ -154,19 +157,18 @@ function mapRowToMonitor(row: DatabaseMonitorRow): Monitor {
 }
 
 function rowsToMonitors(rows: DatabaseMonitorRow[]): Monitor[] {
-    return rows.map(row => mapRowToMonitor(row));
+    return rows.map((row) => mapRowToMonitor(row));
 }
 
 function simulateValidation(data: unknown[]): boolean {
-    return data.every(item => 
-        item !== null && 
-        item !== undefined && 
-        typeof item === "object"
+    return data.every(
+        (item) =>
+            item !== null && item !== undefined && typeof item === "object"
     );
 }
 
 function simulateParameterGeneration(monitors: Monitor[]): unknown[][] {
-    return monitors.map(monitor => [
+    return monitors.map((monitor) => [
         monitor.siteIdentifier,
         monitor.type,
         monitor.url,
@@ -202,103 +204,143 @@ describe("Database Operations Performance Benchmarks", () => {
     });
 
     // Bulk history insertion benchmarks
-    bench("Bulk history insert simulation - Small dataset (100 entries)", () => {
-        simulateBulkHistoryInsert(smallHistoryDataset);
-    }, {
-        time: 1000,
-        iterations: 100,
-        warmupTime: 100,
-        warmupIterations: 5,
-    });
+    bench(
+        "Bulk history insert simulation - Small dataset (100 entries)",
+        () => {
+            simulateBulkHistoryInsert(smallHistoryDataset);
+        },
+        {
+            time: 1000,
+            iterations: 100,
+            warmupTime: 100,
+            warmupIterations: 5,
+        }
+    );
 
-    bench("Bulk history insert simulation - Medium dataset (1K entries)", () => {
-        simulateBulkHistoryInsert(mediumHistoryDataset);
-    }, {
-        time: 1000,
-        iterations: 50,
-        warmupTime: 200,
-        warmupIterations: 3,
-    });
+    bench(
+        "Bulk history insert simulation - Medium dataset (1K entries)",
+        () => {
+            simulateBulkHistoryInsert(mediumHistoryDataset);
+        },
+        {
+            time: 1000,
+            iterations: 50,
+            warmupTime: 200,
+            warmupIterations: 3,
+        }
+    );
 
-    bench("Bulk history insert simulation - Large dataset (10K entries)", () => {
-        simulateBulkHistoryInsert(largeHistoryDataset);
-    }, {
-        time: 2000,
-        iterations: 10,
-        warmupTime: 500,
-        warmupIterations: 2,
-    });
+    bench(
+        "Bulk history insert simulation - Large dataset (10K entries)",
+        () => {
+            simulateBulkHistoryInsert(largeHistoryDataset);
+        },
+        {
+            time: 2000,
+            iterations: 10,
+            warmupTime: 500,
+            warmupIterations: 2,
+        }
+    );
 
     // Monitor mapping benchmarks
-    bench("Row to monitor mapping - Small dataset (100 rows)", () => {
-        rowsToMonitors(smallRowDataset);
-    }, {
-        time: 1000,
-        iterations: 100,
-        warmupTime: 100,
-        warmupIterations: 5,
-    });
+    bench(
+        "Row to monitor mapping - Small dataset (100 rows)",
+        () => {
+            rowsToMonitors(smallRowDataset);
+        },
+        {
+            time: 1000,
+            iterations: 100,
+            warmupTime: 100,
+            warmupIterations: 5,
+        }
+    );
 
-    bench("Row to monitor mapping - Medium dataset (1K rows)", () => {
-        rowsToMonitors(mediumRowDataset);
-    }, {
-        time: 1000,
-        iterations: 50,
-        warmupTime: 200,
-        warmupIterations: 3,
-    });
+    bench(
+        "Row to monitor mapping - Medium dataset (1K rows)",
+        () => {
+            rowsToMonitors(mediumRowDataset);
+        },
+        {
+            time: 1000,
+            iterations: 50,
+            warmupTime: 200,
+            warmupIterations: 3,
+        }
+    );
 
-    bench("Row to monitor mapping - Large dataset (5K rows)", () => {
-        rowsToMonitors(largeRowDataset);
-    }, {
-        time: 2000,
-        iterations: 20,
-        warmupTime: 500,
-        warmupIterations: 2,
-    });
+    bench(
+        "Row to monitor mapping - Large dataset (5K rows)",
+        () => {
+            rowsToMonitors(largeRowDataset);
+        },
+        {
+            time: 2000,
+            iterations: 20,
+            warmupTime: 500,
+            warmupIterations: 2,
+        }
+    );
 
     // JSON parsing benchmarks (active operations)
-    bench("JSON parsing for active operations - Medium dataset (1K operations)", () => {
-        for (const row of mediumRowDataset) {
-            parseActiveOperations(row.active_operations || "[]");
+    bench(
+        "JSON parsing for active operations - Medium dataset (1K operations)",
+        () => {
+            for (const row of mediumRowDataset) {
+                parseActiveOperations(row.active_operations || "[]");
+            }
+        },
+        {
+            time: 1000,
+            iterations: 50,
+            warmupTime: 200,
+            warmupIterations: 3,
         }
-    }, {
-        time: 1000,
-        iterations: 50,
-        warmupTime: 200,
-        warmupIterations: 3,
-    });
+    );
 
     // Data validation benchmarks
-    bench("Data validation simulation - Large dataset (5K items)", () => {
-        simulateValidation(largeRowDataset);
-    }, {
-        time: 1000,
-        iterations: 30,
-        warmupTime: 200,
-        warmupIterations: 3,
-    });
+    bench(
+        "Data validation simulation - Large dataset (5K items)",
+        () => {
+            simulateValidation(largeRowDataset);
+        },
+        {
+            time: 1000,
+            iterations: 30,
+            warmupTime: 200,
+            warmupIterations: 3,
+        }
+    );
 
     // Parameter generation benchmarks
-    bench("Parameter generation - Large dataset (5K monitors)", () => {
-        const monitors = rowsToMonitors(largeRowDataset);
-        simulateParameterGeneration(monitors);
-    }, {
-        time: 2000,
-        iterations: 10,
-        warmupTime: 500,
-        warmupIterations: 2,
-    });
+    bench(
+        "Parameter generation - Large dataset (5K monitors)",
+        () => {
+            const monitors = rowsToMonitors(largeRowDataset);
+            simulateParameterGeneration(monitors);
+        },
+        {
+            time: 2000,
+            iterations: 10,
+            warmupTime: 500,
+            warmupIterations: 2,
+        }
+    );
 
     // Complex combined operations
-    bench("Complete mapping pipeline - Large dataset (5K rows)", () => {
-        const monitors = rowsToMonitors(largeRowDataset);
-        simulateValidation(monitors);
-        simulateParameterGeneration(monitors);
-    }, {
-        time: 3000,
-        iterations: 5,
-        warmupTime: 1000,
-        warmupIterations: 1,
-    });
+    bench(
+        "Complete mapping pipeline - Large dataset (5K rows)",
+        () => {
+            const monitors = rowsToMonitors(largeRowDataset);
+            simulateValidation(monitors);
+            simulateParameterGeneration(monitors);
+        },
+        {
+            time: 3000,
+            iterations: 5,
+            warmupTime: 1000,
+            warmupIterations: 1,
+        }
+    );
 });

@@ -30,7 +30,9 @@ vi.mock("../../../../utils/logger", () => ({
 }));
 
 vi.mock("../../../../../shared/utils/logTemplates", () => ({
-    interpolateLogTemplate: vi.fn((template, data) => `${template} ${JSON.stringify(data)}`),
+    interpolateLogTemplate: vi.fn(
+        (template, data) => `${template} ${JSON.stringify(data)}`
+    ),
     LOG_TEMPLATES: {
         debug: {
             HISTORY_ENTRY_ADDED: "HISTORY_ENTRY_ADDED",
@@ -71,8 +73,12 @@ describe("History Manipulation Utilities", () => {
         const electronUtilsModule = await import("../../../../electronUtils");
         mockIsDev = vi.mocked(electronUtilsModule.isDev);
 
-        const logTemplatesModule = await import("../../../../../shared/utils/logTemplates");
-        mockInterpolateLogTemplate = vi.mocked(logTemplatesModule.interpolateLogTemplate);
+        const logTemplatesModule = await import(
+            "../../../../../shared/utils/logTemplates"
+        );
+        mockInterpolateLogTemplate = vi.mocked(
+            logTemplatesModule.interpolateLogTemplate
+        );
 
         // Create mock database
         mockDb = {
@@ -87,7 +93,10 @@ describe("History Manipulation Utilities", () => {
     });
 
     describe("addHistoryEntry", () => {
-        it("should add history entry successfully", async ({ task, annotate }) => {
+        it("should add history entry successfully", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Function: addHistoryEntry", "function");
@@ -113,7 +122,10 @@ describe("History Manipulation Utilities", () => {
             );
         });
 
-        it("should add history entry with details", async ({ task, annotate }) => {
+        it("should add history entry with details", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Function: addHistoryEntry", "function");
@@ -139,7 +151,10 @@ describe("History Manipulation Utilities", () => {
             );
         });
 
-        it("should log debug message in development environment", async ({ task, annotate }) => {
+        it("should log debug message in development environment", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Environment: Development", "environment");
@@ -154,11 +169,14 @@ describe("History Manipulation Utilities", () => {
 
             // Assert
             expect(mockLogger.debug).toHaveBeenCalledWith(
-                "HISTORY_ENTRY_ADDED {\"monitorId\":\"test-monitor-123\",\"status\":\"up\"}"
+                'HISTORY_ENTRY_ADDED {"monitorId":"test-monitor-123","status":"up"}'
             );
         });
 
-        it("should not log debug message in production environment", async ({ task, annotate }) => {
+        it("should not log debug message in production environment", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Environment: Production", "environment");
@@ -175,7 +193,10 @@ describe("History Manipulation Utilities", () => {
             expect(mockLogger.debug).not.toHaveBeenCalled();
         });
 
-        it("should handle database errors properly", async ({ task, annotate }) => {
+        it("should handle database errors properly", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Function: addHistoryEntry", "function");
@@ -188,12 +209,12 @@ describe("History Manipulation Utilities", () => {
             });
 
             // Act & Assert
-            expect(() => addHistoryEntry(mockDb, monitorId, sampleStatusHistory)).toThrow(
-                "Database connection failed"
-            );
+            expect(() =>
+                addHistoryEntry(mockDb, monitorId, sampleStatusHistory)
+            ).toThrow("Database connection failed");
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "HISTORY_ADD_FAILED {\"monitorId\":\"test-monitor-123\"}",
+                'HISTORY_ADD_FAILED {"monitorId":"test-monitor-123"}',
                 dbError
             );
         });
@@ -202,11 +223,22 @@ describe("History Manipulation Utilities", () => {
     describe("bulkInsertHistory", () => {
         const historyEntries = [
             { ...sampleStatusHistory, details: "First entry" },
-            { ...sampleStatusHistory, timestamp: Date.now() + 1000, status: "down" as const },
-            { ...sampleStatusHistory, timestamp: Date.now() + 2000, responseTime: 456 },
+            {
+                ...sampleStatusHistory,
+                timestamp: Date.now() + 1000,
+                status: "down" as const,
+            },
+            {
+                ...sampleStatusHistory,
+                timestamp: Date.now() + 2000,
+                responseTime: 456,
+            },
         ];
 
-        it("should handle empty history entries array", async ({ task, annotate }) => {
+        it("should handle empty history entries array", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Function: bulkInsertHistory", "function");
@@ -219,7 +251,10 @@ describe("History Manipulation Utilities", () => {
             expect(mockDb.prepare).not.toHaveBeenCalled();
         });
 
-        it("should bulk insert history entries successfully", async ({ task, annotate }) => {
+        it("should bulk insert history entries successfully", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Function: bulkInsertHistory", "function");
@@ -258,11 +293,14 @@ describe("History Manipulation Utilities", () => {
 
             expect(mockStmt.finalize).toHaveBeenCalledTimes(1);
             expect(mockLogger.info).toHaveBeenCalledWith(
-                "HISTORY_BULK_INSERT {\"count\":3,\"monitorId\":\"test-monitor-123\"}"
+                'HISTORY_BULK_INSERT {"count":3,"monitorId":"test-monitor-123"}'
             );
         });
 
-        it("should finalize statement even if run fails", async ({ task, annotate }) => {
+        it("should finalize statement even if run fails", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Function: bulkInsertHistory", "function");
@@ -280,18 +318,21 @@ describe("History Manipulation Utilities", () => {
             mockDb.prepare = vi.fn().mockReturnValue(mockStmt);
 
             // Act & Assert
-            expect(() => bulkInsertHistory(mockDb, monitorId, historyEntries)).toThrow(
-                "Statement execution failed"
-            );
+            expect(() =>
+                bulkInsertHistory(mockDb, monitorId, historyEntries)
+            ).toThrow("Statement execution failed");
 
             expect(mockStmt.finalize).toHaveBeenCalledTimes(1);
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "HISTORY_BULK_INSERT_FAILED {\"monitorId\":\"test-monitor-123\"}",
+                'HISTORY_BULK_INSERT_FAILED {"monitorId":"test-monitor-123"}',
                 runError
             );
         });
 
-        it("should handle prepare statement failure", async ({ task, annotate }) => {
+        it("should handle prepare statement failure", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Function: bulkInsertHistory", "function");
@@ -305,19 +346,22 @@ describe("History Manipulation Utilities", () => {
             });
 
             // Act & Assert
-            expect(() => bulkInsertHistory(mockDb, monitorId, historyEntries)).toThrow(
-                "Failed to prepare statement"
-            );
+            expect(() =>
+                bulkInsertHistory(mockDb, monitorId, historyEntries)
+            ).toThrow("Failed to prepare statement");
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "HISTORY_BULK_INSERT_FAILED {\"monitorId\":\"test-monitor-123\"}",
+                'HISTORY_BULK_INSERT_FAILED {"monitorId":"test-monitor-123"}',
                 prepareError
             );
         });
     });
 
     describe("deleteAllHistory", () => {
-        it("should delete all history successfully", async ({ task, annotate }) => {
+        it("should delete all history successfully", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Function: deleteAllHistory", "function");
@@ -335,7 +379,10 @@ describe("History Manipulation Utilities", () => {
             expect(mockDb.run).toHaveBeenCalledWith("DELETE FROM history");
         });
 
-        it("should log debug message in development environment", async ({ task, annotate }) => {
+        it("should log debug message in development environment", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Environment: Development", "environment");
@@ -354,7 +401,10 @@ describe("History Manipulation Utilities", () => {
             );
         });
 
-        it("should handle database errors properly", async ({ task, annotate }) => {
+        it("should handle database errors properly", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Function: deleteAllHistory", "function");
@@ -367,7 +417,9 @@ describe("History Manipulation Utilities", () => {
             });
 
             // Act & Assert
-            expect(() => deleteAllHistory(mockDb)).toThrow("Cannot delete from history table");
+            expect(() => deleteAllHistory(mockDb)).toThrow(
+                "Cannot delete from history table"
+            );
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "[HistoryManipulation] Failed to clear all history",
@@ -377,7 +429,10 @@ describe("History Manipulation Utilities", () => {
     });
 
     describe("deleteHistoryByMonitorId", () => {
-        it("should delete history for specific monitor successfully", async ({ task, annotate }) => {
+        it("should delete history for specific monitor successfully", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Function: deleteHistoryByMonitorId", "function");
@@ -397,7 +452,10 @@ describe("History Manipulation Utilities", () => {
             );
         });
 
-        it("should log debug message in development environment", async ({ task, annotate }) => {
+        it("should log debug message in development environment", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Environment: Development", "environment");
@@ -416,7 +474,10 @@ describe("History Manipulation Utilities", () => {
             );
         });
 
-        it("should handle database errors properly", async ({ task, annotate }) => {
+        it("should handle database errors properly", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Function: deleteHistoryByMonitorId", "function");
@@ -429,17 +490,22 @@ describe("History Manipulation Utilities", () => {
             });
 
             // Act & Assert
-            expect(() => deleteHistoryByMonitorId(mockDb, monitorId)).toThrow("Monitor not found");
+            expect(() => deleteHistoryByMonitorId(mockDb, monitorId)).toThrow(
+                "Monitor not found"
+            );
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "HISTORY_PRUNE_FAILED {\"monitorId\":\"test-monitor-123\"}",
+                'HISTORY_PRUNE_FAILED {"monitorId":"test-monitor-123"}',
                 dbError
             );
         });
     });
 
     describe("pruneHistoryForMonitor", () => {
-        it("should return early when limit is zero or negative", async ({ task, annotate }) => {
+        it("should return early when limit is zero or negative", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Function: pruneHistoryForMonitor", "function");
@@ -454,7 +520,10 @@ describe("History Manipulation Utilities", () => {
             expect(mockDb.run).not.toHaveBeenCalled();
         });
 
-        it("should prune excess history entries successfully", async ({ task, annotate }) => {
+        it("should prune excess history entries successfully", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Function: pruneHistoryForMonitor", "function");
@@ -536,7 +605,10 @@ describe("History Manipulation Utilities", () => {
             );
         });
 
-        it("should handle all invalid IDs gracefully", async ({ task, annotate }) => {
+        it("should handle all invalid IDs gracefully", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Function: pruneHistoryForMonitor", "function");
@@ -561,7 +633,10 @@ describe("History Manipulation Utilities", () => {
             expect(mockDb.run).not.toHaveBeenCalled();
         });
 
-        it("should log debug message in development environment", async ({ task, annotate }) => {
+        it("should log debug message in development environment", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Environment: Development", "environment");
@@ -582,7 +657,10 @@ describe("History Manipulation Utilities", () => {
             );
         });
 
-        it("should handle database select errors", async ({ task, annotate }) => {
+        it("should handle database select errors", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Function: pruneHistoryForMonitor", "function");
@@ -601,12 +679,15 @@ describe("History Manipulation Utilities", () => {
             );
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "HISTORY_PRUNE_FAILED {\"monitorId\":\"test-monitor-123\"}",
+                'HISTORY_PRUNE_FAILED {"monitorId":"test-monitor-123"}',
                 selectError
             );
         });
 
-        it("should handle database delete errors", async ({ task, annotate }) => {
+        it("should handle database delete errors", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Function: pruneHistoryForMonitor", "function");
@@ -627,14 +708,17 @@ describe("History Manipulation Utilities", () => {
             );
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "HISTORY_PRUNE_FAILED {\"monitorId\":\"test-monitor-123\"}",
+                'HISTORY_PRUNE_FAILED {"monitorId":"test-monitor-123"}',
                 deleteError
             );
         });
     });
 
     describe("Edge Cases and Integration", () => {
-        it("should handle extremely large datasets", async ({ task, annotate }) => {
+        it("should handle extremely large datasets", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Category: Performance testing", "category");
@@ -661,7 +745,10 @@ describe("History Manipulation Utilities", () => {
             expect(mockStmt.finalize).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle special characters in monitor ID", async ({ task, annotate }) => {
+        it("should handle special characters in monitor ID", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Edge case: Special characters", "edge-case");
@@ -701,7 +788,10 @@ describe("History Manipulation Utilities", () => {
             );
         });
 
-        it("should handle boundary values for prune limit", async ({ task, annotate }) => {
+        it("should handle boundary values for prune limit", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyManipulation", "component");
             await annotate("Function: pruneHistoryForMonitor", "function");
@@ -712,16 +802,16 @@ describe("History Manipulation Utilities", () => {
 
             // Act & Assert - Test boundary values
             pruneHistoryForMonitor(mockDb, monitorId, 1); // Minimum valid value
-            expect(mockDb.all).toHaveBeenCalledWith(
-                expect.any(String),
-                [monitorId, 1]
-            );
+            expect(mockDb.all).toHaveBeenCalledWith(expect.any(String), [
+                monitorId,
+                1,
+            ]);
 
             pruneHistoryForMonitor(mockDb, monitorId, Number.MAX_SAFE_INTEGER); // Maximum safe integer
-            expect(mockDb.all).toHaveBeenCalledWith(
-                expect.any(String),
-                [monitorId, Number.MAX_SAFE_INTEGER]
-            );
+            expect(mockDb.all).toHaveBeenCalledWith(expect.any(String), [
+                monitorId,
+                Number.MAX_SAFE_INTEGER,
+            ]);
         });
     });
 });

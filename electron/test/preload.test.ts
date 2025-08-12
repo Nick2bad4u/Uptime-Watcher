@@ -43,16 +43,31 @@ describe("Electron Preload Script", () => {
             contextBridge: mockContextBridge,
             ipcRenderer: mockIpcRenderer,
         }));
-        });
+    });
     describe("API Exposure", () => {
         it("should expose electronAPI to main world", async ({ annotate }) => {
             await annotate("Component: Preload Script", "component");
             await annotate("Test Type: Unit - API Exposure", "test-type");
-            await annotate("Operation: Context Bridge API Exposure", "operation");
-            await annotate("Priority: Critical - Security Boundary", "priority");
-            await annotate("Complexity: Medium - Security Context Validation", "complexity");
-            await annotate("Security: Validates secure IPC bridge setup", "security");
-            await annotate("Purpose: Ensure API is properly exposed to renderer", "purpose");
+            await annotate(
+                "Operation: Context Bridge API Exposure",
+                "operation"
+            );
+            await annotate(
+                "Priority: Critical - Security Boundary",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Medium - Security Context Validation",
+                "complexity"
+            );
+            await annotate(
+                "Security: Validates secure IPC bridge setup",
+                "security"
+            );
+            await annotate(
+                "Purpose: Ensure API is properly exposed to renderer",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -64,12 +79,27 @@ describe("Electron Preload Script", () => {
 
         it("should expose all required API domains", async ({ annotate }) => {
             await annotate("Component: Preload Script", "component");
-            await annotate("Test Type: Unit - API Surface Validation", "test-type");
-            await annotate("Operation: API Domain Completeness Check", "operation");
+            await annotate(
+                "Test Type: Unit - API Surface Validation",
+                "test-type"
+            );
+            await annotate(
+                "Operation: API Domain Completeness Check",
+                "operation"
+            );
             await annotate("Priority: Critical - API Completeness", "priority");
-            await annotate("Complexity: Low - Property Existence Check", "complexity");
-            await annotate("API Domains: sites, monitoring, data, settings, events, system", "api-domains");
-            await annotate("Purpose: Ensure all required API domains are exposed", "purpose");
+            await annotate(
+                "Complexity: Low - Property Existence Check",
+                "complexity"
+            );
+            await annotate(
+                "API Domains: sites, monitoring, data, settings, events, system",
+                "api-domains"
+            );
+            await annotate(
+                "Purpose: Ensure all required API domains are exposed",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -86,14 +116,28 @@ describe("Electron Preload Script", () => {
     });
 
     describe("Site API", () => {
-        it("should expose all site management methods", async ({ annotate }) => {
+        it("should expose all site management methods", async ({
+            annotate,
+        }) => {
             await annotate("Component: Site API", "component");
             await annotate("Test Type: Unit - Method Exposure", "test-type");
-            await annotate("Operation: Site Management Method Validation", "operation");
+            await annotate(
+                "Operation: Site Management Method Validation",
+                "operation"
+            );
             await annotate("Priority: Critical - CRUD Operations", "priority");
-            await annotate("Complexity: Low - Method Existence Check", "complexity");
-            await annotate("Methods: addSite, getSites, removeSite, updateSite, checkSiteNow", "methods");
-            await annotate("Purpose: Validate all site management methods are available", "purpose");
+            await annotate(
+                "Complexity: Low - Method Existence Check",
+                "complexity"
+            );
+            await annotate(
+                "Methods: addSite, getSites, removeSite, updateSite, checkSiteNow",
+                "methods"
+            );
+            await annotate(
+                "Purpose: Validate all site management methods are available",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -109,12 +153,27 @@ describe("Electron Preload Script", () => {
 
         it("should properly invoke IPC for addSite", async ({ annotate }) => {
             await annotate("Component: Site API", "component");
-            await annotate("Test Type: Unit - IPC Bridge Validation", "test-type");
-            await annotate("Operation: Add Site IPC Communication", "operation");
+            await annotate(
+                "Test Type: Unit - IPC Bridge Validation",
+                "test-type"
+            );
+            await annotate(
+                "Operation: Add Site IPC Communication",
+                "operation"
+            );
             await annotate("Priority: Critical - Data Persistence", "priority");
-            await annotate("Complexity: Medium - IPC Flow Validation", "complexity");
-            await annotate("IPC Channel: Validates site addition flow", "ipc-channel");
-            await annotate("Purpose: Ensure addSite properly communicates with main process", "purpose");
+            await annotate(
+                "Complexity: Medium - IPC Flow Validation",
+                "complexity"
+            );
+            await annotate(
+                "IPC Channel: Validates site addition flow",
+                "ipc-channel"
+            );
+            await annotate(
+                "Purpose: Ensure addSite properly communicates with main process",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -135,12 +194,21 @@ describe("Electron Preload Script", () => {
 
         it("should properly invoke IPC for getSites", async ({ annotate }) => {
             await annotate("Component: Site API", "component");
-            await annotate("Test Type: Unit - IPC Bridge Validation", "test-type");
-            await annotate("Operation: Get Sites IPC Communication", "operation");
+            await annotate(
+                "Test Type: Unit - IPC Bridge Validation",
+                "test-type"
+            );
+            await annotate(
+                "Operation: Get Sites IPC Communication",
+                "operation"
+            );
             await annotate("Priority: Critical - Data Retrieval", "priority");
             await annotate("Complexity: Low - Simple IPC Call", "complexity");
             await annotate("IPC Channel: get-sites", "ipc-channel");
-            await annotate("Purpose: Ensure getSites properly communicates with main process", "purpose");
+            await annotate(
+                "Purpose: Ensure getSites properly communicates with main process",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -151,14 +219,28 @@ describe("Electron Preload Script", () => {
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith("get-sites");
         });
 
-        it("should properly invoke IPC for removeSite", async ({ annotate }) => {
+        it("should properly invoke IPC for removeSite", async ({
+            annotate,
+        }) => {
             await annotate("Component: Site API", "component");
-            await annotate("Test Type: Unit - IPC Bridge Validation", "test-type");
-            await annotate("Operation: Remove Site IPC Communication", "operation");
+            await annotate(
+                "Test Type: Unit - IPC Bridge Validation",
+                "test-type"
+            );
+            await annotate(
+                "Operation: Remove Site IPC Communication",
+                "operation"
+            );
             await annotate("Priority: Critical - Data Deletion", "priority");
-            await annotate("Complexity: Medium - Deletion Flow Validation", "complexity");
+            await annotate(
+                "Complexity: Medium - Deletion Flow Validation",
+                "complexity"
+            );
             await annotate("IPC Channel: remove-site", "ipc-channel");
-            await annotate("Purpose: Ensure removeSite properly communicates with main process", "purpose");
+            await annotate(
+                "Purpose: Ensure removeSite properly communicates with main process",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -173,14 +255,31 @@ describe("Electron Preload Script", () => {
             );
         });
 
-        it("should properly invoke IPC for updateSite", async ({ annotate }) => {
+        it("should properly invoke IPC for updateSite", async ({
+            annotate,
+        }) => {
             await annotate("Component: Site API", "component");
-            await annotate("Test Type: Unit - IPC Bridge Validation", "test-type");
-            await annotate("Operation: Update Site IPC Communication", "operation");
-            await annotate("Priority: Critical - Data Modification", "priority");
-            await annotate("Complexity: Medium - Update Flow Validation", "complexity");
+            await annotate(
+                "Test Type: Unit - IPC Bridge Validation",
+                "test-type"
+            );
+            await annotate(
+                "Operation: Update Site IPC Communication",
+                "operation"
+            );
+            await annotate(
+                "Priority: Critical - Data Modification",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Medium - Update Flow Validation",
+                "complexity"
+            );
             await annotate("IPC Channel: update-site", "ipc-channel");
-            await annotate("Purpose: Ensure updateSite properly communicates with main process", "purpose");
+            await annotate(
+                "Purpose: Ensure updateSite properly communicates with main process",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -197,14 +296,28 @@ describe("Electron Preload Script", () => {
             );
         });
 
-        it("should properly invoke IPC for checkSiteNow", async ({ annotate }) => {
+        it("should properly invoke IPC for checkSiteNow", async ({
+            annotate,
+        }) => {
             await annotate("Component: Site API", "component");
-            await annotate("Test Type: Unit - IPC Bridge Validation", "test-type");
-            await annotate("Operation: Manual Site Check IPC Communication", "operation");
+            await annotate(
+                "Test Type: Unit - IPC Bridge Validation",
+                "test-type"
+            );
+            await annotate(
+                "Operation: Manual Site Check IPC Communication",
+                "operation"
+            );
             await annotate("Priority: High - On-Demand Monitoring", "priority");
-            await annotate("Complexity: Medium - Manual Check Flow", "complexity");
+            await annotate(
+                "Complexity: Medium - Manual Check Flow",
+                "complexity"
+            );
             await annotate("IPC Channel: check-site-now", "ipc-channel");
-            await annotate("Purpose: Ensure manual site checks communicate properly", "purpose");
+            await annotate(
+                "Purpose: Ensure manual site checks communicate properly",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -223,14 +336,31 @@ describe("Electron Preload Script", () => {
     });
 
     describe("Monitoring API", () => {
-        it("should expose all monitoring control methods", async ({ annotate }) => {
+        it("should expose all monitoring control methods", async ({
+            annotate,
+        }) => {
             await annotate("Component: Monitoring API", "component");
             await annotate("Test Type: Unit - Method Exposure", "test-type");
-            await annotate("Operation: Monitoring Control Method Validation", "operation");
-            await annotate("Priority: Critical - Monitoring Control", "priority");
-            await annotate("Complexity: Low - Method Existence Check", "complexity");
-            await annotate("Methods: start/stop monitoring globally and per-site", "methods");
-            await annotate("Purpose: Validate all monitoring control methods are available", "purpose");
+            await annotate(
+                "Operation: Monitoring Control Method Validation",
+                "operation"
+            );
+            await annotate(
+                "Priority: Critical - Monitoring Control",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Low - Method Existence Check",
+                "complexity"
+            );
+            await annotate(
+                "Methods: start/stop monitoring globally and per-site",
+                "methods"
+            );
+            await annotate(
+                "Purpose: Validate all monitoring control methods are available",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -243,14 +373,25 @@ describe("Electron Preload Script", () => {
             expect(monitoringAPI).toHaveProperty("stopMonitoringForSite");
         });
 
-        it("should properly invoke IPC for startMonitoring", async ({ annotate }) => {
+        it("should properly invoke IPC for startMonitoring", async ({
+            annotate,
+        }) => {
             await annotate("Component: Monitoring API", "component");
-            await annotate("Test Type: Unit - IPC Bridge Validation", "test-type");
+            await annotate(
+                "Test Type: Unit - IPC Bridge Validation",
+                "test-type"
+            );
             await annotate("Operation: Global Monitoring Start", "operation");
-            await annotate("Priority: Critical - Global Monitoring Control", "priority");
+            await annotate(
+                "Priority: Critical - Global Monitoring Control",
+                "priority"
+            );
             await annotate("Complexity: Low - Simple IPC Call", "complexity");
             await annotate("IPC Channel: start-monitoring", "ipc-channel");
-            await annotate("Purpose: Ensure global monitoring start communicates properly", "purpose");
+            await annotate(
+                "Purpose: Ensure global monitoring start communicates properly",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -263,14 +404,25 @@ describe("Electron Preload Script", () => {
             );
         });
 
-        it("should properly invoke IPC for stopMonitoring", async ({ annotate }) => {
+        it("should properly invoke IPC for stopMonitoring", async ({
+            annotate,
+        }) => {
             await annotate("Component: Monitoring API", "component");
-            await annotate("Test Type: Unit - IPC Bridge Validation", "test-type");
+            await annotate(
+                "Test Type: Unit - IPC Bridge Validation",
+                "test-type"
+            );
             await annotate("Operation: Global Monitoring Stop", "operation");
-            await annotate("Priority: Critical - Global Monitoring Control", "priority");
+            await annotate(
+                "Priority: Critical - Global Monitoring Control",
+                "priority"
+            );
             await annotate("Complexity: Low - Simple IPC Call", "complexity");
             await annotate("IPC Channel: stop-monitoring", "ipc-channel");
-            await annotate("Purpose: Ensure global monitoring stop communicates properly", "purpose");
+            await annotate(
+                "Purpose: Ensure global monitoring stop communicates properly",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -283,14 +435,34 @@ describe("Electron Preload Script", () => {
             );
         });
 
-        it("should properly invoke IPC for startMonitoringForSite", async ({ annotate }) => {
+        it("should properly invoke IPC for startMonitoringForSite", async ({
+            annotate,
+        }) => {
             await annotate("Component: Monitoring API", "component");
-            await annotate("Test Type: Unit - IPC Bridge Validation", "test-type");
-            await annotate("Operation: Site-Specific Monitoring Start", "operation");
-            await annotate("Priority: High - Selective Monitoring Control", "priority");
-            await annotate("Complexity: Medium - Site-Specific Control", "complexity");
-            await annotate("IPC Channel: start-monitoring-for-site", "ipc-channel");
-            await annotate("Purpose: Ensure site-specific monitoring start works", "purpose");
+            await annotate(
+                "Test Type: Unit - IPC Bridge Validation",
+                "test-type"
+            );
+            await annotate(
+                "Operation: Site-Specific Monitoring Start",
+                "operation"
+            );
+            await annotate(
+                "Priority: High - Selective Monitoring Control",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Medium - Site-Specific Control",
+                "complexity"
+            );
+            await annotate(
+                "IPC Channel: start-monitoring-for-site",
+                "ipc-channel"
+            );
+            await annotate(
+                "Purpose: Ensure site-specific monitoring start works",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -310,14 +482,34 @@ describe("Electron Preload Script", () => {
             );
         });
 
-        it("should properly invoke IPC for stopMonitoringForSite", async ({ annotate }) => {
+        it("should properly invoke IPC for stopMonitoringForSite", async ({
+            annotate,
+        }) => {
             await annotate("Component: Monitoring API", "component");
-            await annotate("Test Type: Unit - IPC Bridge Validation", "test-type");
-            await annotate("Operation: Site-Specific Monitoring Stop", "operation");
-            await annotate("Priority: High - Selective Monitoring Control", "priority");
-            await annotate("Complexity: Medium - Site-Specific Control", "complexity");
-            await annotate("IPC Channel: stop-monitoring-for-site", "ipc-channel");
-            await annotate("Purpose: Ensure site-specific monitoring stop works", "purpose");
+            await annotate(
+                "Test Type: Unit - IPC Bridge Validation",
+                "test-type"
+            );
+            await annotate(
+                "Operation: Site-Specific Monitoring Stop",
+                "operation"
+            );
+            await annotate(
+                "Priority: High - Selective Monitoring Control",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Medium - Site-Specific Control",
+                "complexity"
+            );
+            await annotate(
+                "IPC Channel: stop-monitoring-for-site",
+                "ipc-channel"
+            );
+            await annotate(
+                "Purpose: Ensure site-specific monitoring stop works",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -339,14 +531,28 @@ describe("Electron Preload Script", () => {
     });
 
     describe("Data API", () => {
-        it("should expose all data management methods", async ({ annotate }) => {
+        it("should expose all data management methods", async ({
+            annotate,
+        }) => {
             await annotate("Component: Data API", "component");
             await annotate("Test Type: Unit - Method Exposure", "test-type");
-            await annotate("Operation: Data Management Method Validation", "operation");
+            await annotate(
+                "Operation: Data Management Method Validation",
+                "operation"
+            );
             await annotate("Priority: Critical - Data Operations", "priority");
-            await annotate("Complexity: Low - Method Existence Check", "complexity");
-            await annotate("Methods: exportData, importData, downloadSQLiteBackup", "methods");
-            await annotate("Purpose: Validate all data management methods are available", "purpose");
+            await annotate(
+                "Complexity: Low - Method Existence Check",
+                "complexity"
+            );
+            await annotate(
+                "Methods: exportData, importData, downloadSQLiteBackup",
+                "methods"
+            );
+            await annotate(
+                "Purpose: Validate all data management methods are available",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -358,14 +564,28 @@ describe("Electron Preload Script", () => {
             expect(dataAPI).toHaveProperty("downloadSQLiteBackup");
         });
 
-        it("should properly invoke IPC for exportData", async ({ annotate }) => {
+        it("should properly invoke IPC for exportData", async ({
+            annotate,
+        }) => {
             await annotate("Component: Data API", "component");
-            await annotate("Test Type: Unit - IPC Bridge Validation", "test-type");
-            await annotate("Operation: Data Export IPC Communication", "operation");
+            await annotate(
+                "Test Type: Unit - IPC Bridge Validation",
+                "test-type"
+            );
+            await annotate(
+                "Operation: Data Export IPC Communication",
+                "operation"
+            );
             await annotate("Priority: Critical - Data Backup", "priority");
-            await annotate("Complexity: Medium - Data Serialization", "complexity");
+            await annotate(
+                "Complexity: Medium - Data Serialization",
+                "complexity"
+            );
             await annotate("IPC Channel: export-data", "ipc-channel");
-            await annotate("Purpose: Ensure data export communicates properly with main process", "purpose");
+            await annotate(
+                "Purpose: Ensure data export communicates properly with main process",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -376,14 +596,28 @@ describe("Electron Preload Script", () => {
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith("export-data");
         });
 
-        it("should properly invoke IPC for importData", async ({ annotate }) => {
+        it("should properly invoke IPC for importData", async ({
+            annotate,
+        }) => {
             await annotate("Component: Data API", "component");
-            await annotate("Test Type: Unit - IPC Bridge Validation", "test-type");
-            await annotate("Operation: Data Import IPC Communication", "operation");
+            await annotate(
+                "Test Type: Unit - IPC Bridge Validation",
+                "test-type"
+            );
+            await annotate(
+                "Operation: Data Import IPC Communication",
+                "operation"
+            );
             await annotate("Priority: Critical - Data Restoration", "priority");
-            await annotate("Complexity: High - Data Validation & Import", "complexity");
+            await annotate(
+                "Complexity: High - Data Validation & Import",
+                "complexity"
+            );
             await annotate("IPC Channel: import-data", "ipc-channel");
-            await annotate("Purpose: Ensure data import communicates properly with main process", "purpose");
+            await annotate(
+                "Purpose: Ensure data import communicates properly with main process",
+                "purpose"
+            );
             await import("../preload");
 
             const exposedAPI = getExposedAPI();
@@ -397,14 +631,28 @@ describe("Electron Preload Script", () => {
             );
         });
 
-        it("should properly invoke IPC for downloadSQLiteBackup", async ({ annotate }) => {
+        it("should properly invoke IPC for downloadSQLiteBackup", async ({
+            annotate,
+        }) => {
             await annotate("Component: Data API", "component");
-            await annotate("Test Type: Unit - IPC Bridge Validation", "test-type");
+            await annotate(
+                "Test Type: Unit - IPC Bridge Validation",
+                "test-type"
+            );
             await annotate("Operation: SQLite Backup Download", "operation");
             await annotate("Priority: Critical - Database Backup", "priority");
-            await annotate("Complexity: Medium - Binary Data Handling", "complexity");
-            await annotate("IPC Channel: download-sqlite-backup", "ipc-channel");
-            await annotate("Purpose: Ensure SQLite backup download works properly", "purpose");
+            await annotate(
+                "Complexity: Medium - Binary Data Handling",
+                "complexity"
+            );
+            await annotate(
+                "IPC Channel: download-sqlite-backup",
+                "ipc-channel"
+            );
+            await annotate(
+                "Purpose: Ensure SQLite backup download works properly",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -422,11 +670,26 @@ describe("Electron Preload Script", () => {
         it("should expose all settings methods", async ({ annotate }) => {
             await annotate("Component: Settings API", "component");
             await annotate("Test Type: Unit - Method Exposure", "test-type");
-            await annotate("Operation: Settings Management Method Validation", "operation");
-            await annotate("Priority: High - Configuration Management", "priority");
-            await annotate("Complexity: Low - Method Existence Check", "complexity");
-            await annotate("Methods: getHistoryLimit, updateHistoryLimit", "methods");
-            await annotate("Purpose: Validate all settings management methods are available", "purpose");
+            await annotate(
+                "Operation: Settings Management Method Validation",
+                "operation"
+            );
+            await annotate(
+                "Priority: High - Configuration Management",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Low - Method Existence Check",
+                "complexity"
+            );
+            await annotate(
+                "Methods: getHistoryLimit, updateHistoryLimit",
+                "methods"
+            );
+            await annotate(
+                "Purpose: Validate all settings management methods are available",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -437,14 +700,25 @@ describe("Electron Preload Script", () => {
             expect(settingsAPI).toHaveProperty("updateHistoryLimit");
         });
 
-        it("should properly invoke IPC for getHistoryLimit", async ({ annotate }) => {
+        it("should properly invoke IPC for getHistoryLimit", async ({
+            annotate,
+        }) => {
             await annotate("Component: Settings API", "component");
-            await annotate("Test Type: Unit - IPC Bridge Validation", "test-type");
+            await annotate(
+                "Test Type: Unit - IPC Bridge Validation",
+                "test-type"
+            );
             await annotate("Operation: History Limit Retrieval", "operation");
-            await annotate("Priority: Medium - Configuration Query", "priority");
+            await annotate(
+                "Priority: Medium - Configuration Query",
+                "priority"
+            );
             await annotate("Complexity: Low - Simple IPC Call", "complexity");
             await annotate("IPC Channel: get-history-limit", "ipc-channel");
-            await annotate("Purpose: Ensure history limit retrieval works properly", "purpose");
+            await annotate(
+                "Purpose: Ensure history limit retrieval works properly",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -457,14 +731,28 @@ describe("Electron Preload Script", () => {
             );
         });
 
-        it("should properly invoke IPC for updateHistoryLimit", async ({ annotate }) => {
+        it("should properly invoke IPC for updateHistoryLimit", async ({
+            annotate,
+        }) => {
             await annotate("Component: Settings API", "component");
-            await annotate("Test Type: Unit - IPC Bridge Validation", "test-type");
+            await annotate(
+                "Test Type: Unit - IPC Bridge Validation",
+                "test-type"
+            );
             await annotate("Operation: History Limit Update", "operation");
-            await annotate("Priority: High - Configuration Management", "priority");
-            await annotate("Complexity: Medium - Configuration Persistence", "complexity");
+            await annotate(
+                "Priority: High - Configuration Management",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Medium - Configuration Persistence",
+                "complexity"
+            );
             await annotate("IPC Channel: update-history-limit", "ipc-channel");
-            await annotate("Purpose: Ensure history limit updates work properly", "purpose");
+            await annotate(
+                "Purpose: Ensure history limit updates work properly",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -484,11 +772,26 @@ describe("Electron Preload Script", () => {
         it("should expose all event handling methods", async ({ annotate }) => {
             await annotate("Component: Events API", "component");
             await annotate("Test Type: Unit - Method Exposure", "test-type");
-            await annotate("Operation: Event Handling Method Validation", "operation");
-            await annotate("Priority: Critical - Real-time Communication", "priority");
-            await annotate("Complexity: Medium - Event System Validation", "complexity");
-            await annotate("Methods: Status change events, listener management", "methods");
-            await annotate("Purpose: Validate all event handling methods are available", "purpose");
+            await annotate(
+                "Operation: Event Handling Method Validation",
+                "operation"
+            );
+            await annotate(
+                "Priority: Critical - Real-time Communication",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Medium - Event System Validation",
+                "complexity"
+            );
+            await annotate(
+                "Methods: Status change events, listener management",
+                "methods"
+            );
+            await annotate(
+                "Purpose: Validate all event handling methods are available",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -502,14 +805,34 @@ describe("Electron Preload Script", () => {
             expect(eventsAPI).toHaveProperty("removeAllListeners");
         });
 
-        it("should properly setup IPC listener for onMonitorStatusChanged", async ({ annotate }) => {
+        it("should properly setup IPC listener for onMonitorStatusChanged", async ({
+            annotate,
+        }) => {
             await annotate("Component: Events API", "component");
-            await annotate("Test Type: Unit - Event Listener Setup", "test-type");
-            await annotate("Operation: Monitor Status Change Event Setup", "operation");
-            await annotate("Priority: Critical - Status Change Notifications", "priority");
-            await annotate("Complexity: Medium - Event Registration", "complexity");
-            await annotate("Event Type: Monitor status change events", "event-type");
-            await annotate("Purpose: Ensure monitor status change events are properly registered", "purpose");
+            await annotate(
+                "Test Type: Unit - Event Listener Setup",
+                "test-type"
+            );
+            await annotate(
+                "Operation: Monitor Status Change Event Setup",
+                "operation"
+            );
+            await annotate(
+                "Priority: Critical - Status Change Notifications",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Medium - Event Registration",
+                "complexity"
+            );
+            await annotate(
+                "Event Type: Monitor status change events",
+                "event-type"
+            );
+            await annotate(
+                "Purpose: Ensure monitor status change events are properly registered",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -524,14 +847,28 @@ describe("Electron Preload Script", () => {
             );
         });
 
-        it("should properly setup IPC listener for onUpdateStatus", async ({ annotate }) => {
+        it("should properly setup IPC listener for onUpdateStatus", async ({
+            annotate,
+        }) => {
             await annotate("Component: Events API", "component");
-            await annotate("Test Type: Unit - Event Listener Setup", "test-type");
+            await annotate(
+                "Test Type: Unit - Event Listener Setup",
+                "test-type"
+            );
             await annotate("Operation: Update Status Event Setup", "operation");
             await annotate("Priority: High - Application Updates", "priority");
-            await annotate("Complexity: Medium - Event Registration", "complexity");
-            await annotate("Event Type: Application update status events", "event-type");
-            await annotate("Purpose: Ensure update status events are properly registered", "purpose");
+            await annotate(
+                "Complexity: Medium - Event Registration",
+                "complexity"
+            );
+            await annotate(
+                "Event Type: Application update status events",
+                "event-type"
+            );
+            await annotate(
+                "Purpose: Ensure update status events are properly registered",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -552,8 +889,14 @@ describe("Electron Preload Script", () => {
             await annotate("Operation: Event Listener Removal", "operation");
             await annotate("Priority: Medium - Memory Management", "priority");
             await annotate("Complexity: Low - Cleanup Operation", "complexity");
-            await annotate("Cleanup: Prevents memory leaks from event listeners", "cleanup");
-            await annotate("Purpose: Ensure event listeners can be properly removed", "purpose");
+            await annotate(
+                "Cleanup: Prevents memory leaks from event listeners",
+                "cleanup"
+            );
+            await annotate(
+                "Purpose: Ensure event listeners can be properly removed",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -567,14 +910,31 @@ describe("Electron Preload Script", () => {
             );
         });
 
-        it("should call callback with data when IPC event is received", async ({ annotate }) => {
+        it("should call callback with data when IPC event is received", async ({
+            annotate,
+        }) => {
             await annotate("Component: Events API", "component");
             await annotate("Test Type: Unit - Event Data Flow", "test-type");
-            await annotate("Operation: IPC Event Data Transmission", "operation");
-            await annotate("Priority: Critical - Event Data Integrity", "priority");
-            await annotate("Complexity: High - Event Flow Simulation", "complexity");
-            await annotate("Data Flow: IPC event -> callback with proper data", "data-flow");
-            await annotate("Purpose: Ensure event data is properly passed to callbacks", "purpose");
+            await annotate(
+                "Operation: IPC Event Data Transmission",
+                "operation"
+            );
+            await annotate(
+                "Priority: Critical - Event Data Integrity",
+                "priority"
+            );
+            await annotate(
+                "Complexity: High - Event Flow Simulation",
+                "complexity"
+            );
+            await annotate(
+                "Data Flow: IPC event -> callback with proper data",
+                "data-flow"
+            );
+            await annotate(
+                "Purpose: Ensure event data is properly passed to callbacks",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -611,9 +971,18 @@ describe("Electron Preload Script", () => {
             await annotate("Test Type: Unit - Method Exposure", "test-type");
             await annotate("Operation: System Method Validation", "operation");
             await annotate("Priority: Medium - System Integration", "priority");
-            await annotate("Complexity: Low - Method Existence Check", "complexity");
-            await annotate("System Operations: Platform-specific functionality", "system-operations");
-            await annotate("Purpose: Validate system integration methods are available", "purpose");
+            await annotate(
+                "Complexity: Low - Method Existence Check",
+                "complexity"
+            );
+            await annotate(
+                "System Operations: Platform-specific functionality",
+                "system-operations"
+            );
+            await annotate(
+                "Purpose: Validate system integration methods are available",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -623,14 +992,22 @@ describe("Electron Preload Script", () => {
             expect(systemAPI).toHaveProperty("quitAndInstall");
         });
 
-        it("should properly send IPC for quitAndInstall", async ({ annotate }) => {
+        it("should properly send IPC for quitAndInstall", async ({
+            annotate,
+        }) => {
             await annotate("Component: System API", "component");
             await annotate("Test Type: Unit - IPC Communication", "test-type");
             await annotate("Operation: Quit and Install IPC", "operation");
             await annotate("Priority: High - Application Updates", "priority");
-            await annotate("Complexity: Medium - System-level Operation", "complexity");
+            await annotate(
+                "Complexity: Medium - System-level Operation",
+                "complexity"
+            );
             await annotate("IPC Channel: quit-and-install", "ipc-channel");
-            await annotate("Purpose: Ensure quit and install operation works properly", "purpose");
+            await annotate(
+                "Purpose: Ensure quit and install operation works properly",
+                "purpose"
+            );
 
             // Mock ipcRenderer.send for system API
             const mockSend = vi.fn();
@@ -647,14 +1024,34 @@ describe("Electron Preload Script", () => {
     });
 
     describe("Security Validation", () => {
-        it("should only expose safe IPC communication methods", async ({ annotate }) => {
+        it("should only expose safe IPC communication methods", async ({
+            annotate,
+        }) => {
             await annotate("Component: Security", "component");
-            await annotate("Test Type: Security - API Surface Validation", "test-type");
-            await annotate("Operation: Dangerous Method Exclusion Check", "operation");
-            await annotate("Priority: Critical - Security Boundary", "priority");
-            await annotate("Complexity: High - Security Validation", "complexity");
-            await annotate("Security Check: Ensures no dangerous methods are exposed", "security-check");
-            await annotate("Purpose: Prevent exposure of dangerous Node.js APIs to renderer", "purpose");
+            await annotate(
+                "Test Type: Security - API Surface Validation",
+                "test-type"
+            );
+            await annotate(
+                "Operation: Dangerous Method Exclusion Check",
+                "operation"
+            );
+            await annotate(
+                "Priority: Critical - Security Boundary",
+                "priority"
+            );
+            await annotate(
+                "Complexity: High - Security Validation",
+                "complexity"
+            );
+            await annotate(
+                "Security Check: Ensures no dangerous methods are exposed",
+                "security-check"
+            );
+            await annotate(
+                "Purpose: Prevent exposure of dangerous Node.js APIs to renderer",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -667,28 +1064,65 @@ describe("Electron Preload Script", () => {
             expect(exposedAPI).not.toHaveProperty("global");
         });
 
-        it("should use contextBridge instead of direct global assignment", async ({ annotate }) => {
+        it("should use contextBridge instead of direct global assignment", async ({
+            annotate,
+        }) => {
             await annotate("Component: Security", "component");
-            await annotate("Test Type: Security - Context Isolation", "test-type");
-            await annotate("Operation: Context Bridge Usage Validation", "operation");
-            await annotate("Priority: Critical - Renderer Isolation", "priority");
-            await annotate("Complexity: Medium - Security Architecture", "complexity");
-            await annotate("Security Pattern: Uses contextBridge for safe API exposure", "security-pattern");
-            await annotate("Purpose: Ensure proper context isolation is maintained", "purpose");
+            await annotate(
+                "Test Type: Security - Context Isolation",
+                "test-type"
+            );
+            await annotate(
+                "Operation: Context Bridge Usage Validation",
+                "operation"
+            );
+            await annotate(
+                "Priority: Critical - Renderer Isolation",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Medium - Security Architecture",
+                "complexity"
+            );
+            await annotate(
+                "Security Pattern: Uses contextBridge for safe API exposure",
+                "security-pattern"
+            );
+            await annotate(
+                "Purpose: Ensure proper context isolation is maintained",
+                "purpose"
+            );
             await import("../preload");
 
             // Should use contextBridge.exposeInMainWorld
             expect(mockContextBridge.exposeInMainWorld).toHaveBeenCalled();
         });
 
-        it("should validate that all API methods return promises or are synchronous", async ({ annotate }) => {
+        it("should validate that all API methods return promises or are synchronous", async ({
+            annotate,
+        }) => {
             await annotate("Component: Security", "component");
-            await annotate("Test Type: Security - API Contract Validation", "test-type");
-            await annotate("Operation: Promise Return Type Validation", "operation");
+            await annotate(
+                "Test Type: Security - API Contract Validation",
+                "test-type"
+            );
+            await annotate(
+                "Operation: Promise Return Type Validation",
+                "operation"
+            );
             await annotate("Priority: Medium - API Consistency", "priority");
-            await annotate("Complexity: Medium - Return Type Validation", "complexity");
-            await annotate("Contract: IPC methods must return promises", "contract");
-            await annotate("Purpose: Ensure consistent async API interface", "purpose");
+            await annotate(
+                "Complexity: Medium - Return Type Validation",
+                "complexity"
+            );
+            await annotate(
+                "Contract: IPC methods must return promises",
+                "contract"
+            );
+            await annotate(
+                "Purpose: Ensure consistent async API interface",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -707,14 +1141,31 @@ describe("Electron Preload Script", () => {
     });
 
     describe("Type Safety", () => {
-        it("should properly type the Site parameter in addSite", async ({ annotate }) => {
+        it("should properly type the Site parameter in addSite", async ({
+            annotate,
+        }) => {
             await annotate("Component: Type Safety", "component");
-            await annotate("Test Type: Unit - Type Contract Validation", "test-type");
-            await annotate("Operation: Site Parameter Type Validation", "operation");
+            await annotate(
+                "Test Type: Unit - Type Contract Validation",
+                "test-type"
+            );
+            await annotate(
+                "Operation: Site Parameter Type Validation",
+                "operation"
+            );
             await annotate("Priority: High - Data Type Safety", "priority");
-            await annotate("Complexity: Medium - Type Interface Validation", "complexity");
-            await annotate("Type Contract: Site object with required fields", "type-contract");
-            await annotate("Purpose: Ensure addSite accepts properly typed Site objects", "purpose");
+            await annotate(
+                "Complexity: Medium - Type Interface Validation",
+                "complexity"
+            );
+            await annotate(
+                "Type Contract: Site object with required fields",
+                "type-contract"
+            );
+            await annotate(
+                "Purpose: Ensure addSite accepts properly typed Site objects",
+                "purpose"
+            );
 
             await import("../preload");
 
@@ -734,14 +1185,34 @@ describe("Electron Preload Script", () => {
             );
         });
 
-        it("should properly handle partial Site updates in updateSite", async ({ annotate }) => {
+        it("should properly handle partial Site updates in updateSite", async ({
+            annotate,
+        }) => {
             await annotate("Component: Type Safety", "component");
-            await annotate("Test Type: Unit - Partial Type Validation", "test-type");
-            await annotate("Operation: Partial Site Update Validation", "operation");
-            await annotate("Priority: High - Flexible Update Interface", "priority");
-            await annotate("Complexity: Medium - Partial Type Handling", "complexity");
-            await annotate("Type Contract: Partial Site object for updates", "type-contract");
-            await annotate("Purpose: Ensure updateSite accepts partial Site objects", "purpose");
+            await annotate(
+                "Test Type: Unit - Partial Type Validation",
+                "test-type"
+            );
+            await annotate(
+                "Operation: Partial Site Update Validation",
+                "operation"
+            );
+            await annotate(
+                "Priority: High - Flexible Update Interface",
+                "priority"
+            );
+            await annotate(
+                "Complexity: Medium - Partial Type Handling",
+                "complexity"
+            );
+            await annotate(
+                "Type Contract: Partial Site object for updates",
+                "type-contract"
+            );
+            await annotate(
+                "Purpose: Ensure updateSite accepts partial Site objects",
+                "purpose"
+            );
 
             await import("../preload");
 

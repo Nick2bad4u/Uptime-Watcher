@@ -163,8 +163,8 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
 
                 emit(event: string, ...args: any[]) {
                     if (this.events[event]) {
-                        for (const callback of this.events[event]) callback(...args)
-                        ;
+                        for (const callback of this.events[event])
+                            callback(...args);
                     }
                 }
 

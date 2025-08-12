@@ -1,6 +1,6 @@
 /**
  * Benchmarks for Monitoring System Performance
- * 
+ *
  * Tests performance of monitor scheduling, operation tracking,
  * race condition prevention, and heavy monitoring operations.
  */
@@ -20,7 +20,7 @@ class MockMonitorOperationRegistry {
             initiatedAt: Date.now(),
             cancelled: false,
         };
-        
+
         this.activeOperations.set(operationId, operation);
         this.operationHistory.push(operationId);
         return operationId;
@@ -51,7 +51,7 @@ class MockMonitorOperationRegistry {
     }
 
     cleanup(): void {
-        const cutoff = Date.now() - (5 * 60 * 1000); // 5 minutes ago
+        const cutoff = Date.now() - 5 * 60 * 1000; // 5 minutes ago
         for (const [id, operation] of this.activeOperations) {
             if (operation.initiatedAt < cutoff) {
                 this.activeOperations.delete(id);
@@ -64,15 +64,20 @@ class MockMonitorOperationRegistry {
 class MockMonitorScheduler {
     private intervals = new Map<string, NodeJS.Timeout>();
     private activeMonitors = new Set<string>();
-    private checkCallback?: (siteId: string, monitorId: string) => Promise<void>;
+    private checkCallback?: (
+        siteId: string,
+        monitorId: string
+    ) => Promise<void>;
 
-    setCheckCallback(callback: (siteId: string, monitorId: string) => Promise<void>): void {
+    setCheckCallback(
+        callback: (siteId: string, monitorId: string) => Promise<void>
+    ): void {
         this.checkCallback = callback;
     }
 
     startMonitor(siteId: string, monitorId: string, interval: number): void {
         const key = `${siteId}:${monitorId}`;
-        
+
         if (this.intervals.has(key)) {
             this.stopMonitor(siteId, monitorId);
         }
@@ -94,7 +99,7 @@ class MockMonitorScheduler {
     stopMonitor(siteId: string, monitorId: string): void {
         const key = `${siteId}:${monitorId}`;
         const interval = this.intervals.get(key);
-        
+
         if (interval) {
             clearInterval(interval);
             this.intervals.delete(key);
@@ -152,10 +157,10 @@ class MockSiteCache {
 
     evictOldest(maxSize: number): void {
         if (this.cache.size <= maxSize) return;
-        
+
         const entries = Array.from(this.cache.entries());
         const toRemove = entries.slice(0, this.cache.size - maxSize);
-        
+
         for (const [key] of toRemove) {
             this.cache.delete(key);
         }
@@ -245,11 +250,11 @@ describe("Monitoring System Performance Benchmarks", () => {
             for (let i = 0; i < 1000; i++) {
                 operations.push(registry.initiateCheck(`monitor-${i}`));
             }
-            
+
             for (const opId of operations) {
                 registry.validateOperation(opId);
             }
-            
+
             for (const opId of operations) {
                 registry.completeOperation(opId);
             }
@@ -260,7 +265,7 @@ describe("Monitoring System Performance Benchmarks", () => {
             for (let i = 0; i < 5000; i++) {
                 registry.initiateCheck(`monitor-${i}`);
             }
-            
+
             registry.cleanup();
         });
     });
@@ -278,7 +283,7 @@ describe("Monitoring System Performance Benchmarks", () => {
             for (let i = 0; i < 100; i++) {
                 scheduler.startMonitor(`site-${i}`, `monitor-${i}`, 60000);
             }
-            
+
             for (let i = 0; i < 100; i++) {
                 scheduler.stopMonitor(`site-${i}`, `monitor-${i}`);
             }
@@ -289,12 +294,12 @@ describe("Monitoring System Performance Benchmarks", () => {
             for (let i = 0; i < 50; i++) {
                 scheduler.startMonitor(`site-${i}`, `monitor-${i}`, 60000);
             }
-            
+
             // Query state many times
             for (let i = 0; i < 1000; i++) {
                 scheduler.getActiveCount();
             }
-            
+
             scheduler.stopAll();
         });
     });
@@ -314,7 +319,7 @@ describe("Monitoring System Performance Benchmarks", () => {
             for (const site of sites) {
                 cache.set(site.identifier, site);
             }
-            
+
             // Perform many lookups
             for (let i = 0; i < 10000; i++) {
                 const siteId = `site-${i % 1000}`;
@@ -325,9 +330,12 @@ describe("Monitoring System Performance Benchmarks", () => {
         bench("cache eviction - LRU simulation", () => {
             // Fill cache beyond capacity
             for (let i = 0; i < 2000; i++) {
-                cache.set(`site-${i}`, { identifier: `site-${i}`, name: `Site ${i}` });
+                cache.set(`site-${i}`, {
+                    identifier: `site-${i}`,
+                    name: `Site ${i}`,
+                });
             }
-            
+
             // Simulate eviction
             cache.evictOldest(1000);
         });
@@ -357,22 +365,26 @@ describe("Monitoring System Performance Benchmarks", () => {
         bench("start monitoring for 100 sites (200 monitors)", () => {
             for (const site of sites) {
                 for (const monitor of site.monitors) {
-                    scheduler.startMonitor(site.identifier, monitor.id, monitor.checkInterval);
+                    scheduler.startMonitor(
+                        site.identifier,
+                        monitor.id,
+                        monitor.checkInterval
+                    );
                 }
             }
-            
+
             // Clean up
             scheduler.stopAll();
         });
 
         bench("bulk operation initiation and completion", () => {
             const operations = [];
-            
+
             // Initiate many operations
             for (let i = 0; i < 1000; i++) {
                 operations.push(registry.initiateCheck(`monitor-${i}`));
             }
-            
+
             // Complete them all
             for (const opId of operations) {
                 registry.completeOperation(opId);
@@ -385,19 +397,19 @@ describe("Monitoring System Performance Benchmarks", () => {
 
         bench("concurrent operation validation", () => {
             const operations = new Map<string, string>();
-            
+
             // Simulate concurrent operation initiation
             for (let i = 0; i < 500; i++) {
                 const monitorId = `monitor-${i % 50}`; // 50 monitors, multiple ops each
                 const opId = registry.initiateCheck(monitorId);
                 operations.set(monitorId, opId);
             }
-            
+
             // Simulate validation during concurrent execution
             for (const [monitorId, opId] of operations) {
                 registry.validateOperation(opId);
             }
-            
+
             // Simulate completion
             for (const [, opId] of operations) {
                 registry.completeOperation(opId);
@@ -406,18 +418,20 @@ describe("Monitoring System Performance Benchmarks", () => {
 
         bench("operation cancellation under load", () => {
             const operations = [];
-            
+
             // Create many operations
             for (let i = 0; i < 1000; i++) {
                 operations.push(registry.initiateCheck(`monitor-${i}`));
             }
-            
+
             // Cancel half of them randomly
             for (let i = 0; i < 500; i++) {
-                const randomIndex = Math.floor(Math.random() * operations.length);
+                const randomIndex = Math.floor(
+                    Math.random() * operations.length
+                );
                 registry.cancelOperation(operations[randomIndex]);
             }
-            
+
             // Complete the rest
             for (const opId of operations) {
                 registry.completeOperation(opId);
@@ -428,16 +442,16 @@ describe("Monitoring System Performance Benchmarks", () => {
     describe("Memory Usage Patterns", () => {
         bench("memory allocation patterns - high turnover", () => {
             const registry = new MockMonitorOperationRegistry();
-            
+
             // Simulate high operation turnover
             for (let cycle = 0; cycle < 10; cycle++) {
                 const operations = [];
-                
+
                 // Create many operations
                 for (let i = 0; i < 1000; i++) {
                     operations.push(registry.initiateCheck(`monitor-${i}`));
                 }
-                
+
                 // Complete them quickly
                 for (const opId of operations) {
                     registry.completeOperation(opId);
@@ -447,19 +461,22 @@ describe("Monitoring System Performance Benchmarks", () => {
 
         bench("cache memory management", () => {
             const cache = new MockSiteCache();
-            
+
             // Simulate cache churn
             for (let cycle = 0; cycle < 100; cycle++) {
                 // Add items
                 for (let i = 0; i < 100; i++) {
-                    cache.set(`key-${cycle}-${i}`, { data: `value-${cycle}-${i}`, timestamp: Date.now() });
+                    cache.set(`key-${cycle}-${i}`, {
+                        data: `value-${cycle}-${i}`,
+                        timestamp: Date.now(),
+                    });
                 }
-                
+
                 // Access some items
                 for (let i = 0; i < 50; i++) {
                     cache.get(`key-${cycle}-${i}`);
                 }
-                
+
                 // Evict if needed
                 if (cache.size() > 5000) {
                     cache.evictOldest(3000);

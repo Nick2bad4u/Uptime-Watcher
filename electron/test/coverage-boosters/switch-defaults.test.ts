@@ -43,7 +43,11 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Switch Defaults and Conditional Branch Coverage", "component");
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Switch Defaults and Conditional Branch Coverage",
+                "component"
+            );
 
             // Common switch pattern with default case
             const handleStatus = (status: string): string => {
@@ -70,7 +74,11 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
             expect(handleStatus("")).toBe("unknown");
         });
         it("should test environment switches", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Switch Defaults and Conditional Branch Coverage", "component");
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Switch Defaults and Conditional Branch Coverage",
+                "component"
+            );
 
             const getEnvironmentConfig = (env: string) => {
                 switch (env) {
@@ -100,7 +108,11 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Switch Defaults and Conditional Branch Coverage", "component");
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Switch Defaults and Conditional Branch Coverage",
+                "component"
+            );
 
             const getValue = (input: unknown): string => {
                 return typeof input === "string" ? input : String(input);
@@ -113,7 +125,11 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
             expect(getValue({})).toBe("[object Object]");
         });
         it("should test nested conditionals", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Switch Defaults and Conditional Branch Coverage", "component");
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Switch Defaults and Conditional Branch Coverage",
+                "component"
+            );
 
             const processValue = (
                 value: unknown
@@ -160,7 +176,11 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Switch Defaults and Conditional Branch Coverage", "component");
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Switch Defaults and Conditional Branch Coverage",
+                "component"
+            );
 
             const safeAccess = (
                 obj: any,
@@ -186,7 +206,11 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Switch Defaults and Conditional Branch Coverage", "component");
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Switch Defaults and Conditional Branch Coverage",
+                "component"
+            );
 
             const processArray = (input: unknown): number => {
                 if (!Array.isArray(input)) {
@@ -210,7 +234,11 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Switch Defaults and Conditional Branch Coverage", "component");
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Switch Defaults and Conditional Branch Coverage",
+                "component"
+            );
 
             const validateObject = (
                 obj: unknown
@@ -265,7 +293,11 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Switch Defaults and Conditional Branch Coverage", "component");
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Switch Defaults and Conditional Branch Coverage",
+                "component"
+            );
 
             const isStringArray = (value: unknown): value is string[] => {
                 return (
@@ -298,7 +330,11 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: Switch Defaults and Conditional Branch Coverage", "component");
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Switch Defaults and Conditional Branch Coverage",
+                "component"
+            );
 
             const getWithFallback = <T>(
                 obj: Record<string, unknown>,

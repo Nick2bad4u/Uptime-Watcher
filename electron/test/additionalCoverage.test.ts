@@ -1,9 +1,9 @@
 /**
  * Test suite for additionalCoverage
- * 
+ *
  * @fileoverview Comprehensive tests for unknown functionality
  * in the Uptime Watcher application.
- * 
+ *
  * @author GitHub Copilot
  * @since 2025-08-11
  * @category General
@@ -30,27 +30,34 @@ vi.mock("../utils", () => ({
 
 describe("Additional Coverage Tests", () => {
     beforeEach(() => {
-        vi.clearAllMocks();        });
+        vi.clearAllMocks();
+    });
     describe("Constants Coverage", () => {
         it("should import constants correctly", async () => {
             const constants = await import("../constants");
 
             expect(constants.DEFAULT_REQUEST_TIMEOUT).toBeDefined();
             expect(constants.DEFAULT_CHECK_INTERVAL).toBeDefined();
-            expect(constants.DEFAULT_HISTORY_LIMIT).toBeDefined();        });        });
+            expect(constants.DEFAULT_HISTORY_LIMIT).toBeDefined();
+        });
+    });
     describe("Types Coverage", () => {
         it("should validate type exports", async () => {
             const types = await import("../types");
 
             // Check if types module exists and can be imported
-            expect(types).toBeDefined();        });        });
+            expect(types).toBeDefined();
+        });
+    });
     describe("Utilities Coverage", () => {
         it("should validate utility exports", async () => {
             const correlation = await import("../utils/correlation");
             const logger = await import("../utils/logger");
 
             expect(correlation.generateCorrelationId).toBeDefined();
-            expect(logger.logger).toBeDefined();        });        });
+            expect(logger.logger).toBeDefined();
+        });
+    });
     describe("Environment Coverage", () => {
         it("should handle different environment configurations", () => {
             const originalEnv = process.env["NODE_ENV"];
@@ -64,7 +71,9 @@ describe("Additional Coverage Tests", () => {
             expect(process.env["NODE_ENV"]).toBe("production");
 
             // Restore original environment
-            process.env["NODE_ENV"] = originalEnv;        });        });
+            process.env["NODE_ENV"] = originalEnv;
+        });
+    });
     describe("Mock Coverage", () => {
         it("should verify all mocks are working correctly", async () => {
             const { logger } = await import("../utils/logger");
@@ -77,12 +86,16 @@ describe("Additional Coverage Tests", () => {
             expect(logger.info).toHaveBeenCalledWith("test");
             expect(logger.error).toHaveBeenCalledWith("test");
             expect(logger.debug).toHaveBeenCalledWith("test");
-            expect(logger.warn).toHaveBeenCalledWith("test");        });        });
+            expect(logger.warn).toHaveBeenCalledWith("test");
+        });
+    });
     describe("File System Coverage", () => {
         it("should handle file system operations", () => {
             // Test basic file system functionality
             expect(fs).toBeDefined();
-            expect(path).toBeDefined();        });        });
+            expect(path).toBeDefined();
+        });
+    });
     describe("Runtime Coverage", () => {
         it("should handle runtime type checking", () => {
             const testObject = {
@@ -95,7 +108,9 @@ describe("Additional Coverage Tests", () => {
             expect(typeof testObject.id).toBe("number");
             expect(typeof testObject.name).toBe("string");
             expect(typeof testObject.enabled).toBe("boolean");
-            expect(typeof testObject.config).toBe("object");        });        });
+            expect(typeof testObject.config).toBe("object");
+        });
+    });
     describe("Edge Cases Coverage", () => {
         it("should handle various edge cases", () => {
             // Test null and undefined handling
@@ -108,13 +123,19 @@ describe("Additional Coverage Tests", () => {
 
             // Test object handling
             const testObj = {};
-            expect(Object.keys(testObj).length).toBe(0);        });        });
+            expect(Object.keys(testObj).length).toBe(0);
+        });
+    });
     describe("Async Coverage", () => {
         it("should handle async operations", async () => {
             const asyncFunction = async () => {
                 return new Promise((resolve) => {
-                    setTimeout(() => resolve("success"), 1);        });
+                    setTimeout(() => resolve("success"), 1);
+                });
             };
 
             const result = await asyncFunction();
-            expect(result).toBe("success");        });        });        });
+            expect(result).toBe("success");
+        });
+    });
+});

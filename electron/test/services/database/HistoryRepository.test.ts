@@ -1,9 +1,9 @@
 /**
  * Test suite for HistoryRepository
- * 
+ *
  * @fileoverview Comprehensive tests for unknown functionality
  * in the Uptime Watcher application.
- * 
+ *
  * @author GitHub Copilot
  * @since 2025-08-11
  * @category General
@@ -79,13 +79,16 @@ describe("HistoryRepository", () => {
         vi.mocked(electronUtils.isDev).mockReturnValue(true);
 
         // Clear all mocks
-        vi.clearAllMocks();        });
+        vi.clearAllMocks();
+    });
     describe("Constructor", () => {
         it("should create repository with dependencies", () => {
             expect(historyRepository).toBeInstanceOf(HistoryRepository);
             expect(historyRepository["databaseService"]).toBe(
                 mockDatabaseService
-            );        });        });
+            );
+        });
+    });
     describe("addEntry", () => {
         it("should add a history entry", async () => {
             const monitorId = "monitor-123";
@@ -105,7 +108,8 @@ describe("HistoryRepository", () => {
                 monitorId,
                 mockStatusHistory,
                 details
-            );        });
+            );
+        });
         it("should add entry without details", async () => {
             const monitorId = "monitor-123";
 
@@ -116,7 +120,9 @@ describe("HistoryRepository", () => {
                 monitorId,
                 mockStatusHistory,
                 undefined
-            );        });        });
+            );
+        });
+    });
     describe("addEntryInternal", () => {
         it("should add entry internally", () => {
             const monitorId = "monitor-123";
@@ -134,7 +140,9 @@ describe("HistoryRepository", () => {
                 monitorId,
                 mockStatusHistory,
                 details
-            );        });        });
+            );
+        });
+    });
     describe("bulkInsert", () => {
         it("should bulk insert history entries", async () => {
             const monitorId = "monitor-123";
@@ -163,7 +171,8 @@ describe("HistoryRepository", () => {
             expect(mockStatement.finalize).toHaveBeenCalledTimes(1);
             expect(logger.logger.info).toHaveBeenCalledWith(
                 `[HistoryRepository] Bulk inserted 2 history entries for monitor: ${monitorId}`
-            );        });
+            );
+        });
         it("should handle empty array", async () => {
             const monitorId = "monitor-123";
             const historyEntries: any[] = [];
@@ -172,7 +181,8 @@ describe("HistoryRepository", () => {
 
             expect(
                 mockDatabaseService.executeTransaction
-            ).not.toHaveBeenCalled();        });
+            ).not.toHaveBeenCalled();
+        });
         it("should finalize statement even on error", async () => {
             const monitorId = "monitor-123";
             const historyEntries = [mockStatusHistory];
@@ -191,7 +201,9 @@ describe("HistoryRepository", () => {
                 historyRepository.bulkInsert(monitorId, historyEntries)
             ).rejects.toThrow("SQL error");
 
-            expect(mockStatement.finalize).toHaveBeenCalledTimes(1);        });        });
+            expect(mockStatement.finalize).toHaveBeenCalledTimes(1);
+        });
+    });
     describe("deleteAll", () => {
         it("should delete all history", async () => {
             await historyRepository.deleteAll();
@@ -201,14 +213,18 @@ describe("HistoryRepository", () => {
             ).toHaveBeenCalledTimes(1);
             expect(historyManipulation.deleteAllHistory).toHaveBeenCalledWith(
                 mockDatabase
-            );        });        });
+            );
+        });
+    });
     describe("deleteAllInternal", () => {
         it("should delete all history internally", () => {
             historyRepository.deleteAllInternal(mockDatabase);
 
             expect(historyManipulation.deleteAllHistory).toHaveBeenCalledWith(
                 mockDatabase
-            );        });        });
+            );
+        });
+    });
     describe("deleteByMonitorId", () => {
         it("should delete history by monitor ID", async () => {
             const monitorId = "monitor-123";
@@ -220,7 +236,9 @@ describe("HistoryRepository", () => {
             ).toHaveBeenCalledTimes(1);
             expect(
                 historyManipulation.deleteHistoryByMonitorId
-            ).toHaveBeenCalledWith(mockDatabase, monitorId);        });        });
+            ).toHaveBeenCalledWith(mockDatabase, monitorId);
+        });
+    });
     describe("deleteByMonitorIdInternal", () => {
         it("should delete history by monitor ID internally", () => {
             const monitorId = "monitor-123";
@@ -232,7 +250,9 @@ describe("HistoryRepository", () => {
 
             expect(
                 historyManipulation.deleteHistoryByMonitorId
-            ).toHaveBeenCalledWith(mockDatabase, monitorId);        });        });
+            ).toHaveBeenCalledWith(mockDatabase, monitorId);
+        });
+    });
     describe("findByMonitorId", () => {
         it("should find history by monitor ID", async () => {
             const monitorId = "monitor-123";
@@ -249,7 +269,9 @@ describe("HistoryRepository", () => {
                 mockDatabase,
                 monitorId
             );
-            expect(result).toEqual(expectedHistory);        });        });
+            expect(result).toEqual(expectedHistory);
+        });
+    });
     describe("getHistoryCount", () => {
         it("should get history count", async () => {
             const monitorId = "monitor-123";
@@ -266,7 +288,9 @@ describe("HistoryRepository", () => {
                 mockDatabase,
                 monitorId
             );
-            expect(result).toBe(expectedCount);        });        });
+            expect(result).toBe(expectedCount);
+        });
+    });
     describe("getHistoryCountInternal", () => {
         it("should get history count internally", () => {
             const monitorId = "monitor-123";
@@ -285,7 +309,9 @@ describe("HistoryRepository", () => {
                 mockDatabase,
                 monitorId
             );
-            expect(result).toBe(expectedCount);        });        });
+            expect(result).toBe(expectedCount);
+        });
+    });
     describe("getLatestEntry", () => {
         it("should get latest entry", async () => {
             const monitorId = "monitor-123";
@@ -301,7 +327,8 @@ describe("HistoryRepository", () => {
                 mockDatabase,
                 monitorId
             );
-            expect(result).toEqual(mockStatusHistory);        });
+            expect(result).toEqual(mockStatusHistory);
+        });
         it("should return undefined when no entry exists", async () => {
             const monitorId = "monitor-123";
 
@@ -311,7 +338,9 @@ describe("HistoryRepository", () => {
 
             const result = await historyRepository.getLatestEntry(monitorId);
 
-            expect(result).toBeUndefined();        });        });
+            expect(result).toBeUndefined();
+        });
+    });
     describe("pruneAllHistory", () => {
         it("should prune all history with valid limit", async () => {
             const limit = 100;
@@ -333,19 +362,22 @@ describe("HistoryRepository", () => {
             expect(mockDatabase.run).toHaveBeenCalledWith(
                 "DELETE FROM history WHERE id IN (?,?)",
                 [10, 11]
-            );        });
+            );
+        });
         it("should not prune with zero limit", async () => {
             await historyRepository.pruneAllHistory(0);
 
             expect(
                 mockDatabaseService.executeTransaction
-            ).not.toHaveBeenCalled();        });
+            ).not.toHaveBeenCalled();
+        });
         it("should not prune with negative limit", async () => {
             await historyRepository.pruneAllHistory(-1);
 
             expect(
                 mockDatabaseService.executeTransaction
-            ).not.toHaveBeenCalled();        });
+            ).not.toHaveBeenCalled();
+        });
         it("should handle no excess entries", async () => {
             const limit = 100;
             const mockMonitors = [{ id: 1 }];
@@ -356,7 +388,8 @@ describe("HistoryRepository", () => {
 
             await historyRepository.pruneAllHistory(limit);
 
-            expect(mockDatabase.run).not.toHaveBeenCalled();        });
+            expect(mockDatabase.run).not.toHaveBeenCalled();
+        });
         it("should filter invalid IDs", async () => {
             const limit = 100;
             const mockMonitors = [{ id: 1 }];
@@ -376,7 +409,9 @@ describe("HistoryRepository", () => {
             expect(mockDatabase.run).toHaveBeenCalledWith(
                 "DELETE FROM history WHERE id IN (?,?)",
                 [10, 12]
-            );        });        });
+            );
+        });
+    });
     describe("pruneAllHistoryInternal", () => {
         it("should prune all history internally", () => {
             const limit = 100;
@@ -397,11 +432,13 @@ describe("HistoryRepository", () => {
             ).toHaveBeenCalledWith(mockDatabase, "2", limit);
             expect(logger.logger.debug).toHaveBeenCalledWith(
                 "[HistoryRepository] Pruned history for all monitors (limit: 100) (internal)"
-            );        });
+            );
+        });
         it("should not prune with zero limit", () => {
             historyRepository.pruneAllHistoryInternal(mockDatabase, 0);
 
-            expect(mockDatabase.all).not.toHaveBeenCalled();        });
+            expect(mockDatabase.all).not.toHaveBeenCalled();
+        });
         it("should filter invalid monitor IDs", () => {
             const limit = 100;
             const mockMonitors = [
@@ -423,7 +460,9 @@ describe("HistoryRepository", () => {
             ).toHaveBeenCalledWith(mockDatabase, "3", limit);
             expect(
                 historyManipulation.pruneHistoryForMonitor
-            ).toHaveBeenCalledTimes(2);        });        });
+            ).toHaveBeenCalledTimes(2);
+        });
+    });
     describe("pruneHistory", () => {
         it("should prune history for specific monitor", async () => {
             const monitorId = "monitor-123";
@@ -434,7 +473,9 @@ describe("HistoryRepository", () => {
             expect(mockDatabaseService.getDatabase).toHaveBeenCalledTimes(1);
             expect(
                 historyManipulation.pruneHistoryForMonitor
-            ).toHaveBeenCalledWith(mockDatabase, monitorId, limit);        });        });
+            ).toHaveBeenCalledWith(mockDatabase, monitorId, limit);
+        });
+    });
     describe("pruneHistoryInternal", () => {
         it("should prune history internally", () => {
             const monitorId = "monitor-123";
@@ -451,7 +492,8 @@ describe("HistoryRepository", () => {
             ).toHaveBeenCalledWith(mockDatabase, monitorId, limit);
             expect(logger.logger.debug).toHaveBeenCalledWith(
                 "[HistoryRepository] Pruned history for monitor monitor-123 (limit: 100) (internal)"
-            );        });
+            );
+        });
         it("should not prune with zero limit", () => {
             const monitorId = "monitor-123";
 
@@ -459,7 +501,8 @@ describe("HistoryRepository", () => {
 
             expect(
                 historyManipulation.pruneHistoryForMonitor
-            ).not.toHaveBeenCalled();        });
+            ).not.toHaveBeenCalled();
+        });
         it("should not prune with negative limit", () => {
             const monitorId = "monitor-123";
 
@@ -467,10 +510,15 @@ describe("HistoryRepository", () => {
 
             expect(
                 historyManipulation.pruneHistoryForMonitor
-            ).not.toHaveBeenCalled();        });        });
+            ).not.toHaveBeenCalled();
+        });
+    });
     describe("getDb", () => {
         it("should return database from service", () => {
             const db = historyRepository["getDb"]();
 
             expect(mockDatabaseService.getDatabase).toHaveBeenCalledTimes(1);
-            expect(db).toBe(mockDatabase);        });        });        });
+            expect(db).toBe(mockDatabase);
+        });
+    });
+});
