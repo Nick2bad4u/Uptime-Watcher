@@ -51,6 +51,7 @@ import ThemedText from "../../theme/components/ThemedText";
 import { useTheme } from "../../theme/useTheme";
 import { ensureError } from "../../utils/errorHandling";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
+import { SettingItem } from "../shared/SettingItem";
 
 /**
  * Allowed settings keys that can be updated
@@ -369,56 +370,31 @@ export const Settings = ({
                             🔔 Notifications
                         </ThemedText>
                         <div className="space-y-4">
-                            <div className="setting-item">
-                                <div className="setting-info">
-                                    <ThemedText
-                                        className="setting-title"
-                                        size="sm"
-                                        weight="medium"
-                                    >
-                                        Desktop Notifications
-                                    </ThemedText>
-                                    <ThemedText
-                                        className="setting-description"
-                                        size="xs"
-                                        variant="tertiary"
-                                    >
-                                        Show notifications when sites go up or
-                                        down
-                                    </ThemedText>
-                                </div>
-                                <ThemedCheckbox
-                                    aria-label="Enable desktop notifications"
-                                    checked={settings.notifications}
-                                    disabled={isLoading}
-                                    onChange={handleNotificationsChange}
-                                />
-                            </div>
+                            <SettingItem
+                                control={
+                                    <ThemedCheckbox
+                                        aria-label="Enable desktop notifications"
+                                        checked={settings.notifications}
+                                        disabled={isLoading}
+                                        onChange={handleNotificationsChange}
+                                    />
+                                }
+                                description="Show notifications when sites go up or down"
+                                title="Desktop Notifications"
+                            />
 
-                            <div className="setting-item">
-                                <div className="setting-info">
-                                    <ThemedText
-                                        className="setting-title"
-                                        size="sm"
-                                        weight="medium"
-                                    >
-                                        Sound Alerts
-                                    </ThemedText>
-                                    <ThemedText
-                                        className="setting-description"
-                                        size="xs"
-                                        variant="tertiary"
-                                    >
-                                        Play sound when status changes occur
-                                    </ThemedText>
-                                </div>
-                                <ThemedCheckbox
-                                    aria-label="Enable sound alerts"
-                                    checked={settings.soundAlerts}
-                                    disabled={isLoading}
-                                    onChange={handleSoundAlertsChange}
-                                />
-                            </div>
+                            <SettingItem
+                                control={
+                                    <ThemedCheckbox
+                                        aria-label="Enable sound alerts"
+                                        checked={settings.soundAlerts}
+                                        disabled={isLoading}
+                                        onChange={handleSoundAlertsChange}
+                                    />
+                                }
+                                description="Play sound when status changes occur"
+                                title="Sound Alerts"
+                            />
                         </div>
                     </section>
 
@@ -463,57 +439,31 @@ export const Settings = ({
                                 </div>
                             </div>
 
-                            <div className="setting-item">
-                                <div className="setting-info">
-                                    <ThemedText
-                                        className="setting-title"
-                                        size="sm"
-                                        weight="medium"
-                                    >
-                                        Auto-start with System
-                                    </ThemedText>
-                                    <ThemedText
-                                        className="setting-description"
-                                        size="xs"
-                                        variant="tertiary"
-                                    >
-                                        Launch Uptime Watcher when your computer
-                                        starts
-                                    </ThemedText>
-                                </div>
-                                <ThemedCheckbox
-                                    aria-label="Enable auto-start with system"
-                                    checked={settings.autoStart}
-                                    disabled={isLoading}
-                                    onChange={handleAutoStartChange}
-                                />
-                            </div>
+                            <SettingItem
+                                control={
+                                    <ThemedCheckbox
+                                        aria-label="Enable auto-start with system"
+                                        checked={settings.autoStart}
+                                        disabled={isLoading}
+                                        onChange={handleAutoStartChange}
+                                    />
+                                }
+                                description="Launch Uptime Watcher when your computer starts"
+                                title="Auto-start with System"
+                            />
 
-                            <div className="setting-item">
-                                <div className="setting-info">
-                                    <ThemedText
-                                        className="setting-title"
-                                        size="sm"
-                                        weight="medium"
-                                    >
-                                        Minimize to System Tray
-                                    </ThemedText>
-                                    <ThemedText
-                                        className="setting-description"
-                                        size="xs"
-                                        variant="tertiary"
-                                    >
-                                        Keep app running in system tray when
-                                        window is closed
-                                    </ThemedText>
-                                </div>
-                                <ThemedCheckbox
-                                    aria-label="Enable minimize to system tray"
-                                    checked={settings.minimizeToTray}
-                                    disabled={isLoading}
-                                    onChange={handleMinimizeToTrayChange}
-                                />
-                            </div>
+                            <SettingItem
+                                control={
+                                    <ThemedCheckbox
+                                        aria-label="Enable minimize to system tray"
+                                        checked={settings.minimizeToTray}
+                                        disabled={isLoading}
+                                        onChange={handleMinimizeToTrayChange}
+                                    />
+                                }
+                                description="Keep app running in system tray when window is closed"
+                                title="Minimize to System Tray"
+                            />
                         </div>
                     </section>
 

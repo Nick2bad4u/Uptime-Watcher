@@ -7,6 +7,7 @@
  * @public
  */
 
+import type { Site, StatusUpdate } from "../../shared/types";
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
 import type { DatabaseService } from "../services/database/DatabaseService";
@@ -15,7 +16,6 @@ import type { MonitorRepository } from "../services/database/MonitorRepository";
 import type { SiteRepository } from "../services/database/SiteRepository";
 import type { EnhancedMonitoringServices } from "../services/monitoring/EnhancedMonitoringServiceFactory";
 import type { SiteService } from "../services/site/SiteService";
-import type { Site, StatusUpdate } from "../types";
 import type { StandardizedCache } from "../utils/cache/StandardizedCache";
 
 import {

@@ -7,9 +7,9 @@
  * @public
  */
 
+import type { Site } from "../../../shared/types";
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
-import type { Site } from "../../types";
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import type { DatabaseServiceFactory } from "../factories/DatabaseServiceFactory";
 

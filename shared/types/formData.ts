@@ -218,11 +218,10 @@ export type FormMode = "existing" | "new";
  *
  * @remarks
  * Used to return validation results with success status and error details.
+ * Import directly from "./validation" for FormValidationResult if needed.
  *
  * @public
  */
-// Import from unified validation system
-export type { FormValidationResult as ValidationResult } from "./validation";
 
 /**
  * Union type representing all possible monitor form data types.

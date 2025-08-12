@@ -41,7 +41,7 @@
 
 import { useCallback, useState } from "react";
 
-import type { MonitorType } from "../../types";
+import type { MonitorType } from "../../../shared/types";
 
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { useMonitorFields } from "../../hooks/useMonitorFields";

@@ -7,6 +7,7 @@
 
 import type { Database } from "node-sqlite3-wasm";
 
+import type { Site, StatusHistory } from "../../../shared/types";
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { DatabaseService } from "../../services/database/DatabaseService";
@@ -14,7 +15,6 @@ import type { HistoryRepository } from "../../services/database/HistoryRepositor
 import type { MonitorRepository } from "../../services/database/MonitorRepository";
 import type { SettingsRepository } from "../../services/database/SettingsRepository";
 import type { SiteRepository } from "../../services/database/SiteRepository";
-import type { Site, StatusHistory } from "../../types";
 import type { Logger } from "../interfaces";
 
 import { ERROR_CATALOG } from "../../../shared/utils/errorCatalog";

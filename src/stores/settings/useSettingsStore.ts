@@ -37,10 +37,12 @@ import { persist, type PersistOptions } from "zustand/middleware";
 import type { AppSettings } from "../types";
 import type { SettingsStore } from "./types";
 
+import { withErrorHandling } from "../../../shared/utils/errorHandling";
 import { DEFAULT_HISTORY_LIMIT } from "../../constants";
 import { safeExtractIpcData } from "../../types/ipc";
 import { useErrorStore } from "../error/useErrorStore";
-import { logStoreAction, withErrorHandling } from "../utils";
+import { logStoreAction } from "../utils";
+import { createStoreErrorHandler } from "../utils/storeErrorHandling";
 
 const defaultSettings: AppSettings = {
     autoStart: false,
@@ -117,7 +119,6 @@ export const useSettingsStore: UseBoundStore<
                 settingsLoaded: boolean;
                 success: boolean;
             }> => {
-                const errorStore = useErrorStore.getState();
                 const result = await withErrorHandling(
                     async () => {
                         // Fetch all available settings from backend
@@ -143,20 +144,7 @@ export const useSettingsStore: UseBoundStore<
                             success: true,
                         };
                     },
-                    {
-                        clearError: () => {
-                            errorStore.clearStoreError("settings");
-                        },
-                        setError: (error) => {
-                            errorStore.setStoreError("settings", error);
-                        },
-                        setLoading: (loading) => {
-                            errorStore.setOperationLoading(
-                                "initializeSettings",
-                                loading
-                            );
-                        },
-                    }
+                    createStoreErrorHandler("settings", "initializeSettings")
                 );
 
                 logStoreAction("SettingsStore", "initializeSettings", {
@@ -171,7 +159,6 @@ export const useSettingsStore: UseBoundStore<
                 message: string;
                 success: boolean;
             }> => {
-                const errorStore = useErrorStore.getState();
                 const result = await withErrorHandling(
                     async () => {
                         // Call backend to reset all settings
@@ -198,20 +185,7 @@ export const useSettingsStore: UseBoundStore<
                             success: true,
                         };
                     },
-                    {
-                        clearError: () => {
-                            errorStore.clearStoreError("settings");
-                        },
-                        setError: (error) => {
-                            errorStore.setStoreError("settings", error);
-                        },
-                        setLoading: (loading) => {
-                            errorStore.setOperationLoading(
-                                "resetSettings",
-                                loading
-                            );
-                        },
-                    }
+                    createStoreErrorHandler("settings", "resetSettings")
                 );
 
                 logStoreAction("SettingsStore", "resetSettings", {
@@ -228,7 +202,6 @@ export const useSettingsStore: UseBoundStore<
                 message: string;
                 success: boolean;
             }> => {
-                const errorStore = useErrorStore.getState();
                 const result = await withErrorHandling(
                     async () => {
                         const response =
@@ -251,20 +224,7 @@ export const useSettingsStore: UseBoundStore<
                             success: true,
                         };
                     },
-                    {
-                        clearError: () => {
-                            errorStore.clearStoreError("settings");
-                        },
-                        setError: (error) => {
-                            errorStore.setStoreError("settings", error);
-                        },
-                        setLoading: (loading) => {
-                            errorStore.setOperationLoading(
-                                "syncFromBackend",
-                                loading
-                            );
-                        },
-                    }
+                    createStoreErrorHandler("settings", "syncFromBackend")
                 );
 
                 return result;
@@ -274,7 +234,6 @@ export const useSettingsStore: UseBoundStore<
                     limit,
                 });
 
-                const errorStore = useErrorStore.getState();
                 const currentSettings = get().settings;
 
                 await withErrorHandling(
@@ -307,21 +266,27 @@ export const useSettingsStore: UseBoundStore<
                         });
                     },
                     {
-                        clearError: () => {
-                            errorStore.clearStoreError("settings");
+                        clearError: (): void => {
+                            useErrorStore
+                                .getState()
+                                .clearStoreError("settings");
                         },
-                        setError: (error) => {
+                        setError: (error): void => {
                             // Revert to previous state on error instead of using default
-                            errorStore.setStoreError("settings", error);
+                            useErrorStore
+                                .getState()
+                                .setStoreError("settings", error);
                             get().updateSettings({
                                 historyLimit: currentSettings.historyLimit,
                             });
                         },
-                        setLoading: (loading) => {
-                            errorStore.setOperationLoading(
-                                "updateHistoryLimit",
-                                loading
-                            );
+                        setLoading: (loading): void => {
+                            useErrorStore
+                                .getState()
+                                .setOperationLoading(
+                                    "updateHistoryLimit",
+                                    loading
+                                );
                         },
                     }
                 );

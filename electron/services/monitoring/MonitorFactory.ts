@@ -1,4 +1,4 @@
-import type { MonitorType } from "../../types";
+import type { MonitorType } from "../../../shared/types";
 import type { IMonitorService, MonitorConfig } from "./types";
 
 import {

@@ -35,6 +35,45 @@ export class ApplicationService {
     private readonly serviceContainer: ServiceContainer;
 
     /**
+     * Named event handler for app ready event.
+     */
+    private readonly handleAppReady = (): void => {
+        void (async (): Promise<void> => {
+            try {
+                await this.onAppReady();
+            } catch (error) {
+                logger.error(
+                    LOG_TEMPLATES.errors.APPLICATION_INITIALIZATION_ERROR,
+                    error
+                );
+            }
+        })();
+    };
+
+    /**
+     * Named event handler for window-all-closed event.
+     */
+    private readonly handleWindowAllClosed = (): void => {
+        logger.info(LOG_TEMPLATES.services.APPLICATION_WINDOWS_CLOSED);
+        if (process.platform !== "darwin") {
+            logger.info(LOG_TEMPLATES.services.APPLICATION_QUITTING);
+            app.quit();
+        }
+    };
+
+    /**
+     * Named event handler for activate event.
+     */
+    private readonly handleActivate = (): void => {
+        logger.info(LOG_TEMPLATES.services.APPLICATION_ACTIVATED);
+        const windowService = this.serviceContainer.getWindowService();
+        if (windowService.getAllWindows().length === 0) {
+            logger.info(LOG_TEMPLATES.services.APPLICATION_CREATING_WINDOW);
+            windowService.createMainWindow();
+        }
+    };
+
+    /**
      * Cleans up resources before application shutdown.
      *
      * @remarks
@@ -61,6 +100,9 @@ export class ApplicationService {
                     )
                 );
             }
+
+            // Remove application event listeners
+            this.removeApplicationEventListeners();
 
             // Cleanup IPC handlers
             // NOTE: Currently synchronous, but designed to be future-compatible with async cleanup
@@ -151,35 +193,20 @@ export class ApplicationService {
      * @internal
      */
     private setupApplication(): void {
-        app.on("ready", (): void => {
-            void (async (): Promise<void> => {
-                try {
-                    await this.onAppReady();
-                } catch (error) {
-                    logger.error(
-                        LOG_TEMPLATES.errors.APPLICATION_INITIALIZATION_ERROR,
-                        error
-                    );
-                }
-            })();
-        });
+        app.on("ready", this.handleAppReady);
+        app.on("window-all-closed", this.handleWindowAllClosed);
+        app.on("activate", this.handleActivate);
+    }
 
-        app.on("window-all-closed", () => {
-            logger.info(LOG_TEMPLATES.services.APPLICATION_WINDOWS_CLOSED);
-            if (process.platform !== "darwin") {
-                logger.info(LOG_TEMPLATES.services.APPLICATION_QUITTING);
-                app.quit();
-            }
-        });
-
-        app.on("activate", () => {
-            logger.info(LOG_TEMPLATES.services.APPLICATION_ACTIVATED);
-            const windowService = this.serviceContainer.getWindowService();
-            if (windowService.getAllWindows().length === 0) {
-                logger.info(LOG_TEMPLATES.services.APPLICATION_CREATING_WINDOW);
-                windowService.createMainWindow();
-            }
-        });
+    /**
+     * Removes application event listeners.
+     * Called during cleanup to prevent memory leaks.
+     * @internal
+     */
+    private removeApplicationEventListeners(): void {
+        app.off("ready", this.handleAppReady);
+        app.off("window-all-closed", this.handleWindowAllClosed);
+        app.off("activate", this.handleActivate);
     }
 
     /**

@@ -9,14 +9,14 @@
 
 import type { z } from "zod";
 
-import type { MonitorType } from "../../types";
+import type {
+    Monitor,
+    MonitorFieldDefinition,
+    MonitorType,
+} from "../../../shared/types";
 import type { IMonitorService } from "./types";
 
-import {
-    type Monitor,
-    MONITOR_STATUS,
-    type MonitorFieldDefinition,
-} from "../../../shared/types";
+import { MONITOR_STATUS } from "../../../shared/types";
 // Import shared validation schemas
 import { withErrorHandling } from "../../../shared/utils/errorHandling";
 import { monitorSchemas } from "../../../shared/validation/schemas";

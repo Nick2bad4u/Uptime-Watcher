@@ -108,6 +108,45 @@ class Main {
     /** Application service instance for managing app lifecycle and features */
     private readonly applicationService: ApplicationService;
 
+    /** Flag to ensure cleanup is only called once */
+    private cleanedUp = false;
+
+    /**
+     * Named event handler for safe cleanup on process exit.
+     */
+    private readonly handleProcessExit = (): void => {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (!this.cleanedUp && this.applicationService?.cleanup) {
+            this.cleanedUp = true;
+            void (async (): Promise<void> => {
+                try {
+                    await this.applicationService.cleanup();
+                } catch (error) {
+                    logger.error("[Main] Cleanup failed", error);
+                    throw error;
+                }
+            })();
+        }
+    };
+
+    /**
+     * Named event handler for safe cleanup on app quit.
+     */
+    private readonly handleAppQuit = (): void => {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (!this.cleanedUp && this.applicationService?.cleanup) {
+            this.cleanedUp = true;
+            void (async (): Promise<void> => {
+                try {
+                    await this.applicationService.cleanup();
+                } catch (error) {
+                    logger.error("[Main] Cleanup failed", error);
+                    throw error;
+                }
+            })();
+        }
+    };
+
     /**
      * Constructs the main application and sets up shutdown handlers.
      *
@@ -125,26 +164,22 @@ class Main {
         logger.info("Starting Uptime Watcher application");
         this.applicationService = new ApplicationService();
 
-        // Ensure cleanup is only called once to prevent double-cleanup errors
-        let cleanedUp = false;
-        const safeCleanup = (): void => {
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            if (!cleanedUp && this.applicationService?.cleanup) {
-                cleanedUp = true;
-                this.applicationService.cleanup().catch((error: unknown) => {
-                    logger.error("[Main] Cleanup failed", error);
-                    throw error;
-                });
-            }
-        };
-
         // Setup cleanup on Node.js process exit to ensure graceful shutdown.
         // Note: 'beforeExit' may not fire in all shutdown scenarios (e.g., forced kills or SIGKILL).
         // It is best-effort and should be combined with Electron's 'will-quit' for robustness.
-        process.on("beforeExit", safeCleanup);
+        process.on("beforeExit", this.handleProcessExit);
 
         // Also handle Electron's will-quit event for robust cleanup
-        app.on("will-quit", safeCleanup);
+        app.on("will-quit", this.handleAppQuit);
+    }
+
+    /**
+     * Removes event listeners to prevent memory leaks.
+     * Called during application shutdown.
+     */
+    public removeEventListeners(): void {
+        process.off("beforeExit", this.handleProcessExit);
+        app.off("will-quit", this.handleAppQuit);
     }
 }
 

@@ -188,6 +188,34 @@ function convertEnabledField(monitor: Record<string, unknown>): number {
 }
 
 /**
+ * Core SQL value conversion logic shared between database conversion functions.
+ *
+ * @param value - Value to convert
+ * @param sqlType - SQL type for conversion
+ * @param defaultStrategy - Strategy for handling unknown types: 'raw' keeps original value, 'stringify' converts to string
+ * @returns Converted value according to SQL type and strategy
+ *
+ * @internal Helper function to eliminate type conversion duplication
+ */
+function convertSqlValue(
+    value: unknown,
+    sqlType: string,
+    defaultStrategy: "raw" | "stringify"
+): unknown {
+    switch (sqlType) {
+        case "INTEGER": {
+            return Number(value);
+        }
+        case "TEXT": {
+            return safeStringify(value);
+        }
+        default: {
+            return defaultStrategy === "raw" ? value : safeStringify(value);
+        }
+    }
+}
+
+/**
  * Converts a database value to its corresponding JavaScript type.
  *
  * @remarks
@@ -207,17 +235,7 @@ function convertFromDatabase(value: unknown, sqlType: string): unknown {
         return undefined;
     }
 
-    switch (sqlType) {
-        case "INTEGER": {
-            return Number(value);
-        }
-        case "TEXT": {
-            return safeStringify(value);
-        }
-        default: {
-            return value;
-        }
-    }
+    return convertSqlValue(value, sqlType, "raw");
 }
 
 /**
@@ -260,17 +278,7 @@ function convertToDatabase(value: unknown, sqlType: string): unknown {
         return null;
     }
 
-    switch (sqlType) {
-        case "INTEGER": {
-            return Number(value);
-        }
-        case "TEXT": {
-            return safeStringify(value);
-        }
-        default: {
-            return safeStringify(value);
-        } // Convert anything else to string to avoid object binding errors
-    }
+    return convertSqlValue(value, sqlType, "stringify");
 }
 
 /**

@@ -13,9 +13,9 @@
  * @see {@link MonitorType} for type definition - import from ../../types
  */
 
-import type { MonitorType } from "../../types";
+import type { MonitorType } from "../../../shared/types";
 
-import { BASE_MONITOR_TYPES } from "../../types";
+import { BASE_MONITOR_TYPES } from "../../../shared/types";
 
 // MonitorType is available via import from ../../types - no re-export needed
 

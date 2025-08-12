@@ -23,8 +23,9 @@
  * @packageDocumentation
  */
 
+import type { ChartData, ChartOptions } from "chart.js";
+
 import type { Theme } from "../theme/types";
-import type { ChartData, ChartOptions } from "./chartSetup";
 
 /**
  * Interface for chart configuration return type.

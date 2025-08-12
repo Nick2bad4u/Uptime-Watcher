@@ -23,7 +23,7 @@
 
 import type { AxiosInstance, AxiosResponse } from "axios";
 
-import type { Site } from "../../types";
+import type { Site } from "../../../shared/types";
 import type {
     IMonitorService,
     MonitorCheckResult,
@@ -42,15 +42,14 @@ import {
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 import { withOperationalHooks } from "../../utils/operationalHooks";
-import { DEFAULT_RETRY_ATTEMPTS } from "./constants";
-import { createErrorResult, handleCheckError } from "./utils/errorHandling";
+import {
+    createMonitorErrorResult,
+    extractMonitorConfig,
+    validateMonitorUrl,
+} from "./shared/monitorServiceHelpers";
+import { handleCheckError } from "./utils/errorHandling";
 import { createHttpClient } from "./utils/httpClient";
 import { determineMonitorStatus } from "./utils/httpStatusUtils";
-import {
-    getMonitorRetryAttempts,
-    getMonitorTimeout,
-    hasValidUrl,
-} from "./utils/monitorTypeGuards";
 
 /**
  * Extends Axios types to support timing metadata for monitoring.
@@ -156,22 +155,20 @@ export class HttpMonitor implements IMonitorService {
             );
         }
 
-        if (!hasValidUrl(monitor)) {
-            return createErrorResult("HTTP monitor missing or invalid URL", 0);
+        // Validate URL using shared helper
+        const validationError = validateMonitorUrl(monitor);
+        if (validationError) {
+            return createMonitorErrorResult(validationError, 0);
         }
 
-        // Use type-safe utility functions instead of type assertions
-        const timeout = getMonitorTimeout(
+        // Extract monitor configuration using shared helper
+        const { retryAttempts, timeout } = extractMonitorConfig(
             monitor,
             this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT
         );
-        const retryAttempts = getMonitorRetryAttempts(
-            monitor,
-            DEFAULT_RETRY_ATTEMPTS
-        );
 
         return this.performHealthCheckWithRetry(
-            monitor.url,
+            monitor.url ?? "",
             timeout,
             retryAttempts
         );

@@ -7,32 +7,22 @@
 
 import type { Monitor, MonitorType, Site } from "@shared/types";
 
+import type { BaseSiteOperations } from "./baseTypes";
+
 import { isDevelopment } from "../../../shared/utils/environment";
 import { ERROR_CATALOG } from "../../../shared/utils/errorCatalog";
 import logger from "../../services/logger";
 import { safeExtractIpcData } from "../../types/ipc";
-import { useErrorStore } from "../error/useErrorStore";
-import { logStoreAction, withErrorHandling } from "../utils";
 import { handleSQLiteBackupDownload } from "./utils/fileDownload";
+import { normalizeMonitor } from "./utils/monitorOperations";
 import {
-    normalizeMonitor,
-    updateMonitorInSite,
-} from "./utils/monitorOperations";
+    getSiteById,
+    updateMonitorAndSave,
+    withSiteOperation,
+    withSiteOperationReturning,
+} from "./utils/operationHelpers";
 
-export interface SiteOperationsActions {
-    /** Add a monitor to an existing site */
-    addMonitorToSite: (siteId: string, monitor: Monitor) => Promise<void>;
-    /** Create a new site */
-    createSite: (siteData: {
-        identifier: string;
-        monitoring?: boolean;
-        monitors?: Monitor[];
-        name?: string;
-    }) => Promise<void>;
-    /** Delete a site */
-    deleteSite: (identifier: string) => Promise<void>;
-    /** Download SQLite backup */
-    downloadSQLiteBackup: () => Promise<void>;
+export interface SiteOperationsActions extends BaseSiteOperations {
     /** Initialize sites data from backend */
     initializeSites: () => Promise<{
         message: string;
@@ -41,26 +31,6 @@ export interface SiteOperationsActions {
     }>;
     /** Modify an existing site */
     modifySite: (identifier: string, updates: Partial<Site>) => Promise<void>;
-    /** Remove a monitor from a site */
-    removeMonitorFromSite: (siteId: string, monitorId: string) => Promise<void>;
-    /** Update monitor retry attempts */
-    updateMonitorRetryAttempts: (
-        siteId: string,
-        monitorId: string,
-        retryAttempts: number
-    ) => Promise<void>;
-    /** Update monitor timeout */
-    updateMonitorTimeout: (
-        siteId: string,
-        monitorId: string,
-        timeout: number
-    ) => Promise<void>;
-    /** Update site check interval */
-    updateSiteCheckInterval: (
-        siteId: string,
-        monitorId: string,
-        interval: number
-    ) => Promise<void>;
 }
 
 export interface SiteOperationsDependencies {
@@ -75,44 +45,25 @@ export const createSiteOperationsActions = (
     deps: SiteOperationsDependencies
 ): SiteOperationsActions => ({
     addMonitorToSite: async (siteId, monitor): Promise<void> => {
-        logStoreAction("SitesStore", "addMonitorToSite", { monitor, siteId });
-
-        const errorStore = useErrorStore.getState();
-        await withErrorHandling(
+        await withSiteOperation(
+            "addMonitorToSite",
             async () => {
                 // Get the current site
-                const site = deps
-                    .getSites()
-                    .find((s) => s.identifier === siteId);
-                if (!site) {
-                    throw new Error(ERROR_CATALOG.sites.NOT_FOUND);
-                }
+                const site = getSiteById(siteId, deps);
 
                 // Allow multiple monitors of the same type
                 const updatedMonitors = [...site.monitors, monitor];
                 await window.electronAPI.sites.updateSite(siteId, {
                     monitors: updatedMonitors,
                 });
-                await deps.syncSitesFromBackend();
             },
-            {
-                clearError: () => {
-                    errorStore.clearStoreError("sites-operations");
-                },
-                setError: (error) => {
-                    errorStore.setStoreError("sites-operations", error);
-                },
-                setLoading: (loading) => {
-                    errorStore.setOperationLoading("addMonitorToSite", loading);
-                },
-            }
+            { monitor, siteId },
+            deps
         );
     },
     createSite: async (siteData): Promise<void> => {
-        logStoreAction("SitesStore", "createSite", { siteData });
-
-        const errorStore = useErrorStore.getState();
-        await withErrorHandling(
+        await withSiteOperation(
+            "createSite",
             async () => {
                 // Default to HTTP monitor if none provided
                 const monitors: Monitor[] = (
@@ -142,24 +93,14 @@ export const createSiteOperationsActions = (
                 const newSite = safeExtractIpcData(response, completeSite);
                 deps.addSite(newSite);
             },
-            {
-                clearError: () => {
-                    errorStore.clearStoreError("sites-operations");
-                },
-                setError: (error) => {
-                    errorStore.setStoreError("sites-operations", error);
-                },
-                setLoading: (loading) => {
-                    errorStore.setOperationLoading("createSite", loading);
-                },
-            }
+            { siteData },
+            deps,
+            false // Don't sync after as we're adding directly to deps
         );
     },
     deleteSite: async (identifier: string): Promise<void> => {
-        logStoreAction("SitesStore", "deleteSite", { identifier });
-
-        const errorStore = useErrorStore.getState();
-        await withErrorHandling(
+        await withSiteOperation(
+            "deleteSite",
             async () => {
                 // Stop monitoring for all monitors of this site before deleting
                 // Filter out null/undefined values to handle corrupted data
@@ -189,24 +130,15 @@ export const createSiteOperationsActions = (
                 await window.electronAPI.sites.removeSite(identifier);
                 deps.removeSite(identifier);
             },
-            {
-                clearError: () => {
-                    errorStore.clearStoreError("sites-operations");
-                },
-                setError: (error) => {
-                    errorStore.setStoreError("sites-operations", error);
-                },
-                setLoading: (loading) => {
-                    errorStore.setOperationLoading("deleteSite", loading);
-                },
-            }
+            { identifier },
+            deps,
+            false // Don't sync after as we're removing directly from deps
         );
     },
     downloadSQLiteBackup: async (): Promise<void> => {
-        const errorStore = useErrorStore.getState();
-        await withErrorHandling(
+        await withSiteOperation(
+            "downloadSQLiteBackup",
             async () => {
-                // eslint-disable-next-line ex/no-unhandled
                 await handleSQLiteBackupDownload(async () => {
                     try {
                         const response =
@@ -224,34 +156,18 @@ export const createSiteOperationsActions = (
                     }
                 });
             },
-            {
-                clearError: () => {
-                    errorStore.clearStoreError("sites-operations");
-                },
-                setError: (error) => {
-                    errorStore.setStoreError("sites-operations", error);
-                },
-                setLoading: (loading) => {
-                    errorStore.setOperationLoading(
-                        "downloadSQLiteBackup",
-                        loading
-                    );
-                },
-            }
+            { message: "SQLite backup download completed", success: true },
+            deps,
+            false // Don't sync for backup download
         );
-
-        logStoreAction("SitesStore", "downloadSQLiteBackup", {
-            message: "SQLite backup download completed",
-            success: true,
-        });
     },
     initializeSites: async (): Promise<{
         message: string;
         sitesLoaded: number;
         success: boolean;
     }> => {
-        const errorStore = useErrorStore.getState();
-        const result = await withErrorHandling(
+        return withSiteOperationReturning(
+            "initializeSites",
             async () => {
                 const response = await window.electronAPI.sites.getSites();
                 const sites = safeExtractIpcData<Site[]>(response, []);
@@ -262,68 +178,30 @@ export const createSiteOperationsActions = (
                     success: true,
                 };
             },
-            {
-                clearError: () => {
-                    errorStore.clearStoreError("sites-operations");
-                },
-                setError: (error) => {
-                    errorStore.setStoreError("sites-operations", error);
-                },
-                setLoading: (loading) => {
-                    errorStore.setOperationLoading("initializeSites", loading);
-                },
-            }
+            {},
+            deps,
+            false // Don't sync for initialization - we're loading the data
         );
-
-        logStoreAction("SitesStore", "initializeSites", {
-            message: result.message,
-            sitesLoaded: result.sitesLoaded,
-            success: result.success,
-        });
-
-        return result;
     },
     modifySite: async (
         identifier: string,
         updates: Partial<Site>
     ): Promise<void> => {
-        logStoreAction("SitesStore", "modifySite", { identifier, updates });
-
-        const errorStore = useErrorStore.getState();
-        await withErrorHandling(
+        await withSiteOperation(
+            "modifySite",
             async () => {
                 await window.electronAPI.sites.updateSite(identifier, updates);
-                await deps.syncSitesFromBackend();
             },
-            {
-                clearError: () => {
-                    errorStore.clearStoreError("sites-operations");
-                },
-                setError: (error) => {
-                    errorStore.setStoreError("sites-operations", error);
-                },
-                setLoading: (loading) => {
-                    errorStore.setOperationLoading("modifySite", loading);
-                },
-            }
+            { identifier, updates },
+            deps
         );
     },
     removeMonitorFromSite: async (siteId, monitorId): Promise<void> => {
-        logStoreAction("SitesStore", "removeMonitorFromSite", {
-            monitorId,
-            siteId,
-        });
-
-        const errorStore = useErrorStore.getState();
-        await withErrorHandling(
+        await withSiteOperation(
+            "removeMonitorFromSite",
             async () => {
                 // Get the current site
-                const site = deps
-                    .getSites()
-                    .find((s) => s.identifier === siteId);
-                if (!site) {
-                    throw new Error(ERROR_CATALOG.sites.NOT_FOUND);
-                }
+                const site = getSiteById(siteId, deps);
 
                 // Check if this is the only monitor - prevent removal if so
                 if (site.monitors.length <= 1) {
@@ -350,24 +228,9 @@ export const createSiteOperationsActions = (
 
                 // Remove the monitor via backend
                 await window.electronAPI.sites.removeMonitor(siteId, monitorId);
-
-                // Refresh site data from backend
-                await deps.syncSitesFromBackend();
             },
-            {
-                clearError: () => {
-                    errorStore.clearStoreError("sites-operations");
-                },
-                setError: (error) => {
-                    errorStore.setStoreError("sites-operations", error);
-                },
-                setLoading: (loading) => {
-                    errorStore.setOperationLoading(
-                        "removeMonitorFromSite",
-                        loading
-                    );
-                },
-            }
+            { monitorId, siteId },
+            deps
         );
     },
     updateMonitorRetryAttempts: async (
@@ -375,52 +238,19 @@ export const createSiteOperationsActions = (
         monitorId: string,
         retryAttempts: number | undefined
     ): Promise<void> => {
-        logStoreAction("SitesStore", "updateMonitorRetryAttempts", {
-            monitorId,
-            retryAttempts,
-            siteId,
-        });
-
-        const errorStore = useErrorStore.getState();
-        await withErrorHandling(
+        await withSiteOperation(
+            "updateMonitorRetryAttempts",
             async () => {
-                const site = deps
-                    .getSites()
-                    .find((s) => s.identifier === siteId);
-                if (!site) {
-                    throw new Error(ERROR_CATALOG.sites.NOT_FOUND);
-                }
-
                 // Only update if retryAttempts is defined
                 const updates: Partial<Monitor> = {};
                 if (retryAttempts !== undefined) {
                     updates.retryAttempts = retryAttempts;
                 }
 
-                const updatedSite = updateMonitorInSite(
-                    site,
-                    monitorId,
-                    updates
-                );
-                await window.electronAPI.sites.updateSite(siteId, {
-                    monitors: updatedSite.monitors,
-                });
-                await deps.syncSitesFromBackend();
+                await updateMonitorAndSave(siteId, monitorId, updates, deps);
             },
-            {
-                clearError: () => {
-                    errorStore.clearStoreError("sites-operations");
-                },
-                setError: (error) => {
-                    errorStore.setStoreError("sites-operations", error);
-                },
-                setLoading: (loading) => {
-                    errorStore.setOperationLoading(
-                        "updateMonitorRetryAttempts",
-                        loading
-                    );
-                },
-            }
+            { monitorId, retryAttempts, siteId },
+            deps
         );
     },
     updateMonitorTimeout: async (
@@ -428,52 +258,19 @@ export const createSiteOperationsActions = (
         monitorId: string,
         timeout: number | undefined
     ): Promise<void> => {
-        logStoreAction("SitesStore", "updateMonitorTimeout", {
-            monitorId,
-            siteId,
-            timeout,
-        });
-
-        const errorStore = useErrorStore.getState();
-        await withErrorHandling(
+        await withSiteOperation(
+            "updateMonitorTimeout",
             async () => {
-                const site = deps
-                    .getSites()
-                    .find((s) => s.identifier === siteId);
-                if (!site) {
-                    throw new Error(ERROR_CATALOG.sites.NOT_FOUND);
-                }
-
                 // Only update if timeout is defined
                 const updates: Partial<Monitor> = {};
                 if (timeout !== undefined) {
                     updates.timeout = timeout;
                 }
 
-                const updatedSite = updateMonitorInSite(
-                    site,
-                    monitorId,
-                    updates
-                );
-                await window.electronAPI.sites.updateSite(siteId, {
-                    monitors: updatedSite.monitors,
-                });
-                await deps.syncSitesFromBackend();
+                await updateMonitorAndSave(siteId, monitorId, updates, deps);
             },
-            {
-                clearError: () => {
-                    errorStore.clearStoreError("sites-operations");
-                },
-                setError: (error) => {
-                    errorStore.setStoreError("sites-operations", error);
-                },
-                setLoading: (loading) => {
-                    errorStore.setOperationLoading(
-                        "updateMonitorTimeout",
-                        loading
-                    );
-                },
-            }
+            { monitorId, siteId, timeout },
+            deps
         );
     },
     updateSiteCheckInterval: async (
@@ -481,44 +278,20 @@ export const createSiteOperationsActions = (
         monitorId: string,
         interval: number
     ): Promise<void> => {
-        logStoreAction("SitesStore", "updateSiteCheckInterval", {
-            interval,
-            monitorId,
-            siteId,
-        });
-
-        const errorStore = useErrorStore.getState();
-        await withErrorHandling(
+        await withSiteOperation(
+            "updateSiteCheckInterval",
             async () => {
-                const site = deps
-                    .getSites()
-                    .find((s) => s.identifier === siteId);
-                if (!site) {
-                    throw new Error(ERROR_CATALOG.sites.NOT_FOUND);
-                }
-
-                const updatedSite = updateMonitorInSite(site, monitorId, {
-                    checkInterval: interval,
-                });
-                await window.electronAPI.sites.updateSite(siteId, {
-                    monitors: updatedSite.monitors,
-                });
-                await deps.syncSitesFromBackend();
+                await updateMonitorAndSave(
+                    siteId,
+                    monitorId,
+                    {
+                        checkInterval: interval,
+                    },
+                    deps
+                );
             },
-            {
-                clearError: () => {
-                    errorStore.clearStoreError("sites-operations");
-                },
-                setError: (error) => {
-                    errorStore.setStoreError("sites-operations", error);
-                },
-                setLoading: (loading) => {
-                    errorStore.setOperationLoading(
-                        "updateSiteCheckInterval",
-                        loading
-                    );
-                },
-            }
+            { interval, monitorId, siteId },
+            deps
         );
     },
 });

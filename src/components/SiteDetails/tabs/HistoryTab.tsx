@@ -117,8 +117,11 @@ export const HistoryTab = ({
 
     const backendLimit = settings.historyLimit || 25;
 
-    // Track the last monitor ID we logged for to prevent duplicate logging
-    const lastLoggedMonitorId = useRef<null | string>(null);
+    // Track the last monitor ID and type we logged for to prevent duplicate logging
+    const lastLoggedMonitorRef = useRef<null | {
+        id: string;
+        type: string;
+    }>(null);
 
     // Icon colors configuration
     const getIconColors = (): {
@@ -186,16 +189,30 @@ export const HistoryTab = ({
 
     // Log when history tab is viewed - only when monitor actually changes
     useEffect(() => {
-        if (lastLoggedMonitorId.current !== selectedMonitor.id) {
+        const currentMonitor = {
+            id: selectedMonitor.id,
+            type: selectedMonitor.type,
+        };
+        const lastLogged = lastLoggedMonitorRef.current;
+
+        // Only log if monitor ID or type has changed (not just history length)
+        if (
+            !lastLogged ||
+            lastLogged.id !== currentMonitor.id ||
+            lastLogged.type !== currentMonitor.type
+        ) {
             logger.user.action("History tab viewed", {
                 monitorId: selectedMonitor.id,
                 monitorType: selectedMonitor.type,
                 totalRecords: selectedMonitor.history.length,
             });
-            lastLoggedMonitorId.current = selectedMonitor.id;
+            lastLoggedMonitorRef.current = currentMonitor;
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- Intentionally exclude selectedMonitor.history.length to prevent re-logging on every history update; only log when monitor ID or type changes
-    }, [selectedMonitor.id, selectedMonitor.type]);
+    }, [
+        selectedMonitor.id,
+        selectedMonitor.type,
+        selectedMonitor.history.length,
+    ]);
 
     const filteredHistoryRecords = selectedMonitor.history
         .filter(

@@ -12,12 +12,12 @@
  * @see {@link EnhancedMonitoringServices} for the preferred enhanced implementation
  */
 
+import type { Site } from "../../../shared/types";
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { DatabaseService } from "../../services/database/DatabaseService";
 import type { MonitorRepository } from "../../services/database/MonitorRepository";
 import type { MonitorScheduler } from "../../services/monitoring/MonitorScheduler";
-import type { Site } from "../../types";
 import type { StandardizedCache } from "../cache/StandardizedCache";
 import type { Logger } from "../interfaces";
 
@@ -121,6 +121,76 @@ function validateCheckInterval(
 }
 
 /**
+ * Helper function to find and validate a monitor, eliminating duplication between start/stop functions.
+ *
+ * @param config - Configuration object with required dependencies
+ * @param site - Site containing the monitor
+ * @param identifier - Site identifier for logging
+ * @param monitorId - Monitor ID to find
+ * @param validateInterval - Whether to validate check interval (needed for start operations)
+ * @returns Monitor object if found and valid, null otherwise
+ *
+ * @internal Helper function to eliminate monitor lookup duplication
+ */
+function findAndValidateMonitor(
+    config: MonitoringLifecycleConfig,
+    site: Site,
+    identifier: string,
+    monitorId: string,
+    validateInterval = false
+): null | Site["monitors"][0] {
+    const monitor = findMonitorById(site, monitorId, identifier, config);
+    if (!monitor) {
+        return null;
+    }
+
+    // For start operations, also validate check interval
+    if (
+        validateInterval &&
+        !validateCheckInterval(monitor, identifier, config)
+    ) {
+        return null;
+    }
+
+    return monitor;
+}
+
+/**
+ * Helper function to refresh site cache after monitor operations, eliminating duplication.
+ *
+ * @param config - Configuration object with required dependencies
+ * @param identifier - Site identifier
+ * @param operation - Operation type for logging ("start" or "stop")
+ *
+ * @internal Helper function to eliminate site cache refresh duplication
+ */
+async function refreshSiteCache(
+    config: MonitoringLifecycleConfig,
+    identifier: string,
+    operation: "start" | "stop"
+): Promise<void> {
+    if (config.siteService) {
+        try {
+            const freshSiteData =
+                await config.siteService.findByIdentifierWithDetails(
+                    identifier
+                );
+            if (freshSiteData) {
+                config.sites.set(identifier, freshSiteData);
+                config.logger.debug(
+                    `Refreshed site cache for ${identifier} after monitor ${operation}`
+                );
+            }
+        } catch (error) {
+            config.logger.error(
+                `Failed to refresh site cache for ${identifier} after monitor ${operation}:`,
+                error
+            );
+        }
+    }
+}
+
+/**
  * Helper function to start or stop monitoring for all monitors in a site.
  *
  * @param config - Configuration object with required dependencies
@@ -196,12 +266,14 @@ async function startSpecificMonitor(
     identifier: string,
     monitorId: string
 ): Promise<boolean> {
-    const monitor = findMonitorById(site, monitorId, identifier, config);
+    const monitor = findAndValidateMonitor(
+        config,
+        site,
+        identifier,
+        monitorId,
+        true
+    );
     if (!monitor) {
-        return false;
-    }
-
-    if (!validateCheckInterval(monitor, identifier, config)) {
         return false;
     }
 
@@ -232,27 +304,8 @@ async function startSpecificMonitor(
             { identifier, monitorId }
         );
 
-        // Refresh the site cache to ensure the scheduler gets updated monitor state
-        if (config.siteService) {
-            try {
-                const freshSiteData =
-                    await config.siteService.findByIdentifierWithDetails(
-                        identifier
-                    );
-                if (freshSiteData) {
-                    config.sites.set(identifier, freshSiteData);
-                    config.logger.debug(
-                        `Refreshed site cache for ${identifier} after monitor start`
-                    );
-                }
-            } catch (error) {
-                config.logger.warn(
-                    `Failed to refresh site cache for ${identifier}`,
-                    error
-                );
-                // Continue anyway - the scheduler might still work with stale data
-            }
-        }
+        // Refresh the site cache after monitor operation
+        await refreshSiteCache(config, identifier, "start");
 
         const started = config.monitorScheduler.startMonitor(
             identifier,
@@ -294,7 +347,13 @@ async function stopSpecificMonitor(
     identifier: string,
     monitorId: string
 ): Promise<boolean> {
-    const monitor = findMonitorById(site, monitorId, identifier, config);
+    const monitor = findAndValidateMonitor(
+        config,
+        site,
+        identifier,
+        monitorId,
+        false
+    );
     if (!monitor) {
         return false;
     }
@@ -324,27 +383,8 @@ async function stopSpecificMonitor(
             { identifier, monitorId }
         );
 
-        // Refresh the site cache to ensure updated monitor state is reflected
-        if (config.siteService) {
-            try {
-                const freshSiteData =
-                    await config.siteService.findByIdentifierWithDetails(
-                        identifier
-                    );
-                if (freshSiteData) {
-                    config.sites.set(identifier, freshSiteData);
-                    config.logger.debug(
-                        `Refreshed site cache for ${identifier} after monitor stop`
-                    );
-                }
-            } catch (error) {
-                config.logger.warn(
-                    `Failed to refresh site cache for ${identifier}`,
-                    error
-                );
-                // Continue anyway - the stop operation should still work
-            }
-        }
+        // Refresh the site cache after monitor operation
+        await refreshSiteCache(config, identifier, "stop");
 
         const stopped = config.monitorScheduler.stopMonitor(
             identifier,

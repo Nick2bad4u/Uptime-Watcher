@@ -44,7 +44,7 @@
 import React, { useCallback } from "react";
 
 import ThemedText from "../../theme/components/ThemedText";
-import FormField from "./FormField";
+import { BaseFormField } from "./BaseFormField";
 
 /**
  * Properties for the RadioGroup component.
@@ -138,33 +138,37 @@ const RadioGroup: React.NamedExoticComponent<RadioGroupProperties> = React.memo(
         );
 
         return (
-            <FormField
+            <BaseFormField
                 {...(error !== undefined && { error })}
                 {...(helpText !== undefined && { helpText })}
                 id={id}
                 label={label}
                 required={required}
             >
-                <div className="flex items-center gap-4" role="radiogroup">
-                    {options.map((option) => (
-                        <label
-                            className="flex items-center gap-1"
-                            key={option.value}
-                        >
-                            <input
-                                checked={value === option.value}
-                                disabled={disabled}
-                                name={name}
-                                onChange={createChangeHandler(option.value)}
-                                required={required}
-                                type="radio"
-                                value={option.value}
-                            />
-                            <ThemedText size="sm">{option.label}</ThemedText>
-                        </label>
-                    ))}
-                </div>
-            </FormField>
+                {() => (
+                    <div className="flex items-center gap-4" role="radiogroup">
+                        {options.map((option) => (
+                            <label
+                                className="flex items-center gap-1"
+                                key={option.value}
+                            >
+                                <input
+                                    checked={value === option.value}
+                                    disabled={disabled}
+                                    name={name}
+                                    onChange={createChangeHandler(option.value)}
+                                    required={required}
+                                    type="radio"
+                                    value={option.value}
+                                />
+                                <ThemedText size="sm">
+                                    {option.label}
+                                </ThemedText>
+                            </label>
+                        ))}
+                    </div>
+                )}
+            </BaseFormField>
         );
     }
 );

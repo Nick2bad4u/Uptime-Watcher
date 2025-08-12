@@ -28,7 +28,7 @@
  * @packageDocumentation
  */
 
-import type { MonitorType, Site } from "../../types";
+import type { MonitorType, Site } from "../../../shared/types";
 import type {
     IMonitorService,
     MonitorCheckResult,
@@ -36,13 +36,11 @@ import type {
 } from "./types";
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
-import { DEFAULT_RETRY_ATTEMPTS } from "./constants";
 import {
-    getMonitorRetryAttempts,
-    getMonitorTimeout,
-    hasValidHost,
-    hasValidPort,
-} from "./utils/monitorTypeGuards";
+    createMonitorErrorResult,
+    extractMonitorConfig,
+    validateMonitorHostAndPort,
+} from "./shared/monitorServiceHelpers";
 import { performPortCheckWithRetry } from "./utils/portRetry";
 
 /**
@@ -88,23 +86,23 @@ export class PortMonitor implements IMonitorService {
             );
         }
 
-        if (!hasValidHost(monitor) || !hasValidPort(monitor)) {
-            return {
-                details: "Missing or invalid host/port configuration",
-                error: "Port monitor missing valid host or port",
-                responseTime: 0,
-                status: "down",
-            };
+        const hostPortError = validateMonitorHostAndPort(monitor);
+        if (hostPortError) {
+            return createMonitorErrorResult(hostPortError, 0);
+        }
+
+        // Host and port are guaranteed to be valid at this point due to validation above
+        if (!monitor.host || !monitor.port) {
+            return createMonitorErrorResult(
+                "Port monitor missing valid host or port",
+                0
+            );
         }
 
         // Use type-safe utility functions instead of type assertions
-        const timeout = getMonitorTimeout(
+        const { retryAttempts, timeout } = extractMonitorConfig(
             monitor,
-            this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT
-        );
-        const retryAttempts = getMonitorRetryAttempts(
-            monitor,
-            DEFAULT_RETRY_ATTEMPTS
+            this.config.timeout
         );
 
         return performPortCheckWithRetry(

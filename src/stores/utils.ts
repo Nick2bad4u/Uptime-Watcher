@@ -54,8 +54,7 @@ export const createBaseStore = <T extends BaseStore>(
     },
 });
 
-// Re-export shared error handling utility for frontend stores
-export { withErrorHandling } from "@shared/utils/errorHandling";
+// Import withErrorHandling directly from "@shared/utils/errorHandling" if needed
 
 /**
  * Creates a persistence configuration for Zustand store persistence.

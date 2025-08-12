@@ -471,11 +471,10 @@ export interface ThemeOverride {
  *
  * @remarks
  * Used to return validation results for theme configurations.
+ * Import directly from "./validation" for ThemeValidationResult if needed.
  *
  * @public
  */
-// Import from unified validation system
-export type { ThemeValidationResult } from "./validation";
 
 /**
  * Typography configuration interface.

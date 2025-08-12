@@ -66,17 +66,14 @@ ChartJS.register(
  *
  * @public
  */
-export { type ChartData, Chart as ChartJS, type ChartOptions } from "chart.js";
-
 /**
- * Default Chart.js configuration export for type compatibility.
- * This enables TypeScript to properly resolve Chart.js types and components.
- * Chart.js types for proper TypeScript support.
- * Re-exporting these creates a single source of truth for chart-related types.
+ * Chart.js setup and configuration.
+ *
+ * @remarks
+ * Previously re-exported Chart.js types and React Chart.js components.
+ * Import directly from the original packages as needed:
+ * - ChartData, Chart as ChartJS, ChartOptions: Import from "chart.js"
+ * - Bar, Doughnut, Line: Import from "react-chartjs-2"
+ *
+ * @public
  */
-
-/**
- * React-chartjs-2 components with proper typings.
- * Re-export these to make it clear which components should be used.
- */
-export { Bar, Doughnut, Line } from "react-chartjs-2";

@@ -22,8 +22,7 @@ import {
 
 import { ERROR_CATALOG } from "../../../../shared/utils/errorCatalog";
 
-// Re-export validateMonitor from shared types for convenience
-export { validateMonitor } from "@shared/types";
+// Import validateMonitor directly from "@shared/types" if needed
 
 /**
  * Validates and returns a monitor type or default

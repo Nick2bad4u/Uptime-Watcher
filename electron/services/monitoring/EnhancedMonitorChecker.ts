@@ -30,7 +30,6 @@
 import type { Monitor, Site, StatusUpdate } from "../../../shared/types";
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
-import type { Site as SiteType } from "../../types";
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import type { HistoryRepository } from "../database/HistoryRepository";
 import type { MonitorRepository } from "../database/MonitorRepository";
@@ -149,7 +148,7 @@ export interface EnhancedMonitorCheckConfig {
      * Provides fast, in-memory access to site configurations and monitor definitions,
      * reducing database load during frequent monitoring operations.
      */
-    sites: StandardizedCache<SiteType>;
+    sites: StandardizedCache<Site>;
 
     /**
      * Status update service for safe concurrent status updates.

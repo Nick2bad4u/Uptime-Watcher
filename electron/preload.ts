@@ -10,6 +10,7 @@
 
 import { contextBridge, ipcRenderer } from "electron";
 
+import type { Monitor, Site } from "../shared/types";
 import type {
     CacheInvalidatedEventData,
     MonitorDownEventData,
@@ -18,7 +19,6 @@ import type {
     TestEventData,
     UpdateStatusEventData,
 } from "../shared/types/events";
-import type { Monitor, Site } from "./types";
 
 /**
  * Site management API methods for CRUD operations.

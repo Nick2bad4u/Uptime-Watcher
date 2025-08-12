@@ -16,6 +16,7 @@ import {
     MdSpeed,
 } from "react-icons/md";
 
+import { getSiteDisplayStatus } from "../../../../shared/utils/siteStatus";
 import StatusIndicator from "../../../theme/components/StatusIndicator";
 import ThemedBadge from "../../../theme/components/ThemedBadge";
 import ThemedBox from "../../../theme/components/ThemedBox";
@@ -24,7 +25,6 @@ import ThemedCard from "../../../theme/components/ThemedCard";
 import ThemedProgress from "../../../theme/components/ThemedProgress";
 import ThemedText from "../../../theme/components/ThemedText";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
-import { getSiteDisplayStatus } from "../../../utils/siteStatus";
 import { formatDuration, formatResponseTime } from "../../../utils/time";
 
 /**

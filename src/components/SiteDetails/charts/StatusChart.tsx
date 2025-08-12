@@ -43,14 +43,13 @@
  * @public
  */
 
+import type { ChartOptions } from "chart.js";
 import type { JSX } from "react/jsx-runtime";
 
 import { memo, type MemoExoticComponent } from "react";
+import { Bar } from "react-chartjs-2";
 
 import type { StatusBarChartData } from "../../../services/chartConfig";
-import type { ChartOptions } from "../../../services/chartSetup";
-
-import { Bar } from "../../../services/chartSetup";
 
 /**
  * Memoized status distribution bar chart component for monitoring status visualization.

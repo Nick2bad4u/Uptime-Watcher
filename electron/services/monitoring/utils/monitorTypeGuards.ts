@@ -7,7 +7,7 @@
  * This addresses the type safety issues identified in HttpMonitor and PortMonitor.
  */
 
-import type { Site } from "../../../types";
+import type { Site } from "../../../../shared/types";
 
 import {
     isNonEmptyString,

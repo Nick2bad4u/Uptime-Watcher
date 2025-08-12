@@ -77,6 +77,49 @@ export class WindowService {
     private mainWindow: BrowserWindow | null = null;
 
     /**
+     * Named event handler for ready-to-show event
+     */
+    private readonly handleReadyToShow = (): void => {
+        logger.info("[WindowService] Main window ready to show");
+        this.mainWindow?.show();
+    };
+
+    /**
+     * Named event handler for dom-ready event
+     */
+    private readonly handleDomReady = (): void => {
+        logger.debug("[WindowService] DOM ready in renderer");
+    };
+
+    /**
+     * Named event handler for did-finish-load event
+     */
+    private readonly handleDidFinishLoad = (): void => {
+        logger.debug("[WindowService] Renderer finished loading");
+    };
+
+    /**
+     * Named event handler for did-fail-load event
+     */
+    private readonly handleDidFailLoad = (
+        _event: Electron.Event,
+        errorCode: number,
+        errorDescription: string
+    ): void => {
+        logger.error(
+            `[WindowService] Failed to load renderer: ${errorCode} - ${errorDescription}`
+        );
+    };
+
+    /**
+     * Named event handler for closed event
+     */
+    private readonly handleClosed = (): void => {
+        logger.info("[WindowService] Main window closed");
+        this.mainWindow = null;
+    };
+
+    /**
      * Load development content after waiting for Vite server.
      *
      * @returns Promise that resolves when content is loaded or rejects on error
@@ -439,31 +482,39 @@ export class WindowService {
     private setupWindowEvents(): void {
         if (!this.mainWindow) return;
 
-        this.mainWindow.once("ready-to-show", () => {
-            logger.info("[WindowService] Main window ready to show");
-            this.mainWindow?.show();
-        });
-
-        this.mainWindow.webContents.once("dom-ready", () => {
-            logger.debug("[WindowService] DOM ready in renderer");
-        });
-
-        this.mainWindow.webContents.once("did-finish-load", () => {
-            logger.debug("[WindowService] Renderer finished loading");
-        });
-
-        this.mainWindow.webContents.on(
-            "did-fail-load",
-            (_event, errorCode, errorDescription) => {
-                logger.error(
-                    `[WindowService] Failed to load renderer: ${errorCode} - ${errorDescription}`
-                );
-            }
+        this.mainWindow.once("ready-to-show", this.handleReadyToShow);
+        this.mainWindow.webContents.once("dom-ready", this.handleDomReady);
+        this.mainWindow.webContents.once(
+            "did-finish-load",
+            this.handleDidFinishLoad
         );
+        this.mainWindow.webContents.on("did-fail-load", this.handleDidFailLoad);
+        this.mainWindow.on("closed", this.handleClosed);
+    }
 
-        this.mainWindow.on("closed", () => {
-            logger.info("[WindowService] Main window closed");
-            this.mainWindow = null;
-        });
+    /**
+     * Cleanup window event listeners.
+     *
+     * @remarks
+     * Removes all event listeners to prevent memory leaks.
+     * Should be called before destroying the window.
+     */
+    public cleanupWindowEvents(): void {
+        if (!this.mainWindow || this.mainWindow.isDestroyed()) return;
+
+        this.mainWindow.removeListener("ready-to-show", this.handleReadyToShow);
+        this.mainWindow.webContents.removeListener(
+            "dom-ready",
+            this.handleDomReady
+        );
+        this.mainWindow.webContents.removeListener(
+            "did-finish-load",
+            this.handleDidFinishLoad
+        );
+        this.mainWindow.webContents.removeListener(
+            "did-fail-load",
+            this.handleDidFailLoad
+        );
+        this.mainWindow.removeListener("closed", this.handleClosed);
     }
 }

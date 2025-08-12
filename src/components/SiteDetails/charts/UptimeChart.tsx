@@ -40,14 +40,13 @@
  * @public
  */
 
+import type { ChartOptions } from "chart.js";
 import type { JSX } from "react/jsx-runtime";
 
 import { memo, type MemoExoticComponent } from "react";
+import { Doughnut } from "react-chartjs-2";
 
 import type { UptimeChartData } from "../../../services/chartConfig";
-import type { ChartOptions } from "../../../services/chartSetup";
-
-import { Doughnut } from "../../../services/chartSetup";
 
 /**
  * Memoized uptime distribution doughnut chart component for site monitoring visualization.

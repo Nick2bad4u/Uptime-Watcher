@@ -3,7 +3,7 @@
  * Handles complex site loading with related entities (monitors and history).
  */
 
-import type { Site } from "../../types";
+import type { Site } from "../../../shared/types";
 import type { DatabaseService } from "../database/DatabaseService";
 import type { HistoryRepository } from "../database/HistoryRepository";
 import type { MonitorRepository } from "../database/MonitorRepository";

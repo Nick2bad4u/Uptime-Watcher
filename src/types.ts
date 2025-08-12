@@ -31,53 +31,16 @@ import type {
  * These types are used for form validation and UI state management
  * in monitor creation and editing workflows.
  */
-// Explicit exports from monitor-forms for clarity
-export type {
-    BaseMonitorFields,
-    HttpMonitorFields,
-    MonitorFieldChangeHandlers,
-    MonitorFieldValues,
-    MonitorFormFields,
-    MonitorValidationResult,
-    PingMonitorFields,
-    PortMonitorFields,
-} from "./types/monitor-forms";
+// Import monitor form types directly from "./types/monitor-forms" if needed
 
-export {
-    getDefaultMonitorFields,
-    isHttpMonitorFields,
-    isPingMonitorFields,
-    isPortMonitorFields,
-} from "./types/monitor-forms";
+// Import monitor form functions directly from "./types/monitor-forms" if needed
 
 /**
- * @public
- * @remarks Re-export all shared domain types for frontend consumption.
+ * Shared domain type imports.
+ *
  * @remarks
- * Provides a unified import for all core domain types (Site, Monitor, etc.),
- * ensuring consistency with backend type definitions.
+ * Import shared domain types directly from "\@shared/types".
  */
-// Types available via direct import from @shared/types for better clarity and avoiding re-export issues
-export type {
-    BASE_MONITOR_TYPES,
-    DEFAULT_MONITOR_STATUS,
-    DEFAULT_SITE_STATUS,
-    MonitorFieldDefinition,
-    MonitorStatus,
-    MonitorStatusConstants,
-    MonitorType,
-    SiteForStatus,
-    SiteStatus,
-    StatusHistory,
-} from "@shared/types";
-
-export {
-    isComputedSiteStatus,
-    isMonitorStatus,
-    isSiteStatus,
-    MONITOR_STATUS,
-    validateMonitor,
-} from "@shared/types";
 
 /**
  * @public

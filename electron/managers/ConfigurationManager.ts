@@ -3,8 +3,8 @@
  * Centralizes business logic for configuration decisions and caches validation results.
  */
 
+import type { Site } from "../../shared/types";
 import type { ConfigValue } from "../../shared/types/configTypes";
-import type { Site } from "../types";
 import type { ValidationResult } from "./validators/interfaces";
 
 import { CacheKeys } from "../../shared/utils/cacheKeys";

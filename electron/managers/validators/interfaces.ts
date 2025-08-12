@@ -21,5 +21,8 @@
  *
  * @public
  */
-// Import from unified validation system
-export type { BaseValidationResult as ValidationResult } from "../../../shared/types/validation";
+// Validation result interface - import directly from shared/types/validation if needed
+export interface ValidationResult {
+    errors: string[];
+    success: boolean;
+}

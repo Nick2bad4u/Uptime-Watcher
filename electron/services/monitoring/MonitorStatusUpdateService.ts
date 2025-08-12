@@ -10,8 +10,7 @@
  * @packageDocumentation
  */
 
-import type { Monitor } from "../../../shared/types";
-import type { Site } from "../../types";
+import type { Monitor, Site } from "../../../shared/types";
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import type { MonitorRepository } from "../database/MonitorRepository";
 import type { MonitorOperationRegistry } from "./MonitorOperationRegistry";

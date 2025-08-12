@@ -72,11 +72,11 @@
  * ```
  */
 
+import type { Monitor, Site, StatusUpdate } from "../shared/types";
 import type { UptimeEvents } from "./events/eventTypes";
 import type { DatabaseManager } from "./managers/DatabaseManager";
 import type { MonitorManager } from "./managers/MonitorManager";
 import type { SiteManager } from "./managers/SiteManager";
-import type { Monitor, Site, StatusUpdate } from "./types";
 
 import {
     createErrorHandlingMiddleware,
@@ -184,6 +184,268 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
     // Manager instances
     private readonly siteManager: SiteManager;
+
+    // Named event handlers for database events
+    private readonly handleUpdateSitesCacheRequestedEvent = (
+        data: UpdateSitesCacheRequestData
+    ): void => {
+        void (async (): Promise<void> => {
+            try {
+                await this.handleUpdateSitesCacheRequest(data);
+            } catch (error) {
+                logger.error(
+                    "[UptimeOrchestrator] Error handling update-sites-cache-requested:",
+                    error
+                );
+            }
+        })();
+    };
+
+    private readonly handleGetSitesFromCacheRequestedEvent = (): void => {
+        void (async (): Promise<void> => {
+            try {
+                await this.handleGetSitesFromCacheRequest();
+            } catch (error) {
+                logger.error(
+                    "[UptimeOrchestrator] Error handling get-sites-from-cache-requested:",
+                    error
+                );
+            }
+        })();
+    };
+
+    private readonly handleDatabaseInitializedEvent = (): void => {
+        void (async (): Promise<void> => {
+            try {
+                await this.handleDatabaseInitialized();
+            } catch (error) {
+                logger.error(
+                    "[UptimeOrchestrator] Error handling internal:database:initialized:",
+                    error
+                );
+            }
+        })();
+    };
+
+    // Named event handlers for event forwarding
+    private readonly handleSiteAddedEvent = (
+        data: SiteEventData & { _meta?: unknown }
+    ): void => {
+        void (async (): Promise<void> => {
+            // Extract original data without _meta to prevent conflicts
+            await this.emitTyped("site:added", {
+                site: data.site,
+                source: "user" as const,
+                timestamp: data.timestamp,
+            });
+        })();
+    };
+
+    private readonly handleSiteRemovedEvent = (
+        data: SiteEventData & { _meta?: unknown }
+    ): void => {
+        void (async (): Promise<void> => {
+            // Extract original data without _meta to prevent conflicts
+            await this.emitTyped("site:removed", {
+                cascade: true,
+                siteId: data.identifier ?? data.site.identifier,
+                siteName: data.site.name,
+                timestamp: data.timestamp,
+            });
+        })();
+    };
+
+    private readonly handleSiteUpdatedEvent = (
+        data: SiteEventData & { _meta?: unknown; previousSite?: Site }
+    ): void => {
+        void (async (): Promise<void> => {
+            // Extract original data without _meta to prevent conflicts
+            await this.emitTyped("site:updated", {
+                previousSite: data.previousSite ?? data.site,
+                site: data.site,
+                timestamp: data.timestamp,
+                updatedFields: data.updatedFields ?? [],
+            });
+        })();
+    };
+
+    // Named event handlers for monitoring events
+    private readonly handleMonitorStartedEvent = (): void => {
+        void (async (): Promise<void> => {
+            try {
+                const sites = this.siteManager.getSitesFromCache();
+                const totalMonitors = sites.reduce(
+                    (total: number, site: Site) => total + site.monitors.length,
+                    0
+                );
+
+                await this.emitTyped("monitoring:started", {
+                    monitorCount: totalMonitors,
+                    siteCount: sites.length,
+                    timestamp: Date.now(),
+                });
+            } catch (error) {
+                logger.error(
+                    "[UptimeOrchestrator] Error handling internal:monitor:started:",
+                    error
+                );
+            }
+        })();
+    };
+
+    private readonly handleMonitorStoppedEvent = (): void => {
+        void (async (): Promise<void> => {
+            try {
+                const activeMonitors = this.monitorManager.isMonitoringActive()
+                    ? this.monitorManager.getActiveMonitorCount()
+                    : 0;
+
+                await this.emitTyped("monitoring:stopped", {
+                    activeMonitors,
+                    reason: "user" as const,
+                    timestamp: Date.now(),
+                });
+            } catch (error) {
+                logger.error(
+                    "[UptimeOrchestrator] Error handling internal:monitor:stopped:",
+                    error
+                );
+            }
+        })();
+    };
+
+    // Named event handlers for site management events
+    private readonly handleStartMonitoringRequestedEvent = (
+        data: StartMonitoringRequestData
+    ): void => {
+        void (async (): Promise<void> => {
+            try {
+                const success =
+                    await this.monitorManager.startMonitoringForSite(
+                        data.identifier,
+                        data.monitorId
+                    );
+                await this.emitTyped(
+                    "internal:site:start-monitoring-response",
+                    {
+                        identifier: data.identifier,
+                        monitorId: data.monitorId,
+                        operation: "start-monitoring-response",
+                        success,
+                        timestamp: Date.now(),
+                    }
+                );
+            } catch (error) {
+                logger.error(
+                    `[UptimeOrchestrator] Error starting monitoring for site ${data.identifier}:`,
+                    error
+                );
+                await this.emitTyped(
+                    "internal:site:start-monitoring-response",
+                    {
+                        identifier: data.identifier,
+                        monitorId: data.monitorId,
+                        operation: "start-monitoring-response",
+                        success: false,
+                        timestamp: Date.now(),
+                    }
+                );
+            }
+        })();
+    };
+
+    private readonly handleStopMonitoringRequestedEvent = (
+        data: StopMonitoringRequestData
+    ): void => {
+        void (async (): Promise<void> => {
+            try {
+                const success = await this.monitorManager.stopMonitoringForSite(
+                    data.identifier,
+                    data.monitorId
+                );
+                await this.emitTyped("internal:site:stop-monitoring-response", {
+                    identifier: data.identifier,
+                    monitorId: data.monitorId,
+                    operation: "stop-monitoring-response",
+                    success,
+                    timestamp: Date.now(),
+                });
+            } catch (error) {
+                logger.error(
+                    `[UptimeOrchestrator] Error stopping monitoring for site ${data.identifier}:`,
+                    error
+                );
+                await this.emitTyped("internal:site:stop-monitoring-response", {
+                    identifier: data.identifier,
+                    monitorId: data.monitorId,
+                    operation: "stop-monitoring-response",
+                    success: false,
+                    timestamp: Date.now(),
+                });
+            }
+        })();
+    };
+
+    private readonly handleIsMonitoringActiveRequestedEvent = (
+        data: IsMonitoringActiveRequestData
+    ): void => {
+        void (async (): Promise<void> => {
+            const isActive = this.monitorManager.isMonitorActiveInScheduler(
+                data.identifier,
+                data.monitorId
+            );
+            await this.emitTyped(
+                "internal:site:is-monitoring-active-response",
+                {
+                    identifier: data.identifier,
+                    isActive,
+                    monitorId: data.monitorId,
+                    operation: "is-monitoring-active-response",
+                    timestamp: Date.now(),
+                }
+            );
+        })();
+    };
+
+    private readonly handleRestartMonitoringRequestedEvent = (
+        data: RestartMonitoringRequestData
+    ): void => {
+        void (async (): Promise<void> => {
+            try {
+                // Note: restartMonitorWithNewConfig is intentionally synchronous
+                // as it only updates scheduler configuration without async I/O
+                const success = this.monitorManager.restartMonitorWithNewConfig(
+                    data.identifier,
+                    data.monitor
+                );
+                await this.emitTyped(
+                    "internal:site:restart-monitoring-response",
+                    {
+                        identifier: data.identifier,
+                        monitorId: data.monitor.id,
+                        operation: "restart-monitoring-response",
+                        success,
+                        timestamp: Date.now(),
+                    }
+                );
+            } catch (error) {
+                logger.error(
+                    `[UptimeOrchestrator] Error restarting monitoring for site ${data.identifier}:`,
+                    error
+                );
+                await this.emitTyped(
+                    "internal:site:restart-monitoring-response",
+                    {
+                        identifier: data.identifier,
+                        monitorId: data.monitor.id,
+                        operation: "restart-monitoring-response",
+                        success: false,
+                        timestamp: Date.now(),
+                    }
+                );
+            }
+        })();
+    };
 
     /**
      * Gets the current history retention limit.
@@ -328,6 +590,73 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             );
         } catch (error) {
             logger.error("[UptimeOrchestrator] Initialization failed:", error);
+            throw error;
+        }
+    }
+
+    /**
+     * Shuts down the orchestrator and removes all event listeners.
+     * Ensures proper cleanup to prevent memory leaks.
+     *
+     * @returns Promise that resolves when shutdown is complete.
+     */
+    public async shutdown(): Promise<void> {
+        try {
+            logger.info("[UptimeOrchestrator] Starting shutdown...");
+
+            // Remove specific event listeners using the named handler references
+            this.off(
+                "internal:database:update-sites-cache-requested",
+                this.handleUpdateSitesCacheRequestedEvent
+            );
+            this.off(
+                "internal:database:get-sites-from-cache-requested",
+                this.handleGetSitesFromCacheRequestedEvent
+            );
+            this.off(
+                "internal:database:initialized",
+                this.handleDatabaseInitializedEvent
+            );
+
+            this.off("internal:site:added", this.handleSiteAddedEvent);
+            this.off("internal:site:removed", this.handleSiteRemovedEvent);
+            this.off("internal:site:updated", this.handleSiteUpdatedEvent);
+
+            this.off(
+                "internal:monitor:started",
+                this.handleMonitorStartedEvent
+            );
+            this.off(
+                "internal:monitor:stopped",
+                this.handleMonitorStoppedEvent
+            );
+
+            this.off(
+                "internal:site:start-monitoring-requested",
+                this.handleStartMonitoringRequestedEvent
+            );
+            this.off(
+                "internal:site:stop-monitoring-requested",
+                this.handleStopMonitoringRequestedEvent
+            );
+            this.off(
+                "internal:site:is-monitoring-active-requested",
+                this.handleIsMonitoringActiveRequestedEvent
+            );
+            this.off(
+                "internal:site:restart-monitoring-requested",
+                this.handleRestartMonitoringRequestedEvent
+            );
+
+            // Clear all middleware
+            this.clearMiddleware();
+
+            // Add an await for async compliance
+            await Promise.resolve();
+
+            logger.info("[UptimeOrchestrator] Shutdown completed successfully");
+        } catch (error) {
+            logger.error("[UptimeOrchestrator] Shutdown failed:", error);
             throw error;
         }
     }
@@ -705,101 +1034,37 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Set up database manager event handlers.
      */
     private setupDatabaseEventHandlers(): void {
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener
         this.on(
             "internal:database:update-sites-cache-requested",
-            (data: UpdateSitesCacheRequestData): void => {
-                void (async (): Promise<void> => {
-                    try {
-                        await this.handleUpdateSitesCacheRequest(data);
-                    } catch (error) {
-                        logger.error(
-                            "[UptimeOrchestrator] Error handling update-sites-cache-requested:",
-                            error
-                        );
-                    }
-                })();
-            }
+            this.handleUpdateSitesCacheRequestedEvent
         );
 
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener
         this.on(
             "internal:database:get-sites-from-cache-requested",
-            (): void => {
-                void (async (): Promise<void> => {
-                    try {
-                        await this.handleGetSitesFromCacheRequest();
-                    } catch (error) {
-                        logger.error(
-                            "[UptimeOrchestrator] Error handling get-sites-from-cache-requested:",
-                            error
-                        );
-                    }
-                })();
-            }
+            this.handleGetSitesFromCacheRequestedEvent
         );
 
-        this.on("internal:database:initialized", (): void => {
-            void (async (): Promise<void> => {
-                try {
-                    await this.handleDatabaseInitialized();
-                } catch (error) {
-                    logger.error(
-                        "[UptimeOrchestrator] Error handling internal:database:initialized:",
-                        error
-                    );
-                }
-            })();
-        });
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener
+        this.on(
+            "internal:database:initialized",
+            this.handleDatabaseInitializedEvent
+        );
     }
 
     /**
      * Set up event forwarding from internal events to public frontend events.
      */
     private setupEventForwarding(): void {
-        this.on(
-            "internal:site:added",
-            (data: SiteEventData & { _meta?: unknown }): void => {
-                void (async (): Promise<void> => {
-                    // Extract original data without _meta to prevent conflicts
-                    await this.emitTyped("site:added", {
-                        site: data.site,
-                        source: "user" as const,
-                        timestamp: data.timestamp,
-                    });
-                })();
-            }
-        );
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener
+        this.on("internal:site:added", this.handleSiteAddedEvent);
 
-        this.on(
-            "internal:site:removed",
-            (data: SiteEventData & { _meta?: unknown }): void => {
-                void (async (): Promise<void> => {
-                    // Extract original data without _meta to prevent conflicts
-                    await this.emitTyped("site:removed", {
-                        cascade: true,
-                        siteId: data.identifier ?? data.site.identifier,
-                        siteName: data.site.name,
-                        timestamp: data.timestamp,
-                    });
-                })();
-            }
-        );
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener
+        this.on("internal:site:removed", this.handleSiteRemovedEvent);
 
-        this.on(
-            "internal:site:updated",
-            (
-                data: SiteEventData & { _meta?: unknown; previousSite?: Site }
-            ): void => {
-                void (async (): Promise<void> => {
-                    // Extract original data without _meta to prevent conflicts
-                    await this.emitTyped("site:updated", {
-                        previousSite: data.previousSite ?? data.site,
-                        site: data.site,
-                        timestamp: data.timestamp,
-                        updatedFields: data.updatedFields ?? [],
-                    });
-                })();
-            }
-        );
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener
+        this.on("internal:site:updated", this.handleSiteUpdatedEvent);
     }
 
     /**
@@ -829,200 +1094,39 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Set up monitoring event handlers.
      */
     private setupMonitoringEventHandlers(): void {
-        this.on("internal:monitor:started", (): void => {
-            void (async (): Promise<void> => {
-                try {
-                    const sites = this.siteManager.getSitesFromCache();
-                    const totalMonitors = sites.reduce(
-                        (total: number, site: Site) =>
-                            total + site.monitors.length,
-                        0
-                    );
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener
+        this.on("internal:monitor:started", this.handleMonitorStartedEvent);
 
-                    await this.emitTyped("monitoring:started", {
-                        monitorCount: totalMonitors,
-                        siteCount: sites.length,
-                        timestamp: Date.now(),
-                    });
-                } catch (error) {
-                    logger.error(
-                        "[UptimeOrchestrator] Error handling internal:monitor:started:",
-                        error
-                    );
-                }
-            })();
-        });
-
-        this.on("internal:monitor:stopped", (): void => {
-            void (async (): Promise<void> => {
-                try {
-                    const activeMonitors =
-                        this.monitorManager.isMonitoringActive()
-                            ? this.monitorManager.getActiveMonitorCount()
-                            : 0;
-
-                    await this.emitTyped("monitoring:stopped", {
-                        activeMonitors,
-                        reason: "user" as const,
-                        timestamp: Date.now(),
-                    });
-                } catch (error) {
-                    logger.error(
-                        "[UptimeOrchestrator] Error handling internal:monitor:stopped:",
-                        error
-                    );
-                }
-            })();
-        });
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener
+        this.on("internal:monitor:stopped", this.handleMonitorStoppedEvent);
     }
 
     /**
      * Set up site manager event handlers.
      */
     private setupSiteEventHandlers(): void {
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener
         this.on(
             "internal:site:start-monitoring-requested",
-            (data: StartMonitoringRequestData): void => {
-                void (async (): Promise<void> => {
-                    try {
-                        const success =
-                            await this.monitorManager.startMonitoringForSite(
-                                data.identifier,
-                                data.monitorId
-                            );
-                        await this.emitTyped(
-                            "internal:site:start-monitoring-response",
-                            {
-                                identifier: data.identifier,
-                                monitorId: data.monitorId,
-                                operation: "start-monitoring-response",
-                                success,
-                                timestamp: Date.now(),
-                            }
-                        );
-                    } catch (error) {
-                        logger.error(
-                            `[UptimeOrchestrator] Error starting monitoring for site ${data.identifier}:`,
-                            error
-                        );
-                        await this.emitTyped(
-                            "internal:site:start-monitoring-response",
-                            {
-                                identifier: data.identifier,
-                                monitorId: data.monitorId,
-                                operation: "start-monitoring-response",
-                                success: false,
-                                timestamp: Date.now(),
-                            }
-                        );
-                    }
-                })();
-            }
+            this.handleStartMonitoringRequestedEvent
         );
 
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener
         this.on(
             "internal:site:stop-monitoring-requested",
-            (data: StopMonitoringRequestData): void => {
-                void (async (): Promise<void> => {
-                    try {
-                        const success =
-                            await this.monitorManager.stopMonitoringForSite(
-                                data.identifier,
-                                data.monitorId
-                            );
-                        await this.emitTyped(
-                            "internal:site:stop-monitoring-response",
-                            {
-                                identifier: data.identifier,
-                                monitorId: data.monitorId,
-                                operation: "stop-monitoring-response",
-                                success,
-                                timestamp: Date.now(),
-                            }
-                        );
-                    } catch (error) {
-                        logger.error(
-                            `[UptimeOrchestrator] Error stopping monitoring for site ${data.identifier}:`,
-                            error
-                        );
-                        await this.emitTyped(
-                            "internal:site:stop-monitoring-response",
-                            {
-                                identifier: data.identifier,
-                                monitorId: data.monitorId,
-                                operation: "stop-monitoring-response",
-                                success: false,
-                                timestamp: Date.now(),
-                            }
-                        );
-                    }
-                })();
-            }
+            this.handleStopMonitoringRequestedEvent
         );
 
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener
         this.on(
             "internal:site:is-monitoring-active-requested",
-            (data: IsMonitoringActiveRequestData): void => {
-                void (async (): Promise<void> => {
-                    const isActive =
-                        this.monitorManager.isMonitorActiveInScheduler(
-                            data.identifier,
-                            data.monitorId
-                        );
-                    await this.emitTyped(
-                        "internal:site:is-monitoring-active-response",
-                        {
-                            identifier: data.identifier,
-                            isActive,
-                            monitorId: data.monitorId,
-                            operation: "is-monitoring-active-response",
-                            timestamp: Date.now(),
-                        }
-                    );
-                })();
-            }
+            this.handleIsMonitoringActiveRequestedEvent
         );
 
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener
         this.on(
             "internal:site:restart-monitoring-requested",
-            (data: RestartMonitoringRequestData): void => {
-                void (async (): Promise<void> => {
-                    try {
-                        // Note: restartMonitorWithNewConfig is intentionally synchronous
-                        // as it only updates scheduler configuration without async I/O
-                        const success =
-                            this.monitorManager.restartMonitorWithNewConfig(
-                                data.identifier,
-                                data.monitor
-                            );
-                        await this.emitTyped(
-                            "internal:site:restart-monitoring-response",
-                            {
-                                identifier: data.identifier,
-                                monitorId: data.monitor.id,
-                                operation: "restart-monitoring-response",
-                                success,
-                                timestamp: Date.now(),
-                            }
-                        );
-                    } catch (error) {
-                        logger.error(
-                            `[UptimeOrchestrator] Error restarting monitoring for site ${data.identifier}:`,
-                            error
-                        );
-                        await this.emitTyped(
-                            "internal:site:restart-monitoring-response",
-                            {
-                                identifier: data.identifier,
-                                monitorId: data.monitor.id,
-                                operation: "restart-monitoring-response",
-                                success: false,
-                                timestamp: Date.now(),
-                            }
-                        );
-                    }
-                })();
-            }
+            this.handleRestartMonitoringRequestedEvent
         );
     }
 

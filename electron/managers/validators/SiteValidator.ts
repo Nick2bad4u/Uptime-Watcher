@@ -21,7 +21,7 @@
  * ```
  */
 
-import type { Site } from "../../types";
+import type { Site } from "../../../shared/types";
 import type { ValidationResult } from "./interfaces";
 
 import { isNonEmptyString } from "../../../shared/validation/validatorUtils";

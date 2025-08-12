@@ -142,8 +142,8 @@ export type UpdateStatus =
  *
  * @example
  * ```typescript
- * import { Site, Monitor, StatusUpdate } from '@/stores/types';
- * // Instead of multiple imports from @shared/types
+ * ```typescript
+ * import \{ Site, Monitor, StatusUpdate \} from '\@shared/types';
+ * // Instead of importing from stores/types
  * ```
  */
-export type { Monitor, MonitorType, Site, StatusUpdate } from "@shared/types";

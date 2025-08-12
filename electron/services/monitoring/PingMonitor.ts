@@ -34,7 +34,7 @@
  * @see {@link performPingCheckWithRetry} - Core ping checking functionality
  */
 
-import type { MonitorType, Site } from "../../types";
+import type { MonitorType, Site } from "../../../shared/types";
 import type {
     IMonitorService,
     MonitorCheckResult,
@@ -42,12 +42,11 @@ import type {
 } from "./types";
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
-import { DEFAULT_RETRY_ATTEMPTS } from "./constants";
 import {
-    getMonitorRetryAttempts,
-    getMonitorTimeout,
-    hasValidHost,
-} from "./utils/monitorTypeGuards";
+    createMonitorErrorResult,
+    extractMonitorConfig,
+    validateMonitorHost,
+} from "./shared/monitorServiceHelpers";
 import { performPingCheckWithRetry } from "./utils/pingRetry";
 
 /**
@@ -138,23 +137,20 @@ export class PingMonitor implements IMonitorService {
             );
         }
 
-        if (!hasValidHost(monitor)) {
-            return {
-                details: "Missing or invalid host configuration",
-                error: "Ping monitor missing valid host",
-                responseTime: 0,
-                status: "down",
-            };
+        const hostError = validateMonitorHost(monitor);
+        if (hostError) {
+            return createMonitorErrorResult(hostError, 0);
+        }
+
+        // Host is guaranteed to be valid at this point due to validation above
+        if (!monitor.host) {
+            return createMonitorErrorResult("Monitor missing valid host", 0);
         }
 
         // Use type-safe utility functions instead of type assertions
-        const timeout = getMonitorTimeout(
+        const { retryAttempts, timeout } = extractMonitorConfig(
             monitor,
-            this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT
-        );
-        const retryAttempts = getMonitorRetryAttempts(
-            monitor,
-            DEFAULT_RETRY_ATTEMPTS
+            this.config.timeout
         );
 
         return performPingCheckWithRetry(monitor.host, timeout, retryAttempts);

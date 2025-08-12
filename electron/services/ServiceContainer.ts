@@ -1,3 +1,4 @@
+import type { Site } from "../../shared/types";
 /**
  * Centralized dependency injection container for all Electron services.
  *
@@ -15,7 +16,6 @@
  */
 import type { UptimeEvents } from "../events/eventTypes";
 import type { IMonitoringOperations } from "../managers/SiteManager";
-import type { Site } from "../types";
 import type { StandardizedCache } from "../utils/cache/StandardizedCache";
 
 import { TypedEventBus } from "../events/TypedEventBus";

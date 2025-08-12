@@ -8,7 +8,7 @@ import type { JSX } from "react/jsx-runtime";
 
 import React, { useEffect, useState } from "react";
 
-import type { MonitorType } from "../../types";
+import type { MonitorType } from "../../../shared/types";
 
 import logger from "../../services/logger";
 import {

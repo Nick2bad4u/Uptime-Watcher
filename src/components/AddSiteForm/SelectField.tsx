@@ -43,8 +43,7 @@
 import React, { useCallback } from "react";
 
 import ThemedSelect from "../../theme/components/ThemedSelect";
-import { createAriaLabel, getAriaDescribedBy } from "./form-utils";
-import FormField from "./FormField";
+import { BaseFormField } from "./BaseFormField";
 
 /**
  * Properties for the SelectField component.
@@ -136,42 +135,34 @@ const SelectField: React.NamedExoticComponent<SelectFieldProperties> =
         );
 
         return (
-            <FormField
+            <BaseFormField
                 {...(error !== undefined && { error })}
                 {...(helpText !== undefined && { helpText })}
                 id={id}
                 label={label}
                 required={required}
             >
-                <ThemedSelect
-                    {...((): Record<string, unknown> => {
-                        const ariaDescribedBy = getAriaDescribedBy(
-                            id,
-                            error,
-                            helpText
-                        );
-                        return ariaDescribedBy
-                            ? { "aria-describedby": ariaDescribedBy }
-                            : {};
-                    })()}
-                    aria-label={createAriaLabel(label, required)}
-                    disabled={disabled}
-                    id={id}
-                    onChange={handleChange}
-                    required={required}
-                    title={createAriaLabel(label, required)}
-                    value={value}
-                >
-                    {placeholder ? (
-                        <option value="">{placeholder}</option>
-                    ) : null}
-                    {options.map((option) => (
-                        <option key={option.value} value={option.value}>
-                            {option.label}
-                        </option>
-                    ))}
-                </ThemedSelect>
-            </FormField>
+                {(ariaProps) => (
+                    <ThemedSelect
+                        {...ariaProps}
+                        disabled={disabled}
+                        id={id}
+                        onChange={handleChange}
+                        required={required}
+                        title={ariaProps["aria-label"]}
+                        value={value}
+                    >
+                        {placeholder ? (
+                            <option value="">{placeholder}</option>
+                        ) : null}
+                        {options.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </ThemedSelect>
+                )}
+            </BaseFormField>
         );
     });
 

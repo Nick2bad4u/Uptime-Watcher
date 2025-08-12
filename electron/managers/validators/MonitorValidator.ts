@@ -16,7 +16,7 @@
  * @public
  */
 
-import type { Site } from "../../types";
+import type { Site } from "../../../shared/types";
 import type { ValidationResult } from "./interfaces";
 
 import { validateMonitorData } from "../../../shared/validation/schemas";

@@ -7,8 +7,7 @@
 
 import { hasScales as hasScalesInternal } from "@shared/types/chartConfig";
 
-// Re-export hasScales for convenience
-export { hasScales } from "@shared/types/chartConfig";
+// Import hasScales directly from "@shared/types/chartConfig" if needed
 
 /**
  * Safely get scale configuration.

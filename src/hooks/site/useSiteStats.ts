@@ -6,7 +6,7 @@
 
 import { useMemo } from "react";
 
-import type { StatusHistory } from "../../types";
+import type { StatusHistory } from "../../../shared/types";
 
 /**
  * Interface for site statistics data

@@ -43,6 +43,7 @@
  * @packageDocumentation
  */
 
+import type { Site } from "../../shared/types";
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
 import type { DatabaseService } from "../services/database/DatabaseService";
@@ -50,7 +51,6 @@ import type { HistoryRepository } from "../services/database/HistoryRepository";
 import type { MonitorRepository } from "../services/database/MonitorRepository";
 import type { SettingsRepository } from "../services/database/SettingsRepository";
 import type { SiteRepository } from "../services/database/SiteRepository";
-import type { Site } from "../types";
 import type { MonitoringConfig } from "../utils/database/interfaces";
 import type { ConfigurationManager } from "./ConfigurationManager";
 

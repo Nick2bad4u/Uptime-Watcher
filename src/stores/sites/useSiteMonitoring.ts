@@ -5,8 +5,9 @@
  * Uses centralized error store for consistent error handling across the application.
  */
 
-import { useErrorStore } from "../error/useErrorStore";
-import { logStoreAction, withErrorHandling } from "../utils";
+import { withErrorHandling } from "../../../shared/utils/errorHandling";
+import { logStoreAction } from "../utils";
+import { createStoreErrorHandler } from "../utils/storeErrorHandling";
 
 export interface SiteMonitoringActions {
     /** Check a site now */
@@ -41,29 +42,17 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
     checkSiteNow: async (siteId: string, monitorId: string): Promise<void> => {
         logStoreAction("SitesStore", "checkSiteNow", { monitorId, siteId });
 
-        const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
                 await window.electronAPI.sites.checkSiteNow(siteId, monitorId);
                 // Backend will emit 'monitor:status-changed', which will trigger incremental update
             },
-            {
-                clearError: () => {
-                    errorStore.clearStoreError("sites-monitoring");
-                },
-                setError: (error) => {
-                    errorStore.setStoreError("sites-monitoring", error);
-                },
-                setLoading: (loading) => {
-                    errorStore.setOperationLoading("checkSiteNow", loading);
-                },
-            }
+            createStoreErrorHandler("sites-monitoring", "checkSiteNow")
         );
     },
     startSiteMonitoring: async (siteId: string): Promise<void> => {
         logStoreAction("SitesStore", "startSiteMonitoring", { siteId });
 
-        const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
                 await window.electronAPI.monitoring.startMonitoringForSite(
@@ -71,20 +60,7 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
                 );
                 // No need for manual sync - StatusUpdateHandler will update UI via events
             },
-            {
-                clearError: () => {
-                    errorStore.clearStoreError("sites-monitoring");
-                },
-                setError: (error) => {
-                    errorStore.setStoreError("sites-monitoring", error);
-                },
-                setLoading: (loading) => {
-                    errorStore.setOperationLoading(
-                        "startSiteMonitoring",
-                        loading
-                    );
-                },
-            }
+            createStoreErrorHandler("sites-monitoring", "startSiteMonitoring")
         );
     },
     startSiteMonitorMonitoring: async (
@@ -96,7 +72,6 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
             siteId,
         });
 
-        const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
                 await window.electronAPI.monitoring.startMonitoringForSite(
@@ -105,26 +80,15 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
                 );
                 // No need for manual sync - StatusUpdateHandler will update UI via events
             },
-            {
-                clearError: () => {
-                    errorStore.clearStoreError("sites-monitoring");
-                },
-                setError: (error) => {
-                    errorStore.setStoreError("sites-monitoring", error);
-                },
-                setLoading: (loading) => {
-                    errorStore.setOperationLoading(
-                        "startSiteMonitorMonitoring",
-                        loading
-                    );
-                },
-            }
+            createStoreErrorHandler(
+                "sites-monitoring",
+                "startSiteMonitorMonitoring"
+            )
         );
     },
     stopSiteMonitoring: async (siteId: string): Promise<void> => {
         logStoreAction("SitesStore", "stopSiteMonitoring", { siteId });
 
-        const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
                 await window.electronAPI.monitoring.stopMonitoringForSite(
@@ -132,20 +96,7 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
                 );
                 // No need for manual sync - StatusUpdateHandler will update UI via events
             },
-            {
-                clearError: () => {
-                    errorStore.clearStoreError("sites-monitoring");
-                },
-                setError: (error) => {
-                    errorStore.setStoreError("sites-monitoring", error);
-                },
-                setLoading: (loading) => {
-                    errorStore.setOperationLoading(
-                        "stopSiteMonitoring",
-                        loading
-                    );
-                },
-            }
+            createStoreErrorHandler("sites-monitoring", "stopSiteMonitoring")
         );
     },
     stopSiteMonitorMonitoring: async (
@@ -157,7 +108,6 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
             siteId,
         });
 
-        const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
                 await window.electronAPI.monitoring.stopMonitoringForSite(
@@ -166,20 +116,10 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
                 );
                 // No need for manual sync - StatusUpdateHandler will update UI via events
             },
-            {
-                clearError: () => {
-                    errorStore.clearStoreError("sites-monitoring");
-                },
-                setError: (error) => {
-                    errorStore.setStoreError("sites-monitoring", error);
-                },
-                setLoading: (loading) => {
-                    errorStore.setOperationLoading(
-                        "stopSiteMonitorMonitoring",
-                        loading
-                    );
-                },
-            }
+            createStoreErrorHandler(
+                "sites-monitoring",
+                "stopSiteMonitorMonitoring"
+            )
         );
     },
 });

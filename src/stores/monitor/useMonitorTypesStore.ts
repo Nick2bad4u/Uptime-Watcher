@@ -40,8 +40,9 @@ import type { Monitor, MonitorType } from "../../../shared/types";
 import type { ValidationResult } from "../../../shared/types/validation";
 import type { BaseStore } from "../types";
 
+import { withErrorHandling } from "../../../shared/utils/errorHandling";
 import { safeExtractIpcData } from "../../types/ipc";
-import { logStoreAction, withErrorHandling } from "../utils";
+import { logStoreAction } from "../utils";
 
 /**
  * Monitor Types store actions interface.

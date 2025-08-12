@@ -63,6 +63,67 @@ export class AutoUpdaterService {
     private onStatusChange?: (statusData: UpdateStatusData) => void;
 
     /**
+     * Named event handler for checking-for-update event
+     */
+    private readonly handleCheckingForUpdate = (): void => {
+        logger.debug("[AutoUpdaterService] Checking for updates");
+        this.notifyStatusChange({ status: "checking" });
+    };
+
+    /**
+     * Named event handler for update-available event
+     */
+    private readonly handleUpdateAvailable = (info: unknown): void => {
+        logger.info("[AutoUpdaterService] Update available", info);
+        this.notifyStatusChange({ status: "available" });
+    };
+
+    /**
+     * Named event handler for update-not-available event
+     */
+    private readonly handleUpdateNotAvailable = (info: unknown): void => {
+        logger.debug("[AutoUpdaterService] No update available", info);
+        this.notifyStatusChange({ status: "idle" });
+    };
+
+    /**
+     * Named event handler for download-progress event
+     */
+    private readonly handleDownloadProgress = (progressObj: {
+        bytesPerSecond: number;
+        percent: number;
+        total: number;
+        transferred: number;
+    }): void => {
+        logger.debug("[AutoUpdaterService] Download progress", {
+            bytesPerSecond: progressObj.bytesPerSecond,
+            percent: progressObj.percent,
+            total: progressObj.total,
+            transferred: progressObj.transferred,
+        });
+        this.notifyStatusChange({ status: "downloading" });
+    };
+
+    /**
+     * Named event handler for update-downloaded event
+     */
+    private readonly handleUpdateDownloaded = (info: unknown): void => {
+        logger.info("[AutoUpdaterService] Update downloaded", info);
+        this.notifyStatusChange({ status: "downloaded" });
+    };
+
+    /**
+     * Named event handler for error event
+     */
+    private readonly handleError = (error: Error): void => {
+        logger.error("[AutoUpdaterService] Auto-updater error", error);
+        this.notifyStatusChange({
+            error: error.message || String(error),
+            status: "error",
+        });
+    };
+
+    /**
      * Check for updates and notify if available.
      *
      * @returns Promise that resolves when check completes
@@ -123,43 +184,49 @@ export class AutoUpdaterService {
     public initialize(): void {
         logger.info("[AutoUpdaterService] Initializing auto-updater");
 
-        autoUpdater.on("checking-for-update", () => {
-            logger.debug("[AutoUpdaterService] Checking for updates");
-            this.notifyStatusChange({ status: "checking" });
-        });
+        autoUpdater.on("checking-for-update", this.handleCheckingForUpdate);
+        autoUpdater.on("update-available", this.handleUpdateAvailable);
+        autoUpdater.on("update-not-available", this.handleUpdateNotAvailable);
+        autoUpdater.on("download-progress", this.handleDownloadProgress);
+        autoUpdater.on("update-downloaded", this.handleUpdateDownloaded);
+        autoUpdater.on("error", this.handleError);
+    }
 
-        autoUpdater.on("update-available", (info) => {
-            logger.info("[AutoUpdaterService] Update available", info);
-            this.notifyStatusChange({ status: "available" });
-        });
+    /**
+     * Cleanup method to remove all event listeners.
+     *
+     * @returns void
+     *
+     * @remarks
+     * Removes all event listeners registered during initialization.
+     * Should be called before application shutdown.
+     */
+    public cleanup(): void {
+        logger.info(
+            "[AutoUpdaterService] Cleaning up auto-updater event listeners"
+        );
 
-        autoUpdater.on("update-not-available", (info) => {
-            logger.debug("[AutoUpdaterService] No update available", info);
-            this.notifyStatusChange({ status: "idle" });
-        });
-
-        autoUpdater.on("download-progress", (progressObj) => {
-            logger.debug("[AutoUpdaterService] Download progress", {
-                bytesPerSecond: progressObj.bytesPerSecond,
-                percent: progressObj.percent,
-                total: progressObj.total,
-                transferred: progressObj.transferred,
-            });
-            this.notifyStatusChange({ status: "downloading" });
-        });
-
-        autoUpdater.on("update-downloaded", (info) => {
-            logger.info("[AutoUpdaterService] Update downloaded", info);
-            this.notifyStatusChange({ status: "downloaded" });
-        });
-
-        autoUpdater.on("error", (error) => {
-            logger.error("[AutoUpdaterService] Auto-updater error", error);
-            this.notifyStatusChange({
-                error: error.message || String(error),
-                status: "error",
-            });
-        });
+        autoUpdater.removeListener(
+            "checking-for-update",
+            this.handleCheckingForUpdate
+        );
+        autoUpdater.removeListener(
+            "update-available",
+            this.handleUpdateAvailable
+        );
+        autoUpdater.removeListener(
+            "update-not-available",
+            this.handleUpdateNotAvailable
+        );
+        autoUpdater.removeListener(
+            "download-progress",
+            this.handleDownloadProgress
+        );
+        autoUpdater.removeListener(
+            "update-downloaded",
+            this.handleUpdateDownloaded
+        );
+        autoUpdater.removeListener("error", this.handleError);
     }
 
     /**

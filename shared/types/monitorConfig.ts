@@ -212,11 +212,10 @@ export interface PingMonitorConfig extends BaseMonitorConfig {
  *
  * @remarks
  * Used to return validation results for monitor configurations.
+ * Import directly from "./validation" for MonitorConfigValidationResult if needed.
  *
  * @public
  */
-// Import from unified validation system
-export type { MonitorConfigValidationResult } from "./validation";
 
 /**
  * Configuration interface for port monitors.

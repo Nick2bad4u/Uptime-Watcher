@@ -43,14 +43,13 @@
  * @public
  */
 
+import type { ChartOptions } from "chart.js";
 import type { JSX } from "react/jsx-runtime";
 
 import { memo, type MemoExoticComponent } from "react";
+import { Line } from "react-chartjs-2";
 
 import type { ResponseTimeChartData } from "../../../services/chartConfig";
-import type { ChartOptions } from "../../../services/chartSetup";
-
-import { Line } from "../../../services/chartSetup";
 
 /**
  * Memoized response time line chart component for monitoring performance trends.

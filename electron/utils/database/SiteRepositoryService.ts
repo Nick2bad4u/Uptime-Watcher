@@ -60,6 +60,7 @@
  * @packageDocumentation
  */
 
+import type { Site } from "../../../shared/types";
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { HistoryRepository } from "../../services/database/HistoryRepository";
@@ -67,7 +68,6 @@ import type { MonitorRepository } from "../../services/database/MonitorRepositor
 import type { SettingsRepository } from "../../services/database/SettingsRepository";
 import type { SiteRepository } from "../../services/database/SiteRepository";
 import type { SiteRow } from "../../services/database/utils/siteMapper";
-import type { Site } from "../../types";
 import type { StandardizedCache } from "../cache/StandardizedCache";
 import type { Logger } from "../interfaces";
 import type { MonitoringConfig, SiteLoadingConfig } from "./interfaces";

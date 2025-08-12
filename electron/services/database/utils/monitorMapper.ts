@@ -7,8 +7,8 @@
  * All mapping functions are type-safe and log errors with full context.
  */
 
+import type { Monitor, Site } from "../../../../shared/types";
 import type { MonitorRow as DatabaseMonitorRow } from "../../../../shared/types/database";
-import type { Monitor, Site } from "../../../types";
 import type { DbValue } from "./valueConverters";
 
 import { LOG_TEMPLATES } from "../../../../shared/utils/logTemplates";

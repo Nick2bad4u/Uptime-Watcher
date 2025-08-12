@@ -1,4 +1,4 @@
-import type { Site } from "../../types";
+import type { Site } from "../../../shared/types";
 
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";

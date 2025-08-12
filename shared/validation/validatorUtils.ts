@@ -166,6 +166,75 @@ export function isValidNumeric(
 }
 
 /**
+ * Validates that a value is a valid host (IP address, FQDN, or localhost).
+ *
+ * @param value - Value to validate
+ * @returns True if value is a valid host
+ *
+ * @example
+ * ```typescript
+ * isValidHost("192.168.1.1") // true
+ * isValidHost("example.com") // true
+ * isValidHost("localhost") // true
+ * isValidHost("invalid..host") // false
+ * ```
+ *
+ * @public
+ */
+export function isValidHost(value: unknown): value is string {
+    if (typeof value !== "string") {
+        return false;
+    }
+
+    // Check if it's a valid IP address
+    if (validator.isIP(value)) {
+        return true;
+    }
+
+    // Check if it's a valid FQDN
+    if (
+        validator.isFQDN(value, {
+            allow_numeric_tld: false,
+            allow_trailing_dot: false,
+            allow_underscores: false,
+            allow_wildcard: false,
+            require_tld: true,
+        })
+    ) {
+        return true;
+    }
+
+    // Allow localhost as a special case
+    return value === "localhost";
+}
+
+/**
+ * Validates that a value is a valid port number.
+ *
+ * @param value - Value to validate (number or string)
+ * @returns True if value is a valid port number (1-65535)
+ *
+ * @example
+ * ```typescript
+ * isValidPort(80) // true
+ * isValidPort("443") // true
+ * isValidPort(0) // false
+ * isValidPort(70000) // false
+ * ```
+ *
+ * @public
+ */
+export function isValidPort(value: unknown): boolean {
+    if (typeof value === "number") {
+        return validator.isPort(value.toString());
+    }
+    if (typeof value === "string") {
+        return validator.isPort(value);
+    }
+    return false;
+}
+
+/**
  * Validates that a value is a valid URL.
  *
  * @param value - Value to validate

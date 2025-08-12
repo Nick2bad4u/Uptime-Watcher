@@ -1,7 +1,7 @@
 import type { Database } from "node-sqlite3-wasm";
 
+import type { StatusHistory } from "../../../../shared/types";
 import type { HistoryRow as DatabaseHistoryRow } from "../../../../shared/types/database";
-import type { StatusHistory } from "../../../types";
 
 import {
     interpolateLogTemplate,

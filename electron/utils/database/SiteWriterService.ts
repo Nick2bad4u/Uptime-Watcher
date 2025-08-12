@@ -22,11 +22,11 @@
 
 import type { Database } from "node-sqlite3-wasm";
 
+import type { Monitor, Site } from "../../../shared/types";
 import type { MonitorRow } from "../../../shared/types/database";
 import type { DatabaseService } from "../../services/database/DatabaseService";
 import type { MonitorRepository } from "../../services/database/MonitorRepository";
 import type { SiteRepository } from "../../services/database/SiteRepository";
-import type { Monitor, Site } from "../../types";
 import type { StandardizedCache } from "../cache/StandardizedCache";
 import type { Logger } from "../interfaces";
 import type { MonitoringConfig, SiteWritingConfig } from "./interfaces";

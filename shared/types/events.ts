@@ -8,6 +8,20 @@
 import type { Monitor, Site } from "@shared/types";
 
 /**
+ * Base interface for all event data payloads.
+ *
+ * @remarks
+ * Provides common timestamp field that all events must include.
+ * All event interfaces should extend this base interface to ensure consistency.
+ */
+export interface BaseEventData {
+    /**
+     * The time (in ms since epoch) when the event occurred.
+     */
+    timestamp: number;
+}
+
+/**
  * Payload for cache invalidation events.
  *
  * @remarks
@@ -27,7 +41,7 @@ import type { Monitor, Site } from "@shared/types";
  * };
  * ```
  */
-export interface CacheInvalidatedEventData {
+export interface CacheInvalidatedEventData extends BaseEventData {
     /**
      * The specific identifier affected (optional for global invalidation).
      * @remarks If omitted, the invalidation is considered global.
@@ -38,10 +52,6 @@ export interface CacheInvalidatedEventData {
      * @remarks Can be 'delete', 'expiry', 'manual', or 'update'.
      */
     reason: "delete" | "expiry" | "manual" | "update";
-    /**
-     * The time (in ms since epoch) when invalidation occurred.
-     */
-    timestamp: number;
     /**
      * The type of cache invalidation.
      * @remarks 'all' for global, 'monitor' for a specific monitor, 'site' for a specific site.
@@ -64,15 +74,13 @@ export interface CacheInvalidatedEventData {
  * };
  * ```
  */
-export interface DatabaseConnectionEventData {
+export interface DatabaseConnectionEventData extends BaseEventData {
     /** Unique identifier for the connection */
     connectionId?: string;
     /** Additional context about the connection state */
     details?: string;
     /** Current connection state */
     state: "connected" | "connecting" | "disconnected" | "error";
-    /** Timestamp when the state change occurred */
-    timestamp: number;
 }
 
 /**
@@ -91,7 +99,7 @@ export interface DatabaseConnectionEventData {
  * };
  * ```
  */
-export interface DatabaseErrorEventData {
+export interface DatabaseErrorEventData extends BaseEventData {
     /** The actual error that occurred */
     error: Error;
     /** The database operation that failed */
@@ -100,8 +108,6 @@ export interface DatabaseErrorEventData {
     parameters?: unknown[];
     /** The database table involved (optional) */
     table?: string;
-    /** Timestamp when the error occurred */
-    timestamp: number;
 }
 
 /**
@@ -121,7 +127,7 @@ export interface DatabaseErrorEventData {
  * };
  * ```
  */
-export interface DatabaseRetryEventData {
+export interface DatabaseRetryEventData extends BaseEventData {
     /** Current attempt number (1-based) */
     attempt: number;
     /** Delay before this retry attempt in milliseconds */
@@ -130,8 +136,6 @@ export interface DatabaseRetryEventData {
     maxAttempts: number;
     /** The database operation being retried */
     operation: DatabaseOperation;
-    /** Timestamp when the retry was initiated */
-    timestamp: number;
 }
 
 /**
@@ -150,7 +154,7 @@ export interface DatabaseRetryEventData {
  * };
  * ```
  */
-export interface DatabaseSuccessEventData {
+export interface DatabaseSuccessEventData extends BaseEventData {
     /** Whether this operation was served from cache */
     cacheHit?: boolean;
     /** Duration of the operation in milliseconds */
@@ -159,8 +163,6 @@ export interface DatabaseSuccessEventData {
     operation: DatabaseOperation;
     /** Number of rows affected/returned */
     rowCount?: number;
-    /** Timestamp when the operation completed */
-    timestamp: number;
 }
 
 /**
@@ -184,7 +186,7 @@ export interface DatabaseSuccessEventData {
  * };
  * ```
  */
-export interface MonitorDownEventData {
+export interface MonitorDownEventData extends BaseEventData {
     /**
      * The monitor that went down.
      */
@@ -197,10 +199,6 @@ export interface MonitorDownEventData {
      * The unique identifier of the site.
      */
     siteId: string;
-    /**
-     * The time (in ms since epoch) when the event occurred.
-     */
-    timestamp: number;
 }
 
 /**
@@ -225,7 +223,7 @@ export interface MonitorDownEventData {
  * };
  * ```
  */
-export interface MonitoringControlEventData {
+export interface MonitoringControlEventData extends BaseEventData {
     /**
      * Number of active monitors (for stopped events).
      */
@@ -243,10 +241,6 @@ export interface MonitoringControlEventData {
      * Number of sites involved in the operation.
      */
     siteCount?: number;
-    /**
-     * The time (in ms since epoch) when the event occurred.
-     */
-    timestamp: number;
 }
 
 /**
@@ -270,7 +264,7 @@ export interface MonitoringControlEventData {
  * };
  * ```
  */
-export interface MonitorUpEventData {
+export interface MonitorUpEventData extends BaseEventData {
     /**
      * The monitor that came back up.
      */
@@ -283,10 +277,6 @@ export interface MonitorUpEventData {
      * The unique identifier of the site.
      */
     siteId: string;
-    /**
-     * The time (in ms since epoch) when the event occurred.
-     */
-    timestamp: number;
 }
 
 /**

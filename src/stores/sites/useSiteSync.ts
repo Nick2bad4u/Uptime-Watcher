@@ -16,11 +16,12 @@
 
 import type { Site, StatusUpdate } from "@shared/types";
 
+import { withErrorHandling } from "../../../shared/utils/errorHandling";
 import logger from "../../services/logger";
 import { safeExtractIpcData } from "../../types/ipc";
 import { ensureError } from "../../utils/errorHandling";
-import { useErrorStore } from "../error/useErrorStore";
-import { logStoreAction, withErrorHandling } from "../utils";
+import { logStoreAction } from "../utils";
+import { createStoreErrorHandler } from "../utils/storeErrorHandling";
 import { SiteService } from "./services/SiteService";
 import { StatusUpdateManager } from "./utils/statusUpdateHandler";
 
@@ -198,7 +199,6 @@ export const createSiteSyncActions = (
             });
         },
         getSyncStatus: async () => {
-            const errorStore = useErrorStore.getState();
             try {
                 return await withErrorHandling(
                     async () => {
@@ -219,20 +219,7 @@ export const createSiteSyncActions = (
                         });
                         return status;
                     },
-                    {
-                        clearError: () => {
-                            errorStore.clearStoreError("sites-sync");
-                        },
-                        setError: (error) => {
-                            errorStore.setStoreError("sites-sync", error);
-                        },
-                        setLoading: (loading) => {
-                            errorStore.setOperationLoading(
-                                "getSyncStatus",
-                                loading
-                            );
-                        },
-                    }
+                    createStoreErrorHandler("sites-sync", "getSyncStatus")
                 );
             } catch {
                 // Fallback for error case
@@ -318,7 +305,6 @@ export const createSiteSyncActions = (
             return cleanup;
         },
         syncSitesFromBackend: async () => {
-            const errorStore = useErrorStore.getState();
             await withErrorHandling(
                 async () => {
                     const backendSites = await SiteService.getSites();
@@ -330,20 +316,7 @@ export const createSiteSyncActions = (
                         success: true,
                     });
                 },
-                {
-                    clearError: () => {
-                        errorStore.clearStoreError("sites-sync");
-                    },
-                    setError: (error) => {
-                        errorStore.setStoreError("sites-sync", error);
-                    },
-                    setLoading: (loading) => {
-                        errorStore.setOperationLoading(
-                            "syncSitesFromBackend",
-                            loading
-                        );
-                    },
-                }
+                createStoreErrorHandler("sites-sync", "syncSitesFromBackend")
             );
         },
         unsubscribeFromStatusUpdates: () => {

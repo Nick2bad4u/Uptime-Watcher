@@ -2,13 +2,13 @@
  * Interfaces for database utilities to support dependency injection and testing.
  */
 
+import type { Site } from "../../../shared/types";
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { HistoryRepository } from "../../services/database/HistoryRepository";
 import type { MonitorRepository } from "../../services/database/MonitorRepository";
 import type { SettingsRepository } from "../../services/database/SettingsRepository";
 import type { SiteRepository } from "../../services/database/SiteRepository";
-import type { Site } from "../../types";
 import type { Logger } from "../interfaces";
 
 // Logger type available for internal use - external consumers should import from ../interfaces

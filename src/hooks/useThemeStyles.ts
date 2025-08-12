@@ -31,7 +31,7 @@
  * ```
  */
 
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import { useMount } from "./useMount";
 
@@ -247,7 +247,13 @@ export function useThemeStyles(isCollapsed = false): ThemeStyles {
 
     // Refs to store media query and handler for cleanup
     const mediaQueryRef = useRef<MediaQueryList | null>(null);
-    const handlerRef = useRef<((e: MediaQueryListEvent) => void) | null>(null);
+
+    /**
+     * Named event handler for media query changes
+     */
+    const handleThemeChange = useCallback((e: MediaQueryListEvent): void => {
+        setIsDarkMode(e.matches);
+    }, []);
 
     // Set up media query listener for theme changes
     useMount(
@@ -264,14 +270,11 @@ export function useThemeStyles(isCollapsed = false): ThemeStyles {
                 const mediaQuery = window.matchMedia(
                     "(prefers-color-scheme: dark)"
                 );
-                const handleThemeChange = (e: MediaQueryListEvent): void => {
-                    setIsDarkMode(e.matches);
-                };
 
-                // Store references for cleanup
+                // Store reference for cleanup
                 mediaQueryRef.current = mediaQuery;
-                handlerRef.current = handleThemeChange;
 
+                // eslint-disable-next-line listeners/no-missing-remove-event-listener
                 mediaQuery.addEventListener("change", handleThemeChange);
             } catch {
                 // Fallback if matchMedia throws an error
@@ -280,17 +283,16 @@ export function useThemeStyles(isCollapsed = false): ThemeStyles {
         },
         () => {
             // Cleanup media query listener on unmount
-            if (mediaQueryRef.current && handlerRef.current) {
+            if (mediaQueryRef.current) {
                 try {
                     mediaQueryRef.current.removeEventListener(
                         "change",
-                        handlerRef.current
+                        handleThemeChange
                     );
                 } catch {
                     // Ignore cleanup errors
                 }
                 mediaQueryRef.current = null;
-                handlerRef.current = null;
             }
         }
     );

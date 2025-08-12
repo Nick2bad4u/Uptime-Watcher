@@ -27,6 +27,16 @@ import type { ValidationResult } from "@shared/types/validation";
 import validator from "validator";
 import { z } from "zod";
 
+import { isValidHost, isValidPort } from "./validatorUtils";
+
+/**
+ * Reusable host validation schema for monitors.
+ * Eliminates duplication between port and ping monitor schemas.
+ */
+const hostValidationSchema = z
+    .string()
+    .refine(isValidHost, "Must be a valid hostname, IP address, or localhost");
+
 /**
  * Validation constraints for monitor fields.
  *
@@ -133,27 +143,10 @@ export const httpMonitorSchema: HttpMonitorSchemaType =
  */
 export const portMonitorSchema: PortMonitorSchemaType =
     baseMonitorSchema.extend({
-        host: z.string().refine((val) => {
-            // Use validator.js for robust host validation
-            if (validator.isIP(val)) {
-                return true;
-            }
-            if (
-                validator.isFQDN(val, {
-                    allow_numeric_tld: false,
-                    allow_trailing_dot: false,
-                    allow_underscores: false,
-                    allow_wildcard: false,
-                    require_tld: true,
-                })
-            ) {
-                return true;
-            }
-            return val === "localhost";
-        }, "Must be a valid hostname, IP address, or localhost"),
-        port: z.number().refine((val) => {
-            return validator.isPort(val.toString());
-        }, "Must be a valid port number (1-65535)"),
+        host: hostValidationSchema,
+        port: z
+            .number()
+            .refine(isValidPort, "Must be a valid port number (1-65535)"),
         type: z.literal("port"),
     });
 
@@ -165,24 +158,7 @@ export const portMonitorSchema: PortMonitorSchemaType =
  */
 export const pingMonitorSchema: PingMonitorSchemaType =
     baseMonitorSchema.extend({
-        host: z.string().refine((val) => {
-            // Use validator.js for robust host validation
-            if (validator.isIP(val)) {
-                return true;
-            }
-            if (
-                validator.isFQDN(val, {
-                    allow_numeric_tld: false,
-                    allow_trailing_dot: false,
-                    allow_underscores: false,
-                    allow_wildcard: false,
-                    require_tld: true,
-                })
-            ) {
-                return true;
-            }
-            return val === "localhost";
-        }, "Must be a valid hostname, IP address, or localhost"),
+        host: hostValidationSchema,
         type: z.literal("ping"),
     });
 

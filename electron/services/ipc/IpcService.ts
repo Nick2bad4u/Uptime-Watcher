@@ -1,6 +1,6 @@
 import { BrowserWindow, ipcMain } from "electron";
 
-import type { Monitor, Site } from "../../types";
+import type { Monitor, Site } from "../../../shared/types";
 import type { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import type { AutoUpdaterService } from "../updater/AutoUpdaterService";
 

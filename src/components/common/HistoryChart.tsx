@@ -5,7 +5,7 @@
 
 import React from "react";
 
-import type { StatusHistory } from "../../types";
+import type { StatusHistory } from "../../../shared/types";
 
 import MiniChartBar from "../../theme/components/MiniChartBar";
 import ThemedText from "../../theme/components/ThemedText";

@@ -55,8 +55,7 @@
 import React, { useCallback } from "react";
 
 import ThemedInput from "../../theme/components/ThemedInput";
-import { createAriaLabel, getAriaDescribedBy } from "./form-utils";
-import FormField from "./FormField";
+import { BaseFormField } from "./BaseFormField";
 
 /**
  * Properties for the TextField component.
@@ -139,36 +138,28 @@ const TextField: React.NamedExoticComponent<TextFieldProperties> = React.memo(
         );
 
         return (
-            <FormField
+            <BaseFormField
                 {...(error !== undefined && { error })}
                 {...(helpText !== undefined && { helpText })}
                 id={id}
                 label={label}
                 required={required}
             >
-                <ThemedInput
-                    {...((): Record<string, unknown> => {
-                        const ariaDescribedBy = getAriaDescribedBy(
-                            id,
-                            error,
-                            helpText
-                        );
-                        return ariaDescribedBy
-                            ? { "aria-describedby": ariaDescribedBy }
-                            : {};
-                    })()}
-                    aria-label={createAriaLabel(label, required)}
-                    disabled={disabled}
-                    id={id}
-                    {...(max !== undefined && { max })}
-                    {...(min !== undefined && { min })}
-                    onChange={handleChange}
-                    {...(placeholder !== undefined && { placeholder })}
-                    required={required}
-                    type={type}
-                    value={value}
-                />
-            </FormField>
+                {(ariaProps) => (
+                    <ThemedInput
+                        {...ariaProps}
+                        disabled={disabled}
+                        id={id}
+                        {...(max !== undefined && { max })}
+                        {...(min !== undefined && { min })}
+                        onChange={handleChange}
+                        {...(placeholder !== undefined && { placeholder })}
+                        required={required}
+                        type={type}
+                        value={value}
+                    />
+                )}
+            </BaseFormField>
         );
     }
 );

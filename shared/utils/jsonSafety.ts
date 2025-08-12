@@ -24,6 +24,32 @@ function ensureError(error: unknown): Error {
 }
 
 /**
+ * Wraps any operation with consistent error handling for SafeJsonResult pattern.
+ *
+ * @param operation - Function to execute safely
+ * @param errorPrefix - Prefix for error messages
+ * @returns Safe result object with data or error
+ *
+ * @throws Never throws - all errors are captured and returned in the result object
+ *
+ * @internal Helper function to eliminate error handling duplication
+ */
+function safeOperation<T>(
+    operation: () => T,
+    errorPrefix: string
+): SafeJsonResult<T> {
+    try {
+        const result = operation();
+        return { data: result, success: true };
+    } catch (error) {
+        return {
+            error: `${errorPrefix}: ${ensureError(error).message}`,
+            success: false,
+        };
+    }
+}
+
+/**
  * Safely parse JSON string with type validation.
  *
  * @param json - JSON string to parse
@@ -50,26 +76,15 @@ export function safeJsonParse<T>(
     json: string,
     validator: (data: unknown) => data is T
 ): SafeJsonResult<T> {
-    try {
+    return safeOperation(() => {
         const parsed: unknown = JSON.parse(json);
 
         if (validator(parsed)) {
-            return {
-                data: parsed,
-                success: true,
-            };
+            return parsed;
         }
 
-        return {
-            error: "Parsed data does not match expected type",
-            success: false,
-        };
-    } catch (error) {
-        return {
-            error: `JSON parsing failed: ${ensureError(error).message}`,
-            success: false,
-        };
-    }
+        throw new TypeError("Parsed data does not match expected type");
+    }, "JSON parsing failed");
 }
 
 /**
@@ -93,36 +108,24 @@ export function safeJsonParseArray<T>(
     json: string,
     elementValidator: (item: unknown) => item is T
 ): SafeJsonResult<T[]> {
-    try {
+    return safeOperation(() => {
         const parsed: unknown = JSON.parse(json);
 
         if (!Array.isArray(parsed)) {
-            return {
-                error: "Parsed data is not an array",
-                success: false,
-            };
+            throw new TypeError("Parsed data is not an array");
         }
 
         // Validate all elements
         for (const [i, element] of parsed.entries()) {
             if (!elementValidator(element)) {
-                return {
-                    error: `Array element at index ${i} does not match expected type`,
-                    success: false,
-                };
+                throw new TypeError(
+                    `Array element at index ${i} does not match expected type`
+                );
             }
         }
 
-        return {
-            data: parsed as T[],
-            success: true,
-        };
-    } catch (error) {
-        return {
-            error: `JSON parsing failed: ${ensureError(error).message}`,
-            success: false,
-        };
-    }
+        return parsed as T[];
+    }, "JSON parsing failed");
 }
 
 /**
@@ -174,26 +177,15 @@ export function safeJsonStringify(
     value: unknown,
     space?: number | string
 ): SafeJsonResult<string> {
-    try {
+    return safeOperation(() => {
         const jsonString = JSON.stringify(value, undefined, space);
 
         if (typeof jsonString !== "string") {
-            return {
-                error: "Value cannot be serialized to JSON",
-                success: false,
-            };
+            throw new TypeError("Value cannot be serialized to JSON");
         }
 
-        return {
-            data: jsonString,
-            success: true,
-        };
-    } catch (error) {
-        return {
-            error: `JSON stringification failed: ${ensureError(error).message}`,
-            success: false,
-        };
-    }
+        return jsonString;
+    }, "JSON stringification failed");
 }
 
 /**
