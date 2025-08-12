@@ -161,7 +161,9 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
 
             expect(result.success).toBe(false);
             expect(result.errors).toHaveLength(1);
-            expect(result.errors[0]).toBe("url: Must be a valid HTTP or HTTPS URL");
+            expect(result.errors[0]).toBe(
+                "url: Must be a valid HTTP or HTTPS URL"
+            );
         });
 
         it("should handle monitors with all status types", () => {
@@ -259,7 +261,9 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             const result =
                 validator.validateMonitorConfiguration(monitorWithBadData);
             expect(result.success).toBe(false);
-            expect(result.errors).toContain("Invalid monitor type `invalid`. Available types: `http, port`");
+            expect(result.errors).toContain(
+                "Invalid monitor type `invalid`. Available types: `http, port`"
+            );
         });
     });
 

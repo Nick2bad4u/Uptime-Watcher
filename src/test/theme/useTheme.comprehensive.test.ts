@@ -192,12 +192,12 @@ const mockUseSettingsStore = vi.mocked(useSettingsStore);
 describe("Theme Hooks - Comprehensive Coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         // Reset and setup the mock
         mockUpdateSettings.mockReset();
-        
+
         mockUseSettingsStore.mockReturnValue({
-            settings: { 
+            settings: {
                 theme: "light",
                 autoStart: false,
                 historyLimit: 1000,
@@ -236,7 +236,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
 
             // Test that setTheme function exists and can be called without error
             expect(typeof result.current.setTheme).toBe("function");
-            
+
             // Test that calling setTheme doesn't throw an error
             expect(() => {
                 act(() => {
@@ -250,7 +250,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
 
             // Test that toggleTheme function exists and can be called without error
             expect(typeof result.current.toggleTheme).toBe("function");
-            
+
             // Test that calling toggleTheme doesn't throw an error
             expect(() => {
                 act(() => {
@@ -263,7 +263,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
             // Test that toggleTheme function exists and can be called without error
             const { result } = renderHook(() => useTheme());
             expect(typeof result.current.toggleTheme).toBe("function");
-            
+
             // Test that calling toggleTheme doesn't throw an error
             expect(() => {
                 act(() => {
@@ -359,7 +359,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
         it("should cleanup timeouts on unmount", () => {
             // Use fake timers to track setTimeout/clearTimeout calls
             vi.useFakeTimers();
-            
+
             const { unmount } = renderHook(() => useTheme());
 
             // Test that unmount doesn't throw an error and completes cleanup
@@ -381,7 +381,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
 
         it("should increment themeVersion when theme updates", () => {
             const { result } = renderHook(() => useTheme());
-            
+
             // Test that themeVersion exists and is a number
             expect(typeof result.current.themeVersion).toBe("number");
             expect(result.current.themeVersion).toBeGreaterThanOrEqual(0);
@@ -465,7 +465,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
                 "Excellent"
             );
             expect(result.current.getAvailabilityDescription(99.5)).toBe(
-                "Good"  // 99.5 < 99, so it's "Good" not "Very Good"
+                "Good" // 99.5 < 99, so it's "Good" not "Very Good"
             );
             expect(result.current.getAvailabilityDescription(99)).toBe(
                 "Very Good"
@@ -496,7 +496,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
                 "Excellent"
             );
             expect(result.current.getAvailabilityDescription(-10)).toBe(
-                "Failed"  // Clamped to 0, which returns "Failed"
+                "Failed" // Clamped to 0, which returns "Failed"
             );
         });
     });
@@ -663,7 +663,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
 
             // Test that the functions exist and can be called without error
             expect(typeof result.current.setTheme).toBe("function");
-            
+
             await act(async () => {
                 expect(() => result.current.setTheme("dark")).not.toThrow();
                 expect(() => result.current.setTheme("light")).not.toThrow();

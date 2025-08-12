@@ -858,7 +858,9 @@ describe("Theme Components - Complete Coverage", () => {
             render(<StatusIndicator status="up" />);
 
             // StatusIndicator renders as a div with themed-status-indicator class
-            const indicator = document.querySelector('.themed-status-indicator');
+            const indicator = document.querySelector(
+                ".themed-status-indicator"
+            );
             expect(indicator).toBeInTheDocument();
         });
 
@@ -870,7 +872,9 @@ describe("Theme Components - Complete Coverage", () => {
                     <StatusIndicator status="up" size={size} />
                 );
 
-                const indicator = document.querySelector('.themed-status-indicator');
+                const indicator = document.querySelector(
+                    ".themed-status-indicator"
+                );
                 expect(indicator).toBeInTheDocument();
 
                 unmount();
@@ -890,7 +894,9 @@ describe("Theme Components - Complete Coverage", () => {
             for (const status of statuses) {
                 const { unmount } = render(<StatusIndicator status={status} />);
 
-                const indicator = document.querySelector('.themed-status-indicator');
+                const indicator = document.querySelector(
+                    ".themed-status-indicator"
+                );
                 expect(indicator).toBeInTheDocument();
 
                 unmount();

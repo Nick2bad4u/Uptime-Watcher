@@ -111,29 +111,28 @@ describe("SiteService", () => {
         });
 
         it("should successfully delete site with all related data", async () => {
-            const result = await siteService.deleteSiteWithRelatedData(
-                mockSiteIdentifier
-            );
+            const result =
+                await siteService.deleteSiteWithRelatedData(mockSiteIdentifier);
 
             expect(result).toBe(true);
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalledTimes(
-                1
-            );
-            expect(mockMonitorRepository.findBySiteIdentifier).toHaveBeenCalledWith(
-                mockSiteIdentifier
-            );
-            expect(mockHistoryRepository.deleteByMonitorId).toHaveBeenCalledTimes(
-                2
-            );
-            expect(mockHistoryRepository.deleteByMonitorId).toHaveBeenCalledWith(
-                "monitor-1"
-            );
-            expect(mockHistoryRepository.deleteByMonitorId).toHaveBeenCalledWith(
-                "monitor-2"
-            );
-            expect(mockMonitorRepository.deleteBySiteIdentifier).toHaveBeenCalledWith(
-                mockSiteIdentifier
-            );
+            expect(
+                mockDatabaseService.executeTransaction
+            ).toHaveBeenCalledTimes(1);
+            expect(
+                mockMonitorRepository.findBySiteIdentifier
+            ).toHaveBeenCalledWith(mockSiteIdentifier);
+            expect(
+                mockHistoryRepository.deleteByMonitorId
+            ).toHaveBeenCalledTimes(2);
+            expect(
+                mockHistoryRepository.deleteByMonitorId
+            ).toHaveBeenCalledWith("monitor-1");
+            expect(
+                mockHistoryRepository.deleteByMonitorId
+            ).toHaveBeenCalledWith("monitor-2");
+            expect(
+                mockMonitorRepository.deleteBySiteIdentifier
+            ).toHaveBeenCalledWith(mockSiteIdentifier);
             expect(mockSiteRepository.delete).toHaveBeenCalledWith(
                 mockSiteIdentifier
             );
@@ -164,12 +163,13 @@ describe("SiteService", () => {
                 .fn()
                 .mockResolvedValue([]);
 
-            const result = await siteService.deleteSiteWithRelatedData(
-                mockSiteIdentifier
-            );
+            const result =
+                await siteService.deleteSiteWithRelatedData(mockSiteIdentifier);
 
             expect(result).toBe(true);
-            expect(mockHistoryRepository.deleteByMonitorId).not.toHaveBeenCalled();
+            expect(
+                mockHistoryRepository.deleteByMonitorId
+            ).not.toHaveBeenCalled();
             expect(mockLogger.debug).toHaveBeenCalledWith(
                 `[SiteService] Found 0 monitors to delete for site ${mockSiteIdentifier}`
             );
@@ -286,9 +286,10 @@ describe("SiteService", () => {
         });
 
         it("should successfully find site with complete details", async () => {
-            const result = await siteService.findByIdentifierWithDetails(
-                mockSiteIdentifier
-            );
+            const result =
+                await siteService.findByIdentifierWithDetails(
+                    mockSiteIdentifier
+                );
 
             const expectedSite: Site = {
                 identifier: mockSiteIdentifier,
@@ -306,9 +307,9 @@ describe("SiteService", () => {
             expect(mockSiteRepository.findByIdentifier).toHaveBeenCalledWith(
                 mockSiteIdentifier
             );
-            expect(mockMonitorRepository.findBySiteIdentifier).toHaveBeenCalledWith(
-                mockSiteIdentifier
-            );
+            expect(
+                mockMonitorRepository.findBySiteIdentifier
+            ).toHaveBeenCalledWith(mockSiteIdentifier);
             expect(mockHistoryRepository.findByMonitorId).toHaveBeenCalledWith(
                 "monitor-1"
             );
@@ -319,9 +320,10 @@ describe("SiteService", () => {
                 .fn()
                 .mockResolvedValue(undefined);
 
-            const result = await siteService.findByIdentifierWithDetails(
-                mockSiteIdentifier
-            );
+            const result =
+                await siteService.findByIdentifierWithDetails(
+                    mockSiteIdentifier
+                );
 
             expect(result).toBeUndefined();
             expect(mockLogger.debug).toHaveBeenCalledWith(
@@ -334,9 +336,10 @@ describe("SiteService", () => {
                 .fn()
                 .mockResolvedValue([]);
 
-            const result = await siteService.findByIdentifierWithDetails(
-                mockSiteIdentifier
-            );
+            const result =
+                await siteService.findByIdentifierWithDetails(
+                    mockSiteIdentifier
+                );
 
             expect(result).toEqual({
                 identifier: mockSiteIdentifier,
@@ -344,7 +347,9 @@ describe("SiteService", () => {
                 monitoring: true,
                 monitors: [],
             });
-            expect(mockHistoryRepository.findByMonitorId).not.toHaveBeenCalled();
+            expect(
+                mockHistoryRepository.findByMonitorId
+            ).not.toHaveBeenCalled();
         });
 
         it("should use default name when site name is null", async () => {
@@ -356,9 +361,10 @@ describe("SiteService", () => {
                 .fn()
                 .mockResolvedValue([]);
 
-            const result = await siteService.findByIdentifierWithDetails(
-                mockSiteIdentifier
-            );
+            const result =
+                await siteService.findByIdentifierWithDetails(
+                    mockSiteIdentifier
+                );
 
             expect(result?.name).toBe("Unnamed Site");
         });
@@ -372,9 +378,10 @@ describe("SiteService", () => {
                 .fn()
                 .mockResolvedValue([]);
 
-            const result = await siteService.findByIdentifierWithDetails(
-                mockSiteIdentifier
-            );
+            const result =
+                await siteService.findByIdentifierWithDetails(
+                    mockSiteIdentifier
+                );
 
             expect(result?.name).toBe("Unnamed Site");
         });
@@ -388,9 +395,10 @@ describe("SiteService", () => {
                 .fn()
                 .mockResolvedValue([]);
 
-            const result = await siteService.findByIdentifierWithDetails(
-                mockSiteIdentifier
-            );
+            const result =
+                await siteService.findByIdentifierWithDetails(
+                    mockSiteIdentifier
+                );
 
             expect(result?.monitoring).toBe(false);
         });
@@ -447,14 +455,17 @@ describe("SiteService", () => {
             mockHistoryRepository.findByMonitorId = vi
                 .fn()
                 .mockImplementation((monitorId) => {
-                    if (monitorId === "monitor-1") return Promise.resolve(history1);
-                    if (monitorId === "monitor-2") return Promise.resolve(history2);
+                    if (monitorId === "monitor-1")
+                        return Promise.resolve(history1);
+                    if (monitorId === "monitor-2")
+                        return Promise.resolve(history2);
                     return Promise.resolve([]);
                 });
 
-            const result = await siteService.findByIdentifierWithDetails(
-                mockSiteIdentifier
-            );
+            const result =
+                await siteService.findByIdentifierWithDetails(
+                    mockSiteIdentifier
+                );
 
             expect(result?.monitors).toHaveLength(2);
             expect(result?.monitors[0].history).toEqual(history1);
@@ -521,11 +532,14 @@ describe("SiteService", () => {
         ];
 
         beforeEach(() => {
-            mockSiteRepository.findAll = vi.fn().mockResolvedValue(mockSiteRows);
+            mockSiteRepository.findAll = vi
+                .fn()
+                .mockResolvedValue(mockSiteRows);
             mockMonitorRepository.findBySiteIdentifier = vi
                 .fn()
                 .mockImplementation((siteId) => {
-                    if (siteId === "site-1") return Promise.resolve(mockMonitors1);
+                    if (siteId === "site-1")
+                        return Promise.resolve(mockMonitors1);
                     return Promise.resolve([]);
                 });
             mockHistoryRepository.findByMonitorId = vi
@@ -580,7 +594,9 @@ describe("SiteService", () => {
             expect(result).toHaveLength(2);
             expect(result[0].monitors).toEqual([]);
             expect(result[1].monitors).toEqual([]);
-            expect(mockHistoryRepository.findByMonitorId).not.toHaveBeenCalled();
+            expect(
+                mockHistoryRepository.findByMonitorId
+            ).not.toHaveBeenCalled();
         });
 
         it("should handle null monitoring values", async () => {

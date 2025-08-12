@@ -39,7 +39,7 @@ describe("historyQuery utilities", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         // Create mock database with standard methods
         mockDb = {
             all: vi.fn(),
@@ -58,7 +58,9 @@ describe("historyQuery utilities", () => {
     describe("findHistoryByMonitorId", () => {
         it("should return empty array when no history entries exist", () => {
             const mockRows: DatabaseHistoryRow[] = [];
-            (mockDb.all as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockRows);
+            (mockDb.all as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+                mockRows
+            );
 
             const result = findHistoryByMonitorId(mockDb, mockMonitorId);
 
@@ -100,7 +102,9 @@ describe("historyQuery utilities", () => {
                 },
             ];
 
-            (mockDb.all as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockRows);
+            (mockDb.all as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+                mockRows
+            );
             (rowToHistoryEntry as unknown as ReturnType<typeof vi.fn>)
                 .mockReturnValueOnce(mockMappedEntries[0])
                 .mockReturnValueOnce(mockMappedEntries[1]);
@@ -134,8 +138,12 @@ describe("historyQuery utilities", () => {
                 details: "Success",
             };
 
-            (mockDb.all as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockRows);
-            (rowToHistoryEntry as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockMappedEntry);
+            (mockDb.all as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+                mockRows
+            );
+            (
+                rowToHistoryEntry as unknown as ReturnType<typeof vi.fn>
+            ).mockReturnValue(mockMappedEntry);
 
             const result = findHistoryByMonitorId(mockDb, mockMonitorId);
 
@@ -146,12 +154,16 @@ describe("historyQuery utilities", () => {
 
         it("should throw and log error when database query fails", () => {
             const dbError = new Error("Database connection failed");
-            (mockDb.all as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => {
+            (
+                mockDb.all as unknown as ReturnType<typeof vi.fn>
+            ).mockImplementation(() => {
                 throw dbError;
             });
 
-            expect(() => findHistoryByMonitorId(mockDb, mockMonitorId)).toThrow(dbError);
-            
+            expect(() => findHistoryByMonitorId(mockDb, mockMonitorId)).toThrow(
+                dbError
+            );
+
             expect(logger.error).toHaveBeenCalledWith(
                 "[HistoryQuery] Failed to fetch history for monitor: monitor-123",
                 dbError
@@ -160,7 +172,9 @@ describe("historyQuery utilities", () => {
 
         it("should handle empty monitor ID", () => {
             const mockRows: DatabaseHistoryRow[] = [];
-            (mockDb.all as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockRows);
+            (mockDb.all as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+                mockRows
+            );
 
             const result = findHistoryByMonitorId(mockDb, "");
 
@@ -185,10 +199,20 @@ describe("historyQuery utilities", () => {
                 },
             ];
 
-            (mockDb.all as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockRows);
+            (mockDb.all as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+                mockRows
+            );
             (rowToHistoryEntry as unknown as ReturnType<typeof vi.fn>)
-                .mockReturnValueOnce({ timestamp: TEST_TIMESTAMP_2, status: "down", responseTime: 0 })
-                .mockReturnValueOnce({ timestamp: TEST_TIMESTAMP, status: "up", responseTime: 150 });
+                .mockReturnValueOnce({
+                    timestamp: TEST_TIMESTAMP_2,
+                    status: "down",
+                    responseTime: 0,
+                })
+                .mockReturnValueOnce({
+                    timestamp: TEST_TIMESTAMP,
+                    status: "up",
+                    responseTime: 150,
+                });
 
             const result = findHistoryByMonitorId(mockDb, mockMonitorId);
 
@@ -197,7 +221,7 @@ describe("historyQuery utilities", () => {
                 expect.stringContaining("ORDER BY timestamp DESC"),
                 [mockMonitorId]
             );
-            
+
             // Verify results maintain the order from the database
             expect(result[0].timestamp).toBe(TEST_TIMESTAMP_2);
             expect(result[1].timestamp).toBe(TEST_TIMESTAMP);
@@ -207,7 +231,9 @@ describe("historyQuery utilities", () => {
     describe("getHistoryCount", () => {
         it("should return count when history entries exist", () => {
             const mockResult = { count: 5 };
-            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockResult);
+            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+                mockResult
+            );
 
             const result = getHistoryCount(mockDb, mockMonitorId);
 
@@ -220,7 +246,9 @@ describe("historyQuery utilities", () => {
 
         it("should return 0 when no history entries exist", () => {
             const mockResult = { count: 0 };
-            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockResult);
+            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+                mockResult
+            );
 
             const result = getHistoryCount(mockDb, mockMonitorId);
 
@@ -228,7 +256,9 @@ describe("historyQuery utilities", () => {
         });
 
         it("should return 0 when result is undefined", () => {
-            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(undefined);
+            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+                undefined
+            );
 
             const result = getHistoryCount(mockDb, mockMonitorId);
 
@@ -236,7 +266,9 @@ describe("historyQuery utilities", () => {
         });
 
         it("should return 0 when result is null", () => {
-            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(null);
+            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+                null
+            );
 
             const result = getHistoryCount(mockDb, mockMonitorId);
 
@@ -245,7 +277,9 @@ describe("historyQuery utilities", () => {
 
         it("should return 0 when count property is undefined", () => {
             const mockResult = { count: undefined };
-            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockResult);
+            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+                mockResult
+            );
 
             const result = getHistoryCount(mockDb, mockMonitorId);
 
@@ -254,7 +288,9 @@ describe("historyQuery utilities", () => {
 
         it("should return 0 when count property is null", () => {
             const mockResult = { count: null };
-            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockResult);
+            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+                mockResult
+            );
 
             const result = getHistoryCount(mockDb, mockMonitorId);
 
@@ -263,7 +299,9 @@ describe("historyQuery utilities", () => {
 
         it("should handle large count values", () => {
             const mockResult = { count: 999_999 };
-            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockResult);
+            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+                mockResult
+            );
 
             const result = getHistoryCount(mockDb, mockMonitorId);
 
@@ -272,12 +310,16 @@ describe("historyQuery utilities", () => {
 
         it("should throw and log error when database query fails", () => {
             const dbError = new Error("Database connection failed");
-            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => {
+            (
+                mockDb.get as unknown as ReturnType<typeof vi.fn>
+            ).mockImplementation(() => {
                 throw dbError;
             });
 
-            expect(() => getHistoryCount(mockDb, mockMonitorId)).toThrow(dbError);
-            
+            expect(() => getHistoryCount(mockDb, mockMonitorId)).toThrow(
+                dbError
+            );
+
             expect(logger.error).toHaveBeenCalledWith(
                 "[HistoryQuery] Failed to get history count for monitor: monitor-123",
                 dbError
@@ -286,7 +328,9 @@ describe("historyQuery utilities", () => {
 
         it("should handle empty monitor ID", () => {
             const mockResult = { count: 0 };
-            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockResult);
+            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+                mockResult
+            );
 
             const result = getHistoryCount(mockDb, "");
 
@@ -314,8 +358,12 @@ describe("historyQuery utilities", () => {
                 details: "OK",
             };
 
-            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockRow);
-            (rowToHistoryEntry as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockMappedEntry);
+            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+                mockRow
+            );
+            (
+                rowToHistoryEntry as unknown as ReturnType<typeof vi.fn>
+            ).mockReturnValue(mockMappedEntry);
 
             const result = getLatestHistoryEntry(mockDb, mockMonitorId);
 
@@ -328,7 +376,9 @@ describe("historyQuery utilities", () => {
         });
 
         it("should return undefined when no history entries exist", () => {
-            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(undefined);
+            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+                undefined
+            );
 
             const result = getLatestHistoryEntry(mockDb, mockMonitorId);
 
@@ -341,7 +391,9 @@ describe("historyQuery utilities", () => {
         });
 
         it("should return undefined when result is null", () => {
-            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(null);
+            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+                null
+            );
 
             const result = getLatestHistoryEntry(mockDb, mockMonitorId);
 
@@ -362,8 +414,12 @@ describe("historyQuery utilities", () => {
                 responseTime: 0,
             };
 
-            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockRow);
-            (rowToHistoryEntry as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockMappedEntry);
+            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+                mockRow
+            );
+            (
+                rowToHistoryEntry as unknown as ReturnType<typeof vi.fn>
+            ).mockReturnValue(mockMappedEntry);
 
             const result = getLatestHistoryEntry(mockDb, mockMonitorId);
 
@@ -377,8 +433,12 @@ describe("historyQuery utilities", () => {
                 responseTime: 100,
             };
 
-            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockRow);
-            (rowToHistoryEntry as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+                mockRow
+            );
+            (
+                rowToHistoryEntry as unknown as ReturnType<typeof vi.fn>
+            ).mockReturnValue({
                 timestamp: TEST_TIMESTAMP,
                 status: "up",
                 responseTime: 100,
@@ -395,12 +455,16 @@ describe("historyQuery utilities", () => {
 
         it("should throw and log error when database query fails", () => {
             const dbError = new Error("Database connection failed");
-            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => {
+            (
+                mockDb.get as unknown as ReturnType<typeof vi.fn>
+            ).mockImplementation(() => {
                 throw dbError;
             });
 
-            expect(() => getLatestHistoryEntry(mockDb, mockMonitorId)).toThrow(dbError);
-            
+            expect(() => getLatestHistoryEntry(mockDb, mockMonitorId)).toThrow(
+                dbError
+            );
+
             expect(logger.error).toHaveBeenCalledWith(
                 "[HistoryQuery] Failed to get latest history entry for monitor: monitor-123",
                 dbError
@@ -408,7 +472,9 @@ describe("historyQuery utilities", () => {
         });
 
         it("should handle empty monitor ID", () => {
-            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(undefined);
+            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+                undefined
+            );
 
             const result = getLatestHistoryEntry(mockDb, "");
 
@@ -427,13 +493,19 @@ describe("historyQuery utilities", () => {
             };
 
             const mappingError = new Error("Mapping failed");
-            
-            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockRow);
-            (rowToHistoryEntry as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => {
+
+            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+                mockRow
+            );
+            (
+                rowToHistoryEntry as unknown as ReturnType<typeof vi.fn>
+            ).mockImplementation(() => {
                 throw mappingError;
             });
 
-            expect(() => getLatestHistoryEntry(mockDb, mockMonitorId)).toThrow(mappingError);
+            expect(() => getLatestHistoryEntry(mockDb, mockMonitorId)).toThrow(
+                mappingError
+            );
             expect(rowToHistoryEntry).toHaveBeenCalledWith(mockRow);
         });
     });
@@ -454,8 +526,12 @@ describe("historyQuery utilities", () => {
                 details: "All systems operational",
             };
 
-            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockRow);
-            (rowToHistoryEntry as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockMappedEntry);
+            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+                mockRow
+            );
+            (
+                rowToHistoryEntry as unknown as ReturnType<typeof vi.fn>
+            ).mockReturnValue(mockMappedEntry);
 
             const latest = getLatestHistoryEntry(mockDb, mockMonitorId);
 
@@ -466,7 +542,9 @@ describe("historyQuery utilities", () => {
 
         it("should handle monitor with no data consistently across all functions", () => {
             // Setup mocks for a monitor with no data
-            (mockDb.all as unknown as ReturnType<typeof vi.fn>).mockReturnValue([]);
+            (mockDb.all as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+                []
+            );
             (mockDb.get as unknown as ReturnType<typeof vi.fn>)
                 .mockReturnValueOnce({ count: 0 }) // for getHistoryCount
                 .mockReturnValueOnce(undefined); // for getLatestHistoryEntry
@@ -482,13 +560,27 @@ describe("historyQuery utilities", () => {
 
         it("should handle database errors consistently across all functions", () => {
             const dbError = new Error("Database unavailable");
-            
-            (mockDb.all as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => { throw dbError; });
-            (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => { throw dbError; });
 
-            expect(() => findHistoryByMonitorId(mockDb, mockMonitorId)).toThrow(dbError);
-            expect(() => getHistoryCount(mockDb, mockMonitorId)).toThrow(dbError);
-            expect(() => getLatestHistoryEntry(mockDb, mockMonitorId)).toThrow(dbError);
+            (
+                mockDb.all as unknown as ReturnType<typeof vi.fn>
+            ).mockImplementation(() => {
+                throw dbError;
+            });
+            (
+                mockDb.get as unknown as ReturnType<typeof vi.fn>
+            ).mockImplementation(() => {
+                throw dbError;
+            });
+
+            expect(() => findHistoryByMonitorId(mockDb, mockMonitorId)).toThrow(
+                dbError
+            );
+            expect(() => getHistoryCount(mockDb, mockMonitorId)).toThrow(
+                dbError
+            );
+            expect(() => getLatestHistoryEntry(mockDb, mockMonitorId)).toThrow(
+                dbError
+            );
 
             // All functions should log errors
             expect(logger.error).toHaveBeenCalledTimes(3);

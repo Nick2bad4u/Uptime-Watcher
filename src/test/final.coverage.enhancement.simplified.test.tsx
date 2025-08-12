@@ -155,7 +155,9 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
         it("should handle event emitter", () => {
             class EventTargetWrapper extends EventTarget {
                 emit(eventType: string, data: any) {
-                    this.dispatchEvent(new CustomEvent(eventType, { detail: data }));
+                    this.dispatchEvent(
+                        new CustomEvent(eventType, { detail: data })
+                    );
                 }
 
                 on(eventType: string, callback: (event: CustomEvent) => void) {
@@ -163,7 +165,10 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 }
 
                 off(eventType: string, callback: (event: CustomEvent) => void) {
-                    this.removeEventListener(eventType, callback as EventListener);
+                    this.removeEventListener(
+                        eventType,
+                        callback as EventListener
+                    );
                 }
             }
 
@@ -175,7 +180,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             expect(callback).toHaveBeenCalledWith(
                 expect.objectContaining({
                     detail: "data",
-                    type: "test"
+                    type: "test",
                 })
             );
 

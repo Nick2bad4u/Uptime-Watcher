@@ -546,7 +546,7 @@ describe("historyMapper utilities", () => {
 
             // Convert to row
             const row = historyEntryToRow(monitorId, originalEntry);
-            
+
             // Convert back to entry
             const convertedEntry = rowToHistoryEntry(row);
 
@@ -566,7 +566,7 @@ describe("historyMapper utilities", () => {
             };
 
             expect(isValidHistoryRow(validRow)).toBe(true);
-            
+
             const entry = rowToHistoryEntry(validRow);
             expect(entry.status).toBe("up");
             expect(entry.responseTime).toBe(150);
@@ -590,7 +590,7 @@ describe("historyMapper utilities", () => {
             ];
 
             const entries = rowsToHistoryEntries(rows);
-            
+
             expect(entries).toHaveLength(2);
             expect(entries[0].status).toBe("up");
             expect(entries[1].status).toBe("down");

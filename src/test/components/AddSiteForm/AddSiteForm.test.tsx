@@ -125,7 +125,9 @@ describe("AddSiteForm", () => {
     it("should render without crashing", () => {
         render(<AddSiteForm />);
         // Check for the submit button which is definitely in the DOM
-        expect(screen.getByRole("button", { name: "Add Monitor" })).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: "Add Monitor" })
+        ).toBeInTheDocument();
     });
 
     it("should render form elements", () => {

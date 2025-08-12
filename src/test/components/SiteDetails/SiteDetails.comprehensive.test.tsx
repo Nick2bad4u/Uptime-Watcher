@@ -120,7 +120,9 @@ vi.mock("../../../theme/useTheme", () => ({
         getSurfaceClass: vi.fn(() => ({ backgroundColor: "#ffffff" })),
         getTextClass: vi.fn(() => ({ color: "#000000" })),
     })),
-    useThemeValue: vi.fn((selector) => selector({ colors: { text: { primary: "#000000" } } })),
+    useThemeValue: vi.fn((selector) =>
+        selector({ colors: { text: { primary: "#000000" } } })
+    ),
 }));
 
 vi.mock("../../../services/chartConfig", () => ({
@@ -405,7 +407,7 @@ describe("SiteDetails", () => {
             renderSiteDetails();
 
             // Use the test id to find the history tab button
-            const historyTabButton = screen.getByTestId('history-tab');
+            const historyTabButton = screen.getByTestId("history-tab");
             fireEvent.click(historyTabButton);
 
             expect(

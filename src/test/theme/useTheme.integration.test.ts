@@ -142,7 +142,11 @@ describe("useTheme Integration Tests - Full Coverage", () => {
             expect(result.current.themeName).toBe("light");
             expect(result.current.isDark).toBe(false);
             expect(result.current.systemTheme).toBe("light");
-            expect(result.current.availableThemes).toEqual(["light", "dark", "system"]);
+            expect(result.current.availableThemes).toEqual([
+                "light",
+                "dark",
+                "system",
+            ]);
             expect(result.current.currentTheme.name).toBe("light");
             expect(result.current.themeVersion).toBe(1);
         });
@@ -152,7 +156,7 @@ describe("useTheme Integration Tests - Full Coverage", () => {
 
             // Test that setTheme function exists and can be called without error
             expect(typeof result.current.setTheme).toBe("function");
-            
+
             act(() => {
                 expect(() => result.current.setTheme("dark")).not.toThrow();
             });
@@ -163,7 +167,7 @@ describe("useTheme Integration Tests - Full Coverage", () => {
 
             // Test that toggleTheme function exists and can be called
             expect(typeof result.current.toggleTheme).toBe("function");
-            
+
             act(() => {
                 expect(() => result.current.toggleTheme()).not.toThrow();
             });
@@ -177,7 +181,7 @@ describe("useTheme Integration Tests - Full Coverage", () => {
 
             // Test that toggleTheme function works with dark theme
             expect(typeof result.current.toggleTheme).toBe("function");
-            
+
             act(() => {
                 expect(() => result.current.toggleTheme()).not.toThrow();
             });
@@ -193,7 +197,9 @@ describe("useTheme Integration Tests - Full Coverage", () => {
         it("should return fallback color for invalid path", () => {
             const { result } = renderHook(() => useTheme());
 
-            const color = result.current.getColor("invalid.path.that.does.not.exist");
+            const color = result.current.getColor(
+                "invalid.path.that.does.not.exist"
+            );
             expect(color).toBe("#111827"); // Falls back to text.primary
         });
 
@@ -210,7 +216,9 @@ describe("useTheme Integration Tests - Full Coverage", () => {
         it("should return fallback color for invalid status", () => {
             const { result } = renderHook(() => useTheme());
 
-            const invalidColor = result.current.getStatusColor("invalid" as any);
+            const invalidColor = result.current.getStatusColor(
+                "invalid" as any
+            );
             expect(invalidColor).toBe("#6b7280"); // Falls back to text.secondary
         });
 
@@ -219,7 +227,7 @@ describe("useTheme Integration Tests - Full Coverage", () => {
 
             // Test that the system theme is accessible and has initial value
             expect(result.current.systemTheme).toBe("light");
-            
+
             // Test that systemTheme is a string and has valid value
             expect(["light", "dark"]).toContain(result.current.systemTheme);
         });
@@ -259,8 +267,12 @@ describe("useTheme Integration Tests - Full Coverage", () => {
         it("should return correct descriptions for different percentages", () => {
             const { result } = renderHook(() => useAvailabilityColors());
 
-            expect(result.current.getAvailabilityDescription(100)).toBe("Excellent");
-            expect(result.current.getAvailabilityDescription(99.5)).toBe("Good");  // 99.5 < 99, so it's "Good"
+            expect(result.current.getAvailabilityDescription(100)).toBe(
+                "Excellent"
+            );
+            expect(result.current.getAvailabilityDescription(99.5)).toBe(
+                "Good"
+            ); // 99.5 < 99, so it's "Good"
             expect(result.current.getAvailabilityDescription(97)).toBe("Good");
             expect(result.current.getAvailabilityDescription(92)).toBe("Fair");
             expect(result.current.getAvailabilityDescription(85)).toBe("Fair"); // Actual value from test
@@ -332,7 +344,7 @@ describe("useTheme Integration Tests - Full Coverage", () => {
 
     describe("useThemeValue hook", () => {
         it("should extract values from theme using selector", () => {
-            const { result } = renderHook(() => 
+            const { result } = renderHook(() =>
                 useThemeValue((theme) => theme.colors.status.up)
             );
 
@@ -340,7 +352,7 @@ describe("useTheme Integration Tests - Full Coverage", () => {
         });
 
         it("should work with complex selectors", () => {
-            const { result } = renderHook(() => 
+            const { result } = renderHook(() =>
                 useThemeValue((theme) => ({
                     name: theme.name,
                     isDark: theme.isDark,

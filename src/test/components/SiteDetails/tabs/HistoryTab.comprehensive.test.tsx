@@ -324,7 +324,7 @@ describe("HistoryTab", () => {
             const monitor = createMockMonitor(20);
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
-            // Should show only up to history limit  
+            // Should show only up to history limit
             expect(
                 document.querySelectorAll(".themed-status-indicator")
             ).toHaveLength(10);
