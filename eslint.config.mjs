@@ -2284,7 +2284,6 @@ export default [
             "unicorn/no-await-expression-member": "off", // Allow await in test expressions
             "unicorn/filename-case": "off", // Allow test files to have any case
             "unicorn/prevent-abbreviations": "off", // Too many false positives in tests
-            "unused-imports/no-unused-imports": "error",
 
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-non-null-assertion": "off",
@@ -2387,7 +2386,6 @@ export default [
             "unicorn/no-await-expression-member": "off", // Allow await in test expressions
             "unicorn/filename-case": "off", // Allow test files to have any case
             "unicorn/prevent-abbreviations": "off", // Too many false positives in tests
-            "unused-imports/no-unused-imports": "error",
 
             // Relaxed function rules for backend tests (explicit for clarity)
 
@@ -2426,8 +2424,6 @@ export default [
     // TypeScript Config files using Electron Test TSConfig
     {
         files: [
-            "**/*.config.{ts}", // Configuration files
-            "**/*.config.ts", // Configuration files
             "**/*.config.{ts}", // Configuration files
         ],
         ignores: [

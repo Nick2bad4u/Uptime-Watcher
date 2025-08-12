@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ["All Tools"]
+tools: ['All Tools']
 description: "Generate 100% Test Coverage"
 ---
 
@@ -176,3 +176,14 @@ description: "Generate 100% Test Coverage"
 ## Test Assertions
 
 - A long list can be found here: [Vitest Test Assertion API](https://vitest.dev/api/assert.html)
+
+You cannot stop until you eliminate all of these test warnings:
+
+I REPEAT: You cannot stop until you eliminate all of these test warnings:
+
+"ERROR: Coverage for lines does not meet global threshold (90%)"
+"ERROR: Coverage for functions does not meet global threshold (90%)"
+"ERROR: Coverage for statements does not meet global threshold (90%)"
+"ERROR: Coverage for branches does not meet global threshold (90%)"
+
+I REPEAT: You cannot stop until you eliminate all of these test warnings above for both Front AND Backend tests.
