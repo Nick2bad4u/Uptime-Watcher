@@ -1,29 +1,16 @@
 ---
 mode: "agent"
 tools: ['All Tools']
-description: "Generate 100% Test Coverage"
+description: "Add Metadata and Benchmarks to existing tests"
 ---
 
-# Review All Coverage and Test Files
+1. I want you to work on creating Vitest Benchmarks for our most critical heavy compute areas.
 
-## Workflow
+2. I want you to add more metadata to ALL of our tests using the vitest context features.
 
-1. **Fix all broken tests first.**
-2. Run and check current test errors and warnings:
-   - `npm run test`
-   - `npm run test:electron`
-3. Ensure all tests pass with no errors or warnings.
-4. Check coverage and create tests for files below 90% (or 100% if above 90%):
-   - `npm run test:coverage`
-   - `npm run test:electron:coverage`
-5. Scan source code to create intelligent tests for all branches and edge cases.
-6. Ensure comprehensive tests for all edge cases.
-7. Use unlimited requests and time as needed.
-8. **Do not skip any files**, regardless of size or perceived triviality.
-9. Continue until all files reach 90% (or 100% if above 90%) coverage for branch, line, function, and statement.
-10. Do not stop, even if the process is lengthy.
+3. Dont stop until you have scanned every single test file and added metadata to all of them.
 
-## Test Creation Rules
+Always have meaningful metadata that aligns with the project.
 
 ### General Guidelines
 
