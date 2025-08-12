@@ -142,14 +142,14 @@ describe("Application Constants", () => {
         });
 
         it("should have valid interval structure", () => {
-            CHECK_INTERVALS.forEach((interval: IntervalOption) => {
+            for (const interval of CHECK_INTERVALS) {
                 expect(interval).toHaveProperty("label");
                 expect(interval).toHaveProperty("value");
                 expect(typeof interval.label).toBe("string");
                 expect(typeof interval.value).toBe("number");
                 expect(interval.label.length).toBeGreaterThan(0);
                 expect(interval.value).toBeGreaterThan(0);
-            });
+            }
         });
 
         it("should have reasonable interval values", () => {
@@ -210,14 +210,14 @@ describe("Application Constants", () => {
         });
 
         it("should have valid history limit structure", () => {
-            HISTORY_LIMIT_OPTIONS.forEach((option: IntervalOption) => {
+            for (const option of HISTORY_LIMIT_OPTIONS) {
                 expect(option).toHaveProperty("label");
                 expect(option).toHaveProperty("value");
                 expect(typeof option.label).toBe("string");
                 expect(typeof option.value).toBe("number");
                 expect(option.label.length).toBeGreaterThan(0);
                 expect(option.value).toBeGreaterThan(0);
-            });
+            }
         });
 
         it("should include unlimited option", () => {

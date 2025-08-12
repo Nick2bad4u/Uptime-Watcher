@@ -111,9 +111,9 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         );
 
         const themedTexts = document.querySelectorAll(".themed-text");
-        themedTexts.forEach((element) => {
+        for (const element of themedTexts) {
             expect(container).toContainElement(element as HTMLElement);
-        });
+        }
     });
 
     it("should handle text content correctly", () => {

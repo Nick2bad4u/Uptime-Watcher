@@ -88,11 +88,11 @@ describe("Component Coverage Boost", () => {
                 }));
             };
 
-            const rendered = renderSiteList(mockSites);
-            expect(rendered).toHaveLength(3);
-            expect(rendered[0]?.statusColor).toBe("green");
-            expect(rendered[1]?.statusColor).toBe("red");
-            expect(rendered[2]?.statusColor).toBe("yellow");
+            const utils = renderSiteList(mockSites);
+            expect(utils).toHaveLength(3);
+            expect(utils[0]?.statusColor).toBe("green");
+            expect(utils[1]?.statusColor).toBe("red");
+            expect(utils[2]?.statusColor).toBe("yellow");
         });
     });
 
@@ -642,8 +642,8 @@ describe("Component Coverage Boost", () => {
                 }),
                 calculateTrend: (data: number[]) => {
                     if (data.length < 2) return "insufficient-data";
-                    const last = data[data.length - 1];
-                    const previous = data[data.length - 2];
+                    const last = data.at(-1);
+                    const previous = data.at(-2);
                     if (
                         last !== undefined &&
                         previous !== undefined &&
@@ -702,18 +702,22 @@ describe("Component Coverage Boost", () => {
                     const cutoffTime = new Date();
 
                     switch (timeRange) {
-                        case "1h":
+                        case "1h": {
                             cutoffTime.setHours(now.getHours() - 1);
                             break;
-                        case "6h":
+                        }
+                        case "6h": {
                             cutoffTime.setHours(now.getHours() - 6);
                             break;
-                        case "24h":
+                        }
+                        case "24h": {
                             cutoffTime.setDate(now.getDate() - 1);
                             break;
-                        case "7d":
+                        }
+                        case "7d": {
                             cutoffTime.setDate(now.getDate() - 7);
                             break;
+                        }
                     }
 
                     return data.filter(
@@ -722,10 +726,10 @@ describe("Component Coverage Boost", () => {
                 },
                 aggregateByStatus: (data: HistoryChartProps["data"]) => {
                     const statusCounts: Record<string, number> = {};
-                    data.forEach((item) => {
+                    for (const item of data) {
                         statusCounts[item.status] =
                             (statusCounts[item.status] || 0) + 1;
-                    });
+                    }
                     return statusCounts;
                 },
                 calculateUptime: (data: HistoryChartProps["data"]) => {
@@ -798,16 +802,12 @@ describe("Component Coverage Boost", () => {
                     incidents: Array<{ startTime: string; endTime: string }>
                 ) => {
                     if (incidents.length === 0) return 0;
-                    const totalDowntime = incidents.reduce(
-                        (total, incident) => {
-                            const start = new Date(
-                                incident.startTime
-                            ).getTime();
-                            const end = new Date(incident.endTime).getTime();
-                            return total + (end - start);
-                        },
-                        0
-                    );
+                    let totalDowntime = 0;
+                    for (const incident of incidents) {
+                        const start = new Date(incident.startTime).getTime();
+                        const end = new Date(incident.endTime).getTime();
+                        totalDowntime += end - start;
+                    }
                     return totalDowntime / incidents.length / 1000 / 60; // minutes
                 },
             };

@@ -88,6 +88,39 @@ vi.mock("../../../theme/useTheme", () => ({
         themeVersion: 1,
         toggleTheme: vi.fn(),
     })),
+    useAvailabilityColors: vi.fn(() => ({
+        getAvailabilityColor: vi.fn((percentage: number) => {
+            if (percentage >= 95) return "#10b981";
+            if (percentage >= 80) return "#f59e0b";
+            return "#ef4444";
+        }),
+        getAvailabilityDescription: vi.fn((percentage: number) => {
+            if (percentage >= 99.9) return "Excellent";
+            if (percentage >= 95) return "Good";
+            if (percentage >= 80) return "Fair";
+            return "Poor";
+        }),
+        getAvailabilityVariant: vi.fn((percentage: number) => {
+            if (percentage >= 95) return "success";
+            if (percentage >= 80) return "warning";
+            return "danger";
+        }),
+    })),
+    useStatusColors: vi.fn(() => ({
+        up: "#10b981",
+        down: "#ef4444",
+        pending: "#f59e0b",
+        unknown: "#6b7280",
+    })),
+    useThemeClasses: vi.fn(() => ({
+        getBackgroundClass: vi.fn(() => ({ backgroundColor: "#ffffff" })),
+        getBorderClass: vi.fn(() => ({ borderColor: "#e0e0e0" })),
+        getColor: vi.fn(() => "#000000"),
+        getStatusClass: vi.fn(() => ({ color: "#000000" })),
+        getSurfaceClass: vi.fn(() => ({ backgroundColor: "#ffffff" })),
+        getTextClass: vi.fn(() => ({ color: "#000000" })),
+    })),
+    useThemeValue: vi.fn((selector) => selector({ colors: { text: { primary: "#000000" } } })),
 }));
 
 vi.mock("../../../services/chartConfig", () => ({
@@ -371,7 +404,8 @@ describe("SiteDetails", () => {
         it("should handle tab change events", () => {
             renderSiteDetails();
 
-            const historyTabButton = screen.getByTestId("history-tab");
+            // Use the test id to find the history tab button
+            const historyTabButton = screen.getByTestId('history-tab');
             fireEvent.click(historyTabButton);
 
             expect(

@@ -70,20 +70,20 @@ describe("Settings - Invalid Key Logging", () => {
                 historyLimit: number;
             }
 
-            const allowedKeys: (keyof SettingsType)[] = [
+            const allowedKeys = new Set<keyof SettingsType>([
                 "notifications",
                 "autoStart",
                 "minimizeToTray",
                 "theme",
                 "soundAlerts",
                 "historyLimit",
-            ];
+            ]);
 
             const handleSettingChange = (
                 key: keyof SettingsType,
                 value: unknown
             ) => {
-                if (!allowedKeys.includes(key)) {
+                if (!allowedKeys.has(key)) {
                     logger.warn(
                         "Attempted to update invalid settings key",
                         key

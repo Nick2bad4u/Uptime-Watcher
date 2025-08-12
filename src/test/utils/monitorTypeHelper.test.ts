@@ -403,7 +403,7 @@ describe("monitorTypeHelper", () => {
         });
 
         it("should preserve order of monitor types from backend", async () => {
-            const reversedTypes = [...mockMonitorTypes].reverse();
+            const reversedTypes = [...mockMonitorTypes].toReversed();
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(
                 reversedTypes
             );

@@ -153,36 +153,31 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
         });
 
         it("should handle event emitter", () => {
-            class EventEmitter {
-                private events: Record<string, Function[]> = {};
-
-                on(event: string, callback: Function) {
-                    this.events[event] ??= [];
-                    this.events[event].push(callback);
+            class EventTargetWrapper extends EventTarget {
+                emit(eventType: string, data: any) {
+                    this.dispatchEvent(new CustomEvent(eventType, { detail: data }));
                 }
 
-                emit(event: string, ...args: any[]) {
-                    if (this.events[event]) {
-                        for (const callback of this.events[event])
-                            callback(...args);
-                    }
+                on(eventType: string, callback: (event: CustomEvent) => void) {
+                    this.addEventListener(eventType, callback as EventListener);
                 }
 
-                off(event: string, callback: Function) {
-                    if (this.events[event]) {
-                        this.events[event] = this.events[event].filter(
-                            (cb) => cb !== callback
-                        );
-                    }
+                off(eventType: string, callback: (event: CustomEvent) => void) {
+                    this.removeEventListener(eventType, callback as EventListener);
                 }
             }
 
-            const emitter = new EventEmitter();
+            const emitter = new EventTargetWrapper();
             const callback = vi.fn();
 
             emitter.on("test", callback);
             emitter.emit("test", "data");
-            expect(callback).toHaveBeenCalledWith("data");
+            expect(callback).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    detail: "data",
+                    type: "test"
+                })
+            );
 
             emitter.off("test", callback);
             emitter.emit("test", "data2");

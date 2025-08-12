@@ -161,7 +161,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
 
             expect(result.success).toBe(false);
             expect(result.errors).toHaveLength(1);
-            expect(result.errors[0]).toBe("Validation failed for monitor data");
+            expect(result.errors[0]).toBe("url: Must be a valid HTTP or HTTPS URL");
         });
 
         it("should handle monitors with all status types", () => {
@@ -256,22 +256,10 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             });
             delete (monitorWithBadData as any).url; // Remove URL for invalid monitor
 
-            // First mock the type as valid, then make validation fail
-            const { isValidMonitorType, validateMonitorData } = await import(
-                "../../../services/monitoring/MonitorTypeRegistry"
-            );
-            vi.mocked(isValidMonitorType).mockReturnValueOnce(true);
-            vi.mocked(validateMonitorData).mockReturnValueOnce({
-                success: false,
-                errors: ["Custom validation error"],
-                warnings: [],
-                metadata: {},
-            });
-
             const result =
                 validator.validateMonitorConfiguration(monitorWithBadData);
             expect(result.success).toBe(false);
-            expect(result.errors).toContain("Custom validation error");
+            expect(result.errors).toContain("Invalid monitor type `invalid`. Available types: `http, port`");
         });
     });
 

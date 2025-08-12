@@ -259,7 +259,7 @@ describe("Settings Component Coverage Tests", () => {
                 defaultValue: number
             ) => {
                 const num = Number.parseInt(value, 10);
-                if (isNaN(num)) return defaultValue;
+                if (Number.isNaN(num)) return defaultValue;
                 if (num < min) return min;
                 if (num > max) return max;
                 return num;
@@ -546,7 +546,7 @@ describe("Settings Component Coverage Tests", () => {
             // Mock implementation of safeInteger since we can't import it directly
             const mockSafeInteger = (input: string, options: any = {}) => {
                 const num = Number.parseInt(input, 10);
-                if (isNaN(num)) return options.default || 0;
+                if (Number.isNaN(num)) return options.default || 0;
                 return num;
             };
 

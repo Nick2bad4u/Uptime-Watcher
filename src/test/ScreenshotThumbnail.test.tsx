@@ -8,7 +8,6 @@ import {
     screen,
     fireEvent,
     waitFor,
-    cleanup,
     act,
     createEvent,
 } from "@testing-library/react";
@@ -85,7 +84,7 @@ describe("ScreenshotThumbnail", () => {
         vi.clearAllMocks();
 
         // Mock window.open to prevent navigation
-        Object.defineProperty(window, "open", {
+        Object.defineProperty(globalThis, "open", {
             configurable: true,
             value: mockWindowOpen,
         });
@@ -96,7 +95,7 @@ describe("ScreenshotThumbnail", () => {
             .mockImplementation(() => createMockBoundingClientRect());
 
         // Mock location methods to prevent navigation errors in JSDOM
-        Object.defineProperty(window, "location", {
+        Object.defineProperty(globalThis, "location", {
             configurable: true,
             value: {
                 assign: vi.fn(),
@@ -114,12 +113,12 @@ describe("ScreenshotThumbnail", () => {
             vi.spyOn(this, "defaultPrevented", "get").mockReturnValue(true);
         });
 
-        Object.defineProperty(window, "innerWidth", {
+        Object.defineProperty(globalThis, "innerWidth", {
             value: 1920,
             writable: true,
         });
 
-        Object.defineProperty(window, "innerHeight", {
+        Object.defineProperty(globalThis, "innerHeight", {
             value: 1080,
             writable: true,
         });
@@ -131,7 +130,6 @@ describe("ScreenshotThumbnail", () => {
     });
 
     afterEach(() => {
-        cleanup();
         vi.useRealTimers();
     });
 
@@ -182,7 +180,7 @@ describe("ScreenshotThumbnail", () => {
     describe("Click Handling", () => {
         it("should call electronAPI.openExternal when available", async () => {
             // Mock electronAPI with openExternal method
-            Object.defineProperty(window, "electronAPI", {
+            Object.defineProperty(globalThis, "electronAPI", {
                 value: mockElectronAPI,
                 writable: true,
             });
@@ -228,7 +226,7 @@ describe("ScreenshotThumbnail", () => {
 
         it("should handle electronAPI without openExternal method", () => {
             // Mock electronAPI without system.openExternal that throws an error
-            Object.defineProperty(window, "electronAPI", {
+            Object.defineProperty(globalThis, "electronAPI", {
                 value: {
                     system: {
                         openExternal: vi.fn().mockImplementation(() => {
@@ -240,7 +238,7 @@ describe("ScreenshotThumbnail", () => {
             });
 
             // Mock window.open function directly
-            vi.spyOn(window, "open").mockImplementation(mockWindowOpen);
+            vi.spyOn(globalThis, "open").mockImplementation(mockWindowOpen);
 
             // Render the component
             render(<ScreenshotThumbnail {...defaultProps} />);
@@ -274,11 +272,8 @@ describe("ScreenshotThumbnail", () => {
             const link = screen.getByRole("link");
 
             // Use testing-library's built-in hover functionality
-            await act(async () => {
-                // Using fireEvent instead of userEvent to avoid navigation issues
-
-                fireEvent.mouseEnter(link);
-            });
+            // Using fireEvent instead of userEvent to avoid navigation issues
+            fireEvent.mouseEnter(link);
 
             // Check that the overlay appears
             await waitFor(() => {
@@ -535,15 +530,15 @@ describe("ScreenshotThumbnail", () => {
             });
 
             // Simulate window resize
-            Object.defineProperty(window, "innerWidth", {
+            Object.defineProperty(globalThis, "innerWidth", {
                 value: 800,
                 writable: true,
             });
-            Object.defineProperty(window, "innerHeight", {
+            Object.defineProperty(globalThis, "innerHeight", {
                 value: 600,
                 writable: true,
             });
-            fireEvent(window, new Event("resize"));
+            fireEvent(globalThis, new Event("resize"));
 
             // Portal should still exist and be functional
             await waitFor(() => {
@@ -726,7 +721,7 @@ describe("ScreenshotThumbnail", () => {
                 },
             };
 
-            Object.defineProperty(window, "electronAPI", {
+            Object.defineProperty(globalThis, "electronAPI", {
                 value: apiWithOpenExternal,
                 writable: true,
             });
@@ -754,7 +749,7 @@ describe("ScreenshotThumbnail", () => {
                 },
             };
 
-            Object.defineProperty(window, "electronAPI", {
+            Object.defineProperty(globalThis, "electronAPI", {
                 value: apiWithoutOpenExternal,
                 writable: true,
             });
@@ -780,7 +775,7 @@ describe("ScreenshotThumbnail", () => {
     describe("Cleanup Edge Cases", () => {
         it("should clean up timeout on component unmount", () => {
             vi.useFakeTimers();
-            const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
+            const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
             const { unmount } = render(
                 <ScreenshotThumbnail
@@ -814,7 +809,7 @@ describe("ScreenshotThumbnail", () => {
 
         it("should clear timeout on mouse leave after mouse enter", () => {
             vi.useFakeTimers();
-            const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
+            const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
             render(
                 <ScreenshotThumbnail
@@ -844,7 +839,7 @@ describe("ScreenshotThumbnail", () => {
 
         it("should clear timeout on focus after timeout creation", () => {
             vi.useFakeTimers();
-            const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
+            const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
             render(
                 <ScreenshotThumbnail
@@ -873,7 +868,7 @@ describe("ScreenshotThumbnail", () => {
 
         it("should clear timeout on blur after timeout creation", () => {
             vi.useFakeTimers();
-            const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
+            const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
             render(
                 <ScreenshotThumbnail
@@ -902,7 +897,7 @@ describe("ScreenshotThumbnail", () => {
 
         it("should specifically cover timeout clearance in handleMouseLeave (line 132-133)", () => {
             vi.useFakeTimers();
-            const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
+            const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
             render(
                 <ScreenshotThumbnail
@@ -965,7 +960,7 @@ describe("ScreenshotThumbnail", () => {
 
         it("should test handleMouseEnter timeout clearing when timeout exists", () => {
             vi.useFakeTimers();
-            const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
+            const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
             render(
                 <ScreenshotThumbnail
@@ -996,7 +991,7 @@ describe("ScreenshotThumbnail", () => {
 
         it("should test handleFocus timeout clearing when timeout exists", () => {
             vi.useFakeTimers();
-            const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
+            const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
             render(
                 <ScreenshotThumbnail
@@ -1026,7 +1021,7 @@ describe("ScreenshotThumbnail", () => {
 
         it("should test handleBlur timeout clearing when timeout exists", () => {
             vi.useFakeTimers();
-            const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
+            const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
             render(
                 <ScreenshotThumbnail
@@ -1056,7 +1051,7 @@ describe("ScreenshotThumbnail", () => {
 
         it("should test timeout cleanup in handleMouseLeave with rapid events", () => {
             vi.useFakeTimers();
-            const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
+            const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
             render(
                 <ScreenshotThumbnail
@@ -1103,11 +1098,11 @@ describe("ScreenshotThumbnail", () => {
             };
             Element.prototype.getBoundingClientRect = vi.fn(() => mockRect1);
 
-            Object.defineProperty(window, "innerWidth", {
+            Object.defineProperty(globalThis, "innerWidth", {
                 value: 1920,
                 writable: true,
             });
-            Object.defineProperty(window, "innerHeight", {
+            Object.defineProperty(globalThis, "innerHeight", {
                 value: 1080,
                 writable: true,
             });
@@ -1174,7 +1169,7 @@ describe("ScreenshotThumbnail", () => {
 
         it("should handle all event combinations that can clear timeouts", () => {
             vi.useFakeTimers();
-            const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
+            const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
             render(
                 <ScreenshotThumbnail

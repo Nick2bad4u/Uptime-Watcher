@@ -429,9 +429,10 @@ describe("Header Component", () => {
         it("should have proper CSS classes for styling", () => {
             render(<Header />);
 
-            expect(screen.getByRole("banner")).toBeInTheDocument();
+            // Header renders as a ThemedBox, not as a banner role
             expect(screen.getByText("Uptime Watcher")).toBeInTheDocument();
-            expect(screen.getByTestId("status-summary")).toBeInTheDocument();
+            // Check for the status summary area using a class that exists in DOM
+            expect(screen.getByText("Health")).toBeInTheDocument();
         });
     });
 

@@ -36,10 +36,10 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should handle Error subclasses correctly", () => {
-                const typeError = new TypeError("Type error message");
-                const result = ensureError(typeError);
+                const customTypeError = new TypeError("Type error message");
+                const result = ensureError(customTypeError);
 
-                expect(result).toBe(typeError);
+                expect(result).toBe(customTypeError);
                 expect(result).toBeInstanceOf(Error);
                 expect(result).toBeInstanceOf(TypeError);
                 expect(result.message).toBe("Type error message");

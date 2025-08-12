@@ -527,7 +527,7 @@ describe("monitorTitleFormatters", () => {
             // Manually set type for the unknown monitor to test edge case
             (monitors[2] as any).type = "unknown";
 
-            const results = monitors.map(formatTitleSuffix);
+            const results = monitors.map((monitor) => formatTitleSuffix(monitor));
 
             expect(results).toEqual([
                 " (https://example.com)",

@@ -617,11 +617,11 @@ describe("Shared Utils Coverage", () => {
             // Test safeConversions.ts edge case (line 267)
             const conversionUtils = {
                 safeNumber: (value: any, fallback = 0): number => {
-                    if (typeof value === "number" && !isNaN(value))
+                    if (typeof value === "number" && !Number.isNaN(value))
                         return value;
                     if (typeof value === "string") {
                         const parsed = Number.parseFloat(value);
-                        return isNaN(parsed) ? fallback : parsed;
+                        return Number.isNaN(parsed) ? fallback : parsed;
                     }
                     return fallback;
                 },

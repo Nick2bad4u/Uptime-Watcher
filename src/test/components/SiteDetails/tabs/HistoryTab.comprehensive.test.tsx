@@ -102,14 +102,14 @@ describe("HistoryTab", () => {
         type: "http",
         url: "https://example.com",
         monitoring: true,
-        checkInterval: 60000,
+        checkInterval: 60_000,
         timeout: 5000,
         retryAttempts: 3,
         status: "up",
         lastChecked: new Date(),
         responseTime: 150,
         history: Array.from({ length: historyLength }, (_, i) => ({
-            timestamp: Date.now() - i * 60000,
+            timestamp: Date.now() - i * 60_000,
             status: i % 2 === 0 ? "up" : "down",
             responseTime: 100 + i * 10,
         })),
@@ -324,7 +324,7 @@ describe("HistoryTab", () => {
             const monitor = createMockMonitor(20);
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
-            // Should show only up to history limit
+            // Should show only up to history limit  
             expect(
                 document.querySelectorAll(".themed-status-indicator")
             ).toHaveLength(10);
@@ -610,10 +610,10 @@ describe("HistoryTab", () => {
             render(<HistoryTab {...defaultProps} />);
 
             const buttons = document.querySelectorAll(".themed-button");
-            buttons.forEach((button) => {
+            for (const button of buttons) {
                 expect(button).toBeInTheDocument();
                 expect(button.tagName).toBe("BUTTON");
-            });
+            }
         });
 
         it("should provide accessible select dropdown", () => {
