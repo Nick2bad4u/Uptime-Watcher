@@ -62,8 +62,8 @@ const mockGetHistoryLimit = vi.fn();
 const mockResetSettings = vi.fn();
 const mockUpdateHistoryLimit = vi.fn();
 
-global.window = {
-    ...global.window,
+globalThis.window = {
+    ...globalThis.window,
     electronAPI: {
         settings: {
             getHistoryLimit: mockGetHistoryLimit,

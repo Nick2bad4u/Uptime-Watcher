@@ -66,7 +66,7 @@ describe("Fallback Utilities", () => {
             });
 
             it("should return false for NaN", () => {
-                expect(isNullOrUndefined(NaN)).toBe(false);
+                expect(isNullOrUndefined(Number.NaN)).toBe(false);
             });
         });
 
@@ -452,7 +452,7 @@ describe("Fallback Utilities", () => {
                 const monitor = {
                     id: "1",
                     type: "custom",
-                    checkInterval: 30000,
+                    checkInterval: 30_000,
                     timeout: 5000,
                     retryAttempts: 3,
                     // No url, host, or port properties
@@ -645,8 +645,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should handle newlines and special characters", () => {
-                const text = "line1\\nline2\\ttab";
-                expect(truncateForLogging(text, 10)).toBe("line1\\nlin");
+                const text = String.raw`line1\nline2\ttab`;
+                expect(truncateForLogging(text, 10)).toBe(String.raw`line1\nlin`);
             });
         });
 

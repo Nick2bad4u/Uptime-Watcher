@@ -331,6 +331,9 @@ describe("MonitorUiComponents", () => {
                     "port",
                     "example.com"
                 );
+            });
+            
+            await waitFor(() => {
                 expect(screen.getByText("port formatted")).toBeInTheDocument();
             });
         });
@@ -354,6 +357,9 @@ describe("MonitorUiComponents", () => {
                     "http",
                     longDetails
                 );
+            });
+            
+            await waitFor(() => {
                 expect(
                     screen.getByText("formatted long string")
                 ).toBeInTheDocument();

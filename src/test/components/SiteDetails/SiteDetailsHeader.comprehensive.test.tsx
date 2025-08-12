@@ -91,8 +91,8 @@ describe("SiteDetailsHeader", () => {
         status: "up",
         responseTime: 150,
         monitoring: true,
-        checkInterval: 300000,
-        timeout: 10000,
+        checkInterval: 300_000,
+        timeout: 10_000,
         retryAttempts: 3,
         history: [],
     };
@@ -104,8 +104,8 @@ describe("SiteDetailsHeader", () => {
         status: "up",
         responseTime: 50,
         monitoring: true,
-        checkInterval: 300000,
-        timeout: 10000,
+        checkInterval: 300_000,
+        timeout: 10_000,
         retryAttempts: 3,
         history: [],
     };
@@ -118,8 +118,8 @@ describe("SiteDetailsHeader", () => {
         status: "up",
         responseTime: 25,
         monitoring: true,
-        checkInterval: 300000,
-        timeout: 10000,
+        checkInterval: 300_000,
+        timeout: 10_000,
         retryAttempts: 3,
         history: [],
     };

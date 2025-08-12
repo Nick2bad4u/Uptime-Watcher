@@ -182,16 +182,37 @@ describe("ApplicationService", () => {
         Object.defineProperty(process, "platform", {
             value: "win32",
             writable: true,
-        });        });
+        });
+    });
     afterEach(() => {
         vi.restoreAllMocks();
-        });
+    });
     describe("Constructor", () => {
-        it("should initialize with service container and setup application", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
-            
+        it("should initialize with service container and setup application", async ({
+            task,
+            annotate,
+            signal,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(`Task ID: ${task.id}`, "task-id");
+            await annotate(`Suite: ${task.suite?.name || "Unknown"}`, "suite");
+            await annotate("Component: ApplicationService", "component");
+            await annotate(
+                "Feature: Service container initialization",
+                "feature"
+            );
+            await annotate("Priority: Critical", "priority");
+            await annotate("Category: Constructor behavior", "category");
+            await annotate(
+                `Signal aborted: ${signal.aborted}`,
+                "signal-status"
+            );
+
             // Act
             applicationService = new ApplicationService();
+
+            // Verify signal hasn't been aborted during test execution
+            expect(signal.aborted).toBe(false);
 
             // Assert
             expect(mockLogger.info).toHaveBeenCalledWith(
@@ -199,10 +220,24 @@ describe("ApplicationService", () => {
             );
             expect(mockServiceContainer.getInstance).toHaveBeenCalledWith({
                 enableDebugLogging: false,
-        });
+            });
             expect(mockApp.on).toHaveBeenCalled();
         });
-        it("should enable debug logging in development environment", async () => {
+        it("should enable debug logging in development environment", async ({
+            task,
+            annotate,
+            signal,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(`Task ID: ${task.id}`, "task-id");
+            await annotate("Component: ApplicationService", "component");
+            await annotate("Environment: Development", "environment");
+            await annotate("Priority: Medium", "priority");
+            await annotate(
+                `Signal aborted: ${signal.aborted}`,
+                "signal-status"
+            );
+
             // Arrange
             const { isDevelopment } = await import(
                 "../../../../shared/utils/environment"
@@ -212,13 +247,34 @@ describe("ApplicationService", () => {
             // Act
             applicationService = new ApplicationService();
 
+            // Verify signal state
+            expect(signal.aborted).toBe(false);
+
             // Assert
             expect(mockServiceContainer.getInstance).toHaveBeenCalledWith({
                 enableDebugLogging: true,
-        });        });
+            });
+        });
         it("should setup app event listeners", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
+            // Basic task metadata usage
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(`Task ID: ${task.id}`, "task-id");
+            await annotate(`Suite: ${task.suite?.name || 'Unknown'}`, "suite");
+            await annotate(`File: ${task.file?.name || 'Unknown'}`, "file");
+            await annotate(`Mode: ${task.mode}`, "mode");
+            await annotate(`Concurrent: ${task.concurrent || false}`, "concurrent");
             
+            // Component and feature info
+            await annotate("Component: ApplicationService", "component");
+            await annotate("Feature: Electron app event binding", "feature");
+            await annotate("Priority: High", "priority");
+            await annotate("Category: Event system setup", "category");
+
+            // Conditional logic based on task properties
+            if (task.mode === 'only') {
+                await annotate("⚠️ Running in ONLY mode - isolated test", "warning");
+            }
+
             // Act
             applicationService = new ApplicationService();
 
@@ -236,7 +292,30 @@ describe("ApplicationService", () => {
                 expect.any(Function)
             );
         });
-        it("should setup auto updater when ready event fires", async () => {
+        it("should setup auto updater when ready event fires", async ({
+            task,
+            annotate,
+        }) => {
+            // Advanced task metadata usage
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(`Task hierarchy: ${task.suite?.name} > ${task.name}`, "hierarchy");
+            
+            // Extract test context from task name for dynamic behavior
+            const isReadyEventTest = task.name.includes('ready event');
+            await annotate(`Ready event test: ${isReadyEventTest}`, "test-type");
+            
+            await annotate("Component: ApplicationService", "component");
+            await annotate("Feature: Auto-updater initialization", "feature");
+            await annotate("Priority: High", "priority");
+
+            // Use task metadata for conditional test logic
+            const taskInfo = {
+                isSkipped: task.mode === 'skip',
+                isOnly: task.mode === 'only',
+                isConcurrent: task.concurrent || false
+            };
+            await annotate(`Task info: ${JSON.stringify(taskInfo)}`, "task-info");
+
             // Arrange
             applicationService = new ApplicationService();
             const readyHandler = mockApp.on.mock.calls.find(
@@ -255,7 +334,15 @@ describe("ApplicationService", () => {
                 mockAutoUpdaterService.checkForUpdates
             ).toHaveBeenCalledTimes(1);
         });
-        it("should setup uptime monitoring event handlers when ready event fires", async () => {
+        it("should setup uptime monitoring event handlers when ready event fires", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "integration");
+            await annotate("Component: ApplicationService", "component");
+            await annotate("Feature: Event system integration", "feature");
+            await annotate("Priority: Critical", "priority");
+
             // Arrange
             applicationService = new ApplicationService();
             const readyHandler = mockApp.on.mock.calls.find(
@@ -290,7 +377,8 @@ describe("ApplicationService", () => {
                 "cache:invalidated",
                 expect.any(Function)
             );
-        });        });
+        });
+    });
     describe("Cleanup", () => {
         beforeEach(async () => {
             applicationService = new ApplicationService();
@@ -305,12 +393,34 @@ describe("ApplicationService", () => {
                 mockWindowService
             );
         });
-        it("should cleanup all services successfully", async () => {
+        it("should cleanup all services successfully", async ({
+            task,
+            annotate,
+            signal,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "integration");
+            await annotate(`Task ID: ${task.id}`, "task-id");
+            await annotate(`Suite: ${task.suite?.name || "Unknown"}`, "suite");
+            await annotate("Component: ApplicationService", "component");
+            await annotate("Feature: Service cleanup lifecycle", "feature");
+            await annotate("Priority: Critical", "priority");
+            await annotate("Category: Lifecycle management", "category");
+            await annotate(
+                `Signal aborted: ${signal.aborted}`,
+                "signal-status"
+            );
+
             // Arrange
             mockUptimeOrchestrator.stopMonitoring.mockResolvedValue(undefined);
 
+            // Simulate cleanup with signal monitoring
+            const cleanupPromise = applicationService.cleanup();
+
+            // Verify signal is not aborted during cleanup
+            expect(signal.aborted).toBe(false);
+
             // Act
-            await applicationService.cleanup();
+            await cleanupPromise;
 
             // Assert
             expect(mockLogger.info).toHaveBeenCalledWith(
@@ -328,7 +438,22 @@ describe("ApplicationService", () => {
                 "APPLICATION_CLEANUP_COMPLETE"
             );
         });
-        it("should handle cleanup errors properly", async () => {
+        it("should handle cleanup errors properly", async ({
+            task,
+            annotate,
+            signal,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(`Task ID: ${task.id}`, "task-id");
+            await annotate("Component: ApplicationService", "component");
+            await annotate("Feature: Error handling during cleanup", "feature");
+            await annotate("Priority: High", "priority");
+            await annotate("Category: Error scenarios", "category");
+            await annotate(
+                `Signal aborted: ${signal.aborted}`,
+                "signal-status"
+            );
+
             // Arrange
             const error = new Error("Cleanup failed");
             mockUptimeOrchestrator.stopMonitoring.mockRejectedValue(error);
@@ -337,19 +462,97 @@ describe("ApplicationService", () => {
             await expect(applicationService.cleanup()).rejects.toThrow(
                 "Cleanup failed"
             );
+
+            // Verify signal state after error
+            expect(signal.aborted).toBe(false);
+
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "APPLICATION_CLEANUP_ERROR",
                 error
             );
         });
-        it("should cleanup IPC service if cleanup method exists", async () => {
+
+        it("should handle cleanup cancellation gracefully", async ({
+            task,
+            annotate,
+            signal,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(`Task ID: ${task.id}`, "task-id");
+            await annotate("Component: ApplicationService", "component");
+            await annotate("Feature: Cleanup cancellation handling", "feature");
+            await annotate("Priority: Medium", "priority");
+            await annotate("Category: Cancellation scenarios", "category");
+            await annotate(
+                `Signal aborted: ${signal.aborted}`,
+                "signal-status"
+            );
+
+            // Arrange - Create a custom AbortController for this test
+            const abortController = new AbortController();
+            const customSignal = abortController.signal;
+
+            // Mock a long-running cleanup operation
+            mockUptimeOrchestrator.stopMonitoring.mockImplementation(
+                () =>
+                    new Promise((resolve, reject) => {
+                        // Simulate async operation that can be cancelled
+                        const timeout = setTimeout(() => resolve(undefined), 1000);
+                        
+                        // Handle cancellation properly
+                        customSignal.addEventListener("abort", () => {
+                            clearTimeout(timeout);
+                            reject(new Error("Operation aborted"));
+                        });
+                        
+                        // If already aborted when this runs
+                        if (customSignal.aborted) {
+                            clearTimeout(timeout);
+                            reject(new Error("Operation aborted"));
+                        }
+                    })
+            );
+
+            // Act - Start cleanup and then abort it
+            const cleanupPromise = applicationService.cleanup();
+
+            // Simulate cancellation after a short delay
+            setTimeout(() => abortController.abort(), 10);
+
+            // Assert - Should handle cancellation
+            await expect(cleanupPromise).rejects.toThrow("Operation aborted");
+
+            // Verify test signal is still intact
+            expect(signal.aborted).toBe(false);
+        });
+        it("should cleanup IPC service if cleanup method exists", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "unit");
+            await annotate("Component: ApplicationService", "component");
+            await annotate("Feature: IPC service cleanup", "feature");
+            await annotate("Priority: Medium", "priority");
+
             // Act
             await applicationService.cleanup();
 
             // Assert
             expect(mockIpcService.cleanup).toHaveBeenCalledTimes(1);
         });
-        it("should handle IPC service without cleanup method", async () => {
+        it("should handle IPC service without cleanup method", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "unit");
+            await annotate("Component: ApplicationService", "component");
+            await annotate(
+                "Feature: Graceful handling of missing methods",
+                "feature"
+            );
+            await annotate("Priority: Medium", "priority");
+            await annotate("Category: Robustness", "category");
+
             // Arrange
             const ipcServiceWithoutCleanup = {};
             mockServiceContainer.getIpcService.mockReturnValue(
@@ -364,20 +567,31 @@ describe("ApplicationService", () => {
                 1
             );
             expect(mockWindowService.closeMainWindow).toHaveBeenCalledTimes(1);
-        });        });
+        });
+    });
     describe("App Event Handlers", () => {
         beforeEach(() => {
             applicationService = new ApplicationService();
         });
         describe("window-all-closed event", () => {
-            it("should quit app on non-macOS platforms", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
-            
+            it("should quit app on non-macOS platforms", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: ApplicationService", "component");
+                await annotate("Platform: Windows/Linux", "platform");
+                await annotate(
+                    "Feature: App lifecycle - window closure",
+                    "feature"
+                );
+                await annotate("Priority: High", "priority");
+
                 // Arrange
                 Object.defineProperty(process, "platform", {
                     value: "win32",
                     writable: true,
-        });
+                });
                 const windowAllClosedHandler = mockApp.on.mock.calls.find(
                     (call: any[]) => call[0] === "window-all-closed"
                 )?.[1];
@@ -393,15 +607,19 @@ describe("ApplicationService", () => {
                     "APPLICATION_QUITTING"
                 );
                 expect(mockApp.quit).toHaveBeenCalledTimes(1);
-        });
-            it("should not quit app on macOS platform", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
-            
+            });
+            it("should not quit app on macOS platform", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: ApplicationService", "component");
+
                 // Arrange
                 Object.defineProperty(process, "platform", {
                     value: "darwin",
                     writable: true,
-        });
+                });
                 const windowAllClosedHandler = mockApp.on.mock.calls.find(
                     (call: any[]) => call[0] === "window-all-closed"
                 )?.[1];
@@ -414,11 +632,16 @@ describe("ApplicationService", () => {
                     "APPLICATION_WINDOWS_CLOSED"
                 );
                 expect(mockApp.quit).not.toHaveBeenCalled();
-        });        });
+            });
+        });
         describe("activate event", () => {
-            it("should create main window when no windows exist", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
-            
+            it("should create main window when no windows exist", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: ApplicationService", "component");
+
                 // Arrange
                 mockWindowService.getAllWindows.mockReturnValue([]);
                 const activateHandler = mockApp.on.mock.calls.find(
@@ -441,10 +664,14 @@ describe("ApplicationService", () => {
                 expect(
                     mockWindowService.createMainWindow
                 ).toHaveBeenCalledTimes(1);
-        });
-            it("should not create window when windows exist", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
-            
+            });
+            it("should not create window when windows exist", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: ApplicationService", "component");
+
                 // Arrange
                 mockWindowService.getAllWindows.mockReturnValue([{ id: 1 }]);
                 const activateHandler = mockApp.on.mock.calls.find(
@@ -464,7 +691,9 @@ describe("ApplicationService", () => {
                 expect(
                     mockWindowService.createMainWindow
                 ).not.toHaveBeenCalled();
-        });        });        });
+            });
+        });
+    });
     describe("Auto Updater Setup", () => {
         beforeEach(async () => {
             applicationService = new ApplicationService();
@@ -473,9 +702,19 @@ describe("ApplicationService", () => {
             )?.[1];
             await readyHandler?.();
         });
-        it("should setup auto updater status callback", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
-            
+        it("should setup auto updater status callback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ApplicationService", "component");
+            await annotate(
+                "Feature: Auto-updater status communication",
+                "feature"
+            );
+            await annotate("Priority: Medium", "priority");
+            await annotate("Category: IPC communication", "category");
+
             // Arrange
             const statusCallback =
                 mockAutoUpdaterService.setStatusCallback.mock.calls[0]?.[0];
@@ -490,7 +729,23 @@ describe("ApplicationService", () => {
                 statusData
             );
         });
-        it("should handle auto updater check errors", async () => {
+        it("should handle auto updater check errors", async ({
+            task,
+            annotate,
+            signal,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(`Task ID: ${task.id}`, "task-id");
+            await annotate(`Suite: ${task.suite?.name || "Unknown"}`, "suite");
+            await annotate("Component: ApplicationService", "component");
+            await annotate("Feature: Auto-updater error handling", "feature");
+            await annotate("Priority: Medium", "priority");
+            await annotate("Category: Error scenarios", "category");
+            await annotate(
+                `Signal aborted: ${signal.aborted}`,
+                "signal-status"
+            );
+
             // Arrange
             const error = new Error("Update check failed");
             mockAutoUpdaterService.checkForUpdates.mockRejectedValue(error);
@@ -507,12 +762,74 @@ describe("ApplicationService", () => {
             // Wait for async operation
             await new Promise((resolve) => setTimeout(resolve, 0));
 
+            // Verify signal hasn't been aborted during async operations
+            expect(signal.aborted).toBe(false);
+
             // Assert
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "APPLICATION_UPDATE_CHECK_ERROR",
                 error
             );
-        });        });
+        });
+
+        it("should handle auto updater cancellation during initialization", async ({
+            task,
+            annotate,
+            signal,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(`Task ID: ${task.id}`, "task-id");
+            await annotate("Component: ApplicationService", "component");
+            await annotate(
+                "Feature: Auto-updater cancellation handling",
+                "feature"
+            );
+            await annotate("Priority: Medium", "priority");
+            await annotate("Category: Cancellation scenarios", "category");
+            await annotate(
+                `Signal aborted: ${signal.aborted}`,
+                "signal-status"
+            );
+
+            // Arrange - Create a cancellable update check
+            const abortController = new AbortController();
+            const customSignal = abortController.signal;
+
+            mockAutoUpdaterService.checkForUpdates.mockImplementation(
+                () =>
+                    new Promise((resolve, reject) => {
+                        const timeout = setTimeout(resolve, 1000);
+                        customSignal.addEventListener("abort", () => {
+                            clearTimeout(timeout);
+                            reject(new Error("Update check cancelled"));
+                        });
+                    })
+            );
+
+            // Create new instance
+            new ApplicationService();
+            const readyHandler = mockApp.on.mock.calls.find(
+                (call: any[]) => call[0] === "ready"
+            )?.[1];
+
+            // Act - Start ready handler and cancel update check
+            const readyPromise = readyHandler?.();
+            setTimeout(() => abortController.abort(), 10);
+
+            // Wait for completion
+            await readyPromise;
+            await new Promise((resolve) => setTimeout(resolve, 50));
+
+            // Verify test signal is intact
+            expect(signal.aborted).toBe(false);
+
+            // Assert that error was logged due to cancellation
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "APPLICATION_UPDATE_CHECK_ERROR",
+                expect.any(Error)
+            );
+        });
+    });
     describe("Uptime Monitoring Event Handlers", () => {
         beforeEach(async () => {
             applicationService = new ApplicationService();
@@ -522,9 +839,13 @@ describe("ApplicationService", () => {
             await readyHandler?.();
         });
         describe("monitor:up event", () => {
-            it("should forward monitor up event to renderer", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
-            
+            it("should forward monitor up event to renderer", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: ApplicationService", "component");
+
                 // Arrange
                 const monitorUpHandler =
                     mockUptimeOrchestrator.onTyped.mock.calls.find(
@@ -547,10 +868,14 @@ describe("ApplicationService", () => {
                 expect(
                     mockNotificationService.notifyMonitorUp
                 ).toHaveBeenCalledWith(eventData.site, eventData.monitor.id);
-        });
-            it("should handle monitor up forwarding errors", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
-            
+            });
+            it("should handle monitor up forwarding errors", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: ApplicationService", "component");
+
                 // Arrange
                 const monitorUpHandler =
                     mockUptimeOrchestrator.onTyped.mock.calls.find(
@@ -564,7 +889,7 @@ describe("ApplicationService", () => {
                 const error = new Error("Forward failed");
                 mockWindowService.sendToRenderer.mockImplementation(() => {
                     throw error;
-        });
+                });
                 // Act
                 monitorUpHandler?.(eventData);
 
@@ -573,11 +898,16 @@ describe("ApplicationService", () => {
                     "APPLICATION_FORWARD_MONITOR_UP_ERROR",
                     error
                 );
-        });        });
+            });
+        });
         describe("monitor:down event", () => {
-            it("should forward monitor down event to renderer", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
-            
+            it("should forward monitor down event to renderer", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: ApplicationService", "component");
+
                 // Arrange
                 const monitorDownHandler =
                     mockUptimeOrchestrator.onTyped.mock.calls.find(
@@ -600,10 +930,14 @@ describe("ApplicationService", () => {
                 expect(
                     mockNotificationService.notifyMonitorDown
                 ).toHaveBeenCalledWith(eventData.site, eventData.monitor.id);
-        });
-            it("should handle monitor down forwarding errors", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
-            
+            });
+            it("should handle monitor down forwarding errors", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: ApplicationService", "component");
+
                 // Arrange
                 const monitorDownHandler =
                     mockUptimeOrchestrator.onTyped.mock.calls.find(
@@ -617,7 +951,7 @@ describe("ApplicationService", () => {
                 const error = new Error("Forward failed");
                 mockWindowService.sendToRenderer.mockImplementation(() => {
                     throw error;
-        });
+                });
                 // Act
                 monitorDownHandler?.(eventData);
 
@@ -626,11 +960,13 @@ describe("ApplicationService", () => {
                     "APPLICATION_FORWARD_MONITOR_DOWN_ERROR",
                     error
                 );
-        });        });
+            });
+        });
         describe("system:error event", () => {
             it("should log system errors", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
-            
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: ApplicationService", "component");
+
                 // Arrange
                 const systemErrorHandler =
                     mockUptimeOrchestrator.onTyped.mock.calls.find(
@@ -649,11 +985,16 @@ describe("ApplicationService", () => {
                     expect.stringContaining("APPLICATION_SYSTEM_ERROR"),
                     eventData.error
                 );
-        });        });
+            });
+        });
         describe("monitoring:started event", () => {
-            it("should forward monitoring started event to renderer", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
-            
+            it("should forward monitoring started event to renderer", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: ApplicationService", "component");
+
                 // Arrange
                 const monitoringStartedHandler =
                     mockUptimeOrchestrator.onTyped.mock.calls.find(
@@ -669,10 +1010,14 @@ describe("ApplicationService", () => {
                     "monitoring:started",
                     eventData
                 );
-        });
-            it("should handle monitoring started forwarding errors", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
-            
+            });
+            it("should handle monitoring started forwarding errors", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: ApplicationService", "component");
+
                 // Arrange
                 const monitoringStartedHandler =
                     mockUptimeOrchestrator.onTyped.mock.calls.find(
@@ -682,7 +1027,7 @@ describe("ApplicationService", () => {
                 const error = new Error("Forward failed");
                 mockWindowService.sendToRenderer.mockImplementation(() => {
                     throw error;
-        });
+                });
                 // Act
                 monitoringStartedHandler?.(eventData);
 
@@ -691,11 +1036,16 @@ describe("ApplicationService", () => {
                     "APPLICATION_FORWARD_MONITORING_STARTED_ERROR",
                     error
                 );
-        });        });
+            });
+        });
         describe("monitoring:stopped event", () => {
-            it("should forward monitoring stopped event to renderer", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
-            
+            it("should forward monitoring stopped event to renderer", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: ApplicationService", "component");
+
                 // Arrange
                 const monitoringStoppedHandler =
                     mockUptimeOrchestrator.onTyped.mock.calls.find(
@@ -711,10 +1061,14 @@ describe("ApplicationService", () => {
                     "monitoring:stopped",
                     eventData
                 );
-        });
-            it("should handle monitoring stopped forwarding errors", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
-            
+            });
+            it("should handle monitoring stopped forwarding errors", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: ApplicationService", "component");
+
                 // Arrange
                 const monitoringStoppedHandler =
                     mockUptimeOrchestrator.onTyped.mock.calls.find(
@@ -724,7 +1078,7 @@ describe("ApplicationService", () => {
                 const error = new Error("Forward failed");
                 mockWindowService.sendToRenderer.mockImplementation(() => {
                     throw error;
-        });
+                });
                 // Act
                 monitoringStoppedHandler?.(eventData);
 
@@ -733,11 +1087,16 @@ describe("ApplicationService", () => {
                     "APPLICATION_FORWARD_MONITORING_STOPPED_ERROR",
                     error
                 );
-        });        });
+            });
+        });
         describe("cache:invalidated event", () => {
-            it("should forward cache invalidated event to renderer", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
-            
+            it("should forward cache invalidated event to renderer", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: ApplicationService", "component");
+
                 // Arrange
                 const cacheInvalidatedHandler =
                     mockUptimeOrchestrator.onTyped.mock.calls.find(
@@ -757,10 +1116,14 @@ describe("ApplicationService", () => {
                     "cache:invalidated",
                     eventData
                 );
-        });
-            it("should handle cache invalidation forwarding errors", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
-            
+            });
+            it("should handle cache invalidation forwarding errors", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: ApplicationService", "component");
+
                 // Arrange
                 const cacheInvalidatedHandler =
                     mockUptimeOrchestrator.onTyped.mock.calls.find(
@@ -774,7 +1137,7 @@ describe("ApplicationService", () => {
                 const error = new Error("Forward failed");
                 mockWindowService.sendToRenderer.mockImplementation(() => {
                     throw error;
-        });
+                });
                 // Act
                 cacheInvalidatedHandler?.(eventData);
 
@@ -783,11 +1146,28 @@ describe("ApplicationService", () => {
                     "APPLICATION_FORWARD_CACHE_INVALIDATION_ERROR",
                     error
                 );
-        });        });        });
+            });
+        });
+    });
     describe("Edge Cases and Error Handling", () => {
-        it("should handle missing service methods gracefully", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
-            
+        it("should handle missing service methods gracefully", async ({
+            task,
+            annotate,
+            signal,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(`Task ID: ${task.id}`, "task-id");
+            await annotate(`Suite: ${task.suite?.name || "Unknown"}`, "suite");
+            await annotate("Component: ApplicationService", "component");
+            await annotate("Feature: Graceful degradation", "feature");
+            await annotate("Priority: High", "priority");
+            await annotate("Category: Robustness testing", "category");
+            await annotate("Edge case: Missing service methods", "edge-case");
+            await annotate(
+                `Signal aborted: ${signal.aborted}`,
+                "signal-status"
+            );
+
             // Arrange
             const serviceWithoutMethods = {};
             mockServiceContainer.getIpcService.mockReturnValue(
@@ -796,10 +1176,30 @@ describe("ApplicationService", () => {
 
             // Act & Assert - Should not throw during construction
             expect(() => new ApplicationService()).not.toThrow();
+
+            // Verify signal state
+            expect(signal.aborted).toBe(false);
         });
-        it("should handle null/undefined event data", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
-            
+        it("should handle null/undefined event data", async ({
+            task,
+            annotate,
+            signal,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(`Task ID: ${task.id}`, "task-id");
+            await annotate("Component: ApplicationService", "component");
+            await annotate(
+                "Feature: Null/undefined event data handling",
+                "feature"
+            );
+            await annotate("Priority: Medium", "priority");
+            await annotate("Category: Input validation", "category");
+            await annotate("Edge case: Null event data", "edge-case");
+            await annotate(
+                `Signal aborted: ${signal.aborted}`,
+                "signal-status"
+            );
+
             // Arrange
             applicationService = new ApplicationService();
             const monitorUpHandler =
@@ -810,10 +1210,31 @@ describe("ApplicationService", () => {
             // Act & Assert - Should not throw
             expect(() => monitorUpHandler?.(null)).not.toThrow();
             expect(() => monitorUpHandler?.(undefined)).not.toThrow();
+
+            // Verify signal state after operations
+            expect(signal.aborted).toBe(false);
         });
-        it("should handle service container getInstance returning undefined", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional"); await annotate("Component: ApplicationService", "component");
-            
+
+        it("should handle service container getInstance returning undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ApplicationService", "component");
+            await annotate(
+                "Feature: Service container failure handling",
+                "feature"
+            );
+            await annotate("Priority: Medium", "priority");
+            await annotate(
+                "Category: Dependency injection failure",
+                "category"
+            );
+            await annotate(
+                "Edge case: Service container returns null",
+                "edge-case"
+            );
+
             // Arrange
             mockServiceContainer.getInstance.mockReturnValue(null);
 
@@ -826,9 +1247,22 @@ describe("ApplicationService", () => {
             mockServiceContainer.getInstance.mockReturnValue(
                 mockServiceContainer
             );
-        });        });
+        });
+    });
     describe("Integration and Lifecycle", () => {
-        it("should properly coordinate service initialization order", async () => {
+        it("should properly coordinate service initialization order", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "integration");
+            await annotate("Component: ApplicationService", "component");
+            await annotate(
+                "Feature: Service initialization coordination",
+                "feature"
+            );
+            await annotate("Priority: Critical", "priority");
+            await annotate("Category: Service orchestration", "category");
+
             // Act
             applicationService = new ApplicationService();
             const readyHandler = mockApp.on.mock.calls.find(
@@ -852,7 +1286,19 @@ describe("ApplicationService", () => {
                 expect(mock).toHaveBeenCalled();
             }
         });
-        it("should handle full lifecycle from construction to cleanup", async () => {
+        it("should handle full lifecycle from construction to cleanup", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "integration");
+            await annotate("Component: ApplicationService", "component");
+            await annotate(
+                "Feature: Complete application lifecycle",
+                "feature"
+            );
+            await annotate("Priority: Critical", "priority");
+            await annotate("Category: End-to-end testing", "category");
+
             // Arrange
             applicationService = new ApplicationService();
 
@@ -878,4 +1324,6 @@ describe("ApplicationService", () => {
             expect(mockLogger.info).toHaveBeenCalledWith(
                 "APPLICATION_CLEANUP_COMPLETE"
             );
-        });        });        });
+        });
+    });
+});

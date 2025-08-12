@@ -186,14 +186,14 @@ describe("AnalyticsTab", () => {
 
         const mockDowntimePeriods: DowntimePeriod[] = [
             {
-                start: Date.now() - 3600000,
-                end: Date.now() - 3000000,
-                duration: 600000,
+                start: Date.now() - 3_600_000,
+                end: Date.now() - 3_000_000,
+                duration: 600_000,
             },
             {
-                start: Date.now() - 7200000,
-                end: Date.now() - 7020000,
-                duration: 180000,
+                start: Date.now() - 7_200_000,
+                end: Date.now() - 7_020_000,
+                duration: 180_000,
             },
         ];
 
@@ -209,13 +209,13 @@ describe("AnalyticsTab", () => {
             formatResponseTime: vi.fn((time: number) => `${time}ms`),
             getAvailabilityDescription: vi.fn((percentage: number) => {
                 if (percentage >= 99.9) return "Excellent";
-                if (percentage >= 99.0) return "Good";
+                if (percentage >= 99) return "Good";
                 return "Poor";
             }),
             lineChartData: mockLineChartData,
             lineChartOptions: mockChartOptions,
             monitorType: "http" as const,
-            mttr: 300000,
+            mttr: 300_000,
             p50: 120,
             p95: 200,
             p99: 250,
@@ -224,7 +224,7 @@ describe("AnalyticsTab", () => {
             showAdvancedMetrics: false,
             siteDetailsChartTimeRange: "24h" as const,
             totalChecks: 100,
-            totalDowntime: 780000,
+            totalDowntime: 780_000,
             upCount: 95,
             uptime: "99.5",
             uptimeChartData: mockUptimeChartData,
@@ -329,7 +329,7 @@ describe("AnalyticsTab", () => {
 
         it("should display MTTR with correct formatting when advanced metrics enabled", () => {
             const props = createMockProps({
-                mttr: 300000,
+                mttr: 300_000,
                 formatDuration: vi.fn(() => "5m"),
                 showAdvancedMetrics: true, // Need to enable advanced metrics to show MTTR
             });
@@ -343,7 +343,7 @@ describe("AnalyticsTab", () => {
             const fiveMinTexts = screen.getAllByText("5m");
             expect(fiveMinTexts.length).toBeGreaterThan(0);
 
-            expect(props.formatDuration).toHaveBeenCalledWith(300000);
+            expect(props.formatDuration).toHaveBeenCalledWith(300_000);
         });
     });
 
@@ -402,9 +402,9 @@ describe("AnalyticsTab", () => {
             const props = createMockProps({
                 downtimePeriods: [
                     {
-                        start: Date.now() - 3600000,
-                        end: Date.now() - 3000000,
-                        duration: 600000,
+                        start: Date.now() - 3_600_000,
+                        end: Date.now() - 3_000_000,
+                        duration: 600_000,
                     },
                 ],
                 formatDuration: vi.fn(() => "10m"),
@@ -429,7 +429,7 @@ describe("AnalyticsTab", () => {
 
         it("should display downtime duration", () => {
             const props = createMockProps({
-                totalDowntime: 780000,
+                totalDowntime: 780_000,
                 formatDuration: vi.fn(() => "13m"),
             });
 
@@ -592,9 +592,9 @@ describe("AnalyticsTab", () => {
             );
             // Should have multiple ConditionalResponseTime elements, all with ping monitor type
             expect(responseTimeElements.length).toBeGreaterThan(0);
-            responseTimeElements.forEach((element) => {
+            for (const element of responseTimeElements) {
                 expect(element).toHaveAttribute("data-monitor-type", "ping");
-            });
+            }
         });
 
         it("should handle port monitor type", () => {
@@ -608,9 +608,9 @@ describe("AnalyticsTab", () => {
             );
             // Should have multiple ConditionalResponseTime elements, all with port monitor type
             expect(responseTimeElements.length).toBeGreaterThan(0);
-            responseTimeElements.forEach((element) => {
+            for (const element of responseTimeElements) {
                 expect(element).toHaveAttribute("data-monitor-type", "port");
-            });
+            }
         });
     });
 
@@ -625,8 +625,8 @@ describe("AnalyticsTab", () => {
                 formatResponseTime,
                 getAvailabilityDescription,
                 avgResponseTime: 150,
-                mttr: 300000,
-                totalDowntime: 780000,
+                mttr: 300_000,
+                totalDowntime: 780_000,
                 uptime: "99.5",
                 showAdvancedMetrics: true, // Enable advanced metrics to show MTTR
             });
@@ -635,9 +635,9 @@ describe("AnalyticsTab", () => {
 
             expect(getAvailabilityDescription).toHaveBeenCalledWith(99.5);
             // formatDuration is called with totalDowntime in downtime card
-            expect(formatDuration).toHaveBeenCalledWith(780000); // totalDowntime
+            expect(formatDuration).toHaveBeenCalledWith(780_000); // totalDowntime
             // formatDuration is called with MTTR in advanced metrics (when shown)
-            expect(formatDuration).toHaveBeenCalledWith(300000); // MTTR
+            expect(formatDuration).toHaveBeenCalledWith(300_000); // MTTR
             // formatResponseTime is called multiple times for different response time values
             expect(formatResponseTime).toHaveBeenCalledWith(150); // avgResponseTime
         });

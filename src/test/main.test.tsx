@@ -48,7 +48,7 @@ describe("Main Entry Point", () => {
         } as any;
 
         // Mock document with getElementById
-        global.document = {
+        globalThis.document = {
             getElementById: vi.fn().mockReturnValue(null),
             createElement: vi.fn().mockReturnValue(mockElement),
         } as any;

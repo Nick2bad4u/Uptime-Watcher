@@ -11,12 +11,12 @@ describe("generateUuid", () => {
 
     beforeEach(() => {
         // Store original crypto object
-        originalCrypto = global.crypto;
+        originalCrypto = globalThis.crypto;
     });
 
     afterEach(() => {
         // Restore original crypto object
-        global.crypto = originalCrypto;
+        globalThis.crypto = originalCrypto;
         vi.clearAllMocks();
         vi.useRealTimers();
     });
@@ -27,7 +27,7 @@ describe("generateUuid", () => {
             const mockUuid = "123e4567-e89b-12d3-a456-426614174000";
             const mockRandomUuid = vi.fn().mockReturnValue(mockUuid);
 
-            global.crypto = {
+            globalThis.crypto = {
                 randomUUID: mockRandomUuid,
             } as any;
 
@@ -51,7 +51,7 @@ describe("generateUuid", () => {
                 .fn()
                 .mockImplementation(() => mockUuids[callCount++]);
 
-            global.crypto = {
+            globalThis.crypto = {
                 randomUUID: mockRandomUuid,
             } as any;
 
@@ -73,7 +73,7 @@ describe("generateUuid", () => {
             // Arrange
             const mockRandomUuid = vi.fn().mockReturnValue("");
 
-            global.crypto = {
+            globalThis.crypto = {
                 randomUUID: mockRandomUuid,
             } as any;
 
@@ -89,14 +89,14 @@ describe("generateUuid", () => {
     describe("Fallback Behavior", () => {
         it("should use fallback when crypto is undefined", () => {
             // Arrange
-            global.crypto = undefined as any;
+            globalThis.crypto = undefined as any;
             vi.useFakeTimers();
             vi.setSystemTime(new Date("2023-01-01T00:00:00.000Z"));
 
             // Mock Math.random for consistent testing
             const mockRandom = vi
                 .spyOn(Math, "random")
-                .mockReturnValue(0.123456789);
+                .mockReturnValue(0.123_456_789);
 
             // Act
             const result = generateUuid();
@@ -108,13 +108,13 @@ describe("generateUuid", () => {
 
         it("should use fallback when crypto.randomUUID is undefined", () => {
             // Arrange
-            global.crypto = {} as any; // crypto exists but randomUUID doesn't
+            globalThis.crypto = {} as any; // crypto exists but randomUUID doesn't
             vi.useFakeTimers();
             vi.setSystemTime(new Date("2023-06-15T12:30:00.000Z"));
 
             const mockRandom = vi
                 .spyOn(Math, "random")
-                .mockReturnValue(0.987654321);
+                .mockReturnValue(0.987_654_321);
 
             // Act
             const result = generateUuid();
@@ -126,7 +126,7 @@ describe("generateUuid", () => {
 
         it("should use fallback when crypto.randomUUID is not a function", () => {
             // Arrange
-            global.crypto = {
+            globalThis.crypto = {
                 randomUUID: "not-a-function",
             } as any;
             vi.useFakeTimers();
@@ -134,7 +134,7 @@ describe("generateUuid", () => {
 
             const mockRandom = vi
                 .spyOn(Math, "random")
-                .mockReturnValue(0.555555555);
+                .mockReturnValue(0.555_555_555);
 
             // Act
             const result = generateUuid();
@@ -150,7 +150,7 @@ describe("generateUuid", () => {
                 throw new Error("Crypto not available");
             });
 
-            global.crypto = {
+            globalThis.crypto = {
                 randomUUID: mockRandomUuid,
             } as any;
 
@@ -159,7 +159,7 @@ describe("generateUuid", () => {
 
             const mockRandom = vi
                 .spyOn(Math, "random")
-                .mockReturnValue(0.111111111);
+                .mockReturnValue(0.111_111_111);
 
             // Act
             const result = generateUuid();
@@ -172,10 +172,10 @@ describe("generateUuid", () => {
 
         it("should generate different fallback UUIDs on multiple calls", () => {
             // Arrange
-            global.crypto = undefined as any;
+            globalThis.crypto = undefined as any;
             vi.useFakeTimers();
 
-            let timeValue = 1640995200000; // 2022-01-01T00:00:00.000Z
+            let timeValue = 1_640_995_200_000; // 2022-01-01T00:00:00.000Z
             let randomValue = 0.1;
 
             vi.setSystemTime(timeValue);
@@ -211,40 +211,40 @@ describe("generateUuid", () => {
     describe("Fallback Format Validation", () => {
         it("should generate fallback UUIDs with correct format", () => {
             // Arrange
-            global.crypto = undefined as any;
+            globalThis.crypto = undefined as any;
             vi.useFakeTimers();
             vi.setSystemTime(new Date("2023-01-01T00:00:00.000Z"));
 
             const _mockRandom = vi
                 .spyOn(Math, "random")
-                .mockReturnValue(0.123456789);
+                .mockReturnValue(0.123_456_789);
             void _mockRandom;
 
             // Act
             const result = generateUuid();
 
             // Assert
-            expect(result).toMatch(/^site-[a-z0-9]{9}-\d{13}$/);
+            expect(result).toMatch(/^site-[\da-z]{9}-\d{13}$/);
             expect(result.startsWith("site-")).toBe(true);
             expect(result.includes("-1672531200000")).toBe(true); // timestamp part
         });
 
         it("should handle different Math.random values correctly", () => {
             // Arrange
-            global.crypto = undefined as any;
+            globalThis.crypto = undefined as any;
             vi.useFakeTimers();
             vi.setSystemTime(new Date("2023-01-01T00:00:00.000Z"));
 
             const testCases = [
-                { random: 0.0, expected: "site--1672531200000" },
+                { random: 0, expected: "site--1672531200000" },
                 {
-                    random: 0.999999999,
+                    random: 0.999_999_999,
                     expected: "site-zzzzzxtmw-1672531200000",
                 },
                 { random: 0.5, expected: "site-i-1672531200000" },
             ];
 
-            testCases.forEach(({ random, expected }) => {
+            for (const { random, expected } of testCases) {
                 // Arrange
                 const mockRandom = vi
                     .spyOn(Math, "random")
@@ -258,13 +258,13 @@ describe("generateUuid", () => {
 
                 // Cleanup
                 mockRandom.mockRestore();
-            });
+            }
         });
 
         it("should include correct timestamp in fallback UUID", () => {
             // Arrange
-            global.crypto = undefined as any;
-            const testTimestamp = 1640995200000; // 2022-01-01T00:00:00.000Z
+            globalThis.crypto = undefined as any;
+            const testTimestamp = 1_640_995_200_000; // 2022-01-01T00:00:00.000Z
 
             vi.useFakeTimers();
             vi.setSystemTime(testTimestamp);
@@ -284,8 +284,8 @@ describe("generateUuid", () => {
     describe("Edge Cases", () => {
         it("should handle very large timestamps", () => {
             // Arrange
-            global.crypto = undefined as any;
-            const largeTimestamp = 9999999999999; // Year 2286
+            globalThis.crypto = undefined as any;
+            const largeTimestamp = 9_999_999_999_999; // Year 2286
 
             vi.useFakeTimers();
             vi.setSystemTime(largeTimestamp);
@@ -303,7 +303,7 @@ describe("generateUuid", () => {
 
         it("should handle timestamp of 0", () => {
             // Arrange
-            global.crypto = undefined as any;
+            globalThis.crypto = undefined as any;
 
             vi.useFakeTimers();
             vi.setSystemTime(0); // Unix epoch
@@ -321,7 +321,7 @@ describe("generateUuid", () => {
 
         it("should handle Math.random returning exactly 0", () => {
             // Arrange
-            global.crypto = undefined as any;
+            globalThis.crypto = undefined as any;
             vi.useFakeTimers();
             vi.setSystemTime(1000);
 
@@ -338,13 +338,13 @@ describe("generateUuid", () => {
 
         it("should handle Math.random returning close to 1", () => {
             // Arrange
-            global.crypto = undefined as any;
+            globalThis.crypto = undefined as any;
             vi.useFakeTimers();
             vi.setSystemTime(1000);
 
             const _mockRandom = vi
                 .spyOn(Math, "random")
-                .mockReturnValue(0.999999999);
+                .mockReturnValue(0.999_999_999);
             void _mockRandom;
 
             // Act
@@ -359,37 +359,37 @@ describe("generateUuid", () => {
     describe("Return Value Properties", () => {
         it("should always return a string", () => {
             // Test with crypto.randomUUID
-            global.crypto = {
+            globalThis.crypto = {
                 randomUUID: vi.fn().mockReturnValue("test-uuid"),
             } as any;
 
             expect(typeof generateUuid()).toBe("string");
 
             // Test with fallback
-            global.crypto = undefined as any;
+            globalThis.crypto = undefined as any;
             expect(typeof generateUuid()).toBe("string");
         });
 
         it("should always return a non-empty string", () => {
             // Test with crypto.randomUUID
-            global.crypto = {
+            globalThis.crypto = {
                 randomUUID: vi.fn().mockReturnValue("test-uuid"),
             } as any;
 
             expect(generateUuid().length).toBeGreaterThan(0);
 
             // Test with fallback
-            global.crypto = undefined as any;
+            globalThis.crypto = undefined as any;
             expect(generateUuid().length).toBeGreaterThan(0);
         });
 
         it("should generate unique values across multiple calls", () => {
             // Arrange - Force fallback behavior by removing crypto entirely and mocking Math.random
-            const originalCrypto = global.crypto;
+            const originalCrypto = globalThis.crypto;
             const originalGlobalThisCrypto = globalThis.crypto;
             const originalWindowCrypto = (globalThis as any).window?.crypto;
 
-            delete (global as any).crypto;
+            delete (globalThis as any).crypto;
             delete (globalThis as any).crypto;
             if ((globalThis as any).window) {
                 delete (globalThis as any).window.crypto;
@@ -416,7 +416,7 @@ describe("generateUuid", () => {
             expect(results.size).toBeGreaterThan(numCalls * 0.8); // At least 80% unique due to time + random
 
             // Restore everything
-            global.crypto = originalCrypto;
+            globalThis.crypto = originalCrypto;
             globalThis.crypto = originalGlobalThisCrypto;
             if ((globalThis as any).window && originalWindowCrypto) {
                 (globalThis as any).window.crypto = originalWindowCrypto;
@@ -426,7 +426,7 @@ describe("generateUuid", () => {
 
         it("should maintain consistent format across environments", () => {
             // Test crypto environment
-            global.crypto = {
+            globalThis.crypto = {
                 randomUUID: vi
                     .fn()
                     .mockReturnValue("123e4567-e89b-12d3-a456-426614174000"),
@@ -436,25 +436,25 @@ describe("generateUuid", () => {
             expect(typeof cryptoResult).toBe("string");
 
             // Test fallback environment
-            global.crypto = undefined as any;
+            globalThis.crypto = undefined as any;
             vi.useFakeTimers();
             vi.setSystemTime(1000);
             vi.spyOn(Math, "random").mockReturnValue(0.5);
 
             const fallbackResult = generateUuid();
             expect(typeof fallbackResult).toBe("string");
-            expect(fallbackResult).toMatch(/^site-[a-z0-9]*-\d+$/); // Allow variable length random part
+            expect(fallbackResult).toMatch(/^site-[\da-z]*-\d+$/); // Allow variable length random part
         });
     });
 
     describe("Performance and Reliability", () => {
         it("should handle rapid successive calls", () => {
             // Arrange - Force fallback to test uniqueness properly
-            const originalCrypto = global.crypto;
+            const originalCrypto = globalThis.crypto;
             const originalGlobalThisCrypto = globalThis.crypto;
             const originalWindowCrypto = (globalThis as any).window?.crypto;
 
-            delete (global as any).crypto;
+            delete (globalThis as any).crypto;
             delete (globalThis as any).crypto;
             if ((globalThis as any).window) {
                 delete (globalThis as any).window.crypto;
@@ -482,7 +482,7 @@ describe("generateUuid", () => {
             expect(new Set(results).size).toBeGreaterThan(numCalls * 0.8); // At least 80% unique
 
             // Restore everything
-            global.crypto = originalCrypto;
+            globalThis.crypto = originalCrypto;
             globalThis.crypto = originalGlobalThisCrypto;
             if ((globalThis as any).window && originalWindowCrypto) {
                 (globalThis as any).window.crypto = originalWindowCrypto;
@@ -494,26 +494,26 @@ describe("generateUuid", () => {
             // Test various problematic scenarios
             const scenarios = [
                 () => {
-                    global.crypto = null as any;
+                    globalThis.crypto = null as any;
                 },
                 () => {
-                    global.crypto = undefined as any;
+                    globalThis.crypto = undefined as any;
                 },
                 () => {
-                    global.crypto = {} as any;
+                    globalThis.crypto = {} as any;
                 },
                 () => {
-                    global.crypto = { randomUUID: null } as any;
+                    globalThis.crypto = { randomUUID: null } as any;
                 },
                 () => {
-                    global.crypto = {
+                    globalThis.crypto = {
                         randomUUID: () => {
                             throw new Error("Test error");
                         },
                     } as any;
                 },
                 () => {
-                    global.crypto = {
+                    globalThis.crypto = {
                         randomUUID: vi.fn().mockImplementation(() => {
                             throw new TypeError("Cannot read property");
                         }),
@@ -521,20 +521,20 @@ describe("generateUuid", () => {
                 },
             ];
 
-            scenarios.forEach((setupScenario, index) => {
+            for (const [index, setupScenario] of scenarios.entries()) {
                 expect(() => {
                     setupScenario();
                     generateUuid();
                 }).not.toThrow(`Scenario ${index + 1} should not throw`);
-            });
+            }
         });
 
         it("should work with mocked Date.now", () => {
             // Arrange
-            global.crypto = undefined as any;
+            globalThis.crypto = undefined as any;
             const mockNow = vi
                 .spyOn(Date, "now")
-                .mockReturnValue(1234567890123);
+                .mockReturnValue(1_234_567_890_123);
             const mockRandom = vi.spyOn(Math, "random").mockReturnValue(0.5);
 
             // Act
@@ -554,7 +554,7 @@ describe("generateUuid", () => {
     describe("Real-world Usage Scenarios", () => {
         it("should work in Node.js-like environment", () => {
             // Simulate Node.js crypto module
-            global.crypto = {
+            globalThis.crypto = {
                 randomUUID: vi
                     .fn()
                     .mockReturnValue("a1b2c3d4-e5f6-7890-abcd-ef1234567890"),
@@ -566,9 +566,9 @@ describe("generateUuid", () => {
 
         it("should work in browser-like environment without crypto", () => {
             // Simulate old browser without crypto.randomUUID
-            global.crypto = undefined as any;
+            globalThis.crypto = undefined as any;
             vi.useFakeTimers();
-            vi.setSystemTime(1640995200000);
+            vi.setSystemTime(1_640_995_200_000);
             vi.spyOn(Math, "random").mockReturnValue(0.75);
 
             const result = generateUuid();
@@ -578,11 +578,11 @@ describe("generateUuid", () => {
 
         it("should work for database primary keys", () => {
             // Generate IDs that could be used as database keys
-            const originalCrypto = global.crypto;
+            const originalCrypto = globalThis.crypto;
             const originalGlobalThisCrypto = globalThis.crypto;
             const originalWindowCrypto = (globalThis as any).window?.crypto;
 
-            delete (global as any).crypto;
+            delete (globalThis as any).crypto;
             delete (globalThis as any).crypto;
             if ((globalThis as any).window) {
                 delete (globalThis as any).window.crypto;
@@ -603,13 +603,13 @@ describe("generateUuid", () => {
             expect(new Set(ids).size).toBeGreaterThan(30); // At least 60% unique
 
             // All should be valid strings
-            ids.forEach((id) => {
+            for (const id of ids) {
                 expect(typeof id).toBe("string");
                 expect(id.length).toBeGreaterThan(0);
-            });
+            }
 
             // Restore everything
-            global.crypto = originalCrypto;
+            globalThis.crypto = originalCrypto;
             globalThis.crypto = originalGlobalThisCrypto;
             if ((globalThis as any).window && originalWindowCrypto) {
                 (globalThis as any).window.crypto = originalWindowCrypto;
@@ -619,15 +619,15 @@ describe("generateUuid", () => {
 
         it("should work for temporary file naming", () => {
             // Generate IDs for temporary files
-            global.crypto = undefined as any;
+            globalThis.crypto = undefined as any;
             vi.useFakeTimers();
-            vi.setSystemTime(1234567890123);
+            vi.setSystemTime(1_234_567_890_123);
             vi.spyOn(Math, "random").mockReturnValue(0.75);
 
             const id = generateUuid();
             const filename = `temp-${id}.tmp`;
 
-            expect(filename).toMatch(/^temp-site-[a-z0-9]*-\d+\.tmp$/); // Allow variable length random part
+            expect(filename).toMatch(/^temp-site-[\da-z]*-\d+\.tmp$/); // Allow variable length random part
         });
     });
 });

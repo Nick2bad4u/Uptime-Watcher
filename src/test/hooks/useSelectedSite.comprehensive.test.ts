@@ -300,7 +300,7 @@ describe("useSelectedSite", () => {
 
         it("should handle very large sites array efficiently", () => {
             // Arrange
-            const largeSitesArray = Array.from({ length: 10000 }, (_, i) => ({
+            const largeSitesArray = Array.from({ length: 10_000 }, (_, i) => ({
                 identifier: `site-${i}`,
                 name: `Site ${i}`,
                 url: `https://example${i}.com`,

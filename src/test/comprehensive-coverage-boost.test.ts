@@ -26,14 +26,14 @@ describe("Comprehensive Coverage Boost Tests", () => {
             const mockMonitorConfig = {
                 type: "http",
                 timeout: 5000,
-                interval: 60000,
+                interval: 60_000,
                 retryAttempts: 3,
             };
 
             expect(mockMonitorConfig).toBeDefined();
             expect(mockMonitorConfig.type).toBe("http");
             expect(mockMonitorConfig.timeout).toBe(5000);
-            expect(mockMonitorConfig.interval).toBe(60000);
+            expect(mockMonitorConfig.interval).toBe(60_000);
             expect(mockMonitorConfig.retryAttempts).toBe(3);
         });
 
@@ -99,8 +99,8 @@ describe("Comprehensive Coverage Boost Tests", () => {
                         type: "http",
                         name: "HTTP Monitor",
                         url: "https://api.example.com",
-                        timeout: 30000,
-                        interval: 300000,
+                        timeout: 30_000,
+                        interval: 300_000,
                     },
                 ],
                 validation: {
@@ -290,7 +290,7 @@ describe("Comprehensive Coverage Boost Tests", () => {
                 },
                 getFileExtension: (filename: string) => {
                     const parts = filename.split(".");
-                    return parts.length > 1 ? parts[parts.length - 1] : "";
+                    return parts.length > 1 ? parts.at(-1) : "";
                 },
             };
 

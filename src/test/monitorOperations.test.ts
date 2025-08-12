@@ -21,7 +21,7 @@ const mockCrypto = {
     randomUUID: vi.fn().mockReturnValue(mockUUID),
 };
 
-Object.defineProperty(global, "crypto", {
+Object.defineProperty(globalThis, "crypto", {
     value: mockCrypto,
     writable: true,
 });
@@ -43,7 +43,7 @@ describe("monitorOperations", () => {
 
             expect(monitor).toEqual({
                 activeOperations: [],
-                checkInterval: 300000,
+                checkInterval: 300_000,
                 history: [],
                 id: mockUUID,
                 monitoring: true,
@@ -58,7 +58,7 @@ describe("monitorOperations", () => {
 
         it("should create a monitor with overrides", () => {
             const overrides: Partial<Monitor> = {
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 history: [
                     { responseTime: 250, status: "up", timestamp: Date.now() },
                 ],
@@ -78,7 +78,7 @@ describe("monitorOperations", () => {
 
             expect(monitor).toEqual({
                 activeOperations: [],
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 history: overrides.history,
                 host: "example.com",
                 id: "custom-id",
@@ -102,7 +102,7 @@ describe("monitorOperations", () => {
 
             expect(monitor).toEqual({
                 activeOperations: [],
-                checkInterval: 300000,
+                checkInterval: 300_000,
                 history: [],
                 id: mockUUID,
                 monitoring: true,
@@ -126,7 +126,7 @@ describe("monitorOperations", () => {
                 status: "up",
                 type: "http",
                 responseTime: -1,
-                checkInterval: 300000,
+                checkInterval: 300_000,
                 timeout: 5000,
                 retryAttempts: 3,
             };
@@ -289,7 +289,7 @@ describe("monitorOperations", () => {
             for (const status of statusValues) {
                 const monitor = {
                     activeOperations: [],
-                    checkInterval: 300000,
+                    checkInterval: 300_000,
                     history: [],
                     id: "test-id",
                     monitoring: true,
@@ -312,7 +312,7 @@ describe("monitorOperations", () => {
 
             expect(result).toEqual({
                 activeOperations: [],
-                checkInterval: 300000,
+                checkInterval: 300_000,
                 history: [],
                 id: mockUUID,
                 monitoring: true,
@@ -370,7 +370,7 @@ describe("monitorOperations", () => {
         it("should include optional fields when provided", () => {
             const lastChecked = new Date();
             const partialMonitor: Partial<Monitor> = {
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 host: "example.com",
                 lastChecked,
                 monitoring: true,
@@ -384,7 +384,7 @@ describe("monitorOperations", () => {
 
             expect(result).toEqual({
                 activeOperations: [],
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 history: [],
                 host: "example.com",
                 id: mockUUID,
@@ -443,7 +443,7 @@ describe("monitorOperations", () => {
                     status: "up",
                     type: "http",
                     responseTime: -1,
-                    checkInterval: 300000,
+                    checkInterval: 300_000,
                     timeout: 5000,
                     retryAttempts: 3,
                 },
@@ -454,7 +454,7 @@ describe("monitorOperations", () => {
                     status: "down",
                     type: "port",
                     responseTime: -1,
-                    checkInterval: 300000,
+                    checkInterval: 300_000,
                     timeout: 5000,
                     retryAttempts: 3,
                 },
@@ -493,7 +493,7 @@ describe("monitorOperations", () => {
             monitoring: true,
             monitors: [
                 {
-                    checkInterval: 300000,
+                    checkInterval: 300_000,
                     history: [],
                     id: "monitor-1",
                     monitoring: true,
@@ -504,7 +504,7 @@ describe("monitorOperations", () => {
                     retryAttempts: 3,
                 },
                 {
-                    checkInterval: 60000,
+                    checkInterval: 60_000,
                     history: [],
                     id: "monitor-2",
                     monitoring: false,
@@ -589,7 +589,7 @@ describe("monitorOperations", () => {
                     status: "up",
                     type: "http",
                     responseTime: -1,
-                    checkInterval: 300000,
+                    checkInterval: 300_000,
                     timeout: 5000,
                     retryAttempts: 3,
                 },
@@ -605,7 +605,7 @@ describe("monitorOperations", () => {
                 status: "pending",
                 type: "port",
                 responseTime: -1,
-                checkInterval: 300000,
+                checkInterval: 300_000,
                 timeout: 5000,
                 retryAttempts: 3,
             };
@@ -625,7 +625,7 @@ describe("monitorOperations", () => {
                 status: "pending",
                 type: "port",
                 responseTime: -1,
-                checkInterval: 300000,
+                checkInterval: 300_000,
                 timeout: 5000,
                 retryAttempts: 3,
             };
@@ -650,7 +650,7 @@ describe("monitorOperations", () => {
                 status: "pending",
                 type: "http",
                 responseTime: -1,
-                checkInterval: 300000,
+                checkInterval: 300_000,
                 timeout: 5000,
                 retryAttempts: 3,
             };
@@ -674,7 +674,7 @@ describe("monitorOperations", () => {
                     status: "up",
                     type: "http",
                     responseTime: -1,
-                    checkInterval: 300000,
+                    checkInterval: 300_000,
                     timeout: 5000,
                     retryAttempts: 3,
                 },
@@ -685,7 +685,7 @@ describe("monitorOperations", () => {
                     status: "down",
                     type: "port",
                     responseTime: -1,
-                    checkInterval: 300000,
+                    checkInterval: 300_000,
                     timeout: 5000,
                     retryAttempts: 3,
                 },
@@ -758,7 +758,7 @@ describe("monitorOperations", () => {
                     status: "up",
                     type: "http",
                     responseTime: -1,
-                    checkInterval: 300000,
+                    checkInterval: 300_000,
                     timeout: 5000,
                     retryAttempts: 3,
                 },
@@ -798,7 +798,7 @@ describe("monitorOperations", () => {
 
     describe("monitorOperations", () => {
         const mockMonitor: Monitor = {
-            checkInterval: 300000,
+            checkInterval: 300_000,
             history: [],
             id: "monitor-1",
             monitoring: true,
@@ -847,7 +847,7 @@ describe("monitorOperations", () => {
 
         describe("updateCheckInterval", () => {
             it("should update check interval", () => {
-                const newInterval = 60000;
+                const newInterval = 60_000;
 
                 const result = monitorOperations.updateCheckInterval(
                     mockMonitor,
@@ -865,7 +865,7 @@ describe("monitorOperations", () => {
 
                 const result = monitorOperations.updateCheckInterval(
                     mockMonitor,
-                    60000
+                    60_000
                 );
 
                 expect(mockMonitor).toEqual(originalMonitor);
@@ -950,7 +950,7 @@ describe("monitorOperations", () => {
 
         describe("updateTimeout", () => {
             it("should update timeout", () => {
-                const newTimeout = 10000;
+                const newTimeout = 10_000;
 
                 const result = monitorOperations.updateTimeout(
                     mockMonitor,
@@ -968,7 +968,7 @@ describe("monitorOperations", () => {
 
                 const result = monitorOperations.updateTimeout(
                     mockMonitor,
-                    10000
+                    10_000
                 );
 
                 expect(mockMonitor).toEqual(originalMonitor);

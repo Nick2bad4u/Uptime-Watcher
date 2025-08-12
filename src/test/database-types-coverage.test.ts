@@ -34,7 +34,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             const validRow = {
                 monitorId: "test-monitor-minimal",
                 status: "down",
-                timestamp: 1640995200000,
+                timestamp: 1_640_995_200_000,
             };
 
             expect(isValidHistoryRow(validRow)).toBe(true);
@@ -44,7 +44,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             const row = {
                 monitorId: "test",
                 status: "up",
-                timestamp: 12345,
+                timestamp: 12_345,
             };
 
             expect(isValidHistoryRow(row)).toBe(true);
@@ -54,7 +54,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             const row = {
                 monitorId: "test",
                 status: "down",
-                timestamp: 12345,
+                timestamp: 12_345,
             };
 
             expect(isValidHistoryRow(row)).toBe(true);
@@ -64,7 +64,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             const row = {
                 monitorId: "test",
                 status: "up",
-                timestamp: 1640995200000,
+                timestamp: 1_640_995_200_000,
             };
 
             expect(isValidHistoryRow(row)).toBe(true);
@@ -108,7 +108,7 @@ describe("Shared Database Types - Complete Coverage", () => {
         it("should reject object missing monitorId", () => {
             const row = {
                 status: "up",
-                timestamp: 12345,
+                timestamp: 12_345,
             };
 
             expect(isValidHistoryRow(row)).toBe(false);
@@ -117,7 +117,7 @@ describe("Shared Database Types - Complete Coverage", () => {
         it("should reject object missing status", () => {
             const row = {
                 monitorId: "test",
-                timestamp: 12345,
+                timestamp: 12_345,
             };
 
             expect(isValidHistoryRow(row)).toBe(false);
@@ -136,7 +136,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             const row = {
                 monitorId: undefined,
                 status: "up",
-                timestamp: 12345,
+                timestamp: 12_345,
             };
 
             expect(isValidHistoryRow(row)).toBe(false);
@@ -146,7 +146,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             const row = {
                 monitorId: "test",
                 status: undefined,
-                timestamp: 12345,
+                timestamp: 12_345,
             };
 
             expect(isValidHistoryRow(row)).toBe(false);
@@ -166,7 +166,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             const row = {
                 monitorId: 123,
                 status: "up",
-                timestamp: 12345,
+                timestamp: 12_345,
             };
 
             expect(isValidHistoryRow(row)).toBe(false);
@@ -176,7 +176,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             const row = {
                 monitorId: "test",
                 status: "invalid-status",
-                timestamp: 12345,
+                timestamp: 12_345,
             };
 
             expect(isValidHistoryRow(row)).toBe(false);
@@ -186,7 +186,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             const row = {
                 monitorId: "test",
                 status: "up",
-                timestamp: NaN,
+                timestamp: Number.NaN,
             };
 
             expect(isValidHistoryRow(row)).toBe(false);
@@ -541,7 +541,7 @@ describe("Shared Database Types - Complete Coverage", () => {
 
         it("should reject object with non-string identifier", () => {
             const row = {
-                identifier: 12345,
+                identifier: 12_345,
                 name: "Some Site",
             };
 
@@ -711,14 +711,14 @@ describe("Shared Database Types - Complete Coverage", () => {
             const validUpRow = {
                 monitorId: "test",
                 status: "up",
-                timestamp: 12345,
+                timestamp: 12_345,
             };
             expect(isValidHistoryRow(validUpRow)).toBe(true);
 
             const validDownRow = {
                 monitorId: "test",
                 status: "down",
-                timestamp: 12345,
+                timestamp: 12_345,
             };
             expect(isValidHistoryRow(validDownRow)).toBe(true);
 
@@ -726,14 +726,14 @@ describe("Shared Database Types - Complete Coverage", () => {
             const invalidStatusRow = {
                 monitorId: "test",
                 status: "invalid",
-                timestamp: 12345,
+                timestamp: 12_345,
             };
             expect(isValidHistoryRow(invalidStatusRow)).toBe(false);
 
             const nullStatusRow = {
                 monitorId: "test",
                 status: null,
-                timestamp: 12345,
+                timestamp: 12_345,
             };
             expect(isValidHistoryRow(nullStatusRow)).toBe(false);
         });
@@ -745,7 +745,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             const validNumberRow = {
                 monitorId: "test",
                 status: "up",
-                timestamp: 1640995200000,
+                timestamp: 1_640_995_200_000,
             };
             expect(isValidHistoryRow(validNumberRow)).toBe(true);
 
@@ -753,7 +753,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             const nanRow = {
                 monitorId: "test",
                 status: "up",
-                timestamp: NaN,
+                timestamp: Number.NaN,
             };
             expect(isValidHistoryRow(nanRow)).toBe(false);
         });

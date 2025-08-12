@@ -39,7 +39,7 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
         } as unknown as typeof console;
 
         // Replace global console temporarily
-        global.console = mockConsole;
+        globalThis.console = mockConsole;
     });
 
     describe("Frontend Store Integration", () => {

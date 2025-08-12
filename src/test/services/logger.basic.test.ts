@@ -363,7 +363,7 @@ describe("Logger Service - Basic Coverage", () => {
 
         it("should log settings change with complex values", () => {
             const oldValue = { timeout: 5000, retries: 3 };
-            const newValue = { timeout: 10000, retries: 5 };
+            const newValue = { timeout: 10_000, retries: 5 };
 
             logger.user.settingsChange("monitor-config", oldValue, newValue);
 

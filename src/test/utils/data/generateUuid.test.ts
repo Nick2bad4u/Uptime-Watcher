@@ -41,7 +41,7 @@ describe("generateUuid", () => {
                 .mockReturnValue("550e8400-e29b-41d4-a716-446655440000");
 
             // Mock crypto object
-            global.crypto = {
+            globalThis.crypto = {
                 randomUUID: mockRandomUUID,
             } as any;
 
@@ -56,54 +56,54 @@ describe("generateUuid", () => {
                 throw new Error("randomUUID not available");
             });
 
-            global.crypto = {
+            globalThis.crypto = {
                 randomUUID: mockRandomUUID,
             } as any;
 
             const result = generateUuid();
 
             expect(mockRandomUUID).toHaveBeenCalledTimes(1);
-            expect(result).toMatch(/^site-[a-z0-9]+-\d+$/);
+            expect(result).toMatch(/^site-[\da-z]+-\d+$/);
         });
     });
 
     describe("Fallback Behavior", () => {
         it("should use fallback when crypto is undefined", () => {
-            const originalCrypto = global.crypto;
-            global.crypto = undefined as any;
+            const originalCrypto = globalThis.crypto;
+            globalThis.crypto = undefined as any;
 
             const result = generateUuid();
 
-            expect(result).toMatch(/^site-[a-z0-9]+-\d+$/);
+            expect(result).toMatch(/^site-[\da-z]+-\d+$/);
             expect(result.startsWith("site-")).toBe(true);
 
             // Restore original
-            global.crypto = originalCrypto;
+            globalThis.crypto = originalCrypto;
         });
 
         it("should use fallback when crypto.randomUUID is undefined", () => {
-            global.crypto = {} as any;
+            globalThis.crypto = {} as any;
 
             const result = generateUuid();
 
-            expect(result).toMatch(/^site-[a-z0-9]+-\d+$/);
+            expect(result).toMatch(/^site-[\da-z]+-\d+$/);
             expect(result.startsWith("site-")).toBe(true);
         });
 
         it("should use fallback when crypto.randomUUID is not a function", () => {
-            global.crypto = {
+            globalThis.crypto = {
                 randomUUID: "not a function",
             } as any;
 
             const result = generateUuid();
 
-            expect(result).toMatch(/^site-[a-z0-9]+-\d+$/);
+            expect(result).toMatch(/^site-[\da-z]+-\d+$/);
             expect(result.startsWith("site-")).toBe(true);
         });
 
         it("should generate unique fallback UUIDs on multiple calls", () => {
-            const originalCrypto = global.crypto;
-            global.crypto = undefined as any;
+            const originalCrypto = globalThis.crypto;
+            globalThis.crypto = undefined as any;
 
             const results = new Set();
             const numCalls = 20;
@@ -116,14 +116,14 @@ describe("generateUuid", () => {
             expect(results.size).toBe(numCalls);
 
             // Restore original
-            global.crypto = originalCrypto;
+            globalThis.crypto = originalCrypto;
         });
     });
 
     describe("Fallback Format Validation", () => {
         beforeEach(() => {
             // Force fallback behavior
-            global.crypto = undefined as any;
+            globalThis.crypto = undefined as any;
         });
 
         afterEach(() => {
@@ -144,7 +144,7 @@ describe("generateUuid", () => {
             expect(parts).toHaveLength(3);
             expect(parts[0]).toBe("site");
 
-            const extractedTimestamp = parseInt(parts[2]!, 10);
+            const extractedTimestamp = Number.parseInt(parts[2]!, 10);
             expect(extractedTimestamp).toBeGreaterThanOrEqual(beforeTimestamp);
             expect(extractedTimestamp).toBeLessThanOrEqual(afterTimestamp);
         });
@@ -154,50 +154,50 @@ describe("generateUuid", () => {
             const parts = result.split("-");
 
             expect(parts).toHaveLength(3);
-            expect(parts[1]).toMatch(/^[a-z0-9]+$/);
+            expect(parts[1]).toMatch(/^[\da-z]+$/);
             expect(parts[1]!.length).toBeGreaterThan(0);
         });
 
         it("should use consistent format across calls", () => {
             const results = Array.from({ length: 10 }, () => generateUuid());
 
-            results.forEach((result) => {
-                expect(result).toMatch(/^site-[a-z0-9]+-\d+$/);
-            });
+            for (const result of results) {
+                expect(result).toMatch(/^site-[\da-z]+-\d+$/);
+            }
         });
     });
 
     describe("Edge Cases", () => {
         it("should handle very large timestamps in fallback", () => {
-            const originalCrypto = global.crypto;
-            global.crypto = undefined as any;
+            const originalCrypto = globalThis.crypto;
+            globalThis.crypto = undefined as any;
 
             const mockNow = vi
                 .spyOn(Date, "now")
-                .mockReturnValue(9999999999999);
+                .mockReturnValue(9_999_999_999_999);
 
             const result = generateUuid();
 
-            expect(result).toMatch(/^site-[a-z0-9]+-9999999999999$/);
+            expect(result).toMatch(/^site-[\da-z]+-9{13}$/);
             expect(result.includes("9999999999999")).toBe(true);
 
             mockNow.mockRestore();
-            global.crypto = originalCrypto;
+            globalThis.crypto = originalCrypto;
         });
 
         it("should handle timestamp of 0 in fallback", () => {
-            const originalCrypto = global.crypto;
-            global.crypto = undefined as any;
+            const originalCrypto = globalThis.crypto;
+            globalThis.crypto = undefined as any;
 
             const mockNow = vi.spyOn(Date, "now").mockReturnValue(0);
 
             const result = generateUuid();
 
-            expect(result).toMatch(/^site-[a-z0-9]+-0$/);
+            expect(result).toMatch(/^site-[\da-z]+-0$/);
             expect(result.endsWith("-0")).toBe(true);
 
             mockNow.mockRestore();
-            global.crypto = originalCrypto;
+            globalThis.crypto = originalCrypto;
         });
     });
 
@@ -222,15 +222,15 @@ describe("generateUuid", () => {
             expect(nativeResult.length).toBeGreaterThan(0);
 
             // Force fallback
-            const originalCrypto = global.crypto;
-            global.crypto = undefined as any;
+            const originalCrypto = globalThis.crypto;
+            globalThis.crypto = undefined as any;
 
             const fallbackResult = generateUuid();
             expect(typeof fallbackResult).toBe("string");
-            expect(fallbackResult).toMatch(/^site-[a-z0-9]+-\d+$/);
+            expect(fallbackResult).toMatch(/^site-[\da-z]+-\d+$/);
 
             // Restore
-            global.crypto = originalCrypto;
+            globalThis.crypto = originalCrypto;
         });
     });
 
@@ -242,10 +242,10 @@ describe("generateUuid", () => {
             expect(new Set(ids).size).toBe(50);
 
             // All should be valid strings
-            ids.forEach((id) => {
+            for (const id of ids) {
                 expect(typeof id).toBe("string");
                 expect(id.length).toBeGreaterThan(0);
-            });
+            }
         });
 
         it("should work for temporary file naming", () => {

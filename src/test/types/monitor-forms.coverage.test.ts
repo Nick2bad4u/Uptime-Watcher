@@ -8,7 +8,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
     describe("BaseMonitorFields Interface", () => {
         it("should define base monitor fields correctly", () => {
             const baseFields = {
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 name: "Test Monitor",
                 retryAttempts: 3,
                 timeout: 5000,
@@ -35,10 +35,10 @@ describe("Monitor Forms Types Coverage Tests", () => {
         it("should extend BaseMonitorFields", () => {
             const httpFields = {
                 // Base fields
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 name: "HTTP Monitor",
                 retryAttempts: 2,
-                timeout: 10000,
+                timeout: 10_000,
                 // HTTP specific fields
                 expectedStatusCode: 200,
                 followRedirects: true,
@@ -73,14 +73,14 @@ describe("Monitor Forms Types Coverage Tests", () => {
                 "PUT",
             ];
 
-            validMethods.forEach((method) => {
+            for (const method of validMethods) {
                 const httpFields = {
                     url: "https://example.com",
                     method: method as any,
                 };
 
                 expect(validMethods.includes(httpFields.method)).toBe(true);
-            });
+            }
         });
 
         it("should require URL field", () => {
@@ -101,10 +101,10 @@ describe("Monitor Forms Types Coverage Tests", () => {
                 "X-Custom-Header": "custom-value",
             };
 
-            Object.entries(headers).forEach(([key, value]) => {
+            for (const [key, value] of Object.entries(headers)) {
                 expect(typeof key).toBe("string");
                 expect(typeof value).toBe("string");
-            });
+            }
         });
     });
 
@@ -188,10 +188,10 @@ describe("Monitor Forms Types Coverage Tests", () => {
         it("should work with MonitorType from shared types", () => {
             const monitorTypes = ["http", "port"];
 
-            monitorTypes.forEach((type) => {
+            for (const type of monitorTypes) {
                 expect(typeof type).toBe("string");
                 expect(["http", "port"].includes(type)).toBe(true);
-            });
+            }
         });
 
         it("should support type-safe field validation", () => {
@@ -210,25 +210,25 @@ describe("Monitor Forms Types Coverage Tests", () => {
                 { field: "headers", value: {}, type: "object" },
             ];
 
-            testCases.forEach(({ field, value, type }) => {
+            for (const { field, value, type } of testCases) {
                 expect(validateField(field, value, type)).toBe(true);
-            });
+            }
         });
     });
 
     describe("Field Value Types", () => {
         it("should handle various number field types", () => {
             const numberFields = {
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 retryAttempts: 3,
                 timeout: 5000,
                 expectedStatusCode: 200,
             };
 
-            Object.values(numberFields).forEach((value) => {
+            for (const value of Object.values(numberFields)) {
                 expect(typeof value).toBe("number");
                 expect(value).toBeGreaterThan(0);
-            });
+            }
         });
 
         it("should handle string field types", () => {
@@ -238,10 +238,10 @@ describe("Monitor Forms Types Coverage Tests", () => {
                 method: "GET",
             };
 
-            Object.values(stringFields).forEach((value) => {
+            for (const value of Object.values(stringFields)) {
                 expect(typeof value).toBe("string");
                 expect(value.length).toBeGreaterThan(0);
-            });
+            }
         });
 
         it("should handle boolean field types", () => {
@@ -250,9 +250,9 @@ describe("Monitor Forms Types Coverage Tests", () => {
                 enabled: false,
             };
 
-            Object.values(booleanFields).forEach((value) => {
+            for (const value of Object.values(booleanFields)) {
                 expect(typeof value).toBe("boolean");
-            });
+            }
         });
     });
 
@@ -267,15 +267,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
                 name: "Optional name",
             };
 
-            requiredFields.forEach((field) => {
+            for (const field of requiredFields) {
                 expect(formData).toHaveProperty(field);
                 expect(formData[field as keyof typeof formData]).toBeDefined();
-            });
+            }
         });
 
         it("should handle field defaults", () => {
             const defaultValues = {
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 method: "GET",
@@ -283,7 +283,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
                 followRedirects: true,
             };
 
-            expect(defaultValues.checkInterval).toBe(60000);
+            expect(defaultValues.checkInterval).toBe(60_000);
             expect(defaultValues.timeout).toBe(5000);
             expect(defaultValues.retryAttempts).toBe(3);
             expect(defaultValues.method).toBe("GET");
@@ -307,12 +307,12 @@ describe("Monitor Forms Types Coverage Tests", () => {
             };
 
             expect(Object.keys(multipleHeaders)).toHaveLength(4);
-            Object.entries(multipleHeaders).forEach(([key, value]) => {
+            for (const [key, value] of Object.entries(multipleHeaders)) {
                 expect(typeof key).toBe("string");
                 expect(typeof value).toBe("string");
                 expect(key.length).toBeGreaterThan(0);
                 expect(value.length).toBeGreaterThan(0);
-            });
+            }
         });
 
         it("should handle header case sensitivity", () => {
@@ -337,7 +337,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
                 "PUT",
             ];
 
-            httpMethods.forEach((method) => {
+            for (const method of httpMethods) {
                 const isValid = [
                     "DELETE",
                     "GET",
@@ -346,13 +346,13 @@ describe("Monitor Forms Types Coverage Tests", () => {
                     "PUT",
                 ].includes(method);
                 expect(isValid).toBe(true);
-            });
+            }
         });
 
         it("should reject invalid HTTP methods", () => {
             const invalidMethods = ["PATCH", "OPTIONS", "TRACE", "CONNECT"];
 
-            invalidMethods.forEach((method) => {
+            for (const method of invalidMethods) {
                 const isValid = [
                     "DELETE",
                     "GET",
@@ -361,7 +361,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
                     "PUT",
                 ].includes(method);
                 expect(isValid).toBe(false);
-            });
+            }
         });
     });
 

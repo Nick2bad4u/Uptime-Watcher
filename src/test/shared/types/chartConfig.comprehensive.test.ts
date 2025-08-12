@@ -83,9 +83,9 @@ describe("chartConfig utilities", () => {
                 { plugins: Symbol("test") },
             ];
 
-            configs.forEach((config) => {
+            for (const config of configs) {
                 expect(hasPlugins(config)).toBe(false);
-            });
+            }
 
             // Arrays are objects in JavaScript, so these would return true
             expect(hasPlugins({ plugins: [] })).toBe(true);
@@ -233,9 +233,9 @@ describe("chartConfig utilities", () => {
                 { scales: Symbol("test") },
             ];
 
-            configs.forEach((config) => {
+            for (const config of configs) {
                 expect(hasScales(config)).toBe(false);
-            });
+            }
 
             // Arrays are objects in JavaScript, so these would return true
             expect(hasScales({ scales: [] })).toBe(true);

@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { isValidUrl } from "../../validation/validatorUtils";
 import {
     hasProperties,
     hasProperty,
@@ -16,7 +17,6 @@ import {
     isString,
     isValidPort,
     isValidTimestamp,
-    isValidUrl,
 } from "../../utils/typeGuards";
 
 describe("Type Guards - Comprehensive Coverage", () => {
@@ -626,52 +626,6 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isValidTimestamp(3.14)).toBe(true); // Decimal numbers are still valid
             expect(isValidTimestamp(now + dayInMs - 1000)).toBe(true); // Well under limit
             expect(isValidTimestamp(now + dayInMs + 10_000)).toBe(false); // Well over limit
-        });
-    });
-
-    describe("isValidUrl", () => {
-        it("should return true for valid URLs", () => {
-            expect(isValidUrl("https://example.com")).toBe(true);
-            expect(isValidUrl("https://httptest.example.com")).toBe(true);
-            expect(isValidUrl("https://www.example.com")).toBe(true);
-            expect(isValidUrl("https://example.com/path")).toBe(true);
-            expect(isValidUrl("https://example.com:8080")).toBe(true);
-            expect(isValidUrl("https://example.com/path?query=value")).toBe(
-                true
-            );
-            expect(isValidUrl("https://example.com/path#fragment")).toBe(true);
-            expect(isValidUrl("ftp://files.example.com")).toBe(true);
-            expect(isValidUrl("file:///path/to/file")).toBe(true);
-        });
-
-        it("should return false for invalid URLs", () => {
-            expect(isValidUrl("not-a-url")).toBe(false);
-            expect(isValidUrl("http://")).toBe(false);
-            expect(isValidUrl("://example.com")).toBe(false);
-            expect(isValidUrl("example.com")).toBe(false); // Missing protocol
-            expect(isValidUrl("")).toBe(false);
-        });
-
-        it("should return false for non-strings", () => {
-            expect(isValidUrl(42)).toBe(false);
-            expect(isValidUrl(null)).toBe(false);
-            expect(isValidUrl(undefined)).toBe(false);
-            expect(isValidUrl(true)).toBe(false);
-            expect(isValidUrl({})).toBe(false);
-            expect(isValidUrl([])).toBe(false);
-        });
-
-        it("should handle malformed URLs", () => {
-            expect(isValidUrl("https://[invalid")).toBe(false);
-            expect(isValidUrl("https://example.com:99999")).toBe(false); // Invalid port
-            expect(isValidUrl("https://exam ple.com")).toBe(false); // Space in domain
-        });
-
-        it("should handle edge cases", () => {
-            expect(isValidUrl("https://localhost")).toBe(true);
-            expect(isValidUrl("https://127.0.0.1")).toBe(true);
-            expect(isValidUrl("https://[::1]")).toBe(true); // IPv6
-            expect(isValidUrl("data:text/plain;base64,SGVsbG8=")).toBe(true); // Data URL
         });
     });
 

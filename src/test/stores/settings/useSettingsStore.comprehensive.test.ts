@@ -50,14 +50,14 @@ const mockElectronAPI = {
 };
 
 // Set up window.electronAPI mock conditionally
-if (!(window as any).electronAPI) {
-    Object.defineProperty(window, "electronAPI", {
+if ((globalThis as any).electronAPI) {
+    (globalThis as any).electronAPI = mockElectronAPI;
+} else {
+    Object.defineProperty(globalThis, "electronAPI", {
         value: mockElectronAPI,
         writable: true,
         configurable: true,
     });
-} else {
-    (window as any).electronAPI = mockElectronAPI;
 }
 
 describe("useSettingsStore", () => {
@@ -291,14 +291,14 @@ describe("useSettingsStore", () => {
             // Test large value
             mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
                 success: true,
-                data: 100000,
+                data: 100_000,
             });
 
             await act(async () => {
-                await result.current.updateHistoryLimitValue(100000);
+                await result.current.updateHistoryLimitValue(100_000);
             });
 
-            expect(result.current.settings.historyLimit).toBe(100000); // No clamping in frontend
+            expect(result.current.settings.historyLimit).toBe(100_000); // No clamping in frontend
         });
 
         it("should handle backend update errors", async () => {
@@ -347,7 +347,7 @@ describe("useSettingsStore", () => {
             await act(async () => {
                 try {
                     await result.current.updateHistoryLimitValue(600);
-                } catch (error) {
+                } catch {
                     // Expected to throw
                 }
             });
@@ -360,8 +360,8 @@ describe("useSettingsStore", () => {
     describe("Edge Cases and Error Handling", () => {
         it("should handle missing electronAPI gracefully", async () => {
             // Temporarily remove electronAPI
-            const originalAPI = (window as any).electronAPI;
-            (window as any).electronAPI = undefined;
+            const originalAPI = (globalThis as any).electronAPI;
+            (globalThis as any).electronAPI = undefined;
 
             const { result } = renderHook(() => useSettingsStore());
 
@@ -373,7 +373,7 @@ describe("useSettingsStore", () => {
                 });
             } finally {
                 // Restore electronAPI
-                (window as any).electronAPI = originalAPI;
+                (globalThis as any).electronAPI = originalAPI;
             }
         });
 

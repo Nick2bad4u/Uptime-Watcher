@@ -427,17 +427,11 @@ describe("Header Component", () => {
         });
 
         it("should have proper CSS classes for styling", () => {
-            const { container } = render(<Header />);
+            render(<Header />);
 
-            expect(
-                container.querySelector(".header-container")
-            ).toBeInTheDocument();
-            expect(
-                container.querySelector(".header-title-box")
-            ).toBeInTheDocument();
-            expect(
-                container.querySelector(".header-status-summary-box")
-            ).toBeInTheDocument();
+            expect(screen.getByRole("banner")).toBeInTheDocument();
+            expect(screen.getByText("Uptime Watcher")).toBeInTheDocument();
+            expect(screen.getByTestId("status-summary")).toBeInTheDocument();
         });
     });
 

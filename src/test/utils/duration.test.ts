@@ -114,13 +114,13 @@ describe("Duration Utilities", () => {
                 // 7200 seconds = Math.ceil(7200/3600) = 2 hours
                 expect(result2).toBe("2h");
 
-                const result3 = calculateMaxDuration(10800, 0);
+                const result3 = calculateMaxDuration(10_800, 0);
                 // 10800 seconds = Math.ceil(10800/3600) = 3 hours
                 expect(result3).toBe("3h");
             });
 
             it("should handle very large durations", () => {
-                const result = calculateMaxDuration(86400, 0);
+                const result = calculateMaxDuration(86_400, 0);
                 // 86400 seconds = 24 hours
                 expect(result).toBe("24h");
             });
@@ -168,7 +168,7 @@ describe("Duration Utilities", () => {
             it("should handle typical monitoring scenarios", () => {
                 // Common scenario: 30 second timeout, 3 retries
                 const result1 = calculateMaxDuration(30, 3);
-                expect(result1).toMatch(/^\d+[sm]$/);
+                expect(result1).toMatch(/^\d+[ms]$/);
 
                 // Quick check scenario: 5 second timeout, 1 retry
                 const result2 = calculateMaxDuration(5, 1);

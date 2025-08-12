@@ -61,17 +61,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
         it("should handle object operations", () => {
             const pick = (obj: any, keys: string[]): any => {
                 const result: any = {};
-                keys.forEach((key) => {
+                for (const key of keys) {
                     result[key] = obj[key];
-                });
+                }
                 return result;
             };
 
             const omit = (obj: any, keys: string[]): any => {
                 const result = { ...obj };
-                keys.forEach((key) => {
+                for (const key of keys) {
                     delete result[key];
-                });
+                }
                 return result;
             };
 
@@ -103,7 +103,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 const sizes = ["Bytes", "KB", "MB", "GB"];
                 const i = Math.floor(Math.log(bytes) / Math.log(k));
                 return (
-                    parseFloat((bytes / Math.pow(k, i)).toFixed(2)) +
+                    Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) +
                     " " +
                     sizes[i]
                 );
@@ -117,7 +117,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             };
 
             expect(formatBytes(1024)).toBe("1 KB");
-            expect(formatBytes(1048576)).toBe("1 MB");
+            expect(formatBytes(1_048_576)).toBe("1 MB");
             expect(formatTime(3661)).toBe("1:01:01");
         });
 
@@ -163,9 +163,8 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
 
                 emit(event: string, ...args: any[]) {
                     if (this.events[event]) {
-                        this.events[event].forEach((callback) =>
-                            callback(...args)
-                        );
+                        for (const callback of this.events[event]) callback(...args)
+                        ;
                     }
                 }
 
@@ -332,10 +331,10 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 }
 
                 if (obj instanceof Date) {
-                    return new Date(obj.getTime());
+                    return new Date(obj);
                 }
 
-                if (obj instanceof Array) {
+                if (Array.isArray(obj)) {
                     return obj.map((item) => deepClone(item));
                 }
 
@@ -513,7 +512,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
 
             const expensiveOperation = () => {
                 let sum = 0;
-                for (let i = 0; i < 10000; i++) {
+                for (let i = 0; i < 10_000; i++) {
                     sum += i;
                 }
                 return sum;

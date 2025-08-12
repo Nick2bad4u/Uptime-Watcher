@@ -21,9 +21,9 @@ describe("useErrorStore", () => {
             store.clearAllErrors();
             store.setLoading(false);
             // Clear all operation loading states by setting them to false
-            Object.keys(store.operationLoading).forEach((operation) => {
+            for (const operation of Object.keys(store.operationLoading)) {
                 store.setOperationLoading(operation, false);
-            });
+            }
         });
         vi.clearAllMocks();
     });

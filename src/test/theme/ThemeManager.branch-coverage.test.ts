@@ -19,8 +19,8 @@ describe("ThemeManager - Branch Coverage Completion", () => {
     describe("SSR Environment Handling", () => {
         it("should handle missing document in applyThemeClasses", () => {
             // Mock document as undefined to simulate SSR
-            const originalDocument = global.document;
-            Object.defineProperty(global, "document", {
+            const originalDocument = globalThis.document;
+            Object.defineProperty(globalThis, "document", {
                 value: undefined,
                 writable: true,
             });
@@ -47,7 +47,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             }).not.toThrow();
 
             // Restore document
-            Object.defineProperty(global, "document", {
+            Object.defineProperty(globalThis, "document", {
                 value: originalDocument,
                 writable: true,
             });
@@ -55,8 +55,8 @@ describe("ThemeManager - Branch Coverage Completion", () => {
 
         it("should handle missing window in onSystemThemeChange", () => {
             // Mock window as undefined to simulate SSR
-            const originalWindow = global.window;
-            Object.defineProperty(global, "window", {
+            const originalWindow = globalThis.window;
+            Object.defineProperty(globalThis, "window", {
                 value: undefined,
                 writable: true,
             });
@@ -69,7 +69,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             expect(() => cleanup()).not.toThrow();
 
             // Restore window
-            Object.defineProperty(global, "window", {
+            Object.defineProperty(globalThis, "window", {
                 value: originalWindow,
                 writable: true,
             });
@@ -90,7 +90,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             };
 
             // Mock window.matchMedia
-            Object.defineProperty(window, "matchMedia", {
+            Object.defineProperty(globalThis, "matchMedia", {
                 writable: true,
                 value: vi.fn(() => mockMediaQuery),
             });
@@ -131,7 +131,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
                 removeEventListener: vi.fn(),
             };
 
-            Object.defineProperty(window, "matchMedia", {
+            Object.defineProperty(globalThis, "matchMedia", {
                 writable: true,
                 value: vi.fn(() => mockMediaQuery),
             });
@@ -243,7 +243,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
                 removeEventListener: mockRemoveEventListener,
             };
 
-            Object.defineProperty(window, "matchMedia", {
+            Object.defineProperty(globalThis, "matchMedia", {
                 writable: true,
                 value: vi.fn(() => mockMediaQuery),
             });

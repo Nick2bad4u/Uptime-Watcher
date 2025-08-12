@@ -222,8 +222,9 @@ describe.skip("App Component", () => {
         await annotate("CSS Class: app-container", "css-class");
         await annotate("Purpose: Ensure proper CSS classes are applied", "purpose");
 
-        const { container } = render(<App />);
-        const appContainer = container.querySelector(".app-container");
+        render(<App />);
+        const appContainer = screen.getByRole("main");
         expect(appContainer).toBeInTheDocument();
+        expect(appContainer).toHaveClass("app-container");
     });
 });

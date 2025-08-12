@@ -167,7 +167,7 @@ describe("Cache Utilities", () => {
                 cache.set("key1", "value1");
 
                 // Advance time significantly
-                mockNow.mockReturnValue(1000000);
+                mockNow.mockReturnValue(1_000_000);
                 expect(cache.get("key1")).toBe("value1"); // Should still be valid
             });
 
@@ -286,7 +286,7 @@ describe("Cache Utilities", () => {
                 cache.set("key2", "value2");
 
                 // Advance time significantly
-                mockNow.mockReturnValue(1000000);
+                mockNow.mockReturnValue(1_000_000);
                 cache.cleanup();
 
                 expect(cache.size).toBe(2); // Nothing should be removed

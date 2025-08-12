@@ -48,14 +48,14 @@ describe("Application Constants", () => {
         });
 
         it("should have valid monitor type structure", () => {
-            FALLBACK_MONITOR_TYPE_OPTIONS.forEach((option) => {
+            for (const option of FALLBACK_MONITOR_TYPE_OPTIONS) {
                 expect(option).toHaveProperty("label");
                 expect(option).toHaveProperty("value");
                 expect(typeof option.label).toBe("string");
                 expect(typeof option.value).toBe("string");
                 expect(option.label.length).toBeGreaterThan(0);
                 expect(option.value.length).toBeGreaterThan(0);
-            });
+            }
         });
 
         it("should contain expected monitor types", () => {
@@ -99,15 +99,15 @@ describe("Application Constants", () => {
         });
 
         it("should contain valid font names", () => {
-            FONT_FAMILY_MONO.forEach((font) => {
+            for (const font of FONT_FAMILY_MONO) {
                 expect(typeof font).toBe("string");
                 expect(font.length).toBeGreaterThan(0);
-            });
+            }
 
-            FONT_FAMILY_SANS.forEach((font) => {
+            for (const font of FONT_FAMILY_SANS) {
                 expect(typeof font).toBe("string");
                 expect(font.length).toBeGreaterThan(0);
-            });
+            }
         });
 
         it("should include fallback fonts", () => {
@@ -328,7 +328,7 @@ describe("Application Constants", () => {
                 "7d",
                 "30d",
             ];
-            expectedPeriods.forEach((period) => {
+            for (const period of expectedPeriods) {
                 expect(CHART_TIME_PERIODS).toHaveProperty(period);
                 expect(
                     typeof CHART_TIME_PERIODS[period as keyof ChartTimePeriods]
@@ -336,7 +336,7 @@ describe("Application Constants", () => {
                 expect(
                     CHART_TIME_PERIODS[period as keyof ChartTimePeriods]
                 ).toBeGreaterThan(0);
-            });
+            }
         });
 
         it("should export CHART_TIME_RANGES", () => {
@@ -372,9 +372,9 @@ describe("Application Constants", () => {
     describe("Type Definitions", () => {
         it("should have valid ChartTimeRange type", () => {
             const validRanges: ChartTimeRange[] = ["1h", "24h", "7d", "30d"];
-            validRanges.forEach((range) => {
+            for (const range of validRanges) {
                 expect(CHART_TIME_RANGES).toContain(range);
-            });
+            }
         });
 
         it("should have valid IntervalOption interface usage", () => {
@@ -403,7 +403,7 @@ describe("Application Constants", () => {
             expect(timingMatch).not.toBeNull();
 
             if (timingMatch && timingMatch[1]) {
-                const seconds = parseFloat(timingMatch[1]);
+                const seconds = Number.parseFloat(timingMatch[1]);
                 expect(seconds).toBeGreaterThan(0);
                 expect(seconds).toBeLessThan(2); // Should be reasonable for UI animations
             }
@@ -453,10 +453,10 @@ describe("Application Constants", () => {
                 CHART_TIME_PERIODS,
             ];
 
-            criticalConstants.forEach((constant) => {
+            for (const constant of criticalConstants) {
                 expect(constant).toBeDefined();
                 expect(constant).not.toBeNull();
-            });
+            }
         });
     });
 
@@ -478,12 +478,12 @@ describe("Application Constants", () => {
 
         it("should have reasonable default timeout values", () => {
             expect(DEFAULT_REQUEST_TIMEOUT).toBeGreaterThan(1000); // At least 1 second
-            expect(DEFAULT_REQUEST_TIMEOUT).toBeLessThan(60000); // Less than 1 minute
+            expect(DEFAULT_REQUEST_TIMEOUT).toBeLessThan(60_000); // Less than 1 minute
         });
 
         it("should have reasonable default check interval", () => {
             expect(DEFAULT_CHECK_INTERVAL).toBeGreaterThan(5000); // At least 5 seconds
-            expect(DEFAULT_CHECK_INTERVAL).toBeLessThan(3600000); // Less than 1 hour
+            expect(DEFAULT_CHECK_INTERVAL).toBeLessThan(3_600_000); // Less than 1 hour
         });
     });
 });

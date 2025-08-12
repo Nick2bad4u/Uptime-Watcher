@@ -63,7 +63,7 @@ describe("Monitor UI Helpers", () => {
 
     // Helper function to create mock Monitor objects
     const createMockMonitor = (partial: Partial<Monitor> = {}): Monitor => ({
-        checkInterval: 30000,
+        checkInterval: 30_000,
         history: [],
         id: "test-monitor-id",
         monitoring: true,

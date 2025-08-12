@@ -4,7 +4,7 @@ import { lightTheme, darkTheme } from "../theme/themes";
 import type { Theme } from "../theme/types";
 
 // Mock DOM environment
-Object.defineProperty(window, "matchMedia", {
+Object.defineProperty(globalThis, "matchMedia", {
     writable: true,
     value: vi.fn().mockImplementation((query) => ({
         matches: false,
@@ -48,7 +48,7 @@ describe("ThemeManager", () => {
             },
         };
 
-        Object.defineProperty(global, "document", {
+        Object.defineProperty(globalThis, "document", {
             value: {
                 documentElement: mockDocumentElement,
                 body: mockBodyClassList,
@@ -93,7 +93,7 @@ describe("ThemeManager", () => {
         });
 
         it("should handle undefined document", () => {
-            Object.defineProperty(global, "document", {
+            Object.defineProperty(globalThis, "document", {
                 value: undefined,
                 writable: true,
             });
@@ -118,7 +118,7 @@ describe("ThemeManager", () => {
         });
 
         it("should get system theme preference", () => {
-            vi.mocked(window.matchMedia).mockReturnValue({
+            vi.mocked(globalThis.matchMedia).mockReturnValue({
                 matches: true,
                 media: "(prefers-color-scheme: dark)",
                 onchange: null,
@@ -137,7 +137,7 @@ describe("ThemeManager", () => {
 
     describe("getSystemThemePreference", () => {
         it("should return dark when user prefers dark mode", () => {
-            vi.mocked(window.matchMedia).mockReturnValue({
+            vi.mocked(globalThis.matchMedia).mockReturnValue({
                 matches: true,
             } as any);
 
@@ -147,7 +147,7 @@ describe("ThemeManager", () => {
         });
 
         it("should return light when user prefers light mode", () => {
-            vi.mocked(window.matchMedia).mockReturnValue({
+            vi.mocked(globalThis.matchMedia).mockReturnValue({
                 matches: false,
             } as any);
 
@@ -157,15 +157,15 @@ describe("ThemeManager", () => {
         });
 
         it("should return light when window is undefined", () => {
-            const originalWindow = global.window;
+            const originalWindow = globalThis.window;
             // @ts-expect-error - intentionally deleting window for testing
-            delete global.window;
+            delete globalThis.window;
 
             const preference = themeManager.getSystemThemePreference();
 
             expect(preference).toBe("light");
 
-            global.window = originalWindow;
+            globalThis.window = originalWindow;
         });
     });
 
@@ -200,7 +200,7 @@ describe("ThemeManager", () => {
                 removeEventListener: vi.fn(),
             };
 
-            vi.mocked(window.matchMedia).mockReturnValue(mockMediaQuery as any);
+            vi.mocked(globalThis.matchMedia).mockReturnValue(mockMediaQuery as any);
 
             const cleanup = themeManager.onSystemThemeChange(callback);
 
@@ -217,9 +217,9 @@ describe("ThemeManager", () => {
         });
 
         it("should return no-op function when window is undefined", () => {
-            const originalWindow = global.window;
+            const originalWindow = globalThis.window;
             // @ts-expect-error - intentionally deleting window for testing
-            delete global.window;
+            delete globalThis.window;
 
             const callback = vi.fn();
             const cleanup = themeManager.onSystemThemeChange(callback);
@@ -227,7 +227,7 @@ describe("ThemeManager", () => {
             expect(typeof cleanup).toBe("function");
             expect(() => cleanup()).not.toThrow();
 
-            global.window = originalWindow;
+            globalThis.window = originalWindow;
         });
     });
 
@@ -428,14 +428,14 @@ describe("ThemeManager", () => {
             const manager = ThemeManager.getInstance();
 
             // Mock document to be undefined to trigger line 302
-            const originalDocument = global.document;
-            delete (global as any).document;
+            const originalDocument = globalThis.document;
+            delete (globalThis as any).document;
 
             // This should handle undefined document gracefully
             expect(() => manager.applyTheme(lightTheme)).not.toThrow();
 
             // Restore document
-            global.document = originalDocument;
+            globalThis.document = originalDocument;
         });
     });
 });

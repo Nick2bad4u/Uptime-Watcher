@@ -571,9 +571,9 @@ describe("Monitor Form Data Types", () => {
                 123,
             ];
 
-            invalidScenarios.forEach((scenario) => {
+            for (const scenario of invalidScenarios) {
                 expect(isValidMonitorFormData(scenario)).toBe(false);
-            });
+            }
         });
 
         it("should handle partial form data gracefully", () => {

@@ -10,38 +10,38 @@ describe("AddSiteForm Component Coverage Tests", () => {
             const validModes = ["existing", "new"];
             const invalidModes = ["invalid", "", "other"];
 
-            validModes.forEach((mode) => {
+            for (const mode of validModes) {
                 expect(validModes.includes(mode)).toBe(true);
-            });
+            }
 
-            invalidModes.forEach((mode) => {
+            for (const mode of invalidModes) {
                 expect(validModes.includes(mode)).toBe(false);
-            });
+            }
         });
 
         it("should validate monitor types", () => {
-            const baseMonitorTypes = ["http", "port"];
+            const baseMonitorTypes = new Set(["http", "port"]);
 
-            expect(baseMonitorTypes.includes("http")).toBe(true);
-            expect(baseMonitorTypes.includes("port")).toBe(true);
-            expect(baseMonitorTypes.includes("invalid")).toBe(false);
+            expect(baseMonitorTypes.has("http")).toBe(true);
+            expect(baseMonitorTypes.has("port")).toBe(true);
+            expect(baseMonitorTypes.has("invalid")).toBe(false);
         });
 
         it("should handle numeric validation", () => {
             const testCases = [
                 { value: "5000", expected: 5000, isValid: true },
                 { value: "0", expected: 0, isValid: true },
-                { value: "invalid", expected: NaN, isValid: false },
+                { value: "invalid", expected: Number.NaN, isValid: false },
                 { value: "", expected: 0, isValid: true }, // Empty string converts to 0
             ];
 
-            testCases.forEach(({ value, expected, isValid }) => {
+            for (const { value, expected, isValid } of testCases) {
                 const numericValue = Number(value);
                 const valid = !Number.isNaN(numericValue);
 
                 expect(numericValue).toBe(expected);
                 expect(valid).toBe(isValid);
-            });
+            }
         });
     });
 
@@ -76,12 +76,12 @@ describe("AddSiteForm Component Coverage Tests", () => {
             };
 
             mockHandlers.setAddMode("existing");
-            mockHandlers.setCheckInterval(10000);
+            mockHandlers.setCheckInterval(10_000);
             mockHandlers.setMonitorType("port");
             mockHandlers.resetForm();
 
             expect(mockHandlers.setAddMode).toHaveBeenCalledWith("existing");
-            expect(mockHandlers.setCheckInterval).toHaveBeenCalledWith(10000);
+            expect(mockHandlers.setCheckInterval).toHaveBeenCalledWith(10_000);
             expect(mockHandlers.setMonitorType).toHaveBeenCalledWith("port");
             expect(mockHandlers.resetForm).toHaveBeenCalled();
         });
@@ -144,10 +144,10 @@ describe("AddSiteForm Component Coverage Tests", () => {
             expect(Array.isArray(monitorTypes.options)).toBe(true);
             expect(monitorTypes.options).toHaveLength(2);
 
-            monitorTypes.options.forEach((option) => {
+            for (const option of monitorTypes.options) {
                 expect(option).toHaveProperty("value");
                 expect(option).toHaveProperty("label");
-            });
+            }
         });
     });
 
@@ -241,9 +241,9 @@ describe("AddSiteForm Component Coverage Tests", () => {
                 showButtonLoading: false,
             };
 
-            Object.values(loadingStates).forEach((state) => {
+            for (const state of Object.values(loadingStates)) {
                 expect(typeof state).toBe("boolean");
-            });
+            }
         });
     });
 
@@ -262,15 +262,15 @@ describe("AddSiteForm Component Coverage Tests", () => {
 
     describe("Constants", () => {
         it("should use correct check intervals", () => {
-            const CHECK_INTERVALS = [5000, 10000, 30000, 60000];
+            const CHECK_INTERVALS = [5000, 10_000, 30_000, 60_000];
 
             expect(Array.isArray(CHECK_INTERVALS)).toBe(true);
             expect(CHECK_INTERVALS.length).toBeGreaterThan(0);
 
-            CHECK_INTERVALS.forEach((interval) => {
+            for (const interval of CHECK_INTERVALS) {
                 expect(typeof interval).toBe("number");
                 expect(interval).toBeGreaterThan(0);
-            });
+            }
         });
 
         it("should use correct UI delays", () => {
@@ -351,12 +351,12 @@ describe("AddSiteForm Component Coverage Tests", () => {
                 logger: { error: vi.fn() },
             };
 
-            Object.entries(dependencies).forEach(([key, value]) => {
+            for (const [key, value] of Object.entries(dependencies)) {
                 expect(value).toBeDefined();
                 if (key !== "logger") {
                     expect(typeof value).toBe("function");
                 }
-            });
+            }
         });
     });
 });

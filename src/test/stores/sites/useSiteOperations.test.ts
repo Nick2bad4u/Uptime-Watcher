@@ -66,7 +66,7 @@ vi.mock("../../types/ipc", () => ({
 }));
 
 // Access the global electronAPI mock
-const mockElectronAPI = window.electronAPI as any;
+const mockElectronAPI = globalThis.electronAPI as any;
 
 describe("createSiteOperationsActions", () => {
     let mockDeps: SiteOperationsDependencies;
@@ -78,7 +78,7 @@ describe("createSiteOperationsActions", () => {
         vi.clearAllMocks();
 
         mockMonitor = {
-            checkInterval: 60000,
+            checkInterval: 60_000,
             history: [],
             id: "monitor-1",
             monitoring: true,
@@ -354,7 +354,7 @@ describe("createSiteOperationsActions", () => {
         it("should update monitor timeout", async () => {
             mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
 
-            await actions.updateMonitorTimeout("test-site", "monitor-1", 10000);
+            await actions.updateMonitorTimeout("test-site", "monitor-1", 10_000);
 
             expect(mockElectronAPI.sites.updateSite).toHaveBeenCalled();
             expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
@@ -366,7 +366,7 @@ describe("createSiteOperationsActions", () => {
             await actions.updateSiteCheckInterval(
                 "test-site",
                 "monitor-1",
-                30000
+                30_000
             );
 
             expect(mockElectronAPI.sites.updateSite).toHaveBeenCalled();

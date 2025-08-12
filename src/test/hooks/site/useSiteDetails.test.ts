@@ -76,8 +76,8 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
                 id: "monitor-1",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 60000,
-                timeout: 10000,
+                checkInterval: 60_000,
+                timeout: 10_000,
                 retryAttempts: 3,
                 monitoring: true,
             },
@@ -208,7 +208,7 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
                 useSiteDetails({ site: mockSite })
             );
 
-            expect(result.current.localCheckInterval).toBe(60000);
+            expect(result.current.localCheckInterval).toBe(60_000);
             expect(result.current.localTimeout).toBeDefined();
             expect(result.current.localRetryAttempts).toBe(3);
         });

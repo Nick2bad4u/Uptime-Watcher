@@ -8,9 +8,9 @@ vi.mock("../../../constants", async (importOriginal) => {
     return {
         ...actual,
         CHECK_INTERVALS: [
-            { label: "1 minute", value: 60000 },
-            { label: "5 minutes", value: 300000 },
-            { label: "10 minutes", value: 600000 },
+            { label: "1 minute", value: 60_000 },
+            { label: "5 minutes", value: 300_000 },
+            { label: "10 minutes", value: 600_000 },
         ],
     };
 });
@@ -75,7 +75,7 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
                 id: "",
                 type: "http",
                 status: "active",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 url: "",
@@ -90,7 +90,7 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
         // Add missing methods from the hook
         monitorType: "http",
         setMonitorType: vi.fn(),
-        checkInterval: 60000,
+        checkInterval: 60_000,
         setCheckInterval: vi.fn(),
         addMode: "new",
         setAddMode: vi.fn(),

@@ -134,7 +134,7 @@ describe("calculateMaxDuration", () => {
         it("should handle large timeout values", () => {
             // Act & Assert
             expect(calculateMaxDuration(1000, 0)).toBe("17m"); // 1000s -> 17m
-            expect(calculateMaxDuration(10000, 0)).toBe("3h"); // 10000s -> 3h
+            expect(calculateMaxDuration(10_000, 0)).toBe("3h"); // 10000s -> 3h
         });
 
         it("should handle large retry counts", () => {
@@ -149,7 +149,7 @@ describe("calculateMaxDuration", () => {
 
             // Assert
             expect(result).toBeTruthy();
-            expect(result).toMatch(/^\d+[smh]$/); // Should be valid format
+            expect(result).toMatch(/^\d+[hms]$/); // Should be valid format
         });
 
         it("should handle fractional timeouts", () => {
@@ -208,10 +208,10 @@ describe("calculateMaxDuration", () => {
             const duration3 = calculateMaxDuration(timeout, 3);
 
             // Convert back to numbers for comparison (remove unit)
-            const value0 = parseInt(duration0);
-            const value1 = parseInt(duration1);
-            const value2 = parseInt(duration2);
-            const value3 = parseInt(duration3);
+            const value0 = Number.parseInt(duration0);
+            const value1 = Number.parseInt(duration1);
+            const value2 = Number.parseInt(duration2);
+            const value3 = Number.parseInt(duration3);
 
             // Assert
             expect(value1).toBeGreaterThan(value0);
@@ -229,9 +229,9 @@ describe("calculateMaxDuration", () => {
             const duration15 = calculateMaxDuration(15, retryAttempts);
 
             // Convert back to numbers for comparison
-            const value5 = parseInt(duration5);
-            const value10 = parseInt(duration10);
-            const value15 = parseInt(duration15);
+            const value5 = Number.parseInt(duration5);
+            const value10 = Number.parseInt(duration10);
+            const value15 = Number.parseInt(duration15);
 
             // Assert
             expect(value10).toBeGreaterThan(value5);
@@ -264,7 +264,7 @@ describe("calculateMaxDuration", () => {
 
         it("should always return a valid time format", () => {
             // Arrange
-            const timeFormatRegex = /^\d+[smh]$/;
+            const timeFormatRegex = /^\d+[hms]$/;
 
             // Act & Assert
             expect(calculateMaxDuration(5, 0)).toMatch(timeFormatRegex);

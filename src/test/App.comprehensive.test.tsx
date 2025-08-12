@@ -289,13 +289,11 @@ describe("App Component - Comprehensive Coverage", () => {
             const { rerender } = render(<App />);
 
             // Quickly change to not loading before delay
-            await act(async () => {
-                mockUseErrorStore.mockReturnValue({
-                    ...defaultErrorStore,
-                    isLoading: false,
-                });
-                rerender(<App />);
+            mockUseErrorStore.mockReturnValue({
+                ...defaultErrorStore,
+                isLoading: false,
             });
+            rerender(<App />);
 
             // Should not show loading overlay
             expect(
@@ -589,6 +587,9 @@ describe("App Component - Comprehensive Coverage", () => {
 
             await waitFor(() => {
                 expect(initializeSites).toHaveBeenCalledTimes(1);
+            });
+            
+            await waitFor(() => {
                 expect(initializeSettings).toHaveBeenCalledTimes(1);
             });
         });

@@ -8,8 +8,8 @@ describe("File Download Utility Coverage Tests", () => {
     // Mock DOM APIs
     beforeEach(() => {
         // Mock URL.createObjectURL and URL.revokeObjectURL
-        global.URL.createObjectURL = vi.fn(() => "mock-object-url");
-        global.URL.revokeObjectURL = vi.fn();
+        globalThis.URL.createObjectURL = vi.fn(() => "mock-object-url");
+        globalThis.URL.revokeObjectURL = vi.fn();
 
         // Mock document.createElement
         const mockAnchor = {
@@ -18,8 +18,8 @@ describe("File Download Utility Coverage Tests", () => {
             click: vi.fn(),
             remove: vi.fn(),
         } as any;
-        global.document.createElement = vi.fn(() => mockAnchor) as any;
-        global.document.body.appendChild = vi.fn();
+        globalThis.document.createElement = vi.fn(() => mockAnchor) as any;
+        globalThis.document.body.appendChild = vi.fn();
     });
 
     describe("FileDownloadOptions Interface", () => {
@@ -66,7 +66,7 @@ describe("File Download Utility Coverage Tests", () => {
                     anchor.href = url;
                     anchor.download = fileName;
 
-                    document.body.appendChild(anchor);
+                    document.body.append(anchor);
                     anchor.click();
                     anchor.remove();
 
@@ -225,10 +225,10 @@ describe("File Download Utility Coverage Tests", () => {
                 "sqlite3",
             ];
 
-            extensions.forEach((ext) => {
+            for (const ext of extensions) {
                 const fileName = generateBackupFileName("test", ext);
                 expect(fileName.endsWith(`.${ext}`)).toBe(true);
-            });
+            }
         });
     });
 
@@ -264,7 +264,7 @@ describe("File Download Utility Coverage Tests", () => {
                 anchor.href = url;
                 anchor.download = "backup.sqlite";
 
-                document.body.appendChild(anchor);
+                document.body.append(anchor);
                 anchor.click();
                 anchor.remove();
 
@@ -471,12 +471,12 @@ describe("File Download Utility Coverage Tests", () => {
                 "text/csv",
             ];
 
-            mimeTypes.forEach((mimeType) => {
+            for (const mimeType of mimeTypes) {
                 const blob = new Blob([new ArrayBuffer(100)], {
                     type: mimeType,
                 });
                 expect(blob.type).toBe(mimeType);
-            });
+            }
         });
 
         it("should handle file extensions", () => {
@@ -487,21 +487,21 @@ describe("File Download Utility Coverage Tests", () => {
                 { ext: "csv", mime: "text/csv" },
             ];
 
-            extensions.forEach(({ ext, mime }) => {
+            for (const { ext, mime } of extensions) {
                 const fileName = `test.${ext}`;
                 expect(fileName.endsWith(`.${ext}`)).toBe(true);
 
                 const blob = new Blob([new ArrayBuffer(50)], { type: mime });
                 expect(blob.type).toBe(mime);
-            });
+            }
         });
     });
 
     describe("Memory Management", () => {
         it("should handle object URL cleanup", () => {
             const mockUrl = "mock-blob-url";
-            global.URL.createObjectURL = vi.fn(() => mockUrl);
-            global.URL.revokeObjectURL = vi.fn();
+            globalThis.URL.createObjectURL = vi.fn(() => mockUrl);
+            globalThis.URL.revokeObjectURL = vi.fn();
 
             const cleanupObjectURL = (url: string) => {
                 URL.revokeObjectURL(url);
@@ -554,7 +554,7 @@ describe("File Download Utility Coverage Tests", () => {
             expect(validateFileName("valid-file.txt")).toBe(true);
             expect(validateFileName("")).toBe(false);
             expect(validateFileName("invalid/file.txt")).toBe(false);
-            expect(validateFileName("invalid\\file.txt")).toBe(false);
+            expect(validateFileName(String.raw`invalid\file.txt`)).toBe(false);
             expect(validateFileName("invalid:file.txt")).toBe(false);
         });
     });

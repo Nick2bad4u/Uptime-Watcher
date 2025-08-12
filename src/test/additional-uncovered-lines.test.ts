@@ -42,7 +42,7 @@ interface MockWindow {
         | undefined;
 }
 
-Object.defineProperty(global, "window", {
+Object.defineProperty(globalThis, "window", {
     value: {} as MockWindow,
     writable: true,
 });
@@ -56,8 +56,8 @@ describe("Additional Uncovered Lines Tests", () => {
         document.body.innerHTML = "";
 
         // Mock global URL methods
-        global.URL.createObjectURL = vi.fn(() => "blob:test");
-        global.URL.revokeObjectURL = vi.fn();
+        globalThis.URL.createObjectURL = vi.fn(() => "blob:test");
+        globalThis.URL.revokeObjectURL = vi.fn();
     });
 
     afterEach(() => {
@@ -70,7 +70,7 @@ describe("Additional Uncovered Lines Tests", () => {
                 identifier: "test-site-id",
                 monitors: [
                     {
-                        checkInterval: 30000,
+                        checkInterval: 30_000,
                         history: [],
                         id: "monitor-1",
                         monitoring: true,
@@ -97,7 +97,7 @@ describe("Additional Uncovered Lines Tests", () => {
             const mockCreateObjectURL = vi.fn(() => {
                 throw new Error("Failed to create object URL");
             });
-            Object.defineProperty(global.URL, "createObjectURL", {
+            Object.defineProperty(globalThis.URL, "createObjectURL", {
                 value: mockCreateObjectURL,
                 writable: true,
             });
@@ -143,7 +143,7 @@ describe("Additional Uncovered Lines Tests", () => {
             const mockCreateObjectURL = vi.fn(() => {
                 throw new Error("Network error");
             });
-            Object.defineProperty(global.URL, "createObjectURL", {
+            Object.defineProperty(globalThis.URL, "createObjectURL", {
                 value: mockCreateObjectURL,
                 writable: true,
             });

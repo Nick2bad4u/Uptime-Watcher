@@ -10,8 +10,8 @@ describe("SiteCardHeader", () => {
         name: "Test Site",
         url: "https://example.com",
         monitors: [],
-        created_at: 1640995200000,
-        updated_at: 1640995200000,
+        created_at: 1_640_995_200_000,
+        updated_at: 1_640_995_200_000,
     };
 
     const defaultProps = {
@@ -60,7 +60,7 @@ describe("SiteCardHeader", () => {
             { isLoading: false, isMonitoring: false },
         ];
 
-        states.forEach((state) => {
+        for (const state of states) {
             const props = {
                 ...defaultProps,
                 display: {
@@ -74,6 +74,6 @@ describe("SiteCardHeader", () => {
             };
             expect(props.display.isLoading).toBe(state.isLoading);
             expect(props.monitoring.isMonitoring).toBe(state.isMonitoring);
-        });
+        }
     });
 });

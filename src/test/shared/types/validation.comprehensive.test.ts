@@ -62,7 +62,7 @@ describe("Validation Types and Utilities", () => {
                 field: "emailAddress",
                 rule: "email-validation",
                 severity: "high",
-                timestamp: 1234567890,
+                timestamp: 1_234_567_890,
             };
             const result = createFailureResult(errors, metadata);
 
@@ -301,7 +301,7 @@ describe("Validation Types and Utilities", () => {
 
     describe("Edge Cases and Error Conditions", () => {
         it("should handle createFailureResult with very long error messages", () => {
-            const longError = "A".repeat(10000);
+            const longError = "A".repeat(10_000);
             const result = createFailureResult([longError]);
 
             expect(result.errors[0]).toBe(longError);

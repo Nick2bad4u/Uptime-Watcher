@@ -8,7 +8,7 @@ describe("Monitor Form Data Types Coverage Tests", () => {
     describe("BaseFormData Interface", () => {
         it("should define base form data properties", () => {
             const baseFormData = {
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 monitoring: true,
                 retryAttempts: 3,
                 timeout: 5000,
@@ -36,15 +36,15 @@ describe("Monitor Form Data Types Coverage Tests", () => {
 
         it("should validate numeric fields", () => {
             const numericFields = {
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 retryAttempts: 2,
-                timeout: 10000,
+                timeout: 10_000,
             };
 
-            Object.values(numericFields).forEach((value) => {
+            for (const value of Object.values(numericFields)) {
                 expect(typeof value).toBe("number");
                 expect(value).toBeGreaterThan(0);
-            });
+            }
         });
     });
 
@@ -52,7 +52,7 @@ describe("Monitor Form Data Types Coverage Tests", () => {
         it("should extend Record<string, unknown>", () => {
             const dynamicFormData = {
                 // Base fields
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 monitoring: true,
                 retryAttempts: 3,
                 timeout: 5000,
@@ -95,14 +95,14 @@ describe("Monitor Form Data Types Coverage Tests", () => {
         it("should support extensible monitor types", () => {
             const extensibleFormData = {
                 type: "custom-monitor-type",
-                checkInterval: 45000,
+                checkInterval: 45_000,
                 customParameter1: "value1",
                 customParameter2: 999,
                 customParameter3: true,
             };
 
             expect(extensibleFormData.type).toBe("custom-monitor-type");
-            expect(extensibleFormData.checkInterval).toBe(45000);
+            expect(extensibleFormData.checkInterval).toBe(45_000);
             expect(extensibleFormData.customParameter1).toBe("value1");
             expect(extensibleFormData.customParameter2).toBe(999);
             expect(extensibleFormData.customParameter3).toBe(true);
@@ -116,7 +116,7 @@ describe("Monitor Form Data Types Coverage Tests", () => {
                 type: "http" as const,
                 url: "https://example.com",
                 // Base fields
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 monitoring: true,
                 retryAttempts: 2,
                 timeout: 8000,
@@ -172,7 +172,7 @@ describe("Monitor Form Data Types Coverage Tests", () => {
 
             const validData = {
                 type: "http",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
@@ -218,7 +218,7 @@ describe("Monitor Form Data Types Coverage Tests", () => {
     describe("Form Data Transformation", () => {
         it("should transform between different form data types", () => {
             const baseData = {
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 monitoring: true,
                 retryAttempts: 3,
                 timeout: 5000,
@@ -243,7 +243,7 @@ describe("Monitor Form Data Types Coverage Tests", () => {
 
         it("should handle form data merging", () => {
             const defaultData = {
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 monitoring: false,
                 retryAttempts: 3,
                 timeout: 5000,
@@ -260,7 +260,7 @@ describe("Monitor Form Data Types Coverage Tests", () => {
                 ...userData,
             };
 
-            expect(mergedData.checkInterval).toBe(60000); // From default
+            expect(mergedData.checkInterval).toBe(60_000); // From default
             expect(mergedData.monitoring).toBe(true); // Overridden by user
             expect(mergedData.type).toBe("http"); // From user
             expect(mergedData.url).toBe("https://user-site.com"); // From user
@@ -273,7 +273,7 @@ describe("Monitor Form Data Types Coverage Tests", () => {
                 return {
                     type,
                     url,
-                    checkInterval: 30000,
+                    checkInterval: 30_000,
                     monitoring: true,
                 };
             };
@@ -304,14 +304,14 @@ describe("Monitor Form Data Types Coverage Tests", () => {
     describe("Form Field Defaults", () => {
         it("should provide reasonable defaults", () => {
             const defaultFormData = {
-                checkInterval: 60000, // 1 minute
+                checkInterval: 60_000, // 1 minute
                 monitoring: false,
                 retryAttempts: 3,
                 timeout: 5000, // 5 seconds
                 type: "http",
             };
 
-            expect(defaultFormData.checkInterval).toBe(60000);
+            expect(defaultFormData.checkInterval).toBe(60_000);
             expect(defaultFormData.monitoring).toBe(false);
             expect(defaultFormData.retryAttempts).toBe(3);
             expect(defaultFormData.timeout).toBe(5000);
@@ -320,9 +320,9 @@ describe("Monitor Form Data Types Coverage Tests", () => {
 
         it("should handle field value ranges", () => {
             const fieldRanges = {
-                checkInterval: { min: 1000, max: 3600000 }, // 1 second to 1 hour
+                checkInterval: { min: 1000, max: 3_600_000 }, // 1 second to 1 hour
                 retryAttempts: { min: 0, max: 10 },
-                timeout: { min: 1000, max: 30000 }, // 1 to 30 seconds
+                timeout: { min: 1000, max: 30_000 }, // 1 to 30 seconds
             };
 
             const testValue = (
@@ -332,13 +332,13 @@ describe("Monitor Form Data Types Coverage Tests", () => {
                 return value >= range.min && value <= range.max;
             };
 
-            expect(testValue(30000, fieldRanges.checkInterval)).toBe(true);
+            expect(testValue(30_000, fieldRanges.checkInterval)).toBe(true);
             expect(testValue(3, fieldRanges.retryAttempts)).toBe(true);
             expect(testValue(5000, fieldRanges.timeout)).toBe(true);
 
             expect(testValue(500, fieldRanges.checkInterval)).toBe(false); // Too low
             expect(testValue(15, fieldRanges.retryAttempts)).toBe(false); // Too high
-            expect(testValue(50000, fieldRanges.timeout)).toBe(false); // Too high
+            expect(testValue(50_000, fieldRanges.timeout)).toBe(false); // Too high
         });
     });
 
@@ -428,14 +428,14 @@ describe("Monitor Form Data Types Coverage Tests", () => {
                 type: "http",
                 url: "https://extended.com",
                 customHttpField: "custom-value",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 monitoring: true,
             };
 
             expect(extendedData.type).toBe("http");
             expect(extendedData.url).toBe("https://extended.com");
             expect(extendedData.customHttpField).toBe("custom-value");
-            expect(extendedData.checkInterval).toBe(30000);
+            expect(extendedData.checkInterval).toBe(30_000);
             expect(extendedData.monitoring).toBe(true);
         });
 
@@ -457,14 +457,14 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             const now = new Date();
             const extendedFormData: ExtendedFormData = {
                 type: "http",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 createdAt: now,
                 updatedAt: now,
                 version: 1,
             };
 
             expect(extendedFormData.type).toBe("http");
-            expect(extendedFormData.checkInterval).toBe(30000);
+            expect(extendedFormData.checkInterval).toBe(30_000);
             expect(extendedFormData.createdAt).toBe(now);
             expect(extendedFormData.updatedAt).toBe(now);
             expect(extendedFormData.version).toBe(1);

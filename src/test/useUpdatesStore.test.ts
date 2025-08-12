@@ -21,7 +21,7 @@ const mockQuitAndInstall = vi.fn();
 // Helper to setup electronAPI mock
 const setupElectronAPIMock = (mockAPI: unknown) => {
     // Use a different approach to avoid property redefinition
-    const win = window as unknown as Record<string, unknown>;
+    const win = globalThis as unknown as Record<string, unknown>;
     win["electronAPI"] = mockAPI;
 };
 

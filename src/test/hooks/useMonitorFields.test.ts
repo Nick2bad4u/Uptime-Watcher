@@ -92,7 +92,7 @@ const mockElectronAPI = {
 };
 
 // Set up the mock globally
-Object.defineProperty(window, "electronAPI", {
+Object.defineProperty(globalThis, "electronAPI", {
     value: mockElectronAPI,
     writable: true,
 });

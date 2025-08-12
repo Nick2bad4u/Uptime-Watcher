@@ -44,7 +44,7 @@ describe("useSiteMonitor Hook", () => {
                         responseTime: 250,
                     },
                     {
-                        timestamp: Date.now() - 60000,
+                        timestamp: Date.now() - 60_000,
                         status: "up",
                         responseTime: 200,
                     },
@@ -55,7 +55,7 @@ describe("useSiteMonitor Hook", () => {
                 type: "port",
                 host: "example.com",
                 port: 80,
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 2,
                 monitoring: false,

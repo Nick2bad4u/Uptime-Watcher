@@ -121,8 +121,8 @@ describe("Shared Types Coverage", () => {
                 type: "http",
                 name: "Website Check",
                 enabled: true,
-                interval: 60000,
-                timeout: 30000,
+                interval: 60_000,
+                timeout: 30_000,
                 retryAttempts: 3,
                 configuration: {
                     url: "https://example.com",
@@ -159,19 +159,19 @@ describe("Shared Types Coverage", () => {
                 validateType: (type: string) =>
                     ["http", "ping", "port", "dns"].includes(type),
                 validateInterval: (interval: number) =>
-                    interval >= 30000 && interval <= 3600000,
+                    interval >= 30_000 && interval <= 3_600_000,
                 validateTimeout: (timeout: number) =>
-                    timeout >= 1000 && timeout <= 300000,
+                    timeout >= 1000 && timeout <= 300_000,
                 validateRetryAttempts: (attempts: number) =>
                     attempts >= 0 && attempts <= 10,
             };
 
             expect(validator.validateType("http")).toBe(true);
             expect(validator.validateType("invalid")).toBe(false);
-            expect(validator.validateInterval(60000)).toBe(true);
-            expect(validator.validateInterval(10000)).toBe(false);
-            expect(validator.validateTimeout(30000)).toBe(true);
-            expect(validator.validateTimeout(500000)).toBe(false);
+            expect(validator.validateInterval(60_000)).toBe(true);
+            expect(validator.validateInterval(10_000)).toBe(false);
+            expect(validator.validateTimeout(30_000)).toBe(true);
+            expect(validator.validateTimeout(500_000)).toBe(false);
             expect(validator.validateRetryAttempts(3)).toBe(true);
             expect(validator.validateRetryAttempts(15)).toBe(false);
         });
@@ -310,10 +310,7 @@ describe("Shared Types Coverage", () => {
                 },
                 applyTheme: (themeName: string) => {
                     // Mock theme application
-                    document.documentElement.setAttribute(
-                        "data-theme",
-                        themeName
-                    );
+                    document.documentElement.dataset.theme = themeName;
                 },
             };
 
@@ -403,7 +400,7 @@ describe("Shared Types Coverage", () => {
                     field: "timeout",
                     type: "range",
                     message: "Timeout must be between 1000 and 300000ms",
-                    parameters: { min: 1000, max: 300000 },
+                    parameters: { min: 1000, max: 300_000 },
                 },
             ];
 
@@ -412,15 +409,17 @@ describe("Shared Types Coverage", () => {
                 value: any
             ): boolean => {
                 switch (rule.type) {
-                    case "required":
+                    case "required": {
                         return (
                             value !== null &&
                             value !== undefined &&
                             value !== ""
                         );
-                    case "format":
+                    }
+                    case "format": {
                         return rule.validator ? rule.validator(value) : true;
-                    case "range":
+                    }
+                    case "range": {
                         if (rule.parameters) {
                             return (
                                 value >= rule.parameters["min"] &&
@@ -428,8 +427,10 @@ describe("Shared Types Coverage", () => {
                             );
                         }
                         return true;
-                    default:
+                    }
+                    default: {
                         return true;
+                    }
                 }
             };
 

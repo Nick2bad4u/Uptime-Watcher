@@ -130,13 +130,13 @@ describe("Theme Components - Comprehensive Coverage", () => {
                 "xl",
             ] as const;
 
-            sizes.forEach((size) => {
+            for (const size of sizes) {
                 const { unmount } = render(
                     <ThemedButton {...defaultProps} size={size} />
                 );
                 expect(screen.getByRole("button")).toBeInTheDocument();
                 unmount();
-            });
+            }
         });
 
         it("should render all variant types", () => {
@@ -151,19 +151,19 @@ describe("Theme Components - Comprehensive Coverage", () => {
                 "error",
             ] as const;
 
-            variants.forEach((variant) => {
+            for (const variant of variants) {
                 const { unmount } = render(
                     <ThemedButton {...defaultProps} variant={variant} />
                 );
                 expect(screen.getByRole("button")).toBeInTheDocument();
                 unmount();
-            });
+            }
         });
 
         it("should render all button types", () => {
             const types = ["button", "submit", "reset"] as const;
 
-            types.forEach((type) => {
+            for (const type of types) {
                 const { unmount } = render(
                     <ThemedButton {...defaultProps} type={type} />
                 );
@@ -172,7 +172,7 @@ describe("Theme Components - Comprehensive Coverage", () => {
                     type
                 );
                 unmount();
-            });
+            }
         });
 
         it("should handle disabled state", () => {
@@ -188,7 +188,7 @@ describe("Theme Components - Comprehensive Coverage", () => {
         it("should render with icon in different positions", () => {
             const icon = <span data-testid="button-icon">Icon</span>;
 
-            ["left", "right"].forEach((position) => {
+            for (const position of ["left", "right"]) {
                 const { unmount } = render(
                     <ThemedButton
                         {...defaultProps}
@@ -198,7 +198,7 @@ describe("Theme Components - Comprehensive Coverage", () => {
                 );
                 expect(screen.getByTestId("button-icon")).toBeInTheDocument();
                 unmount();
-            });
+            }
         });
 
         it("should handle fullWidth prop", () => {
@@ -385,13 +385,13 @@ describe("Theme Components - Comprehensive Coverage", () => {
                 "xl",
             ] as const;
 
-            sizes.forEach((size) => {
+            for (const size of sizes) {
                 const { unmount } = render(
                     <ThemedIconButton {...defaultProps} size={size} />
                 );
                 expect(screen.getByRole("button")).toBeInTheDocument();
                 unmount();
-            });
+            }
         });
 
         it("should render all variant types", () => {
@@ -406,13 +406,13 @@ describe("Theme Components - Comprehensive Coverage", () => {
                 "error",
             ] as const;
 
-            variants.forEach((variant) => {
+            for (const variant of variants) {
                 const { unmount } = render(
                     <ThemedIconButton {...defaultProps} variant={variant} />
                 );
                 expect(screen.getByRole("button")).toBeInTheDocument();
                 unmount();
-            });
+            }
         });
 
         it("should handle disabled state", () => {

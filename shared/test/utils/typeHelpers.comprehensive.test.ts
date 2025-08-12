@@ -7,12 +7,11 @@ import { describe, it, expect, expectTypeOf } from "vitest";
 import {
     castIpcResponse,
     isArray,
-    isNumber,
     isRecord,
-    isString,
     safePropertyAccess,
     validateAndConvert,
 } from "../../utils/typeHelpers";
+import { isNumber, isString } from "../../utils/typeGuards";
 
 describe("Shared Type Helpers", () => {
     describe("castIpcResponse", () => {

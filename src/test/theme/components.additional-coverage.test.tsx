@@ -179,7 +179,7 @@ describe("Theme Components - Missing Coverage", () => {
         it("should render with different status values", () => {
             const statuses = ["up", "down", "pending", "paused"] as const;
 
-            statuses.forEach((status) => {
+            for (const status of statuses) {
                 const { unmount } = render(
                     <StatusIndicator status={status} showText />
                 );
@@ -190,7 +190,7 @@ describe("Theme Components - Missing Coverage", () => {
                     status.charAt(0).toUpperCase() + status.slice(1)
                 );
                 unmount();
-            });
+            }
         });
 
         it("should show text and status together", () => {
@@ -211,7 +211,7 @@ describe("Theme Components - Missing Coverage", () => {
         it("should render with different size variants", () => {
             const sizes = ["sm", "md", "lg"] as const;
 
-            sizes.forEach((size) => {
+            for (const size of sizes) {
                 const { unmount } = render(
                     <StatusIndicator status="up" size={size} />
                 );
@@ -220,7 +220,7 @@ describe("Theme Components - Missing Coverage", () => {
                 );
                 expect(indicator).toBeInTheDocument();
                 unmount();
-            });
+            }
         });
     });
 
@@ -239,14 +239,14 @@ describe("Theme Components - Missing Coverage", () => {
         it("should render with all size variants", () => {
             const sizes = ["xs", "sm", "md", "lg"] as const;
 
-            sizes.forEach((size) => {
+            for (const size of sizes) {
                 const { unmount } = render(
                     <ThemedBadge size={size}>Test Badge</ThemedBadge>
                 );
                 const badge = document.querySelector(".themed-badge");
                 expect(badge).toBeInTheDocument();
                 unmount();
-            });
+            }
         });
 
         it("should render with all variant types", () => {
@@ -259,14 +259,14 @@ describe("Theme Components - Missing Coverage", () => {
                 "info",
             ] as const;
 
-            variants.forEach((variant) => {
+            for (const variant of variants) {
                 const { unmount } = render(
                     <ThemedBadge variant={variant}>Test Badge</ThemedBadge>
                 );
                 const badge = document.querySelector(".themed-badge");
                 expect(badge).toBeInTheDocument();
                 unmount();
-            });
+            }
         });
     });
 
@@ -274,13 +274,13 @@ describe("Theme Components - Missing Coverage", () => {
         it("should render with different types", () => {
             const types = ["text", "email", "password", "number"] as const;
 
-            types.forEach((type) => {
+            for (const type of types) {
                 const { unmount } = render(<ThemedInput type={type} />);
                 const input = document.querySelector("input");
                 expect(input).toBeInTheDocument();
                 expect(input).toHaveAttribute("type", type);
                 unmount();
-            });
+            }
         });
 
         it("should handle disabled state", () => {
@@ -306,12 +306,12 @@ describe("Theme Components - Missing Coverage", () => {
                 { disabled: true, required: false },
             ];
 
-            combinations.forEach((props) => {
+            for (const props of combinations) {
                 const { unmount } = render(<ThemedInput {...props} />);
                 const input = document.querySelector("input");
                 expect(input).toBeInTheDocument();
                 unmount();
-            });
+            }
         });
     });
 

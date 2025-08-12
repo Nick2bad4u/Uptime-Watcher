@@ -290,7 +290,7 @@ describe("Status Utilities", () => {
                 // Verify formatted string starts with the icon
                 expect(formatted).toMatch(
                     new RegExp(
-                        `^${icon.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} `
+                        `^${icon.replaceAll(/[$()*+.?[\\\]^{|}]/g, String.raw`\$&`)} `
                     )
                 );
 

@@ -55,11 +55,11 @@ describe("StatusUpdateHandler", () => {
                 type: "http",
                 status: "up",
                 monitoring: false,
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 lastChecked: new Date(),
                 responseTime: 100,
                 retryAttempts: 3,
-                timeout: 30000,
+                timeout: 30_000,
                 history: [],
                 url: `https://example-${id}.com`,
             },
@@ -100,14 +100,14 @@ describe("StatusUpdateHandler", () => {
         };
 
         // Set up window.electronAPI mock
-        if (!(window as any).electronAPI) {
-            Object.defineProperty(window, "electronAPI", {
+        if ((globalThis as any).electronAPI) {
+            (globalThis as any).electronAPI = mockElectronAPI;
+        } else {
+            Object.defineProperty(globalThis, "electronAPI", {
                 value: mockElectronAPI,
                 writable: true,
                 configurable: true,
             });
-        } else {
-            (window as any).electronAPI = mockElectronAPI;
         }
 
         // Create manager instance
@@ -446,12 +446,12 @@ describe("StatusUpdateHandler", () => {
     describe("Missing window.electronAPI", () => {
         beforeEach(() => {
             // Remove electronAPI for these tests
-            (window as any).electronAPI = undefined;
+            (globalThis as any).electronAPI = undefined;
         });
 
         afterEach(() => {
             // Restore electronAPI
-            (window as any).electronAPI = mockElectronAPI;
+            (globalThis as any).electronAPI = mockElectronAPI;
         });
 
         it("should handle missing electronAPI gracefully", () => {

@@ -12,7 +12,7 @@ import { DefaultErrorFallback } from "../../../components/error/DefaultErrorFall
 
 // Mock window.location.reload
 const mockReload = vi.fn();
-Object.defineProperty(window, "location", {
+Object.defineProperty(globalThis, "location", {
     value: {
         reload: mockReload,
     },

@@ -61,9 +61,9 @@ describe("useSiteActions Hook Coverage Tests", () => {
                 stopSiteMonitorMonitoring: vi.fn(),
             };
 
-            Object.values(sitesStore).forEach((fn) => {
+            for (const fn of Object.values(sitesStore)) {
                 expect(typeof fn).toBe("function");
-            });
+            }
 
             // Test calling the functions
             sitesStore.checkSiteNow("site-1");
@@ -464,13 +464,13 @@ describe("useSiteActions Hook Coverage Tests", () => {
                 },
             ];
 
-            actions.forEach((action) => {
+            for (const action of actions) {
                 mockLogger.user.action(action.name, action.data);
                 expect(mockLogger.user.action).toHaveBeenCalledWith(
                     action.name,
                     action.data
                 );
-            });
+            }
         });
 
         it("should log site errors correctly", () => {
@@ -501,9 +501,9 @@ describe("useSiteActions Hook Coverage Tests", () => {
                 "setShowSiteDetails",
             ];
 
-            dependencies.forEach((dep) => {
+            for (const dep of dependencies) {
                 expect(typeof dep).toBe("string");
-            });
+            }
         });
 
         it("should memoize handlers correctly", () => {

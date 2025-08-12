@@ -74,7 +74,7 @@ describe("Shared Utils Coverage", () => {
             };
 
             const normalizeCacheKey = (key: string): string => {
-                return key.toLowerCase().replace(/\s+/g, "-");
+                return key.toLowerCase().replaceAll(/\s+/g, "-");
             };
 
             const generateCacheKey = (
@@ -516,7 +516,7 @@ describe("Shared Utils Coverage", () => {
                     template: string,
                     context: Record<string, any>
                 ) => {
-                    return template.replace(/\{(\w+)\}/g, (match, key) => {
+                    return template.replaceAll(/{(\w+)}/g, (match, key) => {
                         return context[key]?.toString() || match;
                     });
                 },
@@ -556,10 +556,10 @@ describe("Shared Utils Coverage", () => {
                 },
                 truncateString: (str: string, maxLength: number): string => {
                     if (str.length <= maxLength) return str;
-                    return str.substring(0, maxLength - 3) + "...";
+                    return str.slice(0, Math.max(0, maxLength - 3)) + "...";
                 },
                 normalizeWhitespace: (str: string): string => {
-                    return str.replace(/\s+/g, " ").trim();
+                    return str.replaceAll(/\s+/g, " ").trim();
                 },
             };
 
@@ -584,7 +584,7 @@ describe("Shared Utils Coverage", () => {
                 safeStringify: (value: any): string => {
                     try {
                         return JSON.stringify(value);
-                    } catch (error) {
+                    } catch {
                         // Handle circular references and other JSON errors
                         return "[Circular Reference or Invalid JSON]";
                     }
@@ -592,7 +592,7 @@ describe("Shared Utils Coverage", () => {
                 safeParse: <T>(jsonString: string, fallback: T): T => {
                     try {
                         return JSON.parse(jsonString);
-                    } catch (error) {
+                    } catch {
                         return fallback;
                     }
                 },
@@ -620,7 +620,7 @@ describe("Shared Utils Coverage", () => {
                     if (typeof value === "number" && !isNaN(value))
                         return value;
                     if (typeof value === "string") {
-                        const parsed = parseFloat(value);
+                        const parsed = Number.parseFloat(value);
                         return isNaN(parsed) ? fallback : parsed;
                     }
                     return fallback;
@@ -641,7 +641,7 @@ describe("Shared Utils Coverage", () => {
 
             expect(conversionUtils.safeNumber("123.45")).toBe(123.45);
             expect(conversionUtils.safeNumber("invalid", 42)).toBe(42);
-            expect(conversionUtils.safeNumber(NaN, 10)).toBe(10);
+            expect(conversionUtils.safeNumber(Number.NaN, 10)).toBe(10);
             expect(conversionUtils.safeBoolean("true")).toBe(true);
             expect(conversionUtils.safeBoolean("false")).toBe(false);
             expect(conversionUtils.safeBoolean(1)).toBe(true);

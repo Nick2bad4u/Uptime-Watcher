@@ -6,7 +6,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock window.matchMedia
-Object.defineProperty(window, "matchMedia", {
+Object.defineProperty(globalThis, "matchMedia", {
     writable: true,
     value: vi.fn().mockImplementation((query) => ({
         matches: false,
@@ -21,7 +21,7 @@ Object.defineProperty(window, "matchMedia", {
 });
 
 // Mock document with body
-Object.defineProperty(global, "document", {
+Object.defineProperty(globalThis, "document", {
     value: {
         body: {
             classList: {
@@ -118,7 +118,7 @@ describe("ThemeManager", () => {
 
     describe("getSystemThemePreference", () => {
         it("should return dark when system prefers dark", () => {
-            vi.mocked(window.matchMedia).mockReturnValue({
+            vi.mocked(globalThis.matchMedia).mockReturnValue({
                 matches: true,
                 media: "(prefers-color-scheme: dark)",
                 onchange: null,
@@ -134,7 +134,7 @@ describe("ThemeManager", () => {
         });
 
         it("should return light when system prefers light", () => {
-            vi.mocked(window.matchMedia).mockReturnValue({
+            vi.mocked(globalThis.matchMedia).mockReturnValue({
                 matches: false,
                 media: "(prefers-color-scheme: dark)",
                 onchange: null,
@@ -150,15 +150,15 @@ describe("ThemeManager", () => {
         });
 
         it("should handle missing matchMedia", () => {
-            const originalMatchMedia = window.matchMedia;
+            const originalMatchMedia = globalThis.matchMedia;
             // @ts-expect-error Testing missing matchMedia
-            window.matchMedia = undefined;
+            globalThis.matchMedia = undefined;
 
             const preference = themeManager.getSystemThemePreference();
             expect(preference).toBe("light"); // default fallback
 
             // Restore matchMedia
-            window.matchMedia = originalMatchMedia;
+            globalThis.matchMedia = originalMatchMedia;
         });
     });
 
@@ -194,14 +194,14 @@ describe("ThemeManager", () => {
         });
 
         it("should handle missing document gracefully", () => {
-            const originalDocument = global.document;
-            delete (global as any).document;
+            const originalDocument = globalThis.document;
+            delete (globalThis as any).document;
 
             const lightTheme = themeManager.getTheme("light");
             expect(() => themeManager.applyTheme(lightTheme)).not.toThrow();
 
             // Restore document
-            global.document = originalDocument;
+            globalThis.document = originalDocument;
         });
 
         it("should apply all theme properties", () => {
@@ -355,14 +355,14 @@ describe("ThemeManager", () => {
         });
 
         it("should work without DOM environment", () => {
-            const originalDocument = global.document;
-            delete (global as any).document;
+            const originalDocument = globalThis.document;
+            delete (globalThis as any).document;
 
             const theme = themeManager.getTheme("light");
             expect(() => themeManager.applyTheme(theme)).not.toThrow();
 
             // Restore document
-            global.document = originalDocument;
+            globalThis.document = originalDocument;
         });
     });
 

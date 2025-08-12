@@ -25,9 +25,9 @@ describe("FormData Types", () => {
                 monitor: {
                     type: "http",
                     url: "https://example.com",
-                    checkInterval: 300000,
+                    checkInterval: 300_000,
                     retryAttempts: 3,
-                    timeout: 30000,
+                    timeout: 30_000,
                 },
             };
 
@@ -44,9 +44,9 @@ describe("FormData Types", () => {
                 monitor: {
                     type: "http",
                     url: "https://example.com",
-                    checkInterval: 300000,
+                    checkInterval: 300_000,
                     retryAttempts: 3,
-                    timeout: 30000,
+                    timeout: 30_000,
                 },
             };
 
@@ -56,9 +56,9 @@ describe("FormData Types", () => {
                 monitor: {
                     type: "ping",
                     host: "example.com",
-                    checkInterval: 300000,
+                    checkInterval: 300_000,
                     retryAttempts: 3,
-                    timeout: 30000,
+                    timeout: 30_000,
                 },
             };
 
@@ -74,9 +74,9 @@ describe("FormData Types", () => {
                     type: "port",
                     host: "example.com",
                     port: 80,
-                    checkInterval: 300000,
+                    checkInterval: 300_000,
                     retryAttempts: 3,
-                    timeout: 30000,
+                    timeout: 30_000,
                 },
             };
 
@@ -91,15 +91,15 @@ describe("FormData Types", () => {
             const validHttpFormData: HttpFormData = {
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 300000,
-                timeout: 30000,
+                checkInterval: 300_000,
+                timeout: 30_000,
                 retryAttempts: 3,
             };
 
             expect(validHttpFormData.type).toBe("http");
             expect(validHttpFormData.url).toBe("https://example.com");
-            expect(validHttpFormData.checkInterval).toBe(300000);
-            expect(validHttpFormData.timeout).toBe(30000);
+            expect(validHttpFormData.checkInterval).toBe(300_000);
+            expect(validHttpFormData.timeout).toBe(30_000);
             expect(validHttpFormData.retryAttempts).toBe(3);
         });
 
@@ -107,8 +107,8 @@ describe("FormData Types", () => {
             const httpWithOptions: HttpFormData = {
                 type: "http",
                 url: "https://api.example.com",
-                checkInterval: 300000,
-                timeout: 30000,
+                checkInterval: 300_000,
+                timeout: 30_000,
                 retryAttempts: 3,
                 method: "POST",
                 expectedStatusCode: 201,
@@ -138,15 +138,15 @@ describe("FormData Types", () => {
             const validPingFormData: PingFormData = {
                 type: "ping",
                 host: "example.com",
-                checkInterval: 300000,
-                timeout: 30000,
+                checkInterval: 300_000,
+                timeout: 30_000,
                 retryAttempts: 3,
             };
 
             expect(validPingFormData.type).toBe("ping");
             expect(validPingFormData.host).toBe("example.com");
-            expect(validPingFormData.checkInterval).toBe(300000);
-            expect(validPingFormData.timeout).toBe(30000);
+            expect(validPingFormData.checkInterval).toBe(300_000);
+            expect(validPingFormData.timeout).toBe(30_000);
             expect(validPingFormData.retryAttempts).toBe(3);
         });
 
@@ -154,8 +154,8 @@ describe("FormData Types", () => {
             const pingWithOptions: PingFormData = {
                 type: "ping",
                 host: "192.168.1.1",
-                checkInterval: 60000,
-                timeout: 10000,
+                checkInterval: 60_000,
+                timeout: 10_000,
                 retryAttempts: 2,
                 packetCount: 5,
                 packetSize: 64,
@@ -171,8 +171,8 @@ describe("FormData Types", () => {
             const pingFormData: PingFormData = {
                 type: "ping",
                 host: "test.com",
-                checkInterval: 120000,
-                timeout: 15000,
+                checkInterval: 120_000,
+                timeout: 15_000,
                 retryAttempts: 1,
                 packetCount: 4,
                 packetSize: 32,
@@ -191,16 +191,16 @@ describe("FormData Types", () => {
                 type: "port",
                 host: "example.com",
                 port: 80,
-                checkInterval: 300000,
-                timeout: 30000,
+                checkInterval: 300_000,
+                timeout: 30_000,
                 retryAttempts: 3,
             };
 
             expect(validPortFormData.type).toBe("port");
             expect(validPortFormData.host).toBe("example.com");
             expect(validPortFormData.port).toBe(80);
-            expect(validPortFormData.checkInterval).toBe(300000);
-            expect(validPortFormData.timeout).toBe(30000);
+            expect(validPortFormData.checkInterval).toBe(300_000);
+            expect(validPortFormData.timeout).toBe(30_000);
             expect(validPortFormData.retryAttempts).toBe(3);
         });
 
@@ -209,8 +209,8 @@ describe("FormData Types", () => {
                 type: "port",
                 host: "192.168.1.1",
                 port: 443,
-                checkInterval: 60000,
-                timeout: 10000,
+                checkInterval: 60_000,
+                timeout: 10_000,
                 retryAttempts: 2,
                 connectionTimeout: 5000,
             };
@@ -229,21 +229,21 @@ describe("FormData Types", () => {
                 5432,
             ];
 
-            commonPorts.forEach((port) => {
+            for (const port of commonPorts) {
                 const portData: PortFormData = {
                     type: "port",
                     host: "example.com",
                     port,
-                    checkInterval: 300000,
-                    timeout: 30000,
+                    checkInterval: 300_000,
+                    timeout: 30_000,
                     retryAttempts: 3,
                 };
 
                 expect(portData.port).toBe(port);
                 expect(typeof portData.port).toBe("number");
                 expect(portData.port).toBeGreaterThan(0);
-                expect(portData.port).toBeLessThanOrEqual(65535);
-            });
+                expect(portData.port).toBeLessThanOrEqual(65_535);
+            }
         });
     });
 
@@ -252,16 +252,16 @@ describe("FormData Types", () => {
             const httpData: HttpFormData = {
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 300000,
-                timeout: 30000,
+                checkInterval: 300_000,
+                timeout: 30_000,
                 retryAttempts: 3,
             };
 
             const pingData: PingFormData = {
                 type: "ping",
                 host: "example.com",
-                checkInterval: 300000,
-                timeout: 30000,
+                checkInterval: 300_000,
+                timeout: 30_000,
                 retryAttempts: 3,
             };
 
@@ -269,18 +269,18 @@ describe("FormData Types", () => {
                 type: "port",
                 host: "example.com",
                 port: 80,
-                checkInterval: 300000,
-                timeout: 30000,
+                checkInterval: 300_000,
+                timeout: 30_000,
                 retryAttempts: 3,
             };
 
             // All types should have base properties
-            [httpData, pingData, portData].forEach((data) => {
+            for (const data of [httpData, pingData, portData]) {
                 expect(data).toHaveProperty("checkInterval");
                 expect(data).toHaveProperty("timeout");
                 expect(data).toHaveProperty("retryAttempts");
                 expect(data).toHaveProperty("type");
-            });
+            }
         });
     });
 
@@ -289,16 +289,16 @@ describe("FormData Types", () => {
             const httpMonitor: MonitorFormData = {
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 300000,
-                timeout: 30000,
+                checkInterval: 300_000,
+                timeout: 30_000,
                 retryAttempts: 3,
             };
 
             const pingMonitor: MonitorFormData = {
                 type: "ping",
                 host: "example.com",
-                checkInterval: 300000,
-                timeout: 30000,
+                checkInterval: 300_000,
+                timeout: 30_000,
                 retryAttempts: 3,
             };
 
@@ -306,8 +306,8 @@ describe("FormData Types", () => {
                 type: "port",
                 host: "example.com",
                 port: 80,
-                checkInterval: 300000,
-                timeout: 30000,
+                checkInterval: 300_000,
+                timeout: 30_000,
                 retryAttempts: 3,
             };
 
@@ -322,16 +322,16 @@ describe("FormData Types", () => {
             const httpData: MonitorFormData = {
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 300000,
-                timeout: 30000,
+                checkInterval: 300_000,
+                timeout: 30_000,
                 retryAttempts: 3,
             };
 
             const pingData: MonitorFormData = {
                 type: "ping",
                 host: "example.com",
-                checkInterval: 300000,
-                timeout: 30000,
+                checkInterval: 300_000,
+                timeout: 30_000,
                 retryAttempts: 3,
             };
 
@@ -347,8 +347,8 @@ describe("FormData Types", () => {
             const pingData: MonitorFormData = {
                 type: "ping",
                 host: "example.com",
-                checkInterval: 300000,
-                timeout: 30000,
+                checkInterval: 300_000,
+                timeout: 30_000,
                 retryAttempts: 3,
             };
 
@@ -356,8 +356,8 @@ describe("FormData Types", () => {
                 type: "port",
                 host: "example.com",
                 port: 80,
-                checkInterval: 300000,
-                timeout: 30000,
+                checkInterval: 300_000,
+                timeout: 30_000,
                 retryAttempts: 3,
             };
 
@@ -374,16 +374,16 @@ describe("FormData Types", () => {
                 type: "port",
                 host: "example.com",
                 port: 80,
-                checkInterval: 300000,
-                timeout: 30000,
+                checkInterval: 300_000,
+                timeout: 30_000,
                 retryAttempts: 3,
             };
 
             const httpData: MonitorFormData = {
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 300000,
-                timeout: 30000,
+                checkInterval: 300_000,
+                timeout: 30_000,
                 retryAttempts: 3,
             };
 
@@ -401,8 +401,8 @@ describe("FormData Types", () => {
             const httpDefaults = DEFAULT_FORM_DATA.http;
 
             expect(httpDefaults.type).toBe("http");
-            expect(httpDefaults.checkInterval).toBe(300000);
-            expect(httpDefaults.timeout).toBe(30000);
+            expect(httpDefaults.checkInterval).toBe(300_000);
+            expect(httpDefaults.timeout).toBe(30_000);
             expect(httpDefaults.retryAttempts).toBe(3);
             expect(httpDefaults.enabled).toBe(true);
             expect(httpDefaults.method).toBe("GET");
@@ -414,8 +414,8 @@ describe("FormData Types", () => {
             const pingDefaults = DEFAULT_FORM_DATA.ping;
 
             expect(pingDefaults.type).toBe("ping");
-            expect(pingDefaults.checkInterval).toBe(300000);
-            expect(pingDefaults.timeout).toBe(30000);
+            expect(pingDefaults.checkInterval).toBe(300_000);
+            expect(pingDefaults.timeout).toBe(30_000);
             expect(pingDefaults.retryAttempts).toBe(3);
             expect(pingDefaults.enabled).toBe(true);
             expect(pingDefaults.packetCount).toBe(4);
@@ -427,12 +427,12 @@ describe("FormData Types", () => {
             const portDefaults = DEFAULT_FORM_DATA.port;
 
             expect(portDefaults.type).toBe("port");
-            expect(portDefaults.checkInterval).toBe(300000);
-            expect(portDefaults.timeout).toBe(30000);
+            expect(portDefaults.checkInterval).toBe(300_000);
+            expect(portDefaults.timeout).toBe(30_000);
             expect(portDefaults.retryAttempts).toBe(3);
             expect(portDefaults.enabled).toBe(true);
             expect(portDefaults.port).toBe(80);
-            expect(portDefaults.connectionTimeout).toBe(10000);
+            expect(portDefaults.connectionTimeout).toBe(10_000);
         });
 
         it("should have consistent default intervals across types", () => {
@@ -457,8 +457,8 @@ describe("FormData Types", () => {
                     monitor: {
                         type: "http",
                         url: "https://newsite.com",
-                        checkInterval: 300000,
-                        timeout: 30000,
+                        checkInterval: 300_000,
+                        timeout: 30_000,
                         retryAttempts: 3,
                     },
                 },
@@ -479,8 +479,8 @@ describe("FormData Types", () => {
                     monitor: {
                         type: "ping",
                         host: "existing.com",
-                        checkInterval: 300000,
-                        timeout: 30000,
+                        checkInterval: 300_000,
+                        timeout: 30_000,
                         retryAttempts: 3,
                     },
                 },
@@ -510,12 +510,12 @@ describe("FormData Types", () => {
                 fieldName: "checkInterval",
                 fieldType: "number",
                 required: true,
-                min: 60000,
-                max: 3600000,
+                min: 60_000,
+                max: 3_600_000,
                 validator: (value) => {
                     if (typeof value !== "number") return "Must be a number";
-                    if (value < 60000) return "Minimum interval is 60 seconds";
-                    if (value > 3600000) return "Maximum interval is 1 hour";
+                    if (value < 60_000) return "Minimum interval is 60 seconds";
+                    if (value > 3_600_000) return "Maximum interval is 1 hour";
                     return null;
                 },
             };
@@ -523,8 +523,8 @@ describe("FormData Types", () => {
             expect(validation.fieldName).toBe("checkInterval");
             expect(validation.fieldType).toBe("number");
             expect(validation.required).toBe(true);
-            expect(validation.min).toBe(60000);
-            expect(validation.max).toBe(3600000);
+            expect(validation.min).toBe(60_000);
+            expect(validation.max).toBe(3_600_000);
             expect(typeof validation.validator).toBe("function");
         });
 
@@ -547,7 +547,7 @@ describe("FormData Types", () => {
                 fieldType: "port",
                 required: true,
                 min: 1,
-                max: 65535,
+                max: 65_535,
             };
 
             expect(urlValidation.fieldType).toBe("url");
@@ -564,8 +564,8 @@ describe("FormData Types", () => {
                 monitor: {
                     type: "http",
                     url: "https://typescript.test",
-                    checkInterval: 300000,
-                    timeout: 30000,
+                    checkInterval: 300_000,
+                    timeout: 30_000,
                     retryAttempts: 3,
                 },
             };
@@ -581,46 +581,50 @@ describe("FormData Types", () => {
                 {
                     type: "http",
                     url: "https://example.com",
-                    checkInterval: 300000,
-                    timeout: 30000,
+                    checkInterval: 300_000,
+                    timeout: 30_000,
                     retryAttempts: 3,
                 },
                 {
                     type: "ping",
                     host: "example.com",
-                    checkInterval: 300000,
-                    timeout: 30000,
+                    checkInterval: 300_000,
+                    timeout: 30_000,
                     retryAttempts: 3,
                 },
                 {
                     type: "port",
                     host: "example.com",
                     port: 80,
-                    checkInterval: 300000,
-                    timeout: 30000,
+                    checkInterval: 300_000,
+                    timeout: 30_000,
                     retryAttempts: 3,
                 },
             ];
 
-            monitors.forEach((monitor) => {
+            for (const monitor of monitors) {
                 switch (monitor.type) {
-                    case "http":
+                    case "http": {
                         expect(monitor.url).toBeDefined();
                         break;
-                    case "ping":
+                    }
+                    case "ping": {
                         expect(monitor.host).toBeDefined();
                         break;
-                    case "port":
+                    }
+                    case "port": {
                         expect(monitor.port).toBeDefined();
                         break;
-                    default:
+                    }
+                    default: {
                         // TypeScript should catch this at compile time
                         const _exhaustive: never = monitor;
                         throw new Error(
                             `Unhandled monitor type: ${_exhaustive}`
                         );
+                    }
                 }
-            });
+            }
         });
     });
 });

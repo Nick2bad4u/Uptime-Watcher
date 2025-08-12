@@ -43,13 +43,13 @@ describe("Settings Component Coverage Tests", () => {
                 "notAllowed",
             ];
 
-            validKeys.forEach((key) => {
+            for (const key of validKeys) {
                 expect(ALLOWED_SETTINGS_KEYS.has(key as any)).toBe(true);
-            });
+            }
 
-            invalidKeys.forEach((key) => {
+            for (const key of invalidKeys) {
                 expect(ALLOWED_SETTINGS_KEYS.has(key as any)).toBe(false);
-            });
+            }
         });
     });
 
@@ -218,11 +218,11 @@ describe("Settings Component Coverage Tests", () => {
                 { key: "notifications", value: false, type: "boolean" },
             ];
 
-            testValues.forEach(({ key, value, type }) => {
+            for (const { key, value, type } of testValues) {
                 // Using key for test validation
                 expect(key).toBeTruthy();
                 expect(typeof value).toBe(type);
-            });
+            }
         });
     });
 
@@ -245,10 +245,10 @@ describe("Settings Component Coverage Tests", () => {
                 true
             );
 
-            HISTORY_LIMIT_OPTIONS.forEach((limit) => {
+            for (const limit of HISTORY_LIMIT_OPTIONS) {
                 expect(typeof limit).toBe("number");
                 expect(limit).toBeGreaterThan(0);
-            });
+            }
         });
 
         it("should validate safe integer conversion", () => {
@@ -258,7 +258,7 @@ describe("Settings Component Coverage Tests", () => {
                 max: number,
                 defaultValue: number
             ) => {
-                const num = parseInt(value, 10);
+                const num = Number.parseInt(value, 10);
                 if (isNaN(num)) return defaultValue;
                 if (num < min) return min;
                 if (num > max) return max;
@@ -290,12 +290,11 @@ describe("Settings Component Coverage Tests", () => {
                 }, // Invalid
             ];
 
-            testCases.forEach(
-                ({ input, min, max, default: defaultValue, expected }) => {
+            for (const { input, min, max, default: defaultValue, expected } of testCases) {
                     const result = safeInteger(input, min, max, defaultValue);
                     expect(result).toBe(expected);
                 }
-            );
+            
         });
     });
 
@@ -303,20 +302,20 @@ describe("Settings Component Coverage Tests", () => {
         it("should handle theme names", () => {
             const themeNames = ["light", "dark", "system"];
 
-            themeNames.forEach((theme) => {
+            for (const theme of themeNames) {
                 expect(typeof theme).toBe("string");
                 expect(["light", "dark", "system"].includes(theme)).toBe(true);
-            });
+            }
         });
 
         it("should handle theme selection", () => {
             const setTheme = vi.fn();
 
             const themes = ["light", "dark", "system"];
-            themes.forEach((theme) => {
+            for (const theme of themes) {
                 setTheme(theme);
                 expect(setTheme).toHaveBeenCalledWith(theme);
-            });
+            }
         });
     });
 
@@ -483,10 +482,10 @@ describe("Settings Component Coverage Tests", () => {
             expect(Array.isArray(features)).toBe(true);
             expect(features.length).toBe(9);
 
-            features.forEach((feature) => {
+            for (const feature of features) {
                 expect(typeof feature).toBe("string");
                 expect(feature.length).toBeGreaterThan(0);
-            });
+            }
         });
     });
 
@@ -501,13 +500,13 @@ describe("Settings Component Coverage Tests", () => {
                 "ThemedText",
             ];
 
-            themedComponents.forEach((component) => {
+            for (const component of themedComponents) {
                 expect(typeof component).toBe("string");
                 expect(
                     component.startsWith("Themed") ||
                         component === "StatusIndicator"
                 ).toBe(true);
-            });
+            }
         });
     });
 
@@ -530,10 +529,10 @@ describe("Settings Component Coverage Tests", () => {
                 { key: "autoStart", value: true },
             ];
 
-            settingChanges.forEach(({ key, value }) => {
+            for (const { key, value } of settingChanges) {
                 updateSettings({ [key]: value });
                 expect(updateSettings).toHaveBeenCalledWith({ [key]: value });
-            });
+            }
         });
     });
 
@@ -541,7 +540,7 @@ describe("Settings Component Coverage Tests", () => {
         it("should validate safeInteger utility", () => {
             // Mock implementation of safeInteger since we can't import it directly
             const mockSafeInteger = (input: string, options: any = {}) => {
-                const num = parseInt(input, 10);
+                const num = Number.parseInt(input, 10);
                 if (isNaN(num)) return options.default || 0;
                 return num;
             };
@@ -563,9 +562,9 @@ describe("Settings Component Coverage Tests", () => {
                 validation: true,
             };
 
-            Object.values(architectureElements).forEach((element) => {
+            for (const element of Object.values(architectureElements)) {
                 expect(element).toBe(true);
-            });
+            }
         });
     });
 });

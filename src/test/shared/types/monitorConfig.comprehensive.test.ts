@@ -66,8 +66,8 @@ describe("Monitor Configuration Types", () => {
                 performanceThresholds: {
                     responseTimeCritical: 5000,
                     responseTimeWarning: 2000,
-                    uptimeCritical: 95.0,
-                    uptimeWarning: 98.0,
+                    uptimeCritical: 95,
+                    uptimeWarning: 98,
                 },
             };
 
@@ -77,8 +77,8 @@ describe("Monitor Configuration Types", () => {
             expect(config.performanceThresholds?.responseTimeWarning).toBe(
                 2000
             );
-            expect(config.performanceThresholds?.uptimeCritical).toBe(95.0);
-            expect(config.performanceThresholds?.uptimeWarning).toBe(98.0);
+            expect(config.performanceThresholds?.uptimeCritical).toBe(95);
+            expect(config.performanceThresholds?.uptimeWarning).toBe(98);
         });
 
         it("should define proper scheduling configuration", () => {
@@ -127,32 +127,32 @@ describe("Monitor Configuration Types", () => {
     describe("BaseMonitorConfig", () => {
         it("should define proper base structure", () => {
             const config: BaseMonitorConfig = {
-                checkInterval: 300000,
+                checkInterval: 300_000,
                 enabled: true,
                 id: "monitor-123",
                 name: "Test Monitor",
                 retryAttempts: 3,
-                timeout: 30000,
+                timeout: 30_000,
                 type: "http",
             };
 
-            expect(config.checkInterval).toBe(300000);
+            expect(config.checkInterval).toBe(300_000);
             expect(config.enabled).toBe(true);
             expect(config.id).toBe("monitor-123");
             expect(config.name).toBe("Test Monitor");
             expect(config.retryAttempts).toBe(3);
-            expect(config.timeout).toBe(30000);
+            expect(config.timeout).toBe(30_000);
             expect(config.type).toBe("http");
         });
 
         it("should be extended by specific monitor types", () => {
             const httpConfig: HttpMonitorConfig = {
-                checkInterval: 300000,
+                checkInterval: 300_000,
                 enabled: true,
                 id: "http-monitor",
                 name: "HTTP Test",
                 retryAttempts: 3,
-                timeout: 30000,
+                timeout: 30_000,
                 type: "http",
                 url: "https://example.com",
                 expectedStatusCodes: [200],
@@ -174,12 +174,12 @@ describe("Monitor Configuration Types", () => {
     describe("HttpMonitorConfig", () => {
         it("should define proper HTTP structure", () => {
             const config: HttpMonitorConfig = {
-                checkInterval: 300000,
+                checkInterval: 300_000,
                 enabled: true,
                 id: "http-1",
                 name: "HTTP Monitor",
                 retryAttempts: 3,
-                timeout: 30000,
+                timeout: 30_000,
                 type: "http",
                 url: "https://example.com",
                 expectedStatusCodes: [200, 201],
@@ -196,12 +196,12 @@ describe("Monitor Configuration Types", () => {
 
         it("should support authentication configuration", () => {
             const config: HttpMonitorConfig = {
-                checkInterval: 300000,
+                checkInterval: 300_000,
                 enabled: true,
                 id: "http-auth",
                 name: "Authenticated HTTP Monitor",
                 retryAttempts: 3,
-                timeout: 30000,
+                timeout: 30_000,
                 type: "http",
                 url: "https://api.example.com",
                 expectedStatusCodes: [200],
@@ -221,12 +221,12 @@ describe("Monitor Configuration Types", () => {
 
         it("should support certificate configuration", () => {
             const config: HttpMonitorConfig = {
-                checkInterval: 300000,
+                checkInterval: 300_000,
                 enabled: true,
                 id: "http-cert",
                 name: "Certificate HTTP Monitor",
                 retryAttempts: 3,
-                timeout: 30000,
+                timeout: 30_000,
                 type: "http",
                 url: "https://secure.example.com",
                 expectedStatusCodes: [200],
@@ -248,12 +248,12 @@ describe("Monitor Configuration Types", () => {
 
         it("should support expected content patterns", () => {
             const config: HttpMonitorConfig = {
-                checkInterval: 300000,
+                checkInterval: 300_000,
                 enabled: true,
                 id: "http-content",
                 name: "Content HTTP Monitor",
                 retryAttempts: 3,
-                timeout: 30000,
+                timeout: 30_000,
                 type: "http",
                 url: "https://example.com",
                 expectedStatusCodes: [200],
@@ -282,12 +282,12 @@ describe("Monitor Configuration Types", () => {
 
         it("should support custom headers and request body", () => {
             const config: HttpMonitorConfig = {
-                checkInterval: 300000,
+                checkInterval: 300_000,
                 enabled: true,
                 id: "http-custom",
                 name: "Custom HTTP Monitor",
                 retryAttempts: 3,
-                timeout: 30000,
+                timeout: 30_000,
                 type: "http",
                 url: "https://api.example.com",
                 expectedStatusCodes: [201],
@@ -315,12 +315,12 @@ describe("Monitor Configuration Types", () => {
     describe("PingMonitorConfig", () => {
         it("should define proper ping structure", () => {
             const config: PingMonitorConfig = {
-                checkInterval: 300000,
+                checkInterval: 300_000,
                 enabled: true,
                 id: "ping-1",
                 name: "Ping Monitor",
                 retryAttempts: 3,
-                timeout: 30000,
+                timeout: 30_000,
                 type: "ping",
                 host: "example.com",
                 maxPacketLoss: 5,
@@ -337,12 +337,12 @@ describe("Monitor Configuration Types", () => {
 
         it("should support IP version and RTT configuration", () => {
             const config: PingMonitorConfig = {
-                checkInterval: 300000,
+                checkInterval: 300_000,
                 enabled: true,
                 id: "ping-ipv6",
                 name: "IPv6 Ping Monitor",
                 retryAttempts: 3,
-                timeout: 30000,
+                timeout: 30_000,
                 type: "ping",
                 host: "2001:db8::1",
                 maxPacketLoss: 0,
@@ -360,36 +360,36 @@ describe("Monitor Configuration Types", () => {
     describe("PortMonitorConfig", () => {
         it("should define proper port structure", () => {
             const config: PortMonitorConfig = {
-                checkInterval: 300000,
+                checkInterval: 300_000,
                 enabled: true,
                 id: "port-1",
                 name: "Port Monitor",
                 retryAttempts: 3,
-                timeout: 30000,
+                timeout: 30_000,
                 type: "port",
                 host: "example.com",
                 port: 80,
-                connectionTimeout: 10000,
+                connectionTimeout: 10_000,
             };
 
             expect(config.type).toBe("port");
             expect(config.host).toBe("example.com");
             expect(config.port).toBe(80);
-            expect(config.connectionTimeout).toBe(10000);
+            expect(config.connectionTimeout).toBe(10_000);
         });
 
         it("should support IP version and protocol configuration", () => {
             const config: PortMonitorConfig = {
-                checkInterval: 300000,
+                checkInterval: 300_000,
                 enabled: true,
                 id: "port-ssl",
                 name: "SSL Port Monitor",
                 retryAttempts: 3,
-                timeout: 30000,
+                timeout: 30_000,
                 type: "port",
                 host: "secure.example.com",
                 port: 443,
-                connectionTimeout: 15000,
+                connectionTimeout: 15_000,
                 ipVersion: "ipv4",
                 protocol: {
                     useTls: true,
@@ -412,12 +412,12 @@ describe("Monitor Configuration Types", () => {
         it("should accept all monitor types", () => {
             const configs: MonitorConfig[] = [
                 {
-                    checkInterval: 300000,
+                    checkInterval: 300_000,
                     enabled: true,
                     id: "http-1",
                     name: "HTTP",
                     retryAttempts: 3,
-                    timeout: 30000,
+                    timeout: 30_000,
                     type: "http",
                     url: "https://example.com",
                     expectedStatusCodes: [200],
@@ -425,12 +425,12 @@ describe("Monitor Configuration Types", () => {
                     method: "GET",
                 },
                 {
-                    checkInterval: 300000,
+                    checkInterval: 300_000,
                     enabled: true,
                     id: "ping-1",
                     name: "Ping",
                     retryAttempts: 3,
-                    timeout: 30000,
+                    timeout: 30_000,
                     type: "ping",
                     host: "example.com",
                     maxPacketLoss: 0,
@@ -438,16 +438,16 @@ describe("Monitor Configuration Types", () => {
                     packetSize: 32,
                 },
                 {
-                    checkInterval: 300000,
+                    checkInterval: 300_000,
                     enabled: true,
                     id: "port-1",
                     name: "Port",
                     retryAttempts: 3,
-                    timeout: 30000,
+                    timeout: 30_000,
                     type: "port",
                     host: "example.com",
                     port: 80,
-                    connectionTimeout: 10000,
+                    connectionTimeout: 10_000,
                 },
             ];
 
@@ -471,7 +471,7 @@ describe("Monitor Configuration Types", () => {
                     method: "GET",
                     expectedStatusCodes: [200],
                     followRedirects: true,
-                    timeout: 30000,
+                    timeout: 30_000,
                 },
             };
 
@@ -504,12 +504,12 @@ describe("Monitor Configuration Types", () => {
 
     describe("Type Guards", () => {
         const httpConfig: MonitorConfig = {
-            checkInterval: 300000,
+            checkInterval: 300_000,
             enabled: true,
             id: "http-1",
             name: "HTTP",
             retryAttempts: 3,
-            timeout: 30000,
+            timeout: 30_000,
             type: "http",
             url: "https://example.com",
             expectedStatusCodes: [200],
@@ -518,12 +518,12 @@ describe("Monitor Configuration Types", () => {
         };
 
         const pingConfig: MonitorConfig = {
-            checkInterval: 300000,
+            checkInterval: 300_000,
             enabled: true,
             id: "ping-1",
             name: "Ping",
             retryAttempts: 3,
-            timeout: 30000,
+            timeout: 30_000,
             type: "ping",
             host: "example.com",
             maxPacketLoss: 0,
@@ -532,16 +532,16 @@ describe("Monitor Configuration Types", () => {
         };
 
         const portConfig: MonitorConfig = {
-            checkInterval: 300000,
+            checkInterval: 300_000,
             enabled: true,
             id: "port-1",
             name: "Port",
             retryAttempts: 3,
-            timeout: 30000,
+            timeout: 30_000,
             type: "port",
             host: "example.com",
             port: 80,
-            connectionTimeout: 10000,
+            connectionTimeout: 10_000,
         };
 
         it("should correctly identify HTTP configurations", () => {
@@ -588,37 +588,37 @@ describe("Monitor Configuration Types", () => {
             const defaults = DEFAULT_MONITOR_CONFIG.http;
 
             expect(defaults.type).toBe("http");
-            expect(defaults.checkInterval).toBe(300000);
+            expect(defaults.checkInterval).toBe(300_000);
             expect(defaults.enabled).toBe(true);
             expect(defaults.expectedStatusCodes).toEqual([200]);
             expect(defaults.followRedirects).toBe(true);
             expect(defaults.method).toBe("GET");
             expect(defaults.retryAttempts).toBe(3);
-            expect(defaults.timeout).toBe(30000);
+            expect(defaults.timeout).toBe(30_000);
         });
 
         it("should provide ping defaults", () => {
             const defaults = DEFAULT_MONITOR_CONFIG.ping;
 
             expect(defaults.type).toBe("ping");
-            expect(defaults.checkInterval).toBe(300000);
+            expect(defaults.checkInterval).toBe(300_000);
             expect(defaults.enabled).toBe(true);
             expect(defaults.maxPacketLoss).toBe(0);
             expect(defaults.packetCount).toBe(4);
             expect(defaults.packetSize).toBe(32);
             expect(defaults.retryAttempts).toBe(3);
-            expect(defaults.timeout).toBe(30000);
+            expect(defaults.timeout).toBe(30_000);
         });
 
         it("should provide port defaults", () => {
             const defaults = DEFAULT_MONITOR_CONFIG.port;
 
             expect(defaults.type).toBe("port");
-            expect(defaults.checkInterval).toBe(300000);
-            expect(defaults.connectionTimeout).toBe(10000);
+            expect(defaults.checkInterval).toBe(300_000);
+            expect(defaults.connectionTimeout).toBe(10_000);
             expect(defaults.enabled).toBe(true);
             expect(defaults.retryAttempts).toBe(3);
-            expect(defaults.timeout).toBe(30000);
+            expect(defaults.timeout).toBe(30_000);
         });
 
         it("should have consistent default intervals across types", () => {
@@ -628,7 +628,7 @@ describe("Monitor Configuration Types", () => {
 
             expect(httpInterval).toBe(pingInterval);
             expect(pingInterval).toBe(portInterval);
-            expect(httpInterval).toBe(300000); // 5 minutes
+            expect(httpInterval).toBe(300_000); // 5 minutes
         });
 
         it("should have consistent timeout values", () => {
@@ -638,7 +638,7 @@ describe("Monitor Configuration Types", () => {
 
             expect(httpTimeout).toBe(pingTimeout);
             expect(pingTimeout).toBe(portTimeout);
-            expect(httpTimeout).toBe(30000); // 30 seconds
+            expect(httpTimeout).toBe(30_000); // 30 seconds
         });
 
         it("should have consistent retry attempts", () => {
@@ -656,12 +656,12 @@ describe("Monitor Configuration Types", () => {
         it("should enforce strict typing", () => {
             // This test ensures TypeScript compilation catches type errors
             const config: HttpMonitorConfig = {
-                checkInterval: 300000,
+                checkInterval: 300_000,
                 enabled: true,
                 id: "test",
                 name: "Test",
                 retryAttempts: 3,
-                timeout: 30000,
+                timeout: 30_000,
                 type: "http", // Must be exactly 'http'
                 url: "https://example.com",
                 expectedStatusCodes: [200],
@@ -680,24 +680,28 @@ describe("Monitor Configuration Types", () => {
             ];
 
             // Each config should be properly typed based on its type field
-            configs.forEach((config) => {
+            for (const config of configs) {
                 switch (config.type) {
-                    case "http":
+                    case "http": {
                         expect(isHttpMonitorConfig(config)).toBe(true);
                         break;
-                    case "ping":
+                    }
+                    case "ping": {
                         expect(isPingMonitorConfig(config)).toBe(true);
                         break;
-                    case "port":
+                    }
+                    case "port": {
                         expect(isPortMonitorConfig(config)).toBe(true);
                         break;
-                    default:
+                    }
+                    default: {
                         // This should never happen with proper typing
                         fail(
                             `Unexpected monitor type: ${(config as any).type}`
                         );
+                    }
                 }
-            });
+            }
         });
     });
 });

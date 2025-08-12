@@ -10,7 +10,7 @@ describe("UUID Generation", () => {
     describe("with crypto.randomUUID available", () => {
         beforeEach(() => {
             // Mock crypto.randomUUID
-            Object.defineProperty(global, "crypto", {
+            Object.defineProperty(globalThis, "crypto", {
                 configurable: true,
                 value: {
                     randomUUID: vi.fn(
@@ -32,7 +32,7 @@ describe("UUID Generation", () => {
 
             // UUID v4 format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
             expect(uuid).toMatch(
-                /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+                /^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/i
             );
         });
     });
@@ -49,7 +49,7 @@ describe("UUID Generation", () => {
                 randomUUID: vi.fn(
                     () =>
                         "mock-uuid-" +
-                        Math.random().toString(36).substring(2, 15)
+                        Math.random().toString(36).slice(2, 15)
                 ),
                 getRandomValues: vi.fn((arr) => {
                     for (let i = 0; i < arr.length; i++) {
@@ -63,7 +63,7 @@ describe("UUID Generation", () => {
         it("should use fallback implementation when crypto is undefined", () => {
             const uuid = generateUuid();
 
-            expect(uuid).toMatch(/^site-[a-z0-9]+-\d+$/);
+            expect(uuid).toMatch(/^site-[\da-z]+-\d+$/);
         });
 
         it("should include timestamp in fallback", () => {
@@ -75,7 +75,7 @@ describe("UUID Generation", () => {
             expect(timestampMatch).toBeTruthy();
 
             if (timestampMatch) {
-                const timestamp = parseInt(timestampMatch[1] ?? "");
+                const timestamp = Number.parseInt(timestampMatch[1] ?? "");
                 expect(timestamp).toBeGreaterThanOrEqual(beforeTime);
                 expect(timestamp).toBeLessThanOrEqual(afterTime);
             }
@@ -109,7 +109,7 @@ describe("UUID Generation", () => {
                 randomUUID: vi.fn(
                     () =>
                         "mock-uuid-" +
-                        Math.random().toString(36).substring(2, 15)
+                        Math.random().toString(36).slice(2, 15)
                 ),
                 getRandomValues: vi.fn((arr) => {
                     for (let i = 0; i < arr.length; i++) {
@@ -123,7 +123,7 @@ describe("UUID Generation", () => {
         it("should use fallback when randomUUID method is not available", () => {
             const uuid = generateUuid();
 
-            expect(uuid).toMatch(/^site-[a-z0-9]+-\d+$/);
+            expect(uuid).toMatch(/^site-[\da-z]+-\d+$/);
         });
     });
 
@@ -144,7 +144,7 @@ describe("UUID Generation", () => {
                 randomUUID: vi.fn(
                     () =>
                         "mock-uuid-" +
-                        Math.random().toString(36).substring(2, 15)
+                        Math.random().toString(36).slice(2, 15)
                 ),
                 getRandomValues: vi.fn((arr) => {
                     for (let i = 0; i < arr.length; i++) {
@@ -159,7 +159,7 @@ describe("UUID Generation", () => {
             const uuid = generateUuid();
 
             expect(crypto.randomUUID).toHaveBeenCalled();
-            expect(uuid).toMatch(/^site-[a-z0-9]+-\d+$/);
+            expect(uuid).toMatch(/^site-[\da-z]+-\d+$/);
         });
 
         it("should handle multiple calls when randomUUID throws", () => {
@@ -167,8 +167,8 @@ describe("UUID Generation", () => {
             const uuid2 = generateUuid();
 
             expect(crypto.randomUUID).toHaveBeenCalledTimes(2);
-            expect(uuid1).toMatch(/^site-[a-z0-9]+-\d+$/);
-            expect(uuid2).toMatch(/^site-[a-z0-9]+-\d+$/);
+            expect(uuid1).toMatch(/^site-[\da-z]+-\d+$/);
+            expect(uuid2).toMatch(/^site-[\da-z]+-\d+$/);
             expect(uuid1).not.toBe(uuid2);
         });
 
@@ -192,7 +192,7 @@ describe("UUID Generation", () => {
                 });
 
                 const uuid = generateUuid();
-                expect(uuid).toMatch(/^site-[a-z0-9]+-\d+$/);
+                expect(uuid).toMatch(/^site-[\da-z]+-\d+$/);
             }
         });
     });
@@ -212,7 +212,7 @@ describe("UUID Generation", () => {
                 randomUUID: vi.fn(
                     () =>
                         "mock-uuid-" +
-                        Math.random().toString(36).substring(2, 15)
+                        Math.random().toString(36).slice(2, 15)
                 ),
                 getRandomValues: vi.fn((arr) => {
                     for (let i = 0; i < arr.length; i++) {
@@ -226,14 +226,14 @@ describe("UUID Generation", () => {
         it("should use fallback when randomUUID is not a function", () => {
             const uuid = generateUuid();
 
-            expect(uuid).toMatch(/^site-[a-z0-9]+-\d+$/);
+            expect(uuid).toMatch(/^site-[\da-z]+-\d+$/);
         });
     });
 
     describe("edge cases", () => {
         it("should handle consecutive calls", () => {
             // Mock crypto to ensure we test the function directly
-            Object.defineProperty(global, "crypto", {
+            Object.defineProperty(globalThis, "crypto", {
                 configurable: true,
                 value: {
                     randomUUID: vi
@@ -265,7 +265,7 @@ describe("UUID Generation", () => {
 
             // All should be valid and different
             for (const id of ids) {
-                expect(id).toMatch(/^site-[a-z0-9]+-\d+$/);
+                expect(id).toMatch(/^site-[\da-z]+-\d+$/);
             }
 
             // Should have different random parts (high probability)
@@ -278,7 +278,7 @@ describe("UUID Generation", () => {
                 randomUUID: vi.fn(
                     () =>
                         "mock-uuid-" +
-                        Math.random().toString(36).substring(2, 15)
+                        Math.random().toString(36).slice(2, 15)
                 ),
                 getRandomValues: vi.fn(),
             });
@@ -334,7 +334,7 @@ describe("UUID Generation", () => {
             // All should be valid fallback format
             for (const uuid of uuids) {
                 expect(typeof uuid).toBe("string");
-                expect(uuid).toMatch(/^site-[a-z0-9]+-\d+$/);
+                expect(uuid).toMatch(/^site-[\da-z]+-\d+$/);
             }
 
             // Restore crypto mock
@@ -342,7 +342,7 @@ describe("UUID Generation", () => {
                 randomUUID: vi.fn(
                     () =>
                         "mock-uuid-" +
-                        Math.random().toString(36).substring(2, 15)
+                        Math.random().toString(36).slice(2, 15)
                 ),
                 getRandomValues: vi.fn(),
             });
@@ -357,17 +357,17 @@ describe("UUID Generation", () => {
 
             expect(parts).toHaveLength(3);
             expect(parts[0]).toBe("site");
-            expect(parts[1]).toMatch(/^[a-z0-9]+$/);
+            expect(parts[1]).toMatch(/^[\da-z]+$/);
             expect(parts[1]?.length).toBe(9); // substring(2, 11) gives 9 characters
             expect(parts[2]).toMatch(/^\d+$/);
-            expect(parseInt(parts[2] ?? "0")).toBeGreaterThan(0);
+            expect(Number.parseInt(parts[2] ?? "0")).toBeGreaterThan(0);
 
             // Restore crypto mock
             vi.stubGlobal("crypto", {
                 randomUUID: vi.fn(
                     () =>
                         "mock-uuid-" +
-                        Math.random().toString(36).substring(2, 15)
+                        Math.random().toString(36).slice(2, 15)
                 ),
                 getRandomValues: vi.fn(),
             });

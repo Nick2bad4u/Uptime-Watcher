@@ -54,7 +54,7 @@ const mockElectronAPI = {
     },
 };
 
-Object.defineProperty(global, "window", {
+Object.defineProperty(globalThis, "window", {
     value: {
         electronAPI: mockElectronAPI,
     },
@@ -112,7 +112,7 @@ describe("useSiteSync", () => {
             const mockStatus = {
                 siteCount: 5,
                 synchronized: true,
-                lastSync: 1640995200000,
+                lastSync: 1_640_995_200_000,
                 success: true,
             };
 
@@ -149,7 +149,7 @@ describe("useSiteSync", () => {
             ).mockResolvedValue({
                 siteCount: 5,
                 synchronized: true,
-                lastSync: 1640995200000,
+                lastSync: 1_640_995_200_000,
                 success: true,
             });
 
@@ -309,9 +309,9 @@ describe("useSiteSync", () => {
             try {
                 await syncActions.syncSitesFromBackend();
                 // The function should handle errors internally and not throw
-            } catch (err) {
+            } catch (error_) {
                 // If it does throw, that's also acceptable behavior
-                expect(err).toBeDefined();
+                expect(error_).toBeDefined();
             }
         });
     });

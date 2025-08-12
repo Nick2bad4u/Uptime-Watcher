@@ -21,7 +21,7 @@ const createMockMediaQuery = (matches: boolean) => ({
 });
 
 // Setup window.matchMedia mock before any tests run
-Object.defineProperty(window, "matchMedia", {
+Object.defineProperty(globalThis, "matchMedia", {
     writable: true,
     value: vi
         .fn()
@@ -30,15 +30,15 @@ Object.defineProperty(window, "matchMedia", {
 
 describe("useThemeStyles Hook", () => {
     let mockMediaQuery: ReturnType<typeof createMockMediaQuery>;
-    let originalMatchMedia: typeof window.matchMedia;
+    let originalMatchMedia: typeof globalThis.matchMedia;
 
     beforeEach(() => {
         // Save original matchMedia if it exists
         originalMatchMedia =
-            (globalThis as any).window?.matchMedia || window.matchMedia;
+            (globalThis as any).window?.matchMedia || globalThis.matchMedia;
 
         mockMediaQuery = createMockMediaQuery(false);
-        Object.defineProperty(window, "matchMedia", {
+        Object.defineProperty(globalThis, "matchMedia", {
             writable: true,
             value: vi.fn().mockReturnValue(mockMediaQuery),
         });
@@ -48,7 +48,7 @@ describe("useThemeStyles Hook", () => {
         vi.clearAllMocks();
         // Restore original matchMedia
         if (originalMatchMedia) {
-            Object.defineProperty(window, "matchMedia", {
+            Object.defineProperty(globalThis, "matchMedia", {
                 writable: true,
                 value: originalMatchMedia,
             });
@@ -58,7 +58,7 @@ describe("useThemeStyles Hook", () => {
     describe("Light Mode Styles", () => {
         beforeEach(() => {
             mockMediaQuery = createMockMediaQuery(false);
-            (window.matchMedia as any).mockReturnValue(mockMediaQuery);
+            (globalThis.matchMedia as any).mockReturnValue(mockMediaQuery);
         });
 
         it("should return light mode styles when collapsed=false", () => {
@@ -122,7 +122,7 @@ describe("useThemeStyles Hook", () => {
     describe("Dark Mode Styles", () => {
         beforeEach(() => {
             mockMediaQuery = createMockMediaQuery(true);
-            (window.matchMedia as any).mockReturnValue(mockMediaQuery);
+            (globalThis.matchMedia as any).mockReturnValue(mockMediaQuery);
         });
 
         it("should return dark mode styles when collapsed=false", () => {
@@ -185,7 +185,7 @@ describe("useThemeStyles Hook", () => {
         it("should react to theme changes via media query listener", () => {
             // Start with light mode
             mockMediaQuery = createMockMediaQuery(false);
-            (window.matchMedia as any).mockReturnValue(mockMediaQuery);
+            (globalThis.matchMedia as any).mockReturnValue(mockMediaQuery);
 
             const { result } = renderHook(() => useThemeStyles());
 
@@ -209,7 +209,7 @@ describe("useThemeStyles Hook", () => {
         it("should react to theme changes from dark to light", () => {
             // Start with dark mode
             mockMediaQuery = createMockMediaQuery(true);
-            (window.matchMedia as any).mockReturnValue(mockMediaQuery);
+            (globalThis.matchMedia as any).mockReturnValue(mockMediaQuery);
 
             const { result } = renderHook(() => useThemeStyles());
 
@@ -289,7 +289,7 @@ describe("useThemeStyles Hook", () => {
     describe("SSR Compatibility", () => {
         it("should handle missing matchMedia function gracefully", () => {
             // Mock environment without matchMedia
-            Object.defineProperty(window, "matchMedia", {
+            Object.defineProperty(globalThis, "matchMedia", {
                 writable: true,
                 value: undefined,
             });
@@ -303,7 +303,7 @@ describe("useThemeStyles Hook", () => {
 
         it("should handle matchMedia function that throws errors", () => {
             // Mock matchMedia that throws
-            Object.defineProperty(window, "matchMedia", {
+            Object.defineProperty(globalThis, "matchMedia", {
                 writable: true,
                 value: vi.fn().mockImplementation(() => {
                     throw new Error("matchMedia not supported");

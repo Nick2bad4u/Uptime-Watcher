@@ -222,7 +222,7 @@ describe("Settings Component", () => {
 
     it("should handle reset settings", () => {
         // Mock window.confirm to return true
-        const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+        const confirmSpy = vi.spyOn(globalThis, "confirm").mockReturnValue(true);
 
         render(<Settings onClose={mockOnClose} />);
 
@@ -236,7 +236,7 @@ describe("Settings Component", () => {
 
     it("should not reset settings when cancelled", () => {
         // Mock window.confirm to return false
-        const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false);
+        const confirmSpy = vi.spyOn(globalThis, "confirm").mockReturnValue(false);
 
         render(<Settings onClose={mockOnClose} />);
 

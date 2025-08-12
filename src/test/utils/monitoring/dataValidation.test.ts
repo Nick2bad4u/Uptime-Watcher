@@ -1,12 +1,12 @@
 /**
  * @fileoverview Comprehensive tests for monitoring data validation utilities
- * Tests parseUptimeValue, isValidUrl, and safeGetHostname functions for 100% coverage
+ * Tests parseUptimeValue and safeGetHostname functions for 100% coverage
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { isValidUrl } from "../../../../shared/validation/validatorUtils";
 import {
     parseUptimeValue,
-    isValidUrl,
     safeGetHostname,
 } from "../../../utils/monitoring/dataValidation";
 import logger from "../../../services/logger";
@@ -134,11 +134,21 @@ describe("Monitoring Data Validation", () => {
             expect(isValidUrl("https://example.com#anchor")).toBe(true);
         });
 
-        it("should return true for other valid URL schemes", () => {
+        it("should return true for valid HTTP/HTTPS URLs", () => {
+            // validator.js only accepts HTTP/HTTPS protocols by default
+            expect(isValidUrl("https://example.com")).toBe(true);
+            expect(isValidUrl("http://example.com")).toBe(true);
+            expect(isValidUrl("https://localhost")).toBe(true);
+            expect(isValidUrl("http://localhost:3000")).toBe(true);
+        });
+
+        it("should handle different URL schemes per validator.js behavior", () => {
+            // validator.js accepts some non-HTTP protocols
             expect(isValidUrl("ftp://example.com")).toBe(true);
-            expect(isValidUrl("file:///path/to/file")).toBe(true);
-            expect(isValidUrl("mailto:test@example.com")).toBe(true);
-            expect(isValidUrl("tel:+1234567890")).toBe(true);
+            // validator.js rejects these protocols by default
+            expect(isValidUrl("file:///path/to/file")).toBe(false);
+            expect(isValidUrl("mailto:test@example.com")).toBe(false);
+            expect(isValidUrl("tel:+1234567890")).toBe(false);
         });
 
         it("should return false for invalid URLs", () => {
@@ -162,14 +172,14 @@ describe("Monitoring Data Validation", () => {
             expect(isValidUrl("https:///")).toBe(false);
             expect(isValidUrl("https://[")).toBe(false);
             expect(isValidUrl("https://]")).toBe(false);
-            // Note: "https://example..com" is considered valid by URL constructor
-            expect(isValidUrl("https://example..com")).toBe(true);
+            // validator.js rejects URLs with double dots for security
+            expect(isValidUrl("https://example..com")).toBe(false);
         });
 
         it("should handle special characters in URLs", () => {
-            // Note: URLs with spaces are actually considered valid by URL constructor
+            // validator.js rejects URLs with unencoded spaces for security
             expect(isValidUrl("https://example.com/path with spaces")).toBe(
-                true
+                false
             );
             expect(
                 isValidUrl("https://example.com/path%20with%20encoded%20spaces")
@@ -233,10 +243,8 @@ describe("Monitoring Data Validation", () => {
         it("should handle edge cases and malformed URLs", () => {
             expect(safeGetHostname("https://[")).toBe("");
             expect(safeGetHostname("https://]")).toBe("");
-            // Note: "https://example..com" is valid to URL constructor and returns hostname
-            expect(safeGetHostname("https://example..com")).toBe(
-                "example..com"
-            );
+            // Since validator.js now rejects "https://example..com", hostname extraction returns empty
+            expect(safeGetHostname("https://example..com")).toBe("");
         });
 
         it("should handle URLs with special hostnames", () => {

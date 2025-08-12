@@ -17,7 +17,7 @@ import {
 
 // Mock window.electronAPI
 beforeEach(() => {
-    Object.defineProperty(window, "electronAPI", {
+    Object.defineProperty(globalThis, "electronAPI", {
         value: {
             settings: {
                 get: vi
@@ -208,7 +208,7 @@ describe("useTheme Hooks - Working Tests", () => {
             expect(typeof result.current.getAvailabilityColor(110)).toBe(
                 "string"
             );
-            expect(typeof result.current.getAvailabilityColor(NaN)).toBe(
+            expect(typeof result.current.getAvailabilityColor(Number.NaN)).toBe(
                 "string"
             );
         });

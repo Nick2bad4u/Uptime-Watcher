@@ -54,7 +54,7 @@ describe("useSiteAnalytics", () => {
     });
 
     const mockMonitorEmpty: Monitor = {
-        checkInterval: 60000,
+        checkInterval: 60_000,
         history: [],
         id: "monitor-empty",
         monitoring: true,
@@ -67,7 +67,7 @@ describe("useSiteAnalytics", () => {
     };
 
     const mockMonitorWithHistory: Monitor = {
-        checkInterval: 60000,
+        checkInterval: 60_000,
         history: [
             createStatusRecord(now - 1000, "up", 200),
             createStatusRecord(now - 2000, "down", 0),
@@ -89,7 +89,7 @@ describe("useSiteAnalytics", () => {
     };
 
     const mockPortMonitor: Monitor = {
-        checkInterval: 30000,
+        checkInterval: 30_000,
         history: [
             createStatusRecord(now - 1000, "down", 5000),
             createStatusRecord(now - 2000, "up", 50),
@@ -505,8 +505,8 @@ describe("useSiteAnalytics", () => {
             const largeResponseMonitor: Monitor = {
                 ...mockMonitorEmpty,
                 history: [
-                    createStatusRecord(now - 1000, "up", 999999),
-                    createStatusRecord(now - 2000, "up", 1000000),
+                    createStatusRecord(now - 1000, "up", 999_999),
+                    createStatusRecord(now - 2000, "up", 1_000_000),
                 ],
             };
 
@@ -514,8 +514,8 @@ describe("useSiteAnalytics", () => {
                 useSiteAnalytics(largeResponseMonitor, "24h")
             );
 
-            expect(result.current.avgResponseTime).toBe(1000000); // Math.round(999999.5) = 1000000
-            expect(result.current.slowestResponse).toBe(1000000);
+            expect(result.current.avgResponseTime).toBe(1_000_000); // Math.round(999999.5) = 1000000
+            expect(result.current.slowestResponse).toBe(1_000_000);
         });
 
         it("should handle zero response times", () => {
@@ -786,8 +786,8 @@ describe("SiteAnalyticsUtils", () => {
         });
 
         it("should handle edge cases", () => {
-            expect(SiteAnalyticsUtils.getAvailabilityStatus(99.0)).toBe("good");
-            expect(SiteAnalyticsUtils.getAvailabilityStatus(95.0)).toBe(
+            expect(SiteAnalyticsUtils.getAvailabilityStatus(99)).toBe("good");
+            expect(SiteAnalyticsUtils.getAvailabilityStatus(95)).toBe(
                 "warning"
             );
         });
@@ -830,8 +830,8 @@ describe("SiteAnalyticsUtils", () => {
         });
 
         it("should handle edge cases", () => {
-            expect(SiteAnalyticsUtils.getPerformanceStatus(500.0)).toBe("good");
-            expect(SiteAnalyticsUtils.getPerformanceStatus(1000.0)).toBe(
+            expect(SiteAnalyticsUtils.getPerformanceStatus(500)).toBe("good");
+            expect(SiteAnalyticsUtils.getPerformanceStatus(1000)).toBe(
                 "warning"
             );
         });

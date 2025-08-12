@@ -3,7 +3,7 @@
  * Tests all theme component variants, props, and edge cases.
  */
 
-import { render, screen, fireEvent, cleanup } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
@@ -25,7 +25,6 @@ const mockOnChange = vi.fn();
 describe("Theme Components - Complete Coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        cleanup();
     });
 
     describe("ThemedBox Component", () => {
@@ -40,7 +39,7 @@ describe("Theme Components - Complete Coverage", () => {
         it("should apply all surface variants", () => {
             const surfaces = ["base", "elevated", "overlay"] as const;
 
-            surfaces.forEach((surface) => {
+            for (const surface of surfaces) {
                 const { unmount } = render(
                     <ThemedBox surface={surface}>Surface {surface}</ThemedBox>
                 );
@@ -50,7 +49,7 @@ describe("Theme Components - Complete Coverage", () => {
                 expect(box).toHaveClass("themed-box");
 
                 unmount();
-            });
+            }
         });
 
         it("should apply all padding variants", () => {
@@ -62,7 +61,7 @@ describe("Theme Components - Complete Coverage", () => {
                 "xl",
             ] as const;
 
-            paddings.forEach((padding) => {
+            for (const padding of paddings) {
                 const { unmount } = render(
                     <ThemedBox padding={padding}>Padding {padding}</ThemedBox>
                 );
@@ -72,7 +71,7 @@ describe("Theme Components - Complete Coverage", () => {
                 expect(box).toHaveClass("themed-box");
 
                 unmount();
-            });
+            }
         });
 
         it("should handle click events", () => {
@@ -86,7 +85,7 @@ describe("Theme Components - Complete Coverage", () => {
         it("should handle different element types", () => {
             const elements = ["div", "section", "article", "aside"] as const;
 
-            elements.forEach((as) => {
+            for (const as of elements) {
                 const { unmount } = render(
                     <ThemedBox as={as}>Element {as}</ThemedBox>
                 );
@@ -96,13 +95,13 @@ describe("Theme Components - Complete Coverage", () => {
                 expect(box.tagName.toLowerCase()).toBe(as);
 
                 unmount();
-            });
+            }
         });
 
         it("should handle variant prop", () => {
             const variants = ["primary", "secondary", "tertiary"] as const;
 
-            variants.forEach((variant) => {
+            for (const variant of variants) {
                 const { unmount } = render(
                     <ThemedBox variant={variant}>Variant {variant}</ThemedBox>
                 );
@@ -111,7 +110,7 @@ describe("Theme Components - Complete Coverage", () => {
                 expect(box).toBeInTheDocument();
 
                 unmount();
-            });
+            }
         });
 
         it("should handle rounded prop", () => {
@@ -123,7 +122,7 @@ describe("Theme Components - Complete Coverage", () => {
                 "full",
             ] as const;
 
-            roundedOptions.forEach((rounded) => {
+            for (const rounded of roundedOptions) {
                 const { unmount } = render(
                     <ThemedBox rounded={rounded}>Rounded {rounded}</ThemedBox>
                 );
@@ -132,7 +131,7 @@ describe("Theme Components - Complete Coverage", () => {
                 expect(box).toBeInTheDocument();
 
                 unmount();
-            });
+            }
         });
 
         it("should handle shadow prop", () => {
@@ -144,7 +143,7 @@ describe("Theme Components - Complete Coverage", () => {
                 "inner",
             ] as const;
 
-            shadowOptions.forEach((shadow) => {
+            for (const shadow of shadowOptions) {
                 const { unmount } = render(
                     <ThemedBox shadow={shadow}>Shadow {shadow}</ThemedBox>
                 );
@@ -153,7 +152,7 @@ describe("Theme Components - Complete Coverage", () => {
                 expect(box).toBeInTheDocument();
 
                 unmount();
-            });
+            }
         });
 
         it("should handle border prop", () => {
@@ -211,7 +210,7 @@ describe("Theme Components - Complete Coverage", () => {
                 "tertiary",
             ] as const;
 
-            variants.forEach((variant) => {
+            for (const variant of variants) {
                 const { unmount } = render(
                     <ThemedButton variant={variant} onClick={mockOnClick}>
                         {variant} Button
@@ -224,7 +223,7 @@ describe("Theme Components - Complete Coverage", () => {
                 expect(button).toBeInTheDocument();
 
                 unmount();
-            });
+            }
         });
 
         it("should apply all size variants", () => {
@@ -236,7 +235,7 @@ describe("Theme Components - Complete Coverage", () => {
                 "xl",
             ] as const;
 
-            sizes.forEach((size) => {
+            for (const size of sizes) {
                 const { unmount } = render(
                     <ThemedButton size={size} onClick={mockOnClick}>
                         {size} Button
@@ -249,7 +248,7 @@ describe("Theme Components - Complete Coverage", () => {
                 expect(button).toBeInTheDocument();
 
                 unmount();
-            });
+            }
         });
 
         it("should handle disabled state", () => {
@@ -342,7 +341,7 @@ describe("Theme Components - Complete Coverage", () => {
         it("should handle different button types", () => {
             const types = ["button", "submit", "reset"] as const;
 
-            types.forEach((type) => {
+            for (const type of types) {
                 const { unmount } = render(
                     <ThemedButton type={type} onClick={mockOnClick}>
                         {type} Button
@@ -355,7 +354,7 @@ describe("Theme Components - Complete Coverage", () => {
                 expect(button).toHaveAttribute("type", type);
 
                 unmount();
-            });
+            }
         });
     });
 
@@ -376,7 +375,7 @@ describe("Theme Components - Complete Coverage", () => {
                 "url",
             ] as const;
 
-            types.forEach((type) => {
+            for (const type of types) {
                 const { unmount } = render(
                     <ThemedInput type={type} placeholder={`${type} input`} />
                 );
@@ -385,7 +384,7 @@ describe("Theme Components - Complete Coverage", () => {
                 expect(input).toHaveAttribute("type", type);
 
                 unmount();
-            });
+            }
         });
 
         it("should handle number input type", () => {
@@ -480,7 +479,7 @@ describe("Theme Components - Complete Coverage", () => {
                 "4xl",
             ] as const;
 
-            sizes.forEach((size) => {
+            for (const size of sizes) {
                 const { unmount } = render(
                     <ThemedText size={size}>Size {size}</ThemedText>
                 );
@@ -489,13 +488,13 @@ describe("Theme Components - Complete Coverage", () => {
                 expect(text).toBeInTheDocument();
 
                 unmount();
-            });
+            }
         });
 
         it("should apply all weight variants", () => {
             const weights = ["normal", "medium", "semibold", "bold"] as const;
 
-            weights.forEach((weight) => {
+            for (const weight of weights) {
                 const { unmount } = render(
                     <ThemedText weight={weight}>Weight {weight}</ThemedText>
                 );
@@ -504,7 +503,7 @@ describe("Theme Components - Complete Coverage", () => {
                 expect(text).toBeInTheDocument();
 
                 unmount();
-            });
+            }
         });
 
         it("should apply all variant colors", () => {
@@ -520,7 +519,7 @@ describe("Theme Components - Complete Coverage", () => {
                 "tertiary",
             ] as const;
 
-            variants.forEach((variant) => {
+            for (const variant of variants) {
                 const { unmount } = render(
                     <ThemedText variant={variant}>Variant {variant}</ThemedText>
                 );
@@ -529,13 +528,13 @@ describe("Theme Components - Complete Coverage", () => {
                 expect(text).toBeInTheDocument();
 
                 unmount();
-            });
+            }
         });
 
         it("should apply all text alignment", () => {
             const alignments = ["left", "center", "right", "justify"] as const;
 
-            alignments.forEach((align) => {
+            for (const align of alignments) {
                 const { unmount } = render(
                     <ThemedText align={align}>Align {align}</ThemedText>
                 );
@@ -544,7 +543,7 @@ describe("Theme Components - Complete Coverage", () => {
                 expect(text).toBeInTheDocument();
 
                 unmount();
-            });
+            }
         });
 
         it("should handle style prop", () => {
@@ -762,7 +761,7 @@ describe("Theme Components - Complete Coverage", () => {
         it("should handle all variants", () => {
             const variants = ["primary", "secondary", "tertiary"] as const;
 
-            variants.forEach((variant) => {
+            for (const variant of variants) {
                 const { unmount } = render(
                     <ThemedCard variant={variant}>Variant {variant}</ThemedCard>
                 );
@@ -771,7 +770,7 @@ describe("Theme Components - Complete Coverage", () => {
                 expect(cardText).toBeInTheDocument();
 
                 unmount();
-            });
+            }
         });
 
         it("should handle mouse events", () => {
@@ -814,7 +813,7 @@ describe("Theme Components - Complete Coverage", () => {
                 "info",
             ] as const;
 
-            variants.forEach((variant) => {
+            for (const variant of variants) {
                 const { unmount } = render(
                     <ThemedBadge variant={variant}>{variant} Badge</ThemedBadge>
                 );
@@ -823,13 +822,13 @@ describe("Theme Components - Complete Coverage", () => {
                 expect(badge).toBeInTheDocument();
 
                 unmount();
-            });
+            }
         });
 
         it("should apply all size variants", () => {
             const sizes = ["xs", "sm", "md", "lg"] as const;
 
-            sizes.forEach((size) => {
+            for (const size of sizes) {
                 const { unmount } = render(
                     <ThemedBadge size={size}>{size} Badge</ThemedBadge>
                 );
@@ -838,7 +837,7 @@ describe("Theme Components - Complete Coverage", () => {
                 expect(badge).toBeInTheDocument();
 
                 unmount();
-            });
+            }
         });
 
         it("should handle icon prop", () => {
@@ -856,29 +855,26 @@ describe("Theme Components - Complete Coverage", () => {
 
     describe("StatusIndicator Component", () => {
         it("should render with status", () => {
-            const { container } = render(<StatusIndicator status="up" />);
+            render(<StatusIndicator status="up" />);
 
-            const indicator = container.querySelector(
-                ".themed-status-indicator"
-            );
+            // Use text content or role when available
+            const indicator = screen.getByText(/up/i) || screen.getByRole("status");
             expect(indicator).toBeInTheDocument();
         });
 
         it("should handle different sizes", () => {
             const sizes = ["sm", "md", "lg"] as const;
 
-            sizes.forEach((size) => {
-                const { container, unmount } = render(
+            for (const size of sizes) {
+                const { unmount } = render(
                     <StatusIndicator status="up" size={size} />
                 );
 
-                const indicator = container.querySelector(
-                    ".themed-status-indicator"
-                );
+                const indicator = screen.getByText(/up/i) || screen.getByRole("status");
                 expect(indicator).toBeInTheDocument();
 
                 unmount();
-            });
+            }
         });
 
         it("should handle showText prop", () => {
@@ -891,33 +887,32 @@ describe("Theme Components - Complete Coverage", () => {
         it("should handle different status values", () => {
             const statuses = ["up", "down", "unknown"] as const;
 
-            statuses.forEach((status) => {
-                const { container, unmount } = render(
+            for (const status of statuses) {
+                const { unmount } = render(
                     <StatusIndicator status={status} />
                 );
 
-                const indicator = container.querySelector(
-                    ".themed-status-indicator"
-                );
+                const indicator = screen.getByText(new RegExp(status, 'i')) || 
+                               screen.getByRole("status");
                 expect(indicator).toBeInTheDocument();
 
                 unmount();
-            });
+            }
         });
     });
 
     describe("MiniChartBar Component", () => {
         it("should render with status and timestamp", () => {
-            const { container } = render(
-                <MiniChartBar status="up" timestamp={new Date()} />
-            );
+            render(<MiniChartBar status="up" timestamp={new Date()} />);
 
-            const bar = container.querySelector(".themed-mini-chart-bar");
+            // For chart components, we can look for presentations or specific content
+            const bar = screen.getByRole("presentation") || 
+                       document.querySelector(".themed-mini-chart-bar");
             expect(bar).toBeInTheDocument();
         });
 
         it("should handle responseTime prop", () => {
-            const { container } = render(
+            render(
                 <MiniChartBar
                     status="up"
                     timestamp={new Date()}
@@ -925,40 +920,44 @@ describe("Theme Components - Complete Coverage", () => {
                 />
             );
 
-            const bar = container.querySelector(".themed-mini-chart-bar");
+            const bar = screen.getByRole("presentation") || 
+                       document.querySelector(".themed-mini-chart-bar");
             expect(bar).toBeInTheDocument();
         });
 
         it("should handle different status values", () => {
             const statuses = ["up", "down", "unknown"] as const;
 
-            statuses.forEach((status) => {
-                const { container, unmount } = render(
+            for (const status of statuses) {
+                const { unmount } = render(
                     <MiniChartBar status={status} timestamp={new Date()} />
                 );
 
-                const bar = container.querySelector(".themed-mini-chart-bar");
+                const bar = screen.getByRole("presentation") || 
+                           document.querySelector(".themed-mini-chart-bar");
                 expect(bar).toBeInTheDocument();
 
                 unmount();
-            });
+            }
         });
 
         it("should handle string timestamp", () => {
-            const { container } = render(
+            render(
                 <MiniChartBar status="up" timestamp="2024-01-01T00:00:00Z" />
             );
 
-            const bar = container.querySelector(".themed-mini-chart-bar");
+            const bar = screen.getByRole("presentation") || 
+                       document.querySelector(".themed-mini-chart-bar");
             expect(bar).toBeInTheDocument();
         });
 
         it("should handle number timestamp", () => {
-            const { container } = render(
+            render(
                 <MiniChartBar status="up" timestamp={Date.now()} />
             );
 
-            const bar = container.querySelector(".themed-mini-chart-bar");
+            const bar = screen.getByRole("presentation") || 
+                       document.querySelector(".themed-mini-chart-bar");
             expect(bar).toBeInTheDocument();
         });
     });

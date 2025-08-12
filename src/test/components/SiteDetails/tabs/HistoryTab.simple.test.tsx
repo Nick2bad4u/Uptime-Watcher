@@ -82,14 +82,14 @@ describe("HistoryTab", () => {
         type: "http",
         url: "https://example.com",
         monitoring: true,
-        checkInterval: 60000,
+        checkInterval: 60_000,
         timeout: 5000,
         retryAttempts: 3,
         status: "up",
         lastChecked: new Date(),
         responseTime: 150,
         history: Array.from({ length: historyLength }, (_, i) => ({
-            timestamp: Date.now() - i * 60000,
+            timestamp: Date.now() - i * 60_000,
             status: i % 2 === 0 ? "up" : "down",
             responseTime: 100 + i * 10,
         })),
@@ -125,7 +125,7 @@ describe("HistoryTab", () => {
             );
 
             // Should render without crashing and show empty state
-            expect(screen.getByText(/No records found/i)).toBeInTheDocument();
+            expect(screen.getByText(/no records found/i)).toBeInTheDocument();
         });
 
         it("should handle monitor with large history", () => {
@@ -173,7 +173,7 @@ describe("HistoryTab", () => {
                 ...createMockMonitor(),
                 history: [
                     { timestamp: Date.now(), status: "up" }, // missing responseTime
-                    { timestamp: Date.now() - 60000 }, // missing status and responseTime
+                    { timestamp: Date.now() - 60_000 }, // missing status and responseTime
                 ],
             } as any;
 

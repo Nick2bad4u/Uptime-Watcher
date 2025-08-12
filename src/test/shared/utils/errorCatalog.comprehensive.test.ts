@@ -200,10 +200,10 @@ describe("errorCatalog utilities", () => {
                 "Custom error message not in catalog",
             ];
 
-            unknownMessages.forEach((message) => {
+            for (const message of unknownMessages) {
                 const result = isKnownErrorMessage(message);
                 expect(result).toBe(false);
-            });
+            }
         });
 
         it("should handle empty string", () => {
@@ -296,7 +296,7 @@ describe("errorCatalog utilities", () => {
                 "Configuration error",
             ];
 
-            commonErrors.forEach((error) => {
+            for (const error of commonErrors) {
                 const isKnown = isKnownErrorMessage(error);
                 expect(typeof isKnown).toBe("boolean");
 
@@ -307,7 +307,7 @@ describe("errorCatalog utilities", () => {
                 );
                 expect(contextualError).toContain(error);
                 expect(contextualError).toContain("integration test");
-            });
+            }
         });
 
         it("should handle complex error scenarios", () => {

@@ -52,11 +52,11 @@ describe("Log Templates", () => {
         it("should have no empty or undefined values", () => {
             const serviceLogValues = Object.values(SERVICE_LOGS);
 
-            serviceLogValues.forEach((logMessage) => {
+            for (const logMessage of serviceLogValues) {
                 expect(logMessage).toBeDefined();
                 expect(logMessage).not.toBe("");
                 expect(typeof logMessage).toBe("string");
-            });
+            }
         });
 
         it("should contain database service logs", () => {
@@ -92,11 +92,11 @@ describe("Log Templates", () => {
         it("should have consistent debug message format", () => {
             const debugLogValues = Object.values(DEBUG_LOGS);
 
-            debugLogValues.forEach((logMessage) => {
+            for (const logMessage of debugLogValues) {
                 expect(logMessage).toBeDefined();
                 expect(typeof logMessage).toBe("string");
                 expect(logMessage.length).toBeGreaterThan(0);
-            });
+            }
         });
 
         it("should contain monitoring related debug logs", () => {
@@ -114,11 +114,11 @@ describe("Log Templates", () => {
         it("should have consistent error message format", () => {
             const errorLogValues = Object.values(ERROR_LOGS);
 
-            errorLogValues.forEach((logMessage) => {
+            for (const logMessage of errorLogValues) {
                 expect(logMessage).toBeDefined();
                 expect(typeof logMessage).toBe("string");
                 expect(logMessage.length).toBeGreaterThan(0);
-            });
+            }
         });
 
         it("should contain database related error logs", () => {
@@ -136,11 +136,11 @@ describe("Log Templates", () => {
         it("should have consistent warning message format", () => {
             const warningLogValues = Object.values(WARNING_LOGS);
 
-            warningLogValues.forEach((logMessage) => {
+            for (const logMessage of warningLogValues) {
                 expect(logMessage).toBeDefined();
                 expect(typeof logMessage).toBe("string");
                 expect(logMessage.length).toBeGreaterThan(0);
-            });
+            }
         });
 
         it("should contain monitoring related warning logs", () => {
@@ -180,12 +180,12 @@ describe("Log Templates", () => {
                 "warnings",
             ];
 
-            requiredCategories.forEach((category) => {
+            for (const category of requiredCategories) {
                 expect(LOG_TEMPLATES).toHaveProperty(category);
                 expect(
                     LOG_TEMPLATES[category as keyof LogTemplatesInterface]
                 ).toBeDefined();
-            });
+            }
         });
 
         it("should maintain consistent structure", () => {
@@ -207,7 +207,7 @@ describe("Log Templates", () => {
                 ...Object.values(WARNING_LOGS),
             ];
 
-            allLogValues.forEach((logMessage) => {
+            for (const logMessage of allLogValues) {
                 // Should not be just whitespace
                 expect(logMessage.trim().length).toBeGreaterThan(0);
 
@@ -218,7 +218,7 @@ describe("Log Templates", () => {
                 expect(logMessage.toLowerCase()).not.toContain("todo");
                 expect(logMessage.toLowerCase()).not.toContain("placeholder");
                 expect(logMessage.toLowerCase()).not.toContain("fixme");
-            });
+            }
         });
 
         it("should follow consistent naming conventions", () => {
@@ -229,14 +229,14 @@ describe("Log Templates", () => {
                 ...Object.keys(WARNING_LOGS),
             ];
 
-            allKeys.forEach((key) => {
+            for (const key of allKeys) {
                 // Should be uppercase with underscores
-                expect(key).toMatch(/^[A-Z][A-Z0-9_]*$/);
+                expect(key).toMatch(/^[A-Z][\dA-Z_]*$/);
 
                 // Should not start or end with underscore
                 expect(key).not.toMatch(/^_/);
                 expect(key).not.toMatch(/_$/);
-            });
+            }
         });
 
         it("should have unique log messages across categories", () => {
@@ -379,23 +379,23 @@ describe("Log Templates", () => {
                 "Site ",
             ];
 
-            serviceValues.forEach((message) => {
+            for (const message of serviceValues) {
                 const hasKnownPrefix = knownPrefixes.some((prefix) =>
                     message.startsWith(prefix)
                 );
                 expect(hasKnownPrefix).toBe(true);
-            });
+            }
         });
 
         it("should follow semantic naming for log levels", () => {
             // Service logs should be informational
             const serviceValues = Object.values(SERVICE_LOGS);
-            serviceValues.forEach((message) => {
+            for (const message of serviceValues) {
                 // Should not contain error/warning keywords in informational logs
                 expect(message.toLowerCase()).not.toContain("error");
                 expect(message.toLowerCase()).not.toContain("failed");
                 expect(message.toLowerCase()).not.toContain("warning");
-            });
+            }
         });
     });
 });

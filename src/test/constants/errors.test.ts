@@ -100,16 +100,16 @@ describe("Error Constants", () => {
 
         it("should have proper structure for all domains", () => {
             // Test that each domain has error messages
-            Object.values(ERROR_CATALOG).forEach((domain) => {
+            for (const domain of Object.values(ERROR_CATALOG)) {
                 expect(typeof domain).toBe("object");
                 expect(Object.keys(domain).length).toBeGreaterThan(0);
 
                 // Test that all error messages are strings
-                Object.values(domain).forEach((message) => {
+                for (const message of Object.values(domain)) {
                     expect(typeof message).toBe("string");
                     expect((message as string).length).toBeGreaterThan(0);
-                });
-            });
+                }
+            }
         });
 
         it("should be readonly at TypeScript level", () => {

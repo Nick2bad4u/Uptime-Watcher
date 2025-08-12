@@ -47,7 +47,7 @@ vi.mock("../../../utils/data/generateUuid", () => ({
 vi.mock("../../SiteDetails/useAddSiteForm", () => ({
     useAddSiteForm: vi.fn(() => ({
         addMode: "new",
-        checkInterval: 60000,
+        checkInterval: 60_000,
         formError: null,
         host: "",
         monitorType: "http",

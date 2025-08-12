@@ -160,9 +160,9 @@ describe("cacheKeys utilities", () => {
                 CacheKeys.validation.monitorType("http"),
             ];
 
-            keys.forEach((key) => {
+            for (const key of keys) {
                 expect(isStandardizedCacheKey(key)).toBe(true);
-            });
+            }
         });
     });
 
@@ -314,13 +314,12 @@ describe("cacheKeys utilities", () => {
                 },
             ];
 
-            testData.forEach(
-                ({
+            for (const {
                     fn,
                     expectedPrefix,
                     expectedOperation,
                     expectedIdentifier,
-                }) => {
+                } of testData) {
                     const key = fn();
                     expect(isStandardizedCacheKey(key)).toBe(true);
 
@@ -335,7 +334,7 @@ describe("cacheKeys utilities", () => {
                         expect(parsed.identifier).toBe(expectedIdentifier);
                     }
                 }
-            );
+            
         });
     });
 });

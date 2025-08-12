@@ -129,7 +129,7 @@ describe("useDelayedButtonLoading", () => {
     describe("Timer Management", () => {
         it("should clear timeout when component unmounts", () => {
             // Arrange
-            const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
+            const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
             // Act
             const { unmount } = renderHook(() => useDelayedButtonLoading(true));
@@ -141,7 +141,7 @@ describe("useDelayedButtonLoading", () => {
 
         it("should clear previous timeout when isLoading changes rapidly", () => {
             // Arrange
-            const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
+            const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
             const { rerender } = renderHook(
                 ({ isLoading }) => useDelayedButtonLoading(isLoading),
                 {

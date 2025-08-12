@@ -33,7 +33,7 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
                 id: "",
                 type: "http",
                 status: "active",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 url: "",
@@ -124,7 +124,7 @@ import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
 describe("AddSiteForm", () => {
     it("should render without crashing", () => {
         render(<AddSiteForm />);
-        expect(document.querySelector(".themed-box")).toBeInTheDocument();
+        expect(screen.getByTestId("themed-box")).toBeInTheDocument();
     });
 
     it("should render form elements", () => {

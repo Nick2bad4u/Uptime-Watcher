@@ -37,7 +37,7 @@ describe("Store Utils", () => {
         vi.clearAllMocks();
         vi.useFakeTimers();
         // Reset window.electronAPI
-        (window as any).electronAPI = undefined;
+        (globalThis as any).electronAPI = undefined;
     });
 
     afterEach(() => {
@@ -272,7 +272,7 @@ describe("Store Utils", () => {
 
     describe("waitForElectronAPI", () => {
         it("should resolve immediately when electronAPI is available", async () => {
-            (window as any).electronAPI = {
+            (globalThis as any).electronAPI = {
                 sites: { getSites: vi.fn() },
             };
 
@@ -280,7 +280,7 @@ describe("Store Utils", () => {
         });
 
         it("should work with custom maxAttempts and baseDelay", async () => {
-            (window as any).electronAPI = {
+            (globalThis as any).electronAPI = {
                 sites: { getSites: vi.fn() },
             };
 

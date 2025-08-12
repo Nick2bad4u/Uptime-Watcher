@@ -32,7 +32,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
         overrides: Partial<FormSubmitProperties> = {}
     ): FormSubmitProperties => ({
         addMode: "new",
-        checkInterval: 30000,
+        checkInterval: 30_000,
         formError: undefined,
         clearError: vi.fn(),
         generateUuid: vi.fn(() => "test-uuid"),

@@ -12,8 +12,8 @@ import type { Monitor } from "../../../../../shared/types";
 // Mock all external dependencies
 vi.mock("../../../../constants", () => ({
     ARIA_LABEL: "aria-label",
-    CHECK_INTERVALS: [30000, 60000, 300000, 600000],
-    TIMEOUT_CONSTRAINTS: { MIN: 1000, MAX: 30000 },
+    CHECK_INTERVALS: [30_000, 60_000, 300_000, 600_000],
+    TIMEOUT_CONSTRAINTS: { MIN: 1000, MAX: 30_000 },
     TRANSITION_ALL: "all 0.2s ease-in-out",
 }));
 
@@ -164,13 +164,13 @@ vi.mock("../../../../theme/components", () => ({
 }));
 
 vi.mock("../../../../utils/monitoring/dataValidation", () => ({
-    parseUptimeValue: vi.fn((value: string) => parseFloat(value)),
+    parseUptimeValue: vi.fn((value: string) => Number.parseFloat(value)),
 }));
 
 vi.mock("../../../../utils/time", () => ({
     getIntervalLabel: vi.fn((interval: number) => {
-        if (interval < 60000) return `${interval / 1000}s`;
-        return `${interval / 60000}m`;
+        if (interval < 60_000) return `${interval / 1000}s`;
+        return `${interval / 60_000}m`;
     }),
 }));
 
@@ -188,7 +188,7 @@ describe("OverviewTab", () => {
         type: "http",
         url: "https://example.com",
         monitoring: true,
-        checkInterval: 60000,
+        checkInterval: 60_000,
         timeout: 5000,
         retryAttempts: 3,
         status: "up",
@@ -208,7 +208,7 @@ describe("OverviewTab", () => {
         handleTimeoutChange: mockHandleTimeoutChange,
         intervalChanged: false,
         isLoading: false,
-        localCheckInterval: 60000,
+        localCheckInterval: 60_000,
         localTimeout: 5000,
         onCheckNow: mockOnCheckNow,
         selectedMonitor: createMockMonitor(),
@@ -415,15 +415,15 @@ describe("OverviewTab", () => {
             render(
                 <OverviewTab
                     {...baseProps}
-                    avgResponseTime={30000}
-                    fastestResponse={25000}
-                    slowestResponse={35000}
+                    avgResponseTime={30_000}
+                    fastestResponse={25_000}
+                    slowestResponse={35_000}
                 />
             );
 
-            expect(mockFormatResponseTime).toHaveBeenCalledWith(30000);
-            expect(mockFormatResponseTime).toHaveBeenCalledWith(25000);
-            expect(mockFormatResponseTime).toHaveBeenCalledWith(35000);
+            expect(mockFormatResponseTime).toHaveBeenCalledWith(30_000);
+            expect(mockFormatResponseTime).toHaveBeenCalledWith(25_000);
+            expect(mockFormatResponseTime).toHaveBeenCalledWith(35_000);
         });
 
         it("should handle zero total checks", () => {
@@ -445,7 +445,7 @@ describe("OverviewTab", () => {
         });
 
         it("should handle extreme interval values", () => {
-            render(<OverviewTab {...baseProps} localCheckInterval={30000} />);
+            render(<OverviewTab {...baseProps} localCheckInterval={30_000} />);
 
             expect(
                 document.querySelector(".themed-select")
@@ -453,7 +453,7 @@ describe("OverviewTab", () => {
         });
 
         it("should handle extreme timeout values", () => {
-            render(<OverviewTab {...baseProps} localTimeout={30000} />);
+            render(<OverviewTab {...baseProps} localTimeout={30_000} />);
 
             expect(document.querySelector(".themed-input")).toBeInTheDocument();
         });

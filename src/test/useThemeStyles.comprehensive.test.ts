@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useThemeStyles } from "../hooks/useThemeStyles";
 
 // Mock window.matchMedia
-Object.defineProperty(window, "matchMedia", {
+Object.defineProperty(globalThis, "matchMedia", {
     value: vi.fn().mockImplementation((query) => ({
         addEventListener: vi.fn(),
         dispatchEvent: vi.fn(),
@@ -67,7 +67,7 @@ describe("useThemeStyles", () => {
     });
 
     it("should handle light mode", () => {
-        vi.mocked(window.matchMedia).mockImplementation((query) => ({
+        vi.mocked(globalThis.matchMedia).mockImplementation((query) => ({
             addEventListener: vi.fn(),
             addListener: vi.fn(),
             dispatchEvent: vi.fn(),
@@ -87,7 +87,7 @@ describe("useThemeStyles", () => {
     });
 
     it("should handle dark mode", () => {
-        vi.mocked(window.matchMedia).mockImplementation((query) => ({
+        vi.mocked(globalThis.matchMedia).mockImplementation((query) => ({
             addEventListener: vi.fn(),
             addListener: vi.fn(),
             dispatchEvent: vi.fn(),
@@ -180,16 +180,16 @@ describe("useThemeStyles", () => {
     });
 
     it("should handle missing matchMedia gracefully", () => {
-        const originalMatchMedia = window.matchMedia;
+        const originalMatchMedia = globalThis.matchMedia;
         // Remove matchMedia to test defensive programming
 
-        delete (window as any).matchMedia;
+        delete (globalThis as any).matchMedia;
 
         expect(() => {
             renderHook(() => useThemeStyles());
         }).not.toThrow();
 
-        window.matchMedia = originalMatchMedia;
+        globalThis.matchMedia = originalMatchMedia;
     });
 
     it("should provide transition effects", () => {
@@ -203,7 +203,7 @@ describe("useThemeStyles", () => {
 
     it("should have consistent color schemes", () => {
         // Test light mode
-        vi.mocked(window.matchMedia).mockImplementation(() => ({
+        vi.mocked(globalThis.matchMedia).mockImplementation(() => ({
             addEventListener: vi.fn(),
             addListener: vi.fn(),
             dispatchEvent: vi.fn(),
@@ -217,7 +217,7 @@ describe("useThemeStyles", () => {
         const { result: lightResult } = renderHook(() => useThemeStyles());
 
         // Test dark mode
-        vi.mocked(window.matchMedia).mockImplementation((query) => ({
+        vi.mocked(globalThis.matchMedia).mockImplementation((query) => ({
             addEventListener: vi.fn(),
             addListener: vi.fn(),
             dispatchEvent: vi.fn(),

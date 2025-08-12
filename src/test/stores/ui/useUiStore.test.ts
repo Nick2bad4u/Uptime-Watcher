@@ -23,7 +23,7 @@ const localStorageMock = {
     setItem: vi.fn(),
 };
 
-Object.defineProperty(window, "localStorage", {
+Object.defineProperty(globalThis, "localStorage", {
     value: localStorageMock,
 });
 
@@ -110,12 +110,12 @@ describe("useUIStore", () => {
 
             const tabs = ["site-overview", "analytics", "history", "settings"];
 
-            tabs.forEach((tab) => {
+            for (const tab of tabs) {
                 act(() => {
                     result.current.setActiveSiteDetailsTab(tab);
                 });
                 expect(result.current.activeSiteDetailsTab).toBe(tab);
-            });
+            }
         });
 
         it("should handle empty string tab", () => {
@@ -390,12 +390,12 @@ describe("useUIStore", () => {
 
             const timeRanges = ["1h", "24h", "7d", "30d"] as const;
 
-            timeRanges.forEach((range) => {
+            for (const range of timeRanges) {
                 act(() => {
                     result.current.setSiteDetailsChartTimeRange(range);
                 });
                 expect(result.current.siteDetailsChartTimeRange).toBe(range);
-            });
+            }
         });
 
         it("should change time range multiple times", () => {
@@ -529,12 +529,12 @@ describe("useUIStore", () => {
                 { ...mockSite, identifier: "site-3" },
             ];
 
-            sites.forEach((site) => {
+            for (const site of sites) {
                 act(() => {
                     result.current.setSelectedSite(site);
                 });
                 expect(result.current.selectedSiteId).toBe(site.identifier);
-            });
+            }
 
             // Clear selection
             act(() => {
@@ -647,7 +647,7 @@ describe("useUIStore", () => {
                 () => result.current.showAdvancedMetrics,
             ];
 
-            booleanActions.forEach((action, index) => {
+            for (const [index, action] of booleanActions.entries()) {
                 const getState = booleanStates[index]!;
 
                 // Should start false
@@ -670,7 +670,7 @@ describe("useUIStore", () => {
                     action(true);
                 });
                 expect(getState!()).toBe(true);
-            });
+            }
         });
     });
 });

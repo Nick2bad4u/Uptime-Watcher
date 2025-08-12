@@ -23,7 +23,7 @@ import {
 describe("Timeout Utilities", () => {
     describe("clampTimeoutMs", () => {
         it("should return the input when within valid range", () => {
-            const validTimeout = 30000; // 30 seconds
+            const validTimeout = 30_000; // 30 seconds
             expect(clampTimeoutMs(validTimeout)).toBe(validTimeout);
         });
 
@@ -52,7 +52,7 @@ describe("Timeout Utilities", () => {
         });
 
         it("should handle fractional values", () => {
-            const fractional = 15000.5;
+            const fractional = 15_000.5;
             expect(clampTimeoutMs(fractional)).toBe(fractional);
         });
     });
@@ -95,7 +95,7 @@ describe("Timeout Utilities", () => {
 
     describe("getTimeoutSeconds", () => {
         it("should convert monitor timeout from ms to seconds", () => {
-            const timeoutMs = 15000; // 15 seconds
+            const timeoutMs = 15_000; // 15 seconds
             expect(getTimeoutSeconds(timeoutMs)).toBe(15);
         });
 
@@ -115,14 +115,14 @@ describe("Timeout Utilities", () => {
         });
 
         it("should handle large timeout values", () => {
-            expect(getTimeoutSeconds(60000)).toBe(60);
+            expect(getTimeoutSeconds(60_000)).toBe(60);
         });
     });
 
     describe("isValidTimeoutMs", () => {
         it("should return true for valid timeout values", () => {
             expect(isValidTimeoutMs(5000)).toBe(true);
-            expect(isValidTimeoutMs(30000)).toBe(true);
+            expect(isValidTimeoutMs(30_000)).toBe(true);
             expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MIN)).toBe(true);
             expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MAX)).toBe(true);
         });
@@ -193,7 +193,7 @@ describe("Timeout Utilities", () => {
         it("should convert milliseconds to seconds correctly", () => {
             expect(timeoutMsToSeconds(1000)).toBe(1);
             expect(timeoutMsToSeconds(5000)).toBe(5);
-            expect(timeoutMsToSeconds(30000)).toBe(30);
+            expect(timeoutMsToSeconds(30_000)).toBe(30);
         });
 
         it("should handle zero", () => {
@@ -206,8 +206,8 @@ describe("Timeout Utilities", () => {
         });
 
         it("should handle large values", () => {
-            expect(timeoutMsToSeconds(60000)).toBe(60);
-            expect(timeoutMsToSeconds(300000)).toBe(300);
+            expect(timeoutMsToSeconds(60_000)).toBe(60);
+            expect(timeoutMsToSeconds(300_000)).toBe(300);
         });
 
         it("should preserve precision for small values", () => {
@@ -229,7 +229,7 @@ describe("Timeout Utilities", () => {
         it("should convert seconds to milliseconds correctly", () => {
             expect(timeoutSecondsToMs(1)).toBe(1000);
             expect(timeoutSecondsToMs(5)).toBe(5000);
-            expect(timeoutSecondsToMs(30)).toBe(30000);
+            expect(timeoutSecondsToMs(30)).toBe(30_000);
         });
 
         it("should handle zero", () => {
@@ -242,8 +242,8 @@ describe("Timeout Utilities", () => {
         });
 
         it("should handle large values", () => {
-            expect(timeoutSecondsToMs(60)).toBe(60000);
-            expect(timeoutSecondsToMs(300)).toBe(300000);
+            expect(timeoutSecondsToMs(60)).toBe(60_000);
+            expect(timeoutSecondsToMs(300)).toBe(300_000);
         });
 
         it("should preserve precision for small values", () => {
@@ -263,7 +263,7 @@ describe("Timeout Utilities", () => {
 
     describe("Conversion consistency", () => {
         it("should maintain round-trip conversion accuracy", () => {
-            const originalMs = 15000;
+            const originalMs = 15_000;
             const convertedSeconds = timeoutMsToSeconds(originalMs);
             const backToMs = timeoutSecondsToMs(convertedSeconds);
             expect(backToMs).toBe(originalMs);

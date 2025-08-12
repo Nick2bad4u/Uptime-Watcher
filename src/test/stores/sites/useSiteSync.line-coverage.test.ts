@@ -60,7 +60,7 @@ const mockElectronAPI = {
     },
 };
 
-Object.defineProperty(global, "window", {
+Object.defineProperty(globalThis, "window", {
     value: {
         electronAPI: mockElectronAPI,
     },
@@ -128,7 +128,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
                     return {
                         siteCount: 5,
                         synchronized: true,
-                        lastSync: 1640995200000,
+                        lastSync: 1_640_995_200_000,
                         success: true,
                     };
                 }
@@ -139,7 +139,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
             ).mockResolvedValue({
                 siteCount: 5,
                 synchronized: true,
-                lastSync: 1640995200000,
+                lastSync: 1_640_995_200_000,
                 success: true,
             });
 

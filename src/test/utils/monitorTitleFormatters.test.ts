@@ -19,7 +19,7 @@ function createMockMonitor(overrides: Partial<Monitor> = {}): Monitor {
         id: "test-monitor",
         type: "http",
         monitoring: true,
-        checkInterval: 30000,
+        checkInterval: 30_000,
         timeout: 5000,
         retryAttempts: 3,
         responseTime: 0,
@@ -204,7 +204,7 @@ describe("monitorTitleFormatters", () => {
                 const monitor = createMockMonitor({
                     type: "port",
                     host: "service.example.com",
-                    port: 65535,
+                    port: 65_535,
                 });
 
                 const result = formatTitleSuffix(monitor);

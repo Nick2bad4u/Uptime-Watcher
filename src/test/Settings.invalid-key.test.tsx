@@ -266,7 +266,7 @@ vi.mock("../theme/useTheme", () => ({
 }));
 
 // Mock window.confirm
-global.confirm = vi.fn(() => true);
+globalThis.confirm = vi.fn(() => true);
 
 describe("Settings Component - Invalid Key Coverage", () => {
     beforeEach(() => {

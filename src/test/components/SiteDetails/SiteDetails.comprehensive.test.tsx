@@ -13,7 +13,7 @@ const MockBrowserRouter = ({ children }: { children: React.ReactNode }) => (
 );
 
 // Mock window.matchMedia before other imports
-Object.defineProperty(window, "matchMedia", {
+Object.defineProperty(globalThis, "matchMedia", {
     writable: true,
     value: vi.fn().mockImplementation((query) => ({
         matches: false,
@@ -197,8 +197,8 @@ const mockSite = {
             id: "monitor-1",
             type: "http" as const,
             url: "https://example.com",
-            checkInterval: 300000,
-            timeout: 30000,
+            checkInterval: 300_000,
+            timeout: 30_000,
             retryAttempts: 3,
             monitoring: true,
             status: "up" as const,
@@ -216,15 +216,15 @@ const mockUseSiteDetailsReturn = {
         upCount: 95,
         downCount: 5,
         uptime: "95.0%",
-        uptimeRaw: 95.0,
+        uptimeRaw: 95,
         avgResponseTime: 150,
         fastestResponse: 50,
         slowestResponse: 300,
         p50: 140,
         p95: 280,
         p99: 295,
-        totalDowntime: 300000,
-        mttr: 60000,
+        totalDowntime: 300_000,
+        mttr: 60_000,
         incidentCount: 2,
         downtimePeriods: [],
         filteredHistory: [],
@@ -249,10 +249,10 @@ const mockUseSiteDetailsReturn = {
     intervalChanged: false,
     isLoading: false,
     isMonitoring: true,
-    localCheckInterval: 300000,
+    localCheckInterval: 300_000,
     localName: "Test Site",
     localRetryAttempts: 3,
-    localTimeout: 30000,
+    localTimeout: 30_000,
     retryAttemptsChanged: false,
     selectedMonitor: mockSite.monitors[0],
     selectedMonitorId: "monitor-1",
@@ -653,11 +653,11 @@ describe("SiteDetails", () => {
             ).toHaveBeenCalledTimes(availableTabs.length);
 
             // Verify each call was made with the correct tab name
-            availableTabs.forEach((tab, index) => {
+            for (const [index, tab] of availableTabs.entries()) {
                 expect(
                     mockUseSiteDetailsReturn.setActiveSiteDetailsTab
                 ).toHaveBeenNthCalledWith(index + 1, tab);
-            });
+            }
         });
     });
 });

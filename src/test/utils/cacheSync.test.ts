@@ -84,9 +84,9 @@ describe("cacheSync", () => {
         );
 
         // Clean up any existing window.electronAPI
-        if (typeof window !== "undefined") {
+        if (globalThis.window !== undefined) {
             // delete window.electronAPI;
-            (window as any).electronAPI = undefined;
+            (globalThis as any).electronAPI = undefined;
         }
     });
 
@@ -94,9 +94,9 @@ describe("cacheSync", () => {
         describe("when window is undefined (SSR/Node environment)", () => {
             it("should return no-op cleanup function and warn", () => {
                 // Mock window as undefined
-                const originalWindow = global.window;
+                const originalWindow = globalThis.window;
 
-                delete (global as any).window;
+                delete (globalThis as any).window;
 
                 const cleanup = setupCacheSync();
 
@@ -109,13 +109,13 @@ describe("cacheSync", () => {
                 cleanup();
 
                 // Restore window
-                global.window = originalWindow;
+                globalThis.window = originalWindow;
             });
         });
 
         describe("when electronAPI is not available", () => {
             it("should return no-op cleanup function and warn", () => {
-                (global as any).window = {};
+                (globalThis as any).window = {};
 
                 const cleanup = setupCacheSync();
 
@@ -138,11 +138,11 @@ describe("cacheSync", () => {
                 mockCleanup = vi.fn();
                 mockOnCacheInvalidated.mockReturnValue(mockCleanup);
 
-                (global as any).window = {
+                (globalThis as any).window = {
                     electronAPI: createMockElectronAPI(true, true),
                 };
 
-                global.window.electronAPI.events.onCacheInvalidated =
+                globalThis.window.electronAPI.events.onCacheInvalidated =
                     mockOnCacheInvalidated;
             });
 
@@ -409,7 +409,7 @@ describe("cacheSync", () => {
 
         describe("when electronAPI exists but events is missing", () => {
             it("should handle missing events property gracefully", () => {
-                (global as any).window = {
+                (globalThis as any).window = {
                     electronAPI: {
                         ...createMockElectronAPI(true, false),
                         events: undefined,
@@ -437,11 +437,11 @@ describe("cacheSync", () => {
                 mockCleanup = vi.fn();
                 mockOnCacheInvalidated.mockReturnValue(mockCleanup);
 
-                (global as any).window = {
+                (globalThis as any).window = {
                     electronAPI: createMockElectronAPI(true, true),
                 };
 
-                global.window.electronAPI.events.onCacheInvalidated =
+                globalThis.window.electronAPI.events.onCacheInvalidated =
                     mockOnCacheInvalidated;
             });
 
@@ -506,11 +506,11 @@ describe("cacheSync", () => {
                 mockCleanup = vi.fn();
                 mockOnCacheInvalidated.mockReturnValue(mockCleanup);
 
-                (global as any).window = {
+                (globalThis as any).window = {
                     electronAPI: createMockElectronAPI(true, true),
                 };
 
-                global.window.electronAPI.events.onCacheInvalidated =
+                globalThis.window.electronAPI.events.onCacheInvalidated =
                     mockOnCacheInvalidated;
 
                 setupCacheSync();

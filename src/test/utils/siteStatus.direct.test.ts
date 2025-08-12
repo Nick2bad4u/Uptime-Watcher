@@ -138,11 +138,11 @@ describe("Frontend siteStatus re-exports", () => {
         it("should call re-exported getSiteStatusVariant", () => {
             const statuses: SiteStatus[] = ["up", "down", "mixed", "unknown"];
 
-            statuses.forEach((status) => {
+            for (const status of statuses) {
                 const result = getSiteStatusVariant(status);
                 expect(typeof result).toBe("string");
                 expect(result.length).toBeGreaterThan(0);
-            });
+            }
         });
 
         it("should call re-exported calculateSiteMonitoringStatus", () => {
@@ -195,7 +195,7 @@ describe("Frontend siteStatus re-exports", () => {
                 "paused",
             ] as const;
 
-            monitorStatuses.forEach((status) => {
+            for (const status of monitorStatuses) {
                 const site = {
                     id: `test-${status}`,
                     name: `Test ${status} Site`,
@@ -205,7 +205,7 @@ describe("Frontend siteStatus re-exports", () => {
 
                 const result = calculateSiteStatus(site);
                 expect(typeof result).toBe("string");
-            });
+            }
         });
     });
 });

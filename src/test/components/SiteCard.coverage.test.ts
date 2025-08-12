@@ -46,7 +46,7 @@ describe("SiteCard Component Coverage Tests", () => {
                         responseTime: 150,
                         lastChecked: new Date(),
                         history: [],
-                        checkInterval: 60000,
+                        checkInterval: 60_000,
                         timeout: 5000,
                         retryAttempts: 3,
                     },
@@ -94,9 +94,9 @@ describe("SiteCard Component Coverage Tests", () => {
                 onStopSiteMonitoring: vi.fn(),
             };
 
-            Object.values(interactionProps).forEach((prop) => {
+            for (const prop of Object.values(interactionProps)) {
                 expect(typeof prop).toBe("function");
-            });
+            }
 
             // Test calling the functions
             interactionProps.onCheckNow();
@@ -367,10 +367,10 @@ describe("SiteCard Component Coverage Tests", () => {
                     "SiteCardFooter",
                 ];
 
-                subComponents.forEach((component) => {
+                for (const component of subComponents) {
                     expect(typeof component).toBe("string");
                     expect(component.startsWith("SiteCard")).toBe(true);
-                });
+                }
             });
 
             it("should use ThemedBox as container", () => {
@@ -498,10 +498,10 @@ describe("SiteCard Component Coverage Tests", () => {
                     1000,
                 ];
 
-                responseTimes.forEach((time) => {
+                for (const time of responseTimes) {
                     expect(typeof time).toBe("number");
                     expect(time).toBeGreaterThan(0);
-                });
+                }
 
                 const avgResponseTime =
                     responseTimes.reduce((a, b) => a + b, 0) /
@@ -515,14 +515,14 @@ describe("SiteCard Component Coverage Tests", () => {
                     99.9,
                     100,
                     0,
-                    50.0,
+                    50,
                 ];
 
-                uptimeValues.forEach((uptime) => {
+                for (const uptime of uptimeValues) {
                     expect(typeof uptime).toBe("number");
                     expect(uptime).toBeGreaterThanOrEqual(0);
                     expect(uptime).toBeLessThanOrEqual(100);
-                });
+                }
             });
         });
 
@@ -549,9 +549,9 @@ describe("SiteCard Component Coverage Tests", () => {
                     handleMonitorIdChange: vi.fn(),
                 };
 
-                Object.values(clickHandlers).forEach((handler) => {
+                for (const handler of Object.values(clickHandlers)) {
                     expect(typeof handler).toBe("function");
-                });
+                }
 
                 clickHandlers.handleCardClick();
                 clickHandlers.handleCheckNow();

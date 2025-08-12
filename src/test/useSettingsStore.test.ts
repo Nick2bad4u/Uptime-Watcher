@@ -19,7 +19,7 @@ const mockElectronAPI = {
     },
 };
 
-Object.defineProperty(window, "electronAPI", {
+Object.defineProperty(globalThis, "electronAPI", {
     value: mockElectronAPI,
     writable: true,
 });
@@ -307,10 +307,10 @@ describe("useSettingsStore", () => {
         it("should handle very large historyLimit", () => {
             useSettingsStore
                 .getState()
-                .updateSettings({ historyLimit: 999999 });
+                .updateSettings({ historyLimit: 999_999 });
 
             const state = useSettingsStore.getState();
-            expect(state.settings.historyLimit).toBe(999999);
+            expect(state.settings.historyLimit).toBe(999_999);
         });
     });
 

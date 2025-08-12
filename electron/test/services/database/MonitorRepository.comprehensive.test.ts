@@ -41,9 +41,11 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
         } as any;
 
         repository = new MonitorRepository({
-            databaseService: mockDatabaseService,        });        });
+            databaseService: mockDatabaseService,
+        });        });
     afterEach(() => {
-        vi.clearAllMocks();        });
+        vi.clearAllMocks();
+        });
     describe("bulkCreate", () => {
         it("should create multiple monitors successfully", async () => {
             const siteIdentifier = "site-123";
@@ -85,10 +87,12 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             );
 
             expect(result).toHaveLength(2);
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();        });
+            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
+        });
         it("should handle empty monitors array", async () => {
             const result = await repository.bulkCreate("site-123", []);
-            expect(result).toEqual([]);        });
+            expect(result).toEqual([]);
+        });
         it("should handle database transaction errors", async () => {
             mockDatabaseService.executeTransaction.mockRejectedValue(
                 new Error("Transaction failed")
@@ -109,14 +113,16 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
                         id: "temp-1",
                     },
                 ])
-            ).rejects.toThrow("Transaction failed");        });        });
+            ).rejects.toThrow("Transaction failed");
+        });        });
     describe("clearActiveOperations", () => {
         it("should clear active operations for a monitor", async () => {
             mockDatabase.run.mockReturnValue({ changes: 1 });
 
             await repository.clearActiveOperations("monitor-123");
 
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();        });
+            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
+        });
         it("should handle database errors during clear operations", async () => {
             mockDatabaseService.executeTransaction.mockRejectedValue(
                 new Error("Clear failed")
@@ -124,7 +130,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             await expect(
                 repository.clearActiveOperations("monitor-123")
-            ).rejects.toThrow("Clear failed");        });        });
+            ).rejects.toThrow("Clear failed");
+        });        });
     describe("create", () => {
         it("should create a new monitor successfully", async () => {
             const siteIdentifier = "site-123";
@@ -145,7 +152,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             const result = await repository.create(siteIdentifier, monitor);
 
             expect(result).toBe("123");
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();        });
+            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
+        });
         it("should handle port monitor creation", async () => {
             const siteIdentifier = "site-123";
             const monitor: Omit<Site["monitors"][0], "id"> = {
@@ -165,7 +173,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             const result = await repository.create(siteIdentifier, monitor);
 
-            expect(result).toBe("456");        });
+            expect(result).toBe("456");
+        });
         it("should handle creation errors", async () => {
             mockDatabaseService.executeTransaction.mockRejectedValue(
                 new Error("Creation failed")
@@ -183,7 +192,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
                     responseTime: 0,
                     history: [],
                 })
-            ).rejects.toThrow("Creation failed");        });        });
+            ).rejects.toThrow("Creation failed");
+        });        });
     describe("delete", () => {
         it("should delete a monitor successfully", async () => {
             mockDatabase.run
@@ -193,7 +203,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             const result = await repository.delete("monitor-123");
 
             expect(result).toBe(true);
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();        });
+            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
+        });
         it("should return false when monitor not found", async () => {
             mockDatabase.run
                 .mockReturnValueOnce({ changes: 0 }) // No history
@@ -201,7 +212,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             const result = await repository.delete("nonexistent");
 
-            expect(result).toBe(false);        });
+            expect(result).toBe(false);
+        });
         it("should handle deletion errors", async () => {
             mockDatabaseService.executeTransaction.mockRejectedValue(
                 new Error("Deletion failed")
@@ -209,14 +221,16 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             await expect(repository.delete("monitor-123")).rejects.toThrow(
                 "Deletion failed"
-            );        });        });
+            );
+        });        });
     describe("deleteAll", () => {
         it("should delete all monitors", async () => {
             mockDatabase.run.mockReturnValue({ changes: 5 });
 
             await repository.deleteAll();
 
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();        });
+            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
+        });
         it("should handle delete all errors", async () => {
             mockDatabaseService.executeTransaction.mockRejectedValue(
                 new Error("Delete all failed")
@@ -224,7 +238,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             await expect(repository.deleteAll()).rejects.toThrow(
                 "Delete all failed"
-            );        });        });
+            );
+        });        });
     describe("deleteBySiteIdentifier", () => {
         it("should delete monitors by site identifier", async () => {
             // Mock the query for monitor rows first, then the delete operations
@@ -237,7 +252,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             await repository.deleteBySiteIdentifier("site-123");
 
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();        });
+            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
+        });
         it("should handle site deletion errors", async () => {
             mockDatabaseService.executeTransaction.mockRejectedValue(
                 new Error("Site deletion failed")
@@ -245,7 +261,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             await expect(
                 repository.deleteBySiteIdentifier("site-123")
-            ).rejects.toThrow("Site deletion failed");        });        });
+            ).rejects.toThrow("Site deletion failed");
+        });        });
     describe("update", () => {
         it("should update a monitor successfully", async () => {
             const monitorId = "monitor-123";
@@ -263,7 +280,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             await repository.update(monitorId, updatedData);
 
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();        });
+            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
+        });
         it("should handle monitor not found for update", async () => {
             const monitorId = "nonexistent";
             const updateData = { url: "https://example.com" };
@@ -273,7 +291,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             // Should not throw error even if monitor not found
             await repository.update(monitorId, updateData);
 
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();        });
+            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
+        });
         it("should handle update errors", async () => {
             mockDatabaseService.executeTransaction.mockRejectedValue(
                 new Error("Update failed")
@@ -281,7 +300,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             await expect(
                 repository.update("monitor-123", { url: "https://example.com" })
-            ).rejects.toThrow("Update failed");        });
+            ).rejects.toThrow("Update failed");
+        });
         it("should handle monitors with different status values", async () => {
             const statuses = ["up", "down", "pending", "paused"] as const;
 
@@ -291,11 +311,13 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
                 await repository.update(`monitor-${status}`, {
                     status,
                     responseTime: 100,
-                    lastChecked: new Date(),        });
+                    lastChecked: new Date(),
+        });
                 expect(
                     mockDatabaseService.executeTransaction
                 ).toHaveBeenCalled();
-            }        });        });
+            }
+        });        });
     describe("Edge Cases and Error Handling", () => {
         it("should handle malformed monitor data gracefully", async () => {
             // Test with minimal monitor data
@@ -314,23 +336,28 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             mockDatabase.get.mockReturnValue({ id: 789 });
 
             const result = await repository.create("site-123", monitor);
-            expect(result).toBe("789");        });
+            expect(result).toBe("789");
+        });
         it("should handle database connection errors", async () => {
             mockDatabaseService.getDatabase.mockImplementation(() => {
-                throw new Error("Database connection failed");        });
+                throw new Error("Database connection failed");
+        });
             await expect(
                 repository.findByIdentifier("monitor-123")
-            ).rejects.toThrow("Database connection failed");        });
+            ).rejects.toThrow("Database connection failed");
+        });
         it("should handle null/undefined responses from database", async () => {
             mockDatabase.get.mockReturnValue(null);
 
             const result = await repository.findByIdentifier("monitor-123");
-            expect(result).toBeUndefined();        });
+            expect(result).toBeUndefined();
+        });
         it("should handle empty result sets", async () => {
             mockDatabase.all.mockReturnValue([]);
 
             const result = await repository.findBySiteIdentifier("empty-site");
-            expect(result).toEqual([]);        });
+            expect(result).toEqual([]);
+        });
         it("should handle very large datasets", async () => {
             const largeDataset = Array.from({ length: 1000 }, (_, i) => ({
                 id: `monitor-${i}`,
@@ -349,7 +376,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             mockDatabase.all.mockReturnValue(largeDataset);
 
             const result = await repository.findBySiteIdentifier("large-site");
-            expect(result).toHaveLength(1000);        });        });
+            expect(result).toHaveLength(1000);
+        });        });
     describe("Internal Method Coverage", () => {
         it("should cover clearActiveOperationsInternal through public method", async () => {
             // This tests the internal method through the public interface
@@ -357,7 +385,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             await repository.clearActiveOperations("monitor-123");
 
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();        });
+            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
+        });
         it("should cover createInternal through public method", async () => {
             // This tests the internal method through the public interface
             mockDatabase.get.mockReturnValue({ id: 999 });
@@ -371,8 +400,10 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: 0,
-                history: [],        });
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();        });        });
+                history: [],
+        });
+            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
+        });        });
     describe("Complex Scenarios", () => {
         it("should handle mixed monitor types in bulk operations", async () => {
             const mixedMonitors: Array<Site["monitors"][0]> = [
@@ -425,19 +456,21 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
                 "mixed-site",
                 mixedMonitors
             );
-            expect(result).toHaveLength(3);        });
+            expect(result).toHaveLength(3);
+        });
         it("should handle concurrent operations correctly", async () => {
-            // Simulate concurrent operations
-            const promises = [
-                repository.findByIdentifier("monitor-1"),
-                repository.findByIdentifier("monitor-2"),
-                repository.findByIdentifier("monitor-3"),
-            ];
-
+            // Set up mock responses for concurrent calls
             mockDatabase.get
                 .mockReturnValueOnce({ id: "monitor-1" })
                 .mockReturnValueOnce({ id: "monitor-2" })
                 .mockReturnValueOnce({ id: "monitor-3" });
 
-            const results = await Promise.all(promises);
-            expect(results).toHaveLength(3);        });        });        });
+            // Execute concurrent operations and await all results
+            const results = await Promise.all([
+                repository.findByIdentifier("monitor-1"),
+                repository.findByIdentifier("monitor-2"),
+                repository.findByIdentifier("monitor-3"),
+            ]);
+
+            expect(results).toHaveLength(3);
+        });        });        });

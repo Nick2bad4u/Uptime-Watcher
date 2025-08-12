@@ -7,7 +7,7 @@ import "@testing-library/jest-dom";
 import { vi, type Mock } from "vitest";
 
 // Mock ResizeObserver for Chart.js testing
-global.ResizeObserver = vi.fn().mockImplementation(() => ({
+globalThis.ResizeObserver = vi.fn().mockImplementation(() => ({
     observe: vi.fn(),
     unobserve: vi.fn(),
     disconnect: vi.fn(),
@@ -149,7 +149,7 @@ const mockElectronAPI: {
                             type: "number",
                             required: false,
                             min: 1,
-                            max: 65535,
+                            max: 65_535,
                         },
                     ],
                 },
@@ -168,7 +168,7 @@ const mockElectronAPI: {
                             type: "number",
                             required: true,
                             min: 1,
-                            max: 65535,
+                            max: 65_535,
                         },
                     ],
                 },
@@ -220,13 +220,13 @@ const mockElectronAPI: {
 };
 
 // Mock window.electronAPI globally
-Object.defineProperty(window, "electronAPI", {
+Object.defineProperty(globalThis, "electronAPI", {
     value: mockElectronAPI,
     writable: true,
 });
 
 // Mock window.matchMedia for theme tests
-Object.defineProperty(window, "matchMedia", {
+Object.defineProperty(globalThis, "matchMedia", {
     writable: true,
     value: vi.fn().mockImplementation((query) => ({
         matches: false,
@@ -239,10 +239,10 @@ Object.defineProperty(window, "matchMedia", {
 });
 
 // Mock crypto API for UUID generation
-Object.defineProperty(global, "crypto", {
+Object.defineProperty(globalThis, "crypto", {
     value: {
         randomUUID: vi.fn(
-            () => "mock-uuid-" + Math.random().toString(36).substring(2, 15)
+            () => "mock-uuid-" + Math.random().toString(36).slice(2, 15)
         ),
         getRandomValues: vi.fn((arr) => {
             for (let i = 0; i < arr.length; i++) {

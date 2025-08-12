@@ -24,7 +24,7 @@ const mockElectronAPI = {
     },
 };
 
-Object.defineProperty(window, "electronAPI", {
+Object.defineProperty(globalThis, "electronAPI", {
     value: mockElectronAPI,
     writable: true,
 });
@@ -55,7 +55,7 @@ describe("Monitor Validation Utilities", () => {
             async (_fn, _operation, fallback) => {
                 try {
                     return await _fn();
-                } catch (error) {
+                } catch {
                     return fallback;
                 }
             }
@@ -78,7 +78,7 @@ describe("Monitor Validation Utilities", () => {
                 responseTime: -1,
                 retryAttempts: 3,
                 status: "pending",
-                timeout: 10000,
+                timeout: 10_000,
                 type: "http",
                 url: "https://example.com",
             });
@@ -96,7 +96,7 @@ describe("Monitor Validation Utilities", () => {
                 responseTime: -1,
                 retryAttempts: 3,
                 status: "pending",
-                timeout: 10000,
+                timeout: 10_000,
                 type: "port",
                 host: "localhost",
                 port: 3000,
@@ -133,7 +133,7 @@ describe("Monitor Validation Utilities", () => {
             expect(result["responseTime"]).toBe(-1);
             expect(result["retryAttempts"]).toBe(3);
             expect(result["status"]).toBe("pending");
-            expect(result["timeout"]).toBe(10000);
+            expect(result["timeout"]).toBe(10_000);
         });
 
         it("should preserve additional custom fields", () => {
@@ -749,7 +749,7 @@ describe("Monitor Validation Utilities", () => {
 
                 const result = await validateMonitorFormData("port", {
                     host: "invalid-host",
-                    port: 99999,
+                    port: 99_999,
                 });
 
                 expect(result).toEqual({
@@ -776,7 +776,7 @@ describe("Monitor Validation Utilities", () => {
 
                 const result = await validateMonitorFormData("port", {
                     host: "localhost",
-                    port: 99999,
+                    port: 99_999,
                 });
 
                 expect(result).toEqual({

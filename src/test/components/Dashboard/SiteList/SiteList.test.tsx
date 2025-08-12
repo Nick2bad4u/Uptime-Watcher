@@ -69,8 +69,8 @@ describe("SiteList", () => {
                     type: "http" as any,
                     status: "up" as any,
                     monitoring: true,
-                    checkInterval: 60000,
-                    timeout: 30000,
+                    checkInterval: 60_000,
+                    timeout: 30_000,
                     retryAttempts: 3,
                     responseTime: 200,
                     history: [],
@@ -88,8 +88,8 @@ describe("SiteList", () => {
                     type: "http" as any,
                     status: "down" as any,
                     monitoring: true,
-                    checkInterval: 60000,
-                    timeout: 30000,
+                    checkInterval: 60_000,
+                    timeout: 30_000,
                     retryAttempts: 3,
                     responseTime: 0,
                     history: [],
@@ -107,8 +107,8 @@ describe("SiteList", () => {
                     type: "http" as any,
                     status: "unknown" as any,
                     monitoring: false,
-                    checkInterval: 60000,
-                    timeout: 30000,
+                    checkInterval: 60_000,
+                    timeout: 30_000,
                     retryAttempts: 3,
                     responseTime: 0,
                     history: [],
@@ -277,11 +277,11 @@ describe("SiteList", () => {
             render(<SiteList />);
 
             // Assert - Each site card should be rendered with its identifier
-            mockSites.forEach((site) => {
+            for (const site of mockSites) {
                 expect(
                     screen.getByTestId(`site-card-${site.identifier}`)
                 ).toBeInTheDocument();
-            });
+            }
         });
 
         it("should handle sites with special characters in identifiers", () => {

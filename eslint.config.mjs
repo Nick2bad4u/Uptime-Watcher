@@ -108,9 +108,8 @@ import * as cssPlugin from "eslint-plugin-css";
 // Schema: https://www.schemastore.org/eslintrc.json
 
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = import.meta.dirname;
 
 export default [
     importX.flatConfigs.typescript,
@@ -510,7 +509,7 @@ export default [
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
             ...pluginMicrosoftSdl.configs.required.rules,
 
-            "sort-destructure-keys/sort-destructure-keys": "warn",
+            "sort-destructure-keys/sort-destructure-keys": "off",
 
             "@eslint-react/naming-convention/component-name": "warn",
             "@eslint-react/naming-convention/context-name": "warn",
@@ -1478,7 +1477,7 @@ export default [
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
             ...pluginMicrosoftSdl.configs.required.rules,
 
-            "sort-destructure-keys/sort-destructure-keys": "warn",
+            "sort-destructure-keys/sort-destructure-keys": "off",
 
             "@eslint-react/naming-convention/component-name": "warn",
             "@eslint-react/naming-convention/context-name": "warn",
@@ -2262,10 +2261,30 @@ export default [
 
         rules: {
             ...tseslint.configs.recommended.rules,
-            ...vitest.configs.all.rules,
+            ...vitest.configs.recommended.rules,
             ...pluginComments.configs.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs["flat/all"].rules,
+
+            "unicorn/no-keyword-prefix": [
+                "error",
+                {
+                    disallowedPrefixes: [
+                        "interface",
+                        "type",
+                        "enum",
+                    ],
+                    checkProperties: false,
+                },
+            ], // Allow "class" prefix for className and other legitimate uses
+            "unicorn/no-useless-undefined": "off", // Allow undefined in test setups
+            "unicorn/consistent-function-scoping": "off", // Tests often use different scoping
+            "unicorn/no-unused-properties": "off", // Allow unused properties in test setups
+            "unicorn/no-null": "off", // Null is common in test setups
+            "unicorn/no-await-expression-member": "off", // Allow await in test expressions
+            "unicorn/filename-case": "off", // Allow test files to have any case
+            "unicorn/prevent-abbreviations": "off", // Too many false positives in tests
+            "unused-imports/no-unused-imports": "error",
 
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-non-null-assertion": "off",
@@ -2337,7 +2356,7 @@ export default [
         },
         rules: {
             ...tseslint.configs.recommended.rules,
-            ...vitest.configs.all.rules,
+            ...vitest.configs.recommended.rules,
             ...pluginUnicorn.configs["flat/all"].rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
 
