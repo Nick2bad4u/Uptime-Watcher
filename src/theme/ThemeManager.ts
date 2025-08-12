@@ -5,6 +5,9 @@
  * Note: Empty constructor and no-op functions are intentional design patterns.
  */
 
+/* eslint-disable @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison */
+// Defensive programming for test edge cases and cross-environment compatibility
+
 import type { Theme, ThemeName } from "./types";
 
 import { themes } from "./themes";
@@ -107,7 +110,6 @@ export class ThemeManager {
      * This ensures safe operation across all deployment environments.
      */
     public getSystemThemePreference(): "dark" | "light" {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- window.matchMedia can be undefined in test environments (Jest/JSDOM), SSR, and some older browsers
         if (typeof window !== "undefined" && window.matchMedia) {
             return window.matchMedia("(prefers-color-scheme: dark)").matches
                 ? "dark"
@@ -172,7 +174,11 @@ export class ThemeManager {
      */
     private addBorderRadiusVariables(theme: Theme, variables: string[]): void {
         // Border radius - all themes have borderRadius property
-        if (typeof theme.borderRadius === "object") {
+
+        if (
+            typeof theme.borderRadius === "object" &&
+            theme.borderRadius !== null
+        ) {
             for (const [size, value] of Object.entries(theme.borderRadius)) {
                 variables.push(`  --radius-${size}: ${value};`);
             }
@@ -183,7 +189,7 @@ export class ThemeManager {
      * Add color CSS variables from theme.
      */
     private addColorVariables(theme: Theme, variables: string[]): void {
-        if (typeof theme.colors === "object") {
+        if (typeof theme.colors === "object" && theme.colors !== null) {
             for (const [category, colors] of Object.entries(theme.colors)) {
                 if (typeof colors === "object" && colors !== null) {
                     // Type-safe access to color values - colors are either string or nested color objects
@@ -206,7 +212,7 @@ export class ThemeManager {
      */
     private addShadowVariables(theme: Theme, variables: string[]): void {
         // Shadows - all themes have shadows property
-        if (typeof theme.shadows === "object") {
+        if (typeof theme.shadows === "object" && theme.shadows !== null) {
             for (const [size, value] of Object.entries(theme.shadows)) {
                 variables.push(`  --shadow-${size}: ${value};`);
             }
@@ -218,7 +224,7 @@ export class ThemeManager {
      */
     private addSpacingVariables(theme: Theme, variables: string[]): void {
         // Spacing - all themes have spacing property
-        if (typeof theme.spacing === "object") {
+        if (typeof theme.spacing === "object" && theme.spacing !== null) {
             for (const [size, value] of Object.entries(theme.spacing)) {
                 variables.push(`  --spacing-${size}: ${value};`);
             }
@@ -230,7 +236,7 @@ export class ThemeManager {
      */
     private addTypographyVariables(theme: Theme, variables: string[]): void {
         // Typography - all themes have typography property with required sub-properties
-        if (typeof theme.typography === "object") {
+        if (typeof theme.typography === "object" && theme.typography !== null) {
             this.addFontSizeVariables(theme.typography, variables);
             this.addFontWeightVariables(theme.typography, variables);
             this.addLineHeightVariables(theme.typography, variables);
@@ -244,7 +250,10 @@ export class ThemeManager {
         typography: Theme["typography"],
         variables: string[]
     ): void {
-        if (typeof typography.fontSize === "object") {
+        if (
+            typeof typography.fontSize === "object" &&
+            typography.fontSize !== null
+        ) {
             for (const [size, value] of Object.entries(typography.fontSize)) {
                 variables.push(`  --font-size-${size}: ${value};`);
             }
@@ -258,7 +267,10 @@ export class ThemeManager {
         typography: Theme["typography"],
         variables: string[]
     ): void {
-        if (typeof typography.fontWeight === "object") {
+        if (
+            typeof typography.fontWeight === "object" &&
+            typography.fontWeight !== null
+        ) {
             for (const [weight, value] of Object.entries(
                 typography.fontWeight
             )) {
@@ -274,7 +286,10 @@ export class ThemeManager {
         typography: Theme["typography"],
         variables: string[]
     ): void {
-        if (typeof typography.lineHeight === "object") {
+        if (
+            typeof typography.lineHeight === "object" &&
+            typography.lineHeight !== null
+        ) {
             for (const [height, value] of Object.entries(
                 typography.lineHeight
             )) {
@@ -290,7 +305,7 @@ export class ThemeManager {
         root: HTMLElement,
         borderRadius: Theme["borderRadius"]
     ): void {
-        if (typeof borderRadius === "object") {
+        if (typeof borderRadius === "object" && borderRadius !== null) {
             for (const [size, value] of Object.entries(borderRadius)) {
                 root.style.setProperty(`--radius-${size}`, String(value));
             }
@@ -301,7 +316,7 @@ export class ThemeManager {
      * Apply color CSS custom properties
      */
     private applyColors(root: HTMLElement, colors: Theme["colors"]): void {
-        if (typeof colors === "object") {
+        if (typeof colors === "object" && colors !== null) {
             for (const [category, colorValue] of Object.entries(colors)) {
                 if (typeof colorValue === "object" && colorValue !== null) {
                     // Type-safe access to color values - colorValue is a nested color object with string values
@@ -327,7 +342,7 @@ export class ThemeManager {
      * Apply shadow CSS custom properties
      */
     private applyShadows(root: HTMLElement, shadows: Theme["shadows"]): void {
-        if (typeof shadows === "object") {
+        if (typeof shadows === "object" && shadows !== null) {
             for (const [size, value] of Object.entries(shadows)) {
                 root.style.setProperty(`--shadow-${size}`, String(value));
             }
@@ -338,7 +353,7 @@ export class ThemeManager {
      * Apply spacing CSS custom properties
      */
     private applySpacing(root: HTMLElement, spacing: Theme["spacing"]): void {
-        if (typeof spacing === "object") {
+        if (typeof spacing === "object" && spacing !== null) {
             for (const [size, value] of Object.entries(spacing)) {
                 root.style.setProperty(`--spacing-${size}`, String(value));
             }
@@ -385,7 +400,7 @@ export class ThemeManager {
         root: HTMLElement,
         typography: Theme["typography"]
     ): void {
-        if (typeof typography === "object") {
+        if (typeof typography === "object" && typography !== null) {
             this.applyFontSizeProperties(root, typography);
             this.applyFontWeightProperties(root, typography);
             this.applyLineHeightProperties(root, typography);
@@ -399,7 +414,10 @@ export class ThemeManager {
         root: HTMLElement,
         typography: Theme["typography"]
     ): void {
-        if (typeof typography.fontSize === "object") {
+        if (
+            typeof typography.fontSize === "object" &&
+            typography.fontSize !== null
+        ) {
             for (const [size, value] of Object.entries(typography.fontSize)) {
                 root.style.setProperty(`--font-size-${size}`, value);
             }
@@ -413,7 +431,10 @@ export class ThemeManager {
         root: HTMLElement,
         typography: Theme["typography"]
     ): void {
-        if (typeof typography.fontWeight === "object") {
+        if (
+            typeof typography.fontWeight === "object" &&
+            typography.fontWeight !== null
+        ) {
             for (const [weight, value] of Object.entries(
                 typography.fontWeight
             )) {
@@ -429,7 +450,10 @@ export class ThemeManager {
         root: HTMLElement,
         typography: Theme["typography"]
     ): void {
-        if (typeof typography.lineHeight === "object") {
+        if (
+            typeof typography.lineHeight === "object" &&
+            typography.lineHeight !== null
+        ) {
             for (const [height, value] of Object.entries(
                 typography.lineHeight
             )) {
@@ -464,3 +488,5 @@ export class ThemeManager {
  * @public
  */
 export const themeManager: ThemeManager = ThemeManager.getInstance();
+
+/* eslint-enable @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison */

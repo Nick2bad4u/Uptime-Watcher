@@ -45,10 +45,15 @@ export function getEnvVar<K extends keyof KnownEnvironmentVariables>(
         return undefined;
     }
 
-    // Use bracket notation to access the environment variable safely
-    // eslint-disable-next-line n/no-process-env -- Environment utility needs safe process.env access
-    const value = process.env[key];
-    return value as KnownEnvironmentVariables[K] | undefined;
+    try {
+        // Use bracket notation to access the environment variable safely
+        // eslint-disable-next-line n/no-process-env -- Environment utility needs safe process.env access
+        const value = process.env[key];
+        return value as KnownEnvironmentVariables[K] | undefined;
+    } catch {
+        // Handle edge cases where process.env might be null or undefined in tests
+        return undefined;
+    }
 }
 
 /**

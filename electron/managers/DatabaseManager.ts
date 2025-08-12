@@ -560,16 +560,23 @@ export class DatabaseManager {
                 // First update the cache so monitoring can find the sites
                 await this.emitSitesCacheUpdateRequested();
 
-                // Then request monitoring start via events
-                await this.eventEmitter.emitTyped(
-                    "internal:site:start-monitoring-requested",
-                    {
-                        identifier,
-                        monitorId,
-                        operation: "start-monitoring-requested",
-                        timestamp: Date.now(),
-                    }
-                );
+                // Then request monitoring start via events (with error handling)
+                try {
+                    await this.eventEmitter.emitTyped(
+                        "internal:site:start-monitoring-requested",
+                        {
+                            identifier,
+                            monitorId,
+                            operation: "start-monitoring-requested",
+                            timestamp: Date.now(),
+                        }
+                    );
+                } catch (error) {
+                    monitorLogger.error(
+                        "[DatabaseManager] Failed to emit start monitoring requested event:",
+                        error
+                    );
+                }
 
                 return true; // Always return true for the interface
             },
@@ -577,16 +584,23 @@ export class DatabaseManager {
                 identifier: string,
                 monitorId: string
             ): Promise<boolean> => {
-                // Request monitoring stop via events
-                await this.eventEmitter.emitTyped(
-                    "internal:site:stop-monitoring-requested",
-                    {
-                        identifier,
-                        monitorId,
-                        operation: "stop-monitoring-requested",
-                        timestamp: Date.now(),
-                    }
-                );
+                // Request monitoring stop via events (with error handling)
+                try {
+                    await this.eventEmitter.emitTyped(
+                        "internal:site:stop-monitoring-requested",
+                        {
+                            identifier,
+                            monitorId,
+                            operation: "stop-monitoring-requested",
+                            timestamp: Date.now(),
+                        }
+                    );
+                } catch (error) {
+                    monitorLogger.error(
+                        "[DatabaseManager] Failed to emit stop monitoring requested event:",
+                        error
+                    );
+                }
 
                 return true; // Always return true for the interface
             },

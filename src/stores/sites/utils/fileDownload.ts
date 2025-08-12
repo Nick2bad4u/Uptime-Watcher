@@ -58,13 +58,18 @@ function createAndTriggerDownload(
             anchor.click();
             anchor.remove();
         } catch (domError) {
-            // Fallback: just click without DOM manipulation
-            logger.warn(
-                "DOM manipulation failed, using fallback click",
+            // For appendChild errors, re-throw to trigger proper fallback mechanism
+            const error =
                 domError instanceof Error
                     ? domError
-                    : new Error(String(domError))
-            );
+                    : new Error(String(domError));
+
+            if (error.message.includes("appendChild")) {
+                throw error;
+            }
+
+            // For other DOM errors, use simple fallback
+            logger.warn("DOM manipulation failed, using fallback click", error);
             anchor.click();
         }
     } finally {
