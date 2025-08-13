@@ -96,6 +96,8 @@ import sqlTemplate from "eslint-plugin-sql-template";
 import * as pluginNFDAR from "eslint-plugin-no-function-declare-after-return";
 import * as pluginJSDoc from "eslint-plugin-require-jsdoc";
 import eslintPluginCommentLength from "eslint-plugin-comment-length";
+import pluginSortReactDependency from "eslint-plugin-sort-react-dependency-arrays";
+import pluginRegexLook from "eslint-plugin-no-lookahead-lookbehind-regexp";
 
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 
@@ -106,7 +108,7 @@ import * as cssPlugin from "eslint-plugin-css";
 // eslint-find-rules
 // eslint-formatter-compact -- Built into eslint
 // eslint-import-resolver-node -- Replaced by import-x
-// eslint-plugin-css-modules - Replaced by css-plugin
+// eslint-plugin-css-modules -- Replaced by css-plugin
 // eslint-plugin-json
 // eslint-plugin-no-inferred-method-name
 // eslint-plugin-react-native
@@ -116,6 +118,7 @@ import * as cssPlugin from "eslint-plugin-css";
 // eslint-plugin-fsecond
 // eslint-plugin-es-x
 // @dword-design/import-alias
+// eslint-plugin-typesafe -- Broken
 
 // Don't use
 // eslint-plugin-import -- Replaced by import-x
@@ -512,6 +515,8 @@ export default [
             "no-function-declare-after-return": pluginNFDAR,
             "require-jsdoc": pluginJSDoc,
             "comment-length": eslintPluginCommentLength,
+            "sort-react-dependency-arrays": pluginSortReactDependency,
+            "no-lookahead-lookbehind-regexp": pluginRegexLook,
         },
         rules: {
             // TypeScript rules
@@ -550,6 +555,9 @@ export default [
             ...pluginNFDAR.rules,
             ...pluginJSDoc.rules,
             ...eslintPluginCommentLength.configs["flat/recommended"].rules,
+            ...pluginRegexLook.configs.recommended.rules,
+
+            "sort-react-dependency-arrays/sort": "error",
 
             "sql-template/no-unsafe-query": "error",
 
@@ -1499,6 +1507,10 @@ export default [
             "sql-template": sqlTemplate,
             "no-function-declare-after-return": pluginNFDAR,
             "require-jsdoc": pluginJSDoc,
+            "comment-length": eslintPluginCommentLength,
+            "no-lookahead-lookbehind-regexp": pluginRegexLook,
+
+
         },
         rules: {
             // TypeScript backend rules
@@ -1534,6 +1546,8 @@ export default [
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
             ...pluginJSDoc.rules,
+            ...eslintPluginCommentLength.configs["flat/recommended"].rules,
+            ...pluginRegexLook.configs.recommended.rules,
 
             "sql-template/no-unsafe-query": "error",
 
