@@ -144,7 +144,9 @@ const mockMonitorTypes = [
 ];
 
 // Helper function to create consistent mock return values
-const createMockFormState = (overrides: Partial<ReturnType<typeof useAddSiteForm>> = {}) => ({
+const createMockFormState = (
+    overrides: Partial<ReturnType<typeof useAddSiteForm>> = {}
+) => ({
     // State
     addMode: "new" as const,
     checkInterval: 60_000,
@@ -266,15 +268,17 @@ const defaultProps = {
 /**
  * Renders the AddSiteForm component with default props
  */
-const renderAddSiteForm = (props = {}): RenderResult & { getForm: () => Element } => {
+const renderAddSiteForm = (
+    props = {}
+): RenderResult & { getForm: () => Element } => {
     const mergedProps = { ...defaultProps, ...props };
     const view = render(<AddSiteForm {...mergedProps} />);
     return {
         ...view,
         getForm: () => {
             // eslint-disable-next-line testing-library/no-container
-            const form = view.container.querySelector('form');
-            if (!form) throw new Error('Form element not found');
+            const form = view.container.querySelector("form");
+            if (!form) throw new Error("Form element not found");
             return form;
         },
     };
@@ -300,8 +304,12 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
 
         it("should render all required form elements", () => {
             renderAddSiteForm();
-            expect(screen.getByRole("textbox", { name: /site name.*required/i })).toBeInTheDocument();
-            expect(screen.getByRole("textbox", { name: /url.*required/i })).toBeInTheDocument();
+            expect(
+                screen.getByRole("textbox", { name: /site name.*required/i })
+            ).toBeInTheDocument();
+            expect(
+                screen.getByRole("textbox", { name: /url.*required/i })
+            ).toBeInTheDocument();
             expect(
                 screen.getByRole("combobox", { name: /monitor type/i })
             ).toBeInTheDocument();
@@ -326,49 +334,63 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     describe("Form Field Components", () => {
         it("should render site name field with proper attributes", () => {
             renderAddSiteForm();
-            const nameField = screen.getByRole("textbox", { name: /site name.*required/i });
+            const nameField = screen.getByRole("textbox", {
+                name: /site name.*required/i,
+            });
             expect(nameField).toBeInTheDocument();
             expect(nameField).toHaveAttribute("type", "text");
         });
 
         it("should render site URL field with proper attributes", () => {
             renderAddSiteForm();
-            const urlField = screen.getByRole("textbox", { name: /url.*required/i });
+            const urlField = screen.getByRole("textbox", {
+                name: /url.*required/i,
+            });
             expect(urlField).toBeInTheDocument();
             expect(urlField).toHaveAttribute("type", "url");
         });
 
         it("should render monitor type selection field", () => {
             renderAddSiteForm();
-            const monitorField = screen.getByRole("combobox", { name: /monitor type/i });
+            const monitorField = screen.getByRole("combobox", {
+                name: /monitor type/i,
+            });
             expect(monitorField).toBeInTheDocument();
             expect(monitorField.tagName).toBe("SELECT");
         });
 
         it("should render check interval field", () => {
             renderAddSiteForm();
-            const intervalField = screen.getByRole("combobox", { name: /check interval/i });
+            const intervalField = screen.getByRole("combobox", {
+                name: /check interval/i,
+            });
             expect(intervalField).toBeInTheDocument();
             expect(intervalField.tagName).toBe("SELECT");
         });
 
         it("should render description field", () => {
             renderAddSiteForm();
-            const descriptionField = screen.getByRole("textbox", { name: /description/i });
+            const descriptionField = screen.getByRole("textbox", {
+                name: /description/i,
+            });
             expect(descriptionField).toBeInTheDocument();
             expect(descriptionField).toHaveAttribute("type", "text");
         });
 
         it("should render timeout field with numeric input", () => {
             renderAddSiteForm();
-            const timeoutField = screen.getByRole("spinbutton", { name: /timeout/i });
+            const timeoutField = screen.getByRole("spinbutton", {
+                name: /timeout/i,
+            });
             expect(timeoutField).toBeInTheDocument();
             expect(timeoutField).toHaveAttribute("type", "number");
         });
 
         it("should render retries field with numeric input", () => {
             renderAddSiteForm();
-            const retriesField = screen.getByRole("spinbutton", { name: /retries/i });
+            const retriesField = screen.getByRole("spinbutton", {
+                name: /retries/i,
+            });
             expect(retriesField).toBeInTheDocument();
             expect(retriesField).toHaveAttribute("type", "number");
         });
@@ -376,11 +398,13 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
 
     describe("Form Data Population and Display", () => {
         it("should populate form fields with initial data", () => {
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                name: "Test Site",
-                url: "https://test.com",
-                checkInterval: 300_000, // 5 minutes in milliseconds
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    name: "Test Site",
+                    url: "https://test.com",
+                    checkInterval: 300_000, // 5 minutes in milliseconds
+                })
+            );
 
             renderAddSiteForm();
 
@@ -393,27 +417,33 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
         });
 
         it("should handle empty form data gracefully", () => {
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                isFormValid: vi.fn(() => false),
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    isFormValid: vi.fn(() => false),
+                })
+            );
 
             const { getForm } = renderAddSiteForm();
             expect(getForm()).toBeInTheDocument();
         });
 
         it("should handle null form data", () => {
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                isFormValid: vi.fn(() => false),
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    isFormValid: vi.fn(() => false),
+                })
+            );
 
             const { getForm } = renderAddSiteForm();
             expect(getForm()).toBeInTheDocument();
         });
 
         it("should handle undefined form data", () => {
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                isFormValid: vi.fn(() => false),
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    isFormValid: vi.fn(() => false),
+                })
+            );
 
             const { getForm } = renderAddSiteForm();
             expect(getForm()).toBeInTheDocument();
@@ -423,10 +453,12 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     describe("User Interactions and Form Changes", () => {
         it("should handle site name input changes", async () => {
             const setName = vi.fn();
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                addMode: "new",
-                setName,
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    addMode: "new",
+                    setName,
+                })
+            );
 
             render(<AddSiteForm />);
 
@@ -438,32 +470,38 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
 
         it("should handle site URL input changes", async () => {
             const setUrl = vi.fn();
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                addMode: "new",
-                setUrl,
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    addMode: "new",
+                    setUrl,
+                })
+            );
 
             renderAddSiteForm();
-            const urlInput = screen
-                .getByRole("textbox", { name: /url.*required/i });
+            const urlInput = screen.getByRole("textbox", {
+                name: /url.*required/i,
+            });
             await user.type(urlInput, "https://example.com");
             expect(setUrl).toHaveBeenCalled();
         });
 
         it("should handle monitor type selection changes", async () => {
             const setMonitorType = vi.fn();
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                monitorType: "ping",
-                setMonitorType,
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    monitorType: "ping",
+                    setMonitorType,
+                })
+            );
 
             renderAddSiteForm();
-            const monitorSelect = screen
-                .getByRole("combobox", { name: /monitor type/i });
-            
+            const monitorSelect = screen.getByRole("combobox", {
+                name: /monitor type/i,
+            });
+
             // Since the mock returns "ping", the select should show that value
             expect(monitorSelect).toHaveValue("ping");
-            
+
             // Test that changing the value calls the setter
             await user.selectOptions(monitorSelect, "http");
             expect(setMonitorType).toHaveBeenCalledWith("http");
@@ -477,75 +515,88 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             mockUseAddSiteForm.mockReturnValue(mockActions);
 
             renderAddSiteForm();
-            
+
             // Description field is rendered as a text input within DynamicMonitorFields
-            const descriptionInput = screen.getByRole("textbox", { name: /description/i });
+            const descriptionInput = screen.getByRole("textbox", {
+                name: /description/i,
+            });
             expect(descriptionInput).toBeInTheDocument();
-            
+
             // Test that the input accepts changes - the field is controlled by parent state
             // so we test that user interaction is possible rather than state persistence
             await user.clear(descriptionInput);
             await user.type(descriptionInput, "Site description");
-            
-            // Since this is a controlled input from DynamicMonitorFields, 
+
+            // Since this is a controlled input from DynamicMonitorFields,
             // the actual value depends on the parent component's state management
             expect(descriptionInput).toBeInTheDocument();
         });
 
         it("should handle interval value changes", async () => {
             const setCheckInterval = vi.fn();
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                setCheckInterval,
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    setCheckInterval,
+                })
+            );
 
             renderAddSiteForm();
-            const intervalInput = screen
-                .getByRole("combobox", { name: /check interval/i });
+            const intervalInput = screen.getByRole("combobox", {
+                name: /check interval/i,
+            });
             await user.selectOptions(intervalInput, "300000"); // milliseconds
             expect(setCheckInterval).toHaveBeenCalled();
         });
 
         it("should handle timeout value changes", async () => {
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                monitorType: "http", // Timeout field appears for HTTP monitors
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    monitorType: "http", // Timeout field appears for HTTP monitors
+                })
+            );
 
             renderAddSiteForm();
-            
+
             // Timeout field is rendered as a number input within DynamicMonitorFields
-            const timeoutInput = screen.getByRole("spinbutton", { name: /timeout/i });
+            const timeoutInput = screen.getByRole("spinbutton", {
+                name: /timeout/i,
+            });
             expect(timeoutInput).toBeInTheDocument();
-            
+
             // The input starts with default value 0 as specified in DynamicMonitorFields
             expect(timeoutInput).toHaveValue(0);
-            
+
             // Test that user interaction is possible with the controlled input
             await user.clear(timeoutInput);
             await user.type(timeoutInput, "45");
-            
+
             // Since this is a controlled input, verify it accepts user input
             // The actual value persistence depends on parent state management
             expect(timeoutInput).toBeInTheDocument();
         });
 
         it("should handle retries value changes", async () => {
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                monitorType: "http", // Retries field appears for HTTP monitors
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    monitorType: "http", // Retries field appears for HTTP monitors
+                })
+            );
 
             renderAddSiteForm();
-            
+
             // Retries field is rendered as a number input within DynamicMonitorFields
-            const retriesInput = screen.getByRole("spinbutton", { name: /retries/i });
+            const retriesInput = screen.getByRole("spinbutton", {
+                name: /retries/i,
+            });
             expect(retriesInput).toBeInTheDocument();
-            
+
             // The input starts with default value 0 as specified in DynamicMonitorFields
             expect(retriesInput).toHaveValue(0);
-            
+
             // Test that user interaction is possible with the controlled input
             await user.clear(retriesInput);
             await user.type(retriesInput, "5");
-            
+
             // Since this is a controlled input, verify it accepts user input
             // The actual value persistence depends on parent state management
             expect(retriesInput).toBeInTheDocument();
@@ -557,9 +608,11 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             const resetForm = vi.fn();
             const onSuccess = vi.fn();
 
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                resetForm,
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    resetForm,
+                })
+            );
 
             const { getForm } = renderAddSiteForm({ onSuccess });
             const form = getForm();
@@ -594,9 +647,11 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
         });
 
         it("should prevent submission when form is invalid", () => {
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                formError: "Site name is required",
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    formError: "Site name is required",
+                })
+            );
 
             renderAddSiteForm();
             const submitButton = screen.getByRole("button", {
@@ -623,9 +678,11 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
 
     describe("Loading and Disabled States", () => {
         it("should show loading state when form is submitting", () => {
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                // No specific overrides needed - will show loading based on component behavior
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    // No specific overrides needed - will show loading based on component behavior
+                })
+            );
 
             // Mock the error store to show loading state
             mockUseErrorStore.mockReturnValue({
@@ -642,15 +699,21 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
         });
 
         it("should disable form fields when submitting", () => {
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                addMode: "new", // Ensure fields are visible
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    addMode: "new", // Ensure fields are visible
+                })
+            );
 
             renderAddSiteForm();
-            
+
             // Check if fields exist first
-            const nameInput = screen.queryByRole("textbox", { name: /site name.*required/i });
-            const urlInput = screen.queryByRole("textbox", { name: /url.*required/i });
+            const nameInput = screen.queryByRole("textbox", {
+                name: /site name.*required/i,
+            });
+            const urlInput = screen.queryByRole("textbox", {
+                name: /url.*required/i,
+            });
 
             if (nameInput && urlInput) {
                 // If fields exist, they should be present
@@ -672,7 +735,7 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
                 monitorType: "http",
                 checkInterval: 60_000,
             });
-            
+
             // Mock the isFormValid function to return true for valid form
             mockFormActions.isFormValid = vi.fn().mockReturnValue(true);
             mockUseAddSiteForm.mockReturnValue(mockFormActions);
@@ -688,7 +751,7 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             const submitButton = screen.getByRole("button", {
                 name: /add/i,
             });
-            
+
             // With valid form data and no loading state, button should be enabled
             expect(submitButton).not.toBeDisabled();
         });
@@ -708,13 +771,15 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
 
     describe("Error Handling and Display", () => {
         it("should display field validation errors", () => {
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                formError: "Site name is required",
-                addMode: "new", // Ensure error fields are visible
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    formError: "Site name is required",
+                    addMode: "new", // Ensure error fields are visible
+                })
+            );
 
             renderAddSiteForm();
-            
+
             // Check if error message is displayed
             const errorText = screen.queryByText("Site name is required");
             if (errorText) {
@@ -780,13 +845,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
                 lasterror: undefined,
             });
 
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                addMode: "new", // Ensure fields are visible for testing
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    addMode: "new", // Ensure fields are visible for testing
+                })
+            );
 
             renderAddSiteForm();
-            const nameInput = screen.queryByRole("textbox", { name: /site name.*required/i });
-            
+            const nameInput = screen.queryByRole("textbox", {
+                name: /site name.*required/i,
+            });
+
             if (nameInput) {
                 await user.click(nameInput);
                 // Verify the input exists and is clickable
@@ -817,9 +886,11 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
         });
 
         it("should handle invalid add mode state", () => {
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                formError: "Invalid add mode",
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    formError: "Invalid add mode",
+                })
+            );
 
             renderAddSiteForm();
             const submitButton = screen.getByRole("button", {
@@ -830,9 +901,11 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
         });
 
         it("should handle invalid monitor type state", () => {
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                formError: "Invalid monitor type",
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    formError: "Invalid monitor type",
+                })
+            );
 
             renderAddSiteForm();
             const submitButton = screen.getByRole("button", {
@@ -843,24 +916,30 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
         });
 
         it("should handle complex validation scenarios", () => {
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                name: "a", // Too short
-                url: "invalid-url", // Invalid format
-                formError: "Site name must be at least 3 characters",
-                addMode: "new", // Ensure fields are visible
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    name: "a", // Too short
+                    url: "invalid-url", // Invalid format
+                    formError: "Site name must be at least 3 characters",
+                    addMode: "new", // Ensure fields are visible
+                })
+            );
 
             renderAddSiteForm();
-            
+
             // The component shows the form error from the formError state
             expect(
                 screen.getByText("Site name must be at least 3 characters")
             ).toBeInTheDocument();
-            
+
             // Verify form fields are present
-            expect(screen.getByRole("textbox", { name: /site name.*required/i })).toBeInTheDocument();
-            expect(screen.getByRole("textbox", { name: /url.*required/i })).toBeInTheDocument();
-            
+            expect(
+                screen.getByRole("textbox", { name: /site name.*required/i })
+            ).toBeInTheDocument();
+            expect(
+                screen.getByRole("textbox", { name: /url.*required/i })
+            ).toBeInTheDocument();
+
             // Verify submit button exists but is not disabled by validation (only by loading state)
             const submitButton = screen.getByRole("button", { name: /add/i });
             expect(submitButton).toBeInTheDocument();
@@ -870,8 +949,9 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     describe("Monitor Types Integration", () => {
         it("should render available monitor types in select field", () => {
             renderAddSiteForm();
-            const monitorSelect = screen
-                .getByRole("combobox", { name: /monitor type/i });
+            const monitorSelect = screen.getByRole("combobox", {
+                name: /monitor type/i,
+            });
 
             expect(monitorSelect).toBeInTheDocument();
             for (const type of mockMonitorTypes) {
@@ -888,8 +968,9 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             });
 
             renderAddSiteForm();
-            const monitorSelect = screen
-                .getByRole("combobox", { name: /monitor type/i });
+            const monitorSelect = screen.getByRole("combobox", {
+                name: /monitor type/i,
+            });
             expect(monitorSelect).toBeInTheDocument();
         });
 
@@ -980,12 +1061,14 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             });
 
             renderAddSiteForm();
-            
+
             // Help text is displayed in the help section at the bottom of the form
             // Look for partial text match to handle the bullet point formatting
             expect(
                 screen.getByText((content, element) => {
-                    return content.includes("Enter the URL of the site you want to monitor");
+                    return content.includes(
+                        "Enter the URL of the site you want to monitor"
+                    );
                 })
             ).toBeInTheDocument();
         });
@@ -1018,8 +1101,9 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             const mockDynamicHelp = mockUseDynamicHelpText;
 
             renderAddSiteForm();
-            const urlInput = screen
-                .getByRole("textbox", { name: /url.*required/i });
+            const urlInput = screen.getByRole("textbox", {
+                name: /url.*required/i,
+            });
 
             await user.click(urlInput);
 
@@ -1032,9 +1116,15 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
         it("should have proper form labels and ARIA attributes", () => {
             renderAddSiteForm();
 
-            const nameField = screen.getByRole("textbox", { name: /site name.*required/i });
-            const urlField = screen.getByRole("textbox", { name: /url.*required/i });
-            const monitorField = screen.getByRole("combobox", { name: /monitor type/i });
+            const nameField = screen.getByRole("textbox", {
+                name: /site name.*required/i,
+            });
+            const urlField = screen.getByRole("textbox", {
+                name: /url.*required/i,
+            });
+            const monitorField = screen.getByRole("combobox", {
+                name: /monitor type/i,
+            });
 
             expect(nameField).toBeInTheDocument();
             expect(urlField).toBeInTheDocument();
@@ -1049,7 +1139,7 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             await user.tab();
             const firstFocusedElement = document.activeElement;
             expect(firstFocusedElement).toBeTruthy();
-            
+
             // Tab to next element
             await user.tab();
             const secondFocusedElement = document.activeElement;
@@ -1072,10 +1162,12 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
         });
 
         it("should announce validation errors to screen readers", () => {
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                formError: "Site name is required",
-                addMode: "new",
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    formError: "Site name is required",
+                    addMode: "new",
+                })
+            );
 
             renderAddSiteForm();
             // Check if error message exists with proper accessibility
@@ -1094,12 +1186,14 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     describe("Edge Cases and Corner Scenarios", () => {
         it("should handle very long form field values", () => {
             const longText = "a".repeat(1000);
-            
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                name: longText,
-                url: `https://${longText.slice(0, 20)}.com`,
-                addMode: "new",
-            }));
+
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    name: longText,
+                    url: `https://${longText.slice(0, 20)}.com`,
+                    addMode: "new",
+                })
+            );
 
             renderAddSiteForm();
             // Check if long text is handled properly
@@ -1115,11 +1209,13 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
 
         it("should handle special characters in form values", () => {
             const specialChars = "Test-Site!@#";
-            
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                name: specialChars,
-                addMode: "new",
-            }));
+
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    name: specialChars,
+                    addMode: "new",
+                })
+            );
 
             renderAddSiteForm();
             // Check if special characters are handled
@@ -1136,22 +1232,24 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
         it("should handle extreme numeric values", () => {
             // Use a text field that can display large numbers, and respect form constraints
             const extremeValue = "999999999"; // Large but reasonable number
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                name: extremeValue, // Site name can handle large text values
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    name: extremeValue, // Site name can handle large text values
+                })
+            );
 
             renderAddSiteForm();
-            expect(
-                screen.getByDisplayValue(extremeValue)
-            ).toBeInTheDocument();
+            expect(screen.getByDisplayValue(extremeValue)).toBeInTheDocument();
         });
 
         it("should handle Unicode characters in form values", () => {
             const unicodeText = "你好世界 🌍 Здравствуй мир 🇺🇳 مرحبا بالعالم";
-            
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                name: unicodeText,
-            }));
+
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    name: unicodeText,
+                })
+            );
 
             renderAddSiteForm();
             expect(screen.getByDisplayValue(unicodeText)).toBeInTheDocument();
@@ -1160,9 +1258,11 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
         it("should handle form reset scenarios", () => {
             const resetForm = vi.fn();
 
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                resetForm,
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    resetForm,
+                })
+            );
 
             renderAddSiteForm();
 
@@ -1177,9 +1277,7 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
 
             // Simulate multiple re-renders with different props
             for (let i = 0; i < 10; i++) {
-                rerender(
-                    <AddSiteForm {...defaultProps} />
-                );
+                rerender(<AddSiteForm {...defaultProps} />);
             }
 
             const { getForm } = renderAddSiteForm();
@@ -1187,10 +1285,12 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
         });
 
         it("should maintain form state during re-renders", () => {
-            mockUseAddSiteForm.mockReturnValue(createMockFormState({
-                name: "Persistent Site",
-                url: "https://persistent.com",
-            }));
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    name: "Persistent Site",
+                    url: "https://persistent.com",
+                })
+            );
 
             const { rerender } = renderAddSiteForm();
 

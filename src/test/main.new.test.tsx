@@ -26,10 +26,10 @@ describe("main.tsx - Application Entry Point", () => {
     beforeEach(() => {
         // Reset DOM
         document.body.innerHTML = '<div id="root"></div>';
-        
+
         // Reset mocks
         vi.clearAllMocks();
-        
+
         // Spy on console.error
         originalConsoleError = console.error;
         console.error = vi.fn();
@@ -43,12 +43,12 @@ describe("main.tsx - Application Entry Point", () => {
     describe("Basic Functionality", () => {
         it("should use getElementById for root element lookup", async () => {
             const getElementByIdSpy = vi.spyOn(document, "getElementById");
-            
+
             // Import main.tsx which triggers initialization
             await import("../main");
 
             expect(getElementByIdSpy).toHaveBeenCalledWith("root");
-            
+
             getElementByIdSpy.mockRestore();
         });
 
@@ -126,7 +126,7 @@ describe("main.tsx - Application Entry Point", () => {
 
             // Verify no errors were logged
             expect(console.error).not.toHaveBeenCalled();
-            
+
             // Verify the root element still exists
             const rootElement = document.querySelector("#root");
             expect(rootElement).toBeTruthy();

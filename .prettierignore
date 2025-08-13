@@ -25,3 +25,9 @@ package.json
 
 # Ignore specific files
 **/coverage-results.json
+
+# Ignore prompts (Changed " to ' for tools messes up agents)
+**/**.prompt.md
+**/**.prompt-copy.md
+**/**.prompt.**.md
+**/**.chatmode.md

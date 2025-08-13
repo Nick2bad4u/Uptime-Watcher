@@ -12,16 +12,18 @@ Sorts ESLint rules by plugin prefix within each files section to improve readabi
 ✅ **Alphabetical Sorting**: Sorts rules alphabetically within each plugin group  
 ✅ **Structure Preservation**: Preserves all configuration sections and their structure  
 ✅ **Section Comments**: Adds helpful section comments for better navigation  
-✅ **Format Maintenance**: Maintains original formatting and comments where possible  
+✅ **Format Maintenance**: Maintains original formatting and comments where possible
 
 ### Usage
 
 #### Via npm script (recommended):
+
 ```bash
 npm run sort-eslint-rules
 ```
 
 #### Direct execution:
+
 ```bash
 # JavaScript version
 node scripts/sort-eslint-rules.mjs
@@ -31,6 +33,7 @@ npx tsx scripts/sort-eslint-rules.ts
 ```
 
 ### Help
+
 ```bash
 node scripts/sort-eslint-rules.mjs --help
 npx tsx scripts/sort-eslint-rules.ts --help
@@ -50,10 +53,11 @@ The script will:
 ### Example transformation
 
 **Before:**
+
 ```javascript
 rules: {
     "unicorn/prefer-module": "error",
-    "@typescript-eslint/no-unused-vars": "warn", 
+    "@typescript-eslint/no-unused-vars": "warn",
     "react/jsx-filename-extension": ["error", { extensions: [".tsx"] }],
     "unicorn/prevent-abbreviations": "off",
     "@typescript-eslint/no-explicit-any": "warn",
@@ -62,18 +66,19 @@ rules: {
 ```
 
 **After:**
+
 ```javascript
 rules: {
     // TypeScript
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/no-unused-vars": "warn",
 
-    // React  
+    // React
     "react/function-component-definition": ["error", { namedComponents: "arrow-function" }],
     "react/jsx-filename-extension": ["error", { extensions: [".tsx"] }],
 
     // Unicorn
-    "unicorn/prefer-module": "error", 
+    "unicorn/prefer-module": "error",
     "unicorn/prevent-abbreviations": "off",
 }
 ```
@@ -100,6 +105,7 @@ The script recognizes and properly groups rules from 30+ ESLint plugins includin
 ### Development
 
 The scripts are available in both JavaScript and TypeScript versions:
+
 - `sort-eslint-rules.mjs` - Standalone JavaScript version
 - `sort-eslint-rules.ts` - TypeScript version with better type safety
 

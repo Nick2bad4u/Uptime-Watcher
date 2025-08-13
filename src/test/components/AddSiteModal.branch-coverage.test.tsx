@@ -1,10 +1,10 @@
 /**
  * @fileoverview Comprehensive tests for AddSiteModal component to improve branch coverage
  * @see Related Component: {@link src/components/AddSiteForm/AddSiteModal.tsx}
- * 
+ *
  * Test Coverage Focus:
  * - Modal visibility toggle branches
- * - Event handler branches  
+ * - Event handler branches
  * - Keyboard escape handling branches
  * - Backdrop click interaction branches
  * - Theme state branches
@@ -23,10 +23,16 @@ vi.mock("../../stores/ui/useUiStore");
 vi.mock("../../theme/useTheme", () => ({
     useTheme: vi.fn(),
     useThemeClasses: vi.fn(() => ({
-        getBackgroundClass: vi.fn(() => ({ backgroundColor: "var(--color-background-primary)" })),
+        getBackgroundClass: vi.fn(() => ({
+            backgroundColor: "var(--color-background-primary)",
+        })),
         getTextClass: vi.fn(() => ({ color: "var(--color-text-primary)" })),
-        getBorderClass: vi.fn(() => ({ borderColor: "var(--color-border-primary)" })),
-        getSurfaceClass: vi.fn(() => ({ backgroundColor: "var(--color-surface-base)" })),
+        getBorderClass: vi.fn(() => ({
+            borderColor: "var(--color-border-primary)",
+        })),
+        getSurfaceClass: vi.fn(() => ({
+            backgroundColor: "var(--color-surface-base)",
+        })),
         getStatusClass: vi.fn(() => ({ color: "var(--color-status-up)" })),
         getColor: vi.fn(() => "#000000"),
     })),
@@ -44,8 +50,12 @@ vi.mock("../../components/AddSiteForm/AddSiteForm", () => ({
 // Mock themed components with unique test-ids
 vi.mock("../../theme/components/ThemedBox", () => ({
     default: ({ children, className, ...props }: any) => (
-        <div 
-            data-testid={className?.includes('max-w-2xl') ? "modal-outer-box" : "modal-inner-box"} 
+        <div
+            data-testid={
+                className?.includes("max-w-2xl")
+                    ? "modal-outer-box"
+                    : "modal-inner-box"
+            }
             className={className}
             {...props}
         >
@@ -212,8 +222,8 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             });
 
             render(<AddSiteModal />);
-            const backdrop = document.querySelector('.fixed.inset-0');
-            expect(backdrop).toHaveClass('dark');
+            const backdrop = document.querySelector(".fixed.inset-0");
+            expect(backdrop).toHaveClass("dark");
         });
 
         it("should not apply dark theme classes when isDark is false", () => {
@@ -247,8 +257,8 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
 
             render(<AddSiteModal />);
             // Check that the backdrop div exists and verify dark class is absent
-            const backdrop = document.querySelector('.fixed.inset-0');
-            expect(backdrop).not.toHaveClass('dark');
+            const backdrop = document.querySelector(".fixed.inset-0");
+            expect(backdrop).not.toHaveClass("dark");
         });
     });
 
@@ -271,38 +281,40 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
 
         it("should call setShowAddSiteModal(false) when close button is clicked", async () => {
             render(<AddSiteModal />);
-            
-            const closeButton = screen.getByRole("button", { name: /close modal/i });
+
+            const closeButton = screen.getByRole("button", {
+                name: /close modal/i,
+            });
             await userEvent.click(closeButton);
-            
+
             expect(mockSetShowAddSiteModal).toHaveBeenCalledWith(false);
         });
 
         it("should call setShowAddSiteModal(false) when backdrop is clicked", async () => {
             render(<AddSiteModal />);
-            
+
             // Get the backdrop by testing the event directly
-            const backdrop = document.querySelector('.fixed.inset-0')!;
+            const backdrop = document.querySelector(".fixed.inset-0")!;
             fireEvent.click(backdrop);
-            
+
             expect(mockSetShowAddSiteModal).toHaveBeenCalledWith(false);
         });
 
         it("should not close modal when clicking inside the modal content", async () => {
             render(<AddSiteModal />);
-            
+
             const modalContent = screen.getByTestId("modal-outer-box");
             fireEvent.click(modalContent);
-            
+
             expect(mockSetShowAddSiteModal).not.toHaveBeenCalled();
         });
 
         it("should close modal when form success callback is called", async () => {
             render(<AddSiteModal />);
-            
+
             const successButton = screen.getByTestId("mock-success-button");
             await userEvent.click(successButton);
-            
+
             expect(mockSetShowAddSiteModal).toHaveBeenCalledWith(false);
         });
     });
@@ -326,9 +338,9 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
 
         it("should close modal when Escape key is pressed and modal is visible", async () => {
             render(<AddSiteModal />);
-            
+
             fireEvent.keyDown(document, { key: "Escape" });
-            
+
             await waitFor(() => {
                 expect(mockSetShowAddSiteModal).toHaveBeenCalledWith(false);
             });
@@ -336,11 +348,11 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
 
         it("should not close modal when other keys are pressed", async () => {
             render(<AddSiteModal />);
-            
+
             fireEvent.keyDown(document, { key: "Enter" });
             fireEvent.keyDown(document, { key: "Space" });
             fireEvent.keyDown(document, { key: "Tab" });
-            
+
             expect(mockSetShowAddSiteModal).not.toHaveBeenCalled();
         });
 
@@ -361,17 +373,20 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             });
 
             render(<AddSiteModal />);
-            
+
             fireEvent.keyDown(document, { key: "Escape" });
-            
+
             expect(mockSetShowAddSiteModal).not.toHaveBeenCalled();
         });
     });
 
     describe("Event Cleanup Branches", () => {
         it("should add and remove event listeners based on modal visibility", () => {
-            const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
-            const removeEventListenerSpy = vi.spyOn(document, 'removeEventListener');
+            const addEventListenerSpy = vi.spyOn(document, "addEventListener");
+            const removeEventListenerSpy = vi.spyOn(
+                document,
+                "removeEventListener"
+            );
 
             // Start with modal visible
             mockUseUIStore.mockReturnValue({
@@ -389,13 +404,19 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             });
 
             const { unmount } = render(<AddSiteModal />);
-            
-            expect(addEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
-            
+
+            expect(addEventListenerSpy).toHaveBeenCalledWith(
+                "keydown",
+                expect.any(Function)
+            );
+
             unmount();
-            
-            expect(removeEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
-            
+
+            expect(removeEventListenerSpy).toHaveBeenCalledWith(
+                "keydown",
+                expect.any(Function)
+            );
+
             addEventListenerSpy.mockRestore();
             removeEventListenerSpy.mockRestore();
         });

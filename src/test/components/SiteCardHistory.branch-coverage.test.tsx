@@ -25,7 +25,8 @@ vi.mock("../../hooks/useMonitorTypes", () => ({
 vi.mock("../../utils/monitorTitleFormatters", () => ({
     formatTitleSuffix: vi.fn((monitor: Monitor) => {
         if (monitor.url) return ` - ${monitor.url}`;
-        if (monitor.host && monitor.port) return ` - ${monitor.host}:${monitor.port}`;
+        if (monitor.host && monitor.port)
+            return ` - ${monitor.host}:${monitor.port}`;
         return "";
     }),
 }));
@@ -62,8 +63,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
                     monitor={undefined}
                 />
             );
-            
-            expect(screen.getByTestId("chart-title")).toHaveTextContent("No Monitor Selected");
+
+            expect(screen.getByTestId("chart-title")).toHaveTextContent(
+                "No Monitor Selected"
+            );
         });
 
         it("should process monitor when monitor is defined", () => {
@@ -87,8 +90,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
                     monitor={monitor}
                 />
             );
-            
-            expect(screen.getByTestId("chart-title")).toHaveTextContent("HTTP History - https://example.com");
+
+            expect(screen.getByTestId("chart-title")).toHaveTextContent(
+                "HTTP History - https://example.com"
+            );
         });
     });
 
@@ -114,8 +119,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
                     monitor={monitor}
                 />
             );
-            
-            expect(screen.getByTestId("chart-title")).toHaveTextContent("HTTP History");
+
+            expect(screen.getByTestId("chart-title")).toHaveTextContent(
+                "HTTP History"
+            );
         });
 
         it("should fallback to monitor.type when option is not found", () => {
@@ -139,8 +146,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
                     monitor={monitor}
                 />
             );
-            
-            expect(screen.getByTestId("chart-title")).toHaveTextContent("unknown_type History");
+
+            expect(screen.getByTestId("chart-title")).toHaveTextContent(
+                "unknown_type History"
+            );
         });
     });
 
@@ -166,8 +175,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
                     monitor={monitor}
                 />
             );
-            
-            expect(screen.getByTestId("chart-title")).toHaveTextContent("HTTP History - https://api.example.com/health");
+
+            expect(screen.getByTestId("chart-title")).toHaveTextContent(
+                "HTTP History - https://api.example.com/health"
+            );
         });
 
         it("should handle port monitor with host and port", () => {
@@ -192,8 +203,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
                     monitor={monitor}
                 />
             );
-            
-            expect(screen.getByTestId("chart-title")).toHaveTextContent("Port History - database.example.com:5432");
+
+            expect(screen.getByTestId("chart-title")).toHaveTextContent(
+                "Port History - database.example.com:5432"
+            );
         });
 
         it("should handle ping monitor without URL or port", () => {
@@ -217,8 +230,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
                     monitor={monitor}
                 />
             );
-            
-            expect(screen.getByTestId("chart-title")).toHaveTextContent("Ping History");
+
+            expect(screen.getByTestId("chart-title")).toHaveTextContent(
+                "Ping History"
+            );
         });
     });
 
@@ -239,14 +254,14 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             };
 
             const shortHistory = mockHistory.slice(0, 1);
-            
+
             render(
                 <SiteCardHistory
                     filteredHistory={shortHistory}
                     monitor={monitor}
                 />
             );
-            
+
             expect(screen.getByTestId("chart-items")).toHaveTextContent("1");
         });
 
@@ -265,26 +280,20 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
                 history: [],
             };
 
-            render(
-                <SiteCardHistory
-                    filteredHistory={[]}
-                    monitor={monitor}
-                />
-            );
-            
+            render(<SiteCardHistory filteredHistory={[]} monitor={monitor} />);
+
             expect(screen.getByTestId("chart-items")).toHaveTextContent("0");
         });
 
         it("should handle both monitor and no monitor cases", () => {
             // Test the case where both monitors are undefined
             render(
-                <SiteCardHistory
-                    filteredHistory={[]}
-                    monitor={undefined}
-                />
+                <SiteCardHistory filteredHistory={[]} monitor={undefined} />
             );
-            
-            expect(screen.getByTestId("chart-title")).toHaveTextContent("No Monitor Selected");
+
+            expect(screen.getByTestId("chart-title")).toHaveTextContent(
+                "No Monitor Selected"
+            );
         });
 
         it("should handle monitor property differences", () => {
@@ -308,8 +317,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
                     monitor={monitor1}
                 />
             );
-            
-            expect(screen.getByTestId("chart-title")).toHaveTextContent("HTTP History - https://example1.com");
+
+            expect(screen.getByTestId("chart-title")).toHaveTextContent(
+                "HTTP History - https://example1.com"
+            );
         });
 
         it("should handle different monitor types", () => {
@@ -334,8 +345,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
                     monitor={portMonitor}
                 />
             );
-            
-            expect(screen.getByTestId("chart-title")).toHaveTextContent("Port History - localhost:8080");
+
+            expect(screen.getByTestId("chart-title")).toHaveTextContent(
+                "Port History - localhost:8080"
+            );
         });
 
         it("should handle monitor ID differences", () => {
@@ -359,8 +372,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
                     monitor={monitor}
                 />
             );
-            
-            expect(screen.getByTestId("chart-title")).toHaveTextContent("HTTP History - https://example.com");
+
+            expect(screen.getByTestId("chart-title")).toHaveTextContent(
+                "HTTP History - https://example.com"
+            );
         });
     });
 
@@ -385,8 +400,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
                     monitor={monitor}
                 />
             );
-            
-            expect(screen.getByTestId("chart-title")).toHaveTextContent("Ping History");
+
+            expect(screen.getByTestId("chart-title")).toHaveTextContent(
+                "Ping History"
+            );
         });
 
         it("should handle monitor with partial properties", () => {
@@ -411,8 +428,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
                     monitor={monitor}
                 />
             );
-            
-            expect(screen.getByTestId("chart-title")).toHaveTextContent("Port History");
+
+            expect(screen.getByTestId("chart-title")).toHaveTextContent(
+                "Port History"
+            );
         });
 
         it("should verify maxItems is passed correctly", () => {
@@ -436,8 +455,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
                     monitor={monitor}
                 />
             );
-            
-            expect(screen.getByTestId("chart-max-items")).toHaveTextContent("60");
+
+            expect(screen.getByTestId("chart-max-items")).toHaveTextContent(
+                "60"
+            );
         });
 
         it("should handle very long monitor URLs", () => {
@@ -461,7 +482,7 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
                     monitor={monitor}
                 />
             );
-            
+
             expect(screen.getByTestId("chart-title")).toHaveTextContent(
                 "HTTP History - https://very-long-subdomain.extremely-long-domain-name.example.com/very/long/path/with/many/segments/api/v1/health/check"
             );

@@ -21,7 +21,8 @@ vi.mock("react-dom/client", () => ({
 
 // Mock App component
 vi.mock("../App", () => ({
-    default: () => React.createElement("div", { "data-testid": "app" }, "Mocked App"),
+    default: () =>
+        React.createElement("div", { "data-testid": "app" }, "Mocked App"),
 }));
 
 // Mock CSS import
@@ -33,12 +34,12 @@ describe("main.tsx - Application Entry Point", () => {
     beforeEach(() => {
         // Reset DOM
         document.body.innerHTML = '<div id="root"></div>';
-        
+
         // Reset mocks
         vi.clearAllMocks();
         mockCreateRoot.mockClear();
         mockRender.mockClear();
-        
+
         // Spy on console.error
         originalConsoleError = console.error;
         console.error = vi.fn();
@@ -56,12 +57,12 @@ describe("main.tsx - Application Entry Point", () => {
 
             // Import and execute main.tsx - it should handle the error gracefully
             const mainModule = await import("../main");
-            
+
             // Since main.tsx wraps in try-catch, we expect console.error to be called
             expect(console.error).toHaveBeenCalledWith(
                 "Failed to initialize application:",
                 expect.objectContaining({
-                    message: "Root element not found"
+                    message: "Root element not found",
                 })
             );
         });
@@ -77,14 +78,14 @@ describe("main.tsx - Application Entry Point", () => {
             expect(console.error).toHaveBeenCalledWith(
                 "Failed to initialize application:",
                 expect.objectContaining({
-                    message: "Root element not found"
+                    message: "Root element not found",
                 })
             );
         });
 
         it("should use getElementById for root element lookup", async () => {
             const getElementByIdSpy = vi.spyOn(document, "getElementById");
-            
+
             // Ensure root element exists
             document.body.innerHTML = '<div id="root"></div>';
 
@@ -92,7 +93,7 @@ describe("main.tsx - Application Entry Point", () => {
             await import("../main");
 
             expect(getElementByIdSpy).toHaveBeenCalledWith("root");
-            
+
             getElementByIdSpy.mockRestore();
         });
 
@@ -120,9 +121,9 @@ describe("main.tsx - Application Entry Point", () => {
                     type: React.StrictMode,
                     props: {
                         children: expect.objectContaining({
-                            type: expect.any(Function) // App component
-                        })
-                    }
+                            type: expect.any(Function), // App component
+                        }),
+                    },
                 })
             );
         });
@@ -133,7 +134,7 @@ describe("main.tsx - Application Entry Point", () => {
             // First reset modules to ensure fresh import
             vi.resetModules();
 
-            // Simulate createRoot failure to test error handling  
+            // Simulate createRoot failure to test error handling
             mockCreateRoot.mockImplementation(() => {
                 throw new Error("ReactDOM createRoot failed");
             });
@@ -147,7 +148,9 @@ describe("main.tsx - Application Entry Point", () => {
             expect(console.error).toHaveBeenCalledWith(
                 "Failed to initialize application:",
                 expect.objectContaining({
-                    message: expect.stringContaining("ReactDOM createRoot failed")
+                    message: expect.stringContaining(
+                        "ReactDOM createRoot failed"
+                    ),
                 })
             );
 
@@ -173,7 +176,7 @@ describe("main.tsx - Application Entry Point", () => {
             expect(console.error).toHaveBeenCalledWith(
                 "Failed to initialize application:",
                 expect.objectContaining({
-                    message: "createRoot failed"
+                    message: "createRoot failed",
                 })
             );
         });
@@ -196,7 +199,7 @@ describe("main.tsx - Application Entry Point", () => {
 
             // Verify createRoot was called with the correct element
             expect(mockCreateRoot).toHaveBeenCalledWith(rootElement);
-            
+
             // Verify render was called
             expect(mockRender).toHaveBeenCalled();
         });
@@ -225,7 +228,7 @@ describe("main.tsx - Application Entry Point", () => {
             // Verify render was called with StrictMode
             expect(mockRender).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    type: React.StrictMode
+                    type: React.StrictMode,
                 })
             );
         });
@@ -243,7 +246,7 @@ describe("main.tsx - Application Entry Point", () => {
 
             // Verify no errors were logged
             expect(console.error).not.toHaveBeenCalled();
-            
+
             // Verify successful initialization
             expect(mockCreateRoot).toHaveBeenCalledWith(rootDiv);
             expect(mockRender).toHaveBeenCalled();
