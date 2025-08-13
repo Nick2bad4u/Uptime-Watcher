@@ -13,7 +13,9 @@ import { logger } from "../../../utils/logger";
  * Utility functions for manipulating monitor history data in the database.
  *
  * @remarks
- * Provides low-level helpers for adding, bulk inserting, deleting, and pruning monitor history entries. All functions are intended for internal use by repository classes and assume transaction context is managed by the caller.
+ * Provides low-level helpers for adding, bulk inserting, deleting, and pruning
+ * monitor history entries. All functions are intended for internal use by
+ * repository classes and assume transaction context is managed by the caller.
  *
  * @internal
  */
@@ -99,13 +101,16 @@ export function addHistoryEntry(
  * @throws {@link Error} When database bulk insertion fails
  *
  * @remarks
- * **Transaction Context**: Assumes it's called within an existing transaction context.
- * Uses a prepared statement for better performance during bulk operations.
+ * **Transaction Context**: Assumes it's called within an existing transaction
+ * context. Uses a prepared statement for better performance during bulk
+ * operations.
  *
  * **Performance**: Optimized for large datasets with prepared statement reuse.
- * The statement is properly finalized in the finally block to prevent resource leaks.
+ * The statement is properly finalized in the finally block to prevent resource
+ * leaks.
  *
- * **Status Validation**: StatusHistory.status is always "up" or "down" per domain contract.
+ * **Status Validation**: StatusHistory.status is always "up" or "down" per
+ * domain contract.
  *
  * @internal
  */
@@ -168,7 +173,8 @@ export function bulkInsertHistory(
  * **WARNING**: This operation is destructive and irreversible.
  *
  * **Transaction Context**: Designed to be called from repository methods
- * that manage transaction context. Always used within HistoryRepository.deleteAllInternal().
+ * that manage transaction context. Always used within
+ * HistoryRepository.deleteAllInternal().
  *
  * @internal
  */
@@ -197,7 +203,8 @@ export function deleteAllHistory(db: Database): void {
  *
  * @remarks
  * **Transaction Context**: Designed to be called from repository methods
- * that manage transaction context. Used within HistoryRepository.deleteByMonitorIdInternal().
+ * that manage transaction context. Used within
+ * HistoryRepository.deleteByMonitorIdInternal().
  *
  * @internal
  */
@@ -224,7 +231,8 @@ export function deleteHistoryByMonitorId(
 }
 
 /**
- * Prune old history entries for a monitor, keeping only the most recent entries.
+ * Prune old history entries for a monitor, keeping only the most recent
+ * entries.
  *
  * @param db - Database connection instance
  * @param monitorId - Unique identifier of the monitor
@@ -233,14 +241,17 @@ export function deleteHistoryByMonitorId(
  * @throws {@link Error} When database operations fail
  *
  * @remarks
- * **Algorithm**: Uses `LIMIT -1 OFFSET ?` to select all entries beyond the most recent `limit` entries.
- * In SQLite, `LIMIT -1` means "no limit", and combined with `OFFSET`, this efficiently
- * identifies excess entries for deletion.
+ * **Algorithm**: Uses `LIMIT -1 OFFSET ?` to select all entries beyond the
+ * most recent `limit` entries. In SQLite, `LIMIT -1` means "no limit", and
+ * combined with `OFFSET`, this efficiently identifies excess entries for
+ * deletion.
  *
- * **Transaction Context**: Designed to be called from repository methods within transaction context.
- * Used by HistoryRepository.pruneHistoryInternal() and HistoryRepository.pruneAllHistoryInternal().
+ * **Transaction Context**: Designed to be called from repository methods
+ * within transaction context. Used by HistoryRepository.pruneHistoryInternal()
+ * and HistoryRepository.pruneAllHistoryInternal().
  *
- * **Performance**: Only executes DELETE when excess entries exist to avoid unnecessary operations.
+ * **Performance**: Only executes DELETE when excess entries exist to avoid
+ * unnecessary operations.
  *
  * @internal
  */
@@ -263,7 +274,8 @@ export function pruneHistoryForMonitor(
         }>;
 
         if (excess.length > 0) {
-            // Convert numeric IDs to ensure type safety and validate they are numbers
+            // Convert numeric IDs to ensure type safety and validate they are
+            // numbers
             const excessIds = excess
                 .map((row) => row.id)
                 .filter((id) => Number.isFinite(id) && id > 0);

@@ -3,22 +3,24 @@
  * Site management coordinator for CRUD operations and cache synchronization.
  *
  * @remarks
- * The SiteManager serves as the primary interface for all site-related operations,
- * providing a unified API for site creation, updates, deletion, and monitoring
- * coordination. It maintains an in-memory cache for performance while ensuring
- * data consistency with the underlying database through transactional operations.
+ * The SiteManager serves as the primary interface for all site-related
+ * operations, providing a unified API for site creation, updates, deletion,
+ * and monitoring coordination. It maintains an in-memory cache for performance
+ * while ensuring data consistency with the underlying database through
+ * transactional operations.
  *
  * Key responsibilities:
- * - **Site CRUD Operations**: Create, read, update, and delete site configurations
- * - **Cache Management**: Maintain synchronized in-memory cache for performance
- * - **Monitor Integration**: Coordinate with MonitorManager for monitoring operations
- * - **Event Communication**: Emit typed events for frontend and internal coordination
- * - **Data Persistence**: Ensure atomic database operations with transaction safety
- * - **Error Handling**: Provide comprehensive error handling and recovery mechanisms
+ * - **Site CRUD Operations**: Create, read, update, and delete site
+ * configurations - **Cache Management**: Maintain synchronized in-memory cache
+ * for performance - **Monitor Integration**: Coordinate with MonitorManager
+ * for monitoring operations - **Event Communication**: Emit typed events for
+ * frontend and internal coordination - **Data Persistence**: Ensure atomic
+ * database operations with transaction safety - **Error Handling**: Provide
+ * comprehensive error handling and recovery mechanisms
  *
- * The manager uses dependency injection for testability and follows the repository
- * pattern for data access. All operations are designed to be atomic and maintain
- * data consistency across cache and database layers.
+ * The manager uses dependency injection for testability and follows the
+ * repository pattern for data access. All operations are designed to be atomic
+ * and maintain data consistency across cache and database layers.
  *
  * @example
  * ```typescript
@@ -226,10 +228,10 @@ export class SiteManager {
      * @returns Promise resolving to array of complete site objects.
      * @throws If database operation fails.
      * @remarks
-     * Retrieves all sites from the database including their associated monitors
-     * and status history. This operation also updates the cache to ensure it
-     * stays synchronized with the database. Use this method when you need
-     * guaranteed fresh data or during cache refresh operations.
+     * Retrieves all sites from the database including their associated
+     * monitors and status history. This operation also updates the cache to
+     * ensure it stays synchronized with the database. Use this method when you
+     * need guaranteed fresh data or during cache refresh operations.
      * @example
      * ```typescript
      * const allSites = await siteManager.getSites();
@@ -297,7 +299,8 @@ export class SiteManager {
             const success = await this.executeMonitorDeletion(monitorId);
 
             if (success) {
-                // Refresh the cache by getting all sites (to ensure proper site structure)
+                // Refresh the cache by getting all sites (to ensure proper
+                // site structure)
                 const allSites =
                     await this.siteRepositoryService.getSitesFromDatabase();
 
@@ -433,7 +436,8 @@ export class SiteManager {
             updates
         );
 
-        // Handle monitoring changes if monitors were updated (replaces orchestrator logic)
+        // Handle monitoring changes if monitors were updated (replaces
+        // orchestrator logic)
         if (updates.monitors) {
             await this.siteWriterService.handleMonitorIntervalChanges(
                 identifier,
@@ -442,7 +446,8 @@ export class SiteManager {
                 monitoringConfig
             );
 
-            // Detect and setup new monitors to ensure consistency with new site behavior
+            // Detect and setup new monitors to ensure consistency with new
+            // site behavior
             const newMonitorIds = this.siteWriterService.detectNewMonitors(
                 originalSite.monitors,
                 updates.monitors
@@ -455,8 +460,9 @@ export class SiteManager {
             }
         }
 
-        // Refresh the entire cache from database to ensure we have the latest monitor IDs
-        // This is especially important when monitors are added/updated
+        // Refresh the entire cache from database to ensure we have the latest
+        // monitor IDs This is especially important when monitors are
+        // added/updated
         const freshSites =
             await this.siteRepositoryService.getSitesFromDatabase();
         await this.updateSitesCache(freshSites);
@@ -489,10 +495,12 @@ export class SiteManager {
     }
 
     /**
-     * Updates the sites cache with new data, replacing all existing entries atomically.
+     * Updates the sites cache with new data, replacing all existing entries
+     * atomically.
      *
      * @remarks
-     * Uses a temporary cache for atomic replacement to ensure consistency and avoid partial updates. Emits a cache-updated event after completion.
+     * Uses a temporary cache for atomic replacement to ensure consistency and
+     * avoid partial updates. Emits a cache-updated event after completion.
      *
      * @param sites - Array of {@link Site} objects to update the cache with.
      * @returns A promise that resolves when cache update is complete.
@@ -535,7 +543,8 @@ export class SiteManager {
      * Executes monitor deletion from the database.
      *
      * @remarks
-     * Used internally to remove a monitor from the database. The repository handles its own transaction.
+     * Used internally to remove a monitor from the database. The repository
+     * handles its own transaction.
      *
      * @param monitorId - The monitor ID to delete.
      * @returns `true` if the monitor was deleted, `false` otherwise.
@@ -552,7 +561,10 @@ export class SiteManager {
      * Loads a site in the background and updates cache.
      *
      * @remarks
-     * Performs silent background loading with error logging and event emission. This ensures background operations don't disrupt the main application flow while still providing observability through logging and events.
+     * Performs silent background loading with error logging and event
+     * emission. This ensures background operations don't disrupt the main
+     * application flow while still providing observability through logging and
+     * events.
      *
      * @param identifier - The site identifier to load.
      * @returns A promise that resolves when background loading is complete.
@@ -603,7 +615,8 @@ export class SiteManager {
                 });
             }
         } catch (error) {
-            // Emit error event for observability while maintaining non-blocking behavior
+            // Emit error event for observability while maintaining
+            // non-blocking behavior
             logger.debug(
                 interpolateLogTemplate(
                     LOG_TEMPLATES.errors.SITE_BACKGROUND_LOAD_FAILED,
@@ -633,7 +646,8 @@ export class SiteManager {
      * Validates site data according to business rules.
      *
      * @remarks
-     * Used internally to validate site configuration before database operations. Throws if validation fails.
+     * Used internally to validate site configuration before database
+     * operations. Throws if validation fails.
      *
      * @param site - The {@link Site} object to validate.
      * @returns A promise that resolves if validation passes.
@@ -656,10 +670,10 @@ export class SiteManager {
      *
      * @param dependencies - Required dependencies for site management operations.
      * @remarks
-     * Initializes the SiteManager with all required dependencies including repositories,
-     * database service, event emitter, and optional monitoring operations. Creates
-     * internal service orchestrators for coordinated operations and sets up the
-     * in-memory cache for performance optimization.
+     * Initializes the SiteManager with all required dependencies including
+     * repositories, database service, event emitter, and optional monitoring
+     * operations. Creates internal service orchestrators for coordinated
+     * operations and sets up the in-memory cache for performance optimization.
      * @example
      * ```typescript
      * const siteManager = new SiteManager({ ... });
@@ -766,7 +780,8 @@ export class SiteManager {
      *
      * @returns The standardized cache instance for sites.
      * @remarks
-     * Used for internal coordination between managers. External consumers should use getSites().
+     * Used for internal coordination between managers. External consumers
+     * should use getSites().
      */
     public getSitesCache(): StandardizedCache<Site> {
         return this.sitesCache;
@@ -793,7 +808,8 @@ export class SiteManager {
      * Creates monitoring configuration for site operations.
      *
      * @remarks
-     * Used internally for coordinated monitoring actions during site updates. Throws if monitoring operations are not available but required.
+     * Used internally for coordinated monitoring actions during site updates.
+     * Throws if monitoring operations are not available but required.
      *
      * @returns Configuration for managing monitoring operations.
      * @throws When monitoring operations are not available but required.

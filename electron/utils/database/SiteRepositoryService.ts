@@ -2,10 +2,10 @@
  * Site repository service for data operations and dependency injection.
  *
  * @remarks
- * Provides a testable, dependency-injected service layer for site data operations,
- * separating business logic from infrastructure concerns. Designed with the repository
- * pattern and service layer architecture to enable comprehensive testing and
- * maintainable code organization.
+ * Provides a testable, dependency-injected service layer for site data
+ * operations, separating business logic from infrastructure concerns. Designed
+ * with the repository pattern and service layer architecture to enable
+ * comprehensive testing and maintainable code organization.
  *
  * @public
  *
@@ -42,9 +42,9 @@
  * await service.loadSitesIntoCache(siteCache);
  * ```
  *
- * The service provides both data operations (SiteRepositoryService) and orchestration
- * logic (SiteLoadingOrchestrator) to handle complex workflows while maintaining
- * clean separation between pure functions and side effects.
+ * The service provides both data operations (SiteRepositoryService) and
+ * orchestration logic (SiteLoadingOrchestrator) to handle complex workflows
+ * while maintaining clean separation between pure functions and side effects.
  *
  * @example
  * ```typescript
@@ -100,8 +100,9 @@ export class SiteLoadingOrchestrator {
                 monitoringConfig
             );
 
-            // Note: Auto-start monitoring is now handled by MonitorManager.setupSiteForMonitoring()
-            // No need to explicitly start monitoring here as it's handled during site setup
+            // Note: Auto-start monitoring is now handled by
+            // MonitorManager.setupSiteForMonitoring() No need to explicitly
+            // start monitoring here as it's handled during site setup
 
             const sitesLoaded = siteCache.size;
             return {

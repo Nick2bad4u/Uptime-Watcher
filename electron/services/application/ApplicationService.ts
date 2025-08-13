@@ -18,10 +18,14 @@ import { ServiceContainer } from "../ServiceContainer";
  * and their dependencies. Provides proper initialization order and cleanup.
  */
 /**
- * Main application service that orchestrates all other services and coordinates application lifecycle.
+ * Main application service that orchestrates all other services and
+ * coordinates application lifecycle.
  *
  * @remarks
- * Uses dependency injection through {@link ServiceContainer} to manage all services and their dependencies. Provides proper initialization order, event handler setup, and cleanup. Handles Electron app events and orchestrates service startup and shutdown.
+ * Uses dependency injection through {@link ServiceContainer} to manage all
+ * services and their dependencies. Provides proper initialization order, event
+ * handler setup, and cleanup. Handles Electron app events and orchestrates
+ * service startup and shutdown.
  *
  * @public
  */
@@ -77,7 +81,9 @@ export class ApplicationService {
      * Cleans up resources before application shutdown.
      *
      * @remarks
-     * Performs ordered shutdown of all services including IPC cleanup, monitoring stoppage, and window closure. Follows project error handling standards by re-throwing errors after logging for upstream handling.
+     * Performs ordered shutdown of all services including IPC cleanup,
+     * monitoring stoppage, and window closure. Follows project error handling
+     * standards by re-throwing errors after logging for upstream handling.
      *
      * @returns A promise that resolves when cleanup is complete.
      * @throws Re-throws any errors encountered during cleanup for upstream handling.
@@ -105,7 +111,8 @@ export class ApplicationService {
             this.removeApplicationEventListeners();
 
             // Cleanup IPC handlers
-            // NOTE: Currently synchronous, but designed to be future-compatible with async cleanup
+            // NOTE: Currently synchronous, but designed to be
+            // future-compatible with async cleanup
             const ipcService = this.serviceContainer.getIpcService();
             if (
                 "cleanup" in ipcService &&
@@ -119,7 +126,8 @@ export class ApplicationService {
             await orchestrator.stopMonitoring();
 
             // Close windows
-            // NOTE: Currently synchronous, but designed to be future-compatible with async closure
+            // NOTE: Currently synchronous, but designed to be
+            // future-compatible with async closure
             this.serviceContainer.getWindowService().closeMainWindow();
 
             logger.info(LOG_TEMPLATES.services.APPLICATION_CLEANUP_COMPLETE);
@@ -134,7 +142,11 @@ export class ApplicationService {
      * Handles the application ready event and initializes all services.
      *
      * @remarks
-     * Performs ordered initialization of all services through the {@link ServiceContainer}, creates the main application window, and sets up event handlers and auto-updater. This method is called automatically when Electron's 'ready' event fires. Errors are caught and logged by the calling {@link setupApplication} method.
+     * Performs ordered initialization of all services through the {@link
+     * ServiceContainer}, creates the main application window, and sets up
+     * event handlers and auto-updater. This method is called automatically
+     * when Electron's 'ready' event fires. Errors are caught and logged by the
+     * calling {@link setupApplication} method.
      *
      * @returns A promise that resolves when initialization is complete.
      * @internal
@@ -158,10 +170,13 @@ export class ApplicationService {
     }
 
     /**
-     * Constructs the {@link ApplicationService} and sets up the service container.
+     * Constructs the {@link ApplicationService} and sets up the service
+     * container.
      *
      * @remarks
-     * Creates a {@link ServiceContainer} instance with appropriate debug settings and sets up application-level event handlers. This constructor should be called once during application startup.
+     * Creates a {@link ServiceContainer} instance with appropriate debug
+     * settings and sets up application-level event handlers. This constructor
+     * should be called once during application startup.
      *
      * @example
      * ```typescript
@@ -210,7 +225,8 @@ export class ApplicationService {
     }
 
     /**
-     * Sets up the auto-updater service with status callbacks and initialization.
+     * Sets up the auto-updater service with status callbacks and
+     * initialization.
      *
      * @remarks
      * Configures the auto-updater service to:
@@ -246,8 +262,9 @@ export class ApplicationService {
      * Sets up typed event handlers for uptime monitoring system events.
      *
      * @remarks
-     * Establishes communication bridge between the uptime monitoring system and the renderer process by forwarding typed events including:
-     * - Monitor status changes (up/down/status-changed)
+     * Establishes communication bridge between the uptime monitoring system
+     * and the renderer process by forwarding typed events including: - Monitor
+     * status changes (up/down/status-changed)
      * - Monitoring lifecycle events (started/stopped)
      * - Cache invalidation events
      * - System errors

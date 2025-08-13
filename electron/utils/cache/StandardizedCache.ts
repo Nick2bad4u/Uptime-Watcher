@@ -14,7 +14,9 @@ import { logger } from "../logger";
  * Cache configuration.
  */
 export interface CacheConfig {
-    /** Default TTL in milliseconds. Set to 0 or negative to disable expiration. */
+    /**
+     * Default TTL in milliseconds. Set to 0 or negative to disable expiration.
+     */
     defaultTTL?: number;
     /** Enable statistics tracking */
     enableStats?: boolean;
@@ -227,7 +229,8 @@ export class StandardizedCache<T> {
         }
 
         this.updateSize();
-        // Workaround for ESLint plugin bug: avoid direct [Symbol.iterator]() call
+        // Workaround for ESLint plugin bug: avoid direct [Symbol.iterator]()
+        // call
         const iteratorFn = entries[Symbol.iterator];
         return iteratorFn.call(entries);
     }
@@ -378,8 +381,9 @@ export class StandardizedCache<T> {
      * Register invalidation callback for cache events.
      *
      * @param callback - Function to call when cache items are invalidated.
-     *                   Called with a specific key when a single item is invalidated,
-     *                   or with undefined when all items are invalidated.
+     *                   Called with a specific key when a single item is
+     *                   invalidated, or with undefined when all items are
+     *                   invalidated.
      * @returns Cleanup function to remove the callback
      */
     public onInvalidation(callback: (key?: string) => void): () => void {
@@ -476,7 +480,8 @@ export class StandardizedCache<T> {
     /**
      * Notify invalidation callbacks.
      *
-     * Calls all registered invalidation callbacks, handling any errors gracefully.
+     * Calls all registered invalidation callbacks, handling any errors
+     * gracefully.
      *
      * @param key - The invalidated cache key, or undefined if all keys were invalidated
      */

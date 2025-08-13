@@ -1,5 +1,6 @@
 /**
- * Interfaces for database utilities to support dependency injection and testing.
+ * Interfaces for database utilities to support dependency injection and
+ * testing.
  */
 
 import type { Site } from "@shared/types";
@@ -12,7 +13,8 @@ import type { SettingsRepository } from "../../services/database/SettingsReposit
 import type { SiteRepository } from "../../services/database/SiteRepository";
 import type { Logger } from "../interfaces";
 
-// Logger type available for internal use - external consumers should import from ../interfaces
+// Logger type available for internal use - external consumers should import
+// from ../interfaces
 
 /**
  * Configuration for monitoring operations.
@@ -64,7 +66,8 @@ export interface SiteWritingConfig {
 /**
  * Custom error for site loading operations.
  *
- * Provides enhanced error context and stack trace preservation for site loading failures.
+ * Provides enhanced error context and stack trace preservation for site
+ * loading failures.
  */
 export class SiteLoadingError extends Error {
     /**

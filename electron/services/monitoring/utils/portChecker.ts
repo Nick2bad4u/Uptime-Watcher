@@ -10,7 +10,11 @@ import { PORT_NOT_REACHABLE, PortCheckError } from "./portErrorHandling";
  * TCP port connectivity check utilities for monitoring services.
  *
  * @remarks
- * Provides low-level, single-attempt TCP port checking for use in monitor health checks. Measures precise response times and supplies detailed error information for retry and diagnostics. All database and event updates are handled outside this utility. For port checks with retry logic, see {@link portRetry.ts}.
+ * Provides low-level, single-attempt TCP port checking for use in monitor
+ * health checks. Measures precise response times and supplies detailed error
+ * information for retry and diagnostics. All database and event updates are
+ * handled outside this utility. For port checks with retry logic, see {@link
+ * portRetry.ts}.
  *
  * @see {@link performSinglePortCheck}
  * @see {@link MonitorCheckResult}
@@ -22,21 +26,31 @@ import { PORT_NOT_REACHABLE, PortCheckError } from "./portErrorHandling";
  * Utility functions for performing port connectivity checks via TCP.
  *
  * @remarks
- * Provides low-level port checking using TCP connectivity tests. Measures precise response times and
- * supplies detailed error information for retry mechanisms. For port checks with retry logic, use
- * {@link portRetry.ts} instead.
+ * Provides low-level port checking using TCP connectivity tests. Measures
+ * precise response times and supplies detailed error information for retry
+ * mechanisms. For port checks with retry logic, use {@link portRetry.ts}
+ * instead.
  *
  * @see {@link performSinglePortCheck}
  * @public
  */
 
 /**
- * Performs a single TCP port connectivity check to a specified host and port, without retry logic.
+ * Performs a single TCP port connectivity check to a specified host and port,
+ * without retry logic.
  *
  * @remarks
- * Uses the {@link "is-port-reachable"} library to test TCP connectivity to the given host and port, measuring response time with high-precision `performance.now()`. Debug logging is enabled in development mode. This function does not mutate state or trigger events; it is intended for use within repository or service layers that handle orchestration and event propagation.
+ * Uses the {@link "is-port-reachable"} library to test TCP connectivity to the
+ * given host and port, measuring response time with high-precision
+ * `performance.now()`. Debug logging is enabled in development mode. This
+ * function does not mutate state or trigger events; it is intended for use
+ * within repository or service layers that handle orchestration and event
+ * propagation.
  *
- * On success, resolves to a {@link MonitorCheckResult} with status `"up"` and the measured response time. On failure, throws a {@link PortCheckError} containing the error message and response time for use in retry or error handling logic.
+ * On success, resolves to a {@link MonitorCheckResult} with status `"up"` and
+ * the measured response time. On failure, throws a {@link PortCheckError}
+ * containing the error message and response time for use in retry or error
+ * handling logic.
  *
  * @example
  * ```typescript
@@ -94,7 +108,8 @@ export async function performSinglePortCheck(
             status: "up",
         };
     } else {
-        // Port not reachable - throw custom error with response time to support retry logic
+        // Port not reachable - throw custom error with response time to
+        // support retry logic
         throw new PortCheckError(PORT_NOT_REACHABLE, responseTime);
     }
 }

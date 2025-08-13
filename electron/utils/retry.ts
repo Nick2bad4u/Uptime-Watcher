@@ -1,12 +1,14 @@
 /**
- * Retry utility for handling transient failures in database and network operations.
- * Provides configurable retry logic with exponential backoff for robust error handling.
+ * Retry utility for handling transient failures in database and network
+ * operations. Provides configurable retry logic with exponential backoff for
+ * robust error handling.
  */
 
 import { dbLogger } from "./logger";
 
 /**
- * Database-specific retry wrapper with optimized settings for database operations.
+ * Database-specific retry wrapper with optimized settings for database
+ * operations.
  *
  * @typeParam T - The return type of the database operation
  * @param operation - Database operation to retry

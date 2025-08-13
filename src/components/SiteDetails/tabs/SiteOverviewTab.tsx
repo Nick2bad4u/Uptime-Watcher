@@ -130,9 +130,9 @@ export const SiteOverviewTab = ({
             return currentTheme.colors.error;
         },
         [
+            currentTheme.colors.error,
             currentTheme.colors.success,
             currentTheme.colors.warning,
-            currentTheme.colors.error,
         ]
     );
 

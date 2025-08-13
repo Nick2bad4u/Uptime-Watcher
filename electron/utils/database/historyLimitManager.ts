@@ -90,7 +90,8 @@ export async function setHistoryLimit(
     // Update the internal limit
     updateHistoryLimit(finalLimit);
 
-    // Use single transaction for atomicity - either both operations succeed or both fail
+    // Use single transaction for atomicity - either both operations succeed or
+    // both fail
     await withDatabaseOperation(
         async () => {
             return databaseService.executeTransaction((db) => {
@@ -101,7 +102,8 @@ export async function setHistoryLimit(
                     finalLimit.toString()
                 );
 
-                // Prune history for all monitors if limit > 0 using internal method
+                // Prune history for all monitors if limit > 0 using internal
+                // method
                 if (finalLimit > 0) {
                     repositories.history.pruneAllHistoryInternal(
                         db,

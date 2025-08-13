@@ -2,7 +2,9 @@
  * Utilities for evaluating HTTP status codes in uptime monitoring.
  *
  * @remarks
- * Maps HTTP response codes to monitor status ("up" or "down") for use in monitoring services. All logic is type-safe and concise. Provides helpers for status evaluation and validation.
+ * Maps HTTP response codes to monitor status ("up" or "down") for use in
+ * monitoring services. All logic is type-safe and concise. Provides helpers
+ * for status evaluation and validation.
  *
  * @see {@link determineMonitorStatus}
  * @public
@@ -12,7 +14,8 @@
  * Validates that a value is a valid HTTP status code (100–599).
  *
  * @remarks
- * Used internally to ensure only valid HTTP status codes are evaluated for monitor status. Returns true for integer values in the 100–599 range.
+ * Used internally to ensure only valid HTTP status codes are evaluated for
+ * monitor status. Returns true for integer values in the 100–599 range.
  *
  * @param httpStatus - The HTTP status code to validate.
  * @returns True if the code is a valid HTTP status code, false otherwise.

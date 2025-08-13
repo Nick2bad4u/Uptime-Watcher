@@ -1,6 +1,7 @@
 /**
- * Configuration manager for business rules and policies with standardized caching.
- * Centralizes business logic for configuration decisions and caches validation results.
+ * Configuration manager for business rules and policies with standardized
+ * caching. Centralizes business logic for configuration decisions and caches
+ * validation results.
  */
 
 import type { Site } from "@shared/types";
@@ -28,7 +29,8 @@ import { SiteValidator } from "./validators/SiteValidator";
  * Describes the configuration for history retention limits.
  *
  * @remarks
- * Used by {@link ConfigurationManager.getHistoryRetentionRules} to specify allowed history limits.
+ * Used by {@link ConfigurationManager.getHistoryRetentionRules} to specify
+ * allowed history limits.
  *
  * @public
  */
@@ -54,12 +56,14 @@ export interface HistoryRetentionConfig {
 }
 
 /**
- * Manages business configuration, validation, and policy rules for the application.
+ * Manages business configuration, validation, and policy rules for the
+ * application.
  *
  * @remarks
- * Centralizes business logic for configuration decisions, validation, and caching of results.
- * Uses composition with specialized validators and standardized caches for performance.
- * All configuration and validation flows should use this manager for consistency.
+ * Centralizes business logic for configuration decisions, validation, and
+ * caching of results. Uses composition with specialized validators and
+ * standardized caches for performance. All configuration and validation flows
+ * should use this manager for consistency.
  *
  * @public
  */
@@ -68,8 +72,8 @@ export class ConfigurationManager {
      * Cache for configuration values.
      *
      * @remarks
-     * Used to store and retrieve configuration values for improved performance.
-     * Now uses ConfigValue type for better type safety.
+     * Used to store and retrieve configuration values for improved
+     * performance. Now uses ConfigValue type for better type safety.
      *
      * @readonly
      * @internal
@@ -110,13 +114,15 @@ export class ConfigurationManager {
     private readonly validationCache: StandardizedCache<ValidationResult>;
 
     /**
-     * Validates a monitor configuration according to business rules, with caching.
+     * Validates a monitor configuration according to business rules, with
+     * caching.
      *
      * @param monitor - The monitor configuration to validate. Must be a member of {@link Site.monitors}.
      * @returns A promise resolving to a {@link ValidationResult} with errors and validity status.
      *
      * @remarks
-     * Delegates to {@link MonitorValidator.validateMonitorConfiguration} and caches results for performance.
+     * Delegates to {@link MonitorValidator.validateMonitorConfiguration} and
+     * caches results for performance.
      */
     public async validateMonitorConfiguration(
         monitor: Site["monitors"][0]
@@ -160,13 +166,15 @@ export class ConfigurationManager {
     }
 
     /**
-     * Validates a site configuration according to business rules, with caching.
+     * Validates a site configuration according to business rules, with
+     * caching.
      *
      * @param site - The {@link Site} configuration to validate.
      * @returns A promise resolving to a {@link ValidationResult} with errors and validity status.
      *
      * @remarks
-     * Delegates to {@link SiteValidator.validateSiteConfiguration} and caches results for performance.
+     * Delegates to {@link SiteValidator.validateSiteConfiguration} and caches
+     * results for performance.
      */
     public async validateSiteConfiguration(
         site: Site
@@ -205,7 +213,8 @@ export class ConfigurationManager {
      * Creates a new {@link ConfigurationManager} instance.
      *
      * @remarks
-     * Instantiates specialized validators and initializes standardized caches for configuration and validation results.
+     * Instantiates specialized validators and initializes standardized caches
+     * for configuration and validation results.
      */
     public constructor() {
         this.siteValidator = new SiteValidator();
@@ -231,7 +240,8 @@ export class ConfigurationManager {
      * Clears the validation cache.
      *
      * @remarks
-     * Use this method to invalidate cached validation results after configuration updates or changes.
+     * Use this method to invalidate cached validation results after
+     * configuration updates or changes.
      */
     public clearValidationCache(): void {
         this.validationCache.clear();
@@ -327,14 +337,15 @@ export class ConfigurationManager {
     }
 
     /**
-     * Determines if monitoring should be auto-started for a site according to business rules.
+     * Determines if monitoring should be auto-started for a site according to
+     * business rules.
      *
      * @param site - The {@link Site} configuration to evaluate.
      * @returns `true` if monitoring should be auto-started for the site; otherwise, `false`.
      *
      * @remarks
-     * Monitoring is not auto-started in development mode or for sites without monitors.
-     * The site's `monitoring` property takes precedence.
+     * Monitoring is not auto-started in development mode or for sites without
+     * monitors. The site's `monitoring` property takes precedence.
      */
     public shouldAutoStartMonitoring(site: Site): boolean {
         // Business rule: Don't auto-start in development mode
@@ -352,13 +363,15 @@ export class ConfigurationManager {
     }
 
     /**
-     * Determines if a site should be included in exports according to business rules.
+     * Determines if a site should be included in exports according to business
+     * rules.
      *
      * @param site - The {@link Site} configuration to evaluate.
      * @returns `true` if the site should be included in exports; otherwise, `false`.
      *
      * @remarks
-     * Delegates to {@link SiteValidator.shouldIncludeInExport} for consistency.
+     * Delegates to {@link SiteValidator.shouldIncludeInExport} for
+     * consistency.
      */
     public shouldIncludeInExport(site: Site): boolean {
         return this.siteValidator.shouldIncludeInExport(site);

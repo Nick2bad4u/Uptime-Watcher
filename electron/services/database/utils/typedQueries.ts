@@ -4,7 +4,8 @@
  * @remarks
  * These helpers provide compile-time type safety for database operations while
  * maintaining runtime safety through controlled SQL queries. This centralizes
- * the inevitable type assertions required when working with SQLite's untyped results.
+ * the inevitable type assertions required when working with SQLite's untyped
+ * results.
  *
  * @packageDocumentation
  */
@@ -33,9 +34,9 @@ export interface IdOnlyResult {
  * @returns Inserted record with generated fields
  *
  * @remarks
- * This function handles INSERT...RETURNING queries which return the inserted record.
- * Commonly used for getting auto-generated IDs. Callers should cast the result to
- * the expected type.
+ * This function handles INSERT...RETURNING queries which return the inserted
+ * record. Commonly used for getting auto-generated IDs. Callers should cast
+ * the result to the expected type.
  */
 export function insertWithReturning(
     db: Database,
@@ -69,7 +70,8 @@ export function queryForCount(
 }
 
 /**
- * Type-safe wrapper for database queries that return arrays of records with ID fields.
+ * Type-safe wrapper for database queries that return arrays of records with ID
+ * fields.
  *
  * @param db - Database instance
  * @param sql - SQL query string that selects id fields
@@ -77,8 +79,9 @@ export function queryForCount(
  * @returns Array of objects with id: number
  *
  * @remarks
- * This function centralizes the type assertion for queries that select ID fields.
- * It's safe because we control the SQL and know it returns numeric IDs.
+ * This function centralizes the type assertion for queries that select ID
+ * fields. It's safe because we control the SQL and know it returns numeric
+ * IDs.
  */
 export function queryForIds(
     db: Database,
@@ -107,7 +110,8 @@ export function queryForRecords<
 }
 
 /**
- * Type-safe wrapper for database queries that return a single record or undefined.
+ * Type-safe wrapper for database queries that return a single record or
+ * undefined.
  *
  * @param db - Database instance
  * @param sql - SQL query string

@@ -326,8 +326,8 @@ export class AutoUpdaterService {
      *
      * Error handling:
      * - Gracefully handles undefined callback
-     * - Does not catch callback exceptions (callbacks should handle their own errors)
-     * - Logs status changes for debugging purposes
+     * - Does not catch callback exceptions (callbacks should handle their own
+     * errors) - Logs status changes for debugging purposes
      *
      * @internal
      */

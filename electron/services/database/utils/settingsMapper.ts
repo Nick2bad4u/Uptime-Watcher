@@ -1,6 +1,7 @@
 /**
  * Settings database row mapping utilities.
- * Provides consistent data transformation between database rows and Settings objects.
+ * Provides consistent data transformation between database rows and Settings
+ * objects.
  */
 
 import type { SettingsRow as DatabaseSettingsRow } from "@shared/types/database";
@@ -26,9 +27,10 @@ export interface SettingRow {
  * @returns True if setting is valid
  *
  * @remarks
- * Validates SettingRow objects that have already been mapped from database rows.
- * Only checks key validity since value field is always processed appropriately.
- * Uses simplified validation since SettingRow interface already enforces string types.
+ * Validates SettingRow objects that have already been mapped from database
+ * rows. Only checks key validity since value field is always processed
+ * appropriately. Uses simplified validation since SettingRow interface already
+ * enforces string types.
  *
  * @internal
  */
@@ -121,8 +123,9 @@ export function rowToSetting(row: DatabaseSettingsRow): SettingRow {
  * Empty strings, 0, and false are converted to their string representations.
  * Only null and undefined values return undefined.
  *
- * **Error Propagation**: Errors from `safeStringify()` are propagated to caller
- * for proper error handling. This typically occurs with circular reference objects.
+ * **Error Propagation**: Errors from `safeStringify()` are propagated to
+ * caller for proper error handling. This typically occurs with circular
+ * reference objects.
  *
  * **Edge Cases**:
  * - Missing `row.value` field returns undefined

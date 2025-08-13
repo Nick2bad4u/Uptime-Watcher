@@ -213,9 +213,9 @@ export const HistoryTab = ({
             lastLoggedMonitorRef.current = currentMonitor;
         }
     }, [
+        selectedMonitor.history.length,
         selectedMonitor.id,
         selectedMonitor.type,
-        selectedMonitor.history.length,
     ]);
 
     const filteredHistoryRecords = selectedMonitor.history

@@ -22,7 +22,8 @@ export interface NotificationConfig {
 }
 
 /**
- * Service responsible for handling system notifications for monitor status changes.
+ * Service responsible for handling system notifications for monitor status
+ * changes.
  *
  * @remarks
  * Manages desktop notifications for monitor status changes using Electron's
@@ -30,16 +31,16 @@ export interface NotificationConfig {
  * types and handles platform compatibility checks.
  *
  * **Thread Safety and Concurrency:**
- * This service is designed to be thread-safe for typical Electron usage patterns:
- * - Safe to call from main process event handlers
+ * This service is designed to be thread-safe for typical Electron usage
+ * patterns: - Safe to call from main process event handlers
  * - Safe to call from IPC message handlers
  * - Safe to call from multiple timer callbacks concurrently
  * - Configuration updates are applied atomically
  * - No shared mutable state between notification calls
  *
  * **Performance Considerations:**
- * - Monitor lookup uses Array.find() - consider caching for high-frequency usage
- * - Notification creation is synchronous but display is asynchronous
+ * - Monitor lookup uses Array.find() - consider caching for high-frequency
+ * usage - Notification creation is synchronous but display is asynchronous
  * - Platform support check is cached by Electron
  *
  * **Error Handling:**
@@ -79,8 +80,9 @@ export class NotificationService {
      * @param config - Optional configuration for notification behavior
      *
      * @remarks
-     * If no configuration is provided, both down and up alerts are enabled by default.
-     * The configuration can be updated later using {@link NotificationService.updateConfig}.
+     * If no configuration is provided, both down and up alerts are enabled by
+     * default. The configuration can be updated later using {@link
+     * NotificationService.updateConfig}.
      */
     public constructor(config?: NotificationConfig) {
         this.config = config ?? { showDownAlerts: true, showUpAlerts: true };
@@ -92,8 +94,9 @@ export class NotificationService {
      * @returns A copy of the current configuration
      *
      * @remarks
-     * Returns a copy to prevent external modification of the internal configuration.
-     * Use {@link NotificationService.updateConfig} to modify settings.
+     * Returns a copy to prevent external modification of the internal
+     * configuration. Use {@link NotificationService.updateConfig} to modify
+     * settings.
      */
     public getConfig(): NotificationConfig {
         return { ...this.config };
@@ -105,9 +108,9 @@ export class NotificationService {
      * @returns `true` if notifications are supported, `false` otherwise
      *
      * @remarks
-     * Uses Electron's built-in platform detection to determine notification support.
-     * On unsupported platforms, notification methods will log warnings instead
-     * of attempting to display notifications.
+     * Uses Electron's built-in platform detection to determine notification
+     * support. On unsupported platforms, notification methods will log
+     * warnings instead of attempting to display notifications.
      */
     public isSupported(): boolean {
         return Notification.isSupported();
@@ -120,8 +123,9 @@ export class NotificationService {
      * @param monitorId - ID of the specific monitor that went down
      *
      * @remarks
-     * Displays a critical urgency notification with site name and monitor type.
-     * Automatically skipped if down alerts are disabled in configuration or
+     * Displays a critical urgency notification with site name and monitor
+     * type. Automatically skipped if down alerts are disabled in configuration
+     * or
      * if notifications are not supported on the current platform.
      *
      * The notification includes:

@@ -1,10 +1,12 @@
 /**
- * Utilities for mapping monitor data between database rows and application objects.
+ * Utilities for mapping monitor data between database rows and application
+ * objects.
  *
  * @remarks
- * Provides conversion between raw database rows (snake_case) and application monitor objects (camelCase).
- * Integrates with the dynamic monitor type schema system for extensibility.
- * All mapping functions are type-safe and log errors with full context.
+ * Provides conversion between raw database rows (snake_case) and application
+ * monitor objects (camelCase). Integrates with the dynamic monitor type schema
+ * system for extensibility. All mapping functions are type-safe and log errors
+ * with full context.
  */
 
 import type { Monitor, Site } from "@shared/types";
@@ -68,9 +70,10 @@ function copyDynamicFields(
  * Creates base monitor object from dynamic monitor data using safe validation.
  *
  * @remarks
- * Uses centralized validation utilities for safe integer conversion with bounds checking.
- * Replaces manual Number() conversions with validator-based safeInteger() function
- * to prevent invalid data from reaching the application layer.
+ * Uses centralized validation utilities for safe integer conversion with
+ * bounds checking. Replaces manual Number() conversions with validator-based
+ * safeInteger() function to prevent invalid data from reaching the application
+ * layer.
  *
  * @param dynamicMonitor - Mapped monitor data from database
  * @returns Base monitor object with validated fields
@@ -97,7 +100,8 @@ function createBaseMonitor(dynamicMonitor: Monitor): Site["monitors"][0] {
 }
 
 /**
- * Safely parses activeOperations from database row using validator package for security.
+ * Safely parses activeOperations from database row using validator package for
+ * security.
  *
  * @remarks
  * Uses the centralized validator utilities to ensure consistent validation
@@ -145,11 +149,12 @@ function parseActiveOperations(row: DatabaseMonitorRow): string[] {
  * @public
  */
 /**
- * Builds a parameter array for inserting or updating a monitor in the database.
+ * Builds a parameter array for inserting or updating a monitor in the
+ * database.
  *
  * @remarks
- * Converts a monitor object to a row format using the dynamic schema system, then
- * returns an array of values in the order expected by the SQL statement.
+ * Converts a monitor object to a row format using the dynamic schema system,
+ * then returns an array of values in the order expected by the SQL statement.
  * All values are type-safe and nulls are used for missing/undefined fields.
  *
  * @param siteIdentifier - The unique identifier of the site this monitor belongs to.
@@ -204,7 +209,8 @@ export function buildMonitorParameters(
 }
 
 /**
- * Validates that a database row contains the minimum required fields for a monitor.
+ * Validates that a database row contains the minimum required fields for a
+ * monitor.
  *
  * @remarks
  * Checks for the presence and type of critical fields in a raw database row.
@@ -251,7 +257,8 @@ export function rowsToMonitors(rows: DatabaseMonitorRow[]): Site["monitors"] {
 }
 
 /**
- * Converts a single database row to a monitor object using the dynamic schema system.
+ * Converts a single database row to a monitor object using the dynamic schema
+ * system.
  *
  * @remarks
  * - Maps snake_case DB fields to camelCase.
@@ -298,7 +305,8 @@ export function rowToMonitor(row: DatabaseMonitorRow): Site["monitors"][0] {
 }
 
 /**
- * Converts a database row to a monitor object, or returns `undefined` if the row is missing.
+ * Converts a database row to a monitor object, or returns `undefined` if the
+ * row is missing.
  *
  * @remarks
  * - Returns `undefined` if the input row is `undefined` or `null`.

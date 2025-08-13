@@ -70,12 +70,13 @@ interface SerializedMonitorTypeConfig {
 }
 
 /**
- * Utility functions for validating and processing monitor configuration properties.
+ * Utility functions for validating and processing monitor configuration
+ * properties.
  *
  * @remarks
  * Provides methods to extract and validate monitor configuration properties,
- * ensuring only expected properties are present and logging any unexpected ones.
- * Used during the serialization process to maintain data integrity.
+ * ensuring only expected properties are present and logging any unexpected
+ * ones. Used during the serialization process to maintain data integrity.
  *
  * @internal
  */
@@ -85,7 +86,8 @@ const ConfigPropertyValidator = {
      *
      * @remarks
      * Separates known base properties from unexpected properties to maintain
-     * clean serialization and provide debugging information for unknown properties.
+     * clean serialization and provide debugging information for unknown
+     * properties.
      *
      * @param config - The monitor configuration object to process
      * @returns Object containing validated base properties and any unexpected properties found
@@ -142,9 +144,10 @@ const ConfigPropertyValidator = {
      * Validates and logs unexpected properties in monitor configuration.
      *
      * @remarks
-     * Checks for properties that are not part of the expected monitor configuration
-     * schema and logs warnings for debugging purposes. This helps identify when
-     * monitor configurations contain unexpected data that might not be serialized.
+     * Checks for properties that are not part of the expected monitor
+     * configuration schema and logs warnings for debugging purposes. This
+     * helps identify when monitor configurations contain unexpected data that
+     * might not be serialized.
      *
      * @param unexpectedProperties - Record of unexpected properties found during validation
      * @param monitorType - The monitor type identifier for logging context
@@ -171,9 +174,9 @@ const ConfigPropertyValidator = {
  * Utility functions for serializing UI configuration objects.
  *
  * @remarks
- * Provides specialized methods for serializing different parts of monitor UI configuration
- * objects for safe transmission over IPC. Handles optional properties correctly and
- * excludes functions that cannot be serialized.
+ * Provides specialized methods for serializing different parts of monitor UI
+ * configuration objects for safe transmission over IPC. Handles optional
+ * properties correctly and excludes functions that cannot be serialized.
  *
  * @internal
  */
@@ -182,9 +185,9 @@ const UiConfigSerializer = {
      * Serializes detail formats configuration for IPC transmission.
      *
      * @remarks
-     * Processes detail format configuration by extracting serializable properties
-     * and excluding non-serializable functions like historyDetail, formatDetail,
-     * and formatTitleSuffix.
+     * Processes detail format configuration by extracting serializable
+     * properties and excluding non-serializable functions like historyDetail,
+     * formatDetail, and formatTitleSuffix.
      *
      * @param detailFormats - The detail formats configuration object to serialize
      * @returns Serialized detail formats object or undefined if input is empty
@@ -272,8 +275,8 @@ const UiConfigSerializer = {
      *
      * @remarks
      * Orchestrates the serialization of all UI configuration components using
-     * specialized serializer methods. Only includes components with actual content
-     * to avoid sending empty objects over IPC.
+     * specialized serializer methods. Only includes components with actual
+     * content to avoid sending empty objects over IPC.
      *
      * @param uiConfig - The complete UI configuration object to serialize
      * @returns Serialized UI configuration object or undefined if input is empty
@@ -338,15 +341,17 @@ const UiConfigSerializer = {
 };
 
 /**
- * Inter-Process Communication (IPC) service for Electron main-renderer communication.
+ * Inter-Process Communication (IPC) service for Electron main-renderer
+ * communication.
  *
  * @remarks
  * Manages all IPC handlers between the main process and renderer processes,
- * organized by functional domains including sites, monitoring, data management,
- * system operations, and state synchronization. Provides a secure interface
- * for the frontend to interact with backend services through Electron's
- * contextBridge API. All handler registration and cleanup is centrally managed
- * through this service to prevent memory leaks and ensure proper teardown.
+ * organized by functional domains including sites, monitoring, data
+ * management, system operations, and state synchronization. Provides a secure
+ * interface for the frontend to interact with backend services through
+ * Electron's contextBridge API. All handler registration and cleanup is
+ * centrally managed through this service to prevent memory leaks and ensure
+ * proper teardown.
  *
  * The service organizes handlers into logical groups:
  * - Site management: CRUD operations for monitoring sites
@@ -411,10 +416,11 @@ export class IpcService {
      * Constructs a new IpcService instance.
      *
      * @remarks
-     * Initializes the IPC service with required orchestrator and updater dependencies.
-     * The constructor only stores references to dependencies - no handlers are registered
-     * until {@link setupHandlers} is explicitly called. This allows for proper
-     * initialization order during application startup.
+     * Initializes the IPC service with required orchestrator and updater
+     * dependencies. The constructor only stores references to dependencies -
+     * no handlers are registered until {@link setupHandlers} is explicitly
+     * called. This allows for proper initialization order during application
+     * startup.
      *
      * @param uptimeOrchestrator - The core orchestrator for monitoring operations
      * @param autoUpdaterService - The service for handling application updates
@@ -439,7 +445,9 @@ export class IpcService {
      * Removes all registered IPC handlers and event listeners.
      *
      * @remarks
-     * Should be called during application shutdown to prevent memory leaks. Removes handlers registered via `ipcMain.handle` and listeners via `ipcMain.on` for all registered channels.
+     * Should be called during application shutdown to prevent memory leaks.
+     * Removes handlers registered via `ipcMain.handle` and listeners via
+     * `ipcMain.on` for all registered channels.
      *
      * @example
      * ```typescript
@@ -462,9 +470,10 @@ export class IpcService {
      *
      * @remarks
      * Sets up handlers for all functional domains including site management,
-     * monitoring control, monitor type registry, data management, system operations,
-     * and state synchronization. This method should be called exactly once during
-     * application startup after all dependencies are initialized.
+     * monitoring control, monitor type registry, data management, system
+     * operations, and state synchronization. This method should be called
+     * exactly once during application startup after all dependencies are
+     * initialized.
      *
      * The setup process registers handlers in the following order:
      * 1. Site management handlers
@@ -498,7 +507,9 @@ export class IpcService {
      * Serializes a monitor type configuration for IPC transmission.
      *
      * @remarks
-     * Excludes non-serializable properties (functions, schemas) and logs unexpected properties. Preserves all data needed by the renderer process. Throws if unexpected properties are encountered.
+     * Excludes non-serializable properties (functions, schemas) and logs
+     * unexpected properties. Preserves all data needed by the renderer
+     * process. Throws if unexpected properties are encountered.
      *
      * @param config - The monitor type configuration to serialize.
      * @returns Serializable configuration object safe for IPC transmission.
@@ -549,9 +560,11 @@ export class IpcService {
      * Registers IPC handlers for data management operations.
      *
      * @remarks
-     * Handles export/import of configuration, history limit management, and database backup using standardized IPC patterns.
-     * All handlers use consistent response formatting, parameter validation, and error handling.
-     * All handlers are registered with unique channel names and are tracked for cleanup.
+     * Handles export/import of configuration, history limit management, and
+     * database backup using standardized IPC patterns. All handlers use
+     * consistent response formatting, parameter validation, and error
+     * handling. All handlers are registered with unique channel names and are
+     * tracked for cleanup.
      *
      * @internal
      */
@@ -611,9 +624,11 @@ export class IpcService {
      * Registers IPC handlers for monitoring control operations.
      *
      * @remarks
-     * Handles starting/stopping monitoring globally or per site/monitor, and manual checks using standardized IPC patterns.
-     * All handlers use consistent response formatting, parameter validation, and error handling.
-     * All handlers are registered with unique channel names and are tracked for cleanup.
+     * Handles starting/stopping monitoring globally or per site/monitor, and
+     * manual checks using standardized IPC patterns. All handlers use
+     * consistent response formatting, parameter validation, and error
+     * handling. All handlers are registered with unique channel names and are
+     * tracked for cleanup.
      *
      * @internal
      */
@@ -690,7 +705,9 @@ export class IpcService {
      * Registers IPC handlers for monitor type registry operations.
      *
      * @remarks
-     * Handles retrieval of monitor type configs, formatting, and validation. All handlers are registered with unique channel names and are tracked for cleanup.
+     * Handles retrieval of monitor type configs, formatting, and validation.
+     * All handlers are registered with unique channel names and are tracked
+     * for cleanup.
      *
      * @returns For `validate-monitor-data`, returns a {@link ValidationResult} object.
      *
@@ -709,7 +726,8 @@ export class IpcService {
         registerStandardizedIpcHandler(
             "get-monitor-types",
             () => {
-                // Get all monitor type configs and serialize them safely for IPC
+                // Get all monitor type configs and serialize them safely for
+                // IPC
                 const configs = getAllMonitorTypeConfigs();
                 return configs.map((config) =>
                     this.serializeMonitorTypeConfig(config)
@@ -780,7 +798,8 @@ export class IpcService {
                 // Use the validation function from the registry
                 const result = validateMonitorData(monitorType.trim(), data);
 
-                // Return the validation result directly - map success to success parameter
+                // Return the validation result directly - map success to
+                // success parameter
                 return createValidationResponse(
                     result.success,
                     result.errors,
@@ -797,9 +816,10 @@ export class IpcService {
      * Registers IPC handlers for site management operations.
      *
      * @remarks
-     * Handles CRUD operations for sites and monitors using standardized IPC patterns.
-     * All handlers use consistent response formatting, parameter validation, and error handling.
-     * All handlers are registered with unique channel names and are tracked for cleanup.
+     * Handles CRUD operations for sites and monitors using standardized IPC
+     * patterns. All handlers use consistent response formatting, parameter
+     * validation, and error handling. All handlers are registered with unique
+     * channel names and are tracked for cleanup.
      *
      * @internal
      */
@@ -859,10 +879,11 @@ export class IpcService {
      * Registers IPC handlers for state synchronization operations.
      *
      * @remarks
-     * Handles manual full sync requests and sync status queries using standardized IPC patterns.
-     * Emits synchronization events to all renderer processes. All handlers use consistent response
-     * formatting, parameter validation, and error handling. All handlers are registered with
-     * unique channel names and are tracked for cleanup.
+     * Handles manual full sync requests and sync status queries using
+     * standardized IPC patterns. Emits synchronization events to all renderer
+     * processes. All handlers use consistent response formatting, parameter
+     * validation, and error handling. All handlers are registered with unique
+     * channel names and are tracked for cleanup.
      *
      * @internal
      */
@@ -924,7 +945,8 @@ export class IpcService {
      * Registers IPC handlers for system-level operations.
      *
      * @remarks
-     * Handles application quit and install events using event listeners. Event listeners must be removed via {@link cleanup}.
+     * Handles application quit and install events using event listeners. Event
+     * listeners must be removed via {@link cleanup}.
      *
      * @internal
      */

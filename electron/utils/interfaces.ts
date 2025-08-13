@@ -7,9 +7,9 @@
  * Standardized logging interface used throughout utilities.
  *
  * @remarks
- * Provides consistent logging patterns and error reporting across all utility modules.
- * All logging methods accept a message string followed by optional additional arguments
- * for structured logging and context information.
+ * Provides consistent logging patterns and error reporting across all utility
+ * modules. All logging methods accept a message string followed by optional
+ * additional arguments for structured logging and context information.
  */
 export interface Logger {
     /**

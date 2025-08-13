@@ -1,9 +1,11 @@
 /**
- * Represents the result of a validation operation, providing error details and validity status.
+ * Represents the result of a validation operation, providing error details and
+ * validity status.
  *
  * @remarks
- * Used by validators throughout the application to return standardized results.
- * Enables consistent error handling and user feedback by encapsulating both error messages and overall validity.
+ * Used by validators throughout the application to return standardized
+ * results. Enables consistent error handling and user feedback by
+ * encapsulating both error messages and overall validity.
  *
  * @example
  * ```typescript
@@ -21,7 +23,8 @@
  *
  * @public
  */
-// Validation result interface - import directly from shared/types/validation if needed
+// Validation result interface - import directly from shared/types/validation
+// if needed
 export interface ValidationResult {
     errors: string[];
     success: boolean;

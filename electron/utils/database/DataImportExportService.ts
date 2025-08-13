@@ -1,8 +1,9 @@
 /**
  * Service for data import/export operations.
  *
- * Provides a testable, dependency-injected service for application data management.
- * Handles importing and exporting sites, monitors, history, and settings data.
+ * Provides a testable, dependency-injected service for application data
+ * management. Handles importing and exporting sites, monitors, history, and
+ * settings data.
  */
 
 import type { Site, StatusHistory } from "@shared/types";
@@ -265,7 +266,8 @@ export class DataImportExportService {
         originalMonitors: Site["monitors"]
     ): void {
         for (const createdMonitor of createdMonitors) {
-            // Find the original monitor with matching properties to get its history
+            // Find the original monitor with matching properties to get its
+            // history
             const originalMonitor = originalMonitors.find(
                 (orig) =>
                     orig.type === createdMonitor.type &&

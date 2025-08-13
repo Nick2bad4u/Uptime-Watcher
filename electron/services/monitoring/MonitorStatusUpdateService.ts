@@ -27,9 +27,9 @@ import { monitorLogger as logger } from "../../utils/logger";
  * Unified monitor check result interface for status updates.
  *
  * @remarks
- * This interface combines operation correlation fields with monitor check results.
- * Used by the status update service to validate and apply status changes.
- * Includes all fields from both registry and service interfaces.
+ * This interface combines operation correlation fields with monitor check
+ * results. Used by the status update service to validate and apply status
+ * changes. Includes all fields from both registry and service interfaces.
  */
 export interface StatusUpdateMonitorCheckResult {
     /** Optional human-readable details */
@@ -49,11 +49,12 @@ export interface StatusUpdateMonitorCheckResult {
 }
 
 /**
- * Service for conditionally updating monitor status based on operation correlation.
+ * Service for conditionally updating monitor status based on operation
+ * correlation.
  *
  * @remarks
- * Validates operations before applying status updates to prevent race conditions
- * between monitor state changes and delayed check results.
+ * Validates operations before applying status updates to prevent race
+ * conditions between monitor state changes and delayed check results.
  *
  * @public
  */
@@ -203,7 +204,8 @@ export class MonitorStatusUpdateService {
                 `Failed to refresh site cache for monitor ${monitorId}`,
                 error
             );
-            // Don't throw - cache refresh failure shouldn't break monitor updates
+            // Don't throw - cache refresh failure shouldn't break monitor
+            // updates
         }
     }
 

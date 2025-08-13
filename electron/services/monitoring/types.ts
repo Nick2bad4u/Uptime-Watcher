@@ -2,8 +2,8 @@
  * Type definitions for monitoring services and operations.
  *
  * @remarks
- * Defines interfaces and types used by monitor services to perform health checks
- * and manage monitoring configurations across different monitor types.
+ * Defines interfaces and types used by monitor services to perform health
+ * checks and manage monitoring configurations across different monitor types.
  *
  * **Configuration Defaults:**
  * Default values referenced in this file are implemented in:
@@ -13,7 +13,8 @@
  *
  * **Type Safety:**
  * All interfaces use TypeScript strict mode and require explicit handling
- * of optional properties. No `any` types are used to ensure compile-time safety.
+ * of optional properties. No `any` types are used to ensure compile-time
+ * safety.
  *
  * **Extension Guidelines:**
  * When adding new monitor types:
@@ -60,9 +61,10 @@ export interface IMonitorService {
      * @throws {@link Error} When monitor configuration is invalid or check fails catastrophically
      *
      * @remarks
-     * Implementations should handle timeouts, retries, and error conditions gracefully.
-     * Failed checks should return a result with `status: "down"` rather than throwing,
-     * unless the monitor configuration itself is invalid.
+     * Implementations should handle timeouts, retries, and error conditions
+     * gracefully. Failed checks should return a result with `status: "down"`
+     * rather than throwing, unless the monitor configuration itself is
+     * invalid.
      */
     check: (monitor: Site["monitors"][0]) => Promise<MonitorCheckResult>;
 
@@ -83,8 +85,8 @@ export interface IMonitorService {
      * @param config - Partial configuration to update
      *
      * @remarks
-     * Allows runtime configuration updates without recreating the service instance.
-     * Only the provided configuration properties will be updated.
+     * Allows runtime configuration updates without recreating the service
+     * instance. Only the provided configuration properties will be updated.
      */
     updateConfig: (config: Partial<MonitorConfig>) => void;
 }
@@ -103,8 +105,8 @@ export interface MonitorCheckResult {
      * Optional human-readable details about the check result.
      *
      * @remarks
-     * May include status codes, response headers, or other diagnostic information
-     * useful for troubleshooting or display purposes.
+     * May include status codes, response headers, or other diagnostic
+     * information useful for troubleshooting or display purposes.
      * Examples: "HTTP 200 OK", "Connection timeout", "DNS resolution failed"
      */
     details?: string;
@@ -124,7 +126,8 @@ export interface MonitorCheckResult {
      *
      * @remarks
      * For successful checks, this represents the actual response time.
-     * For failed checks, this may represent timeout value or time until failure.
+     * For failed checks, this may represent timeout value or time until
+     * failure.
      */
     responseTime: number;
 
@@ -133,7 +136,8 @@ export interface MonitorCheckResult {
      *
      * @remarks
      * - `"up"`: Monitor endpoint is healthy and responding normally
-     * - `"down"`: Monitor endpoint is failing, unreachable, or returned an error
+     * - `"down"`: Monitor endpoint is failing, unreachable, or returned an
+     * error
      */
     status: "down" | "up";
 }

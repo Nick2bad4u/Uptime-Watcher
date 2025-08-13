@@ -2,8 +2,9 @@
  * Preload script that exposes safe IPC communication to the renderer process.
  *
  * @remarks
- * Creates a secure bridge between main and renderer processes using contextBridge.
- * Organized by functional domains: sites, monitoring, data, settings, events, system.
+ * Creates a secure bridge between main and renderer processes using
+ * contextBridge. Organized by functional domains: sites, monitoring, data,
+ * settings, events, system.
  *
  * @packageDocumentation
  */
@@ -136,7 +137,8 @@ const monitoringAPI = {
  *
  * @remarks
  * Handles application data persistence operations including JSON import/export
- * for configuration backup and SQLite database backup for complete data recovery.
+ * for configuration backup and SQLite database backup for complete data
+ * recovery.
  */
 const dataAPI = {
     /**
@@ -156,9 +158,10 @@ const dataAPI = {
         fileName: string;
     }> => {
         // This assertion is safe because:
-        // 1. The IPC handler is defined in our codebase with a known return type
-        // 2. This is an internal API call with a well-defined contract
-        // 3. The main process handler guarantees this specific return type structure
+        // 1. The IPC handler is defined in our codebase with a known return
+        // type 2. This is an internal API call with a well-defined contract 3.
+        // The main process handler guarantees this specific return type
+        // structure
 
         return ipcRenderer.invoke("download-sqlite-backup") as Promise<{
             buffer: ArrayBuffer;
@@ -188,7 +191,8 @@ const dataAPI = {
  *
  * @remarks
  * Manages application-wide configuration settings that affect behavior
- * such as history retention, notification preferences, and other user preferences.
+ * such as history retention, notification preferences, and other user
+ * preferences.
  */
 const settingsAPI = {
     /**
@@ -219,8 +223,8 @@ const settingsAPI = {
      * @returns Promise resolving when the limit is updated and old records are pruned
      *
      * @remarks
-     * This operation will immediately prune history records that exceed the new limit
-     * across all monitors to free up storage space.
+     * This operation will immediately prune history records that exceed the
+     * new limit across all monitors to free up storage space.
      */
     updateHistoryLimit: (limit: number): Promise<void> =>
         ipcRenderer.invoke("update-history-limit", limit),
@@ -242,11 +246,11 @@ const eventsAPI = {
      * @returns Cleanup function to remove the listener
      *
      * @remarks
-     * Called when backend caches are invalidated, allowing frontend to clear its caches.
-     * Useful for keeping frontend and backend caches synchronized.
+     * Called when backend caches are invalidated, allowing frontend to clear
+     * its caches. Useful for keeping frontend and backend caches synchronized.
      *
-     * **IMPORTANT:** Call the returned cleanup function to prevent memory leaks,
-     * especially when components unmount or are destroyed.
+     * **IMPORTANT:** Call the returned cleanup function to prevent memory
+     * leaks, especially when components unmount or are destroyed.
      *
      * @example
      * ```typescript
@@ -420,7 +424,8 @@ const eventsAPI = {
      * @returns Cleanup function to remove the listener
      *
      * @remarks
-     * Receives events about application updates (checking, downloading, ready to install).
+     * Receives events about application updates (checking, downloading, ready
+     * to install).
      */
     onUpdateStatus: (
         callback: (data: UpdateStatusEventData) => void
@@ -474,10 +479,11 @@ const systemAPI = {
      * Quit the application and install a pending update.
      *
      * @remarks
-     * Only effective when an update has been downloaded and is ready to install.
-     * This will close the application and start the update installer.
+     * Only effective when an update has been downloaded and is ready to
+     * install. This will close the application and start the update installer.
      *
-     * Note: Uses ipcRenderer.send instead of invoke because no response is needed from the main process.
+     * Note: Uses ipcRenderer.send instead of invoke because no response is
+     * needed from the main process.
      */
     quitAndInstall: (): void => {
         ipcRenderer.send("quit-and-install");
@@ -599,8 +605,9 @@ const monitorTypesAPI = {
 };
 
 /**
- * Exposes a structured API object (`window.electronAPI`) to the renderer process, organized by functional domains:
- * - `data`: Import/export and backup operations
+ * Exposes a structured API object (`window.electronAPI`) to the renderer
+ * process, organized by functional domains: - `data`: Import/export and backup
+ * operations
  * - `events`: Real-time event listeners for backend changes
  * - `monitoring`: Control of monitoring lifecycle
  * - `monitorTypes`: Access to monitor type registry and validation
@@ -610,8 +617,9 @@ const monitorTypesAPI = {
  * - `system`: System-level actions (updates, external links)
  *
  * @remarks
- * Each domain provides a set of methods for a specific area of functionality, improving maintainability and type safety.
- * All APIs are exposed as immutable, read-only properties to reinforce the security model.
+ * Each domain provides a set of methods for a specific area of functionality,
+ * improving maintainability and type safety. All APIs are exposed as
+ * immutable, read-only properties to reinforce the security model.
  */
 contextBridge.exposeInMainWorld("electronAPI", {
     // Domain-specific APIs organized for maintainability

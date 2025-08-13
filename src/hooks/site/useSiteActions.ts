@@ -156,7 +156,7 @@ export function useSiteActions(
                 logger.site.error(site.identifier, ensureError(error));
             }
         })();
-    }, [site.identifier, site.name, site.monitors.length, startSiteMonitoring]);
+    }, [site.identifier, site.monitors.length, site.name, startSiteMonitoring]);
 
     // Stop monitoring for all monitors in the site with proper logging
     const handleStopSiteMonitoring = useCallback((): void => {
@@ -172,7 +172,7 @@ export function useSiteActions(
                 logger.site.error(site.identifier, ensureError(error));
             }
         })();
-    }, [site.identifier, site.name, site.monitors.length, stopSiteMonitoring]);
+    }, [site.identifier, site.monitors.length, site.name, stopSiteMonitoring]);
 
     // Perform an immediate status check with enhanced logging
     const handleCheckNow = useCallback((): void => {

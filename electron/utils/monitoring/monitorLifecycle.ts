@@ -2,12 +2,14 @@
  * Traditional monitor lifecycle management utilities.
  *
  * @remarks
- * **Legacy Fallback System**: This module provides traditional monitor start/stop operations
- * that serve as fallbacks when the enhanced monitoring system is unavailable. The enhanced
- * system with operation correlation and race condition prevention is preferred for all new
- * monitor lifecycle operations.
+ * **Legacy Fallback System**: This module provides traditional monitor
+ * start/stop operations that serve as fallbacks when the enhanced monitoring
+ * system is unavailable. The enhanced system with operation correlation and
+ * race condition prevention is preferred for all new monitor lifecycle
+ * operations.
  *
- * Consolidates monitor starting and stopping operations for better organization.
+ * Consolidates monitor starting and stopping operations for better
+ * organization.
  *
  * @see {@link EnhancedMonitoringServices} for the preferred enhanced implementation
  */
@@ -30,9 +32,15 @@ import { withDatabaseOperation } from "../operationalHooks";
  * Configuration object for monitoring lifecycle functions.
  */
 export interface MonitoringLifecycleConfig {
-    /** Database service for executing transactions and maintaining data consistency */
+    /**
+     * Database service for executing transactions and maintaining data
+     * consistency
+     */
     databaseService: DatabaseService;
-    /** Event emitter for communicating monitoring state changes to other components */
+    /**
+     * Event emitter for communicating monitoring state changes to other
+     * components
+     */
     eventEmitter: TypedEventBus<UptimeEvents>;
     /** Logger instance for debugging and operational information */
     logger: Logger;
@@ -58,10 +66,10 @@ export interface MonitoringLifecycleConfig {
  * @returns Promise resolving to true if operation succeeded, false otherwise
  *
  * @remarks
- * Used for recursive calls in monitoring operations. The callback should handle
- * both individual monitor operations (when monitorId is provided) and bulk
- * operations (when monitorId is undefined). Error handling should be managed
- * within the callback implementation.
+ * Used for recursive calls in monitoring operations. The callback should
+ * handle both individual monitor operations (when monitorId is provided) and
+ * bulk operations (when monitorId is undefined). Error handling should be
+ * managed within the callback implementation.
  */
 export type MonitoringCallback = (
     identifier: string,
@@ -123,7 +131,8 @@ function validateCheckInterval(
 }
 
 /**
- * Helper function to find and validate a monitor, eliminating duplication between start/stop functions.
+ * Helper function to find and validate a monitor, eliminating duplication
+ * between start/stop functions.
  *
  * @param config - Configuration object with required dependencies
  * @param site - Site containing the monitor
@@ -158,7 +167,8 @@ function findAndValidateMonitor(
 }
 
 /**
- * Helper function to refresh site cache after monitor operations, eliminating duplication.
+ * Helper function to refresh site cache after monitor operations, eliminating
+ * duplication.
  *
  * @param config - Configuration object with required dependencies
  * @param identifier - Site identifier
@@ -200,14 +210,16 @@ async function refreshSiteCache(
  * @param identifier - Site identifier for logging
  * @param callback - Callback function to execute for each monitor
  * @param useOptimisticLogic - Result aggregation strategy:
- *   - true (optimistic): Success if ANY monitor operation succeeds (used for starting)
- *   - false (pessimistic): Success only if ALL monitor operations succeed (used for stopping)
+ *   - true (optimistic): Success if ANY monitor operation succeeds (used for
+ *   starting) - false (pessimistic): Success only if ALL monitor operations
+ *   succeed (used for stopping)
  * @returns Promise resolving to aggregated success state based on logic type
  *
  * @remarks
  * The different aggregation strategies reflect the operational semantics:
- * - Starting: If any monitor starts successfully, the site is considered "partially active"
- * - Stopping: All monitors must stop successfully for the site to be "fully stopped"
+ * - Starting: If any monitor starts successfully, the site is considered
+ * "partially active" - Stopping: All monitors must stop successfully for the
+ * site to be "fully stopped"
  */
 async function processAllSiteMonitors(
     config: MonitoringLifecycleConfig,
@@ -242,8 +254,9 @@ async function processAllSiteMonitors(
         }
     }
 
-    // For starting monitors, use optimistic logic (succeed if ANY monitor starts)
-    // For stopping monitors, use pessimistic logic (fail if ANY monitor fails to stop)
+    // For starting monitors, use optimistic logic (succeed if ANY monitor
+    // starts) For stopping monitors, use pessimistic logic (fail if ANY monitor
+    // fails to stop)
     return useOptimisticLogic ? results.some(Boolean) : results.every(Boolean);
 }
 
@@ -280,9 +293,9 @@ async function startSpecificMonitor(
     }
 
     try {
-        // Note: Database update is performed before starting the monitor scheduler
-        // This design choice ensures status consistency even if scheduler fails
-        // Use operational hooks for database update
+        // Note: Database update is performed before starting the monitor
+        // scheduler This design choice ensures status consistency even if
+        // scheduler fails Use operational hooks for database update
         await withDatabaseOperation(
             () => {
                 const db = config.databaseService.getDatabase();
@@ -438,8 +451,9 @@ export async function startAllMonitoring(
     );
 
     // Set all monitors to pending status and enable monitoring
-    // Note: Intentionally sets all monitors to "pending" regardless of previous state
-    // to indicate they are being initialized for monitoring startup
+    // Note: Intentionally sets all monitors to "pending" regardless of
+    // previous state to indicate they are being initialized for monitoring
+    // startup
     for (const site of config.sites.getAll()) {
         for (const monitor of site.monitors) {
             if (monitor.id) {
@@ -529,8 +543,8 @@ export async function stopAllMonitoring(
     config.monitorScheduler.stopAll();
 
     // Set all monitors to paused status
-    // Note: Intentionally sets all monitors to "paused" regardless of previous state
-    // to indicate monitoring has been stopped system-wide
+    // Note: Intentionally sets all monitors to "paused" regardless of previous
+    // state to indicate monitoring has been stopped system-wide
     for (const site of config.sites.getAll()) {
         for (const monitor of site.monitors) {
             if (monitor.id && monitor.monitoring) {
@@ -550,7 +564,8 @@ export async function stopAllMonitoring(
                                     }
                                 );
 
-                                // Clear active operations when stopping monitoring
+                                // Clear active operations when stopping
+                                // monitoring
                                 config.monitorRepository.clearActiveOperationsInternal(
                                     db,
                                     monitor.id

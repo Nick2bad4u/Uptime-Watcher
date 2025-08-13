@@ -4,8 +4,8 @@ import type { Site } from "@shared/types";
  * Centralized dependency injection container for all Electron services.
  *
  * @remarks
- * Provides a unified mechanism for managing service dependencies and their lifecycle,
- * ensuring correct initialization order and singleton management.
+ * Provides a unified mechanism for managing service dependencies and their
+ * lifecycle, ensuring correct initialization order and singleton management.
  *
  * Services are categorized as:
  * - Core Services: Infrastructure (Database, IPC)
@@ -51,8 +51,9 @@ export interface ServiceContainerConfig {
      * Enables debug logging for service initialization and lifecycle events.
      *
      * @remarks
-     * When enabled, logs detailed information about service creation, dependency injection,
-     * initialization order, timing, manager setup, event forwarding, and error contexts.
+     * When enabled, logs detailed information about service creation,
+     * dependency injection, initialization order, timing, manager setup, event
+     * forwarding, and error contexts.
      *
      * @defaultValue false
      */
@@ -78,11 +79,12 @@ export interface ServiceContainerConfig {
 }
 
 /**
- * Centralized service container for dependency management and lifecycle orchestration.
+ * Centralized service container for dependency management and lifecycle
+ * orchestration.
  *
  * @remarks
- * Provides singleton access to all core, application, feature, and utility services.
- * Ensures correct initialization order and dependency injection.
+ * Provides singleton access to all core, application, feature, and utility
+ * services. Ensures correct initialization order and dependency injection.
  *
  * @public
  */
@@ -185,7 +187,8 @@ export class ServiceContainer {
      * Gets the singleton {@link ServiceContainer} instance.
      *
      * @remarks
-     * If the instance does not exist, it is created with the provided configuration.
+     * If the instance does not exist, it is created with the provided
+     * configuration.
      *
      * @param config - Optional configuration for the container.
      * @returns The singleton {@link ServiceContainer} instance.
@@ -248,7 +251,8 @@ export class ServiceContainer {
      * Constructs a new {@link ServiceContainer}.
      *
      * @remarks
-     * Use {@link ServiceContainer.getInstance} to obtain the singleton instance.
+     * Use {@link ServiceContainer.getInstance} to obtain the singleton
+     * instance.
      *
      * @param config - Optional configuration for service container behavior.
      */
@@ -293,7 +297,8 @@ export class ServiceContainer {
      * Gets the {@link DatabaseManager} singleton.
      *
      * @remarks
-     * Instantiates with required repositories, configuration manager, and event bus.
+     * Instantiates with required repositories, configuration manager, and
+     * event bus.
      *
      * @returns The {@link DatabaseManager} instance.
      */
@@ -381,8 +386,9 @@ export class ServiceContainer {
      * Gets all initialized services for shutdown and debugging.
      *
      * @remarks
-     * Dynamically discovers all initialized services by inspecting private fields.
-     * Only includes services that are actually initialized (not undefined).
+     * Dynamically discovers all initialized services by inspecting private
+     * fields. Only includes services that are actually initialized (not
+     * undefined).
      *
      * @returns Array of objects containing service names and their instances.
      */
@@ -761,10 +767,12 @@ export class ServiceContainer {
     }
 
     /**
-     * Sets up event forwarding from a manager's event bus to the main orchestrator.
+     * Sets up event forwarding from a manager's event bus to the main
+     * orchestrator.
      *
      * @remarks
-     * Ensures frontend status updates work properly while maintaining dependency isolation.
+     * Ensures frontend status updates work properly while maintaining
+     * dependency isolation.
      *
      * @param managerEventBus - The {@link TypedEventBus} to forward events from.
      * @param managerName - The name of the manager for logging.

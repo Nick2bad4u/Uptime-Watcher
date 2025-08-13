@@ -1,10 +1,12 @@
 /**
- * Utilities and types for standardized error handling in port monitoring operations.
+ * Utilities and types for standardized error handling in port monitoring
+ * operations.
  *
  * @remarks
- * This module provides error constants, result structures, and helper functions for handling
- * port connectivity failures in a consistent, type-safe manner. It is used by the Electron backend
- * to communicate port check errors to the frontend, preserving timing and diagnostic information.
+ * This module provides error constants, result structures, and helper
+ * functions for handling port connectivity failures in a consistent, type-safe
+ * manner. It is used by the Electron backend to communicate port check errors
+ * to the frontend, preserving timing and diagnostic information.
  *
  * @see {@link PortCheckError}
  * @see {@link PortCheckErrorResult}
@@ -19,7 +21,8 @@ import { logger } from "../../../utils/logger";
  * Standardized error message for port connectivity failures.
  *
  * @remarks
- * Used throughout port monitoring utilities to ensure consistent error reporting and handling.
+ * Used throughout port monitoring utilities to ensure consistent error
+ * reporting and handling.
  *
  * @public
  */
@@ -29,7 +32,8 @@ export const PORT_NOT_REACHABLE = "Port not reachable";
  * Result structure for a failed port check operation.
  *
  * @remarks
- * Used to communicate port check failures to the frontend in a standardized, type-safe format.
+ * Used to communicate port check failures to the frontend in a standardized,
+ * type-safe format.
  *
  * @example
  * ```typescript
@@ -72,10 +76,12 @@ export interface PortCheckErrorResult {
 }
 
 /**
- * Custom error class for port connectivity failures, preserving response time information.
+ * Custom error class for port connectivity failures, preserving response time
+ * information.
  *
  * @remarks
- * Extends the standard {@link Error} class to include timing data, supporting diagnostics and retry/backoff strategies.
+ * Extends the standard {@link Error} class to include timing data, supporting
+ * diagnostics and retry/backoff strategies.
  *
  * @example
  * ```typescript
@@ -113,12 +119,14 @@ export class PortCheckError extends Error {
 }
 
 /**
- * Normalizes errors from port checks into a standardized result structure for frontend consumption.
+ * Normalizes errors from port checks into a standardized result structure for
+ * frontend consumption.
  *
  * @remarks
- * Converts any error thrown during a port check into a {@link PortCheckErrorResult} object. If the error is a
- * {@link PortCheckError}, its response time is preserved; otherwise, responseTime is set to -1. Logs debug information
- * in development mode for diagnostics.
+ * Converts any error thrown during a port check into a {@link
+ * PortCheckErrorResult} object. If the error is a {@link PortCheckError}, its
+ * response time is preserved; otherwise, responseTime is set to -1. Logs debug
+ * information in development mode for diagnostics.
  *
  * @param error - The error thrown during port checking. May be any type, but typically an {@link Error} or {@link PortCheckError}.
  * @param host - The hostname or IP address being checked.
@@ -147,7 +155,8 @@ export function handlePortCheckError(
 ): PortCheckErrorResult {
     const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
-    // Extract response time from custom error if available, use -1 for unknown timing
+    // Extract response time from custom error if available, use -1 for unknown
+    // timing
     const responseTime =
         error instanceof PortCheckError ? error.responseTime : -1;
 

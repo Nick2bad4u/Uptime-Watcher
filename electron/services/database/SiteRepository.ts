@@ -8,7 +8,8 @@ import { withDatabaseOperation } from "../../utils/operationalHooks";
 import { rowsToSites, rowToSite, type SiteRow } from "./utils/siteMapper";
 
 /**
- * Defines the dependencies required by the {@link SiteRepository} for managing site data persistence.
+ * Defines the dependencies required by the {@link SiteRepository} for managing
+ * site data persistence.
  *
  * @remarks
  * Used to inject the {@link DatabaseService} for transactional operations. This interface is used for dependency injection.
@@ -56,9 +57,10 @@ const SITE_QUERIES = {
  * Repository for managing site data persistence.
  *
  * @remarks
- * Handles all CRUD operations for sites in the database using the repository pattern.
- * All mutations are wrapped in transactions for consistency and error handling.
- * Data normalization is applied for site names and monitoring status.
+ * Handles all CRUD operations for sites in the database using the repository
+ * pattern. All mutations are wrapped in transactions for consistency and error
+ * handling. Data normalization is applied for site names and monitoring
+ * status.
  */
 export class SiteRepository {
     /** @internal */
@@ -126,7 +128,8 @@ export class SiteRepository {
      * Deletes all sites from the database.
      *
      * @remarks
-     * **WARNING**: This operation is irreversible and will delete all site data.
+     * **WARNING**: This operation is irreversible and will delete all site
+     * data.
      *
      * @returns Promise that resolves when all sites are deleted.
      * @throws If the database operation fails.
@@ -194,7 +197,8 @@ export class SiteRepository {
      * Retrieves all sites from the database.
      *
      * @remarks
-     * Functionally identical to {@link exportAll}, but intended for general querying.
+     * Functionally identical to {@link exportAll}, but intended for general
+     * querying.
      *
      * @returns Promise resolving to an array of all site data.
      * @throws If the database operation fails.
@@ -354,7 +358,8 @@ export class SiteRepository {
     }
 
     /**
-     * Internal method to delete a site by identifier within an existing transaction.
+     * Internal method to delete a site by identifier within an existing
+     * transaction.
      *
      * @remarks
      * - Must be called within an active transaction context.

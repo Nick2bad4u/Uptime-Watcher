@@ -1,6 +1,7 @@
 /**
  * Shared utilities for monitor services to reduce code duplication
- * Contains common patterns used across PingMonitor, PortMonitor, and HttpMonitor
+ * Contains common patterns used across PingMonitor, PortMonitor, and
+ * HttpMonitor
  */
 
 import type { Monitor } from "@shared/types";

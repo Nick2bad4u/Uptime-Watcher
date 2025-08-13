@@ -6,12 +6,13 @@
  * - MonitorManager: Monitoring operations and scheduling
  * - DatabaseManager: Database operations and data management
  *
- * Uses TypedEventBus to provide real-time updates to the renderer process with type safety.
+ * Uses TypedEventBus to provide real-time updates to the renderer process with
+ * type safety.
  *
  * ## Architecture & Event-Driven Design
  *
- * The orchestrator uses an event-driven architecture for inter-manager communication:
- * - Internal events coordinate operations between managers
+ * The orchestrator uses an event-driven architecture for inter-manager
+ * communication: - Internal events coordinate operations between managers
  * - Public events provide updates to the frontend renderer
  * - All events are strongly typed for compile-time safety
  * - Event handlers are organized by domain (site, database, monitoring)
@@ -28,18 +29,21 @@
  *
  * ## Error Handling & Transaction Guarantees
  *
- * - **Transactional Operations**: `addSite()`, `removeMonitor()`, `setHistoryLimit()`
- * - **Error Propagation**: All public methods propagate errors to callers
+ * - **Transactional Operations**: `addSite()`, `removeMonitor()`,
+ * `setHistoryLimit()` - **Error Propagation**: All public methods propagate
+ * errors to callers
  * - **Cleanup on Failure**: Failed operations attempt automatic rollback
- * - **Event Error Isolation**: Event handler errors don't affect other handlers
- * - **Logging**: All errors are logged with context before propagation
+ * - **Event Error Isolation**: Event handler errors don't affect other
+ * handlers - **Logging**: All errors are logged with context before
+ * propagation
  *
  * ## Atomicity Guarantees
  *
  * - `addSite()`: Atomic site creation with monitoring setup or full rollback
  * - `removeMonitor()`: Atomic monitor removal with proper cleanup
- * - `setHistoryLimit()`: Atomic limit update with history pruning in transaction
- * - `updateSite()`: Delegated to SiteManager with transaction support
+ * - `setHistoryLimit()`: Atomic limit update with history pruning in
+ * transaction - `updateSite()`: Delegated to SiteManager with transaction
+ * support
  *
  * Events emitted:
  * - monitor:status-changed: When monitor status changes
@@ -413,8 +417,9 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     ): void => {
         void (async (): Promise<void> => {
             try {
-                // Note: restartMonitorWithNewConfig is intentionally synchronous
-                // as it only updates scheduler configuration without async I/O
+                // Note: restartMonitorWithNewConfig is intentionally
+                // synchronous as it only updates scheduler configuration
+                // without async I/O
                 const success = this.monitorManager.restartMonitorWithNewConfig(
                     data.identifier,
                     data.monitor
@@ -605,7 +610,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         try {
             logger.info("[UptimeOrchestrator] Starting shutdown...");
 
-            // Remove specific event listeners using the named handler references
+            // Remove specific event listeners using the named handler
+            // references
             this.off(
                 "internal:database:update-sites-cache-requested",
                 this.handleUpdateSitesCacheRequestedEvent
@@ -686,15 +692,17 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 monitorId
             );
 
-            // If stopping monitoring failed, log warning but continue with database removal
-            // The monitor may not be running, but database record should still be removed
+            // If stopping monitoring failed, log warning but continue with
+            // database removal The monitor may not be running, but database
+            // record should still be removed
             if (!monitoringStopped) {
                 logger.warn(
                     `[UptimeOrchestrator] Failed to stop monitoring for ${siteIdentifier}/${monitorId}, but continuing with database removal`
                 );
             }
 
-            // Phase 2: Remove monitor from database using transaction (irreversible)
+            // Phase 2: Remove monitor from database using transaction
+            // (irreversible)
             databaseRemoved = await this.siteManager.removeMonitor(
                 siteIdentifier,
                 monitorId
@@ -719,7 +727,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                         `[UptimeOrchestrator] Successfully restarted monitoring for ${siteIdentifier}/${monitorId} after failed removal`
                     );
                 } catch (restartError) {
-                    // This is a critical inconsistency - monitor stopped but database record exists
+                    // This is a critical inconsistency - monitor stopped but
+                    // database record exists
                     const criticalError = new Error(
                         `Critical state inconsistency: Monitor ${siteIdentifier}/${monitorId} stopped but database removal failed and restart failed`
                     );
@@ -758,8 +767,9 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      *
      * @remarks
      * This method delegates to SiteManager for the actual removal operation.
-     * Site removal events (site:removed) are emitted by the SiteManager through
-     * the event forwarding system, not directly by this orchestrator method.
+     * Site removal events (site:removed) are emitted by the SiteManager
+     * through the event forwarding system, not directly by this orchestrator
+     * method.
      */
     public async removeSite(identifier: string): Promise<boolean> {
         return this.siteManager.removeSite(identifier);
@@ -795,7 +805,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * consistency between the setting update and history pruning.
      *
      * @param limit - The new history limit (number of entries to retain per monitor).
-     *                Values less than or equal to 0 will disable history pruning.
+     *                Values less than or equal to 0 will disable history
+     *                pruning.
      * @returns Promise that resolves when the limit is set.
      */
     public async setHistoryLimit(limit: number): Promise<void> {
@@ -903,13 +914,15 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @returns Promise that resolves when the cache update is complete
      *
      * @remarks
-     * Extracted from event handler to enable proper async handling and testing.
-     * Updates the site cache and sets up monitoring for all loaded sites.
+     * Extracted from event handler to enable proper async handling and
+     * testing. Updates the site cache and sets up monitoring for all loaded
+     * sites.
      *
      * Uses Promise.allSettled to handle monitoring setup failures gracefully.
      * Critical failures include both rejected promises and fulfilled promises
-     * where the operation reported failure. The logic correctly identifies failures
-     * by checking either rejected status or successful completion with failure result.
+     * where the operation reported failure. The logic correctly identifies
+     * failures by checking either rejected status or successful completion
+     * with failure result.
      */
     private async handleUpdateSitesCacheRequest(
         data: UpdateSitesCacheRequestData
@@ -1012,7 +1025,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
-     * Gets the current history retention limit (method version for IPC compatibility).
+     * Gets the current history retention limit (method version for IPC
+     * compatibility).
      *
      * @returns The current history limit.
      *
@@ -1139,9 +1153,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @throws Error if validation fails, with specific context about which manager failed
      *
      * @remarks
-     * Performs basic validation that each manager has the expected interface methods.
-     * This ensures managers were properly constructed and their critical methods
-     * are accessible before the orchestrator begins coordinating operations.
+     * Performs basic validation that each manager has the expected interface
+     * methods. This ensures managers were properly constructed and their
+     * critical methods are accessible before the orchestrator begins
+     * coordinating operations.
      *
      * A "properly initialized" manager must have its core interface methods
      * available as functions, indicating successful construction and readiness

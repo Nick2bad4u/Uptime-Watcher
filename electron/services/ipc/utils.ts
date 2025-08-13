@@ -1,6 +1,7 @@
 /**
- * Standardized IPC handler utilities for consistent response formatting and error handling.
- * Provides wrapper functions and utilities for creating type-safe, consistent IPC handlers.
+ * Standardized IPC handler utilities for consistent response formatting and
+ * error handling. Provides wrapper functions and utilities for creating
+ * type-safe, consistent IPC handlers.
  */
 
 import { isNonEmptyString } from "@shared/validation/validatorUtils";
@@ -167,7 +168,8 @@ export function createValidationResponse(
 }
 
 /**
- * Registers a standardized IPC handler with consistent error handling and response formatting.
+ * Registers a standardized IPC handler with consistent error handling and
+ * response formatting.
  *
  * @param channelName - Name of the IPC channel
  * @param handler - The handler function
@@ -175,9 +177,9 @@ export function createValidationResponse(
  * @param registeredHandlers - Set to track registered handlers for cleanup
  *
  * @remarks
- * Registers an IPC handler with the electron ipcMain, automatically wrapping it with
- * standardized error handling, logging, and response formatting. All responses will
- * follow the IpcResponse interface for consistency.
+ * Registers an IPC handler with the electron ipcMain, automatically wrapping
+ * it with standardized error handling, logging, and response formatting. All
+ * responses will follow the IpcResponse interface for consistency.
  *
  * @example
  * ```typescript
@@ -212,16 +214,18 @@ export function registerStandardizedIpcHandler<T>(
 }
 
 /**
- * Wraps an IPC handler with standardized error handling, logging, and response formatting.
+ * Wraps an IPC handler with standardized error handling, logging, and response
+ * formatting.
  *
  * @param channelName - Name of the IPC channel
  * @param handler - The handler function to wrap
  * @returns The wrapped handler result
  *
  * @remarks
- * Provides consistent error handling, logging, and response formatting for all IPC handlers.
- * Automatically logs handler execution and errors, validates parameters if provided,
- * and ensures all responses follow the standardized format.
+ * Provides consistent error handling, logging, and response formatting for all
+ * IPC handlers. Automatically logs handler execution and errors, validates
+ * parameters if provided, and ensures all responses follow the standardized
+ * format.
  *
  * @example
  * ```typescript
@@ -280,7 +284,8 @@ export async function withIpcHandler<T>(
 }
 
 /**
- * Wraps an IPC handler with parameter validation, standardized error handling, and response formatting.
+ * Wraps an IPC handler with parameter validation, standardized error handling,
+ * and response formatting.
  *
  * @param channelName - Name of the IPC channel
  * @param handler - The handler function to wrap
@@ -290,7 +295,8 @@ export async function withIpcHandler<T>(
  *
  * @remarks
  * Extended version of withIpcHandler that includes parameter validation.
- * Validates parameters before executing the handler and provides detailed error messages.
+ * Validates parameters before executing the handler and provides detailed
+ * error messages.
  *
  * @example
  * ```typescript

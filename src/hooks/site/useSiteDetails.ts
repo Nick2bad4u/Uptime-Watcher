@@ -190,9 +190,9 @@ export function useSiteDetails({
             setSelectedMonitorId(currentSite.identifier, selectedMonitor.id);
         }
     }, [
+        currentSite.identifier,
         foundMonitor,
         selectedMonitor,
-        currentSite.identifier,
         setSelectedMonitorId,
     ]);
 
@@ -291,10 +291,10 @@ export function useSiteDetails({
             }
         },
         [
-            currentSite.identifier,
             activeSiteDetailsTab,
-            setSelectedMonitorId,
+            currentSite.identifier,
             setActiveSiteDetailsTab,
+            setSelectedMonitorId,
         ]
     );
 
@@ -319,7 +319,7 @@ export function useSiteDetails({
             undefined,
             false // Don't throw, handle gracefully
         );
-    }, [currentSite.identifier, currentSite.name, clearError, deleteSite]);
+    }, [clearError, currentSite.identifier, currentSite.name, deleteSite]);
 
     // Handler for monitor removal
     const handleRemoveMonitor = useCallback(async () => {
@@ -360,11 +360,11 @@ export function useSiteDetails({
             false
         );
     }, [
+        clearError,
         currentSite.identifier,
         currentSite.name,
-        selectedMonitor,
-        clearError,
         removeMonitorFromSite,
+        selectedMonitor,
     ]);
 
     // Site-level monitoring handlers
@@ -386,11 +386,11 @@ export function useSiteDetails({
             false
         );
     }, [
+        clearError,
         currentSite.identifier,
         currentSite.monitors.length,
-        startSiteMonitoring,
         modifySite,
-        clearError,
+        startSiteMonitoring,
     ]);
 
     const handleStopSiteMonitoring = useCallback(async () => {
@@ -411,11 +411,11 @@ export function useSiteDetails({
             false
         );
     }, [
+        clearError,
         currentSite.identifier,
         currentSite.monitors.length,
-        stopSiteMonitoring,
         modifySite,
-        clearError,
+        stopSiteMonitoring,
     ]);
 
     // Monitoring handlers
@@ -437,10 +437,10 @@ export function useSiteDetails({
             false
         );
     }, [
+        clearError,
         currentSite.identifier,
         selectedMonitorId,
         startSiteMonitorMonitoring,
-        clearError,
     ]);
 
     const handleStopMonitoring = useCallback(async () => {
@@ -461,10 +461,10 @@ export function useSiteDetails({
             false
         );
     }, [
+        clearError,
         currentSite.identifier,
         selectedMonitorId,
         stopSiteMonitorMonitoring,
-        clearError,
     ]);
 
     // Interval change handlers
@@ -510,12 +510,12 @@ export function useSiteDetails({
             siteId: currentSite.identifier,
         });
     }, [
-        currentSite.identifier,
-        selectedMonitorId,
-        localCheckInterval,
-        updateSiteCheckInterval,
         clearError,
+        currentSite.identifier,
+        localCheckInterval,
         selectedMonitor?.type,
+        selectedMonitorId,
+        updateSiteCheckInterval,
     ]);
 
     // Timeout change handlers
@@ -566,12 +566,12 @@ export function useSiteDetails({
             siteId: currentSite.identifier,
         });
     }, [
-        currentSite.identifier,
-        selectedMonitorId,
-        localTimeout,
-        updateMonitorTimeout,
         clearError,
+        currentSite.identifier,
+        localTimeout,
         selectedMonitor?.type,
+        selectedMonitorId,
+        updateMonitorTimeout,
     ]);
 
     // Retry attempts change handlers
@@ -617,12 +617,12 @@ export function useSiteDetails({
             siteId: currentSite.identifier,
         });
     }, [
-        currentSite.identifier,
-        selectedMonitorId,
-        localRetryAttempts,
-        updateMonitorRetryAttempts,
         clearError,
+        currentSite.identifier,
+        localRetryAttempts,
         selectedMonitor?.type,
+        selectedMonitorId,
+        updateMonitorRetryAttempts,
     ]);
 
     // Name save handler
@@ -652,11 +652,11 @@ export function useSiteDetails({
             false
         );
     }, [
-        hasUnsavedChanges,
         clearError,
-        modifySite,
         currentSite.identifier,
+        hasUnsavedChanges,
         localName,
+        modifySite,
     ]);
 
     // Use analytics hook

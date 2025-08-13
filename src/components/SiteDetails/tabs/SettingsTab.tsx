@@ -233,7 +233,7 @@ export const SettingsTab = ({
             siteId: currentSite.identifier,
         });
         await handleSaveName();
-    }, [localName, currentSite.name, currentSite.identifier, handleSaveName]);
+    }, [currentSite.identifier, currentSite.name, handleSaveName, localName]);
 
     const loggedHandleSaveInterval = useCallback(() => {
         logger.user.action("Settings: Save check interval", {
@@ -244,11 +244,11 @@ export const SettingsTab = ({
         });
         handleSaveInterval();
     }, [
-        selectedMonitor.id,
-        localCheckInterval,
-        selectedMonitor.checkInterval,
         currentSite.identifier,
         handleSaveInterval,
+        localCheckInterval,
+        selectedMonitor.checkInterval,
+        selectedMonitor.id,
     ]);
 
     const loggedHandleRemoveSite = useCallback(async () => {
@@ -268,11 +268,11 @@ export const SettingsTab = ({
         });
         await handleSaveTimeout();
     }, [
-        selectedMonitor.id,
-        localTimeout,
-        selectedMonitor.timeout,
         currentSite.identifier,
         handleSaveTimeout,
+        localTimeout,
+        selectedMonitor.id,
+        selectedMonitor.timeout,
     ]);
 
     const loggedHandleSaveRetryAttempts = useCallback(async () => {
@@ -284,11 +284,11 @@ export const SettingsTab = ({
         });
         await handleSaveRetryAttempts();
     }, [
-        selectedMonitor.id,
-        localRetryAttempts,
-        selectedMonitor.retryAttempts,
         currentSite.identifier,
         handleSaveRetryAttempts,
+        localRetryAttempts,
+        selectedMonitor.id,
+        selectedMonitor.retryAttempts,
     ]);
 
     // useCallback handlers for jsx-no-bind compliance

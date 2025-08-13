@@ -19,25 +19,34 @@ import {
  *
  * @remarks
  * This interface uses `exactOptionalPropertyTypes` TypeScript configuration,
- * which means optional properties must be explicitly handled to avoid type errors.
- * The `configurationError` property should only be included when there's an actual error.
+ * which means optional properties must be explicitly handled to avoid type
+ * errors. The `configurationError` property should only be included when
+ * there's an actual error.
  */
 export interface MonitorServiceResult {
-    /** Whether configuration was successfully applied (if config was provided) */
+    /**
+     * Whether configuration was successfully applied (if config was provided)
+     */
     configurationApplied: boolean;
-    /** Configuration error message if application failed (only present when there's an error) */
+    /**
+     * Configuration error message if application failed (only present when
+     * there's an error)
+     */
     configurationError?: string;
     /** The monitor service instance */
     instance: IMonitorService;
 }
 
 /**
- * Factory for creating, caching, and managing monitor service instances for all registered monitor types.
+ * Factory for creating, caching, and managing monitor service instances for
+ * all registered monitor types.
  *
  * @remarks
- * This class provides a singleton instance per monitor type, using the registry's service factories for instantiation.
- * It ensures that only one instance per monitor type exists at a time, and provides configuration management for all monitor services.
- * All monitor type validation and service instantiation is delegated to the monitor type registry.
+ * This class provides a singleton instance per monitor type, using the
+ * registry's service factories for instantiation. It ensures that only one
+ * instance per monitor type exists at a time, and provides configuration
+ * management for all monitor services. All monitor type validation and service
+ * instantiation is delegated to the monitor type registry.
  *
  * @example
  * ```typescript
@@ -55,7 +64,8 @@ export interface MonitorServiceResult {
  * Cache of monitor service instances, keyed by monitor type string.
  *
  * @remarks
- * Implements the singleton pattern: only one instance per monitor type is created and reused.
+ * Implements the singleton pattern: only one instance per monitor type is
+ * created and reused.
  *
  * @internal
  * @readonly
@@ -66,8 +76,9 @@ const serviceInstances = new Map<string, IMonitorService>();
  * Clears all cached monitor service instances.
  *
  * @remarks
- * Useful for testing, reloading configuration, or resetting the monitor service state.
- * After calling this method, new service instances will be created on demand.
+ * Useful for testing, reloading configuration, or resetting the monitor
+ * service state. After calling this method, new service instances will be
+ * created on demand.
  *
  * @example
  * ```typescript
@@ -84,7 +95,8 @@ export function clearMonitorFactoryCache(): void {
  * Retrieves all available monitor types from the registry.
  *
  * @remarks
- * This method returns all monitor types currently registered in the system, including both built-in and dynamically registered types.
+ * This method returns all monitor types currently registered in the system,
+ * including both built-in and dynamically registered types.
  *
  * @returns An array of registered monitor type strings.
  *
@@ -100,13 +112,15 @@ export function getAvailableMonitorTypes(): string[] {
 }
 
 /**
- * Retrieves the monitor service instance for a given monitor type, creating it if necessary.
+ * Retrieves the monitor service instance for a given monitor type, creating it
+ * if necessary.
  *
  * @remarks
  * - Validates the monitor type against the registry.
- * - Uses the singleton pattern: returns the cached instance if available, otherwise creates a new one.
- * - If a configuration is provided, updates the instance's configuration if forced or if the instance is new.
- * - Throws if the monitor type is unsupported or if no factory is registered for the type.
+ * - Uses the singleton pattern: returns the cached instance if available,
+ * otherwise creates a new one. - If a configuration is provided, updates the
+ * instance's configuration if forced or if the instance is new. - Throws if
+ * the monitor type is unsupported or if no factory is registered for the type.
  * - Configuration failures are logged but do not prevent service retrieval.
  *
  * @param type - The monitor type string. Must be a valid registered type.
@@ -138,11 +152,13 @@ export function getMonitor(
 }
 
 /**
- * Retrieves the monitor service instance with configuration application status.
+ * Retrieves the monitor service instance with configuration application
+ * status.
  *
  * @remarks
- * Same as {@link getMonitor} but returns detailed result including configuration application status.
- * Use this method when you need to know if configuration was successfully applied.
+ * Same as {@link getMonitor} but returns detailed result including
+ * configuration application status. Use this method when you need to know if
+ * configuration was successfully applied.
  *
  * @param type - The monitor type string. Must be a valid registered type.
  * @param config - Optional monitor configuration to apply to the instance.
@@ -195,7 +211,8 @@ export function getMonitorWithResult(
     let configurationApplied = true;
     let configurationError: string | undefined = undefined;
 
-    // Apply configuration if provided and either forcing update or instance is new
+    // Apply configuration if provided and either forcing update or instance is
+    // new
     if (
         config &&
         (forceConfigUpdate || serviceInstances.get(type) === instance)
@@ -232,13 +249,16 @@ export function getMonitorWithResult(
 }
 
 /**
- * Updates configuration for all currently initialized monitor service instances.
+ * Updates configuration for all currently initialized monitor service
+ * instances.
  *
  * @remarks
- * - Applies the provided configuration to all cached monitor service instances.
- * - Only affects already-created instances; future instances require explicit config on creation.
- * - Type-specific settings in the config object may be ignored by some monitor types if not applicable.
- * - Errors during config update are logged and do not interrupt updates for other instances.
+ * - Applies the provided configuration to all cached monitor service
+ * instances. - Only affects already-created instances; future instances
+ * require explicit config on creation. - Type-specific settings in the config
+ * object may be ignored by some monitor types if not applicable. - Errors
+ * during config update are logged and do not interrupt updates for other
+ * instances.
  *
  * @param config - Monitor configuration object containing settings to apply to all monitor services.
  *

@@ -1,6 +1,7 @@
 /**
- * Operational hooks utility for standardizing error handling, retries, and event emission.
- * Provides consistent patterns for async operations with observability.
+ * Operational hooks utility for standardizing error handling, retries, and
+ * event emission. Provides consistent patterns for async operations with
+ * observability.
  */
 
 import type { UptimeEvents } from "../events/eventTypes";
@@ -291,11 +292,12 @@ async function handleSuccess<T>(
  * Specialized wrapper for database operations with database-specific defaults.
  *
  * @remarks
- * This function is a convenience wrapper around withOperationalHooks that applies
- * database-optimized settings and adds a "database:" prefix to operation names for
- * consistent event naming. While the underlying implementation is generic, this
- * wrapper should only be used for actual database operations to maintain clear
- * semantic boundaries and event categorization.
+ * This function is a convenience wrapper around withOperationalHooks that
+ * applies database-optimized settings and adds a "database:" prefix to
+ * operation names for consistent event naming. While the underlying
+ * implementation is generic, this wrapper should only be used for actual
+ * database operations to maintain clear semantic boundaries and event
+ * categorization.
  *
  * @typeParam T - The return type of the database operation
  * @param operation - Database operation to execute with retry logic
@@ -322,7 +324,8 @@ export async function withDatabaseOperation<T>(
 }
 
 /**
- * Wraps an async operation with retry logic, error handling, and event emission.
+ * Wraps an async operation with retry logic, error handling, and event
+ * emission.
  */
 export async function withOperationalHooks<T>(
     operation: () => Promise<T>,

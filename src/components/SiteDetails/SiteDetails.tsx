@@ -182,7 +182,7 @@ export const SiteDetails = ({
     );
     const doughnutOptions = useMemo(
         () => chartConfig.getDoughnutChartConfig(analytics.totalChecks),
-        [chartConfig, analytics.totalChecks]
+        [analytics.totalChecks, chartConfig]
     );
 
     // Chart data using analytics
@@ -222,7 +222,7 @@ export const SiteDetails = ({
             ],
             labels: ["Up", "Down"],
         }),
-        [analytics.upCount, analytics.downCount, currentTheme]
+        [analytics.downCount, analytics.upCount, currentTheme]
     );
 
     const doughnutChartData = useMemo(
@@ -243,7 +243,7 @@ export const SiteDetails = ({
             ],
             labels: ["Up", "Down"],
         }),
-        [analytics.upCount, analytics.downCount, currentTheme]
+        [analytics.downCount, analytics.upCount, currentTheme]
     );
 
     // Memoized event handlers to prevent unnecessary re-renders

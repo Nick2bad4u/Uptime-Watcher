@@ -3,8 +3,9 @@
  *
  * @remarks
  * Provides type-safe validation for different categories of IPC operations.
- * Each validator returns `null` if parameters are valid, or an array of error messages if invalid.
- * All validators conform to the {@link IpcParameterValidator} interface.
+ * Each validator returns `null` if parameters are valid, or an array of error
+ * messages if invalid. All validators conform to the {@link
+ * IpcParameterValidator} interface.
  *
  * @see {@link IpcParameterValidator}
  * @public
@@ -78,7 +79,8 @@ function createNoParamsValidator(): IpcParameterValidator {
 }
 
 /**
- * Helper function to create validators for handlers with optional second string parameter.
+ * Helper function to create validators for handlers with optional second
+ * string parameter.
  *
  * @param firstParamName - Name of the required first parameter
  * @param secondParamName - Name of the optional second parameter
@@ -166,7 +168,8 @@ function createSingleObjectValidator(paramName: string): IpcParameterValidator {
 }
 
 /**
- * Helper function to create validators for handlers expecting a single string parameter.
+ * Helper function to create validators for handlers expecting a single string
+ * parameter.
  *
  * @param paramName - Name of the parameter for error messages
  * @returns A validator function that validates a single string parameter
@@ -227,7 +230,8 @@ function createStringObjectValidator(
 }
 
 /**
- * Helper function to create validators for handlers with validated first parameter and unvalidated second.
+ * Helper function to create validators for handlers with validated first
+ * parameter and unvalidated second.
  *
  * @param firstParamName - Name of the required first parameter
  * @returns A validator function that validates first parameter only
@@ -257,7 +261,8 @@ function createStringWithUnvalidatedSecondValidator(
 }
 
 /**
- * Helper function to create validators for handlers expecting two string parameters.
+ * Helper function to create validators for handlers expecting two string
+ * parameters.
  *
  * @param firstParamName - Name of the first parameter for error messages
  * @param secondParamName - Name of the second parameter for error messages
@@ -359,7 +364,8 @@ export const MonitoringHandlerValidators: MonitoringHandlerValidatorsInterface =
          * Validates parameters for the "check-site-now" IPC handler.
          *
          * @remarks
-         * Expects two parameters: site identifier and monitor ID (both strings).
+         * Expects two parameters: site identifier and monitor ID (both
+         * strings).
          */
         checkSiteNow: createTwoStringValidator("identifier", "monitorId"),
 
@@ -372,10 +378,12 @@ export const MonitoringHandlerValidators: MonitoringHandlerValidatorsInterface =
         startMonitoring: createNoParamsValidator(),
 
         /**
-         * Validates parameters for the "start-monitoring-for-site" IPC handler.
+         * Validates parameters for the "start-monitoring-for-site" IPC
+         * handler.
          *
          * @remarks
-         * Expects one or two parameters: site identifier (string), and optional monitor ID (string).
+         * Expects one or two parameters: site identifier (string), and
+         * optional monitor ID (string).
          */
         startMonitoringForSite: createOptionalSecondStringValidator(
             "identifier",
@@ -394,7 +402,8 @@ export const MonitoringHandlerValidators: MonitoringHandlerValidatorsInterface =
          * Validates parameters for the "stop-monitoring-for-site" IPC handler.
          *
          * @remarks
-         * Expects one or two parameters: site identifier (string), and optional monitor ID (string).
+         * Expects one or two parameters: site identifier (string), and
+         * optional monitor ID (string).
          */
         stopMonitoringForSite: createOptionalSecondStringValidator(
             "identifier",
@@ -464,7 +473,8 @@ export const DataHandlerValidators: DataHandlerValidatorsInterface = {
  * Parameter validators for monitor type IPC handlers.
  *
  * @remarks
- * Each property is a validator for a specific monitor type-related IPC channel.
+ * Each property is a validator for a specific monitor type-related IPC
+ * channel.
  *
  * @public
  */
@@ -479,7 +489,8 @@ export const MonitorTypeHandlerValidators: MonitorTypeHandlerValidatorsInterface
         formatMonitorDetail: createTwoStringValidator("monitorType", "details"),
 
         /**
-         * Validates parameters for the "format-monitor-title-suffix" IPC handler.
+         * Validates parameters for the "format-monitor-title-suffix" IPC
+         * handler.
          *
          * @remarks
          * Expects two parameters: monitor type (string) and monitor object.

@@ -1,10 +1,13 @@
 /**
- * Factory for creating and configuring enhanced monitoring services with comprehensive operation correlation.
+ * Factory for creating and configuring enhanced monitoring services with
+ * comprehensive operation correlation.
  *
  * @remarks
- * This factory provides centralized creation and configuration of the enhanced monitoring system components,
- * ensuring proper dependency injection, service coordination, and consistent configuration across all
- * monitoring operations. It serves as the single point of truth for enhanced monitoring service initialization.
+ * This factory provides centralized creation and configuration of the enhanced
+ * monitoring system components, ensuring proper dependency injection, service
+ * coordination, and consistent configuration across all monitoring operations.
+ * It serves as the single point of truth for enhanced monitoring service
+ * initialization.
  *
  * **Key Responsibilities:**
  * - Creates and configures all enhanced monitoring service components
@@ -14,9 +17,10 @@
  * - Abstracts service creation complexity from consuming code
  *
  * **Service Components Created:**
- * - {@link EnhancedMonitorChecker} - Core monitoring logic with operation correlation
- * - {@link MonitorOperationRegistry} - Operation tracking and race condition prevention
- * - {@link MonitorStatusUpdateService} - Safe concurrent status updates
+ * - {@link EnhancedMonitorChecker} - Core monitoring logic with operation
+ * correlation - {@link MonitorOperationRegistry} - Operation tracking and race
+ * condition prevention - {@link MonitorStatusUpdateService} - Safe concurrent
+ * status updates
  * - {@link OperationTimeoutManager} - Timeout management and resource cleanup
  *
  * @example
@@ -55,12 +59,14 @@ import { MonitorStatusUpdateService } from "./MonitorStatusUpdateService";
 import { OperationTimeoutManager } from "./OperationTimeoutManager";
 
 /**
- * Dependencies required for creating and configuring enhanced monitoring services.
+ * Dependencies required for creating and configuring enhanced monitoring
+ * services.
  *
  * @remarks
- * This interface defines all the external dependencies that the enhanced monitoring factory
- * requires to create fully functional monitoring services. Each dependency serves a specific
- * purpose in the monitoring ecosystem and must be properly configured before service creation.
+ * This interface defines all the external dependencies that the enhanced
+ * monitoring factory requires to create fully functional monitoring services.
+ * Each dependency serves a specific purpose in the monitoring ecosystem and
+ * must be properly configured before service creation.
  *
  * **Dependency Categories:**
  * - **Data Access**: Repositories for persistent storage operations
@@ -84,21 +90,24 @@ import { OperationTimeoutManager } from "./OperationTimeoutManager";
  */
 export interface EnhancedMonitoringDependencies {
     /**
-     * Event emitter for system-wide communication and monitoring notifications.
+     * Event emitter for system-wide communication and monitoring
+     * notifications.
      *
      * @remarks
-     * Used to broadcast monitor status changes, operation events, and other monitoring-related
-     * notifications throughout the application. Essential for UI updates and cross-component communication.
+     * Used to broadcast monitor status changes, operation events, and other
+     * monitoring-related notifications throughout the application. Essential
+     * for UI updates and cross-component communication.
      */
     eventEmitter: TypedEventBus<UptimeEvents>;
 
     /**
-     * Function to get the current maximum number of history entries to keep for each monitor.
+     * Function to get the current maximum number of history entries to keep
+     * for each monitor.
      *
      * @remarks
-     * This function provides dynamic access to the history limit setting, which may change
-     * during runtime based on user configuration or system constraints. Used for automatic
-     * history pruning during status updates.
+     * This function provides dynamic access to the history limit setting,
+     * which may change during runtime based on user configuration or system
+     * constraints. Used for automatic history pruning during status updates.
      *
      * @returns The maximum number of status history entries to retain per monitor
      */
@@ -108,9 +117,9 @@ export interface EnhancedMonitoringDependencies {
      * Repository for monitor status history operations and management.
      *
      * @remarks
-     * Handles persistence and retrieval of monitor status history entries, including
-     * automatic pruning based on the configured history limit. Essential for trend
-     * analysis and historical reporting.
+     * Handles persistence and retrieval of monitor status history entries,
+     * including automatic pruning based on the configured history limit.
+     * Essential for trend analysis and historical reporting.
      */
     historyRepository: HistoryRepository;
 
@@ -118,17 +127,20 @@ export interface EnhancedMonitoringDependencies {
      * Repository for monitor entity operations and configuration management.
      *
      * @remarks
-     * Manages monitor entity persistence, status updates, configuration changes,
-     * and monitor-related database operations. Core component for monitor state management.
+     * Manages monitor entity persistence, status updates, configuration
+     * changes, and monitor-related database operations. Core component for
+     * monitor state management.
      */
     monitorRepository: MonitorRepository;
 
     /**
-     * Repository for site entity operations and site-monitor relationship management.
+     * Repository for site entity operations and site-monitor relationship
+     * management.
      *
      * @remarks
-     * Handles site entity persistence and manages the relationship between sites
-     * and their associated monitors. Required for site-level monitoring operations.
+     * Handles site entity persistence and manages the relationship between
+     * sites and their associated monitors. Required for site-level monitoring
+     * operations.
      */
     siteRepository: SiteRepository;
 
@@ -136,31 +148,35 @@ export interface EnhancedMonitoringDependencies {
      * In-memory cache for fast access to site and monitor configurations.
      *
      * @remarks
-     * Provides high-performance, in-memory access to site configurations and monitor
-     * definitions, reducing database load during frequent monitoring operations.
-     * Critical for maintaining acceptable monitoring performance at scale.
+     * Provides high-performance, in-memory access to site configurations and
+     * monitor definitions, reducing database load during frequent monitoring
+     * operations. Critical for maintaining acceptable monitoring performance
+     * at scale.
      */
     sites: StandardizedCache<Site>;
 }
 
 /**
- * Complete bundle of enhanced monitoring services for operation correlation and race condition prevention.
+ * Complete bundle of enhanced monitoring services for operation correlation
+ * and race condition prevention.
  *
  * @remarks
- * This interface defines the complete set of enhanced monitoring services that work together
- * to provide robust, race condition-safe monitoring operations. All services are pre-configured
- * and ready for use, with proper inter-service dependencies already established.
+ * This interface defines the complete set of enhanced monitoring services that
+ * work together to provide robust, race condition-safe monitoring operations.
+ * All services are pre-configured and ready for use, with proper inter-service
+ * dependencies already established.
  *
  * **Service Architecture:**
- * - **Core Engine**: {@link EnhancedMonitorChecker} provides the main monitoring logic
- * - **Operation Tracking**: {@link MonitorOperationRegistry} prevents race conditions
- * - **Status Management**: {@link MonitorStatusUpdateService} ensures safe concurrent updates
- * - **Resource Management**: {@link OperationTimeoutManager} handles timeouts and cleanup
+ * - **Core Engine**: {@link EnhancedMonitorChecker} provides the main
+ * monitoring logic - **Operation Tracking**: {@link MonitorOperationRegistry}
+ * prevents race conditions - **Status Management**: {@link
+ * MonitorStatusUpdateService} ensures safe concurrent updates - **Resource
+ * Management**: {@link OperationTimeoutManager} handles timeouts and cleanup
  *
  * **Usage Pattern:**
- * All services in this bundle are designed to work together. The checker service is the primary
- * interface for consumers, while the other services provide supporting functionality that the
- * checker coordinates automatically.
+ * All services in this bundle are designed to work together. The checker
+ * service is the primary interface for consumers, while the other services
+ * provide supporting functionality that the checker coordinates automatically.
  *
  * @example
  * ```typescript
@@ -181,32 +197,37 @@ export interface EnhancedMonitoringDependencies {
  */
 export interface EnhancedMonitoringServices {
     /**
-     * Enhanced monitor checker with comprehensive operation correlation and race condition prevention.
+     * Enhanced monitor checker with comprehensive operation correlation and
+     * race condition prevention.
      *
      * @remarks
-     * This is the primary service interface for monitor checking operations. It coordinates
-     * with all other services in the bundle to provide safe, efficient monitoring capabilities.
-     * Most consumers should interact exclusively with this service.
+     * This is the primary service interface for monitor checking operations.
+     * It coordinates with all other services in the bundle to provide safe,
+     * efficient monitoring capabilities. Most consumers should interact
+     * exclusively with this service.
      */
     checker: EnhancedMonitorChecker;
 
     /**
-     * Operation registry for monitoring active operations and preventing race conditions.
+     * Operation registry for monitoring active operations and preventing race
+     * conditions.
      *
      * @remarks
-     * Tracks all active monitor operations to prevent duplicate or conflicting checks.
-     * Primarily used internally by the checker service, but available for advanced
-     * use cases requiring direct operation state querying.
+     * Tracks all active monitor operations to prevent duplicate or conflicting
+     * checks. Primarily used internally by the checker service, but available
+     * for advanced use cases requiring direct operation state querying.
      */
     operationRegistry: MonitorOperationRegistry;
 
     /**
-     * Status update service with operation validation and concurrent access safety.
+     * Status update service with operation validation and concurrent access
+     * safety.
      *
      * @remarks
-     * Provides safe status update operations that validate against current operation state
-     * to prevent race conditions during concurrent monitor checks. Ensures status updates
-     * are only applied when appropriate and maintains data consistency.
+     * Provides safe status update operations that validate against current
+     * operation state to prevent race conditions during concurrent monitor
+     * checks. Ensures status updates are only applied when appropriate and
+     * maintains data consistency.
      */
     statusUpdateService: MonitorStatusUpdateService;
 
@@ -214,38 +235,44 @@ export interface EnhancedMonitoringServices {
      * Timeout manager for operation lifecycle management and resource cleanup.
      *
      * @remarks
-     * Handles operation timeouts, automatic cleanup procedures, and resource management
-     * for monitor operations. Ensures that operations don't run indefinitely and that
-     * resources are properly released when operations complete or are cancelled.
+     * Handles operation timeouts, automatic cleanup procedures, and resource
+     * management for monitor operations. Ensures that operations don't run
+     * indefinitely and that resources are properly released when operations
+     * complete or are cancelled.
      */
     timeoutManager: OperationTimeoutManager;
 }
 
 /**
- * Factory class for creating and configuring complete enhanced monitoring service bundles.
+ * Factory class for creating and configuring complete enhanced monitoring
+ * service bundles.
  *
  * @remarks
- * This factory provides a single point of entry for creating all enhanced monitoring services
- * with proper dependency injection and configuration. It ensures that all services are created
- * with the correct interdependencies and are ready for immediate use.
+ * This factory provides a single point of entry for creating all enhanced
+ * monitoring services with proper dependency injection and configuration. It
+ * ensures that all services are created with the correct interdependencies and
+ * are ready for immediate use.
  *
  * **Factory Benefits:**
- * - **Centralized Configuration**: Single place to configure all monitoring services
- * - **Dependency Management**: Automatic handling of complex service dependencies
- * - **Consistency**: Ensures all service instances use compatible configurations
- * - **Simplicity**: Reduces boilerplate code for service instantiation
+ * - **Centralized Configuration**: Single place to configure all monitoring
+ * services - **Dependency Management**: Automatic handling of complex service
+ * dependencies - **Consistency**: Ensures all service instances use compatible
+ * configurations - **Simplicity**: Reduces boilerplate code for service
+ * instantiation
  * - **Testability**: Facilitates easy mocking and testing of service bundles
  *
  * @public
  */
 export const EnhancedMonitoringServiceFactory = {
     /**
-     * Creates a complete bundle of enhanced monitoring services configured for immediate use.
+     * Creates a complete bundle of enhanced monitoring services configured for
+     * immediate use.
      *
      * @remarks
-     * This method creates and configures all enhanced monitoring services with proper
-     * interdependencies. All services are initialized and ready for use upon return.
-     * The factory handles complex service relationships internally.
+     * This method creates and configures all enhanced monitoring services with
+     * proper interdependencies. All services are initialized and ready for use
+     * upon return. The factory handles complex service relationships
+     * internally.
      *
      * **Service Creation Order:**
      * 1. Operation registry for tracking active operations
@@ -254,9 +281,9 @@ export const EnhancedMonitoringServiceFactory = {
      * 4. Enhanced checker with all dependencies injected
      *
      * **Dependency Validation:**
-     * The factory validates that all required dependencies are provided and properly
-     * configured before creating services. Invalid or missing dependencies will
-     * result in clear error messages.
+     * The factory validates that all required dependencies are provided and
+     * properly configured before creating services. Invalid or missing
+     * dependencies will result in clear error messages.
      *
      * @param dependencies - Complete set of required external dependencies
      *

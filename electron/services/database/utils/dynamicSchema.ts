@@ -2,7 +2,9 @@
  * Dynamic database schema management for monitor types in Uptime Watcher.
  *
  * @remarks
- * Provides dynamic database schema management for monitor types. Automatically generates database columns and mappings based on the monitor type registry. All APIs are strictly typed and designed for extensibility.
+ * Provides dynamic database schema management for monitor types. Automatically
+ * generates database columns and mappings based on the monitor type registry.
+ * All APIs are strictly typed and designed for extensibility.
  *
  * @public
  */
@@ -17,7 +19,8 @@ import { isValidIdentifierArray } from "@shared/validation/validatorUtils";
 import { getAllMonitorTypeConfigs } from "../../monitoring/MonitorTypeRegistry";
 
 /**
- * Field mapping configuration for transforming monitor fields to database columns.
+ * Field mapping configuration for transforming monitor fields to database
+ * columns.
  *
  * @internal
  */
@@ -41,7 +44,8 @@ interface SqlParameters {
 }
 
 /**
- * Configuration for standard field mappings between monitor objects and database rows.
+ * Configuration for standard field mappings between monitor objects and
+ * database rows.
  *
  * @internal
  */
@@ -122,7 +126,9 @@ const STANDARD_FIELD_MAPPINGS: FieldMapping[] = [
  * Database field definition for dynamic monitor schema.
  *
  * @remarks
- * Used to describe dynamically generated columns for monitor types. All fields are mapped from monitor type registry definitions and used in dynamic schema generation.
+ * Used to describe dynamically generated columns for monitor types. All fields
+ * are mapped from monitor type registry definitions and used in dynamic schema
+ * generation.
  *
  * @public
  */
@@ -173,7 +179,8 @@ export interface DatabaseFieldDefinition {
  * Converts enabled/monitoring fields to a database-compatible integer value.
  *
  * @remarks
- * Used internally to map boolean or truthy `enabled`/`monitoring` fields to SQLite integer format (1 for true, 0 for false).
+ * Used internally to map boolean or truthy `enabled`/`monitoring` fields to
+ * SQLite integer format (1 for true, 0 for false).
  *
  * @param monitor - Monitor object containing `enabled` and/or `monitoring` properties.
  * @returns Database value: 1 for true, 0 for false.
@@ -185,7 +192,8 @@ function convertEnabledField(monitor: Record<string, unknown>): number {
 }
 
 /**
- * Core SQL value conversion logic shared between database conversion functions.
+ * Core SQL value conversion logic shared between database conversion
+ * functions.
  *
  * @param value - Value to convert
  * @param sqlType - SQL type for conversion
@@ -216,7 +224,8 @@ function convertSqlValue(
  * Converts a database value to its corresponding JavaScript type.
  *
  * @remarks
- * Handles INTEGER and TEXT types; defaults to raw value for unknown types. Used internally for dynamic field mapping.
+ * Handles INTEGER and TEXT types; defaults to raw value for unknown types.
+ * Used internally for dynamic field mapping.
  *
  * @param value - Value from the database.
  * @param sqlType - SQL type of the value (e.g., "INTEGER", "TEXT").
@@ -239,7 +248,8 @@ function convertFromDatabase(value: unknown, sqlType: string): unknown {
  * Converts a `lastChecked` value to a database-compatible timestamp.
  *
  * @remarks
- * Used internally to ensure `lastChecked` is stored as a number (timestamp) or null.
+ * Used internally to ensure `lastChecked` is stored as a number (timestamp) or
+ * null.
  *
  * @param lastChecked - Value to convert (Date, number, or other).
  * @returns Timestamp as number, or null if not convertible.
@@ -259,7 +269,8 @@ function convertLastCheckedField(lastChecked: unknown): null | number {
  * Converts a JavaScript value to a database-compatible format for storage.
  *
  * @remarks
- * Handles INTEGER and TEXT types; defaults to stringified value for unknown types. Used internally for dynamic field mapping.
+ * Handles INTEGER and TEXT types; defaults to stringified value for unknown
+ * types. Used internally for dynamic field mapping.
  *
  * @param value - JavaScript value to convert.
  * @param sqlType - SQL type for the database column (e.g., "INTEGER", "TEXT").
@@ -282,7 +293,8 @@ function convertToDatabase(value: unknown, sqlType: string): unknown {
  * Maps a monitor field type to its corresponding SQL data type for SQLite.
  *
  * @remarks
- * Unknown field types default to TEXT for safety. Supported types: "number" → INTEGER, "text"/"url" → TEXT.
+ * Unknown field types default to TEXT for safety. Supported types: "number" →
+ * INTEGER, "text"/"url" → TEXT.
  *
  * @param fieldType - Field type from monitor configuration.
  * @returns SQL data type for SQLite.
@@ -308,10 +320,12 @@ function getSqlTypeFromFieldType(fieldType: string): string {
 }
 
 /**
- * Maps dynamic monitor type-specific fields from a monitor object to a database row.
+ * Maps dynamic monitor type-specific fields from a monitor object to a
+ * database row.
  *
  * @remarks
- * Used internally to populate a database row with dynamic fields based on monitor type definitions.
+ * Used internally to populate a database row with dynamic fields based on
+ * monitor type definitions.
  *
  * @param monitor - Monitor object to map.
  * @param row - Database row object to populate.
@@ -336,7 +350,8 @@ function mapDynamicFields(
  * Maps standard monitor fields from a monitor object to a database row.
  *
  * @remarks
- * Uses a configuration-driven approach to map fields, reducing complexity and improving maintainability.
+ * Uses a configuration-driven approach to map fields, reducing complexity and
+ * improving maintainability.
  *
  * @param monitor - Monitor object to map.
  * @param row - Database row object to populate.
@@ -346,7 +361,8 @@ function mapStandardFields(
     monitor: Record<string, unknown>,
     row: Record<string, unknown>
 ): void {
-    // Handle enabled/monitoring fields specially since they map to the same db field
+    // Handle enabled/monitoring fields specially since they map to the same db
+    // field
     if (
         monitor["monitoring"] !== undefined ||
         monitor["enabled"] !== undefined
@@ -371,10 +387,12 @@ function mapStandardFields(
 }
 
 /**
- * Converts a camelCase or PascalCase string to snake_case for database columns.
+ * Converts a camelCase or PascalCase string to snake_case for database
+ * columns.
  *
  * @remarks
- * Handles leading uppercase characters to avoid leading underscores. Used internally for dynamic schema generation.
+ * Handles leading uppercase characters to avoid leading underscores. Used
+ * internally for dynamic schema generation.
  *
  * @param str - String to convert.
  * @returns Snake_case version of the string.
@@ -427,7 +445,8 @@ export function generateDatabaseFieldDefinitions(): DatabaseFieldDefinition[] {
                 columnName,
                 defaultValue: null, // Actual null value, not string "NULL"
                 monitorType: config.type,
-                // All dynamic fields are nullable since they're only used by specific monitor types
+                // All dynamic fields are nullable since they're only used by
+                // specific monitor types
                 nullable: true,
                 sourceField: field.name,
                 sqlType: getSqlTypeFromFieldType(field.type),
@@ -443,7 +462,8 @@ export function generateDatabaseFieldDefinitions(): DatabaseFieldDefinition[] {
  * including all static and dynamic fields.
  *
  * @remarks
- * Static fields are always present; dynamic fields are generated from monitor type registry.
+ * Static fields are always present; dynamic fields are generated from monitor
+ * type registry.
  *
  * @returns SQL string for creating the monitors table.
  *
@@ -484,7 +504,8 @@ ${staticFields}${dynamicFields ? `,\n${dynamicFields}` : ""}
 }
 
 /**
- * Generates SQL parameter columns and placeholders for INSERT/UPDATE operations.
+ * Generates SQL parameter columns and placeholders for INSERT/UPDATE
+ * operations.
  *
  * @remarks
  * Combines static and dynamic columns for parameterized queries.
@@ -557,7 +578,8 @@ export function mapMonitorToRow(monitor: Monitor): MonitorRow {
  *
  * @remarks
  * Converts database values to JavaScript types.
- * Maps `enabled` to both `enabled` and `monitoring` for frontend compatibility.
+ * Maps `enabled` to both `enabled` and `monitoring` for frontend
+ * compatibility.
  *
  * @param row - Database row to convert.
  * @returns Monitor object with all properties mapped.
@@ -600,7 +622,8 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
         ...(row.host && { host: row.host }),
         ...(row.port && { port: row.port }),
         ...(row.url && { url: row.url }),
-        // Only add lastChecked if it exists to avoid undefined assignment with exactOptionalPropertyTypes
+        // Only add lastChecked if it exists to avoid undefined assignment with
+        // exactOptionalPropertyTypes
         ...(row.last_checked && { lastChecked: new Date(row.last_checked) }),
     };
 

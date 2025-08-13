@@ -13,11 +13,13 @@ import {
 } from "./utils/settingsMapper";
 
 /**
- * Defines the dependencies required by the SettingsRepository for managing application settings persistence.
+ * Defines the dependencies required by the SettingsRepository for managing
+ * application settings persistence.
  *
  * @remarks
  * Provides the required DatabaseService for all settings operations.
- * This interface is used for dependency injection to ensure proper service coupling.
+ * This interface is used for dependency injection to ensure proper service
+ * coupling.
  *
  * @public
  */
@@ -50,7 +52,8 @@ const SETTINGS_QUERIES = {
 /**
  * Repository for managing application settings persistence.
  *
- * Handles all CRUD operations for settings in the database, following the repository pattern.
+ * Handles all CRUD operations for settings in the database, following the
+ * repository pattern.
  *
  * @remarks
  * All operations are wrapped in transactions and use the repository pattern for consistency, error handling, and maintainability. This class should be used as the sole interface for settings data access and mutation.
@@ -226,11 +229,15 @@ export class SettingsRepository {
      * @param settings - Key-value pairs to insert.
      * @throws Error when database operations fail.
      * @remarks
-     * **IMPORTANT**: This method must be called within an existing transaction context.
+     * **IMPORTANT**: This method must be called within an existing transaction
+     * context.
      *
-     * **Error Handling**: Uses prepared statements which may throw on constraint violations or database errors. All exceptions are propagated to the calling transaction context for proper rollback handling.
+     * **Error Handling**: Uses prepared statements which may throw on
+     * constraint violations or database errors. All exceptions are propagated
+     * to the calling transaction context for proper rollback handling.
      *
-     * **Performance**: Uses prepared statements for optimal bulk insert performance.
+     * **Performance**: Uses prepared statements for optimal bulk insert
+     * performance.
      */
     public bulkInsertInternal(
         db: Database,
@@ -258,7 +265,8 @@ export class SettingsRepository {
     }
 
     /**
-     * Clears all settings from the database within an existing transaction context.
+     * Clears all settings from the database within an existing transaction
+     * context.
      *
      * @param db - The database connection (must be within an active transaction).
      * @remarks
@@ -310,7 +318,10 @@ export class SettingsRepository {
      * @returns The database connection from the {@link DatabaseService}.
      * @throws Error if the database is not initialized.
      * @remarks
-     * **Usage Pattern**: Only used for read operations and internal methods. All mutations must use executeTransaction() for proper transaction management. Caller must ensure DatabaseService.initialize() was called first.
+     * **Usage Pattern**: Only used for read operations and internal methods.
+     * All mutations must use executeTransaction() for proper transaction
+     * management. Caller must ensure DatabaseService.initialize() was called
+     * first.
      */
     private getDb(): Database {
         return this.databaseService.getDatabase();

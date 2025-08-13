@@ -10,14 +10,16 @@
  * @remarks
  * This method handles two scenarios:
  * 1. **Monitors with IDs**: Compares IDs to detect new ones
- * 2. **Monitors without IDs**: Detects new monitors by comparing monitor objects
+ * 2. **Monitors without IDs**: Detects new monitors by comparing monitor
+ * objects
  *    since IDs are assigned during database creation
  *
  * **Empty String Placeholder Contract:**
- * - When a monitor doesn't have an ID yet (new monitors), an empty string ("") is returned
- * - Downstream consumers MUST handle empty strings as "new monitor without ID" indicators
- * - These placeholders signal that the monitor needs database creation and ID assignment
- * - Empty strings should NOT be treated as valid monitor IDs for database operations
+ * - When a monitor doesn't have an ID yet (new monitors), an empty string ("")
+ * is returned - Downstream consumers MUST handle empty strings as "new monitor
+ * without ID" indicators - These placeholders signal that the monitor needs
+ * database creation and ID assignment - Empty strings should NOT be treated as
+ * valid monitor IDs for database operations
  */
 
 import type { Monitor, Site } from "@shared/types";
@@ -78,7 +80,8 @@ export class SiteWriterService {
      * 3. Creates new monitors and assigns generated IDs
      *
      * All operations are wrapped in a transaction to ensure data consistency.
-     * Monitor IDs are assigned during creation and updated in the returned object.
+     * Monitor IDs are assigned during creation and updated in the returned
+     * object.
      *
      * @example
      * ```typescript
@@ -120,7 +123,8 @@ export class SiteWriterService {
                     // Persist site to database using internal method
                     this.repositories.site.upsertInternal(db, site);
 
-                    // Remove all existing monitors for this site, then insert new ones
+                    // Remove all existing monitors for this site, then insert
+                    // new ones
                     this.repositories.monitor.deleteBySiteIdentifierInternal(
                         db,
                         site.identifier
@@ -170,9 +174,10 @@ export class SiteWriterService {
      * 2. Deletes all associated monitors from the database
      * 3. Deletes the site record from the database
      *
-     * All database operations are wrapped in a transaction to ensure consistency.
-     * If the site is not found in the cache, it will still attempt database cleanup
-     * to handle cases where cache and database are out of sync.
+     * All database operations are wrapped in a transaction to ensure
+     * consistency. If the site is not found in the cache, it will still
+     * attempt database cleanup to handle cases where cache and database are
+     * out of sync.
      *
      * @example
      * ```typescript
@@ -234,7 +239,8 @@ export class SiteWriterService {
         newMonitors: Site["monitors"],
         monitoringConfig: MonitoringConfig
     ): Promise<void> {
-        // Always handle monitor interval changes in both development and production
+        // Always handle monitor interval changes in both development and
+        // production
 
         try {
             for (const newMonitor of newMonitors) {
@@ -271,7 +277,8 @@ export class SiteWriterService {
                 `Failed to handle monitor interval changes for site ${identifier}:`,
                 error
             );
-            // Don't throw - this is a side effect operation that shouldn't fail the update
+            // Don't throw - this is a side effect operation that shouldn't
+            // fail the update
         }
     }
 
@@ -345,7 +352,8 @@ export class SiteWriterService {
                     // Persist to database using internal method
                     this.repositories.site.upsertInternal(db, updatedSite);
 
-                    // Update monitors if provided - UPDATE existing monitors instead of recreating
+                    // Update monitors if provided - UPDATE existing monitors
+                    // instead of recreating
                     if (updates.monitors) {
                         this.updateMonitorsPreservingHistory(
                             db,
@@ -384,11 +392,12 @@ export class SiteWriterService {
      * @remarks
      * This method handles two scenarios:
      * 1. **Monitors with IDs**: Compares IDs to detect new ones
-     * 2. **Monitors without IDs**: Detects new monitors by comparing monitor objects
+     * 2. **Monitors without IDs**: Detects new monitors by comparing monitor
+     * objects
      *    since IDs are assigned during database creation
      *
-     * Monitors without IDs are returned with empty string placeholders to indicate
-     * they need special handling during monitor setup operations.
+     * Monitors without IDs are returned with empty string placeholders to
+     * indicate they need special handling during monitor setup operations.
      */
     public detectNewMonitors(
         originalMonitors: Site["monitors"],
@@ -399,7 +408,8 @@ export class SiteWriterService {
         );
         const newMonitorIds: string[] = [];
 
-        // Create a comparison set of original monitors for detecting new monitors without IDs
+        // Create a comparison set of original monitors for detecting new
+        // monitors without IDs
         const originalMonitorSignatures = new Set(
             originalMonitors.map((m) => this.createMonitorSignature(m))
         );
@@ -409,7 +419,8 @@ export class SiteWriterService {
                 // Monitor has ID and is not in original set
                 newMonitorIds.push(monitor.id);
             } else if (!monitor.id) {
-                // Monitor without ID - check if it's genuinely new by comparing signature
+                // Monitor without ID - check if it's genuinely new by
+                // comparing signature
                 const monitorSignature = this.createMonitorSignature(monitor);
                 if (!originalMonitorSignatures.has(monitorSignature)) {
                     // New monitor without ID - use empty string as placeholder
@@ -458,9 +469,9 @@ export class SiteWriterService {
      * @returns A string signature representing the monitor's configuration
      *
      * @remarks
-     * Used to detect new monitors that don't have IDs yet. The signature includes
-     * all configuration properties that make a monitor unique, excluding runtime
-     * properties like status, lastChecked, and responseTime.
+     * Used to detect new monitors that don't have IDs yet. The signature
+     * includes all configuration properties that make a monitor unique,
+     * excluding runtime properties like status, lastChecked, and responseTime.
      */
     private createMonitorSignature(monitor: Site["monitors"][0]): string {
         return [

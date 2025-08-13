@@ -259,7 +259,8 @@ export class WindowService {
                     BASE_DELAY * 2 ** attempt,
                     MAX_DELAY
                 );
-                // Using crypto for better randomness would be overkill for jitter - Math.random is sufficient
+                // Using crypto for better randomness would be overkill for
+                // jitter - Math.random is sufficient
                 // eslint-disable-next-line sonarjs/pseudo-random -- dev only
                 const jitter = Math.random() * 200; // Add up to 200ms jitter
                 const totalDelay = exponentialDelay + jitter;
@@ -280,8 +281,9 @@ export class WindowService {
      * Create a new WindowService instance.
      *
      * @remarks
-     * Initializes the service with proper defaults and prepares for window creation.
-     * Windows are not created automatically - call createMainWindow() to create the main window.
+     * Initializes the service with proper defaults and prepares for window
+     * creation. Windows are not created automatically - call
+     * createMainWindow() to create the main window.
      */
     public constructor() {
         if (isDev()) {
@@ -405,7 +407,8 @@ export class WindowService {
      * @returns void - Method handles content loading asynchronously
      *
      * @remarks
-     * Handles environment-specific content loading with comprehensive error handling:
+     * Handles environment-specific content loading with comprehensive error
+     * handling:
      *
      * **Development Mode:**
      * - Waits for Vite dev server to be ready using exponential backoff

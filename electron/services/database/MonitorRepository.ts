@@ -4,9 +4,10 @@ import type { MonitorRow } from "@shared/types/database";
  * Database repository for monitor persistence and management.
  *
  * @remarks
- * Handles CRUD operations for site monitoring configurations using the repository pattern.
- * All operations are wrapped in transactions and use the DatabaseService for transaction management.
- * All mutations are atomic to ensure data consistency and proper error handling.
+ * Handles CRUD operations for site monitoring configurations using the
+ * repository pattern. All operations are wrapped in transactions and use the
+ * DatabaseService for transaction management. All mutations are atomic to
+ * ensure data consistency and proper error handling.
  *
  * @public
  */
@@ -78,9 +79,10 @@ const MONITOR_QUERIES = {
  * Repository for managing monitor data persistence.
  *
  * @remarks
- * Handles all CRUD operations for monitors in the database using the repository pattern.
- * All mutations are wrapped in transactions for consistency and error handling.
- * All operations use the DatabaseService for transaction management and maintain atomicity.
+ * Handles all CRUD operations for monitors in the database using the
+ * repository pattern. All mutations are wrapped in transactions for
+ * consistency and error handling. All operations use the DatabaseService for
+ * transaction management and maintain atomicity.
  */
 export class MonitorRepository {
     /** @internal */
@@ -111,7 +113,8 @@ export class MonitorRepository {
 
                 await this.databaseService.executeTransaction((db) => {
                     for (const monitor of monitors) {
-                        // Use RETURNING clause to get the ID directly from the insert
+                        // Use RETURNING clause to get the ID directly from the
+                        // insert
                         const insertResult = insertWithReturning(
                             db,
                             MONITOR_QUERIES.INSERT_WITH_RETURNING,
@@ -159,7 +162,8 @@ export class MonitorRepository {
      * @remarks
      * This method is used when a monitor is stopped or reset to ensure
      * no stale operations remain active. Use only for standalone operations.
-     * For operations within existing transactions, use clearActiveOperationsInternal.
+     * For operations within existing transactions, use
+     * clearActiveOperationsInternal.
      */
     public async clearActiveOperations(monitorId: string): Promise<void> {
         return withDatabaseOperation(async () => {
@@ -433,7 +437,8 @@ export class MonitorRepository {
         db: Database,
         monitorId: string
     ): void {
-        // Clear all active operations (internal call to avoid nested transaction)
+        // Clear all active operations (internal call to avoid nested
+        // transaction)
         this.updateInternal(db, monitorId, { activeOperations: [] });
 
         if (isDev()) {
@@ -461,7 +466,8 @@ export class MonitorRepository {
     ): string {
         // Generate dynamic SQL and parameters
         const { columns, placeholders } = generateSqlParameters();
-        // Type assertion is safe: buildMonitorParameters doesn't use the id field for INSERT operations
+        // Type assertion is safe: buildMonitorParameters doesn't use the id
+        // field for INSERT operations
         const parameters = buildMonitorParameters(
             siteIdentifier,
             monitor as Site["monitors"][0]
@@ -492,7 +498,8 @@ export class MonitorRepository {
     }
 
     /**
-     * Internal method to clear all monitors from the database within an existing transaction.
+     * Internal method to clear all monitors from the database within an
+     * existing transaction.
      *
      * @param db - Database connection (must be within active transaction).
      * @returns void
@@ -505,7 +512,8 @@ export class MonitorRepository {
     }
 
     /**
-     * Internal method to delete all monitors for a specific site within an existing transaction.
+     * Internal method to delete all monitors for a specific site within an
+     * existing transaction.
      *
      * @param db - Database connection (must be within active transaction).
      * @param siteIdentifier - The site identifier to delete monitors for.
@@ -534,7 +542,8 @@ export class MonitorRepository {
     }
 
     /**
-     * Internal method to delete a monitor and its history within an existing transaction.
+     * Internal method to delete a monitor and its history within an existing
+     * transaction.
      *
      * @param db - Database connection (must be within active transaction).
      * @param monitorId - The monitor ID to delete.
@@ -552,14 +561,17 @@ export class MonitorRepository {
     }
 
     /**
-     * Updates a monitor's configuration within an existing transaction context.
+     * Updates a monitor's configuration within an existing transaction
+     * context.
      *
      * @param db - The database connection (must be within an active transaction).
      * @param monitorId - The unique identifier of the monitor to update.
      * @param monitor - Partial monitor configuration data to update.
      * @throws Error if the update query fails.
      * @remarks
-     * Only provided fields are updated. Converts camelCase to snake_case for DB columns. Use this method only when already within a transaction context.
+     * Only provided fields are updated. Converts camelCase to snake_case for
+     * DB columns. Use this method only when already within a transaction
+     * context.
      */
     public updateInternal(
         db: Database,
@@ -604,7 +616,8 @@ export class MonitorRepository {
      * @param monitor - Partial monitor configuration data to update.
      * @returns Object containing updateFields (SQL fragments) and updateValues (DB values).
      * @remarks
-     * Only primitive types are included. Monitoring fields may be skipped per domain logic.
+     * Only primitive types are included. Monitoring fields may be skipped per
+     * domain logic.
      */
     private buildUpdateFieldsAndValues(
         row: Record<string, unknown>,
@@ -617,7 +630,8 @@ export class MonitorRepository {
         for (const [key, value] of Object.entries(row)) {
             if (value !== undefined && value !== null) {
                 // Skip monitoring-related fields based on domain logic
-                // This prevents status updates from accidentally changing monitoring state
+                // This prevents status updates from accidentally changing
+                // monitoring state
                 if (this.shouldSkipMonitoringFields(key, monitor)) {
                     continue;
                 }
@@ -641,7 +655,8 @@ export class MonitorRepository {
      * @param value - Value to convert for database storage.
      * @returns Database-compatible value or null if conversion not possible.
      * @remarks
-     * Strings and numbers are passed through. Booleans are converted to 1/0. Other types are skipped.
+     * Strings and numbers are passed through. Booleans are converted to 1/0.
+     * Other types are skipped.
      */
     private convertValueForDatabase(
         key: string,
@@ -705,7 +720,8 @@ export class MonitorRepository {
      * @returns Database connection from the DatabaseService.
      * @throws Error when database is not initialized.
      * @remarks
-     * Only used for read operations and internal methods. Mutations must use executeTransaction().
+     * Only used for read operations and internal methods. Mutations must use
+     * executeTransaction().
      */
     private getDb(): Database {
         return this.databaseService.getDatabase();
@@ -718,7 +734,8 @@ export class MonitorRepository {
      * @param monitor - Monitor update data being processed.
      * @returns True if the field should be skipped, false otherwise.
      * @remarks
-     * The 'enabled' field is derived from 'monitoring' state. If neither is provided, skip 'enabled'.
+     * The 'enabled' field is derived from 'monitoring' state. If neither is
+     * provided, skip 'enabled'.
      */
     private shouldSkipMonitoringFields(
         key: string,

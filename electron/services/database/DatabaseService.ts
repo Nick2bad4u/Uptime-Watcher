@@ -32,7 +32,8 @@ const DATABASE_SERVICE_QUERIES = {
  * - Transaction support
  * - Basic backup functionality
  *
- * Business logic (site loading, import/export, etc.) is handled by DatabaseManager.
+ * Business logic (site loading, import/export, etc.) is handled by
+ * DatabaseManager.
  *
  * **Platform Compatibility:**
  * - Built for Electron main process environment
@@ -157,7 +158,8 @@ export class DatabaseService {
     public close(): void {
         if (this.db) {
             try {
-                // node-sqlite3-wasm completes all pending operations before closing
+                // node-sqlite3-wasm completes all pending operations before
+                // closing
                 this.db.close();
                 this.db = undefined;
                 logger.info(LOG_TEMPLATES.services.DATABASE_CONNECTION_CLOSED);
@@ -194,16 +196,18 @@ export class DatabaseService {
     }
 
     /**
-     * Initializes the database connection and creates schema if it doesn't exist.
+     * Initializes the database connection and creates schema if it doesn't
+     * exist.
      *
      * @returns The initialized database instance.
      * @throws {@link Error} When database initialization fails.
      * @remarks
      * **Initialization Behavior:**
-     * - Creates the database file in the user data directory if it doesn't exist
-     * - Sets up the complete schema including all required tables and indexes
-     * - Safe to call multiple times - returns existing connection if already initialized
-     * - Uses singleton pattern to prevent multiple connections
+     * - Creates the database file in the user data directory if it doesn't
+     * exist - Sets up the complete schema including all required tables and
+     * indexes - Safe to call multiple times - returns existing connection if
+     * already initialized - Uses singleton pattern to prevent multiple
+     * connections
      *
      * **Thread Safety:**
      * - Multiple concurrent calls are safe (idempotent operation)

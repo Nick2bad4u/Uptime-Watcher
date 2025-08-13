@@ -38,8 +38,9 @@ import { PortMonitor } from "./PortMonitor";
  *
  * @remarks
  * Each monitor type (e.g., HTTP, Port) must provide a configuration object
- * describing its metadata, validation schema, UI display options, and service factory.
- * This enables dynamic registration, validation, and UI rendering for new monitor types.
+ * describing its metadata, validation schema, UI display options, and service
+ * factory. This enables dynamic registration, validation, and UI rendering for
+ * new monitor types.
  *
  * @param description - Description of what this monitor checks.
  * @param displayName - Human-readable display name for UI.
@@ -77,7 +78,10 @@ export interface BaseMonitorConfig {
             showAdvancedMetrics?: boolean;
             showUrl?: boolean;
         };
-        /** Function to format detail display in history (e.g., "Port: 80", "Response Code: 200") */
+        /**
+         * Function to format detail display in history (e.g., "Port: 80",
+         * "Response Code: 200")
+         */
         formatDetail?: (details: string) => string;
         /** Function to format title suffix for history charts (e.g., " (https://example.com)") */
         formatTitleSuffix?: (monitor: Monitor) => string;
@@ -124,7 +128,8 @@ export interface MonitorUIConfig {
  * Internal registry for all monitor types and their configurations.
  *
  * @remarks
- * Used by registry functions to store and retrieve monitor type definitions. Not exported.
+ * Used by registry functions to store and retrieve monitor type definitions.
+ * Not exported.
  *
  * @internal
  */
@@ -134,7 +139,9 @@ const monitorTypes = new Map<string, BaseMonitorConfig>();
  * Simple monitor type validation for internal use.
  *
  * @remarks
- * Breaks circular dependency with EnhancedTypeGuards by providing basic validation. Used internally by registry functions that need type validation without importing external validation utilities.
+ * Breaks circular dependency with EnhancedTypeGuards by providing basic
+ * validation. Used internally by registry functions that need type validation
+ * without importing external validation utilities.
  *
  * Validation logic:
  * - Checks if type is a string
@@ -175,7 +182,8 @@ function validateMonitorTypeInternal(type: unknown): {
  * Gets all registered monitor types with their configurations.
  *
  * @remarks
- * Returns an array of all monitor type configuration objects currently registered in the system.
+ * Returns an array of all monitor type configuration objects currently
+ * registered in the system.
  *
  * @returns Array of {@link BaseMonitorConfig} objects for all registered monitor types.
  * @public
@@ -188,7 +196,8 @@ export function getAllMonitorTypeConfigs(): BaseMonitorConfig[] {
  * Gets the service factory function for a given monitor type.
  *
  * @remarks
- * Returns the factory function for creating monitor service instances for the specified type, or undefined if not registered.
+ * Returns the factory function for creating monitor service instances for the
+ * specified type, or undefined if not registered.
  *
  * @param type - The monitor type identifier.
  * @returns Service factory function or undefined if the type is not registered.
@@ -205,7 +214,8 @@ export function getMonitorServiceFactory(
  * Gets the configuration object for a given monitor type.
  *
  * @remarks
- * Returns the {@link BaseMonitorConfig} for the specified type, or undefined if not registered.
+ * Returns the {@link BaseMonitorConfig} for the specified type, or undefined
+ * if not registered.
  *
  * @param type - The monitor type identifier.
  * @returns Monitor configuration object or undefined if the type is not registered.
@@ -221,7 +231,8 @@ export function getMonitorTypeConfig(
  * Gets all registered monitor type identifiers.
  *
  * @remarks
- * Returns an array of all monitor type string identifiers currently registered in the system.
+ * Returns an array of all monitor type string identifiers currently registered
+ * in the system.
  *
  * @returns Array of registered monitor type strings.
  * @public
@@ -234,7 +245,8 @@ export function getRegisteredMonitorTypes(): string[] {
  * Checks if a monitor type is registered in the system.
  *
  * @remarks
- * Returns true if the specified monitor type identifier is registered, false otherwise.
+ * Returns true if the specified monitor type identifier is registered, false
+ * otherwise.
  *
  * @param type - The monitor type identifier to check.
  * @returns True if the type is registered, false otherwise.
@@ -248,7 +260,8 @@ export function isValidMonitorType(type: string): boolean {
  * Registers a new monitor type with its configuration.
  *
  * @remarks
- * Adds the provided {@link BaseMonitorConfig} to the internal registry, making it available for use in the system.
+ * Adds the provided {@link BaseMonitorConfig} to the internal registry, making
+ * it available for use in the system.
  *
  * @param config - The monitor type configuration object to register.
  * @public

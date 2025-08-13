@@ -1,8 +1,12 @@
 /**
- * Orchestrates all monitoring operations for sites and monitors, including scheduling, status checking, and lifecycle management.
+ * Orchestrates all monitoring operations for sites and monitors, including
+ * scheduling, status checking, and lifecycle management.
  *
  * @remarks
- * Coordinates monitor lifecycle, scheduling, and event-driven updates for sites and monitors. All backend monitoring logic flows through this manager. Interacts with repositories, event bus, and service layer according to the repository and event-driven patterns.
+ * Coordinates monitor lifecycle, scheduling, and event-driven updates for
+ * sites and monitors. All backend monitoring logic flows through this manager.
+ * Interacts with repositories, event bus, and service layer according to the
+ * repository and event-driven patterns.
  *
  * @public
  */
@@ -37,10 +41,13 @@ import {
 import { withDatabaseOperation } from "../utils/operationalHooks";
 
 /**
- * Defines the dependencies required by {@link MonitorManager} for orchestration and data access.
+ * Defines the dependencies required by {@link MonitorManager} for
+ * orchestration and data access.
  *
  * @remarks
- * All dependencies are injected to support testability and separation of concerns. This interface is used for dependency injection in the {@link MonitorManager} constructor.
+ * All dependencies are injected to support testability and separation of
+ * concerns. This interface is used for dependency injection in the {@link
+ * MonitorManager} constructor.
  *
  * @public
  */
@@ -79,7 +86,8 @@ export interface MonitorManagerDependencies {
      * Repository interfaces for DB access.
      *
      * @remarks
-     * Provides access to the repositories for history, monitor, and site entities.
+     * Provides access to the repositories for history, monitor, and site
+     * entities.
      */
     repositories: {
         history: HistoryRepository;
@@ -96,10 +104,13 @@ export interface MonitorManagerDependencies {
 }
 
 /**
- * Main class for orchestrating monitor scheduling, status checks, and event-driven updates.
+ * Main class for orchestrating monitor scheduling, status checks, and
+ * event-driven updates.
  *
  * @remarks
- * All monitoring operations, including lifecycle management, scheduling, and event emission, are coordinated here. This class is the central entry point for all backend monitoring logic.
+ * All monitoring operations, including lifecycle management, scheduling, and
+ * event emission, are coordinated here. This class is the central entry point
+ * for all backend monitoring logic.
  *
  * @public
  */
@@ -153,10 +164,13 @@ export class MonitorManager {
     private readonly monitorScheduler: MonitorScheduler;
 
     /**
-     * Manually checks a site or monitor and returns the resulting status update.
+     * Manually checks a site or monitor and returns the resulting status
+     * update.
      *
      * @remarks
-     * Triggers a manual check for a site or monitor, emits a completion event, and returns the result. Uses the repository and event-driven patterns for all operations.
+     * Triggers a manual check for a site or monitor, emits a completion event,
+     * and returns the result. Uses the repository and event-driven patterns
+     * for all operations.
      *
      * @param identifier - The site identifier to check.
      * @param monitorId - Optional monitor ID for targeted check.
@@ -227,7 +241,8 @@ export class MonitorManager {
      * Sets up new monitors that were added to an existing site.
      *
      * @remarks
-     * Ensures new monitors receive the same initialization as those in new sites, including default interval assignment and auto-start logic.
+     * Ensures new monitors receive the same initialization as those in new
+     * sites, including default interval assignment and auto-start logic.
      *
      * @param site - The {@link Site} containing the new monitors.
      * @param newMonitorIds - Array of new monitor IDs to set up.
@@ -279,10 +294,13 @@ export class MonitorManager {
     }
 
     /**
-     * Sets up a new site for monitoring, including initial checks, interval assignment, and auto-start logic.
+     * Sets up a new site for monitoring, including initial checks, interval
+     * assignment, and auto-start logic.
      *
      * @remarks
-     * Applies business rules for default intervals and auto-starting monitoring. Initial checks are handled by {@link MonitorScheduler} when monitoring starts.
+     * Applies business rules for default intervals and auto-starting
+     * monitoring. Initial checks are handled by {@link MonitorScheduler} when
+     * monitoring starts.
      *
      * @param site - The {@link Site} to set up for monitoring.
      * @returns A promise that resolves when setup is complete.
@@ -298,7 +316,8 @@ export class MonitorManager {
         await this.applyDefaultIntervals(site);
 
         // Apply business rules for auto-starting monitoring
-        // Note: Initial checks are handled by MonitorScheduler when monitoring starts
+        // Note: Initial checks are handled by MonitorScheduler when monitoring
+        // starts
         await this.autoStartMonitoringIfAppropriate(site);
 
         // Emit site setup completed event
@@ -316,7 +335,8 @@ export class MonitorManager {
      * Starts monitoring for all sites.
      *
      * @remarks
-     * Initiates monitoring for all sites and emits a monitoring started event. Uses the repository and event-driven patterns for all operations.
+     * Initiates monitoring for all sites and emits a monitoring started event.
+     * Uses the repository and event-driven patterns for all operations.
      *
      * @returns A promise that resolves when monitoring has started.
      * @throws Any error encountered during start is logged and re-thrown.
@@ -357,7 +377,8 @@ export class MonitorManager {
      * Starts monitoring for a specific site or monitor.
      *
      * @remarks
-     * Initiates monitoring for a site or monitor and emits a started event. Handles recursive calls to avoid infinite loops.
+     * Initiates monitoring for a site or monitor and emits a started event.
+     * Handles recursive calls to avoid infinite loops.
      *
      * @param identifier - The site identifier to start monitoring for.
      * @param monitorId - Optional monitor ID for targeted monitoring.
@@ -373,7 +394,8 @@ export class MonitorManager {
         identifier: string,
         monitorId?: string
     ): Promise<boolean> {
-        // Proceed with traditional monitoring lifecycle which handles operation cleanup
+        // Proceed with traditional monitoring lifecycle which handles
+        // operation cleanup
         const result = await startMonitoringForSite(
             {
                 databaseService: this.dependencies.databaseService,
@@ -430,7 +452,8 @@ export class MonitorManager {
      * Stops monitoring for all sites.
      *
      * @remarks
-     * Stops all monitoring and emits a monitoring stopped event. Uses the repository and event-driven patterns for all operations.
+     * Stops all monitoring and emits a monitoring stopped event. Uses the
+     * repository and event-driven patterns for all operations.
      *
      * @returns A promise that resolves when monitoring has stopped.
      * @throws Any error encountered during stop is logged and re-thrown.
@@ -464,7 +487,8 @@ export class MonitorManager {
      * Stops monitoring for a specific site or monitor.
      *
      * @remarks
-     * Stops monitoring for a site or monitor and emits a stopped event. Handles recursive calls to avoid infinite loops.
+     * Stops monitoring for a site or monitor and emits a stopped event.
+     * Handles recursive calls to avoid infinite loops.
      *
      * @param identifier - The site identifier to stop monitoring for.
      * @param monitorId - Optional monitor ID for targeted stop.
@@ -480,7 +504,8 @@ export class MonitorManager {
         identifier: string,
         monitorId?: string
     ): Promise<boolean> {
-        // Proceed with traditional monitoring lifecycle which handles operation cleanup
+        // Proceed with traditional monitoring lifecycle which handles
+        // operation cleanup
         const result = await stopMonitoringForSite(
             {
                 databaseService: this.dependencies.databaseService,
@@ -538,7 +563,9 @@ export class MonitorManager {
      * Applies default check intervals for monitors that do not have one set.
      *
      * @remarks
-     * Ensures all monitors have a check interval set according to business rules. Updates the database first, then allows the cache/state to be updated through proper channels.
+     * Ensures all monitors have a check interval set according to business
+     * rules. Updates the database first, then allows the cache/state to be
+     * updated through proper channels.
      *
      * @param site - The {@link Site} whose monitors should be checked for default interval assignment.
      * @returns A promise that resolves when all applicable monitors have been updated.
@@ -601,10 +628,12 @@ export class MonitorManager {
     }
 
     /**
-     * Automatically starts monitoring if appropriate according to business rules.
+     * Automatically starts monitoring if appropriate according to business
+     * rules.
      *
      * @remarks
-     * Site-level monitoring acts as a master switch. Only monitors with monitoring enabled are started.
+     * Site-level monitoring acts as a master switch. Only monitors with
+     * monitoring enabled are started.
      *
      * @param site - The {@link Site} to evaluate for auto-start.
      * @returns A promise that resolves when auto-start logic is complete.
@@ -645,7 +674,8 @@ export class MonitorManager {
             )
         );
 
-        // Start only monitors that have monitoring enabled (respecting individual monitor states)
+        // Start only monitors that have monitoring enabled (respecting
+        // individual monitor states)
         for (const monitor of site.monitors) {
             if (monitor.id && monitor.monitoring) {
                 await this.startMonitoringForSite(site.identifier, monitor.id);
@@ -718,7 +748,8 @@ export class MonitorManager {
      * Handles scheduled monitor checks from the {@link MonitorScheduler}.
      *
      * @remarks
-     * Invoked by the scheduler to perform a check on a specific monitor at the scheduled interval.
+     * Invoked by the scheduler to perform a check on a specific monitor at the
+     * scheduled interval.
      *
      * @param siteIdentifier - The identifier of the site.
      * @param monitorId - The monitor ID to check.
@@ -762,7 +793,10 @@ export class MonitorManager {
      * Sets up individual new monitors.
      *
      * @remarks
-     * New monitors are handled differently as they have not been persisted yet. Default intervals are applied directly to the monitor objects before they are saved to the database. Auto-start logic is also applied if appropriate.
+     * New monitors are handled differently as they have not been persisted
+     * yet. Default intervals are applied directly to the monitor objects
+     * before they are saved to the database. Auto-start logic is also applied
+     * if appropriate.
      *
      * @param site - The {@link Site} containing the new monitors.
      * @param newMonitors - Array of new monitors to set up.
@@ -774,8 +808,9 @@ export class MonitorManager {
         newMonitors: Site["monitors"]
     ): Promise<void> {
         // Apply default intervals for new monitors that don't have one
-        // Note: For new monitors, direct assignment is acceptable as they haven't been
-        // persisted yet and will be saved through the normal persistence flow
+        // Note: For new monitors, direct assignment is acceptable as they
+        // haven't been persisted yet and will be saved through the normal
+        // persistence flow
         for (const monitor of newMonitors) {
             if (this.shouldApplyDefaultInterval(monitor)) {
                 monitor.checkInterval = DEFAULT_CHECK_INTERVAL;
@@ -786,7 +821,8 @@ export class MonitorManager {
         }
 
         // Auto-start monitoring for new monitors if appropriate
-        // Note: Initial checks are handled by MonitorScheduler when monitoring starts
+        // Note: Initial checks are handled by MonitorScheduler when monitoring
+        // starts
         if (site.monitoring) {
             await this.autoStartNewMonitors(site, newMonitors);
         } else {
@@ -802,18 +838,21 @@ export class MonitorManager {
     }
 
     /**
-     * Constructs a new {@link MonitorManager} instance with enhanced monitoring capabilities.
+     * Constructs a new {@link MonitorManager} instance with enhanced
+     * monitoring capabilities.
      *
      * @remarks
-     * All dependencies are injected to support testability and separation of concerns.
-     * The enhanced monitoring services are required and provide race condition prevention,
-     * operation correlation, and advanced timeout management for all monitoring operations.
+     * All dependencies are injected to support testability and separation of
+     * concerns. The enhanced monitoring services are required and provide race
+     * condition prevention, operation correlation, and advanced timeout
+     * management for all monitoring operations.
      *
      * **Architecture Integration:**
      * - Enhanced services are always provided by the ServiceContainer
      * - No fallback to legacy monitoring systems
      * - All monitoring operations use the unified enhanced system
-     * - Operation correlation prevents race conditions across concurrent operations
+     * - Operation correlation prevents race conditions across concurrent
+     * operations
      *
      * @param dependencies - The required {@link MonitorManagerDependencies} for orchestration and data access
      * @param enhancedServices - The required {@link EnhancedMonitoringServices} for advanced monitoring capabilities
@@ -852,7 +891,8 @@ export class MonitorManager {
      * Gets the count of active monitors currently being scheduled.
      *
      * @remarks
-     * Returns the number of monitors that are currently scheduled for periodic checks.
+     * Returns the number of monitors that are currently scheduled for periodic
+     * checks.
      *
      * @returns The number of active monitors in the scheduler.
      * @example
@@ -869,7 +909,8 @@ export class MonitorManager {
      * Checks if a specific monitor is actively being scheduled for checks.
      *
      * @remarks
-     * Returns whether the given monitor is currently scheduled for periodic checks by the scheduler.
+     * Returns whether the given monitor is currently scheduled for periodic
+     * checks by the scheduler.
      *
      * @param siteIdentifier - The identifier of the site.
      * @param monitorId - The monitor ID to check.
@@ -888,7 +929,8 @@ export class MonitorManager {
     }
 
     /**
-     * Indicates whether monitoring is currently active for any site or monitor.
+     * Indicates whether monitoring is currently active for any site or
+     * monitor.
      *
      * @remarks
      * Returns the global monitoring state.
@@ -904,7 +946,9 @@ export class MonitorManager {
      * Restarts monitoring for a specific monitor with updated configuration.
      *
      * @remarks
-     * Useful when monitor intervals or settings change and need immediate application. Delegates to the {@link MonitorScheduler} for actual restart logic.
+     * Useful when monitor intervals or settings change and need immediate
+     * application. Delegates to the {@link MonitorScheduler} for actual
+     * restart logic.
      *
      * @param siteIdentifier - The identifier of the site containing the monitor.
      * @param monitor - The monitor object with updated configuration.
@@ -926,7 +970,10 @@ export class MonitorManager {
      * Determines if a monitor should receive a default interval.
      *
      * @remarks
-     * Checks for falsy `checkInterval` values. Zero is considered a valid interval and will not trigger default assignment. The type system guarantees `checkInterval` is a number, but runtime values may still be falsy due to initialization or data import scenarios.
+     * Checks for falsy `checkInterval` values. Zero is considered a valid
+     * interval and will not trigger default assignment. The type system
+     * guarantees `checkInterval` is a number, but runtime values may still be
+     * falsy due to initialization or data import scenarios.
      *
      * @param monitor - The monitor to check for default interval application.
      * @returns `true` if the monitor should receive the default interval, `false` otherwise.

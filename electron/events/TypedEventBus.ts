@@ -50,7 +50,8 @@ const logger = createTemplateLogger(baseLogger);
  * Diagnostic information about a {@link TypedEventBus} instance.
  *
  * @remarks
- * Provides runtime insights into event bus configuration and usage, including listener and middleware statistics.
+ * Provides runtime insights into event bus configuration and usage, including
+ * listener and middleware statistics.
  *
  * @public
  */
@@ -74,7 +75,8 @@ export interface EventBusDiagnostics {
  *
  * @remarks
  * Provides debugging and tracking information for each event emission.
- * This metadata is available in all event listeners under the `_meta` property.
+ * This metadata is available in all event listeners under the `_meta`
+ * property.
  *
  * @public
  */
@@ -93,11 +95,12 @@ export interface EventMetadata {
  * Middleware function for event processing.
  *
  * @remarks
- * Middleware can inspect event data, add logging, collect metrics, perform validation,
- * or handle other cross-cutting concerns. Middleware should NOT modify the data object,
- * as modifications will not be reflected in the final event delivered to listeners.
- * Call `next()` to continue processing or throw an error to stop the middleware chain.
- * Data transformations should be performed before calling {@link TypedEventBus.emitTyped}.
+ * Middleware can inspect event data, add logging, collect metrics, perform
+ * validation, or handle other cross-cutting concerns. Middleware should NOT
+ * modify the data object, as modifications will not be reflected in the final
+ * event delivered to listeners. Call `next()` to continue processing or throw
+ * an error to stop the middleware chain. Data transformations should be
+ * performed before calling {@link TypedEventBus.emitTyped}.
  *
  * @example
  * ```typescript
@@ -125,12 +128,13 @@ export type EventMiddleware<T = unknown> = (
  * Enhanced event bus with type safety and middleware support.
  *
  * @remarks
- * Provides compile-time type checking for events, automatic correlation tracking,
- * middleware processing, and comprehensive debugging capabilities. Events are
- * processed through a middleware chain before emission.
+ * Provides compile-time type checking for events, automatic correlation
+ * tracking, middleware processing, and comprehensive debugging capabilities.
+ * Events are processed through a middleware chain before emission.
  *
  * **Type Constraints:**
- * EventMap values must be object types (not primitives) to support metadata enhancement.
+ * EventMap values must be object types (not primitives) to support metadata
+ * enhancement.
  *
  * @typeParam EventMap - Map of event names to their data types. Values must be object types.
  *
@@ -150,21 +154,25 @@ export class TypedEventBus<
      * Emit a typed event through the middleware chain.
      *
      * @remarks
-     * Guarantees type safety between event name and data. The event is processed
-     * through all registered middleware before being emitted to listeners.
-     * Automatic metadata is added including correlation ID, timestamp, and bus ID.
+     * Guarantees type safety between event name and data. The event is
+     * processed through all registered middleware before being emitted to
+     * listeners. Automatic metadata is added including correlation ID,
+     * timestamp, and bus ID.
      *
      * **Middleware Processing:**
-     * - Middleware is intended for cross-cutting concerns (logging, validation, rate limiting).
-     * - Middleware receives the original event data for inspection but cannot modify
+     * - Middleware is intended for cross-cutting concerns (logging,
+     * validation, rate limiting). - Middleware receives the original event
+     * data for inspection but cannot modify
      *   the data that gets delivered to listeners.
-     * - Data transformations should be performed before calling {@link TypedEventBus.emitTyped}.
-     * - If middleware throws an error, event emission is aborted.
+     * - Data transformations should be performed before calling {@link
+     * TypedEventBus.emitTyped}. - If middleware throws an error, event
+     * emission is aborted.
      *
      * **Data Transformation Behavior:**
      * - **Objects**: Spread with added `_meta` property.
      * - **Arrays**: Preserved with non-enumerable `_meta` property.
-     * - **Primitives**: Wrapped as `{ value: primitiveData, _meta: metadata }`.
+     * - **Primitives**: Wrapped as
+     * `{ value: primitiveData, _meta: metadata }`.
      * - **Objects with _meta**: Original `_meta` preserved as `_originalMeta`.
      *
      * @example
@@ -234,8 +242,8 @@ export class TypedEventBus<
      * Process event through middleware chain.
      *
      * @remarks
-     * Executes middleware in registration order. If any middleware throws an error,
-     * the chain is aborted and the error is propagated to the caller.
+     * Executes middleware in registration order. If any middleware throws an
+     * error, the chain is aborted and the error is propagated to the caller.
      *
      * @param eventName - Name of the event being processed.
      * @param data - Event data payload.
@@ -262,7 +270,8 @@ export class TypedEventBus<
                             processNext(currentIndex + 1)
                         );
                     } catch (error) {
-                        // Use base logger directly for error objects since template logger doesn't support error objects
+                        // Use base logger directly for error objects since
+                        // template logger doesn't support error objects
                         baseLogger.error(
                             `[TypedEventBus:${this.busId}] Middleware error for '${eventName}' [${correlationId}]`,
                             error
@@ -281,8 +290,9 @@ export class TypedEventBus<
      *
      * @remarks
      * If no name is provided, a unique correlation ID will be generated.
-     * The bus is configured with a reasonable max listener limit for development use.
-     * A maximum middleware limit prevents memory leaks from excessive middleware registration.
+     * The bus is configured with a reasonable max listener limit for
+     * development use. A maximum middleware limit prevents memory leaks from
+     * excessive middleware registration.
      *
      * @example
      * ```typescript
@@ -404,7 +414,8 @@ export class TypedEventBus<
      * Register a one-time typed event listener.
      *
      * @remarks
-     * The listener is automatically removed after the first time the event is emitted.
+     * The listener is automatically removed after the first time the event is
+     * emitted.
      *
      * @typeParam K - The event name (must be a key in EventMap).
      * @param event - The event name to listen for.
@@ -436,8 +447,9 @@ export class TypedEventBus<
      * Register a typed event listener with guaranteed type safety.
      *
      * @remarks
-     * The listener receives the original event data plus automatically added metadata.
-     * TypeScript will enforce that the listener signature matches the event data type.
+     * The listener receives the original event data plus automatically added
+     * metadata. TypeScript will enforce that the listener signature matches
+     * the event data type.
      *
      * @typeParam K - The event name (must be a key in EventMap).
      * @param event - The event name to listen for.
@@ -486,9 +498,10 @@ export class TypedEventBus<
      * @remarks
      * Middleware is executed in registration order. Each middleware must call
      * `next()` to continue the chain or throw an error to abort processing.
-     * A maximum middleware limit prevents memory leaks from excessive registrations.
-     * If you need more middleware, consider increasing the limit in the constructor
-     * or combining multiple middleware functions into one.
+     * A maximum middleware limit prevents memory leaks from excessive
+     * registrations. If you need more middleware, consider increasing the
+     * limit in the constructor or combining multiple middleware functions into
+     * one.
      *
      * @param middleware - Middleware function to register.
      * @throws Error when the maximum middleware limit is exceeded.
@@ -512,14 +525,15 @@ export class TypedEventBus<
      * Create enhanced event data with metadata, handling edge cases safely.
      *
      * @remarks
-     * Handles arrays, objects with existing `_meta` properties, and primitives safely.
-     * Preserves original data structure and type safety.
+     * Handles arrays, objects with existing `_meta` properties, and primitives
+     * safely. Preserves original data structure and type safety.
      *
      * **Special Behaviors:**
-     * - **Arrays**: Preserves array structure with non-enumerable `_meta` property.
-     * - **Objects with _meta**: Existing `_meta` preserved as `_originalMeta` property.
-     * - **Primitives**: Wrapped in `{ value: data, _meta: metadata }` structure.
-     * - **Type Safety**: All transformations maintain compile-time type guarantees.
+     * - **Arrays**: Preserves array structure with non-enumerable `_meta`
+     * property. - **Objects with _meta**: Existing `_meta` preserved as
+     * `_originalMeta` property. - **Primitives**: Wrapped in
+     * `{ value: data, _meta: metadata }` structure. - **Type Safety**:
+     * All transformations maintain compile-time type guarantees.
      *
      * @example
      * ```typescript
@@ -553,9 +567,11 @@ export class TypedEventBus<
         // Handle arrays specially to preserve array nature
         if (Array.isArray(data)) {
             // For arrays, we need to preserve both the array type and add _meta
-            // This is a legitimate type transformation that requires careful handling
+            // This is a legitimate type transformation that requires careful
+            // handling
             const result: unknown[] = Array.from(data);
-            // Use defineProperty to add non-enumerable _meta, preserving array immutability expectations
+            // Use defineProperty to add non-enumerable _meta, preserving array
+            // immutability expectations
             Object.defineProperty(result, "_meta", {
                 configurable: false,
                 enumerable: false,
@@ -563,10 +579,10 @@ export class TypedEventBus<
                 writable: false,
             });
             // This assertion is safe because:
-            // 1. result has the same elements as data (Array.from preserves content)
-            // 2. we've added the required _meta property
-            // 3. defineProperty preserves the array nature
-            // 4. T is known to be an array type (from Array.isArray check)
+            // 1. result has the same elements as data (Array.from preserves
+            // content) 2. we've added the required _meta property 3.
+            // defineProperty preserves the array nature 4. T is known to be an
+            // array type (from Array.isArray check)
 
             return result;
         }
@@ -598,7 +614,8 @@ export class TypedEventBus<
  * Factory function to create a new typed event bus instance.
  *
  * @remarks
- * This function is a convenience wrapper for the {@link TypedEventBus} constructor.
+ * This function is a convenience wrapper for the {@link TypedEventBus}
+ * constructor.
  *
  * @example
  * ```typescript

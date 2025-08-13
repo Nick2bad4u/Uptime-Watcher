@@ -2,9 +2,10 @@
  * Provides specialized error handling for ping monitoring operations.
  *
  * @remarks
- * This module standardizes error handling for ping connectivity checks, providing
- * consistent error messages and result formatting. Works in conjunction with the
- * ping retry utilities to ensure uniform error reporting across all ping operations.
+ * This module standardizes error handling for ping connectivity checks,
+ * providing consistent error messages and result formatting. Works in
+ * conjunction with the ping retry utilities to ensure uniform error reporting
+ * across all ping operations.
  *
  * @see {@link handlePingCheckError}
  * @public

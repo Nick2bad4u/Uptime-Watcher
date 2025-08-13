@@ -1,11 +1,14 @@
 /**
- * Provides retry-enabled TCP port connectivity checks with exponential backoff and standardized error handling.
+ * Provides retry-enabled TCP port connectivity checks with exponential backoff
+ * and standardized error handling.
  *
  * @remarks
- * This module builds on the basic port checking utilities by adding configurable retry logic, exponential backoff,
- * and development-mode debug logging. It integrates with the operational hooks system for consistent error handling
- * and event emission across the monitoring system. For single port checks without retry logic, use {@link portChecker.ts} directly.
- * For error handling utilities, see {@link portErrorHandling.ts}.
+ * This module builds on the basic port checking utilities by adding
+ * configurable retry logic, exponential backoff, and development-mode debug
+ * logging. It integrates with the operational hooks system for consistent
+ * error handling and event emission across the monitoring system. For single
+ * port checks without retry logic, use {@link portChecker.ts} directly. For
+ * error handling utilities, see {@link portErrorHandling.ts}.
  *
  * @see {@link performPortCheckWithRetry}
  * @see {@link portChecker.ts}
@@ -23,13 +26,16 @@ import { performSinglePortCheck } from "./portChecker";
 import { handlePortCheckError } from "./portErrorHandling";
 
 /**
- * Performs a TCP port connectivity check with retry logic and exponential backoff.
+ * Performs a TCP port connectivity check with retry logic and exponential
+ * backoff.
  *
  * @remarks
- * This function wraps {@link performSinglePortCheck} with retry logic using {@link withOperationalHooks}.
- * It attempts to connect to the specified host and port, retrying on failure up to `maxRetries` times
- * (for a total of `maxRetries + 1` attempts). Exponential backoff is applied between attempts.
- * Debug logging is enabled in development mode. If all attempts fail, a standardized error result is returned via {@link handlePortCheckError}.
+ * This function wraps {@link performSinglePortCheck} with retry logic using
+ * {@link withOperationalHooks}. It attempts to connect to the specified host
+ * and port, retrying on failure up to `maxRetries` times (for a total of
+ * `maxRetries + 1` attempts). Exponential backoff is applied between attempts.
+ * Debug logging is enabled in development mode. If all attempts fail, a
+ * standardized error result is returned via {@link handlePortCheckError}.
  *
  * @example
  * ```typescript
@@ -57,8 +63,9 @@ export async function performPortCheckWithRetry(
     maxRetries: number
 ): Promise<MonitorCheckResult> {
     try {
-        // Convert "additional retries" to "total attempts" for withOperationalHooks
-        // maxRetries=3 means: 1 initial attempt + 3 retries = 4 total attempts
+        // Convert "additional retries" to "total attempts" for
+        // withOperationalHooks maxRetries=3 means: 1 initial attempt + 3
+        // retries = 4 total attempts
         const totalAttempts = maxRetries + 1;
 
         // Prepare base configuration for operational hooks

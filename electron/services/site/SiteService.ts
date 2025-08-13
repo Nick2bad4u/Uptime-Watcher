@@ -1,6 +1,7 @@
 /**
- * Site service for coordinating site-related operations across multiple repositories.
- * Handles complex site loading with related entities (monitors and history).
+ * Site service for coordinating site-related operations across multiple
+ * repositories. Handles complex site loading with related entities (monitors
+ * and history).
  */
 
 import type { Site } from "@shared/types";
@@ -15,10 +16,12 @@ import type { SiteRepository } from "../database/SiteRepository";
 import { logger } from "../../utils/logger";
 
 /**
- * Defines the dependencies required by {@link SiteService} for site operations.
+ * Defines the dependencies required by {@link SiteService} for site
+ * operations.
  *
  * @remarks
- * Includes all repositories and the database service needed for coordinating site, monitor, and history operations.
+ * Includes all repositories and the database service needed for coordinating
+ * site, monitor, and history operations.
  *
  * @public
  */
@@ -33,7 +36,9 @@ export interface SiteServiceDependencies {
  * Service for coordinating site operations across multiple repositories.
  *
  * @remarks
- * Handles complex operations that require coordination between site, monitor, and history data. Provides atomic deletion, detailed loading, and batch operations for sites and their related entities.
+ * Handles complex operations that require coordination between site, monitor,
+ * and history data. Provides atomic deletion, detailed loading, and batch
+ * operations for sites and their related entities.
  *
  * @public
  */
@@ -58,10 +63,12 @@ export class SiteService {
     private readonly siteRepository: SiteRepository;
 
     /**
-     * Deletes a site and all its related data (monitors and history) atomically.
+     * Deletes a site and all its related data (monitors and history)
+     * atomically.
      *
      * @remarks
-     * Uses a transaction to ensure atomicity. Deletes all monitor history, monitors, and the site itself. Throws if any operation fails.
+     * Uses a transaction to ensure atomicity. Deletes all monitor history,
+     * monitors, and the site itself. Throws if any operation fails.
      *
      * @param identifier - The site identifier to delete.
      * @returns Promise resolving to true if all deletions succeeded.
@@ -146,7 +153,8 @@ export class SiteService {
      * Finds a site by identifier with all related monitors and history data.
      *
      * @remarks
-     * Replaces the complex logic that was previously in SiteRepository. Loads the site, its monitors, and all monitor history in a single operation.
+     * Replaces the complex logic that was previously in SiteRepository. Loads
+     * the site, its monitors, and all monitor history in a single operation.
      *
      * @param identifier - The site identifier to find.
      * @returns Promise resolving to the site with details, or undefined if not found.
@@ -213,7 +221,9 @@ export class SiteService {
      * Gets all sites with their related monitors and history data.
      *
      * @remarks
-     * Replaces the complex logic that was previously in SiteRepository. Optimized to fetch monitor history in parallel for better performance. Returns all sites with complete details.
+     * Replaces the complex logic that was previously in SiteRepository.
+     * Optimized to fetch monitor history in parallel for better performance.
+     * Returns all sites with complete details.
      *
      * @returns Promise resolving to an array of sites with complete data.
      * @public

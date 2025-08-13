@@ -9,7 +9,9 @@ import { logger } from "../../../utils/logger";
  * Utilities for creating SQLite database backups.
  *
  * @remarks
- * Provides functionality to create backup copies of the SQLite database for export, download, or archival purposes. Uses Node.js file system APIs with lazy importing to minimize startup overhead and improve performance.
+ * Provides functionality to create backup copies of the SQLite database for
+ * export, download, or archival purposes. Uses Node.js file system APIs with
+ * lazy importing to minimize startup overhead and improve performance.
  *
  * @public
  */
@@ -18,7 +20,9 @@ import { logger } from "../../../utils/logger";
  * Result interface for database backup operations.
  *
  * @remarks
- * Provides a structured return type for backup operations with comprehensive metadata for tracking and validation. Used as the return value for {@link createDatabaseBackup}.
+ * Provides a structured return type for backup operations with comprehensive
+ * metadata for tracking and validation. Used as the return value for {@link
+ * createDatabaseBackup}.
  *
  * @public
  */
@@ -34,14 +38,16 @@ export interface DatabaseBackupResult {
      * Standardized filename for the backup file.
      *
      * @remarks
-     * The filename used for the backup file, typically "uptime-watcher-backup.sqlite".
+     * The filename used for the backup file, typically
+     * "uptime-watcher-backup.sqlite".
      */
     fileName: string;
     /**
      * Metadata about the backup operation.
      *
      * @remarks
-     * Contains details about the backup creation, including timestamp, original path, and file size.
+     * Contains details about the backup creation, including timestamp,
+     * original path, and file size.
      */
     metadata: {
         /**
@@ -55,7 +61,8 @@ export interface DatabaseBackupResult {
          * Original database file path.
          *
          * @remarks
-         * The absolute path to the original SQLite database file that was backed up.
+         * The absolute path to the original SQLite database file that was
+         * backed up.
          */
         originalPath: string;
         /**
@@ -72,7 +79,12 @@ export interface DatabaseBackupResult {
  * Creates a backup of the SQLite database by reading the file into a buffer.
  *
  * @remarks
- * Reads the entire SQLite database file into memory as a Buffer and returns a structured result with buffer data, filename, and comprehensive metadata. Uses dynamic import of `fs/promises` to minimize startup overhead. Enhanced error handling for import failures and file operations. Loads the entire database into memory (suitable for typical database sizes). For very large databases, consider streaming approaches.
+ * Reads the entire SQLite database file into memory as a Buffer and returns a
+ * structured result with buffer data, filename, and comprehensive metadata.
+ * Uses dynamic import of `fs/promises` to minimize startup overhead. Enhanced
+ * error handling for import failures and file operations. Loads the entire
+ * database into memory (suitable for typical database sizes). For very large
+ * databases, consider streaming approaches.
  *
  * @param dbPath - Absolute path to the SQLite database file to backup.
  * @param fileName - Optional custom filename for the backup (defaults to "uptime-watcher-backup.sqlite").

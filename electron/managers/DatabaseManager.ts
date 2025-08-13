@@ -1,5 +1,6 @@
 /**
- * Manages database operations including initialization, data management, and backups.
+ * Manages database operations including initialization, data management, and
+ * backups.
  *
  * @remarks
  * Handles database initialization, import/export, and backup operations.
@@ -34,10 +35,13 @@ import { SiteLoadingOrchestrator } from "../utils/database/SiteRepositoryService
 import { monitorLogger } from "../utils/logger";
 
 /**
- * Defines the dependencies required to construct a {@link DatabaseManager} instance.
+ * Defines the dependencies required to construct a {@link DatabaseManager}
+ * instance.
  *
  * @remarks
- * This interface is used for dependency injection, enabling testability and modularity. All repositories and services required for database operations must be provided.
+ * This interface is used for dependency injection, enabling testability and
+ * modularity. All repositories and services required for database operations
+ * must be provided.
  *
  * @see {@link DatabaseManager}
  */
@@ -65,23 +69,25 @@ export interface DatabaseManagerDependencies {
  * Database operations manager for the Uptime Watcher application.
  *
  * @remarks
- * The DatabaseManager serves as the central coordination point for all database-related
- * operations including initialization, data import/export, backup management, and site
- * loading. It provides a unified interface for database operations while maintaining
- * consistency with the service-based architecture.
+ * The DatabaseManager serves as the central coordination point for all
+ * database-related operations including initialization, data import/export,
+ * backup management, and site loading. It provides a unified interface for
+ * database operations while maintaining consistency with the service-based
+ * architecture.
  *
  * Key responsibilities:
  * - **Database Initialization**: Setup and schema management
  * - **Data Import/Export**: JSON-based data persistence and restoration
  * - **Backup Management**: SQLite database backup creation and download
  * - **Site Loading**: Coordinated loading of sites from database into cache
- * - **History Management**: Configuration and limits for status history retention
- * - **Event Coordination**: Typed event emission for system-wide coordination
+ * - **History Management**: Configuration and limits for status history
+ * retention - **Event Coordination**: Typed event emission for system-wide
+ * coordination
  *
- * The manager uses dependency injection for testability and follows the repository
- * pattern for data access. All operations are designed to be atomic and maintain
- * data consistency using the withErrorHandling utility for standardized error
- * management and logging.
+ * The manager uses dependency injection for testability and follows the
+ * repository pattern for data access. All operations are designed to be atomic
+ * and maintain data consistency using the withErrorHandling utility for
+ * standardized error management and logging.
  *
  * @example
  * ```typescript
@@ -166,7 +172,8 @@ export class DatabaseManager {
      * Downloads a SQLite database backup file.
      *
      * @remarks
-     * Uses the command pattern to execute a backup operation and returns the backup buffer and file name.
+     * Uses the command pattern to execute a backup operation and returns the
+     * backup buffer and file name.
      *
      * @returns A promise resolving to an object containing the backup buffer and file name.
      * @throws Error if backup creation or file system operations fail.
@@ -193,7 +200,8 @@ export class DatabaseManager {
      * Exports all application data to a JSON string.
      *
      * @remarks
-     * Uses the command pattern to serialize all application data for backup or migration.
+     * Uses the command pattern to serialize all application data for backup or
+     * migration.
      *
      * @returns A promise resolving to a JSON string containing all exported data.
      * @throws Error if database access or data serialization fails.
@@ -216,7 +224,9 @@ export class DatabaseManager {
      * Imports data from a JSON string with comprehensive error handling.
      *
      * @remarks
-     * Uses the standard error handling pattern: {@link withErrorHandling} for logging and debugging, and `.catch()` for method-specific recovery and event emission. Always emits a failure event if import fails.
+     * Uses the standard error handling pattern: {@link withErrorHandling} for
+     * logging and debugging, and `.catch()` for method-specific recovery and
+     * event emission. Always emits a failure event if import fails.
      *
      * @param data - The JSON string containing import data.
      * @returns A promise resolving to a boolean indicating success.
@@ -255,7 +265,8 @@ export class DatabaseManager {
                 );
             }
 
-            // withErrorHandling already logged the error, so we just return false
+            // withErrorHandling already logged the error, so we just return
+            // false
             return false;
         }
     }
@@ -264,7 +275,9 @@ export class DatabaseManager {
      * Initializes the database and loads all sites.
      *
      * @remarks
-     * Loads the current history limit from settings, initializes the database, loads all sites, and emits a transaction-completed event. Errors during event emission are logged but do not interrupt initialization.
+     * Loads the current history limit from settings, initializes the database,
+     * loads all sites, and emits a transaction-completed event. Errors during
+     * event emission are logged but do not interrupt initialization.
      *
      * @returns A promise that resolves when initialization is complete.
      * @throws Error if database initialization, site loading, or settings loading fails.
@@ -272,7 +285,8 @@ export class DatabaseManager {
     public async initialize(): Promise<void> {
         return withErrorHandling(
             async () => {
-                // First, load current settings from database including history limit
+                // First, load current settings from database including history
+                // limit
                 try {
                     const currentLimit =
                         await this.dependencies.repositories.settings.get(
@@ -298,7 +312,8 @@ export class DatabaseManager {
                 this.dependencies.repositories.database.initialize();
                 await this.loadSites();
 
-                // Emit typed database initialized event (with error handling for event emission)
+                // Emit typed database initialized event (with error handling
+                // for event emission)
                 try {
                     await this.eventEmitter.emitTyped(
                         "database:transaction-completed",
@@ -315,7 +330,8 @@ export class DatabaseManager {
                         "[DatabaseManager] Error emitting database initialized event:",
                         error
                     );
-                    // Don't throw here as the database initialization itself succeeded
+                    // Don't throw here as the database initialization itself
+                    // succeeded
                 }
             },
             { logger: monitorLogger, operationName: "initialize database" }
@@ -326,7 +342,10 @@ export class DatabaseManager {
      * Refreshes sites from the database and updates the cache.
      *
      * @remarks
-     * Loads all sites from the database, updates the cache, emits a sites-refreshed event, and returns the loaded sites. If an error occurs, emits a sites-refreshed event with zero count and returns an empty array.
+     * Loads all sites from the database, updates the cache, emits a
+     * sites-refreshed event, and returns the loaded sites. If an error occurs,
+     * emits a sites-refreshed event with zero count and returns an empty
+     * array.
      *
      * @returns A promise resolving to an array of loaded {@link Site} objects.
      * @throws Error if database access or cache update fails.
@@ -369,8 +388,9 @@ export class DatabaseManager {
                 }
             );
 
-            // Return empty array as fallback, but the error is logged for debugging
-            // This allows the UI to continue functioning even if cache refresh fails
+            // Return empty array as fallback, but the error is logged for
+            // debugging This allows the UI to continue functioning even if
+            // cache refresh fails
             return [];
         }
     }
@@ -379,7 +399,9 @@ export class DatabaseManager {
      * Resets all application settings to their default values.
      *
      * @remarks
-     * Resets the history limit and (in the future) other persisted settings to their defaults. The operation is performed within a database transaction for consistency.
+     * Resets the history limit and (in the future) other persisted settings to
+     * their defaults. The operation is performed within a database transaction
+     * for consistency.
      *
      * @returns A promise that resolves when settings have been reset.
      */
@@ -400,7 +422,8 @@ export class DatabaseManager {
      * Sets the history limit for status history retention.
      *
      * @remarks
-     * Validates the input and updates the history limit in the database and in memory. Emits a history-limit-updated event on success.
+     * Validates the input and updates the history limit in the database and in
+     * memory. Emits a history-limit-updated event on success.
      *
      * @param limit - The new history limit value to set.
      * @returns A promise that resolves when the history limit is updated.
@@ -433,7 +456,8 @@ export class DatabaseManager {
             );
         }
 
-        // Use ConfigurationManager to get proper business rules for history limits
+        // Use ConfigurationManager to get proper business rules for history
+        // limits
         const historyRules =
             this.configurationManager.getHistoryRetentionRules();
         if (limit > historyRules.maxLimit) {
@@ -469,7 +493,8 @@ export class DatabaseManager {
      * Emits a history limit updated event.
      *
      * @remarks
-     * Consolidates all history limit event emissions to avoid redundancy and ensure consistent event structure.
+     * Consolidates all history limit event emissions to avoid redundancy and
+     * ensure consistent event structure.
      *
      * @param limit - The new history limit.
      */
@@ -495,7 +520,8 @@ export class DatabaseManager {
      * Emits a sites cache update requested event.
      *
      * @remarks
-     * Consolidates all sites cache update event emissions to avoid redundancy and ensure consistent event structure.
+     * Consolidates all sites cache update event emissions to avoid redundancy
+     * and ensure consistent event structure.
      */
     private async emitSitesCacheUpdateRequested(): Promise<void> {
         try {
@@ -519,10 +545,14 @@ export class DatabaseManager {
     }
 
     /**
-     * Loads sites from the database and updates the cache using atomic replacement.
+     * Loads sites from the database and updates the cache using atomic
+     * replacement.
      *
      * @remarks
-     * Loads all sites from the database into a temporary cache, then atomically replaces the existing cache to prevent race conditions. Sets up monitoring configuration for each loaded site. Intended for internal use only.
+     * Loads all sites from the database into a temporary cache, then
+     * atomically replaces the existing cache to prevent race conditions. Sets
+     * up monitoring configuration for each loaded site. Intended for internal
+     * use only.
      *
      * @internal
      */
@@ -532,7 +562,8 @@ export class DatabaseManager {
             `[DatabaseManager:${operationId}] Starting site loading operation`
         );
 
-        // Create a temporary cache for atomic replacement (prevents race conditions)
+        // Create a temporary cache for atomic replacement (prevents race
+        // conditions)
         const tempCache = new StandardizedCache<Site>({
             name: "tempSiteCache",
         });
@@ -562,7 +593,8 @@ export class DatabaseManager {
                 // First update the cache so monitoring can find the sites
                 await this.emitSitesCacheUpdateRequested();
 
-                // Then request monitoring start via events (with error handling)
+                // Then request monitoring start via events (with error
+                // handling)
                 try {
                     await this.eventEmitter.emitTyped(
                         "internal:site:start-monitoring-requested",
@@ -608,7 +640,8 @@ export class DatabaseManager {
             },
         };
 
-        // Load sites using the new service-based architecture into temporary cache
+        // Load sites using the new service-based architecture into temporary
+        // cache
         const result = await this.siteLoadingOrchestrator.loadSitesFromDatabase(
             tempCache,
             monitoringConfig
@@ -624,7 +657,8 @@ export class DatabaseManager {
             this.siteCache.set(key, site);
         }
 
-        // Update the cache with loaded sites (final update to ensure consistency)
+        // Update the cache with loaded sites (final update to ensure
+        // consistency)
         await this.emitSitesCacheUpdateRequested();
 
         monitorLogger.info(
@@ -636,7 +670,9 @@ export class DatabaseManager {
      * Constructs a new {@link DatabaseManager} instance.
      *
      * @remarks
-     * All dependencies are injected for testability and modularity. Services and orchestrators are created using the provided repositories and event emitter.
+     * All dependencies are injected for testability and modularity. Services
+     * and orchestrators are created using the provided repositories and event
+     * emitter.
      *
      * @param dependencies - The set of dependencies required for all database operations.
      */

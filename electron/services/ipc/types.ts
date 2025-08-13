@@ -20,11 +20,13 @@ export interface IpcHandlerConfig<TParams = unknown[], TResult = unknown> {
 }
 
 /**
- * Base IPC response interface for consistent communication between main and renderer processes.
+ * Base IPC response interface for consistent communication between main and
+ * renderer processes.
  *
  * @remarks
- * Provides a standardized structure for all IPC handler responses, ensuring consistent error handling
- * and data format across the application. All IPC handlers should use this response format.
+ * Provides a standardized structure for all IPC handler responses, ensuring
+ * consistent error handling and data format across the application. All IPC
+ * handlers should use this response format.
  *
  * @example
  * ```typescript
@@ -60,7 +62,8 @@ export interface IpcResponse<T = unknown> {
  * Validation result interface specifically for monitor validation operations.
  *
  * @remarks
- * Extends the base IpcResponse pattern for monitor validation-specific operations.
+ * Extends the base IpcResponse pattern for monitor validation-specific
+ * operations.
  *
  * @public
  */

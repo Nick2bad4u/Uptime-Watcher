@@ -2,8 +2,8 @@
  * Backend constants for the Uptime Watcher application.
  *
  * @remarks
- * This module defines configuration values and operational defaults used throughout
- * the Electron main process and backend services.
+ * This module defines configuration values and operational defaults used
+ * throughout the Electron main process and backend services.
  *
  * @packageDocumentation
  */
@@ -36,8 +36,8 @@ interface RetryBackoffConfig {
  * Default timeout for HTTP requests in milliseconds.
  *
  * @remarks
- * Used by monitor checks and HTTP-based integrations to determine how long to wait
- * before aborting a request.
+ * Used by monitor checks and HTTP-based integrations to determine how long to
+ * wait before aborting a request.
  *
  * @defaultValue 10000
  */
@@ -57,7 +57,8 @@ export const DEFAULT_CHECK_INTERVAL = 300_000;
  * User agent string for HTTP requests.
  *
  * @remarks
- * Sent as the `User-Agent` header in all outbound HTTP requests performed by the backend.
+ * Sent as the `User-Agent` header in all outbound HTTP requests performed by
+ * the backend.
  *
  * @defaultValue "Uptime-Watcher/1.0"
  */
@@ -67,8 +68,8 @@ export const USER_AGENT = "Uptime-Watcher/1.0";
  * Retry backoff configuration for failed operations.
  *
  * @remarks
- * Used for exponential backoff when retrying failed network or database operations,
- * to avoid overwhelming external services or the local system.
+ * Used for exponential backoff when retrying failed network or database
+ * operations, to avoid overwhelming external services or the local system.
  *
  * @example
  * ```ts
@@ -90,7 +91,8 @@ export const RETRY_BACKOFF: RetryBackoffConfig = Object.freeze({
  * Default number of history records to retain per monitor.
  *
  * @remarks
- * Used to limit the number of status check records stored for each monitor in the database.
+ * Used to limit the number of status check records stored for each monitor in
+ * the database.
  *
  * @defaultValue 500
  */
@@ -100,8 +102,8 @@ export const DEFAULT_HISTORY_LIMIT = 500;
  * Cache TTL values for standardized caching in milliseconds.
  *
  * @remarks
- * Used by ConfigurationManager and other backend services to provide consistent
- * cache expiration behavior.
+ * Used by ConfigurationManager and other backend services to provide
+ * consistent cache expiration behavior.
  */
 export const CACHE_TTL: CacheTtlConfig = Object.freeze({
     /** TTL for configuration values cache (30 minutes). */
@@ -114,8 +116,8 @@ export const CACHE_TTL: CacheTtlConfig = Object.freeze({
  * Cache size limits for standardized caching.
  *
  * @remarks
- * Used by ConfigurationManager and other backend services to provide consistent
- * cache size constraints.
+ * Used by ConfigurationManager and other backend services to provide
+ * consistent cache size constraints.
  */
 export const CACHE_SIZE_LIMITS: CacheSizeLimitsConfig = Object.freeze({
     /** Maximum entries for configuration values cache. */

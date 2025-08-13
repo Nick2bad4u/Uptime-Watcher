@@ -1,14 +1,17 @@
 /**
- * Network connectivity monitoring service using ICMP ping for network reachability checks.
+ * Network connectivity monitoring service using ICMP ping for network
+ * reachability checks.
  *
  * @remarks
- * Provides comprehensive ping monitoring capabilities for network hosts and endpoints
- * with configurable timeouts, retry logic, and detailed response time measurement.
- * Designed for reliable network connectivity verification using native system ping utilities.
+ * Provides comprehensive ping monitoring capabilities for network hosts and
+ * endpoints with configurable timeouts, retry logic, and detailed response
+ * time measurement. Designed for reliable network connectivity verification
+ * using native system ping utilities.
  *
- * The service uses the node-ping wrapper around system ping utilities for cross-platform
- * compatibility, ensuring consistent behavior across Windows, macOS, and Linux platforms.
- * Only cross-platform ping options are used to maximize compatibility.
+ * The service uses the node-ping wrapper around system ping utilities for
+ * cross-platform compatibility, ensuring consistent behavior across Windows,
+ * macOS, and Linux platforms. Only cross-platform ping options are used to
+ * maximize compatibility.
  *
  * @example
  * ```typescript
@@ -54,13 +57,15 @@ import { performPingCheckWithRetry } from "./utils/pingRetry";
  * Service for performing ping monitoring checks.
  *
  * @remarks
- * Implements the {@link IMonitorService} interface to provide ICMP ping connectivity
- * monitoring with advanced features for reliability and performance. Uses the
- * node-ping wrapper around system ping utilities for cross-platform compatibility.
+ * Implements the {@link IMonitorService} interface to provide ICMP ping
+ * connectivity monitoring with advanced features for reliability and
+ * performance. Uses the node-ping wrapper around system ping utilities for
+ * cross-platform compatibility.
  *
  * The service automatically handles different types of network failures and
  * provides detailed error reporting for troubleshooting connectivity issues.
- * All ping operations use only cross-platform options for maximum compatibility.
+ * All ping operations use only cross-platform options for maximum
+ * compatibility.
  *
  * Key features:
  * - Cross-platform ping execution using only compatible options
@@ -96,15 +101,17 @@ export class PingMonitor implements IMonitorService {
      * @throws {@link Error} When monitor validation fails (wrong type or missing host)
      *
      * @remarks
-     * Validates the monitor configuration before performing the ping check, ensuring
-     * the monitor type is "ping" and a valid host is provided. Uses monitor-specific
-     * timeout and retry settings when available, falling back to service defaults.
+     * Validates the monitor configuration before performing the ping check,
+     * ensuring the monitor type is "ping" and a valid host is provided. Uses
+     * monitor-specific timeout and retry settings when available, falling back
+     * to service defaults.
      *
      * The check process:
      * 1. Validates monitor type and required fields
      * 2. Extracts timeout and retry configuration
-     * 3. Performs ping with retry logic using {@link performPingCheckWithRetry}
-     * 4. Returns standardized result with status, response time, and details
+     * 3. Performs ping with retry logic using {@link
+     * performPingCheckWithRetry} 4. Returns standardized result with status,
+     * response time, and details
      *
      * Response time measurement includes the complete ping operation duration,
      * from initiation to completion or failure.
@@ -163,9 +170,10 @@ export class PingMonitor implements IMonitorService {
      * @param config - Configuration options for the monitor service
      *
      * @remarks
-     * Initializes the monitor with default timeout and retry values, merging any
-     * provided configuration options. The monitor uses sensible defaults if no
-     * configuration is provided, making it safe to instantiate without parameters.
+     * Initializes the monitor with default timeout and retry values, merging
+     * any provided configuration options. The monitor uses sensible defaults
+     * if no configuration is provided, making it safe to instantiate without
+     * parameters.
      *
      * Default configuration:
      * - timeout: 30000ms (30 seconds)
@@ -197,10 +205,10 @@ export class PingMonitor implements IMonitorService {
      *
      * @remarks
      * Returns a defensive shallow copy of the current configuration to prevent
-     * external modification. This ensures configuration immutability and prevents
-     * accidental state corruption. Note that this is a shallow copy - only the
-     * top-level properties are copied. If nested objects are added to MonitorConfig
-     * in the future, they would be referenced, not cloned.
+     * external modification. This ensures configuration immutability and
+     * prevents accidental state corruption. Note that this is a shallow copy -
+     * only the top-level properties are copied. If nested objects are added to
+     * MonitorConfig in the future, they would be referenced, not cloned.
      */
     public getConfig(): MonitorConfig {
         return { ...this.config };

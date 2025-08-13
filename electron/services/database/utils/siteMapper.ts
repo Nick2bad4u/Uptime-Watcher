@@ -1,6 +1,7 @@
 /**
  * Site database row mapping utilities.
- * Provides consistent data transformation between database rows and Site objects.
+ * Provides consistent data transformation between database rows and Site
+ * objects.
  */
 
 import type { SiteRow as DatabaseSiteRow } from "@shared/types/database";
@@ -14,9 +15,9 @@ import { logger } from "../../../utils/logger";
  * Site type for basic operations (without monitors).
  *
  * @remarks
- * Represents a simplified site object used for database operations and mapping.
- * This interface excludes the monitors array to avoid circular dependencies
- * and focuses on core site properties.
+ * Represents a simplified site object used for database operations and
+ * mapping. This interface excludes the monitors array to avoid circular
+ * dependencies and focuses on core site properties.
  *
  * @public
  */
@@ -47,8 +48,9 @@ export interface SiteRow {
  * @returns True if row is valid
  *
  * @remarks
- * Validates that the row has a valid identifier that is not null, undefined, or empty string.
- * This ensures database integrity and prevents invalid site creation.
+ * Validates that the row has a valid identifier that is not null, undefined,
+ * or empty string. This ensures database integrity and prevents invalid site
+ * creation.
  *
  * @public
  */
@@ -101,7 +103,8 @@ export function rowToSite(row: DatabaseSiteRow): SiteRow {
             throw new Error("Invalid site row: missing or invalid identifier");
         }
 
-        // Handle identifier (required field) - we know it's valid from validation above
+        // Handle identifier (required field) - we know it's valid from
+        // validation above
         const identifier = safeStringify(row.identifier);
 
         const site: SiteRow = {

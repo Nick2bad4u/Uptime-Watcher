@@ -4,7 +4,8 @@
  * @remarks
  * Provides safe type checking for monitor configuration properties that may be
  * undefined at runtime despite type definitions suggesting otherwise.
- * This addresses the type safety issues identified in HttpMonitor and PortMonitor.
+ * This addresses the type safety issues identified in HttpMonitor and
+ * PortMonitor.
  */
 
 import type { Site } from "@shared/types";

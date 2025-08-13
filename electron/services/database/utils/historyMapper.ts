@@ -1,9 +1,10 @@
 /**
- * Utilities for mapping between database history rows and {@link StatusHistory} objects.
+ * Utilities for mapping between database history rows and {@link
+ * StatusHistory} objects.
  *
  * @remarks
- * Provides consistent, type-safe transformation between raw database rows and domain history objects,
- * including validation, conversion, and error logging.
+ * Provides consistent, type-safe transformation between raw database rows and
+ * domain history objects, including validation, conversion, and error logging.
  *
  * @see {@link StatusHistory}
  * @public
@@ -41,7 +42,8 @@ export interface HistoryRow {
 }
 
 /**
- * Safely converts a value to a number, returning a fallback if conversion fails.
+ * Safely converts a value to a number, returning a fallback if conversion
+ * fails.
  *
  * @remarks
  * Used internally to ensure numeric fields are valid numbers.
@@ -63,7 +65,8 @@ function safeNumber(value: unknown, fallback: number = 0): number {
 }
 
 /**
- * Validates and converts a status value to a valid {@link StatusHistory.status} value.
+ * Validates and converts a status value to a valid {@link
+ * StatusHistory.status} value.
  *
  * @remarks
  * If the value is not "up" or "down", logs a warning and returns "down".
@@ -112,7 +115,8 @@ export function historyEntryToRow(
 }
 
 /**
- * Validates that a database row contains the minimum required fields for a history entry.
+ * Validates that a database row contains the minimum required fields for a
+ * history entry.
  *
  * @remarks
  * Ensures that the row has a valid monitor ID, status, and timestamp.
@@ -139,7 +143,8 @@ export function isValidHistoryRow(row: DatabaseHistoryRow): boolean {
 }
 
 /**
- * Converts an array of raw database rows to an array of {@link StatusHistory} objects.
+ * Converts an array of raw database rows to an array of {@link StatusHistory}
+ * objects.
  *
  * @remarks
  * Each row is mapped using {@link rowToHistoryEntry}.
@@ -164,8 +169,8 @@ export function rowsToHistoryEntries(
  * Converts a single database row to a {@link StatusHistory} object.
  *
  * @remarks
- * Performs safe number conversion and status validation. If a value is invalid,
- * it defaults to a safe fallback and logs a warning or error.
+ * Performs safe number conversion and status validation. If a value is
+ * invalid, it defaults to a safe fallback and logs a warning or error.
  *
  * @param row - The raw database row to convert.
  * @returns The mapped {@link StatusHistory} object.
@@ -204,7 +209,8 @@ export function rowToHistoryEntry(row: DatabaseHistoryRow): StatusHistory {
 }
 
 /**
- * Converts a database row to a {@link StatusHistory} object, or returns `undefined` if the row is not present.
+ * Converts a database row to a {@link StatusHistory} object, or returns
+ * `undefined` if the row is not present.
  *
  * @remarks
  * Useful for optional row lookups where the row may be missing.

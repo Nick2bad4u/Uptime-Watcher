@@ -14,7 +14,8 @@ import { withDatabaseOperation } from "../operationalHooks";
  * Initialize the database and load sites.
  *
  * Handles database setup and site loading with proper error handling.
- * Errors are emitted via the event bus and re-thrown following project guidelines.
+ * Errors are emitted via the event bus and re-thrown following project
+ * guidelines.
  *
  * @param databaseService - The database service instance
  * @param loadSitesCallback - Callback function to load sites

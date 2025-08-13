@@ -1,6 +1,7 @@
 /**
  * Database value conversion utilities.
- * Provides type-safe conversions between application types and database values.
+ * Provides type-safe conversions between application types and database
+ * values.
  */
 
 /**
@@ -25,8 +26,9 @@ export type DbValue = null | number | string;
  * @param updateValues - Array to append the database value
  *
  * @remarks
- * Converts boolean values to database-compatible integers (1 for true, 0 for false).
- * Only adds the field if the value is not undefined, allowing for optional updates.
+ * Converts boolean values to database-compatible integers (1 for true, 0 for
+ * false). Only adds the field if the value is not undefined, allowing for
+ * optional updates.
  *
  * @public
  */
@@ -52,8 +54,8 @@ export function addBooleanField(
  *
  * @remarks
  * Converts the value to a number type for database storage.
- * Only adds the field if the value is not undefined, allowing for optional updates.
- * Zero values are treated as valid and will be included.
+ * Only adds the field if the value is not undefined, allowing for optional
+ * updates. Zero values are treated as valid and will be included.
  *
  * @public
  */
@@ -79,13 +81,13 @@ export function addNumberField(
  * @param updateValues - Array to append the database value
  *
  * @remarks
- * Handles string values for database storage with explicit empty string handling.
- * - If value is undefined: field is not added (skipped)
+ * Handles string values for database storage with explicit empty string
+ * handling. - If value is undefined: field is not added (skipped)
  * - If value is empty string: stores empty string (preserved as-is)
  * - Otherwise: stores the string value after conversion
  *
- * Only adds the field if the value is not undefined, allowing for optional updates.
- * Empty strings are preserved to maintain data integrity.
+ * Only adds the field if the value is not undefined, allowing for optional
+ * updates. Empty strings are preserved to maintain data integrity.
  *
  * @public
  */

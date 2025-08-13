@@ -4,7 +4,8 @@
  * @remarks
  * Provides structured logging with consistent formatting and categorization.
  * Supports multiple specialized loggers with distinct prefixes for easy
- * identification and filtering of log messages during development and debugging.
+ * identification and filtering of log messages during development and
+ * debugging.
  *
  * @example
  * Basic usage:
@@ -74,8 +75,8 @@ interface Logger {
  *
  * @remarks
  * The error method provides special handling for Error objects, extracting
- * both the error message and stack trace for comprehensive debugging information.
- * Non-Error objects are logged as-is for additional context.
+ * both the error message and stack trace for comprehensive debugging
+ * information. Non-Error objects are logged as-is for additional context.
  *
  * @example
  * ```typescript

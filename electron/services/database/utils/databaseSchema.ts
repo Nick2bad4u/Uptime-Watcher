@@ -7,10 +7,13 @@ import { getRegisteredMonitorTypes } from "../../monitoring/MonitorTypeRegistry"
 import { generateMonitorTableSchema } from "./dynamicSchema";
 
 /**
- * Utilities for managing the SQLite database schema, including table and index creation and validation setup.
+ * Utilities for managing the SQLite database schema, including table and index
+ * creation and validation setup.
  *
  * @remarks
- * Provides functions for creating database tables, indexes, and setting up validation frameworks. All table creation operations are idempotent using "IF NOT EXISTS" clauses. Used during application startup and migrations.
+ * Provides functions for creating database tables, indexes, and setting up
+ * validation frameworks. All table creation operations are idempotent using
+ * "IF NOT EXISTS" clauses. Used during application startup and migrations.
  *
  * @public
  */
@@ -74,7 +77,10 @@ const SCHEMA_QUERIES = {
  * Validates a generated SQL schema string before execution.
  *
  * @remarks
- * Performs validation checks to ensure the schema is a non-empty string, contains the required table definition, and does not include placeholder values that indicate generation errors. Prevents runtime failures from malformed SQL.
+ * Performs validation checks to ensure the schema is a non-empty string,
+ * contains the required table definition, and does not include placeholder
+ * values that indicate generation errors. Prevents runtime failures from
+ * malformed SQL.
  *
  * @param schema - The generated SQL schema string to validate.
  * @throws {@link Error} When schema validation fails due to missing or invalid content.
@@ -133,7 +139,9 @@ export function createDatabaseIndexes(db: Database): void {
  * Creates the full database schema (tables and indexes) within a transaction.
  *
  * @remarks
- * Creates all tables and indexes within coordinated operations to ensure consistent schema creation. Uses explicit transaction handling via BEGIN/COMMIT. Rolls back on error to maintain database integrity.
+ * Creates all tables and indexes within coordinated operations to ensure
+ * consistent schema creation. Uses explicit transaction handling via
+ * BEGIN/COMMIT. Rolls back on error to maintain database integrity.
  *
  * @param db - The {@link Database} instance to create the schema on.
  * @throws When schema creation fails. Errors are logged and re-thrown for upstream handling.
@@ -172,7 +180,8 @@ export function createDatabaseSchema(db: Database): void {
  * - `stats`: Runtime statistics
  * - `logs`: Application logs
  *
- * Uses dynamic schema generation for the monitors table. All table creation operations are idempotent.
+ * Uses dynamic schema generation for the monitors table. All table creation
+ * operations are idempotent.
  *
  * @param db - The {@link Database} instance to create tables on.
  * @throws When table creation fails. Errors are logged and re-thrown for upstream handling.
@@ -211,7 +220,10 @@ export function createDatabaseTables(db: Database): void {
  * Sets up the monitor type validation framework for the database.
  *
  * @remarks
- * Integrates with {@link getRegisteredMonitorTypes} to provide runtime validation of monitor types. Intended to set up database-level constraints and validation triggers to ensure data integrity for monitor type fields. Currently logs the available types and prepares for future enhancements.
+ * Integrates with {@link getRegisteredMonitorTypes} to provide runtime
+ * validation of monitor types. Intended to set up database-level constraints
+ * and validation triggers to ensure data integrity for monitor type fields.
+ * Currently logs the available types and prepares for future enhancements.
  *
  * @returns void
  * @throws When validation setup fails. Errors are logged but not re-thrown, as this is a non-critical enhancement.

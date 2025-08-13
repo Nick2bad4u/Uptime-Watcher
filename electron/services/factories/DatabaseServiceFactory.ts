@@ -2,7 +2,10 @@
  * Service factory for database-related services following the Factory pattern.
  *
  * @remarks
- * Provides centralized creation and configuration of database services. Implements the Factory pattern to resolve Dependency Inversion Principle violations in DatabaseManager. All service creation is centralized here with proper abstraction interfaces and dependency injection.
+ * Provides centralized creation and configuration of database services.
+ * Implements the Factory pattern to resolve Dependency Inversion Principle
+ * violations in DatabaseManager. All service creation is centralized here with
+ * proper abstraction interfaces and dependency injection.
  *
  * @public
  */
@@ -27,10 +30,12 @@ import { SiteRepositoryService } from "../../utils/database/SiteRepositoryServic
 import { monitorLogger } from "../../utils/logger";
 
 /**
- * Defines the dependencies required by the {@link DatabaseServiceFactory} for service creation.
+ * Defines the dependencies required by the {@link DatabaseServiceFactory} for
+ * service creation.
  *
  * @remarks
- * Includes all repositories, the database service, and the event emitter needed for constructing database-related services.
+ * Includes all repositories, the database service, and the event emitter
+ * needed for constructing database-related services.
  *
  * @public
  */
@@ -61,7 +66,8 @@ export interface IDataBackupService {
  * Abstract interface for import/export service operations.
  *
  * @remarks
- * Used for type safety and dependency injection for import/export-related operations.
+ * Used for type safety and dependency injection for import/export-related
+ * operations.
  *
  * @public
  */
@@ -80,7 +86,8 @@ export interface IDataImportExportService {
  * Abstract interface for site repository service operations.
  *
  * @remarks
- * Used for type safety and dependency injection for site repository operations.
+ * Used for type safety and dependency injection for site repository
+ * operations.
  *
  * @public
  */
@@ -89,10 +96,14 @@ export interface ISiteRepositoryService {
 }
 
 /**
- * Factory for creating database-related services with proper dependency injection.
+ * Factory for creating database-related services with proper dependency
+ * injection.
  *
  * @remarks
- * Centralizes service creation to resolve Dependency Inversion Principle violations. All services are created with proper abstractions and dependency injection. This class is the single entry point for constructing all database-related services in the backend.
+ * Centralizes service creation to resolve Dependency Inversion Principle
+ * violations. All services are created with proper abstractions and dependency
+ * injection. This class is the single entry point for constructing all
+ * database-related services in the backend.
  *
  * @public
  */
@@ -105,7 +116,8 @@ export class DatabaseServiceFactory {
      * Constructs a new {@link DatabaseServiceFactory} instance.
      *
      * @remarks
-     * Initializes the factory with all required dependencies and sets up a logger adapter for use by created services.
+     * Initializes the factory with all required dependencies and sets up a
+     * logger adapter for use by created services.
      *
      * @param dependencies - The {@link DatabaseServiceFactoryDependencies} required for service creation.
      */
@@ -118,7 +130,8 @@ export class DatabaseServiceFactory {
      * Creates a data backup service instance.
      *
      * @remarks
-     * Returns a new {@link DataBackupService} with injected dependencies for backup operations.
+     * Returns a new {@link DataBackupService} with injected dependencies for
+     * backup operations.
      *
      * @returns Data backup service implementation.
      */
@@ -133,7 +146,8 @@ export class DatabaseServiceFactory {
      * Creates a data import/export service instance.
      *
      * @remarks
-     * Returns a new {@link DataImportExportService} with injected dependencies for import/export operations.
+     * Returns a new {@link DataImportExportService} with injected dependencies
+     * for import/export operations.
      *
      * @returns Data import/export service implementation.
      */
@@ -150,7 +164,8 @@ export class DatabaseServiceFactory {
      * Creates a site repository service instance.
      *
      * @remarks
-     * Returns a new {@link SiteRepositoryService} with injected dependencies for site repository operations.
+     * Returns a new {@link SiteRepositoryService} with injected dependencies
+     * for site repository operations.
      *
      * @returns Site repository service implementation.
      */

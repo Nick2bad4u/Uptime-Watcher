@@ -1,10 +1,12 @@
 /**
- * Enhanced monitor status checker with advanced operation correlation and race condition prevention.
+ * Enhanced monitor status checker with advanced operation correlation and race
+ * condition prevention.
  *
  * @remarks
- * This class provides robust monitor checking capabilities with operation correlation to prevent race conditions
- * in concurrent monitoring scenarios. It integrates with the operation registry and timeout management system
- * to ensure safe, coordinated monitor operations across the application.
+ * This class provides robust monitor checking capabilities with operation
+ * correlation to prevent race conditions in concurrent monitoring scenarios.
+ * It integrates with the operation registry and timeout management system to
+ * ensure safe, coordinated monitor operations across the application.
  *
  * Key features:
  * - Operation correlation to prevent duplicate or conflicting checks
@@ -62,12 +64,14 @@ import { PingMonitor } from "./PingMonitor";
 import { PortMonitor } from "./PortMonitor";
 
 /**
- * Configuration interface for enhanced monitor checking with comprehensive service dependencies.
+ * Configuration interface for enhanced monitor checking with comprehensive
+ * service dependencies.
  *
  * @remarks
- * This configuration object provides all necessary dependencies for the enhanced monitor checker
- * to operate safely with operation correlation and race condition prevention. Each dependency
- * serves a specific purpose in the monitoring operation lifecycle.
+ * This configuration object provides all necessary dependencies for the
+ * enhanced monitor checker to operate safely with operation correlation and
+ * race condition prevention. Each dependency serves a specific purpose in the
+ * monitoring operation lifecycle.
  *
  * @example
  * ```typescript
@@ -88,20 +92,22 @@ import { PortMonitor } from "./PortMonitor";
  */
 export interface EnhancedMonitorCheckConfig {
     /**
-     * Event emitter for system-wide communication and monitor event propagation.
+     * Event emitter for system-wide communication and monitor event
+     * propagation.
      *
      * @remarks
-     * Used to emit monitor status changes, operation events, and other monitoring-related notifications
-     * throughout the application.
+     * Used to emit monitor status changes, operation events, and other
+     * monitoring-related notifications throughout the application.
      */
     eventEmitter: TypedEventBus<UptimeEvents>;
 
     /**
-     * Function to get the maximum number of history entries to keep for each monitor.
+     * Function to get the maximum number of history entries to keep for each
+     * monitor.
      *
      * @remarks
-     * This function provides the current history limit setting, which may change during runtime
-     * based on user configuration or system constraints.
+     * This function provides the current history limit setting, which may
+     * change during runtime based on user configuration or system constraints.
      *
      * @returns The maximum number of status history entries to retain
      */
@@ -111,8 +117,8 @@ export interface EnhancedMonitorCheckConfig {
      * Repository for history operations and status history management.
      *
      * @remarks
-     * Handles persistence and retrieval of monitor status history entries, including
-     * automatic pruning based on the configured history limit.
+     * Handles persistence and retrieval of monitor status history entries,
+     * including automatic pruning based on the configured history limit.
      */
     historyRepository: HistoryRepository;
 
@@ -120,8 +126,8 @@ export interface EnhancedMonitorCheckConfig {
      * Repository for monitor entity operations and status updates.
      *
      * @remarks
-     * Manages monitor entity persistence, updates monitor status and configuration,
-     * and handles monitor-related database operations.
+     * Manages monitor entity persistence, updates monitor status and
+     * configuration, and handles monitor-related database operations.
      */
     monitorRepository: MonitorRepository;
 
@@ -129,8 +135,9 @@ export interface EnhancedMonitorCheckConfig {
      * Operation registry for correlation and race condition prevention.
      *
      * @remarks
-     * Tracks active monitor operations to prevent concurrent checks on the same monitor
-     * and provides operation correlation for debugging and state management.
+     * Tracks active monitor operations to prevent concurrent checks on the
+     * same monitor and provides operation correlation for debugging and state
+     * management.
      */
     operationRegistry: MonitorOperationRegistry;
 
@@ -138,17 +145,19 @@ export interface EnhancedMonitorCheckConfig {
      * Repository for site entity operations and site-monitor relationships.
      *
      * @remarks
-     * Handles site entity persistence and manages the relationship between sites
-     * and their associated monitors.
+     * Handles site entity persistence and manages the relationship between
+     * sites and their associated monitors.
      */
     siteRepository: SiteRepository;
 
     /**
-     * Sites cache for quick access to site and monitor data without database queries.
+     * Sites cache for quick access to site and monitor data without database
+     * queries.
      *
      * @remarks
-     * Provides fast, in-memory access to site configurations and monitor definitions,
-     * reducing database load during frequent monitoring operations.
+     * Provides fast, in-memory access to site configurations and monitor
+     * definitions, reducing database load during frequent monitoring
+     * operations.
      */
     sites: StandardizedCache<Site>;
 
@@ -156,8 +165,9 @@ export interface EnhancedMonitorCheckConfig {
      * Status update service for safe concurrent status updates.
      *
      * @remarks
-     * Provides operation-aware status updates that prevent race conditions when multiple
-     * monitor checks might attempt to update the same monitor's status simultaneously.
+     * Provides operation-aware status updates that prevent race conditions
+     * when multiple monitor checks might attempt to update the same monitor's
+     * status simultaneously.
      */
     statusUpdateService: MonitorStatusUpdateService;
 
@@ -165,26 +175,29 @@ export interface EnhancedMonitorCheckConfig {
      * Timeout manager for operation cleanup and resource management.
      *
      * @remarks
-     * Manages operation timeouts, cleanup procedures, and ensures resources are properly
-     * released when monitor operations complete or are cancelled.
+     * Manages operation timeouts, cleanup procedures, and ensures resources
+     * are properly released when monitor operations complete or are cancelled.
      */
     timeoutManager: OperationTimeoutManager;
 }
 
 /**
- * Enhanced monitor checker with advanced operation correlation and race condition prevention.
+ * Enhanced monitor checker with advanced operation correlation and race
+ * condition prevention.
  *
  * @remarks
- * This class is the core monitoring engine that provides robust, race condition-safe monitor checking
- * capabilities. It coordinates with multiple service layers to ensure safe concurrent operations
- * and maintains operation state throughout the monitoring lifecycle.
+ * This class is the core monitoring engine that provides robust, race
+ * condition-safe monitor checking capabilities. It coordinates with multiple
+ * service layers to ensure safe concurrent operations and maintains operation
+ * state throughout the monitoring lifecycle.
  *
  * **Key Features:**
- * - **Operation Correlation**: Prevents duplicate operations on the same monitor
- * - **Race Condition Prevention**: Ensures safe concurrent monitoring operations
- * - **Advanced Timeout Management**: Handles operation timeouts with proper cleanup
- * - **Status Update Safety**: Prevents conflicting status updates from concurrent checks
- * - **Comprehensive Logging**: Detailed operation tracking for debugging and monitoring
+ * - **Operation Correlation**: Prevents duplicate operations on the same
+ * monitor - **Race Condition Prevention**: Ensures safe concurrent monitoring
+ * operations - **Advanced Timeout Management**: Handles operation timeouts
+ * with proper cleanup - **Status Update Safety**: Prevents conflicting status
+ * updates from concurrent checks - **Comprehensive Logging**: Detailed
+ * operation tracking for debugging and monitoring
  *
  * **Operation Lifecycle:**
  * 1. Validate monitor and operation prerequisites
@@ -239,12 +252,14 @@ export class EnhancedMonitorChecker {
     private readonly portMonitor: PortMonitor;
 
     /**
-     * Performs a comprehensive monitor status check with advanced operation correlation.
+     * Performs a comprehensive monitor status check with advanced operation
+     * correlation.
      *
      * @remarks
-     * This is the primary entry point for all monitor checking operations. The method provides
-     * two distinct operation modes: correlated checks for scheduled operations that prevent
-     * race conditions, and direct checks for manual operations that bypass correlation.
+     * This is the primary entry point for all monitor checking operations. The
+     * method provides two distinct operation modes: correlated checks for
+     * scheduled operations that prevent race conditions, and direct checks for
+     * manual operations that bypass correlation.
      *
      * **Operation Modes:**
      *
@@ -278,7 +293,8 @@ export class EnhancedMonitorChecker {
      * @param isManualCheck - Whether this is a user-initiated manual check (default: false)
      *
      * @returns A promise that resolves to a StatusUpdate object if the check succeeds,
-     *          or undefined if the check fails, is cancelled, or encounters conflicts
+     *          or undefined if the check fails, is cancelled, or encounters
+     *          conflicts
      *
      * @throws Throws detailed errors for configuration issues, operation failures,
      *         or system-level problems that prevent check execution
@@ -666,7 +682,8 @@ export class EnhancedMonitorChecker {
                 timestamp: new Date(),
             };
 
-            // Save history entry for direct checks too (always save actual result)
+            // Save history entry for direct checks too (always save actual
+            // result)
             await this.saveHistoryEntry(monitor, checkResult);
 
             const statusUpdate: StatusUpdate = {
@@ -682,8 +699,9 @@ export class EnhancedMonitorChecker {
                 timestamp: checkResult.timestamp.toISOString(),
             };
 
-            // Update monitor directly (bypass operation correlation for manual checks)
-            // For manual checks on paused monitors, don't update the status
+            // Update monitor directly (bypass operation correlation for manual
+            // checks) For manual checks on paused monitors, don't update the
+            // status
             const updateData: Partial<Monitor> = {
                 lastChecked: checkResult.timestamp,
                 responseTime: serviceResult.responseTime,
@@ -835,17 +853,20 @@ export class EnhancedMonitorChecker {
         };
 
         try {
-            // Pass the details field from the check result to the history repository
+            // Pass the details field from the check result to the history
+            // repository
             await this.config.historyRepository.addEntry(
                 monitor.id,
                 historyEntry,
                 checkResult.details
             );
 
-            // Smart history pruning: Only prune when necessary to avoid performance overhead
+            // Smart history pruning: Only prune when necessary to avoid
+            // performance overhead
             const historyLimit = this.config.getHistoryLimit();
             if (historyLimit > 0) {
-                // Use a buffer strategy: only prune when we exceed limit + buffer
+                // Use a buffer strategy: only prune when we exceed limit +
+                // buffer
                 const bufferSize = Math.max(Math.floor(historyLimit * 0.2), 5);
                 const pruneThreshold = historyLimit + bufferSize;
                 const currentCount =
@@ -872,7 +893,8 @@ export class EnhancedMonitorChecker {
                 `Failed to save history entry for monitor ${monitor.id}`,
                 error
             );
-            // Don't throw error - history saving failure shouldn't stop monitoring
+            // Don't throw error - history saving failure shouldn't stop
+            // monitoring
         }
     }
 

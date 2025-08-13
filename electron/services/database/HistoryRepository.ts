@@ -19,7 +19,8 @@ import {
 } from "./utils/historyQuery";
 
 /**
- * Defines the dependencies required by the {@link HistoryRepository} for managing history data persistence.
+ * Defines the dependencies required by the {@link HistoryRepository} for
+ * managing history data persistence.
  *
  * @remarks
  * Provides the required {@link DatabaseService} for all history operations. This interface is used for dependency injection.
@@ -52,7 +53,8 @@ const HISTORY_QUERIES = {
 /**
  * Repository for managing history data persistence.
  *
- * Handles all CRUD operations for monitor history in the database, following the repository pattern.
+ * Handles all CRUD operations for monitor history in the database, following
+ * the repository pattern.
  *
  * @remarks
  * All operations are wrapped in transactions and use the repository pattern for consistency, error handling, and maintainability. This class should be used as the sole interface for history data access and mutation.
@@ -97,7 +99,8 @@ export class HistoryRepository {
     }
 
     /**
-     * Bulk inserts history entries for a monitor (used for import functionality).
+     * Bulk inserts history entries for a monitor (used for import
+     * functionality).
      *
      * @param monitorId - The unique identifier of the monitor to add history for.
      * @param historyEntries - Array of status history entries to insert. Each entry may include an optional `details` property.
@@ -266,7 +269,8 @@ export class HistoryRepository {
     }
 
     /**
-     * Prunes old history entries for all monitors, keeping only the most recent entries per monitor.
+     * Prunes old history entries for all monitors, keeping only the most
+     * recent entries per monitor.
      *
      * @param limit - The maximum number of entries to keep per monitor. Must be greater than 0.
      * @returns A promise that resolves when pruning is complete.
@@ -283,13 +287,15 @@ export class HistoryRepository {
             async () => {
                 // Use executeTransaction for atomic multi-monitor operation
                 await this.databaseService.executeTransaction((db) => {
-                    // Type assertion is safe: SQL query "SELECT id FROM monitors" guarantees { id: number } structure
+                    // Type assertion is safe: SQL query "SELECT id FROM
+                    // monitors" guarantees { id: number } structure
 
                     const monitors = db.all(
                         HISTORY_QUERIES.SELECT_MONITOR_IDS
                     ) as Array<{ id: number }>;
                     for (const monitor of monitors) {
-                        // Type assertion is safe: SQL query "SELECT id FROM history..." guarantees { id: number } structure
+                        // Type assertion is safe: SQL query "SELECT id FROM
+                        // history..." guarantees { id: number } structure
 
                         const excessEntries = db.all(
                             HISTORY_QUERIES.SELECT_EXCESS_ENTRIES,
@@ -299,7 +305,8 @@ export class HistoryRepository {
                             ]
                         ) as Array<{ id: number }>;
                         if (excessEntries.length > 0) {
-                            // Convert numeric IDs to ensure type safety and validate they are numbers
+                            // Convert numeric IDs to ensure type safety and
+                            // validate they are numbers
                             const excessIds = excessEntries
                                 .map((e) => e.id)
                                 .filter((id) => Number.isFinite(id) && id > 0);
@@ -325,7 +332,8 @@ export class HistoryRepository {
     }
 
     /**
-     * Prunes old history entries for a specific monitor, keeping only the most recent entries.
+     * Prunes old history entries for a specific monitor, keeping only the most
+     * recent entries.
      *
      * @param monitorId - The unique identifier of the monitor to prune history for.
      * @param limit - The maximum number of entries to keep. Must be greater than 0.
@@ -363,7 +371,8 @@ export class HistoryRepository {
     }
 
     /**
-     * Adds a new history entry for a monitor within an existing transaction context.
+     * Adds a new history entry for a monitor within an existing transaction
+     * context.
      *
      * @param db - The database connection (must be within an active transaction).
      * @param monitorId - The unique identifier of the monitor to add history for.
@@ -382,18 +391,22 @@ export class HistoryRepository {
     }
 
     /**
-     * Clears all history from the database within an existing transaction context.
+     * Clears all history from the database within an existing transaction
+     * context.
      *
      * @param db - The database connection (must be within an active transaction).
      * @remarks
-     * **IMPORTANT**: This method must be called within an existing transaction context. The operation is destructive and irreversible. Proper error handling is delegated to the calling transaction context.
+     * **IMPORTANT**: This method must be called within an existing transaction
+     * context. The operation is destructive and irreversible. Proper error
+     * handling is delegated to the calling transaction context.
      */
     public deleteAllInternal(db: Database): void {
         deleteAllHistory(db);
     }
 
     /**
-     * Deletes all history entries for a specific monitor within an existing transaction context.
+     * Deletes all history entries for a specific monitor within an existing
+     * transaction context.
      *
      * @param db - The database connection (must be within an active transaction).
      * @param monitorId - The unique identifier of the monitor to delete history for.
@@ -405,20 +418,24 @@ export class HistoryRepository {
     }
 
     /**
-     * Gets the count of history entries for a monitor within an existing transaction context.
+     * Gets the count of history entries for a monitor within an existing
+     * transaction context.
      *
      * @param db - The database connection (must be within an active transaction).
      * @param monitorId - The unique identifier of the monitor.
      * @returns The number of history entries for the monitor.
      * @remarks
-     * **IMPORTANT**: This method must be called within an existing transaction context. Provides synchronous access for use in transaction-wrapped operations.
+     * **IMPORTANT**: This method must be called within an existing transaction
+     * context. Provides synchronous access for use in transaction-wrapped
+     * operations.
      */
     public getHistoryCountInternal(db: Database, monitorId: string): number {
         return getHistoryCount(db, monitorId);
     }
 
     /**
-     * Prunes old history entries for all monitors within an existing transaction context, keeping only the most recent entries per monitor.
+     * Prunes old history entries for all monitors within an existing
+     * transaction context, keeping only the most recent entries per monitor.
      *
      * @param db - The database connection (must be within an active transaction).
      * @param limit - The maximum number of entries to keep per monitor. Must be greater than 0.
@@ -431,7 +448,8 @@ export class HistoryRepository {
         }
 
         // Get all monitor IDs
-        // Type assertion is safe: SQL query "SELECT id FROM monitors" guarantees { id: number } structure
+        // Type assertion is safe: SQL query "SELECT id FROM monitors"
+        // guarantees { id: number } structure
 
         const monitorRows = db.all(
             HISTORY_QUERIES.SELECT_MONITOR_IDS
@@ -456,7 +474,8 @@ export class HistoryRepository {
     }
 
     /**
-     * Prunes old history entries for a specific monitor within an existing transaction context, keeping only the most recent entries.
+     * Prunes old history entries for a specific monitor within an existing
+     * transaction context, keeping only the most recent entries.
      *
      * @param db - The database connection (must be within an active transaction).
      * @param monitorId - The unique identifier of the monitor to prune history for.
@@ -488,7 +507,10 @@ export class HistoryRepository {
      * @returns The database connection from the {@link DatabaseService}.
      * @remarks
      * **Repository Pattern Justification:**
-     * This method provides controlled access to the database connection for internal repository operations. While it exposes the raw database instance, it's designed for use within repository methods that already implement proper transaction and error handling patterns.
+     * This method provides controlled access to the database connection for
+     * internal repository operations. While it exposes the raw database
+     * instance, it's designed for use within repository methods that already
+     * implement proper transaction and error handling patterns.
      *
      * **Usage Guidelines:**
      * - Only used within repository methods

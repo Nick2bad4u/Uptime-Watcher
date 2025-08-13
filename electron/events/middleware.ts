@@ -2,8 +2,9 @@
  * Pre-built middleware functions and types for the TypedEventBus event system.
  *
  * @remarks
- * Provides common middleware for logging, metrics, filtering, validation, error handling, and more.
- * All middleware is type-safe and composable for robust event-driven architectures.
+ * Provides common middleware for logging, metrics, filtering, validation,
+ * error handling, and more. All middleware is type-safe and composable for
+ * robust event-driven architectures.
  *
  * @packageDocumentation
  */
@@ -72,14 +73,16 @@ const trackEventTiming = (
  * Result type for event data validation.
  *
  * @remarks
- * Can be a boolean (true/false) or an object with `isValid` and optional `error` message.
- * Used by validator functions to indicate if event data is valid.
+ * Can be a boolean (true/false) or an object with `isValid` and optional
+ * `error` message. Used by validator functions to indicate if event data is
+ * valid.
  *
  * Validators can return:
  * - `true` for successful validation
  * - `false` for failed validation (generic error)
  * - `{ isValid: true }` for successful validation with context
- * - `{ isValid: false, error?: string }` for failed validation with specific error message
+ * - `{ isValid: false, error?: string }` for failed validation with specific
+ * error message
  */
 type ValidationResult = boolean | { error?: string; isValid: boolean };
 
@@ -134,8 +137,8 @@ const EVENT_EMITTED_MSG = "[EventBus] Event emitted";
  * @returns Combined middleware function that executes all provided middlewares in sequence
  *
  * @remarks
- * Executes middlewares in the order they are provided. Each middleware must call `next()`
- * to continue the chain, or omit it to stop execution.
+ * Executes middlewares in the order they are provided. Each middleware must
+ * call `next()` to continue the chain, or omit it to stop execution.
  *
  * @example
  * ```typescript
@@ -155,8 +158,8 @@ const EVENT_EMITTED_MSG = "[EventBus] Event emitted";
  * @returns Combined middleware function that executes all provided middlewares in sequence
  *
  * @remarks
- * Executes middlewares in the order they are provided. Each middleware must call `next()`
- * to continue the chain, or omit it to stop execution.
+ * Executes middlewares in the order they are provided. Each middleware must
+ * call `next()` to continue the chain, or omit it to stop execution.
  *
  * @example
  * ```typescript
@@ -263,8 +266,9 @@ export function createDebugMiddleware(options: {
  *
  * @remarks
  * Options include:
- * - `continueOnError`: Whether to continue processing after an error (default: true)
- * - `onError`: Optional callback function to handle errors with custom logic
+ * - `continueOnError`: Whether to continue processing after an error (default:
+ * true) - `onError`: Optional callback function to handle errors with custom
+ * logic
  *
  * @example
  * ```typescript
@@ -387,7 +391,8 @@ export function createFilterMiddleware(options: {
  * Options include:
  * - `filter`: Function to determine which events to log
  * - `includeData`: Whether to include event data in logs (default: false)
- * - `level`: Log level to use ('debug', 'info', 'warn', 'error') (default: 'info')
+ * - `level`: Log level to use ('debug', 'info', 'warn', 'error') (default:
+ * 'info')
  *
  * @example
  * ```typescript
@@ -452,7 +457,8 @@ export function createLoggingMiddleware(options: {
  * Options include:
  * - `trackCounts`: Whether to track event occurrence counts (default: true)
  * - `trackTiming`: Whether to track event processing duration (default: true)
- * - `metricsCallback`: Optional callback to receive metric data for external systems
+ * - `metricsCallback`: Optional callback to receive metric data for external
+ * systems
  *
  * @example
  * ```typescript
@@ -510,8 +516,9 @@ export function createMetricsMiddleware(options: {
  * @remarks
  * Options include:
  * - `burstLimit`: Maximum number of events allowed in a burst (default: 10).
- * - `maxEventsPerSecond`: Maximum number of events allowed per second (default: 100).
- * - `onRateLimit`: Optional callback invoked when an event is rate-limited.
+ * - `maxEventsPerSecond`: Maximum number of events allowed per second
+ * (default: 100). - `onRateLimit`: Optional callback invoked when an event is
+ * rate-limited.
  *
  * @example
  * ```typescript
@@ -575,14 +582,16 @@ export function createRateLimitMiddleware(options: {
 }
 
 /**
- * Creates middleware that validates event data using a map of validator functions.
+ * Creates middleware that validates event data using a map of validator
+ * functions.
  *
  * @typeParam T - Record type defining event names and their data types.
  * @param validators - Map of event names to their validator functions.
  * @returns EventMiddleware function that validates event data before processing.
  *
  * @remarks
- * If validation fails, the event is blocked and an error is logged. Throws on validation failure.
+ * If validation fails, the event is blocked and an error is logged. Throws on
+ * validation failure.
  *
  * @example
  * ```typescript
@@ -623,8 +632,9 @@ export function createValidationMiddleware<T extends Record<string, unknown>>(
             // This assertion is necessary because:
             // 1. We've verified the validator exists for this event name
             // 2. The validator is designed to handle T[K] for some specific K
-            // 3. TypeScript can't statically prove which K, but runtime guarantees it's correct
-            // 4. The validator will perform its own runtime validation anyway
+            // 3. TypeScript can't statically prove which K, but runtime
+            // guarantees it's correct 4. The validator will perform its own
+            // runtime validation anyway
 
             const result = validator(data as T[keyof T]);
 
@@ -685,8 +695,9 @@ export function createValidationMiddleware<T extends Record<string, unknown>>(
  * Predefined middleware stacks for different environments.
  *
  * @remarks
- * Provides convenient factory functions for common middleware stacks: custom, development, production, and testing.
- * Each stack returns a composed middleware chain suitable for the target environment.
+ * Provides convenient factory functions for common middleware stacks: custom,
+ * development, production, and testing. Each stack returns a composed
+ * middleware chain suitable for the target environment.
  *
  * @example
  * ```typescript
@@ -722,7 +733,8 @@ export const MIDDLEWARE_STACKS: MiddlewareStacks = {
         composeMiddleware(...middlewares),
 
     /**
-     * Development stack with comprehensive debugging, verbose logging, and error handling.
+     * Development stack with comprehensive debugging, verbose logging, and
+     * error handling.
      *
      * @returns Middleware stack optimized for development
      *
@@ -820,37 +832,41 @@ export const MIDDLEWARE_STACKS: MiddlewareStacks = {
 };
 
 /**
- * Safely serialize data for logging, handling circular references and type preservation.
+ * Safely serialize data for logging, handling circular references and type
+ * preservation.
  *
  * @param data - Data to serialize
  * @returns Serialized data safe for logging
  *
  * @remarks
- * This function is specifically designed for logging purposes to avoid circular reference
- * errors during JSON serialization. It returns the original object when possible for
- * better debugger inspection, or a safe placeholder string when serialization fails.
+ * This function is specifically designed for logging purposes to avoid
+ * circular reference errors during JSON serialization. It returns the original
+ * object when possible for better debugger inspection, or a safe placeholder
+ * string when serialization fails.
  *
  * **Behavior:**
  * - **Primitives**: Returned as-is (string, number, boolean, null, undefined)
- * - **Objects**: Original object returned if JSON-serializable, placeholder if not
- * - **Circular References**: Returns descriptive placeholder string
+ * - **Objects**: Original object returned if JSON-serializable, placeholder if
+ * not - **Circular References**: Returns descriptive placeholder string
  * - **Functions/Symbols**: Converted to string representation
  */
 /**
- * Safely serialize data for logging, handling circular references and type preservation.
+ * Safely serialize data for logging, handling circular references and type
+ * preservation.
  *
  * @param data - Data to serialize
  * @returns Serialized data safe for logging
  *
  * @remarks
- * This function is specifically designed for logging purposes to avoid circular reference
- * errors during JSON serialization. It returns the original object when possible for
- * better debugger inspection, or a safe placeholder string when serialization fails.
+ * This function is specifically designed for logging purposes to avoid
+ * circular reference errors during JSON serialization. It returns the original
+ * object when possible for better debugger inspection, or a safe placeholder
+ * string when serialization fails.
  *
  * **Behavior:**
  * - **Primitives**: Returned as-is (string, number, boolean, null, undefined)
- * - **Objects**: Original object returned if JSON-serializable, placeholder if not
- * - **Circular References**: Returns descriptive placeholder string
+ * - **Objects**: Original object returned if JSON-serializable, placeholder if
+ * not - **Circular References**: Returns descriptive placeholder string
  * - **Functions/Symbols**: Converted to string representation
  */
 function safeSerialize(data: unknown): unknown {

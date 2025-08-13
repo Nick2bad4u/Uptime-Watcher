@@ -2,9 +2,10 @@
  * Site validation logic extracted for better separation of concerns.
  *
  * @remarks
- * Validates site configuration according to business rules and handles all site-specific
- * validation concerns. This class focuses on site-level validation and delegates monitor
- * validation to the specialized MonitorValidator.
+ * Validates site configuration according to business rules and handles all
+ * site-specific validation concerns. This class focuses on site-level
+ * validation and delegates monitor validation to the specialized
+ * MonitorValidator.
  *
  * The validator performs comprehensive checks including:
  * - Site identifier validation (non-empty string requirement)
@@ -33,8 +34,9 @@ import { MonitorValidator } from "./MonitorValidator";
  * Validates site configuration according to business rules.
  *
  * @remarks
- * Focused on site-level validation concerns including identifier validation and monitor array validation.
- * Delegates monitor validation to {@link MonitorValidator} for comprehensive monitor checks.
+ * Focused on site-level validation concerns including identifier validation
+ * and monitor array validation. Delegates monitor validation to {@link
+ * MonitorValidator} for comprehensive monitor checks.
  *
  * @example
  * ```typescript
@@ -61,21 +63,24 @@ export class SiteValidator {
      * Create a new SiteValidator instance.
      *
      * @remarks
-     * Instantiates a {@link MonitorValidator} for monitor validation delegation.
+     * Instantiates a {@link MonitorValidator} for monitor validation
+     * delegation.
      */
     public constructor() {
         this.monitorValidator = new MonitorValidator();
     }
 
     /**
-     * Determines if a site should be included in exports according to business rules.
+     * Determines if a site should be included in exports according to business
+     * rules.
      *
      * @param site - The site to evaluate for export inclusion.
      * @returns Whether the site should be included in exports.
      *
      * @remarks
-     * Sites are included in exports only if they have a valid, non-empty string identifier.
-     * This ensures exported data integrity and prevents corruption from sites with invalid identifiers.
+     * Sites are included in exports only if they have a valid, non-empty
+     * string identifier. This ensures exported data integrity and prevents
+     * corruption from sites with invalid identifiers.
      *
      * @example
      * ```typescript
@@ -96,7 +101,8 @@ export class SiteValidator {
      * @returns Validation result containing errors and validity status.
      *
      * @remarks
-     * Performs identifier and monitor array validation, delegating monitor validation to {@link MonitorValidator}.
+     * Performs identifier and monitor array validation, delegating monitor
+     * validation to {@link MonitorValidator}.
      *
      * @example
      * ```typescript
@@ -159,8 +165,9 @@ export class SiteValidator {
      * @returns Array of validation errors (empty if valid).
      *
      * @remarks
-     * Checks that monitors is an array and delegates individual monitor validation to {@link MonitorValidator}.
-     * Returns error messages for invalid monitors, or an empty array if all are valid.
+     * Checks that monitors is an array and delegates individual monitor
+     * validation to {@link MonitorValidator}. Returns error messages for
+     * invalid monitors, or an empty array if all are valid.
      *
      * @example
      * ```typescript
@@ -183,7 +190,8 @@ export class SiteValidator {
             const monitorValidation =
                 this.monitorValidator.validateMonitorConfiguration(monitor);
             if (!monitorValidation.success) {
-                // Include monitor identifier in error message if available for easier debugging
+                // Include monitor identifier in error message if available for
+                // easier debugging
                 const monitorId = monitor.id ? ` (${monitor.id})` : "";
                 errors.push(
                     ...monitorValidation.errors.map(
