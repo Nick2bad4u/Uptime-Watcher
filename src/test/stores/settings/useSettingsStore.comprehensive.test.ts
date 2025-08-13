@@ -313,10 +313,18 @@ describe("useSettingsStore", () => {
 
             const { result } = renderHook(() => useSettingsStore());
 
+            // Reset to clean state first
+            act(() => {
+                result.current.updateSettings({ historyLimit: 500 }); // Reset to default
+            });
+
             // Set initial value BEFORE setting up the error mock
-            await act(async () => {
+            act(() => {
                 result.current.updateSettings({ historyLimit: 200 });
             });
+
+            // Verify the initial state is set correctly
+            expect(result.current.settings.historyLimit).toBe(200);
 
             // Now mock the error AFTER setting initial state
             mockElectronAPI.settings.updateHistoryLimit.mockRejectedValue(

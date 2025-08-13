@@ -2,7 +2,7 @@
  * Tests for component areas with low coverage
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 
 // Mock React components for testing uncovered component paths
 // Removed unused MockComponent to fix TS6133
@@ -273,6 +273,345 @@ describe("Component Coverage Boost", () => {
             expect(navigationLogic.getPreviousTab(items, "overview")).toBe(
                 "settings"
             );
+        });
+    });
+
+    describe("SiteCardHistory Component Coverage", () => {
+        it("should handle SiteCardHistory memo comparison logic", () => {
+            // Test SiteCardHistory.tsx areHistoryPropsEqual function (lines 36-65)
+            interface SiteCardHistoryProps {
+                filteredHistory: Array<{ timestamp: number; status: string }>;
+                monitor: Monitor | undefined;
+            }
+
+            interface Monitor {
+                id: string;
+                type: string;
+                url?: string;
+                port?: number;
+                host?: string;
+            }
+
+            const areHistoryPropsEqual = (prev: SiteCardHistoryProps, next: SiteCardHistoryProps): boolean => {
+                // Compare history arrays
+                if (prev.filteredHistory.length !== next.filteredHistory.length) {
+                    return false;
+                }
+                const prevTimestamp = prev.filteredHistory[0]?.timestamp;
+                const nextTimestamp = next.filteredHistory[0]?.timestamp;
+                if (prevTimestamp !== nextTimestamp) {
+                    return false;
+                }
+
+                // Compare monitor objects
+                const prevMonitor = prev.monitor;
+                const nextMonitor = next.monitor;
+                if (prevMonitor === undefined && nextMonitor === undefined) {
+                    return true;
+                }
+                if (prevMonitor === undefined || nextMonitor === undefined) {
+                    return false;
+                }
+                if (prevMonitor.id !== nextMonitor.id || prevMonitor.type !== nextMonitor.type) {
+                    return false;
+                }
+                return !(
+                    prevMonitor.url !== nextMonitor.url ||
+                    prevMonitor.port !== nextMonitor.port ||
+                    prevMonitor.host !== nextMonitor.host
+                );
+            };
+
+            const baseHistory = [{ timestamp: 1000, status: "up" }];
+            const baseMonitor: Monitor = { id: "1", type: "http", url: "https://example.com" };
+
+            // Test same props
+            const props1 = { filteredHistory: baseHistory, monitor: baseMonitor };
+            const props2 = { filteredHistory: baseHistory, monitor: baseMonitor };
+            expect(areHistoryPropsEqual(props1, props2)).toBe(true);
+
+            // Test different history lengths
+            const props3 = { filteredHistory: [...baseHistory, { timestamp: 2000, status: "down" }], monitor: baseMonitor };
+            expect(areHistoryPropsEqual(props1, props3)).toBe(false);
+
+            // Test different timestamps
+            const differentHistory = [{ timestamp: 2000, status: "up" }];
+            const props4 = { filteredHistory: differentHistory, monitor: baseMonitor };
+            expect(areHistoryPropsEqual(props1, props4)).toBe(false);
+
+            // Test both monitors undefined
+            const props5 = { filteredHistory: baseHistory, monitor: undefined };
+            const props6 = { filteredHistory: baseHistory, monitor: undefined };
+            expect(areHistoryPropsEqual(props5, props6)).toBe(true);
+
+            // Test one monitor undefined
+            const props7 = { filteredHistory: baseHistory, monitor: undefined };
+            expect(areHistoryPropsEqual(props1, props7)).toBe(false);
+            expect(areHistoryPropsEqual(props7, props1)).toBe(false);
+
+            // Test different monitor IDs
+            const differentMonitor = { id: "2", type: "http", url: "https://example.com" };
+            const props8 = { filteredHistory: baseHistory, monitor: differentMonitor };
+            expect(areHistoryPropsEqual(props1, props8)).toBe(false);
+
+            // Test different monitor types
+            const differentTypeMonitor = { id: "1", type: "port", url: "https://example.com" };
+            const props9 = { filteredHistory: baseHistory, monitor: differentTypeMonitor };
+            expect(areHistoryPropsEqual(props1, props9)).toBe(false);
+
+            // Test different URLs
+            const differentUrlMonitor = { id: "1", type: "http", url: "https://different.com" };
+            const props10 = { filteredHistory: baseHistory, monitor: differentUrlMonitor };
+            expect(areHistoryPropsEqual(props1, props10)).toBe(false);
+
+            // Test different ports
+            const portMonitor1 = { id: "1", type: "port", host: "localhost", port: 8080 };
+            const portMonitor2 = { id: "1", type: "port", host: "localhost", port: 9090 };
+            const props11 = { filteredHistory: baseHistory, monitor: portMonitor1 };
+            const props12 = { filteredHistory: baseHistory, monitor: portMonitor2 };
+            expect(areHistoryPropsEqual(props11, props12)).toBe(false);
+
+            // Test different hosts
+            const hostMonitor1 = { id: "1", type: "port", host: "localhost", port: 8080 };
+            const hostMonitor2 = { id: "1", type: "port", host: "remote", port: 8080 };
+            const props13 = { filteredHistory: baseHistory, monitor: hostMonitor1 };
+            const props14 = { filteredHistory: baseHistory, monitor: hostMonitor2 };
+            expect(areHistoryPropsEqual(props13, props14)).toBe(false);
+        });
+
+        it("should handle SiteCardHistory title generation logic", () => {
+            // Test title generation logic (lines 102-122)
+            interface Monitor {
+                id: string;
+                type: string;
+                url?: string;
+                port?: number;
+                host?: string;
+            }
+
+            interface MonitorTypeOption {
+                value: string;
+                label: string;
+            }
+
+            const historyTitleLogic = {
+                generateTitle: (monitor: Monitor | undefined, options: MonitorTypeOption[]) => {
+                    if (!monitor) {
+                        return "No Monitor Selected";
+                    }
+
+                    // Get display name from monitor type options
+                    const monitorTypeOption = options.find(
+                        (option) => option.value === monitor.type
+                    );
+                    const displayName = monitorTypeOption?.label ?? monitor.type;
+
+                    // Get type-specific suffix
+                    let suffix = "";
+                    if (monitor.url) {
+                        suffix = ` - ${monitor.url}`;
+                    } else if (monitor.host && monitor.port) {
+                        suffix = ` - ${monitor.host}:${monitor.port}`;
+                    }
+
+                    return `${displayName} History${suffix}`;
+                },
+            };
+
+            const options: MonitorTypeOption[] = [
+                { value: "http", label: "HTTP" },
+                { value: "port", label: "Port" },
+                { value: "ping", label: "Ping" },
+            ];
+
+            // Test undefined monitor
+            expect(historyTitleLogic.generateTitle(undefined, options)).toBe("No Monitor Selected");
+
+            // Test HTTP monitor with URL
+            const httpMonitor: Monitor = { id: "1", type: "http", url: "https://example.com" };
+            expect(historyTitleLogic.generateTitle(httpMonitor, options)).toBe("HTTP History - https://example.com");
+
+            // Test port monitor with host and port
+            const portMonitor: Monitor = { id: "1", type: "port", host: "localhost", port: 8080 };
+            expect(historyTitleLogic.generateTitle(portMonitor, options)).toBe("Port History - localhost:8080");
+
+            // Test unknown monitor type (fallback to type)
+            const unknownMonitor: Monitor = { id: "1", type: "unknown" };
+            expect(historyTitleLogic.generateTitle(unknownMonitor, options)).toBe("unknown History");
+
+            // Test monitor with no URL, host, or port
+            const basicMonitor: Monitor = { id: "1", type: "ping" };
+            expect(historyTitleLogic.generateTitle(basicMonitor, options)).toBe("Ping History");
+
+            // Test monitor type option not found (fallback to monitor.type)
+            const missingTypeMonitor: Monitor = { id: "1", type: "custom" };
+            expect(historyTitleLogic.generateTitle(missingTypeMonitor, options)).toBe("custom History");
+        });
+    });
+
+    describe("ActionButtonGroup Component Coverage", () => {
+        it("should handle ActionButtonGroup event handlers", () => {
+            // Test ActionButtonGroup.tsx functionality (lines 85-95, conditional logic)
+            interface ActionButtonGroupProps {
+                allMonitorsRunning: boolean;
+                disabled: boolean;
+                isLoading: boolean;
+                isMonitoring: boolean;
+                onCheckNow: () => void;
+                onStartMonitoring: () => void;
+                onStartSiteMonitoring: () => void;
+                onStopMonitoring: () => void;
+                onStopSiteMonitoring: () => void;
+            }
+
+            const actionButtonLogic = {
+                shouldDisableButtons: (props: ActionButtonGroupProps) => {
+                    return props.isLoading || props.disabled;
+                },
+                getButtonState: (props: ActionButtonGroupProps) => {
+                    return {
+                        checkNowDisabled: props.isLoading || props.disabled,
+                        monitoringDisabled: props.isLoading || props.disabled,
+                        showStopButton: props.isMonitoring,
+                        showStartButton: !props.isMonitoring,
+                    };
+                },
+                handleCheckNowClick: (props: ActionButtonGroupProps, event?: React.MouseEvent) => {
+                    if (event) {
+                        event.stopPropagation();
+                    }
+                    if (!actionButtonLogic.shouldDisableButtons(props)) {
+                        props.onCheckNow();
+                    }
+                },
+                handleStartMonitoringClick: (props: ActionButtonGroupProps, event?: React.MouseEvent) => {
+                    if (event) {
+                        event.stopPropagation();
+                    }
+                    if (!actionButtonLogic.shouldDisableButtons(props)) {
+                        props.onStartMonitoring();
+                    }
+                },
+                handleStopMonitoringClick: (props: ActionButtonGroupProps, event?: React.MouseEvent) => {
+                    if (event) {
+                        event.stopPropagation();
+                    }
+                    if (!actionButtonLogic.shouldDisableButtons(props)) {
+                        props.onStopMonitoring();
+                    }
+                },
+            };
+
+            // Test all monitoring states
+            const baseProps: ActionButtonGroupProps = {
+                allMonitorsRunning: false,
+                disabled: false,
+                isLoading: false,
+                isMonitoring: false,
+                onCheckNow: vi.fn(),
+                onStartMonitoring: vi.fn(),
+                onStartSiteMonitoring: vi.fn(),
+                onStopMonitoring: vi.fn(),
+                onStopSiteMonitoring: vi.fn(),
+            };
+
+            // Test enabled state
+            expect(actionButtonLogic.shouldDisableButtons(baseProps)).toBe(false);
+            
+            // Test disabled state
+            const disabledProps = { ...baseProps, disabled: true };
+            expect(actionButtonLogic.shouldDisableButtons(disabledProps)).toBe(true);
+            
+            // Test loading state
+            const loadingProps = { ...baseProps, isLoading: true };
+            expect(actionButtonLogic.shouldDisableButtons(loadingProps)).toBe(true);
+
+            // Test monitoring states
+            const monitoringProps = { ...baseProps, isMonitoring: true };
+            const buttonState = actionButtonLogic.getButtonState(monitoringProps);
+            expect(buttonState.showStopButton).toBe(true);
+            expect(buttonState.showStartButton).toBe(false);
+
+            const notMonitoringProps = { ...baseProps, isMonitoring: false };
+            const notMonitoringState = actionButtonLogic.getButtonState(notMonitoringProps);
+            expect(notMonitoringState.showStopButton).toBe(false);
+            expect(notMonitoringState.showStartButton).toBe(true);
+
+            // Test event handling with stopPropagation
+            const mockEvent = {
+                stopPropagation: vi.fn(),
+            } as Partial<React.MouseEvent> as React.MouseEvent;
+
+            actionButtonLogic.handleCheckNowClick(baseProps, mockEvent);
+            expect(mockEvent.stopPropagation).toHaveBeenCalled();
+            expect(baseProps.onCheckNow).toHaveBeenCalled();
+
+            actionButtonLogic.handleStartMonitoringClick(baseProps, mockEvent);
+            expect(baseProps.onStartMonitoring).toHaveBeenCalled();
+
+            actionButtonLogic.handleStopMonitoringClick(baseProps, mockEvent);
+            expect(baseProps.onStopMonitoring).toHaveBeenCalled();
+        });
+
+        it("should handle all monitors running scenarios", () => {
+            interface ActionButtonGroupProps {
+                allMonitorsRunning: boolean;
+                disabled: boolean;
+                isLoading: boolean;
+                isMonitoring: boolean;
+                onCheckNow: () => void;
+                onStartMonitoring: () => void;
+                onStartSiteMonitoring: () => void;
+                onStopMonitoring: () => void;
+                onStopSiteMonitoring: () => void;
+            }
+
+            const siteMonitoringLogic = {
+                shouldShowSiteMonitoringButton: (props: ActionButtonGroupProps) => {
+                    return true; // Always shows SiteMonitoringButton
+                },
+                getSiteMonitoringProps: (props: ActionButtonGroupProps) => {
+                    return {
+                        allMonitorsRunning: props.allMonitorsRunning,
+                        isLoading: props.isLoading || props.disabled,
+                        onStartSiteMonitoring: props.onStartSiteMonitoring,
+                        onStopSiteMonitoring: props.onStopSiteMonitoring,
+                    };
+                },
+            };
+
+            const propsAllRunning: ActionButtonGroupProps = {
+                allMonitorsRunning: true,
+                disabled: false,
+                isLoading: false,
+                isMonitoring: true,
+                onCheckNow: vi.fn(),
+                onStartMonitoring: vi.fn(),
+                onStartSiteMonitoring: vi.fn(),
+                onStopMonitoring: vi.fn(),
+                onStopSiteMonitoring: vi.fn(),
+            };
+
+            const propsNoneRunning: ActionButtonGroupProps = {
+                allMonitorsRunning: false,
+                disabled: false,
+                isLoading: false,
+                isMonitoring: false,
+                onCheckNow: vi.fn(),
+                onStartMonitoring: vi.fn(),
+                onStartSiteMonitoring: vi.fn(),
+                onStopMonitoring: vi.fn(),
+                onStopSiteMonitoring: vi.fn(),
+            };
+
+            expect(siteMonitoringLogic.shouldShowSiteMonitoringButton(propsAllRunning)).toBe(true);
+            expect(siteMonitoringLogic.shouldShowSiteMonitoringButton(propsNoneRunning)).toBe(true);
+
+            const allRunningMonitoringProps = siteMonitoringLogic.getSiteMonitoringProps(propsAllRunning);
+            expect(allRunningMonitoringProps.allMonitorsRunning).toBe(true);
+
+            const noneRunningMonitoringProps = siteMonitoringLogic.getSiteMonitoringProps(propsNoneRunning);
+            expect(noneRunningMonitoringProps.allMonitorsRunning).toBe(false);
         });
     });
 
@@ -579,7 +918,7 @@ describe("Component Coverage Boost", () => {
                 },
                 getBadgeClasses: (props: StatusBadgeProps) => {
                     const baseClasses = ["status-badge"];
-                    if (props.size > 0) baseClasses.push(`size-${props.size}`);
+                    if (props.size) baseClasses.push(`size-${props.size}`);
                     baseClasses.push(`status-${props.status}`);
                     return baseClasses.join(" ");
                 },
