@@ -8,7 +8,7 @@
  * @packageDocumentation
  */
 
-import { app } from "electron";
+import { app, BrowserWindow } from "electron";
 import {
     installExtension,
     REACT_DEVELOPER_TOOLS,
@@ -92,6 +92,31 @@ log.transports.file.fileName = ELECTRON_LOG_FILE;
 log.transports.file.maxSize = LOG_FILE_MAX_SIZE;
 log.transports.file.format = LOG_FILE_FORMAT;
 log.transports.console.format = LOG_CONSOLE_FORMAT;
+
+// Hot reload for preload scripts (development only)
+if (isDev()) {
+    /**
+     * Handle hot reload messages from vite-plugin-electron
+     * @param msg - Message from the plugin
+     */
+    const handleHotReload = (msg: unknown): void => {
+        if (msg === "electron-vite&type=hot-reload") {
+            for (const win of BrowserWindow.getAllWindows()) {
+                // Hot reload preload scripts
+                win.webContents.reload();
+            }
+        }
+    };
+    /**
+     * Clean up the hot reload listener on app quit
+     */
+    const handleCleanup = (): void => {
+        process.off("message", handleHotReload);
+        app.off("before-quit", handleCleanup); // <-- Remove the before-quit listener
+    };
+    process.on("message", handleHotReload);
+    app.on("before-quit", handleCleanup);
+}
 
 /**
  * Main application class that initializes and manages the Electron app.

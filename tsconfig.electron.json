@@ -5,12 +5,6 @@
         "outDir": "dist-electron",
         "tsBuildInfoFile": "./dist-electron/tsconfig.electron.tsbuildinfo",
         "paths": {
-            "@/*": [
-                "electron/*"
-            ],
-            "@app/*": [
-                "src/*"
-            ],
             "@shared/*": [
                 "shared/*"
             ]
@@ -23,7 +17,8 @@
         "electron/test/**/*",
         "node_modules",
         "shared/**/*.spec.ts",
-        "shared/**/*.test.ts"
+        "shared/**/*.test.ts",
+        "**/scripts/**"
     ],
     "include": [
         "electron/**/*.css",

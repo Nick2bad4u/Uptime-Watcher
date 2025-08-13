@@ -136,7 +136,7 @@ function rewriteLinks(content) {
 
 // 🏷 Download Tag Pages (from GitHub)
 function downloadFile(cmd, filePath, logMsg, name) {
-    return new Promise((resolve, reject) => {
+    return /** @type {Promise<void>} */(new Promise((resolve, reject) => {
         exec(cmd, (err) => {
             if (err) {
                 console.error(
@@ -184,7 +184,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
             downloadedFiles.push(name);
             resolve();
         });
-    });
+    }));
 }
 
 const tagPromises = tags.map((tag) => {

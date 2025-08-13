@@ -1,3 +1,5 @@
+// @ts-nocheck
+// @ts-nocheck
 /**
  * Universal Doc Downloader & Cleaner Template
  * -------------------------------------------

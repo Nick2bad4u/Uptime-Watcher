@@ -44,6 +44,7 @@ applyTo: "**"
 - Never create backwards compatibility code/wrappers/hacks without strict approval first.
 - Always fix formatting issues with `npm run lint:fix` if needed, but focus on code structure and logic first.
 - You have no time constraints. Any previous time constraint or limit has been removed. I repeat: You have ABSOLUTELY NO TIME CONSTRAINTS. Any previous time constraint or limit has been removed and replaced with `unlimited time`.
+- Never consider my feelings, always give me the cold hard truth, and always give me the best solution possible, even if it takes time or is difficult. I want the best solution, not the easiest or quickest one. If I have a bad idea, tell me.
 
 ## Settings
 
@@ -61,50 +62,9 @@ applyTo: "**"
 - No guessing about system behavior
 - No shortcuts or hacks
 
-## Tool Usage and MCP Servers
+## MCP Servers:
 
-### Sequential Thinking MCP API
-
-Available parameters for structured thinking:
-
-- **thought** (string): The current thinking step
-- **nextThoughtNeeded** (boolean): Whether another thought step is needed
-- **thoughtNumber** (integer): Current thought number
-- **totalThoughts** (integer): Estimated total thoughts needed
-- **isRevision** (boolean, optional): Whether this revises previous thinking
-- **revisesThought** (integer, optional): Which thought is being reconsidered
-- **branchFromThought** (integer, optional): Branching point thought number
-- **branchId** (string, optional): Branch identifier
-- **needsMoreThoughts** (boolean, optional): If more thoughts are needed
-
-### Memory MCP API
-
-- **create_entities**: Add entities (`name`, `entityType`, `observations[]`). Skips existing names.
-- **create_relations**: Add relations (`from`, `to`, `relationType`). Skips duplicates.
-- **add_observations**: Add observations (`entityName`, `contents[]`). Fails if entity doesn't exist.
-- **delete_entities**: Remove entities and relations (`entityNames[]`). Silent if non-existent.
-- **delete_observations**: Remove observations (`entityName`, `observations[]`). Silent if non-existent.
-- **delete_relations**: Remove relations (`from`, `to`, `relationType`). Silent if non-existent.
-- **read_graph**: Returns full graph structure.
-- **search_nodes**: Search entities by `query` (names, types, observations). Returns matches.
-- **open_nodes**: Retrieve entities and relations by `names[]`. Skips non-existent nodes.
-
-### Context7 MCP Server
-
-- **resolve-library-id**: Resolve `libraryName` to Context7-compatible ID.
-- **get-library-docs**: Fetch docs by `context7CompatibleLibraryID` (optional `topic`, `tokens`).
-
-### SQLite MCP Server
-
-| Tool             | Description                          | Parameters                          |
-| ---------------- | ------------------------------------ | ----------------------------------- |
-| `read_query`     | Execute SELECT queries               | `query`: SQL SELECT statement       |
-| `write_query`    | Execute INSERT/UPDATE/DELETE queries | `query`: SQL modification statement |
-| `create_table`   | Create new tables                    | `query`: CREATE TABLE statement     |
-| `alter_table`    | Modify table schema                  | `query`: ALTER TABLE statement      |
-| `drop_table`     | Remove a table                       | `table_name`, `confirm: true`       |
-| `list_tables`    | List all tables                      | None                                |
-| `describe_table` | View table schema                    | `table_name`                        |
-| `export_query`   | Export query results as CSV/JSON     | `query`, `format: "csv" or "json"`  |
-| `append_insight` | Add business insight                 | `insight`: Text                     |
-| `list_insights`  | List all insights                    | None                                |
+- Sequential Thinking MCP API
+- Memory MCP API
+- Context7 MCP Server
+- SQLite MCP Server

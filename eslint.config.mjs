@@ -24,15 +24,16 @@
 /* eslint-disable object-shorthand */
 /* eslint-disable sort-imports */
 
-// Import { plugin as ex } from "eslint-plugin-exception-handling";
-// Import eslintPluginNoInferred from "eslint-plugin-no-inferred-method-name";
-// Import stylistic from "@stylistic/eslint-plugin";
 import { importX } from "eslint-plugin-import-x";
 import { plugin as ex } from "eslint-plugin-exception-handling";
+import * as nodeDependenciesPlugin from "eslint-plugin-node-dependencies";
 import arrayFunc from "eslint-plugin-array-func";
 import depend from "eslint-plugin-depend";
+import eslintConfigPrettier from "eslint-config-prettier";
 import eslintPluginJsonc from "eslint-plugin-jsonc";
+import eslintPluginJsonSchemaValidator from "eslint-plugin-json-schema-validator";
 import eslintPluginMath from "eslint-plugin-math";
+import eslintPluginNoUseExtendNative from "eslint-plugin-no-use-extend-native";
 import eslintPluginToml from "eslint-plugin-toml";
 import eslintPluginYml from "eslint-plugin-yml";
 import eslintReact from "@eslint-react/eslint-plugin";
@@ -42,24 +43,29 @@ import eslintReactNamingConvention from "eslint-plugin-react-naming-convention";
 import eslintReactWeb from "eslint-plugin-react-web-api";
 import globals from "globals";
 import html from "eslint-plugin-html";
+import implicitDependencies from "eslint-plugin-implicit-dependencies";
+import istanbul from "eslint-plugin-istanbul";
 import js from "@eslint/js";
 import json from "@eslint/json";
 import jsoncEslintParser from "jsonc-eslint-parser";
 import jsxA11y from "eslint-plugin-jsx-a11y";
+import listeners from "eslint-plugin-listeners";
 import markdown from "@eslint/markdown";
+import noBarrelFiles from "eslint-plugin-no-barrel-files";
 import nodePlugin from "eslint-plugin-n";
 import nounsanitized from "eslint-plugin-no-unsanitized";
+import observers from "eslint-plugin-observers";
 import pluginBoundaries from "eslint-plugin-boundaries";
 import pluginCanonical from "eslint-plugin-canonical";
 // eslint-disable-next-line depend/ban-dependencies -- Recommended one sucks
 import pluginComments from "eslint-plugin-eslint-comments";
 import pluginCompat from "eslint-plugin-compat";
 import pluginFunctional from "eslint-plugin-functional";
+import pluginMicrosoftSdl from "@microsoft/eslint-plugin-sdl";
 import pluginNoOnly from "eslint-plugin-no-only-tests";
 import pluginPerfectionist from "eslint-plugin-perfectionist";
 import pluginPreferArrow from "eslint-plugin-prefer-arrow";
 import pluginPrettier from "eslint-plugin-prettier";
-import eslintConfigPrettier from "eslint-config-prettier";
 import pluginPromise from "eslint-plugin-promise";
 // eslint-disable-next-line depend/ban-dependencies -- Recommended one sucks
 import pluginReact from "eslint-plugin-react";
@@ -69,12 +75,15 @@ import pluginRegexp from "eslint-plugin-regexp";
 import pluginSecurity from "eslint-plugin-security";
 import pluginSonarjs from "eslint-plugin-sonarjs";
 import pluginSortClassMembers from "eslint-plugin-sort-class-members";
+import pluginSortDestructure from "eslint-plugin-sort-destructure-keys";
 import pluginTestingLibrary from "eslint-plugin-testing-library";
 import pluginTsdoc from "eslint-plugin-tsdoc";
 import pluginUnicorn from "eslint-plugin-unicorn";
 import pluginUnusedImports from "eslint-plugin-unused-imports";
 import pluginWriteGood from "eslint-plugin-write-good-comments";
+import progress from "eslint-plugin-file-progress";
 import putout from "eslint-plugin-putout";
+import reactCompiler from "eslint-plugin-react-compiler";
 import reactRefresh from "eslint-plugin-react-refresh";
 import tailwind from "eslint-plugin-tailwindcss";
 import tomlEslintParser from "toml-eslint-parser";
@@ -83,9 +92,10 @@ import tseslintParser from "@typescript-eslint/parser";
 import vitest from "@vitest/eslint-plugin";
 import xss from "eslint-plugin-xss";
 import yamlEslintParser from "yaml-eslint-parser";
-import eslintPluginNoUseExtendNative from "eslint-plugin-no-use-extend-native";
-import pluginMicrosoftSdl from "@microsoft/eslint-plugin-sdl";
-import pluginSortDestructure from "eslint-plugin-sort-destructure-keys";
+import sqlTemplate from "eslint-plugin-sql-template";
+import * as pluginNFDAR from "eslint-plugin-no-function-declare-after-return";
+import * as pluginJSDoc from "eslint-plugin-require-jsdoc";
+import eslintPluginCommentLength from "eslint-plugin-comment-length";
 
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 
@@ -101,6 +111,11 @@ import * as cssPlugin from "eslint-plugin-css";
 // eslint-plugin-no-inferred-method-name
 // eslint-plugin-react-native
 // eslint-plugin-react-x
+// eslint-plugin-no-inferred-method-name
+// @stylistic/eslint-plugin
+// eslint-plugin-fsecond
+// eslint-plugin-es-x
+// @dword-design/import-alias
 
 // Don't use
 // eslint-plugin-import -- Replaced by import-x
@@ -113,6 +128,9 @@ const __dirname = import.meta.dirname;
 
 export default [
     importX.flatConfigs.typescript,
+    progress.configs.recommended,
+    ...nodeDependenciesPlugin.configs["flat/recommended"],
+    noBarrelFiles.flat,
     // Global ignores - must be first and more comprehensive
     {
         ignores: [
@@ -136,6 +154,10 @@ export default [
             "**/release/**",
             "**/test/themeTypes.test.tsx",
             "**/test/types.test.tsx",
+            "benchmarks/**/*.ts", // Ignore all benchmark files
+            "vite.config.ts", // Ignore vite config due to parsing issues
+            "vitest.config.ts", // Ignore vitest config due to parsing issues
+            "vitest.electron.config.ts", // Ignore vitest electron config
             "Coverage/",
             "coverage/",
             "dist-electron/",
@@ -214,6 +236,7 @@ export default [
         ],
         ignores: ["docs/docusaurus/**"],
         ...eslintPluginYml.configs["flat/prettier"].rules,
+        ...eslintPluginJsonSchemaValidator.configs["flat/recommended"].rules,
         languageOptions: {
             parser: yamlEslintParser,
             // Options used with yaml-eslint-parser.
@@ -235,6 +258,7 @@ export default [
         files: ["**/*.md"],
         ignores: ["docs/docusaurus/**"],
         ...markdown.configs.recommended[0],
+        ...eslintPluginJsonSchemaValidator.configs["flat/recommended"].rules,
         plugins: { markdown },
         language: "markdown/gfm",
     },
@@ -253,6 +277,7 @@ export default [
         plugins: { eslintPluginJsonc: eslintPluginJsonc },
         ...json.configs.recommended[0],
         ...eslintPluginJsonc.configs["flat/prettier"][0],
+        ...eslintPluginJsonSchemaValidator.configs["flat/recommended"].rules,
         languageOptions: {
             parser: jsoncEslintParser,
             parserOptions: { jsonSyntax: "JSON" },
@@ -263,7 +288,9 @@ export default [
     {
         files: ["**/*.toml"],
         ignores: ["lychee.toml"],
+        plugins: { eslintPluginToml: eslintPluginToml },
         ...eslintPluginToml.configs["flat/standard"][0],
+        ...eslintPluginJsonSchemaValidator.configs["flat/recommended"].rules,
         languageOptions: {
             parser: tomlEslintParser,
             parserOptions: { tomlVersion: "1.0.0" },
@@ -368,6 +395,7 @@ export default [
             "shared/**/*.test.{ts,tsx}",
             "shared/test/**/*.ts",
             "src/test/**/*.{ts,tsx}",
+            "benchmarks/**/*.ts", // Ignore benchmark files from TypeScript linting
         ],
         languageOptions: {
             parser: tseslintParser,
@@ -395,7 +423,7 @@ export default [
         },
         settings: {
             tailwind: {
-                config: "./tailwind.config.js",
+                config: "./tailwind.config.mjs",
             },
             react: { version: "19" },
             "boundaries/elements": [
@@ -475,6 +503,15 @@ export default [
             "no-use-extend-native": eslintPluginNoUseExtendNative,
             "@microsoft/sdl": pluginMicrosoftSdl,
             "sort-destructure-keys": pluginSortDestructure,
+            "react-compiler": reactCompiler,
+            istanbul: istanbul,
+            observers: observers,
+            "implicit-dependencies": implicitDependencies,
+            listeners: listeners,
+            "sql-template": sqlTemplate,
+            "no-function-declare-after-return": pluginNFDAR,
+            "require-jsdoc": pluginJSDoc,
+            "comment-length": eslintPluginCommentLength,
         },
         rules: {
             // TypeScript rules
@@ -508,6 +545,21 @@ export default [
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
             ...pluginMicrosoftSdl.configs.required.rules,
+            ...reactCompiler.configs.recommended.rules,
+            ...listeners.configs.strict.rules,
+            ...pluginNFDAR.rules,
+            ...pluginJSDoc.rules,
+            ...eslintPluginCommentLength.configs["flat/recommended"].rules,
+
+            "sql-template/no-unsafe-query": "error",
+
+            // "implicit-dependencies/no-implicit": "error",
+
+            "observers/no-missing-unobserve-or-disconnect": "error",
+            "observers/matching-unobserve-target": "error",
+
+            "istanbul/no-ignore-file": "error",
+            "istanbul/prefer-ignore-reason": "error",
 
             "sort-destructure-keys/sort-destructure-keys": "off",
 
@@ -625,13 +677,9 @@ export default [
                     aliases: [
                         {
                             alias: "@shared/",
-                            matchParent: path.resolve(__dirname, "shared"),
-                            matchPath: String.raw`^shared\/`,
-                        },
-                        {
-                            alias: "@electron/",
-                            matchParent: path.resolve(__dirname, "electron"),
-                            matchPath: String.raw`^electron\/`,
+                            matchParent: path.resolve(import.meta.dirname),
+                            matchPath: "^shared/",
+                            maxRelativeDepth: 0,
                         },
                     ],
                 },
@@ -1444,6 +1492,13 @@ export default [
             "no-use-extend-native": eslintPluginNoUseExtendNative,
             "@microsoft/sdl": pluginMicrosoftSdl,
             "sort-destructure-keys": pluginSortDestructure,
+            istanbul: istanbul,
+            observers: observers,
+            "implicit-dependencies": implicitDependencies,
+            listeners: listeners,
+            "sql-template": sqlTemplate,
+            "no-function-declare-after-return": pluginNFDAR,
+            "require-jsdoc": pluginJSDoc,
         },
         rules: {
             // TypeScript backend rules
@@ -1476,6 +1531,19 @@ export default [
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
             ...pluginMicrosoftSdl.configs.required.rules,
+            ...listeners.configs.strict.rules,
+            ...pluginNFDAR.rules,
+            ...pluginJSDoc.rules,
+
+            "sql-template/no-unsafe-query": "error",
+
+            // "implicit-dependencies/no-implicit": "error", - Errors on @shared
+
+            "observers/no-missing-unobserve-or-disconnect": "error",
+            "observers/matching-unobserve-target": "error",
+
+            "istanbul/no-ignore-file": "error",
+            "istanbul/prefer-ignore-reason": "error",
 
             "sort-destructure-keys/sort-destructure-keys": "off",
 
@@ -1593,13 +1661,9 @@ export default [
                     aliases: [
                         {
                             alias: "@shared/",
-                            matchParent: path.resolve(__dirname, "shared"),
-                            matchPath: String.raw`^shared\/`,
-                        },
-                        {
-                            alias: "@app/",
-                            matchParent: path.resolve(__dirname, "src"),
-                            matchPath: String.raw`^src\/`,
+                            matchParent: path.resolve(import.meta.dirname),
+                            matchPath: "^shared/",
+                            maxRelativeDepth: 0,
                         },
                     ],
                 },
@@ -2222,6 +2286,9 @@ export default [
             },
         },
         settings: {
+            vitest: {
+                typecheck: true,
+            },
             react: { version: "19" },
             n: {
                 allowModules: [
@@ -2396,6 +2463,9 @@ export default [
             "no-only-tests/no-only-tests": "error",
         },
         settings: {
+            vitest: {
+                typecheck: true,
+            },
             n: {
                 allowModules: [
                     "electron",
@@ -3089,6 +3159,16 @@ export default [
         rules: {
             // Allow type assertions in these contexts where they're necessary and well-documented
             "@typescript-eslint/no-unsafe-type-assertion": "off",
+        },
+    },
+
+    // Store-specific overrides to handle false positives
+    {
+        files: ["src/stores/**/*.ts", "src/stores/**/*.tsx"],
+        rules: {
+            // Disable ex/no-unhandled for stores due to false positives with variable access
+            // The rule incorrectly flags simple parameter/variable access as potential exceptions
+            "ex/no-unhandled": "off",
         },
     },
 

@@ -7,14 +7,15 @@
  */
 
 import path from "node:path";
+import { normalizePath } from "vite";
 import { defineConfig } from "vitest/config";
 
 const vitestConfig = defineConfig({
     resolve: {
         alias: {
-            "@": path.resolve(import.meta.dirname, "./electron"),
-            "@app": path.resolve(import.meta.dirname, "./src"),
-            "@shared": path.resolve(import.meta.dirname, "./shared"),
+            "@shared": normalizePath(
+                path.resolve(import.meta.dirname, "./shared")
+            ),
         },
     },
     test: {

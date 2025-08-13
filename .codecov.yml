@@ -92,7 +92,7 @@ coverage:
         - "vitest.electron.config.ts"
         - "tsconfig*.json"
         - "eslint.config.mjs"
-        - "tailwind.config.js"
+        - "tailwind.config.mjs"
         - "postcss.config.mjs"
 
         # Test files (don't test the tests)

@@ -3,12 +3,6 @@
     "compilerOptions": {
         "tsBuildInfoFile": "./dist-electron/tsconfig.test.tsbuildinfo",
         "paths": {
-            "@/*": [
-                "electron/*"
-            ],
-            "@app/*": [
-                "src/*"
-            ],
             "@shared/*": [
                 "shared/*"
             ]
@@ -40,7 +34,7 @@
         "src/**/*.tsx",
         "src/test/**/*.ts",
         "src/test/**/*.tsx",
-        "tailwind.config.js",
+        "tailwind.config.mjs",
         "vitest.config.ts",
         "src/test/**/*.ts",
         "src/test/**/*.tsx"

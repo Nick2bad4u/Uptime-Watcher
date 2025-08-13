@@ -7606,7 +7606,7 @@ Modernizes the application's theme by introducing error text styling, consistent
 - Improved the ThemeColors interface to include new properties for border and surface colors.
 - Refined the ThemeSpacing and ThemeTypography interfaces for better organization.
 - Enhanced the useTheme hook to streamline theme management and color retrieval.
-- Updated the tailwind.config.js to align with new theme colors and animations.
+- Updated the tailwind.config.mjs to align with new theme colors and animations.
 - Adjusted TypeScript configuration files for consistency and clarity.
 - Improved the Vite configuration for better plugin management and build output. [`(6ca7152)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6ca7152ae1f9ec359be47b5cb30f7e959a50f46e)
 
