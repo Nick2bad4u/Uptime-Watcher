@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ["All Tools"]
+tools: ['All Tools']
 description: "Create Node.js worker threads for CPU-intensive tasks"
 ---
 

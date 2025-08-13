@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ["All Tools"]
+tools: ['All Tools']
 description: "Conduct a thorough review of the codebase for consistency"
 ---
 

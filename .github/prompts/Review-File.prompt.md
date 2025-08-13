@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ["All Tools"]
+tools: ['All Tools']
 description: "Review File for quality, correctness, and style. Provide constructive feedback and suggestions for improvement."
 ---
 

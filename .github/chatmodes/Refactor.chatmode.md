@@ -1,6 +1,6 @@
 ---
 description: Generate an implementation plan for new features or refactoring existing code.
-tools: ["All Tools"]
+tools: ['All Tools']
 ---
 
 # Planning mode instructions

@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ["All Tools"]
+tools: ['All Tools']
 description: "Fix All ESLint Errors and Warnings"
 ---
 

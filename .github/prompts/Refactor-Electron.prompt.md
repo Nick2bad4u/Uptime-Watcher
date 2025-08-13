@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ["All Tools"]
+tools: ['All Tools']
 description: "Refactor core backend service classes: orchestration, state, repository and event logic for maintainability, type safety, and testability"
 ---
 

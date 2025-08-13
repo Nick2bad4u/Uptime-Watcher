@@ -1,6 +1,6 @@
 ---
 description: Write, improve, and review unit, integration, or end-to-end tests for code. Recommend test cases and coverage improvements.
-tools: ["All Tools"]
+tools: ['All Tools']
 ---
 
 # Test Writing mode instructions

@@ -1,6 +1,6 @@
 ---
 description: AI-powered debugging mode for diagnosing, analyzing, and resolving errors or unexpected behaviors in code.
-tools: ["All Tools"]
+tools: ['All Tools']
 ---
 
 # Debugging mode instructions

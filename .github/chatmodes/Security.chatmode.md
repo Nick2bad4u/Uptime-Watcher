@@ -1,6 +1,6 @@
 ---
 description: Audit code for security vulnerabilities and suggest improvements to protect against threats.
-tools: ["All Tools"]
+tools: ['All Tools']
 ---
 
 # Security mode instructions

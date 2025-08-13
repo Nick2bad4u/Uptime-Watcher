@@ -91,7 +91,7 @@ Uptime-Watcher/
 │   ├── vitest.config.ts       # Frontend test configuration
 │   ├── vitest.electron.config.ts # Backend test configuration
 │   ├── eslint.config.mjs      # ESLint configuration
-│   ├── tailwind.config.js     # Tailwind CSS configuration
+│   ├── tailwind.config.mjs     # Tailwind CSS configuration
 │   └── .env                   # Environment variables
 │
 ├── 🖥️ electron/ (Main Process - Node.js)
@@ -1023,9 +1023,7 @@ export default defineConfig(() => ({
  "compilerOptions": {
   "baseUrl": ".",
   "paths": {
-   "@/*": ["src/*"], // Frontend components and utilities
    "@shared/*": ["shared/*"], // Shared types and utilities
-   "@electron/*": ["electron/*"], // Backend services and utilities
   },
  },
 }

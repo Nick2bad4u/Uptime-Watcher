@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ["All Tools"]
+tools: ['All Tools']
 description: "Review Electron main process/backend code to determine if refactoring is necessary"
 ---
 

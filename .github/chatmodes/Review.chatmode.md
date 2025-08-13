@@ -1,6 +1,6 @@
 ---
 description: Review code changes, pull requests, or diffs for quality, correctness, and style. Provide constructive feedback and suggestions for improvement.
-tools: ["All Tools"]
+tools: ['All Tools']
 ---
 
 # Review mode instructions

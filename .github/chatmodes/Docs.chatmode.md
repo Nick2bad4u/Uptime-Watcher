@@ -1,6 +1,6 @@
 ---
 description: Generate, update, or improve documentation for code, APIs, or projects. Suggest and draft docstrings, READMEs, and inline comments.
-tools: ["All Tools"]
+tools: ['All Tools']
 ---
 
 # Documentation mode instructions

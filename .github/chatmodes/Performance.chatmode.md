@@ -1,6 +1,6 @@
 ---
 description: Analyze code for performance bottlenecks and suggest optimizations for speed, memory, and efficiency.
-tools: ["All Tools"]
+tools: ['All Tools']
 ---
 
 # Performance mode instructions
