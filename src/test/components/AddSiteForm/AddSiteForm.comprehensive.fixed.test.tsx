@@ -76,7 +76,9 @@ vi.mock("../../../stores/sites/useSitesStore", () => ({
 }));
 
 vi.mock("../../../components/common/ErrorAlert/ErrorAlert", () => ({
-    ErrorAlert: ({ message }: { message: string }) => <div data-testid="error-alert">{message}</div>,
+    ErrorAlert: ({ message }: { message: string }) => (
+        <div data-testid="error-alert">{message}</div>
+    ),
 }));
 
 vi.mock("../../../hooks/useMonitorTypes", () => ({
@@ -111,20 +113,40 @@ vi.mock("../../../stores/monitor/useMonitorTypesStore", () => ({
                 type: "http",
                 fields: [
                     { name: "url", type: "text", label: "URL", required: true },
-                    { name: "port", type: "number", label: "Port", required: false },
+                    {
+                        name: "port",
+                        type: "number",
+                        label: "Port",
+                        required: false,
+                    },
                 ],
             },
             {
                 type: "ping",
                 fields: [
-                    { name: "host", type: "text", label: "Host", required: true },
+                    {
+                        name: "host",
+                        type: "text",
+                        label: "Host",
+                        required: true,
+                    },
                 ],
             },
             {
                 type: "port",
                 fields: [
-                    { name: "host", type: "text", label: "Host", required: true },
-                    { name: "port", type: "number", label: "Port", required: true },
+                    {
+                        name: "host",
+                        type: "text",
+                        label: "Host",
+                        required: true,
+                    },
+                    {
+                        name: "port",
+                        type: "number",
+                        label: "Port",
+                        required: true,
+                    },
                 ],
             },
         ],
@@ -132,9 +154,13 @@ vi.mock("../../../stores/monitor/useMonitorTypesStore", () => ({
 }));
 
 vi.mock("../../../theme/components/ThemedText", () => ({
-    default: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-        <span className={className}>{children}</span>
-    ),
+    default: ({
+        children,
+        className,
+    }: {
+        children: React.ReactNode;
+        className?: string;
+    }) => <span className={className}>{children}</span>,
 }));
 
 vi.mock("../../../utils/data/generateUuid", () => ({
@@ -143,7 +169,9 @@ vi.mock("../../../utils/data/generateUuid", () => ({
 
 vi.mock("../DynamicMonitorFields", () => ({
     default: ({ monitorType }: { monitorType: string }) => (
-        <div data-testid="dynamic-monitor-fields">Dynamic fields for {monitorType}</div>
+        <div data-testid="dynamic-monitor-fields">
+            Dynamic fields for {monitorType}
+        </div>
     ),
 }));
 
@@ -187,16 +215,26 @@ describe("AddSiteForm Comprehensive Tests", () => {
         it("renders the form with all required fields", () => {
             render(<AddSiteForm />);
 
-            expect(screen.getByRole("textbox", { name: /site name/i })).toBeInTheDocument();
-            expect(screen.getByRole("textbox", { name: /url/i })).toBeInTheDocument();
-            expect(screen.getByRole("combobox", { name: /monitor type/i })).toBeInTheDocument();
-            expect(screen.getByRole("button", { name: /add site/i })).toBeInTheDocument();
+            expect(
+                screen.getByRole("textbox", { name: /site name/i })
+            ).toBeInTheDocument();
+            expect(
+                screen.getByRole("textbox", { name: /url/i })
+            ).toBeInTheDocument();
+            expect(
+                screen.getByRole("combobox", { name: /monitor type/i })
+            ).toBeInTheDocument();
+            expect(
+                screen.getByRole("button", { name: /add site/i })
+            ).toBeInTheDocument();
         });
 
         it("displays default values correctly", () => {
             render(<AddSiteForm />);
 
-            const nameInput = screen.getByRole("textbox", { name: /site name/i });
+            const nameInput = screen.getByRole("textbox", {
+                name: /site name/i,
+            });
             const urlInput = screen.getByRole("textbox", { name: /url/i });
 
             expect(nameInput).toHaveValue("");
@@ -206,7 +244,9 @@ describe("AddSiteForm Comprehensive Tests", () => {
         it("shows monitor type dropdown with correct options", () => {
             render(<AddSiteForm />);
 
-            const monitorTypeSelect = screen.getByRole("combobox", { name: /monitor type/i });
+            const monitorTypeSelect = screen.getByRole("combobox", {
+                name: /monitor type/i,
+            });
             expect(monitorTypeSelect).toHaveValue("http");
         });
     });
@@ -216,7 +256,9 @@ describe("AddSiteForm Comprehensive Tests", () => {
             const user = userEvent.setup();
             render(<AddSiteForm />);
 
-            const nameInput = screen.getByRole("textbox", { name: /site name/i });
+            const nameInput = screen.getByRole("textbox", {
+                name: /site name/i,
+            });
             await user.type(nameInput, "Test Site");
 
             // Check that setName was called with each character as user types
@@ -240,7 +282,9 @@ describe("AddSiteForm Comprehensive Tests", () => {
             const user = userEvent.setup();
             render(<AddSiteForm />);
 
-            const monitorTypeSelect = screen.getByRole("combobox", { name: /monitor type/i });
+            const monitorTypeSelect = screen.getByRole("combobox", {
+                name: /monitor type/i,
+            });
             await user.selectOptions(monitorTypeSelect, "ping");
 
             expect(mockFormHook.setMonitorType).toHaveBeenCalledWith("ping");
@@ -255,8 +299,12 @@ describe("AddSiteForm Comprehensive Tests", () => {
             render(<AddSiteForm />);
 
             // Check for HTTP-specific fields (URL and Port)
-            expect(screen.getByRole("textbox", { name: /url/i })).toBeInTheDocument();
-            expect(screen.getByRole("spinbutton", { name: /port/i })).toBeInTheDocument();
+            expect(
+                screen.getByRole("textbox", { name: /url/i })
+            ).toBeInTheDocument();
+            expect(
+                screen.getByRole("spinbutton", { name: /port/i })
+            ).toBeInTheDocument();
         });
 
         it("renders dynamic fields for ping monitor type", () => {
@@ -266,7 +314,9 @@ describe("AddSiteForm Comprehensive Tests", () => {
             render(<AddSiteForm />);
 
             // Check for ping-specific fields (Host only)
-            expect(screen.getByRole("textbox", { name: /host/i })).toBeInTheDocument();
+            expect(
+                screen.getByRole("textbox", { name: /host/i })
+            ).toBeInTheDocument();
         });
 
         it("renders dynamic fields for port monitor type", () => {
@@ -276,8 +326,12 @@ describe("AddSiteForm Comprehensive Tests", () => {
             render(<AddSiteForm />);
 
             // Check for port-specific fields (Host and Port, both required)
-            expect(screen.getByRole("textbox", { name: /host/i })).toBeInTheDocument();
-            expect(screen.getByRole("spinbutton", { name: /port/i })).toBeInTheDocument();
+            expect(
+                screen.getByRole("textbox", { name: /host/i })
+            ).toBeInTheDocument();
+            expect(
+                screen.getByRole("spinbutton", { name: /port/i })
+            ).toBeInTheDocument();
         });
     });
 
@@ -298,7 +352,9 @@ describe("AddSiteForm Comprehensive Tests", () => {
 
             render(<AddSiteForm />);
 
-            expect(screen.getByTestId("error-alert")).toHaveTextContent("Invalid URL format");
+            expect(screen.getByTestId("error-alert")).toHaveTextContent(
+                "Invalid URL format"
+            );
         });
 
         it("does not display error alert when form has no error", () => {
@@ -318,7 +374,9 @@ describe("AddSiteForm Comprehensive Tests", () => {
 
             render(<AddSiteForm />);
 
-            expect(screen.getByRole("button", { name: /add site/i })).toBeInTheDocument();
+            expect(
+                screen.getByRole("button", { name: /add site/i })
+            ).toBeInTheDocument();
         });
 
         it("handles existing site mode correctly", () => {
@@ -328,9 +386,15 @@ describe("AddSiteForm Comprehensive Tests", () => {
             render(<AddSiteForm />);
 
             // In existing mode, should show site selector instead of site name input
-            expect(screen.getByRole("combobox", { name: /select site/i })).toBeInTheDocument();
-            expect(screen.queryByRole("textbox", { name: /site name/i })).not.toBeInTheDocument();
-            expect(screen.getByRole("button", { name: /add monitor/i })).toBeInTheDocument();
+            expect(
+                screen.getByRole("combobox", { name: /select site/i })
+            ).toBeInTheDocument();
+            expect(
+                screen.queryByRole("textbox", { name: /site name/i })
+            ).not.toBeInTheDocument();
+            expect(
+                screen.getByRole("button", { name: /add monitor/i })
+            ).toBeInTheDocument();
         });
     });
 
@@ -353,7 +417,9 @@ describe("AddSiteForm Comprehensive Tests", () => {
 
             render(<AddSiteForm />);
 
-            const nameInput = screen.getByRole("textbox", { name: /site name/i });
+            const nameInput = screen.getByRole("textbox", {
+                name: /site name/i,
+            });
             const urlInput = screen.getByRole("textbox", { name: /url/i });
 
             expect(nameInput).toHaveValue("");
@@ -364,13 +430,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
             const user = userEvent.setup();
             render(<AddSiteForm />);
 
-            const nameInput = screen.getByRole("textbox", { name: /site name/i });
+            const nameInput = screen.getByRole("textbox", {
+                name: /site name/i,
+            });
             const specialText = "Test & Special-Characters_123";
-            
+
             await user.type(nameInput, specialText);
 
             // Check that setName was called for each character
-            expect(mockFormHook.setName).toHaveBeenCalledTimes(specialText.length);
+            expect(mockFormHook.setName).toHaveBeenCalledTimes(
+                specialText.length
+            );
             expect(mockFormHook.setName).toHaveBeenLastCalledWith("3"); // Last character
         });
 
@@ -378,9 +448,11 @@ describe("AddSiteForm Comprehensive Tests", () => {
             const user = userEvent.setup();
             render(<AddSiteForm />);
 
-            const nameInput = screen.getByRole("textbox", { name: /site name/i });
+            const nameInput = screen.getByRole("textbox", {
+                name: /site name/i,
+            });
             const longText = "A".repeat(50); // Reduced from 1000 to 50 to avoid excessive mock calls
-            
+
             await user.type(nameInput, longText);
 
             // Check that setName was called for each character
@@ -393,17 +465,25 @@ describe("AddSiteForm Comprehensive Tests", () => {
         it("has proper ARIA labels", () => {
             render(<AddSiteForm />);
 
-            expect(screen.getByRole("textbox", { name: /site name/i })).toHaveAttribute("aria-label");
-            expect(screen.getByRole("textbox", { name: /url/i })).toHaveAttribute("aria-label");
-            expect(screen.getByRole("combobox", { name: /monitor type/i })).toHaveAttribute("aria-label");
+            expect(
+                screen.getByRole("textbox", { name: /site name/i })
+            ).toHaveAttribute("aria-label");
+            expect(
+                screen.getByRole("textbox", { name: /url/i })
+            ).toHaveAttribute("aria-label");
+            expect(
+                screen.getByRole("combobox", { name: /monitor type/i })
+            ).toHaveAttribute("aria-label");
         });
 
         it("supports keyboard navigation", async () => {
             const user = userEvent.setup();
             render(<AddSiteForm />);
 
-            const nameInput = screen.getByRole("textbox", { name: /site name/i });
-            
+            const nameInput = screen.getByRole("textbox", {
+                name: /site name/i,
+            });
+
             // Test basic focus behavior
             await user.click(nameInput);
             expect(nameInput).toHaveFocus();
@@ -425,7 +505,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             };
 
             const { rerender } = render(<TestWrapper />);
-            
+
             // Initial render
             expect(renderCount).toHaveBeenCalledTimes(1);
 
@@ -443,7 +523,9 @@ describe("AddSiteForm Comprehensive Tests", () => {
 
             render(<AddSiteForm />);
 
-            const nameInput = screen.getByRole("textbox", { name: /site name/i });
+            const nameInput = screen.getByRole("textbox", {
+                name: /site name/i,
+            });
             const urlInput = screen.getByRole("textbox", { name: /url/i });
 
             expect(nameInput).toHaveValue("");

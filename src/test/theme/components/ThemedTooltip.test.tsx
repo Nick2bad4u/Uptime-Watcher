@@ -6,7 +6,9 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import ThemedTooltip, { type ThemedTooltipProperties } from "../../../theme/components/ThemedTooltip";
+import ThemedTooltip, {
+    type ThemedTooltipProperties,
+} from "../../../theme/components/ThemedTooltip";
 
 describe("ThemedTooltip", () => {
     const defaultProps: ThemedTooltipProperties = {
@@ -25,7 +27,10 @@ describe("ThemedTooltip", () => {
             render(<ThemedTooltip {...defaultProps} />);
 
             const tooltipContainer = screen.getByText("Hover me").parentElement;
-            expect(tooltipContainer).toHaveAttribute("title", "Test tooltip content");
+            expect(tooltipContainer).toHaveAttribute(
+                "title",
+                "Test tooltip content"
+            );
         });
 
         it("should apply base themed-tooltip class", () => {
@@ -36,16 +41,22 @@ describe("ThemedTooltip", () => {
         });
 
         it("should render with custom className", () => {
-            render(<ThemedTooltip {...defaultProps} className="custom-tooltip" />);
+            render(
+                <ThemedTooltip {...defaultProps} className="custom-tooltip" />
+            );
 
             const tooltipContainer = screen.getByText("Hover me").parentElement;
-            expect(tooltipContainer).toHaveClass("themed-tooltip", "custom-tooltip");
+            expect(tooltipContainer).toHaveClass(
+                "themed-tooltip",
+                "custom-tooltip"
+            );
         });
 
         it("should render with empty className", () => {
             render(<ThemedTooltip {...defaultProps} className="" />);
 
-            const tooltipContainer = screen.getByText("Hover me").parentElement!;
+            const tooltipContainer =
+                screen.getByText("Hover me").parentElement!;
             expect(tooltipContainer).toHaveClass("themed-tooltip");
             expect(tooltipContainer.className).toBe("themed-tooltip ");
         });
@@ -60,7 +71,8 @@ describe("ThemedTooltip", () => {
         });
 
         it("should handle long tooltip content", () => {
-            const longContent = "This is a very long tooltip content that contains multiple sentences and should be displayed properly when the user hovers over the element.";
+            const longContent =
+                "This is a very long tooltip content that contains multiple sentences and should be displayed properly when the user hovers over the element.";
             render(<ThemedTooltip {...defaultProps} content={longContent} />);
 
             const tooltipContainer = screen.getByText("Hover me").parentElement;
@@ -69,7 +81,9 @@ describe("ThemedTooltip", () => {
 
         it("should handle tooltip content with special characters", () => {
             const specialContent = "Special chars: & < > \" ' @#$%^&*()";
-            render(<ThemedTooltip {...defaultProps} content={specialContent} />);
+            render(
+                <ThemedTooltip {...defaultProps} content={specialContent} />
+            );
 
             const tooltipContainer = screen.getByText("Hover me").parentElement;
             expect(tooltipContainer).toHaveAttribute("title", specialContent);
@@ -77,7 +91,9 @@ describe("ThemedTooltip", () => {
 
         it("should handle tooltip content with newlines", () => {
             const multilineContent = "Line 1\nLine 2\nLine 3";
-            render(<ThemedTooltip {...defaultProps} content={multilineContent} />);
+            render(
+                <ThemedTooltip {...defaultProps} content={multilineContent} />
+            );
 
             const tooltipContainer = screen.getByText("Hover me").parentElement;
             expect(tooltipContainer).toHaveAttribute("title", multilineContent);
@@ -93,7 +109,9 @@ describe("ThemedTooltip", () => {
 
         it("should handle unicode tooltip content", () => {
             const unicodeContent = "Unicode test: 🎯 📊 ✅ ❌ ⚠️";
-            render(<ThemedTooltip {...defaultProps} content={unicodeContent} />);
+            render(
+                <ThemedTooltip {...defaultProps} content={unicodeContent} />
+            );
 
             const tooltipContainer = screen.getByText("Hover me").parentElement;
             expect(tooltipContainer).toHaveAttribute("title", unicodeContent);
@@ -118,7 +136,9 @@ describe("ThemedTooltip", () => {
                 </ThemedTooltip>
             );
 
-            expect(screen.getByRole("button", { name: "Click me" })).toBeInTheDocument();
+            expect(
+                screen.getByRole("button", { name: "Click me" })
+            ).toBeInTheDocument();
         });
 
         it("should render multiple children", () => {
@@ -146,15 +166,13 @@ describe("ThemedTooltip", () => {
             );
 
             expect(screen.getByText("Nested")).toBeInTheDocument();
-            expect(screen.getByRole("button", { name: "Deep button" })).toBeInTheDocument();
+            expect(
+                screen.getByRole("button", { name: "Deep button" })
+            ).toBeInTheDocument();
         });
 
         it("should handle empty children", () => {
-            render(
-                <ThemedTooltip content="Empty tooltip">
-                    {""}
-                </ThemedTooltip>
-            );
+            render(<ThemedTooltip content="Empty tooltip">{""}</ThemedTooltip>);
 
             const tooltipContainer = screen.getByTitle("Empty tooltip");
             expect(tooltipContainer).toBeInTheDocument();
@@ -162,9 +180,7 @@ describe("ThemedTooltip", () => {
 
         it("should handle numeric children", () => {
             render(
-                <ThemedTooltip content="Number tooltip">
-                    {42}
-                </ThemedTooltip>
+                <ThemedTooltip content="Number tooltip">{42}</ThemedTooltip>
             );
 
             expect(screen.getByText("42")).toBeInTheDocument();
@@ -173,32 +189,55 @@ describe("ThemedTooltip", () => {
 
     describe("CSS Classes", () => {
         it("should combine base class with custom className", () => {
-            render(<ThemedTooltip {...defaultProps} className="custom-class another-class" />);
+            render(
+                <ThemedTooltip
+                    {...defaultProps}
+                    className="custom-class another-class"
+                />
+            );
 
             const tooltipContainer = screen.getByText("Hover me").parentElement;
-            expect(tooltipContainer).toHaveClass("themed-tooltip", "custom-class", "another-class");
+            expect(tooltipContainer).toHaveClass(
+                "themed-tooltip",
+                "custom-class",
+                "another-class"
+            );
         });
 
         it("should handle whitespace in className", () => {
-            render(<ThemedTooltip {...defaultProps} className="  spaced-class  " />);
+            render(
+                <ThemedTooltip {...defaultProps} className="  spaced-class  " />
+            );
 
-            const tooltipContainer = screen.getByText("Hover me").parentElement!;
-            expect(tooltipContainer.className).toBe("themed-tooltip   spaced-class  ");
+            const tooltipContainer =
+                screen.getByText("Hover me").parentElement!;
+            expect(tooltipContainer.className).toBe(
+                "themed-tooltip   spaced-class  "
+            );
         });
 
         it("should handle undefined className", () => {
             render(<ThemedTooltip {...defaultProps} className={undefined} />);
 
-            const tooltipContainer = screen.getByText("Hover me").parentElement!;
+            const tooltipContainer =
+                screen.getByText("Hover me").parentElement!;
             expect(tooltipContainer).toHaveClass("themed-tooltip");
             expect(tooltipContainer.className).toBe("themed-tooltip ");
         });
 
         it("should preserve class order", () => {
-            render(<ThemedTooltip {...defaultProps} className="first second third" />);
+            render(
+                <ThemedTooltip
+                    {...defaultProps}
+                    className="first second third"
+                />
+            );
 
-            const tooltipContainer = screen.getByText("Hover me").parentElement!;
-            expect(tooltipContainer.className).toBe("themed-tooltip first second third");
+            const tooltipContainer =
+                screen.getByText("Hover me").parentElement!;
+            expect(tooltipContainer.className).toBe(
+                "themed-tooltip first second third"
+            );
         });
     });
 
@@ -213,7 +252,9 @@ describe("ThemedTooltip", () => {
                 </ThemedTooltip>
             );
 
-            const button = screen.getByRole("button", { name: "Interactive button" });
+            const button = screen.getByRole("button", {
+                name: "Interactive button",
+            });
             await user.click(button);
 
             expect(mockClick).toHaveBeenCalledTimes(1);
@@ -224,14 +265,21 @@ describe("ThemedTooltip", () => {
 
             render(<ThemedTooltip {...defaultProps} />);
 
-            const tooltipContainer = screen.getByText("Hover me").parentElement!;
-            
+            const tooltipContainer =
+                screen.getByText("Hover me").parentElement!;
+
             // Test that hover behavior works with title attribute
             await user.hover(tooltipContainer);
-            expect(tooltipContainer).toHaveAttribute("title", "Test tooltip content");
-            
+            expect(tooltipContainer).toHaveAttribute(
+                "title",
+                "Test tooltip content"
+            );
+
             await user.unhover(tooltipContainer);
-            expect(tooltipContainer).toHaveAttribute("title", "Test tooltip content");
+            expect(tooltipContainer).toHaveAttribute(
+                "title",
+                "Test tooltip content"
+            );
         });
 
         it("should support keyboard navigation", async () => {
@@ -244,7 +292,9 @@ describe("ThemedTooltip", () => {
                 </ThemedTooltip>
             );
 
-            const button = screen.getByRole("button", { name: "Keyboard button" });
+            const button = screen.getByRole("button", {
+                name: "Keyboard button",
+            });
             button.focus();
             await user.keyboard("{Enter}");
 
@@ -272,7 +322,10 @@ describe("ThemedTooltip", () => {
             render(<ThemedTooltip {...defaultProps} />);
 
             const tooltipContainer = screen.getByText("Hover me").parentElement;
-            expect(tooltipContainer).toHaveAttribute("title", "Test tooltip content");
+            expect(tooltipContainer).toHaveAttribute(
+                "title",
+                "Test tooltip content"
+            );
         });
 
         it("should preserve child element accessibility", () => {
@@ -300,24 +353,39 @@ describe("ThemedTooltip", () => {
         it("should support screen reader friendly content", () => {
             render(
                 <ThemedTooltip content="Screen reader tooltip information">
-                    <span aria-describedby="tooltip-desc">Described content</span>
+                    <span aria-describedby="tooltip-desc">
+                        Described content
+                    </span>
                 </ThemedTooltip>
             );
 
             const describedElement = screen.getByText("Described content");
-            expect(describedElement).toHaveAttribute("aria-describedby", "tooltip-desc");
+            expect(describedElement).toHaveAttribute(
+                "aria-describedby",
+                "tooltip-desc"
+            );
         });
     });
 
     describe("Edge Cases", () => {
         it("should handle content updates", () => {
-            const { rerender } = render(<ThemedTooltip {...defaultProps} content="Initial content" />);
+            const { rerender } = render(
+                <ThemedTooltip {...defaultProps} content="Initial content" />
+            );
 
             const tooltipContainer = screen.getByText("Hover me").parentElement;
-            expect(tooltipContainer).toHaveAttribute("title", "Initial content");
+            expect(tooltipContainer).toHaveAttribute(
+                "title",
+                "Initial content"
+            );
 
-            rerender(<ThemedTooltip {...defaultProps} content="Updated content" />);
-            expect(tooltipContainer).toHaveAttribute("title", "Updated content");
+            rerender(
+                <ThemedTooltip {...defaultProps} content="Updated content" />
+            );
+            expect(tooltipContainer).toHaveAttribute(
+                "title",
+                "Updated content"
+            );
         });
 
         it("should handle children updates", () => {
@@ -340,13 +408,23 @@ describe("ThemedTooltip", () => {
         });
 
         it("should handle className updates", () => {
-            const { rerender } = render(<ThemedTooltip {...defaultProps} className="initial-class" />);
+            const { rerender } = render(
+                <ThemedTooltip {...defaultProps} className="initial-class" />
+            );
 
             const tooltipContainer = screen.getByText("Hover me").parentElement;
-            expect(tooltipContainer).toHaveClass("themed-tooltip", "initial-class");
+            expect(tooltipContainer).toHaveClass(
+                "themed-tooltip",
+                "initial-class"
+            );
 
-            rerender(<ThemedTooltip {...defaultProps} className="updated-class" />);
-            expect(tooltipContainer).toHaveClass("themed-tooltip", "updated-class");
+            rerender(
+                <ThemedTooltip {...defaultProps} className="updated-class" />
+            );
+            expect(tooltipContainer).toHaveClass(
+                "themed-tooltip",
+                "updated-class"
+            );
             expect(tooltipContainer).not.toHaveClass("initial-class");
         });
 
@@ -356,15 +434,33 @@ describe("ThemedTooltip", () => {
             const tooltipContainer = screen.getByText("Hover me").parentElement;
 
             // Rapid updates
-            rerender(<ThemedTooltip {...defaultProps} content="Content 1" className="class1" />);
+            rerender(
+                <ThemedTooltip
+                    {...defaultProps}
+                    content="Content 1"
+                    className="class1"
+                />
+            );
             expect(tooltipContainer).toHaveAttribute("title", "Content 1");
             expect(tooltipContainer).toHaveClass("class1");
 
-            rerender(<ThemedTooltip {...defaultProps} content="Content 2" className="class2" />);
+            rerender(
+                <ThemedTooltip
+                    {...defaultProps}
+                    content="Content 2"
+                    className="class2"
+                />
+            );
             expect(tooltipContainer).toHaveAttribute("title", "Content 2");
             expect(tooltipContainer).toHaveClass("class2");
 
-            rerender(<ThemedTooltip {...defaultProps} content="Content 3" className="class3" />);
+            rerender(
+                <ThemedTooltip
+                    {...defaultProps}
+                    content="Content 3"
+                    className="class3"
+                />
+            );
             expect(tooltipContainer).toHaveAttribute("title", "Content 3");
             expect(tooltipContainer).toHaveClass("class3");
         });
@@ -397,10 +493,18 @@ describe("ThemedTooltip", () => {
                 </ThemedTooltip>
             );
 
-            const tooltipContainer = screen.getByTitle("Complete tooltip with all features");
-            expect(tooltipContainer).toHaveClass("themed-tooltip", "integration-test", "custom-style");
+            const tooltipContainer = screen.getByTitle(
+                "Complete tooltip with all features"
+            );
+            expect(tooltipContainer).toHaveClass(
+                "themed-tooltip",
+                "integration-test",
+                "custom-style"
+            );
             expect(screen.getByText("Complex content")).toBeInTheDocument();
-            expect(screen.getByRole("button", { name: "Interactive element" })).toBeInTheDocument();
+            expect(
+                screen.getByRole("button", { name: "Interactive element" })
+            ).toBeInTheDocument();
         });
 
         it("should work with minimal props", () => {
@@ -410,9 +514,13 @@ describe("ThemedTooltip", () => {
                 </ThemedTooltip>
             );
 
-            const tooltipContainer = screen.getByText("Simple text").parentElement;
+            const tooltipContainer =
+                screen.getByText("Simple text").parentElement;
             expect(tooltipContainer).toHaveClass("themed-tooltip");
-            expect(tooltipContainer).toHaveAttribute("title", "Minimal tooltip");
+            expect(tooltipContainer).toHaveAttribute(
+                "title",
+                "Minimal tooltip"
+            );
         });
 
         it("should maintain tooltip relationship across re-renders", () => {
@@ -422,7 +530,7 @@ describe("ThemedTooltip", () => {
             const initialTitle = tooltipContainer?.getAttribute("title");
 
             rerender(<ThemedTooltip {...defaultProps} />);
-            
+
             tooltipContainer = screen.getByText("Hover me").parentElement;
             expect(tooltipContainer).toHaveAttribute("title", initialTitle);
         });

@@ -18,7 +18,9 @@ vi.mock("@/services/logger");
 const mockUseSelectedSite = vi.mocked(useSelectedSite);
 const mockUseSitesStore = vi.mocked(useSitesStore);
 const mockUseMonitorTypesStore = vi.mocked(useMonitorTypesStore);
-const mockValidateMonitorFieldClientSide = vi.mocked(validateMonitorFieldClientSide);
+const mockValidateMonitorFieldClientSide = vi.mocked(
+    validateMonitorFieldClientSide
+);
 const mockLogger = vi.mocked(logger);
 
 describe("useSiteDetails - Branch Coverage", () => {
@@ -56,7 +58,7 @@ describe("useSiteDetails - Branch Coverage", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         mockUseSelectedSite.mockReturnValue({
             selectedSite: mockSite,
             selectedMonitorId: "monitor-1",
@@ -65,7 +67,7 @@ describe("useSiteDetails - Branch Coverage", () => {
 
         mockUseSitesStore.mockReturnValue(mockSitesStore);
         mockUseMonitorTypesStore.mockReturnValue(mockMonitorTypesStore);
-        
+
         mockLogger.user = {
             action: vi.fn(),
         };
@@ -82,14 +84,16 @@ describe("useSiteDetails - Branch Coverage", () => {
                 await result.current.handleStartMonitoring();
             });
 
-            expect(mockSitesStore.startSiteMonitorMonitoring).toHaveBeenCalledWith(
-                "test-site",
-                "monitor-1"
+            expect(
+                mockSitesStore.startSiteMonitorMonitoring
+            ).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(mockLogger.user.action).toHaveBeenCalledWith(
+                "Started monitoring",
+                {
+                    monitorId: "monitor-1",
+                    siteId: "test-site",
+                }
             );
-            expect(mockLogger.user.action).toHaveBeenCalledWith("Started monitoring", {
-                monitorId: "monitor-1",
-                siteId: "test-site",
-            });
         });
     });
 
@@ -101,14 +105,16 @@ describe("useSiteDetails - Branch Coverage", () => {
                 await result.current.handleStopMonitoring();
             });
 
-            expect(mockSitesStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith(
-                "test-site",
-                "monitor-1"
+            expect(
+                mockSitesStore.stopSiteMonitorMonitoring
+            ).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(mockLogger.user.action).toHaveBeenCalledWith(
+                "Stopped monitoring",
+                {
+                    monitorId: "monitor-1",
+                    siteId: "test-site",
+                }
             );
-            expect(mockLogger.user.action).toHaveBeenCalledWith("Stopped monitoring", {
-                monitorId: "monitor-1",
-                siteId: "test-site",
-            });
         });
     });
 
@@ -125,7 +131,7 @@ describe("useSiteDetails - Branch Coverage", () => {
             // Set up the interval change first
             act(() => {
                 result.current.handleIntervalChange({
-                    target: { value: "30000" }
+                    target: { value: "30000" },
                 } as React.ChangeEvent<HTMLSelectElement>);
             });
 
@@ -154,7 +160,7 @@ describe("useSiteDetails - Branch Coverage", () => {
             // Set up the interval change first
             act(() => {
                 result.current.handleIntervalChange({
-                    target: { value: "30000" }
+                    target: { value: "30000" },
                 } as React.ChangeEvent<HTMLSelectElement>);
             });
 
@@ -167,11 +173,14 @@ describe("useSiteDetails - Branch Coverage", () => {
                 "monitor-1",
                 30_000
             );
-            expect(mockLogger.user.action).toHaveBeenCalledWith("Updated check interval", {
-                monitorId: "monitor-1",
-                newInterval: 30_000,
-                siteId: "test-site",
-            });
+            expect(mockLogger.user.action).toHaveBeenCalledWith(
+                "Updated check interval",
+                {
+                    monitorId: "monitor-1",
+                    newInterval: 30_000,
+                    siteId: "test-site",
+                }
+            );
         });
     });
 
@@ -188,7 +197,7 @@ describe("useSiteDetails - Branch Coverage", () => {
             // Set up the timeout change first
             act(() => {
                 result.current.handleTimeoutChange({
-                    target: { value: "1" }
+                    target: { value: "1" },
                 } as React.ChangeEvent<HTMLInputElement>);
             });
 
@@ -217,7 +226,7 @@ describe("useSiteDetails - Branch Coverage", () => {
             // Set up the timeout change first
             act(() => {
                 result.current.handleTimeoutChange({
-                    target: { value: "10" }
+                    target: { value: "10" },
                 } as React.ChangeEvent<HTMLInputElement>);
             });
 
@@ -230,11 +239,14 @@ describe("useSiteDetails - Branch Coverage", () => {
                 "monitor-1",
                 10_000 // Converted to milliseconds
             );
-            expect(mockLogger.user.action).toHaveBeenCalledWith("Updated monitor timeout", {
-                monitorId: "monitor-1",
-                newTimeout: 10_000,
-                siteId: "test-site",
-            });
+            expect(mockLogger.user.action).toHaveBeenCalledWith(
+                "Updated monitor timeout",
+                {
+                    monitorId: "monitor-1",
+                    newTimeout: 10_000,
+                    siteId: "test-site",
+                }
+            );
         });
     });
 
@@ -251,7 +263,7 @@ describe("useSiteDetails - Branch Coverage", () => {
             // Set up the retry attempts change first
             act(() => {
                 result.current.handleRetryAttemptsChange({
-                    target: { value: "10" }
+                    target: { value: "10" },
                 } as React.ChangeEvent<HTMLInputElement>);
             });
 
@@ -260,7 +272,9 @@ describe("useSiteDetails - Branch Coverage", () => {
                 act(async () => {
                     await result.current.handleSaveRetryAttempts();
                 })
-            ).rejects.toThrow("Validation failed: Invalid retry attempts value");
+            ).rejects.toThrow(
+                "Validation failed: Invalid retry attempts value"
+            );
 
             expect(mockLogger.site.error).toHaveBeenCalledWith(
                 "test-site",
@@ -280,7 +294,7 @@ describe("useSiteDetails - Branch Coverage", () => {
             // Set up the retry attempts change first
             act(() => {
                 result.current.handleRetryAttemptsChange({
-                    target: { value: "5" }
+                    target: { value: "5" },
                 } as React.ChangeEvent<HTMLInputElement>);
             });
 
@@ -288,16 +302,17 @@ describe("useSiteDetails - Branch Coverage", () => {
                 await result.current.handleSaveRetryAttempts();
             });
 
-            expect(mockSitesStore.updateMonitorRetryAttempts).toHaveBeenCalledWith(
-                "test-site",
-                "monitor-1",
-                5
+            expect(
+                mockSitesStore.updateMonitorRetryAttempts
+            ).toHaveBeenCalledWith("test-site", "monitor-1", 5);
+            expect(mockLogger.user.action).toHaveBeenCalledWith(
+                "Updated monitor retry attempts",
+                {
+                    monitorId: "monitor-1",
+                    newRetryAttempts: 5,
+                    siteId: "test-site",
+                }
             );
-            expect(mockLogger.user.action).toHaveBeenCalledWith("Updated monitor retry attempts", {
-                monitorId: "monitor-1",
-                newRetryAttempts: 5,
-                siteId: "test-site",
-            });
         });
     });
 
@@ -320,7 +335,7 @@ describe("useSiteDetails - Branch Coverage", () => {
             // Make a name change to trigger hasUnsavedChanges
             act(() => {
                 result.current.handleNameChange({
-                    target: { value: "  New Site Name  " }
+                    target: { value: "  New Site Name  " },
                 } as React.ChangeEvent<HTMLInputElement>);
             });
 
@@ -332,9 +347,12 @@ describe("useSiteDetails - Branch Coverage", () => {
                 "test-site",
                 { name: "New Site Name" } // Should be trimmed
             );
-            expect(mockLogger.user.action).toHaveBeenCalledWith("Updated site name", {
-                identifier: "test-site",
-            });
+            expect(mockLogger.user.action).toHaveBeenCalledWith(
+                "Updated site name",
+                {
+                    identifier: "test-site",
+                }
+            );
         });
     });
 
@@ -343,15 +361,17 @@ describe("useSiteDetails - Branch Coverage", () => {
             // Create a monitor without type to test the fallback
             const siteWithoutType = {
                 ...mockSite,
-                monitors: [{
-                    id: "monitor-1",
-                    checkInterval: 60_000,
-                    timeout: 5000,
-                    retryAttempts: 3,
-                    url: "https://example.com",
-                    isMonitoring: false,
-                    // No type property
-                }],
+                monitors: [
+                    {
+                        id: "monitor-1",
+                        checkInterval: 60_000,
+                        timeout: 5000,
+                        retryAttempts: 3,
+                        url: "https://example.com",
+                        isMonitoring: false,
+                        // No type property
+                    },
+                ],
             };
 
             mockUseSelectedSite.mockReturnValue({
@@ -369,7 +389,7 @@ describe("useSiteDetails - Branch Coverage", () => {
 
             act(() => {
                 result.current.handleIntervalChange({
-                    target: { value: "30000" }
+                    target: { value: "30000" },
                 } as React.ChangeEvent<HTMLSelectElement>);
             });
 

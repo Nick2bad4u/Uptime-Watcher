@@ -220,68 +220,78 @@ const newHashes = {};
 
 // Download and process a single doc page
 function downloadFile(cmd, filePath, logMsg, name) {
-    return /** @type {Promise<void>} */(new Promise((resolve, reject) => {
-        // Sanitize filePath: must be inside OUTPUT_DIR
-        const resolvedPath = path.resolve(filePath);
-        if (!resolvedPath.startsWith(OUTPUT_DIR)) {
-            return reject(new Error("Unsafe file path detected: " + filePath));
-        }
-
-        // Basic validation: cmd must start with "pandoc"
-        if (typeof cmd !== "string" || !cmd.trim().startsWith("pandoc")) {
-            return reject(
-                new Error("Unsafe or invalid command detected: " + cmd)
-            );
-        }
-
-        // Ensure parent directory exists before running pandoc
-        const dir = path.dirname(resolvedPath);
-        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-
-        // @ts-ignore
-        exec(cmd, (err) => {
-            if (err) {
-                console.error(logMsg.replace("✅", "❌") + ` → ${err.message}`);
-                return reject(err);
-            }
-            if (!fs.existsSync(resolvedPath)) {
-                console.error(
-                    logMsg.replace("✅", "❌") + " → File not created."
-                );
-                return reject(new Error("File not created: " + resolvedPath));
-            }
-            let content;
-            try {
-                content = fs.readFileSync(resolvedPath, "utf8");
-            } catch (readErr) {
-                console.error(
-                    logMsg.replace("✅", "❌") +
-                        ` → Failed to read file: ${readErr.message}`
-                );
-                return reject(readErr);
-            }
-            if (!content || content.trim().length === 0) {
-                console.error(logMsg.replace("✅", "❌") + " → File is empty.");
+    return /** @type {Promise<void>} */ (
+        new Promise((resolve, reject) => {
+            // Sanitize filePath: must be inside OUTPUT_DIR
+            const resolvedPath = path.resolve(filePath);
+            if (!resolvedPath.startsWith(OUTPUT_DIR)) {
                 return reject(
-                    new Error("Downloaded file is empty: " + resolvedPath)
+                    new Error("Unsafe file path detected: " + filePath)
                 );
             }
-            try {
-                let processedContent = rewriteLinks(content);
-                processedContent = cleanContent(processedContent);
-                fs.writeFileSync(resolvedPath, processedContent);
-            } catch (writeErr) {
-                console.error(
-                    logMsg.replace("✅", "❌") +
-                        ` → Failed to write file: ${writeErr.message}`
+
+            // Basic validation: cmd must start with "pandoc"
+            if (typeof cmd !== "string" || !cmd.trim().startsWith("pandoc")) {
+                return reject(
+                    new Error("Unsafe or invalid command detected: " + cmd)
                 );
-                return reject(writeErr);
             }
-            console.log(logMsg);
-            downloadedFiles.push(name);
-            resolve();
-        });
-    }));
+
+            // Ensure parent directory exists before running pandoc
+            const dir = path.dirname(resolvedPath);
+            if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+
+            // @ts-ignore
+            exec(cmd, (err) => {
+                if (err) {
+                    console.error(
+                        logMsg.replace("✅", "❌") + ` → ${err.message}`
+                    );
+                    return reject(err);
+                }
+                if (!fs.existsSync(resolvedPath)) {
+                    console.error(
+                        logMsg.replace("✅", "❌") + " → File not created."
+                    );
+                    return reject(
+                        new Error("File not created: " + resolvedPath)
+                    );
+                }
+                let content;
+                try {
+                    content = fs.readFileSync(resolvedPath, "utf8");
+                } catch (readErr) {
+                    console.error(
+                        logMsg.replace("✅", "❌") +
+                            ` → Failed to read file: ${readErr.message}`
+                    );
+                    return reject(readErr);
+                }
+                if (!content || content.trim().length === 0) {
+                    console.error(
+                        logMsg.replace("✅", "❌") + " → File is empty."
+                    );
+                    return reject(
+                        new Error("Downloaded file is empty: " + resolvedPath)
+                    );
+                }
+                try {
+                    let processedContent = rewriteLinks(content);
+                    processedContent = cleanContent(processedContent);
+                    fs.writeFileSync(resolvedPath, processedContent);
+                } catch (writeErr) {
+                    console.error(
+                        logMsg.replace("✅", "❌") +
+                            ` → Failed to write file: ${writeErr.message}`
+                    );
+                    return reject(writeErr);
+                }
+                console.log(logMsg);
+                downloadedFiles.push(name);
+                resolve();
+            });
+        })
+    );
 }
 
 // Build page download promises

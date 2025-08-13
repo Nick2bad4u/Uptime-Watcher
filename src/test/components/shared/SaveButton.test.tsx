@@ -6,11 +6,24 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { SaveButton, type SaveButtonProps } from "../../../components/shared/SaveButton";
+import {
+    SaveButton,
+    type SaveButtonProps,
+} from "../../../components/shared/SaveButton";
 
 // Mock themed components and react-icons
 vi.mock("../../../theme/components/ThemedButton", () => ({
-    default: ({ children, className, disabled, icon, onClick, size, variant, "aria-label": ariaLabel, ...props }: any) => (
+    default: ({
+        children,
+        className,
+        disabled,
+        icon,
+        onClick,
+        size,
+        variant,
+        "aria-label": ariaLabel,
+        ...props
+    }: any) => (
         <button
             data-testid="themed-button"
             className={className}
@@ -63,27 +76,48 @@ describe("SaveButton", () => {
         it("should render with custom aria-label", () => {
             render(<SaveButton {...defaultProps} aria-label="Save document" />);
 
-            expect(screen.getByTestId("themed-button")).toHaveAttribute("aria-label", "Save document");
+            expect(screen.getByTestId("themed-button")).toHaveAttribute(
+                "aria-label",
+                "Save document"
+            );
         });
 
         it("should render with custom className", () => {
-            render(<SaveButton {...defaultProps} className="custom-save-btn" />);
+            render(
+                <SaveButton {...defaultProps} className="custom-save-btn" />
+            );
 
-            expect(screen.getByTestId("themed-button")).toHaveClass("custom-save-btn");
+            expect(screen.getByTestId("themed-button")).toHaveClass(
+                "custom-save-btn"
+            );
         });
 
         it("should render with different sizes", () => {
-            const { rerender } = render(<SaveButton {...defaultProps} size="xs" />);
-            expect(screen.getByTestId("themed-button")).toHaveAttribute("data-size", "xs");
+            const { rerender } = render(
+                <SaveButton {...defaultProps} size="xs" />
+            );
+            expect(screen.getByTestId("themed-button")).toHaveAttribute(
+                "data-size",
+                "xs"
+            );
 
             rerender(<SaveButton {...defaultProps} size="sm" />);
-            expect(screen.getByTestId("themed-button")).toHaveAttribute("data-size", "sm");
+            expect(screen.getByTestId("themed-button")).toHaveAttribute(
+                "data-size",
+                "sm"
+            );
 
             rerender(<SaveButton {...defaultProps} size="md" />);
-            expect(screen.getByTestId("themed-button")).toHaveAttribute("data-size", "md");
+            expect(screen.getByTestId("themed-button")).toHaveAttribute(
+                "data-size",
+                "md"
+            );
 
             rerender(<SaveButton {...defaultProps} size="lg" />);
-            expect(screen.getByTestId("themed-button")).toHaveAttribute("data-size", "lg");
+            expect(screen.getByTestId("themed-button")).toHaveAttribute(
+                "data-size",
+                "lg"
+            );
         });
     });
 
@@ -105,7 +139,13 @@ describe("SaveButton", () => {
         });
 
         it("should be disabled when both disabled and isLoading are true", () => {
-            render(<SaveButton {...defaultProps} disabled={true} isLoading={true} />);
+            render(
+                <SaveButton
+                    {...defaultProps}
+                    disabled={true}
+                    isLoading={true}
+                />
+            );
 
             const button = screen.getByTestId("themed-button");
             expect(button).toBeDisabled();
@@ -113,7 +153,13 @@ describe("SaveButton", () => {
         });
 
         it("should not be disabled when both disabled and isLoading are false", () => {
-            render(<SaveButton {...defaultProps} disabled={false} isLoading={false} />);
+            render(
+                <SaveButton
+                    {...defaultProps}
+                    disabled={false}
+                    isLoading={false}
+                />
+            );
 
             const button = screen.getByTestId("themed-button");
             expect(button).not.toBeDisabled();
@@ -131,7 +177,13 @@ describe("SaveButton", () => {
         });
 
         it("should show secondary variant when disabled but not loading", () => {
-            render(<SaveButton {...defaultProps} disabled={true} isLoading={false} />);
+            render(
+                <SaveButton
+                    {...defaultProps}
+                    disabled={true}
+                    isLoading={false}
+                />
+            );
 
             const button = screen.getByTestId("themed-button");
             expect(button).toBeDisabled();
@@ -139,7 +191,13 @@ describe("SaveButton", () => {
         });
 
         it("should show secondary variant when both disabled and loading", () => {
-            render(<SaveButton {...defaultProps} disabled={true} isLoading={true} />);
+            render(
+                <SaveButton
+                    {...defaultProps}
+                    disabled={true}
+                    isLoading={true}
+                />
+            );
 
             const button = screen.getByTestId("themed-button");
             expect(button).toBeDisabled();
@@ -164,7 +222,13 @@ describe("SaveButton", () => {
             const user = userEvent.setup();
             const mockOnClick = vi.fn();
 
-            render(<SaveButton {...defaultProps} onClick={mockOnClick} disabled={true} />);
+            render(
+                <SaveButton
+                    {...defaultProps}
+                    onClick={mockOnClick}
+                    disabled={true}
+                />
+            );
 
             const button = screen.getByTestId("themed-button");
             await user.click(button);
@@ -176,7 +240,13 @@ describe("SaveButton", () => {
             const user = userEvent.setup();
             const mockOnClick = vi.fn();
 
-            render(<SaveButton {...defaultProps} onClick={mockOnClick} isLoading={true} />);
+            render(
+                <SaveButton
+                    {...defaultProps}
+                    onClick={mockOnClick}
+                    isLoading={true}
+                />
+            );
 
             const button = screen.getByTestId("themed-button");
             await user.click(button);
@@ -227,29 +297,34 @@ describe("SaveButton", () => {
 
     describe("Props Spreading", () => {
         it("should spread additional props to ThemedButton", () => {
-            const SaveButtonWithProps = (props: any) => <SaveButton {...defaultProps} {...props} />;
-            
-            render(
-                <SaveButtonWithProps
-                    data-testattribute="test-value"
-                />
+            const SaveButtonWithProps = (props: any) => (
+                <SaveButton {...defaultProps} {...props} />
             );
+
+            render(<SaveButtonWithProps data-testattribute="test-value" />);
 
             const button = screen.getByTestId("themed-button");
             expect(button).toHaveAttribute("data-testattribute", "test-value");
         });
 
         it("should handle id prop", () => {
-            const SaveButtonWithId = (props: any) => <SaveButton {...defaultProps} {...props} />;
-            
+            const SaveButtonWithId = (props: any) => (
+                <SaveButton {...defaultProps} {...props} />
+            );
+
             render(<SaveButtonWithId id="save-button-id" />);
 
-            expect(screen.getByTestId("themed-button")).toHaveAttribute("id", "save-button-id");
+            expect(screen.getByTestId("themed-button")).toHaveAttribute(
+                "id",
+                "save-button-id"
+            );
         });
 
         it("should handle data attributes", () => {
-            const SaveButtonWithData = (props: any) => <SaveButton {...defaultProps} {...props} />;
-            
+            const SaveButtonWithData = (props: any) => (
+                <SaveButton {...defaultProps} {...props} />
+            );
+
             render(
                 <SaveButtonWithData
                     data-cy="save-btn"
@@ -267,25 +342,49 @@ describe("SaveButton", () => {
         it("should use primary variant when enabled", () => {
             render(<SaveButton {...defaultProps} disabled={false} />);
 
-            expect(screen.getByTestId("themed-button")).toHaveAttribute("data-variant", "primary");
+            expect(screen.getByTestId("themed-button")).toHaveAttribute(
+                "data-variant",
+                "primary"
+            );
         });
 
         it("should use secondary variant when disabled", () => {
             render(<SaveButton {...defaultProps} disabled={true} />);
 
-            expect(screen.getByTestId("themed-button")).toHaveAttribute("data-variant", "secondary");
+            expect(screen.getByTestId("themed-button")).toHaveAttribute(
+                "data-variant",
+                "secondary"
+            );
         });
 
         it("should prioritize disabled prop over loading for variant", () => {
-            render(<SaveButton {...defaultProps} disabled={true} isLoading={true} />);
+            render(
+                <SaveButton
+                    {...defaultProps}
+                    disabled={true}
+                    isLoading={true}
+                />
+            );
 
-            expect(screen.getByTestId("themed-button")).toHaveAttribute("data-variant", "secondary");
+            expect(screen.getByTestId("themed-button")).toHaveAttribute(
+                "data-variant",
+                "secondary"
+            );
         });
 
         it("should use primary variant when only loading", () => {
-            render(<SaveButton {...defaultProps} disabled={false} isLoading={true} />);
+            render(
+                <SaveButton
+                    {...defaultProps}
+                    disabled={false}
+                    isLoading={true}
+                />
+            );
 
-            expect(screen.getByTestId("themed-button")).toHaveAttribute("data-variant", "primary");
+            expect(screen.getByTestId("themed-button")).toHaveAttribute(
+                "data-variant",
+                "primary"
+            );
         });
     });
 
@@ -293,13 +392,21 @@ describe("SaveButton", () => {
         it("should have proper aria-label by default", () => {
             render(<SaveButton {...defaultProps} />);
 
-            expect(screen.getByTestId("themed-button")).toHaveAttribute("aria-label", "Save changes");
+            expect(screen.getByTestId("themed-button")).toHaveAttribute(
+                "aria-label",
+                "Save changes"
+            );
         });
 
         it("should allow custom aria-label", () => {
-            render(<SaveButton {...defaultProps} aria-label="Save form data" />);
+            render(
+                <SaveButton {...defaultProps} aria-label="Save form data" />
+            );
 
-            expect(screen.getByTestId("themed-button")).toHaveAttribute("aria-label", "Save form data");
+            expect(screen.getByTestId("themed-button")).toHaveAttribute(
+                "aria-label",
+                "Save form data"
+            );
         });
 
         it("should be focusable when enabled", () => {
@@ -322,17 +429,41 @@ describe("SaveButton", () => {
 
     describe("Edge Cases", () => {
         it("should handle rapid state changes", () => {
-            const { rerender } = render(<SaveButton {...defaultProps} disabled={false} isLoading={false} />);
+            const { rerender } = render(
+                <SaveButton
+                    {...defaultProps}
+                    disabled={false}
+                    isLoading={false}
+                />
+            );
 
             expect(screen.getByTestId("themed-button")).not.toBeDisabled();
 
-            rerender(<SaveButton {...defaultProps} disabled={true} isLoading={false} />);
+            rerender(
+                <SaveButton
+                    {...defaultProps}
+                    disabled={true}
+                    isLoading={false}
+                />
+            );
             expect(screen.getByTestId("themed-button")).toBeDisabled();
 
-            rerender(<SaveButton {...defaultProps} disabled={false} isLoading={true} />);
+            rerender(
+                <SaveButton
+                    {...defaultProps}
+                    disabled={false}
+                    isLoading={true}
+                />
+            );
             expect(screen.getByTestId("themed-button")).toBeDisabled();
 
-            rerender(<SaveButton {...defaultProps} disabled={false} isLoading={false} />);
+            rerender(
+                <SaveButton
+                    {...defaultProps}
+                    disabled={false}
+                    isLoading={false}
+                />
+            );
             expect(screen.getByTestId("themed-button")).not.toBeDisabled();
         });
 
@@ -341,7 +472,9 @@ describe("SaveButton", () => {
             const mockOnClick1 = vi.fn();
             const mockOnClick2 = vi.fn();
 
-            const { rerender } = render(<SaveButton {...defaultProps} onClick={mockOnClick1} />);
+            const { rerender } = render(
+                <SaveButton {...defaultProps} onClick={mockOnClick1} />
+            );
 
             await user.click(screen.getByTestId("themed-button"));
             expect(mockOnClick1).toHaveBeenCalledTimes(1);
@@ -355,13 +488,17 @@ describe("SaveButton", () => {
         });
 
         it("should handle className changes", () => {
-            const { rerender } = render(<SaveButton {...defaultProps} className="class1" />);
+            const { rerender } = render(
+                <SaveButton {...defaultProps} className="class1" />
+            );
 
             expect(screen.getByTestId("themed-button")).toHaveClass("class1");
 
             rerender(<SaveButton {...defaultProps} className="class2" />);
             expect(screen.getByTestId("themed-button")).toHaveClass("class2");
-            expect(screen.getByTestId("themed-button")).not.toHaveClass("class1");
+            expect(screen.getByTestId("themed-button")).not.toHaveClass(
+                "class1"
+            );
         });
 
         it("should handle empty string className", () => {
@@ -374,7 +511,10 @@ describe("SaveButton", () => {
         it("should handle undefined aria-label gracefully", () => {
             render(<SaveButton {...defaultProps} aria-label={undefined} />);
 
-            expect(screen.getByTestId("themed-button")).toHaveAttribute("aria-label", "Save changes");
+            expect(screen.getByTestId("themed-button")).toHaveAttribute(
+                "aria-label",
+                "Save changes"
+            );
         });
     });
 
@@ -382,7 +522,9 @@ describe("SaveButton", () => {
         it("should work with all props combinations", async () => {
             const user = userEvent.setup();
             const mockOnClick = vi.fn();
-            const SaveButtonIntegration = (props: any) => <SaveButton {...props} />;
+            const SaveButtonIntegration = (props: any) => (
+                <SaveButton {...props} />
+            );
 
             render(
                 <SaveButtonIntegration
@@ -423,7 +565,9 @@ describe("SaveButton", () => {
 
             expect(screen.getByTestId("button-icon")).toBeInTheDocument();
             expect(screen.getByTestId("save-icon")).toBeInTheDocument();
-            expect(screen.getByTestId("themed-button")).toHaveTextContent("Save");
+            expect(screen.getByTestId("themed-button")).toHaveTextContent(
+                "Save"
+            );
         });
     });
 });

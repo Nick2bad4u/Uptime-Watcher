@@ -9,7 +9,13 @@ import "@testing-library/jest-dom";
 import React from "react";
 
 // Import constants
-import { ARIA_LABEL, TRANSITION_ALL, CHECK_INTERVALS, DEFAULT_CHECK_INTERVAL, FALLBACK_MONITOR_TYPE_OPTIONS } from "../../../constants";
+import {
+    ARIA_LABEL,
+    TRANSITION_ALL,
+    CHECK_INTERVALS,
+    DEFAULT_CHECK_INTERVAL,
+    FALLBACK_MONITOR_TYPE_OPTIONS,
+} from "../../../constants";
 
 // Mock all dependencies with proper interfaces
 const mockSetAddMode = vi.fn();
@@ -133,7 +139,7 @@ import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
 describe("AddSiteForm - Comprehensive Tests", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         // Reset to default state
         mockUseAddSiteForm.mockReturnValue({
             addMode: "new" as "new" | "existing",
@@ -169,21 +175,21 @@ describe("AddSiteForm - Comprehensive Tests", () => {
 
         it("should render all form sections", () => {
             render(<AddSiteForm />);
-            
+
             // Check for radio group (Add Mode)
             expect(screen.getByRole("radiogroup")).toBeInTheDocument();
-            
+
             // Check for select elements
             const selects = screen.getAllByRole("combobox");
             expect(selects.length).toBeGreaterThan(0);
-            
+
             // Check for submit button
             expect(screen.getByRole("button")).toBeInTheDocument();
         });
 
         it("should display correct initial values", () => {
             render(<AddSiteForm />);
-            
+
             // Check that "Create New Site" radio is selected by default
             const newSiteRadio = screen.getByDisplayValue("new");
             expect(newSiteRadio).toBeChecked();
@@ -194,30 +200,30 @@ describe("AddSiteForm - Comprehensive Tests", () => {
         it("should call setAddMode when switching modes", async () => {
             const user = userEvent.setup();
             render(<AddSiteForm />);
-            
+
             const existingRadio = screen.getByDisplayValue("existing");
             await user.click(existingRadio);
-            
+
             expect(mockSetAddMode).toHaveBeenCalledWith("existing");
         });
 
         it("should call setMonitorType when changing monitor type", async () => {
             const user = userEvent.setup();
             render(<AddSiteForm />);
-            
+
             const monitorSelect = screen.getByLabelText("Monitor Type");
             await user.selectOptions(monitorSelect, "ping");
-            
+
             expect(mockSetMonitorType).toHaveBeenCalledWith("ping");
         });
 
         it("should call setCheckInterval when changing check interval", async () => {
             const user = userEvent.setup();
             render(<AddSiteForm />);
-            
+
             const intervalSelect = screen.getByLabelText("Check Interval");
             await user.selectOptions(intervalSelect, "300000");
-            
+
             expect(mockSetCheckInterval).toHaveBeenCalledWith(300_000);
         });
     });
@@ -252,7 +258,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
 
         it("should show site name field for new sites", () => {
             render(<AddSiteForm />);
-            
+
             const nameInput = screen.getByLabelText(/site name/i);
             expect(nameInput).toBeInTheDocument();
             expect(nameInput).toHaveValue("Test Site");
@@ -283,9 +289,9 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 setSiteId: mockSetSiteId,
                 setUrl: mockSetUrl,
             });
-            
+
             render(<AddSiteForm />);
-            
+
             const urlInput = screen.getByLabelText(/url/i);
             expect(urlInput).toBeInTheDocument();
             // Note: Field value test removed as form component may not be using mock values correctly
@@ -294,10 +300,10 @@ describe("AddSiteForm - Comprehensive Tests", () => {
         it("should call setName when site name changes", async () => {
             const user = userEvent.setup();
             render(<AddSiteForm />);
-            
+
             const nameInput = screen.getByLabelText(/site name/i);
             await user.type(nameInput, "Test Site");
-            
+
             // Check that setName was called (accepting any pattern for now)
             expect(mockSetName).toHaveBeenCalled();
         });
@@ -333,10 +339,10 @@ describe("AddSiteForm - Comprehensive Tests", () => {
 
         it("should show host and port fields for port monitor", () => {
             render(<AddSiteForm />);
-            
+
             const hostInput = screen.getByLabelText(/host/i);
             const portInput = screen.getByLabelText(/port/i);
-            
+
             expect(hostInput).toBeInTheDocument();
             expect(portInput).toBeInTheDocument();
             // Note: Field value tests removed as form component may not be using mock values correctly
@@ -373,14 +379,14 @@ describe("AddSiteForm - Comprehensive Tests", () => {
 
         it("should show existing mode as selected", () => {
             render(<AddSiteForm />);
-            
+
             const existingRadio = screen.getByDisplayValue("existing");
             expect(existingRadio).toBeChecked();
         });
 
         it("should not show site name field for existing sites", () => {
             render(<AddSiteForm />);
-            
+
             const nameInput = screen.queryByLabelText(/site name/i);
             expect(nameInput).not.toBeInTheDocument();
         });
@@ -413,18 +419,20 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 setSiteId: mockSetSiteId,
                 setUrl: mockSetUrl,
             });
-            
+
             render(<AddSiteForm />);
-            
-            const submitButton = screen.getByRole("button", { name: /add site/i });
+
+            const submitButton = screen.getByRole("button", {
+                name: /add site/i,
+            });
             expect(submitButton).not.toBeDisabled();
         });
 
         it("should enable submit button when form is valid", () => {
             mockIsFormValid.mockReturnValue(true);
-            
+
             render(<AddSiteForm />);
-            
+
             const submitButton = screen.getByRole("button");
             expect(submitButton).not.toBeDisabled();
         });
@@ -454,32 +462,42 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 setSiteId: mockSetSiteId,
                 setUrl: mockSetUrl,
             });
-            
+
             render(<AddSiteForm />);
-            
-            expect(screen.getByText("Site name is required")).toBeInTheDocument();
+
+            expect(
+                screen.getByText("Site name is required")
+            ).toBeInTheDocument();
         });
     });
 
     describe("Monitor Type Options", () => {
         it("should display all monitor type options", () => {
             render(<AddSiteForm />);
-            
+
             // Check that all options are present in the select element
-            const monitorTypeSelect = screen.getByRole("combobox", { name: /monitor type/i });
+            const monitorTypeSelect = screen.getByRole("combobox", {
+                name: /monitor type/i,
+            });
             expect(monitorTypeSelect).toBeInTheDocument();
-            
+
             // Check that all options are available
-            expect(screen.getByRole("option", { name: "HTTP" })).toBeInTheDocument();
-            expect(screen.getByRole("option", { name: "Ping" })).toBeInTheDocument();
-            expect(screen.getByRole("option", { name: "Port" })).toBeInTheDocument();
+            expect(
+                screen.getByRole("option", { name: "HTTP" })
+            ).toBeInTheDocument();
+            expect(
+                screen.getByRole("option", { name: "Ping" })
+            ).toBeInTheDocument();
+            expect(
+                screen.getByRole("option", { name: "Port" })
+            ).toBeInTheDocument();
         });
     });
 
     describe("Check Interval Options", () => {
         it("should display all check interval options", () => {
             render(<AddSiteForm />);
-            
+
             // Check that all interval options are present
             expect(screen.getByText("1 minute")).toBeInTheDocument();
             expect(screen.getByText("5 minutes")).toBeInTheDocument();
@@ -490,7 +508,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
     describe("Form Reset", () => {
         it("should call resetForm when reset is triggered", () => {
             render(<AddSiteForm />);
-            
+
             // Trigger reset via any mechanism that calls it
             // (This would depend on how reset is implemented in the component)
             expect(mockResetForm).toBeDefined();
@@ -500,14 +518,14 @@ describe("AddSiteForm - Comprehensive Tests", () => {
     describe("Accessibility", () => {
         it("should have proper ARIA labels", () => {
             render(<AddSiteForm />);
-            
+
             expect(screen.getByLabelText("Monitor Type")).toBeInTheDocument();
             expect(screen.getByLabelText("Check Interval")).toBeInTheDocument();
         });
 
         it("should have proper form structure", () => {
             render(<AddSiteForm />);
-            
+
             expect(screen.getByRole("radiogroup")).toBeInTheDocument();
             expect(screen.getByRole("button")).toBeInTheDocument();
         });
@@ -539,7 +557,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 setSiteId: mockSetSiteId,
                 setUrl: mockSetUrl,
             });
-            
+
             expect(() => render(<AddSiteForm />)).not.toThrow();
         });
     });

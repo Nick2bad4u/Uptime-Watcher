@@ -136,55 +136,57 @@ function rewriteLinks(content) {
 
 // 🏷 Download Tag Pages (from GitHub)
 function downloadFile(cmd, filePath, logMsg, name) {
-    return /** @type {Promise<void>} */(new Promise((resolve, reject) => {
-        exec(cmd, (err) => {
-            if (err) {
-                console.error(
-                    logMsg.replace("✅", "❌").replace("📘", "❌") +
-                        ` → ${err.message}`
-                );
-                return reject(err);
-            }
-            if (!fs.existsSync(filePath)) {
-                console.error(
-                    logMsg.replace("✅", "❌").replace("📘", "❌") +
-                        " → File not created."
-                );
-                return reject(new Error("File not created: " + filePath));
-            }
-            let content;
-            try {
-                content = fs.readFileSync(filePath, "utf8");
-            } catch (readErr) {
-                console.error(
-                    logMsg.replace("✅", "❌").replace("📘", "❌") +
-                        ` → Failed to read file: ${readErr.message}`
-                );
-                return reject(readErr);
-            }
-            if (!content || content.trim().length === 0) {
-                console.error(
-                    logMsg.replace("✅", "❌").replace("📘", "❌") +
-                        " → File is empty."
-                );
-                return reject(
-                    new Error("Downloaded file is empty: " + filePath)
-                );
-            }
-            try {
-                fs.writeFileSync(filePath, rewriteLinks(content));
-            } catch (writeErr) {
-                console.error(
-                    logMsg.replace("✅", "❌").replace("📘", "❌") +
-                        ` → Failed to write file: ${writeErr.message}`
-                );
-                return reject(writeErr);
-            }
-            console.log(logMsg);
-            downloadedFiles.push(name);
-            resolve();
-        });
-    }));
+    return /** @type {Promise<void>} */ (
+        new Promise((resolve, reject) => {
+            exec(cmd, (err) => {
+                if (err) {
+                    console.error(
+                        logMsg.replace("✅", "❌").replace("📘", "❌") +
+                            ` → ${err.message}`
+                    );
+                    return reject(err);
+                }
+                if (!fs.existsSync(filePath)) {
+                    console.error(
+                        logMsg.replace("✅", "❌").replace("📘", "❌") +
+                            " → File not created."
+                    );
+                    return reject(new Error("File not created: " + filePath));
+                }
+                let content;
+                try {
+                    content = fs.readFileSync(filePath, "utf8");
+                } catch (readErr) {
+                    console.error(
+                        logMsg.replace("✅", "❌").replace("📘", "❌") +
+                            ` → Failed to read file: ${readErr.message}`
+                    );
+                    return reject(readErr);
+                }
+                if (!content || content.trim().length === 0) {
+                    console.error(
+                        logMsg.replace("✅", "❌").replace("📘", "❌") +
+                            " → File is empty."
+                    );
+                    return reject(
+                        new Error("Downloaded file is empty: " + filePath)
+                    );
+                }
+                try {
+                    fs.writeFileSync(filePath, rewriteLinks(content));
+                } catch (writeErr) {
+                    console.error(
+                        logMsg.replace("✅", "❌").replace("📘", "❌") +
+                            ` → Failed to write file: ${writeErr.message}`
+                    );
+                    return reject(writeErr);
+                }
+                console.log(logMsg);
+                downloadedFiles.push(name);
+                resolve();
+            });
+        })
+    );
 }
 
 const tagPromises = tags.map((tag) => {

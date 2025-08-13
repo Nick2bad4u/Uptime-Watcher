@@ -147,7 +147,9 @@ describe("useSiteSync", () => {
 
         it("should handle withErrorHandling exceptions and use fallback", async () => {
             // Mock withErrorHandling to throw an error (covering the catch block in getSyncStatus)
-            const { withErrorHandling } = await import("../../../../shared/utils/errorHandling");
+            const { withErrorHandling } = await import(
+                "../../../../shared/utils/errorHandling"
+            );
             vi.mocked(withErrorHandling).mockImplementationOnce(async () => {
                 throw new Error("withErrorHandling failed");
             });

@@ -1509,8 +1509,6 @@ export default [
             "require-jsdoc": pluginJSDoc,
             "comment-length": eslintPluginCommentLength,
             "no-lookahead-lookbehind-regexp": pluginRegexLook,
-
-
         },
         rules: {
             // TypeScript backend rules

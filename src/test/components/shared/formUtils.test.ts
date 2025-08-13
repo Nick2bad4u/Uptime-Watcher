@@ -86,7 +86,10 @@ describe("Form Utilities", () => {
         it("should work with custom validation functions", () => {
             const setValue = vi.fn();
             const minLengthValidator = (value: string) => value.length >= 3;
-            const handler = createInputChangeHandler(setValue, minLengthValidator);
+            const handler = createInputChangeHandler(
+                setValue,
+                minLengthValidator
+            );
 
             // Test valid input
             const validEvent = {
@@ -164,7 +167,10 @@ describe("Form Utilities", () => {
 
         it("should handle converter that returns complex objects", () => {
             const setValue = vi.fn();
-            const converter = (value: string) => ({ id: value, name: `Item ${value}` });
+            const converter = (value: string) => ({
+                id: value,
+                name: `Item ${value}`,
+            });
             const handler = createSelectChangeHandler(setValue, converter);
 
             const mockEvent = {
@@ -247,7 +253,9 @@ describe("Form Utilities", () => {
             it("should return true for non-empty strings", () => {
                 expect(validationPatterns.nonEmptyString("hello")).toBe(true);
                 expect(validationPatterns.nonEmptyString("a")).toBe(true);
-                expect(validationPatterns.nonEmptyString("   content   ")).toBe(true);
+                expect(validationPatterns.nonEmptyString("   content   ")).toBe(
+                    true
+                );
             });
 
             it("should return false for empty strings", () => {
@@ -339,7 +347,9 @@ describe("Form Utilities", () => {
             });
 
             it("should handle negative numbers", () => {
-                const validator = validationPatterns.oneOfNumbers([-1, -5, -10]);
+                const validator = validationPatterns.oneOfNumbers([
+                    -1, -5, -10,
+                ]);
 
                 expect(validator(-1)).toBe(true);
                 expect(validator(-5)).toBe(true);
@@ -349,7 +359,9 @@ describe("Form Utilities", () => {
             });
 
             it("should handle floating point numbers", () => {
-                const validator = validationPatterns.oneOfNumbers([1.5, 2.7, 3.14]);
+                const validator = validationPatterns.oneOfNumbers([
+                    1.5, 2.7, 3.14,
+                ]);
 
                 expect(validator(1.5)).toBe(true);
                 expect(validator(2.7)).toBe(true);
@@ -361,7 +373,11 @@ describe("Form Utilities", () => {
 
         describe("oneOfStrings", () => {
             it("should create validator that accepts allowed strings", () => {
-                const validator = validationPatterns.oneOfStrings(["red", "green", "blue"]);
+                const validator = validationPatterns.oneOfStrings([
+                    "red",
+                    "green",
+                    "blue",
+                ]);
 
                 expect(validator("red")).toBe(true);
                 expect(validator("green")).toBe(true);
@@ -369,7 +385,11 @@ describe("Form Utilities", () => {
             });
 
             it("should create validator that rejects non-allowed strings", () => {
-                const validator = validationPatterns.oneOfStrings(["red", "green", "blue"]);
+                const validator = validationPatterns.oneOfStrings([
+                    "red",
+                    "green",
+                    "blue",
+                ]);
 
                 expect(validator("yellow")).toBe(false);
                 expect(validator("purple")).toBe(false);
@@ -385,7 +405,11 @@ describe("Form Utilities", () => {
             });
 
             it("should handle empty strings in allowed values", () => {
-                const validator = validationPatterns.oneOfStrings(["", "option1", "option2"]);
+                const validator = validationPatterns.oneOfStrings([
+                    "",
+                    "option1",
+                    "option2",
+                ]);
 
                 expect(validator("")).toBe(true);
                 expect(validator("option1")).toBe(true);
@@ -394,7 +418,11 @@ describe("Form Utilities", () => {
             });
 
             it("should handle special characters and unicode", () => {
-                const validator = validationPatterns.oneOfStrings(["@#$%", "你好", "🎉"]);
+                const validator = validationPatterns.oneOfStrings([
+                    "@#$%",
+                    "你好",
+                    "🎉",
+                ]);
 
                 expect(validator("@#$%")).toBe(true);
                 expect(validator("你好")).toBe(true);
@@ -403,7 +431,10 @@ describe("Form Utilities", () => {
             });
 
             it("should be case sensitive", () => {
-                const validator = validationPatterns.oneOfStrings(["Hello", "World"]);
+                const validator = validationPatterns.oneOfStrings([
+                    "Hello",
+                    "World",
+                ]);
 
                 expect(validator("Hello")).toBe(true);
                 expect(validator("World")).toBe(true);
@@ -420,8 +451,13 @@ describe("Form Utilities", () => {
             const setAge = vi.fn();
             const setActive = vi.fn();
 
-            const nameHandler = createInputChangeHandler(setName, validationPatterns.nonEmptyString);
-            const ageHandler = createSelectChangeHandler(setAge, (value) => Number.parseInt(value, 10));
+            const nameHandler = createInputChangeHandler(
+                setName,
+                validationPatterns.nonEmptyString
+            );
+            const ageHandler = createSelectChangeHandler(setAge, (value) =>
+                Number.parseInt(value, 10)
+            );
             const activeHandler = createCheckboxChangeHandler(setActive);
 
             // Test name input
@@ -452,15 +488,28 @@ describe("Form Utilities", () => {
         it("should handle complex validation workflows", () => {
             const setValue = vi.fn();
             const rangeValidator = validationPatterns.numberInRange(1, 100);
-            const allowedValidator = validationPatterns.oneOfNumbers([10, 20, 30, 40, 50]);
+            const allowedValidator = validationPatterns.oneOfNumbers([
+                10,
+                20,
+                30,
+                40,
+                50,
+            ]);
 
             // Combined validation for string inputs that represent numbers
             const combinedValidator = (value: string) => {
                 const numValue = Number.parseInt(value, 10);
-                return !Number.isNaN(numValue) && rangeValidator(numValue) && allowedValidator(numValue);
+                return (
+                    !Number.isNaN(numValue) &&
+                    rangeValidator(numValue) &&
+                    allowedValidator(numValue)
+                );
             };
 
-            const handler = createInputChangeHandler(setValue, combinedValidator);
+            const handler = createInputChangeHandler(
+                setValue,
+                combinedValidator
+            );
 
             // Valid: in range and allowed
             const validEvent = {

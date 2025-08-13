@@ -20,7 +20,9 @@ const mockUseSitesStore = vi.mocked(useSitesStore);
 const mockUseErrorStore = vi.mocked(useErrorStore);
 const mockUseUIStore = vi.mocked(useUIStore);
 const mockUseSiteAnalytics = vi.mocked(useSiteAnalytics);
-const mockValidateMonitorFieldClientSide = vi.mocked(validateMonitorFieldClientSide);
+const mockValidateMonitorFieldClientSide = vi.mocked(
+    validateMonitorFieldClientSide
+);
 const mockLogger = vi.mocked(logger);
 
 describe("useSiteDetails - Branch Coverage Tests", () => {
@@ -80,12 +82,12 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         mockUseSitesStore.mockReturnValue(mockSitesStore);
         mockUseErrorStore.mockReturnValue(mockErrorStore);
         mockUseUIStore.mockReturnValue(mockUIStore);
         mockUseSiteAnalytics.mockReturnValue(mockAnalytics);
-        
+
         // Mock logger methods
         mockLogger.user = {
             action: vi.fn(),
@@ -108,12 +110,14 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 errors: ["Invalid interval value"],
             });
 
-            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
+            const { result } = renderHook(() =>
+                useSiteDetails({ site: mockSite })
+            );
 
             // Set up the interval change first
             act(() => {
                 result.current.handleIntervalChange({
-                    target: { value: "30000" }
+                    target: { value: "30000" },
                 } as React.ChangeEvent<HTMLSelectElement>);
             });
 
@@ -134,12 +138,14 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 errors: ["Invalid timeout value"],
             });
 
-            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
+            const { result } = renderHook(() =>
+                useSiteDetails({ site: mockSite })
+            );
 
             // Set up the timeout change first
             act(() => {
                 result.current.handleTimeoutChange({
-                    target: { value: "1" }
+                    target: { value: "1" },
                 } as React.ChangeEvent<HTMLInputElement>);
             });
 
@@ -160,12 +166,14 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 errors: ["Invalid retry attempts value"],
             });
 
-            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
+            const { result } = renderHook(() =>
+                useSiteDetails({ site: mockSite })
+            );
 
             // Set up the retry attempts change first
             act(() => {
                 result.current.handleRetryAttemptsChange({
-                    target: { value: "10" }
+                    target: { value: "10" },
                 } as React.ChangeEvent<HTMLInputElement>);
             });
 
@@ -188,12 +196,14 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 errors: [],
             });
 
-            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
+            const { result } = renderHook(() =>
+                useSiteDetails({ site: mockSite })
+            );
 
             // Set up the interval change first
             act(() => {
                 result.current.handleIntervalChange({
-                    target: { value: "30000" }
+                    target: { value: "30000" },
                 } as React.ChangeEvent<HTMLSelectElement>);
             });
 
@@ -206,11 +216,14 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 "monitor-1",
                 30_000
             );
-            expect(mockLogger.user.action).toHaveBeenCalledWith("Updated check interval", {
-                monitorId: "monitor-1",
-                newInterval: 30_000,
-                siteId: "test-site",
-            });
+            expect(mockLogger.user.action).toHaveBeenCalledWith(
+                "Updated check interval",
+                {
+                    monitorId: "monitor-1",
+                    newInterval: 30_000,
+                    siteId: "test-site",
+                }
+            );
         });
 
         it("should handle successful timeout save", async () => {
@@ -220,12 +233,14 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 errors: [],
             });
 
-            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
+            const { result } = renderHook(() =>
+                useSiteDetails({ site: mockSite })
+            );
 
             // Set up the timeout change first
             act(() => {
                 result.current.handleTimeoutChange({
-                    target: { value: "10" }
+                    target: { value: "10" },
                 } as React.ChangeEvent<HTMLInputElement>);
             });
 
@@ -238,11 +253,14 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 "monitor-1",
                 10_000 // Converted to milliseconds
             );
-            expect(mockLogger.user.action).toHaveBeenCalledWith("Updated monitor timeout", {
-                monitorId: "monitor-1",
-                newTimeout: 10_000,
-                siteId: "test-site",
-            });
+            expect(mockLogger.user.action).toHaveBeenCalledWith(
+                "Updated monitor timeout",
+                {
+                    monitorId: "monitor-1",
+                    newTimeout: 10_000,
+                    siteId: "test-site",
+                }
+            );
         });
 
         it("should handle successful retry attempts save", async () => {
@@ -252,12 +270,14 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 errors: [],
             });
 
-            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
+            const { result } = renderHook(() =>
+                useSiteDetails({ site: mockSite })
+            );
 
             // Set up the retry attempts change first
             act(() => {
                 result.current.handleRetryAttemptsChange({
-                    target: { value: "5" }
+                    target: { value: "5" },
                 } as React.ChangeEvent<HTMLInputElement>);
             });
 
@@ -265,58 +285,69 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 await result.current.handleSaveRetryAttempts();
             });
 
-            expect(mockSitesStore.updateMonitorRetryAttempts).toHaveBeenCalledWith(
-                "test-site",
-                "monitor-1",
-                5
+            expect(
+                mockSitesStore.updateMonitorRetryAttempts
+            ).toHaveBeenCalledWith("test-site", "monitor-1", 5);
+            expect(mockLogger.user.action).toHaveBeenCalledWith(
+                "Updated monitor retry attempts",
+                {
+                    monitorId: "monitor-1",
+                    newRetryAttempts: 5,
+                    siteId: "test-site",
+                }
             );
-            expect(mockLogger.user.action).toHaveBeenCalledWith("Updated monitor retry attempts", {
-                monitorId: "monitor-1",
-                newRetryAttempts: 5,
-                siteId: "test-site",
-            });
         });
     });
 
     describe("Monitoring Operations", () => {
         it("should handle start monitoring", async () => {
-            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
+            const { result } = renderHook(() =>
+                useSiteDetails({ site: mockSite })
+            );
 
             await act(async () => {
                 await result.current.handleStartMonitoring();
             });
 
-            expect(mockSitesStore.startSiteMonitorMonitoring).toHaveBeenCalledWith(
-                "test-site",
-                "monitor-1"
+            expect(
+                mockSitesStore.startSiteMonitorMonitoring
+            ).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(mockLogger.user.action).toHaveBeenCalledWith(
+                "Started monitoring",
+                {
+                    monitorId: "monitor-1",
+                    siteId: "test-site",
+                }
             );
-            expect(mockLogger.user.action).toHaveBeenCalledWith("Started monitoring", {
-                monitorId: "monitor-1",
-                siteId: "test-site",
-            });
         });
 
         it("should handle stop monitoring", async () => {
-            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
+            const { result } = renderHook(() =>
+                useSiteDetails({ site: mockSite })
+            );
 
             await act(async () => {
                 await result.current.handleStopMonitoring();
             });
 
-            expect(mockSitesStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith(
-                "test-site",
-                "monitor-1"
+            expect(
+                mockSitesStore.stopSiteMonitorMonitoring
+            ).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(mockLogger.user.action).toHaveBeenCalledWith(
+                "Stopped monitoring",
+                {
+                    monitorId: "monitor-1",
+                    siteId: "test-site",
+                }
             );
-            expect(mockLogger.user.action).toHaveBeenCalledWith("Stopped monitoring", {
-                monitorId: "monitor-1",
-                siteId: "test-site",
-            });
         });
     });
 
     describe("Name Save Handling", () => {
         it("should handle early return when no unsaved changes", async () => {
-            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
+            const { result } = renderHook(() =>
+                useSiteDetails({ site: mockSite })
+            );
 
             // Don't make any name changes, so hasUnsavedChanges should be false
             await act(async () => {
@@ -328,7 +359,9 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
         });
 
         it("should handle successful name save with trimmed name", async () => {
-            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
+            const { result } = renderHook(() =>
+                useSiteDetails({ site: mockSite })
+            );
 
             // Make a name change to trigger hasUnsavedChanges
             act(() => {
@@ -343,9 +376,12 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 "test-site",
                 { name: "New Site Name" } // Should be trimmed
             );
-            expect(mockLogger.user.action).toHaveBeenCalledWith("Updated site name", {
-                identifier: "test-site",
-            });
+            expect(mockLogger.user.action).toHaveBeenCalledWith(
+                "Updated site name",
+                {
+                    identifier: "test-site",
+                }
+            );
         });
     });
 
@@ -354,15 +390,17 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
             // Create a monitor without type to test the fallback
             const siteWithoutType = {
                 ...mockSite,
-                monitors: [{
-                    id: "monitor-1",
-                    checkInterval: 60_000,
-                    timeout: 5000,
-                    retryAttempts: 3,
-                    url: "https://example.com",
-                    monitoring: false,
-                    // No type property
-                }],
+                monitors: [
+                    {
+                        id: "monitor-1",
+                        checkInterval: 60_000,
+                        timeout: 5000,
+                        retryAttempts: 3,
+                        url: "https://example.com",
+                        monitoring: false,
+                        // No type property
+                    },
+                ],
             };
 
             mockValidateMonitorFieldClientSide.mockResolvedValue({
@@ -370,11 +408,13 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 errors: [],
             });
 
-            const { result } = renderHook(() => useSiteDetails({ site: siteWithoutType }));
+            const { result } = renderHook(() =>
+                useSiteDetails({ site: siteWithoutType })
+            );
 
             act(() => {
                 result.current.handleIntervalChange({
-                    target: { value: "30000" }
+                    target: { value: "30000" },
                 } as React.ChangeEvent<HTMLSelectElement>);
             });
 

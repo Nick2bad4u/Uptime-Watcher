@@ -6,12 +6,19 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { FormErrorAlert, type FormErrorAlertProps } from "../../../components/shared/FormErrorAlert";
+import {
+    FormErrorAlert,
+    type FormErrorAlertProps,
+} from "../../../components/shared/FormErrorAlert";
 
 // Mock themed components
 vi.mock("../../../theme/components/ThemedBox", () => ({
     default: ({ children, className, variant }: any) => (
-        <div data-testid="themed-box" className={className} data-variant={variant}>
+        <div
+            data-testid="themed-box"
+            className={className}
+            data-variant={variant}
+        >
             {children}
         </div>
     ),
@@ -26,7 +33,14 @@ vi.mock("../../../theme/components/ThemedText", () => ({
 }));
 
 vi.mock("../../../theme/components/ThemedButton", () => ({
-    default: ({ children, className, onClick, size, variant, ...props }: any) => (
+    default: ({
+        children,
+        className,
+        onClick,
+        size,
+        variant,
+        ...props
+    }: any) => (
         <button
             data-testid="themed-button"
             className={className}
@@ -54,9 +68,17 @@ describe("FormErrorAlert", () => {
         it("should render error message when error is provided", () => {
             render(<FormErrorAlert {...defaultProps} />);
 
-            expect(screen.getByTestId("themed-text")).toHaveTextContent("Test error message");
-            expect(screen.getByTestId("themed-text")).toHaveAttribute("data-variant", "error");
-            expect(screen.getByTestId("themed-text")).toHaveAttribute("data-size", "sm");
+            expect(screen.getByTestId("themed-text")).toHaveTextContent(
+                "Test error message"
+            );
+            expect(screen.getByTestId("themed-text")).toHaveAttribute(
+                "data-variant",
+                "error"
+            );
+            expect(screen.getByTestId("themed-text")).toHaveAttribute(
+                "data-size",
+                "sm"
+            );
         });
 
         it("should render close button with correct symbol", () => {
@@ -71,13 +93,18 @@ describe("FormErrorAlert", () => {
         it("should render ThemedBox with correct variant", () => {
             render(<FormErrorAlert {...defaultProps} />);
 
-            expect(screen.getByTestId("themed-box")).toHaveAttribute("data-variant", "secondary");
+            expect(screen.getByTestId("themed-box")).toHaveAttribute(
+                "data-variant",
+                "secondary"
+            );
         });
 
         it("should render content container", () => {
             render(<FormErrorAlert {...defaultProps} />);
 
-            const contentDiv = screen.getByTestId("themed-box").querySelector(".error-alert__content");
+            const contentDiv = screen
+                .getByTestId("themed-box")
+                .querySelector(".error-alert__content");
             expect(contentDiv).toBeInTheDocument();
         });
 
@@ -86,7 +113,9 @@ describe("FormErrorAlert", () => {
 
             expect(screen.queryByTestId("themed-box")).not.toBeInTheDocument();
             expect(screen.queryByTestId("themed-text")).not.toBeInTheDocument();
-            expect(screen.queryByTestId("themed-button")).not.toBeInTheDocument();
+            expect(
+                screen.queryByTestId("themed-button")
+            ).not.toBeInTheDocument();
         });
 
         it("should not render when error is empty string", () => {
@@ -94,7 +123,9 @@ describe("FormErrorAlert", () => {
 
             expect(screen.queryByTestId("themed-box")).not.toBeInTheDocument();
             expect(screen.queryByTestId("themed-text")).not.toBeInTheDocument();
-            expect(screen.queryByTestId("themed-button")).not.toBeInTheDocument();
+            expect(
+                screen.queryByTestId("themed-button")
+            ).not.toBeInTheDocument();
         });
     });
 
@@ -136,15 +167,30 @@ describe("FormErrorAlert", () => {
 
     describe("Custom Classes", () => {
         it("should apply custom className", () => {
-            render(<FormErrorAlert {...defaultProps} className="custom-error" />);
+            render(
+                <FormErrorAlert {...defaultProps} className="custom-error" />
+            );
 
-            expect(screen.getByTestId("themed-box")).toHaveClass("error-alert", "custom-error");
+            expect(screen.getByTestId("themed-box")).toHaveClass(
+                "error-alert",
+                "custom-error"
+            );
         });
 
         it("should apply custom className with dark theme", () => {
-            render(<FormErrorAlert {...defaultProps} className="custom-error" isDark={true} />);
+            render(
+                <FormErrorAlert
+                    {...defaultProps}
+                    className="custom-error"
+                    isDark={true}
+                />
+            );
 
-            expect(screen.getByTestId("themed-box")).toHaveClass("error-alert", "dark", "custom-error");
+            expect(screen.getByTestId("themed-box")).toHaveClass(
+                "error-alert",
+                "dark",
+                "custom-error"
+            );
         });
 
         it("should handle empty className", () => {
@@ -153,7 +199,7 @@ describe("FormErrorAlert", () => {
             const themedBox = screen.getByTestId("themed-box");
             expect(themedBox).toHaveClass("error-alert");
             // Empty className should not add empty class, just the base class
-            expect(themedBox.className.split(' ')).toEqual(["error-alert"]);
+            expect(themedBox.className.split(" ")).toEqual(["error-alert"]);
         });
 
         it("should handle undefined className", () => {
@@ -163,7 +209,12 @@ describe("FormErrorAlert", () => {
         });
 
         it("should trim whitespace from className", () => {
-            render(<FormErrorAlert {...defaultProps} className="  custom-error  " />);
+            render(
+                <FormErrorAlert
+                    {...defaultProps}
+                    className="  custom-error  "
+                />
+            );
 
             const themedBox = screen.getByTestId("themed-box");
             expect(themedBox.className).not.toMatch(/^\s|\s$/); // No leading/trailing whitespace
@@ -173,35 +224,46 @@ describe("FormErrorAlert", () => {
 
     describe("Error Messages", () => {
         it("should handle long error messages", () => {
-            const longError = "This is a very long error message that contains multiple sentences and should be displayed properly in the error alert component without any issues.";
+            const longError =
+                "This is a very long error message that contains multiple sentences and should be displayed properly in the error alert component without any issues.";
             render(<FormErrorAlert {...defaultProps} error={longError} />);
 
-            expect(screen.getByTestId("themed-text")).toHaveTextContent(longError);
+            expect(screen.getByTestId("themed-text")).toHaveTextContent(
+                longError
+            );
         });
 
         it("should handle error messages with special characters", () => {
-            const specialError = "Error: Cannot connect to 'localhost:3000' - Connection refused!";
+            const specialError =
+                "Error: Cannot connect to 'localhost:3000' - Connection refused!";
             render(<FormErrorAlert {...defaultProps} error={specialError} />);
 
-            expect(screen.getByTestId("themed-text")).toHaveTextContent(specialError);
+            expect(screen.getByTestId("themed-text")).toHaveTextContent(
+                specialError
+            );
         });
 
         it("should handle error messages with HTML entities", () => {
             const htmlError = "Error: Value must be > 0 & < 100";
             render(<FormErrorAlert {...defaultProps} error={htmlError} />);
 
-            expect(screen.getByTestId("themed-text")).toHaveTextContent(htmlError);
+            expect(screen.getByTestId("themed-text")).toHaveTextContent(
+                htmlError
+            );
         });
 
         it("should handle error messages with unicode characters", () => {
             const unicodeError = "错误：无法连接到服务器 🚫";
             render(<FormErrorAlert {...defaultProps} error={unicodeError} />);
 
-            expect(screen.getByTestId("themed-text")).toHaveTextContent(unicodeError);
+            expect(screen.getByTestId("themed-text")).toHaveTextContent(
+                unicodeError
+            );
         });
 
         it("should handle multiline error messages", () => {
-            const multilineError = "Error on line 1\nError on line 2\nError on line 3";
+            const multilineError =
+                "Error on line 1\nError on line 2\nError on line 3";
             render(<FormErrorAlert {...defaultProps} error={multilineError} />);
 
             // Text content collapses newlines in DOM, so test should expect collapsed text
@@ -217,7 +279,12 @@ describe("FormErrorAlert", () => {
             const user = userEvent.setup();
             const mockOnClearError = vi.fn();
 
-            render(<FormErrorAlert {...defaultProps} onClearError={mockOnClearError} />);
+            render(
+                <FormErrorAlert
+                    {...defaultProps}
+                    onClearError={mockOnClearError}
+                />
+            );
 
             const closeButton = screen.getByTestId("themed-button");
             await user.click(closeButton);
@@ -230,7 +297,12 @@ describe("FormErrorAlert", () => {
             const user = userEvent.setup();
             const mockOnClearError = vi.fn();
 
-            render(<FormErrorAlert {...defaultProps} onClearError={mockOnClearError} />);
+            render(
+                <FormErrorAlert
+                    {...defaultProps}
+                    onClearError={mockOnClearError}
+                />
+            );
 
             const closeButton = screen.getByTestId("themed-button");
             await user.click(closeButton);
@@ -244,7 +316,12 @@ describe("FormErrorAlert", () => {
             const user = userEvent.setup();
             const mockOnClearError = vi.fn();
 
-            render(<FormErrorAlert {...defaultProps} onClearError={mockOnClearError} />);
+            render(
+                <FormErrorAlert
+                    {...defaultProps}
+                    onClearError={mockOnClearError}
+                />
+            );
 
             const closeButton = screen.getByTestId("themed-button");
             closeButton.focus();
@@ -257,11 +334,16 @@ describe("FormErrorAlert", () => {
             const user = userEvent.setup();
             const mockOnClearError = vi.fn();
 
-            render(<FormErrorAlert {...defaultProps} onClearError={mockOnClearError} />);
+            render(
+                <FormErrorAlert
+                    {...defaultProps}
+                    onClearError={mockOnClearError}
+                />
+            );
 
             const closeButton = screen.getByTestId("themed-button");
             closeButton.focus();
-            
+
             // Test that button is focusable and can be activated via click
             // Space key behavior on mocked buttons may not work as expected
             await user.click(closeButton);
@@ -272,22 +354,30 @@ describe("FormErrorAlert", () => {
 
     describe("Edge Cases", () => {
         it("should handle rapid state changes", () => {
-            const { rerender } = render(<FormErrorAlert {...defaultProps} error={null} />);
+            const { rerender } = render(
+                <FormErrorAlert {...defaultProps} error={null} />
+            );
 
             expect(screen.queryByTestId("themed-box")).not.toBeInTheDocument();
 
             rerender(<FormErrorAlert {...defaultProps} error="Error 1" />);
-            expect(screen.getByTestId("themed-text")).toHaveTextContent("Error 1");
+            expect(screen.getByTestId("themed-text")).toHaveTextContent(
+                "Error 1"
+            );
 
             rerender(<FormErrorAlert {...defaultProps} error="Error 2" />);
-            expect(screen.getByTestId("themed-text")).toHaveTextContent("Error 2");
+            expect(screen.getByTestId("themed-text")).toHaveTextContent(
+                "Error 2"
+            );
 
             rerender(<FormErrorAlert {...defaultProps} error={null} />);
             expect(screen.queryByTestId("themed-box")).not.toBeInTheDocument();
         });
 
         it("should handle theme changes during error display", () => {
-            const { rerender } = render(<FormErrorAlert {...defaultProps} isDark={false} />);
+            const { rerender } = render(
+                <FormErrorAlert {...defaultProps} isDark={false} />
+            );
 
             expect(screen.getByTestId("themed-box")).not.toHaveClass("dark");
 
@@ -299,7 +389,9 @@ describe("FormErrorAlert", () => {
         });
 
         it("should handle className changes", () => {
-            const { rerender } = render(<FormErrorAlert {...defaultProps} className="class1" />);
+            const { rerender } = render(
+                <FormErrorAlert {...defaultProps} className="class1" />
+            );
 
             expect(screen.getByTestId("themed-box")).toHaveClass("class1");
 
@@ -313,13 +405,23 @@ describe("FormErrorAlert", () => {
             const mockCallback1 = vi.fn();
             const mockCallback2 = vi.fn();
 
-            const { rerender } = render(<FormErrorAlert {...defaultProps} onClearError={mockCallback1} />);
+            const { rerender } = render(
+                <FormErrorAlert
+                    {...defaultProps}
+                    onClearError={mockCallback1}
+                />
+            );
 
             await user.click(screen.getByTestId("themed-button"));
             expect(mockCallback1).toHaveBeenCalledTimes(1);
             expect(mockCallback2).not.toHaveBeenCalled();
 
-            rerender(<FormErrorAlert {...defaultProps} onClearError={mockCallback2} />);
+            rerender(
+                <FormErrorAlert
+                    {...defaultProps}
+                    onClearError={mockCallback2}
+                />
+            );
 
             await user.click(screen.getByTestId("themed-button"));
             expect(mockCallback1).toHaveBeenCalledTimes(1);
@@ -360,7 +462,9 @@ describe("FormErrorAlert", () => {
         it("should have proper semantic structure", () => {
             render(<FormErrorAlert {...defaultProps} />);
 
-            const contentDiv = screen.getByTestId("themed-box").querySelector(".error-alert__content");
+            const contentDiv = screen
+                .getByTestId("themed-box")
+                .querySelector(".error-alert__content");
             expect(contentDiv).toBeInTheDocument();
         });
     });
@@ -380,8 +484,14 @@ describe("FormErrorAlert", () => {
             );
 
             // Check all elements are rendered
-            expect(screen.getByTestId("themed-box")).toHaveClass("error-alert", "dark", "integration-test");
-            expect(screen.getByTestId("themed-text")).toHaveTextContent("Integration test error");
+            expect(screen.getByTestId("themed-box")).toHaveClass(
+                "error-alert",
+                "dark",
+                "integration-test"
+            );
+            expect(screen.getByTestId("themed-text")).toHaveTextContent(
+                "Integration test error"
+            );
             expect(screen.getByTestId("themed-button")).toHaveTextContent("✕");
 
             // Test interaction
@@ -392,9 +502,16 @@ describe("FormErrorAlert", () => {
         it("should work with minimal props", () => {
             const mockOnClearError = vi.fn();
 
-            render(<FormErrorAlert error="Minimal error" onClearError={mockOnClearError} />);
+            render(
+                <FormErrorAlert
+                    error="Minimal error"
+                    onClearError={mockOnClearError}
+                />
+            );
 
-            expect(screen.getByTestId("themed-text")).toHaveTextContent("Minimal error");
+            expect(screen.getByTestId("themed-text")).toHaveTextContent(
+                "Minimal error"
+            );
             expect(screen.getByTestId("themed-box")).toHaveClass("error-alert");
             expect(screen.getByTestId("themed-box")).not.toHaveClass("dark");
         });

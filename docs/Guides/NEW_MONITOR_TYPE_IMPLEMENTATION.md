@@ -9,7 +9,7 @@ This document provides a **comprehensive, step-by-step guide** for adding a new 
 The system currently supports:
 
 - **HTTP**: Website/API monitoring (`http`) - Full HTTP/HTTPS request monitoring with status code validation
-- **Port**: TCP port connectivity monitoring (`port`) - Direct socket connection testing to specific host:port combinations  
+- **Port**: TCP port connectivity monitoring (`port`) - Direct socket connection testing to specific host:port combinations
 - **Ping**: Network connectivity monitoring (`ping`) - ICMP ping testing for network reachability
 
 ## 🏗️ Architecture Integration
@@ -162,22 +162,22 @@ The system uses the **unified enhanced monitoring architecture** with the follow
 
 Every monitor type must support these standardized fields from the `Monitor` interface in `shared/types.ts`:
 
-| Field             | Type            | Range/Validation      | Purpose                             | Required |
-| ----------------- | --------------- | --------------------- | ----------------------------------- | -------- |
-| `id`              | `string`        | Non-empty string      | Unique monitor identifier           | ✅ Yes   |
-| `type`            | `MonitorType`   | "http" \| "port" \| "ping" | Monitor type classification         | ✅ Yes   |
-| `checkInterval`   | `number`        | 5000ms - 30 days      | Monitoring frequency scheduling     | ✅ Yes   |
-| `retryAttempts`   | `number`        | 0 - 10 attempts       | Failure retry logic                 | ✅ Yes   |
-| `timeout`         | `number`        | 1000ms - 300000ms     | Request timeout for reliability     | ✅ Yes   |
-| `monitoring`      | `boolean`       | true/false            | Whether monitor is actively running | ✅ Yes   |
-| `status`          | `MonitorStatus` | "up" \| "down" \| "pending" \| "paused" | Current monitor status              | ✅ Yes   |
-| `responseTime`    | `number`        | -1 or positive        | Last response time (-1 = never checked) | ✅ Yes   |
-| `history`         | `StatusHistory[]` | Array of status history | Historical status data              | ✅ Yes   |
-| `lastChecked`     | `Date`          | Valid Date object     | Last check timestamp                | ❌ Optional |
-| `activeOperations` | `string[]`      | Array of operation IDs | Currently running operations        | ❌ Optional |
-| `url`             | `string`        | Valid URL (HTTP only) | Target URL for HTTP monitors        | ❌ Type-specific |
-| `host`            | `string`        | Valid hostname/IP     | Target host for ping/port monitors  | ❌ Type-specific |
-| `port`            | `number`        | 1-65535               | Target port for port monitors       | ❌ Type-specific |
+| Field              | Type              | Range/Validation                        | Purpose                                 | Required         |
+| ------------------ | ----------------- | --------------------------------------- | --------------------------------------- | ---------------- |
+| `id`               | `string`          | Non-empty string                        | Unique monitor identifier               | ✅ Yes           |
+| `type`             | `MonitorType`     | "http" \| "port" \| "ping"              | Monitor type classification             | ✅ Yes           |
+| `checkInterval`    | `number`          | 5000ms - 30 days                        | Monitoring frequency scheduling         | ✅ Yes           |
+| `retryAttempts`    | `number`          | 0 - 10 attempts                         | Failure retry logic                     | ✅ Yes           |
+| `timeout`          | `number`          | 1000ms - 300000ms                       | Request timeout for reliability         | ✅ Yes           |
+| `monitoring`       | `boolean`         | true/false                              | Whether monitor is actively running     | ✅ Yes           |
+| `status`           | `MonitorStatus`   | "up" \| "down" \| "pending" \| "paused" | Current monitor status                  | ✅ Yes           |
+| `responseTime`     | `number`          | -1 or positive                          | Last response time (-1 = never checked) | ✅ Yes           |
+| `history`          | `StatusHistory[]` | Array of status history                 | Historical status data                  | ✅ Yes           |
+| `lastChecked`      | `Date`            | Valid Date object                       | Last check timestamp                    | ❌ Optional      |
+| `activeOperations` | `string[]`        | Array of operation IDs                  | Currently running operations            | ❌ Optional      |
+| `url`              | `string`          | Valid URL (HTTP only)                   | Target URL for HTTP monitors            | ❌ Type-specific |
+| `host`             | `string`          | Valid hostname/IP                       | Target host for ping/port monitors      | ❌ Type-specific |
+| `port`             | `number`          | 1-65535                                 | Target port for port monitors           | ❌ Type-specific |
 
 ### **🔹 Production Quality Standards**
 
@@ -191,7 +191,7 @@ Every monitor type must support these standardized fields from the `Monitor` int
 
 New monitor types automatically integrate with the repository pattern through the Enhanced Monitoring System:
 
-```typescript
+````typescript
 /**
  * Monitor service implementing production-grade monitoring patterns.
  *
@@ -211,51 +211,51 @@ New monitor types automatically integrate with the repository pattern through th
  * ```
  */
 export class DnsMonitor implements IMonitorService {
-    /**
-     * Performs a DNS monitoring check.
-     *
-     * @param monitor - Monitor configuration with validated fields
-     * @returns Promise resolving to standardized check result
-     */
-    async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
-        if (monitor.type !== "dns") {
-            throw new Error(`DnsMonitor cannot handle monitor type: ${monitor.type}`);
-        }
+ /**
+  * Performs a DNS monitoring check.
+  *
+  * @param monitor - Monitor configuration with validated fields
+  * @returns Promise resolving to standardized check result
+  */
+ async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
+  if (monitor.type !== "dns") {
+   throw new Error(`DnsMonitor cannot handle monitor type: ${monitor.type}`);
+  }
 
-        // Focus only on the monitoring logic
-        const startTime = performance.now();
-        
-        try {
-            // Perform DNS resolution
-            const result = await this.performDnsLookup(monitor);
-            const responseTime = performance.now() - startTime;
+  // Focus only on the monitoring logic
+  const startTime = performance.now();
 
-            return {
-                status: result.success ? "up" : "down",
-                responseTime: Math.round(responseTime),
-                details: result.details,
-                error: result.error,
-            };
-        } catch (error) {
-            const responseTime = performance.now() - startTime;
-            return {
-                status: "down",
-                responseTime: Math.round(responseTime),
-                details: "DNS lookup failed",
-                error: error instanceof Error ? error.message : String(error),
-            };
-        }
-    }
+  try {
+   // Perform DNS resolution
+   const result = await this.performDnsLookup(monitor);
+   const responseTime = performance.now() - startTime;
 
-    updateConfig(config: Partial<MonitorConfig>): void {
-        this.config = { ...this.config, ...config };
-    }
+   return {
+    status: result.success ? "up" : "down",
+    responseTime: Math.round(responseTime),
+    details: result.details,
+    error: result.error,
+   };
+  } catch (error) {
+   const responseTime = performance.now() - startTime;
+   return {
+    status: "down",
+    responseTime: Math.round(responseTime),
+    details: "DNS lookup failed",
+    error: error instanceof Error ? error.message : String(error),
+   };
+  }
+ }
 
-    getType(): Site["monitors"][0]["type"] {
-        return "dns";
-    }
+ updateConfig(config: Partial<MonitorConfig>): void {
+  this.config = { ...this.config, ...config };
+ }
+
+ getType(): Site["monitors"][0]["type"] {
+  return "dns";
+ }
 }
-```
+````
 
 **Key Benefits of This Integration:**
 
@@ -264,10 +264,10 @@ export class DnsMonitor implements IMonitorService {
 - **Race Condition Prevention**: Operation correlation prevents concurrent check conflicts
 - **Status Management**: Automatic status updates and history tracking
 - **Event Integration**: System events are emitted automatically for UI updates
-      status: "down",
-      responseTime: performance.now() - startTime,
-      details: "Check failed",
-**Key Benefits of This Integration:**
+  status: "down",
+  responseTime: performance.now() - startTime,
+  details: "Check failed",
+  **Key Benefits of This Integration:**
 
 - **Simplified Implementation**: Focus only on monitoring logic, not infrastructure
 - **Automatic Database Operations**: Enhanced system handles persistence through repositories
@@ -281,7 +281,7 @@ export class DnsMonitor implements IMonitorService {
 
 **PRODUCTION REQUIREMENT**: Use the centralized Zod validation system for consistent, secure validation:
 
-```typescript
+````typescript
 import { z } from "zod";
 import validator from "validator";
 import { withErrorHandling } from "shared/utils/errorHandling";
@@ -290,14 +290,14 @@ import { withErrorHandling } from "shared/utils/errorHandling";
  * Production-grade validation for DNS monitor configuration.
  *
  * @remarks
- * The system uses Zod schemas for type-safe validation with comprehensive 
+ * The system uses Zod schemas for type-safe validation with comprehensive
  * error messages. All validation is centralized in shared/validation/schemas.ts
  * using the baseMonitorSchema extension pattern.
- * 
+ *
  * @example
  * ```typescript
  * import { dnsMonitorSchema } from "shared/validation/schemas";
- * 
+ *
  * const validationResult = dnsMonitorSchema.safeParse(monitor);
  * if (!validationResult.success) {
  *   throw new Error(validationResult.error.message);
@@ -305,21 +305,24 @@ import { withErrorHandling } from "shared/utils/errorHandling";
  * ```
  */
 const dnsMonitorSchema = baseMonitorSchema.extend({
-    type: z.literal("dns"),
-    hostname: z.string().refine((val) => {
-        if (validator.isIP(val)) return true;
-        if (validator.isFQDN(val, {
-            allow_numeric_tld: false,
-            allow_trailing_dot: false,
-            allow_underscores: false,
-            allow_wildcard: false,
-            require_tld: true,
-        })) return true;
-        return val === "localhost";
-    }, "Must be a valid hostname, IP address, or localhost"),
-    recordType: z.enum(["A", "AAAA", "MX", "CNAME"]),
+ type: z.literal("dns"),
+ hostname: z.string().refine((val) => {
+  if (validator.isIP(val)) return true;
+  if (
+   validator.isFQDN(val, {
+    allow_numeric_tld: false,
+    allow_trailing_dot: false,
+    allow_underscores: false,
+    allow_wildcard: false,
+    require_tld: true,
+   })
+  )
+   return true;
+  return val === "localhost";
+ }, "Must be a valid hostname, IP address, or localhost"),
+ recordType: z.enum(["A", "AAAA", "MX", "CNAME"]),
 });
-```
+````
 
 ### **🔹 Validation Benefits**
 
@@ -333,40 +336,43 @@ const dnsMonitorSchema = baseMonitorSchema.extend({
 ### **🔹 Critical Validation Requirements**
 
 1. **Schema Extension Pattern**:
+
    ```typescript
    // ALWAYS extend baseMonitorSchema - never create from scratch
    const newMonitorSchema = baseMonitorSchema.extend({
-       type: z.literal("your-type"),
-       // Add type-specific fields here
+    type: z.literal("your-type"),
+    // Add type-specific fields here
    });
    ```
 
 2. **Discriminated Union Integration**:
+
    ```typescript
    // MUST add to the discriminated union in schemas.ts
    export const monitorSchema = z.discriminatedUnion("type", [
-       httpMonitorSchema,
-       portMonitorSchema,
-       pingMonitorSchema,
-       yourNewMonitorSchema, // Add here
+    httpMonitorSchema,
+    portMonitorSchema,
+    pingMonitorSchema,
+    yourNewMonitorSchema, // Add here
    ]);
    ```
 
 3. **Service Interface Compliance**:
+
    ```typescript
    // Must implement IMonitorService with proper error handling
    class CustomMonitor implements IMonitorService {
-       async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
-           // Implementation must return standardized result
-       }
-       
-       updateConfig(config: Partial<MonitorConfig>): void {
-           // Runtime configuration updates
-       }
-       
-       getType(): Site["monitors"][0]["type"] {
-           return "your-type";
-       }
+    async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
+     // Implementation must return standardized result
+    }
+
+    updateConfig(config: Partial<MonitorConfig>): void {
+     // Runtime configuration updates
+    }
+
+    getType(): Site["monitors"][0]["type"] {
+     return "your-type";
+    }
    }
    ```
 
@@ -374,10 +380,10 @@ const dnsMonitorSchema = baseMonitorSchema.extend({
    ```typescript
    // Must register with complete BaseMonitorConfig
    registerMonitorType({
-       type: "your-type",
-       validationSchema: yourNewMonitorSchema, // Same schema as above
-       serviceFactory: () => new YourMonitor(),
-       // ... other required fields
+    type: "your-type",
+    validationSchema: yourNewMonitorSchema, // Same schema as above
+    serviceFactory: () => new YourMonitor(),
+    // ... other required fields
    });
    ```
 
@@ -469,41 +475,43 @@ import validator from "validator";
 
 /**
  * Zod schema for DNS monitor fields.
- * 
+ *
  * @remarks
- * Extends baseMonitorSchema which includes id, checkInterval, monitoring, 
+ * Extends baseMonitorSchema which includes id, checkInterval, monitoring,
  * responseTime, retryAttempts, status, timeout, and type fields.
  */
 export const dnsMonitorSchema = baseMonitorSchema.extend({
-    type: z.literal("dns"),
-    hostname: z.string().refine((val) => {
-        // Use validator.js for robust hostname validation
-        if (validator.isIP(val)) {
-            return true;
-        }
-        if (validator.isFQDN(val, {
-            allow_numeric_tld: false,
-            allow_trailing_dot: false,
-            allow_underscores: false,
-            allow_wildcard: false,
-            require_tld: true,
-        })) {
-            return true;
-        }
-        return val === "localhost";
-    }, "Must be a valid hostname, IP address, or localhost"),
-    recordType: z.enum(["A", "AAAA", "MX", "CNAME"], {
-        errorMap: () => ({ message: "Must select a valid DNS record type" }),
-    }),
-    expectedValue: z.string().optional(),
+ type: z.literal("dns"),
+ hostname: z.string().refine((val) => {
+  // Use validator.js for robust hostname validation
+  if (validator.isIP(val)) {
+   return true;
+  }
+  if (
+   validator.isFQDN(val, {
+    allow_numeric_tld: false,
+    allow_trailing_dot: false,
+    allow_underscores: false,
+    allow_wildcard: false,
+    require_tld: true,
+   })
+  ) {
+   return true;
+  }
+  return val === "localhost";
+ }, "Must be a valid hostname, IP address, or localhost"),
+ recordType: z.enum(["A", "AAAA", "MX", "CNAME"], {
+  errorMap: () => ({ message: "Must select a valid DNS record type" }),
+ }),
+ expectedValue: z.string().optional(),
 });
 
 // Then add to the discriminated union
 export const monitorSchema = z.discriminatedUnion("type", [
-    httpMonitorSchema,
-    portMonitorSchema,
-    pingMonitorSchema,
-    dnsMonitorSchema, // Add your new schema here
+ httpMonitorSchema,
+ portMonitorSchema,
+ pingMonitorSchema,
+ dnsMonitorSchema, // Add your new schema here
 ]);
 ```
 
@@ -735,62 +743,62 @@ export class DnsMonitor implements IMonitorService {
 
 ```typescript
 registerMonitorType({
-    type: "dns",
-    displayName: "DNS (Domain Resolution)",
-    description: "Monitors DNS resolution for domains and records",
-    version: "1.0.0",
-    serviceFactory: () => new DnsMonitor(),
-    validationSchema: dnsMonitorSchema, // From shared/validation/schemas.ts
-    fields: [
-        {
-            name: "hostname",
-            label: "Hostname",
-            type: "text",
-            required: true,
-            placeholder: "example.com",
-            helpText: "Enter the domain name to resolve",
-        },
-        {
-            name: "recordType",
-            label: "Record Type",
-            type: "select",
-            required: true,
-            options: [
-                { value: "A", label: "A Record" },
-                { value: "AAAA", label: "AAAA Record" },
-                { value: "MX", label: "MX Record" },
-                { value: "CNAME", label: "CNAME Record" },
-            ],
-        },
-        // Note: checkInterval, retryAttempts, timeout fields are auto-generated
-        // from the base UI configuration system
-    ],
-    uiConfig: {
-        supportsAdvancedAnalytics: true,
-        supportsResponseTime: true,
-        display: {
-            showAdvancedMetrics: true,
-            showUrl: false, // DNS doesn't use URLs
-        },
-        detailFormats: {
-            analyticsLabel: "DNS Response Time",
-            historyDetail: (details: string) => `Record: ${details}`,
-        },
-        formatDetail: (details: string) => `Record: ${details}`,
-        formatTitleSuffix: (monitor: Monitor) => {
-            if (monitor.type === "dns") {
-                const hostname = (monitor as any).hostname;
-                const recordType = (monitor as any).recordType;
-                return hostname ? ` (${hostname} ${recordType})` : "";
-            }
-            return "";
-        },
-        helpTexts: {
-            primary: "Enter the domain name to resolve",
-            secondary:
-                "The monitor will check DNS resolution according to your monitoring interval",
-        },
-    },
+ type: "dns",
+ displayName: "DNS (Domain Resolution)",
+ description: "Monitors DNS resolution for domains and records",
+ version: "1.0.0",
+ serviceFactory: () => new DnsMonitor(),
+ validationSchema: dnsMonitorSchema, // From shared/validation/schemas.ts
+ fields: [
+  {
+   name: "hostname",
+   label: "Hostname",
+   type: "text",
+   required: true,
+   placeholder: "example.com",
+   helpText: "Enter the domain name to resolve",
+  },
+  {
+   name: "recordType",
+   label: "Record Type",
+   type: "select",
+   required: true,
+   options: [
+    { value: "A", label: "A Record" },
+    { value: "AAAA", label: "AAAA Record" },
+    { value: "MX", label: "MX Record" },
+    { value: "CNAME", label: "CNAME Record" },
+   ],
+  },
+  // Note: checkInterval, retryAttempts, timeout fields are auto-generated
+  // from the base UI configuration system
+ ],
+ uiConfig: {
+  supportsAdvancedAnalytics: true,
+  supportsResponseTime: true,
+  display: {
+   showAdvancedMetrics: true,
+   showUrl: false, // DNS doesn't use URLs
+  },
+  detailFormats: {
+   analyticsLabel: "DNS Response Time",
+   historyDetail: (details: string) => `Record: ${details}`,
+  },
+  formatDetail: (details: string) => `Record: ${details}`,
+  formatTitleSuffix: (monitor: Monitor) => {
+   if (monitor.type === "dns") {
+    const hostname = (monitor as any).hostname;
+    const recordType = (monitor as any).recordType;
+    return hostname ? ` (${hostname} ${recordType})` : "";
+   }
+   return "";
+  },
+  helpTexts: {
+   primary: "Enter the domain name to resolve",
+   secondary:
+    "The monitor will check DNS resolution according to your monitoring interval",
+  },
+ },
 });
 ```
 
@@ -1519,10 +1527,10 @@ Use these exact import patterns for consistency with the current codebase:
 ```typescript
 // Monitor service implementation
 import type { Site } from "../../types";
-import type { 
-    IMonitorService, 
-    MonitorCheckResult, 
-    MonitorConfig 
+import type {
+ IMonitorService,
+ MonitorCheckResult,
+ MonitorConfig,
 } from "./types";
 
 // Shared types and validation
@@ -1562,37 +1570,37 @@ The current system uses strict TypeScript with:
 
 ```typescript
 export class YourMonitor implements IMonitorService {
-    private config: MonitorConfig;
+ private config: MonitorConfig;
 
-    constructor(config: MonitorConfig = {}) {
-        this.config = {
-            timeout: DEFAULT_TIMEOUT,
-            retryAttempts: DEFAULT_RETRY_ATTEMPTS,
-            ...config,
-        };
-    }
+ constructor(config: MonitorConfig = {}) {
+  this.config = {
+   timeout: DEFAULT_TIMEOUT,
+   retryAttempts: DEFAULT_RETRY_ATTEMPTS,
+   ...config,
+  };
+ }
 
-    async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
-        // Type guard for monitor type
-        if (monitor.type !== "your-type") {
-            throw new Error(`YourMonitor cannot handle monitor type: ${monitor.type}`);
-        }
+ async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
+  // Type guard for monitor type
+  if (monitor.type !== "your-type") {
+   throw new Error(`YourMonitor cannot handle monitor type: ${monitor.type}`);
+  }
 
-        // Type-safe implementation
-        return {
-            status: "up" as const,
-            responseTime: 100,
-            details: "Check successful",
-        };
-    }
+  // Type-safe implementation
+  return {
+   status: "up" as const,
+   responseTime: 100,
+   details: "Check successful",
+  };
+ }
 
-    updateConfig(config: Partial<MonitorConfig>): void {
-        this.config = { ...this.config, ...config };
-    }
+ updateConfig(config: Partial<MonitorConfig>): void {
+  this.config = { ...this.config, ...config };
+ }
 
-    getType(): Site["monitors"][0]["type"] {
-        return "your-type";
-    }
+ getType(): Site["monitors"][0]["type"] {
+  return "your-type";
+ }
 }
 ```
 
@@ -1609,52 +1617,52 @@ import type { Site } from "../../../types";
 import { YourMonitor } from "../../../services/monitoring/YourMonitor";
 
 describe("YourMonitor - Comprehensive Coverage", () => {
-    let monitor: YourMonitor;
-    
-    beforeEach(() => {
-        monitor = new YourMonitor();
-    });
+ let monitor: YourMonitor;
 
-    describe("check method", () => {
-        it("should return up status for successful checks", async () => {
-            const mockMonitor: Site["monitors"][0] = {
-                id: "test-monitor",
-                type: "your-type",
-                // ... other required fields
-            };
+ beforeEach(() => {
+  monitor = new YourMonitor();
+ });
 
-            const result = await monitor.check(mockMonitor);
+ describe("check method", () => {
+  it("should return up status for successful checks", async () => {
+   const mockMonitor: Site["monitors"][0] = {
+    id: "test-monitor",
+    type: "your-type",
+    // ... other required fields
+   };
 
-            expect(result.status).toBe("up");
-            expect(result.responseTime).toBeGreaterThan(0);
-            expect(result.details).toBeDefined();
-        });
+   const result = await monitor.check(mockMonitor);
 
-        it("should return down status for failed checks", async () => {
-            // Test failure scenarios
-        });
+   expect(result.status).toBe("up");
+   expect(result.responseTime).toBeGreaterThan(0);
+   expect(result.details).toBeDefined();
+  });
 
-        it("should handle timeout scenarios", async () => {
-            // Test timeout handling
-        });
+  it("should return down status for failed checks", async () => {
+   // Test failure scenarios
+  });
 
-        it("should validate monitor type", async () => {
-            const invalidMonitor = { ...mockMonitor, type: "invalid" as any };
-            
-            await expect(monitor.check(invalidMonitor)).rejects.toThrow();
-        });
-    });
+  it("should handle timeout scenarios", async () => {
+   // Test timeout handling
+  });
 
-    describe("configuration methods", () => {
-        it("should update configuration correctly", () => {
-            monitor.updateConfig({ timeout: 10000 });
-            // Verify configuration was applied
-        });
+  it("should validate monitor type", async () => {
+   const invalidMonitor = { ...mockMonitor, type: "invalid" as any };
 
-        it("should return correct monitor type", () => {
-            expect(monitor.getType()).toBe("your-type");
-        });
-    });
+   await expect(monitor.check(invalidMonitor)).rejects.toThrow();
+  });
+ });
+
+ describe("configuration methods", () => {
+  it("should update configuration correctly", () => {
+   monitor.updateConfig({ timeout: 10000 });
+   // Verify configuration was applied
+  });
+
+  it("should return correct monitor type", () => {
+   expect(monitor.getType()).toBe("your-type");
+  });
+ });
 });
 ```
 
@@ -1665,16 +1673,16 @@ describe("YourMonitor - Comprehensive Coverage", () => {
 ```typescript
 // Test integration with EnhancedMonitorChecker
 describe("YourMonitor Integration", () => {
-    it("should integrate with enhanced monitoring system", async () => {
-        const config = createTestMonitorCheckConfig();
-        const checker = new EnhancedMonitorChecker(config);
-        const site = createTestSite();
+ it("should integrate with enhanced monitoring system", async () => {
+  const config = createTestMonitorCheckConfig();
+  const checker = new EnhancedMonitorChecker(config);
+  const site = createTestSite();
 
-        const result = await checker.checkMonitor(site, "monitor-id", false);
+  const result = await checker.checkMonitor(site, "monitor-id", false);
 
-        expect(result).toBeDefined();
-        expect(result?.status).toMatch(/up|down/);
-    });
+  expect(result).toBeDefined();
+  expect(result?.status).toMatch(/up|down/);
+ });
 });
 ```
 
@@ -1684,18 +1692,18 @@ Test the Zod schema thoroughly:
 
 ```typescript
 describe("YourMonitor Schema Validation", () => {
-    it("should validate correct monitor configuration", () => {
-        const validConfig = {
-            // Valid monitor configuration
-        };
+ it("should validate correct monitor configuration", () => {
+  const validConfig = {
+   // Valid monitor configuration
+  };
 
-        const result = yourMonitorSchema.safeParse(validConfig);
-        expect(result.success).toBe(true);
-    });
+  const result = yourMonitorSchema.safeParse(validConfig);
+  expect(result.success).toBe(true);
+ });
 
-    it("should reject invalid configurations", () => {
-        // Test various invalid configurations
-    });
+ it("should reject invalid configurations", () => {
+  // Test various invalid configurations
+ });
 });
 ```
 
