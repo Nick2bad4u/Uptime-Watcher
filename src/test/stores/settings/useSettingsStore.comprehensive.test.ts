@@ -96,8 +96,7 @@ describe("useSettingsStore", () => {
             try {
                 (handlers as any).setLoading?.(true);
                 (handlers as any).clearError?.();
-                const result = await fn();
-                return result;
+                return await fn();
             } catch (error) {
                 // Match the real withErrorHandling behavior: extract error message
                 const errorMessage =
@@ -433,8 +432,7 @@ describe("useSettingsStore", () => {
                 loadingStatesDuringCall.push(true);
 
                 try {
-                    const result = await fn();
-                    return result;
+                    return await fn();
                 } finally {
                     (handlers as any).setLoading?.(false);
                     loadingStatesDuringCall.push(false);

@@ -246,9 +246,9 @@ export function getMonitorTypeDisplayLabel(monitorType: string): string {
                 // Fallback: Generate a reasonable label from the monitor type
                 // Convert from camelCase/snake_case to Title Case
                 const titleCase = monitorType
-                    // eslint-disable-next-line regexp/require-unicode-sets-regexp, regexp/sort-character-class-elements -- Character class [_-] is readable and standard; 'v' flag would break compatibility with older environments
+                    // eslint-disable-next-line regexp/sort-character-class-elements, regexp/require-unicode-sets-regexp -- Environment compatibility
                     .replaceAll(/[_-]/g, " ") // Replace underscores and hyphens with spaces
-                    // eslint-disable-next-line regexp/require-unicode-sets-regexp -- Lookbehind/lookahead assertions with character classes are not compatible with 'v' flag in all environments
+                    // eslint-disable-next-line regexp/require-unicode-sets-regexp, no-lookahead-lookbehind-regexp/no-lookahead-lookbehind-regexp -- Environment compatibility
                     .replaceAll(/(?<=[a-z])(?=[A-Z])/g, " ") // Add space before capitals
                     .split(" ")
                     .map(

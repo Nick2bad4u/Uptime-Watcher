@@ -6,14 +6,16 @@ import { useErrorStore } from "../../../stores/error/useErrorStore";
 import { useUIStore } from "../../../stores/ui/useUiStore";
 import { useSiteAnalytics } from "../../../hooks/site/useSiteAnalytics";
 import { validateMonitorFieldClientSide } from "../../../utils/monitorValidation";
+import { useSelectedSite } from "../../../hooks/useSelectedSite";
+import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
 import logger from "../../../services/logger";
 
 // Mock all dependencies
-vi.mock("@/hooks/useSelectedSite");
-vi.mock("@/stores/sites/useSitesStore");
-vi.mock("@/stores/monitor/useMonitorTypesStore");
-vi.mock("@/shared/validation/validatorUtils");
-vi.mock("@/services/logger");
+vi.mock("../../../hooks/useSelectedSite");
+vi.mock("../../../stores/sites/useSitesStore");
+vi.mock("../../../stores/monitor/useMonitorTypesStore");
+vi.mock("../../../utils/monitorValidation");
+vi.mock("../../../services/logger");
 
 const mockUseSelectedSite = vi.mocked(useSelectedSite);
 const mockUseSitesStore = vi.mocked(useSitesStore);
@@ -41,13 +43,20 @@ describe("useSiteDetails - Branch Coverage", () => {
     };
 
     const mockSitesStore = {
-        startSiteMonitorMonitoring: vi.fn(),
-        stopSiteMonitorMonitoring: vi.fn(),
-        updateSiteCheckInterval: vi.fn(),
-        updateMonitorTimeout: vi.fn(),
-        updateMonitorRetryAttempts: vi.fn(),
-        modifySite: vi.fn(),
         checkSiteNow: vi.fn(),
+        deleteSite: vi.fn(),
+        getSelectedMonitorId: vi.fn(),
+        modifySite: vi.fn(),
+        removeMonitorFromSite: vi.fn(),
+        setSelectedMonitorId: vi.fn(),
+        sites: [mockSite],
+        startSiteMonitoring: vi.fn(),
+        startSiteMonitorMonitoring: vi.fn(),
+        stopSiteMonitoring: vi.fn(),
+        stopSiteMonitorMonitoring: vi.fn(),
+        updateMonitorRetryAttempts: vi.fn(),
+        updateMonitorTimeout: vi.fn(),
+        updateSiteCheckInterval: vi.fn(),
         error: null,
         clearError: vi.fn(),
     };
@@ -78,7 +87,7 @@ describe("useSiteDetails - Branch Coverage", () => {
 
     describe("handleStartMonitoring", () => {
         it("should handle successful start monitoring (lines 420-430)", async () => {
-            const { result } = renderHook(() => useSiteDetails());
+            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
 
             await act(async () => {
                 await result.current.handleStartMonitoring();
@@ -99,7 +108,7 @@ describe("useSiteDetails - Branch Coverage", () => {
 
     describe("handleStopMonitoring", () => {
         it("should handle successful stop monitoring (lines 434-450)", async () => {
-            const { result } = renderHook(() => useSiteDetails());
+            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
 
             await act(async () => {
                 await result.current.handleStopMonitoring();
@@ -126,7 +135,7 @@ describe("useSiteDetails - Branch Coverage", () => {
                 errors: ["Invalid interval value"],
             });
 
-            const { result } = renderHook(() => useSiteDetails());
+            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
 
             // Set up the interval change first
             act(() => {
@@ -155,7 +164,7 @@ describe("useSiteDetails - Branch Coverage", () => {
                 errors: [],
             });
 
-            const { result } = renderHook(() => useSiteDetails());
+            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
 
             // Set up the interval change first
             act(() => {
@@ -192,7 +201,7 @@ describe("useSiteDetails - Branch Coverage", () => {
                 errors: ["Invalid timeout value"],
             });
 
-            const { result } = renderHook(() => useSiteDetails());
+            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
 
             // Set up the timeout change first
             act(() => {
@@ -221,7 +230,7 @@ describe("useSiteDetails - Branch Coverage", () => {
                 errors: [],
             });
 
-            const { result } = renderHook(() => useSiteDetails());
+            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
 
             // Set up the timeout change first
             act(() => {
@@ -258,7 +267,7 @@ describe("useSiteDetails - Branch Coverage", () => {
                 errors: ["Invalid retry attempts value"],
             });
 
-            const { result } = renderHook(() => useSiteDetails());
+            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
 
             // Set up the retry attempts change first
             act(() => {
@@ -289,7 +298,7 @@ describe("useSiteDetails - Branch Coverage", () => {
                 errors: [],
             });
 
-            const { result } = renderHook(() => useSiteDetails());
+            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
 
             // Set up the retry attempts change first
             act(() => {
@@ -318,7 +327,7 @@ describe("useSiteDetails - Branch Coverage", () => {
 
     describe("handleSaveName - early return path", () => {
         it("should handle early return when no unsaved changes (lines 624-627)", async () => {
-            const { result } = renderHook(() => useSiteDetails());
+            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
 
             // Don't make any name changes, so hasUnsavedChanges should be false
             await act(async () => {
@@ -330,13 +339,11 @@ describe("useSiteDetails - Branch Coverage", () => {
         });
 
         it("should handle successful name save with trimmed name (lines 629-639)", async () => {
-            const { result } = renderHook(() => useSiteDetails());
+            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
 
             // Make a name change to trigger hasUnsavedChanges
             act(() => {
-                result.current.handleNameChange({
-                    target: { value: "  New Site Name  " },
-                } as React.ChangeEvent<HTMLInputElement>);
+                result.current.setLocalName("  New Site Name  ");
             });
 
             await act(async () => {
@@ -351,6 +358,7 @@ describe("useSiteDetails - Branch Coverage", () => {
                 "Updated site name",
                 {
                     identifier: "test-site",
+                    name: "New Site Name",
                 }
             );
         });
@@ -385,7 +393,7 @@ describe("useSiteDetails - Branch Coverage", () => {
                 errors: [],
             });
 
-            const { result } = renderHook(() => useSiteDetails());
+            const { result } = renderHook(() => useSiteDetails({ site: siteWithoutType }));
 
             act(() => {
                 result.current.handleIntervalChange({

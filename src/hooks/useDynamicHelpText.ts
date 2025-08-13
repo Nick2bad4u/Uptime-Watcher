@@ -76,46 +76,50 @@ export function useDynamicHelpText(
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | undefined>();
 
-    useEffect(() => {
-        let isCancelled = false;
+    useEffect(
+        function loadDynamicHelpText() {
+            let isCancelled = false;
 
-        const loadHelpTexts = async (): Promise<void> => {
-            try {
-                setIsLoading(true);
-                setError(undefined);
-                const texts = await getMonitorHelpTexts(monitorType);
-                if (!isCancelled) {
-                    setHelpTexts(texts);
-                    setIsLoading(false);
-                }
-            } catch (caughtError) {
-                logger.warn(
-                    "Failed to load help texts",
-                    caughtError instanceof Error
-                        ? caughtError
-                        : new Error(String(caughtError))
-                );
-                if (!isCancelled) {
-                    const errorMessage =
+            const loadHelpTexts = async (): Promise<void> => {
+                try {
+                    setIsLoading(true);
+                    setError(undefined);
+                    const texts = await getMonitorHelpTexts(monitorType);
+                    if (!isCancelled) {
+                        setHelpTexts(texts);
+                        setIsLoading(false);
+                    }
+                } catch (caughtError) {
+                    logger.warn(
+                        "Failed to load help texts",
                         caughtError instanceof Error
-                            ? caughtError.message
-                            : "Help text unavailable";
-                    setError(errorMessage);
-                    setHelpTexts({
-                        primary: "Help text could not be loaded",
-                        secondary: "Please check your connection and try again",
-                    });
-                    setIsLoading(false);
+                            ? caughtError
+                            : new Error(String(caughtError))
+                    );
+                    if (!isCancelled) {
+                        const errorMessage =
+                            caughtError instanceof Error
+                                ? caughtError.message
+                                : "Help text unavailable";
+                        setError(errorMessage);
+                        setHelpTexts({
+                            primary: "Help text could not be loaded",
+                            secondary:
+                                "Please check your connection and try again",
+                        });
+                        setIsLoading(false);
+                    }
                 }
-            }
-        };
+            };
 
-        void loadHelpTexts();
+            void loadHelpTexts();
 
-        return (): void => {
-            isCancelled = true;
-        };
-    }, [monitorType]);
+            return (): void => {
+                isCancelled = true;
+            };
+        },
+        [monitorType]
+    );
 
     return {
         ...helpTexts,

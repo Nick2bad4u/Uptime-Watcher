@@ -103,18 +103,21 @@ export const SiteDetails = ({
     const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
 
     // Add global escape key handler
-    useEffect(() => {
-        const handleGlobalKeyDown = (event: KeyboardEvent): void => {
-            if (event.key === "Escape") {
-                onClose();
-            }
-        };
+    useEffect(
+        function handleGlobalEscapeKey() {
+            const handleGlobalKeyDown = (event: KeyboardEvent): void => {
+                if (event.key === "Escape") {
+                    onClose();
+                }
+            };
 
-        document.addEventListener("keydown", handleGlobalKeyDown);
-        return (): void => {
-            document.removeEventListener("keydown", handleGlobalKeyDown);
-        };
-    }, [onClose]);
+            document.addEventListener("keydown", handleGlobalKeyDown);
+            return (): void => {
+                document.removeEventListener("keydown", handleGlobalKeyDown);
+            };
+        },
+        [onClose]
+    );
 
     // Use our custom hook to get all the data and functionality we need
     const {
@@ -265,7 +268,7 @@ export const SiteDetails = ({
     }
 
     return (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm md:p-8">
+        <div className="modal-overlay p-4 md:p-8">
             <button
                 aria-label="Close modal"
                 className="absolute inset-0 cursor-pointer border-none bg-transparent"

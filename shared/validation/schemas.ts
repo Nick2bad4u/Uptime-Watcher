@@ -27,7 +27,7 @@ import type {
 import type { ValidationResult } from "@shared/types/validation";
 
 import validator from "validator";
-import { z } from "zod";
+import * as z from "zod";
 
 import { isValidHost, isValidPort } from "./validatorUtils";
 

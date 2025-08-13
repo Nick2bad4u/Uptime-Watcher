@@ -32,9 +32,10 @@ vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
     withErrorHandling: vi.fn(async (fn, handlers) => {
         try {
-            const result = await fn();
-            handlers.setLoading?.(false);
-            return result;
+            return await fn().then((result) => {
+                handlers.setLoading?.(false);
+                return result;
+            });
         } catch (error) {
             handlers.setError?.(error);
             handlers.setLoading?.(false);

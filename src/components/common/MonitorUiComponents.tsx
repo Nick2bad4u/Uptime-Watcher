@@ -48,40 +48,44 @@ export function ConditionalResponseTime({
         useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
-    useEffect(() => {
-        let isCancelled = false;
+    useEffect(
+        function checkResponseTimeSupport() {
+            let isCancelled = false;
 
-        const checkSupport = async (): Promise<void> => {
-            try {
-                const supports = await checkSupportsResponseTime(monitorType);
-                if (!isCancelled) {
-                    setSupportsResponseTime(supports);
-                    setIsLoading(false);
+            const checkSupport = async (): Promise<void> => {
+                try {
+                    const supports =
+                        await checkSupportsResponseTime(monitorType);
+                    if (!isCancelled) {
+                        setSupportsResponseTime(supports);
+                        setIsLoading(false);
+                    }
+                } catch (error) {
+                    // Log the error but gracefully degrade to false (no
+                    // response time support) This follows project pattern of
+                    // non-critical feature degradation
+                    logger.warn(
+                        "Failed to check response time support",
+                        error as Error
+                    );
+                    if (!isCancelled) {
+                        setSupportsResponseTime(false);
+                        setIsLoading(false);
+                    }
+                    // Note: Error is not re-thrown here as this is a UI
+                    // enhancement feature that should degrade gracefully rather
+                    // than break the component
                 }
-            } catch (error) {
-                // Log the error but gracefully degrade to false (no response
-                // time support) This follows project pattern of non-critical
-                // feature degradation
-                logger.warn(
-                    "Failed to check response time support",
-                    error as Error
-                );
-                if (!isCancelled) {
-                    setSupportsResponseTime(false);
-                    setIsLoading(false);
-                }
-                // Note: Error is not re-thrown here as this is a UI
-                // enhancement feature that should degrade gracefully rather
-                // than break the component
-            }
-        };
+            };
 
-        void checkSupport();
+            void checkSupport();
 
-        return (): void => {
-            isCancelled = true;
-        };
-    }, [monitorType]);
+            return (): void => {
+                isCancelled = true;
+            };
+        },
+        [monitorType]
+    );
 
     if (isLoading) {
         return fallback;
@@ -97,38 +101,44 @@ export const DetailLabel = ({
 }: DetailLabelProps): JSX.Element => {
     const [formattedLabel, setFormattedLabel] = useState<string>(fallback);
 
-    useEffect(() => {
-        let isCancelled = false;
+    useEffect(
+        function formatDetailLabel() {
+            let isCancelled = false;
 
-        const formatLabel = async (): Promise<void> => {
-            try {
-                const formatted = await formatMonitorDetail(
-                    monitorType,
-                    details
-                );
-                if (!isCancelled) {
-                    setFormattedLabel(formatted);
+            const formatLabel = async (): Promise<void> => {
+                try {
+                    const formatted = await formatMonitorDetail(
+                        monitorType,
+                        details
+                    );
+                    if (!isCancelled) {
+                        setFormattedLabel(formatted);
+                    }
+                } catch (error) {
+                    // Log the error but gracefully degrade to fallback text
+                    // This follows project pattern of non-critical feature
+                    // degradation
+                    logger.warn(
+                        "Failed to format detail label",
+                        error as Error
+                    );
+                    if (!isCancelled) {
+                        setFormattedLabel(fallback);
+                    }
+                    // Note: Error is not re-thrown here as this is a UI
+                    // enhancement feature that should degrade gracefully rather
+                    // than break the component
                 }
-            } catch (error) {
-                // Log the error but gracefully degrade to fallback text
-                // This follows project pattern of non-critical feature
-                // degradation
-                logger.warn("Failed to format detail label", error as Error);
-                if (!isCancelled) {
-                    setFormattedLabel(fallback);
-                }
-                // Note: Error is not re-thrown here as this is a UI
-                // enhancement feature that should degrade gracefully rather
-                // than break the component
-            }
-        };
+            };
 
-        void formatLabel();
+            void formatLabel();
 
-        return (): void => {
-            isCancelled = true;
-        };
-    }, [details, fallback, monitorType]);
+            return (): void => {
+                isCancelled = true;
+            };
+        },
+        [details, fallback, monitorType]
+    );
 
     return <span>{formattedLabel}</span>;
 };

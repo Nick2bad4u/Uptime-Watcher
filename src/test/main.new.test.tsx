@@ -1,0 +1,135 @@
+/**
+ * @fileoverview Simple tests for main.tsx application entry point focusing on coverage
+ */
+
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+// Simple mocks without complex implementations
+vi.mock("react-dom/client", () => ({
+    default: {
+        createRoot: vi.fn(() => ({
+            render: vi.fn(),
+            unmount: vi.fn(),
+        })),
+    },
+}));
+
+vi.mock("../App", () => ({
+    default: () => "App Component",
+}));
+
+vi.mock("../index.css", () => ({}));
+
+describe("main.tsx - Application Entry Point", () => {
+    let originalConsoleError: typeof console.error;
+
+    beforeEach(() => {
+        // Reset DOM
+        document.body.innerHTML = '<div id="root"></div>';
+        
+        // Reset mocks
+        vi.clearAllMocks();
+        
+        // Spy on console.error
+        originalConsoleError = console.error;
+        console.error = vi.fn();
+    });
+
+    afterEach(() => {
+        console.error = originalConsoleError;
+        vi.resetModules();
+    });
+
+    describe("Basic Functionality", () => {
+        it("should use getElementById for root element lookup", async () => {
+            const getElementByIdSpy = vi.spyOn(document, "getElementById");
+            
+            // Import main.tsx which triggers initialization
+            await import("../main");
+
+            expect(getElementByIdSpy).toHaveBeenCalledWith("root");
+            
+            getElementByIdSpy.mockRestore();
+        });
+
+        it("should handle missing root element gracefully", async () => {
+            // Remove root element
+            document.body.innerHTML = "";
+
+            // Import main.tsx
+            await import("../main");
+
+            // Should log an error due to missing root element
+            expect(console.error).toHaveBeenCalledWith(
+                "Failed to initialize application:",
+                expect.any(Error)
+            );
+        });
+
+        it("should log initialization errors to console", async () => {
+            // Remove root element to trigger error
+            document.body.innerHTML = "";
+
+            // Import main.tsx
+            await import("../main");
+
+            // Verify error logging
+            expect(console.error).toHaveBeenCalledTimes(1);
+            expect(console.error).toHaveBeenCalledWith(
+                "Failed to initialize application:",
+                expect.any(Error)
+            );
+        });
+    });
+
+    describe("Performance Optimizations", () => {
+        it("should use getElementById instead of querySelector for performance", async () => {
+            const getElementByIdSpy = vi.spyOn(document, "getElementById");
+            const querySelectorSpy = vi.spyOn(document, "querySelector");
+
+            // Setup root element
+            document.body.innerHTML = '<div id="root"></div>';
+
+            // Import main.tsx
+            await import("../main");
+
+            // Verify getElementById was used for performance
+            expect(getElementByIdSpy).toHaveBeenCalledWith("root");
+            expect(querySelectorSpy).not.toHaveBeenCalled();
+
+            getElementByIdSpy.mockRestore();
+            querySelectorSpy.mockRestore();
+        });
+    });
+
+    describe("Error Handling Coverage", () => {
+        it("should cover the try-catch block with error", async () => {
+            // Remove root to trigger error path
+            document.body.innerHTML = "";
+
+            // Import main.tsx - should catch error and log it
+            await import("../main");
+
+            // Verify the error handling path was executed
+            expect(console.error).toHaveBeenCalledWith(
+                "Failed to initialize application:",
+                expect.any(Error)
+            );
+        });
+
+        it("should handle successful initialization without errors", async () => {
+            // Ensure root element exists
+            document.body.innerHTML = '<div id="root"></div>';
+
+            // Import main.tsx
+            await import("../main");
+
+            // Verify no errors were logged
+            expect(console.error).not.toHaveBeenCalled();
+            
+            // Verify the root element still exists
+            const rootElement = document.querySelector("#root");
+            expect(rootElement).toBeTruthy();
+        });
+    });
+});

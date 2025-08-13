@@ -31,13 +31,12 @@ vi.mock("../utils", () => ({
                 errorHandling.setLoading(true);
             }
 
-            const result = await fn();
-
-            if (errorHandling?.setLoading) {
-                errorHandling.setLoading(false);
-            }
-
-            return result;
+            return await fn().then((result) => {
+                if (errorHandling?.setLoading) {
+                    errorHandling.setLoading(false);
+                }
+                return result;
+            });
         } catch (error) {
             if (errorHandling?.setError) {
                 errorHandling.setError(

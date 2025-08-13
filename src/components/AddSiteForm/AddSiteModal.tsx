@@ -47,21 +47,24 @@ export const AddSiteModal: React.NamedExoticComponent<object> = React.memo(
         );
 
         // Handle escape key for modal
-        useEffect((): (() => void) => {
-            const handleKeyDown = (event: KeyboardEvent): void => {
-                if (event.key === "Escape" && showAddSiteModal) {
-                    handleClose();
+        useEffect(
+            function handleEscapeKey() {
+                const handleKeyDown = (event: KeyboardEvent): void => {
+                    if (event.key === "Escape" && showAddSiteModal) {
+                        handleClose();
+                    }
+                };
+
+                if (showAddSiteModal) {
+                    document.addEventListener("keydown", handleKeyDown);
                 }
-            };
 
-            if (showAddSiteModal) {
-                document.addEventListener("keydown", handleKeyDown);
-            }
-
-            return (): void => {
-                document.removeEventListener("keydown", handleKeyDown);
-            };
-        }, [handleClose, showAddSiteModal]);
+                return (): void => {
+                    document.removeEventListener("keydown", handleKeyDown);
+                };
+            },
+            [handleClose, showAddSiteModal]
+        );
 
         if (!showAddSiteModal) {
             return null;
@@ -70,7 +73,7 @@ export const AddSiteModal: React.NamedExoticComponent<object> = React.memo(
         return (
             /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
             <div
-                className={`fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm ${
+                className={`modal-overlay fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm ${
                     isDark ? "dark" : ""
                 }`}
                 onClick={handleBackdropClick}

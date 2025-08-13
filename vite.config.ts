@@ -454,7 +454,7 @@ export default defineConfig(({}) => {
                     "./src/utils/chartUtils.ts",
 
                     // Shared types and utilities
-                    "./shared/types/index.ts",
+                    "./shared/types.ts",
                     "./shared/utils/environment.ts",
                 ],
             },
@@ -493,9 +493,10 @@ export default defineConfig(({}) => {
                     "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
                     "**/*.bench.{js,mjs,cjs,ts,mts,cts,jsx,tsx}", // Exclude benchmark files
                 ],
-                experimentalAstAwareRemapping: true, // Enable AST-aware remapping for better accuracy
-                ignoreEmptyLines: true, // Ignore empty lines in coverage reports
-                provider: "istanbul" as const,
+                // V8 Provider Configuration (Recommended since Vitest v3.2.0)
+                provider: "v8" as const, // Switch to V8 for better TypeScript support
+                experimentalAstAwareRemapping: true, // Enable AST-aware remapping for accurate coverage
+                ignoreEmptyLines: true, // Ignore empty lines, comments, and TypeScript interfaces
                 reporter: ["text", "json", "lcov", "html"],
                 reportOnFailure: true,
                 reportsDirectory: "./coverage",

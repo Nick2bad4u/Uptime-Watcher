@@ -265,14 +265,7 @@ Object.defineProperty(document.body, "classList", {
     writable: true,
 });
 
-// Mock document.getElementById for main.tsx tests
-const originalGetElementById = document.getElementById;
-document.getElementById = vi.fn((id) => {
-    if (id === "root") {
-        return document.createElement("div");
-    }
-    return originalGetElementById.call(document, id);
-});
+// Individual tests should manage their own DOM setup for getElementById
 
 vi.mock("electron-log/renderer", () => ({
     default: {

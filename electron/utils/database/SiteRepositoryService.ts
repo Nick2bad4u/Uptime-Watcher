@@ -287,14 +287,12 @@ export class SiteRepositoryService {
             })
         );
 
-        const site: Site = {
+        return {
             identifier: siteRow.identifier,
             monitoring: siteRow.monitoring ?? true, // Use the actual monitoring status with default
             monitors: monitors,
             name: siteRow.name ?? DEFAULT_SITE_NAME, // Use consistent default name
         };
-
-        return site;
     }
 
     /**

@@ -133,7 +133,7 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
     const specificData = buildMonitorData(monitorType, { host, port, url });
 
     // Create monitor with all required fields and type-specific data
-    const monitor: Monitor = {
+    return {
         activeOperations: [],
         checkInterval,
         history: [] as Monitor["history"],
@@ -144,11 +144,9 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
         status: "pending" as const,
         timeout: DEFAULT_REQUEST_TIMEOUT, // Explicit default timeout
         type: monitorType,
-        // Type-safe spread of monitor-specific properties
+        // Type-safe spread of monitor-specific data
         ...specificData,
     };
-
-    return monitor;
 }
 
 /**

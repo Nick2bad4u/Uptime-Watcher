@@ -154,7 +154,7 @@ describe("Monitor Form Data Types Coverage Tests", () => {
     describe("Form Data Validation", () => {
         it("should validate form data types", () => {
             const validateFormData = (data: any) => {
-                const validations = {
+                return {
                     hasType: typeof data.type === "string",
                     hasValidCheckInterval:
                         typeof data.checkInterval === "number" &&
@@ -166,8 +166,6 @@ describe("Monitor Form Data Types Coverage Tests", () => {
                         data.retryAttempts >= 0,
                     hasValidMonitoring: typeof data.monitoring === "boolean",
                 };
-
-                return validations;
             };
 
             const validData = {

@@ -267,45 +267,36 @@ export const createSiteSyncActions = (
         },
         subscribeToSyncEvents: () => {
             // eslint-disable-next-line n/no-sync -- Switch case handles 'sync' event types, not synchronous file operations
-            const cleanup = window.electronAPI.stateSync.onStateSyncEvent(
-                (event) => {
-                    logStoreAction("SitesStore", "syncEventReceived", {
-                        action: event.action,
-                        siteIdentifier: event.siteIdentifier,
-                        source: event.source,
-                        timestamp: event.timestamp,
-                    }); // Handle different sync actions
-                    switch (event.action) {
-                        case "bulk-sync": {
-                            if (event.sites) {
-                                deps.setSites(event.sites);
+            return window.electronAPI.stateSync.onStateSyncEvent((event) => {
+                logStoreAction("SitesStore", "syncEventReceived", {
+                    action: event.action,
+                    siteIdentifier: event.siteIdentifier,
+                    source: event.source,
+                    timestamp: event.timestamp,
+                }); // Handle different sync actions
+                switch (event.action) {
+                    case "bulk-sync": {
+                        if (event.sites) {
+                            deps.setSites(event.sites);
+                        }
+                        break;
+                    }
+                    case "delete":
+                    case "update": {
+                        // For single site updates, trigger a full sync
+                        void (async (): Promise<void> => {
+                            try {
+                                await actions.syncSitesFromBackend();
+                            } catch (error: unknown) {
+                                logStoreAction("SitesStore", "error", {
+                                    error,
+                                });
                             }
-                            break;
-                        }
-                        case "delete":
-                        case "update": {
-                            // For single site updates, trigger a full sync
-                            void (async (): Promise<void> => {
-                                try {
-                                    await actions.syncSitesFromBackend();
-                                } catch (error: unknown) {
-                                    logStoreAction("SitesStore", "error", {
-                                        error,
-                                    });
-                                }
-                            })();
-                            break;
-                        }
+                        })();
+                        break;
                     }
                 }
-            );
-
-            logStoreAction("SitesStore", "subscribeToSyncEvents", {
-                message: "Successfully subscribed to sync events",
-                success: true,
             });
-
-            return cleanup;
         },
         syncSitesFromBackend: async () => {
             await withErrorHandling(

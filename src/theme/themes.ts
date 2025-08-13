@@ -1,3 +1,5 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable @metamask/design-tokens/color-no-hex */
 /**
  * Theme definitions for the application.
  * Contains predefined light and dark theme configurations with complete

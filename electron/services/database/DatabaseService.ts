@@ -108,9 +108,11 @@ export class DatabaseService {
 
         try {
             db.run(DATABASE_SERVICE_QUERIES.BEGIN_TRANSACTION);
-            const result = await operation(db);
-            db.run(DATABASE_SERVICE_QUERIES.COMMIT);
-            return result;
+            // Execute operation and commit on success
+            return await operation(db).then((result) => {
+                db.run(DATABASE_SERVICE_QUERIES.COMMIT);
+                return result;
+            });
         } catch (error) {
             try {
                 db.run(DATABASE_SERVICE_QUERIES.ROLLBACK);

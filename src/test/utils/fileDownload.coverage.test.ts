@@ -311,8 +311,7 @@ describe("File Download Utility Coverage Tests", () => {
                 downloadFunction: () => Promise<Uint8Array>
             ) => {
                 try {
-                    const backupData = await downloadFunction();
-                    return backupData;
+                    return await downloadFunction();
                 } catch (error) {
                     throw error;
                 }

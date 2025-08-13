@@ -89,16 +89,16 @@ function getErrorIcon(variant: ErrorAlertVariant): JSX.Element {
 function getVariantClasses(variant: ErrorAlertVariant): string {
     switch (variant) {
         case "error": {
-            return "border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300";
+            return "border-error-default bg-error-muted text-error-default dark:border-error-default dark:bg-error-muted dark:text-error-alternative";
         }
         case "info": {
-            return "border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-300";
+            return "border-info-default bg-info-muted text-info-default dark:border-info-default dark:bg-info-muted dark:text-info-alternative";
         }
         case "warning": {
-            return "border-yellow-200 bg-yellow-50 text-yellow-800 dark:border-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300";
+            return "border-warning-default bg-warning-muted text-warning-default dark:border-warning-default dark:bg-warning-muted dark:text-warning-alternative";
         }
         default: {
-            return "border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300";
+            return "border-error-default bg-error-muted text-error-default dark:border-error-default dark:bg-error-muted dark:text-error-alternative";
         }
     }
 }
@@ -139,7 +139,7 @@ export const ErrorAlert = ({
             {onDismiss ? (
                 <button
                     aria-label="Dismiss error"
-                    className="-m-1 shrink-0 rounded p-1 transition-colors hover:bg-black/5 dark:hover:bg-white/5"
+                    className="hover:bg-overlay-default/5 dark:hover:bg-overlay-inverse/5 -m-1 shrink-0 rounded-xs p-1 transition-colors"
                     onClick={handleDismiss}
                     title="Dismiss this error message"
                     type="button"

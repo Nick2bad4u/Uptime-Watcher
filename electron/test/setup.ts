@@ -171,7 +171,7 @@ vi.mock("../utils/logger", () => ({
 // Mock MonitorScheduler
 vi.mock("../services/monitoring/MonitorScheduler", () => ({
     MonitorScheduler: vi.fn(() => {
-        const instance = {
+        return {
             // Private properties accessed by tests
             intervals: new Map(),
             onCheckCallback: undefined,
@@ -266,7 +266,6 @@ vi.mock("../services/monitoring/MonitorScheduler", () => ({
                 return [...this.intervals.keys()];
             }),
         };
-        return instance;
     }),
 }));
 

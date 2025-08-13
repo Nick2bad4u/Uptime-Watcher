@@ -65,12 +65,15 @@ export function useMonitorFields(): UseMonitorFieldsResult {
     const { fieldConfigs, isLoaded, lastError, loadMonitorTypes } =
         useMonitorTypesStore();
 
-    useEffect(() => {
-        // Load monitor types when hook is first used
-        if (!isLoaded && !lastError) {
-            void loadMonitorTypes();
-        }
-    }, [isLoaded, lastError, loadMonitorTypes]);
+    useEffect(
+        function loadMonitorFieldTypes() {
+            // Load monitor types when hook is first used
+            if (!isLoaded && !lastError) {
+                void loadMonitorTypes();
+            }
+        },
+        [isLoaded, lastError, loadMonitorTypes]
+    );
 
     const getFields = useCallback(
         (monitorType: string): MonitorFieldDefinition[] => {

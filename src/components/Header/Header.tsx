@@ -147,7 +147,7 @@ export const Header = (): JSX.Element => {
     return (
         <ThemedBox
             border
-            className="border-b shadow-sm"
+            className="border-b shadow-xs"
             padding="md"
             surface="elevated"
         >
@@ -312,7 +312,7 @@ export const Header = (): JSX.Element => {
                             {totalMonitors > 0 && (
                                 <>
                                     <div className="h-8 w-px bg-current opacity-20" />
-                                    <div className="total-sites-badge flex items-center space-x-2 rounded-md bg-gray-500/10 px-2 py-1">
+                                    <div className="total-sites-badge bg-overlay-default/10 flex items-center space-x-2 rounded-md px-2 py-1">
                                         <div className="h-2 w-2 rounded-full bg-current opacity-50" />
                                         <div className="flex flex-col">
                                             <ThemedText

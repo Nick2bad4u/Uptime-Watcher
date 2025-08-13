@@ -12,7 +12,7 @@ import type {
     MonitorFieldDefinition,
     MonitorType,
 } from "@shared/types";
-import type { z } from "zod";
+import type * as z from "zod";
 
 import { MONITOR_STATUS } from "@shared/types";
 // Import shared validation schemas

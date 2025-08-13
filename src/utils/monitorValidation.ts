@@ -52,7 +52,7 @@ export function createMonitorObject(
     type: MonitorType,
     fields: Partial<MonitorFormData>
 ): MonitorCreationData {
-    const monitor: MonitorCreationData = {
+    return {
         history: [],
         monitoring: true,
         responseTime: -1,
@@ -62,8 +62,6 @@ export function createMonitorObject(
         type,
         ...fields,
     };
-
-    return monitor;
 }
 
 /**
@@ -81,9 +79,7 @@ export async function validateMonitorData(
         async () => {
             // Use store method instead of direct IPC call
             const store = useMonitorTypesStore.getState();
-            const result = await store.validateMonitorData(type, data);
-
-            return result;
+            return store.validateMonitorData(type, data);
         },
         "Monitor data validation",
         {

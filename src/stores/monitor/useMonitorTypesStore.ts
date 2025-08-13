@@ -237,17 +237,12 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                         type,
                         details
                     );
-                const formattedDetail = safeExtractIpcData<string>(
-                    response,
-                    details
-                );
-
                 logStoreAction("MonitorTypesStore", "formatMonitorDetail", {
                     success: true,
                     type,
                 });
 
-                return formattedDetail;
+                return safeExtractIpcData<string>(response, details);
             }, state);
         },
         formatMonitorTitleSuffix: async (
@@ -268,11 +263,6 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                         type,
                         monitor
                     );
-                const formattedSuffix = safeExtractIpcData<string>(
-                    response,
-                    ""
-                );
-
                 logStoreAction(
                     "MonitorTypesStore",
                     "formatMonitorTitleSuffix",
@@ -282,7 +272,7 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                     }
                 );
 
-                return formattedSuffix;
+                return safeExtractIpcData<string>(response, "");
             }, state);
         },
         getFieldConfig: (

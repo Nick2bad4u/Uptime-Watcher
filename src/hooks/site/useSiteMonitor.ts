@@ -120,8 +120,7 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
     // Fix: Use history length and last timestamp as dependencies for proper
     // memoization
     const filteredHistory = useMemo(() => {
-        const history = monitor?.history ?? [];
-        return history;
+        return monitor?.history ?? [];
     }, [monitor]);
 
     // Fix: Explicitly check for monitor existence before checking monitoring

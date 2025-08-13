@@ -550,19 +550,6 @@ export class EnhancedMonitorChecker {
             return undefined;
         }
 
-        // Create status update for event emission
-        const statusUpdate: StatusUpdate = {
-            details:
-                checkResult.status === "up"
-                    ? "Monitor is responding"
-                    : "Monitor is not responding",
-            monitorId: checkResult.monitorId,
-            previousStatus: monitor.status,
-            siteIdentifier: site.identifier,
-            status: checkResult.status === "up" ? "up" : "down",
-            timestamp: checkResult.timestamp.toISOString(),
-        };
-
         // Emit proper typed events like the traditional monitoring system
         await this.config.eventEmitter.emitTyped("monitor:status-changed", {
             monitor: freshMonitor,
@@ -582,7 +569,18 @@ export class EnhancedMonitorChecker {
             checkResult
         );
 
-        return statusUpdate;
+        // Return status update for event emission
+        return {
+            details:
+                checkResult.status === "up"
+                    ? "Monitor is responding"
+                    : "Monitor is not responding",
+            monitorId: checkResult.monitorId,
+            previousStatus: monitor.status,
+            siteIdentifier: site.identifier,
+            status: checkResult.status === "up" ? "up" : "down",
+            timestamp: checkResult.timestamp.toISOString(),
+        };
     }
 
     /**
@@ -776,8 +774,7 @@ export class EnhancedMonitorChecker {
         monitor: Monitor
     ): Promise<ServiceMonitorCheckResult> {
         try {
-            const result = await monitorService.check(monitor);
-            return result;
+            return await monitorService.check(monitor);
         } catch (error) {
             logger.error(`Monitor check failed for ${monitor.id}`, error);
             return {

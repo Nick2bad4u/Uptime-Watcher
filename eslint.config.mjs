@@ -43,7 +43,7 @@ import eslintReactNamingConvention from "eslint-plugin-react-naming-convention";
 import eslintReactWeb from "eslint-plugin-react-web-api";
 import globals from "globals";
 import html from "eslint-plugin-html";
-import implicitDependencies from "eslint-plugin-implicit-dependencies";
+import implicitDependencies from "@jcoreio/eslint-plugin-implicit-dependencies";
 import istanbul from "eslint-plugin-istanbul";
 import js from "@eslint/js";
 import json from "@eslint/json";
@@ -98,10 +98,24 @@ import * as pluginJSDoc from "eslint-plugin-require-jsdoc";
 import eslintPluginCommentLength from "eslint-plugin-comment-length";
 import pluginSortReactDependency from "eslint-plugin-sort-react-dependency-arrays";
 import pluginRegexLook from "eslint-plugin-no-lookahead-lookbehind-regexp";
+import * as pluginDesignTokens from "@metamask/eslint-plugin-design-tokens";
+import * as pluginFunctionNames from "eslint-plugin-function-name";
+import * as pluginCleanCode from "eslint-plugin-clean-code";
+import pluginFilenameExport from "eslint-plugin-filename-export";
+import nitpick from "eslint-plugin-nitpick";
+import importZod from "eslint-plugin-import-zod";
+import pluginUseMemo from "eslint-plugin-usememo-recommendations";
+import pluginGoodEffects from "eslint-plugin-goodeffects";
+import pluginJsxPlus from "eslint-plugin-jsx-plus";
+import pluginNoUnary from "eslint-plugin-no-unary-plus";
+import pluginGranular from "eslint-plugin-granular-selectors";
+import moduleInterop from "eslint-plugin-module-interop";
 
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 
 import * as cssPlugin from "eslint-plugin-css";
+
+import { fixupPluginRules } from "@eslint/compat";
 
 // Unused and Uninstalled Plugins:
 // eslint-config-prettier
@@ -119,6 +133,11 @@ import * as cssPlugin from "eslint-plugin-css";
 // eslint-plugin-es-x
 // @dword-design/import-alias
 // eslint-plugin-typesafe -- Broken
+// eslint-plugin-use-selector-with -- Broken
+
+// ESLint Tools
+// Import { FlatCompat } from "@eslint/eslintrc";
+// Const flatCompat = new FlatCompat();
 
 // Don't use
 // eslint-plugin-import -- Replaced by import-x
@@ -134,6 +153,7 @@ export default [
     progress.configs.recommended,
     ...nodeDependenciesPlugin.configs["flat/recommended"],
     noBarrelFiles.flat,
+    nitpick.configs.recommended,
     // Global ignores - must be first and more comprehensive
     {
         ignores: [
@@ -175,6 +195,8 @@ export default [
             "test/themeTypes.test.tsx",
             "test/types.test.tsx",
             "coverage-report.json",
+            "html/**",
+            "report/**",
             // "**/*.config.{js,mjs,ts}",
         ],
     },
@@ -509,7 +531,7 @@ export default [
             "react-compiler": reactCompiler,
             istanbul: istanbul,
             observers: observers,
-            "implicit-dependencies": implicitDependencies,
+            "@jcoreio/implicit-dependencies": implicitDependencies,
             listeners: listeners,
             "sql-template": sqlTemplate,
             "no-function-declare-after-return": pluginNFDAR,
@@ -517,6 +539,17 @@ export default [
             "comment-length": eslintPluginCommentLength,
             "sort-react-dependency-arrays": pluginSortReactDependency,
             "no-lookahead-lookbehind-regexp": pluginRegexLook,
+            "@metamask/design-tokens": pluginDesignTokens,
+            "function-name": pluginFunctionNames,
+            "clean-code": pluginCleanCode,
+            "filename-export": pluginFilenameExport,
+            "import-zod": importZod,
+            "usememo-recommendations": pluginUseMemo,
+            "eslint-plugin-goodeffects": pluginGoodEffects,
+            "jsx-plus": pluginJsxPlus,
+            "no-unary-plus": pluginNoUnary,
+            "granular-selectors": fixupPluginRules(pluginGranular),
+            "module-interop": moduleInterop,
         },
         rules: {
             // TypeScript rules
@@ -556,12 +589,107 @@ export default [
             ...pluginJSDoc.rules,
             ...eslintPluginCommentLength.configs["flat/recommended"].rules,
             ...pluginRegexLook.configs.recommended.rules,
+            ...pluginJsxPlus.configs.all.rules,
+            ...moduleInterop.configs.recommended.rules,
+
+            // Note: granular-selectors plugin rules need to be added manually since
+            // Note: The plugin config are not available after fixupPluginRules wrapping (Below)
+
+            "granular-selectors/granular-selectors": "error",
+
+            "no-unary-plus/no-unary-plus": "error",
+
+            "eslint-plugin-goodeffects/enforceNamedEffectCallbacks": "error",
+
+            "usememo-recommendations/detect-heavy-operations": "warn",
+
+            "import-zod/prefer-zod-namespace": "error",
+
+            // "filename-export/match-named-export": "error",
+            // "filename-export/match-default-export": "error",
+
+            // "clean-code/feature-envy": "error",
+            // "clean-code/exception-handling": "error",
+
+            "function-name/starts-with-verb": [
+                "error",
+                {
+                    whitelist: [
+                        "success",
+                        "all",
+                        "supports",
+                        "safe",
+                        "timeout",
+                        "with",
+                        "cleanup",
+                        "deep",
+                        "handler",
+                        "component",
+                        "typed",
+                        "persist",
+                        "invalidate",
+                        "bulk",
+                        "evict",
+                        "migrate",
+                        "rows",
+                        "row",
+                        "settings",
+                        "shutdown",
+                        "configure",
+                        "rollback",
+                        "prune",
+                        "upsert",
+                        "exists",
+                        "history",
+                        "increment",
+                    ],
+                },
+            ],
+            "@metamask/design-tokens/no-deprecated-classnames": [
+                "warn",
+                {
+                    "bg-opacity-*": "Use opacity modifiers like 'bg-black/50'.",
+                    "text-opacity-*":
+                        "Use opacity modifiers like 'text-black/50'.",
+                    "border-opacity-*":
+                        "Use opacity modifiers like 'border-black/50'.",
+                    "divide-opacity-*":
+                        "Use opacity modifiers like 'divide-black/50'.",
+                    "ring-opacity-*":
+                        "Use opacity modifiers like 'ring-black/50'.",
+                    "placeholder-opacity-*":
+                        "Use opacity modifiers like 'placeholder-black/50'.",
+                    "flex-shrink-*": "Use 'shrink-*' instead.",
+                    "flex-grow-*": "Use 'grow-*' instead.",
+                    "overflow-ellipsis": "Use 'text-ellipsis' instead.",
+                    "decoration-slice": "Use 'box-decoration-slice' instead.",
+                    "decoration-clone": "Use 'box-decoration-clone' instead.",
+
+                    "shadow-sm": "Use 'shadow-xs' instead.",
+                    shadow: "Use 'shadow-sm' instead.",
+                    "drop-shadow-sm": "Use 'drop-shadow-xs' instead.",
+                    "drop-shadow": "Use 'drop-shadow-sm' instead.",
+                    "blur-sm": "Use 'blur-xs' instead.",
+                    blur: "Use 'blur-sm' instead.",
+                    "backdrop-blur-sm": "Use 'backdrop-blur-xs' instead.",
+                    "backdrop-blur": "Use 'backdrop-blur-sm' instead.",
+                    "rounded-sm": "Use 'rounded-xs' instead.",
+                    rounded: "Use 'rounded-sm' instead.",
+                    "outline-none": "Use 'outline-hidden' instead.",
+                    ring: "Use 'ring-3' instead.",
+                },
+            ],
+            "@metamask/design-tokens/prefer-theme-color-classnames": "error",
+            "@metamask/design-tokens/color-no-hex": "error",
 
             "sort-react-dependency-arrays/sort": "error",
 
             "sql-template/no-unsafe-query": "error",
 
-            // "implicit-dependencies/no-implicit": "error",
+            "@jcoreio/implicit-dependencies/no-implicit": [
+                "error",
+                { ignore: ["@shared", "electron-devtools-installer"] },
+            ],
 
             "observers/no-missing-unobserve-or-disconnect": "error",
             "observers/matching-unobserve-target": "error",
@@ -1502,13 +1630,23 @@ export default [
             "sort-destructure-keys": pluginSortDestructure,
             istanbul: istanbul,
             observers: observers,
-            "implicit-dependencies": implicitDependencies,
+            "@jcoreio/implicit-dependencies": implicitDependencies,
             listeners: listeners,
             "sql-template": sqlTemplate,
             "no-function-declare-after-return": pluginNFDAR,
             "require-jsdoc": pluginJSDoc,
             "comment-length": eslintPluginCommentLength,
             "no-lookahead-lookbehind-regexp": pluginRegexLook,
+            "@metamask/design-tokens": pluginDesignTokens,
+            "function-name": pluginFunctionNames,
+            "clean-code": pluginCleanCode,
+            "import-zod": importZod,
+            "usememo-recommendations": pluginUseMemo,
+            "eslint-plugin-goodeffects": pluginGoodEffects,
+            "jsx-plus": pluginJsxPlus,
+            "no-unary-plus": pluginNoUnary,
+            "module-interop": moduleInterop,
+            "granular-selectors": fixupPluginRules(pluginGranular),
         },
         rules: {
             // TypeScript backend rules
@@ -1546,10 +1684,103 @@ export default [
             ...pluginJSDoc.rules,
             ...eslintPluginCommentLength.configs["flat/recommended"].rules,
             ...pluginRegexLook.configs.recommended.rules,
+            ...pluginJsxPlus.configs.all.rules,
+            ...moduleInterop.configs.recommended.rules,
+
+            "no-unary-plus/no-unary-plus": "error",
+
+            // Note: granular-selectors plugin rules need to be added manually since
+            // Note: The plugin config are not available after fixupPluginRules wrapping (Below)
+
+            "granular-selectors/granular-selectors": "error",
+
+            "eslint-plugin-goodeffects/enforceNamedEffectCallbacks": "error",
+
+            "usememo-recommendations/detect-heavy-operations": "warn",
+
+            "import-zod/prefer-zod-namespace": "error",
+
+            // "clean-code/feature-envy": "error",
+            // "clean-code/exception-handling": "error",
+
+            "function-name/starts-with-verb": [
+                "error",
+                {
+                    whitelist: [
+                        "success",
+                        "all",
+                        "supports",
+                        "safe",
+                        "timeout",
+                        "with",
+                        "cleanup",
+                        "deep",
+                        "handler",
+                        "component",
+                        "typed",
+                        "persist",
+                        "invalidate",
+                        "bulk",
+                        "evict",
+                        "migrate",
+                        "rows",
+                        "row",
+                        "settings",
+                        "shutdown",
+                        "configure",
+                        "rollback",
+                        "prune",
+                        "upsert",
+                        "exists",
+                        "history",
+                        "increment",
+                    ],
+                },
+            ],
+
+            "@metamask/design-tokens/no-deprecated-classnames": [
+                "warn",
+                {
+                    "bg-opacity-*": "Use opacity modifiers like 'bg-black/50'.",
+                    "text-opacity-*":
+                        "Use opacity modifiers like 'text-black/50'.",
+                    "border-opacity-*":
+                        "Use opacity modifiers like 'border-black/50'.",
+                    "divide-opacity-*":
+                        "Use opacity modifiers like 'divide-black/50'.",
+                    "ring-opacity-*":
+                        "Use opacity modifiers like 'ring-black/50'.",
+                    "placeholder-opacity-*":
+                        "Use opacity modifiers like 'placeholder-black/50'.",
+                    "flex-shrink-*": "Use 'shrink-*' instead.",
+                    "flex-grow-*": "Use 'grow-*' instead.",
+                    "overflow-ellipsis": "Use 'text-ellipsis' instead.",
+                    "decoration-slice": "Use 'box-decoration-slice' instead.",
+                    "decoration-clone": "Use 'box-decoration-clone' instead.",
+
+                    "shadow-sm": "Use 'shadow-xs' instead.",
+                    shadow: "Use 'shadow-sm' instead.",
+                    "drop-shadow-sm": "Use 'drop-shadow-xs' instead.",
+                    "drop-shadow": "Use 'drop-shadow-sm' instead.",
+                    "blur-sm": "Use 'blur-xs' instead.",
+                    blur: "Use 'blur-sm' instead.",
+                    "backdrop-blur-sm": "Use 'backdrop-blur-xs' instead.",
+                    "backdrop-blur": "Use 'backdrop-blur-sm' instead.",
+                    "rounded-sm": "Use 'rounded-xs' instead.",
+                    rounded: "Use 'rounded-sm' instead.",
+                    "outline-none": "Use 'outline-hidden' instead.",
+                    ring: "Use 'ring-3' instead.",
+                },
+            ],
+            "@metamask/design-tokens/prefer-theme-color-classnames": "error",
+            "@metamask/design-tokens/color-no-hex": "error",
 
             "sql-template/no-unsafe-query": "error",
 
-            // "implicit-dependencies/no-implicit": "error", - Errors on @shared
+            "@jcoreio/implicit-dependencies/no-implicit": [
+                "error",
+                { ignore: ["@shared", "electron-devtools-installer"] },
+            ],
 
             "observers/no-missing-unobserve-or-disconnect": "error",
             "observers/matching-unobserve-target": "error",

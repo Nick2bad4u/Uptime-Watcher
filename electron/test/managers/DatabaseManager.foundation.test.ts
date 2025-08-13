@@ -141,7 +141,6 @@ describe("DatabaseManager Foundation Tests", () => {
                     command instanceof ExportDataCommand ||
                     command.constructor.name === "ExportDataCommand"
                 ) {
-                    const result = '{"sites": [], "settings": []}';
                     // Emit the expected event
                     await mockEventEmitter.emitTyped(
                         "internal:database:data-exported",
@@ -150,14 +149,13 @@ describe("DatabaseManager Foundation Tests", () => {
                             operation: "data-exported",
                         }
                     );
-                    return result;
+                    return '{"sites": [], "settings": []}';
                 }
 
                 if (
                     command instanceof ImportDataCommand ||
                     command.constructor.name === "ImportDataCommand"
                 ) {
-                    const result = true;
                     // Emit the expected event
                     await mockEventEmitter.emitTyped(
                         "internal:database:data-imported",
@@ -165,7 +163,7 @@ describe("DatabaseManager Foundation Tests", () => {
                             operation: "data-imported",
                         }
                     );
-                    return result;
+                    return true;
                 }
 
                 // Default return for unknown commands

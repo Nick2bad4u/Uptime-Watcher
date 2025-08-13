@@ -192,9 +192,8 @@ export class DatabaseCommandExecutor {
         }
 
         try {
-            const result = await command.execute();
             this.executedCommands.push(command as IDatabaseCommand<unknown>);
-            return result;
+            return await command.execute();
         } catch (error) {
             // Attempt rollback on failure
             try {
@@ -332,14 +331,13 @@ export class ExportDataCommand extends DatabaseCommand<string> {
     public async execute(): Promise<string> {
         const dataImportExportService =
             this.serviceFactory.createImportExportService();
-        const result = await dataImportExportService.exportAllData();
 
         await this.emitSuccessEvent("internal:database:data-exported", {
             fileName: `export-${Date.now()}.json`,
             operation: "data-exported",
         });
 
-        return result;
+        return dataImportExportService.exportAllData();
     }
 
     public async rollback(): Promise<void> {

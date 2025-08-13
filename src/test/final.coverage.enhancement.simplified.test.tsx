@@ -483,7 +483,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             const lifecycleEvents: string[] = [];
 
             const LifecycleComponent = () => {
-                React.useEffect(() => {
+                React.useEffect(function trackLifecycle() {
                     lifecycleEvents.push("mounted");
                     return () => {
                         lifecycleEvents.push("unmounted");

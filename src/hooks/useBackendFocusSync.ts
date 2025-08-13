@@ -40,23 +40,26 @@ export function useBackendFocusSync(enabled = false): void {
         (state) => state.fullSyncFromBackend
     );
 
-    useEffect((): (() => void) | undefined => {
-        if (!enabled) {
-            return undefined;
-        }
+    useEffect(
+        function handleBackendFocusSync(): (() => void) | undefined {
+            if (!enabled) {
+                return undefined;
+            }
 
-        const handleFocus = (): void => {
-            // Use full sync on focus to ensure complete data consistency
-            // since the user may have been away for a while
-            // Note: Error handling is managed internally by fullSyncFromBackend
-            // through the store's withErrorHandling wrapper, so void is safe
-            // here
-            void fullSyncFromBackend();
-        };
+            const handleFocus = (): void => {
+                // Use full sync on focus to ensure complete data consistency
+                // since the user may have been away for a while
+                // Note: Error handling is managed internally by
+                // fullSyncFromBackend through the store's withErrorHandling
+                // wrapper, so void is safe here
+                void fullSyncFromBackend();
+            };
 
-        window.addEventListener("focus", handleFocus);
-        return (): void => {
-            window.removeEventListener("focus", handleFocus);
-        };
-    }, [enabled, fullSyncFromBackend]);
+            window.addEventListener("focus", handleFocus);
+            return (): void => {
+                window.removeEventListener("focus", handleFocus);
+            };
+        },
+        [enabled, fullSyncFromBackend]
+    );
 }

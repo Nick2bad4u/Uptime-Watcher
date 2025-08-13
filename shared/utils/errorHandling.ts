@@ -100,8 +100,7 @@ async function handleBackendOperation<T>(
     const { logger, operationName } = context;
 
     try {
-        const result = await operation();
-        return result;
+        return await operation();
     } catch (error) {
         logger.error(
             operationName
@@ -145,8 +144,7 @@ async function handleFrontendOperation<T>(
     }, "set loading state");
 
     try {
-        const result = await operation();
-        return result;
+        return await operation();
     } catch (error) {
         // Handle operation error
         const errorMessage =

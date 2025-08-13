@@ -93,7 +93,7 @@ describe("Settings - Invalid Key Logging", () => {
                 mockUpdateSettings({ [key]: value });
             };
 
-            React.useEffect(() => {
+            React.useEffect(function simulateInvalidKey() {
                 // Simulate the invalid key scenario
                 handleSettingChange(
                     "invalidKey" as keyof SettingsType,

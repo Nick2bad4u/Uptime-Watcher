@@ -43,28 +43,31 @@ export function useDelayedButtonLoading(isLoading: boolean): boolean {
         setShowButtonLoading(true);
     }, []);
 
-    useEffect(() => {
-        if (!isLoading) {
-            // Use timeout to defer state update to avoid direct call in
-            // useEffect
-            const clearTimeoutId = setTimeout(
-                clearButtonLoading,
-                UI_DELAYS.STATE_UPDATE_DEFER
+    useEffect(
+        function handleDelayedButtonLoading() {
+            if (!isLoading) {
+                // Use timeout to defer state update to avoid direct call in
+                // useEffect
+                const clearTimeoutId = setTimeout(
+                    clearButtonLoading,
+                    UI_DELAYS.STATE_UPDATE_DEFER
+                );
+                return (): void => {
+                    clearTimeout(clearTimeoutId);
+                };
+            }
+
+            const timeoutId = setTimeout(
+                showButtonLoadingCallback,
+                UI_DELAYS.LOADING_BUTTON
             );
+
             return (): void => {
-                clearTimeout(clearTimeoutId);
+                clearTimeout(timeoutId);
             };
-        }
-
-        const timeoutId = setTimeout(
-            showButtonLoadingCallback,
-            UI_DELAYS.LOADING_BUTTON
-        );
-
-        return (): void => {
-            clearTimeout(timeoutId);
-        };
-    }, [clearButtonLoading, isLoading, showButtonLoadingCallback]);
+        },
+        [clearButtonLoading, isLoading, showButtonLoadingCallback]
+    );
 
     return showButtonLoading;
 }

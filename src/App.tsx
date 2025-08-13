@@ -130,28 +130,31 @@ const App = (): JSX.Element => {
      * This prevents flash for quick operations while still providing feedback
      * for longer ones
      */
-    useEffect((): (() => void) | undefined => {
-        if (!isLoading) {
-            // Use timeout to defer state update to avoid direct call in
-            // useEffect
-            const clearTimeoutId = setTimeout(
-                clearLoadingOverlay,
-                UI_DELAYS.STATE_UPDATE_DEFER
+    useEffect(
+        function handleLoadingOverlayCleanup(): (() => void) | undefined {
+            if (!isLoading) {
+                // Use timeout to defer state update to avoid direct call in
+                // useEffect
+                const clearTimeoutId = setTimeout(
+                    clearLoadingOverlay,
+                    UI_DELAYS.STATE_UPDATE_DEFER
+                );
+                return (): void => {
+                    clearTimeout(clearTimeoutId);
+                };
+            }
+
+            const timeoutId = setTimeout(
+                showLoadingOverlayCallback,
+                UI_DELAYS.LOADING_OVERLAY
             );
+
             return (): void => {
-                clearTimeout(clearTimeoutId);
+                clearTimeout(timeoutId);
             };
-        }
-
-        const timeoutId = setTimeout(
-            showLoadingOverlayCallback,
-            UI_DELAYS.LOADING_OVERLAY
-        );
-
-        return (): void => {
-            clearTimeout(timeoutId);
-        };
-    }, [clearLoadingOverlay, isLoading, showLoadingOverlayCallback]);
+        },
+        [clearLoadingOverlay, isLoading, showLoadingOverlayCallback]
+    );
 
     /**
      * Initialize the application and set up status update subscriptions.

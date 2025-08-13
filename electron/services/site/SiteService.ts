@@ -197,18 +197,16 @@ export class SiteService {
                     await Promise.all(historyPromises);
                 }
 
-                // Combine into complete site object
-                const site = {
+                // Combine into complete site object and return
+                logger.debug(
+                    `[SiteService] Found site ${identifier} with ${monitors.length} monitors`
+                );
+                return {
                     identifier: siteRow.identifier,
                     monitoring: siteRow.monitoring ?? false,
                     monitors,
                     name: this.getDisplayName(siteRow.name),
                 };
-
-                logger.debug(
-                    `[SiteService] Found site ${identifier} with ${monitors.length} monitors`
-                );
-                return site;
             },
             {
                 logger,

@@ -150,9 +150,9 @@ describe("DefaultErrorFallback", () => {
                 "justify-center",
                 "p-8",
                 "border",
-                "border-red-200",
+                "border-error-default",
                 "rounded-lg",
-                "bg-red-50"
+                "bg-error-muted"
             );
         });
 
@@ -167,10 +167,10 @@ describe("DefaultErrorFallback", () => {
                 "py-2",
                 "text-sm",
                 "font-medium",
-                "text-white",
-                "bg-red-600",
-                "rounded",
-                "hover:bg-red-700"
+                "text-primary-inverse",
+                "bg-error-default",
+                "rounded-xs",
+                "hover:bg-error-alternative"
             );
 
             expect(reloadButton).toHaveClass(
@@ -178,11 +178,12 @@ describe("DefaultErrorFallback", () => {
                 "py-2",
                 "text-sm",
                 "font-medium",
-                "text-red-600",
+                "text-error-default",
                 "border",
-                "border-red-600",
-                "rounded",
-                "hover:bg-red-50"
+                "border-error-default",
+                "rounded-xs",
+                "bg-error-muted/50",
+                "hover:bg-error-muted"
             );
         });
     });

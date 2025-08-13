@@ -1,3 +1,5 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable @metamask/design-tokens/color-no-hex */
 /**
  * Custom hook for theme-aware CSS-in-JS styles
  * Provides consistent styling that respects user's theme preference
@@ -297,7 +299,7 @@ export function useThemeStyles(isCollapsed = false): ThemeStyles {
         }
     );
 
-    const styles = useMemo<ThemeStyles>(
+    return useMemo<ThemeStyles>(
         () => ({
             collapseButtonStyle: getCollapseButtonStyle(isDarkMode),
             contentStyle: getContentStyle(isCollapsed),
@@ -309,6 +311,4 @@ export function useThemeStyles(isCollapsed = false): ThemeStyles {
         }),
         [isCollapsed, isDarkMode]
     );
-
-    return styles;
 }

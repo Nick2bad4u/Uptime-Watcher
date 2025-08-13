@@ -121,48 +121,55 @@ export function useTheme(): UseThemeReturn {
     );
 
     // Update theme when settings or systemTheme change
-    useEffect(() => {
-        // Use timeout to defer state update to avoid direct call in useEffect
-        const updateTimeoutId = setTimeout(
-            updateCurrentTheme,
-            UI_DELAYS.STATE_UPDATE_DEFER
-        );
-        return (): void => {
-            clearTimeout(updateTimeoutId);
-        };
-    }, [settings.theme, systemTheme, updateCurrentTheme]);
-
-    // Listen for system theme changes
-    useEffect(() => {
-        const timeoutIds: NodeJS.Timeout[] = [];
-
-        const cleanup = themeManager.onSystemThemeChange((isDark) => {
-            const newSystemTheme = isDark ? "dark" : "light";
+    useEffect(
+        function handleThemeUpdate() {
             // Use timeout to defer state update to avoid direct call in
             // useEffect
-            const timeoutId = setTimeout(() => {
-                updateSystemTheme(newSystemTheme);
-            }, UI_DELAYS.STATE_UPDATE_DEFER);
-            timeoutIds.push(timeoutId);
-        });
+            const updateTimeoutId = setTimeout(
+                updateCurrentTheme,
+                UI_DELAYS.STATE_UPDATE_DEFER
+            );
+            return (): void => {
+                clearTimeout(updateTimeoutId);
+            };
+        },
+        [settings.theme, systemTheme, updateCurrentTheme]
+    );
 
-        // Set initial system theme using timeout
-        const initialTheme: "dark" | "light" =
-            themeManager.getSystemThemePreference();
-        // eslint-disable-next-line @eslint-react/web-api/no-leaked-timeout -- Timeout is explicitly tracked in timeoutIds array and cleared in cleanup function below
-        const initialTimeoutId = setTimeout(() => {
-            updateSystemTheme(initialTheme);
-        }, UI_DELAYS.STATE_UPDATE_DEFER);
-        timeoutIds.push(initialTimeoutId);
+    // Listen for system theme changes
+    useEffect(
+        function handleSystemThemeChanges() {
+            const timeoutIds: NodeJS.Timeout[] = [];
 
-        return (): void => {
-            cleanup();
-            // Clean up all pending timeouts
-            timeoutIds.forEach((timeoutId) => {
-                clearTimeout(timeoutId);
+            const cleanup = themeManager.onSystemThemeChange((isDark) => {
+                const newSystemTheme = isDark ? "dark" : "light";
+                // Use timeout to defer state update to avoid direct call in
+                // useEffect
+                const timeoutId = setTimeout(() => {
+                    updateSystemTheme(newSystemTheme);
+                }, UI_DELAYS.STATE_UPDATE_DEFER);
+                timeoutIds.push(timeoutId);
             });
-        };
-    }, [updateSystemTheme]);
+
+            // Set initial system theme using timeout
+            const initialTheme: "dark" | "light" =
+                themeManager.getSystemThemePreference();
+            // eslint-disable-next-line @eslint-react/web-api/no-leaked-timeout -- Timeout is explicitly tracked in timeoutIds array and cleared in cleanup function below
+            const initialTimeoutId = setTimeout(() => {
+                updateSystemTheme(initialTheme);
+            }, UI_DELAYS.STATE_UPDATE_DEFER);
+            timeoutIds.push(initialTimeoutId);
+
+            return (): void => {
+                cleanup();
+                // Clean up all pending timeouts
+                timeoutIds.forEach((timeoutId) => {
+                    clearTimeout(timeoutId);
+                });
+            };
+        },
+        [updateSystemTheme]
+    );
 
     /**
      * Change the active theme.

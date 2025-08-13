@@ -84,11 +84,14 @@ const DynamicMonitorFields = ({
     const config = monitorTypes.find((type) => type.type === monitorType);
 
     // Load monitor types when component mounts
-    useEffect(() => {
-        if (!isLoaded && !lastError) {
-            void loadMonitorTypes();
-        }
-    }, [isLoaded, lastError, loadMonitorTypes]);
+    useEffect(
+        function loadMonitorTypesOnMount() {
+            if (!isLoaded && !lastError) {
+                void loadMonitorTypes();
+            }
+        },
+        [isLoaded, lastError, loadMonitorTypes]
+    );
 
     if (!isLoaded) {
         return (

@@ -192,31 +192,35 @@ export const HistoryTab = ({
             : Math.min(10, Math.max(1, historyLength));
 
     // Log when history tab is viewed - only when monitor actually changes
-    useEffect(() => {
-        const currentMonitor = {
-            id: selectedMonitor.id,
-            type: selectedMonitor.type,
-        };
-        const lastLogged = lastLoggedMonitorRef.current;
+    useEffect(
+        function logHistoryTabViewed() {
+            const currentMonitor = {
+                id: selectedMonitor.id,
+                type: selectedMonitor.type,
+            };
+            const lastLogged = lastLoggedMonitorRef.current;
 
-        // Only log if monitor ID or type has changed (not just history length)
-        if (
-            !lastLogged ||
-            lastLogged.id !== currentMonitor.id ||
-            lastLogged.type !== currentMonitor.type
-        ) {
-            logger.user.action("History tab viewed", {
-                monitorId: selectedMonitor.id,
-                monitorType: selectedMonitor.type,
-                totalRecords: selectedMonitor.history.length,
-            });
-            lastLoggedMonitorRef.current = currentMonitor;
-        }
-    }, [
-        selectedMonitor.history.length,
-        selectedMonitor.id,
-        selectedMonitor.type,
-    ]);
+            // Only log if monitor ID or type has changed (not just history
+            // length)
+            if (
+                !lastLogged ||
+                lastLogged.id !== currentMonitor.id ||
+                lastLogged.type !== currentMonitor.type
+            ) {
+                logger.user.action("History tab viewed", {
+                    monitorId: selectedMonitor.id,
+                    monitorType: selectedMonitor.type,
+                    totalRecords: selectedMonitor.history.length,
+                });
+                lastLoggedMonitorRef.current = currentMonitor;
+            }
+        },
+        [
+            selectedMonitor.history.length,
+            selectedMonitor.id,
+            selectedMonitor.type,
+        ]
+    );
 
     const filteredHistoryRecords = selectedMonitor.history
         .filter(

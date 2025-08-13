@@ -94,12 +94,10 @@ export function rowToSetting(row: DatabaseSettingsRow): SettingRow {
         // Handle value (required field)
         const { value } = row;
 
-        const setting: SettingRow = {
+        return {
             key,
             value: value ? safeStringify(value) : "",
         };
-
-        return setting;
     } catch (error) {
         logger.error(LOG_TEMPLATES.errors.SETTINGS_MAPPER_FAILED, {
             error,
@@ -141,8 +139,7 @@ export function rowToSettingValue(
         return undefined;
     }
 
-    const value = safeStringify(row.value);
-    return value;
+    return safeStringify(row.value);
 }
 
 /**

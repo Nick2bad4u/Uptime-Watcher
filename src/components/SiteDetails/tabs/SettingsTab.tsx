@@ -151,22 +151,26 @@ function IdentifierLabel({
 }): string {
     const [label, setLabel] = useState<string>(UiDefaults.loadingLabel);
 
-    useEffect(() => {
-        let isCancelled = false;
+    useEffect(
+        function loadLabelWithCleanup() {
+            let isCancelled = false;
 
-        const loadLabel = async (): Promise<void> => {
-            const identifierLabel = await getIdentifierLabel(selectedMonitor);
-            if (!isCancelled) {
-                setLabel(identifierLabel);
-            }
-        };
+            const loadLabel = async (): Promise<void> => {
+                const identifierLabel =
+                    await getIdentifierLabel(selectedMonitor);
+                if (!isCancelled) {
+                    setLabel(identifierLabel);
+                }
+            };
 
-        void loadLabel();
+            void loadLabel();
 
-        return (): void => {
-            isCancelled = true;
-        };
-    }, [selectedMonitor]);
+            return (): void => {
+                isCancelled = true;
+            };
+        },
+        [selectedMonitor]
+    );
 
     return label;
 }

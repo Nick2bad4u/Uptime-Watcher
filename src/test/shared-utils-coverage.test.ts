@@ -130,9 +130,10 @@ describe("Shared Utils Coverage", () => {
                 delete: (key: string) => mockCache.delete(key),
                 clear: (pattern?: string) => {
                     if (!pattern) {
-                        const count = mockCache.size;
+                        // Use splice-like behavior to capture count before clear
+                        const keys = [...mockCache.keys()];
                         mockCache.clear();
-                        return count;
+                        return keys.length;
                     }
                     let count = 0;
                     for (const key of mockCache.keys()) {

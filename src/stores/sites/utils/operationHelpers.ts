@@ -110,11 +110,15 @@ export const withSiteOperationReturning = async <T>(
 
     return withErrorHandling(
         async () => {
-            const result = await operation();
-            if (syncAfter) {
-                await deps.syncSitesFromBackend();
+            if (!syncAfter) {
+                return operation();
             }
+
+            /* eslint-disable nitpick/no-redundant-vars */
+            const result = await operation();
+            await deps.syncSitesFromBackend();
             return result;
+            /* eslint-enable nitpick/no-redundant-vars */
         },
         createStoreErrorHandler("sites-operations", operationName)
     );

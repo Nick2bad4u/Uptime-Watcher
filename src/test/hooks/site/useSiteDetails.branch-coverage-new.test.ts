@@ -380,6 +380,7 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 "Updated site name",
                 {
                     identifier: "test-site",
+                    name: "New Site Name",
                 }
             );
         });

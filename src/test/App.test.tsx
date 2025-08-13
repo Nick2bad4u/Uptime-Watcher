@@ -113,7 +113,7 @@ vi.mock("../theme/components", () => ({
 
 // Mock ErrorBoundary
 vi.mock("../stores/error/ErrorBoundary", () => ({
-    ErrorBoundary: ({ children }: { children: React.ReactNode }) => (
+    default: ({ children }: { children: React.ReactNode }) => (
         <div data-testid="error-boundary">{children}</div>
     ),
 }));

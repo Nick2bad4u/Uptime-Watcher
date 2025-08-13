@@ -66,25 +66,28 @@ export const ScreenshotThumbnail = ({
     }, []);
 
     // Additional cleanup on hovered state changes
-    useEffect(() => {
-        if (!hovered) {
-            // Clear any pending timeouts when hiding overlay
-            if (hoverTimeoutReference.current) {
-                clearTimeout(hoverTimeoutReference.current);
-                hoverTimeoutReference.current = undefined;
+    useEffect(
+        function cleanupOnHoverChange() {
+            if (!hovered) {
+                // Clear any pending timeouts when hiding overlay
+                if (hoverTimeoutReference.current) {
+                    clearTimeout(hoverTimeoutReference.current);
+                    hoverTimeoutReference.current = undefined;
+                }
+                // Use timeout to defer state update to avoid direct call in
+                // useEffect
+                const clearTimeoutId = setTimeout(
+                    clearOverlayVariables,
+                    UI_DELAYS.STATE_UPDATE_DEFER
+                );
+                return (): void => {
+                    clearTimeout(clearTimeoutId);
+                };
             }
-            // Use timeout to defer state update to avoid direct call in
-            // useEffect
-            const clearTimeoutId = setTimeout(
-                clearOverlayVariables,
-                UI_DELAYS.STATE_UPDATE_DEFER
-            );
-            return (): void => {
-                clearTimeout(clearTimeoutId);
-            };
-        }
-        return (): void => {};
-    }, [clearOverlayVariables, hovered]);
+            return (): void => {};
+        },
+        [clearOverlayVariables, hovered]
+    );
 
     const handleClick = useCallback(
         (event: React.MouseEvent) => {
@@ -132,20 +135,23 @@ export const ScreenshotThumbnail = ({
         }
     }, [hovered]);
 
-    useEffect(() => {
-        if (hovered && linkReference.current) {
-            // Use timeout to defer state update to avoid direct call in
-            // useEffect
-            const updateTimeoutId = setTimeout(
-                updateOverlayPosition,
-                UI_DELAYS.STATE_UPDATE_DEFER
-            );
-            return (): void => {
-                clearTimeout(updateTimeoutId);
-            };
-        }
-        return (): void => {};
-    }, [hovered, siteName, updateOverlayPosition, url]);
+    useEffect(
+        function updateOverlayPositionOnHover() {
+            if (hovered && linkReference.current) {
+                // Use timeout to defer state update to avoid direct call in
+                // useEffect
+                const updateTimeoutId = setTimeout(
+                    updateOverlayPosition,
+                    UI_DELAYS.STATE_UPDATE_DEFER
+                );
+                return (): void => {
+                    clearTimeout(updateTimeoutId);
+                };
+            }
+            return (): void => {};
+        },
+        [hovered, siteName, updateOverlayPosition, url]
+    );
 
     // Debounced hover handlers to prevent rapid state changes
     const handleMouseEnter = useCallback(() => {

@@ -145,10 +145,10 @@ vi.mock("../../../../theme/components", () => ({
             {children}
         </div>
     ),
-    ThemedInput: ({ ...props }: any) => (
+    ThemedInput: (props: any) => (
         <input data-testid="themed-input" {...props} />
     ),
-    ThemedProgress: ({ ...props }: any) => (
+    ThemedProgress: (props: any) => (
         <div data-testid="themed-progress" {...props} />
     ),
     ThemedSelect: ({ children, ...props }: any) => (

@@ -579,7 +579,7 @@ describe("Component Coverage Boost", () => {
                 },
                 getBadgeClasses: (props: StatusBadgeProps) => {
                     const baseClasses = ["status-badge"];
-                    if (props.size > 0 && props.size.length > 0)
+                    if (props.size > 0)
                         baseClasses.push(`size-${props.size}`);
                     baseClasses.push(`status-${props.status}`);
                     return baseClasses.join(" ");
