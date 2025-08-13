@@ -19,6 +19,9 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
 
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
+}));
+
+vi.mock("../../../../shared/utils/errorHandling", () => ({
     withErrorHandling: vi.fn(),
 }));
 
@@ -71,7 +74,8 @@ Object.defineProperty(globalThis, "window", {
 import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
 import { SiteService } from "../../../stores/sites/services/SiteService";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
-import { withErrorHandling, logStoreAction } from "../../../stores/utils";
+import { withErrorHandling } from "../../../../shared/utils/errorHandling";
+import { logStoreAction } from "../../../stores/utils";
 import logger from "../../../services/logger";
 
 describe("useSiteSync - Line Coverage Completion", () => {

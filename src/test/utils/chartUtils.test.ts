@@ -8,8 +8,8 @@ import {
     getNestedScaleProperty,
     getScaleConfig,
     getScaleProperty,
-    hasScales,
 } from "../../utils/chartUtils";
+import { hasScales } from "../../../shared/types/chartConfig";
 
 describe("Chart Utilities", () => {
     describe("hasScales", () => {

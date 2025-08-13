@@ -43,7 +43,7 @@ describe("Additional Coverage Tests", () => {
     });
     describe("Types Coverage", () => {
         it("should validate type exports", async () => {
-            const types = await import("../types");
+            const types = await import("../../shared/types");
 
             // Check if types module exists and can be imported
             expect(types).toBeDefined();

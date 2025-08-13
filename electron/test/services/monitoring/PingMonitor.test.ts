@@ -14,7 +14,7 @@ import {
     MonitorConfig,
     MonitorCheckResult,
 } from "../../../services/monitoring/types";
-import { Site } from "../../../types";
+import { Site } from "../../../../shared/types";
 import { isNonEmptyString } from "../../../../shared/validation/validatorUtils";
 import * as pingRetryModule from "../../../services/monitoring/utils/pingRetry";
 
@@ -185,7 +185,7 @@ describe("PingMonitor", () => {
             const result = await pingMonitor.check(invalidMonitor);
 
             expect(result.status).toBe("down");
-            expect(result.error).toContain("Ping monitor missing valid host");
+            expect(result.error).toContain("Monitor missing valid host");
             expect(mockPerformPingCheckWithRetry).not.toHaveBeenCalled();
         });
 

@@ -1,5 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import type { ChartOptions } from "chart.js";
+
+// Import setup first to ensure Chart.js registration
+import "../../../../services/chartSetup";
 
 import ResponseTimeChart from "../../../../components/SiteDetails/charts/ResponseTimeChart";
 import StatusChart from "../../../../components/SiteDetails/charts/StatusChart";
@@ -9,10 +13,9 @@ import type {
     StatusBarChartData,
     UptimeChartData,
 } from "../../../../services/chartConfig";
-import type { ChartOptions } from "../../../../services/chartSetup";
 
-// Mock chart.js components
-vi.mock("../../../../services/chartSetup", () => ({
+// Mock react-chartjs-2 components
+vi.mock("react-chartjs-2", () => ({
     Line: ({ data, options }: any) => (
         <div data-testid="line-chart" data-chart-type="line">
             <div data-testid="chart-data">{JSON.stringify(data)}</div>

@@ -10,6 +10,7 @@ import { ApplicationService } from "../../../services/application/ApplicationSer
 vi.mock("electron", () => ({
     app: {
         on: vi.fn(),
+        off: vi.fn(),
         quit: vi.fn(),
         removeAllListeners: vi.fn(),
     },

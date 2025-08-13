@@ -27,12 +27,17 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
 // Mock store utils
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
+}));
+
+// Mock withErrorHandling from shared utils
+vi.mock("../../../../shared/utils/errorHandling", () => ({
     withErrorHandling: vi.fn(),
 }));
 
 // Import mocked modules to get references
 import { extractIpcData, safeExtractIpcData } from "../../../types/ipc";
-import { logStoreAction, withErrorHandling } from "../../../stores/utils";
+import { logStoreAction } from "../../../stores/utils";
+import { withErrorHandling } from "../../../../shared/utils/errorHandling";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 
 const mockExtractIpcData = vi.mocked(extractIpcData);
@@ -94,7 +99,10 @@ describe("useSettingsStore", () => {
                 const result = await fn();
                 return result;
             } catch (error) {
-                (handlers as any).setError?.(error);
+                // Match the real withErrorHandling behavior: extract error message
+                const errorMessage =
+                    error instanceof Error ? error.message : String(error);
+                (handlers as any).setError?.(errorMessage);
                 throw error;
             } finally {
                 (handlers as any).setLoading?.(false);
@@ -327,7 +335,7 @@ describe("useSettingsStore", () => {
             expect(result.current.settings.historyLimit).toBe(200);
             expect(mockErrorStore.setStoreError).toHaveBeenCalledWith(
                 "settings",
-                error
+                "Update failed"
             );
         });
 
@@ -472,7 +480,7 @@ describe("useSettingsStore", () => {
 
             expect(mockErrorStore.setStoreError).toHaveBeenCalledWith(
                 "settings",
-                error
+                "Persistent error"
             );
         });
     });

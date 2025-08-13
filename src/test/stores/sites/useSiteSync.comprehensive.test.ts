@@ -19,6 +19,9 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
 
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
+}));
+
+vi.mock("../../../../shared/utils/errorHandling", () => ({
     withErrorHandling: vi.fn(async (operation) => {
         try {
             return await operation();
@@ -143,18 +146,8 @@ describe("useSiteSync", () => {
         });
 
         it("should handle withErrorHandling exceptions and use fallback", async () => {
-            // Mock the actual electronAPI call to succeed, but withErrorHandling to fail
-            vi.mocked(
-                mockElectronAPI.stateSync.getSyncStatus
-            ).mockResolvedValue({
-                siteCount: 5,
-                synchronized: true,
-                lastSync: 1_640_995_200_000,
-                success: true,
-            });
-
             // Mock withErrorHandling to throw an error (covering the catch block in getSyncStatus)
-            const { withErrorHandling } = await import("../../../stores/utils");
+            const { withErrorHandling } = await import("../../../../shared/utils/errorHandling");
             vi.mocked(withErrorHandling).mockImplementationOnce(async () => {
                 throw new Error("withErrorHandling failed");
             });

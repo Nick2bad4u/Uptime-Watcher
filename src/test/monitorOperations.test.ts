@@ -4,7 +4,6 @@ import type { Monitor, MonitorType, Site } from "../../shared/types";
 
 import {
     createDefaultMonitor,
-    validateMonitor,
     normalizeMonitor,
     findMonitorInSite,
     updateMonitorInSite,
@@ -13,6 +12,7 @@ import {
     validateMonitorExists,
     monitorOperations,
 } from "../stores/sites/utils/monitorOperations";
+import { validateMonitor } from "../../shared/types";
 import { ERROR_CATALOG } from "../../shared/utils/errorCatalog";
 
 // Mock crypto.randomUUID

@@ -19,6 +19,9 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
 
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
+}));
+
+vi.mock("../../../../shared/utils/errorHandling", () => ({
     withErrorHandling: vi.fn(),
 }));
 
@@ -57,7 +60,8 @@ Object.defineProperty(globalThis, "window", {
 // Import after mocking
 import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
 import { SiteService } from "../../../stores/sites/services/SiteService";
-import { withErrorHandling, logStoreAction } from "../../../stores/utils";
+import { withErrorHandling } from "../../../../shared/utils/errorHandling";
+import { logStoreAction } from "../../../stores/utils";
 import { safeExtractIpcData } from "../../../types/ipc";
 
 describe("useSiteSync - Final 100% Coverage", () => {
@@ -162,9 +166,9 @@ describe("useSiteSync - Final 100% Coverage", () => {
     describe("Line 239: getSyncStatus catch block fallback", () => {
         it("should return fallback when withErrorHandling throws", async () => {
             // Mock withErrorHandling to throw an error
-            vi.mocked(withErrorHandling).mockRejectedValue(
-                new Error("withErrorHandling failed")
-            );
+            vi.mocked(withErrorHandling).mockImplementation(() => {
+                throw new Error("withErrorHandling failed");
+            });
 
             const result = await syncActions.getSyncStatus();
 

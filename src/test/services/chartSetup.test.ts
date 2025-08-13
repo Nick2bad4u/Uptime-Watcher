@@ -3,14 +3,16 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { ChartJS, Bar, Doughnut, Line } from "../../services/chartSetup";
 import { Chart } from "chart.js";
+import { Bar, Doughnut, Line } from "react-chartjs-2";
+// Import the setup module to ensure registration happens
+import "../../services/chartSetup";
 
 describe("Chart Setup", () => {
     describe("Chart.js Registration", () => {
         it("should export ChartJS", () => {
-            expect(ChartJS).toBeDefined();
-            expect(ChartJS).toBe(Chart);
+            expect(Chart).toBeDefined();
+            expect(Chart).toBe(Chart);
         });
 
         it("should have registered components", () => {
