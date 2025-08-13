@@ -1,9 +1,9 @@
+import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { app } from "electron";
 import { Database } from "node-sqlite3-wasm";
 // eslint-disable-next-line unicorn/import-style -- Need namespace import for both sync and async usage
 import * as path from "node:path";
 
-import { LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
 import { DB_FILE_NAME } from "../../constants";
 import { logger } from "../../utils/logger";
 import { createDatabaseSchema } from "./utils/databaseSchema";

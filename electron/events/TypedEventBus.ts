@@ -35,12 +35,12 @@
  * @packageDocumentation
  */
 
-import { EventEmitter } from "node:events";
-
 import {
     createTemplateLogger,
     LOG_TEMPLATES,
-} from "../../shared/utils/logTemplates";
+} from "@shared/utils/logTemplates";
+import { EventEmitter } from "node:events";
+
 import { generateCorrelationId } from "../utils/correlation";
 import { logger as baseLogger } from "../utils/logger";
 

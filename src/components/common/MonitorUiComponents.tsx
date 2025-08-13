@@ -4,11 +4,10 @@
  * consistent UI behavior across different monitor types.
  */
 
+import type { MonitorType } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
 import React, { useEffect, useState } from "react";
-
-import type { MonitorType } from "../../../shared/types";
 
 import logger from "../../services/logger";
 import {

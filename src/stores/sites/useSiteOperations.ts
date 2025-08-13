@@ -7,10 +7,11 @@
 
 import type { Monitor, MonitorType, Site } from "@shared/types";
 
+import { isDevelopment } from "@shared/utils/environment";
+import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
+
 import type { BaseSiteOperations } from "./baseTypes";
 
-import { isDevelopment } from "../../../shared/utils/environment";
-import { ERROR_CATALOG } from "../../../shared/utils/errorCatalog";
 import logger from "../../services/logger";
 import { safeExtractIpcData } from "../../types/ipc";
 import { handleSQLiteBackupDownload } from "./utils/fileDownload";

@@ -34,7 +34,8 @@
  * @see {@link performPingCheckWithRetry} - Core ping checking functionality
  */
 
-import type { MonitorType, Site } from "../../../shared/types";
+import type { MonitorType, Site } from "@shared/types";
+
 import type {
     IMonitorService,
     MonitorCheckResult,

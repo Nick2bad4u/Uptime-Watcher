@@ -39,9 +39,9 @@
  * @public
  */
 
-import { useCallback, useState } from "react";
+import type { MonitorType } from "@shared/types";
 
-import type { MonitorType } from "../../../shared/types";
+import { useCallback, useState } from "react";
 
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { useMonitorFields } from "../../hooks/useMonitorFields";

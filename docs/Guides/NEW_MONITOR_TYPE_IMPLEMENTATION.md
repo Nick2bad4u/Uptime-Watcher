@@ -8,9 +8,9 @@ This document provides a **comprehensive, step-by-step guide** for adding a new 
 
 The system currently supports:
 
-- **HTTP**: Website/API monitoring (`http`)
-- **Port**: TCP port connectivity monitoring (`port`)
-- **Ping**: Network connectivity monitoring (`ping`)
+- **HTTP**: Website/API monitoring (`http`) - Full HTTP/HTTPS request monitoring with status code validation
+- **Port**: TCP port connectivity monitoring (`port`) - Direct socket connection testing to specific host:port combinations  
+- **Ping**: Network connectivity monitoring (`ping`) - ICMP ping testing for network reachability
 
 ## 🏗️ Architecture Integration
 
@@ -160,14 +160,24 @@ The system uses the **unified enhanced monitoring architecture** with the follow
 
 ### **🔹 Core Required Fields**
 
-Every monitor type must support these standardized fields:
+Every monitor type must support these standardized fields from the `Monitor` interface in `shared/types.ts`:
 
-| Field           | Type     | Range/Validation  | Purpose                            | ADR Reference |
-| --------------- | -------- | ----------------- | ---------------------------------- | ------------- |
-| `checkInterval` | `number` | 5000ms - 30 days  | Monitoring frequency scheduling    | ADR-001       |
-| `retryAttempts` | `number` | 0 - 10 attempts   | Failure retry logic                | ADR-003       |
-| `timeout`       | `number` | 1000ms - 300000ms | Request timeout for reliability    | ADR-003       |
-| `details`       | `string` | Non-empty string  | History tracking and user feedback | ADR-002       |
+| Field             | Type            | Range/Validation      | Purpose                             | Required |
+| ----------------- | --------------- | --------------------- | ----------------------------------- | -------- |
+| `id`              | `string`        | Non-empty string      | Unique monitor identifier           | ✅ Yes   |
+| `type`            | `MonitorType`   | "http" \| "port" \| "ping" | Monitor type classification         | ✅ Yes   |
+| `checkInterval`   | `number`        | 5000ms - 30 days      | Monitoring frequency scheduling     | ✅ Yes   |
+| `retryAttempts`   | `number`        | 0 - 10 attempts       | Failure retry logic                 | ✅ Yes   |
+| `timeout`         | `number`        | 1000ms - 300000ms     | Request timeout for reliability     | ✅ Yes   |
+| `monitoring`      | `boolean`       | true/false            | Whether monitor is actively running | ✅ Yes   |
+| `status`          | `MonitorStatus` | "up" \| "down" \| "pending" \| "paused" | Current monitor status              | ✅ Yes   |
+| `responseTime`    | `number`        | -1 or positive        | Last response time (-1 = never checked) | ✅ Yes   |
+| `history`         | `StatusHistory[]` | Array of status history | Historical status data              | ✅ Yes   |
+| `lastChecked`     | `Date`          | Valid Date object     | Last check timestamp                | ❌ Optional |
+| `activeOperations` | `string[]`      | Array of operation IDs | Currently running operations        | ❌ Optional |
+| `url`             | `string`        | Valid URL (HTTP only) | Target URL for HTTP monitors        | ❌ Type-specific |
+| `host`            | `string`        | Valid hostname/IP     | Target host for ping/port monitors  | ❌ Type-specific |
+| `port`            | `number`        | 1-65535               | Target port for port monitors       | ❌ Type-specific |
 
 ### **🔹 Production Quality Standards**
 
@@ -179,190 +189,197 @@ Every monitor type must support these standardized fields:
 
 ### **🔹 Repository Pattern Integration**
 
-All monitor data operations must use the Repository Pattern with transaction safety:
+New monitor types automatically integrate with the repository pattern through the Enhanced Monitoring System:
 
-````typescript
+```typescript
 /**
  * Monitor service implementing production-grade monitoring patterns.
  *
  * @remarks
- * Integrates with the repository pattern for database operations, enhanced
- * monitoring system for operation correlation, and comprehensive error handling
- * for production reliability.
+ * Monitor services focus on performing checks and returning results.
+ * The Enhanced Monitoring System handles:
+ * - Database operations through repository pattern
+ * - Operation correlation and race condition prevention
+ * - Status updates and history management
+ * - Event emission and system integration
  *
  * @example
  * ```typescript
- * const monitor = new CustomMonitor();
+ * const monitor = new DnsMonitor();
  * const result = await monitor.check(config);
- * // Result automatically integrates with database through repository pattern
+ * // Enhanced system handles database persistence automatically
  * ```
  */
-export class CustomMonitor implements IMonitorService {
- /**
-  * Performs a monitoring check with comprehensive error handling.
-  *
-  * @param monitor - Monitor configuration with validated fields
-  * @returns Promise resolving to standardized check result
-  * @throws Error with correlation ID for debugging
-  */
- async check(monitor: CustomMonitorConfig): Promise<MonitorCheckResult> {
-  return await withErrorHandling(
-   async () => {
-    // Implementation with proper cleanup
-    const startTime = performance.now();
-    try {
-     // Actual monitoring logic
-     const result = await performActualCheck(monitor);
+export class DnsMonitor implements IMonitorService {
+    /**
+     * Performs a DNS monitoring check.
+     *
+     * @param monitor - Monitor configuration with validated fields
+     * @returns Promise resolving to standardized check result
+     */
+    async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
+        if (monitor.type !== "dns") {
+            throw new Error(`DnsMonitor cannot handle monitor type: ${monitor.type}`);
+        }
 
-     return {
-      status: "up",
-      responseTime: performance.now() - startTime,
-      details: `Check successful: ${result.message}`,
-     };
-    } catch (error) {
-     return {
+        // Focus only on the monitoring logic
+        const startTime = performance.now();
+        
+        try {
+            // Perform DNS resolution
+            const result = await this.performDnsLookup(monitor);
+            const responseTime = performance.now() - startTime;
+
+            return {
+                status: result.success ? "up" : "down",
+                responseTime: Math.round(responseTime),
+                details: result.details,
+                error: result.error,
+            };
+        } catch (error) {
+            const responseTime = performance.now() - startTime;
+            return {
+                status: "down",
+                responseTime: Math.round(responseTime),
+                details: "DNS lookup failed",
+                error: error instanceof Error ? error.message : String(error),
+            };
+        }
+    }
+
+    updateConfig(config: Partial<MonitorConfig>): void {
+        this.config = { ...this.config, ...config };
+    }
+
+    getType(): Site["monitors"][0]["type"] {
+        return "dns";
+    }
+}
+```
+
+**Key Benefits of This Integration:**
+
+- **Simplified Implementation**: Focus only on monitoring logic, not infrastructure
+- **Automatic Database Operations**: Enhanced system handles persistence through repositories
+- **Race Condition Prevention**: Operation correlation prevents concurrent check conflicts
+- **Status Management**: Automatic status updates and history tracking
+- **Event Integration**: System events are emitted automatically for UI updates
       status: "down",
       responseTime: performance.now() - startTime,
       details: "Check failed",
-      error: error instanceof Error ? error.message : String(error),
-     };
-    }
-   },
-   {
-    logger,
-    operationName: "CustomMonitor.check",
-    correlationId: generateCorrelationId(),
-   }
-  );
- }
-}
-````
+**Key Benefits of This Integration:**
+
+- **Simplified Implementation**: Focus only on monitoring logic, not infrastructure
+- **Automatic Database Operations**: Enhanced system handles persistence through repositories
+- **Race Condition Prevention**: Operation correlation prevents concurrent check conflicts
+- **Status Management**: Automatic status updates and history tracking
+- **Event Integration**: System events are emitted automatically for UI updates
 
 ## 🛡️ Production-Grade Validation Standards
 
 ### **🔹 Centralized Validation System**
 
-**PRODUCTION REQUIREMENT**: Use the centralized validation utilities for consistent, secure validation:
+**PRODUCTION REQUIREMENT**: Use the centralized Zod validation system for consistent, secure validation:
 
 ```typescript
-import {
- isNonEmptyString,
- isValidUrl,
- isValidFQDN,
- isValidInteger,
- safeInteger,
- isValidPort,
-} from "shared/utils/validation";
-
+import { z } from "zod";
+import validator from "validator";
 import { withErrorHandling } from "shared/utils/errorHandling";
 
 /**
- * Production-grade validation for custom monitor configuration.
+ * Production-grade validation for DNS monitor configuration.
  *
  * @remarks
- * Implements comprehensive validation using centralized utilities,
- * ensuring consistency with other monitor types and security best practices.
- *
- * @param monitor - Monitor configuration to validate
- * @returns true if valid, throws descriptive error if invalid
- * @throws Error with specific validation failure details
+ * The system uses Zod schemas for type-safe validation with comprehensive 
+ * error messages. All validation is centralized in shared/validation/schemas.ts
+ * using the baseMonitorSchema extension pattern.
+ * 
+ * @example
+ * ```typescript
+ * import { dnsMonitorSchema } from "shared/validation/schemas";
+ * 
+ * const validationResult = dnsMonitorSchema.safeParse(monitor);
+ * if (!validationResult.success) {
+ *   throw new Error(validationResult.error.message);
+ * }
+ * ```
  */
-function validateCustomMonitor(monitor: CustomMonitor): boolean {
- return withErrorHandling(
-  () => {
-   // Core field validation using centralized utilities
-   if (!isValidUrl(monitor.url)) {
-    throw new Error("Invalid URL format");
-   }
-
-   if (!isValidInteger(monitor.timeout, 1000, 300_000)) {
-    throw new Error("Timeout must be between 1000ms and 300000ms");
-   }
-
-   if (!isNonEmptyString(monitor.name)) {
-    throw new Error("Monitor name cannot be empty");
-   }
-
-   // Custom validation logic
-   if (monitor.customField && !isValidCustomField(monitor.customField)) {
-    throw new Error("Custom field validation failed");
-   }
-
-   return true;
-  },
-  { logger, operationName: "CustomMonitor.validation" }
- );
-}
+const dnsMonitorSchema = baseMonitorSchema.extend({
+    type: z.literal("dns"),
+    hostname: z.string().refine((val) => {
+        if (validator.isIP(val)) return true;
+        if (validator.isFQDN(val, {
+            allow_numeric_tld: false,
+            allow_trailing_dot: false,
+            allow_underscores: false,
+            allow_wildcard: false,
+            require_tld: true,
+        })) return true;
+        return val === "localhost";
+    }, "Must be a valid hostname, IP address, or localhost"),
+    recordType: z.enum(["A", "AAAA", "MX", "CNAME"]),
+});
 ```
 
 ### **🔹 Validation Benefits**
 
+- ✅ **Type-Safe**: Zod provides compile-time and runtime type safety
 - ✅ **Security-Focused**: Uses validator.js package for proven security patterns
-- ✅ **Consistent**: Same validation patterns across all monitor types
-- ✅ **Type-Safe**: Complete TypeScript integration with proper error types
-- ✅ **Production-Ready**: Comprehensive error handling with correlation IDs
-- ✅ **Enhanced Monitoring Compatible**: Integrates with operation correlation system
+- ✅ **Consistent**: Same validation patterns across all monitor types using `baseMonitorSchema`
+- ✅ **Comprehensive Error Messages**: Detailed validation errors for debugging
+- ✅ **Production-Ready**: Battle-tested validation with comprehensive error handling
+- ✅ **Enhanced Monitoring Compatible**: Integrates with the monitoring system architecture
 
 ### **🔹 Critical Validation Requirements**
 
-1. **Details Field Validation**:
-
+1. **Schema Extension Pattern**:
    ```typescript
-   // Must ensure details will be populated in results
-   if (!isNonEmptyString(result.details)) {
-    logger.warn("Monitor result missing details field");
-   }
+   // ALWAYS extend baseMonitorSchema - never create from scratch
+   const newMonitorSchema = baseMonitorSchema.extend({
+       type: z.literal("your-type"),
+       // Add type-specific fields here
+   });
    ```
 
-2. **Interface Compliance**:
+2. **Discriminated Union Integration**:
+   ```typescript
+   // MUST add to the discriminated union in schemas.ts
+   export const monitorSchema = z.discriminatedUnion("type", [
+       httpMonitorSchema,
+       portMonitorSchema,
+       pingMonitorSchema,
+       yourNewMonitorSchema, // Add here
+   ]);
+   ```
 
+3. **Service Interface Compliance**:
    ```typescript
    // Must implement IMonitorService with proper error handling
    class CustomMonitor implements IMonitorService {
-    async check(monitor: MonitorConfig): Promise<MonitorCheckResult> {
-     // Implementation must handle all error cases
-    }
+       async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
+           // Implementation must return standardized result
+       }
+       
+       updateConfig(config: Partial<MonitorConfig>): void {
+           // Runtime configuration updates
+       }
+       
+       getType(): Site["monitors"][0]["type"] {
+           return "your-type";
+       }
    }
    ```
 
-3. **Enhanced Monitoring Compatibility**:
+4. **Registry Integration**:
    ```typescript
-   // Results must work with operation correlation
-   const result: MonitorCheckResult = {
-    status: determineStatus(),
-    responseTime: measureResponseTime(),
-    details: generateUserFriendlyDetails(),
-    error: captureErrorDetails(),
-   };
+   // Must register with complete BaseMonitorConfig
+   registerMonitorType({
+       type: "your-type",
+       validationSchema: yourNewMonitorSchema, // Same schema as above
+       serviceFactory: () => new YourMonitor(),
+       // ... other required fields
+   });
    ```
-
-### **🔹 Memory Management in Validation**
-
-```typescript
-/**
- * Memory-safe validation with proper cleanup.
- */
-function validateWithCleanup(monitor: MonitorConfig): boolean {
- const validationResources = new Set<() => void>();
-
- try {
-  // Validation logic with resource tracking
-  const cleanup1 = setupValidationResource();
-  validationResources.add(cleanup1);
-
-  return performValidation(monitor);
- } finally {
-  // Always cleanup resources
-  for (const cleanup of validationResources) {
-   try {
-    cleanup();
-   } catch (error) {
-    logger.warn("Validation cleanup failed", error);
-   }
-  }
- }
-}
-```
 
 ## 📋 Production-Grade Implementation Order
 
@@ -404,9 +421,15 @@ Based on analysis of the existing monitor implementations, here are **ALL** the 
 
 #### `shared/types.ts`
 
-- **Location**: Line 18 (BASE_MONITOR_TYPES constant)
+- **Location**: Line 33 (BASE_MONITOR_TYPES constant)
 - **Change**: Add new type to the const array
-- **Example**:
+- **Current Implementation**:
+
+```typescript
+export const BASE_MONITOR_TYPES = ["http", "port", "ping"] as const;
+```
+
+- **Example for Adding New Type**:
 
 ```typescript
 export const BASE_MONITOR_TYPES = ["http", "port", "ping", "dns"] as const; // Add 'dns'
@@ -436,42 +459,59 @@ export const BASE_MONITOR_TYPES = ["http", "port", "ping", "dns"] as const; // A
 #### `shared/validation/schemas.ts`
 
 - **Purpose**: Create production-grade Zod validation schema with comprehensive error handling
-- **Location**: Add to `monitorSchemas` object using centralized validation utilities
+- **Location**: Add new monitor schema to the existing validation system
+- **Current Structure**: The system uses `baseMonitorSchema` extended for type-specific validation
 - **Example**:
 
 ```typescript
 import { z } from "zod";
-import { isValidFQDN, isValidUrl } from "../utils/validation";
+import validator from "validator";
 
 /**
- * Validation schema for DNS monitor configuration.
- *
+ * Zod schema for DNS monitor fields.
+ * 
  * @remarks
- * Extends baseMonitorSchema to inherit core monitoring fields (checkInterval,
- * retryAttempts, timeout) and adds DNS-specific validation using centralized
- * validation utilities for consistency and security.
+ * Extends baseMonitorSchema which includes id, checkInterval, monitoring, 
+ * responseTime, retryAttempts, status, timeout, and type fields.
  */
-export const monitorSchemas = {
- // ... existing schemas
- dns: baseMonitorSchema.extend({
-  type: z.literal("dns"),
-  hostname: z
-   .string()
-   .min(1, "Hostname is required")
-   .refine(isValidFQDN, "Must be a valid domain name"),
-  recordType: z.enum(["A", "AAAA", "MX", "CNAME"], {
-   errorMap: () => ({ message: "Must select a valid DNS record type" }),
-  }),
-  expectedValue: z.string().optional(),
-  // Core fields (checkInterval, retryAttempts, timeout) automatically inherited
- }),
-};
+export const dnsMonitorSchema = baseMonitorSchema.extend({
+    type: z.literal("dns"),
+    hostname: z.string().refine((val) => {
+        // Use validator.js for robust hostname validation
+        if (validator.isIP(val)) {
+            return true;
+        }
+        if (validator.isFQDN(val, {
+            allow_numeric_tld: false,
+            allow_trailing_dot: false,
+            allow_underscores: false,
+            allow_wildcard: false,
+            require_tld: true,
+        })) {
+            return true;
+        }
+        return val === "localhost";
+    }, "Must be a valid hostname, IP address, or localhost"),
+    recordType: z.enum(["A", "AAAA", "MX", "CNAME"], {
+        errorMap: () => ({ message: "Must select a valid DNS record type" }),
+    }),
+    expectedValue: z.string().optional(),
+});
+
+// Then add to the discriminated union
+export const monitorSchema = z.discriminatedUnion("type", [
+    httpMonitorSchema,
+    portMonitorSchema,
+    pingMonitorSchema,
+    dnsMonitorSchema, // Add your new schema here
+]);
 ```
 
 **⚠️ CRITICAL REQUIREMENTS**:
 
-- **MUST extend `baseMonitorSchema`** which includes required monitoring fields
-- **MUST use centralized validation utilities** for security and consistency
+- **MUST extend `baseMonitorSchema`** which includes all required monitoring fields
+- **MUST use `validator.js` for security-tested validation** (already imported in schemas.ts)
+- **MUST add to the discriminated union** in `monitorSchema`
 - **MUST include comprehensive error messages** for user experience
 - **NEVER create schemas from scratch** - always extend the base schema
 
@@ -485,9 +525,9 @@ export const monitorSchemas = {
 
 - **Purpose**: Implement production-ready `IMonitorService` interface with comprehensive error handling
 - **Required Methods**:
-  - `check(monitor: Monitor): Promise<MonitorCheckResult>` - **With operation correlation**
-  - `updateConfig(config: MonitorConfig): void` - **With validation**
-  - `getType(): MonitorType` - **Type identification**
+  - `check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult>` - **Core monitoring functionality**
+  - `updateConfig(config: Partial<MonitorConfig>): void` - **Runtime configuration updates**
+  - `getType(): Site["monitors"][0]["type"]` - **Type identification for routing**
 
 **Production Template Structure**:
 
@@ -689,62 +729,78 @@ export class DnsMonitor implements IMonitorService {
 
 #### `electron/services/monitoring/MonitorTypeRegistry.ts`
 
-- **Location**: Add registration call at bottom of file (around line 400+)
-- **Change**: Register the new monitor type with complete configuration
+- **Location**: Add registration call at bottom of file (after existing registrations)
+- **Change**: Register the new monitor type with complete `BaseMonitorConfig` configuration
 - **Template**:
 
 ```typescript
 registerMonitorType({
- type: "dns",
- displayName: "DNS (Domain Resolution)",
- description: "Monitors DNS resolution for domains",
- version: "1.0.0",
- serviceFactory: () => new DnsMonitor(),
- validationSchema: monitorSchemas.dns,
- fields: [
-  {
-   name: "hostname",
-   label: "Hostname",
-   type: "text",
-   required: true,
-   placeholder: "example.com",
-   helpText: "Enter the domain name to resolve",
-  },
-  {
-   name: "recordType",
-   label: "Record Type",
-   type: "select",
-   required: true,
-   options: [
-    { value: "A", label: "A Record" },
-    { value: "AAAA", label: "AAAA Record" },
-    { value: "MX", label: "MX Record" },
-    { value: "CNAME", label: "CNAME Record" },
-   ],
-  },
-  // Note: checkInterval, retryAttempts, timeout fields are auto-generated
- ],
- uiConfig: {
-  supportsAdvancedAnalytics: true,
-  supportsResponseTime: true,
-  display: {
-   showAdvancedMetrics: true,
-   showUrl: false, // Set based on monitor type
-  },
-  formatDetail: (details: string) => `Record: ${details}`,
-  formatTitleSuffix: (monitor: Record<string, unknown>) => {
-   const hostname = monitor.hostname as string;
-   const recordType = monitor.recordType as string;
-   return hostname ? ` (${hostname} ${recordType})` : "";
-  },
-  helpTexts: {
-   primary: "Enter the domain name to resolve",
-   secondary:
-    "The monitor will check DNS resolution according to your monitoring interval",
-  },
- },
+    type: "dns",
+    displayName: "DNS (Domain Resolution)",
+    description: "Monitors DNS resolution for domains and records",
+    version: "1.0.0",
+    serviceFactory: () => new DnsMonitor(),
+    validationSchema: dnsMonitorSchema, // From shared/validation/schemas.ts
+    fields: [
+        {
+            name: "hostname",
+            label: "Hostname",
+            type: "text",
+            required: true,
+            placeholder: "example.com",
+            helpText: "Enter the domain name to resolve",
+        },
+        {
+            name: "recordType",
+            label: "Record Type",
+            type: "select",
+            required: true,
+            options: [
+                { value: "A", label: "A Record" },
+                { value: "AAAA", label: "AAAA Record" },
+                { value: "MX", label: "MX Record" },
+                { value: "CNAME", label: "CNAME Record" },
+            ],
+        },
+        // Note: checkInterval, retryAttempts, timeout fields are auto-generated
+        // from the base UI configuration system
+    ],
+    uiConfig: {
+        supportsAdvancedAnalytics: true,
+        supportsResponseTime: true,
+        display: {
+            showAdvancedMetrics: true,
+            showUrl: false, // DNS doesn't use URLs
+        },
+        detailFormats: {
+            analyticsLabel: "DNS Response Time",
+            historyDetail: (details: string) => `Record: ${details}`,
+        },
+        formatDetail: (details: string) => `Record: ${details}`,
+        formatTitleSuffix: (monitor: Monitor) => {
+            if (monitor.type === "dns") {
+                const hostname = (monitor as any).hostname;
+                const recordType = (monitor as any).recordType;
+                return hostname ? ` (${hostname} ${recordType})` : "";
+            }
+            return "";
+        },
+        helpTexts: {
+            primary: "Enter the domain name to resolve",
+            secondary:
+                "The monitor will check DNS resolution according to your monitoring interval",
+        },
+    },
 });
 ```
+
+**⚠️ CRITICAL REQUIREMENTS**:
+
+- **MUST implement `BaseMonitorConfig` interface** - All fields are required
+- **MUST provide `serviceFactory`** that returns an instance of your monitor service
+- **MUST use the same validation schema** from `shared/validation/schemas.ts`
+- **MUST configure `uiConfig`** for proper frontend integration
+- **Fields array drives the UI form generation** - be precise with field definitions
 
 **UI Configuration Explained**:
 
@@ -1453,5 +1509,194 @@ This production-ready architecture allows you to focus on implementing core moni
 ### **📌 Enterprise Standards:**
 
 All monitor types must support the standardized monitoring fields (`checkInterval`, `retryAttempts`, `timeout`) which are enforced by the scheduler and validated through our centralized validation system. This ensures consistency, reliability, and maintainability across the entire monitoring ecosystem.
+
+## 📁 **File Structure and Imports**
+
+### **🔹 Current Import Patterns**
+
+Use these exact import patterns for consistency with the current codebase:
+
+```typescript
+// Monitor service implementation
+import type { Site } from "../../types";
+import type { 
+    IMonitorService, 
+    MonitorCheckResult, 
+    MonitorConfig 
+} from "./types";
+
+// Shared types and validation
+import { z } from "zod";
+import validator from "validator";
+import { baseMonitorSchema } from "../../../shared/validation/schemas";
+
+// Utilities and constants
+import { DEFAULT_RETRY_ATTEMPTS, DEFAULT_TIMEOUT } from "./constants";
+import { withErrorHandling } from "../../utils/errorHandling";
+import { logger } from "../../utils/logger";
+
+// Monitor type registry
+import { registerMonitorType } from "./MonitorTypeRegistry";
+```
+
+### **🔹 File Locations**
+
+**Required Files for New Monitor Type:**
+
+1. **Monitor Service**: `electron/services/monitoring/YourMonitor.ts`
+2. **Validation Schema**: Add to `shared/validation/schemas.ts`
+3. **Type Definition**: Update `shared/types.ts` (BASE_MONITOR_TYPES)
+4. **Registry Entry**: Add to `electron/services/monitoring/MonitorTypeRegistry.ts`
+5. **Test File**: `electron/test/services/monitoring/YourMonitor.test.ts`
+
+### **🔹 TypeScript Configuration**
+
+The current system uses strict TypeScript with:
+
+- **Strict mode enabled**: No `any` types allowed
+- **Path mapping**: Use `@shared/` for shared imports
+- **Type-only imports**: Use `import type` for types
+- **Interface segregation**: Implement only required interface methods
+
+**Example Type-Safe Implementation:**
+
+```typescript
+export class YourMonitor implements IMonitorService {
+    private config: MonitorConfig;
+
+    constructor(config: MonitorConfig = {}) {
+        this.config = {
+            timeout: DEFAULT_TIMEOUT,
+            retryAttempts: DEFAULT_RETRY_ATTEMPTS,
+            ...config,
+        };
+    }
+
+    async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
+        // Type guard for monitor type
+        if (monitor.type !== "your-type") {
+            throw new Error(`YourMonitor cannot handle monitor type: ${monitor.type}`);
+        }
+
+        // Type-safe implementation
+        return {
+            status: "up" as const,
+            responseTime: 100,
+            details: "Check successful",
+        };
+    }
+
+    updateConfig(config: Partial<MonitorConfig>): void {
+        this.config = { ...this.config, ...config };
+    }
+
+    getType(): Site["monitors"][0]["type"] {
+        return "your-type";
+    }
+}
+```
+
+## 🧪 **Testing Requirements**
+
+### **🔹 Required Test Coverage**
+
+**PRODUCTION REQUIREMENT**: All new monitor types must achieve comprehensive test coverage:
+
+```typescript
+// electron/test/services/monitoring/YourMonitor.test.ts
+import { describe, expect, it, beforeEach, vi } from "vitest";
+import type { Site } from "../../../types";
+import { YourMonitor } from "../../../services/monitoring/YourMonitor";
+
+describe("YourMonitor - Comprehensive Coverage", () => {
+    let monitor: YourMonitor;
+    
+    beforeEach(() => {
+        monitor = new YourMonitor();
+    });
+
+    describe("check method", () => {
+        it("should return up status for successful checks", async () => {
+            const mockMonitor: Site["monitors"][0] = {
+                id: "test-monitor",
+                type: "your-type",
+                // ... other required fields
+            };
+
+            const result = await monitor.check(mockMonitor);
+
+            expect(result.status).toBe("up");
+            expect(result.responseTime).toBeGreaterThan(0);
+            expect(result.details).toBeDefined();
+        });
+
+        it("should return down status for failed checks", async () => {
+            // Test failure scenarios
+        });
+
+        it("should handle timeout scenarios", async () => {
+            // Test timeout handling
+        });
+
+        it("should validate monitor type", async () => {
+            const invalidMonitor = { ...mockMonitor, type: "invalid" as any };
+            
+            await expect(monitor.check(invalidMonitor)).rejects.toThrow();
+        });
+    });
+
+    describe("configuration methods", () => {
+        it("should update configuration correctly", () => {
+            monitor.updateConfig({ timeout: 10000 });
+            // Verify configuration was applied
+        });
+
+        it("should return correct monitor type", () => {
+            expect(monitor.getType()).toBe("your-type");
+        });
+    });
+});
+```
+
+### **🔹 Integration Testing**
+
+**CRITICAL**: Test integration with the Enhanced Monitoring System:
+
+```typescript
+// Test integration with EnhancedMonitorChecker
+describe("YourMonitor Integration", () => {
+    it("should integrate with enhanced monitoring system", async () => {
+        const config = createTestMonitorCheckConfig();
+        const checker = new EnhancedMonitorChecker(config);
+        const site = createTestSite();
+
+        const result = await checker.checkMonitor(site, "monitor-id", false);
+
+        expect(result).toBeDefined();
+        expect(result?.status).toMatch(/up|down/);
+    });
+});
+```
+
+### **🔹 Validation Testing**
+
+Test the Zod schema thoroughly:
+
+```typescript
+describe("YourMonitor Schema Validation", () => {
+    it("should validate correct monitor configuration", () => {
+        const validConfig = {
+            // Valid monitor configuration
+        };
+
+        const result = yourMonitorSchema.safeParse(validConfig);
+        expect(result.success).toBe(true);
+    });
+
+    it("should reject invalid configurations", () => {
+        // Test various invalid configurations
+    });
+});
+```
 
 **The result is a production-ready monitoring system with enterprise-grade quality, comprehensive testing, and architectural excellence that scales reliably under load while maintaining code quality and developer productivity.**

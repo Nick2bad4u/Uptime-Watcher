@@ -16,10 +16,12 @@
  * @public
  */
 
-import type { Site } from "../../../shared/types";
+import type { Site } from "@shared/types";
+
+import { validateMonitorData } from "@shared/validation/schemas";
+
 import type { ValidationResult } from "./interfaces";
 
-import { validateMonitorData } from "../../../shared/validation/schemas";
 import {
     getRegisteredMonitorTypes,
     isValidMonitorType,

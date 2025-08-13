@@ -7,7 +7,13 @@
  * @public
  */
 
-import type { Site, StatusUpdate } from "../../shared/types";
+import type { Site, StatusUpdate } from "@shared/types";
+
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "@shared/utils/logTemplates";
+
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
 import type { DatabaseService } from "../services/database/DatabaseService";
@@ -18,10 +24,6 @@ import type { EnhancedMonitoringServices } from "../services/monitoring/Enhanced
 import type { SiteService } from "../services/site/SiteService";
 import type { StandardizedCache } from "../utils/cache/StandardizedCache";
 
-import {
-    interpolateLogTemplate,
-    LOG_TEMPLATES,
-} from "../../shared/utils/logTemplates";
 import { DEFAULT_CHECK_INTERVAL } from "../constants";
 import { isDev } from "../electronUtils";
 import { MonitorScheduler } from "../services/monitoring/MonitorScheduler";

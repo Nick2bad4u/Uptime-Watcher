@@ -27,7 +27,13 @@
  * @public
  */
 
-import type { Monitor, Site, StatusUpdate } from "../../../shared/types";
+import type { Monitor, Site, StatusUpdate } from "@shared/types";
+
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "@shared/utils/logTemplates";
+
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
@@ -45,10 +51,6 @@ import type {
     MonitorCheckResult as ServiceMonitorCheckResult,
 } from "./types";
 
-import {
-    interpolateLogTemplate,
-    LOG_TEMPLATES,
-} from "../../../shared/utils/logTemplates";
 import { monitorLogger as logger } from "../../utils/logger";
 import {
     DEFAULT_MONITOR_TIMEOUT_SECONDS,

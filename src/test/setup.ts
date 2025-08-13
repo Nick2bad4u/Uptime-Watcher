@@ -475,10 +475,14 @@ vi.mock("../theme/useTheme", () => ({
             return mockTheme.colors.error;
         }),
         getAvailabilityDescription: vi.fn((percentage: number) => {
-            if (percentage >= 99.9) return "Excellent";
-            if (percentage >= 95) return "Good";
-            if (percentage >= 80) return "Fair";
-            return "Poor";
+            const clampedPercentage = Math.max(0, Math.min(100, percentage));
+            if (clampedPercentage >= 99.9) return "Excellent";
+            if (clampedPercentage >= 99) return "Very Good";
+            if (clampedPercentage >= 95) return "Good";
+            if (clampedPercentage >= 90) return "Fair";
+            if (clampedPercentage >= 80) return "Poor";
+            if (clampedPercentage >= 50) return "Critical";
+            return "Failed";
         }),
         getAvailabilityVariant: vi.fn((percentage: number) => {
             if (percentage >= 95) return "success";

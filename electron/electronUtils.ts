@@ -8,9 +8,8 @@
  * @packageDocumentation
  */
 
+import { isDevelopment } from "@shared/utils/environment";
 import { app } from "electron";
-
-import { isDevelopment } from "../shared/utils/environment";
 
 /**
  * Determines if the Electron app is running in development mode.

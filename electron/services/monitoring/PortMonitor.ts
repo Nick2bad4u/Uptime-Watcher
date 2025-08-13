@@ -28,7 +28,8 @@
  * @packageDocumentation
  */
 
-import type { MonitorType, Site } from "../../../shared/types";
+import type { MonitorType, Site } from "@shared/types";
+
 import type {
     IMonitorService,
     MonitorCheckResult,

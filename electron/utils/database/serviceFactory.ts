@@ -2,7 +2,8 @@
  * Factory functions to create services with proper dependency injection.
  */
 
-import type { Site } from "../../../shared/types";
+import type { Site } from "@shared/types";
+
 import type { monitorLogger } from "../logger";
 
 import { StandardizedCache } from "../cache/StandardizedCache";

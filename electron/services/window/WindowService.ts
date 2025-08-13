@@ -34,12 +34,12 @@
  * @packageDocumentation
  */
 
+import { getNodeEnv } from "@shared/utils/environment";
 import { BrowserWindow } from "electron";
 // eslint-disable-next-line unicorn/import-style -- Need namespace import for path operations
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { getNodeEnv } from "../../../shared/utils/environment";
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 

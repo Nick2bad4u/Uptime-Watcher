@@ -538,14 +538,16 @@
         "**/dist-electron/**": true,
         "**/dist/**": true,
         "**/node_modules/**": true,
-        "**/release/**": true
+        "**/release/**": true,
+        "**/.nyc_output/**": true
     },
     "files.watcherExclude": {
         "**/coverage/**": true,
         "**/dist-electron/**": true,
         "**/dist/**": true,
         "**/node_modules/**": true,
-        "**/release/**": true
+        "**/release/**": true,
+        "**/.nyc_output/**": true
     },
     "js/ts.implicitProjectConfig.checkJs": false,
     "js/ts.implicitProjectConfig.experimentalDecorators": true,
@@ -661,6 +663,7 @@
     "typescript.suggest.autoImports": true,
     "typescript.tsdk": "node_modules/typescript/lib",
     "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+    "typescript.preferences.includeProjectReferencesForAutoImports": "on",
     "typescript.validate.enable": true,
     "typescript.workspaceSymbols.excludeLibrarySymbols": true,
     "workbench.colorCustomizations": {

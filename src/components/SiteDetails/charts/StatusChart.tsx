@@ -51,6 +51,10 @@ import { Bar } from "react-chartjs-2";
 
 import type { StatusBarChartData } from "../../../services/chartConfig";
 
+// Ensure Chart.js registration happens
+// eslint-disable-next-line import-x/no-unassigned-import
+import "../../../services/chartSetup";
+
 /**
  * Memoized status distribution bar chart component for monitoring status visualization.
  *

@@ -30,9 +30,9 @@
  * ```
  */
 
-import { useEffect, useState } from "react";
+import type { MonitorType } from "@shared/types";
 
-import type { MonitorType } from "../../shared/types";
+import { useEffect, useState } from "react";
 
 import logger from "../services/logger";
 import { getMonitorHelpTexts } from "../utils/monitorUiHelpers";

@@ -3,11 +3,13 @@
  * Centralizes business logic for configuration decisions and caches validation results.
  */
 
-import type { Site } from "../../shared/types";
-import type { ConfigValue } from "../../shared/types/configTypes";
+import type { Site } from "@shared/types";
+import type { ConfigValue } from "@shared/types/configTypes";
+
+import { CacheKeys } from "@shared/utils/cacheKeys";
+
 import type { ValidationResult } from "./validators/interfaces";
 
-import { CacheKeys } from "../../shared/utils/cacheKeys";
 import {
     CACHE_SIZE_LIMITS,
     CACHE_TTL,

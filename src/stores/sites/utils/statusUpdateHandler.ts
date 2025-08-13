@@ -11,7 +11,8 @@
 
 import type { Monitor, MonitorStatus, Site, StatusUpdate } from "@shared/types";
 
-import { isDevelopment } from "../../../../shared/utils/environment";
+import { isDevelopment } from "@shared/utils/environment";
+
 import logger from "../../../services/logger";
 import {
     ensureError,

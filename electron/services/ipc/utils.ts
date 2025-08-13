@@ -3,6 +3,7 @@
  * Provides wrapper functions and utilities for creating type-safe, consistent IPC handlers.
  */
 
+import { isNonEmptyString } from "@shared/validation/validatorUtils";
 import { ipcMain } from "electron";
 
 import type {
@@ -11,7 +12,6 @@ import type {
     IpcValidationResponse,
 } from "./types";
 
-import { isNonEmptyString } from "../../../shared/validation/validatorUtils";
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 

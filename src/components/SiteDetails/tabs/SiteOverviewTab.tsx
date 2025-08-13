@@ -7,6 +7,7 @@
 import type { Monitor, Site } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
+import { getSiteDisplayStatus } from "@shared/utils/siteStatus";
 import { useCallback, useMemo } from "react";
 import { FiPlay, FiSettings, FiSquare, FiTrash2 } from "react-icons/fi";
 import {
@@ -16,7 +17,6 @@ import {
     MdSpeed,
 } from "react-icons/md";
 
-import { getSiteDisplayStatus } from "../../../../shared/utils/siteStatus";
 import StatusIndicator from "../../../theme/components/StatusIndicator";
 import ThemedBadge from "../../../theme/components/ThemedBadge";
 import ThemedBox from "../../../theme/components/ThemedBox";

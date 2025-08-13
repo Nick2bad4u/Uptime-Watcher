@@ -6,7 +6,10 @@
  * Uses the new service-based architecture for all operations.
  */
 
-import type { Site } from "../../shared/types";
+import type { Site } from "@shared/types";
+
+import { withErrorHandling } from "@shared/utils/errorHandling";
+
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
 import type { DatabaseService } from "../services/database/DatabaseService";
@@ -16,7 +19,6 @@ import type { SettingsRepository } from "../services/database/SettingsRepository
 import type { SiteRepository } from "../services/database/SiteRepository";
 import type { ConfigurationManager } from "./ConfigurationManager";
 
-import { withErrorHandling } from "../../shared/utils/errorHandling";
 import { DEFAULT_HISTORY_LIMIT } from "../constants";
 import {
     DatabaseCommandExecutor,

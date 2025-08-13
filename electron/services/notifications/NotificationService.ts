@@ -1,8 +1,8 @@
+import type { Site } from "@shared/types";
+
+import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { Notification } from "electron";
 
-import type { Site } from "../../../shared/types";
-
-import { LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
 import { logger } from "../../utils/logger";
 
 /**

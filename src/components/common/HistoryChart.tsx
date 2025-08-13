@@ -3,9 +3,9 @@
  * Provides a compact, responsive chart for displaying historical uptime/downtime data.
  */
 
-import React from "react";
+import type { StatusHistory } from "@shared/types";
 
-import type { StatusHistory } from "../../../shared/types";
+import React from "react";
 
 import MiniChartBar from "../../theme/components/MiniChartBar";
 import ThemedText from "../../theme/components/ThemedText";

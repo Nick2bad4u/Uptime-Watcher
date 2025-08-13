@@ -12,7 +12,8 @@
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
-} from "../../../shared/utils/logTemplates";
+} from "@shared/utils/logTemplates";
+
 import { monitorLogger as logger } from "../../utils/logger";
 
 /**

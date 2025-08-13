@@ -51,6 +51,10 @@ import { Line } from "react-chartjs-2";
 
 import type { ResponseTimeChartData } from "../../../services/chartConfig";
 
+// Ensure Chart.js registration happens
+// eslint-disable-next-line import-x/no-unassigned-import
+import "../../../services/chartSetup";
+
 /**
  * Memoized response time line chart component for monitoring performance trends.
  *

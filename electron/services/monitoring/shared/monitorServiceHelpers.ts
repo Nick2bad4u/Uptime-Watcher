@@ -3,7 +3,8 @@
  * Contains common patterns used across PingMonitor, PortMonitor, and HttpMonitor
  */
 
-import type { Monitor } from "../../../../shared/types";
+import type { Monitor } from "@shared/types";
+
 import type { MonitorCheckResult } from "../types";
 
 import {

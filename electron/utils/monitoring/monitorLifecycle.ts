@@ -12,7 +12,10 @@
  * @see {@link EnhancedMonitoringServices} for the preferred enhanced implementation
  */
 
-import type { Site } from "../../../shared/types";
+import type { Site } from "@shared/types";
+
+import { MONITOR_STATUS } from "@shared/types";
+
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { DatabaseService } from "../../services/database/DatabaseService";
@@ -21,7 +24,6 @@ import type { MonitorScheduler } from "../../services/monitoring/MonitorSchedule
 import type { StandardizedCache } from "../cache/StandardizedCache";
 import type { Logger } from "../interfaces";
 
-import { MONITOR_STATUS } from "../../../shared/types";
 import { withDatabaseOperation } from "../operationalHooks";
 
 /**

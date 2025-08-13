@@ -60,7 +60,8 @@
  * @packageDocumentation
  */
 
-import type { Site } from "../../../shared/types";
+import type { Site } from "@shared/types";
+
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { HistoryRepository } from "../../services/database/HistoryRepository";

@@ -42,8 +42,20 @@ function safeOperation<T>(
         const result = operation();
         return { data: result, success: true };
     } catch (error) {
+        const errorObj = ensureError(error);
+
+        // For custom TypeErrors (validation failures), return the message directly
+        // For JSON.parse errors, add the prefix
+        const errorMessage =
+            errorObj instanceof TypeError &&
+            (errorObj.message.includes("does not match expected type") ||
+                errorObj.message.includes("is not an array") ||
+                errorObj.message.includes("cannot be serialized"))
+                ? errorObj.message
+                : `${errorPrefix}: ${errorObj.message}`;
+
         return {
-            error: `${errorPrefix}: ${ensureError(error).message}`,
+            error: errorMessage,
             success: false,
         };
     }

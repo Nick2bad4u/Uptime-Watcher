@@ -1,10 +1,12 @@
-import type { MonitorType } from "../../../shared/types";
-import type { IMonitorService, MonitorConfig } from "./types";
+import type { MonitorType } from "@shared/types";
 
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
-} from "../../../shared/utils/logTemplates";
+} from "@shared/utils/logTemplates";
+
+import type { IMonitorService, MonitorConfig } from "./types";
+
 import { logger } from "../../utils/logger";
 import {
     getMonitorServiceFactory,

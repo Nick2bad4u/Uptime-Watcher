@@ -2,11 +2,13 @@
  * Common helper functions for site operations to eliminate code duplication.
  */
 
-import type { Site } from "../../../../shared/types";
+import type { Site } from "@shared/types";
+
+import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
+import { withErrorHandling } from "@shared/utils/errorHandling";
+
 import type { SiteOperationsDependencies } from "../useSiteOperations";
 
-import { ERROR_CATALOG } from "../../../../shared/utils/errorCatalog";
-import { withErrorHandling } from "../../../../shared/utils/errorHandling";
 import { logStoreAction } from "../../utils";
 import { createStoreErrorHandler } from "../../utils/storeErrorHandling";
 import { updateMonitorInSite } from "./monitorOperations";

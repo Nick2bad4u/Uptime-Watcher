@@ -1,10 +1,10 @@
-import { app } from "electron";
-
-import { isDevelopment } from "../../../shared/utils/environment";
+import { isDevelopment } from "@shared/utils/environment";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
-} from "../../../shared/utils/logTemplates";
+} from "@shared/utils/logTemplates";
+import { app } from "electron";
+
 import { logger } from "../../utils/logger";
 import { ServiceContainer } from "../ServiceContainer";
 

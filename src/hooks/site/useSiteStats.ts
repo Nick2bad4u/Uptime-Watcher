@@ -4,9 +4,9 @@
  * and check counts from monitor history data.
  */
 
-import { useMemo } from "react";
+import type { StatusHistory } from "@shared/types";
 
-import type { StatusHistory } from "../../../shared/types";
+import { useMemo } from "react";
 
 /**
  * Interface for site statistics data

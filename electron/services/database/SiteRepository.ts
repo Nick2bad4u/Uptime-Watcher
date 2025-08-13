@@ -1,6 +1,6 @@
+import type { SiteRow as DatabaseSiteRow } from "@shared/types/database";
 import type { Database } from "node-sqlite3-wasm";
 
-import type { SiteRow as DatabaseSiteRow } from "../../../shared/types/database";
 import type { DatabaseService } from "./DatabaseService";
 
 import { logger } from "../../utils/logger";

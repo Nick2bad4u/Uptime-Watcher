@@ -48,6 +48,10 @@ import { Doughnut } from "react-chartjs-2";
 
 import type { UptimeChartData } from "../../../services/chartConfig";
 
+// Ensure Chart.js registration happens
+// eslint-disable-next-line import-x/no-unassigned-import
+import "../../../services/chartSetup";
+
 /**
  * Memoized uptime distribution doughnut chart component for site monitoring visualization.
  *

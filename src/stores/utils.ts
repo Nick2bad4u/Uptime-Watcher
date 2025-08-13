@@ -9,9 +9,10 @@
  * @packageDocumentation
  */
 
+import { isDevelopment } from "@shared/utils/environment";
+
 import type { BaseStore } from "./types";
 
-import { isDevelopment } from "../../shared/utils/environment";
 import logger from "../services/logger";
 
 /**

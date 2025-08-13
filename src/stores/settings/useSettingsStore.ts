@@ -31,13 +31,13 @@
  * @public
  */
 
+import { withErrorHandling } from "@shared/utils/errorHandling";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
 import type { AppSettings } from "../types";
 import type { SettingsStore } from "./types";
 
-import { withErrorHandling } from "../../../shared/utils/errorHandling";
 import { DEFAULT_HISTORY_LIMIT } from "../../constants";
 import { safeExtractIpcData } from "../../types/ipc";
 import { useErrorStore } from "../error/useErrorStore";
@@ -271,7 +271,7 @@ export const useSettingsStore: UseBoundStore<
                                 .getState()
                                 .clearStoreError("settings");
                         },
-                        setError: (error): void => {
+                        setError: (error: string | undefined): void => {
                             // Revert to previous state on error instead of using default
                             useErrorStore
                                 .getState()

@@ -14,13 +14,12 @@ import {
     type MonitorType,
     type Site,
 } from "@shared/types";
+import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import {
     isNonEmptyString,
     isValidUrl,
     safeInteger,
 } from "@shared/validation/validatorUtils";
-
-import { ERROR_CATALOG } from "../../../../shared/utils/errorCatalog";
 
 // Import validateMonitor directly from "@shared/types" if needed
 

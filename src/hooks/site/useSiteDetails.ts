@@ -16,11 +16,11 @@
 
 import type { Monitor, Site } from "@shared/types";
 
+import { safeInteger } from "@shared/validation/validatorUtils";
 import { useCallback, useEffect, useState } from "react";
 
 import type { ChartTimeRange } from "../../constants";
 
-import { safeInteger } from "../../../shared/validation/validatorUtils";
 import { DEFAULT_CHECK_INTERVAL, RETRY_CONSTRAINTS } from "../../constants";
 import logger from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";

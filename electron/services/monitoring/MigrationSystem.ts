@@ -7,12 +7,12 @@
  * @public
  */
 
-import isSemVer from "validator/lib/isSemVer";
-
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
-} from "../../../shared/utils/logTemplates";
+} from "@shared/utils/logTemplates";
+import isSemVer from "validator/lib/isSemVer";
+
 import { logger } from "../../utils/logger";
 import { MAX_LOG_DATA_LENGTH, MAX_MIGRATION_STEPS } from "./constants";
 

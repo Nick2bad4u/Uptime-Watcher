@@ -1,4 +1,5 @@
-import type { Site } from "../../shared/types";
+import type { Site } from "@shared/types";
+
 /**
  * Centralized dependency injection container for all Electron services.
  *

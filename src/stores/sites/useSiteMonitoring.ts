@@ -5,7 +5,8 @@
  * Uses centralized error store for consistent error handling across the application.
  */
 
-import { withErrorHandling } from "../../../shared/utils/errorHandling";
+import { withErrorHandling } from "@shared/utils/errorHandling";
+
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
 

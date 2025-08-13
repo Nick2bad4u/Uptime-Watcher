@@ -137,6 +137,9 @@
         "vite/client",
         "vitest.config.ts"
     ],
+    "references": [
+        { "path": "./tsconfig.electron.json" }
+    ],
     "typeAcquisition": {
         "enable": true
     }

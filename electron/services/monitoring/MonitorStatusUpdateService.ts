@@ -10,15 +10,17 @@
  * @packageDocumentation
  */
 
-import type { Monitor, Site } from "../../../shared/types";
-import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
-import type { MonitorRepository } from "../database/MonitorRepository";
-import type { MonitorOperationRegistry } from "./MonitorOperationRegistry";
+import type { Monitor, Site } from "@shared/types";
 
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
-} from "../../../shared/utils/logTemplates";
+} from "@shared/utils/logTemplates";
+
+import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
+import type { MonitorRepository } from "../database/MonitorRepository";
+import type { MonitorOperationRegistry } from "./MonitorOperationRegistry";
+
 import { monitorLogger as logger } from "../../utils/logger";
 
 /**

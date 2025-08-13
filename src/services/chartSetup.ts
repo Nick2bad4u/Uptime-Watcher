@@ -9,6 +9,7 @@
 
 import {
     ArcElement,
+    BarController,
     BarElement,
     CategoryScale,
     Chart as ChartJS,
@@ -16,6 +17,7 @@ import {
     Filler,
     Legend,
     LinearScale,
+    LineController,
     LineElement,
     PointElement,
     TimeScale,
@@ -41,6 +43,8 @@ ChartJS.register(
     ArcElement,
 
     // Controllers
+    LineController,
+    BarController,
     DoughnutController,
 
     // Plugins
@@ -70,10 +74,11 @@ ChartJS.register(
  * Chart.js setup and configuration.
  *
  * @remarks
- * Previously re-exported Chart.js types and React Chart.js components.
- * Import directly from the original packages as needed:
- * - ChartData, Chart as ChartJS, ChartOptions: Import from "chart.js"
+ * This module registers all required Chart.js components centrally.
+ * Import Chart.js and react-chartjs-2 components directly from their packages:
+ * - Chart: Import from "chart.js"
  * - Bar, Doughnut, Line: Import from "react-chartjs-2"
+ * - ChartData, ChartOptions types: Import from "chart.js"
  *
  * @public
  */

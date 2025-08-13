@@ -8,9 +8,10 @@
  * @packageDocumentation
  */
 
+import { isDevelopment } from "@shared/utils/environment";
+
 import type { EventMiddleware } from "./TypedEventBus";
 
-import { isDevelopment } from "../../shared/utils/environment";
 import { logger as baseLogger } from "../utils/logger";
 
 /**

@@ -39,7 +39,7 @@
  *
  * @see {@link Site} in shared/types for complete interface definition
  */
-import type { Site } from "../../../shared/types";
+import type { Site } from "@shared/types";
 
 /**
  * Interface for monitor services that perform health checks.

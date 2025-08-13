@@ -72,7 +72,8 @@
  * ```
  */
 
-import type { Monitor, Site, StatusUpdate } from "../shared/types";
+import type { Monitor, Site, StatusUpdate } from "@shared/types";
+
 import type { UptimeEvents } from "./events/eventTypes";
 import type { DatabaseManager } from "./managers/DatabaseManager";
 import type { MonitorManager } from "./managers/MonitorManager";

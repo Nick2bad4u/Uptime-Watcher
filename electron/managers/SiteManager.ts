@@ -43,7 +43,13 @@
  * @packageDocumentation
  */
 
-import type { Site } from "../../shared/types";
+import type { Site } from "@shared/types";
+
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "@shared/utils/logTemplates";
+
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
 import type { DatabaseService } from "../services/database/DatabaseService";
@@ -54,10 +60,6 @@ import type { SiteRepository } from "../services/database/SiteRepository";
 import type { MonitoringConfig } from "../utils/database/interfaces";
 import type { ConfigurationManager } from "./ConfigurationManager";
 
-import {
-    interpolateLogTemplate,
-    LOG_TEMPLATES,
-} from "../../shared/utils/logTemplates";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
 import { LoggerAdapter } from "../utils/database/serviceFactory";
 import { SiteRepositoryService } from "../utils/database/SiteRepositoryService";

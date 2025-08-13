@@ -21,19 +21,20 @@
  * @public
  */
 
+import type { Site } from "@shared/types";
 import type { AxiosInstance, AxiosResponse } from "axios";
 
-import type { Site } from "../../../shared/types";
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "@shared/utils/logTemplates";
+
 import type {
     IMonitorService,
     MonitorCheckResult,
     MonitorConfig,
 } from "./types";
 
-import {
-    interpolateLogTemplate,
-    LOG_TEMPLATES,
-} from "../../../shared/utils/logTemplates";
 import {
     DEFAULT_REQUEST_TIMEOUT,
     RETRY_BACKOFF,

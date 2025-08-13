@@ -8,12 +8,13 @@
  * @packageDocumentation
  */
 
-import type { MonitorOperationRegistry } from "./MonitorOperationRegistry";
-
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
-} from "../../../shared/utils/logTemplates";
+} from "@shared/utils/logTemplates";
+
+import type { MonitorOperationRegistry } from "./MonitorOperationRegistry";
+
 import { monitorLogger as logger } from "../../utils/logger";
 
 /**

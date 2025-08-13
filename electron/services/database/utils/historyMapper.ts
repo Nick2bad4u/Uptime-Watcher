@@ -9,10 +9,11 @@
  * @public
  */
 
-import type { StatusHistory } from "../../../../shared/types";
-import type { HistoryRow as DatabaseHistoryRow } from "../../../../shared/types/database";
+import type { StatusHistory } from "@shared/types";
+import type { HistoryRow as DatabaseHistoryRow } from "@shared/types/database";
 
-import { LOG_TEMPLATES } from "../../../../shared/utils/logTemplates";
+import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
+
 import { logger } from "../../../utils/logger";
 
 /**

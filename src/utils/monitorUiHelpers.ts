@@ -6,7 +6,8 @@
 import type { Monitor, MonitorType } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 
-import { CacheKeys } from "../../shared/utils/cacheKeys";
+import { CacheKeys } from "@shared/utils/cacheKeys";
+
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { AppCaches } from "./cache";
 import { withUtilityErrorHandling } from "./errorHandling";

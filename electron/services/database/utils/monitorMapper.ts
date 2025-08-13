@@ -7,15 +7,17 @@
  * All mapping functions are type-safe and log errors with full context.
  */
 
-import type { Monitor, Site } from "../../../../shared/types";
-import type { MonitorRow as DatabaseMonitorRow } from "../../../../shared/types/database";
-import type { DbValue } from "./valueConverters";
+import type { Monitor, Site } from "@shared/types";
+import type { MonitorRow as DatabaseMonitorRow } from "@shared/types/database";
 
-import { LOG_TEMPLATES } from "../../../../shared/utils/logTemplates";
+import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import {
     isValidIdentifierArray,
     safeInteger,
-} from "../../../../shared/validation/validatorUtils";
+} from "@shared/validation/validatorUtils";
+
+import type { DbValue } from "./valueConverters";
+
 import { logger } from "../../../utils/logger";
 import {
     generateSqlParameters,

@@ -1,11 +1,12 @@
+import type { Monitor, Site } from "@shared/types";
+
+import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import { validateMonitorData } from "@shared/validation/schemas";
 import { BrowserWindow, ipcMain } from "electron";
 
-import type { Monitor, Site } from "../../../shared/types";
 import type { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import type { AutoUpdaterService } from "../updater/AutoUpdaterService";
 
-import { LOG_TEMPLATES } from "../../../shared/utils/logTemplates";
-import { validateMonitorData } from "../../../shared/validation/schemas";
 import { logger } from "../../utils/logger";
 import {
     getAllMonitorTypeConfigs,

@@ -7,19 +7,20 @@
  * in multiple files.
  */
 
-import type { z } from "zod";
-
 import type {
     Monitor,
     MonitorFieldDefinition,
     MonitorType,
-} from "../../../shared/types";
+} from "@shared/types";
+import type { z } from "zod";
+
+import { MONITOR_STATUS } from "@shared/types";
+// Import shared validation schemas
+import { withErrorHandling } from "@shared/utils/errorHandling";
+import { monitorSchemas } from "@shared/validation/schemas";
+
 import type { IMonitorService } from "./types";
 
-import { MONITOR_STATUS } from "../../../shared/types";
-// Import shared validation schemas
-import { withErrorHandling } from "../../../shared/utils/errorHandling";
-import { monitorSchemas } from "../../../shared/validation/schemas";
 import { logger } from "../../utils/logger";
 import { HttpMonitor } from "./HttpMonitor";
 import {

@@ -3,7 +3,7 @@
  * All IPC handlers should return responses following this structure.
  */
 
-import type { ValidationResult } from "../../../shared/types/validation";
+import type { ValidationResult } from "@shared/types/validation";
 
 /**
  * Parameters for IPC handler wrapper configuration.

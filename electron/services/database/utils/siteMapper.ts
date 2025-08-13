@@ -3,10 +3,11 @@
  * Provides consistent data transformation between database rows and Site objects.
  */
 
-import type { SiteRow as DatabaseSiteRow } from "../../../../shared/types/database";
+import type { SiteRow as DatabaseSiteRow } from "@shared/types/database";
 
-import { LOG_TEMPLATES } from "../../../../shared/utils/logTemplates";
-import { safeStringify } from "../../../../shared/utils/stringConversion";
+import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import { safeStringify } from "@shared/utils/stringConversion";
+
 import { logger } from "../../../utils/logger";
 
 /**

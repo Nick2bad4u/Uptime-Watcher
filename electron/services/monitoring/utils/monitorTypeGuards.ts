@@ -7,13 +7,13 @@
  * This addresses the type safety issues identified in HttpMonitor and PortMonitor.
  */
 
-import type { Site } from "../../../../shared/types";
+import type { Site } from "@shared/types";
 
 import {
     isNonEmptyString,
     isValidFQDN,
     isValidUrl,
-} from "../../../../shared/validation/validatorUtils";
+} from "@shared/validation/validatorUtils";
 
 /**
  * Safely extracts retry attempts from monitor configuration.

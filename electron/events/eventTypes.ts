@@ -10,7 +10,7 @@
  * @public
  */
 
-import type { Monitor, Site, StatusUpdate } from "../../shared/types";
+import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
 /**
  * Comprehensive event map for the Uptime Watcher application.

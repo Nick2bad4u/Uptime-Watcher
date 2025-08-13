@@ -21,10 +21,12 @@
  * ```
  */
 
-import type { Site } from "../../../shared/types";
+import type { Site } from "@shared/types";
+
+import { isNonEmptyString } from "@shared/validation/validatorUtils";
+
 import type { ValidationResult } from "./interfaces";
 
-import { isNonEmptyString } from "../../../shared/validation/validatorUtils";
 import { MonitorValidator } from "./MonitorValidator";
 
 /**

@@ -3,7 +3,7 @@
  * Eliminates duplication of error handling patterns across different store modules.
  */
 
-import type { ErrorHandlingFrontendStore } from "../../../shared/utils/errorHandling";
+import type { ErrorHandlingFrontendStore } from "@shared/utils/errorHandling";
 
 import { useErrorStore } from "../error/useErrorStore";
 

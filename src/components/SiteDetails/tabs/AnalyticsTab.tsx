@@ -3,6 +3,7 @@
  * Displays advanced metrics, charts, and performance analysis for site monitoring.
  */
 
+import type { MonitorType } from "@shared/types";
 import type { ChartOptions } from "chart.js";
 import type { JSX } from "react/jsx-runtime";
 
@@ -10,7 +11,6 @@ import { useCallback } from "react";
 import { FiActivity, FiBarChart2, FiTrendingUp } from "react-icons/fi";
 import { MdAnalytics, MdPieChart, MdSpeed, MdTrendingUp } from "react-icons/md";
 
-import type { MonitorType } from "../../../../shared/types";
 import type { ChartTimeRange } from "../../../constants";
 import type { DowntimePeriod } from "../../../hooks/site/useSiteAnalytics";
 import type {

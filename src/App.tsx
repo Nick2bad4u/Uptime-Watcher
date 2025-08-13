@@ -5,9 +5,9 @@
 
 import type { JSX } from "react/jsx-runtime";
 
+import { isDevelopment, isProduction } from "@shared/utils/environment";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { isDevelopment, isProduction } from "../shared/utils/environment";
 import { AddSiteModal } from "./components/AddSiteForm/AddSiteModal";
 import { ErrorAlert } from "./components/common/ErrorAlert/ErrorAlert";
 import { SiteList } from "./components/Dashboard/SiteList/SiteList";

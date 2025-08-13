@@ -5,9 +5,15 @@
  * Handles importing and exporting sites, monitors, history, and settings data.
  */
 
+import type { Site, StatusHistory } from "@shared/types";
 import type { Database } from "node-sqlite3-wasm";
 
-import type { Site, StatusHistory } from "../../../shared/types";
+import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
+import {
+    safeJsonParse,
+    safeJsonStringifyWithFallback,
+} from "@shared/utils/jsonSafety";
+
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { DatabaseService } from "../../services/database/DatabaseService";
@@ -17,11 +23,6 @@ import type { SettingsRepository } from "../../services/database/SettingsReposit
 import type { SiteRepository } from "../../services/database/SiteRepository";
 import type { Logger } from "../interfaces";
 
-import { ERROR_CATALOG } from "../../../shared/utils/errorCatalog";
-import {
-    safeJsonParse,
-    safeJsonStringifyWithFallback,
-} from "../../../shared/utils/jsonSafety";
 import { withDatabaseOperation } from "../operationalHooks";
 import { SiteLoadingError } from "./interfaces";
 
