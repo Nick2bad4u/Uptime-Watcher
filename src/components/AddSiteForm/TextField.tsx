@@ -1,10 +1,12 @@
 /**
- * Text input field component with accessibility, validation, and themed styling.
+ * Text input field component with accessibility, validation, and themed
+ * styling.
  *
  * @remarks
- * Supports "text", "url", and "number" input types with proper validation and error display.
- * The component integrates with FormField wrapper for consistent styling and accessibility.
- * Provides ARIA attributes and handles various input scenarios including min/max for numbers.
+ * Supports "text", "url", and "number" input types with proper validation and
+ * error display. The component integrates with FormField wrapper for
+ * consistent styling and accessibility. Provides ARIA attributes and handles
+ * various input scenarios including min/max for numbers.
  *
  * @example
  * Basic text input field:
@@ -90,12 +92,14 @@ export interface TextFieldProperties {
 }
 
 /**
- * Text input field component with accessibility, validation, and themed styling.
+ * Text input field component with accessibility, validation, and themed
+ * styling.
  *
  * @remarks
- * Supports "text", "url", and "number" input types with proper validation and error display.
- * The component is memoized for performance and integrates with FormField for consistent styling.
- * Provides ARIA attributes and handles various input scenarios including min/max for numbers.
+ * Supports "text", "url", and "number" input types with proper validation and
+ * error display. The component is memoized for performance and integrates with
+ * FormField for consistent styling. Provides ARIA attributes and handles
+ * various input scenarios including min/max for numbers.
  *
  * @param props - The component properties
  * @returns JSX element containing an accessible text input field

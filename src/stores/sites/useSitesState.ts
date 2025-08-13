@@ -1,6 +1,7 @@
 /**
  * Sites state management module.
- * Handles core state operations for sites, selected site, and monitor selections.
+ * Handles core state operations for sites, selected site, and monitor
+ * selections.
  */
 
 import type { Site } from "@shared/types";

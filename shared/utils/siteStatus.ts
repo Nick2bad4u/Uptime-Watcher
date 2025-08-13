@@ -2,8 +2,9 @@
  * Site status calculation utilities.
  *
  * @remarks
- * Provides comprehensive logic for determining overall site status based on monitor states.
- * This is the single source of truth for status calculations, used by both frontend and backend.
+ * Provides comprehensive logic for determining overall site status based on
+ * monitor states. This is the single source of truth for status calculations,
+ * used by both frontend and backend.
  */
 
 import type { SiteForStatus, SiteStatus } from "@shared/types";
@@ -12,10 +13,12 @@ import type { SiteForStatus, SiteStatus } from "@shared/types";
  * Calculates the overall monitoring state for a site based on its monitors.
  *
  * @remarks
- * The monitoring state reflects whether all, some, or none of the site's monitors are actively monitoring.
- * - Returns `"running"` if all monitors are actively monitoring.
- * - Returns `"stopped"` if no monitors are actively monitoring or if there are no monitors.
- * - Returns `"partial"` if some monitors are monitoring and some are not.
+ * The monitoring state reflects whether all, some, or none of the site's
+ * monitors are actively monitoring. - Returns `"running"` if all monitors are
+ * actively monitoring.
+ * - Returns `"stopped"` if no monitors are actively monitoring or if there are
+ * no monitors. - Returns `"partial"` if some monitors are monitoring and some
+ * are not.
  *
  * @param site - The {@link SiteForStatus} object representing the site to evaluate.
  * @returns The monitoring state: `"running"`, `"stopped"`, or `"partial"`.
@@ -49,7 +52,8 @@ export function calculateSiteMonitoringStatus(
 }
 
 /**
- * Calculates the overall operational status for a site based on the statuses of its monitors.
+ * Calculates the overall operational status for a site based on the statuses
+ * of its monitors.
  *
  * @remarks
  * The operational status reflects the aggregate health of all monitors:
@@ -89,14 +93,16 @@ export function calculateSiteStatus(site: SiteForStatus): SiteStatus {
 }
 
 /**
- * Determines the display status for a site, considering both operational and monitoring states.
+ * Determines the display status for a site, considering both operational and
+ * monitoring states.
  *
  * @remarks
- * This is the primary function for determining the status to display in the UI.
- * - Returns `"unknown"` if there are no monitors.
+ * This is the primary function for determining the status to display in the
+ * UI. - Returns `"unknown"` if there are no monitors.
  * - Returns `"paused"` if no monitors are actively monitoring.
- * - Returns `"mixed"` if monitoring is partial (some monitors running, some not).
- * - Otherwise, returns the operational status as determined by {@link calculateSiteStatus}.
+ * - Returns `"mixed"` if monitoring is partial (some monitors running, some
+ * not). - Otherwise, returns the operational status as determined by {@link
+ * calculateSiteStatus}.
  *
  * @param site - The {@link SiteForStatus} object representing the site to evaluate.
  * @returns The display status as a {@link SiteStatus} value.
@@ -116,7 +122,8 @@ export function getSiteDisplayStatus(site: SiteForStatus): SiteStatus {
         return "unknown";
     }
 
-    // If no monitoring is active, show as paused regardless of operational status
+    // If no monitoring is active, show as paused regardless of operational
+    // status
     if (monitoringStatus === "stopped") {
         return "paused";
     }
@@ -134,7 +141,8 @@ export function getSiteDisplayStatus(site: SiteForStatus): SiteStatus {
  * Generates a human-readable description of the site's current status.
  *
  * @remarks
- * The description summarizes the site's status and monitoring activity for display in the UI.
+ * The description summarizes the site's status and monitoring activity for
+ * display in the UI.
  *
  * @param site - The {@link SiteForStatus} object representing the site to describe.
  * @returns A human-readable string describing the site's status.
@@ -179,10 +187,11 @@ export function getSiteStatusDescription(site: SiteForStatus): string {
  * Maps a {@link SiteStatus} value to a UI color variant for status indicators.
  *
  * @remarks
- * The returned variant is intended for use in UI components (e.g., badges, icons).
- * - `"success"`: All monitors are healthy (`"up"`).
- * - `"error"`: All monitors are down or status is unknown (`"down"` or `"unknown"`).
- * - `"warning"`: Mixed or paused status (`"mixed"` or `"paused"`).
+ * The returned variant is intended for use in UI components (e.g., badges,
+ * icons). - `"success"`: All monitors are healthy (`"up"`).
+ * - `"error"`: All monitors are down or status is unknown (`"down"` or
+ * `"unknown"`). - `"warning"`: Mixed or paused status (`"mixed"` or
+ * `"paused"`).
  * - `"info"`: Pending status (`"pending"`).
  *
  * @param status - The {@link SiteStatus} value to map.
@@ -216,7 +225,8 @@ export function getSiteStatusVariant(
             return "success";
         }
         default: {
-            // Align with unknown status handling - treat unexpected values as errors
+            // Align with unknown status handling - treat unexpected values as
+            // errors
             return "error";
         }
     }

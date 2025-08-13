@@ -117,7 +117,8 @@ export const HistoryTab = ({
 
     const backendLimit = settings.historyLimit || 25;
 
-    // Track the last monitor ID and type we logged for to prevent duplicate logging
+    // Track the last monitor ID and type we logged for to prevent duplicate
+    // logging
     const lastLoggedMonitorRef = useRef<null | {
         id: string;
         type: string;
@@ -136,7 +137,8 @@ export const HistoryTab = ({
 
     const iconColors = getIconColors();
 
-    // Dropdown options: 25, 50, 100, All (clamped to backendLimit and available history)
+    // Dropdown options: 25, 50, 100, All (clamped to backendLimit and
+    // available history)
     const maxShow = Math.min(backendLimit, historyLength);
     const showOptions = [
         10,
@@ -158,7 +160,8 @@ export const HistoryTab = ({
         showOptions.push(historyLength);
     }
 
-    // Ensure we always have at least one valid option, even for small history counts
+    // Ensure we always have at least one valid option, even for small history
+    // counts
     if (showOptions.length === 0) {
         if (historyLength > 0) {
             showOptions.push(historyLength);
@@ -170,7 +173,8 @@ export const HistoryTab = ({
     // Track user's manual history limit selection
     const [userHistoryLimit, setUserHistoryLimit] = useState<number>();
 
-    // Compute effective history limit - use user preference or auto-calculated value
+    // Compute effective history limit - use user preference or auto-calculated
+    // value
     const safeHistoryLength = selectedMonitor.history.length || 0;
     const autoLimit = Math.min(
         50,

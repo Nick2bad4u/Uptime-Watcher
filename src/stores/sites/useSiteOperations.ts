@@ -2,7 +2,8 @@
  * Site operations module.
  * Handles CRUD operations for sites and monitor management.
  *
- * Uses centralized error store for consistent error handling across the application.
+ * Uses centralized error store for consistent error handling across the
+ * application.
  */
 
 import type { Monitor, MonitorType, Site } from "@shared/types";

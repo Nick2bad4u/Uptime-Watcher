@@ -5,8 +5,8 @@
  * @remarks
  * Enhanced monitoring status display component for the site details header.
  * Shows larger indicators with monitor names and types using the theme system.
- * Displays monitor status, type, and connection information with proper error handling
- * for URL parsing.
+ * Displays monitor status, type, and connection information with proper error
+ * handling for URL parsing.
  */
 
 import type { Monitor } from "@shared/types";
@@ -29,8 +29,8 @@ export interface MonitoringStatusDisplayProperties {
  * Enhanced monitoring status display component for the site details header.
  *
  * Shows larger indicators with monitor names and types using the theme system.
- * Displays monitor status, type, and connection information with proper error handling
- * for URL parsing.
+ * Displays monitor status, type, and connection information with proper error
+ * handling for URL parsing.
  *
  * @param props - Component props containing monitors array
  * @returns JSX element with enhanced monitoring status indicators

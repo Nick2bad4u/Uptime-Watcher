@@ -57,8 +57,9 @@ export const updateMonitorAndSave = async (
 };
 
 /**
- * Wraps a site operation with consistent logging, error handling, and optional sync.
- * Eliminates duplication of the common pattern used across all site operations.
+ * Wraps a site operation with consistent logging, error handling, and optional
+ * sync. Eliminates duplication of the common pattern used across all site
+ * operations.
  *
  * @param operationName - Name of the operation for logging and error handling
  * @param operation - The async operation to execute
@@ -88,8 +89,8 @@ export const withSiteOperation = async (
 };
 
 /**
- * Wraps a site operation with consistent logging, error handling, and optional sync.
- * This version supports operations that return a value.
+ * Wraps a site operation with consistent logging, error handling, and optional
+ * sync. This version supports operations that return a value.
  *
  * @param operationName - Name of the operation for logging and error handling
  * @param operation - The async operation to execute that returns a value

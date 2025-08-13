@@ -33,19 +33,22 @@ export interface SiteActionsResult {
 }
 
 /**
- * Hook to handle site-related actions including monitoring control and navigation.
+ * Hook to handle site-related actions including monitoring control and
+ * navigation.
  *
  * @remarks
- * This hook provides a comprehensive set of action handlers for site operations,
- * including both individual monitor control and site-wide monitoring management.
- * All operations are properly logged for debugging and analytics purposes.
+ * This hook provides a comprehensive set of action handlers for site
+ * operations, including both individual monitor control and site-wide
+ * monitoring management. All operations are properly logged for debugging and
+ * analytics purposes.
  *
  * The hook integrates with the sites store for state management and includes
  * proper error handling with user-friendly logging. All handlers are wrapped
  * in useCallback for performance optimization.
  *
- * Monitoring operations support both individual monitor control (start/stop specific
- * monitor) and site-wide control (start/stop all monitors for a site).
+ * Monitoring operations support both individual monitor control (start/stop
+ * specific monitor) and site-wide control (start/stop all monitors for a
+ * site).
  *
  * @param site - The site object to act upon
  * @param monitor - The specific monitor to use for individual monitor actions
@@ -191,7 +194,8 @@ export function useSiteActions(
         });
 
         // Handle async operation with proper error handling
-        // Note: This is a fire-and-forget operation that continues after component unmount
+        // Note: This is a fire-and-forget operation that continues after
+        // component unmount
         void (async (): Promise<void> => {
             try {
                 await checkSiteNow(site.identifier, monitor.id);

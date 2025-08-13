@@ -59,8 +59,9 @@ export function ConditionalResponseTime({
                     setIsLoading(false);
                 }
             } catch (error) {
-                // Log the error but gracefully degrade to false (no response time support)
-                // This follows project pattern of non-critical feature degradation
+                // Log the error but gracefully degrade to false (no response
+                // time support) This follows project pattern of non-critical
+                // feature degradation
                 logger.warn(
                     "Failed to check response time support",
                     error as Error
@@ -69,8 +70,9 @@ export function ConditionalResponseTime({
                     setSupportsResponseTime(false);
                     setIsLoading(false);
                 }
-                // Note: Error is not re-thrown here as this is a UI enhancement feature
-                // that should degrade gracefully rather than break the component
+                // Note: Error is not re-thrown here as this is a UI
+                // enhancement feature that should degrade gracefully rather
+                // than break the component
             }
         };
 
@@ -109,13 +111,15 @@ export const DetailLabel = ({
                 }
             } catch (error) {
                 // Log the error but gracefully degrade to fallback text
-                // This follows project pattern of non-critical feature degradation
+                // This follows project pattern of non-critical feature
+                // degradation
                 logger.warn("Failed to format detail label", error as Error);
                 if (!isCancelled) {
                     setFormattedLabel(fallback);
                 }
-                // Note: Error is not re-thrown here as this is a UI enhancement feature
-                // that should degrade gracefully rather than break the component
+                // Note: Error is not re-thrown here as this is a UI
+                // enhancement feature that should degrade gracefully rather
+                // than break the component
             }
         };
 

@@ -73,7 +73,8 @@ export function isValidFQDN(
 }
 
 /**
- * Validates that a value is a valid identifier (alphanumeric with hyphens/underscores).
+ * Validates that a value is a valid identifier (alphanumeric with
+ * hyphens/underscores).
  *
  * @param value - Value to validate
  * @returns True if value is a valid identifier

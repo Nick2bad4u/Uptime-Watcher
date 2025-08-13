@@ -1,6 +1,7 @@
 /**
  * Settings tab component for configuring site monitoring parameters.
- * Provides interface for modifying site settings, intervals, and performing site management actions.
+ * Provides interface for modifying site settings, intervals, and performing
+ * site management actions.
  */
 
 import type { Monitor, Site } from "@shared/types";
@@ -81,7 +82,9 @@ export interface SettingsTabProperties {
     readonly localName: string;
     /** Local state value for retry attempts */
     readonly localRetryAttempts: number;
-    /** Local state value for timeout in seconds (converted to ms when saving) */
+    /**
+     * Local state value for timeout in seconds (converted to ms when saving)
+     */
     readonly localTimeout: number;
     /** Whether the retry attempts have been changed */
     readonly retryAttemptsChanged: boolean;
@@ -129,7 +132,8 @@ async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
                     return config.fields[0].label;
                 }
             }
-            // Use dynamic utility instead of hardcoded backward compatibility patterns
+            // Use dynamic utility instead of hardcoded backward compatibility
+            // patterns
             return getMonitorTypeDisplayLabel(selectedMonitor.type);
         },
         "Get identifier label for monitor type",

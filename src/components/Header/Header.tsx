@@ -9,8 +9,8 @@
  * - Settings modal access
  * - Responsive layout with accessibility support
  *
- * The component integrates with the application's state management via Zustand stores
- * and provides a consistent navigation and status overview experience.
+ * The component integrates with the application's state management via Zustand
+ * stores and provides a consistent navigation and status overview experience.
  */
 
 /**

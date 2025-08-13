@@ -38,9 +38,9 @@ export interface SiteDetailsHeaderProperties {
 /**
  * Site details header component displaying site information and controls.
  *
- * Displays site name, URL (for HTTP monitors), status indicator with loading spinner,
- * and a screenshot thumbnail. Handles external URL opening with proper fallbacks
- * and validates URLs before processing.
+ * Displays site name, URL (for HTTP monitors), status indicator with loading
+ * spinner, and a screenshot thumbnail. Handles external URL opening with
+ * proper fallbacks and validates URLs before processing.
  *
  * @param props - Component props containing site data and control handlers
  * @returns JSX element containing the site details header

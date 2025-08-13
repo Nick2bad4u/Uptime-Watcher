@@ -22,9 +22,10 @@ interface KnownEnvironmentVariables {
  *
  * @remarks
  * Returns 'unknown' as fallback to indicate unspecified environment state.
- * This is intentionally different from getNodeEnv() which assumes 'development'
- * for safety in development workflows. Use this when you need to detect
- * unspecified environments, use getNodeEnv() when you need development defaults.
+ * This is intentionally different from getNodeEnv() which assumes
+ * 'development' for safety in development workflows. Use this when you need to
+ * detect unspecified environments, use getNodeEnv() when you need development
+ * defaults.
  */
 export function getEnvironment(): string {
     const nodeEnv = getEnvVar("NODE_ENV");
@@ -51,7 +52,8 @@ export function getEnvVar<K extends keyof KnownEnvironmentVariables>(
         const value = process.env[key];
         return value as KnownEnvironmentVariables[K] | undefined;
     } catch {
-        // Handle edge cases where process.env might be null or undefined in tests
+        // Handle edge cases where process.env might be null or undefined in
+        // tests
         return undefined;
     }
 }
@@ -63,10 +65,10 @@ export function getEnvVar<K extends keyof KnownEnvironmentVariables>(
  * @returns The NODE_ENV value or 'development' as fallback
  *
  * @remarks
- * Returns 'development' as fallback for safer development workflows and testing.
- * This assumes development mode when environment is unspecified, which is
- * appropriate for development tools and debugging features. Use getEnvironment()
- * if you need to detect truly unspecified environments.
+ * Returns 'development' as fallback for safer development workflows and
+ * testing. This assumes development mode when environment is unspecified,
+ * which is appropriate for development tools and debugging features. Use
+ * getEnvironment() if you need to detect truly unspecified environments.
  *
  * @example
  * ```typescript

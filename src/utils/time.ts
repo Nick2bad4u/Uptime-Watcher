@@ -2,12 +2,14 @@
  * Centralized utility functions for time and formatting.
  *
  * @remarks
- * Provides consistent time formatting throughout the application with support for
- * various time scales: milliseconds for precise measurements, seconds/minutes/hours
- * for human-readable durations, and relative timestamps for recent events.
+ * Provides consistent time formatting throughout the application with support
+ * for various time scales: milliseconds for precise measurements,
+ * seconds/minutes/hours for human-readable durations, and relative timestamps
+ * for recent events.
  *
  * All functions handle edge cases gracefully and provide fallback values for
- * invalid inputs. Time formatting is optimized for readability in monitoring contexts.
+ * invalid inputs. Time formatting is optimized for readability in monitoring
+ * contexts.
  *
  * @packageDocumentation
  */
@@ -77,9 +79,9 @@ export function formatFullTimestamp(timestamp: number): string {
  * Formats time duration for monitoring intervals in a concise format.
  *
  * @remarks
- * Used for displaying check intervals in monitoring contexts where space is limited.
- * Automatically selects the most appropriate unit (seconds, minutes, or hours) and
- * rounds to whole numbers for simplicity.
+ * Used for displaying check intervals in monitoring contexts where space is
+ * limited. Automatically selects the most appropriate unit (seconds, minutes,
+ * or hours) and rounds to whole numbers for simplicity.
  *
  * @param milliseconds - Time duration in milliseconds
  * @returns Concise formatted time string
@@ -164,12 +166,14 @@ export function formatResponseDuration(milliseconds: number): string {
 }
 
 /**
- * Formats response time in a human-readable format with automatic unit selection.
+ * Formats response time in a human-readable format with automatic unit
+ * selection.
  *
  * @remarks
- * Automatically chooses between milliseconds and seconds based on the magnitude
- * of the response time. Provides a fallback message for undefined or null values.
- * Optimized for displaying network response times in monitoring interfaces.
+ * Automatically chooses between milliseconds and seconds based on the
+ * magnitude of the response time. Provides a fallback message for undefined or
+ * null values. Optimized for displaying network response times in monitoring
+ * interfaces.
  *
  * @param time - Response time in milliseconds (optional)
  * @returns Formatted time string or fallback message

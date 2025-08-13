@@ -1,10 +1,11 @@
 /**
- * Higher-order component for wrapping components with error boundary protection.
- * Provides a convenient way to add error boundaries to existing components.
+ * Higher-order component for wrapping components with error boundary
+ * protection. Provides a convenient way to add error boundaries to existing
+ * components.
  *
  * @remarks
- * Returns a new component that wraps the given component in an {@link ErrorBoundary}.
- * Supports custom fallback components for error display.
+ * Returns a new component that wraps the given component in an {@link
+ * ErrorBoundary}. Supports custom fallback components for error display.
  * Sets a display name for easier debugging in React DevTools.
  */
 
@@ -25,10 +26,13 @@ interface WrappedErrorBoundaryComponent<P extends object> {
 }
 
 /**
- * Higher-order component for wrapping components with error boundary protection.
+ * Higher-order component for wrapping components with error boundary
+ * protection.
  *
  * @remarks
- * Returns a new component that wraps the given component in an {@link ErrorBoundary}. Supports custom fallback components for error display. Sets a display name for easier debugging in React DevTools.
+ * Returns a new component that wraps the given component in an {@link
+ * ErrorBoundary}. Supports custom fallback components for error display. Sets
+ * a display name for easier debugging in React DevTools.
  *
  * @typeParam P - The props type for the wrapped component.
  * @param Component - The component to wrap with error boundary protection.

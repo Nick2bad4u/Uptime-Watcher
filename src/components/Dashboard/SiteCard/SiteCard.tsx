@@ -1,6 +1,7 @@
 /**
- * SiteCard component displaying comprehensive monitoring information for a single site.
- * Composed of multiple sub-components for maintainability and reusability.
+ * SiteCard component displaying comprehensive monitoring information for a
+ * single site. Composed of multiple sub-components for maintainability and
+ * reusability.
  */
 
 import type { Site } from "@shared/types";
@@ -26,8 +27,9 @@ export interface SiteCardProperties {
 }
 
 /**
- * Main site card component using composition of smaller, focused sub-components.
- * Provides a complete overview of site monitoring status, metrics, and controls.
+ * Main site card component using composition of smaller, focused
+ * sub-components. Provides a complete overview of site monitoring status,
+ * metrics, and controls.
  *
  * Features:
  * - Real-time status indicators

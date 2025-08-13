@@ -3,7 +3,8 @@
  *
  * @remarks
  * Centralized error message definitions organized by domain.
- * All error messages are readonly to ensure consistency across the application.
+ * All error messages are readonly to ensure consistency across the
+ * application.
  *
  * @packageDocumentation
  */

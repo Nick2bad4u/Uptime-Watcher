@@ -1,10 +1,12 @@
 /**
- * Base FormField wrapper component that provides consistent label, error handling, and accessibility features.
+ * Base FormField wrapper component that provides consistent label, error
+ * handling, and accessibility features.
  *
  * @remarks
- * This component provides consistent styling and accessibility for all form fields.
- * It displays a label, error/help text, and wraps the input element with proper ARIA attributes.
- * The component is memoized for performance optimization.
+ * This component provides consistent styling and accessibility for all form
+ * fields. It displays a label, error/help text, and wraps the input element
+ * with proper ARIA attributes. The component is memoized for performance
+ * optimization.
  *
  * @example
  * Basic form field with text input:
@@ -60,12 +62,14 @@ export interface FormFieldProperties {
 }
 
 /**
- * Reusable form field wrapper component with label, error handling, and accessibility features.
+ * Reusable form field wrapper component with label, error handling, and
+ * accessibility features.
  *
  * @remarks
- * This component provides consistent styling and accessibility for all form fields.
- * It displays a label with optional required indicator, error/help text, and wraps the input element.
- * The component uses proper ARIA attributes for accessibility and is memoized for performance.
+ * This component provides consistent styling and accessibility for all form
+ * fields. It displays a label with optional required indicator, error/help
+ * text, and wraps the input element. The component uses proper ARIA attributes
+ * for accessibility and is memoized for performance.
  *
  * @param props - The component properties
  * @returns JSX element containing labeled form field with error/help text

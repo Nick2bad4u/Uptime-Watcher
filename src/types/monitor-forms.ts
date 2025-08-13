@@ -175,8 +175,9 @@ export function getDefaultMonitorFields(type: MonitorType): MonitorFormFields {
  * @returns True if fields contain HTTP monitor properties
  *
  * @remarks
- * Checks for presence of required HTTP properties and absence of port/ping-specific ones
- * to provide more robust type detection and prevent false positives.
+ * Checks for presence of required HTTP properties and absence of
+ * port/ping-specific ones to provide more robust type detection and prevent
+ * false positives.
  */
 export function isHttpMonitorFields(
     fields: MonitorFormFields
@@ -191,8 +192,8 @@ export function isHttpMonitorFields(
  * @returns True if fields contain valid ping monitor properties
  *
  * @remarks
- * Validates presence of host property and absence of port property to distinguish
- * from port monitors which also have a host field.
+ * Validates presence of host property and absence of port property to
+ * distinguish from port monitors which also have a host field.
  */
 export function isPingMonitorFields(
     fields: MonitorFormFields

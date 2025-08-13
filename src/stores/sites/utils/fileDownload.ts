@@ -11,7 +11,8 @@ import logger from "../../../services/logger";
  * Options for downloading a file in the browser.
  *
  * @remarks
- * Used to specify the file buffer, filename, and optional MIME type for download operations.
+ * Used to specify the file buffer, filename, and optional MIME type for
+ * download operations.
  */
 export interface FileDownloadOptions {
     /** The file buffer to download */
@@ -26,9 +27,9 @@ export interface FileDownloadOptions {
  * Helper function to create and trigger a file download.
  *
  * @remarks
- * Creates a Blob from the buffer and uses an anchor element to initiate the download.
- * Falls back to direct click if DOM manipulation fails. Object URL is properly
- * managed to avoid memory leaks.
+ * Creates a Blob from the buffer and uses an anchor element to initiate the
+ * download. Falls back to direct click if DOM manipulation fails. Object URL
+ * is properly managed to avoid memory leaks.
  *
  * @param buffer - File data as ArrayBuffer
  * @param fileName - Name for the downloaded file
@@ -52,13 +53,15 @@ function createAndTriggerDownload(
 
         // Safe DOM manipulation
         const { body } = document;
-        // No need to check if body exists; it's always present in browser environments
+        // No need to check if body exists; it's always present in browser
+        // environments
         try {
             body.append(anchor);
             anchor.click();
             anchor.remove();
         } catch (domError) {
-            // For appendChild errors, re-throw to trigger proper fallback mechanism
+            // For appendChild errors, re-throw to trigger proper fallback
+            // mechanism
             const error =
                 domError instanceof Error
                     ? domError
@@ -169,8 +172,9 @@ function handleDownloadError(
  * Triggers a file download in the browser.
  *
  * @remarks
- * This function creates a Blob from the provided buffer and initiates a download using an anchor element.
- * If the primary method fails, a fallback strategy is attempted.
+ * This function creates a Blob from the provided buffer and initiates a
+ * download using an anchor element. If the primary method fails, a fallback
+ * strategy is attempted.
  *
  * @param options - The file download options including buffer, fileName, and optional mimeType.
  * @throws {@link Error} If the download fails due to browser API issues or DOM manipulation errors.
@@ -220,8 +224,9 @@ export function generateBackupFileName(
  * Handles downloading SQLite backup data as a file.
  *
  * @remarks
- * This function retrieves backup data using the provided function, validates it, and triggers a browser download.
- * The download is performed using a Blob and anchor element with proper object URL lifecycle management.
+ * This function retrieves backup data using the provided function, validates
+ * it, and triggers a browser download. The download is performed using a Blob
+ * and anchor element with proper object URL lifecycle management.
  *
  * @param downloadFunction - An async function that returns the backup data as a Uint8Array
  * @throws TypeError if the backup data is not a Uint8Array

@@ -55,11 +55,11 @@ vi.mock("../../../constants", () => ({
         DELETE_BUTTON: "Delete",
     },
     CHECK_INTERVALS: [
-        { label: "1 minute", value: 60000 },
-        { label: "5 minutes", value: 300000 },
-        { label: "10 minutes", value: 600000 },
+        { label: "1 minute", value: 60_000 },
+        { label: "5 minutes", value: 300_000 },
+        { label: "10 minutes", value: 600_000 },
     ],
-    DEFAULT_CHECK_INTERVAL: 60000,
+    DEFAULT_CHECK_INTERVAL: 60_000,
     FALLBACK_MONITOR_TYPE_OPTIONS: [
         { label: "HTTP", value: "http" },
         { label: "Port", value: "port" },
@@ -158,7 +158,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
         mockFormHook = {
             // State
             addMode: "new",
-            checkInterval: 60000,
+            checkInterval: 60_000,
             formError: undefined,
             host: "",
             monitorType: "http",
@@ -286,7 +286,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             const checkIntervalSelect = screen.getByRole("combobox", { name: /check interval/i });
             await user.selectOptions(checkIntervalSelect, "300000");
 
-            expect(mockFormHook.setCheckInterval).toHaveBeenCalledWith(300000);
+            expect(mockFormHook.setCheckInterval).toHaveBeenCalledWith(300_000);
         });
     });
 

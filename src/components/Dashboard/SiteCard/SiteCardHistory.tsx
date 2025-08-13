@@ -68,7 +68,8 @@ function areHistoryPropsEqual(
 }
 
 /**
- * History visualization component for site cards displaying monitor status over time.
+ * History visualization component for site cards displaying monitor status
+ * over time.
  *
  * Features:
  * - Dynamic title generation based on monitor type and configuration

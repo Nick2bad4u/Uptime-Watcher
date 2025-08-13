@@ -7,7 +7,8 @@ import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
 /**
  * Common site CRUD operations interface.
- * Used by both SiteOperationsActions and SitesActions to eliminate duplication.
+ * Used by both SiteOperationsActions and SitesActions to eliminate
+ * duplication.
  */
 export interface BaseSiteOperations {
     /** Add a monitor to an existing site */

@@ -1,6 +1,7 @@
 /**
  * Utility-specific error handling wrapper for frontend utilities.
- * Provides consistent error handling for utility functions that don't need store management.
+ * Provides consistent error handling for utility functions that don't need
+ * store management.
  */
 
 import logger from "../services/logger";

@@ -10,8 +10,8 @@
  * - Default value management and reset functionality
  * - Error handling integration with the error store
  *
- * The store uses a partialize function to persist only essential settings data,
- * avoiding persistence of transient state or computed values.
+ * The store uses a partialize function to persist only essential settings
+ * data, avoiding persistence of transient state or computed values.
  *
  * @example
  * ```typescript
@@ -129,13 +129,15 @@ export const useSettingsStore: UseBoundStore<
                             DEFAULT_HISTORY_LIMIT
                         );
 
-                        // Update local state with backend values, keeping defaults for others
+                        // Update local state with backend values, keeping
+                        // defaults for others
                         const updatedSettings = {
                             ...defaultSettings,
                             historyLimit, // Use actual backend value
                         };
 
-                        // Force update the state to ensure it overrides any persisted values
+                        // Force update the state to ensure it overrides any
+                        // persisted values
                         set({ settings: updatedSettings });
 
                         return {
@@ -164,7 +166,8 @@ export const useSettingsStore: UseBoundStore<
                         // Call backend to reset all settings
                         await window.electronAPI.settings.resetSettings();
 
-                        // Fetch the actual reset values from backend to ensure synchronization
+                        // Fetch the actual reset values from backend to ensure
+                        // synchronization
                         const response =
                             await window.electronAPI.settings.getHistoryLimit();
                         const historyLimit = safeExtractIpcData<number>(
@@ -197,7 +200,8 @@ export const useSettingsStore: UseBoundStore<
             },
             // State
             settings: defaultSettings,
-            // Force sync settings from backend (useful for debugging persistence issues)
+            // Force sync settings from backend (useful for debugging
+            // persistence issues)
             syncFromBackend: async (): Promise<{
                 message: string;
                 success: boolean;
@@ -272,7 +276,8 @@ export const useSettingsStore: UseBoundStore<
                                 .clearStoreError("settings");
                         },
                         setError: (error: string | undefined): void => {
-                            // Revert to previous state on error instead of using default
+                            // Revert to previous state on error instead of
+                            // using default
                             useErrorStore
                                 .getState()
                                 .setStoreError("settings", error);
@@ -309,9 +314,10 @@ export const useSettingsStore: UseBoundStore<
             // After rehydration, sync critical settings from backend
             onRehydrateStorage: () => syncSettingsAfterRehydration,
             // Persistence configuration - only persist essential settings data
-            // This prevents persisting transient state, computed values, or functions
-            // If additional state properties are added in the future, review this
-            // partialize function to ensure appropriate data is persisted
+            // This prevents persisting transient state, computed values, or
+            // functions If additional state properties are added in the future,
+            // review this partialize function to ensure appropriate data is
+            // persisted
             partialize: (state) => ({
                 settings: state.settings,
             }),

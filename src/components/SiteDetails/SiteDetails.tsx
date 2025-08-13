@@ -4,7 +4,8 @@
  * @remarks
  * This component provides a detailed view of a single site's monitoring data,
  * statistics, and configuration options. It uses a composition pattern with
- * specialized child components for maintainability and clear separation of concerns.
+ * specialized child components for maintainability and clear separation of
+ * concerns.
  *
  * The component integrates multiple advanced features:
  * - Real-time status monitoring and visualization
@@ -75,11 +76,12 @@ export interface SiteDetailsProperties {
 }
 
 /**
- * Site details component with tabbed interface for comprehensive site monitoring.
- * Provides overview, history, analytics, and settings views for a monitored site.
+ * Site details component with tabbed interface for comprehensive site
+ * monitoring. Provides overview, history, analytics, and settings views for a
+ * monitored site.
  *
- * Uses composition pattern with specialized tab components and custom hooks for
- * state management and data fetching.
+ * Uses composition pattern with specialized tab components and custom hooks
+ * for state management and data fetching.
  *
  * @param props - Component props
  * @returns JSX element containing the site details interface

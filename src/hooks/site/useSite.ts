@@ -20,7 +20,8 @@ export interface UseSiteResult
 }
 
 /**
- * A comprehensive hook that combines site monitoring, actions, statistics, and UI state
+ * A comprehensive hook that combines site monitoring, actions, statistics, and
+ * UI state
  *
  * @param site - The site to work with
  * @returns Combined data and functionality from all site-related hooks

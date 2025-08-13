@@ -2,7 +2,8 @@
  * Site monitoring operations module.
  * Handles monitoring start/stop operations and manual checks.
  *
- * Uses centralized error store for consistent error handling across the application.
+ * Uses centralized error store for consistent error handling across the
+ * application.
  */
 
 import { withErrorHandling } from "@shared/utils/errorHandling";
@@ -30,12 +31,13 @@ export interface SiteMonitoringActions {
 }
 
 /**
- * Creates site monitoring actions for managing monitoring lifecycle operations.
+ * Creates site monitoring actions for managing monitoring lifecycle
+ * operations.
  *
  * @remarks
- * This factory function creates actions for starting, stopping, and manually checking sites.
- * All operations communicate with the backend via IPC services and rely on event-driven
- * updates for state synchronization.
+ * This factory function creates actions for starting, stopping, and manually
+ * checking sites. All operations communicate with the backend via IPC services
+ * and rely on event-driven updates for state synchronization.
  *
  * @returns Object containing all site monitoring action functions
  */
@@ -46,7 +48,8 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
         await withErrorHandling(
             async () => {
                 await window.electronAPI.sites.checkSiteNow(siteId, monitorId);
-                // Backend will emit 'monitor:status-changed', which will trigger incremental update
+                // Backend will emit 'monitor:status-changed', which will
+                // trigger incremental update
             },
             createStoreErrorHandler("sites-monitoring", "checkSiteNow")
         );
@@ -59,7 +62,8 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
                 await window.electronAPI.monitoring.startMonitoringForSite(
                     siteId
                 );
-                // No need for manual sync - StatusUpdateHandler will update UI via events
+                // No need for manual sync - StatusUpdateHandler will update UI
+                // via events
             },
             createStoreErrorHandler("sites-monitoring", "startSiteMonitoring")
         );
@@ -79,7 +83,8 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
                     siteId,
                     monitorId
                 );
-                // No need for manual sync - StatusUpdateHandler will update UI via events
+                // No need for manual sync - StatusUpdateHandler will update UI
+                // via events
             },
             createStoreErrorHandler(
                 "sites-monitoring",
@@ -95,7 +100,8 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
                 await window.electronAPI.monitoring.stopMonitoringForSite(
                     siteId
                 );
-                // No need for manual sync - StatusUpdateHandler will update UI via events
+                // No need for manual sync - StatusUpdateHandler will update UI
+                // via events
             },
             createStoreErrorHandler("sites-monitoring", "stopSiteMonitoring")
         );
@@ -115,7 +121,8 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
                     siteId,
                     monitorId
                 );
-                // No need for manual sync - StatusUpdateHandler will update UI via events
+                // No need for manual sync - StatusUpdateHandler will update UI
+                // via events
             },
             createStoreErrorHandler(
                 "sites-monitoring",

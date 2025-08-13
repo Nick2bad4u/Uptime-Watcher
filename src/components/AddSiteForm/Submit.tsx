@@ -29,9 +29,9 @@ import {
  * Store actions interface for form submission operations.
  *
  * @remarks
- * Defines the required store methods needed for form submission. This interface
- * decouples the submission logic from specific store implementations, making
- * the code more testable and flexible.
+ * Defines the required store methods needed for form submission. This
+ * interface decouples the submission logic from specific store
+ * implementations, making the code more testable and flexible.
  *
  * @public
  */

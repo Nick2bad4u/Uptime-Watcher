@@ -3,9 +3,9 @@
  * Provides type-safe interfaces for form handling and validation.
  *
  * @remarks
- * These interfaces define the structure of form data used throughout the application
- * for creating and editing monitors. They help avoid index signature access issues
- * while maintaining type safety for form operations.
+ * These interfaces define the structure of form data used throughout the
+ * application for creating and editing monitors. They help avoid index
+ * signature access issues while maintaining type safety for form operations.
  *
  * @packageDocumentation
  */

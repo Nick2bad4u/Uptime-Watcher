@@ -1,12 +1,14 @@
 /**
  * Shared error handling utility for async operations.
- * Provides a unified pattern for error logging, reporting, and state management.
+ * Provides a unified pattern for error logging, reporting, and state
+ * management.
  *
  * Usage (frontend):
  *   await withErrorHandling(() =\> doSomethingAsync(), store)
  *
  * Usage (backend):
- *   await withErrorHandling(() =\> doSomethingAsync(), \{ logger, operationName: "operation" \})
+ *   await withErrorHandling(() =\> doSomethingAsync(), \{ logger,
+ *   operationName: "operation" \})
  */
 
 export interface ErrorHandlingBackendContext {
@@ -24,7 +26,8 @@ export interface ErrorHandlingFrontendStore {
 
 /**
  * Shared error handling utility for async operations.
- * Provides a unified pattern for error logging, reporting, and state management.
+ * Provides a unified pattern for error logging, reporting, and state
+ * management.
  *
  * @remarks
  * This utility provides two overloaded signatures for different contexts:
@@ -52,9 +55,9 @@ export interface ErrorHandlingFrontendStore {
  *
  * @remarks
  * Protects against store operation failures that could interfere with the main
- * operation flow. Uses console logging to avoid dependencies on external loggers
- * in shared utilities. Logs both store operation failures and original error context
- * when provided for comprehensive debugging information.
+ * operation flow. Uses console logging to avoid dependencies on external
+ * loggers in shared utilities. Logs both store operation failures and original
+ * error context when provided for comprehensive debugging information.
  *
  * @internal
  */
@@ -86,9 +89,9 @@ function safeStoreOperation(
  * @throws Re-throws the original error after logging
  *
  * @remarks
- * Logs operation failures with contextual information using the provided logger.
- * Does not modify the original error, ensuring stack traces and error details
- * are preserved for upstream error handling.
+ * Logs operation failures with contextual information using the provided
+ * logger. Does not modify the original error, ensuring stack traces and error
+ * details are preserved for upstream error handling.
  */
 async function handleBackendOperation<T>(
     operation: () => Promise<T>,
@@ -126,7 +129,8 @@ async function handleBackendOperation<T>(
  * - Sets loading state during execution
  * - Handles error state on failure
  * - Ensures loading state is always cleared in finally block
- * Uses safe store operations to prevent state management errors from breaking the operation.
+ * Uses safe store operations to prevent state management errors from breaking
+ * the operation.
  */
 async function handleFrontendOperation<T>(
     operation: () => Promise<T>,
@@ -172,11 +176,14 @@ async function handleFrontendOperation<T>(
  * @returns Promise resolving to operation result
  *
  * @remarks
- * - For frontend stores: Automatically manages loading state and error state in the provided store.
+ * - For frontend stores: Automatically manages loading state and error state
+ * in the provided store.
  *   Clears error state before operation, sets loading during execution,
  *   and handles error state on failure while preserving the original error.
- * - For backend contexts: Logs operation failures using the provided logger with contextual information.
- *   Preserves original error for upstream handling while ensuring proper logging.
+ * - For backend contexts: Logs operation failures using the provided logger
+ * with contextual information.
+ *   Preserves original error for upstream handling while ensuring proper
+ *   logging.
  */
 export async function withErrorHandling<T>(
     operation: () => Promise<T>,
@@ -199,7 +206,8 @@ export async function withErrorHandling<T>(
     operation: () => Promise<T>,
     storeOrContext: ErrorHandlingBackendContext | ErrorHandlingFrontendStore
 ): Promise<T> {
-    // Check if it's a frontend store (has setError, clearError, setLoading methods)
+    // Check if it's a frontend store (has setError, clearError, setLoading
+    // methods)
     return "setError" in storeOrContext &&
         "clearError" in storeOrContext &&
         "setLoading" in storeOrContext

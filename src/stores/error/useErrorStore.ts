@@ -9,8 +9,8 @@
  * - Operation-specific loading states for fine-grained UI feedback
  * - Centralized error clearing and recovery mechanisms
  *
- * The store integrates with the application's error boundary system and provides
- * standardized error handling patterns across all application stores.
+ * The store integrates with the application's error boundary system and
+ * provides standardized error handling patterns across all application stores.
  *
  * @example
  * ```typescript

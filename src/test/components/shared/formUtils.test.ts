@@ -123,7 +123,7 @@ describe("Form Utilities", () => {
 
         it("should create handler that converts string to number", () => {
             const setValue = vi.fn();
-            const converter = (value: string) => parseInt(value, 10);
+            const converter = (value: string) => Number.parseInt(value, 10);
             const handler = createSelectChangeHandler(setValue, converter);
 
             const mockEvent = {
@@ -298,7 +298,7 @@ describe("Form Utilities", () => {
                 expect(validator(0.1)).toBe(true);
                 expect(validator(0.9)).toBe(true);
                 expect(validator(0.05)).toBe(false);
-                expect(validator(1.0)).toBe(false);
+                expect(validator(1)).toBe(false);
             });
 
             it("should handle single-point range", () => {
@@ -421,7 +421,7 @@ describe("Form Utilities", () => {
             const setActive = vi.fn();
 
             const nameHandler = createInputChangeHandler(setName, validationPatterns.nonEmptyString);
-            const ageHandler = createSelectChangeHandler(setAge, (value) => parseInt(value, 10));
+            const ageHandler = createSelectChangeHandler(setAge, (value) => Number.parseInt(value, 10));
             const activeHandler = createCheckboxChangeHandler(setActive);
 
             // Test name input

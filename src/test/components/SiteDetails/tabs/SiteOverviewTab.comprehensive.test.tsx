@@ -33,7 +33,7 @@ describe('SiteOverviewTab - Complete Coverage', () => {
                 id: 'monitor-1',
                 type: 'http',
                 url: 'https://example.com',
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
@@ -46,7 +46,7 @@ describe('SiteOverviewTab - Complete Coverage', () => {
                 id: 'monitor-2',
                 type: 'ping',
                 host: 'example.com',
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 timeout: 3000,
                 retryAttempts: 2,
                 monitoring: false,
@@ -313,7 +313,7 @@ describe('SiteOverviewTab - Complete Coverage', () => {
                             type: 'port',
                             host: 'port.example.com',
                             port: 443,
-                            checkInterval: 30000,
+                            checkInterval: 30_000,
                             timeout: 5000,
                             retryAttempts: 1,
                             monitoring: true,
@@ -354,7 +354,7 @@ describe('SiteOverviewTab - Complete Coverage', () => {
                     monitors: [{
                         id: 'monitor-no-url',
                         type: 'http',
-                        checkInterval: 30000,
+                        checkInterval: 30_000,
                         timeout: 5000,
                         retryAttempts: 1,
                         monitoring: true,
@@ -383,7 +383,7 @@ describe('SiteOverviewTab - Complete Coverage', () => {
         });
 
         it('should handle very high response times', () => {
-            render(<SiteOverviewTab {...defaultProps} avgResponseTime={30000} />);
+            render(<SiteOverviewTab {...defaultProps} avgResponseTime={30_000} />);
             expect(screen.getByText('30.00s')).toBeInTheDocument();
         });
 
@@ -398,7 +398,7 @@ describe('SiteOverviewTab - Complete Coverage', () => {
         });
 
         it('should handle very large check counts', () => {
-            render(<SiteOverviewTab {...defaultProps} totalChecks={999999} />);
+            render(<SiteOverviewTab {...defaultProps} totalChecks={999_999} />);
             expect(screen.getByText('999999 checks')).toBeInTheDocument();
         });
     });
@@ -451,7 +451,7 @@ describe('SiteOverviewTab - Complete Coverage', () => {
                             type: 'port',
                             host: 'test.com',
                             port: 80,
-                            checkInterval: 30000,
+                            checkInterval: 30_000,
                             timeout: 5000,
                             retryAttempts: 1,
                             monitoring: true,

@@ -1,11 +1,13 @@
 /**
- * Themed text component with comprehensive typography styling options and theme integration.
+ * Themed text component with comprehensive typography styling options and
+ * theme integration.
  *
  * @remarks
- * This component provides a flexible text element with full control over typography including
- * size, weight, alignment, and color variants. It integrates with the application's theme system
- * to ensure consistent text styling across the application. The component supports various
- * semantic styling variants for different contexts (primary, secondary, error, etc.).
+ * This component provides a flexible text element with full control over
+ * typography including size, weight, alignment, and color variants. It
+ * integrates with the application's theme system to ensure consistent text
+ * styling across the application. The component supports various semantic
+ * styling variants for different contexts (primary, secondary, error, etc.).
  *
  * @example
  * Heading text with custom styling:
@@ -81,8 +83,9 @@ const DEFAULT_THEMED_BOX_STYLE = {};
  *
  * @remarks
  * This component provides a flexible text element with CSS class-based styling
- * that integrates with the theme system. It automatically generates appropriate
- * class names based on the provided variant, size, weight, and alignment options.
+ * that integrates with the theme system. It automatically generates
+ * appropriate class names based on the provided variant, size, weight, and
+ * alignment options.
  *
  * @param props - The component properties
  * @returns The themed text JSX element

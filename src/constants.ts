@@ -2,9 +2,10 @@
  * Centralized constants for the Uptime Watcher application.
  *
  * @remarks
- * Contains configuration values, UI constants, fallback data, and type definitions
- * used throughout the frontend application. This module serves as the single source
- * of truth for application-wide constants to ensure consistency and maintainability.
+ * Contains configuration values, UI constants, fallback data, and type
+ * definitions used throughout the frontend application. This module serves as
+ * the single source of truth for application-wide constants to ensure
+ * consistency and maintainability.
  *
  * @example
  * ```typescript
@@ -312,8 +313,9 @@ export const UI_DELAYS = {
     /**
      * Minimal delay to defer state updates in useEffect cleanup.
      * @remarks
-     * Used to comply with React best practices by avoiding direct setState calls
-     * in useEffect. The 0ms delay defers execution to the next tick of the event loop.
+     * Used to comply with React best practices by avoiding direct setState
+     * calls in useEffect. The 0ms delay defers execution to the next tick of
+     * the event loop.
      */
     STATE_UPDATE_DEFER: 0, // Defers state updates to next event loop tick (ms)
 } as const;
@@ -359,7 +361,8 @@ export const CHART_TIME_PERIODS: ChartTimePeriods = {
  *
  * @remarks
  * Standardized time ranges used across chart components for consistent
- * data filtering and display. Ranges progress from short-term to long-term monitoring.
+ * data filtering and display. Ranges progress from short-term to long-term
+ * monitoring.
  */
 export const CHART_TIME_RANGES = ["1h", "24h", "7d", "30d"] as const;
 

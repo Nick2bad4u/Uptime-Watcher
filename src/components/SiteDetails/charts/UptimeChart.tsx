@@ -1,11 +1,13 @@
 /**
- * Uptime distribution doughnut chart component with memoization for performance optimization.
+ * Uptime distribution doughnut chart component with memoization for
+ * performance optimization.
  *
  * @remarks
- * This component displays uptime vs downtime distribution using a doughnut chart visualization.
- * It leverages Chart.js through the chartSetup service for rendering and integrates with the
- * ChartConfigService for theming. The component is memoized to prevent unnecessary re-renders
- * when parent component updates, optimizing performance for frequent data updates.
+ * This component displays uptime vs downtime distribution using a doughnut
+ * chart visualization. It leverages Chart.js through the chartSetup service
+ * for rendering and integrates with the ChartConfigService for theming. The
+ * component is memoized to prevent unnecessary re-renders when parent
+ * component updates, optimizing performance for frequent data updates.
  *
  * @example
  * Basic uptime chart with data and options:
@@ -53,12 +55,14 @@ import type { UptimeChartData } from "../../../services/chartConfig";
 import "../../../services/chartSetup";
 
 /**
- * Memoized uptime distribution doughnut chart component for site monitoring visualization.
+ * Memoized uptime distribution doughnut chart component for site monitoring
+ * visualization.
  *
  * @remarks
- * Displays uptime vs downtime distribution using a doughnut chart visualization with Chart.js.
- * The component is memoized to prevent unnecessary re-renders when parent component updates,
- * providing optimal performance for frequent data updates in monitoring contexts.
+ * Displays uptime vs downtime distribution using a doughnut chart
+ * visualization with Chart.js. The component is memoized to prevent
+ * unnecessary re-renders when parent component updates, providing optimal
+ * performance for frequent data updates in monitoring contexts.
  *
  * @param props - The component properties containing data and options for the chart
  * @returns Memoized doughnut chart component

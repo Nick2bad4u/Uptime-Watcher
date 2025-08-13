@@ -3,9 +3,9 @@
  * Supports number, text, and URL field types with proper validation.
  *
  * @remarks
- * This component dynamically renders form fields based on their type definition.
- * It supports "number", "text", and "url" field types with proper validation.
- * For unsupported field types, displays an error message.
+ * This component dynamically renders form fields based on their type
+ * definition. It supports "number", "text", and "url" field types with proper
+ * validation. For unsupported field types, displays an error message.
  * Numeric fields handle automatic conversion and validation of input values.
  *
  * @example
@@ -83,8 +83,9 @@ export interface DynamicFieldProps {
  * Renders a single form field based on its definition.
  *
  * @remarks
- * This component renders appropriate form fields based on the field type definition.
- * Supports "number", "text", and "url" field types with proper validation.
+ * This component renders appropriate form fields based on the field type
+ * definition. Supports "number", "text", and "url" field types with proper
+ * validation.
  * For unsupported field types, displays an error message.
  * Numeric fields handle automatic conversion and validation of input values.
  *

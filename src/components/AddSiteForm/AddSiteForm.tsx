@@ -1,10 +1,11 @@
 /**
- * AddSiteForm component for creating new sites and adding monitors to existing sites.
+ * AddSiteForm component for creating new sites and adding monitors to existing
+ * sites.
  *
  * @remarks
- * - Provides a comprehensive form with validation and flexible configuration options.
- * - Supports both HTTP and port monitoring types, with customizable check intervals.
- * - Uses domain-specific Zustand stores for state management.
+ * - Provides a comprehensive form with validation and flexible configuration
+ * options. - Supports both HTTP and port monitoring types, with customizable
+ * check intervals. - Uses domain-specific Zustand stores for state management.
  * - Loads monitor types dynamically from the backend.
  * - Handles errors via a centralized error store and logger.
  * - All form state is managed via the {@link useAddSiteForm} custom hook.
@@ -82,9 +83,9 @@ function isValidMonitorType(value: string): value is MonitorType {
  * Main form component for adding new monitoring sites or monitors.
  *
  * @remarks
- * - Allows creation of new sites with monitors, or adding monitors to existing sites.
- * - Supports HTTP and port monitoring, with dynamic fields based on monitor type.
- * - Handles form validation, error display, and loading states.
+ * - Allows creation of new sites with monitors, or adding monitors to existing
+ * sites. - Supports HTTP and port monitoring, with dynamic fields based on
+ * monitor type. - Handles form validation, error display, and loading states.
  * - Uses Zustand stores for state and error management.
  * - Loads monitor types from backend and displays dynamic help text.
  *
@@ -174,7 +175,8 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
          *
          * @param event - The form submission event.
          * @remarks
-         * Delegates to {@link handleSubmit} with all relevant form state and handlers.
+         * Delegates to {@link handleSubmit} with all relevant form state and
+         * handlers.
          */
         const onSubmit = useCallback(
             async (event: React.FormEvent) => {

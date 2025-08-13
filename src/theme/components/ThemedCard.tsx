@@ -1,10 +1,12 @@
 /**
- * Themed card component for content containers with optional headers, icons, and interactive features.
+ * Themed card component for content containers with optional headers, icons,
+ * and interactive features.
  *
  * @remarks
- * This component provides a styled container with configurable theming, optional header section,
- * and interactive features like click and hover states. The card integrates with the theme system
- * for consistent styling across the application. It supports various visual variants, padding,
+ * This component provides a styled container with configurable theming,
+ * optional header section, and interactive features like click and hover
+ * states. The card integrates with the theme system for consistent styling
+ * across the application. It supports various visual variants, padding,
  * shadow, and border radius configurations.
  *
  * @example
@@ -101,12 +103,14 @@ export interface ThemedCardProperties {
 }
 
 /**
- * Themed card component for content containers with optional headers, icons, and interactive features.
+ * Themed card component for content containers with optional headers, icons,
+ * and interactive features.
  *
  * @remarks
- * This component provides a styled container with configurable theming, optional header section,
- * and interactive features. The card integrates with the theme system for consistent styling.
- * When title or subtitle is provided, renders a header section with optional icon.
+ * This component provides a styled container with configurable theming,
+ * optional header section, and interactive features. The card integrates with
+ * the theme system for consistent styling. When title or subtitle is provided,
+ * renders a header section with optional icon.
  *
  * @param props - The component properties
  * @returns The themed card JSX element

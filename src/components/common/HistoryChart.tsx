@@ -1,6 +1,7 @@
 /**
  * HistoryChart component for visualizing status history as mini chart bars.
- * Provides a compact, responsive chart for displaying historical uptime/downtime data.
+ * Provides a compact, responsive chart for displaying historical
+ * uptime/downtime data.
  */
 
 import type { StatusHistory } from "@shared/types";
@@ -49,14 +50,16 @@ export const HistoryChart: React.NamedExoticComponent<HistoryChartProps> =
         // Return null for empty history (React convention for "render nothing")
         if (history.length === 0) {
             // React components, returning null from a render function
-            // is actually the correct and idiomatic way to indicate "render nothing."
-            // This is a special case where null is the standard React convention.
+            // is actually the correct and idiomatic way to indicate "render
+            // nothing." This is a special case where null is the standard React
+            // convention.
 
             return null;
         }
 
-        // Show up to maxItems bars, oldest first after reversal (chronological order display)
-        // Note: Assumes input history is in newest-first order, toReversed() makes it oldest-first for display
+        // Show up to maxItems bars, oldest first after reversal (chronological
+        // order display) Note: Assumes input history is in newest-first order,
+        // toReversed() makes it oldest-first for display
         const displayedHistory = history.slice(0, maxItems).toReversed();
 
         return (

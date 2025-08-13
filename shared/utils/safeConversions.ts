@@ -1,6 +1,7 @@
 /**
- * Type-safe conversion utilities for handling user input and data transformation.
- * Provides safe alternatives to parseInt, parseFloat, Number(), etc.
+ * Type-safe conversion utilities for handling user input and data
+ * transformation. Provides safe alternatives to parseInt, parseFloat,
+ * Number(), etc.
  */
 
 import { isNumber, isString } from "./typeGuards";
@@ -15,7 +16,8 @@ import { isNumber, isString } from "./typeGuards";
  * @remarks
  * Handles conversion from strings using Number() constructor, which supports
  * various formats including scientific notation, hexadecimal, and decimal.
- * Returns the default value for any value that cannot be converted to a valid number.
+ * Returns the default value for any value that cannot be converted to a valid
+ * number.
  *
  * @example
  * ```typescript
@@ -125,7 +127,8 @@ export function safeParseInt(value: unknown, defaultValue = 0): number {
  *
  * @remarks
  * First converts the value to a float, then clamps the result to the valid
- * percentage range of 0-100. Useful for progress indicators and completion ratios.
+ * percentage range of 0-100. Useful for progress indicators and completion
+ * ratios.
  *
  * @example
  * ```typescript
@@ -148,9 +151,9 @@ export function safeParsePercentage(value: unknown, defaultValue = 0): number {
  * @returns Valid port number in range 1-65535, or the default value
  *
  * @remarks
- * Validates that the converted integer falls within the valid TCP/UDP port range.
- * Port 0 is reserved and not allowed. Returns the default value for any value
- * outside the valid range or that cannot be converted.
+ * Validates that the converted integer falls within the valid TCP/UDP port
+ * range. Port 0 is reserved and not allowed. Returns the default value for any
+ * value outside the valid range or that cannot be converted.
  *
  * @example
  * ```typescript
@@ -200,7 +203,8 @@ export function safeParsePositiveInt(value: unknown, defaultValue = 1): number {
  * @remarks
  * Validates that the converted integer falls within a reasonable range for
  * retry attempts. Zero retries means no retries will be attempted. Values
- * outside the 0-10 range are considered unreasonable and will return the default.
+ * outside the 0-10 range are considered unreasonable and will return the
+ * default.
  *
  * @example
  * ```typescript
@@ -228,7 +232,8 @@ export function safeParseRetryAttempts(
  * @remarks
  * Ensures the result is a positive number suitable for timeout operations.
  * Zero and negative values are considered invalid for timeouts and will
- * return the default value. Accepts fractional values for sub-millisecond precision.
+ * return the default value. Accepts fractional values for sub-millisecond
+ * precision.
  *
  * @example
  * ```typescript
@@ -254,10 +259,10 @@ export function safeParseTimeout(
  * @returns Valid timestamp in milliseconds, or the default value
  *
  * @remarks
- * Validates that the timestamp is positive and not unreasonably far in the future
- * (allows up to 1 day ahead to account for clock skew). Uses current time as
- * default when no defaultValue is provided. Useful for validating timestamps
- * from external sources.
+ * Validates that the timestamp is positive and not unreasonably far in the
+ * future (allows up to 1 day ahead to account for clock skew). Uses current
+ * time as default when no defaultValue is provided. Useful for validating
+ * timestamps from external sources.
  *
  * @example
  * ```typescript

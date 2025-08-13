@@ -9,9 +9,10 @@
  * - Integration with analytics
  *
  * @remarks
- * This hook uses modern React patterns with derived state computed during render
- * instead of managing state in useEffect hooks. Changes are tracked using previous
- * value comparison and user edit state to provide responsive UI feedback.
+ * This hook uses modern React patterns with derived state computed during
+ * render instead of managing state in useEffect hooks. Changes are tracked
+ * using previous value comparison and user edit state to provide responsive UI
+ * feedback.
  */
 
 import type { Monitor, Site } from "@shared/types";
@@ -173,15 +174,18 @@ export function useSiteDetails({
     const selectedMonitorId =
         getSelectedMonitorId(currentSite.identifier) ?? defaultMonitorId;
 
-    // Find the selected monitor, and if it doesn't exist, update the selection to the first monitor
+    // Find the selected monitor, and if it doesn't exist, update the selection
+    // to the first monitor
     const foundMonitor = currentSite.monitors.find(
         (m) => m.id === selectedMonitorId
     );
     const selectedMonitor = foundMonitor ?? currentSite.monitors[0];
 
-    // Use useEffect to handle stale monitor ID updates (avoid state updates during render)
+    // Use useEffect to handle stale monitor ID updates (avoid state updates
+    // during render)
     useEffect(() => {
-        // If the selected monitor ID is stale (doesn't exist), update it to match the actual selected monitor
+        // If the selected monitor ID is stale (doesn't exist), update it to
+        // match the actual selected monitor
         if (!foundMonitor && selectedMonitor) {
             setSelectedMonitorId(currentSite.identifier, selectedMonitor.id);
         }
@@ -280,7 +284,8 @@ export function useSiteDetails({
         (e: React.ChangeEvent<HTMLSelectElement>) => {
             const newId = e.target.value;
             setSelectedMonitorId(currentSite.identifier, newId);
-            // If current tab is an analytics tab, switch to the new monitor's analytics tab
+            // If current tab is an analytics tab, switch to the new monitor's
+            // analytics tab
             if (activeSiteDetailsTab.endsWith("-analytics")) {
                 setActiveSiteDetailsTab(`${newId}-analytics`);
             }
@@ -591,7 +596,8 @@ export function useSiteDetails({
         );
 
         if (!validationResult.success) {
-            // Log validation error and let the store operation handle it normally
+            // Log validation error and let the store operation handle it
+            // normally
             const validationError = new Error(
                 `Validation failed: ${validationResult.errors.join(", ")}`
             );

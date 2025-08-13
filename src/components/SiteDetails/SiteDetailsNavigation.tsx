@@ -1,7 +1,7 @@
 /**
  * Site details navigation component for managing monitoring controls and tabs.
- * Provides a comprehensive interface for controlling site monitoring, managing intervals,
- * and navigating between different detail views.
+ * Provides a comprehensive interface for controlling site monitoring, managing
+ * intervals, and navigating between different detail views.
  */
 
 import type { Site } from "@shared/types";
@@ -89,7 +89,8 @@ export const SiteDetailsNavigation = ({
         [currentSite.identifier]
     );
 
-    // Memoized handlers to prevent unnecessary re-renders of SiteMonitoringButton
+    // Memoized handlers to prevent unnecessary re-renders of
+    // SiteMonitoringButton
     const handleStartSiteMonitoringMemoized = useCallback(() => {
         void handleStartSiteMonitoring();
     }, [handleStartSiteMonitoring]);

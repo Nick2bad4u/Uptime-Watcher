@@ -2,19 +2,20 @@
  * Shared monitor type interfaces used across frontend and backend.
  *
  * @remarks
- * These interfaces define common configuration and UI properties for monitor types,
- * ensuring consistency between frontend and backend implementations.
+ * These interfaces define common configuration and UI properties for monitor
+ * types, ensuring consistency between frontend and backend implementations.
  */
 
 import type { MonitorFieldDefinition } from "@shared/types";
 
 /**
- * Shared representation of a monitor type configuration used by frontend and backend.
+ * Shared representation of a monitor type configuration used by frontend and
+ * backend.
  *
  * @remarks
  * Mirrors the structure provided by the backend registry and consumed by the
- * renderer. Kept in shared types to avoid circular dependencies between src/utils
- * helpers and Zustand stores.
+ * renderer. Kept in shared types to avoid circular dependencies between
+ * src/utils helpers and Zustand stores.
  */
 export interface MonitorTypeConfig {
     /** Description of what this monitor checks */
@@ -83,7 +84,8 @@ export interface MonitorTypeDisplayCommons {
 }
 
 /**
- * Common UI configuration properties shared between frontend and backend monitor types.
+ * Common UI configuration properties shared between frontend and backend
+ * monitor types.
  *
  * @remarks
  * These properties provide UI hints, help texts, and feature support flags

@@ -10,7 +10,8 @@
  * Base interface for all database row types.
  *
  * @remarks
- * Provides a common optional `id` property for tables that use numeric or string IDs.
+ * Provides a common optional `id` property for tables that use numeric or
+ * string IDs.
  */
 export interface BaseRow {
     /**
@@ -175,7 +176,8 @@ export interface SiteRow extends BaseRow {
 
 /**
  * Validation utilities for database row type checking.
- * Provides atomic validation functions that can be composed for complex validation.
+ * Provides atomic validation functions that can be composed for complex
+ * validation.
  *
  * @internal
  */
@@ -319,8 +321,8 @@ export function isValidSiteRow(obj: unknown): obj is SiteRow {
  * Safely retrieves a property value from a database row object.
  *
  * @remarks
- * Returns the value of the specified property if it exists and is not undefined;
- * otherwise, returns the provided default value.
+ * Returns the value of the specified property if it exists and is not
+ * undefined; otherwise, returns the provided default value.
  *
  * @typeParam T - The expected type of the property value.
  * @param row - The database row object.

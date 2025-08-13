@@ -169,8 +169,8 @@ export class TypedCache<K, V> {
             let oldestAccessTime = Number.POSITIVE_INFINITY;
 
             // Find the least recently used entry (O(n) operation)
-            // NOTE: For better performance with large caches, consider implementing
-            // doubly-linked list for O(1) LRU operations
+            // NOTE: For better performance with large caches, consider
+            // implementing doubly-linked list for O(1) LRU operations
             for (const [entryKey, entry] of this.cache.entries()) {
                 if (entry.lastAccessed < oldestAccessTime) {
                     oldestAccessTime = entry.lastAccessed;
@@ -252,7 +252,8 @@ export function clearAllCaches(): void {
 
 /**
  * Helper for async cache operations with fallback.
- * Attempts to retrieve value from cache first, falling back to fetcher function if not found.
+ * Attempts to retrieve value from cache first, falling back to fetcher
+ * function if not found.
  *
  * @param cache - The cache instance to use
  * @param key - The cache key to lookup

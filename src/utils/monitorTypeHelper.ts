@@ -16,7 +16,8 @@ import { withUtilityErrorHandling } from "./errorHandling";
 /**
  * Frontend representation of monitor type configuration.
  */
-// MonitorTypeConfig moved to shared/types/monitorTypes to avoid circular imports
+// MonitorTypeConfig moved to shared/types/monitorTypes to avoid circular
+// imports
 
 /**
  * Clear the monitor type cache.
@@ -79,9 +80,10 @@ export async function getAvailableMonitorTypes(): Promise<MonitorTypeConfig[]> {
  * @returns Promise resolving to monitor type configuration, or undefined if type is not found
  *
  * @remarks
- * Searches through all available monitor types to find a match for the specified type.
- * Returns undefined if the monitor type is not registered or available from the backend.
- * The search uses the complete cached list from getAvailableMonitorTypes().
+ * Searches through all available monitor types to find a match for the
+ * specified type. Returns undefined if the monitor type is not registered or
+ * available from the backend. The search uses the complete cached list from
+ * getAvailableMonitorTypes().
  */
 export async function getMonitorTypeConfig(
     type: string
@@ -96,10 +98,11 @@ export async function getMonitorTypeConfig(
  * @returns Promise resolving to array of option objects for form selectors
  *
  * @remarks
- * Returns an array of objects with the shape `\{ label: string, value: string \}`
- * where label is the human-readable display name and value is the monitor type identifier.
- * This format is suitable for use with form select components and dropdown menus.
- * The options are derived from all available monitor types from the backend.
+ * Returns an array of objects with the shape `\{ label: string, value: string
+ * \}` where label is the human-readable display name and value is the monitor
+ * type identifier. This format is suitable for use with form select components
+ * and dropdown menus. The options are derived from all available monitor types
+ * from the backend.
  */
 export async function getMonitorTypeOptions(): Promise<
     Array<{ label: string; value: string }>

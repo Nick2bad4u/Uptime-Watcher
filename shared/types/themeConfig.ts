@@ -2,8 +2,9 @@
  * Theme configuration type definitions for Uptime Watcher.
  *
  * @remarks
- * These interfaces provide type-safe configuration structures for application theming.
- * They ensure proper typing for colors, spacing, typography, and component styling.
+ * These interfaces provide type-safe configuration structures for application
+ * theming. They ensure proper typing for colors, spacing, typography, and
+ * component styling.
  *
  * @packageDocumentation
  */

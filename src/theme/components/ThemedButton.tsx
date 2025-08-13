@@ -1,11 +1,13 @@
 /**
- * Themed button component with support for icons, loading states, sizes, and visual variants.
+ * Themed button component with support for icons, loading states, sizes, and
+ * visual variants.
  *
  * @remarks
- * This component provides a comprehensive button implementation with theming support,
- * various visual variants (primary, secondary, danger, etc.), multiple sizes, loading states,
- * and icon positioning. The button follows accessibility best practices with proper ARIA support.
- * It integrates seamlessly with the application's theme system.
+ * This component provides a comprehensive button implementation with theming
+ * support, various visual variants (primary, secondary, danger, etc.),
+ * multiple sizes, loading states, and icon positioning. The button follows
+ * accessibility best practices with proper ARIA support. It integrates
+ * seamlessly with the application's theme system.
  *
  * @example
  * Primary button with icon:
@@ -62,7 +64,10 @@ import { CSS_CLASSES } from "./types";
  * @public
  */
 export interface ThemedButtonProperties {
-    /** Accessible label for screen readers (especially useful for icon-only buttons) */
+    /**
+     * Accessible label for screen readers (especially useful for icon-only
+     * buttons)
+     */
     readonly "aria-label"?: string;
     /** Button content (text, elements, or other components) */
     readonly children?: React.ReactNode;
@@ -101,9 +106,10 @@ const DEFAULT_THEMED_BOX_STYLE = {};
  * Themed button component with comprehensive styling and state management.
  *
  * @remarks
- * This component provides a full-featured button implementation with theming support,
- * loading states, disabled states, icon positioning, and various visual variants.
- * The button automatically handles accessibility features and prevents clicks when disabled or loading.
+ * This component provides a full-featured button implementation with theming
+ * support, loading states, disabled states, icon positioning, and various
+ * visual variants. The button automatically handles accessibility features and
+ * prevents clicks when disabled or loading.
  *
  * @param props - The component properties
  * @returns The themed button JSX element

@@ -2,8 +2,8 @@
  * Unified validation result types for the Uptime Watcher application.
  *
  * @remarks
- * This module provides a single source of truth for validation result interfaces,
- * eliminating the duplication that existed across multiple files.
+ * This module provides a single source of truth for validation result
+ * interfaces, eliminating the duplication that existed across multiple files.
  *
  * @packageDocumentation
  */
@@ -74,7 +74,8 @@ export interface ThemeValidationResult extends BaseValidationResult {
  * Common metadata fields included in validation results.
  *
  * @remarks
- * Provides type safety for commonly used metadata fields while allowing additional arbitrary fields.
+ * Provides type safety for commonly used metadata fields while allowing
+ * additional arbitrary fields.
  *
  * @public
  */

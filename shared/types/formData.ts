@@ -2,9 +2,10 @@
  * Form data type definitions for Uptime Watcher monitor forms.
  *
  * @remarks
- * These interfaces provide type-safe form data structures for creating and editing monitors.
- * Each monitor type has its own specific form data interface that extends the base form data.
- * This ensures proper validation and type checking throughout the form handling pipeline.
+ * These interfaces provide type-safe form data structures for creating and
+ * editing monitors. Each monitor type has its own specific form data interface
+ * that extends the base form data. This ensures proper validation and type
+ * checking throughout the form handling pipeline.
  *
  * @packageDocumentation
  */
@@ -15,7 +16,8 @@ import type { MonitorType } from "@shared/types";
  * Add site form state interface.
  *
  * @remarks
- * Represents the complete state of the add site form including UI state and form data.
+ * Represents the complete state of the add site form including UI state and
+ * form data.
  *
  * @public
  */
@@ -34,7 +36,8 @@ export interface AddSiteFormState {
  * Base form data interface that all monitor form data types extend.
  *
  * @remarks
- * Contains common fields that all monitor types require regardless of their specific type.
+ * Contains common fields that all monitor types require regardless of their
+ * specific type.
  *
  * @public
  */
@@ -187,10 +190,12 @@ export interface PortFormData extends BaseFormData {
 }
 
 /**
- * Complete site form data including site information and monitor configuration.
+ * Complete site form data including site information and monitor
+ * configuration.
  *
  * @remarks
- * Used when creating a new site with an initial monitor or adding a monitor to an existing site.
+ * Used when creating a new site with an initial monitor or adding a monitor to
+ * an existing site.
  *
  * @public
  */
@@ -207,7 +212,8 @@ export interface SiteFormData {
  * Form mode enum for add site form.
  *
  * @remarks
- * Determines whether the form is creating a new site or adding to an existing one.
+ * Determines whether the form is creating a new site or adding to an existing
+ * one.
  *
  * @public
  */
@@ -228,7 +234,8 @@ export type FormMode = "existing" | "new";
  *
  * @remarks
  * Use this type when you need to handle form data for any monitor type.
- * TypeScript will ensure type safety through discriminated unions based on the `type` field.
+ * TypeScript will ensure type safety through discriminated unions based on the
+ * `type` field.
  *
  * @public
  */

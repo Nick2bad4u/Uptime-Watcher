@@ -1,6 +1,7 @@
 /**
  * Type-safe JSON parsing utilities.
- * Provides safe alternatives to JSON.parse with proper error handling and validation.
+ * Provides safe alternatives to JSON.parse with proper error handling and
+ * validation.
  */
 
 /**
@@ -24,7 +25,8 @@ function ensureError(error: unknown): Error {
 }
 
 /**
- * Wraps any operation with consistent error handling for SafeJsonResult pattern.
+ * Wraps any operation with consistent error handling for SafeJsonResult
+ * pattern.
  *
  * @param operation - Function to execute safely
  * @param errorPrefix - Prefix for error messages
@@ -44,8 +46,8 @@ function safeOperation<T>(
     } catch (error) {
         const errorObj = ensureError(error);
 
-        // For custom TypeErrors (validation failures), return the message directly
-        // For JSON.parse errors, add the prefix
+        // For custom TypeErrors (validation failures), return the message
+        // directly For JSON.parse errors, add the prefix
         const errorMessage =
             errorObj instanceof TypeError &&
             (errorObj.message.includes("does not match expected type") ||

@@ -2,9 +2,9 @@
  * Main entry point for the Uptime Watcher React application.
  *
  * @remarks
- * This module initializes the React root and renders the main {@link App} component.
- * React StrictMode is enabled for highlighting potential problems in development.
- * The root element is located by its DOM ID ("root").
+ * This module initializes the React root and renders the main {@link App}
+ * component. React StrictMode is enabled for highlighting potential problems
+ * in development. The root element is located by its DOM ID ("root").
  *
  * @throws {@link Error} If the root element with ID "root" is not found in the DOM.
  */
@@ -21,7 +21,8 @@ import "./index.css";
  * @remarks
  * - Locates the root DOM element by ID ("root").
  * - Throws an error if the root element is missing.
- * - Creates a React root and renders the {@link App} component inside {@link React.StrictMode}.
+ * - Creates a React root and renders the {@link App} component inside {@link
+ * React.StrictMode}.
  *
  * @throws {@link Error} If the root element with ID "root" is not found.
  *

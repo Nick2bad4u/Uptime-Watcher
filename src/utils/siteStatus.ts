@@ -36,7 +36,8 @@ export function calculateSiteStatus(site: SiteForStatus): SiteStatus {
 }
 
 /**
- * Gets the display status for a site, considering both operational and monitoring states.
+ * Gets the display status for a site, considering both operational and
+ * monitoring states.
  *
  * @param site - The site to evaluate.
  * @returns The display status.

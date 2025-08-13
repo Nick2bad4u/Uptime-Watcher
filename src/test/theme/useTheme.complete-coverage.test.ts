@@ -25,13 +25,13 @@ describe("useTheme - Complete Coverage", () => {
             removeItem: vi.fn(),
             clear: vi.fn(),
         };
-        Object.defineProperty(window, 'localStorage', {
+        Object.defineProperty(globalThis, 'localStorage', {
             value: mockStorage,
             writable: true,
         });
 
         // Mock window.matchMedia for system theme detection
-        Object.defineProperty(window, 'matchMedia', {
+        Object.defineProperty(globalThis, 'matchMedia', {
             writable: true,
             value: vi.fn().mockImplementation(query => ({
                 matches: query === '(prefers-color-scheme: dark)',

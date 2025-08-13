@@ -1,9 +1,11 @@
 /**
- * Main sites store for managing site data and operations using modular architecture.
+ * Main sites store for managing site data and operations using modular
+ * architecture.
  *
  * @remarks
- * This store uses a modular composition pattern to separate concerns and improve
- * testability. Instead of a monolithic store, it composes smaller, focused modules:
+ * This store uses a modular composition pattern to separate concerns and
+ * improve testability. Instead of a monolithic store, it composes smaller,
+ * focused modules:
  *
  * - `useSitesState`: Core state management and data manipulation
  * - `useSiteOperations`: CRUD operations for sites and monitors
@@ -48,8 +50,9 @@ import { createSiteSyncActions } from "./useSiteSync";
  *
  * @remarks
  * Creates a Zustand store that composes multiple action modules to provide
- * a complete interface for site management. The store uses dependency injection
- * to share common functions between modules while maintaining clear boundaries.
+ * a complete interface for site management. The store uses dependency
+ * injection to share common functions between modules while maintaining clear
+ * boundaries.
  *
  * @returns Complete sites store with all actions and state
  * @public
@@ -62,7 +65,8 @@ export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
         // Create state actions
         const stateActions = createSitesStateActions(set, get);
 
-        // Shared getSites function - eliminates duplication and improves testability
+        // Shared getSites function - eliminates duplication and improves
+        // testability
         const getSites = (): Site[] => get().sites;
 
         // Create sync actions (needed by other modules)

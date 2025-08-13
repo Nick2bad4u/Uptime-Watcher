@@ -46,9 +46,9 @@ import type {
  * @public
  * @remarks Electron API interface exposed to the renderer process.
  * @remarks
- * Provides secure communication between the React frontend and Electron main process
- * through the contextBridge. All backend operations are accessed through this API,
- * available as `window.electronAPI` in the renderer process.
+ * Provides secure communication between the React frontend and Electron main
+ * process through the contextBridge. All backend operations are accessed
+ * through this API, available as `window.electronAPI` in the renderer process.
  *
  * The API is organized by functional domains:
  * - `data`: Import/export and backup operations

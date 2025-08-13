@@ -165,7 +165,8 @@ export interface SiteSyncDependencies {
     setSites: (sites: Site[]) => void;
 }
 
-// Create a shared status update manager instance - will be initialized when first used
+// Create a shared status update manager instance - will be initialized when
+// first used
 // eslint-disable-next-line @typescript-eslint/init-declarations -- Intentional lazy initialization to create singleton instance only when needed, avoiding unnecessary object creation
 let statusUpdateManager: StatusUpdateManager | undefined;
 
@@ -244,7 +245,8 @@ export const createSiteSyncActions = (
             });
 
             try {
-                // Use the new efficient StatusUpdateManager that handles incremental updates
+                // Use the new efficient StatusUpdateManager that handles
+                // incremental updates
                 statusUpdateManager.subscribe();
             } catch (error) {
                 logger.error(

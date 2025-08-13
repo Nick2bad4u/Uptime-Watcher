@@ -17,9 +17,9 @@ import { useSitesStore } from "../stores/sites/useSitesStore";
  * @returns void - This hook manages side effects only
  *
  * @remarks
- * Uses window focus events to trigger full backend synchronization when enabled.
- * Errors are handled internally by the store's error handling system through
- * withErrorHandling, so the fire-and-forget void pattern is safe here.
+ * Uses window focus events to trigger full backend synchronization when
+ * enabled. Errors are handled internally by the store's error handling system
+ * through withErrorHandling, so the fire-and-forget void pattern is safe here.
  *
  * @example
  * ```tsx
@@ -34,7 +34,8 @@ import { useSitesStore } from "../stores/sites/useSitesStore";
  * ```
  */
 export function useBackendFocusSync(enabled = false): void {
-    // Use selector to avoid unnecessary re-renders when other store state changes
+    // Use selector to avoid unnecessary re-renders when other store state
+    // changes
     const fullSyncFromBackend = useSitesStore(
         (state) => state.fullSyncFromBackend
     );
@@ -48,7 +49,8 @@ export function useBackendFocusSync(enabled = false): void {
             // Use full sync on focus to ensure complete data consistency
             // since the user may have been away for a while
             // Note: Error handling is managed internally by fullSyncFromBackend
-            // through the store's withErrorHandling wrapper, so void is safe here
+            // through the store's withErrorHandling wrapper, so void is safe
+            // here
             void fullSyncFromBackend();
         };
 

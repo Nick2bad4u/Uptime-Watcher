@@ -19,7 +19,9 @@ import { useMemo } from "react";
  * - averageResponseTime: Mean response time for successful checks only
  */
 export interface SiteStats {
-    /** Average response time in milliseconds (only for successful "up" checks) */
+    /**
+     * Average response time in milliseconds (only for successful "up" checks)
+     */
     averageResponseTime: number;
     /** Total number of checks performed */
     checkCount: number;
@@ -35,15 +37,16 @@ export interface SiteStats {
  * @see {@link SiteStats} for the complete interface specification
  *
  * @remarks
- * This hook provides memoized statistical calculations for monitor performance analysis.
- * It handles edge cases including:
+ * This hook provides memoized statistical calculations for monitor performance
+ * analysis. It handles edge cases including:
  * - Empty history arrays (returns zero values safely)
  * - Records without response times (filters them out of average calculation)
  * - Mixed status records (separates up/down for accurate uptime calculation)
  *
- * The uptime calculation uses integer percentage (0-100) for display consistency.
- * Average response time only includes successful "up" checks with valid response times.
- * All calculations are memoized to prevent unnecessary recalculation on each render.
+ * The uptime calculation uses integer percentage (0-100) for display
+ * consistency. Average response time only includes successful "up" checks with
+ * valid response times. All calculations are memoized to prevent unnecessary
+ * recalculation on each render.
  *
  * @example
  * ```tsx

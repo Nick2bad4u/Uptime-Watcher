@@ -2,8 +2,9 @@
  * Chart configuration type definitions for Uptime Watcher.
  *
  * @remarks
- * These interfaces provide type-safe configuration structures for Chart.js charts.
- * They ensure proper typing for chart options, scales, plugins, and data structures.
+ * These interfaces provide type-safe configuration structures for Chart.js
+ * charts. They ensure proper typing for chart options, scales, plugins, and
+ * data structures.
  *
  * @packageDocumentation
  */

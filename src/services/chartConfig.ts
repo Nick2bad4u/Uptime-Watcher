@@ -85,9 +85,9 @@ export interface UptimeChartData extends ChartData<"doughnut"> {
  * Chart Configuration Service for theme-aware chart styling.
  *
  * @remarks
- * Centralizes all chart configurations to ensure consistency and maintainability
- * across the application. The service automatically applies theme colors, fonts,
- * and spacing to all chart configurations.
+ * Centralizes all chart configurations to ensure consistency and
+ * maintainability across the application. The service automatically applies
+ * theme colors, fonts, and spacing to all chart configurations.
  *
  * @public
  */
@@ -246,9 +246,9 @@ export class ChartConfigService {
      * @returns Partial chart options with common styling and behavior
      *
      * @remarks
-     * Provides consistent foundation for all charts including responsive behavior,
-     * theme-aware colors, typography, and tooltip styling. This configuration
-     * is extended by specific chart type methods.
+     * Provides consistent foundation for all charts including responsive
+     * behavior, theme-aware colors, typography, and tooltip styling. This
+     * configuration is extended by specific chart type methods.
      *
      * This is an internal method used by other configuration methods.
      */

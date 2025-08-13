@@ -3,7 +3,8 @@
  *
  * @remarks
  * Defines the structure for error state management across the application,
- * including global errors, store-specific errors, and operation loading states.
+ * including global errors, store-specific errors, and operation loading
+ * states.
  *
  * @packageDocumentation
  */
@@ -12,8 +13,8 @@
  * Error management actions for the error store.
  *
  * @remarks
- * Provides methods for managing application-wide error states and loading indicators.
- * Supports both global errors and store-specific error isolation.
+ * Provides methods for managing application-wide error states and loading
+ * indicators. Supports both global errors and store-specific error isolation.
  *
  * @public
  */
@@ -42,8 +43,8 @@ export interface ErrorActions {
  * Error state structure for centralized error management.
  *
  * @remarks
- * Maintains global error state, store-specific errors, and operation loading states
- * to provide comprehensive error tracking across the application.
+ * Maintains global error state, store-specific errors, and operation loading
+ * states to provide comprehensive error tracking across the application.
  *
  * @public
  */
@@ -62,8 +63,8 @@ export interface ErrorState {
  * Combined error store interface with state and actions.
  *
  * @remarks
- * Merges error state and actions into a single interface for the Zustand store.
- * Provides complete error management functionality for the application.
+ * Merges error state and actions into a single interface for the Zustand
+ * store. Provides complete error management functionality for the application.
  *
  * @public
  */

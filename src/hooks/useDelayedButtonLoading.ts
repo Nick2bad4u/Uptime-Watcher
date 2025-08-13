@@ -45,7 +45,8 @@ export function useDelayedButtonLoading(isLoading: boolean): boolean {
 
     useEffect(() => {
         if (!isLoading) {
-            // Use timeout to defer state update to avoid direct call in useEffect
+            // Use timeout to defer state update to avoid direct call in
+            // useEffect
             const clearTimeoutId = setTimeout(
                 clearButtonLoading,
                 UI_DELAYS.STATE_UPDATE_DEFER

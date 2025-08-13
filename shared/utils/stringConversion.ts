@@ -2,10 +2,10 @@
  * String conversion utilities for safe type conversion across the application.
  *
  * @remarks
- * Provides consistent and robust string conversion handling for database operations,
- * data mapping, and UI display. Ensures that all value types are converted to
- * meaningful string representations, avoiding ambiguous or unhelpful outputs such as
- * '[object Object]'.
+ * Provides consistent and robust string conversion handling for database
+ * operations, data mapping, and UI display. Ensures that all value types are
+ * converted to meaningful string representations, avoiding ambiguous or
+ * unhelpful outputs such as '[object Object]'.
  *
  * @see {@link safeStringify}
  */
@@ -21,8 +21,10 @@ import { safeJsonStringifyWithFallback } from "./jsonSafety";
  * - Returns an empty string for `null` or `undefined`.
  * - Returns the value as-is if it is already a string.
  * - Converts numbers and booleans using `String()`.
- * - For objects, attempts to use {@link safeJsonStringifyWithFallback} for serialization.
- *   If serialization fails (e.g., circular references), returns a descriptive placeholder.
+ * - For objects, attempts to use {@link safeJsonStringifyWithFallback} for
+ * serialization.
+ *   If serialization fails (e.g., circular references), returns a descriptive
+ *   placeholder.
  * - For functions, returns the string `"[Function]"`.
  * - For symbols, returns the result of `Symbol.prototype.toString()`.
  * - For all other types, returns `"[Unknown Type]"`.

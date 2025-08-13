@@ -1,10 +1,12 @@
 /**
- * RadioGroup component for selecting one option from multiple choices with accessibility support.
+ * RadioGroup component for selecting one option from multiple choices with
+ * accessibility support.
  *
  * @remarks
- * Provides an accessible radio button group with ARIA attributes and keyboard navigation.
- * The component integrates with the FormField wrapper for consistent styling and error handling.
- * Each radio option is rendered with proper labeling and accessibility features.
+ * Provides an accessible radio button group with ARIA attributes and keyboard
+ * navigation. The component integrates with the FormField wrapper for
+ * consistent styling and error handling. Each radio option is rendered with
+ * proper labeling and accessibility features.
  *
  * @example
  * Basic radio group with protocol selection:
@@ -87,12 +89,14 @@ export interface RadioOption {
 }
 
 /**
- * RadioGroup component for selecting one option from multiple choices with accessibility support.
+ * RadioGroup component for selecting one option from multiple choices with
+ * accessibility support.
  *
  * @remarks
- * Provides an accessible radio button group with ARIA attributes and keyboard navigation.
- * The component is memoized for performance and integrates with FormField for consistent styling.
- * Each radio option is rendered with proper labeling and event handling.
+ * Provides an accessible radio button group with ARIA attributes and keyboard
+ * navigation. The component is memoized for performance and integrates with
+ * FormField for consistent styling. Each radio option is rendered with proper
+ * labeling and event handling.
  *
  * @param props - The component properties
  * @returns JSX element containing a radio button group

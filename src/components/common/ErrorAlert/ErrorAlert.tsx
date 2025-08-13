@@ -1,5 +1,6 @@
 /**
- * Unified error alert component for consistent error display across the application.
+ * Unified error alert component for consistent error display across the
+ * application.
  *
  * @remarks
  * This component provides a standardized way to display error messages with:

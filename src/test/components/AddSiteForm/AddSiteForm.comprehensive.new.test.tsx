@@ -63,11 +63,11 @@ vi.mock("../../../constants", () => ({
     ARIA_LABEL: "aria-label",
     TRANSITION_ALL: "all 0.2s ease-in-out",
     CHECK_INTERVALS: [
-        { label: "1 minute", value: 60000 },
-        { label: "5 minutes", value: 300000 },
-        { label: "10 minutes", value: 600000 },
+        { label: "1 minute", value: 60_000 },
+        { label: "5 minutes", value: 300_000 },
+        { label: "10 minutes", value: 600_000 },
     ],
-    DEFAULT_CHECK_INTERVAL: 60000,
+    DEFAULT_CHECK_INTERVAL: 60_000,
     UI_DELAYS: {
         STATE_UPDATE_DEFER: 100,
     },
@@ -218,7 +218,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
             const intervalSelect = screen.getByLabelText("Check Interval");
             await user.selectOptions(intervalSelect, "300000");
             
-            expect(mockSetCheckInterval).toHaveBeenCalledWith(300000);
+            expect(mockSetCheckInterval).toHaveBeenCalledWith(300_000);
         });
     });
 
@@ -253,7 +253,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
         it("should show site name field for new sites", () => {
             render(<AddSiteForm />);
             
-            const nameInput = screen.getByLabelText(/Site Name/i);
+            const nameInput = screen.getByLabelText(/site name/i);
             expect(nameInput).toBeInTheDocument();
             expect(nameInput).toHaveValue("Test Site");
         });
@@ -286,7 +286,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
             
             render(<AddSiteForm />);
             
-            const urlInput = screen.getByLabelText(/URL/i);
+            const urlInput = screen.getByLabelText(/url/i);
             expect(urlInput).toBeInTheDocument();
             // Note: Field value test removed as form component may not be using mock values correctly
         });
@@ -295,7 +295,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
             const user = userEvent.setup();
             render(<AddSiteForm />);
             
-            const nameInput = screen.getByLabelText(/Site Name/i);
+            const nameInput = screen.getByLabelText(/site name/i);
             await user.type(nameInput, "Test Site");
             
             // Check that setName was called (accepting any pattern for now)
@@ -334,8 +334,8 @@ describe("AddSiteForm - Comprehensive Tests", () => {
         it("should show host and port fields for port monitor", () => {
             render(<AddSiteForm />);
             
-            const hostInput = screen.getByLabelText(/Host/i);
-            const portInput = screen.getByLabelText(/Port/i);
+            const hostInput = screen.getByLabelText(/host/i);
+            const portInput = screen.getByLabelText(/port/i);
             
             expect(hostInput).toBeInTheDocument();
             expect(portInput).toBeInTheDocument();
@@ -381,7 +381,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
         it("should not show site name field for existing sites", () => {
             render(<AddSiteForm />);
             
-            const nameInput = screen.queryByLabelText(/Site Name/i);
+            const nameInput = screen.queryByLabelText(/site name/i);
             expect(nameInput).not.toBeInTheDocument();
         });
     });

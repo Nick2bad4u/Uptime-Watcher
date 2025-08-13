@@ -1,6 +1,7 @@
 /**
- * Dynamic form component that generates monitor fields based on type configuration.
- * Loads field definitions from backend and renders appropriate form fields.
+ * Dynamic form component that generates monitor fields based on type
+ * configuration. Loads field definitions from backend and renders appropriate
+ * form fields.
  *
  * @remarks
  * - Loads monitor field definitions from the backend using the monitor type.
@@ -46,7 +47,8 @@ export interface DynamicMonitorFieldsProps {
 }
 
 /**
- * Renders form fields dynamically based on monitor type configuration loaded from backend.
+ * Renders form fields dynamically based on monitor type configuration loaded
+ * from backend.
  *
  * @remarks
  * - Fetches monitor type configuration using {@link getMonitorTypeConfig}.

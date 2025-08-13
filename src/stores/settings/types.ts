@@ -4,7 +4,8 @@
  *
  * @remarks
  * Defines the interface for the settings store which handles user preferences,
- * application configuration, and backend synchronization for persistent settings.
+ * application configuration, and backend synchronization for persistent
+ * settings.
  *
  * @packageDocumentation
  */

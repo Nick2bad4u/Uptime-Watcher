@@ -17,8 +17,8 @@
  * @returns Response cast to expected type
  *
  * @remarks
- * Use this for IPC responses where we have a contract but can't guarantee types.
- * The validator provides additional runtime safety if provided.
+ * Use this for IPC responses where we have a contract but can't guarantee
+ * types. The validator provides additional runtime safety if provided.
  */
 export function castIpcResponse<T>(
     response: unknown,
@@ -28,8 +28,9 @@ export function castIpcResponse<T>(
         throw new Error("IPC response validation failed");
     }
 
-    // This assertion is necessary for IPC boundaries where TypeScript can't verify types
-    // Runtime validation via validator parameter provides additional safety
+    // This assertion is necessary for IPC boundaries where TypeScript can't
+    // verify types Runtime validation via validator parameter provides
+    // additional safety
 
     return response as T;
 }

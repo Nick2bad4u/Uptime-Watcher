@@ -3,13 +3,14 @@
  * Provides a clean abstraction over electron API calls.
  *
  * @remarks
- * This service provides a frontend abstraction layer for monitoring operations,
- * ensuring the electron API is available before making calls and providing
- * consistent error handling patterns. All methods automatically initialize
+ * This service provides a frontend abstraction layer for monitoring
+ * operations, ensuring the electron API is available before making calls and
+ * providing consistent error handling patterns. All methods automatically
+ * initialize
  * the service before performing operations.
  *
- * The service supports both specific monitor operations and site-wide operations:
- * - Individual monitor control with monitor ID
+ * The service supports both specific monitor operations and site-wide
+ * operations: - Individual monitor control with monitor ID
  * - Site-wide operations affecting all monitors of a site
  *
  * @example
@@ -73,9 +74,10 @@ export const MonitoringService = {
      * @throws Error if the electron API is unavailable or the operation fails
      *
      * @remarks
-     * This method starts monitoring for all monitors associated with the specified site.
-     * It calls the same backend API as startMonitoring but without the monitorId parameter,
-     * which signals the backend to start all monitors for the site.
+     * This method starts monitoring for all monitors associated with the
+     * specified site. It calls the same backend API as startMonitoring but
+     * without the monitorId parameter, which signals the backend to start all
+     * monitors for the site.
      *
      * @example
      * ```typescript
@@ -112,9 +114,10 @@ export const MonitoringService = {
      * @throws Error if the electron API is unavailable or the operation fails
      *
      * @remarks
-     * This method stops monitoring for all monitors associated with the specified site.
-     * It calls the same backend API as stopMonitoring but without the monitorId parameter,
-     * which signals the backend to stop all monitors for the site.
+     * This method stops monitoring for all monitors associated with the
+     * specified site. It calls the same backend API as stopMonitoring but
+     * without the monitorId parameter, which signals the backend to stop all
+     * monitors for the site.
      *
      * @example
      * ```typescript

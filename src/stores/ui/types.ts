@@ -4,8 +4,8 @@
  *
  * @remarks
  * This store is responsible for managing the UI state of the application,
- * including modal visibility, selected site, active tabs, and chart time ranges.
- * All state mutations must be performed via store actions.
+ * including modal visibility, selected site, active tabs, and chart time
+ * ranges. All state mutations must be performed via store actions.
  */
 
 import type { Site } from "@shared/types";
@@ -16,7 +16,8 @@ import type { ChartTimeRange } from "../types";
  * Interface for the UI store.
  *
  * @remarks
- * Provides state and actions for managing user interface interactions and modal visibility.
+ * Provides state and actions for managing user interface interactions and
+ * modal visibility.
  */
 export interface UIStore {
     /**
@@ -115,5 +116,6 @@ export interface UIStore {
      */
     siteDetailsChartTimeRange: ChartTimeRange;
 
-    // NOTE: getSelectedSite removed - use useSelectedSite hook instead (src/hooks/useSelectedSite.ts)
+    // NOTE: getSelectedSite removed - use useSelectedSite hook instead
+    // (src/hooks/useSelectedSite.ts)
 }

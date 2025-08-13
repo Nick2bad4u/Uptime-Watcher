@@ -2,7 +2,8 @@
  * Defines event payload types for improved type safety in IPC event callbacks.
  *
  * @remarks
- * These interfaces replace generic `unknown` types, ensuring strict typing for all event payloads exchanged between the Electron main process and renderer.
+ * These interfaces replace generic `unknown` types, ensuring strict typing for
+ * all event payloads exchanged between the Electron main process and renderer.
  */
 
 import type { Monitor, Site } from "@shared/types";
@@ -12,7 +13,8 @@ import type { Monitor, Site } from "@shared/types";
  *
  * @remarks
  * Provides common timestamp field that all events must include.
- * All event interfaces should extend this base interface to ensure consistency.
+ * All event interfaces should extend this base interface to ensure
+ * consistency.
  */
 export interface BaseEventData {
     /**
@@ -25,9 +27,10 @@ export interface BaseEventData {
  * Payload for cache invalidation events.
  *
  * @remarks
- * Used to notify listeners that a cache entry or the entire cache has been invalidated for a specific reason.
- * - `identifier`: The specific identifier affected (optional for global invalidation).
- * - `reason`: The reason for invalidation.
+ * Used to notify listeners that a cache entry or the entire cache has been
+ * invalidated for a specific reason. - `identifier`: The specific identifier
+ * affected (optional for global invalidation). - `reason`: The reason for
+ * invalidation.
  * - `timestamp`: The time (in ms since epoch) when invalidation occurred.
  * - `type`: The type of cache invalidation.
  *
@@ -142,8 +145,9 @@ export interface DatabaseRetryEventData extends BaseEventData {
  * Payload for database success events.
  *
  * @remarks
- * Used to track successful database operations for monitoring and performance analysis.
- * Provides metrics about operation performance and cache utilization.
+ * Used to track successful database operations for monitoring and performance
+ * analysis. Provides metrics about operation performance and cache
+ * utilization.
  *
  * @example
  * ```typescript
@@ -205,8 +209,9 @@ export interface MonitorDownEventData extends BaseEventData {
  * Payload for monitoring control events (global monitoring start/stop).
  *
  * @remarks
- * Used to signal global monitoring state changes, such as starting or stopping all monitors.
- * - `activeMonitors`: Number of active monitors (for stopped events).
+ * Used to signal global monitoring state changes, such as starting or stopping
+ * all monitors. - `activeMonitors`: Number of active monitors (for stopped
+ * events).
  * - `monitorCount`: Number of monitors involved in the operation.
  * - `reason`: Reason for stopping (for stopped events).
  * - `siteCount`: Number of sites involved in the operation.
@@ -283,8 +288,8 @@ export interface MonitorUpEventData extends BaseEventData {
  * Payload for update status change events.
  *
  * @remarks
- * Used to communicate the current status of application updates, including errors.
- * - `error`: Error message if status is 'error'.
+ * Used to communicate the current status of application updates, including
+ * errors. - `error`: Error message if status is 'error'.
  * - `status`: The current update status.
  *
  * @example

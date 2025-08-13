@@ -1,6 +1,7 @@
 /**
  * Dynamic UI utilities that use monitor registry for extensible UI behavior.
- * These utilities eliminate hardcoded monitor type checks throughout the frontend.
+ * These utilities eliminate hardcoded monitor type checks throughout the
+ * frontend.
  */
 
 import type { Monitor, MonitorType } from "@shared/types";
@@ -42,7 +43,8 @@ async function getConfig(
 }
 
 /**
- * Clear the configuration cache. Useful for testing or when monitor types change.
+ * Clear the configuration cache. Useful for testing or when monitor types
+ * change.
  */
 export function clearConfigCache(): void {
     AppCaches.uiHelpers.clear();
@@ -55,9 +57,10 @@ export function clearConfigCache(): void {
  * @returns Default monitor ID (first valid ID in array) or empty string if array is empty or contains no valid IDs
  *
  * @remarks
- * This function returns the first element of the array if it exists, otherwise an empty string.
- * It does not validate whether the IDs are actually valid monitor identifiers - that should
- * be done by the caller if needed. Empty arrays return an empty string as a safe fallback.
+ * This function returns the first element of the array if it exists, otherwise
+ * an empty string. It does not validate whether the IDs are actually valid
+ * monitor identifiers - that should be done by the caller if needed. Empty
+ * arrays return an empty string as a safe fallback.
  */
 export function getDefaultMonitorId(monitorIds: string[]): string {
     return monitorIds[0] ?? "";

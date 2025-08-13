@@ -1,14 +1,17 @@
 /**
- * Application settings component providing comprehensive configuration interface.
+ * Application settings component providing comprehensive configuration
+ * interface.
  *
  * @remarks
- * This component serves as the primary settings interface for the entire application,
- * offering both basic user preferences and advanced system configuration options.
- * It integrates with multiple stores to provide a centralized configuration experience.
+ * This component serves as the primary settings interface for the entire
+ * application, offering both basic user preferences and advanced system
+ * configuration options. It integrates with multiple stores to provide a
+ * centralized configuration experience.
  *
- * The component handles both local preference updates and backend data synchronization,
- * ensuring settings are properly persisted across application sessions. Error handling
- * is integrated throughout to provide user feedback on any configuration issues.
+ * The component handles both local preference updates and backend data
+ * synchronization, ensuring settings are properly persisted across application
+ * sessions. Error handling is integrated throughout to provide user feedback
+ * on any configuration issues.
  *
  * Key architectural features:
  * - Uses Zustand stores for state management with persistence
@@ -125,7 +128,8 @@ export const Settings = ({
     const handleHistoryLimitChange = useCallback(
         async (limit: number) => {
             try {
-                // Get the actual primitive value from settings using safe conversion
+                // Get the actual primitive value from settings using safe
+                // conversion
                 const oldLimit = safeInteger(
                     settings.historyLimit,
                     DEFAULT_HISTORY_LIMIT,
@@ -149,7 +153,8 @@ export const Settings = ({
     );
 
     const handleReset = useCallback(() => {
-        // Use window.confirm instead of globalThis for better React compatibility
+        // Use window.confirm instead of globalThis for better React
+        // compatibility
         if (
             window.confirm(
                 "Are you sure you want to reset all settings to defaults?"

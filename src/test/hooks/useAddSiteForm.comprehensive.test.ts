@@ -33,24 +33,28 @@ describe('useAddSiteForm Hook - Comprehensive Coverage', () => {
         // Default mock implementation for getFields
         mockGetFields.mockImplementation((type: MonitorType) => {
             switch (type) {
-                case 'http':
+                case 'http': {
                     return [
                         { name: 'url', required: true },
                         { name: 'checkInterval', required: false }
                     ];
-                case 'port':
+                }
+                case 'port': {
                     return [
                         { name: 'host', required: true },
                         { name: 'port', required: true },
                         { name: 'checkInterval', required: false }
                     ];
-                case 'ping':
+                }
+                case 'ping': {
                     return [
                         { name: 'host', required: true },
                         { name: 'checkInterval', required: false }
                     ];
-                default:
+                }
+                default: {
                     return [];
+                }
             }
         });
     });
@@ -133,10 +137,10 @@ describe('useAddSiteForm Hook - Comprehensive Coverage', () => {
             const { result } = renderHook(() => useAddSiteForm());
 
             act(() => {
-                result.current.setCheckInterval(60000);
+                result.current.setCheckInterval(60_000);
             });
 
-            expect(result.current.checkInterval).toBe(60000);
+            expect(result.current.checkInterval).toBe(60_000);
         });
 
         it('should update siteId correctly', () => {
@@ -531,7 +535,7 @@ describe('useAddSiteForm Hook - Comprehensive Coverage', () => {
                 result.current.setPort('8080');
                 result.current.setName('My Site');
                 result.current.setMonitorType('port');
-                result.current.setCheckInterval(60000);
+                result.current.setCheckInterval(60_000);
                 result.current.setSiteId('custom-id');
                 result.current.setAddMode('existing');
                 result.current.setSelectedExistingSite('existing-site');
@@ -740,9 +744,9 @@ describe('useAddSiteForm Hook - Comprehensive Coverage', () => {
                 'name', 'port', 'selectedExistingSite', 'siteId', 'url'
             ];
 
-            stateProperties.forEach(prop => {
+            for (const prop of stateProperties) {
                 expect(result.current).toHaveProperty(prop);
-            });
+            }
         });
 
         it('should return all expected action functions', () => {
@@ -754,10 +758,10 @@ describe('useAddSiteForm Hook - Comprehensive Coverage', () => {
                 'setPort', 'setSelectedExistingSite', 'setSiteId', 'setUrl'
             ];
 
-            actionProperties.forEach(prop => {
+            for (const prop of actionProperties) {
                 expect(result.current).toHaveProperty(prop);
                 expect(typeof result.current[prop]).toBe('function');
-            });
+            }
         });
     });
 });

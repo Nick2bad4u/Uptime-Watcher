@@ -1,6 +1,7 @@
 /**
- * Theme management hook providing theme state, controls, and utility functions.
- * Handles theme switching, system theme detection, and provides color/styling utilities.
+ * Theme management hook providing theme state, controls, and utility
+ * functions. Handles theme switching, system theme detection, and provides
+ * color/styling utilities.
  */
 
 /* eslint-disable unicorn/consistent-function-scoping -- Hook utility functions must remain inside hook scope to access current theme state and prevent stale closures */
@@ -96,7 +97,8 @@ export function useTheme(): UseThemeReturn {
     const [systemTheme, setSystemTheme] = useState<"dark" | "light">("light");
     const [themeVersion, setThemeVersion] = useState(0); // Force re-renders
 
-    // Memoized getCurrentTheme to satisfy useEffect deps and avoid unnecessary re-renders
+    // Memoized getCurrentTheme to satisfy useEffect deps and avoid unnecessary
+    // re-renders
     const getCurrentTheme = useCallback((): Theme => {
         return themeManager.getTheme(settings.theme);
     }, [settings.theme]);
@@ -136,7 +138,8 @@ export function useTheme(): UseThemeReturn {
 
         const cleanup = themeManager.onSystemThemeChange((isDark) => {
             const newSystemTheme = isDark ? "dark" : "light";
-            // Use timeout to defer state update to avoid direct call in useEffect
+            // Use timeout to defer state update to avoid direct call in
+            // useEffect
             const timeoutId = setTimeout(() => {
                 updateSystemTheme(newSystemTheme);
             }, UI_DELAYS.STATE_UPDATE_DEFER);
@@ -291,7 +294,8 @@ export function useAvailabilityColors(): UseAvailabilityColorsReturn {
         // Clamp percentage between 0 and 100
         const clampedPercentage = Math.max(0, Math.min(100, percentage));
 
-        // Use theme colors for consistency - aligned with description thresholds
+        // Use theme colors for consistency - aligned with description
+        // thresholds
         if (clampedPercentage >= 99.9) {
             return currentTheme.colors.status.up; // Excellent
         } else if (clampedPercentage >= 99) {

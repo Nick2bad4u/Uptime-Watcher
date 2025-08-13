@@ -4,9 +4,9 @@
  *
  * @remarks
  * This component encapsulates the logic for site-wide monitoring control,
- * providing consistent behavior across different contexts (site cards, site details).
- * Supports compact mode for space-constrained layouts and includes proper
- * event handling to prevent propagation to parent elements.
+ * providing consistent behavior across different contexts (site cards, site
+ * details). Supports compact mode for space-constrained layouts and includes
+ * proper event handling to prevent propagation to parent elements.
  *
  * The button automatically switches between start and stop states based on
  * the `allMonitorsRunning` prop, using appropriate styling and icons for
@@ -58,9 +58,10 @@ export interface SiteMonitoringButtonProperties {
  * Reusable site monitoring button that handles start/stop all monitoring.
  *
  * @remarks
- * This component provides a consistent interface for site-wide monitoring controls
- * across different parts of the application. It automatically switches between
- * start and stop states based on whether all monitors are currently running.
+ * This component provides a consistent interface for site-wide monitoring
+ * controls across different parts of the application. It automatically
+ * switches between start and stop states based on whether all monitors are
+ * currently running.
  *
  * Key features:
  * - Automatic state switching based on monitor status
@@ -69,8 +70,8 @@ export interface SiteMonitoringButtonProperties {
  * - Compact mode for space-constrained layouts
  * - Consistent styling with theme integration
  *
- * The component uses the appropriate variant (success for start, error for stop)
- * and includes intuitive emoji icons for visual clarity.
+ * The component uses the appropriate variant (success for start, error for
+ * stop) and includes intuitive emoji icons for visual clarity.
  *
  * @param props - Component configuration and event handlers
  * @returns JSX element containing the themed monitoring button

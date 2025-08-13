@@ -1,12 +1,14 @@
 /**
- * Status distribution bar chart component with memoization for performance optimization and status visualization.
+ * Status distribution bar chart component with memoization for performance
+ * optimization and status visualization.
  *
  * @remarks
- * This component displays status distribution (up/down/pending) using a bar chart visualization.
- * It leverages Chart.js through the chartSetup service for rendering and integrates with the
- * ChartConfigService for theming and configuration. The component is memoized to prevent
- * unnecessary re-renders when parent component updates, optimizing performance for frequent
- * status updates in monitoring scenarios.
+ * This component displays status distribution (up/down/pending) using a bar
+ * chart visualization. It leverages Chart.js through the chartSetup service
+ * for rendering and integrates with the ChartConfigService for theming and
+ * configuration. The component is memoized to prevent unnecessary re-renders
+ * when parent component updates, optimizing performance for frequent status
+ * updates in monitoring scenarios.
  *
  * @example
  * Basic status chart with distribution data:
@@ -56,12 +58,14 @@ import type { StatusBarChartData } from "../../../services/chartConfig";
 import "../../../services/chartSetup";
 
 /**
- * Memoized status distribution bar chart component for monitoring status visualization.
+ * Memoized status distribution bar chart component for monitoring status
+ * visualization.
  *
  * @remarks
- * Displays status distribution (up/down/pending) using a bar chart visualization with Chart.js.
- * The component is memoized to prevent unnecessary re-renders when parent component updates,
- * providing optimal performance for frequent status updates in monitoring contexts.
+ * Displays status distribution (up/down/pending) using a bar chart
+ * visualization with Chart.js. The component is memoized to prevent
+ * unnecessary re-renders when parent component updates, providing optimal
+ * performance for frequent status updates in monitoring contexts.
  *
  * @param props - The component properties containing data and options for the chart
  * @returns Memoized bar chart component

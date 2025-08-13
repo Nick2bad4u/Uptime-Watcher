@@ -2,9 +2,10 @@
  * Utility functions for store management and composition.
  *
  * @remarks
- * Provides common functionality for error handling, persistence, and store composition
- * across all Zustand stores in the application. These utilities ensure consistent
- * patterns for async operations, error states, and data persistence.
+ * Provides common functionality for error handling, persistence, and store
+ * composition across all Zustand stores in the application. These utilities
+ * ensure consistent patterns for async operations, error states, and data
+ * persistence.
  *
  * @packageDocumentation
  */
@@ -22,9 +23,9 @@ import logger from "../services/logger";
  * @returns Object containing common store methods and initial state values
  *
  * @remarks
- * This function provides a standardized way to add error handling, loading states,
- * and error management to any Zustand store. It ensures consistent error handling
- * patterns across all stores in the application.
+ * This function provides a standardized way to add error handling, loading
+ * states, and error management to any Zustand store. It ensures consistent
+ * error handling patterns across all stores in the application.
  *
  * @example
  * ```typescript
@@ -55,7 +56,8 @@ export const createBaseStore = <T extends BaseStore>(
     },
 });
 
-// Import withErrorHandling directly from "@shared/utils/errorHandling" if needed
+// Import withErrorHandling directly from "@shared/utils/errorHandling" if
+// needed
 
 /**
  * Creates a persistence configuration for Zustand store persistence.
@@ -66,8 +68,9 @@ export const createBaseStore = <T extends BaseStore>(
  *
  * @remarks
  * This utility creates a standardized persistence configuration that prefixes
- * all store names with 'uptime-watcher-' to avoid conflicts with other applications.
- * The partialize function allows selective persistence of store properties.
+ * all store names with 'uptime-watcher-' to avoid conflicts with other
+ * applications. The partialize function allows selective persistence of store
+ * properties.
  *
  * @example
  * ```typescript
@@ -102,7 +105,8 @@ export const createPersistConfig = <T>(
  * @remarks
  * This utility prevents rapid successive calls to expensive operations like
  * API requests or state updates. It uses a Map to track timeouts per unique
- * argument combination, allowing different argument sets to be debounced independently.
+ * argument combination, allowing different argument sets to be debounced
+ * independently.
  *
  * @example
  * ```typescript
@@ -139,9 +143,9 @@ export const debounce = <T extends unknown[]>(
  * @param data - Optional data associated with the action
  *
  * @remarks
- * This utility provides consistent logging for store actions during development.
- * It only logs when NODE_ENV is set to 'development' to avoid performance
- * impact in production builds.
+ * This utility provides consistent logging for store actions during
+ * development. It only logs when NODE_ENV is set to 'development' to avoid
+ * performance impact in production builds.
  *
  * @example
  * ```typescript

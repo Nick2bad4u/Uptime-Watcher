@@ -10,7 +10,8 @@
  * provides appropriate fallbacks when help text is unavailable.
  *
  * The hook automatically cancels pending requests when the component unmounts
- * or when the monitor type changes to prevent memory leaks and race conditions.
+ * or when the monitor type changes to prevent memory leaks and race
+ * conditions.
  *
  * @example
  * ```tsx

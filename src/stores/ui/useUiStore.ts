@@ -2,10 +2,10 @@
  * UI store for managing user interface state and interactions.
  *
  * @remarks
- * This store manages the global UI state including modal visibility, selected site,
- * active tabs, and user preferences. It uses Zustand persistence to maintain
- * user preferences across sessions while keeping transient state (like modal
- * visibility) in memory only.
+ * This store manages the global UI state including modal visibility, selected
+ * site, active tabs, and user preferences. It uses Zustand persistence to
+ * maintain user preferences across sessions while keeping transient state
+ * (like modal visibility) in memory only.
  *
  * The store follows the application's modular architecture by separating UI
  * concerns from business logic, allowing components to focus on presentation
@@ -96,11 +96,13 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 });
 
                 // Use electronAPI to open external URL
-                // In test environments, this might fallback to window.open via mocking
+                // In test environments, this might fallback to window.open via
+                // mocking
                 try {
                     window.electronAPI.system.openExternal(url);
                 } catch {
-                    // Fallback for test environments where electronAPI might throw
+                    // Fallback for test environments where electronAPI might
+                    // throw
                     window.open(url, "_blank", "noopener");
                 }
             },
@@ -147,19 +149,22 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
              * Partialize function for selective state persistence.
              *
              * @remarks
-             * This function determines which parts of the UI state should be persisted
-             * across browser sessions. It includes user preferences and settings that
-             * should be remembered, while excluding transient state like modal visibility
-             * and selected site which should reset on each session.
+             * This function determines which parts of the UI state should be
+             * persisted across browser sessions. It includes user preferences
+             * and settings that should be remembered, while excluding
+             * transient state like modal visibility and selected site which
+             * should reset on each session.
              *
              * Persisted state:
              * - activeSiteDetailsTab: Remember which tab was last active
-             * - showAdvancedMetrics: User preference for advanced metrics visibility
-             * - siteDetailsChartTimeRange: User preference for chart time range
+             * - showAdvancedMetrics: User preference for advanced metrics
+             * visibility - siteDetailsChartTimeRange: User preference for
+             * chart time range
              *
              * Non-persisted state:
-             * - Modal states (showSettings, showSiteDetails): Reset on each session
-             * - selectedSiteId: Reset on each session for security/privacy
+             * - Modal states (showSettings, showSiteDetails): Reset on each
+             * session - selectedSiteId: Reset on each session for
+             * security/privacy
              */
             partialize: (state) => ({
                 activeSiteDetailsTab: state.activeSiteDetailsTab,

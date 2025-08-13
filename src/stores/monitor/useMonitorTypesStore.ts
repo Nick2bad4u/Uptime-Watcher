@@ -1,6 +1,7 @@
 /**
  * Monitor Types store for managing monitor type configurations and validation.
- * Handles monitor type definitions, field configurations, and validation operations.
+ * Handles monitor type definitions, field configurations, and validation
+ * operations.
  *
  * @remarks
  * This store manages all monitor type related functionality with caching and
@@ -377,7 +378,8 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                         data
                     );
 
-                // Transform result to ensure all required properties are present
+                // Transform result to ensure all required properties are
+                // present
                 const validationResult: ValidationResult = {
                     data: result.data,
                     errors: result.errors,

@@ -1,6 +1,7 @@
 /**
  * Theme definitions for the application.
- * Contains predefined light and dark theme configurations with complete styling properties.
+ * Contains predefined light and dark theme configurations with complete
+ * styling properties.
  */
 
 import type { Theme } from "./types";
@@ -143,8 +144,9 @@ function createTheme(overrides: Partial<Theme>): Theme {
  * Provides a clean, bright appearance suitable for well-lit environments.
  *
  * @remarks
- * This is the default theme that uses the base theme values without modifications.
- * It provides optimal readability and accessibility in bright environments.
+ * This is the default theme that uses the base theme values without
+ * modifications. It provides optimal readability and accessibility in bright
+ * environments.
  *
  * @example
  * ```typescript

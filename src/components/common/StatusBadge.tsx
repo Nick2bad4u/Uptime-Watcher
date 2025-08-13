@@ -1,14 +1,16 @@
 /**
- * StatusBadge component for displaying status with optional icon and customizable styling.
+ * StatusBadge component for displaying status with optional icon and
+ * customizable styling.
  *
  * @remarks
- * This component provides a standardized way to display monitor and site status
- * throughout the application. It combines visual status indicators with text labels
- * to create an accessible and consistent user experience.
+ * This component provides a standardized way to display monitor and site
+ * status throughout the application. It combines visual status indicators with
+ * text labels to create an accessible and consistent user experience.
  *
- * The component is optimized for performance using React.memo and is designed to be
- * reusable across different contexts while maintaining visual consistency. It supports
- * various sizing options and can be customized with different formatting functions.
+ * The component is optimized for performance using React.memo and is designed
+ * to be reusable across different contexts while maintaining visual
+ * consistency. It supports various sizing options and can be customized with
+ * different formatting functions.
  *
  * Features:
  * - Consistent status visualization across the application
@@ -74,7 +76,8 @@ export interface StatusBadgeProperties {
  * This component is memoized to prevent unnecessary re-renders when parent
  * components update. The memoization is beneficial because status badges are
  * often rendered in lists and don't change frequently. Consumers should ensure
- * that props are stable (especially formatter function) to maximize memoization benefits.
+ * that props are stable (especially formatter function) to maximize
+ * memoization benefits.
  *
  * @param props - StatusBadge component props
  * @returns JSX element containing status indicator and text

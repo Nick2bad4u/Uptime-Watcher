@@ -1,10 +1,12 @@
 /**
- * IPC response type definitions and utilities for type-safe frontend-backend communication.
+ * IPC response type definitions and utilities for type-safe frontend-backend
+ * communication.
  *
  * @remarks
- * This module provides TypeScript interfaces and utility functions that mirror the backend
- * IpcResponse interface, ensuring type safety across the Electron IPC boundary. All
- * standardized IPC handlers in the application return responses in the defined format.
+ * This module provides TypeScript interfaces and utility functions that mirror
+ * the backend IpcResponse interface, ensuring type safety across the Electron
+ * IPC boundary. All standardized IPC handlers in the application return
+ * responses in the defined format.
  *
  * The module includes:
  * - Standardized response format interface
@@ -12,8 +14,9 @@
  * - Data extraction utilities with error handling
  * - Safe fallback mechanisms for failed operations
  *
- * These utilities are essential for maintaining type safety when communicating between
- * the renderer process (frontend) and main process (backend) in the Electron application.
+ * These utilities are essential for maintaining type safety when communicating
+ * between the renderer process (frontend) and main process (backend) in the
+ * Electron application.
  *
  * @example
  * ```typescript

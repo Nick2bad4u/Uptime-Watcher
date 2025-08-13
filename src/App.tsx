@@ -1,6 +1,7 @@
 /**
  * Main App component for Uptime Watcher application.
- * Manages global state, modals, notifications, and renders the main application layout.
+ * Manages global state, modals, notifications, and renders the main
+ * application layout.
  */
 
 import type { JSX } from "react/jsx-runtime";
@@ -46,12 +47,14 @@ const UI_MESSAGES = {
 } as const;
 
 /**
- * Main application component that serves as the root of the Uptime Watcher app.
+ * Main application component that serves as the root of the Uptime Watcher
+ * app.
  *
  * @remarks
- * This is the primary entry point component that orchestrates the entire application
- * including state management, theming, error handling, and real-time updates.
- * Uses deferred state updates via timeouts to comply with React best practices.
+ * This is the primary entry point component that orchestrates the entire
+ * application including state management, theming, error handling, and
+ * real-time updates. Uses deferred state updates via timeouts to comply with
+ * React best practices.
  *
  * @public
  *
@@ -124,11 +127,13 @@ const App = (): JSX.Element => {
 
     /**
      * Only show loading overlay if loading takes more than 100ms
-     * This prevents flash for quick operations while still providing feedback for longer ones
+     * This prevents flash for quick operations while still providing feedback
+     * for longer ones
      */
     useEffect((): (() => void) | undefined => {
         if (!isLoading) {
-            // Use timeout to defer state update to avoid direct call in useEffect
+            // Use timeout to defer state update to avoid direct call in
+            // useEffect
             const clearTimeoutId = setTimeout(
                 clearLoadingOverlay,
                 UI_DELAYS.STATE_UPDATE_DEFER
@@ -172,7 +177,8 @@ const App = (): JSX.Element => {
                 settingsStore.initializeSettings(),
             ]);
 
-            // Set up cache synchronization with backend and store cleanup function
+            // Set up cache synchronization with backend and store cleanup
+            // function
             // eslint-disable-next-line n/no-sync -- Function name contains 'sync' but is not a synchronous file operation
             const cacheSyncCleanup = setupCacheSync();
             cacheSyncCleanupRef.current = cacheSyncCleanup;

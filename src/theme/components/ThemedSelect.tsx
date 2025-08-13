@@ -1,11 +1,13 @@
 /**
- * Themed select dropdown component with consistent styling, accessibility support, and theme integration.
+ * Themed select dropdown component with consistent styling, accessibility
+ * support, and theme integration.
  *
  * @remarks
- * This component provides a styled select dropdown that integrates with the application's theme system.
- * It supports accessibility attributes, various event handlers, and automatic styling based on the current
- * theme. The select component handles focus states, disabled states, and provides consistent visual appearance
- * across the application.
+ * This component provides a styled select dropdown that integrates with the
+ * application's theme system. It supports accessibility attributes, various
+ * event handlers, and automatic styling based on the current theme. The select
+ * component handles focus states, disabled states, and provides consistent
+ * visual appearance across the application.
  *
  * @example
  * Basic select dropdown:
@@ -53,7 +55,9 @@ import { useTheme, useThemeClasses } from "../useTheme";
  * @public
  */
 export interface ThemedSelectProperties {
-    /** ID of element that describes this select (for error messages, help text) */
+    /**
+     * ID of element that describes this select (for error messages, help text)
+     */
     readonly "aria-describedby"?: string;
     /** Accessible label for screen readers */
     readonly "aria-label"?: string;
@@ -80,12 +84,14 @@ export interface ThemedSelectProperties {
 }
 
 /**
- * Themed select dropdown component with consistent styling and accessibility support.
+ * Themed select dropdown component with consistent styling and accessibility
+ * support.
  *
  * @remarks
- * This component provides a styled select dropdown with automatic theme integration,
- * focus states, and accessibility features. The select supports various event handlers
- * and automatically applies appropriate styling based on the current theme and state.
+ * This component provides a styled select dropdown with automatic theme
+ * integration, focus states, and accessibility features. The select supports
+ * various event handlers and automatically applies appropriate styling based
+ * on the current theme and state.
  *
  * @param props - The component properties
  * @returns The themed select JSX element
@@ -124,7 +130,8 @@ const ThemedSelect = ({
     const { getBackgroundClass, getBorderClass, getTextClass } =
         useThemeClasses();
 
-    // Ensure value is always defined to prevent controlled/uncontrolled warnings
+    // Ensure value is always defined to prevent controlled/uncontrolled
+    // warnings
     const selectValue = value ?? "";
 
     const styles: React.CSSProperties = {

@@ -1,10 +1,12 @@
 /**
- * Select dropdown field component with accessibility, validation, and themed styling.
+ * Select dropdown field component with accessibility, validation, and themed
+ * styling.
  *
  * @remarks
- * Renders a select dropdown with options, error/help text, and ARIA attributes.
- * The component integrates with FormField wrapper for consistent styling and accessibility.
- * Supports both string and numeric values with proper type handling.
+ * Renders a select dropdown with options, error/help text, and ARIA
+ * attributes. The component integrates with FormField wrapper for consistent
+ * styling and accessibility. Supports both string and numeric values with
+ * proper type handling.
  *
  * @example
  * Basic select field with string options:
@@ -86,12 +88,14 @@ export interface SelectOption {
 }
 
 /**
- * Select dropdown field component with accessibility, validation, and themed styling.
+ * Select dropdown field component with accessibility, validation, and themed
+ * styling.
  *
  * @remarks
- * Renders a select dropdown with options, error/help text, and ARIA attributes.
- * The component is memoized for performance and integrates with FormField for consistent styling.
- * Supports both string and numeric values with proper event handling.
+ * Renders a select dropdown with options, error/help text, and ARIA
+ * attributes. The component is memoized for performance and integrates with
+ * FormField for consistent styling. Supports both string and numeric values
+ * with proper event handling.
  *
  * @param props - The component properties
  * @returns JSX element containing an accessible select dropdown

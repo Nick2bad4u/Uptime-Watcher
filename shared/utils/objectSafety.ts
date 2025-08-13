@@ -1,6 +1,7 @@
 /**
  * Type-safe object manipulation utilities.
- * Provides enhanced type safety for Object.keys, Object.values, Object.entries operations.
+ * Provides enhanced type safety for Object.keys, Object.values, Object.entries
+ * operations.
  */
 
 import { isObject } from "./typeGuards";
@@ -15,9 +16,9 @@ import { isObject } from "./typeGuards";
  * @returns Property value or fallback
  *
  * @remarks
- * Only accepts string and symbol keys as these are the valid property key types
- * in JavaScript. Number keys are automatically converted to strings by JavaScript,
- * so use string keys directly to avoid confusion.
+ * Only accepts string and symbol keys as these are the valid property key
+ * types in JavaScript. Number keys are automatically converted to strings by
+ * JavaScript, so use string keys directly to avoid confusion.
  *
  * @example
  * ```typescript
@@ -166,8 +167,8 @@ export function safeObjectPick<
  * @remarks
  * This function uses type assertion to preserve compile-time type information.
  * The cast is safe for plain objects but should be used carefully with objects
- * that may have prototype pollution, non-enumerable properties, or symbol keys.
- * Object.entries() only returns enumerable string-keyed properties.
+ * that may have prototype pollution, non-enumerable properties, or symbol
+ * keys. Object.entries() only returns enumerable string-keyed properties.
  *
  * @example
  * ```typescript

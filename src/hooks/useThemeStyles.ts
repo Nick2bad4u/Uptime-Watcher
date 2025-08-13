@@ -7,8 +7,8 @@
  *
  * @remarks
  * This hook provides theme-aware styling with proper SSR support and runtime
- * theme change reactivity. It uses media query listeners to detect theme changes
- * and updates styles accordingly.
+ * theme change reactivity. It uses media query listeners to detect theme
+ * changes and updates styles accordingly.
  *
  * The hook handles:
  * - Server-side rendering compatibility

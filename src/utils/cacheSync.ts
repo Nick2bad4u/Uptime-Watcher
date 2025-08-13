@@ -1,6 +1,7 @@
 /**
  * Frontend cache synchronization utilities.
- * Automatically synchronizes frontend caches with backend cache invalidation events.
+ * Automatically synchronizes frontend caches with backend cache invalidation
+ * events.
  */
 
 import logger from "../services/logger";
@@ -114,14 +115,16 @@ function clearSiteRelatedCaches(identifier?: string): void {
 
 /**
  * Set up automatic cache synchronization with backend.
- * Listens for cache invalidation events and clears appropriate frontend caches.
+ * Listens for cache invalidation events and clears appropriate frontend
+ * caches.
  *
  * @returns Cleanup function to remove event listeners. Call this function
  * when the component unmounts or cache sync is no longer needed to prevent
  * memory leaks and avoid processing events after cleanup.
  */
 export function setupCacheSync(): () => void {
-    // Check if we're in an Electron environment with cache invalidation events available
+    // Check if we're in an Electron environment with cache invalidation events
+    // available
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- window.electronAPI can be undefined outside Electron environments
     if (typeof window === "undefined" || !window.electronAPI?.events) {
         logger.warn(

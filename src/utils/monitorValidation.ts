@@ -21,7 +21,8 @@ import {
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { withUtilityErrorHandling } from "./errorHandling";
 
-// ValidationResult type available via direct import from @shared/types/validation
+// ValidationResult type available via direct import from
+// @shared/types/validation
 
 /**
  * Required fields for monitor creation, ensuring type safety.
@@ -152,12 +153,14 @@ export async function validateMonitorField(
                 return [];
             }
 
-            // Improved error filtering: look for field-specific errors more robustly
+            // Improved error filtering: look for field-specific errors more
+            // robustly
             const fieldErrors = result.errors.filter((error) => {
                 const errorLower = error.toLowerCase();
                 const fieldLower = fieldName.toLowerCase();
 
-                // Check if error message contains the field name or common field error patterns
+                // Check if error message contains the field name or common
+                // field error patterns
                 return (
                     errorLower.includes(fieldLower) ||
                     errorLower.includes(`"${fieldLower}"`) ||
@@ -167,8 +170,8 @@ export async function validateMonitorField(
                 );
             });
 
-            // If no field-specific errors found but validation failed, return all errors
-            // This prevents losing important validation information
+            // If no field-specific errors found but validation failed, return
+            // all errors This prevents losing important validation information
             return fieldErrors.length > 0 ? fieldErrors : result.errors;
         },
         `Monitor field validation for ${fieldName}`,
@@ -177,8 +180,8 @@ export async function validateMonitorField(
 }
 
 /**
- * Validate a specific monitor field for real-time feedback using shared schemas.
- * Provides immediate validation without IPC round-trip.
+ * Validate a specific monitor field for real-time feedback using shared
+ * schemas. Provides immediate validation without IPC round-trip.
  *
  * @param type - Monitor type
  * @param fieldName - Field name to validate
@@ -212,7 +215,8 @@ export async function validateMonitorFieldClientSide(
     );
 }
 
-// Helper functions for monitor form validation (reduces complexity by composition)
+// Helper functions for monitor form validation (reduces complexity by
+// composition)
 const validateHttpMonitorFormData = (data: Partial<HttpFormData>): string[] => {
     const errors: string[] = [];
 
@@ -264,8 +268,9 @@ const validatePortMonitorFormData = (data: Partial<PortFormData>): string[] => {
  * @returns Array of validation error messages
  *
  * @remarks
- * Ping monitors require a host field that must be a valid hostname, IP address, or localhost.
- * Uses shared validation to ensure consistency with backend validation rules.
+ * Ping monitors require a host field that must be a valid hostname, IP
+ * address, or localhost. Uses shared validation to ensure consistency with
+ * backend validation rules.
  */
 const validatePingMonitorFormData = (data: Partial<PingFormData>): string[] => {
     const errors: string[] = [];

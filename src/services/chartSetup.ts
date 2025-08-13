@@ -2,9 +2,9 @@
  * Centralized Chart.js setup and registration module.
  *
  * @remarks
- * This file provides centralized registration of Chart.js components and plugins
- * to avoid duplication across components and ensure consistent chart configuration.
- * All Chart.js registrations should happen here.
+ * This file provides centralized registration of Chart.js components and
+ * plugins to avoid duplication across components and ensure consistent chart
+ * configuration. All Chart.js registrations should happen here.
  */
 
 import {
@@ -61,7 +61,8 @@ ChartJS.register(
  * @remarks
  * Re-exports essential Chart.js types to provide a single source of truth
  * for chart-related TypeScript definitions. This enables proper type checking
- * and IntelliSense support across the application while maintaining consistency.
+ * and IntelliSense support across the application while maintaining
+ * consistency.
  *
  * Types included:
  * - ChartData: Defines the data structure for charts

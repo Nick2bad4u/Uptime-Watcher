@@ -1,11 +1,13 @@
 /**
- * Themed badge component for status indicators, labels, and small informational elements.
+ * Themed badge component for status indicators, labels, and small
+ * informational elements.
  *
  * @remarks
- * This component provides a compact way to display status information, counts, or labels
- * with consistent theming. It supports multiple visual variants for different contexts
- * (success, warning, error, etc.), various sizes, and optional icons. The badge integrates
- * with the theme system for consistent styling across the application.
+ * This component provides a compact way to display status information, counts,
+ * or labels with consistent theming. It supports multiple visual variants for
+ * different contexts (success, warning, error, etc.), various sizes, and
+ * optional icons. The badge integrates with the theme system for consistent
+ * styling across the application.
  *
  * @example
  * Status badge with icon:
@@ -64,17 +66,22 @@ export interface ThemedBadgeProperties {
     readonly iconColor?: string;
     /** Size variant for the badge */
     readonly size?: BadgeSize;
-    /** Visual variant for the badge styling (primary, success, warning, error, etc.) */
+    /**
+     * Visual variant for the badge styling (primary, success, warning, error,
+     * etc.)
+     */
     readonly variant?: BadgeVariant;
 }
 
 /**
- * Themed badge component for status indicators, labels, and informational elements.
+ * Themed badge component for status indicators, labels, and informational
+ * elements.
  *
  * @remarks
- * This component provides a compact way to display status information with consistent theming.
- * The badge automatically calculates appropriate colors, spacing, and typography based on
- * the selected variant and size. Icons are automatically colored to match the theme.
+ * This component provides a compact way to display status information with
+ * consistent theming. The badge automatically calculates appropriate colors,
+ * spacing, and typography based on the selected variant and size. Icons are
+ * automatically colored to match the theme.
  *
  * @param props - The component properties
  * @returns The themed badge JSX element

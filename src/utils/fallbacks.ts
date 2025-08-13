@@ -42,8 +42,9 @@ export function withAsyncErrorHandling(
 }
 
 /**
- * Synchronous error handling wrapper for operations that don't return promises.
- * Provides consistent error handling and fallback behavior for sync operations.
+ * Synchronous error handling wrapper for operations that don't return
+ * promises. Provides consistent error handling and fallback behavior for sync
+ * operations.
  *
  * @param operation - Synchronous operation to execute
  * @param operationName - Name for logging purposes
@@ -125,9 +126,9 @@ const MONITOR_IDENTIFIER_GENERATORS = new Map<
                 : undefined,
     ],
     // Add new monitor types here as they're implemented
-    // ["dns", (monitor) => `${monitor.domain} (${monitor.recordType})` ?? undefined],
-    // ["ssl", (monitor) => monitor.host ?? undefined],
-    // ["api", (monitor) => monitor.endpoint ?? undefined],
+    // ["dns", (monitor) => `${monitor.domain} (${monitor.recordType})` ??
+    // undefined], ["ssl", (monitor) => monitor.host ?? undefined], ["api",
+    // (monitor) => monitor.endpoint ?? undefined],
 ]);
 
 /**
@@ -154,10 +155,11 @@ function getGenericIdentifier(monitor: Monitor): string | undefined {
  * @returns Display identifier string
  *
  * @remarks
- * This function uses a configuration-driven approach to support new monitor types
- * without requiring code changes. To add support for a new monitor type:
- * 1. Add an entry to MONITOR_IDENTIFIER_GENERATORS with a function that extracts the identifier
- * 2. The function will automatically use the new generator
+ * This function uses a configuration-driven approach to support new monitor
+ * types without requiring code changes. To add support for a new monitor type:
+ * 1. Add an entry to MONITOR_IDENTIFIER_GENERATORS with a function that
+ * extracts the identifier 2. The function will automatically use the new
+ * generator
  *
  * @example
  * ```typescript
@@ -219,8 +221,8 @@ const MONITOR_TYPE_LABELS = new Map<string, string>([
  * @returns Display label for the monitor type
  *
  * @remarks
- * This function uses a configuration-driven approach to support new monitor types
- * without requiring code changes. To add support for a new monitor type:
+ * This function uses a configuration-driven approach to support new monitor
+ * types without requiring code changes. To add support for a new monitor type:
  * 1. Add an entry to MONITOR_TYPE_LABELS
  * 2. The function will automatically use the new label
  *

@@ -1,9 +1,9 @@
 /**
  * Screenshot thumbnail component with hover preview
  *
- * Displays a small thumbnail of a website screenshot that expands into a larger
- * preview on hover/focus. Uses Microlink API for screenshot generation and
- * React portals for the overlay positioning.
+ * Displays a small thumbnail of a website screenshot that expands into a
+ * larger preview on hover/focus. Uses Microlink API for screenshot generation
+ * and React portals for the overlay positioning.
  */
 
 import type { JSX } from "react/jsx-runtime";
@@ -73,7 +73,8 @@ export const ScreenshotThumbnail = ({
                 clearTimeout(hoverTimeoutReference.current);
                 hoverTimeoutReference.current = undefined;
             }
-            // Use timeout to defer state update to avoid direct call in useEffect
+            // Use timeout to defer state update to avoid direct call in
+            // useEffect
             const clearTimeoutId = setTimeout(
                 clearOverlayVariables,
                 UI_DELAYS.STATE_UPDATE_DEFER
@@ -133,7 +134,8 @@ export const ScreenshotThumbnail = ({
 
     useEffect(() => {
         if (hovered && linkReference.current) {
-            // Use timeout to defer state update to avoid direct call in useEffect
+            // Use timeout to defer state update to avoid direct call in
+            // useEffect
             const updateTimeoutId = setTimeout(
                 updateOverlayPosition,
                 UI_DELAYS.STATE_UPDATE_DEFER

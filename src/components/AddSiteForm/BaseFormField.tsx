@@ -2,9 +2,10 @@
  * Base form field component that wraps common form field functionality.
  *
  * @remarks
- * This component provides the common FormField wrapper and ARIA attribute logic
- * that is shared across all form field components (TextField, SelectField, RadioGroup, etc.).
- * It eliminates code duplication by centralizing the common patterns.
+ * This component provides the common FormField wrapper and ARIA attribute
+ * logic that is shared across all form field components (TextField,
+ * SelectField, RadioGroup, etc.). It eliminates code duplication by
+ * centralizing the common patterns.
  *
  * @example
  * Basic usage with a custom input component:

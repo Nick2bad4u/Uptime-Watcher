@@ -2,15 +2,15 @@
  * Updates store for managing application updates and notifications.
  *
  * @remarks
- * This store manages the complete update lifecycle for the Electron application,
- * including checking for updates, downloading updates, tracking progress, and
- * applying updates. It provides a centralized state management solution for
- * update-related UI components and handles communication with the Electron
- * main process for update operations.
+ * This store manages the complete update lifecycle for the Electron
+ * application, including checking for updates, downloading updates, tracking
+ * progress, and applying updates. It provides a centralized state management
+ * solution for update-related UI components and handles communication with the
+ * Electron main process for update operations.
  *
  * The store persists update information and status across sessions to provide
- * continuity in the update process, while maintaining error states and progress
- * information in memory for the current session.
+ * continuity in the update process, while maintaining error states and
+ * progress information in memory for the current session.
  *
  * @example
  * ```typescript

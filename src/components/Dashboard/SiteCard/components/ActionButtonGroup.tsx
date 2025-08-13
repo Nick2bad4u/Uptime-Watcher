@@ -40,9 +40,10 @@ export interface ActionButtonGroupProperties {
  *
  * Features:
  * - Unified interface for check now, start/stop monitoring actions
- * - Proper event handling with stopPropagation on individual buttons to prevent card click conflicts
- * - Optimized with React.memo and useCallback to prevent unnecessary re-renders
- * - Accessibility support with proper ARIA labels and native button elements
+ * - Proper event handling with stopPropagation on individual buttons to
+ * prevent card click conflicts - Optimized with React.memo and useCallback to
+ * prevent unnecessary re-renders - Accessibility support with proper ARIA
+ * labels and native button elements
  * - Visual feedback for loading and disabled states
  *
  * @param props - Component props
@@ -74,7 +75,8 @@ export const ActionButtonGroup: React.NamedExoticComponent<ActionButtonGroupProp
         onStopMonitoring,
         onStopSiteMonitoring,
     }: ActionButtonGroupProperties) {
-        // Create individual wrapped handlers for each button with event propagation control
+        // Create individual wrapped handlers for each button with event
+        // propagation control
         const handleCheckNowClick = useCallback(
             (event?: React.MouseEvent<HTMLButtonElement>) => {
                 event?.stopPropagation();

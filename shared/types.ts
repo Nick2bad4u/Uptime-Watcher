@@ -2,7 +2,9 @@
  * Shared type definitions used across frontend and backend.
  *
  * @remarks
- * All core domain types (Monitor, Site, StatusUpdate, etc.) live here. Both frontend and backend must import from this file for consistency. Event types are separate to avoid circular dependencies.
+ * All core domain types (Monitor, Site, StatusUpdate, etc.) live here. Both
+ * frontend and backend must import from this file for consistency. Event types
+ * are separate to avoid circular dependencies.
  *
  * @packageDocumentation
  */
@@ -120,7 +122,8 @@ export interface Monitor {
  * Field definition for dynamic form generation.
  *
  * @remarks
- * Used for monitor type configuration in both frontend and backend. Defines the structure of fields for dynamic forms and monitor configuration.
+ * Used for monitor type configuration in both frontend and backend. Defines
+ * the structure of fields for dynamic forms and monitor configuration.
  *
  * @public
  */
@@ -154,7 +157,8 @@ export interface Site {
  * Minimal Site interface for status calculations.
  *
  * @remarks
- * Allows utilities to work with both frontend and backend Site types. Used for status calculations and summary operations.
+ * Allows utilities to work with both frontend and backend Site types. Used for
+ * status calculations and summary operations.
  *
  * @public
  */
@@ -183,7 +187,8 @@ export interface StatusUpdate {
 }
 
 /**
- * Helper to validate that all elements in activeOperations are valid identifiers.
+ * Helper to validate that all elements in activeOperations are valid
+ * identifiers.
  *
  * @param activeOperations - Array to validate
  * @returns True if all elements are valid identifiers

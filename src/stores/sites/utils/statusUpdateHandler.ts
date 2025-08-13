@@ -2,9 +2,10 @@
  * Status update handler utility for managing site status updates.
  *
  * @remarks
- * Provides optimized incremental updates with fallback mechanisms for real-time site status synchronization.
- * This module handles the complex orchestration between frontend state and backend events.
- * Implements efficient incremental updates to minimize unnecessary data fetching.
+ * Provides optimized incremental updates with fallback mechanisms for
+ * real-time site status synchronization. This module handles the complex
+ * orchestration between frontend state and backend events. Implements
+ * efficient incremental updates to minimize unnecessary data fetching.
  *
  * @public
  */
@@ -39,8 +40,9 @@ interface MonitorStatusChangedEvent {
  * Configuration options for status update handler operations.
  *
  * @remarks
- * Defines the required dependencies and callbacks for managing status update subscriptions.
- * All functions should be stable references to avoid unnecessary re-subscriptions.
+ * Defines the required dependencies and callbacks for managing status update
+ * subscriptions. All functions should be stable references to avoid
+ * unnecessary re-subscriptions.
  *
  * @public
  */
@@ -49,7 +51,8 @@ export interface StatusUpdateHandlerOptions {
      * Function to trigger full sync from backend.
      *
      * @remarks
-     * Called when incremental updates fail or when a complete refresh is needed.
+     * Called when incremental updates fail or when a complete refresh is
+     * needed.
      */
     fullSyncFromBackend: () => Promise<void>;
 
@@ -65,7 +68,8 @@ export interface StatusUpdateHandlerOptions {
      * Optional callback for additional processing of updates.
      *
      * @remarks
-     * Called before applying the update to the store. Can be used for logging or side effects.
+     * Called before applying the update to the store. Can be used for logging
+     * or side effects.
      */
     onUpdate?: (update: StatusUpdate) => void;
 
@@ -79,12 +83,14 @@ export interface StatusUpdateHandlerOptions {
 }
 
 /**
- * Manages status update subscriptions and event handling with efficient incremental updates.
+ * Manages status update subscriptions and event handling with efficient
+ * incremental updates.
  *
  * @remarks
- * Provides a centralized manager for subscribing to and handling real-time status updates
- * from the backend. Handles IPC event management and cleanup automatically.
- * Prioritizes incremental updates over full syncs for better performance.
+ * Provides a centralized manager for subscribing to and handling real-time
+ * status updates from the backend. Handles IPC event management and cleanup
+ * automatically. Prioritizes incremental updates over full syncs for better
+ * performance.
  *
  * @example
  * ```typescript
@@ -118,9 +124,10 @@ export class StatusUpdateManager {
      * @param event - Monitor status changed event data
      *
      * @remarks
-     * Applies status changes directly to existing site/monitor data in the store.
-     * This is much more efficient than triggering a full sync for every status change.
-     * Falls back to full sync only if the site/monitor cannot be found.
+     * Applies status changes directly to existing site/monitor data in the
+     * store. This is much more efficient than triggering a full sync for every
+     * status change. Falls back to full sync only if the site/monitor cannot
+     * be found.
      *
      * @internal
      */
@@ -198,8 +205,9 @@ export class StatusUpdateManager {
      * @param options - Configuration options for the status update manager
      *
      * @remarks
-     * Initializes the manager with the required dependencies for status update handling.
-     * Does not start listening for events until subscribe() is called.
+     * Initializes the manager with the required dependencies for status update
+     * handling. Does not start listening for events until subscribe() is
+     * called.
      */
     public constructor(options: StatusUpdateHandlerOptions) {
         this.fullSyncFromBackend = options.fullSyncFromBackend;
@@ -221,12 +229,14 @@ export class StatusUpdateManager {
     }
 
     /**
-     * Subscribe to status updates from the backend with efficient incremental processing.
+     * Subscribe to status updates from the backend with efficient incremental
+     * processing.
      *
      * @remarks
-     * Sets up IPC event listeners for monitor status changes and monitoring lifecycle events.
-     * Automatically performs an initial full sync when subscribing.
-     * Prioritizes incremental updates over full syncs for better performance.
+     * Sets up IPC event listeners for monitor status changes and monitoring
+     * lifecycle events. Automatically performs an initial full sync when
+     * subscribing. Prioritizes incremental updates over full syncs for better
+     * performance.
      *
      * @example
      * ```typescript
@@ -247,7 +257,8 @@ export class StatusUpdateManager {
             false
         );
 
-        // Listen to monitor status changed events for efficient incremental updates
+        // Listen to monitor status changed events for efficient incremental
+        // updates
         const statusUpdateCleanup =
             window.electronAPI.events.onMonitorStatusChanged(
                 (data: unknown) => {
@@ -256,7 +267,8 @@ export class StatusUpdateManager {
                             if (this.isMonitorStatusChangedEvent(data)) {
                                 await this.handleIncrementalStatusUpdate(data);
                             } else {
-                                // Invalid data structure - trigger full sync as fallback
+                                // Invalid data structure - trigger full sync
+                                // as fallback
                                 if (isDevelopment()) {
                                     logger.warn(
                                         "Invalid monitor status changed event data, triggering full sync",
@@ -403,7 +415,8 @@ export class StatusUpdateManager {
      *
      * @remarks
      * Performs structural validation to ensure the data has the expected shape
-     * for incremental processing. This helps prevent runtime errors from malformed data.
+     * for incremental processing. This helps prevent runtime errors from
+     * malformed data.
      *
      * @internal
      */

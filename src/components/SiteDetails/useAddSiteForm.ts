@@ -2,11 +2,12 @@
  * Custom hook for managing add site form state and validation.
  *
  * @remarks
- * Provides comprehensive form state management for creating new sites and adding
- * monitors to existing sites. Supports real-time validation, automatic UUID generation,
- * and error handling. This hook uses render-time state management with previous value
- * tracking to handle state resets when the selected monitor changes, following modern
- * React patterns that avoid direct setState calls in useEffect hooks.
+ * Provides comprehensive form state management for creating new sites and
+ * adding monitors to existing sites. Supports real-time validation, automatic
+ * UUID generation, and error handling. This hook uses render-time state
+ * management with previous value tracking to handle state resets when the
+ * selected monitor changes, following modern React patterns that avoid direct
+ * setState calls in useEffect hooks.
  *
  * The hook manages two distinct operation modes:
  * - "new": Creates a new site with the first monitor
@@ -122,7 +123,8 @@ export interface AddSiteFormState {
  */
 export type FormMode = "existing" | "new";
 
-// Helper functions for add site form logic (reduces function length by composition)
+// Helper functions for add site form logic (reduces function length by
+// composition)
 const resetFieldsForMonitorType = (
     currentFieldNames: Set<string>,
     setters: {
@@ -162,9 +164,9 @@ const resetFieldsForModeChange = (
  * Validates form fields based on operation mode and monitor type requirements.
  *
  * @remarks
- * Performs comprehensive validation including mode-specific checks (site name for new sites,
- * existing site selection for existing sites) and dynamic field validation based on the
- * selected monitor type's required fields.
+ * Performs comprehensive validation including mode-specific checks (site name
+ * for new sites, existing site selection for existing sites) and dynamic field
+ * validation based on the selected monitor type's required fields.
  *
  * @param addMode - Form operation mode (new site vs existing site)
  * @param name - Site name for new sites
@@ -265,7 +267,8 @@ export function useAddSiteForm(): AddSiteFormActions & AddSiteFormState {
         resetFieldsForModeChange(addMode, { setName, setSiteId });
     }
 
-    // Simple validation function without logging - only used for submit button state
+    // Simple validation function without logging - only used for submit button
+    // state
     const isFormValid = useCallback(() => {
         return validateFormFields(
             addMode,

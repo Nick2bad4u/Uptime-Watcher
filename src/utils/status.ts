@@ -16,7 +16,8 @@
  *
  * @remarks
  * Status comparison is case-insensitive. Supports standard monitoring states:
- * down, mixed, paused, pending, unknown, up. Unknown statuses return a neutral icon.
+ * down, mixed, paused, pending, unknown, up. Unknown statuses return a neutral
+ * icon.
  */
 export function getStatusIcon(status: string): string {
     switch (status.toLowerCase()) {
@@ -53,7 +54,8 @@ export function getStatusIcon(status: string): string {
  *
  * @remarks
  * Uses simple capitalization logic suitable for single-word status values.
- * For multi-word statuses, consider using a more sophisticated formatting function.
+ * For multi-word statuses, consider using a more sophisticated formatting
+ * function.
  */
 export function formatStatusWithIcon(status: string): string {
     const icon = getStatusIcon(status);

@@ -25,7 +25,9 @@ function isPartialMonitor(value: unknown): value is Partial<Monitor> {
  * Validates basic required monitor fields.
  *
  * @remarks
- * Checks for required fields such as id, type, and status, and validates their types. Adds error messages to the provided errors array for any missing or invalid fields.
+ * Checks for required fields such as id, type, and status, and validates their
+ * types. Adds error messages to the provided errors array for any missing or
+ * invalid fields.
  *
  * @param monitor - Partial monitor object to validate.
  * @param errors - Array to collect validation error messages.
@@ -81,7 +83,8 @@ function validateBasicMonitorFields(
  * Validates HTTP monitor-specific fields.
  *
  * @remarks
- * Checks that the url field is present and a string. Adds an error message if missing or invalid.
+ * Checks that the url field is present and a string. Adds an error message if
+ * missing or invalid.
  *
  * @param monitor - Partial monitor object to validate.
  * @param errors - Array to collect validation error messages.
@@ -100,8 +103,8 @@ function validateHttpMonitorFields(
  * Validates ping monitor-specific fields.
  *
  * @remarks
- * Checks that the host field is present and a string. Ping monitors only require a host field,
- * unlike port monitors which also require a port number.
+ * Checks that the host field is present and a string. Ping monitors only
+ * require a host field, unlike port monitors which also require a port number.
  *
  * @param monitor - Partial monitor object to validate.
  * @param errors - Array to collect validation error messages.
@@ -120,7 +123,9 @@ function validatePingMonitorFields(
  * Validates port monitor-specific fields.
  *
  * @remarks
- * Checks that the host field is present and a string, and that the port is a valid number in the range 1-65535. Adds error messages for any missing or invalid fields.
+ * Checks that the host field is present and a string, and that the port is a
+ * valid number in the range 1-65535. Adds error messages for any missing or
+ * invalid fields.
  *
  * @param monitor - Partial monitor object to validate.
  * @param errors - Array to collect validation error messages.
@@ -145,11 +150,13 @@ function validatePortMonitorFields(
 }
 
 /**
- * Validates type-specific monitor fields by delegating to the appropriate field validator.
+ * Validates type-specific monitor fields by delegating to the appropriate
+ * field validator.
  *
  * @remarks
- * Calls the correct field validation function based on the monitor type ("http", "port", or "ping").
- * Adds error messages to the provided errors array for any missing or invalid fields.
+ * Calls the correct field validation function based on the monitor type
+ * ("http", "port", or "ping"). Adds error messages to the provided errors
+ * array for any missing or invalid fields.
  *
  * @param monitor - Partial monitor object to validate.
  * @param errors - Array to collect validation error messages.

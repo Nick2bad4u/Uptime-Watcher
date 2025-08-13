@@ -56,8 +56,8 @@ export interface SiteMonitorResult {
  * @see {@link SiteMonitorResult} for the complete interface specification
  *
  * @remarks
- * This hook manages monitor selection and provides current state for site monitoring.
- * It handles edge cases including:
+ * This hook manages monitor selection and provides current state for site
+ * monitoring. It handles edge cases including:
  * - Sites with no monitors (returns empty data with safe defaults)
  * - Invalid monitor selections (falls back to first available monitor)
  * - Undefined monitor references (provides safe fallback values)
@@ -94,7 +94,8 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
     const { getSelectedMonitorId, setSelectedMonitorId, sites } =
         useSitesStore();
 
-    // Always select the latest site from the store by id to ensure we have the most updated data
+    // Always select the latest site from the store by id to ensure we have the
+    // most updated data
     const latestSite = useMemo(() => {
         return sites.find((s) => s.identifier === site.identifier) ?? site;
     }, [site, sites]);
@@ -116,15 +117,17 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
     // Extract monitor state information
     const status = monitor?.status ?? DEFAULT_MONITOR_STATUS;
     const responseTime = monitor?.responseTime;
-    // Fix: Use history length and last timestamp as dependencies for proper memoization
+    // Fix: Use history length and last timestamp as dependencies for proper
+    // memoization
     const filteredHistory = useMemo(() => {
         const history = monitor?.history ?? [];
         return history;
     }, [monitor]);
 
-    // Fix: Explicitly check for monitor existence before checking monitoring status
-    // Default to true when monitoring is undefined (monitors are active by default)
-    // Note: Handle runtime case where monitoring property might be missing despite types
+    // Fix: Explicitly check for monitor existence before checking monitoring
+    // status Default to true when monitoring is undefined (monitors are active
+    // by default) Note: Handle runtime case where monitoring property might be
+    // missing despite types
     let isMonitoring = false;
     if (monitor) {
         // Handle potential undefined monitoring value (e.g., in test scenarios)

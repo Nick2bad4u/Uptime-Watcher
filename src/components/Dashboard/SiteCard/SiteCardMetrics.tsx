@@ -30,8 +30,8 @@ export interface SiteCardMetricsProperties {
  * - Four-column grid layout for status, uptime, response time, and check count
  * - Optimized with React.memo and useMemo to prevent unnecessary re-renders
  * - Consistent metric card formatting
- * - Handles undefined response times gracefully (displays "-" when not available)
- * - Formats uptime to 1 decimal place for consistency
+ * - Handles undefined response times gracefully (displays "-" when not
+ * available) - Formats uptime to 1 decimal place for consistency
  *
  * @param props - Component props
  * @returns JSX.Element containing the metrics grid

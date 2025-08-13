@@ -5,9 +5,10 @@
  * @returns Object containing field accessor functions and loading state
  *
  * @remarks
- * This hook integrates with the monitor types store to provide field configurations
- * for dynamic form generation. It maintains backward compatibility with existing
- * utility functions while leveraging centralized state management.
+ * This hook integrates with the monitor types store to provide field
+ * configurations for dynamic form generation. It maintains backward
+ * compatibility with existing utility functions while leveraging centralized
+ * state management.
  *
  * Field definitions include validation rules, UI hints, and metadata needed
  * for dynamic form generation and validation.

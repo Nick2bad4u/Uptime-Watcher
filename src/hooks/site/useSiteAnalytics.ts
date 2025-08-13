@@ -117,7 +117,8 @@ function calculateDowntimePeriods(
 
         if (record.status === "down") {
             if (downtimeEnd === undefined) {
-                // This is the first "down" we've encountered, so it's the END of the period
+                // This is the first "down" we've encountered, so it's the END
+                // of the period
                 downtimeEnd = record.timestamp;
                 downtimeStart = record.timestamp;
             } else {
@@ -367,7 +368,8 @@ export const SiteAnalyticsUtils = {
      * @returns Status level based on uptime thresholds
      *
      * @remarks
-     * Thresholds: ≥99.9% = excellent, ≥99% = good, ≥95% = warning, \<95% = critical
+     * Thresholds: ≥99.9% = excellent, ≥99% = good, ≥95% = warning, \<95% =
+     * critical
      */
     getAvailabilityStatus(
         uptime: number
@@ -390,7 +392,8 @@ export const SiteAnalyticsUtils = {
      * @returns Status level based on response time thresholds
      *
      * @remarks
-     * Thresholds: ≤200ms = excellent, ≤500ms = good, ≤1000ms = warning, \>1000ms = critical
+     * Thresholds: ≤200ms = excellent, ≤500ms = good, ≤1000ms = warning,
+     * \>1000ms = critical
      */
     getPerformanceStatus(
         responseTime: number

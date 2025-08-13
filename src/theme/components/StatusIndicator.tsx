@@ -1,5 +1,6 @@
 /**
- * StatusIndicator component for displaying status with optional text and various sizes.
+ * StatusIndicator component for displaying status with optional text and
+ * various sizes.
  */
 
 import type { SiteStatus } from "@shared/types";

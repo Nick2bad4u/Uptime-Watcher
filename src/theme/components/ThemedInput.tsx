@@ -1,11 +1,13 @@
 /**
- * Themed input component with consistent styling, accessibility support, and validation features.
+ * Themed input component with consistent styling, accessibility support, and
+ * validation features.
  *
  * @remarks
- * This component provides a styled input field that integrates with the application's theme system.
- * It supports various input types (text, email, number, password, url), accessibility attributes,
- * and validation constraints. The input automatically applies appropriate colors, focus states,
- * and disabled states based on the current theme.
+ * This component provides a styled input field that integrates with the
+ * application's theme system. It supports various input types (text, email,
+ * number, password, url), accessibility attributes, and validation
+ * constraints. The input automatically applies appropriate colors, focus
+ * states, and disabled states based on the current theme.
  *
  * @example
  * Basic text input:
@@ -63,7 +65,9 @@ import { useTheme, useThemeClasses } from "../useTheme";
  * @public
  */
 export interface ThemedInputProperties {
-    /** ID of element that describes this input (for error messages, help text) */
+    /**
+     * ID of element that describes this input (for error messages, help text)
+     */
     readonly "aria-describedby"?: string;
     /** Accessible label for screen readers */
     readonly "aria-label"?: string;
@@ -95,9 +99,10 @@ export interface ThemedInputProperties {
  * Themed input component with consistent styling and accessibility support.
  *
  * @remarks
- * This component provides a styled input field with automatic theme integration,
- * focus states, and accessibility features. The input supports various types and
- * automatically applies appropriate styling based on the current theme and state.
+ * This component provides a styled input field with automatic theme
+ * integration, focus states, and accessibility features. The input supports
+ * various types and automatically applies appropriate styling based on the
+ * current theme and state.
  *
  * @param props - The component properties
  * @returns The themed input JSX element
@@ -135,7 +140,8 @@ const ThemedInput = ({
     const { getBackgroundClass, getBorderClass, getTextClass } =
         useThemeClasses();
 
-    // Ensure value is always defined to prevent controlled/uncontrolled warnings
+    // Ensure value is always defined to prevent controlled/uncontrolled
+    // warnings
     const inputValue = value ?? "";
 
     const styles: React.CSSProperties = {

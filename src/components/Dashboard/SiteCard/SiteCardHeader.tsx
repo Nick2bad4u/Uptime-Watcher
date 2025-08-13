@@ -1,6 +1,7 @@
 /**
- * SiteCardHeader component displaying site name, monitor selector, and action buttons.
- * Provides the top section of each site card with interactive controls.
+ * SiteCardHeader component displaying site name, monitor selector, and action
+ * buttons. Provides the top section of each site card with interactive
+ * controls.
  */
 
 import type { Site } from "@shared/types";
@@ -84,13 +85,14 @@ export interface SiteInfo {
 }
 
 /**
- * Header section of the site card containing site name, monitor selection, and action buttons.
- * Provides interactive controls for monitor management and site operations.
+ * Header section of the site card containing site name, monitor selection, and
+ * action buttons. Provides interactive controls for monitor management and
+ * site operations.
  *
- * This component is memoized to prevent unnecessary re-renders when parent components
- * update. For optimal performance, ensure that all callback props are stable references
- * (wrapped in useCallback). The site object should also be stable to prevent
- * unnecessary re-renders.
+ * This component is memoized to prevent unnecessary re-renders when parent
+ * components update. For optimal performance, ensure that all callback props
+ * are stable references (wrapped in useCallback). The site object should also
+ * be stable to prevent unnecessary re-renders.
  *
  * UX Note: ActionButtonGroup is disabled when hasMonitor is false, preventing
  * actions on sites without configured monitors. The isLoading state is handled

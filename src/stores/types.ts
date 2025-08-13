@@ -30,7 +30,8 @@ export interface AppSettings {
 }
 
 /**
- * Base store interface providing common error handling and loading state functionality.
+ * Base store interface providing common error handling and loading state
+ * functionality.
  *
  * @remarks
  * Standard error handling and loading state pattern used across all stores.
@@ -55,12 +56,14 @@ export interface BaseStore {
 export type ChartTimeRange = "1h" | "7d" | "24h" | "30d";
 
 /**
- * Store composition utility type for extracting action methods from store interfaces.
+ * Store composition utility type for extracting action methods from store
+ * interfaces.
  *
  * @remarks
- * This utility type extracts only the function properties (actions) from a store
- * interface, filtering out state properties. It's useful for creating action-only
- * interfaces or for dependency injection patterns where only actions are needed.
+ * This utility type extracts only the function properties (actions) from a
+ * store interface, filtering out state properties. It's useful for creating
+ * action-only interfaces or for dependency injection patterns where only
+ * actions are needed.
  *
  * @example
  * ```typescript
@@ -82,12 +85,14 @@ export type StoreActions<T> = {
 };
 
 /**
- * Store state utility type for extracting state properties from store interfaces.
+ * Store state utility type for extracting state properties from store
+ * interfaces.
  *
  * @remarks
- * This utility type extracts only the non-function properties (state) from a store
- * interface, filtering out action methods. It's useful for creating state-only
- * interfaces or for serialization purposes where only data needs to be preserved.
+ * This utility type extracts only the non-function properties (state) from a
+ * store interface, filtering out action methods. It's useful for creating
+ * state-only interfaces or for serialization purposes where only data needs to
+ * be preserved.
  *
  * @example
  * ```typescript
@@ -130,9 +135,10 @@ export type UpdateStatus =
  *
  * @remarks
  * These types are re-exported from the shared/types module to provide a single
- * import location for commonly used domain types across the frontend application.
- * This improves developer experience by reducing the need for multiple import
- * statements and provides consistency in type usage across components.
+ * import location for commonly used domain types across the frontend
+ * application. This improves developer experience by reducing the need for
+ * multiple import statements and provides consistency in type usage across
+ * components.
  *
  * The re-exported types include:
  * - Monitor: Individual monitoring configuration interface

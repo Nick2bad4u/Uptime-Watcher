@@ -32,7 +32,8 @@ export function getIconColorClass(color?: string): string | undefined {
             return "themed-icon--warning";
         }
         default: {
-            // If it's a hex or rgb(a) or custom string, fallback to inline style
+            // If it's a hex or rgb(a) or custom string, fallback to inline
+            // style
             return undefined;
         }
     }

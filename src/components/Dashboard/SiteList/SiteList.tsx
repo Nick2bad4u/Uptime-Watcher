@@ -47,7 +47,8 @@ export const SiteList = (): JSX.Element => {
     return (
         <div className={containerClassName}>
             {sites.map((site) => (
-                // Note: site.identifier is guaranteed to be unique as per Site interface
+                // Note: site.identifier is guaranteed to be unique as per Site
+                // interface
                 <SiteCard key={site.identifier} site={site} />
             ))}
         </div>

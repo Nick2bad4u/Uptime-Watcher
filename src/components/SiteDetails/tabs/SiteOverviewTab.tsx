@@ -1,7 +1,7 @@
 /**
  * Site Overview tab component for displaying comprehensive site information.
- * Provides an overview of the entire site including all monitors, general statistics,
- * and site-level actions.
+ * Provides an overview of the entire site including all monitors, general
+ * statistics, and site-level actions.
  */
 
 import type { Monitor, Site } from "@shared/types";

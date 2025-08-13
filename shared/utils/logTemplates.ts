@@ -1,5 +1,6 @@
 /**
- * Standardized log message templates for consistent logging across the application.
+ * Standardized log message templates for consistent logging across the
+ * application.
  *
  * @remarks
  * This module provides templates for common log messages to ensure consistency

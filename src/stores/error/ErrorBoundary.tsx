@@ -1,11 +1,12 @@
 /**
- * Error boundary component for graceful error handling in React component trees.
+ * Error boundary component for graceful error handling in React component
+ * trees.
  *
  * @remarks
- * This component implements React's error boundary pattern to catch JavaScript errors
- * anywhere in the child component tree, log those errors, and display a fallback UI
- * instead of the component tree that crashed. It's specifically designed for store-related
- * and critical UI error scenarios.
+ * This component implements React's error boundary pattern to catch JavaScript
+ * errors anywhere in the child component tree, log those errors, and display a
+ * fallback UI instead of the component tree that crashed. It's specifically
+ * designed for store-related and critical UI error scenarios.
  *
  * Key features:
  * - Automatic error logging with contextual information
@@ -14,9 +15,10 @@
  * - Integration with application logging infrastructure
  * - TypeScript support with proper error type handling
  *
- * The error boundary follows React's best practices and provides a user-friendly way
- * to handle unexpected errors without crashing the entire application. It's particularly
- * useful around store-connected components where state errors might occur.
+ * The error boundary follows React's best practices and provides a
+ * user-friendly way to handle unexpected errors without crashing the entire
+ * application. It's particularly useful around store-connected components
+ * where state errors might occur.
  *
  * @example
  * ```tsx
@@ -48,7 +50,8 @@ import logger from "../../services/logger";
  * Props for the {@link ErrorBoundary} component.
  *
  * @remarks
- * Accepts children to render, an optional fallback component for error display, and an optional error handler callback.
+ * Accepts children to render, an optional fallback component for error
+ * display, and an optional error handler callback.
  *
  * @public
  */
@@ -80,7 +83,9 @@ export interface ErrorBoundaryState {
  * Error boundary component for wrapping store-connected components.
  *
  * @remarks
- * Catches errors in child components, logs them, and displays a fallback UI. Supports custom fallback components and error handling callbacks. Used to wrap store-connected or critical UI components.
+ * Catches errors in child components, logs them, and displays a fallback UI.
+ * Supports custom fallback components and error handling callbacks. Used to
+ * wrap store-connected or critical UI components.
  *
  * @example
  * ```tsx

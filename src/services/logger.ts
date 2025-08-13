@@ -1,13 +1,15 @@
 /**
- * Centralized logging service using electron-log for consistent logging across processes.
+ * Centralized logging service using electron-log for consistent logging across
+ * processes.
  *
  * @remarks
  * Provides structured logging functionality organized by functional domains
  * (app, site, monitor, store) for contextual logging that's easy to filter.
  *
- * Uses electron-log/renderer for proper renderer process logging that automatically
- * forwards logs to the main process via IPC for centralized file logging while
- * maintaining console output in the renderer process for development.
+ * Uses electron-log/renderer for proper renderer process logging that
+ * automatically forwards logs to the main process via IPC for centralized file
+ * logging while maintaining console output in the renderer process for
+ * development.
  *
  * @packageDocumentation
  */
@@ -125,9 +127,10 @@ function getLogTransport<K extends keyof LogTransports>(
 // Configure electron-log for renderer process
 // The /renderer import is specifically chosen because:
 // 1. It handles IPC communication with main process automatically
-// 2. Provides console logging in renderer while forwarding to main for file logging
-// 3. Avoids direct file access conflicts that would occur with main process logging
-// Check if we're in production mode (Vite sets MODE to 'production' in production builds)
+// 2. Provides console logging in renderer while forwarding to main for file
+// logging 3. Avoids direct file access conflicts that would occur with main
+// process logging Check if we're in production mode (Vite sets MODE to
+// 'production' in production builds)
 const metaEnv = import.meta as { env?: { MODE?: string } };
 const isProduction = metaEnv.env?.MODE === "production";
 log.transports.console.level = isProduction ? "info" : "debug";

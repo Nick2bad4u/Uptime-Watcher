@@ -9,25 +9,22 @@ import { validateMonitorFieldClientSide } from "../../../utils/monitorValidation
 import logger from "../../../services/logger";
 
 // Mock all dependencies
-vi.mock("../../../stores/sites/useSitesStore");
-vi.mock("../../../stores/error/useErrorStore");
-vi.mock("../../../stores/ui/useUiStore");
-vi.mock("../../../hooks/site/useSiteAnalytics");
-vi.mock("../../../utils/monitorValidation");
-vi.mock("../../../services/logger");
+vi.mock("@/hooks/useSelectedSite");
+vi.mock("@/stores/sites/useSitesStore");
+vi.mock("@/stores/monitor/useMonitorTypesStore");
+vi.mock("@/shared/validation/validatorUtils");
+vi.mock("@/services/logger");
 
+const mockUseSelectedSite = vi.mocked(useSelectedSite);
 const mockUseSitesStore = vi.mocked(useSitesStore);
-const mockUseErrorStore = vi.mocked(useErrorStore);
-const mockUseUIStore = vi.mocked(useUIStore);
-const mockUseSiteAnalytics = vi.mocked(useSiteAnalytics);
+const mockUseMonitorTypesStore = vi.mocked(useMonitorTypesStore);
 const mockValidateMonitorFieldClientSide = vi.mocked(validateMonitorFieldClientSide);
 const mockLogger = vi.mocked(logger);
 
-describe("useSiteDetails - Branch Coverage Tests", () => {
+describe("useSiteDetails - Branch Coverage", () => {
     const mockSite = {
         identifier: "test-site",
         name: "Test Site",
-        monitoring: false,
         monitors: [
             {
                 id: "monitor-1",
@@ -36,79 +33,94 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 timeout: 5000,
                 retryAttempts: 3,
                 url: "https://example.com",
-                monitoring: false,
+                isMonitoring: false,
             },
         ],
     };
 
     const mockSitesStore = {
-        sites: [mockSite],
-        getSelectedMonitorId: vi.fn(() => "monitor-1"),
-        setSelectedMonitorId: vi.fn(),
-        checkSiteNow: vi.fn(),
         startSiteMonitorMonitoring: vi.fn(),
         stopSiteMonitorMonitoring: vi.fn(),
         updateSiteCheckInterval: vi.fn(),
         updateMonitorTimeout: vi.fn(),
         updateMonitorRetryAttempts: vi.fn(),
         modifySite: vi.fn(),
-        deleteSite: vi.fn(),
-        removeMonitorFromSite: vi.fn(),
-        startSiteMonitoring: vi.fn(),
-        stopSiteMonitoring: vi.fn(),
-    };
-
-    const mockErrorStore = {
-        isLoading: false,
+        checkSiteNow: vi.fn(),
+        error: null,
         clearError: vi.fn(),
     };
 
-    const mockUIStore = {
-        activeSiteDetailsTab: "overview",
-        showAdvancedMetrics: false,
-        siteDetailsChartTimeRange: "1h" as const,
-        setActiveSiteDetailsTab: vi.fn(),
-        setShowAdvancedMetrics: vi.fn(),
-        setSiteDetailsChartTimeRange: vi.fn(),
-    };
-
-    const mockAnalytics = {
-        chartData: [],
-        isLoading: false,
-        error: null,
+    const mockMonitorTypesStore = {
+        getDisplayName: vi.fn(() => "HTTP"),
     };
 
     beforeEach(() => {
         vi.clearAllMocks();
         
+        mockUseSelectedSite.mockReturnValue({
+            selectedSite: mockSite,
+            selectedMonitorId: "monitor-1",
+            selectedMonitor: mockSite.monitors[0],
+        });
+
         mockUseSitesStore.mockReturnValue(mockSitesStore);
-        mockUseErrorStore.mockReturnValue(mockErrorStore);
-        mockUseUIStore.mockReturnValue(mockUIStore);
-        mockUseSiteAnalytics.mockReturnValue(mockAnalytics);
+        mockUseMonitorTypesStore.mockReturnValue(mockMonitorTypesStore);
         
-        // Mock logger methods
         mockLogger.user = {
             action: vi.fn(),
-            settingsChange: vi.fn(),
         };
         mockLogger.site = {
-            added: vi.fn(),
-            check: vi.fn(),
             error: vi.fn(),
-            removed: vi.fn(),
-            statusChange: vi.fn(),
         };
     });
 
-    describe("Validation Error Paths", () => {
-        it("should handle validation failure for check interval", async () => {
+    describe("handleStartMonitoring", () => {
+        it("should handle successful start monitoring (lines 420-430)", async () => {
+            const { result } = renderHook(() => useSiteDetails());
+
+            await act(async () => {
+                await result.current.handleStartMonitoring();
+            });
+
+            expect(mockSitesStore.startSiteMonitorMonitoring).toHaveBeenCalledWith(
+                "test-site",
+                "monitor-1"
+            );
+            expect(mockLogger.user.action).toHaveBeenCalledWith("Started monitoring", {
+                monitorId: "monitor-1",
+                siteId: "test-site",
+            });
+        });
+    });
+
+    describe("handleStopMonitoring", () => {
+        it("should handle successful stop monitoring (lines 434-450)", async () => {
+            const { result } = renderHook(() => useSiteDetails());
+
+            await act(async () => {
+                await result.current.handleStopMonitoring();
+            });
+
+            expect(mockSitesStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith(
+                "test-site",
+                "monitor-1"
+            );
+            expect(mockLogger.user.action).toHaveBeenCalledWith("Stopped monitoring", {
+                monitorId: "monitor-1",
+                siteId: "test-site",
+            });
+        });
+    });
+
+    describe("handleSaveInterval - validation error path", () => {
+        it("should handle validation failure for check interval (lines 484-492)", async () => {
             // Mock validation failure
             mockValidateMonitorFieldClientSide.mockResolvedValue({
                 success: false,
                 errors: ["Invalid interval value"],
             });
 
-            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
+            const { result } = renderHook(() => useSiteDetails());
 
             // Set up the interval change first
             act(() => {
@@ -122,73 +134,22 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 act(async () => {
                     await result.current.handleSaveInterval();
                 })
-            ).rejects.toThrow();
+            ).rejects.toThrow("Validation failed: Invalid interval value");
 
-            expect(mockLogger.site.error).toHaveBeenCalled();
+            expect(mockLogger.site.error).toHaveBeenCalledWith(
+                "test-site",
+                expect.any(Error)
+            );
         });
 
-        it("should handle validation failure for timeout", async () => {
-            // Mock validation failure
-            mockValidateMonitorFieldClientSide.mockResolvedValue({
-                success: false,
-                errors: ["Invalid timeout value"],
-            });
-
-            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
-
-            // Set up the timeout change first
-            act(() => {
-                result.current.handleTimeoutChange({
-                    target: { value: "1" }
-                } as React.ChangeEvent<HTMLInputElement>);
-            });
-
-            // Now try to save and expect it to throw
-            await expect(
-                act(async () => {
-                    await result.current.handleSaveTimeout();
-                })
-            ).rejects.toThrow();
-
-            expect(mockLogger.site.error).toHaveBeenCalled();
-        });
-
-        it("should handle validation failure for retry attempts", async () => {
-            // Mock validation failure
-            mockValidateMonitorFieldClientSide.mockResolvedValue({
-                success: false,
-                errors: ["Invalid retry attempts value"],
-            });
-
-            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
-
-            // Set up the retry attempts change first
-            act(() => {
-                result.current.handleRetryAttemptsChange({
-                    target: { value: "10" }
-                } as React.ChangeEvent<HTMLInputElement>);
-            });
-
-            // Now try to save and expect it to throw
-            await expect(
-                act(async () => {
-                    await result.current.handleSaveRetryAttempts();
-                })
-            ).rejects.toThrow();
-
-            expect(mockLogger.site.error).toHaveBeenCalled();
-        });
-    });
-
-    describe("Successful Save Operations", () => {
-        it("should handle successful interval save", async () => {
+        it("should handle successful interval save (lines 494-508)", async () => {
             // Mock validation success
             mockValidateMonitorFieldClientSide.mockResolvedValue({
                 success: true,
                 errors: [],
             });
 
-            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
+            const { result } = renderHook(() => useSiteDetails());
 
             // Set up the interval change first
             act(() => {
@@ -212,15 +173,46 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 siteId: "test-site",
             });
         });
+    });
 
-        it("should handle successful timeout save", async () => {
+    describe("handleSaveTimeout - validation error path", () => {
+        it("should handle validation failure for timeout (lines 534-542)", async () => {
+            // Mock validation failure
+            mockValidateMonitorFieldClientSide.mockResolvedValue({
+                success: false,
+                errors: ["Invalid timeout value"],
+            });
+
+            const { result } = renderHook(() => useSiteDetails());
+
+            // Set up the timeout change first
+            act(() => {
+                result.current.handleTimeoutChange({
+                    target: { value: "1" }
+                } as React.ChangeEvent<HTMLInputElement>);
+            });
+
+            // Now try to save and expect it to throw
+            await expect(
+                act(async () => {
+                    await result.current.handleSaveTimeout();
+                })
+            ).rejects.toThrow("Validation failed: Invalid timeout value");
+
+            expect(mockLogger.site.error).toHaveBeenCalledWith(
+                "test-site",
+                expect.any(Error)
+            );
+        });
+
+        it("should handle successful timeout save (lines 544-558)", async () => {
             // Mock validation success
             mockValidateMonitorFieldClientSide.mockResolvedValue({
                 success: true,
                 errors: [],
             });
 
-            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
+            const { result } = renderHook(() => useSiteDetails());
 
             // Set up the timeout change first
             act(() => {
@@ -244,15 +236,46 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 siteId: "test-site",
             });
         });
+    });
 
-        it("should handle successful retry attempts save", async () => {
+    describe("handleSaveRetryAttempts - validation error path", () => {
+        it("should handle validation failure for retry attempts (lines 584-595)", async () => {
+            // Mock validation failure
+            mockValidateMonitorFieldClientSide.mockResolvedValue({
+                success: false,
+                errors: ["Invalid retry attempts value"],
+            });
+
+            const { result } = renderHook(() => useSiteDetails());
+
+            // Set up the retry attempts change first
+            act(() => {
+                result.current.handleRetryAttemptsChange({
+                    target: { value: "10" }
+                } as React.ChangeEvent<HTMLInputElement>);
+            });
+
+            // Now try to save and expect it to throw
+            await expect(
+                act(async () => {
+                    await result.current.handleSaveRetryAttempts();
+                })
+            ).rejects.toThrow("Validation failed: Invalid retry attempts value");
+
+            expect(mockLogger.site.error).toHaveBeenCalledWith(
+                "test-site",
+                expect.any(Error)
+            );
+        });
+
+        it("should handle successful retry attempts save (lines 597-608)", async () => {
             // Mock validation success
             mockValidateMonitorFieldClientSide.mockResolvedValue({
                 success: true,
                 errors: [],
             });
 
-            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
+            const { result } = renderHook(() => useSiteDetails());
 
             // Set up the retry attempts change first
             act(() => {
@@ -278,45 +301,9 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
         });
     });
 
-    describe("Monitoring Operations", () => {
-        it("should handle start monitoring", async () => {
-            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
-
-            await act(async () => {
-                await result.current.handleStartMonitoring();
-            });
-
-            expect(mockSitesStore.startSiteMonitorMonitoring).toHaveBeenCalledWith(
-                "test-site",
-                "monitor-1"
-            );
-            expect(mockLogger.user.action).toHaveBeenCalledWith("Started monitoring", {
-                monitorId: "monitor-1",
-                siteId: "test-site",
-            });
-        });
-
-        it("should handle stop monitoring", async () => {
-            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
-
-            await act(async () => {
-                await result.current.handleStopMonitoring();
-            });
-
-            expect(mockSitesStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith(
-                "test-site",
-                "monitor-1"
-            );
-            expect(mockLogger.user.action).toHaveBeenCalledWith("Stopped monitoring", {
-                monitorId: "monitor-1",
-                siteId: "test-site",
-            });
-        });
-    });
-
-    describe("Name Save Handling", () => {
-        it("should handle early return when no unsaved changes", async () => {
-            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
+    describe("handleSaveName - early return path", () => {
+        it("should handle early return when no unsaved changes (lines 624-627)", async () => {
+            const { result } = renderHook(() => useSiteDetails());
 
             // Don't make any name changes, so hasUnsavedChanges should be false
             await act(async () => {
@@ -327,12 +314,14 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
             expect(mockSitesStore.modifySite).not.toHaveBeenCalled();
         });
 
-        it("should handle successful name save with trimmed name", async () => {
-            const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
+        it("should handle successful name save with trimmed name (lines 629-639)", async () => {
+            const { result } = renderHook(() => useSiteDetails());
 
             // Make a name change to trigger hasUnsavedChanges
             act(() => {
-                result.current.setLocalName("  New Site Name  ");
+                result.current.handleNameChange({
+                    target: { value: "  New Site Name  " }
+                } as React.ChangeEvent<HTMLInputElement>);
             });
 
             await act(async () => {
@@ -349,7 +338,7 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
         });
     });
 
-    describe("Edge Cases", () => {
+    describe("Edge case validations", () => {
         it("should handle missing monitor type in validation (fallback to 'http')", async () => {
             // Create a monitor without type to test the fallback
             const siteWithoutType = {
@@ -360,17 +349,23 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                     timeout: 5000,
                     retryAttempts: 3,
                     url: "https://example.com",
-                    monitoring: false,
+                    isMonitoring: false,
                     // No type property
                 }],
             };
+
+            mockUseSelectedSite.mockReturnValue({
+                selectedSite: siteWithoutType,
+                selectedMonitorId: "monitor-1",
+                selectedMonitor: siteWithoutType.monitors[0],
+            });
 
             mockValidateMonitorFieldClientSide.mockResolvedValue({
                 success: true,
                 errors: [],
             });
 
-            const { result } = renderHook(() => useSiteDetails({ site: siteWithoutType }));
+            const { result } = renderHook(() => useSiteDetails());
 
             act(() => {
                 result.current.handleIntervalChange({

@@ -1,6 +1,6 @@
 /**
- * ThemeManager class for handling theme selection, system preference detection,
- * and theme switching throughout the application.
+ * ThemeManager class for handling theme selection, system preference
+ * detection, and theme switching throughout the application.
  *
  * Note: Empty constructor and no-op functions are intentional design patterns.
  */
@@ -15,7 +15,8 @@ import { deepMergeTheme } from "./utils/themeMerging";
 
 /**
  * Singleton service for managing application themes.
- * Handles theme selection, system preference detection, and automatic switching.
+ * Handles theme selection, system preference detection, and automatic
+ * switching.
  */
 export class ThemeManager {
     /** Singleton instance */
@@ -58,9 +59,10 @@ export class ThemeManager {
      * @returns New theme with deep-merged properties
      *
      * @remarks
-     * This method performs a deep merge of the override properties into the base theme,
-     * ensuring that nested objects are properly merged rather than replaced entirely.
-     * This allows for granular customization while preserving unmodified properties.
+     * This method performs a deep merge of the override properties into the
+     * base theme, ensuring that nested objects are properly merged rather than
+     * replaced entirely. This allows for granular customization while
+     * preserving unmodified properties.
      */
     public createCustomTheme(
         baseTheme: Theme,
@@ -90,8 +92,8 @@ export class ThemeManager {
      * @returns Array of available theme names including system
      *
      * @remarks
-     * Dynamically generates the list from the themes object to ensure consistency.
-     * Always includes "system" for automatic theme detection.
+     * Dynamically generates the list from the themes object to ensure
+     * consistency. Always includes "system" for automatic theme detection.
      */
     public getAvailableThemes(): ThemeName[] {
         const themeNames = Object.keys(themes) as ThemeName[];
@@ -192,7 +194,8 @@ export class ThemeManager {
         if (typeof theme.colors === "object" && theme.colors !== null) {
             for (const [category, colors] of Object.entries(theme.colors)) {
                 if (typeof colors === "object" && colors !== null) {
-                    // Type-safe access to color values - colors are either string or nested color objects
+                    // Type-safe access to color values - colors are either
+                    // string or nested color objects
                     for (const [key, value] of Object.entries(
                         colors as Record<string, string>
                     )) {
@@ -235,7 +238,8 @@ export class ThemeManager {
      * Add typography CSS variables from theme.
      */
     private addTypographyVariables(theme: Theme, variables: string[]): void {
-        // Typography - all themes have typography property with required sub-properties
+        // Typography - all themes have typography property with required
+        // sub-properties
         if (typeof theme.typography === "object" && theme.typography !== null) {
             this.addFontSizeVariables(theme.typography, variables);
             this.addFontWeightVariables(theme.typography, variables);
@@ -319,7 +323,8 @@ export class ThemeManager {
         if (typeof colors === "object" && colors !== null) {
             for (const [category, colorValue] of Object.entries(colors)) {
                 if (typeof colorValue === "object" && colorValue !== null) {
-                    // Type-safe access to color values - colorValue is a nested color object with string values
+                    // Type-safe access to color values - colorValue is a
+                    // nested color object with string values
                     for (const [key, value] of Object.entries(
                         colorValue as Record<string, string>
                     )) {

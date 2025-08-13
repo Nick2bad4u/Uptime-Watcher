@@ -2,9 +2,9 @@
  * Comprehensive type guard utilities for enhanced type safety.
  *
  * @remarks
- * This module provides centralized type checking logic using proper TypeScript type predicates.
- * Each utility function is a type guard that narrows the type of the checked value.
- * All TSDoc tags follow the official TSDoc standard.
+ * This module provides centralized type checking logic using proper TypeScript
+ * type predicates. Each utility function is a type guard that narrows the type
+ * of the checked value. All TSDoc tags follow the official TSDoc standard.
  *
  * @packageDocumentation
  */
@@ -131,7 +131,8 @@ export function isError(value: unknown): value is Error {
 }
 
 /**
- * Determines if a value is a finite number (excludes `Infinity` and `-Infinity`).
+ * Determines if a value is a finite number (excludes `Infinity` and
+ * `-Infinity`).
  *
  * @param value - The value to check.
  * @returns True if `value` is a finite number; otherwise, false.

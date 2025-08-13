@@ -1,10 +1,12 @@
 /**
- * Shared Zod validation schemas and validation utilities for monitor and site data.
+ * Shared Zod validation schemas and validation utilities for monitor and site
+ * data.
  *
  * @remarks
- * These schemas and functions are used by both frontend and backend to ensure data integrity.
- * Validation constraints are synchronized with UI constants in {@link constants.ts}.
- * All validation logic is centralized here for consistency and maintainability.
+ * These schemas and functions are used by both frontend and backend to ensure
+ * data integrity. Validation constraints are synchronized with UI constants in
+ * {@link constants.ts}. All validation logic is centralized here for
+ * consistency and maintainability.
  */
 
 import type {
@@ -114,7 +116,8 @@ export const baseMonitorSchema: BaseMonitorSchemaType = z.object({
  * Zod schema for HTTP monitor fields.
  *
  * @remarks
- * Extends {@link baseMonitorSchema} and adds the `url` field with robust validation.
+ * Extends {@link baseMonitorSchema} and adds the `url` field with robust
+ * validation.
  */
 export const httpMonitorSchema: HttpMonitorSchemaType =
     baseMonitorSchema.extend({
@@ -139,7 +142,8 @@ export const httpMonitorSchema: HttpMonitorSchemaType =
  * Zod schema for port monitor fields.
  *
  * @remarks
- * Extends {@link baseMonitorSchema} and adds `host` and `port` fields with strict validation.
+ * Extends {@link baseMonitorSchema} and adds `host` and `port` fields with
+ * strict validation.
  */
 export const portMonitorSchema: PortMonitorSchemaType =
     baseMonitorSchema.extend({
@@ -154,7 +158,8 @@ export const portMonitorSchema: PortMonitorSchemaType =
  * Zod schema for ping monitor fields.
  *
  * @remarks
- * Extends {@link baseMonitorSchema} and adds `host` field with strict validation.
+ * Extends {@link baseMonitorSchema} and adds `host` field with strict
+ * validation.
  */
 export const pingMonitorSchema: PingMonitorSchemaType =
     baseMonitorSchema.extend({
@@ -249,7 +254,8 @@ export type PortMonitor = z.infer<typeof portMonitorSchema>;
  */
 export type Site = z.infer<typeof siteSchema>;
 
-// ValidationResult type available for consumers via direct import from ../types/validation
+// ValidationResult type available for consumers via direct import from
+// ../types/validation
 
 /**
  * Gets the appropriate Zod schema for a monitor type.
@@ -319,7 +325,8 @@ function validateFieldWithSchema(
  *
  * @remarks
  * Selects the schema based on monitor type ("http" or "port").
- * Returns a {@link ValidationResult} with success status, validated data, errors, and warnings.
+ * Returns a {@link ValidationResult} with success status, validated data,
+ * errors, and warnings.
  *
  * @param type - The monitor type string ("http" or "port").
  * @param data - The monitor data to validate.
@@ -410,7 +417,8 @@ export function validateMonitorData(
  * Validates a specific field of a monitor using the appropriate schema.
  *
  * @remarks
- * Useful for real-time validation during form input. Only validates the specified field.
+ * Useful for real-time validation during form input. Only validates the
+ * specified field.
  *
  * @param type - The monitor type string ("http" or "port").
  * @param fieldName - The name of the field to validate.

@@ -1,6 +1,7 @@
 /**
- * Analytics tab component providing comprehensive monitoring statistics and visualizations.
- * Displays advanced metrics, charts, and performance analysis for site monitoring.
+ * Analytics tab component providing comprehensive monitoring statistics and
+ * visualizations. Displays advanced metrics, charts, and performance analysis
+ * for site monitoring.
  */
 
 import type { MonitorType } from "@shared/types";
@@ -108,7 +109,8 @@ export interface AnalyticsTabProperties {
 }
 
 /**
- * Analytics tab component displaying comprehensive monitoring analytics and visualizations.
+ * Analytics tab component displaying comprehensive monitoring analytics and
+ * visualizations.
  *
  * Features:
  * - Multiple chart types (line, bar, doughnut) for different metrics
@@ -222,7 +224,8 @@ export const AnalyticsTab = ({
 
     const iconColors = getIconColors();
     const variant = getVariant(uptimeValue);
-    // Map variant to progress/badge variant - "danger" becomes "error" for UI consistency
+    // Map variant to progress/badge variant - "danger" becomes "error" for UI
+    // consistency
     const progressVariant = variant === "danger" ? "error" : variant;
 
     // Memoized event handlers

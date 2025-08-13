@@ -1,10 +1,12 @@
 /**
- * React hook for mount and unmount lifecycle management with StrictMode compatibility.
+ * React hook for mount and unmount lifecycle management with StrictMode
+ * compatibility.
  *
  * @remarks
- * This hook provides a clean alternative to useEffect with an empty dependency array
- * for component lifecycle management. It's specifically designed to handle React's
- * StrictMode development behavior where effects can run multiple times.
+ * This hook provides a clean alternative to useEffect with an empty dependency
+ * array for component lifecycle management. It's specifically designed to
+ * handle React's StrictMode development behavior where effects can run
+ * multiple times.
  *
  * Key features:
  * - Prevents duplicate execution in React StrictMode

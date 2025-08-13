@@ -1,11 +1,12 @@
 /**
- * Centralized error message catalog for consistent error handling across the application.
+ * Centralized error message catalog for consistent error handling across the
+ * application.
  *
  * @remarks
- * This module provides a comprehensive collection of standardized error messages
- * organized by domain and operation type. Using these constants ensures consistent
- * error messaging across frontend, backend, and shared code while improving
- * maintainability and preventing typos.
+ * This module provides a comprehensive collection of standardized error
+ * messages organized by domain and operation type. Using these constants
+ * ensures consistent error messaging across frontend, backend, and shared code
+ * while improving maintainability and preventing typos.
  *
  * The error messages are categorized by functional domain:
  * - **Site Operations**: Site CRUD and management operations

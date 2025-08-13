@@ -2,9 +2,9 @@
  * Configuration value type definitions for the Uptime Watcher application.
  *
  * @remarks
- * These types provide better type safety for configuration values stored in the database
- * and used throughout the application. All values are stored as strings in the database
- * but represent different underlying types.
+ * These types provide better type safety for configuration values stored in
+ * the database and used throughout the application. All values are stored as
+ * strings in the database but represent different underlying types.
  *
  * @packageDocumentation
  */
@@ -102,7 +102,8 @@ export interface UIState {
  * @remarks
  * Provides better typing for cached values based on their usage domain.
  * Includes support for MonitorTypeConfig and arrays of monitor configurations.
- * All unknown types have been replaced with specific type unions for type safety.
+ * All unknown types have been replaced with specific type unions for type
+ * safety.
  *
  * @public
  */
@@ -120,8 +121,8 @@ export type CacheValue =
  * Union type representing all possible configuration values.
  *
  * @remarks
- * Configuration values are stored as strings in the database but can represent:
- * - Strings: theme names, language codes, etc.
+ * Configuration values are stored as strings in the database but can
+ * represent: - Strings: theme names, language codes, etc.
  * - Numbers: history limits, timeouts, etc. (stored as string representations)
  * - Booleans: feature flags, etc. (stored as "true"/"false")
  * - Arrays: stored as JSON strings

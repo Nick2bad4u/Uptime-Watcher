@@ -2,9 +2,9 @@
  * Zod schema type definitions for validation schemas.
  *
  * @remarks
- * These interfaces define the explicit types for Zod schemas used in validation.
- * They provide clean type annotations for isolated declarations while keeping
- * the schema definitions readable.
+ * These interfaces define the explicit types for Zod schemas used in
+ * validation. They provide clean type annotations for isolated declarations
+ * while keeping the schema definitions readable.
  *
  * @packageDocumentation
  */

@@ -2,10 +2,11 @@
  * Utilities for timeout conversion and validation.
  *
  * @remarks
- * Centralizes the logic for converting between seconds (UI) and milliseconds (backend).
- * Provides validation and clamping functions to ensure timeouts are within acceptable ranges.
- * The UI displays timeouts in seconds for better user experience, while the backend
- * uses milliseconds for precision in network operations.
+ * Centralizes the logic for converting between seconds (UI) and milliseconds
+ * (backend). Provides validation and clamping functions to ensure timeouts are
+ * within acceptable ranges. The UI displays timeouts in seconds for better
+ * user experience, while the backend uses milliseconds for precision in
+ * network operations.
  *
  * @packageDocumentation
  */

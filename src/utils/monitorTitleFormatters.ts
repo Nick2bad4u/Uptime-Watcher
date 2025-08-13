@@ -80,10 +80,11 @@ export function formatTitleSuffix(monitor: Monitor): string {
  * @param formatter - The formatter function that takes a monitor and returns a suffix string
  *
  * @remarks
- * This function allows dynamic registration of title suffix formatters for different monitor types.
- * The formatter function will be called with a monitor object and should return a string suffix
- * to be appended to monitor titles for display purposes. If a formatter already exists for the
- * monitor type, it will be replaced with the new formatter.
+ * This function allows dynamic registration of title suffix formatters for
+ * different monitor types. The formatter function will be called with a
+ * monitor object and should return a string suffix to be appended to monitor
+ * titles for display purposes. If a formatter already exists for the monitor
+ * type, it will be replaced with the new formatter.
  *
  * @example
  * ```typescript

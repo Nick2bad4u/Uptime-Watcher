@@ -2,9 +2,10 @@
  * Monitor configuration type definitions for Uptime Watcher.
  *
  * @remarks
- * These interfaces provide type-safe configuration structures for different monitor types.
- * Each monitor type has its own specific configuration interface that extends the base configuration.
- * This ensures proper validation and type checking throughout the monitoring system.
+ * These interfaces provide type-safe configuration structures for different
+ * monitor types. Each monitor type has its own specific configuration
+ * interface that extends the base configuration. This ensures proper
+ * validation and type checking throughout the monitoring system.
  *
  * @packageDocumentation
  */
@@ -212,7 +213,8 @@ export interface PingMonitorConfig extends BaseMonitorConfig {
  *
  * @remarks
  * Used to return validation results for monitor configurations.
- * Import directly from "./validation" for MonitorConfigValidationResult if needed.
+ * Import directly from "./validation" for MonitorConfigValidationResult if
+ * needed.
  *
  * @public
  */
@@ -251,7 +253,8 @@ export interface PortMonitorConfig extends BaseMonitorConfig {
  *
  * @remarks
  * Use this type when you need to handle configuration for any monitor type.
- * TypeScript will ensure type safety through discriminated unions based on the `type` field.
+ * TypeScript will ensure type safety through discriminated unions based on the
+ * `type` field.
  *
  * @public
  */
