@@ -24,7 +24,6 @@
 /* eslint-disable sort-imports */
 /* eslint-disable capitalized-comments */
 
-
 import { importX } from "eslint-plugin-import-x";
 import { plugin as ex } from "eslint-plugin-exception-handling";
 import * as nodeDependenciesPlugin from "eslint-plugin-node-dependencies";
@@ -117,7 +116,6 @@ import pluginFormatSQL from "eslint-plugin-format-sql";
 import pluginNeverThrow from "eslint-plugin-neverthrow";
 import pluginNoExplicitTypeExports from "eslint-plugin-no-explicit-type-exports";
 import pluginDeprecation from "eslint-plugin-deprecation";
-
 
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 
@@ -638,7 +636,7 @@ export default [
             "prefer-arrow-callback": "off",
             "no-undef-init": "off",
             "object-shorthand": "off",
-            "camelcase": "off",
+            camelcase: "off",
             "max-classes-per-file": "off",
 
             "deprecation/deprecation": "error",
@@ -1784,7 +1782,7 @@ export default [
             "prefer-arrow-callback": "off",
             "no-undef-init": "off",
             "object-shorthand": "off",
-            "camelcase": "off",
+            camelcase: "off",
             "max-classes-per-file": "off",
 
             "deprecation/deprecation": "error",

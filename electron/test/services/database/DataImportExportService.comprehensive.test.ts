@@ -61,7 +61,10 @@ import {
 } from "../../../utils/database/DataImportExportService";
 import { SiteLoadingError } from "../../../utils/database/interfaces";
 import { withDatabaseOperation } from "../../../utils/operationalHooks";
-import { safeJsonParse, safeJsonStringifyWithFallback } from "@shared/utils/jsonSafety";
+import {
+    safeJsonParse,
+    safeJsonStringifyWithFallback,
+} from "@shared/utils/jsonSafety";
 
 // Mock interfaces and types
 interface MockDatabase {
@@ -155,9 +158,11 @@ describe("DataImportExportService", () => {
 
         // Setup database service mock with proper executeTransaction implementation
         mockDatabaseService = {
-            executeTransaction: vi.fn().mockImplementation(async (operation) => {
-                return await operation(mockDatabase);
-            }),
+            executeTransaction: vi
+                .fn()
+                .mockImplementation(async (operation) => {
+                    return await operation(mockDatabase);
+                }),
         };
 
         // Setup event emitter mock
@@ -1031,7 +1036,9 @@ describe("DataImportExportService", () => {
             });
             mockEventEmitter.emitTyped.mockRejectedValue(emitError);
 
-            await expect(service.importDataFromJson("invalid")).rejects.toThrow(emitError);
+            await expect(service.importDataFromJson("invalid")).rejects.toThrow(
+                emitError
+            );
         });
 
         it("should handle withDatabaseOperation failures", async () => {

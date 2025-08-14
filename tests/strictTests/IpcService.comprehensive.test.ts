@@ -6,10 +6,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import {
-    ipcMain,
-    BrowserWindow,
-} from "electron";
+import { ipcMain, BrowserWindow } from "electron";
 import type { IpcMainInvokeEvent, IpcMainEvent } from "electron";
 
 import { IpcService } from "../../electron/services/ipc/IpcService";

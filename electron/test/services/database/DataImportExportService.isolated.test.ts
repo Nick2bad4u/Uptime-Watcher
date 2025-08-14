@@ -170,7 +170,9 @@ describe("DataImportExportService - Isolated Tests", () => {
         };
 
         // Import the service class dynamically to avoid hoisting issues
-        const { DataImportExportService } = await import("../../../utils/database/DataImportExportService");
+        const { DataImportExportService } = await import(
+            "../../../utils/database/DataImportExportService"
+        );
         service = new DataImportExportService(mockConfig);
     });
 
