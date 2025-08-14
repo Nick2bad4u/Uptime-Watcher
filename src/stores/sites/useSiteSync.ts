@@ -167,8 +167,9 @@ export interface SiteSyncDependencies {
 
 // Create a shared status update manager instance - will be initialized when
 // first used
-// eslint-disable-next-line @typescript-eslint/init-declarations -- Intentional lazy initialization to create singleton instance only when needed, avoiding unnecessary object creation
-let statusUpdateManager: StatusUpdateManager | undefined;
+// Singleton instance management for status updates, lazily initialized to
+// avoid unnecessary object creation
+const statusUpdateManager: { instance?: StatusUpdateManager } = {};
 
 /**
  * Creates site synchronization actions with injected dependencies.
@@ -237,7 +238,7 @@ export const createSiteSyncActions = (
             callback: (update: StatusUpdate) => void
         ) => {
             // Initialize status update manager if not already done
-            statusUpdateManager ??= new StatusUpdateManager({
+            statusUpdateManager.instance ??= new StatusUpdateManager({
                 fullSyncFromBackend: actions.fullSyncFromBackend,
                 getSites: deps.getSites,
                 onUpdate: callback,
@@ -247,7 +248,7 @@ export const createSiteSyncActions = (
             try {
                 // Use the new efficient StatusUpdateManager that handles
                 // incremental updates
-                statusUpdateManager.subscribe();
+                statusUpdateManager.instance.subscribe();
             } catch (error) {
                 logger.error(
                     "Failed to subscribe to status updates:",
@@ -314,7 +315,7 @@ export const createSiteSyncActions = (
             );
         },
         unsubscribeFromStatusUpdates: () => {
-            statusUpdateManager?.unsubscribe();
+            statusUpdateManager.instance?.unsubscribe();
             const result = {
                 message: "Successfully unsubscribed from status updates",
                 success: true,

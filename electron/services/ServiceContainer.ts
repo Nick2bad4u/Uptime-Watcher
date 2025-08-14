@@ -455,6 +455,9 @@ export class ServiceContainer {
      */
     public getMonitorManager(): MonitorManager {
         if (!this.monitorManager) {
+            // Ensure SiteManager is created first to avoid dependency issues
+            this.getSiteManager();
+
             const monitorEventBus = new TypedEventBus<UptimeEvents>(
                 "MonitorManagerEventBus"
             );
