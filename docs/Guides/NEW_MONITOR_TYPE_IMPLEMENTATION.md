@@ -4,13 +4,17 @@
 
 This document provides a **comprehensive, step-by-step guide** for adding a new monitor type to the Uptime Watcher application. The system supports an extensible, production-ready architecture where new monitor types can be added with minimal changes to existing code while maintaining enterprise-grade quality.
 
+> **⚠️ IMPORTANT NOTE**: This guide uses **DNS monitoring as a hypothetical example** to demonstrate implementation patterns. DNS monitoring is **NOT currently implemented** in the system. The DNS examples are purely illustrative to show the proper architectural patterns, code structure, and integration requirements for adding new monitor types.
+
 ## 🔍 Current Monitor Types
 
-The system currently supports:
+The system **currently supports only these three monitor types**:
 
 - **HTTP**: Website/API monitoring (`http`) - Full HTTP/HTTPS request monitoring with status code validation
-- **Port**: TCP port connectivity monitoring (`port`) - Direct socket connection testing to specific host:port combinations
+- **Port**: TCP port connectivity monitoring (`port`) - Direct socket connection testing to specific host:port combinations  
 - **Ping**: Network connectivity monitoring (`ping`) - ICMP ping testing for network reachability
+
+**All other monitor types mentioned in this guide (such as DNS) are examples to demonstrate implementation patterns.**
 
 ## 🏗️ Architecture Integration
 
@@ -192,68 +196,227 @@ Every monitor type must support these standardized fields from the `Monitor` int
 New monitor types automatically integrate with the repository pattern through the Enhanced Monitoring System:
 
 ````typescript
+// Required imports for DNS monitor example
+import type { Site } from "@shared/types";
+import type { MonitorType } from "@shared/types";
+import { DEFAULT_REQUEST_TIMEOUT } from "@electron/constants";
+
+import type { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
+import {
+    createMonitorErrorResult,
+    extractMonitorConfig,
+    validateMonitorHost,
+} from "./shared/monitorServiceHelpers";
+
 /**
- * Monitor service implementing production-grade monitoring patterns.
+ * DNS monitor service for domain name resolution monitoring.
  *
  * @remarks
- * Monitor services focus on performing checks and returning results.
- * The Enhanced Monitoring System handles:
- * - Database operations through repository pattern
- * - Operation correlation and race condition prevention
- * - Status updates and history management
- * - Event emission and system integration
+ * Implements the {@link IMonitorService} interface to provide DNS resolution
+ * monitoring with advanced features for reliability and performance. This is
+ * an **EXAMPLE IMPLEMENTATION** to demonstrate how to add new monitor types.
+ * 
+ * **NOTE: This is a documentation example only - DNS monitoring is not currently implemented.**
+ *
+ * The service automatically handles different types of DNS failures and
+ * provides detailed error reporting for troubleshooting resolution issues.
+ * Follows the same patterns as the implemented HTTP, Port, and Ping monitors.
+ *
+ * Key features demonstrated:
+ * - Proper error handling with helper functions
+ * - Configurable timeout and retry behavior  
+ * - Detailed response time measurement
+ * - Comprehensive TSDoc documentation
+ * - Integration with the monitoring system architecture
+ * - Uses shared helper functions for consistency
  *
  * @example
  * ```typescript
- * const monitor = new DnsMonitor();
- * const result = await monitor.check(config);
- * // Enhanced system handles database persistence automatically
+ * const monitor = new DnsMonitor({
+ *   timeout: 10000,
+ *   retryAttempts: 3
+ * });
+ *
+ * const result = await monitor.check(dnsMonitorData);
+ * if (result.status === "up") {
+ *   console.log(`DNS resolution successful: ${result.responseTime}ms`);
+ * }
  * ```
+ *
+ * @public
  */
 export class DnsMonitor implements IMonitorService {
- /**
-  * Performs a DNS monitoring check.
-  *
-  * @param monitor - Monitor configuration with validated fields
-  * @returns Promise resolving to standardized check result
-  */
- async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
-  if (monitor.type !== "dns") {
-   throw new Error(`DnsMonitor cannot handle monitor type: ${monitor.type}`);
-  }
+    private config: MonitorConfig;
 
-  // Focus only on the monitoring logic
-  const startTime = performance.now();
+    /**
+     * Performs a DNS resolution check on the specified monitor.
+     *
+     * @param monitor - Monitor configuration containing hostname and DNS settings
+     * @returns Promise resolving to {@link MonitorCheckResult} with status, timing, and error data
+     *
+     * @throws {@link Error} When monitor validation fails (wrong type or missing hostname)
+     *
+     * @remarks
+     * Validates the monitor configuration before performing the DNS check,
+     * ensuring the monitor type is "dns" and a valid hostname is provided. Uses
+     * monitor-specific timeout and retry settings when available, falling back
+     * to service defaults.
+     *
+     * The check process follows the same pattern as existing monitors:
+     * 1. Validates monitor type and required fields using helper functions
+     * 2. Extracts timeout and retry configuration
+     * 3. Performs DNS resolution with retry logic
+     * 4. Returns standardized result with status, response time, and details
+     *
+     * Response time measurement includes the complete DNS resolution duration,
+     * from query initiation to completion or failure.
+     */
+    public async check(
+        monitor: Site["monitors"][0]
+    ): Promise<MonitorCheckResult> {
+        if (monitor.type !== "dns") {
+            throw new Error(
+                `DnsMonitor cannot handle monitor type: ${monitor.type}`
+            );
+        }
 
-  try {
-   // Perform DNS resolution
-   const result = await this.performDnsLookup(monitor);
-   const responseTime = performance.now() - startTime;
+        const hostError = validateMonitorHost(monitor);
+        if (hostError) {
+            return createMonitorErrorResult(hostError, 0);
+        }
 
-   return {
-    status: result.success ? "up" : "down",
-    responseTime: Math.round(responseTime),
-    details: result.details,
-    error: result.error,
-   };
-  } catch (error) {
-   const responseTime = performance.now() - startTime;
-   return {
-    status: "down",
-    responseTime: Math.round(responseTime),
-    details: "DNS lookup failed",
-    error: error instanceof Error ? error.message : String(error),
-   };
-  }
- }
+        // Hostname is guaranteed to be valid at this point due to validation above
+        if (!monitor.hostname) {
+            return createMonitorErrorResult("Monitor missing valid hostname", 0);
+        }
 
- updateConfig(config: Partial<MonitorConfig>): void {
-  this.config = { ...this.config, ...config };
- }
+        // Use type-safe utility functions following current patterns
+        const { retryAttempts, timeout } = extractMonitorConfig(
+            monitor,
+            this.config.timeout
+        );
 
- getType(): Site["monitors"][0]["type"] {
-  return "dns";
- }
+        return this.performDnsLookupWithRetry(monitor.hostname, timeout, retryAttempts);
+    }
+
+    /**
+     * Creates a new DnsMonitor instance with the specified configuration.
+     *
+     * @param config - Configuration options for the monitor service
+     *
+     * @remarks
+     * Initializes the monitor with default timeout and retry values, merging
+     * any provided configuration options. Follows the same constructor pattern
+     * as existing monitor implementations.
+     *
+     * Default configuration:
+     * - timeout: 30000ms (30 seconds) - uses DEFAULT_REQUEST_TIMEOUT constant
+     * - retryAttempts: 3
+     *
+     * @example
+     * ```typescript
+     * // Use default configuration
+     * const monitor = new DnsMonitor();
+     *
+     * // Custom configuration
+     * const monitor = new DnsMonitor({
+     *   timeout: 5000,
+     *   retryAttempts: 5
+     * });
+     * ```
+     */
+    public constructor(config: MonitorConfig = {}) {
+        this.config = {
+            timeout: DEFAULT_REQUEST_TIMEOUT,
+            ...config,
+        };
+    }
+
+    /**
+     * Get the current configuration.
+     *
+     * @returns A shallow copy of the current monitor configuration
+     *
+     * @remarks
+     * Returns a defensive shallow copy following the same pattern as existing monitors.
+     */
+    public getConfig(): MonitorConfig {
+        return { ...this.config };
+    }
+
+    /**
+     * Get the monitor type this service handles.
+     *
+     * @returns The monitor type identifier
+     *
+     * @remarks
+     * Returns the string identifier used to route monitoring requests
+     * to this service implementation. Uses the {@link MonitorType} union type
+     * for type safety and consistency across the application.
+     * 
+     * **Updated to match current implementation pattern.**
+     */
+    public getType(): MonitorType {
+        return "dns";
+    }
+
+    /**
+     * Update the configuration for this monitor service.
+     *
+     * @param config - Partial configuration to update
+     *
+     * @remarks
+     * Merges the provided configuration with the existing configuration.
+     * Only specified properties are updated; undefined properties are ignored.
+     * Used for runtime configuration updates without service recreation.
+     */
+    public updateConfig(config: Partial<MonitorConfig>): void {
+        this.config = {
+            ...this.config,
+            ...config,
+        };
+    }
+
+    /**
+     * Performs DNS lookup with retry logic.
+     * 
+     * @param hostname - The hostname to resolve
+     * @param timeout - Timeout in milliseconds
+     * @param retryAttempts - Number of retry attempts
+     * @returns Promise resolving to MonitorCheckResult
+     * 
+     * @remarks
+     * This would be implemented similar to performPingCheckWithRetry
+     * or performHttpCheckWithRetry in actual monitor implementations.
+     */
+    private async performDnsLookupWithRetry(
+        hostname: string,
+        timeout: number,
+        retryAttempts: number
+    ): Promise<MonitorCheckResult> {
+        // Implementation would go here
+        // This is just an example structure
+        const startTime = performance.now();
+        
+        try {
+            // DNS resolution logic would be implemented here
+            const responseTime = performance.now() - startTime;
+            
+            return {
+                status: "up",
+                responseTime: Math.round(responseTime),
+                details: "DNS resolution successful",
+            };
+        } catch (error) {
+            const responseTime = performance.now() - startTime;
+            return {
+                status: "down",
+                responseTime: Math.round(responseTime),
+                details: "DNS lookup failed",
+                error: error instanceof Error ? error.message : String(error),
+            };
+        }
+    }
 }
 ````
 
@@ -293,6 +456,8 @@ import { withErrorHandling } from "shared/utils/errorHandling";
  * The system uses Zod schemas for type-safe validation with comprehensive
  * error messages. All validation is centralized in shared/validation/schemas.ts
  * using the baseMonitorSchema extension pattern.
+ * 
+ * **This is an EXAMPLE for documentation purposes - DNS monitoring is not implemented.**
  *
  * @example
  * ```typescript
@@ -304,25 +469,48 @@ import { withErrorHandling } from "shared/utils/errorHandling";
  * }
  * ```
  */
-const dnsMonitorSchema = baseMonitorSchema.extend({
- type: z.literal("dns"),
- hostname: z.string().refine((val) => {
-  if (validator.isIP(val)) return true;
-  if (
-   validator.isFQDN(val, {
-    allow_numeric_tld: false,
-    allow_trailing_dot: false,
-    allow_underscores: false,
-    allow_wildcard: false,
-    require_tld: true,
-   })
-  )
-   return true;
-  return val === "localhost";
- }, "Must be a valid hostname, IP address, or localhost"),
- recordType: z.enum(["A", "AAAA", "MX", "CNAME"]),
-});
+
+// In shared/validation/schemas.ts, you would add:
+
+/**
+ * Zod schema for DNS monitor fields.
+ * 
+ * @remarks
+ * Extends {@link baseMonitorSchema} and adds DNS-specific fields with strict
+ * validation. Uses the reusable hostValidationSchema pattern for consistency.
+ * **This is an example - not actually implemented.**
+ */
+export const dnsMonitorSchema: DnsMonitorSchemaType = 
+    baseMonitorSchema.extend({
+        type: z.literal("dns"),
+        // Use the reusable host validation schema (already defined in schemas.ts)
+        hostname: hostValidationSchema,
+        recordType: z.enum(["A", "AAAA", "MX", "CNAME", "TXT"], {
+            errorMap: () => ({ message: "Must select a valid DNS record type" }),
+        }),
+        expectedValue: z.string().optional(),
+        // Optional: Add DNS-specific timeout if different from base timeout
+        dnsTimeout: z.number().min(1000).max(30000).optional(),
+    });
+
+// Then add to the discriminated union
+export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
+    httpMonitorSchema,
+    portMonitorSchema,
+    pingMonitorSchema,
+    dnsMonitorSchema, // Add your new schema here
+]);
 ````
+
+**⚠️ CRITICAL REQUIREMENTS - Updated to Match Current Patterns**:
+
+- **MUST extend `baseMonitorSchema`** which includes all required monitoring fields
+- **MUST use the existing `hostValidationSchema`** for consistent host validation
+- **MUST import and use `isValidHost` helper** from `validatorUtils.ts`  
+- **MUST add to the discriminated union** in `monitorSchema`
+- **MUST include comprehensive error messages** for user experience
+- **MUST follow the existing type naming convention** (e.g., `DnsMonitorSchemaType`)
+- **NEVER create schemas from scratch** - always extend the base schema and reuse validation patterns
 
 ### **🔹 Validation Benefits**
 
@@ -427,21 +615,21 @@ Based on analysis of the existing monitor implementations, here are **ALL** the 
 
 #### `shared/types.ts`
 
-- **Location**: Line 33 (BASE_MONITOR_TYPES constant)
+- **Location**: Line 40 (BASE_MONITOR_TYPES constant)
 - **Change**: Add new type to the const array
-- **Current Implementation**:
+- **Current Implementation (only these 3 types are supported)**:
 
 ```typescript
 export const BASE_MONITOR_TYPES = ["http", "port", "ping"] as const;
 ```
 
-- **Example for Adding New Type**:
+- **Example for Adding New Type (DNS example - not implemented)**:
 
 ```typescript
 export const BASE_MONITOR_TYPES = ["http", "port", "ping", "dns"] as const; // Add 'dns'
 ```
 
-**⚠️ Important**: This must be done FIRST as other files depend on this type definition.
+**⚠️ Important**: This must be done FIRST as other files depend on this type definition. The DNS example above is for documentation purposes only.
 
 #### `shared/types/monitorTypes.ts`
 
@@ -465,13 +653,12 @@ export const BASE_MONITOR_TYPES = ["http", "port", "ping", "dns"] as const; // A
 #### `shared/validation/schemas.ts`
 
 - **Purpose**: Create production-grade Zod validation schema with comprehensive error handling
-- **Location**: Add new monitor schema to the existing validation system
+- **Location**: Add new monitor schema to the existing validation system  
 - **Current Structure**: The system uses `baseMonitorSchema` extended for type-specific validation
-- **Example**:
+- **Example (DNS is hypothetical - not implemented)**:
 
 ```typescript
-import { z } from "zod";
-import validator from "validator";
+// In shared/validation/schemas.ts
 
 /**
  * Zod schema for DNS monitor fields.
@@ -479,49 +666,33 @@ import validator from "validator";
  * @remarks
  * Extends baseMonitorSchema which includes id, checkInterval, monitoring,
  * responseTime, retryAttempts, status, timeout, and type fields.
+ * Uses existing validation patterns for consistency.
+ * **This is an example - DNS monitoring is not implemented.**
  */
-export const dnsMonitorSchema = baseMonitorSchema.extend({
- type: z.literal("dns"),
- hostname: z.string().refine((val) => {
-  // Use validator.js for robust hostname validation
-  if (validator.isIP(val)) {
-   return true;
-  }
-  if (
-   validator.isFQDN(val, {
-    allow_numeric_tld: false,
-    allow_trailing_dot: false,
-    allow_underscores: false,
-    allow_wildcard: false,
-    require_tld: true,
-   })
-  ) {
-   return true;
-  }
-  return val === "localhost";
- }, "Must be a valid hostname, IP address, or localhost"),
- recordType: z.enum(["A", "AAAA", "MX", "CNAME"], {
-  errorMap: () => ({ message: "Must select a valid DNS record type" }),
- }),
- expectedValue: z.string().optional(),
+export const dnsMonitorSchema: DnsMonitorSchemaType = baseMonitorSchema.extend({
+    type: z.literal("dns"),
+    // Use the existing reusable host validation schema for consistency
+    hostname: hostValidationSchema,
+    recordType: z.enum(["A", "AAAA", "MX", "CNAME", "TXT"], {
+        errorMap: () => ({ message: "Must select a valid DNS record type" }),
+    }),
+    expectedValue: z.string().optional(),
 });
 
-// Then add to the discriminated union
-export const monitorSchema = z.discriminatedUnion("type", [
- httpMonitorSchema,
- portMonitorSchema,
- pingMonitorSchema,
- dnsMonitorSchema, // Add your new schema here
+// Must add to the discriminated union
+export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
+    httpMonitorSchema,
+    portMonitorSchema, 
+    pingMonitorSchema,
+    dnsMonitorSchema, // Add new schema here
 ]);
 ```
 
-**⚠️ CRITICAL REQUIREMENTS**:
-
-- **MUST extend `baseMonitorSchema`** which includes all required monitoring fields
-- **MUST use `validator.js` for security-tested validation** (already imported in schemas.ts)
-- **MUST add to the discriminated union** in `monitorSchema`
-- **MUST include comprehensive error messages** for user experience
-- **NEVER create schemas from scratch** - always extend the base schema
+**Key Pattern Requirements**:
+- ✅ **Extend `baseMonitorSchema`** - never create from scratch
+- ✅ **Use `hostValidationSchema`** - reuse existing validation patterns
+- ✅ **Add to discriminated union** - required for type safety
+- ✅ **Follow naming convention** - `[type]MonitorSchema` pattern
 
 ---
 
@@ -739,27 +910,28 @@ export class DnsMonitor implements IMonitorService {
 
 - **Location**: Add registration call at bottom of file (after existing registrations)
 - **Change**: Register the new monitor type with complete `BaseMonitorConfig` configuration
-- **Template**:
+- **Template (DNS Example - Not Implemented)**:
 
 ```typescript
+// Example registration for DNS monitor type (not actually implemented)
 registerMonitorType({
- type: "dns",
- displayName: "DNS (Domain Resolution)",
- description: "Monitors DNS resolution for domains and records",
- version: "1.0.0",
- serviceFactory: () => new DnsMonitor(),
- validationSchema: dnsMonitorSchema, // From shared/validation/schemas.ts
- fields: [
-  {
-   name: "hostname",
-   label: "Hostname",
-   type: "text",
-   required: true,
-   placeholder: "example.com",
-   helpText: "Enter the domain name to resolve",
-  },
-  {
-   name: "recordType",
+    type: "dns",
+    displayName: "DNS (Domain Resolution)", 
+    description: "Monitors DNS resolution for domains and records",
+    version: "1.0.0",
+    serviceFactory: () => new DnsMonitor(),
+    validationSchema: dnsMonitorSchema, // From shared/validation/schemas.ts
+    fields: [
+        {
+            name: "hostname",
+            label: "Hostname",
+            type: "text",
+            required: true,
+            placeholder: "example.com",
+            helpText: "Enter the domain name to resolve",
+        },
+        {
+            name: "recordType",
    label: "Record Type",
    type: "select",
    required: true,
