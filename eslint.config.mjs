@@ -110,6 +110,12 @@ import pluginJsxPlus from "eslint-plugin-jsx-plus";
 import pluginNoUnary from "eslint-plugin-no-unary-plus";
 import pluginGranular from "eslint-plugin-granular-selectors";
 import moduleInterop from "eslint-plugin-module-interop";
+import pluginNoUnwaited from "eslint-plugin-no-unawaited-dot-catch-throw";
+import pluginTopLevel from "eslint-plugin-toplevel";
+import pluginFormatSQL from "eslint-plugin-format-sql";
+import pluginNeverThrow from "eslint-plugin-neverthrow";
+import pluginNoExplicitTypeExports from "eslint-plugin-no-explicit-type-exports";
+import pluginDeprecation from "eslint-plugin-deprecation";
 
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 
@@ -134,6 +140,8 @@ import { fixupPluginRules } from "@eslint/compat";
 // @dword-design/import-alias
 // eslint-plugin-typesafe -- Broken
 // eslint-plugin-use-selector-with -- Broken
+// eslint-plugin-zod-import -- Didn't test but does similar function to import-zod
+// @fluentui/eslint-plugin-react-components
 
 // ESLint Tools
 // Import { FlatCompat } from "@eslint/eslintrc";
@@ -550,6 +558,12 @@ export default [
             "no-unary-plus": pluginNoUnary,
             "granular-selectors": fixupPluginRules(pluginGranular),
             "module-interop": moduleInterop,
+            "no-unawaited-dot-catch-throw": pluginNoUnwaited,
+            "eslint-plugin-toplevel": pluginTopLevel,
+            "format-sql": pluginFormatSQL,
+            neverthrow: fixupPluginRules(pluginNeverThrow),
+            "no-explicit-type-exports": pluginNoExplicitTypeExports,
+            "deprecation": fixupPluginRules(pluginDeprecation),
         },
         rules: {
             // TypeScript rules
@@ -591,6 +605,21 @@ export default [
             ...pluginRegexLook.configs.recommended.rules,
             ...pluginJsxPlus.configs.all.rules,
             ...moduleInterop.configs.recommended.rules,
+
+            "deprecation/deprecation": "error",
+
+            "no-explicit-type-exports/no-explicit-type-exports": "error",
+
+            "neverthrow/must-use-result": "error",
+
+            "format-sql/format": "warn",
+
+            "eslint-plugin-toplevel/no-toplevel-var": "error",
+            "eslint-plugin-toplevel/no-toplevel-let": "error",
+            "eslint-plugin-toplevel/no-toplevel-side-effect": "off",
+
+            "no-unawaited-dot-catch-throw/enforce-no-unawaited-dot-catch-throw":
+                "error",
 
             // Note: granular-selectors plugin rules need to be added manually since
             // Note: The plugin config are not available after fixupPluginRules wrapping (Below)
@@ -1647,6 +1676,12 @@ export default [
             "no-unary-plus": pluginNoUnary,
             "module-interop": moduleInterop,
             "granular-selectors": fixupPluginRules(pluginGranular),
+            "no-unawaited-dot-catch-throw": pluginNoUnwaited,
+            "eslint-plugin-toplevel": pluginTopLevel,
+            "format-sql": pluginFormatSQL,
+            neverthrow: fixupPluginRules(pluginNeverThrow),
+            "no-explicit-type-exports": pluginNoExplicitTypeExports,
+            "deprecation": fixupPluginRules(pluginDeprecation),
         },
         rules: {
             // TypeScript backend rules
@@ -1686,6 +1721,21 @@ export default [
             ...pluginRegexLook.configs.recommended.rules,
             ...pluginJsxPlus.configs.all.rules,
             ...moduleInterop.configs.recommended.rules,
+
+            "deprecation/deprecation": "error",
+
+            "no-explicit-type-exports/no-explicit-type-exports": "error",
+
+            "neverthrow/must-use-result": "error",
+
+            "format-sql/format": "warn",
+
+            "eslint-plugin-toplevel/no-toplevel-var": "error",
+            "eslint-plugin-toplevel/no-toplevel-let": "error",
+            "eslint-plugin-toplevel/no-toplevel-side-effect": "off",
+
+            "no-unawaited-dot-catch-throw/enforce-no-unawaited-dot-catch-throw":
+                "error",
 
             "no-unary-plus/no-unary-plus": "error",
 
@@ -2570,7 +2620,8 @@ export default [
         },
 
         rules: {
-            ...tseslint.configs.recommended.rules,
+            ...tseslint.configs.strict.rules,
+            ...tseslint.configs.strictTypeChecked,
             ...vitest.configs.recommended.rules,
             ...pluginComments.configs.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
@@ -2663,7 +2714,8 @@ export default [
             "testing-library": pluginTestingLibrary,
         },
         rules: {
-            ...tseslint.configs.recommended.rules,
+            ...tseslint.configs.strict.rules,
+            ...tseslint.configs.strictTypeChecked,
             ...vitest.configs.recommended.rules,
             ...pluginUnicorn.configs["flat/all"].rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
@@ -3412,6 +3464,43 @@ export default [
             // Disable ex/no-unhandled for stores due to false positives with variable access
             // The rule incorrectly flags simple parameter/variable access as potential exceptions
             "ex/no-unhandled": "off",
+        },
+    },
+
+    // Strict Test files (Frontend)
+    {
+        files: [
+            "shared/test/StrictTests/*.{ts,tsx}",
+            "src/test/StrictTests/*.{ts,tsx}",
+        ],
+        plugins: {
+            vitest: vitest,
+        },
+        rules: {
+            ...vitest.configs.all.rules,
+        },
+        settings: {
+            vitest: {
+                typecheck: true,
+            },
+        },
+    },
+
+    // Strict Test files (Backend)
+    {
+        files: [
+            "electron/test/StrictTests/*.{ts,tsx}",
+        ],
+        plugins: {
+            vitest: vitest,
+        },
+        rules: {
+            ...vitest.configs.all.rules,
+        },
+        settings: {
+            vitest: {
+                typecheck: true,
+            },
         },
     },
 

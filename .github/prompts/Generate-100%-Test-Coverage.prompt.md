@@ -22,6 +22,7 @@ description: "Generate 100% Test Coverage"
 8. **Do not skip any files**, regardless of size or perceived triviality.
 9. Continue until all files reach 90% (or 100% if above 90%) coverage for branch, line, function, and statement.
 10. Do not stop, even if the process is lengthy.
+11. All new test files should be created in `tests/strictTests/` directory, under electron, shared, or src directories as appropriate.
 
 ## Test Creation Rules
 

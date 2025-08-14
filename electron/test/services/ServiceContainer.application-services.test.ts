@@ -4,19 +4,24 @@
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import { EventEmitter } from 'node:events';
 import { ServiceContainer } from '../../services/ServiceContainer.js';
 
-// Create mock TypedEventBus class that extends EventEmitter
-class MockTypedEventBus extends EventEmitter {
+// Create mock TypedEventBus class that extends EventTarget
+class MockTypedEventBus extends EventTarget {
     public emit(event: string, ...args: any[]): boolean {
-        return super.emit(event, ...args);
+        const customEvent = new CustomEvent(event, { detail: args });
+        return this.dispatchEvent(customEvent);
     }
     public on(event: string, listener: (...args: any[]) => void): this {
-        return super.on(event, listener);
+        this.addEventListener(event, (e: Event) => {
+            const customEvent = e as CustomEvent;
+            listener(...(customEvent.detail || []));
+        });
+        return this;
     }
     public off(event: string, listener: (...args: any[]) => void): this {
-        return super.off(event, listener);
+        this.removeEventListener(event, listener as EventListener);
+        return this;
     }
     public addMiddleware = vi.fn();
     public removeMiddleware = vi.fn();
