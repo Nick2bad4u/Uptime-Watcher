@@ -422,7 +422,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
         });
 
         describe("Multiple errors", () => {
-            it.skip("should return multiple errors when multiple fields are invalid", () => {
+            it("should return multiple errors when multiple fields are invalid", () => {
                 const monitor: Partial<Monitor> = {
                     type: "http",
                     checkInterval: 500,
@@ -431,8 +431,9 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                 };
 
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).toHaveLength(5);
+                expect(errors).toHaveLength(6);
                 expect(errors).toContain("Monitor id is required");
+                expect(errors).toContain("Monitor status is required");
                 expect(errors).toContain(
                     "Check interval must be at least 1000ms"
                 );
@@ -506,7 +507,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
 
     describe("validateSite", () => {
         describe("Valid sites", () => {
-            it.skip("should return true for valid site with HTTP monitor", () => {
+            it("should return true for valid site with HTTP monitor", () => {
                 const site: Site = {
                     identifier: "test-site",
                     name: "Test Site",
@@ -530,7 +531,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                 expect(validateSite(site)).toBe(true);
             });
 
-            it.skip("should return true for valid site with port monitor", () => {
+            it("should return true for valid site with port monitor", () => {
                 const site: Site = {
                     identifier: "test-site",
                     name: "Test Site",
@@ -555,7 +556,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                 expect(validateSite(site)).toBe(true);
             });
 
-            it.skip("should return true for valid site with multiple monitors", () => {
+            it("should return true for valid site with multiple monitors", () => {
                 const site: Site = {
                     identifier: "test-site",
                     name: "Test Site",

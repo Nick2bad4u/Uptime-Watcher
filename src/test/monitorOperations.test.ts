@@ -399,20 +399,26 @@ describe("monitorOperations", () => {
             });
         });
 
-        it.skip("should exclude optional fields when undefined", () => {
+        it("should exclude optional fields when undefined", () => {
             const partialMonitor: Partial<Monitor> = {};
 
             const result = normalizeMonitor(partialMonitor);
 
             expect(result).toEqual({
+                activeOperations: [],
+                checkInterval: 300_000,
                 history: [],
                 id: mockUUID,
+                monitoring: true,
+                responseTime: -1,
+                retryAttempts: 3,
                 status: "pending",
+                timeout: 5000,
                 type: "http",
             });
         });
 
-        it.skip("should handle mixed defined and undefined optional fields", () => {
+        it("should handle mixed defined and undefined optional fields", () => {
             const partialMonitor: Partial<Monitor> = {
                 monitoring: true,
                 port: 443,
@@ -421,11 +427,16 @@ describe("monitorOperations", () => {
             const result = normalizeMonitor(partialMonitor);
 
             expect(result).toEqual({
+                activeOperations: [],
+                checkInterval: 300_000,
                 history: [],
                 id: mockUUID,
                 monitoring: true,
                 port: 443,
+                responseTime: -1,
+                retryAttempts: 3,
                 status: "pending",
+                timeout: 5000,
                 type: "http",
             });
         });

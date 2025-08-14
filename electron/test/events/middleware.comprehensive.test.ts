@@ -461,7 +461,7 @@ describe("middleware.ts - Additional Coverage", () => {
         });
     });
     describe("createErrorHandlingMiddleware Edge Cases", () => {
-        it.skip("should handle middleware throwing non-Error objects", async () => {
+        it("should handle middleware throwing non-Error objects", async () => {
             // TODO: Fix test expectation - the actual error message format has changed
             const next = vi.fn().mockImplementation(() => {
                 throw "String error";
@@ -481,7 +481,7 @@ describe("middleware.ts - Additional Coverage", () => {
             );
             expect(mockLogger.error).toHaveBeenCalledWith(
                 expect.stringContaining(
-                    "Middleware error in event 'test:event'"
+                    "[EventBus] Middleware error for event 'test:event'"
                 ),
                 expect.objectContaining({
                     error: expect.any(Error),

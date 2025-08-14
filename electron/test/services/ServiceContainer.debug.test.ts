@@ -24,21 +24,36 @@ vi.mock("../../utils/logger", () => ({
 // Create hoisted mock factory for TypedEventBus using constructor pattern
 const mockTypedEventBus = vi.hoisted(() => {
     function MockTypedEventBus(name?: string) {
-        const eventEmitter = new EventTarget() as any;
-
-        // Add TypedEventBus-specific methods
-        eventEmitter.onTyped = vi.fn();
-        eventEmitter.emitTyped = vi.fn().mockResolvedValue(undefined);
-        eventEmitter.offTyped = vi.fn();
-        eventEmitter.onceTyped = vi.fn();
-        eventEmitter.removeTypedListener = vi.fn();
-        eventEmitter.removeAllTypedListeners = vi.fn();
-        eventEmitter.getListenerCount = vi.fn().mockReturnValue(0);
-        eventEmitter.hasListeners = vi.fn().mockReturnValue(false);
-        eventEmitter.busId = name || "test-bus";
-        eventEmitter.destroy = vi.fn();
-
-        return eventEmitter;
+        // Create a mock that has both EventEmitter and TypedEventBus methods
+        return {
+            // Standard EventEmitter methods
+            on: vi.fn(),
+            off: vi.fn(),
+            emit: vi.fn(),
+            once: vi.fn(),
+            removeListener: vi.fn(),
+            removeAllListeners: vi.fn(),
+            addListener: vi.fn(),
+            prependListener: vi.fn(),
+            prependOnceListener: vi.fn(),
+            listeners: vi.fn().mockReturnValue([]),
+            listenerCount: vi.fn().mockReturnValue(0),
+            eventNames: vi.fn().mockReturnValue([]),
+            setMaxListeners: vi.fn(),
+            getMaxListeners: vi.fn().mockReturnValue(10),
+            
+            // TypedEventBus-specific methods
+            onTyped: vi.fn(),
+            emitTyped: vi.fn().mockResolvedValue(undefined),
+            offTyped: vi.fn(),
+            onceTyped: vi.fn(),
+            removeTypedListener: vi.fn(),
+            removeAllTypedListeners: vi.fn(),
+            getListenerCount: vi.fn().mockReturnValue(0),
+            hasListeners: vi.fn().mockReturnValue(false),
+            busId: name || "test-bus",
+            destroy: vi.fn(),
+        };
     }
 
     return MockTypedEventBus;

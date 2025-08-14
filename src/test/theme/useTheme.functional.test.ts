@@ -5,7 +5,7 @@
 
 import { describe, it, expect } from "vitest";
 
-describe.skip("useTheme Hooks - Functional Tests", () => {
+describe("useTheme Hooks - Functional Tests", () => {
     it("should be implemented when theme system is stabilized", () => {
         expect(true).toBe(true);
     });

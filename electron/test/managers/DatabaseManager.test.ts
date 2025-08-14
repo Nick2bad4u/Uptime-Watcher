@@ -138,6 +138,14 @@ vi.mock("../../utils/database/serviceFactory", () => ({
     })),
 }));
 
+vi.mock("../../services/factories/DatabaseServiceFactory", () => ({
+    DatabaseServiceFactory: vi.fn().mockImplementation(() => ({
+        createSiteRepositoryService: vi.fn(() => ({
+            loadSites: vi.fn(() => Promise.resolve([])),
+        })),
+    })),
+}));
+
 describe("DatabaseManager", () => {
     let databaseManager: DatabaseManager;
     let dependencies: DatabaseManagerDependencies;
@@ -548,7 +556,7 @@ describe("DatabaseManager", () => {
     });
 
     describe("Error Handling", () => {
-        it.skip("should handle withErrorHandling wrapper", async () => {
+        it("should handle withErrorHandling wrapper", async () => {
             // Test that error handling is properly applied to async operations
             const { DataBackupService } = await import(
                 "../../utils/database/DataBackupService"
@@ -567,7 +575,7 @@ describe("DatabaseManager", () => {
             );
         });
 
-        it.skip("should handle repository errors during initialization", async () => {
+        it("should handle repository errors during initialization", async () => {
             vi.mocked(mockSettingsRepository.get).mockRejectedValueOnce(
                 new Error("Database init failed")
             );

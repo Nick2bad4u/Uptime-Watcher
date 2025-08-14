@@ -434,7 +434,7 @@ describe("UptimeOrchestrator", () => {
             expect(result).toBe(false);
         });
 
-        it.skip("should handle monitor removal with failed restart after failed removal", async () => {
+        it("should handle monitor removal with failed restart after failed removal", async () => {
             vi.mocked(mockSiteManager.removeMonitor).mockResolvedValueOnce(
                 false
             );
@@ -442,12 +442,10 @@ describe("UptimeOrchestrator", () => {
                 mockMonitorManager.startMonitoringForSite
             ).mockRejectedValueOnce(new Error("Restart failed"));
 
-            const result = await orchestrator.removeMonitor(
-                "test-site",
-                "monitor-1"
-            );
-
-            expect(result).toBe(false);
+            // This should throw a critical state inconsistency error
+            await expect(
+                orchestrator.removeMonitor("test-site", "monitor-1")
+            ).rejects.toThrow("Critical state inconsistency: Monitor test-site/monitor-1 stopped but database removal failed and restart failed");
         });
 
         it("should handle monitor removal errors", async () => {

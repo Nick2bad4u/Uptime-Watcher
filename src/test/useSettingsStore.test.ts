@@ -100,7 +100,17 @@ describe("useSettingsStore", () => {
             expect(state.settings.autoStart).toBe(false); // unchanged
         });
 
-        it.skip("should reset settings to defaults", () => {
+        it("should reset settings to defaults", async () => {
+            // Configure mocks for reset operation
+            mockElectronAPI.settings.resetSettings.mockResolvedValue({
+                success: true,
+                message: "Settings reset successfully",
+            });
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
+                success: true,
+                data: 100,
+            });
+
             // First modify settings
             useSettingsStore.getState().updateSettings({
                 notifications: false,
@@ -108,8 +118,8 @@ describe("useSettingsStore", () => {
                 theme: "dark",
             });
 
-            // Then reset
-            useSettingsStore.getState().resetSettings();
+            // Then reset (await the async operation)
+            await useSettingsStore.getState().resetSettings();
 
             const state = useSettingsStore.getState();
             expect(state.settings).toEqual({

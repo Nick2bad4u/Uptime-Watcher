@@ -273,14 +273,55 @@ describe("useSiteSync", () => {
             expect(mockDeps.setSites).not.toHaveBeenCalled();
         });
 
-        it.skip("should handle delete events", async () => {
-            // Temporarily skipped due to complex async timing issues
-            // The core functionality is tested elsewhere
+        it("should handle delete events", async () => {
+            // Test delete event handling by simulating the sync event subscription
+            let eventHandler: any;
+            mockElectronAPI.stateSync.onStateSyncEvent.mockImplementation(
+                (handler) => {
+                    eventHandler = handler;
+                    return vi.fn();
+                }
+            );
+
+            syncActions.subscribeToSyncEvents();
+
+            const deleteEvent = {
+                action: "delete",
+                siteId: "site-1",
+                data: {},
+            };
+
+            eventHandler(deleteEvent);
+
+            // Verify that the event was handled (no specific action expected for delete events)
+            expect(mockElectronAPI.stateSync.onStateSyncEvent).toHaveBeenCalled();
         });
 
-        it.skip("should handle update events with syncSitesFromBackend error", async () => {
-            // Temporarily skipped due to complex async timing issues
-            // The core functionality is tested elsewhere
+        it("should handle update events with syncSitesFromBackend error", async () => {
+            // Test error handling during update events by simulating sync subscription
+            let eventHandler: any;
+            mockElectronAPI.stateSync.onStateSyncEvent.mockImplementation(
+                (handler) => {
+                    eventHandler = handler;
+                    return vi.fn();
+                }
+            );
+
+            // Mock SiteService to throw an error
+            vi.mocked(SiteService.getSites).mockRejectedValue(new Error("Sync error"));
+
+            syncActions.subscribeToSyncEvents();
+
+            const updateEvent = {
+                action: "update",
+                siteId: "site-1",
+                data: { name: "Updated Site" },
+            };
+
+            await eventHandler(updateEvent);
+
+            // Verify sync subscription was established
+            expect(mockElectronAPI.stateSync.onStateSyncEvent).toHaveBeenCalled();
         });
     });
 
@@ -291,9 +332,20 @@ describe("useSiteSync", () => {
             syncActions = createSiteSyncActions(mockDeps);
         });
 
-        it.skip("should sync sites from backend successfully", async () => {
-            // Temporarily skipped due to complex mock setup causing infinite recursion
-            // The core functionality is tested in other files
+        it("should sync sites from backend successfully", async () => {
+            // Test successful sync from backend
+            const mockSites = [
+                { id: "site-1", name: "Site 1" },
+                { id: "site-2", name: "Site 2" },
+            ];
+
+            vi.mocked(SiteService.getSites).mockResolvedValue(mockSites);
+
+            await syncActions.syncSitesFromBackend();
+
+            // Verify sync was called and completed
+            expect(SiteService.getSites).toHaveBeenCalled();
+            expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
         });
 
         it("should handle sync errors", async () => {

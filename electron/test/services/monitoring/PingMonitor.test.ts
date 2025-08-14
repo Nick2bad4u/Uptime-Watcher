@@ -281,6 +281,17 @@ describe("PingMonitor", () => {
     });
 
     describe("performance characteristics", () => {
+        const successResult: MonitorCheckResult = {
+            status: "up",
+            responseTime: 50,
+            details: "Ping successful",
+        };
+
+        beforeEach(() => {
+            vi.clearAllMocks();
+            mockPerformPingCheckWithRetry.mockResolvedValue(successResult);
+        });
+
         it("should complete quickly for successful pings", async () => {
             const monitor = createMockPingMonitor();
             const startTime = Date.now();
@@ -291,7 +302,7 @@ describe("PingMonitor", () => {
             expect(duration).toBeLessThan(100); // Should be very fast since we're mocking
         });
 
-        it.skip("should handle concurrent ping checks", async () => {
+        it("should handle concurrent ping checks", async () => {
             const monitor1 = createMockPingMonitor({ host: "host1.com" });
             const monitor2 = createMockPingMonitor({ host: "host2.com" });
             const monitor3 = createMockPingMonitor({ host: "host3.com" });

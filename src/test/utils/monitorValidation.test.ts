@@ -898,8 +898,8 @@ describe("Monitor Validation Utilities", () => {
                 { ["someField"]: "value" } as any
             );
 
-            expect(result.success).toBe(true);
-            expect(result.errors).toEqual([]);
+            expect(result.success).toBe(false);
+            expect(result.errors).toContain("Unsupported monitor type: unknown");
         });
 
         it("should handle empty form data", async () => {

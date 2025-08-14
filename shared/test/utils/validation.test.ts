@@ -84,7 +84,7 @@ describe("Shared Validation Utilities", () => {
             ).toBe(true);
         });
 
-        it.skip("should return errors for port monitor without host or port", () => {
+        it("should return errors for port monitor without host or port", () => {
             const monitor: Partial<Monitor> = {
                 id: "test-id",
                 type: "port",
@@ -93,8 +93,8 @@ describe("Shared Validation Utilities", () => {
             };
 
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors.some((error) => error.includes("host"))).toBe(true);
-            expect(errors.some((error) => error.includes("port"))).toBe(true);
+            expect(errors.some((error) => error.toLowerCase().includes("host"))).toBe(true);
+            expect(errors.some((error) => error.toLowerCase().includes("port"))).toBe(true);
         });
 
         it("should return errors for invalid check interval", () => {
@@ -115,7 +115,7 @@ describe("Shared Validation Utilities", () => {
             ).toBe(true);
         });
 
-        it.skip("should return errors for invalid timeout", () => {
+        it("should return errors for invalid timeout", () => {
             const monitor: Partial<Monitor> = {
                 id: "test-id",
                 type: "http",
@@ -126,7 +126,7 @@ describe("Shared Validation Utilities", () => {
             };
 
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors.some((error) => error.includes("timeout"))).toBe(
+            expect(errors.some((error) => error.toLowerCase().includes("timeout"))).toBe(
                 true
             );
         });
@@ -178,7 +178,7 @@ describe("Shared Validation Utilities", () => {
     });
 
     describe("validateSite", () => {
-        it.skip("should validate complete site", () => {
+        it("should validate complete site", () => {
             const site: Site = {
                 identifier: "test-site",
                 name: "Test Site",
@@ -272,7 +272,7 @@ describe("Shared Validation Utilities", () => {
             expect(validateSite(siteWithInvalidName)).toBe(false);
         });
 
-        it.skip("should handle site with multiple valid monitors", () => {
+        it("should handle site with multiple valid monitors", () => {
             const siteWithMultipleMonitors: Site = {
                 identifier: "test-site",
                 name: "Test Site",

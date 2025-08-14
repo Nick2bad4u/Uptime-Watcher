@@ -454,7 +454,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
             expect(result.current.getAvailabilityVariant(-10)).toBe("danger");
         });
 
-        it.skip("should return correct descriptions for different availability percentages", () => {
+        it("should return correct descriptions for different availability percentages", () => {
             // Temporarily skipped due to implementation mismatch - needs investigation
             const { result } = renderHook(() => useAvailabilityColors());
 
@@ -465,7 +465,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
                 "Excellent"
             );
             expect(result.current.getAvailabilityDescription(99.5)).toBe(
-                "Good" // 99.5 < 99, so it's "Good" not "Very Good"
+                "Very Good" // 99.5 >= 99, so it's "Very Good"
             );
             expect(result.current.getAvailabilityDescription(99)).toBe(
                 "Very Good"
@@ -488,7 +488,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
             expect(result.current.getAvailabilityDescription(0)).toBe("Failed");
         });
 
-        it.skip("should clamp percentage values for descriptions", () => {
+        it("should clamp percentage values for descriptions", () => {
             // Temporarily skipped due to implementation mismatch - needs investigation
             const { result } = renderHook(() => useAvailabilityColors());
 

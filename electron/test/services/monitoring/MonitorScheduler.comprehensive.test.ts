@@ -604,10 +604,10 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                 monitoring: true,
             };
 
-            // Should throw error for invalid interval
-            expect(() => scheduler.startMonitor("site1", monitor)).toThrow(
-                "Invalid check interval: 0. Must be a positive integer."
-            );
+            // Should use default check interval when 0 is specified (0 means use default)
+            const result = scheduler.startMonitor("site1", monitor);
+            expect(result).toBe(true);
+            expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
         });
 
         it("should handle monitor with negative check interval", () => {

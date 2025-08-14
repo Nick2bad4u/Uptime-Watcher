@@ -261,7 +261,7 @@ describe("main.ts - Electron Main Process", () => {
         });
     });
     describe("DevTools Extension Installation", () => {
-        it.skip("should install devtools extensions in development mode", async () => {
+        it("should install devtools extensions in development mode", async () => {
             mockIsDev.mockReturnValue(true);
 
             await import("../main");
@@ -273,6 +273,11 @@ describe("main.ts - Electron Main Process", () => {
             const whenReadyPromise = (mockApp.whenReady as any).mock.results[0]
                 .value;
             await whenReadyPromise;
+
+            // Wait for the additional setTimeout delay (1ms) that happens after whenReady
+            await new Promise<void>((resolve) => {
+                setTimeout(resolve, 10); // Use 10ms to be safe
+            });
 
             expect(mockInstallExtension).toHaveBeenCalledWith(
                 [REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS],

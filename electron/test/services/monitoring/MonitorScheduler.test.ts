@@ -132,7 +132,7 @@ describe("MonitorScheduler", () => {
             );
         });
 
-        it.skip("should use default check interval when monitor interval not specified", async () => {
+        it("should use default check interval when monitor interval not specified", async () => {
             const monitorWithoutInterval: Site["monitors"][0] = {
                 ...mockMonitor,
                 checkInterval: 0, // Use 0 to indicate no interval specified
