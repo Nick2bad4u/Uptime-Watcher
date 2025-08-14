@@ -108,7 +108,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 monitoring: true,
             };
 
@@ -124,7 +124,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             const monitor = {
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 monitoring: true,
             };
 
@@ -139,7 +139,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 monitoring: false, // startMonitor method doesn't check this flag
             };
 
@@ -170,14 +170,14 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 monitoring: true,
             };
 
             scheduler.startMonitor("site1", monitor);
 
             // Fast-forward time to trigger interval
-            vi.advanceTimersByTime(60000);
+            vi.advanceTimersByTime(60_000);
 
             expect(mockCheckCallback).toHaveBeenCalledWith("site1", "monitor1");
         });
@@ -187,7 +187,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 monitoring: true,
             };
 
@@ -196,7 +196,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                 type: "port",
                 host: "localhost",
                 port: 3000,
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 monitoring: true,
             };
 
@@ -221,7 +221,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 monitoring: true,
             };
 
@@ -246,7 +246,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 monitoring: true,
             };
 
@@ -270,7 +270,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 monitoring: true,
             };
 
@@ -287,7 +287,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 monitoring: true,
             };
 
@@ -301,7 +301,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             const monitor = {
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 monitoring: true,
             };
 
@@ -328,7 +328,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                         id: "monitor1",
                         type: "http",
                         url: "https://example.com",
-                        checkInterval: 60000,
+                        checkInterval: 60_000,
                         monitoring: true,
                     },
                     {
@@ -336,7 +336,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                         type: "port",
                         host: "localhost",
                         port: 3000,
-                        checkInterval: 30000,
+                        checkInterval: 30_000,
                         monitoring: true,
                     },
                 ],
@@ -375,7 +375,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                         id: "monitor1",
                         type: "http",
                         url: "https://example.com",
-                        checkInterval: 60000,
+                        checkInterval: 60_000,
                         monitoring: false,
                     },
                 ],
@@ -404,7 +404,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                         id: "monitor1",
                         type: "http",
                         url: "https://example.com",
-                        checkInterval: 60000,
+                        checkInterval: 60_000,
                         monitoring: true,
                     },
                     {
@@ -412,7 +412,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                         type: "port",
                         host: "localhost",
                         port: 3000,
-                        checkInterval: 30000,
+                        checkInterval: 30_000,
                         monitoring: true,
                     },
                 ],
@@ -444,7 +444,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                         id: "monitor1",
                         type: "http",
                         url: "https://example.com",
-                        checkInterval: 60000,
+                        checkInterval: 60_000,
                         monitoring: true,
                     },
                 ],
@@ -461,7 +461,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                         id: "monitor2",
                         type: "http",
                         url: "https://test.com",
-                        checkInterval: 60000,
+                        checkInterval: 60_000,
                         monitoring: true,
                     },
                 ],
@@ -496,7 +496,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                         id: "monitor1",
                         type: "http",
                         url: "https://example.com",
-                        checkInterval: 60000,
+                        checkInterval: 60_000,
                         monitoring: true,
                     },
                 ],
@@ -513,7 +513,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                         id: "monitor2",
                         type: "http",
                         url: "https://test.com",
-                        checkInterval: 60000,
+                        checkInterval: 60_000,
                         monitoring: true,
                     },
                 ],
@@ -581,14 +581,14 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 monitoring: true,
             };
 
             scheduler.startMonitor("site1", monitor);
 
             // Fast-forward to trigger interval
-            vi.advanceTimersByTime(60000);
+            vi.advanceTimersByTime(60_000);
 
             expect(errorCallback).toHaveBeenCalledWith("site1", "monitor1");
             // Monitor should still be active after error
@@ -645,7 +645,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 monitoring: true,
             };
 
@@ -660,7 +660,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                 id: "",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 monitoring: true,
             };
 
@@ -681,7 +681,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 monitoring: true,
             };
 
@@ -717,7 +717,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 monitoring: true,
             };
 
@@ -725,7 +725,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 30000, // Different interval
+                checkInterval: 30_000, // Different interval
                 monitoring: true,
             };
 
@@ -742,7 +742,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 monitoring: true,
             };
 
@@ -751,7 +751,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                 type: "port",
                 host: "localhost",
                 port: 3000,
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 monitoring: true,
             };
 

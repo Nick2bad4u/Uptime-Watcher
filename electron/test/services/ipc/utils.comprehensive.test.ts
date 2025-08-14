@@ -130,14 +130,17 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
             it("should return null for floating point numbers", () => {
                 const result = IpcValidators.requiredNumber(
-                    3.14159,
+                    3.141_59,
                     "testParam"
                 );
                 expect(result).toBeNull();
             });
 
             it("should return error for NaN values", () => {
-                const result = IpcValidators.requiredNumber(NaN, "testParam");
+                const result = IpcValidators.requiredNumber(
+                    Number.NaN,
+                    "testParam"
+                );
                 expect(result).toBe("testParam must be a valid number");
             });
 

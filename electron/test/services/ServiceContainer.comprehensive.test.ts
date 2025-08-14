@@ -671,11 +671,11 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
 
             const status = container.getInitializationStatus();
 
-            expect(status.DatabaseService).toBe(true);
-            expect(status.ConfigurationManager).toBe(true);
-            expect(status.HistoryRepository).toBe(true);
-            expect(status.MonitorManager).toBe(false);
-            expect(status.UptimeOrchestrator).toBe(false);
+            expect(status["DatabaseService"]).toBe(true);
+            expect(status["ConfigurationManager"]).toBe(true);
+            expect(status["HistoryRepository"]).toBe(true);
+            expect(status["MonitorManager"]).toBe(false);
+            expect(status["UptimeOrchestrator"]).toBe(false);
         });
 
         it("should return empty array for getInitializedServices when no services initialized", () => {

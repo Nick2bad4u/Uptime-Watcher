@@ -626,7 +626,7 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
 
     describe("Boundary conditions", () => {
         it("should handle maximum parameter counts", () => {
-            const manyParams = new Array(100).fill("param");
+            const manyParams = Array.from({ length: 100 }).fill("param");
             const result = SiteHandlerValidators.getSites(manyParams);
             expect(isValidationFailure(result)).toBe(true);
         });

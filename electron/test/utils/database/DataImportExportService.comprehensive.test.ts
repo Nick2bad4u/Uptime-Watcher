@@ -688,7 +688,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             ).toHaveBeenNthCalledWith(
                 1,
                 mockDatabase,
-                String(NaN), // Number conversion of "new-monitor-id"
+                String(Number.NaN), // Number conversion of "new-monitor-id"
                 { status: "up", timestamp: 1000, responseTime: 50 },
                 ""
             );
@@ -697,7 +697,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             ).toHaveBeenNthCalledWith(
                 2,
                 mockDatabase,
-                String(NaN),
+                String(Number.NaN),
                 { status: "down", timestamp: 2000, responseTime: 0 },
                 ""
             );
@@ -913,7 +913,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                         {
                             type: "http" as const,
                             url: "https://api.example.com",
-                            checkInterval: 30000,
+                            checkInterval: 30_000,
                             history: Array.from({ length: 5 }, (_, i) => ({
                                 status:
                                     i % 2 === 0
