@@ -12,8 +12,11 @@ const mockEventBus = vi.hoisted(() => {
 
         // Add TypedEventBus specific methods
         emitter.emitTyped = vi.fn().mockResolvedValue(undefined);
+        emitter.on = vi.fn().mockReturnThis();
         emitter.onTyped = vi.fn().mockReturnThis();
+        emitter.off = vi.fn().mockReturnThis();
         emitter.offTyped = vi.fn().mockReturnThis();
+        emitter.once = vi.fn().mockReturnThis();
         emitter.onceTyped = vi.fn().mockReturnThis();
         emitter.removeTypedListener = vi.fn().mockReturnThis();
         emitter.removeAllTypedListeners = vi.fn().mockReturnThis();

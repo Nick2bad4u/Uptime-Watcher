@@ -5,9 +5,10 @@
  * Focuses on data export, import validation, and persistence operations.
  */
 
+/* eslint-disable @typescript-eslint/no-require-imports, unicorn/prefer-module -- Jest test mocking requires dynamic imports */
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DataImportExportService } from "../../../utils/database/DataImportExportService";
-import { validateImportData, isValidSite, isValidSettings } from "../../../../shared/utils/jsonValidation";
 
 import type { DataImportExportConfig } from "../../../utils/database/DataImportExportService";
 import type { Site, Settings } from "../../../../shared/types";
@@ -72,7 +73,7 @@ describe("DataImportExportService - Isolated Tests", () => {
     let mockSites: Site[];
     let mockSettings: Settings;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         vi.clearAllMocks();
 
         // Mock sites data
@@ -169,9 +170,7 @@ describe("DataImportExportService - Isolated Tests", () => {
         };
 
         // Import the service class dynamically to avoid hoisting issues
-        const {
-            DataImportExportService,
-        } = require("../../../utils/database/DataImportExportService");
+        const { DataImportExportService } = await import("../../../utils/database/DataImportExportService");
         service = new DataImportExportService(mockConfig);
     });
 

@@ -9,9 +9,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
     ipcMain,
     BrowserWindow,
-    type IpcMainInvokeEvent,
-    type IpcMainEvent,
 } from "electron";
+import type { IpcMainInvokeEvent, IpcMainEvent } from "electron";
 
 import { IpcService } from "../../electron/services/ipc/IpcService";
 import type { UptimeOrchestrator } from "../../electron/UptimeOrchestrator";

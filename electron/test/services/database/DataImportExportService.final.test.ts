@@ -32,10 +32,10 @@ vi.mock("@shared/types/validators", () => ({
     isImportData: mockIsImportData,
 }));
 
-// Mock operational hooks
-const mockWithOperationalHooks = vi.fn();
-vi.mock("@electron/utils/operationalHooks", () => ({
-    withOperationalHooks: mockWithOperationalHooks,
+// Mock operational hooks - correct relative path
+const mockWithDatabaseOperation = vi.fn();
+vi.mock("../../../utils/operationalHooks", () => ({
+    withDatabaseOperation: mockWithDatabaseOperation,
 }));
 
 // Mock SiteLoadingError
@@ -61,7 +61,7 @@ describe("DataImportExportService - Isolated Tests", () => {
         vi.clearAllMocks();
 
         // Setup operational hooks mock
-        mockWithOperationalHooks.mockImplementation(async (fn: any) => {
+        mockWithDatabaseOperation.mockImplementation(async (fn: any) => {
             const mockDb = { name: "mock-db" };
             return await fn(mockDb);
         });
