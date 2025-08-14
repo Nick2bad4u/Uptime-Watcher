@@ -10,6 +10,7 @@
  */
 
 import type { Monitor, MonitorType } from "@shared/types";
+import type { FormEvent } from "react";
 
 import type { Logger } from "../../services/logger";
 import type {
@@ -297,6 +298,11 @@ async function validateMonitorType(
             formData["port"] = Number(port);
             break;
         }
+        default: {
+            throw new Error(
+                `Unsupported monitor type: ${monitorType as string}`
+            );
+        }
     }
 
     // Use form validation that only validates provided fields
@@ -319,7 +325,7 @@ async function validateMonitorType(
  *
  * @example
  * ```tsx
- * const handleFormSubmit = (e: React.FormEvent) => {
+ * const handleFormSubmit = (e: FormEvent) => {
  *   handleSubmit(e, {
  *     ...formState,
  *     ...formActions,
@@ -332,7 +338,7 @@ async function validateMonitorType(
  * ```
  */
 export async function handleSubmit(
-    event: React.FormEvent,
+    event: FormEvent,
     properties: FormSubmitProperties
 ): Promise<void> {
     const {
@@ -356,12 +362,12 @@ export async function handleSubmit(
     // Log submission start
     logger.debug("Form submission started", {
         addMode,
-        hasHost: !!host.trim(),
-        hasName: !!name.trim(),
-        hasPort: !!port.trim(),
-        hasUrl: !!url.trim(),
+        hasHost: Boolean(host.trim()),
+        hasName: Boolean(name.trim()),
+        hasPort: Boolean(port.trim()),
+        hasUrl: Boolean(url.trim()),
         monitorType,
-        selectedExistingSite: !!selectedExistingSite,
+        selectedExistingSite: Boolean(selectedExistingSite),
     });
 
     // Collect all validation errors

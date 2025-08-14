@@ -33,17 +33,15 @@ import type { JSX } from "react/jsx-runtime";
 import ThemedBox from "../../../theme/components/ThemedBox";
 import ThemedText from "../../../theme/components/ThemedText";
 
-export const EmptyState = (): JSX.Element => {
-    return (
-        <ThemedBox className="text-center" padding="xl" surface="base">
-            {/* empty-state-icon class provides styling from src/theme/components.css */}
-            <div className="empty-state-icon">🌐</div>
-            <ThemedText className="mb-2" size="lg" weight="medium">
-                No sites to monitor
-            </ThemedText>
-            <ThemedText variant="secondary">
-                Add your first website to start monitoring its uptime.
-            </ThemedText>
-        </ThemedBox>
-    );
-};
+export const EmptyState = (): JSX.Element => (
+    <ThemedBox className="text-center" padding="xl" surface="base">
+        {/* empty-state-icon class provides styling from src/theme/components.css */}
+        <div className="empty-state-icon">🌐</div>
+        <ThemedText className="mb-2" size="lg" weight="medium">
+            No sites to monitor
+        </ThemedText>
+        <ThemedText variant="secondary">
+            Add your first website to start monitoring its uptime.
+        </ThemedText>
+    </ThemedBox>
+);

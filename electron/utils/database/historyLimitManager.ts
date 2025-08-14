@@ -93,8 +93,8 @@ export async function setHistoryLimit(
     // Use single transaction for atomicity - either both operations succeed or
     // both fail
     await withDatabaseOperation(
-        async () => {
-            return databaseService.executeTransaction((db) => {
+        async () =>
+            databaseService.executeTransaction((db) => {
                 // Save to settings using internal method
                 repositories.settings.setInternal(
                     db,
@@ -112,8 +112,7 @@ export async function setHistoryLimit(
                 }
 
                 return Promise.resolve();
-            });
-        },
+            }),
         "history-limit-manager-set",
         undefined,
         { limit: finalLimit }

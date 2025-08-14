@@ -200,6 +200,7 @@ export async function withErrorHandling<T>(
  *
  * @internal
  */
+// eslint-disable-next-line no-redeclare -- Function overload implementation is legitimate TypeScript pattern
 export async function withErrorHandling<T>(
     operation: () => Promise<T>,
     storeOrContext: ErrorHandlingBackendContext | ErrorHandlingFrontendStore

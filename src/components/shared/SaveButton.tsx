@@ -48,19 +48,17 @@ export const SaveButton: React.FC<SaveButtonProps> = ({
     onClick,
     size = "sm",
     ...props
-}) => {
-    return (
-        <ThemedButton
-            {...props}
-            aria-label={ariaLabel}
-            className={className}
-            disabled={disabled || isLoading}
-            icon={<FiSave />}
-            onClick={onClick}
-            size={size}
-            variant={disabled ? "secondary" : "primary"}
-        >
-            Save
-        </ThemedButton>
-    );
-};
+}) => (
+    <ThemedButton
+        {...props}
+        aria-label={ariaLabel}
+        className={className}
+        disabled={disabled || isLoading}
+        icon={<FiSave />}
+        onClick={onClick}
+        size={size}
+        variant={disabled ? "secondary" : "primary"}
+    >
+        Save
+    </ThemedButton>
+);

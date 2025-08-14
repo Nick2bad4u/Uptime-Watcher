@@ -228,7 +228,11 @@ async function handleRetry<T>(
             }
         );
 
-        await new Promise((resolve) => setTimeout(resolve, delay));
+        await new Promise<void>((resolve) => {
+            setTimeout(() => {
+                resolve();
+            }, delay);
+        });
     }
 }
 
@@ -289,41 +293,6 @@ async function handleSuccess<T>(
 }
 
 /**
- * Specialized wrapper for database operations with database-specific defaults.
- *
- * @remarks
- * This function is a convenience wrapper around withOperationalHooks that
- * applies database-optimized settings and adds a "database:" prefix to
- * operation names for consistent event naming. While the underlying
- * implementation is generic, this wrapper should only be used for actual
- * database operations to maintain clear semantic boundaries and event
- * categorization.
- *
- * @typeParam T - The return type of the database operation
- * @param operation - Database operation to execute with retry logic
- * @param operationName - Name of the database operation (will be prefixed with "database:")
- * @param eventEmitter - Optional event emitter for operation lifecycle events
- * @param context - Optional context data to include in events
- * @returns Promise resolving to the operation result
- */
-export async function withDatabaseOperation<T>(
-    operation: () => Promise<T>,
-    operationName: string,
-    eventEmitter?: TypedEventBus<UptimeEvents>,
-    context?: Record<string, unknown>
-): Promise<T> {
-    return withOperationalHooks(operation, {
-        backoff: "exponential",
-        initialDelay: 100,
-        maxRetries: 3,
-        operationName: `database:${operationName}`,
-        ...(eventEmitter && { eventEmitter }),
-        ...(context && { context }),
-        emitEvents: Boolean(eventEmitter),
-    });
-}
-
-/**
  * Wraps an async operation with retry logic, error handling, and event
  * emission.
  */
@@ -362,7 +331,9 @@ export async function withOperationalHooks<T>(
                 }
             );
 
+            // eslint-disable-next-line no-await-in-loop
             const result = await operation();
+            // eslint-disable-next-line no-await-in-loop
             return await handleSuccess(
                 result,
                 config,
@@ -396,7 +367,8 @@ export async function withOperationalHooks<T>(
                 );
             }
 
-            // Handle retry
+            // Handle retry - intentionally sequential for retry logic
+            // eslint-disable-next-line no-await-in-loop
             await handleRetry(
                 lastError,
                 config,
@@ -416,4 +388,39 @@ export async function withOperationalHooks<T>(
             `Operation ${operationName} completed without success or error`
         )
     );
+}
+
+/**
+ * Specialized wrapper for database operations with database-specific defaults.
+ *
+ * @remarks
+ * This function is a convenience wrapper around withOperationalHooks that
+ * applies database-optimized settings and adds a "database:" prefix to
+ * operation names for consistent event naming. While the underlying
+ * implementation is generic, this wrapper should only be used for actual
+ * database operations to maintain clear semantic boundaries and event
+ * categorization.
+ *
+ * @typeParam T - The return type of the database operation
+ * @param operation - Database operation to execute with retry logic
+ * @param operationName - Name of the database operation (will be prefixed with "database:")
+ * @param eventEmitter - Optional event emitter for operation lifecycle events
+ * @param context - Optional context data to include in events
+ * @returns Promise resolving to the operation result
+ */
+export async function withDatabaseOperation<T>(
+    operation: () => Promise<T>,
+    operationName: string,
+    eventEmitter?: TypedEventBus<UptimeEvents>,
+    context?: Record<string, unknown>
+): Promise<T> {
+    return withOperationalHooks(operation, {
+        backoff: "exponential",
+        initialDelay: 100,
+        maxRetries: 3,
+        operationName: `database:${operationName}`,
+        ...(eventEmitter && { eventEmitter }),
+        ...(context && { context }),
+        emitEvents: Boolean(eventEmitter),
+    });
 }

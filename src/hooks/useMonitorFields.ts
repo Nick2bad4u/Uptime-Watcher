@@ -76,9 +76,8 @@ export function useMonitorFields(): UseMonitorFieldsResult {
     );
 
     const getFields = useCallback(
-        (monitorType: string): MonitorFieldDefinition[] => {
-            return fieldConfigs[monitorType] ?? [];
-        },
+        (monitorType: string): MonitorFieldDefinition[] =>
+            fieldConfigs[monitorType] ?? [],
         [fieldConfigs]
     );
 

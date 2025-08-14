@@ -12,7 +12,6 @@
  */
 
 /* eslint-disable no-underscore-dangle */
-
 /* eslint-disable no-magic-numbers */
 /* eslint-disable no-inline-comments */
 /* eslint-disable n/no-unpublished-import */
@@ -23,6 +22,8 @@
 /* eslint-disable perfectionist/sort-objects */
 /* eslint-disable object-shorthand */
 /* eslint-disable sort-imports */
+/* eslint-disable capitalized-comments */
+
 
 import { importX } from "eslint-plugin-import-x";
 import { plugin as ex } from "eslint-plugin-exception-handling";
@@ -117,6 +118,7 @@ import pluginNeverThrow from "eslint-plugin-neverthrow";
 import pluginNoExplicitTypeExports from "eslint-plugin-no-explicit-type-exports";
 import pluginDeprecation from "eslint-plugin-deprecation";
 
+
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 
 import * as cssPlugin from "eslint-plugin-css";
@@ -124,6 +126,8 @@ import * as cssPlugin from "eslint-plugin-css";
 import { fixupPluginRules } from "@eslint/compat";
 
 // Unused and Uninstalled Plugins:
+// import * as publint from "eslint-plugin-publint";
+// import publintParser from "eslint-plugin-publint/jsonc-eslint-parser";
 // eslint-config-prettier
 // eslint-find-rules
 // eslint-formatter-compact -- Built into eslint
@@ -345,6 +349,7 @@ export default [
                 tsconfigRootDir: import.meta.dirname,
                 ecmaFeatures: {
                     jsx: true,
+                    impliedStrict: true,
                 },
                 experimentalDecorators: true,
                 JSDocParsingMode: "all",
@@ -439,6 +444,7 @@ export default [
                 tsconfigRootDir: import.meta.dirname,
                 ecmaFeatures: {
                     jsx: true,
+                    impliedStrict: true,
                 },
                 experimentalDecorators: true,
                 JSDocParsingMode: "all",
@@ -452,6 +458,7 @@ export default [
                 document: "readonly",
                 globalThis: "readonly",
                 window: "readonly",
+                NodeJS: "readonly",
             },
         },
         settings: {
@@ -567,6 +574,7 @@ export default [
         },
         rules: {
             // TypeScript rules
+            ...js.configs.all.rules,
             ...tseslint.configs.recommendedTypeChecked,
             ...tseslint.configs.recommended.rules,
             ...tseslint.configs.strictTypeChecked,
@@ -605,6 +613,33 @@ export default [
             ...pluginRegexLook.configs.recommended.rules,
             ...pluginJsxPlus.configs.all.rules,
             ...moduleInterop.configs.recommended.rules,
+
+            "one-var": "off",
+            "no-magic-numbers": "off",
+            "func-style": "off",
+            "capitalized-comments": "off",
+            "class-methods-use-this": "off",
+            "sort-imports": "off",
+            "no-inline-comments": "off",
+            "require-await": "off",
+            "no-ternary": "off",
+            "max-lines": "off",
+            "id-length": "off",
+            "max-lines-per-function": "off",
+            "max-statements": "off",
+            "max-params": "off",
+            "sort-keys": "off",
+            "dot-notation": "off",
+            "no-console": "off",
+            "no-plusplus": "off",
+            "no-undefined": "off",
+            "no-void": "off",
+            "require-unicode-regexp": "off",
+            "prefer-arrow-callback": "off",
+            "no-undef-init": "off",
+            "object-shorthand": "off",
+            "camelcase": "off",
+            "max-classes-per-file": "off",
 
             "deprecation/deprecation": "error",
 
@@ -1563,6 +1598,7 @@ export default [
                 tsconfigRootDir: import.meta.dirname,
                 ecmaFeatures: {
                     jsx: true,
+                    impliedStrict: true,
                 },
                 experimentalDecorators: true,
                 JSDocParsingMode: "all",
@@ -1579,6 +1615,7 @@ export default [
                 global: "readonly",
                 require: "readonly",
                 module: "readonly",
+                NodeJS: "readonly",
             },
         },
         settings: {
@@ -1685,6 +1722,7 @@ export default [
         },
         rules: {
             // TypeScript backend rules
+            ...js.configs.all.rules,
             ...tseslint.configs.recommendedTypeChecked,
             ...tseslint.configs.recommended.rules,
             ...tseslint.configs.strictTypeChecked,
@@ -1721,6 +1759,33 @@ export default [
             ...pluginRegexLook.configs.recommended.rules,
             ...pluginJsxPlus.configs.all.rules,
             ...moduleInterop.configs.recommended.rules,
+
+            "one-var": "off",
+            "no-magic-numbers": "off",
+            "func-style": "off",
+            "capitalized-comments": "off",
+            "class-methods-use-this": "off",
+            "sort-imports": "off",
+            "no-inline-comments": "off",
+            "require-await": "off",
+            "no-ternary": "off",
+            "max-lines": "off",
+            "id-length": "off",
+            "max-lines-per-function": "off",
+            "max-statements": "off",
+            "max-params": "off",
+            "sort-keys": "off",
+            "dot-notation": "off",
+            "no-console": "off",
+            "no-plusplus": "off",
+            "no-undefined": "off",
+            "no-void": "off",
+            "require-unicode-regexp": "off",
+            "prefer-arrow-callback": "off",
+            "no-undef-init": "off",
+            "object-shorthand": "off",
+            "camelcase": "off",
+            "max-classes-per-file": "off",
 
             "deprecation/deprecation": "error",
 
@@ -2701,6 +2766,7 @@ export default [
                 it: "readonly",
                 test: "readonly",
                 vi: "readonly",
+                NodeJS: "readonly",
             },
         },
         plugins: {
@@ -3387,6 +3453,28 @@ export default [
             react: { version: "19" },
         },
     },
+
+    // {
+    //     files: ["**/package.json"],
+    //     languageOptions: {
+    //         parser: publintParser,
+    //     },
+    //     plugins: { publint },
+    //     rules: {
+    //         /**
+    //          * The 'suggestion' type messages created by publint will cause eslint warns
+    //          */
+    //         "publint/suggestion": "warn",
+    //         /**
+    //          * The 'warning' type messages created by publint will cause eslint warns
+    //          */
+    //         "publint/warning": "warn",
+    //         /**
+    //          * The 'error' type messages created by publint will cause eslint errors
+    //          */
+    //         "publint/error": "error",
+    //     },
+    // },
 
     // Strategic overrides for @typescript-eslint/no-unsafe-type-assertion
     // These files/patterns require type assertions due to their nature

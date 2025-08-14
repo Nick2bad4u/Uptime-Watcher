@@ -16,6 +16,52 @@ import type { EventMiddleware } from "./TypedEventBus";
 import { logger as baseLogger } from "../utils/logger";
 
 /**
+ * Safely serialize data for logging, handling circular references and type
+ * preservation.
+ *
+ * @param data - Data to serialize
+ * @returns Serialized data safe for logging
+ *
+ * @remarks
+ * This function is specifically designed for logging purposes to avoid
+ * circular reference errors during JSON serialization. It returns the original
+ * object when possible for better debugger inspection, or a safe placeholder
+ * string when serialization fails.
+ *
+ * **Behavior:**
+ * - **Primitives**: Returned as-is (string, number, boolean, null, undefined)
+ * - **Objects**: Original object returned if JSON-serializable, placeholder if
+ * not - **Circular References**: Returns descriptive placeholder string
+ * - **Functions/Symbols**: Converted to string representation
+ */
+function safeSerialize(data: unknown): unknown {
+    if (data === null || data === undefined) {
+        return data;
+    }
+
+    if (typeof data === "string") {
+        return data;
+    }
+
+    if (typeof data === "number" || typeof data === "boolean") {
+        return data;
+    }
+
+    if (typeof data === "object") {
+        try {
+            // Try to serialize, but catch circular reference errors
+            JSON.stringify(data);
+            return data; // Return original object for better inspection
+        } catch {
+            return "[Circular Reference or Non-Serializable Object]";
+        }
+    }
+
+    // Fallback for any remaining types
+    return JSON.stringify(data);
+}
+
+/**
  * Interface for middleware stack functions.
  */
 interface MiddlewareStacks {
@@ -189,7 +235,6 @@ export function composeMiddleware(
                 const middleware = middlewares[index++];
                 if (middleware) {
                     await middleware(event, data, processNext);
-                    return;
                 }
             } else {
                 await next();
@@ -294,7 +339,6 @@ export function createErrorHandlingMiddleware(options: {
     ) => {
         try {
             await next();
-            return;
         } catch (error) {
             const err =
                 error instanceof Error ? error : new Error(String(error));
@@ -315,7 +359,6 @@ export function createErrorHandlingMiddleware(options: {
             if (!continueOnError) {
                 throw err;
             }
-            return;
         }
     };
 }
@@ -439,6 +482,10 @@ export function createLoggingMiddleware(options: {
             }
             case "warn": {
                 baseLogger.warn(EVENT_EMITTED_MSG, logData);
+                break;
+            }
+            default: {
+                baseLogger.info(EVENT_EMITTED_MSG, logData);
                 break;
             }
         }
@@ -850,48 +897,3 @@ export const MIDDLEWARE_STACKS: MiddlewareStacks = {
  * not - **Circular References**: Returns descriptive placeholder string
  * - **Functions/Symbols**: Converted to string representation
  */
-/**
- * Safely serialize data for logging, handling circular references and type
- * preservation.
- *
- * @param data - Data to serialize
- * @returns Serialized data safe for logging
- *
- * @remarks
- * This function is specifically designed for logging purposes to avoid
- * circular reference errors during JSON serialization. It returns the original
- * object when possible for better debugger inspection, or a safe placeholder
- * string when serialization fails.
- *
- * **Behavior:**
- * - **Primitives**: Returned as-is (string, number, boolean, null, undefined)
- * - **Objects**: Original object returned if JSON-serializable, placeholder if
- * not - **Circular References**: Returns descriptive placeholder string
- * - **Functions/Symbols**: Converted to string representation
- */
-function safeSerialize(data: unknown): unknown {
-    if (data === null || data === undefined) {
-        return data;
-    }
-
-    if (typeof data === "string") {
-        return data;
-    }
-
-    if (typeof data === "number" || typeof data === "boolean") {
-        return data;
-    }
-
-    if (typeof data === "object") {
-        try {
-            // Try to serialize, but catch circular reference errors
-            JSON.stringify(data);
-            return data; // Return original object for better inspection
-        } catch {
-            return "[Circular Reference or Non-Serializable Object]";
-        }
-    }
-
-    // Fallback for any remaining types
-    return JSON.stringify(data);
-}

@@ -54,6 +54,25 @@ export interface ImportSite {
 }
 
 /**
+ * Type guard for expected import data structure.
+ *
+ * Validates that the provided object matches the expected structure
+ * for import data containing sites and optional settings.
+ *
+ * @param obj - Object to validate
+ * @returns True if the object matches the expected import data structure
+ */
+function isImportData(
+    obj: unknown
+): obj is { settings?: Record<string, string>; sites: ImportSite[] } {
+    return (
+        typeof obj === "object" &&
+        obj !== null &&
+        Array.isArray((obj as Record<string, unknown>)["sites"])
+    );
+}
+
+/**
  * Service for handling data import/export operations.
  *
  * Separates data operations from side effects for better testability.
@@ -218,34 +237,62 @@ export class DataImportExportService {
         db: Database,
         sites: ImportSite[]
     ): Promise<void> {
-        for (const site of sites) {
-            if (Array.isArray(site.monitors) && site.monitors.length > 0) {
+        // Process sites in parallel since each site's monitor import
+        // is independent
+        const importPromises = sites
+            .filter(
+                (site) =>
+                    Array.isArray(site.monitors) && site.monitors.length > 0
+            )
+            .map(async (site) => {
+                const { identifier } = site;
                 try {
+                    // We know monitors exists and has content from the filter
+                    if (!site.monitors) {
+                        throw new Error(
+                            "Site monitors is unexpectedly undefined"
+                        );
+                    }
+                    const { monitors } = site;
+
                     // Create monitors using the async bulkCreate method
                     const createdMonitors =
                         await this.repositories.monitor.bulkCreate(
-                            site.identifier,
-                            site.monitors
+                            identifier,
+                            monitors
                         );
 
                     // Import history for the created monitors
                     this.importHistoryForMonitors(
                         db,
                         createdMonitors,
-                        site.monitors
+                        monitors
                     );
 
                     this.logger.debug(
-                        `[DataImportExportService] Imported ${createdMonitors.length} monitors for site: ${site.identifier}`
+                        `[DataImportExportService] Imported ${createdMonitors.length} monitors for site: ${identifier}`
                     );
                 } catch (error) {
                     this.logger.error(
-                        `[DataImportExportService] Failed to import monitors for site ${site.identifier}:`,
+                        `[DataImportExportService] Failed to import monitors for site ${identifier}:`,
                         error
                     );
                     // Continue with other sites even if one fails
+                    throw error; // Re-throw to be caught by Promise.allSettled
                 }
-            }
+            });
+
+        // Wait for all sites to complete, but continue even if some fail
+        const results = await Promise.allSettled(importPromises);
+
+        // Log any failures
+        const failures = results.filter(
+            (result) => result.status === "rejected"
+        ).length;
+        if (failures > 0) {
+            this.logger.warn(
+                `[DataImportExportService] ${failures} out of ${importPromises.length} site monitor imports failed`
+            );
         }
     }
 
@@ -311,23 +358,4 @@ export class DataImportExportService {
             );
         }
     }
-}
-
-/**
- * Type guard for expected import data structure.
- *
- * Validates that the provided object matches the expected structure
- * for import data containing sites and optional settings.
- *
- * @param obj - Object to validate
- * @returns True if the object matches the expected import data structure
- */
-function isImportData(
-    obj: unknown
-): obj is { settings?: Record<string, string>; sites: ImportSite[] } {
-    return (
-        typeof obj === "object" &&
-        obj !== null &&
-        Array.isArray((obj as Record<string, unknown>)["sites"])
-    );
 }

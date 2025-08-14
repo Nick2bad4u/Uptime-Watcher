@@ -46,6 +46,73 @@ import { withOperationalHooks } from "../../../utils/operationalHooks";
 import { handlePingCheckError } from "./pingErrorHandling";
 
 /**
+ * Performs a single ping connectivity check without retry logic.
+ *
+ * @remarks
+ * This function performs a single ping attempt to the specified host using the
+ * node-ping library. It measures response time and returns a structured
+ * result. This function is used internally by {@link
+ * performPingCheckWithRetry} and can also be used directly for single-attempt
+ * checks.
+ *
+ * Uses only cross-platform ping options: numeric, timeout, and min_reply for
+ * maximum compatibility.
+ *
+ * @param host - Target hostname or IP address to ping.
+ * @param timeout - Maximum time to wait for the ping response in milliseconds.
+ * @returns A promise that resolves to a {@link MonitorCheckResult} with ping status and timing.
+ * @throws Error if the ping operation fails or times out.
+ * @see {@link performPingCheckWithRetry}
+ * @public
+ */
+export async function performSinglePingCheck(
+    host: string,
+    timeout: number
+): Promise<MonitorCheckResult> {
+    const startTime = Date.now();
+    const timeoutInSeconds = Math.max(1, Math.floor(timeout / 1000)); // Convert to seconds, minimum 1
+
+    try {
+        const pingResult = await ping.promise.probe(host, {
+            // Use only cross-platform options for maximum compatibility
+            min_reply: 1, // Exit after receiving 1 reply (faster response)
+            numeric: false, // Don't map IP addresses to hostnames
+            timeout: timeoutInSeconds, // Timeout in seconds
+        });
+
+        const responseTime = Date.now() - startTime;
+
+        if (pingResult.alive) {
+            // Parse response time from ping result, fallback to measured time
+            const pingTime =
+                pingResult.time && typeof pingResult.time === "number"
+                    ? Math.round(pingResult.time)
+                    : responseTime;
+
+            return {
+                details: `Ping successful - packet loss: ${pingResult.packetLoss || "0"}%`,
+                responseTime: pingTime,
+                status: "up",
+            };
+        }
+        return {
+            details: "Host unreachable",
+            error: "Ping failed - host unreachable",
+            responseTime,
+            status: "down",
+        };
+    } catch (error) {
+        const responseTime = Date.now() - startTime;
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
+
+        throw new Error(
+            `Ping failed: ${errorMessage} (response time: ${responseTime}ms)`
+        );
+    }
+}
+
+/**
  * Performs a ping connectivity check with retry logic and exponential backoff.
  *
  * @param host - Target hostname or IP address to ping
@@ -116,73 +183,5 @@ export async function performPingCheckWithRetry(
             maxRetries,
             timeout,
         });
-    }
-}
-
-/**
- * Performs a single ping connectivity check without retry logic.
- *
- * @remarks
- * This function performs a single ping attempt to the specified host using the
- * node-ping library. It measures response time and returns a structured
- * result. This function is used internally by {@link
- * performPingCheckWithRetry} and can also be used directly for single-attempt
- * checks.
- *
- * Uses only cross-platform ping options: numeric, timeout, and min_reply for
- * maximum compatibility.
- *
- * @param host - Target hostname or IP address to ping.
- * @param timeout - Maximum time to wait for the ping response in milliseconds.
- * @returns A promise that resolves to a {@link MonitorCheckResult} with ping status and timing.
- * @throws Error if the ping operation fails or times out.
- * @see {@link performPingCheckWithRetry}
- * @public
- */
-export async function performSinglePingCheck(
-    host: string,
-    timeout: number
-): Promise<MonitorCheckResult> {
-    const startTime = Date.now();
-    const timeoutInSeconds = Math.max(1, Math.floor(timeout / 1000)); // Convert to seconds, minimum 1
-
-    try {
-        const pingResult = await ping.promise.probe(host, {
-            // Use only cross-platform options for maximum compatibility
-            min_reply: 1, // Exit after receiving 1 reply (faster response)
-            numeric: false, // Don't map IP addresses to hostnames
-            timeout: timeoutInSeconds, // Timeout in seconds
-        });
-
-        const responseTime = Date.now() - startTime;
-
-        if (pingResult.alive) {
-            // Parse response time from ping result, fallback to measured time
-            const pingTime =
-                pingResult.time && typeof pingResult.time === "number"
-                    ? Math.round(pingResult.time)
-                    : responseTime;
-
-            return {
-                details: `Ping successful - packet loss: ${pingResult.packetLoss || "0"}%`,
-                responseTime: pingTime,
-                status: "up",
-            };
-        } else {
-            return {
-                details: "Host unreachable",
-                error: "Ping failed - host unreachable",
-                responseTime,
-                status: "down",
-            };
-        }
-    } catch (error) {
-        const responseTime = Date.now() - startTime;
-        const errorMessage =
-            error instanceof Error ? error.message : String(error);
-
-        throw new Error(
-            `Ping failed: ${errorMessage} (response time: ${responseTime}ms)`
-        );
     }
 }

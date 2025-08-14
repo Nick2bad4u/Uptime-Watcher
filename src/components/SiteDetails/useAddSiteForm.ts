@@ -269,25 +269,27 @@ export function useAddSiteForm(): AddSiteFormActions & AddSiteFormState {
 
     // Simple validation function without logging - only used for submit button
     // state
-    const isFormValid = useCallback(() => {
-        return validateFormFields(
+    const isFormValid = useCallback(
+        () =>
+            validateFormFields(
+                addMode,
+                name,
+                selectedExistingSite,
+                monitorType,
+                { host, port, url },
+                getFields
+            ),
+        [
             addMode,
-            name,
-            selectedExistingSite,
+            getFields,
+            host,
             monitorType,
-            { host, port, url },
-            getFields
-        );
-    }, [
-        addMode,
-        getFields,
-        host,
-        monitorType,
-        name,
-        port,
-        selectedExistingSite,
-        url,
-    ]);
+            name,
+            port,
+            selectedExistingSite,
+            url,
+        ]
+    );
 
     // Reset form to initial state
     const resetForm = useCallback(() => {

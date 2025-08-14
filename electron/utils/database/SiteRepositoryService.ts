@@ -212,15 +212,13 @@ export class SiteRepositoryService {
     public async getSitesFromDatabase(): Promise<Site[]> {
         try {
             const siteRows = await this.repositories.site.findAll();
-            const sites: Site[] = [];
 
-            for (const siteRow of siteRows) {
-                const site =
-                    await this.buildSiteWithMonitorsAndHistory(siteRow);
-                sites.push(site);
-            }
+            // Build sites in parallel since each site operation is independent
+            const sitePromises = siteRows.map(async (siteRow) =>
+                this.buildSiteWithMonitorsAndHistory(siteRow)
+            );
 
-            return sites;
+            return await Promise.all(sitePromises);
         } catch (error) {
             const message = `Failed to fetch sites from database: ${error instanceof Error ? error.message : String(error)}`;
             this.logger.error(message, error);
@@ -276,21 +274,23 @@ export class SiteRepositoryService {
         );
 
         // Load history for all monitors in parallel for better performance
-        await Promise.all(
+        const monitorsWithHistory = await Promise.all(
             monitors.map(async (monitor) => {
                 if (monitor.id) {
-                    monitor.history =
+                    const history =
                         await this.repositories.history.findByMonitorId(
                             monitor.id
                         );
+                    return { ...monitor, history };
                 }
+                return monitor;
             })
         );
 
         return {
             identifier: siteRow.identifier,
             monitoring: siteRow.monitoring ?? true, // Use the actual monitoring status with default
-            monitors: monitors,
+            monitors: monitorsWithHistory,
             name: siteRow.name ?? DEFAULT_SITE_NAME, // Use consistent default name
         };
     }

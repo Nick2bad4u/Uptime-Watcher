@@ -22,12 +22,10 @@ const ThemedTooltip = ({
     children,
     className = "",
     content,
-}: ThemedTooltipProperties): React.JSX.Element => {
-    return (
-        <div className={`themed-tooltip ${className}`} title={content}>
-            {children}
-        </div>
-    );
-};
+}: ThemedTooltipProperties): React.JSX.Element => (
+    <div className={`themed-tooltip ${className}`} title={content}>
+        {children}
+    </div>
+);
 
 export default ThemedTooltip;

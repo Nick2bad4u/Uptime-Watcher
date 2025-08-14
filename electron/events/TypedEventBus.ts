@@ -594,6 +594,7 @@ export class TypedEventBus<
                 `[TypedEventBus:${this.busId}] Event data contains _meta property, preserving as _originalMeta`
             );
             // Type-safe access to _meta property
+            // eslint-disable-next-line no-underscore-dangle -- _meta is conventional metadata property in event systems
             const existingMeta = (data as { _meta?: unknown })._meta;
             return {
                 ...data,

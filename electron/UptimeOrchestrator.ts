@@ -682,15 +682,13 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         siteIdentifier: string,
         monitorId: string
     ): Promise<boolean> {
-        let monitoringStopped = false;
-        let databaseRemoved = false;
-
         try {
             // Phase 1: Stop monitoring immediately (reversible)
-            monitoringStopped = await this.monitorManager.stopMonitoringForSite(
-                siteIdentifier,
-                monitorId
-            );
+            const monitoringStopped =
+                await this.monitorManager.stopMonitoringForSite(
+                    siteIdentifier,
+                    monitorId
+                );
 
             // If stopping monitoring failed, log warning but continue with
             // database removal The monitor may not be running, but database
@@ -703,7 +701,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
             // Phase 2: Remove monitor from database using transaction
             // (irreversible)
-            databaseRemoved = await this.siteManager.removeMonitor(
+            const databaseRemoved = await this.siteManager.removeMonitor(
                 siteIdentifier,
                 monitorId
             );
@@ -952,9 +950,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         const failed = setupResults.length - successful;
 
         if (failed > 0) {
-            const criticalFailures = setupResults.filter((result) => {
-                return result.status === "rejected" || !result.value.success;
-            }).length;
+            const criticalFailures = setupResults.filter(
+                (result) =>
+                    result.status === "rejected" || !result.value.success
+            ).length;
 
             if (criticalFailures > 0) {
                 const errorMessage = `Critical monitoring setup failures: ${criticalFailures} of ${data.sites.length} sites failed`;

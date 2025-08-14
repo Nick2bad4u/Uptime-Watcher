@@ -123,13 +123,11 @@ function parseActiveOperations(row: DatabaseMonitorRow): string[] {
 
         if (isValidIdentifierArray(parsed)) {
             return parsed;
-        } else {
-            logger.warn(
-                LOG_TEMPLATES.warnings.MONITOR_ACTIVE_OPERATIONS_INVALID,
-                { parsed }
-            );
-            return [];
         }
+        logger.warn(LOG_TEMPLATES.warnings.MONITOR_ACTIVE_OPERATIONS_INVALID, {
+            parsed,
+        });
+        return [];
     } catch (error) {
         logger.warn(
             LOG_TEMPLATES.warnings.MONITOR_ACTIVE_OPERATIONS_PARSE_FAILED,
@@ -237,35 +235,13 @@ export function isValidMonitorRow(row: Record<string, unknown>): boolean {
 }
 
 /**
- * Converts an array of database rows to an array of monitor objects.
- *
- * @remarks
- * Each row is mapped using {@link rowToMonitor}. History is not loaded here.
- *
- * @param rows - Array of raw database rows.
- * @returns Array of mapped monitor objects.
- *
- * @example
- * ```typescript
- * const monitors = rowsToMonitors(dbRows);
- * ```
- * @see {@link rowToMonitor}
- * @public
- */
-export function rowsToMonitors(rows: DatabaseMonitorRow[]): Site["monitors"] {
-    return rows.map((row) => rowToMonitor(row));
-}
-
-/**
  * Converts a single database row to a monitor object using the dynamic schema
  * system.
  *
  * @remarks
- * - Maps snake_case DB fields to camelCase.
  * - Handles monitor type-specific fields via {@link mapRowToMonitor}.
- * - Applies default values for missing/invalid fields.
- * - Does not load history (history is loaded separately).
- * - Logs and re-throws errors for full traceability.
+ * - Adds security validation for activeOperations JSON.
+ * - Performs safe type conversions with fallbacks.
  *
  * @param row - The raw database row to convert.
  * @returns The mapped monitor object.
@@ -303,6 +279,38 @@ export function rowToMonitor(row: DatabaseMonitorRow): Site["monitors"][0] {
         throw error;
     }
 }
+
+/**
+ * Converts an array of database rows to an array of monitor objects.
+ *
+ * @remarks
+ * Each row is mapped using {@link rowToMonitor}. History is not loaded here.
+ *
+ * @param rows - Array of raw database rows.
+ * @returns Array of mapped monitor objects.
+ *
+ * @example
+ * ```typescript
+ * const monitors = rowsToMonitors(dbRows);
+ * ```
+ * @see {@link rowToMonitor}
+ * @public
+ */
+export function rowsToMonitors(rows: DatabaseMonitorRow[]): Site["monitors"] {
+    return rows.map((row) => rowToMonitor(row));
+}
+
+/**
+ * Converts a single database row to a monitor object using the dynamic schema
+ * system.
+ *
+ * @remarks
+ * - Maps snake_case DB fields to camelCase.
+ * - Handles monitor type-specific fields via {@link mapRowToMonitor}.
+ * - Applies default values for missing/invalid fields.
+ * - Does not load history (history is loaded separately).
+ * - Logs and re-throws errors for full traceability.
+ */
 
 /**
  * Converts a database row to a monitor object, or returns `undefined` if the

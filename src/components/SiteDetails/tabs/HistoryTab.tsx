@@ -23,6 +23,7 @@
  */
 
 import type { Monitor, StatusHistory } from "@shared/types";
+import type { ChangeEvent, ReactElement } from "react";
 import type { JSX } from "react/jsx-runtime";
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -230,7 +231,7 @@ export const HistoryTab = ({
         .slice(0, safeHistoryLimit);
 
     // Helper to render details with label using dynamic formatting
-    function renderDetails(record: StatusHistory): null | React.ReactElement {
+    function renderDetails(record: StatusHistory): null | ReactElement {
         if (!record.details) {
             return null;
         }
@@ -258,7 +259,7 @@ export const HistoryTab = ({
     );
 
     const handleHistoryLimitChange = useCallback(
-        (event: React.ChangeEvent<HTMLSelectElement>) => {
+        (event: ChangeEvent<HTMLSelectElement>) => {
             const newLimit = Math.min(
                 Number.parseInt(event.target.value, 10),
                 backendLimit,

@@ -4,6 +4,7 @@
  */
 
 import type { Monitor } from "@shared/types";
+import type { ChangeEvent } from "react";
 import type { JSX } from "react/jsx-runtime";
 
 import { useCallback } from "react";
@@ -43,9 +44,7 @@ export interface OverviewTabProperties {
     /** Function to format response time for display */
     readonly formatResponseTime: (time: number) => string;
     /** Handler for monitor check interval changes */
-    readonly handleIntervalChange: (
-        e: React.ChangeEvent<HTMLSelectElement>
-    ) => void;
+    readonly handleIntervalChange: (e: ChangeEvent<HTMLSelectElement>) => void;
     /** Handler for removing the monitor */
     readonly handleRemoveMonitor: () => Promise<void>;
     /** Handler for saving interval changes */
@@ -53,9 +52,7 @@ export interface OverviewTabProperties {
     /** Handler for saving timeout changes */
     readonly handleSaveTimeout: () => Promise<void>;
     /** Handler for monitor timeout changes */
-    readonly handleTimeoutChange: (
-        e: React.ChangeEvent<HTMLInputElement>
-    ) => void;
+    readonly handleTimeoutChange: (e: ChangeEvent<HTMLInputElement>) => void;
     /** Whether the check interval has been changed */
     readonly intervalChanged: boolean;
     /** Whether any async operation is in progress */

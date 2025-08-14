@@ -10,6 +10,26 @@
  */
 
 /**
+ * Determines if a value is an object (excluding `null` and arrays).
+ *
+ * @param value - The value to check.
+ * @returns True if `value` is an object and not null or an array; otherwise, false.
+ */
+export function isObject(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Determines if a value is a number (excluding `NaN`).
+ *
+ * @param value - The value to check.
+ * @returns True if `value` is a number and not `NaN`; otherwise, false.
+ */
+export function isNumber(value: unknown): value is number {
+    return typeof value === "number" && !Number.isNaN(value);
+}
+
+/**
  * Determines if an object contains all specified properties.
  *
  * @typeParam K - The type of property keys to check for.
@@ -180,26 +200,6 @@ export function isNonNullObject(
     value: unknown
 ): value is Record<string, unknown> {
     return isObject(value);
-}
-
-/**
- * Determines if a value is a number (excluding `NaN`).
- *
- * @param value - The value to check.
- * @returns True if `value` is a number and not `NaN`; otherwise, false.
- */
-export function isNumber(value: unknown): value is number {
-    return typeof value === "number" && !Number.isNaN(value);
-}
-
-/**
- * Determines if a value is an object (excluding `null` and arrays).
- *
- * @param value - The value to check.
- * @returns True if `value` is an object and not null or an array; otherwise, false.
- */
-export function isObject(value: unknown): value is Record<string, unknown> {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 /**

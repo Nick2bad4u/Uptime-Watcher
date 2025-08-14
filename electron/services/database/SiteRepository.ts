@@ -88,12 +88,11 @@ export class SiteRepository {
         }
 
         await withDatabaseOperation(
-            async () => {
-                return this.databaseService.executeTransaction((db) => {
+            async () =>
+                this.databaseService.executeTransaction((db) => {
                     this.bulkInsertInternal(db, sites);
                     return Promise.resolve();
-                });
-            },
+                }),
             "site-bulk-insert",
             undefined,
             { count: sites.length }
@@ -113,11 +112,10 @@ export class SiteRepository {
      */
     public async delete(identifier: string): Promise<boolean> {
         return withDatabaseOperation(
-            async () => {
-                return this.databaseService.executeTransaction((db) => {
-                    return Promise.resolve(this.deleteInternal(db, identifier));
-                });
-            },
+            async () =>
+                this.databaseService.executeTransaction((db) =>
+                    Promise.resolve(this.deleteInternal(db, identifier))
+                ),
             "site-delete",
             undefined,
             { identifier }
@@ -139,12 +137,14 @@ export class SiteRepository {
      * ```
      */
     public async deleteAll(): Promise<void> {
-        return withDatabaseOperation(async () => {
-            return this.databaseService.executeTransaction((db) => {
-                this.deleteAllInternal(db);
-                return Promise.resolve();
-            });
-        }, "site-delete-all");
+        return withDatabaseOperation(
+            async () =>
+                this.databaseService.executeTransaction((db) => {
+                    this.deleteAllInternal(db);
+                    return Promise.resolve();
+                }),
+            "site-delete-all"
+        );
     }
 
     /**

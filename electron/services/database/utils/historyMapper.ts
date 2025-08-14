@@ -143,29 +143,6 @@ export function isValidHistoryRow(row: DatabaseHistoryRow): boolean {
 }
 
 /**
- * Converts an array of raw database rows to an array of {@link StatusHistory}
- * objects.
- *
- * @remarks
- * Each row is mapped using {@link rowToHistoryEntry}.
- *
- * @param rows - Array of raw database rows.
- * @returns Array of mapped {@link StatusHistory} objects.
- *
- * @example
- * ```typescript
- * const history = rowsToHistoryEntries(dbRows);
- * ```
- *
- * @public
- */
-export function rowsToHistoryEntries(
-    rows: DatabaseHistoryRow[]
-): StatusHistory[] {
-    return rows.map((row) => rowToHistoryEntry(row));
-}
-
-/**
  * Converts a single database row to a {@link StatusHistory} object.
  *
  * @remarks
@@ -207,6 +184,37 @@ export function rowToHistoryEntry(row: DatabaseHistoryRow): StatusHistory {
         throw error;
     }
 }
+
+/**
+ * Converts an array of raw database rows to an array of {@link StatusHistory}
+ * objects.
+ *
+ * @remarks
+ * Each row is mapped using {@link rowToHistoryEntry}.
+ *
+ * @param rows - Array of raw database rows.
+ * @returns Array of mapped {@link StatusHistory} objects.
+ *
+ * @example
+ * ```typescript
+ * const history = rowsToHistoryEntries(dbRows);
+ * ```
+ *
+ * @public
+ */
+export function rowsToHistoryEntries(
+    rows: DatabaseHistoryRow[]
+): StatusHistory[] {
+    return rows.map((row) => rowToHistoryEntry(row));
+}
+
+/**
+ * Converts a single database row to a {@link StatusHistory} object.
+ *
+ * @remarks
+ * Performs safe number conversion and status validation. If a value is
+ * invalid, it defaults to a safe fallback and logs a warning or error.
+ */
 
 /**
  * Converts a database row to a {@link StatusHistory} object, or returns

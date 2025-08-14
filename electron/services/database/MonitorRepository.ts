@@ -166,12 +166,14 @@ export class MonitorRepository {
      * clearActiveOperationsInternal.
      */
     public async clearActiveOperations(monitorId: string): Promise<void> {
-        return withDatabaseOperation(async () => {
-            return this.databaseService.executeTransaction((db) => {
-                this.clearActiveOperationsInternal(db, monitorId);
-                return Promise.resolve();
-            });
-        }, "MonitorRepository.clearActiveOperations");
+        return withDatabaseOperation(
+            async () =>
+                this.databaseService.executeTransaction((db) => {
+                    this.clearActiveOperationsInternal(db, monitorId);
+                    return Promise.resolve();
+                }),
+            "MonitorRepository.clearActiveOperations"
+        );
     }
 
     /**
@@ -193,13 +195,12 @@ export class MonitorRepository {
         monitor: Omit<Site["monitors"][0], "id">
     ): Promise<string> {
         return withDatabaseOperation(
-            async () => {
-                return this.databaseService.executeTransaction((db) => {
-                    return Promise.resolve(
+            async () =>
+                this.databaseService.executeTransaction((db) =>
+                    Promise.resolve(
                         this.createInternal(db, siteIdentifier, monitor)
-                    );
-                });
-            },
+                    )
+                ),
             "monitor-create",
             undefined,
             { siteIdentifier, type: monitor.type }
@@ -221,8 +222,8 @@ export class MonitorRepository {
      */
     public async delete(monitorId: string): Promise<boolean> {
         return withDatabaseOperation(
-            async () => {
-                return this.databaseService.executeTransaction((db) => {
+            async () =>
+                this.databaseService.executeTransaction((db) => {
                     const result = this.deleteInternal(db, monitorId);
 
                     if (result) {
@@ -238,8 +239,7 @@ export class MonitorRepository {
                     }
 
                     return Promise.resolve(result);
-                });
-            },
+                }),
             "monitor-delete",
             undefined,
             { monitorId }
@@ -259,12 +259,14 @@ export class MonitorRepository {
      * ```
      */
     public async deleteAll(): Promise<void> {
-        return withDatabaseOperation(async () => {
-            return this.databaseService.executeTransaction((db) => {
-                this.deleteAllInternal(db);
-                return Promise.resolve();
-            });
-        }, "monitor-delete-all");
+        return withDatabaseOperation(
+            async () =>
+                this.databaseService.executeTransaction((db) => {
+                    this.deleteAllInternal(db);
+                    return Promise.resolve();
+                }),
+            "monitor-delete-all"
+        );
     }
 
     /**
@@ -282,8 +284,8 @@ export class MonitorRepository {
      */
     public async deleteBySiteIdentifier(siteIdentifier: string): Promise<void> {
         return withDatabaseOperation(
-            async () => {
-                return this.databaseService.executeTransaction((db) => {
+            async () =>
+                this.databaseService.executeTransaction((db) => {
                     this.deleteBySiteIdentifierInternal(db, siteIdentifier);
 
                     if (isDev()) {
@@ -292,8 +294,7 @@ export class MonitorRepository {
                         );
                     }
                     return Promise.resolve();
-                });
-            },
+                }),
             "monitor-delete-by-site",
             undefined,
             { siteIdentifier }
@@ -400,12 +401,11 @@ export class MonitorRepository {
         monitor: Partial<Site["monitors"][0]>
     ): Promise<void> {
         return withDatabaseOperation(
-            async () => {
-                return this.databaseService.executeTransaction((db) => {
+            async () =>
+                this.databaseService.executeTransaction((db) => {
                     this.updateInternal(db, monitorId, monitor);
                     return Promise.resolve();
-                });
-            },
+                }),
             "monitor-update",
             undefined,
             { monitorId }
@@ -629,14 +629,12 @@ export class MonitorRepository {
 
         // Only update fields that are actually provided and are primitive types
         for (const [key, value] of Object.entries(row)) {
-            if (value !== undefined && value !== null) {
-                // Skip monitoring-related fields based on domain logic
-                // This prevents status updates from accidentally changing
-                // monitoring state
-                if (this.shouldSkipMonitoringFields(key, monitor)) {
-                    continue;
-                }
+            const shouldProcess =
+                value !== undefined &&
+                value !== null &&
+                !this.shouldSkipMonitoringFields(key, monitor);
 
+            if (shouldProcess) {
                 // Ensure we only bind primitive types that SQLite can handle
                 const fieldValue = this.convertValueForDatabase(key, value);
                 if (fieldValue !== null) {

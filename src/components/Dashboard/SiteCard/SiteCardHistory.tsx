@@ -126,7 +126,6 @@ export const SiteCardHistory: React.NamedExoticComponent<SiteCardHistoryProperti
                 />
             );
         },
-        (previousProperties, nextProperties) => {
-            return areHistoryPropsEqual(previousProperties, nextProperties);
-        }
+        (previousProperties, nextProperties) =>
+            areHistoryPropsEqual(previousProperties, nextProperties)
     );

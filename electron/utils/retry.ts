@@ -7,28 +7,6 @@
 import { dbLogger } from "./logger";
 
 /**
- * Database-specific retry wrapper with optimized settings for database
- * operations.
- *
- * @typeParam T - The return type of the database operation
- * @param operation - Database operation to retry
- * @param operationName - Name of the operation for logging
- * @param maxRetries - Maximum number of retry attempts (default: 5)
- * @returns Promise that resolves with the operation result
- */
-export async function withDbRetry<T>(
-    operation: () => Promise<T>,
-    operationName: string,
-    maxRetries = 5
-): Promise<T> {
-    return withRetry(operation, {
-        delayMs: 300,
-        maxRetries,
-        operationName,
-    });
-}
-
-/**
  * Generic retry utility with configurable parameters
  *
  * @typeParam T - The return type of the async operation
@@ -57,6 +35,7 @@ export async function withRetry<T>(
 
     for (const attempt of Array.from({ length: maxRetries }, (_, i) => i)) {
         try {
+            // eslint-disable-next-line no-await-in-loop
             return await operation();
         } catch (error) {
             errors.push(error);
@@ -71,7 +50,12 @@ export async function withRetry<T>(
             }
 
             if (attempt < maxRetries - 1) {
-                await new Promise((resolve) => setTimeout(resolve, delayMs));
+                // eslint-disable-next-line no-await-in-loop
+                await new Promise<void>((resolve) => {
+                    setTimeout(() => {
+                        resolve();
+                    }, delayMs);
+                });
             }
         }
     }
@@ -82,4 +66,26 @@ export async function withRetry<T>(
         lastError
     );
     throw lastError;
+}
+
+/**
+ * Database-specific retry wrapper with optimized settings for database
+ * operations.
+ *
+ * @typeParam T - The return type of the database operation
+ * @param operation - Database operation to retry
+ * @param operationName - Name of the operation for logging
+ * @param maxRetries - Maximum number of retry attempts (default: 5)
+ * @returns Promise that resolves with the operation result
+ */
+export async function withDbRetry<T>(
+    operation: () => Promise<T>,
+    operationName: string,
+    maxRetries = 5
+): Promise<T> {
+    return withRetry(operation, {
+        delayMs: 300,
+        maxRetries,
+        operationName,
+    });
 }

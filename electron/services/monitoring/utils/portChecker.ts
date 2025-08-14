@@ -107,9 +107,8 @@ export async function performSinglePortCheck(
             responseTime,
             status: "up",
         };
-    } else {
-        // Port not reachable - throw custom error with response time to
-        // support retry logic
-        throw new PortCheckError(PORT_NOT_REACHABLE, responseTime);
     }
+    // Port not reachable - throw custom error with response time to
+    // support retry logic
+    throw new PortCheckError(PORT_NOT_REACHABLE, responseTime);
 }

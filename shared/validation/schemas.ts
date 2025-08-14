@@ -119,23 +119,26 @@ export const baseMonitorSchema: BaseMonitorSchemaType = z.object({
  * Extends {@link baseMonitorSchema} and adds the `url` field with robust
  * validation.
  */
+
 export const httpMonitorSchema: HttpMonitorSchemaType =
     baseMonitorSchema.extend({
         type: z.literal("http"),
-        url: z.string().refine((val) => {
-            // Use validator.js for robust URL validation
-            return validator.isURL(val, {
-                allow_protocol_relative_urls: false,
-                allow_trailing_dot: false,
-                allow_underscores: false,
-                disallow_auth: false,
-                protocols: ["http", "https"],
-                require_host: true,
-                require_protocol: true,
-                require_tld: true,
-                validate_length: true,
-            });
-        }, "Must be a valid HTTP or HTTPS URL"),
+        url: z.string().refine(
+            (val) =>
+                // Use validator.js for robust URL validation
+                validator.isURL(val, {
+                    allow_protocol_relative_urls: false,
+                    allow_trailing_dot: false,
+                    allow_underscores: false,
+                    disallow_auth: false,
+                    protocols: ["http", "https"],
+                    require_host: true,
+                    require_protocol: true,
+                    require_tld: true,
+                    validate_length: true,
+                }),
+            "Must be a valid HTTP or HTTPS URL"
+        ),
     });
 
 /**

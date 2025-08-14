@@ -42,6 +42,69 @@ function ensureErrorInstance(error: unknown): Error {
 }
 
 /**
+ * Sets up request and response interceptors for precise timing measurement on
+ * an Axios instance.
+ *
+ * @remarks
+ * Uses `performance.now()` for high-precision timing measurement. Adds
+ * metadata to request config and calculates duration in response interceptor.
+ * Also handles timing for error responses to ensure consistent measurement.
+ * The timing data is attached to response/error objects via declaration
+ * merging defined in HttpMonitor.ts for type safety. This function mutates the
+ * provided Axios instance.
+ *
+ * @param axiosInstance - The {@link AxiosInstance} to configure with timing interceptors.
+ *
+ * @example
+ * ```typescript
+ * const client = axios.create();
+ * setupTimingInterceptors(client);
+ * ```
+ *
+ * @see {@link createHttpClient}
+ * @public
+ */
+export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
+    // Add request interceptor to record start time
+    axiosInstance.interceptors.request.use(
+        (config) => {
+            // Use a more precise timing method
+            config.metadata = {
+                startTime: performance.now(),
+            };
+            return config;
+        },
+        // eslint-disable-next-line promise/no-promise-in-callback -- Standard axios interceptor pattern
+        (error) => Promise.reject(ensureErrorInstance(error))
+    );
+
+    // Add response interceptor to calculate duration
+    axiosInstance.interceptors.response.use(
+        (response) => {
+            if (response.config.metadata?.startTime) {
+                const duration =
+                    performance.now() - response.config.metadata.startTime;
+                response.responseTime = Math.round(duration);
+            }
+            return response;
+        },
+        (error) => {
+            // Also calculate timing for error responses
+            const err = error as {
+                config?: { metadata?: { startTime?: number } };
+                responseTime?: number;
+            };
+            if (err.config?.metadata?.startTime) {
+                const duration =
+                    performance.now() - err.config.metadata.startTime;
+                err.responseTime = Math.round(duration);
+            }
+            return Promise.reject(ensureErrorInstance(error));
+        }
+    );
+}
+
+/**
  * Creates a configured Axios instance optimized for HTTP monitoring.
  *
  * @remarks
@@ -94,9 +157,7 @@ export function createHttpClient(config: MonitorConfig): AxiosInstance {
          *
          * @returns Always true to treat all HTTP responses as "successful".
          */
-        validateStatus: () => {
-            return true;
-        },
+        validateStatus: () => true,
     };
 
     if (config.timeout !== undefined) {
@@ -109,68 +170,4 @@ export function createHttpClient(config: MonitorConfig): AxiosInstance {
     setupTimingInterceptors(axiosInstance);
 
     return axiosInstance;
-}
-
-/**
- * Sets up request and response interceptors for precise timing measurement on
- * an Axios instance.
- *
- * @remarks
- * Uses `performance.now()` for high-precision timing measurement. Adds
- * metadata to request config and calculates duration in response interceptor.
- * Also handles timing for error responses to ensure consistent measurement.
- * The timing data is attached to response/error objects via declaration
- * merging defined in HttpMonitor.ts for type safety. This function mutates the
- * provided Axios instance.
- *
- * @param axiosInstance - The {@link AxiosInstance} to configure with timing interceptors.
- *
- * @example
- * ```typescript
- * const client = axios.create();
- * setupTimingInterceptors(client);
- * ```
- *
- * @see {@link createHttpClient}
- * @public
- */
-export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
-    // Add request interceptor to record start time
-    axiosInstance.interceptors.request.use(
-        (config) => {
-            // Use a more precise timing method
-            config.metadata = {
-                startTime: performance.now(),
-            };
-            return config;
-        },
-        (error) => {
-            return Promise.reject(ensureErrorInstance(error));
-        }
-    );
-
-    // Add response interceptor to calculate duration
-    axiosInstance.interceptors.response.use(
-        (response) => {
-            if (response.config.metadata?.startTime) {
-                const duration =
-                    performance.now() - response.config.metadata.startTime;
-                response.responseTime = Math.round(duration);
-            }
-            return response;
-        },
-        (error) => {
-            // Also calculate timing for error responses
-            const err = error as {
-                config?: { metadata?: { startTime?: number } };
-                responseTime?: number;
-            };
-            if (err.config?.metadata?.startTime) {
-                const duration =
-                    performance.now() - err.config.metadata.startTime;
-                err.responseTime = Math.round(duration);
-            }
-            return Promise.reject(ensureErrorInstance(error));
-        }
-    );
 }

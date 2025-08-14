@@ -86,12 +86,11 @@ export class HistoryRepository {
         details?: string
     ): Promise<void> {
         return withDatabaseOperation(
-            async () => {
-                return this.databaseService.executeTransaction((db) => {
+            async () =>
+                this.databaseService.executeTransaction((db) => {
                     this.addEntryInternal(db, monitorId, entry, details);
                     return Promise.resolve();
-                });
-            },
+                }),
             "history-add-entry",
             undefined,
             { monitorId }
@@ -165,12 +164,14 @@ export class HistoryRepository {
      * ```
      */
     public async deleteAll(): Promise<void> {
-        return withDatabaseOperation(async () => {
-            return this.databaseService.executeTransaction((db) => {
-                this.deleteAllInternal(db);
-                return Promise.resolve();
-            });
-        }, "history-delete-all");
+        return withDatabaseOperation(
+            async () =>
+                this.databaseService.executeTransaction((db) => {
+                    this.deleteAllInternal(db);
+                    return Promise.resolve();
+                }),
+            "history-delete-all"
+        );
     }
 
     /**
@@ -186,12 +187,11 @@ export class HistoryRepository {
      */
     public async deleteByMonitorId(monitorId: string): Promise<void> {
         return withDatabaseOperation(
-            async () => {
-                return this.databaseService.executeTransaction((db) => {
+            async () =>
+                this.databaseService.executeTransaction((db) => {
                     this.deleteByMonitorIdInternal(db, monitorId);
                     return Promise.resolve();
-                });
-            },
+                }),
             "history-delete-by-monitor",
             undefined,
             { monitorId }

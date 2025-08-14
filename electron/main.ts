@@ -35,38 +35,47 @@ const configureLogging = (): {
     const infoFlag = args.has("--log-info");
 
     // Determine log level based on flags and environment
-    // eslint-disable-next-line @typescript-eslint/init-declarations
-    let consoleLevel: ElectronLogLevel;
-    // eslint-disable-next-line @typescript-eslint/init-declarations
-    let fileLevel: ElectronLogLevel;
-
-    if (debugFlag) {
-        consoleLevel = "debug";
-        fileLevel = "debug";
-        console.log("[LOGGING] Debug logging enabled via command line flag");
-    } else if (productionFlag) {
-        consoleLevel = "info";
-        fileLevel = "warn";
-        console.log(
-            "[LOGGING] Production logging level enabled via command line flag"
-        );
-    } else if (infoFlag) {
-        consoleLevel = "info";
-        fileLevel = "info";
-        console.log(
-            "[LOGGING] Info logging level enabled via command line flag"
-        );
-    } else {
+    return ((): {
+        consoleLevel: ElectronLogLevel;
+        fileLevel: ElectronLogLevel;
+    } => {
+        if (debugFlag) {
+            console.log(
+                "[LOGGING] Debug logging enabled via command line flag"
+            );
+            return {
+                consoleLevel: "debug" as ElectronLogLevel,
+                fileLevel: "debug" as ElectronLogLevel,
+            };
+        } else if (productionFlag) {
+            console.log(
+                "[LOGGING] Production logging level enabled via command line flag"
+            );
+            return {
+                consoleLevel: "info" as ElectronLogLevel,
+                fileLevel: "warn" as ElectronLogLevel,
+            };
+        } else if (infoFlag) {
+            console.log(
+                "[LOGGING] Info logging level enabled via command line flag"
+            );
+            return {
+                consoleLevel: "info" as ElectronLogLevel,
+                fileLevel: "info" as ElectronLogLevel,
+            };
+        }
         // Default development behavior
         const isDevMode = !app.isPackaged;
-        consoleLevel = isDevMode ? "debug" : "info";
-        fileLevel = isDevMode ? "info" : "warn";
+        const consoleLevel = isDevMode ? "debug" : "info";
+        const fileLevel = isDevMode ? "info" : "warn";
         console.log(
             `[LOGGING] Default logging: console=${consoleLevel}, file=${fileLevel} (isDev=${isDevMode})`
         );
-    }
-
-    return { consoleLevel, fileLevel };
+        return {
+            consoleLevel: consoleLevel as ElectronLogLevel,
+            fileLevel: fileLevel as ElectronLogLevel,
+        };
+    })();
 };
 
 // Enable preload mode for reliable logging in Electron's main process,
@@ -221,7 +230,7 @@ class Main {
  * preventing premature garbage collection and maintaining lifecycle handlers.
  */
 if (process.versions.electron) {
-    // eslint-disable-next-line sonarjs/constructor-for-side-effects -- Main instance needed for lifecycle management
+    // eslint-disable-next-line sonarjs/constructor-for-side-effects, no-new -- Main instance needed for lifecycle management
     new Main();
 
     /**
@@ -241,10 +250,12 @@ if (process.versions.electron) {
      * // Extensions are installed automatically in development mode.
      * ```
      */
-    void (async (): Promise<Array<{ id: string; name: string }>> => {
+    void (async (): Promise<void> => {
         await app.whenReady();
         // Wait a bit for the main window to be created and ready
-        await new Promise((resolve) => setTimeout(resolve, 1));
+        await new Promise<void>((resolve) => {
+            setTimeout(resolve, 1);
+        });
 
         if (isDev()) {
             try {
@@ -257,15 +268,12 @@ if (process.versions.electron) {
                 logger.info(
                     `[Main] Added Extensions: ${extensions.map((ext) => ext.name).join(", ")}`
                 );
-                return extensions;
             } catch (error) {
                 logger.warn(
                     "[Main] Failed to install dev extensions (this is normal in production)",
                     error
                 );
-                return [];
             }
         }
-        return []; // No extensions in production
     })();
 }

@@ -12,6 +12,22 @@ import {
 } from "@shared/types";
 
 /**
+ * Validates monitor type.
+ *
+ * @param type - Value to check as monitor type
+ * @returns Type predicate indicating if the value is a valid MonitorType
+ *
+ * @remarks
+ * Supports all monitor types: HTTP, port, and ping monitors.
+ */
+export function validateMonitorType(type: unknown): type is MonitorType {
+    return (
+        typeof type === "string" &&
+        (type === "http" || type === "port" || type === "ping")
+    );
+}
+
+/**
  * Type guard to check if a value is a partial monitor object.
  *
  * @param value - Value to check
@@ -183,6 +199,10 @@ function validateTypeSpecificFields(
             validatePortMonitorFields(monitor, errors);
             break;
         }
+        default: {
+            errors.push(`Unknown monitor type: ${String(monitor.type)}`);
+            break;
+        }
     }
 }
 
@@ -208,22 +228,6 @@ export function getMonitorValidationErrors(
     validateTypeSpecificFields(monitor, errors);
 
     return errors;
-}
-
-/**
- * Validates monitor type.
- *
- * @param type - Value to check as monitor type
- * @returns Type predicate indicating if the value is a valid MonitorType
- *
- * @remarks
- * Supports all monitor types: HTTP, port, and ping monitors.
- */
-export function validateMonitorType(type: unknown): type is MonitorType {
-    return (
-        typeof type === "string" &&
-        (type === "http" || type === "port" || type === "ping")
-    );
 }
 
 /**

@@ -146,6 +146,7 @@ export class MonitorOperationRegistry {
      * @returns Unique operation ID
      */
     public initiateCheck(monitorId: string): string {
+        // eslint-disable-next-line no-useless-assignment -- Variable initialized to satisfy init-declarations rule, even though immediately reassigned
         let operationId = "";
         let attempts = 0;
         do {

@@ -34,6 +34,8 @@
  * @packageDocumentation
  */
 
+import type { Event } from "electron";
+
 import { getNodeEnv } from "@shared/utils/environment";
 import { BrowserWindow } from "electron";
 // eslint-disable-next-line unicorn/import-style -- Need namespace import for path operations
@@ -102,7 +104,7 @@ export class WindowService {
      * Named event handler for did-fail-load event
      */
     private readonly handleDidFailLoad = (
-        _event: Electron.Event,
+        _event: Event,
         errorCode: number,
         errorDescription: string
     ): void => {
@@ -230,6 +232,7 @@ export class WindowService {
                     controller.abort();
                 }, FETCH_TIMEOUT);
 
+                // eslint-disable-next-line no-await-in-loop -- Sequential server readiness check required
                 const response = await fetch(SERVER_URL, {
                     signal: controller.signal,
                 });
@@ -268,6 +271,7 @@ export class WindowService {
                 logger.debug(
                     `[WindowService] Waiting ${Math.round(totalDelay)}ms before retry ${attempt + 2}/${MAX_RETRIES}`
                 );
+                // eslint-disable-next-line no-await-in-loop, no-promise-executor-return -- Sequential retry delay required
                 await new Promise((resolve) => setTimeout(resolve, totalDelay));
             }
         }

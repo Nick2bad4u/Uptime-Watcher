@@ -165,7 +165,7 @@ const DynamicField = ({
             );
         }
         case "text":
-
+        // falls through
         case "url": {
             return (
                 <TextField

@@ -176,6 +176,7 @@ const ThemedButton = ({
             );
         }
         if (icon) {
+            // eslint-disable-next-line no-useless-assignment -- Variable initialized to satisfy init-declarations rule, even though immediately reassigned
             let iconElement: React.ReactNode = null;
             if (React.isValidElement(icon) && iconColor) {
                 iconElement = renderColoredIcon(icon, iconColor);

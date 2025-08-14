@@ -17,6 +17,38 @@ import {
 } from "@shared/validation/validatorUtils";
 
 /**
+ * Type guard to safely check if a monitor has valid retry attempts.
+ *
+ * @param monitor - The monitor configuration to check
+ * @returns True if the monitor has valid retry attempts, false otherwise
+ */
+export function hasValidRetryAttempts(
+    monitor: Site["monitors"][0]
+): monitor is Site["monitors"][0] & { retryAttempts: number } {
+    return (
+        typeof monitor.retryAttempts === "number" &&
+        monitor.retryAttempts >= 0 &&
+        Number.isFinite(monitor.retryAttempts)
+    );
+}
+
+/**
+ * Type guard to safely check if a monitor has a valid timeout value.
+ *
+ * @param monitor - The monitor configuration to check
+ * @returns True if the monitor has a valid timeout, false otherwise
+ */
+export function hasValidTimeout(
+    monitor: Site["monitors"][0]
+): monitor is Site["monitors"][0] & { timeout: number } {
+    return (
+        typeof monitor.timeout === "number" &&
+        monitor.timeout > 0 &&
+        Number.isFinite(monitor.timeout)
+    );
+}
+
+/**
  * Safely extracts retry attempts from monitor configuration.
  *
  * @param monitor - The monitor configuration
@@ -76,38 +108,6 @@ export function hasValidPort(
         typeof monitor.port === "number" &&
         monitor.port >= 1 &&
         monitor.port <= 65_535
-    );
-}
-
-/**
- * Type guard to safely check if a monitor has valid retry attempts.
- *
- * @param monitor - The monitor configuration to check
- * @returns True if the monitor has valid retry attempts, false otherwise
- */
-export function hasValidRetryAttempts(
-    monitor: Site["monitors"][0]
-): monitor is Site["monitors"][0] & { retryAttempts: number } {
-    return (
-        typeof monitor.retryAttempts === "number" &&
-        monitor.retryAttempts >= 0 &&
-        Number.isFinite(monitor.retryAttempts)
-    );
-}
-
-/**
- * Type guard to safely check if a monitor has a valid timeout value.
- *
- * @param monitor - The monitor configuration to check
- * @returns True if the monitor has a valid timeout, false otherwise
- */
-export function hasValidTimeout(
-    monitor: Site["monitors"][0]
-): monitor is Site["monitors"][0] & { timeout: number } {
-    return (
-        typeof monitor.timeout === "number" &&
-        monitor.timeout > 0 &&
-        Number.isFinite(monitor.timeout)
     );
 }
 

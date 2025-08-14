@@ -6,6 +6,7 @@
  */
 
 import type { Monitor, Site } from "@shared/types";
+import type { MouseEvent } from "react";
 import type { JSX } from "react/jsx-runtime";
 
 import { isValidUrl } from "@shared/validation/validatorUtils";
@@ -65,7 +66,7 @@ const SiteDetailsHeader = ({
 
     // Memoized click handler for URL link
     const handleUrlClick = useCallback(
-        (event: React.MouseEvent) => {
+        (event: MouseEvent) => {
             event.preventDefault();
             const url = selectedMonitor?.url ?? "";
             openExternal(url, {

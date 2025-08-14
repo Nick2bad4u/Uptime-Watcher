@@ -99,9 +99,10 @@ export function useTheme(): UseThemeReturn {
 
     // Memoized getCurrentTheme to satisfy useEffect deps and avoid unnecessary
     // re-renders
-    const getCurrentTheme = useCallback((): Theme => {
-        return themeManager.getTheme(settings.theme);
-    }, [settings.theme]);
+    const getCurrentTheme = useCallback(
+        (): Theme => themeManager.getTheme(settings.theme),
+        [settings.theme]
+    );
 
     const [currentTheme, setCurrentTheme] = useState<Theme>(getCurrentTheme);
 
@@ -315,9 +316,8 @@ export function useAvailabilityColors(): UseAvailabilityColorsReturn {
             return currentTheme.colors.warning; // Poor
         } else if (clampedPercentage >= 50) {
             return currentTheme.colors.error; // Critical
-        } else {
-            return currentTheme.colors.status.down; // Failed
         }
+        return currentTheme.colors.status.down; // Failed
     };
 
     const getAvailabilityVariant = (
@@ -329,9 +329,8 @@ export function useAvailabilityColors(): UseAvailabilityColorsReturn {
             return "success";
         } else if (clampedPercentage >= 80) {
             return "warning";
-        } else {
-            return "danger";
         }
+        return "danger";
     };
 
     const getAvailabilityDescription = (percentage: number): string => {
@@ -349,9 +348,8 @@ export function useAvailabilityColors(): UseAvailabilityColorsReturn {
             return "Poor";
         } else if (clampedPercentage >= 50) {
             return "Critical";
-        } else {
-            return "Failed";
         }
+        return "Failed";
     };
 
     return {
@@ -413,43 +411,33 @@ export function useThemeClasses(): UseThemeClassesReturn {
 
     const getBackgroundClass = (
         variant: "primary" | "secondary" | "tertiary" = "primary"
-    ): { backgroundColor: string } => {
-        return {
-            backgroundColor: `var(--color-background-${variant})`,
-        };
-    };
+    ): { backgroundColor: string } => ({
+        backgroundColor: `var(--color-background-${variant})`,
+    });
 
     const getTextClass = (
         variant: "inverse" | "primary" | "secondary" | "tertiary" = "primary"
-    ): { color: string } => {
-        return {
-            color: `var(--color-text-${variant})`,
-        };
-    };
+    ): { color: string } => ({
+        color: `var(--color-text-${variant})`,
+    });
 
     const getBorderClass = (
         variant: "focus" | "primary" | "secondary" = "primary"
-    ): { borderColor: string } => {
-        return {
-            borderColor: `var(--color-border-${variant})`,
-        };
-    };
+    ): { borderColor: string } => ({
+        borderColor: `var(--color-border-${variant})`,
+    });
 
     const getSurfaceClass = (
         variant: "base" | "elevated" | "overlay" = "base"
-    ): { backgroundColor: string } => {
-        return {
-            backgroundColor: `var(--color-surface-${variant})`,
-        };
-    };
+    ): { backgroundColor: string } => ({
+        backgroundColor: `var(--color-surface-${variant})`,
+    });
 
     const getStatusClass = (
         status: MonitorStatus | SiteStatus
-    ): { color: string } => {
-        return {
-            color: `var(--color-status-${status})`,
-        };
-    };
+    ): { color: string } => ({
+        color: `var(--color-status-${status})`,
+    });
 
     return {
         getBackgroundClass,

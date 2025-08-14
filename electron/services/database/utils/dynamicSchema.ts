@@ -44,6 +44,27 @@ interface SqlParameters {
 }
 
 /**
+ * Converts a `lastChecked` value to a database-compatible timestamp.
+ *
+ * @remarks
+ * Used internally to ensure `lastChecked` is stored as a number (timestamp) or
+ * null.
+ *
+ * @param lastChecked - Value to convert (Date, number, or other).
+ * @returns Timestamp as number, or null if not convertible.
+ * @internal
+ */
+function convertLastCheckedField(lastChecked: unknown): null | number {
+    if (lastChecked instanceof Date) {
+        return lastChecked.getTime();
+    }
+    if (typeof lastChecked === "number") {
+        return lastChecked;
+    }
+    return null;
+}
+
+/**
  * Configuration for standard field mappings between monitor objects and
  * database rows.
  *
@@ -245,27 +266,6 @@ function convertFromDatabase(value: unknown, sqlType: string): unknown {
 }
 
 /**
- * Converts a `lastChecked` value to a database-compatible timestamp.
- *
- * @remarks
- * Used internally to ensure `lastChecked` is stored as a number (timestamp) or
- * null.
- *
- * @param lastChecked - Value to convert (Date, number, or other).
- * @returns Timestamp as number, or null if not convertible.
- * @internal
- */
-function convertLastCheckedField(lastChecked: unknown): null | number {
-    if (lastChecked instanceof Date) {
-        return lastChecked.getTime();
-    }
-    if (typeof lastChecked === "number") {
-        return lastChecked;
-    }
-    return null;
-}
-
-/**
  * Converts a JavaScript value to a database-compatible format for storage.
  *
  * @remarks
@@ -317,6 +317,76 @@ function getSqlTypeFromFieldType(fieldType: string): string {
             return "TEXT"; // Safe default for unknown types
         }
     }
+}
+
+/**
+ * Converts a camelCase or PascalCase string to snake_case for database
+ * columns.
+ *
+ * @remarks
+ * Handles leading uppercase characters to avoid leading underscores. Used
+ * internally for dynamic schema generation.
+ *
+ * @param str - String to convert.
+ * @returns Snake_case version of the string.
+ * @example
+ * ```typescript
+ * const snake = toSnakeCase("SiteIdentifier"); // "site_identifier"
+ * ```
+ * @internal
+ */
+function toSnakeCase(str: string): string {
+    if (!str || typeof str !== "string") return str;
+
+    // Handle leading uppercase to avoid leading underscore
+    return str
+        .replace(/^[A-Z]/v, (match) => match.toLowerCase())
+        .replaceAll(/[A-Z]/gv, (letter) => `_${letter.toLowerCase()}`);
+}
+
+/**
+ * Generates database field definitions from the monitor type registry.
+ *
+ * @remarks
+ * Avoids duplicate columns by tracking seen field names.
+ * Converts field names to snake_case for database compatibility.
+ *
+ * @returns Array of {@link DatabaseFieldDefinition} objects for all monitor types.
+ *
+ * @example
+ * ```typescript
+ * const fields = generateDatabaseFieldDefinitions();
+ * ```
+ */
+export function generateDatabaseFieldDefinitions(): DatabaseFieldDefinition[] {
+    const configs = getAllMonitorTypeConfigs();
+    const fields: DatabaseFieldDefinition[] = [];
+    const seenFields = new Set<string>();
+
+    for (const config of configs) {
+        for (const field of config.fields) {
+            // Convert field name to snake_case for database
+            const columnName = toSnakeCase(field.name);
+
+            // Skip if we've already seen this field (avoid duplicates)
+            if (!seenFields.has(columnName)) {
+                seenFields.add(columnName);
+
+                fields.push({
+                    columnName,
+                    defaultValue: null, // Actual null value, not string "NULL"
+                    monitorType: config.type,
+                    // All dynamic fields are nullable since they're only used
+                    // by specific monitor types
+                    nullable: true,
+                    sourceField: field.name,
+                    sqlType: getSqlTypeFromFieldType(field.type),
+                });
+            }
+        }
+    }
+
+    return fields;
 }
 
 /**
@@ -384,77 +454,6 @@ function mapStandardFields(
             row[mapping.dbField] = value;
         }
     }
-}
-
-/**
- * Converts a camelCase or PascalCase string to snake_case for database
- * columns.
- *
- * @remarks
- * Handles leading uppercase characters to avoid leading underscores. Used
- * internally for dynamic schema generation.
- *
- * @param str - String to convert.
- * @returns Snake_case version of the string.
- * @example
- * ```typescript
- * const snake = toSnakeCase("SiteIdentifier"); // "site_identifier"
- * ```
- * @internal
- */
-function toSnakeCase(str: string): string {
-    if (!str || typeof str !== "string") return str;
-
-    // Handle leading uppercase to avoid leading underscore
-    return str
-        .replace(/^[A-Z]/v, (match) => match.toLowerCase())
-        .replaceAll(/[A-Z]/gv, (letter) => `_${letter.toLowerCase()}`);
-}
-
-/**
- * Generates database field definitions from the monitor type registry.
- *
- * @remarks
- * Avoids duplicate columns by tracking seen field names.
- * Converts field names to snake_case for database compatibility.
- *
- * @returns Array of {@link DatabaseFieldDefinition} objects for all monitor types.
- *
- * @example
- * ```typescript
- * const fields = generateDatabaseFieldDefinitions();
- * ```
- */
-export function generateDatabaseFieldDefinitions(): DatabaseFieldDefinition[] {
-    const configs = getAllMonitorTypeConfigs();
-    const fields: DatabaseFieldDefinition[] = [];
-    const seenFields = new Set<string>();
-
-    for (const config of configs) {
-        for (const field of config.fields) {
-            // Convert field name to snake_case for database
-            const columnName = toSnakeCase(field.name);
-
-            // Skip if we've already seen this field (avoid duplicates)
-            if (seenFields.has(columnName)) {
-                continue;
-            }
-            seenFields.add(columnName);
-
-            fields.push({
-                columnName,
-                defaultValue: null, // Actual null value, not string "NULL"
-                monitorType: config.type,
-                // All dynamic fields are nullable since they're only used by
-                // specific monitor types
-                nullable: true,
-                sourceField: field.name,
-                sqlType: getSqlTypeFromFieldType(field.type),
-            });
-        }
-    }
-
-    return fields;
 }
 
 /**

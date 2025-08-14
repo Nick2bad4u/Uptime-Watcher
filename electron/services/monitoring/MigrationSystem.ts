@@ -207,6 +207,7 @@ class MigrationOrchestrator {
                         )
                     );
 
+                    // eslint-disable-next-line no-await-in-loop
                     currentData = await migration.transform(currentData);
                     appliedMigrations.push(
                         `${migration.fromVersion}_to_${migration.toVersion}`
@@ -715,11 +716,10 @@ export const exampleMigrations = {
                         ...data,
                         port: parsed,
                     });
-                } else {
-                    throw new Error(
-                        `Invalid port value: ${portValue}. Must be 1-65535.`
-                    );
                 }
+                throw new Error(
+                    `Invalid port value: ${portValue}. Must be 1-65535.`
+                );
             }
 
             // If already a number, validate it
@@ -729,11 +729,10 @@ export const exampleMigrations = {
                         ...data,
                         port: portValue,
                     });
-                } else {
-                    throw new Error(
-                        `Invalid port number: ${portValue}. Must be 1-65535.`
-                    );
                 }
+                throw new Error(
+                    `Invalid port number: ${portValue}. Must be 1-65535.`
+                );
             }
 
             // Invalid port type

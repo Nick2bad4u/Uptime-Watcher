@@ -185,16 +185,14 @@ const RowValidationUtils = {
     /**
      * Validates that a value is a non-null object.
      */
-    isValidObject: (obj: unknown): obj is Record<string, unknown> => {
-        return typeof obj === "object" && obj !== null && !Array.isArray(obj);
-    },
+    isValidObject: (obj: unknown): obj is Record<string, unknown> =>
+        typeof obj === "object" && obj !== null && !Array.isArray(obj),
 
     /**
      * Validates monitor status value.
      */
-    isValidStatus: (value: unknown): value is "down" | "up" => {
-        return value === "up" || value === "down";
-    },
+    isValidStatus: (value: unknown): value is "down" | "up" =>
+        value === "up" || value === "down",
 
     /**
      * Validates timestamp as numeric value.

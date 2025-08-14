@@ -205,8 +205,8 @@ export const useSettingsStore: UseBoundStore<
             syncFromBackend: async (): Promise<{
                 message: string;
                 success: boolean;
-            }> => {
-                return withErrorHandling(
+            }> =>
+                withErrorHandling(
                     async () => {
                         const response =
                             await window.electronAPI.settings.getHistoryLimit();
@@ -229,8 +229,7 @@ export const useSettingsStore: UseBoundStore<
                         };
                     },
                     createStoreErrorHandler("settings", "syncFromBackend")
-                );
-            },
+                ),
             updateHistoryLimitValue: async (limit: number): Promise<void> => {
                 logStoreAction("SettingsStore", "updateHistoryLimitValue", {
                     limit,

@@ -217,10 +217,9 @@ export class StandardizedCache<T> {
             if (entry.expiresAt && now > entry.expiresAt) {
                 this.cache.delete(key);
                 expiredKeys.push(key);
-                continue;
+            } else {
+                entries.push([key, entry.data]);
             }
-
-            entries.push([key, entry.data]);
         }
 
         // Notify callbacks for expired items
@@ -277,10 +276,9 @@ export class StandardizedCache<T> {
             if (entry.expiresAt && now > entry.expiresAt) {
                 this.cache.delete(key);
                 expiredKeys.push(key);
-                continue;
+            } else {
+                values.push(entry.data);
             }
-
-            values.push(entry.data);
         }
 
         // Notify callbacks for expired items
@@ -362,10 +360,9 @@ export class StandardizedCache<T> {
             if (entry.expiresAt && now > entry.expiresAt) {
                 this.cache.delete(key);
                 expiredKeys.push(key);
-                continue;
+            } else {
+                validKeys.push(key);
             }
-
-            validKeys.push(key);
         }
 
         // Notify callbacks for expired items

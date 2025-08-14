@@ -18,6 +18,7 @@ import type {
     TestEventData,
     UpdateStatusEventData,
 } from "@shared/types/events";
+import type { IpcRendererEvent } from "electron";
 
 import { contextBridge, ipcRenderer } from "electron";
 
@@ -156,19 +157,17 @@ const dataAPI = {
     downloadSQLiteBackup: async (): Promise<{
         buffer: ArrayBuffer;
         fileName: string;
-    }> => {
+    }> =>
         // This assertion is safe because:
         // 1. The IPC handler is defined in our codebase with a known return
         // type 2. This is an internal API call with a well-defined contract 3.
         // The main process handler guarantees this specific return type
         // structure
 
-        return ipcRenderer.invoke("download-sqlite-backup") as Promise<{
+        ipcRenderer.invoke("download-sqlite-backup") as Promise<{
             buffer: ArrayBuffer;
             fileName: string;
-        }>;
-    },
-
+        }>,
     /**
      * Export all application data as JSON string.
      *
@@ -266,7 +265,7 @@ const eventsAPI = {
         callback: (data: CacheInvalidatedEventData) => void
     ): (() => void) => {
         const handler = (
-            _: Electron.IpcRendererEvent,
+            _: IpcRendererEvent,
             data: CacheInvalidatedEventData
         ): void => {
             callback(data);
@@ -290,7 +289,7 @@ const eventsAPI = {
         callback: (data: MonitorDownEventData) => void
     ): (() => void) => {
         const handler = (
-            _: Electron.IpcRendererEvent,
+            _: IpcRendererEvent,
             data: MonitorDownEventData
         ): void => {
             callback(data);
@@ -314,7 +313,7 @@ const eventsAPI = {
         callback: (data: MonitoringControlEventData) => void
     ) => {
         const handler = (
-            _: Electron.IpcRendererEvent,
+            _: IpcRendererEvent,
             data: MonitoringControlEventData
         ): void => {
             callback(data);
@@ -338,7 +337,7 @@ const eventsAPI = {
         callback: (data: MonitoringControlEventData) => void
     ) => {
         const handler = (
-            _: Electron.IpcRendererEvent,
+            _: IpcRendererEvent,
             data: MonitoringControlEventData
         ): void => {
             callback(data);
@@ -362,7 +361,7 @@ const eventsAPI = {
     onMonitorStatusChanged: (
         callback: (data: unknown) => void
     ): (() => void) => {
-        const handler = (_: Electron.IpcRendererEvent, data: unknown): void => {
+        const handler = (_: IpcRendererEvent, data: unknown): void => {
             callback(data);
         };
         ipcRenderer.on("monitor:status-changed", handler);
@@ -384,7 +383,7 @@ const eventsAPI = {
         callback: (data: MonitorUpEventData) => void
     ): (() => void) => {
         const handler = (
-            _: Electron.IpcRendererEvent,
+            _: IpcRendererEvent,
             data: MonitorUpEventData
         ): void => {
             callback(data);
@@ -405,10 +404,7 @@ const eventsAPI = {
      * Used primarily for development and debugging purposes.
      */
     onTestEvent: (callback: (data: TestEventData) => void): (() => void) => {
-        const handler = (
-            _: Electron.IpcRendererEvent,
-            data: TestEventData
-        ): void => {
+        const handler = (_: IpcRendererEvent, data: TestEventData): void => {
             callback(data);
         };
         ipcRenderer.on("test-event", handler);
@@ -431,7 +427,7 @@ const eventsAPI = {
         callback: (data: UpdateStatusEventData) => void
     ): (() => void) => {
         const handler = (
-            _: Electron.IpcRendererEvent,
+            _: IpcRendererEvent,
             data: UpdateStatusEventData
         ): void => {
             callback(data);
@@ -526,7 +522,7 @@ const stateSyncAPI = {
         }) => void
     ) => {
         const handler = (
-            _event: Electron.IpcRendererEvent,
+            _event: IpcRendererEvent,
             eventData: Parameters<typeof callback>[0]
         ): void => {
             callback(eventData);

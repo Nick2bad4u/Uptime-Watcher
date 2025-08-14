@@ -240,7 +240,7 @@ async function processAllSiteMonitors(
     for (const monitor of validMonitors) {
         if (monitor.id) {
             try {
-                // eslint-disable-next-line n/callback-return -- This is a processing callback, not an async Node.js callback
+                // eslint-disable-next-line n/callback-return, no-await-in-loop -- Sequential processing to avoid DB conflicts
                 const result = await callback(identifier, monitor.id);
                 results.push(result);
             } catch (error) {
@@ -459,6 +459,7 @@ export async function startAllMonitoring(
             if (monitor.id) {
                 try {
                     // Use operational hooks for database update
+                    // eslint-disable-next-line no-await-in-loop -- Sequential initialization to avoid startup conflicts
                     await withDatabaseOperation(
                         () => {
                             const db = config.databaseService.getDatabase();
@@ -550,6 +551,7 @@ export async function stopAllMonitoring(
             if (monitor.id && monitor.monitoring) {
                 try {
                     // Use operational hooks for database update
+                    // eslint-disable-next-line no-await-in-loop -- Sequential shutdown to avoid conflicts
                     await withDatabaseOperation(
                         () => {
                             const db = config.databaseService.getDatabase();

@@ -266,9 +266,9 @@ export const createSiteSyncActions = (
 
             return result;
         },
-        subscribeToSyncEvents: () => {
+        subscribeToSyncEvents: () =>
             // eslint-disable-next-line n/no-sync -- Switch case handles 'sync' event types, not synchronous file operations
-            return window.electronAPI.stateSync.onStateSyncEvent((event) => {
+            window.electronAPI.stateSync.onStateSyncEvent((event) => {
                 logStoreAction("SitesStore", "syncEventReceived", {
                     action: event.action,
                     siteIdentifier: event.siteIdentifier,
@@ -296,9 +296,14 @@ export const createSiteSyncActions = (
                         })();
                         break;
                     }
+                    default: {
+                        logStoreAction("SitesStore", "warning", {
+                            message: `Unknown sync action: ${String(event.action)}`,
+                        });
+                        break;
+                    }
                 }
-            });
-        },
+            }),
         syncSitesFromBackend: async () => {
             await withErrorHandling(
                 async () => {

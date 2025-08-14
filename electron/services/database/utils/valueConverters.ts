@@ -45,6 +45,34 @@ export function addBooleanField(
 }
 
 /**
+ * Safely convert a value to number or return undefined.
+ *
+ * @param value - The value to convert to a number
+ * @returns Converted number value, or undefined if conversion fails or value is nullish
+ *
+ * @remarks
+ * Provides safe number conversion with explicit handling of edge cases:
+ * - Already a number: returned as-is (including 0, NaN, Infinity)
+ * - Truthy values: converted using Number() constructor
+ * - Falsy values (null, undefined, "", false, 0): returns undefined
+ *
+ * Note: This function treats 0 as a valid number that should be preserved,
+ * unlike some truthy/falsy checks that would convert 0 to undefined.
+ *
+ * @public
+ */
+export function safeNumberConvert(value: unknown): number | undefined {
+    if (typeof value === "number") {
+        return value;
+    }
+    if (value !== null && value !== undefined && value !== "") {
+        const converted = Number(value);
+        return Number.isNaN(converted) ? undefined : converted;
+    }
+    return undefined;
+}
+
+/**
  * Add a number field to update arrays if the value is defined.
  *
  * @param fieldName - The database field name to update
@@ -136,32 +164,4 @@ export function convertDateForDb(
         return value.toISOString();
     }
     return value;
-}
-
-/**
- * Safely convert a value to number or return undefined.
- *
- * @param value - The value to convert to a number
- * @returns Converted number value, or undefined if conversion fails or value is nullish
- *
- * @remarks
- * Provides safe number conversion with explicit handling of edge cases:
- * - Already a number: returned as-is (including 0, NaN, Infinity)
- * - Truthy values: converted using Number() constructor
- * - Falsy values (null, undefined, "", false, 0): returns undefined
- *
- * Note: This function treats 0 as a valid number that should be preserved,
- * unlike some truthy/falsy checks that would convert 0 to undefined.
- *
- * @public
- */
-export function safeNumberConvert(value: unknown): number | undefined {
-    if (typeof value === "number") {
-        return value;
-    }
-    if (value !== null && value !== undefined && value !== "") {
-        const converted = Number(value);
-        return Number.isNaN(converted) ? undefined : converted;
-    }
-    return undefined;
 }

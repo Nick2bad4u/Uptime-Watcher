@@ -18,7 +18,7 @@
 import type { Monitor, Site } from "@shared/types";
 
 import { safeInteger } from "@shared/validation/validatorUtils";
-import { useCallback, useEffect, useState } from "react";
+import { type ChangeEvent, useCallback, useEffect, useState } from "react";
 
 import type { ChartTimeRange } from "../../constants";
 
@@ -66,11 +66,11 @@ export interface UseSiteDetailsResult {
     currentSite: Site;
     // Handlers
     handleCheckNow: () => Promise<void>;
-    handleIntervalChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-    handleMonitorIdChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    handleIntervalChange: (e: ChangeEvent<HTMLSelectElement>) => void;
+    handleMonitorIdChange: (e: ChangeEvent<HTMLSelectElement>) => void;
     handleRemoveMonitor: () => Promise<void>;
     handleRemoveSite: () => Promise<void>;
-    handleRetryAttemptsChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    handleRetryAttemptsChange: (e: ChangeEvent<HTMLInputElement>) => void;
     handleSaveInterval: () => Promise<void>;
     handleSaveName: () => Promise<void>;
     handleSaveRetryAttempts: () => Promise<void>;
@@ -79,7 +79,7 @@ export interface UseSiteDetailsResult {
     handleStartSiteMonitoring: () => Promise<void>;
     handleStopMonitoring: () => Promise<void>;
     handleStopSiteMonitoring: () => Promise<void>;
-    handleTimeoutChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    handleTimeoutChange: (e: ChangeEvent<HTMLInputElement>) => void;
     // State
     hasUnsavedChanges: boolean;
     intervalChanged: boolean;
@@ -130,6 +130,7 @@ export interface UseSiteDetailsResult {
  * ```
  */
 
+// eslint-disable-next-line complexity
 export function useSiteDetails({
     site,
 }: UseSiteDetailsProperties): UseSiteDetailsResult {
@@ -287,7 +288,7 @@ export function useSiteDetails({
 
     // Handler for monitor selection change
     const handleMonitorIdChange = useCallback(
-        (e: React.ChangeEvent<HTMLSelectElement>) => {
+        (e: ChangeEvent<HTMLSelectElement>) => {
             const newId = e.target.value;
             setSelectedMonitorId(currentSite.identifier, newId);
             // If current tab is an analytics tab, switch to the new monitor's
@@ -307,6 +308,7 @@ export function useSiteDetails({
     // Handler for site removal
     const handleRemoveSite = useCallback(async () => {
         if (
+            // eslint-disable-next-line no-alert -- Legacy confirmation dialog for destructive action
             !globalThis.confirm(
                 `Are you sure you want to remove ${currentSite.name}?`
             )
@@ -340,6 +342,7 @@ export function useSiteDetails({
         const monitorName =
             selectedMonitor.url ?? selectedMonitor.host ?? selectedMonitor.type;
         if (
+            // eslint-disable-next-line no-alert -- Legacy confirmation dialog for destructive action
             !globalThis.confirm(
                 `Are you sure you want to remove the monitor "${monitorName}" from ${currentSite.name}?`
             )
@@ -475,7 +478,7 @@ export function useSiteDetails({
 
     // Interval change handlers
     const handleIntervalChange = useCallback(
-        (e: React.ChangeEvent<HTMLSelectElement>) => {
+        (e: ChangeEvent<HTMLSelectElement>) => {
             const newInterval = safeInteger(
                 e.target.value,
                 DEFAULT_CHECK_INTERVAL
@@ -526,7 +529,7 @@ export function useSiteDetails({
 
     // Timeout change handlers
     const handleTimeoutChange = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => {
+        (e: ChangeEvent<HTMLInputElement>) => {
             // Work directly with seconds in the UI
             const timeoutInSeconds = clampTimeoutSeconds(
                 safeInteger(e.target.value, 5)
@@ -582,7 +585,7 @@ export function useSiteDetails({
 
     // Retry attempts change handlers
     const handleRetryAttemptsChange = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => {
+        (e: ChangeEvent<HTMLInputElement>) => {
             const retryAttempts = safeInteger(e.target.value, 3);
             setUserEditedRetryAttempts(retryAttempts);
             const currentRetryAttempts = selectedMonitor?.retryAttempts ?? 0;

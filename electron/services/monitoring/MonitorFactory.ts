@@ -112,46 +112,6 @@ export function getAvailableMonitorTypes(): string[] {
 }
 
 /**
- * Retrieves the monitor service instance for a given monitor type, creating it
- * if necessary.
- *
- * @remarks
- * - Validates the monitor type against the registry.
- * - Uses the singleton pattern: returns the cached instance if available,
- * otherwise creates a new one. - If a configuration is provided, updates the
- * instance's configuration if forced or if the instance is new. - Throws if
- * the monitor type is unsupported or if no factory is registered for the type.
- * - Configuration failures are logged but do not prevent service retrieval.
- *
- * @param type - The monitor type string. Must be a valid registered type.
- * @param config - Optional monitor configuration to apply to the instance.
- * @param forceConfigUpdate - If true, updates the configuration on an existing instance even if already set.
- * @returns The monitor service instance for the specified type.
- *
- * @throws {@link Error} If the monitor type is not supported or no service factory is registered for the type.
- *
- * @example
- * ```typescript
- * const monitor = getMonitor("http", { timeout: 5000 });
- * ```
- *
- * @see {@link IMonitorService}
- * @see {@link MonitorConfig}
- * @see {@link getMonitorServiceFactory}
- * @see {@link isValidMonitorType}
- * @see {@link getMonitorWithResult} for version that returns configuration status
- * @public
- */
-export function getMonitor(
-    type: MonitorType,
-    config?: MonitorConfig,
-    forceConfigUpdate = false
-): IMonitorService {
-    const result = getMonitorWithResult(type, config, forceConfigUpdate);
-    return result.instance;
-}
-
-/**
  * Retrieves the monitor service instance with configuration application
  * status.
  *
@@ -246,6 +206,46 @@ export function getMonitorWithResult(
         ...(configurationError !== undefined && { configurationError }),
         instance,
     };
+}
+
+/**
+ * Retrieves the monitor service instance for a given monitor type, creating it
+ * if necessary.
+ *
+ * @remarks
+ * - Validates the monitor type against the registry.
+ * - Uses the singleton pattern: returns the cached instance if available,
+ * otherwise creates a new one. - If a configuration is provided, updates the
+ * instance's configuration if forced or if the instance is new. - Throws if
+ * the monitor type is unsupported or if no factory is registered for the type.
+ * - Configuration failures are logged but do not prevent service retrieval.
+ *
+ * @param type - The monitor type string. Must be a valid registered type.
+ * @param config - Optional monitor configuration to apply to the instance.
+ * @param forceConfigUpdate - If true, updates the configuration on an existing instance even if already set.
+ * @returns The monitor service instance for the specified type.
+ *
+ * @throws {@link Error} If the monitor type is not supported or no service factory is registered for the type.
+ *
+ * @example
+ * ```typescript
+ * const monitor = getMonitor("http", { timeout: 5000 });
+ * ```
+ *
+ * @see {@link IMonitorService}
+ * @see {@link MonitorConfig}
+ * @see {@link getMonitorServiceFactory}
+ * @see {@link isValidMonitorType}
+ * @see {@link getMonitorWithResult} for version that returns configuration status
+ * @public
+ */
+export function getMonitor(
+    type: MonitorType,
+    config?: MonitorConfig,
+    forceConfigUpdate = false
+): IMonitorService {
+    const result = getMonitorWithResult(type, config, forceConfigUpdate);
+    return result.instance;
 }
 
 /**

@@ -51,24 +51,6 @@ export function isValidSettingRow(row: DatabaseSettingsRow): boolean {
 }
 
 /**
- * Convert multiple database rows to SettingRow objects.
- *
- * @param rows - Array of raw database rows
- * @returns Array of mapped SettingRow objects
- *
- * @remarks
- * Filters out invalid rows using isValidSettingRow before mapping to prevent
- * creation of settings with empty keys or invalid data.
- *
- * @public
- */
-export function rowsToSettings(rows: DatabaseSettingsRow[]): SettingRow[] {
-    return rows
-        .filter((row) => isValidSettingRow(row))
-        .map((row) => rowToSetting(row));
-}
-
-/**
  * Convert a database row to a SettingRow object.
  *
  * @param row - Raw database row
@@ -107,6 +89,40 @@ export function rowToSetting(row: DatabaseSettingsRow): SettingRow {
         throw error;
     }
 }
+
+/**
+ * Convert multiple database rows to SettingRow objects.
+ *
+ * @param rows - Array of raw database rows
+ * @returns Array of mapped SettingRow objects
+ *
+ * @remarks
+ * Filters out invalid rows using isValidSettingRow before mapping to prevent
+ * creation of settings with empty keys or invalid data.
+ *
+ * @public
+ */
+export function rowsToSettings(rows: DatabaseSettingsRow[]): SettingRow[] {
+    return rows
+        .filter((row) => isValidSettingRow(row))
+        .map((row) => rowToSetting(row));
+}
+
+/**
+ * Convert a database row to a SettingRow object.
+ *
+ * @param row - Raw database row
+ * @returns Mapped SettingRow object
+ *
+ * @throws {@link Error} When row has invalid key
+ *
+ * @remarks
+ * Handles type conversion and ensures consistent data transformation
+ * across all settings-related database operations. Uses precise type checking
+ * instead of loose falsy checks for better type safety.
+ *
+ * @public
+ */
 
 /**
  * Convert a single database row to a setting value.

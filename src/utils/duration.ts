@@ -31,7 +31,6 @@ export function calculateMaxDuration(
         return `${totalTime}s`;
     } else if (totalTime < 3600) {
         return `${Math.ceil(totalTime / 60)}m`;
-    } else {
-        return `${Math.ceil(totalTime / 3600)}h`;
     }
+    return `${Math.ceil(totalTime / 3600)}h`;
 }

@@ -30,18 +30,16 @@ const ThemedCheckbox = ({
     disabled = false,
     onChange,
     required = false,
-}: ThemedCheckboxProperties): React.JSX.Element => {
-    return (
-        <input
-            type="checkbox"
-            {...(checked === undefined ? {} : { checked })}
-            aria-label={ariaLabel}
-            className={`themed-checkbox ${className}`}
-            disabled={disabled}
-            onChange={onChange}
-            required={required}
-        />
-    );
-};
+}: ThemedCheckboxProperties): React.JSX.Element => (
+    <input
+        type="checkbox"
+        {...(checked === undefined ? {} : { checked })}
+        aria-label={ariaLabel}
+        className={`themed-checkbox ${className}`}
+        disabled={disabled}
+        onChange={onChange}
+        required={required}
+    />
+);
 
 export default ThemedCheckbox;

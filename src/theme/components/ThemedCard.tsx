@@ -130,6 +130,7 @@ export interface ThemedCardProperties {
  *
  * @public
  */
+// eslint-disable-next-line complexity -- UI component with many optional props requires conditional logic for flexibility
 const ThemedCard = ({
     children,
     className = "",

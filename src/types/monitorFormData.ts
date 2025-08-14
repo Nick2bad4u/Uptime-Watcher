@@ -78,10 +78,12 @@ export type MonitorFormData = HttpFormData | PingFormData | PortFormData;
  * @param type - Monitor type
  * @returns Default form data for the specified type
  */
+/* eslint-disable no-redeclare -- Function overloads are legitimate TypeScript pattern */
 export function createDefaultFormData(type: "http"): Partial<HttpFormData>;
 export function createDefaultFormData(type: "ping"): Partial<PingFormData>;
 export function createDefaultFormData(type: "port"): Partial<PortFormData>;
 export function createDefaultFormData(type: string): Partial<BaseFormData> {
+    /* eslint-enable no-redeclare */
     return {
         checkInterval: 300_000, // 5 minutes
         monitoring: true,

@@ -29,6 +29,8 @@ Requirements:
 - Zero ESLint errors or warnings in the codebase after completion.
 - All code changes must maintain or improve code quality and readability.
 - Do not introduce hacks or workarounds to bypass linting rules.
+- DO NOT USE SCRIPTS. DO ALL YOUR WORK MANUALLY:
+- I REPEAT, ONLY NON-SCRIPT WORK IS ALLOWED. (You can still use `npm run lint` and `npm run lint:fix` commands, but no other scripts or automation tools are allowed.)
 
 If Attachments are present:
 

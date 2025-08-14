@@ -92,34 +92,29 @@ export const validationPatterns = {
     /**
      * Validates that a string is not empty after trimming
      */
-    nonEmptyString: (value: string): boolean => {
-        return value.trim().length > 0;
-    },
+    nonEmptyString: (value: string): boolean => value.trim().length > 0,
 
     /**
      * Validates that a number is within a specified range
      */
-    numberInRange: (min: number, max: number): ((value: number) => boolean) => {
-        return (value: number): boolean => {
-            return value >= min && value <= max;
-        };
-    },
+    numberInRange:
+        (min: number, max: number): ((value: number) => boolean) =>
+        (value: number): boolean =>
+            value >= min && value <= max,
 
     /**
      * Validates that a value is one of the allowed numbers
      */
-    oneOfNumbers: (allowedValues: number[]): ((value: number) => boolean) => {
-        return (value: number): boolean => {
-            return allowedValues.includes(value);
-        };
-    },
+    oneOfNumbers:
+        (allowedValues: number[]): ((value: number) => boolean) =>
+        (value: number): boolean =>
+            allowedValues.includes(value),
 
     /**
      * Validates that a value is one of the allowed options
      */
-    oneOfStrings: (allowedValues: string[]): ((value: string) => boolean) => {
-        return (value: string): boolean => {
-            return allowedValues.includes(value);
-        };
-    },
+    oneOfStrings:
+        (allowedValues: string[]): ((value: string) => boolean) =>
+        (value: string): boolean =>
+            allowedValues.includes(value),
 } as const;

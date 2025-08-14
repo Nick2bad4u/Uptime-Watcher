@@ -9,6 +9,7 @@ import type {
     Site,
     StatusHistory,
 } from "@shared/types";
+import type { ChangeEvent } from "react";
 
 import { DEFAULT_MONITOR_STATUS } from "@shared/types";
 import { useCallback, useMemo } from "react";
@@ -26,7 +27,7 @@ export interface SiteMonitorResult {
     filteredHistory: StatusHistory[];
     // Actions
     /** Handler for monitor selection changes */
-    handleMonitorIdChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    handleMonitorIdChange: (e: ChangeEvent<HTMLSelectElement>) => void;
     /** Whether the selected monitor is actively being monitored */
     isMonitoring: boolean;
     // Current state
@@ -96,32 +97,33 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
 
     // Always select the latest site from the store by id to ensure we have the
     // most updated data
-    const latestSite = useMemo(() => {
-        return sites.find((s) => s.identifier === site.identifier) ?? site;
-    }, [site, sites]);
+    const latestSite = useMemo(
+        () => sites.find((s) => s.identifier === site.identifier) ?? site,
+        [site, sites]
+    );
 
     // Get monitor selection info
-    const monitorIds = useMemo(() => {
-        return latestSite.monitors.map((m) => m.id);
-    }, [latestSite]);
+    const monitorIds = useMemo(
+        () => latestSite.monitors.map((m) => m.id),
+        [latestSite]
+    );
 
     const defaultMonitorId = getDefaultMonitorId(monitorIds);
     const selectedMonitorId =
         getSelectedMonitorId(latestSite.identifier) ?? defaultMonitorId;
 
     // Get the currently selected monitor
-    const monitor = useMemo(() => {
-        return latestSite.monitors.find((m) => m.id === selectedMonitorId);
-    }, [latestSite, selectedMonitorId]);
+    const monitor = useMemo(
+        () => latestSite.monitors.find((m) => m.id === selectedMonitorId),
+        [latestSite, selectedMonitorId]
+    );
 
     // Extract monitor state information
     const status = monitor?.status ?? DEFAULT_MONITOR_STATUS;
     const responseTime = monitor?.responseTime;
     // Fix: Use history length and last timestamp as dependencies for proper
     // memoization
-    const filteredHistory = useMemo(() => {
-        return monitor?.history ?? [];
-    }, [monitor]);
+    const filteredHistory = useMemo(() => monitor?.history ?? [], [monitor]);
 
     // Fix: Explicitly check for monitor existence before checking monitoring
     // status Default to true when monitoring is undefined (monitors are active
@@ -131,10 +133,7 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
     if (monitor) {
         // Handle potential undefined monitoring value (e.g., in test scenarios)
         // Use Object.hasOwnProperty to safely check for property existence
-        const hasMonitoringProperty = Object.prototype.hasOwnProperty.call(
-            monitor,
-            "monitoring"
-        );
+        const hasMonitoringProperty = Object.hasOwn(monitor, "monitoring");
         if (hasMonitoringProperty) {
             isMonitoring = monitor.monitoring;
         } else {
@@ -145,7 +144,7 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
 
     // Handler for changing the monitor - memoized to prevent recreation
     const handleMonitorIdChange = useCallback(
-        (e: React.ChangeEvent<HTMLSelectElement>) => {
+        (e: ChangeEvent<HTMLSelectElement>) => {
             setSelectedMonitorId(latestSite.identifier, e.target.value);
         },
         [latestSite.identifier, setSelectedMonitorId]

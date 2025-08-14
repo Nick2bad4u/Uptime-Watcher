@@ -73,9 +73,8 @@ interface StateSyncHandlerValidatorsInterface {
  * @returns A validator function that ensures no parameters are passed
  */
 function createNoParamsValidator(): IpcParameterValidator {
-    return (params: unknown[]): null | string[] => {
-        return params.length === 0 ? null : ["No parameters expected"];
-    };
+    return (params: unknown[]): null | string[] =>
+        params.length === 0 ? null : ["No parameters expected"];
 }
 
 /**

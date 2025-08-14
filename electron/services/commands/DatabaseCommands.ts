@@ -223,11 +223,12 @@ export class DatabaseCommandExecutor {
     public async rollbackAll(): Promise<void> {
         const errors: Error[] = [];
 
-        // Rollback in reverse order
+        // Rollback in reverse order - sequential for data integrity
         for (let i = this.executedCommands.length - 1; i >= 0; i--) {
             try {
                 const command = this.executedCommands[i];
                 if (command) {
+                    // eslint-disable-next-line no-await-in-loop -- Sequential rollback required for data integrity
                     await command.rollback();
                 }
             } catch (error) {

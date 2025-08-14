@@ -33,6 +33,8 @@
  * ```
  */
 
+import type { CSSProperties } from "react";
+
 import { useCallback, useMemo, useRef, useState } from "react";
 
 import { useMount } from "./useMount";
@@ -44,19 +46,19 @@ import { useMount } from "./useMount";
  */
 export interface ThemeStyles {
     /** Button styles for collapse/expand controls */
-    collapseButtonStyle: React.CSSProperties;
+    collapseButtonStyle: CSSProperties;
     /** Main content area styling */
-    contentStyle: React.CSSProperties;
+    contentStyle: CSSProperties;
     /** Header section styling */
-    headerStyle: React.CSSProperties;
+    headerStyle: CSSProperties;
     /** Metadata text styling */
-    metaStyle: React.CSSProperties;
+    metaStyle: CSSProperties;
     /** Overlay/modal backdrop styling */
-    overlayStyle: React.CSSProperties;
+    overlayStyle: CSSProperties;
     /** Primary title text styling */
-    titleStyle: React.CSSProperties;
+    titleStyle: CSSProperties;
     /** URL/link text styling */
-    urlStyle: React.CSSProperties;
+    urlStyle: CSSProperties;
 }
 
 /**
@@ -70,7 +72,7 @@ const TRANSITION_EASING = "0.3s cubic-bezier(0.4, 0, 0.2, 1)";
  * @param isDarkMode - Whether dark mode is active
  * @returns CSS properties for collapse button
  */
-function getCollapseButtonStyle(isDarkMode: boolean): React.CSSProperties {
+function getCollapseButtonStyle(isDarkMode: boolean): CSSProperties {
     return {
         alignItems: "center",
         backgroundColor: "transparent",
@@ -91,7 +93,7 @@ function getCollapseButtonStyle(isDarkMode: boolean): React.CSSProperties {
  * @param isCollapsed - Whether the component is collapsed
  * @returns CSS properties for content area
  */
-function getContentStyle(isCollapsed: boolean): React.CSSProperties {
+function getContentStyle(isCollapsed: boolean): CSSProperties {
     return {
         padding: isCollapsed ? "1rem 1.5rem" : "1.5rem",
         position: "relative",
@@ -110,7 +112,7 @@ function getContentStyle(isCollapsed: boolean): React.CSSProperties {
 function getHeaderStyle(
     isCollapsed: boolean,
     isDarkMode: boolean
-): React.CSSProperties {
+): CSSProperties {
     const darkGradient =
         "linear-gradient(120deg, rgba(37, 99, 235, 0.15) 0%, rgba(147, 51, 234, 0.15) 60%, rgba(31, 41, 55, 0.8) 100%)";
     const lightGradient =
@@ -142,7 +144,7 @@ function getHeaderStyle(
  * @param isDarkMode - Whether dark mode is active
  * @returns CSS properties for metadata text
  */
-function getMetaStyle(isDarkMode: boolean): React.CSSProperties {
+function getMetaStyle(isDarkMode: boolean): CSSProperties {
     return {
         alignItems: "center",
         color: isDarkMode ? "#9ca3af" : "#6b7280",
@@ -161,7 +163,7 @@ function getMetaStyle(isDarkMode: boolean): React.CSSProperties {
  * @param isDarkMode - Whether dark mode is active
  * @returns CSS properties for overlay backdrop
  */
-function getOverlayStyle(isDarkMode: boolean): React.CSSProperties {
+function getOverlayStyle(isDarkMode: boolean): CSSProperties {
     const darkGradient =
         "linear-gradient(120deg, rgba(37, 99, 235, 0.05) 0%, rgba(147, 51, 234, 0.05) 60%, rgba(31, 41, 55, 0.1) 100%)";
     const lightGradient =
@@ -188,7 +190,7 @@ function getOverlayStyle(isDarkMode: boolean): React.CSSProperties {
  * @param isDarkMode - Whether dark mode is active
  * @returns CSS properties for title text
  */
-function getTitleStyle(isDarkMode: boolean): React.CSSProperties {
+function getTitleStyle(isDarkMode: boolean): CSSProperties {
     const darkShadow =
         "0 2px 12px rgba(59, 130, 246, 0.3), 0 1px 0 rgba(37, 99, 235, 0.3)";
     const lightShadow =
@@ -213,7 +215,7 @@ function getTitleStyle(isDarkMode: boolean): React.CSSProperties {
  * @param isDarkMode - Whether dark mode is active
  * @returns CSS properties for URL text
  */
-function getUrlStyle(isDarkMode: boolean): React.CSSProperties {
+function getUrlStyle(isDarkMode: boolean): CSSProperties {
     return {
         background: "none",
         color: isDarkMode ? "#9ca3af" : "#6b7280",

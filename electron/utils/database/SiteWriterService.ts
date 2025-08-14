@@ -248,27 +248,28 @@ export class SiteWriterService {
                     (m) => m.id === newMonitor.id
                 );
 
-                if (
-                    originalMonitor?.checkInterval !== newMonitor.checkInterval
-                ) {
+                const intervalChanged =
+                    originalMonitor?.checkInterval !== newMonitor.checkInterval;
+
+                if (intervalChanged && newMonitor.id) {
                     this.logger.debug(
                         `Monitor ${newMonitor.id} interval changed from ${originalMonitor?.checkInterval} to ${newMonitor.checkInterval}`
                     );
 
-                    if (newMonitor.id) {
-                        // Always stop to clean up any existing scheduling
-                        await monitoringConfig.stopMonitoring(
+                    // Always stop to clean up any existing scheduling
+                    // eslint-disable-next-line no-await-in-loop -- Sequential monitor stop/start operations required
+                    await monitoringConfig.stopMonitoring(
+                        identifier,
+                        newMonitor.id
+                    );
+
+                    // Only restart if the monitor was actually monitoring
+                    if (originalMonitor?.monitoring) {
+                        // eslint-disable-next-line no-await-in-loop -- Sequential monitor stop/start operations required
+                        await monitoringConfig.startMonitoring(
                             identifier,
                             newMonitor.id
                         );
-
-                        // Only restart if the monitor was actually monitoring
-                        if (originalMonitor?.monitoring) {
-                            await monitoringConfig.startMonitoring(
-                                identifier,
-                                newMonitor.id
-                            );
-                        }
                     }
                 }
             }

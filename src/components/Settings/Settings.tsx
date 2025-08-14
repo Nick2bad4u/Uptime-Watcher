@@ -31,6 +31,7 @@
  * @public
  */
 
+import type { ChangeEvent } from "react";
 import type { JSX } from "react/jsx-runtime";
 
 import { safeInteger } from "@shared/validation/validatorUtils";
@@ -156,6 +157,7 @@ export const Settings = ({
         // Use window.confirm instead of globalThis for better React
         // compatibility
         if (
+            // eslint-disable-next-line no-alert -- Legacy confirmation dialog for destructive action, requires UI refactoring to replace
             window.confirm(
                 "Are you sure you want to reset all settings to defaults?"
             )
@@ -177,42 +179,42 @@ export const Settings = ({
 
     // Memoized event handlers to prevent unnecessary re-renders
     const handleHistoryLimitSelectChange = useCallback(
-        (event: React.ChangeEvent<HTMLSelectElement>) => {
+        (event: ChangeEvent<HTMLSelectElement>) => {
             void handleHistoryLimitChange(Number(event.target.value));
         },
         [handleHistoryLimitChange]
     );
 
     const handleNotificationsChange = useCallback(
-        (event: React.ChangeEvent<HTMLInputElement>) => {
+        (event: ChangeEvent<HTMLInputElement>) => {
             handleSettingChange("notifications", event.target.checked);
         },
         [handleSettingChange]
     );
 
     const handleSoundAlertsChange = useCallback(
-        (event: React.ChangeEvent<HTMLInputElement>) => {
+        (event: ChangeEvent<HTMLInputElement>) => {
             handleSettingChange("soundAlerts", event.target.checked);
         },
         [handleSettingChange]
     );
 
     const handleAutoStartChange = useCallback(
-        (event: React.ChangeEvent<HTMLInputElement>) => {
+        (event: ChangeEvent<HTMLInputElement>) => {
             handleSettingChange("autoStart", event.target.checked);
         },
         [handleSettingChange]
     );
 
     const handleMinimizeToTrayChange = useCallback(
-        (event: React.ChangeEvent<HTMLInputElement>) => {
+        (event: ChangeEvent<HTMLInputElement>) => {
             handleSettingChange("minimizeToTray", event.target.checked);
         },
         [handleSettingChange]
     );
 
     const handleThemeSelectChange = useCallback(
-        (event: React.ChangeEvent<HTMLSelectElement>) => {
+        (event: ChangeEvent<HTMLSelectElement>) => {
             handleThemeChange(event.target.value);
         },
         [handleThemeChange]

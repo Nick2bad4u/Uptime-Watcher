@@ -419,19 +419,18 @@ export class MonitorManager {
                         recursiveId,
                         recursiveMonitorId
                     );
-                } else {
-                    // Prevent infinite recursion by using direct scheduler call
-                    logger.warn(
-                        interpolateLogTemplate(
-                            LOG_TEMPLATES.warnings.RECURSIVE_CALL_PREVENTED,
-                            {
-                                identifier,
-                                monitorId: monitorId ?? "all",
-                            }
-                        )
-                    );
-                    return false;
                 }
+                // Prevent infinite recursion by using direct scheduler call
+                logger.warn(
+                    interpolateLogTemplate(
+                        LOG_TEMPLATES.warnings.RECURSIVE_CALL_PREVENTED,
+                        {
+                            identifier,
+                            monitorId: monitorId ?? "all",
+                        }
+                    )
+                );
+                return false;
             }
         );
 
@@ -529,19 +528,18 @@ export class MonitorManager {
                         recursiveId,
                         recursiveMonitorId
                     );
-                } else {
-                    // Prevent infinite recursion by using direct scheduler call
-                    logger.warn(
-                        interpolateLogTemplate(
-                            LOG_TEMPLATES.warnings.RECURSIVE_CALL_PREVENTED,
-                            {
-                                identifier,
-                                monitorId: monitorId ?? "all",
-                            }
-                        )
-                    );
-                    return false;
                 }
+                // Prevent infinite recursion by using direct scheduler call
+                logger.warn(
+                    interpolateLogTemplate(
+                        LOG_TEMPLATES.warnings.RECURSIVE_CALL_PREVENTED,
+                        {
+                            identifier,
+                            monitorId: monitorId ?? "all",
+                        }
+                    )
+                );
+                return false;
             }
         );
 
@@ -582,8 +580,15 @@ export class MonitorManager {
             )
         );
 
-        for (const monitor of site.monitors) {
-            if (monitor.id && this.shouldApplyDefaultInterval(monitor)) {
+        // Apply default intervals to monitors in parallel
+        const updatePromises = site.monitors
+            .filter(
+                (monitor) =>
+                    monitor.id && this.shouldApplyDefaultInterval(monitor)
+            )
+            .map(async (monitor) => {
+                if (!monitor.id) return;
+
                 // Update database first (state management compliance)
                 await withDatabaseOperation(
                     () => {
@@ -614,8 +619,9 @@ export class MonitorManager {
                         }
                     )
                 );
-            }
-        }
+            });
+
+        await Promise.all(updatePromises);
 
         logger.info(
             interpolateLogTemplate(
@@ -675,8 +681,8 @@ export class MonitorManager {
         );
 
         // Start only monitors that have monitoring enabled (respecting
-        // individual monitor states)
-        for (const monitor of site.monitors) {
+        // individual monitor states) - run in parallel for better performance
+        const startPromises = site.monitors.map(async (monitor) => {
             if (monitor.id && monitor.monitoring) {
                 await this.startMonitoringForSite(site.identifier, monitor.id);
 
@@ -695,7 +701,9 @@ export class MonitorManager {
                     )
                 );
             }
-        }
+        });
+
+        await Promise.all(startPromises);
 
         logger.info(
             interpolateLogTemplate(
@@ -722,7 +730,8 @@ export class MonitorManager {
         site: Site,
         newMonitors: Site["monitors"]
     ): Promise<void> {
-        for (const monitor of newMonitors) {
+        // Start new monitors in parallel for better performance
+        const startPromises = newMonitors.map(async (monitor) => {
             if (monitor.id && monitor.monitoring) {
                 await this.startMonitoringForSite(site.identifier, monitor.id);
                 logger.debug(
@@ -741,7 +750,9 @@ export class MonitorManager {
                     )
                 );
             }
-        }
+        });
+
+        await Promise.all(startPromises);
     }
 
     /**

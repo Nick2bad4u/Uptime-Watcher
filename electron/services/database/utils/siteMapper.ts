@@ -63,29 +63,10 @@ export function isValidSiteRow(row: DatabaseSiteRow): boolean {
 }
 
 /**
- * Convert multiple database rows to Site objects.
- *
- * @param rows - Array of raw database rows
- * @returns Array of mapped Site objects
- *
- * @remarks
- * Processes multiple database rows using the {@link rowToSite} function.
- * Each row is validated and converted independently. If any row fails
- * validation, the entire operation will fail.
- *
- * @throws When any database row lacks a valid identifier
- *
- * @public
- */
-export function rowsToSites(rows: DatabaseSiteRow[]): SiteRow[] {
-    return rows.map((row) => rowToSite(row));
-}
-
-/**
  * Convert a database row to a Site object (without monitors).
  *
- * @param row - Raw database row
- * @returns Mapped Site object
+ * @param row - Raw database row to convert
+ * @returns Site object with validated fields
  *
  * @remarks
  * Handles type conversion and ensures consistent data transformation
@@ -133,4 +114,23 @@ export function rowToSite(row: DatabaseSiteRow): SiteRow {
         });
         throw error;
     }
+}
+
+/**
+ * Convert multiple database rows to Site objects.
+ *
+ * @param rows - Array of raw database rows
+ * @returns Array of mapped Site objects
+ *
+ * @remarks
+ * Processes multiple database rows using the {@link rowToSite} function.
+ * Each row is validated and converted independently. If any row fails
+ * validation, the entire operation will fail.
+ *
+ * @throws When any database row lacks a valid identifier
+ *
+ * @public
+ */
+export function rowsToSites(rows: DatabaseSiteRow[]): SiteRow[] {
+    return rows.map((row) => rowToSite(row));
 }

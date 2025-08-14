@@ -38,16 +38,14 @@ import UptimeChart from "../charts/UptimeChart";
 /**
  * Get color for MTTR display based on recovery status
  */
-const getMttrColor = (mttrValue: number, theme: Theme): string => {
-    return mttrValue === 0 ? theme.colors.success : theme.colors.error;
-};
+const getMttrColor = (mttrValue: number, theme: Theme): string =>
+    mttrValue === 0 ? theme.colors.success : theme.colors.error;
 
 /**
  * Get color for incidents display based on incident count
  */
-const getIncidentsColor = (incidentCount: number, theme: Theme): string => {
-    return incidentCount === 0 ? theme.colors.success : theme.colors.error;
-};
+const getIncidentsColor = (incidentCount: number, theme: Theme): string =>
+    incidentCount === 0 ? theme.colors.success : theme.colors.error;
 
 /**
  * Props for the AnalyticsTab component.

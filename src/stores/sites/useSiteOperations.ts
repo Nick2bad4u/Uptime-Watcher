@@ -112,6 +112,7 @@ export const createSiteOperationsActions = (
                 if (site?.monitors) {
                     for (const monitor of site.monitors) {
                         try {
+                            // eslint-disable-next-line no-await-in-loop -- Sequential monitor stop operations required
                             await window.electronAPI.monitoring.stopMonitoringForSite(
                                 identifier,
                                 monitor.id
@@ -167,8 +168,8 @@ export const createSiteOperationsActions = (
         message: string;
         sitesLoaded: number;
         success: boolean;
-    }> => {
-        return withSiteOperationReturning(
+    }> =>
+        withSiteOperationReturning(
             "initializeSites",
             async () => {
                 const response = await window.electronAPI.sites.getSites();
@@ -183,8 +184,7 @@ export const createSiteOperationsActions = (
             {},
             deps,
             false // Don't sync for initialization - we're loading the data
-        );
-    },
+        ),
     modifySite: async (
         identifier: string,
         updates: Partial<Site>

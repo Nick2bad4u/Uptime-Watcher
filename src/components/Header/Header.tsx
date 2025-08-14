@@ -69,6 +69,11 @@ const incrementCountByStatus = (
             counts.up++;
             break;
         }
+        default: {
+            // Handle unknown status - treat as pending
+            counts.pending++;
+            break;
+        }
     }
 };
 

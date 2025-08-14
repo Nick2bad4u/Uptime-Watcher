@@ -136,6 +136,52 @@ export interface MonitorUIConfig {
 const monitorTypes = new Map<string, BaseMonitorConfig>();
 
 /**
+ * Gets the configuration object for a given monitor type.
+ *
+ * @remarks
+ * Returns the {@link BaseMonitorConfig} for the specified type, or undefined
+ * if not registered.
+ *
+ * @param type - The monitor type identifier.
+ * @returns Monitor configuration object or undefined if the type is not registered.
+ * @public
+ */
+export function getMonitorTypeConfig(
+    type: string
+): BaseMonitorConfig | undefined {
+    return monitorTypes.get(type);
+}
+
+/**
+ * Gets all registered monitor type identifiers.
+ *
+ * @remarks
+ * Returns an array of all monitor type string identifiers currently registered
+ * in the system.
+ *
+ * @returns Array of registered monitor type strings.
+ * @public
+ */
+export function getRegisteredMonitorTypes(): string[] {
+    return Array.from(monitorTypes.keys());
+}
+
+/**
+ * Checks if a monitor type is registered in the system.
+ *
+ * @remarks
+ * Returns true if the specified monitor type identifier is registered, false
+ * otherwise.
+ *
+ * @param type - The monitor type identifier to check.
+ * @returns True if the type is registered, false otherwise.
+ * @public
+ */
+export function isValidMonitorType(type: string): boolean {
+    return monitorTypes.has(type);
+}
+
+/**
  * Simple monitor type validation for internal use.
  *
  * @remarks
@@ -208,52 +254,6 @@ export function getMonitorServiceFactory(
 ): (() => IMonitorService) | undefined {
     const config = getMonitorTypeConfig(type);
     return config?.serviceFactory;
-}
-
-/**
- * Gets the configuration object for a given monitor type.
- *
- * @remarks
- * Returns the {@link BaseMonitorConfig} for the specified type, or undefined
- * if not registered.
- *
- * @param type - The monitor type identifier.
- * @returns Monitor configuration object or undefined if the type is not registered.
- * @public
- */
-export function getMonitorTypeConfig(
-    type: string
-): BaseMonitorConfig | undefined {
-    return monitorTypes.get(type);
-}
-
-/**
- * Gets all registered monitor type identifiers.
- *
- * @remarks
- * Returns an array of all monitor type string identifiers currently registered
- * in the system.
- *
- * @returns Array of registered monitor type strings.
- * @public
- */
-export function getRegisteredMonitorTypes(): string[] {
-    return Array.from(monitorTypes.keys());
-}
-
-/**
- * Checks if a monitor type is registered in the system.
- *
- * @remarks
- * Returns true if the specified monitor type identifier is registered, false
- * otherwise.
- *
- * @param type - The monitor type identifier to check.
- * @returns True if the type is registered, false otherwise.
- * @public
- */
-export function isValidMonitorType(type: string): boolean {
-    return monitorTypes.has(type);
 }
 
 /**

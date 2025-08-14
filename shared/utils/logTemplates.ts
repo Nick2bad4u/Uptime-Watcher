@@ -392,6 +392,36 @@ export type LogTemplate =
     | (typeof WARNING_LOGS)[keyof typeof WARNING_LOGS];
 
 /**
+ * Helper function to interpolate template variables in log messages.
+ *
+ * @param template - Log template string with variable placeholders
+ * @param variables - Object containing variable values for interpolation
+ * @returns Interpolated log message
+ *
+ * @example
+ * ```typescript
+ * const message = interpolateLogTemplate(
+ *   "Site {identifier} loaded with {count} monitors",
+ *   { identifier: "example.com", count: 3 }
+ * );
+ * // Returns: "Site example.com loaded with 3 monitors"
+ * ```
+ */
+export function interpolateLogTemplate(
+    template: string,
+    variables: Record<string, number | string>
+): string {
+    return template.replaceAll(
+        // eslint-disable-next-line regexp/strict, regexp/require-unicode-sets-regexp -- Conflicting rules: strict wants escaped braces, require-unicode-sets wants v flag
+        /{(?<variableName>[$_a-z][\w$]*)}/gi,
+        (match, key) => {
+            const value = variables[key as keyof typeof variables];
+            return value === undefined ? match : String(value);
+        }
+    );
+}
+
+/**
  * Enhanced logger wrapper that supports template interpolation.
  *
  * @example
@@ -463,31 +493,4 @@ export function createTemplateLogger(baseLogger: Logger): {
             baseLogger.warn(interpolated, variables);
         },
     };
-}
-
-/**
- * Helper function to interpolate template variables in log messages.
- *
- * @param template - Log template string with variable placeholders
- * @param variables - Object containing variable values for interpolation
- * @returns Interpolated log message
- *
- * @example
- * ```typescript
- * const message = interpolateLogTemplate(
- *   "Site {identifier} loaded with {count} monitors",
- *   { identifier: "example.com", count: 3 }
- * );
- * // Returns: "Site example.com loaded with 3 monitors"
- * ```
- */
-export function interpolateLogTemplate(
-    template: string,
-    variables: Record<string, number | string>
-): string {
-    // eslint-disable-next-line regexp/prefer-named-capture-group, regexp/require-unicode-sets-regexp, regexp/strict -- Conflicting rules: strict wants escaped braces, unicorn/better-regex wants unescaped
-    return template.replaceAll(/{([$_a-z][\w$]*)}/gi, (match, key) => {
-        const value = variables[key as keyof typeof variables];
-        return value === undefined ? match : String(value);
-    });
 }

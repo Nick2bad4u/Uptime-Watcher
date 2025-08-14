@@ -16,23 +16,6 @@ interface KnownEnvironmentVariables {
 }
 
 /**
- * Get the current environment name safely.
- *
- * @returns Environment name or 'unknown' if not set
- *
- * @remarks
- * Returns 'unknown' as fallback to indicate unspecified environment state.
- * This is intentionally different from getNodeEnv() which assumes
- * 'development' for safety in development workflows. Use this when you need to
- * detect unspecified environments, use getNodeEnv() when you need development
- * defaults.
- */
-export function getEnvironment(): string {
-    const nodeEnv = getEnvVar("NODE_ENV");
-    return typeof process === "undefined" ? "unknown" : (nodeEnv ?? "unknown");
-}
-
-/**
  * Type-safe environment variable access utility.
  * Avoids index signature issues with process.env.
  *
@@ -56,6 +39,23 @@ export function getEnvVar<K extends keyof KnownEnvironmentVariables>(
         // tests
         return undefined;
     }
+}
+
+/**
+ * Get the current environment name safely.
+ *
+ * @returns Environment name or 'unknown' if not set
+ *
+ * @remarks
+ * Returns 'unknown' as fallback to indicate unspecified environment state.
+ * This is intentionally different from getNodeEnv() which assumes
+ * 'development' for safety in development workflows. Use this when you need to
+ * detect unspecified environments, use getNodeEnv() when you need development
+ * defaults.
+ */
+export function getEnvironment(): string {
+    const nodeEnv = getEnvVar("NODE_ENV");
+    return typeof process === "undefined" ? "unknown" : (nodeEnv ?? "unknown");
 }
 
 /**

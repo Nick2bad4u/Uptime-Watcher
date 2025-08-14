@@ -312,6 +312,10 @@ const validateMonitorFormDataByType = (
             );
             break;
         }
+        default: {
+            errors.push(`Unsupported monitor type: ${String(type)}`);
+            break;
+        }
     }
 
     return errors;

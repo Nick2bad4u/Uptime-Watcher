@@ -99,7 +99,7 @@ export const SiteCard: React.NamedExoticComponent<SiteCardProperties> =
                 },
                 monitoring: {
                     allMonitorsRunning,
-                    hasMonitor: !!monitor,
+                    hasMonitor: Boolean(monitor),
                     isMonitoring,
                     selectedMonitorId,
                 },

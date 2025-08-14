@@ -48,26 +48,24 @@ export const SettingItem: React.FC<SettingItemProps> = ({
     description,
     disabled = false,
     title,
-}) => {
-    return (
-        <div
-            className={`setting-item ${disabled ? "disabled" : ""} ${className}`.trim()}
-        >
-            <div className="setting-info">
-                <ThemedText className="setting-title" size="sm" weight="medium">
-                    {title}
+}) => (
+    <div
+        className={`setting-item ${disabled ? "disabled" : ""} ${className}`.trim()}
+    >
+        <div className="setting-info">
+            <ThemedText className="setting-title" size="sm" weight="medium">
+                {title}
+            </ThemedText>
+            {description ? (
+                <ThemedText
+                    className="setting-description"
+                    size="xs"
+                    variant="tertiary"
+                >
+                    {description}
                 </ThemedText>
-                {description ? (
-                    <ThemedText
-                        className="setting-description"
-                        size="xs"
-                        variant="tertiary"
-                    >
-                        {description}
-                    </ThemedText>
-                ) : null}
-            </div>
-            <div className="setting-control">{control}</div>
+            ) : null}
         </div>
-    );
-};
+        <div className="setting-control">{control}</div>
+    </div>
+);

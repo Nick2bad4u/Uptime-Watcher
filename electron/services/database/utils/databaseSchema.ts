@@ -136,39 +136,6 @@ export function createDatabaseIndexes(db: Database): void {
 }
 
 /**
- * Creates the full database schema (tables and indexes) within a transaction.
- *
- * @remarks
- * Creates all tables and indexes within coordinated operations to ensure
- * consistent schema creation. Uses explicit transaction handling via
- * BEGIN/COMMIT. Rolls back on error to maintain database integrity.
- *
- * @param db - The {@link Database} instance to create the schema on.
- * @throws When schema creation fails. Errors are logged and re-thrown for upstream handling.
- * @public
- */
-export function createDatabaseSchema(db: Database): void {
-    try {
-        db.run(SCHEMA_QUERIES.BEGIN_TRANSACTION);
-
-        try {
-            createDatabaseTables(db);
-            createDatabaseIndexes(db);
-            setupMonitorTypeValidation();
-
-            db.run(SCHEMA_QUERIES.COMMIT);
-            logger.info(LOG_TEMPLATES.services.DATABASE_SCHEMA_CREATED);
-        } catch (error) {
-            db.run(SCHEMA_QUERIES.ROLLBACK);
-            throw error;
-        }
-    } catch (error) {
-        logger.error(LOG_TEMPLATES.errors.DATABASE_SCHEMA_FAILED, error);
-        throw error;
-    }
-}
-
-/**
  * Creates all required database tables if they do not exist.
  *
  * @remarks
@@ -269,5 +236,38 @@ export function setupMonitorTypeValidation(): void {
         logger.warn(
             LOG_TEMPLATES.warnings.DATABASE_MONITOR_VALIDATION_CONTINUE
         );
+    }
+}
+
+/**
+ * Creates the full database schema (tables and indexes) within a transaction.
+ *
+ * @remarks
+ * Creates all tables and indexes within coordinated operations to ensure
+ * consistent schema creation. Uses explicit transaction handling via
+ * BEGIN/COMMIT. Rolls back on error to maintain database integrity.
+ *
+ * @param db - The {@link Database} instance to create the schema on.
+ * @throws When schema creation fails. Errors are logged and re-thrown for upstream handling.
+ * @public
+ */
+export function createDatabaseSchema(db: Database): void {
+    try {
+        db.run(SCHEMA_QUERIES.BEGIN_TRANSACTION);
+
+        try {
+            createDatabaseTables(db);
+            createDatabaseIndexes(db);
+            setupMonitorTypeValidation();
+
+            db.run(SCHEMA_QUERIES.COMMIT);
+            logger.info(LOG_TEMPLATES.services.DATABASE_SCHEMA_CREATED);
+        } catch (error) {
+            db.run(SCHEMA_QUERIES.ROLLBACK);
+            throw error;
+        }
+    } catch (error) {
+        logger.error(LOG_TEMPLATES.errors.DATABASE_SCHEMA_FAILED, error);
+        throw error;
     }
 }

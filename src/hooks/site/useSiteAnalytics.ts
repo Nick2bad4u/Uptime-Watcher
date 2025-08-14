@@ -111,32 +111,34 @@ function calculateDowntimePeriods(
     // Process in reverse chronological order (newest to oldest)
     for (let i = filteredHistory.length - 1; i >= 0; i--) {
         const record = filteredHistory[i];
-        if (!record) {
-            continue; // Skip if record is undefined
-        }
+        if (record) {
+            // Process only if record is defined
+            if (record.status === "down") {
+                if (downtimeEnd === undefined) {
+                    // This is the first "down" we've encountered, so it's the
+                    // END of the period
+                    downtimeEnd = record.timestamp;
+                    downtimeStart = record.timestamp;
+                } else {
+                    // We're extending the downtime period backwards
+                    downtimeStart = record.timestamp;
+                }
+            } else if (
+                downtimeEnd !== undefined &&
+                downtimeStart !== undefined
+            ) {
+                // We hit an "up" status, so the downtime period is complete
+                const period: DowntimePeriod = {
+                    duration: downtimeEnd - downtimeStart,
+                    end: downtimeEnd,
+                    start: downtimeStart,
+                };
+                downtimePeriods.push(period);
 
-        if (record.status === "down") {
-            if (downtimeEnd === undefined) {
-                // This is the first "down" we've encountered, so it's the END
-                // of the period
-                downtimeEnd = record.timestamp;
-                downtimeStart = record.timestamp;
-            } else {
-                // We're extending the downtime period backwards
-                downtimeStart = record.timestamp;
+                // Reset for next period
+                downtimeEnd = undefined;
+                downtimeStart = undefined;
             }
-        } else if (downtimeEnd !== undefined && downtimeStart !== undefined) {
-            // We hit an "up" status, so the downtime period is complete
-            const period: DowntimePeriod = {
-                duration: downtimeEnd - downtimeStart,
-                end: downtimeEnd,
-                start: downtimeStart,
-            };
-            downtimePeriods.push(period);
-
-            // Reset for next period
-            downtimeEnd = undefined;
-            downtimeStart = undefined;
         }
     }
 

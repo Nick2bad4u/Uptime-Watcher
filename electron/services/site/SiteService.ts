@@ -99,8 +99,8 @@ export class SiteService {
                         `[SiteService] Found ${monitors.length} monitors to delete for site ${identifier}`
                     );
 
-                    // Delete history for each monitor
-                    for (const monitor of monitors) {
+                    // Delete history for each monitor in parallel
+                    const historyDeletions = monitors.map(async (monitor) => {
                         try {
                             await this.historyRepository.deleteByMonitorId(
                                 monitor.id
@@ -110,7 +110,9 @@ export class SiteService {
                                 `Failed to delete history for monitor ${monitor.id} in site ${identifier}: ${error instanceof Error ? error.message : String(error)}`
                             );
                         }
-                    }
+                    });
+
+                    await Promise.all(historyDeletions);
                     logger.debug(
                         `[SiteService] Deleted history for ${monitors.length} monitors`
                     );
@@ -186,25 +188,24 @@ export class SiteService {
                     );
 
                 // Fetch monitor history in parallel for better performance
-                if (monitors.length > 0) {
-                    const historyPromises = monitors.map(async (monitor) => {
-                        monitor.history =
+                const monitorsWithHistory = await Promise.all(
+                    monitors.map(async (monitor) => {
+                        const history =
                             await this.historyRepository.findByMonitorId(
                                 monitor.id
                             );
-                        return monitor;
-                    });
-                    await Promise.all(historyPromises);
-                }
+                        return { ...monitor, history };
+                    })
+                );
 
                 // Combine into complete site object and return
                 logger.debug(
-                    `[SiteService] Found site ${identifier} with ${monitors.length} monitors`
+                    `[SiteService] Found site ${identifier} with ${monitorsWithHistory.length} monitors`
                 );
                 return {
                     identifier: siteRow.identifier,
                     monitoring: siteRow.monitoring ?? false,
-                    monitors,
+                    monitors: monitorsWithHistory,
                     name: this.getDisplayName(siteRow.name),
                 };
             },
@@ -244,23 +245,20 @@ export class SiteService {
                             );
 
                         // Fetch monitor history in parallel
-                        if (monitors.length > 0) {
-                            const historyPromises = monitors.map(
-                                async (monitor) => {
-                                    monitor.history =
-                                        await this.historyRepository.findByMonitorId(
-                                            monitor.id
-                                        );
-                                    return monitor;
-                                }
-                            );
-                            await Promise.all(historyPromises);
-                        }
+                        const monitorsWithHistory = await Promise.all(
+                            monitors.map(async (monitor) => {
+                                const history =
+                                    await this.historyRepository.findByMonitorId(
+                                        monitor.id
+                                    );
+                                return { ...monitor, history };
+                            })
+                        );
 
                         return {
                             identifier: siteRow.identifier,
                             monitoring: siteRow.monitoring ?? false,
-                            monitors,
+                            monitors: monitorsWithHistory,
                             name: this.getDisplayName(siteRow.name),
                         };
                     })

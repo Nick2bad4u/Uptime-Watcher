@@ -168,52 +168,6 @@ export function createValidationResponse(
 }
 
 /**
- * Registers a standardized IPC handler with consistent error handling and
- * response formatting.
- *
- * @param channelName - Name of the IPC channel
- * @param handler - The handler function
- * @param validateParams - Optional parameter validation function
- * @param registeredHandlers - Set to track registered handlers for cleanup
- *
- * @remarks
- * Registers an IPC handler with the electron ipcMain, automatically wrapping
- * it with standardized error handling, logging, and response formatting. All
- * responses will follow the IpcResponse interface for consistency.
- *
- * @example
- * ```typescript
- * registerStandardizedIpcHandler(
- *   "get-sites",
- *   async () => this.uptimeOrchestrator.getSites(),
- *   null,
- *   this.registeredIpcHandlers
- * );
- * ```
- *
- * @public
- */
-export function registerStandardizedIpcHandler<T>(
-    channelName: string,
-    handler: (...args: unknown[]) => Promise<T> | T,
-    validateParams: IpcParameterValidator | null,
-    registeredHandlers: Set<string>
-): void {
-    registeredHandlers.add(channelName);
-
-    ipcMain.handle(channelName, async (_, ...args: unknown[]) => {
-        return validateParams
-            ? withIpcHandlerValidation(
-                  channelName,
-                  handler,
-                  validateParams,
-                  args
-              )
-            : withIpcHandler(channelName, () => handler(...args));
-    });
-}
-
-/**
  * Wraps an IPC handler with standardized error handling, logging, and response
  * formatting.
  *
@@ -371,4 +325,50 @@ export async function withIpcHandlerValidation<T>(
             handler: channelName,
         });
     }
+}
+
+/**
+ * Registers a standardized IPC handler with consistent error handling and
+ * response formatting.
+ *
+ * @param channelName - Name of the IPC channel
+ * @param handler - The handler function
+ * @param validateParams - Optional parameter validation function
+ * @param registeredHandlers - Set to track registered handlers for cleanup
+ *
+ * @remarks
+ * Registers an IPC handler with the electron ipcMain, automatically wrapping
+ * it with standardized error handling, logging, and response formatting. All
+ * responses will follow the IpcResponse interface for consistency.
+ *
+ * @example
+ * ```typescript
+ * registerStandardizedIpcHandler(
+ *   "get-sites",
+ *   async () => this.uptimeOrchestrator.getSites(),
+ *   null,
+ *   this.registeredIpcHandlers
+ * );
+ * ```
+ *
+ * @public
+ */
+export function registerStandardizedIpcHandler<T>(
+    channelName: string,
+    handler: (...args: unknown[]) => Promise<T> | T,
+    validateParams: IpcParameterValidator | null,
+    registeredHandlers: Set<string>
+): void {
+    registeredHandlers.add(channelName);
+
+    ipcMain.handle(channelName, async (_, ...args: unknown[]) =>
+        validateParams
+            ? withIpcHandlerValidation(
+                  channelName,
+                  handler,
+                  validateParams,
+                  args
+              )
+            : withIpcHandler(channelName, () => handler(...args))
+    );
 }

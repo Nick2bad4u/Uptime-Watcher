@@ -490,9 +490,8 @@ export class ServiceContainer {
                 {
                     databaseService: this.getDatabaseService(),
                     eventEmitter: monitorEventBus,
-                    getHistoryLimit: (): number => {
-                        return this.getDatabaseManager().getHistoryLimit();
-                    },
+                    getHistoryLimit: (): number =>
+                        this.getDatabaseManager().getHistoryLimit(),
                     getSitesCache,
                     repositories: {
                         history: this.getHistoryRepository(),
