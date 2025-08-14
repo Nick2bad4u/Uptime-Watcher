@@ -239,6 +239,7 @@ export function validateMonitor(monitor: Partial<Monitor>): monitor is Monitor {
     return (
         typeof monitor.id === "string" &&
         typeof monitor.type === "string" &&
+        (BASE_MONITOR_TYPES as readonly string[]).includes(monitor.type) &&
         typeof monitor.status === "string" &&
         isMonitorStatus(monitor.status) &&
         typeof monitor.monitoring === "boolean" &&
@@ -247,6 +248,7 @@ export function validateMonitor(monitor: Partial<Monitor>): monitor is Monitor {
         typeof monitor.timeout === "number" &&
         typeof monitor.retryAttempts === "number" &&
         Array.isArray(monitor.history) &&
-        isValidActiveOperations(monitor.activeOperations)
+        (monitor.activeOperations === undefined ||
+            isValidActiveOperations(monitor.activeOperations))
     );
 }

@@ -1,5 +1,6 @@
 import type { Site } from "@shared/types";
 
+import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 import { MIN_CHECK_INTERVAL } from "./constants";
@@ -224,8 +225,14 @@ export class MonitorScheduler {
         // Stop existing interval if any
         this.stopMonitor(siteIdentifier, monitor.id);
 
-        // Validate and use monitor-specific checkInterval
-        const checkInterval = this.validateCheckInterval(monitor.checkInterval);
+        // Use default check interval if monitor doesn't specify one or 0
+        const effectiveCheckInterval =
+            monitor.checkInterval || DEFAULT_CHECK_INTERVAL;
+
+        // Validate the effective check interval
+        const checkInterval = this.validateCheckInterval(
+            effectiveCheckInterval
+        );
 
         if (isDev()) {
             logger.debug(

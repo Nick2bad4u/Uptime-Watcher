@@ -189,8 +189,9 @@ export class DataImportExportService {
      */
     public async persistImportedData(
         sites: ImportSite[],
-        settings: Record<string, string>
+        settings: null | Record<string, string> | undefined
     ): Promise<void> {
+        const safeSettings = settings ?? {};
         return withDatabaseOperation(
             async () => {
                 // Use executeTransaction for atomic multi-table operation
@@ -213,17 +214,20 @@ export class DataImportExportService {
                     await this.importMonitorsWithHistory(db, sites);
 
                     // Import settings using internal method
-                    this.repositories.settings.bulkInsertInternal(db, settings);
+                    this.repositories.settings.bulkInsertInternal(
+                        db,
+                        safeSettings
+                    );
                 });
 
                 this.logger.info(
-                    `Successfully imported ${sites.length} sites and ${Object.keys(settings).length} settings`
+                    `Successfully imported ${sites.length} sites and ${Object.keys(safeSettings).length} settings`
                 );
             },
             "data-import-persist",
             this.eventEmitter,
             {
-                settingsCount: Object.keys(settings).length,
+                settingsCount: Object.keys(safeSettings).length,
                 sitesCount: sites.length,
             }
         );
