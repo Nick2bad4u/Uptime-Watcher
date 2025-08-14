@@ -21,7 +21,7 @@ const mockSiteManager = vi.hoisted(() => {
         invalidate: vi.fn(),
         invalidateAll: vi.fn(),
         bulkUpdate: vi.fn(),
-        onInvalidation: vi.fn().mockReturnValue(() => {})
+        onInvalidation: vi.fn().mockReturnValue(() => {}),
     };
 
     return vi.fn().mockImplementation(() => ({
@@ -61,16 +61,19 @@ vi.mock("../../events/TypedEventBus", () => ({
     TypedEventBus: mockEventBus,
 }));
 
-vi.mock("../../managers/monitoring/services/EnhancedMonitoringServiceFactory", () => ({
-    EnhancedMonitoringServiceFactory: {
-        createServices: vi.fn().mockReturnValue({
-            enhancedHistoryRepository: {},
-            enhancedMonitoringOperations: {},
-            enhancedMonitorRepository: {},
-            enhancedSiteRepository: {},
-        }),
-    },
-}));
+vi.mock(
+    "../../managers/monitoring/services/EnhancedMonitoringServiceFactory",
+    () => ({
+        EnhancedMonitoringServiceFactory: {
+            createServices: vi.fn().mockReturnValue({
+                enhancedHistoryRepository: {},
+                enhancedMonitoringOperations: {},
+                enhancedMonitorRepository: {},
+                enhancedSiteRepository: {},
+            }),
+        },
+    })
+);
 
 vi.mock("../../utils/logger", () => ({
     logger: {

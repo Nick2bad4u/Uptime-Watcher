@@ -1,12 +1,17 @@
 /**
  * Comprehensive IpcService Tests - Isolated Component Testing
- * 
+ *
  * Tests IpcService without ServiceContainer dependencies to achieve 95% coverage.
  * Focuses on handler registration, validation, error handling, and response formatting.
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ipcMain, BrowserWindow, type IpcMainInvokeEvent, type IpcMainEvent } from "electron";
+import {
+    ipcMain,
+    BrowserWindow,
+    type IpcMainInvokeEvent,
+    type IpcMainEvent,
+} from "electron";
 
 import { IpcService } from "../../electron/services/ipc/IpcService";
 import type { UptimeOrchestrator } from "../../electron/UptimeOrchestrator";
@@ -56,7 +61,10 @@ vi.mock("../../electron/services/monitoring/MonitorTypeRegistry", () => ({
                 supportsResponseTime: true,
                 detailFormats: { analyticsLabel: "HTTP Analytics" },
                 display: { showAdvancedMetrics: true, showUrl: true },
-                helpTexts: { primary: "Enter URL", secondary: "Include protocol" },
+                helpTexts: {
+                    primary: "Enter URL",
+                    secondary: "Include protocol",
+                },
             },
             serviceFactory: vi.fn(),
             validationSchema: {},
@@ -78,8 +86,12 @@ vi.mock("../../electron/services/monitoring/MonitorTypeRegistry", () => ({
             return {
                 type: "http",
                 uiConfig: {
-                    formatDetail: vi.fn((details: string) => `HTTP: ${details}`),
-                    formatTitleSuffix: vi.fn((monitor: Monitor) => `(${monitor.id})`),
+                    formatDetail: vi.fn(
+                        (details: string) => `HTTP: ${details}`
+                    ),
+                    formatTitleSuffix: vi.fn(
+                        (monitor: Monitor) => `(${monitor.id})`
+                    ),
                 },
             };
         }
@@ -148,7 +160,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             ports: [],
             reply: vi.fn(),
             returnValue: undefined,
-            type: 'unknown' as any,
+            type: "unknown" as any,
             preventDefault: vi.fn(),
             defaultPrevented: false,
         } as unknown as IpcMainEvent;
@@ -178,7 +190,10 @@ describe("IpcService - Comprehensive Coverage", () => {
             quitAndInstall: vi.fn(),
         } as unknown as AutoUpdaterService;
 
-        ipcService = new IpcService(mockUptimeOrchestrator, mockAutoUpdaterService);
+        ipcService = new IpcService(
+            mockUptimeOrchestrator,
+            mockAutoUpdaterService
+        );
     });
 
     describe("Constructor and Basic Setup", () => {
@@ -200,11 +215,14 @@ describe("IpcService - Comprehensive Coverage", () => {
 
             // Verify multiple handlers are registered
             expect(ipcMain.handle).toHaveBeenCalled();
-            expect(ipcMain.on).toHaveBeenCalledWith("quit-and-install", expect.any(Function));
+            expect(ipcMain.on).toHaveBeenCalledWith(
+                "quit-and-install",
+                expect.any(Function)
+            );
 
             // Check that handle was called for various IPC channels
             const handleCalls = vi.mocked(ipcMain.handle).mock.calls;
-            const registeredChannels = handleCalls.map(call => call[0]);
+            const registeredChannels = handleCalls.map((call) => call[0]);
 
             // Site handlers
             expect(registeredChannels).toContain("add-site");
@@ -246,9 +264,9 @@ describe("IpcService - Comprehensive Coverage", () => {
         });
 
         it("should handle add-site with valid site data", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "add-site"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "add-site");
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
@@ -260,27 +278,31 @@ describe("IpcService - Comprehensive Coverage", () => {
             };
 
             const result = await handler(mockIpcEvent, mockSite);
-            expect(mockUptimeOrchestrator.addSite).toHaveBeenCalledWith(mockSite);
+            expect(mockUptimeOrchestrator.addSite).toHaveBeenCalledWith(
+                mockSite
+            );
             expect(result).toEqual({ success: true, data: true });
         });
 
         it("should handle remove-site with site identifier", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "remove-site"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "remove-site");
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent, "site-to-remove");
 
-            expect(mockUptimeOrchestrator.removeSite).toHaveBeenCalledWith("site-to-remove");
+            expect(mockUptimeOrchestrator.removeSite).toHaveBeenCalledWith(
+                "site-to-remove"
+            );
             expect(result).toEqual({ success: true, data: true });
         });
 
         it("should handle get-sites without parameters", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "get-sites"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "get-sites");
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
@@ -291,9 +313,9 @@ describe("IpcService - Comprehensive Coverage", () => {
         });
 
         it("should handle update-site with identifier and partial data", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "update-site"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "update-site");
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
@@ -301,20 +323,26 @@ describe("IpcService - Comprehensive Coverage", () => {
 
             const result = await handler(mockIpcEvent, "site-id", updateData);
 
-            expect(mockUptimeOrchestrator.updateSite).toHaveBeenCalledWith("site-id", updateData);
+            expect(mockUptimeOrchestrator.updateSite).toHaveBeenCalledWith(
+                "site-id",
+                updateData
+            );
             expect(result).toEqual({ success: true, data: true });
         });
 
         it("should handle remove-monitor with site and monitor identifiers", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "remove-monitor"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "remove-monitor");
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent, "site-id", "monitor-id");
 
-            expect(mockUptimeOrchestrator.removeMonitor).toHaveBeenCalledWith("site-id", "monitor-id");
+            expect(mockUptimeOrchestrator.removeMonitor).toHaveBeenCalledWith(
+                "site-id",
+                "monitor-id"
+            );
             expect(result).toEqual({ success: true, data: true });
         });
     });
@@ -325,9 +353,9 @@ describe("IpcService - Comprehensive Coverage", () => {
         });
 
         it("should handle start-monitoring globally", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "start-monitoring"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "start-monitoring");
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
@@ -338,9 +366,9 @@ describe("IpcService - Comprehensive Coverage", () => {
         });
 
         it("should handle stop-monitoring globally", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "stop-monitoring"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "stop-monitoring");
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
@@ -351,41 +379,51 @@ describe("IpcService - Comprehensive Coverage", () => {
         });
 
         it("should handle start-monitoring-for-site with identifier and optional monitor", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "start-monitoring-for-site"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find(
+                    (call) => call[0] === "start-monitoring-for-site"
+                );
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent, "site-id", "monitor-id");
 
-            expect(mockUptimeOrchestrator.startMonitoringForSite).toHaveBeenCalledWith("site-id", "monitor-id");
+            expect(
+                mockUptimeOrchestrator.startMonitoringForSite
+            ).toHaveBeenCalledWith("site-id", "monitor-id");
             expect(result).toEqual({ success: true, data: true });
         });
 
         it("should handle stop-monitoring-for-site with identifier and optional monitor", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "stop-monitoring-for-site"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find(
+                    (call) => call[0] === "stop-monitoring-for-site"
+                );
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent, "site-id", "monitor-id");
 
-            expect(mockUptimeOrchestrator.stopMonitoringForSite).toHaveBeenCalledWith("site-id", "monitor-id");
+            expect(
+                mockUptimeOrchestrator.stopMonitoringForSite
+            ).toHaveBeenCalledWith("site-id", "monitor-id");
             expect(result).toEqual({ success: true, data: true });
         });
 
         it("should handle check-site-now with site and monitor identifiers", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "check-site-now"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "check-site-now");
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent, "site-id", "monitor-id");
 
-            expect(mockUptimeOrchestrator.checkSiteManually).toHaveBeenCalledWith("site-id", "monitor-id");
+            expect(
+                mockUptimeOrchestrator.checkSiteManually
+            ).toHaveBeenCalledWith("site-id", "monitor-id");
             expect(result).toEqual({ success: true, data: true });
         });
     });
@@ -396,9 +434,9 @@ describe("IpcService - Comprehensive Coverage", () => {
         });
 
         it("should handle get-monitor-types and serialize configurations", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "get-monitor-types"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "get-monitor-types");
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
@@ -409,7 +447,9 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result.data).toHaveLength(2);
 
             // Check serialized config structure
-            const httpConfig = result.data.find((config: any) => config.type === "http");
+            const httpConfig = result.data.find(
+                (config: any) => config.type === "http"
+            );
             expect(httpConfig).toBeDefined();
             expect(httpConfig.displayName).toBe("HTTP Monitor");
             expect(httpConfig.description).toBe("HTTP endpoint monitoring");
@@ -424,33 +464,42 @@ describe("IpcService - Comprehensive Coverage", () => {
         });
 
         it("should handle format-monitor-detail with known monitor type", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "format-monitor-detail"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "format-monitor-detail");
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent, "http", "test details");
 
-            expect(result).toEqual({ success: true, data: "HTTP: test details" });
+            expect(result).toEqual({
+                success: true,
+                data: "HTTP: test details",
+            });
         });
 
         it("should handle format-monitor-detail with unknown monitor type", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "format-monitor-detail"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "format-monitor-detail");
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
-            const result = await handler(mockIpcEvent, "unknown", "test details");
+            const result = await handler(
+                mockIpcEvent,
+                "unknown",
+                "test details"
+            );
 
             expect(result).toEqual({ success: true, data: "test details" });
         });
 
         it("should handle format-monitor-title-suffix with known monitor type", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "format-monitor-title-suffix"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find(
+                    (call) => call[0] === "format-monitor-title-suffix"
+                );
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
@@ -473,9 +522,11 @@ describe("IpcService - Comprehensive Coverage", () => {
         });
 
         it("should handle format-monitor-title-suffix with unknown monitor type", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "format-monitor-title-suffix"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find(
+                    (call) => call[0] === "format-monitor-title-suffix"
+                );
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
@@ -498,13 +549,15 @@ describe("IpcService - Comprehensive Coverage", () => {
         });
 
         it("should handle validate-monitor-data with valid data", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "validate-monitor-data"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "validate-monitor-data");
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
-            const result = await handler(mockIpcEvent, "http", { url: "https://example.com" });
+            const result = await handler(mockIpcEvent, "http", {
+                url: "https://example.com",
+            });
 
             expect(result.success).toBe(true);
             expect(result.errors).toEqual([]);
@@ -513,26 +566,30 @@ describe("IpcService - Comprehensive Coverage", () => {
         });
 
         it("should handle validate-monitor-data with invalid data", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "validate-monitor-data"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "validate-monitor-data");
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
-            const result = await handler(mockIpcEvent, "invalid", { invalid: true });
+            const result = await handler(mockIpcEvent, "invalid", {
+                invalid: true,
+            });
 
             expect(result.success).toBe(false);
             expect(result.errors).toEqual(["Invalid monitor type"]);
         });
 
         it("should handle validate-monitor-data with warnings", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "validate-monitor-data"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "validate-monitor-data");
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
-            const result = await handler(mockIpcEvent, "warning", { data: "test" });
+            const result = await handler(mockIpcEvent, "warning", {
+                data: "test",
+            });
 
             expect(result.success).toBe(true);
             expect(result.warnings).toEqual(["Warning message"]);
@@ -545,9 +602,9 @@ describe("IpcService - Comprehensive Coverage", () => {
         });
 
         it("should handle export-data without parameters", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "export-data"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "export-data");
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
@@ -558,35 +615,39 @@ describe("IpcService - Comprehensive Coverage", () => {
         });
 
         it("should handle import-data with data string", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "import-data"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "import-data");
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent, "import-data-string");
 
-            expect(mockUptimeOrchestrator.importData).toHaveBeenCalledWith("import-data-string");
+            expect(mockUptimeOrchestrator.importData).toHaveBeenCalledWith(
+                "import-data-string"
+            );
             expect(result).toEqual({ success: true, data: true });
         });
 
         it("should handle update-history-limit with number parameter", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "update-history-limit"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "update-history-limit");
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent, 5000);
 
-            expect(mockUptimeOrchestrator.setHistoryLimit).toHaveBeenCalledWith(5000);
+            expect(mockUptimeOrchestrator.setHistoryLimit).toHaveBeenCalledWith(
+                5000
+            );
             expect(result).toEqual({ success: true, data: undefined });
         });
 
         it("should handle get-history-limit without parameters", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "get-history-limit"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "get-history-limit");
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
@@ -597,9 +658,9 @@ describe("IpcService - Comprehensive Coverage", () => {
         });
 
         it("should handle reset-settings without parameters", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "reset-settings"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "reset-settings");
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
@@ -610,16 +671,21 @@ describe("IpcService - Comprehensive Coverage", () => {
         });
 
         it("should handle download-sqlite-backup without parameters", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "download-sqlite-backup"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find(
+                    (call) => call[0] === "download-sqlite-backup"
+                );
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent);
 
             expect(mockUptimeOrchestrator.downloadBackup).toHaveBeenCalled();
-            expect(result).toEqual({ success: true, data: "/path/to/backup.db" });
+            expect(result).toEqual({
+                success: true,
+                data: "/path/to/backup.db",
+            });
         });
     });
 
@@ -629,9 +695,9 @@ describe("IpcService - Comprehensive Coverage", () => {
         });
 
         it("should handle request-full-sync and emit events", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "request-full-sync"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "request-full-sync");
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
@@ -666,9 +732,9 @@ describe("IpcService - Comprehensive Coverage", () => {
         });
 
         it("should handle get-sync-status and return status info", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "get-sync-status"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "get-sync-status");
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
@@ -691,12 +757,15 @@ describe("IpcService - Comprehensive Coverage", () => {
         });
 
         it("should register quit-and-install event handler", () => {
-            expect(ipcMain.on).toHaveBeenCalledWith("quit-and-install", expect.any(Function));
+            expect(ipcMain.on).toHaveBeenCalledWith(
+                "quit-and-install",
+                expect.any(Function)
+            );
 
             // Simulate the event handler being called
-            const onCall = vi.mocked(ipcMain.on).mock.calls.find(
-                call => call[0] === "quit-and-install"
-            );
+            const onCall = vi
+                .mocked(ipcMain.on)
+                .mock.calls.find((call) => call[0] === "quit-and-install");
             expect(onCall).toBeDefined();
 
             const handler = onCall![1];
@@ -712,32 +781,39 @@ describe("IpcService - Comprehensive Coverage", () => {
         });
 
         it("should properly serialize UI config with all components", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "get-monitor-types"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "get-monitor-types");
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent);
 
-            const httpConfig = result.data.find((config: any) => config.type === "http");
-            
+            const httpConfig = result.data.find(
+                (config: any) => config.type === "http"
+            );
+
             expect(httpConfig.uiConfig).toEqual({
                 supportsAdvancedAnalytics: true,
                 supportsResponseTime: true,
                 detailFormats: { analyticsLabel: "HTTP Analytics" },
                 display: { showAdvancedMetrics: true, showUrl: true },
-                helpTexts: { primary: "Enter URL", secondary: "Include protocol" },
+                helpTexts: {
+                    primary: "Enter URL",
+                    secondary: "Include protocol",
+                },
             });
         });
 
         it("should serialize UI config with minimal components", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "get-monitor-types"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "get-monitor-types");
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent);
 
-            const pingConfig = result.data.find((config: any) => config.type === "ping");
-            
+            const pingConfig = result.data.find(
+                (config: any) => config.type === "ping"
+            );
+
             expect(pingConfig.uiConfig).toEqual({
                 supportsAdvancedAnalytics: false,
                 supportsResponseTime: true,
@@ -746,9 +822,9 @@ describe("IpcService - Comprehensive Coverage", () => {
 
         it("should handle empty UI config serialization", () => {
             // This tests the internal serialization utilities through configuration
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "get-monitor-types"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "get-monitor-types");
             expect(handleCall).toBeDefined();
             // The serialization is tested through the actual handler execution above
         });
@@ -763,11 +839,14 @@ describe("IpcService - Comprehensive Coverage", () => {
             ipcService.cleanup();
 
             expect(ipcMain.removeHandler).toHaveBeenCalled();
-            expect(ipcMain.removeAllListeners).toHaveBeenCalledWith("quit-and-install");
+            expect(ipcMain.removeAllListeners).toHaveBeenCalledWith(
+                "quit-and-install"
+            );
 
             // Verify that all registered channels are cleaned up
-            const removeHandlerCalls = vi.mocked(ipcMain.removeHandler).mock.calls;
-            const removedChannels = removeHandlerCalls.map(call => call[0]);
+            const removeHandlerCalls = vi.mocked(ipcMain.removeHandler).mock
+                .calls;
+            const removedChannels = removeHandlerCalls.map((call) => call[0]);
 
             // Check that important channels are being removed
             expect(removedChannels.length).toBeGreaterThan(0);
@@ -775,26 +854,34 @@ describe("IpcService - Comprehensive Coverage", () => {
 
         it("should handle errors in orchestrator methods gracefully", async () => {
             // Mock an error in getSites
-            mockUptimeOrchestrator.getSites = vi.fn().mockRejectedValue(new Error("Database error"));
+            mockUptimeOrchestrator.getSites = vi
+                .fn()
+                .mockRejectedValue(new Error("Database error"));
 
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "get-sites"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "get-sites");
             const handler = handleCall![1];
 
-            await expect(handler(mockIpcEvent)).rejects.toThrow("Database error");
+            await expect(handler(mockIpcEvent)).rejects.toThrow(
+                "Database error"
+            );
         });
 
         it("should handle async errors in monitoring operations", async () => {
             // Mock an error in startMonitoring
-            mockUptimeOrchestrator.startMonitoring = vi.fn().mockRejectedValue(new Error("Monitoring error"));
+            mockUptimeOrchestrator.startMonitoring = vi
+                .fn()
+                .mockRejectedValue(new Error("Monitoring error"));
 
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "start-monitoring"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "start-monitoring");
             const handler = handleCall![1];
 
-            await expect(handler(mockIpcEvent)).rejects.toThrow("Monitoring error");
+            await expect(handler(mockIpcEvent)).rejects.toThrow(
+                "Monitoring error"
+            );
         });
     });
 
@@ -806,9 +893,9 @@ describe("IpcService - Comprehensive Coverage", () => {
         it("should handle empty sites array in sync operations", async () => {
             mockUptimeOrchestrator.getSites = vi.fn().mockResolvedValue([]);
 
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "request-full-sync"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "request-full-sync");
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent);
 
@@ -816,9 +903,9 @@ describe("IpcService - Comprehensive Coverage", () => {
         });
 
         it("should handle monitor configuration without formatDetail function", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "format-monitor-detail"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "format-monitor-detail");
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent, "ping", "test details");
 
@@ -826,9 +913,11 @@ describe("IpcService - Comprehensive Coverage", () => {
         });
 
         it("should handle monitor configuration without formatTitleSuffix function", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "format-monitor-title-suffix"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find(
+                    (call) => call[0] === "format-monitor-title-suffix"
+                );
             const handler = handleCall![1];
             const mockMonitor: Monitor = {
                 id: "monitor1",
@@ -848,13 +937,20 @@ describe("IpcService - Comprehensive Coverage", () => {
         });
 
         it("should handle whitespace in monitor type for trimming", async () => {
-            const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                call => call[0] === "format-monitor-detail"
-            );
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "format-monitor-detail");
             const handler = handleCall![1];
-            const result = await handler(mockIpcEvent, "  http  ", "test details");
+            const result = await handler(
+                mockIpcEvent,
+                "  http  ",
+                "test details"
+            );
 
-            expect(result).toEqual({ success: true, data: "HTTP: test details" });
+            expect(result).toEqual({
+                success: true,
+                data: "HTTP: test details",
+            });
         });
     });
 });

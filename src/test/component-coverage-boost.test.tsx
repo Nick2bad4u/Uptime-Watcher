@@ -292,9 +292,14 @@ describe("Component Coverage Boost", () => {
                 host?: string;
             }
 
-            const areHistoryPropsEqual = (prev: SiteCardHistoryProps, next: SiteCardHistoryProps): boolean => {
+            const areHistoryPropsEqual = (
+                prev: SiteCardHistoryProps,
+                next: SiteCardHistoryProps
+            ): boolean => {
                 // Compare history arrays
-                if (prev.filteredHistory.length !== next.filteredHistory.length) {
+                if (
+                    prev.filteredHistory.length !== next.filteredHistory.length
+                ) {
                     return false;
                 }
                 const prevTimestamp = prev.filteredHistory[0]?.timestamp;
@@ -312,7 +317,10 @@ describe("Component Coverage Boost", () => {
                 if (prevMonitor === undefined || nextMonitor === undefined) {
                     return false;
                 }
-                if (prevMonitor.id !== nextMonitor.id || prevMonitor.type !== nextMonitor.type) {
+                if (
+                    prevMonitor.id !== nextMonitor.id ||
+                    prevMonitor.type !== nextMonitor.type
+                ) {
                     return false;
                 }
                 return !(
@@ -323,20 +331,39 @@ describe("Component Coverage Boost", () => {
             };
 
             const baseHistory = [{ timestamp: 1000, status: "up" }];
-            const baseMonitor: Monitor = { id: "1", type: "http", url: "https://example.com" };
+            const baseMonitor: Monitor = {
+                id: "1",
+                type: "http",
+                url: "https://example.com",
+            };
 
             // Test same props
-            const props1 = { filteredHistory: baseHistory, monitor: baseMonitor };
-            const props2 = { filteredHistory: baseHistory, monitor: baseMonitor };
+            const props1 = {
+                filteredHistory: baseHistory,
+                monitor: baseMonitor,
+            };
+            const props2 = {
+                filteredHistory: baseHistory,
+                monitor: baseMonitor,
+            };
             expect(areHistoryPropsEqual(props1, props2)).toBe(true);
 
             // Test different history lengths
-            const props3 = { filteredHistory: [...baseHistory, { timestamp: 2000, status: "down" }], monitor: baseMonitor };
+            const props3 = {
+                filteredHistory: [
+                    ...baseHistory,
+                    { timestamp: 2000, status: "down" },
+                ],
+                monitor: baseMonitor,
+            };
             expect(areHistoryPropsEqual(props1, props3)).toBe(false);
 
             // Test different timestamps
             const differentHistory = [{ timestamp: 2000, status: "up" }];
-            const props4 = { filteredHistory: differentHistory, monitor: baseMonitor };
+            const props4 = {
+                filteredHistory: differentHistory,
+                monitor: baseMonitor,
+            };
             expect(areHistoryPropsEqual(props1, props4)).toBe(false);
 
             // Test both monitors undefined
@@ -350,32 +377,85 @@ describe("Component Coverage Boost", () => {
             expect(areHistoryPropsEqual(props7, props1)).toBe(false);
 
             // Test different monitor IDs
-            const differentMonitor = { id: "2", type: "http", url: "https://example.com" };
-            const props8 = { filteredHistory: baseHistory, monitor: differentMonitor };
+            const differentMonitor = {
+                id: "2",
+                type: "http",
+                url: "https://example.com",
+            };
+            const props8 = {
+                filteredHistory: baseHistory,
+                monitor: differentMonitor,
+            };
             expect(areHistoryPropsEqual(props1, props8)).toBe(false);
 
             // Test different monitor types
-            const differentTypeMonitor = { id: "1", type: "port", url: "https://example.com" };
-            const props9 = { filteredHistory: baseHistory, monitor: differentTypeMonitor };
+            const differentTypeMonitor = {
+                id: "1",
+                type: "port",
+                url: "https://example.com",
+            };
+            const props9 = {
+                filteredHistory: baseHistory,
+                monitor: differentTypeMonitor,
+            };
             expect(areHistoryPropsEqual(props1, props9)).toBe(false);
 
             // Test different URLs
-            const differentUrlMonitor = { id: "1", type: "http", url: "https://different.com" };
-            const props10 = { filteredHistory: baseHistory, monitor: differentUrlMonitor };
+            const differentUrlMonitor = {
+                id: "1",
+                type: "http",
+                url: "https://different.com",
+            };
+            const props10 = {
+                filteredHistory: baseHistory,
+                monitor: differentUrlMonitor,
+            };
             expect(areHistoryPropsEqual(props1, props10)).toBe(false);
 
             // Test different ports
-            const portMonitor1 = { id: "1", type: "port", host: "localhost", port: 8080 };
-            const portMonitor2 = { id: "1", type: "port", host: "localhost", port: 9090 };
-            const props11 = { filteredHistory: baseHistory, monitor: portMonitor1 };
-            const props12 = { filteredHistory: baseHistory, monitor: portMonitor2 };
+            const portMonitor1 = {
+                id: "1",
+                type: "port",
+                host: "localhost",
+                port: 8080,
+            };
+            const portMonitor2 = {
+                id: "1",
+                type: "port",
+                host: "localhost",
+                port: 9090,
+            };
+            const props11 = {
+                filteredHistory: baseHistory,
+                monitor: portMonitor1,
+            };
+            const props12 = {
+                filteredHistory: baseHistory,
+                monitor: portMonitor2,
+            };
             expect(areHistoryPropsEqual(props11, props12)).toBe(false);
 
             // Test different hosts
-            const hostMonitor1 = { id: "1", type: "port", host: "localhost", port: 8080 };
-            const hostMonitor2 = { id: "1", type: "port", host: "remote", port: 8080 };
-            const props13 = { filteredHistory: baseHistory, monitor: hostMonitor1 };
-            const props14 = { filteredHistory: baseHistory, monitor: hostMonitor2 };
+            const hostMonitor1 = {
+                id: "1",
+                type: "port",
+                host: "localhost",
+                port: 8080,
+            };
+            const hostMonitor2 = {
+                id: "1",
+                type: "port",
+                host: "remote",
+                port: 8080,
+            };
+            const props13 = {
+                filteredHistory: baseHistory,
+                monitor: hostMonitor1,
+            };
+            const props14 = {
+                filteredHistory: baseHistory,
+                monitor: hostMonitor2,
+            };
             expect(areHistoryPropsEqual(props13, props14)).toBe(false);
         });
 
@@ -395,7 +475,10 @@ describe("Component Coverage Boost", () => {
             }
 
             const historyTitleLogic = {
-                generateTitle: (monitor: Monitor | undefined, options: MonitorTypeOption[]) => {
+                generateTitle: (
+                    monitor: Monitor | undefined,
+                    options: MonitorTypeOption[]
+                ) => {
                     if (!monitor) {
                         return "No Monitor Selected";
                     }
@@ -404,7 +487,8 @@ describe("Component Coverage Boost", () => {
                     const monitorTypeOption = options.find(
                         (option) => option.value === monitor.type
                     );
-                    const displayName = monitorTypeOption?.label ?? monitor.type;
+                    const displayName =
+                        monitorTypeOption?.label ?? monitor.type;
 
                     // Get type-specific suffix
                     let suffix = "";
@@ -425,27 +509,48 @@ describe("Component Coverage Boost", () => {
             ];
 
             // Test undefined monitor
-            expect(historyTitleLogic.generateTitle(undefined, options)).toBe("No Monitor Selected");
+            expect(historyTitleLogic.generateTitle(undefined, options)).toBe(
+                "No Monitor Selected"
+            );
 
             // Test HTTP monitor with URL
-            const httpMonitor: Monitor = { id: "1", type: "http", url: "https://example.com" };
-            expect(historyTitleLogic.generateTitle(httpMonitor, options)).toBe("HTTP History - https://example.com");
+            const httpMonitor: Monitor = {
+                id: "1",
+                type: "http",
+                url: "https://example.com",
+            };
+            expect(historyTitleLogic.generateTitle(httpMonitor, options)).toBe(
+                "HTTP History - https://example.com"
+            );
 
             // Test port monitor with host and port
-            const portMonitor: Monitor = { id: "1", type: "port", host: "localhost", port: 8080 };
-            expect(historyTitleLogic.generateTitle(portMonitor, options)).toBe("Port History - localhost:8080");
+            const portMonitor: Monitor = {
+                id: "1",
+                type: "port",
+                host: "localhost",
+                port: 8080,
+            };
+            expect(historyTitleLogic.generateTitle(portMonitor, options)).toBe(
+                "Port History - localhost:8080"
+            );
 
             // Test unknown monitor type (fallback to type)
             const unknownMonitor: Monitor = { id: "1", type: "unknown" };
-            expect(historyTitleLogic.generateTitle(unknownMonitor, options)).toBe("unknown History");
+            expect(
+                historyTitleLogic.generateTitle(unknownMonitor, options)
+            ).toBe("unknown History");
 
             // Test monitor with no URL, host, or port
             const basicMonitor: Monitor = { id: "1", type: "ping" };
-            expect(historyTitleLogic.generateTitle(basicMonitor, options)).toBe("Ping History");
+            expect(historyTitleLogic.generateTitle(basicMonitor, options)).toBe(
+                "Ping History"
+            );
 
             // Test monitor type option not found (fallback to monitor.type)
             const missingTypeMonitor: Monitor = { id: "1", type: "custom" };
-            expect(historyTitleLogic.generateTitle(missingTypeMonitor, options)).toBe("custom History");
+            expect(
+                historyTitleLogic.generateTitle(missingTypeMonitor, options)
+            ).toBe("custom History");
         });
     });
 
@@ -476,7 +581,10 @@ describe("Component Coverage Boost", () => {
                         showStartButton: !props.isMonitoring,
                     };
                 },
-                handleCheckNowClick: (props: ActionButtonGroupProps, event?: React.MouseEvent) => {
+                handleCheckNowClick: (
+                    props: ActionButtonGroupProps,
+                    event?: React.MouseEvent
+                ) => {
                     if (event) {
                         event.stopPropagation();
                     }
@@ -484,7 +592,10 @@ describe("Component Coverage Boost", () => {
                         props.onCheckNow();
                     }
                 },
-                handleStartMonitoringClick: (props: ActionButtonGroupProps, event?: React.MouseEvent) => {
+                handleStartMonitoringClick: (
+                    props: ActionButtonGroupProps,
+                    event?: React.MouseEvent
+                ) => {
                     if (event) {
                         event.stopPropagation();
                     }
@@ -492,7 +603,10 @@ describe("Component Coverage Boost", () => {
                         props.onStartMonitoring();
                     }
                 },
-                handleStopMonitoringClick: (props: ActionButtonGroupProps, event?: React.MouseEvent) => {
+                handleStopMonitoringClick: (
+                    props: ActionButtonGroupProps,
+                    event?: React.MouseEvent
+                ) => {
                     if (event) {
                         event.stopPropagation();
                     }
@@ -516,24 +630,32 @@ describe("Component Coverage Boost", () => {
             };
 
             // Test enabled state
-            expect(actionButtonLogic.shouldDisableButtons(baseProps)).toBe(false);
-            
+            expect(actionButtonLogic.shouldDisableButtons(baseProps)).toBe(
+                false
+            );
+
             // Test disabled state
             const disabledProps = { ...baseProps, disabled: true };
-            expect(actionButtonLogic.shouldDisableButtons(disabledProps)).toBe(true);
-            
+            expect(actionButtonLogic.shouldDisableButtons(disabledProps)).toBe(
+                true
+            );
+
             // Test loading state
             const loadingProps = { ...baseProps, isLoading: true };
-            expect(actionButtonLogic.shouldDisableButtons(loadingProps)).toBe(true);
+            expect(actionButtonLogic.shouldDisableButtons(loadingProps)).toBe(
+                true
+            );
 
             // Test monitoring states
             const monitoringProps = { ...baseProps, isMonitoring: true };
-            const buttonState = actionButtonLogic.getButtonState(monitoringProps);
+            const buttonState =
+                actionButtonLogic.getButtonState(monitoringProps);
             expect(buttonState.showStopButton).toBe(true);
             expect(buttonState.showStartButton).toBe(false);
 
             const notMonitoringProps = { ...baseProps, isMonitoring: false };
-            const notMonitoringState = actionButtonLogic.getButtonState(notMonitoringProps);
+            const notMonitoringState =
+                actionButtonLogic.getButtonState(notMonitoringProps);
             expect(notMonitoringState.showStopButton).toBe(false);
             expect(notMonitoringState.showStartButton).toBe(true);
 
@@ -567,7 +689,9 @@ describe("Component Coverage Boost", () => {
             }
 
             const siteMonitoringLogic = {
-                shouldShowSiteMonitoringButton: (props: ActionButtonGroupProps) => {
+                shouldShowSiteMonitoringButton: (
+                    props: ActionButtonGroupProps
+                ) => {
                     return true; // Always shows SiteMonitoringButton
                 },
                 getSiteMonitoringProps: (props: ActionButtonGroupProps) => {
@@ -604,13 +728,23 @@ describe("Component Coverage Boost", () => {
                 onStopSiteMonitoring: vi.fn(),
             };
 
-            expect(siteMonitoringLogic.shouldShowSiteMonitoringButton(propsAllRunning)).toBe(true);
-            expect(siteMonitoringLogic.shouldShowSiteMonitoringButton(propsNoneRunning)).toBe(true);
+            expect(
+                siteMonitoringLogic.shouldShowSiteMonitoringButton(
+                    propsAllRunning
+                )
+            ).toBe(true);
+            expect(
+                siteMonitoringLogic.shouldShowSiteMonitoringButton(
+                    propsNoneRunning
+                )
+            ).toBe(true);
 
-            const allRunningMonitoringProps = siteMonitoringLogic.getSiteMonitoringProps(propsAllRunning);
+            const allRunningMonitoringProps =
+                siteMonitoringLogic.getSiteMonitoringProps(propsAllRunning);
             expect(allRunningMonitoringProps.allMonitorsRunning).toBe(true);
 
-            const noneRunningMonitoringProps = siteMonitoringLogic.getSiteMonitoringProps(propsNoneRunning);
+            const noneRunningMonitoringProps =
+                siteMonitoringLogic.getSiteMonitoringProps(propsNoneRunning);
             expect(noneRunningMonitoringProps.allMonitorsRunning).toBe(false);
         });
     });

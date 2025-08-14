@@ -20,22 +20,25 @@ vi.mock("@electron/events/TypedEventBus", () => {
     console.log("TypedEventBus mock being defined");
     // eslint-disable-next-line @typescript-eslint/no-require-imports, unicorn/prefer-module -- Required for mock
     const { EventEmitter } = require("node:events");
-    
+
     return {
         TypedEventBus: vi.fn().mockImplementation((name?: string) => {
             console.log(`Creating TypedEventBus instance for: ${name}`);
             // Create an actual EventEmitter instance
             // eslint-disable-next-line unicorn/prefer-event-target -- Required for Node.js EventEmitter compatibility
             const eventEmitter = new EventEmitter();
-            
+
             // Add TypedEventBus-specific methods
             const mockInstance = Object.assign(eventEmitter, {
                 onTyped: vi.fn(),
                 emitTyped: vi.fn(),
                 busId: name || "test-bus",
             });
-            
-            console.log("Mock TypedEventBus instance created with on method:", typeof mockInstance.on);
+
+            console.log(
+                "Mock TypedEventBus instance created with on method:",
+                typeof mockInstance.on
+            );
             return mockInstance;
         }),
     };
@@ -46,22 +49,27 @@ vi.mock("../events/TypedEventBus", () => {
     console.log("TypedEventBus relative mock being defined");
     // eslint-disable-next-line @typescript-eslint/no-require-imports, unicorn/prefer-module -- Required for mock
     const { EventEmitter } = require("node:events");
-    
+
     return {
         TypedEventBus: vi.fn().mockImplementation((name?: string) => {
-            console.log(`Creating TypedEventBus relative instance for: ${name}`);
+            console.log(
+                `Creating TypedEventBus relative instance for: ${name}`
+            );
             // Create an actual EventEmitter instance
             // eslint-disable-next-line unicorn/prefer-event-target -- Required for Node.js EventEmitter compatibility
             const eventEmitter = new EventEmitter();
-            
+
             // Add TypedEventBus-specific methods
             const mockInstance = Object.assign(eventEmitter, {
                 onTyped: vi.fn(),
                 emitTyped: vi.fn(),
                 busId: name || "test-bus",
             });
-            
-            console.log("Mock TypedEventBus relative instance created with on method:", typeof mockInstance.on);
+
+            console.log(
+                "Mock TypedEventBus relative instance created with on method:",
+                typeof mockInstance.on
+            );
             return mockInstance;
         }),
     };
@@ -75,7 +83,7 @@ const mockDatabaseServiceInstance = {
     getConnection: vi.fn(),
     beginTransaction: vi.fn(),
     commitTransaction: vi.fn(),
-    rollbackTransaction: vi.fn()
+    rollbackTransaction: vi.fn(),
 };
 
 vi.mock("../../services/database/DatabaseService", () => ({
@@ -91,7 +99,7 @@ vi.mock("../../services/database/HistoryRepository", () => ({
         getAllHistory: vi.fn().mockResolvedValue([]),
         addHistoryEntry: vi.fn().mockResolvedValue(undefined),
         deleteHistory: vi.fn().mockResolvedValue(undefined),
-        isInitialized: vi.fn().mockReturnValue(true)
+        isInitialized: vi.fn().mockReturnValue(true),
     })),
 }));
 
@@ -102,7 +110,7 @@ vi.mock("../../services/database/MonitorRepository", () => ({
         createMonitor: vi.fn().mockResolvedValue(undefined),
         updateMonitor: vi.fn().mockResolvedValue(undefined),
         deleteMonitor: vi.fn().mockResolvedValue(undefined),
-        isInitialized: vi.fn().mockReturnValue(true)
+        isInitialized: vi.fn().mockReturnValue(true),
     })),
 }));
 
@@ -112,7 +120,7 @@ vi.mock("../../services/database/SettingsRepository", () => ({
         getSettings: vi.fn().mockResolvedValue({}),
         updateSettings: vi.fn().mockResolvedValue(undefined),
         resetSettings: vi.fn().mockResolvedValue(undefined),
-        isInitialized: vi.fn().mockReturnValue(true)
+        isInitialized: vi.fn().mockReturnValue(true),
     })),
 }));
 
@@ -123,7 +131,7 @@ vi.mock("../../services/database/SiteRepository", () => ({
         createSite: vi.fn().mockResolvedValue(undefined),
         updateSite: vi.fn().mockResolvedValue(undefined),
         deleteSite: vi.fn().mockResolvedValue(undefined),
-        isInitialized: vi.fn().mockReturnValue(true)
+        isInitialized: vi.fn().mockReturnValue(true),
     })),
 }));
 
@@ -134,7 +142,7 @@ vi.mock("../../managers/ConfigurationManager", () => ({
         getConfig: vi.fn().mockReturnValue({}),
         updateConfig: vi.fn().mockResolvedValue(undefined),
         resetConfig: vi.fn().mockResolvedValue(undefined),
-        isInitialized: vi.fn().mockReturnValue(true)
+        isInitialized: vi.fn().mockReturnValue(true),
     })),
 }));
 
@@ -168,7 +176,7 @@ vi.mock("../../UptimeOrchestrator", () => ({
         stop: vi.fn().mockResolvedValue(undefined),
         restart: vi.fn().mockResolvedValue(undefined),
         isInitialized: vi.fn().mockReturnValue(true),
-        emitTyped: vi.fn().mockResolvedValue(undefined)
+        emitTyped: vi.fn().mockResolvedValue(undefined),
     })),
 }));
 
@@ -187,10 +195,10 @@ describe("ServiceContainer - Targeted SiteManager Test", () => {
         it("should create SiteManager without event bus errors", () => {
             console.log("Starting SiteManager creation test");
             const container = ServiceContainer.getInstance();
-            
+
             console.log("About to call getSiteManager()");
             const siteManager = container.getSiteManager();
-            
+
             console.log("SiteManager created successfully:", siteManager);
             expect(siteManager).toBeDefined();
         });

@@ -43,13 +43,13 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
     beforeEach(() => {
         // Reset all mocks
         vi.clearAllMocks();
-        
+
         // Create new instance
         scheduler = new MonitorScheduler();
-        
+
         // Create mock check callback
         mockCheckCallback = vi.fn().mockResolvedValue(undefined);
-        
+
         // Use fake timers
         vi.useFakeTimers();
     });
@@ -68,29 +68,31 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
         it("should initialize without check callback", () => {
             // Try to perform immediate check without callback - should do nothing
-            expect(() => scheduler.performImmediateCheck("site1", "monitor1")).not.toThrow();
+            expect(() =>
+                scheduler.performImmediateCheck("site1", "monitor1")
+            ).not.toThrow();
         });
     });
 
     describe("setCheckCallback", () => {
         it("should set the check callback function", () => {
             scheduler.setCheckCallback(mockCheckCallback);
-            
+
             // Verify by calling performImmediateCheck
             scheduler.performImmediateCheck("site1", "monitor1");
-            
+
             expect(mockCheckCallback).toHaveBeenCalledWith("site1", "monitor1");
         });
 
         it("should allow setting callback multiple times", () => {
             const firstCallback = vi.fn().mockResolvedValue(undefined);
             const secondCallback = vi.fn().mockResolvedValue(undefined);
-            
+
             scheduler.setCheckCallback(firstCallback);
             scheduler.setCheckCallback(secondCallback);
-            
+
             scheduler.performImmediateCheck("site1", "monitor1");
-            
+
             expect(firstCallback).not.toHaveBeenCalled();
             expect(secondCallback).toHaveBeenCalledWith("site1", "monitor1");
         });
@@ -111,7 +113,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             };
 
             const result = scheduler.startMonitor("site1", monitor);
-            
+
             expect(result).toBe(true);
             expect(scheduler.getActiveCount()).toBe(1);
             expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
@@ -127,7 +129,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             };
 
             const result = scheduler.startMonitor("site1", monitor);
-            
+
             expect(result).toBe(false);
             expect(scheduler.getActiveCount()).toBe(0);
         });
@@ -142,7 +144,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             };
 
             const result = scheduler.startMonitor("site1", monitor);
-            
+
             expect(result).toBe(true); // startMonitor ignores monitoring flag
             expect(scheduler.getActiveCount()).toBe(1);
         });
@@ -157,7 +159,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             };
 
             const result = scheduler.startMonitor("site1", monitor);
-            
+
             expect(result).toBe(true);
             // The monitor should still be started with minimum interval
             expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
@@ -173,10 +175,10 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             };
 
             scheduler.startMonitor("site1", monitor);
-            
+
             // Fast-forward time to trigger interval
             vi.advanceTimersByTime(60000);
-            
+
             expect(mockCheckCallback).toHaveBeenCalledWith("site1", "monitor1");
         });
 
@@ -200,11 +202,11 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
             scheduler.startMonitor("site1", monitor1);
             scheduler.startMonitor("site1", monitor2);
-            
+
             expect(scheduler.getActiveCount()).toBe(2);
             expect(scheduler.getActiveMonitors().sort()).toEqual([
                 "site1|monitor1",
-                "site1|monitor2"
+                "site1|monitor2",
             ]);
         });
     });
@@ -225,9 +227,9 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
             scheduler.startMonitor("site1", monitor);
             expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
-            
+
             const result = scheduler.stopMonitor("site1", "monitor1");
-            
+
             expect(result).toBe(true);
             expect(scheduler.isMonitoring("site1", "monitor1")).toBe(false);
             expect(scheduler.getActiveCount()).toBe(0);
@@ -235,7 +237,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
         it("should return false for non-existent monitor", () => {
             const result = scheduler.stopMonitor("site1", "nonexistent");
-            
+
             expect(result).toBe(false);
         });
 
@@ -250,10 +252,10 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
             scheduler.startMonitor("site1", monitor);
             scheduler.stopMonitor("site1", "monitor1");
-            
+
             // Try to stop again
             const result = scheduler.stopMonitor("site1", "monitor1");
-            
+
             expect(result).toBe(false);
         });
     });
@@ -273,9 +275,9 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             };
 
             scheduler.startMonitor("site1", monitor);
-            
+
             const result = scheduler.restartMonitor("site1", monitor);
-            
+
             expect(result).toBe(true);
             expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
         });
@@ -290,7 +292,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             };
 
             const result = scheduler.restartMonitor("site1", monitor);
-            
+
             expect(result).toBe(true);
             expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
         });
@@ -304,7 +306,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             };
 
             const result = scheduler.restartMonitor("site1", monitor);
-            
+
             expect(result).toBe(false);
         });
     });
@@ -336,12 +338,12 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                         port: 3000,
                         checkInterval: 30000,
                         monitoring: true,
-                    }
-                ]
+                    },
+                ],
             };
 
             scheduler.startSite(site);
-            
+
             expect(scheduler.getActiveCount()).toBe(2);
             expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
             expect(scheduler.isMonitoring("site1", "monitor2")).toBe(true);
@@ -354,7 +356,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                 name: "Test Site",
                 url: "https://example.com",
                 monitoring: true,
-                monitors: []
+                monitors: [],
             };
 
             expect(() => scheduler.startSite(site)).not.toThrow();
@@ -375,12 +377,12 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                         url: "https://example.com",
                         checkInterval: 60000,
                         monitoring: false,
-                    }
-                ]
+                    },
+                ],
             };
 
             scheduler.startSite(site);
-            
+
             expect(scheduler.getActiveCount()).toBe(0);
         });
     });
@@ -412,15 +414,15 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                         port: 3000,
                         checkInterval: 30000,
                         monitoring: true,
-                    }
-                ]
+                    },
+                ],
             };
 
             scheduler.startSite(site);
             expect(scheduler.getActiveCount()).toBe(2);
-            
+
             scheduler.stopSite("site1");
-            
+
             expect(scheduler.getActiveCount()).toBe(0);
             expect(scheduler.isMonitoring("site1", "monitor1")).toBe(false);
             expect(scheduler.isMonitoring("site1", "monitor2")).toBe(false);
@@ -444,8 +446,8 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                         url: "https://example.com",
                         checkInterval: 60000,
                         monitoring: true,
-                    }
-                ]
+                    },
+                ],
             };
 
             const site2: Site = {
@@ -461,16 +463,16 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                         url: "https://test.com",
                         checkInterval: 60000,
                         monitoring: true,
-                    }
-                ]
+                    },
+                ],
             };
 
             scheduler.startSite(site1);
             scheduler.startSite(site2);
             expect(scheduler.getActiveCount()).toBe(2);
-            
+
             scheduler.stopSite("site1");
-            
+
             expect(scheduler.getActiveCount()).toBe(1);
             expect(scheduler.isMonitoring("site1", "monitor1")).toBe(false);
             expect(scheduler.isMonitoring("site2", "monitor2")).toBe(true);
@@ -496,8 +498,8 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                         url: "https://example.com",
                         checkInterval: 60000,
                         monitoring: true,
-                    }
-                ]
+                    },
+                ],
             };
 
             const site2: Site = {
@@ -513,16 +515,16 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                         url: "https://test.com",
                         checkInterval: 60000,
                         monitoring: true,
-                    }
-                ]
+                    },
+                ],
             };
 
             scheduler.startSite(site1);
             scheduler.startSite(site2);
             expect(scheduler.getActiveCount()).toBe(2);
-            
+
             scheduler.stopAll();
-            
+
             expect(scheduler.getActiveCount()).toBe(0);
             expect(scheduler.getActiveMonitors()).toEqual([]);
         });
@@ -536,25 +538,31 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
     describe("performImmediateCheck", () => {
         it("should invoke check callback when set", async () => {
             scheduler.setCheckCallback(mockCheckCallback);
-            
+
             await scheduler.performImmediateCheck("site1", "monitor1");
-            
+
             expect(mockCheckCallback).toHaveBeenCalledWith("site1", "monitor1");
         });
 
         it("should handle callback errors gracefully", async () => {
-            const errorCallback = vi.fn().mockRejectedValue(new Error("Check failed"));
+            const errorCallback = vi
+                .fn()
+                .mockRejectedValue(new Error("Check failed"));
             scheduler.setCheckCallback(errorCallback);
-            
+
             // Should not throw even if callback throws
-            await expect(scheduler.performImmediateCheck("site1", "monitor1")).resolves.not.toThrow();
-            
+            await expect(
+                scheduler.performImmediateCheck("site1", "monitor1")
+            ).resolves.not.toThrow();
+
             expect(errorCallback).toHaveBeenCalledWith("site1", "monitor1");
             // Note: Logger mock verification removed since real MonitorScheduler uses real logger
         });
 
         it("should do nothing when no callback is set", async () => {
-            await expect(scheduler.performImmediateCheck("site1", "monitor1")).resolves.not.toThrow();
+            await expect(
+                scheduler.performImmediateCheck("site1", "monitor1")
+            ).resolves.not.toThrow();
         });
     });
 
@@ -564,9 +572,11 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         });
 
         it("should handle callback errors during scheduled checks", () => {
-            const errorCallback = vi.fn().mockRejectedValue(new Error("Scheduled check failed"));
+            const errorCallback = vi
+                .fn()
+                .mockRejectedValue(new Error("Scheduled check failed"));
             scheduler.setCheckCallback(errorCallback);
-            
+
             const monitor = {
                 id: "monitor1",
                 type: "http",
@@ -576,10 +586,10 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             };
 
             scheduler.startMonitor("site1", monitor);
-            
+
             // Fast-forward to trigger interval
             vi.advanceTimersByTime(60000);
-            
+
             expect(errorCallback).toHaveBeenCalledWith("site1", "monitor1");
             // Monitor should still be active after error
             expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
@@ -625,7 +635,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             };
 
             const result = scheduler.startMonitor("site1", monitor);
-            
+
             expect(result).toBe(true);
             expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
         });
@@ -640,7 +650,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             };
 
             const result = scheduler.startMonitor("", monitor);
-            
+
             expect(result).toBe(true);
             expect(scheduler.isMonitoring("", "monitor1")).toBe(true);
         });
@@ -655,7 +665,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             };
 
             const result = scheduler.startMonitor("site1", monitor);
-            
+
             expect(result).toBe(false); // Empty string ID is treated as no ID
             expect(scheduler.isMonitoring("site1", "")).toBe(false);
         });
@@ -676,7 +686,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             };
 
             scheduler.startMonitor("site1", monitor);
-            
+
             const activeMonitors = scheduler.getActiveMonitors();
             expect(activeMonitors).toContain("site1|monitor1");
         });
@@ -691,7 +701,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             };
 
             scheduler.startMonitor("site1", monitor);
-            
+
             // Monitor should be started despite low interval
             expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
         });
@@ -721,7 +731,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
             scheduler.startMonitor("site1", monitor1);
             expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
-            
+
             scheduler.restartMonitor("site1", monitor2);
             expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
             expect(scheduler.getActiveCount()).toBe(1);
@@ -748,11 +758,11 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             // Start both monitors
             scheduler.startMonitor("site1", monitor1);
             scheduler.startMonitor("site1", monitor2);
-            
+
             // Stop one, restart the other
             scheduler.stopMonitor("site1", "monitor1");
             scheduler.restartMonitor("site1", monitor2);
-            
+
             expect(scheduler.getActiveCount()).toBe(1);
             expect(scheduler.isMonitoring("site1", "monitor1")).toBe(false);
             expect(scheduler.isMonitoring("site1", "monitor2")).toBe(true);

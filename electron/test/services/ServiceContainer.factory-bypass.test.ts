@@ -1,6 +1,6 @@
 /**
  * ServiceContainer test using factory bypass approach
- * 
+ *
  * Instead of trying to fix SiteManager mocking, we mock EnhancedMonitoringServiceFactory
  * to avoid the getSitesCache dependency entirely
  */
@@ -12,7 +12,7 @@ import { EventEmitter } from "node:events";
 const mockTypedEventBus = vi.hoisted(() => {
     function MockTypedEventBus(name?: string) {
         const eventEmitter = new EventEmitter() as any;
-        
+
         // Add TypedEventBus-specific methods
         eventEmitter.onTyped = vi.fn();
         eventEmitter.emitTyped = vi.fn().mockResolvedValue(undefined);
@@ -24,10 +24,10 @@ const mockTypedEventBus = vi.hoisted(() => {
         eventEmitter.hasListeners = vi.fn().mockReturnValue(false);
         eventEmitter.busId = name || "test-bus";
         eventEmitter.destroy = vi.fn();
-        
+
         return eventEmitter;
     }
-    
+
     return MockTypedEventBus;
 });
 
@@ -48,7 +48,9 @@ vi.mock("../../services/monitoring/EnhancedMonitoringServiceFactory", () => ({
                 deleteAllMonitorResults: vi.fn().mockResolvedValue(undefined),
             },
             enhancedMonitoringOperations: {
-                checkSiteStatus: vi.fn().mockResolvedValue({ success: true, responseTime: 100 }),
+                checkSiteStatus: vi
+                    .fn()
+                    .mockResolvedValue({ success: true, responseTime: 100 }),
                 performHealthCheck: vi.fn().mockResolvedValue(true),
                 validateSiteConfiguration: vi.fn().mockReturnValue(true),
             },
@@ -105,12 +107,14 @@ vi.mock("../../managers/SiteManager", () => ({
             entries: vi.fn().mockReturnValue([][Symbol.iterator]()),
             getAll: vi.fn().mockReturnValue([]),
             size: 0,
-            getStats: vi.fn().mockReturnValue({ hits: 0, misses: 0, evictions: 0 }),
+            getStats: vi
+                .fn()
+                .mockReturnValue({ hits: 0, misses: 0, evictions: 0 }),
             cleanup: vi.fn().mockReturnValue(0),
             invalidate: vi.fn(),
             invalidateAll: vi.fn(),
             bulkUpdate: vi.fn(),
-            onInvalidation: vi.fn().mockReturnValue(() => {})
+            onInvalidation: vi.fn().mockReturnValue(() => {}),
         };
 
         return {
@@ -121,7 +125,7 @@ vi.mock("../../managers/SiteManager", () => ({
             updateSite: vi.fn().mockResolvedValue(undefined),
             deleteSite: vi.fn().mockResolvedValue(undefined),
             isInitialized: vi.fn().mockReturnValue(true),
-            eventBus: mockTypedEventBus()
+            eventBus: mockTypedEventBus(),
         };
     },
 }));
@@ -145,10 +149,10 @@ describe("ServiceContainer - Factory Bypass Test", () => {
 
     it("should create SiteManager successfully", () => {
         console.log("🧪 Testing SiteManager creation");
-        
+
         const siteManager = container.getSiteManager();
         console.log("🎯 SiteManager created:", !!siteManager);
-        
+
         expect(siteManager).toBeDefined();
         expect(siteManager.initialize).toBeDefined();
         expect(siteManager.addSite).toBeDefined();
@@ -156,20 +160,24 @@ describe("ServiceContainer - Factory Bypass Test", () => {
 
     it("should create MonitorManager successfully without getSitesCache error", async () => {
         console.log("🧪 Testing MonitorManager creation with factory bypass");
-        
+
         // First create SiteManager
         const siteManager = container.getSiteManager();
         console.log("🎯 SiteManager created:", !!siteManager);
-        
+
         // Then create MonitorManager - this should NOT fail because EnhancedMonitoringServiceFactory is mocked
         const monitorManager = container.getMonitorManager();
         console.log("🎯 MonitorManager created:", !!monitorManager);
-        
+
         expect(siteManager).toBeDefined();
         expect(monitorManager).toBeDefined();
-        
+
         // Verify that EnhancedMonitoringServiceFactory.createServices was called
-        const { EnhancedMonitoringServiceFactory } = await import("../../services/monitoring/EnhancedMonitoringServiceFactory");
-        expect(EnhancedMonitoringServiceFactory.createServices).toHaveBeenCalled();
+        const { EnhancedMonitoringServiceFactory } = await import(
+            "../../services/monitoring/EnhancedMonitoringServiceFactory"
+        );
+        expect(
+            EnhancedMonitoringServiceFactory.createServices
+        ).toHaveBeenCalled();
     });
 });

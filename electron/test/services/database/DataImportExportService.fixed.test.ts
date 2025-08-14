@@ -1,6 +1,6 @@
 /**
  * Test file for DataImportExportService - Corrected Implementation
- * 
+ *
  * Fixed interface issues:
  * - Correct repository method signatures with db parameter
  * - Proper utility function mocking
@@ -71,9 +71,11 @@ describe("DataImportExportService - Corrected Implementation", () => {
         // Create comprehensive mock config with correct interfaces
         mockConfig = {
             databaseService: {
-                executeTransaction: vi.fn().mockImplementation(async (callback) => {
-                    return await callback(mockDb);
-                }),
+                executeTransaction: vi
+                    .fn()
+                    .mockImplementation(async (callback) => {
+                        return await callback(mockDb);
+                    }),
             },
             eventEmitter: {
                 emitTyped: vi.fn().mockResolvedValue(undefined),
@@ -124,20 +126,36 @@ describe("DataImportExportService - Corrected Implementation", () => {
         it("should export sites and settings successfully", async () => {
             // Setup mock data
             const mockSites = [
-                { id: "1", url: "https://example.com", name: "Test Site 1", monitoring: true, monitors: [] },
-                { id: "2", url: "https://test.com", name: "Test Site 2", monitoring: false, monitors: [] }
+                {
+                    id: "1",
+                    url: "https://example.com",
+                    name: "Test Site 1",
+                    monitoring: true,
+                    monitors: [],
+                },
+                {
+                    id: "2",
+                    url: "https://test.com",
+                    name: "Test Site 2",
+                    monitoring: false,
+                    monitors: [],
+                },
             ];
             const mockSettings = {
                 "app.theme": "light",
                 "app.language": "en",
                 "check.interval": "300",
-                "notifications.enabled": "true"
+                "notifications.enabled": "true",
             };
 
             // Mock repository responses
-            (mockConfig.repositories.site.exportAll as any).mockResolvedValue(mockSites);
-            (mockConfig.repositories.settings.getAll as any).mockResolvedValue(mockSettings);
-            
+            (mockConfig.repositories.site.exportAll as any).mockResolvedValue(
+                mockSites
+            );
+            (mockConfig.repositories.settings.getAll as any).mockResolvedValue(
+                mockSettings
+            );
+
             // Mock utility function to return specific JSON
             mockSafeJsonStringify.mockReturnValue('{"test": "data"}');
 
@@ -151,7 +169,7 @@ describe("DataImportExportService - Corrected Implementation", () => {
                     exportedAt: expect.any(String),
                     settings: mockSettings,
                     sites: mockSites,
-                    version: "1.0"
+                    version: "1.0",
                 }),
                 "{}",
                 2
@@ -160,9 +178,13 @@ describe("DataImportExportService - Corrected Implementation", () => {
 
         it("should handle sites repository error", async () => {
             const error = new Error("Sites export failed");
-            (mockConfig.repositories.site.exportAll as any).mockRejectedValue(error);
+            (mockConfig.repositories.site.exportAll as any).mockRejectedValue(
+                error
+            );
 
-            await expect(service.exportAllData()).rejects.toThrow("Failed to export data: Sites export failed");
+            await expect(service.exportAllData()).rejects.toThrow(
+                "Failed to export data: Sites export failed"
+            );
             expect(mockConfig.logger.error).toHaveBeenCalledWith(
                 "Failed to export data: Sites export failed",
                 error
@@ -171,10 +193,16 @@ describe("DataImportExportService - Corrected Implementation", () => {
 
         it("should handle settings repository error", async () => {
             const error = new Error("Settings export failed");
-            (mockConfig.repositories.site.exportAll as any).mockResolvedValue([]);
-            (mockConfig.repositories.settings.getAll as any).mockRejectedValue(error);
+            (mockConfig.repositories.site.exportAll as any).mockResolvedValue(
+                []
+            );
+            (mockConfig.repositories.settings.getAll as any).mockRejectedValue(
+                error
+            );
 
-            await expect(service.exportAllData()).rejects.toThrow("Failed to export data: Settings export failed");
+            await expect(service.exportAllData()).rejects.toThrow(
+                "Failed to export data: Settings export failed"
+            );
             expect(mockConfig.logger.error).toHaveBeenCalledWith(
                 "Failed to export data: Settings export failed",
                 error
@@ -182,8 +210,12 @@ describe("DataImportExportService - Corrected Implementation", () => {
         });
 
         it("should handle JSON stringify returning fallback", async () => {
-            (mockConfig.repositories.site.exportAll as any).mockResolvedValue([]);
-            (mockConfig.repositories.settings.getAll as any).mockResolvedValue({});
+            (mockConfig.repositories.site.exportAll as any).mockResolvedValue(
+                []
+            );
+            (mockConfig.repositories.settings.getAll as any).mockResolvedValue(
+                {}
+            );
             mockSafeJsonStringify.mockReturnValue("{}");
 
             const result = await service.exportAllData();
@@ -197,9 +229,15 @@ describe("DataImportExportService - Corrected Implementation", () => {
             const mockParseResult = {
                 success: true,
                 data: {
-                    sites: [{ id: "1", name: "Test Site", url: "https://example.com" }],
-                    settings: { "app.theme": "dark" }
-                }
+                    sites: [
+                        {
+                            id: "1",
+                            name: "Test Site",
+                            url: "https://example.com",
+                        },
+                    ],
+                    settings: { "app.theme": "dark" },
+                },
             };
 
             mockSafeJsonParseFunc.mockReturnValue(mockParseResult);
@@ -210,14 +248,19 @@ describe("DataImportExportService - Corrected Implementation", () => {
                 sites: mockParseResult.data.sites,
                 settings: mockParseResult.data.settings,
             });
-            expect(mockSafeJsonParseFunc).toHaveBeenCalledWith(validJsonData, expect.any(Function));
+            expect(mockSafeJsonParseFunc).toHaveBeenCalledWith(
+                validJsonData,
+                expect.any(Function)
+            );
         });
 
         it("should handle failed JSON parsing", async () => {
             const mockParseResult = { success: false, error: "Parse error" };
             mockSafeJsonParseFunc.mockReturnValue(mockParseResult);
 
-            await expect(service.importDataFromJson("invalid json")).rejects.toThrow(SiteLoadingError);
+            await expect(
+                service.importDataFromJson("invalid json")
+            ).rejects.toThrow(SiteLoadingError);
             expect(mockConfig.logger.error).toHaveBeenCalledWith(
                 expect.stringContaining("Failed to parse import data"),
                 expect.any(Error)
@@ -227,7 +270,9 @@ describe("DataImportExportService - Corrected Implementation", () => {
         it("should handle null parse result", async () => {
             mockSafeJsonParseFunc.mockReturnValue(null);
 
-            await expect(service.importDataFromJson("invalid json")).rejects.toThrow(SiteLoadingError);
+            await expect(
+                service.importDataFromJson("invalid json")
+            ).rejects.toThrow(SiteLoadingError);
             expect(mockConfig.logger.error).toHaveBeenCalledWith(
                 expect.stringContaining("Failed to parse import data"),
                 expect.any(Error)
@@ -238,60 +283,90 @@ describe("DataImportExportService - Corrected Implementation", () => {
             const mockParseResult = { success: true, data: null };
             mockSafeJsonParseFunc.mockReturnValue(mockParseResult);
 
-            await expect(service.importDataFromJson('{"sites": []}')).rejects.toThrow(SiteLoadingError);
+            await expect(
+                service.importDataFromJson('{"sites": []}')
+            ).rejects.toThrow(SiteLoadingError);
         });
     });
 
     describe("persistImportedData", () => {
-        const mockSites = [{ identifier: "1", name: "Test Site", url: "https://example.com" }];
+        const mockSites = [
+            { identifier: "1", name: "Test Site", url: "https://example.com" },
+        ];
         const mockSettings = { "app.theme": "dark" };
 
         it("should persist sites and settings successfully", async () => {
             await service.persistImportedData(mockSites, mockSettings);
 
-            expect(mockConfig.databaseService.executeTransaction).toHaveBeenCalled();
-            
+            expect(
+                mockConfig.databaseService.executeTransaction
+            ).toHaveBeenCalled();
+
             // Verify transaction callback was called with correct operations
-            const transactionCallback = (mockConfig.databaseService.executeTransaction as any).mock.calls[0][0];
+            const transactionCallback = (
+                mockConfig.databaseService.executeTransaction as any
+            ).mock.calls[0][0];
             await transactionCallback(mockDb);
 
             // Verify all repositories had deleteAllInternal called with db
-            expect(mockConfig.repositories.site.deleteAllInternal).toHaveBeenCalledWith(mockDb);
-            expect(mockConfig.repositories.settings.deleteAllInternal).toHaveBeenCalledWith(mockDb);
-            expect(mockConfig.repositories.monitor.deleteAllInternal).toHaveBeenCalledWith(mockDb);
-            expect(mockConfig.repositories.history.deleteAllInternal).toHaveBeenCalledWith(mockDb);
+            expect(
+                mockConfig.repositories.site.deleteAllInternal
+            ).toHaveBeenCalledWith(mockDb);
+            expect(
+                mockConfig.repositories.settings.deleteAllInternal
+            ).toHaveBeenCalledWith(mockDb);
+            expect(
+                mockConfig.repositories.monitor.deleteAllInternal
+            ).toHaveBeenCalledWith(mockDb);
+            expect(
+                mockConfig.repositories.history.deleteAllInternal
+            ).toHaveBeenCalledWith(mockDb);
 
             // Verify bulk inserts called with db and data
-            expect(mockConfig.repositories.site.bulkInsertInternal).toHaveBeenCalledWith(
+            expect(
+                mockConfig.repositories.site.bulkInsertInternal
+            ).toHaveBeenCalledWith(
                 mockDb,
                 expect.arrayContaining([
                     expect.objectContaining({
                         identifier: mockSites[0].identifier,
                         name: mockSites[0].name,
-                        monitoring: true
-                    })
+                        monitoring: true,
+                    }),
                 ])
             );
-            expect(mockConfig.repositories.settings.bulkInsertInternal).toHaveBeenCalledWith(mockDb, mockSettings);
+            expect(
+                mockConfig.repositories.settings.bulkInsertInternal
+            ).toHaveBeenCalledWith(mockDb, mockSettings);
         });
 
         it("should handle transaction error", async () => {
             const error = new Error("Transaction failed");
-            (mockConfig.databaseService.executeTransaction as any).mockRejectedValue(error);
+            (
+                mockConfig.databaseService.executeTransaction as any
+            ).mockRejectedValue(error);
 
-            await expect(service.persistImportedData(mockSites, mockSettings)).rejects.toThrow("Transaction failed");
+            await expect(
+                service.persistImportedData(mockSites, mockSettings)
+            ).rejects.toThrow("Transaction failed");
         });
 
         it("should handle empty sites array", async () => {
             await service.persistImportedData([], mockSettings);
 
-            expect(mockConfig.databaseService.executeTransaction).toHaveBeenCalled();
-            
+            expect(
+                mockConfig.databaseService.executeTransaction
+            ).toHaveBeenCalled();
+
             // Verify empty sites array is handled
-            const transactionCallback = (mockConfig.databaseService.executeTransaction as any).mock.calls[0][0];
+            const transactionCallback = (
+                mockConfig.databaseService.executeTransaction as any
+            ).mock.calls[0][0];
             await transactionCallback(mockDb);
 
-            expect(mockConfig.repositories.site.bulkInsertInternal).toHaveBeenCalledWith(mockDb, []);
+            expect(
+                mockConfig.repositories.site.bulkInsertInternal
+            ).toHaveBeenCalledWith(mockDb, []);
         });
     });
 
@@ -300,13 +375,17 @@ describe("DataImportExportService - Corrected Implementation", () => {
             const mockParseResult = { success: false, error: "Invalid format" };
             mockSafeJsonParseFunc.mockReturnValue(mockParseResult);
 
-            await expect(service.importDataFromJson("invalid")).rejects.toThrow(SiteLoadingError);
+            await expect(service.importDataFromJson("invalid")).rejects.toThrow(
+                SiteLoadingError
+            );
             expect(mockConfig.eventEmitter.emitTyped).toHaveBeenCalledWith(
                 "database:error",
                 expect.objectContaining({
-                    details: expect.stringContaining("Failed to parse import data"),
+                    details: expect.stringContaining(
+                        "Failed to parse import data"
+                    ),
                     operation: "import-data-parse",
-                    timestamp: expect.any(Number)
+                    timestamp: expect.any(Number),
                 })
             );
         });
@@ -314,25 +393,31 @@ describe("DataImportExportService - Corrected Implementation", () => {
         it("should handle export workflow with comprehensive error scenarios", async () => {
             // Test successful path first
             (mockConfig.repositories.site.exportAll as any).mockResolvedValue([
-                { id: "1", url: "https://example.com", name: "Test" }
+                { id: "1", url: "https://example.com", name: "Test" },
             ]);
-            (mockConfig.repositories.settings.getAll as any).mockResolvedValue({ "app.theme": "light" });
+            (mockConfig.repositories.settings.getAll as any).mockResolvedValue({
+                "app.theme": "light",
+            });
             mockSafeJsonStringify.mockReturnValue('{"data": "success"}');
-            
+
             const result = await service.exportAllData();
             expect(result).toBe('{"data": "success"}');
 
             // Test failure path
             const error = new Error("Export system failure");
-            (mockConfig.repositories.site.exportAll as any).mockRejectedValue(error);
+            (mockConfig.repositories.site.exportAll as any).mockRejectedValue(
+                error
+            );
 
-            await expect(service.exportAllData()).rejects.toThrow("Failed to export data: Export system failure");
+            await expect(service.exportAllData()).rejects.toThrow(
+                "Failed to export data: Export system failure"
+            );
             expect(mockConfig.eventEmitter.emitTyped).toHaveBeenCalledWith(
                 "database:error",
                 expect.objectContaining({
                     details: "Failed to export data: Export system failure",
                     operation: "export-data",
-                    timestamp: expect.any(Number)
+                    timestamp: expect.any(Number),
                 })
             );
         });

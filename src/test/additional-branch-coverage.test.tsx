@@ -1,28 +1,28 @@
 /**
  * Additional Branch Coverage Tests
- * 
+ *
  * Targeting remaining files with low branch coverage to achieve 90%+ threshold.
  */
 
-import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { render, fireEvent, screen, waitFor } from '@testing-library/react';
-import React from 'react';
+import { describe, expect, it, vi, beforeEach } from "vitest";
+import { render, fireEvent, screen, waitFor } from "@testing-library/react";
+import React from "react";
 
 // Import components and utilities needing branch coverage
-import RadioGroup from '../components/AddSiteForm/RadioGroup';
-import { SettingItem } from '../components/shared/SettingItem';
-import ThemedBox from '../theme/components/ThemedBox';
-import ThemedProgress from '../theme/components/ThemedProgress';
-import { getIconColorClass } from '../theme/components/iconUtils';
-import ThemeProvider from '../theme/components/ThemeProvider';
+import RadioGroup from "../components/AddSiteForm/RadioGroup";
+import { SettingItem } from "../components/shared/SettingItem";
+import ThemedBox from "../theme/components/ThemedBox";
+import ThemedProgress from "../theme/components/ThemedProgress";
+import { getIconColorClass } from "../theme/components/iconUtils";
+import ThemeProvider from "../theme/components/ThemeProvider";
 
-describe('Additional Branch Coverage Tests', () => {
-    describe('RadioGroup Component', () => {
-        it('should handle custom onChange callback', () => {
+describe("Additional Branch Coverage Tests", () => {
+    describe("RadioGroup Component", () => {
+        it("should handle custom onChange callback", () => {
             const mockOnChange = vi.fn();
             const options = [
-                { value: 'option1', label: 'Option 1' },
-                { value: 'option2', label: 'Option 2' }
+                { value: "option1", label: "Option 1" },
+                { value: "option2", label: "Option 2" },
             ];
 
             render(
@@ -38,17 +38,17 @@ describe('Additional Branch Coverage Tests', () => {
                 </ThemeProvider>
             );
 
-            const radio = screen.getByDisplayValue('option2');
+            const radio = screen.getByDisplayValue("option2");
             fireEvent.click(radio);
 
-            expect(mockOnChange).toHaveBeenCalledWith('option2');
+            expect(mockOnChange).toHaveBeenCalledWith("option2");
         });
 
-        it('should handle selection of different radio options', () => {
+        it("should handle selection of different radio options", () => {
             const mockOnChange = vi.fn();
             const options = [
-                { value: 'new', label: 'New Site' },
-                { value: 'existing', label: 'Existing Site' }
+                { value: "new", label: "New Site" },
+                { value: "existing", label: "Existing Site" },
             ];
 
             render(
@@ -65,17 +65,17 @@ describe('Additional Branch Coverage Tests', () => {
             );
 
             // Click on existing option
-            const existingRadio = screen.getByDisplayValue('existing');
+            const existingRadio = screen.getByDisplayValue("existing");
             fireEvent.click(existingRadio);
 
-            expect(mockOnChange).toHaveBeenCalledWith('existing');
+            expect(mockOnChange).toHaveBeenCalledWith("existing");
         });
 
-        it('should render all radio options correctly', () => {
+        it("should render all radio options correctly", () => {
             const options = [
-                { value: 'http', label: 'HTTP Monitor' },
-                { value: 'port', label: 'Port Monitor' },
-                { value: 'ping', label: 'Ping Monitor' }
+                { value: "http", label: "HTTP Monitor" },
+                { value: "port", label: "Port Monitor" },
+                { value: "ping", label: "Ping Monitor" },
             ];
 
             render(
@@ -91,31 +91,33 @@ describe('Additional Branch Coverage Tests', () => {
                 </ThemeProvider>
             );
 
-            expect(screen.getByText('HTTP Monitor')).toBeInTheDocument();
-            expect(screen.getByText('Port Monitor')).toBeInTheDocument();
-            expect(screen.getByText('Ping Monitor')).toBeInTheDocument();
+            expect(screen.getByText("HTTP Monitor")).toBeInTheDocument();
+            expect(screen.getByText("Port Monitor")).toBeInTheDocument();
+            expect(screen.getByText("Ping Monitor")).toBeInTheDocument();
         });
     });
 
-    describe('SettingItem Component', () => {
-        it('should render control when provided', () => {
+    describe("SettingItem Component", () => {
+        it("should render control when provided", () => {
             render(
                 <ThemeProvider>
-                    <SettingItem 
+                    <SettingItem
                         title="Test Setting"
-                        control={<div data-testid="setting-control">Control</div>}
+                        control={
+                            <div data-testid="setting-control">Control</div>
+                        }
                     />
                 </ThemeProvider>
             );
 
-            expect(screen.getByTestId('setting-control')).toBeInTheDocument();
-            expect(screen.getByText('Test Setting')).toBeInTheDocument();
+            expect(screen.getByTestId("setting-control")).toBeInTheDocument();
+            expect(screen.getByText("Test Setting")).toBeInTheDocument();
         });
 
-        it('should render description when provided', () => {
+        it("should render description when provided", () => {
             render(
                 <ThemeProvider>
-                    <SettingItem 
+                    <SettingItem
                         title="Test Setting"
                         description="This is a test setting description"
                         control={<div>Control</div>}
@@ -123,13 +125,15 @@ describe('Additional Branch Coverage Tests', () => {
                 </ThemeProvider>
             );
 
-            expect(screen.getByText('This is a test setting description')).toBeInTheDocument();
+            expect(
+                screen.getByText("This is a test setting description")
+            ).toBeInTheDocument();
         });
 
-        it('should handle disabled state', () => {
+        it("should handle disabled state", () => {
             render(
                 <ThemeProvider>
-                    <SettingItem 
+                    <SettingItem
                         title="Disabled Setting"
                         disabled={true}
                         control={<input data-testid="disabled-input" />}
@@ -137,12 +141,12 @@ describe('Additional Branch Coverage Tests', () => {
                 </ThemeProvider>
             );
 
-            expect(screen.getByTestId('disabled-input')).toBeInTheDocument();
+            expect(screen.getByTestId("disabled-input")).toBeInTheDocument();
         });
     });
 
-    describe('ThemedBox Component', () => {
-        it('should handle different variant combinations', () => {
+    describe("ThemedBox Component", () => {
+        it("should handle different variant combinations", () => {
             // Test default variant
             const { rerender } = render(
                 <ThemeProvider>
@@ -150,7 +154,7 @@ describe('Additional Branch Coverage Tests', () => {
                 </ThemeProvider>
             );
 
-            expect(screen.getByText('Default Box')).toBeInTheDocument();
+            expect(screen.getByText("Default Box")).toBeInTheDocument();
 
             // Test primary variant
             rerender(
@@ -159,7 +163,7 @@ describe('Additional Branch Coverage Tests', () => {
                 </ThemeProvider>
             );
 
-            expect(screen.getByText('Primary Box')).toBeInTheDocument();
+            expect(screen.getByText("Primary Box")).toBeInTheDocument();
 
             // Test secondary variant
             rerender(
@@ -168,25 +172,25 @@ describe('Additional Branch Coverage Tests', () => {
                 </ThemeProvider>
             );
 
-            expect(screen.getByText('Secondary Box')).toBeInTheDocument();
+            expect(screen.getByText("Secondary Box")).toBeInTheDocument();
         });
 
-        it('should handle custom className and style props', () => {
+        it("should handle custom className and style props", () => {
             render(
                 <ThemeProvider>
-                    <ThemedBox 
-                        className="custom-class" 
-                        style={{ margin: '10px' }}
+                    <ThemedBox
+                        className="custom-class"
+                        style={{ margin: "10px" }}
                     >
                         Styled Box
                     </ThemedBox>
                 </ThemeProvider>
             );
 
-            expect(screen.getByText('Styled Box')).toBeInTheDocument();
+            expect(screen.getByText("Styled Box")).toBeInTheDocument();
         });
 
-        it('should render children content correctly', () => {
+        it("should render children content correctly", () => {
             render(
                 <ThemeProvider>
                     <ThemedBox>
@@ -195,12 +199,12 @@ describe('Additional Branch Coverage Tests', () => {
                 </ThemeProvider>
             );
 
-            expect(screen.getByTestId('child-content')).toBeInTheDocument();
+            expect(screen.getByTestId("child-content")).toBeInTheDocument();
         });
     });
 
-    describe('ThemedProgress Component', () => {
-        it('should handle different progress value ranges', () => {
+    describe("ThemedProgress Component", () => {
+        it("should handle different progress value ranges", () => {
             // Test 0% progress
             const { rerender } = render(
                 <ThemeProvider>
@@ -208,7 +212,7 @@ describe('Additional Branch Coverage Tests', () => {
                 </ThemeProvider>
             );
 
-            expect(screen.getByRole('progressbar')).toBeInTheDocument();
+            expect(screen.getByRole("progressbar")).toBeInTheDocument();
 
             // Test 50% progress
             rerender(
@@ -217,7 +221,7 @@ describe('Additional Branch Coverage Tests', () => {
                 </ThemeProvider>
             );
 
-            expect(screen.getByRole('progressbar')).toBeInTheDocument();
+            expect(screen.getByRole("progressbar")).toBeInTheDocument();
 
             // Test 100% progress
             rerender(
@@ -226,10 +230,10 @@ describe('Additional Branch Coverage Tests', () => {
                 </ThemeProvider>
             );
 
-            expect(screen.getByRole('progressbar')).toBeInTheDocument();
+            expect(screen.getByRole("progressbar")).toBeInTheDocument();
         });
 
-        it('should handle different size variants', () => {
+        it("should handle different size variants", () => {
             // Test small size
             const { rerender } = render(
                 <ThemeProvider>
@@ -237,7 +241,7 @@ describe('Additional Branch Coverage Tests', () => {
                 </ThemeProvider>
             );
 
-            expect(screen.getByRole('progressbar')).toBeInTheDocument();
+            expect(screen.getByRole("progressbar")).toBeInTheDocument();
 
             // Test medium size
             rerender(
@@ -246,7 +250,7 @@ describe('Additional Branch Coverage Tests', () => {
                 </ThemeProvider>
             );
 
-            expect(screen.getByRole('progressbar')).toBeInTheDocument();
+            expect(screen.getByRole("progressbar")).toBeInTheDocument();
 
             // Test large size
             rerender(
@@ -255,10 +259,10 @@ describe('Additional Branch Coverage Tests', () => {
                 </ThemeProvider>
             );
 
-            expect(screen.getByRole('progressbar')).toBeInTheDocument();
+            expect(screen.getByRole("progressbar")).toBeInTheDocument();
         });
 
-        it('should handle different color variants', () => {
+        it("should handle different color variants", () => {
             // Test primary color
             const { rerender } = render(
                 <ThemeProvider>
@@ -266,7 +270,7 @@ describe('Additional Branch Coverage Tests', () => {
                 </ThemeProvider>
             );
 
-            expect(screen.getByRole('progressbar')).toBeInTheDocument();
+            expect(screen.getByRole("progressbar")).toBeInTheDocument();
 
             // Test success color
             rerender(
@@ -275,7 +279,7 @@ describe('Additional Branch Coverage Tests', () => {
                 </ThemeProvider>
             );
 
-            expect(screen.getByRole('progressbar')).toBeInTheDocument();
+            expect(screen.getByRole("progressbar")).toBeInTheDocument();
 
             // Test warning color
             rerender(
@@ -284,7 +288,7 @@ describe('Additional Branch Coverage Tests', () => {
                 </ThemeProvider>
             );
 
-            expect(screen.getByRole('progressbar')).toBeInTheDocument();
+            expect(screen.getByRole("progressbar")).toBeInTheDocument();
 
             // Test error color
             rerender(
@@ -293,82 +297,81 @@ describe('Additional Branch Coverage Tests', () => {
                 </ThemeProvider>
             );
 
-            expect(screen.getByRole('progressbar')).toBeInTheDocument();
+            expect(screen.getByRole("progressbar")).toBeInTheDocument();
         });
 
-        it('should handle progress with label', () => {
+        it("should handle progress with label", () => {
             render(
                 <ThemeProvider>
-                    <ThemedProgress 
-                        value={75} 
+                    <ThemedProgress
+                        value={75}
                         label="Loading..."
                         showLabel={true}
                     />
                 </ThemeProvider>
             );
 
-            expect(screen.getByText('Loading...')).toBeInTheDocument();
-            expect(screen.getByRole('progressbar')).toBeInTheDocument();
+            expect(screen.getByText("Loading...")).toBeInTheDocument();
+            expect(screen.getByRole("progressbar")).toBeInTheDocument();
         });
 
-        it('should handle extra small size', () => {
+        it("should handle extra small size", () => {
             render(
                 <ThemeProvider>
-                    <ThemedProgress 
-                        value={25} 
-                        size="xs"
-                    />
+                    <ThemedProgress value={25} size="xs" />
                 </ThemeProvider>
             );
 
-            expect(screen.getByRole('progressbar')).toBeInTheDocument();
+            expect(screen.getByRole("progressbar")).toBeInTheDocument();
         });
     });
 
-    describe('IconUtils Utility Functions', () => {
-        it('should handle getIconColorClass function with all color types', () => {
+    describe("IconUtils Utility Functions", () => {
+        it("should handle getIconColorClass function with all color types", () => {
             // Test danger/error color
-            expect(getIconColorClass('danger')).toBe('themed-icon--error');
-            expect(getIconColorClass('error')).toBe('themed-icon--error');
+            expect(getIconColorClass("danger")).toBe("themed-icon--error");
+            expect(getIconColorClass("error")).toBe("themed-icon--error");
 
             // Test info color
-            expect(getIconColorClass('info')).toBe('themed-icon--info');
+            expect(getIconColorClass("info")).toBe("themed-icon--info");
 
             // Test primary color
-            expect(getIconColorClass('primary')).toBe('themed-icon--primary');
+            expect(getIconColorClass("primary")).toBe("themed-icon--primary");
 
             // Test secondary color
-            expect(getIconColorClass('secondary')).toBe('themed-icon--secondary');
+            expect(getIconColorClass("secondary")).toBe(
+                "themed-icon--secondary"
+            );
 
             // Test success color
-            expect(getIconColorClass('success')).toBe('themed-icon--success');
+            expect(getIconColorClass("success")).toBe("themed-icon--success");
 
             // Test warning color
-            expect(getIconColorClass('warning')).toBe('themed-icon--warning');
+            expect(getIconColorClass("warning")).toBe("themed-icon--warning");
         });
 
-        it('should handle undefined color gracefully', () => {
+        it("should handle undefined color gracefully", () => {
             expect(getIconColorClass(undefined)).toBeUndefined();
         });
 
-        it('should handle empty string color', () => {
-            expect(getIconColorClass('')).toBeUndefined();
+        it("should handle empty string color", () => {
+            expect(getIconColorClass("")).toBeUndefined();
         });
 
-        it('should handle custom color values', () => {
+        it("should handle custom color values", () => {
             // Test hex color
-            expect(getIconColorClass('#ff0000')).toBeUndefined();
+            expect(getIconColorClass("#ff0000")).toBeUndefined();
 
             // Test rgb color
-            expect(getIconColorClass('rgb(255, 0, 0)')).toBeUndefined();
+            expect(getIconColorClass("rgb(255, 0, 0)")).toBeUndefined();
 
             // Test unknown color name
-            expect(getIconColorClass('unknown')).toBeUndefined();
+            expect(getIconColorClass("unknown")).toBeUndefined();
         });
     });
 
-    describe('Error Boundary and Edge Cases', () => {
-        it('should handle components with missing props gracefully', () => {
+    describe("Error Boundary and Edge Cases", () => {
+        it("should handle components with missing props gracefully", () => {
             // Test RadioGroup with minimal props
             render(
                 <ThemeProvider>
@@ -384,16 +387,16 @@ describe('Additional Branch Coverage Tests', () => {
             );
 
             // Should not crash with empty options
-            expect(screen.queryByRole('radio')).not.toBeInTheDocument();
+            expect(screen.queryByRole("radio")).not.toBeInTheDocument();
         });
 
-        it('should handle ThemedBox with all prop combinations', () => {
+        it("should handle ThemedBox with all prop combinations", () => {
             render(
                 <ThemeProvider>
                     <ThemedBox
                         variant="primary"
                         className="test-class"
-                        style={{ padding: '20px' }}
+                        style={{ padding: "20px" }}
                         onClick={() => {}}
                     >
                         Full Box Content
@@ -401,77 +404,65 @@ describe('Additional Branch Coverage Tests', () => {
                 </ThemeProvider>
             );
 
-            expect(screen.getByText('Full Box Content')).toBeInTheDocument();
+            expect(screen.getByText("Full Box Content")).toBeInTheDocument();
         });
 
-        it('should handle ThemedProgress edge cases with high values', () => {
+        it("should handle ThemedProgress edge cases with high values", () => {
             // Test with very high values
             render(
                 <ThemeProvider>
-                    <ThemedProgress 
-                        value={999} 
-                        max={100} 
-                    />
+                    <ThemedProgress value={999} max={100} />
                 </ThemeProvider>
             );
 
-            expect(screen.getByRole('progressbar')).toBeInTheDocument();
+            expect(screen.getByRole("progressbar")).toBeInTheDocument();
         });
 
-        it('should handle ThemedProgress edge cases with negative values', () => {
+        it("should handle ThemedProgress edge cases with negative values", () => {
             // Test with negative values
             render(
                 <ThemeProvider>
-                    <ThemedProgress 
-                        value={-10} 
-                        max={100} 
-                    />
+                    <ThemedProgress value={-10} max={100} />
                 </ThemeProvider>
             );
 
-            expect(screen.getByRole('progressbar')).toBeInTheDocument();
+            expect(screen.getByRole("progressbar")).toBeInTheDocument();
         });
 
-        it('should handle ThemedProgress percentage calculation with zero max', () => {
+        it("should handle ThemedProgress percentage calculation with zero max", () => {
             // Test with zero max
             render(
                 <ThemeProvider>
-                    <ThemedProgress 
-                        value={50} 
-                        max={0} 
-                    />
+                    <ThemedProgress value={50} max={0} />
                 </ThemeProvider>
             );
 
-            expect(screen.getByRole('progressbar')).toBeInTheDocument();
+            expect(screen.getByRole("progressbar")).toBeInTheDocument();
         });
 
-        it('should handle ThemedProgress percentage calculation with negative max', () => {
+        it("should handle ThemedProgress percentage calculation with negative max", () => {
             // Test with negative max
             render(
                 <ThemeProvider>
-                    <ThemedProgress 
-                        value={50} 
-                        max={-10} 
-                    />
+                    <ThemedProgress value={50} max={-10} />
                 </ThemeProvider>
             );
 
-            expect(screen.getByRole('progressbar')).toBeInTheDocument();
+            expect(screen.getByRole("progressbar")).toBeInTheDocument();
         });
     });
 
-    describe('Component State Management', () => {
-        it('should handle RadioGroup state changes', () => {
-            let currentValue = 'option1';
+    describe("Component State Management", () => {
+        it("should handle RadioGroup state changes", () => {
+            let currentValue = "option1";
             const handleChange = (value: string) => {
                 currentValue = value;
             };
 
             const options = [
-                { value: 'option1', label: 'Option 1' },
-                { value: 'option2', label: 'Option 2' },
-                { value: 'option3', label: 'Option 3' }
+                { value: "option1", label: "Option 1" },
+                { value: "option2", label: "Option 2" },
+                { value: "option3", label: "Option 3" },
             ];
 
             const { rerender } = render(
@@ -488,11 +479,11 @@ describe('Additional Branch Coverage Tests', () => {
             );
 
             // Check initial state
-            expect(screen.getByDisplayValue('option1')).toBeChecked();
+            expect(screen.getByDisplayValue("option1")).toBeChecked();
 
             // Simulate option change
-            fireEvent.click(screen.getByDisplayValue('option2'));
-            currentValue = 'option2';
+            fireEvent.click(screen.getByDisplayValue("option2"));
+            currentValue = "option2";
 
             rerender(
                 <ThemeProvider>
@@ -507,7 +498,7 @@ describe('Additional Branch Coverage Tests', () => {
                 </ThemeProvider>
             );
 
-            expect(screen.getByDisplayValue('option2')).toBeChecked();
+            expect(screen.getByDisplayValue("option2")).toBeChecked();
         });
     });
 });

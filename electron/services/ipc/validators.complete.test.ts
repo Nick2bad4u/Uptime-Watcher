@@ -1,12 +1,12 @@
 /**
  * @fileoverview Comprehensive isolated tests for IPC parameter validators
  * @module ValidatorsTest
- * 
+ *
  * @description
- * Provides complete test coverage for all exported validator groups in the 
+ * Provides complete test coverage for all exported validator groups in the
  * validators.ts module using isolated testing with comprehensive dependency mocking.
  * Tests the actual validator behavior and parameter validation logic.
- * 
+ *
  * @author Uptime-Watcher
  * @version 1.0.0
  */
@@ -56,28 +56,34 @@ describe("IPC Validators - Exported Validator Groups", () => {
 
         describe("addSite validator", () => {
             it("should return null for valid single object parameter", () => {
-                const siteObject = { name: "Test Site", url: "https://example.com" };
+                const siteObject = {
+                    name: "Test Site",
+                    url: "https://example.com",
+                };
                 const result = SiteHandlerValidators.addSite([siteObject]);
-                
+
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
             it("should return error array for invalid parameter count", () => {
-                const result = SiteHandlerValidators.addSite(["param1", "param2"]);
-                
+                const result = SiteHandlerValidators.addSite([
+                    "param1",
+                    "param2",
+                ]);
+
                 expect(isValidationFailure(result)).toBe(true);
                 expect(Array.isArray(result)).toBe(true);
             });
 
             it("should return error array for empty parameters", () => {
                 const result = SiteHandlerValidators.addSite([]);
-                
+
                 expect(isValidationFailure(result)).toBe(true);
             });
 
             it("should return error array for invalid object parameter", () => {
                 const result = SiteHandlerValidators.addSite([null]);
-                
+
                 expect(isValidationFailure(result)).toBe(true);
             });
         });
@@ -85,53 +91,60 @@ describe("IPC Validators - Exported Validator Groups", () => {
         describe("getSites validator", () => {
             it("should return null for empty parameters", () => {
                 const result = SiteHandlerValidators.getSites([]);
-                
+
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
             it("should return error array for non-empty parameters", () => {
                 const result = SiteHandlerValidators.getSites(["unexpected"]);
-                
+
                 expect(isValidationFailure(result)).toBe(true);
             });
         });
 
         describe("removeMonitor validator", () => {
             it("should return null for valid two string parameters", () => {
-                const result = SiteHandlerValidators.removeMonitor(["site-id", "monitor-id"]);
-                
+                const result = SiteHandlerValidators.removeMonitor([
+                    "site-id",
+                    "monitor-id",
+                ]);
+
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
             it("should return error array for invalid parameter count", () => {
-                const result = SiteHandlerValidators.removeMonitor(["only-one"]);
-                
+                const result = SiteHandlerValidators.removeMonitor([
+                    "only-one",
+                ]);
+
                 expect(isValidationFailure(result)).toBe(true);
             });
 
             it("should return error array for invalid parameter types", () => {
                 const result = SiteHandlerValidators.removeMonitor([123, 456]);
-                
+
                 expect(isValidationFailure(result)).toBe(true);
             });
         });
 
         describe("removeSite validator", () => {
             it("should return null for valid single string parameter", () => {
-                const result = SiteHandlerValidators.removeSite(["site-identifier"]);
-                
+                const result = SiteHandlerValidators.removeSite([
+                    "site-identifier",
+                ]);
+
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
             it("should return error array for invalid parameter count", () => {
                 const result = SiteHandlerValidators.removeSite([]);
-                
+
                 expect(isValidationFailure(result)).toBe(true);
             });
 
             it("should return error array for invalid parameter type", () => {
                 const result = SiteHandlerValidators.removeSite([123]);
-                
+
                 expect(isValidationFailure(result)).toBe(true);
             });
         });
@@ -139,20 +152,28 @@ describe("IPC Validators - Exported Validator Groups", () => {
         describe("updateSite validator", () => {
             it("should return null for valid string and object parameters", () => {
                 const updates = { name: "Updated Site" };
-                const result = SiteHandlerValidators.updateSite(["site-id", updates]);
-                
+                const result = SiteHandlerValidators.updateSite([
+                    "site-id",
+                    updates,
+                ]);
+
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
             it("should return error array for invalid parameter count", () => {
-                const result = SiteHandlerValidators.updateSite(["only-string"]);
-                
+                const result = SiteHandlerValidators.updateSite([
+                    "only-string",
+                ]);
+
                 expect(isValidationFailure(result)).toBe(true);
             });
 
             it("should return error array for invalid parameter types", () => {
-                const result = SiteHandlerValidators.updateSite([123, "not-object"]);
-                
+                const result = SiteHandlerValidators.updateSite([
+                    123,
+                    "not-object",
+                ]);
+
                 expect(isValidationFailure(result)).toBe(true);
             });
         });
@@ -161,28 +182,51 @@ describe("IPC Validators - Exported Validator Groups", () => {
     describe("MonitoringHandlerValidators", () => {
         it("should have all required validator properties", () => {
             expect(MonitoringHandlerValidators).toHaveProperty("checkSiteNow");
-            expect(MonitoringHandlerValidators).toHaveProperty("startMonitoring");
-            expect(MonitoringHandlerValidators).toHaveProperty("startMonitoringForSite");
-            expect(MonitoringHandlerValidators).toHaveProperty("stopMonitoring");
-            expect(MonitoringHandlerValidators).toHaveProperty("stopMonitoringForSite");
+            expect(MonitoringHandlerValidators).toHaveProperty(
+                "startMonitoring"
+            );
+            expect(MonitoringHandlerValidators).toHaveProperty(
+                "startMonitoringForSite"
+            );
+            expect(MonitoringHandlerValidators).toHaveProperty(
+                "stopMonitoring"
+            );
+            expect(MonitoringHandlerValidators).toHaveProperty(
+                "stopMonitoringForSite"
+            );
         });
 
         it("should have validators as functions", () => {
-            expect(typeof MonitoringHandlerValidators.checkSiteNow).toBe("function");
-            expect(typeof MonitoringHandlerValidators.startMonitoring).toBe("function");
-            expect(typeof MonitoringHandlerValidators.startMonitoringForSite).toBe("function");
-            expect(typeof MonitoringHandlerValidators.stopMonitoring).toBe("function");
-            expect(typeof MonitoringHandlerValidators.stopMonitoringForSite).toBe("function");
+            expect(typeof MonitoringHandlerValidators.checkSiteNow).toBe(
+                "function"
+            );
+            expect(typeof MonitoringHandlerValidators.startMonitoring).toBe(
+                "function"
+            );
+            expect(
+                typeof MonitoringHandlerValidators.startMonitoringForSite
+            ).toBe("function");
+            expect(typeof MonitoringHandlerValidators.stopMonitoring).toBe(
+                "function"
+            );
+            expect(
+                typeof MonitoringHandlerValidators.stopMonitoringForSite
+            ).toBe("function");
         });
 
         describe("checkSiteNow validator", () => {
             it("should return null for valid two string parameters", () => {
-                const result = MonitoringHandlerValidators.checkSiteNow(["site-id", "monitor-id"]);
+                const result = MonitoringHandlerValidators.checkSiteNow([
+                    "site-id",
+                    "monitor-id",
+                ]);
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
             it("should return error array for invalid parameter count", () => {
-                const result = MonitoringHandlerValidators.checkSiteNow(["only-one"]);
+                const result = MonitoringHandlerValidators.checkSiteNow([
+                    "only-one",
+                ]);
                 expect(isValidationFailure(result)).toBe(true);
             });
         });
@@ -194,24 +238,38 @@ describe("IPC Validators - Exported Validator Groups", () => {
             });
 
             it("should return error array for non-empty parameters", () => {
-                const result = MonitoringHandlerValidators.startMonitoring(["unexpected"]);
+                const result = MonitoringHandlerValidators.startMonitoring([
+                    "unexpected",
+                ]);
                 expect(isValidationFailure(result)).toBe(true);
             });
         });
 
         describe("startMonitoringForSite validator", () => {
             it("should return null for valid parameters with both strings", () => {
-                const result = MonitoringHandlerValidators.startMonitoringForSite(["site-id", "monitor-id"]);
+                const result =
+                    MonitoringHandlerValidators.startMonitoringForSite([
+                        "site-id",
+                        "monitor-id",
+                    ]);
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
             it("should return null for valid parameters with single string", () => {
-                const result = MonitoringHandlerValidators.startMonitoringForSite(["site-id"]);
+                const result =
+                    MonitoringHandlerValidators.startMonitoringForSite([
+                        "site-id",
+                    ]);
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
             it("should return error array for invalid parameter count", () => {
-                const result = MonitoringHandlerValidators.startMonitoringForSite(["one", "two", "three"]);
+                const result =
+                    MonitoringHandlerValidators.startMonitoringForSite([
+                        "one",
+                        "two",
+                        "three",
+                    ]);
                 expect(isValidationFailure(result)).toBe(true);
             });
         });
@@ -223,24 +281,34 @@ describe("IPC Validators - Exported Validator Groups", () => {
             });
 
             it("should return error array for non-empty parameters", () => {
-                const result = MonitoringHandlerValidators.stopMonitoring(["unexpected"]);
+                const result = MonitoringHandlerValidators.stopMonitoring([
+                    "unexpected",
+                ]);
                 expect(isValidationFailure(result)).toBe(true);
             });
         });
 
         describe("stopMonitoringForSite validator", () => {
             it("should return null for valid parameters with both strings", () => {
-                const result = MonitoringHandlerValidators.stopMonitoringForSite(["site-id", "monitor-id"]);
+                const result =
+                    MonitoringHandlerValidators.stopMonitoringForSite([
+                        "site-id",
+                        "monitor-id",
+                    ]);
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
             it("should return null for valid parameters with single string", () => {
-                const result = MonitoringHandlerValidators.stopMonitoringForSite(["site-id"]);
+                const result =
+                    MonitoringHandlerValidators.stopMonitoringForSite([
+                        "site-id",
+                    ]);
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
             it("should return error array for invalid parameter count", () => {
-                const result = MonitoringHandlerValidators.stopMonitoringForSite([]);
+                const result =
+                    MonitoringHandlerValidators.stopMonitoringForSite([]);
                 expect(isValidationFailure(result)).toBe(true);
             });
         });
@@ -248,7 +316,9 @@ describe("IPC Validators - Exported Validator Groups", () => {
 
     describe("DataHandlerValidators", () => {
         it("should have all required validator properties", () => {
-            expect(DataHandlerValidators).toHaveProperty("downloadSqliteBackup");
+            expect(DataHandlerValidators).toHaveProperty(
+                "downloadSqliteBackup"
+            );
             expect(DataHandlerValidators).toHaveProperty("exportData");
             expect(DataHandlerValidators).toHaveProperty("getHistoryLimit");
             expect(DataHandlerValidators).toHaveProperty("importData");
@@ -257,12 +327,18 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         it("should have validators as functions", () => {
-            expect(typeof DataHandlerValidators.downloadSqliteBackup).toBe("function");
+            expect(typeof DataHandlerValidators.downloadSqliteBackup).toBe(
+                "function"
+            );
             expect(typeof DataHandlerValidators.exportData).toBe("function");
-            expect(typeof DataHandlerValidators.getHistoryLimit).toBe("function");
+            expect(typeof DataHandlerValidators.getHistoryLimit).toBe(
+                "function"
+            );
             expect(typeof DataHandlerValidators.importData).toBe("function");
             expect(typeof DataHandlerValidators.resetSettings).toBe("function");
-            expect(typeof DataHandlerValidators.updateHistoryLimit).toBe("function");
+            expect(typeof DataHandlerValidators.updateHistoryLimit).toBe(
+                "function"
+            );
         });
 
         describe("downloadSqliteBackup validator", () => {
@@ -272,7 +348,9 @@ describe("IPC Validators - Exported Validator Groups", () => {
             });
 
             it("should return error array for non-empty parameters", () => {
-                const result = DataHandlerValidators.downloadSqliteBackup(["unexpected"]);
+                const result = DataHandlerValidators.downloadSqliteBackup([
+                    "unexpected",
+                ]);
                 expect(isValidationFailure(result)).toBe(true);
             });
         });
@@ -296,7 +374,9 @@ describe("IPC Validators - Exported Validator Groups", () => {
             });
 
             it("should return error array for non-empty parameters", () => {
-                const result = DataHandlerValidators.getHistoryLimit(["unexpected"]);
+                const result = DataHandlerValidators.getHistoryLimit([
+                    "unexpected",
+                ]);
                 expect(isValidationFailure(result)).toBe(true);
             });
         });
@@ -326,7 +406,9 @@ describe("IPC Validators - Exported Validator Groups", () => {
             });
 
             it("should return error array for non-empty parameters", () => {
-                const result = DataHandlerValidators.resetSettings(["unexpected"]);
+                const result = DataHandlerValidators.resetSettings([
+                    "unexpected",
+                ]);
                 expect(isValidationFailure(result)).toBe(true);
             });
         });
@@ -343,7 +425,9 @@ describe("IPC Validators - Exported Validator Groups", () => {
             });
 
             it("should return error array for invalid parameter type", () => {
-                const result = DataHandlerValidators.updateHistoryLimit(["not-a-number"]);
+                const result = DataHandlerValidators.updateHistoryLimit([
+                    "not-a-number",
+                ]);
                 expect(isValidationFailure(result)).toBe(true);
             });
         });
@@ -351,27 +435,47 @@ describe("IPC Validators - Exported Validator Groups", () => {
 
     describe("MonitorTypeHandlerValidators", () => {
         it("should have all required validator properties", () => {
-            expect(MonitorTypeHandlerValidators).toHaveProperty("formatMonitorDetail");
-            expect(MonitorTypeHandlerValidators).toHaveProperty("formatMonitorTitleSuffix");
-            expect(MonitorTypeHandlerValidators).toHaveProperty("getMonitorTypes");
-            expect(MonitorTypeHandlerValidators).toHaveProperty("validateMonitorData");
+            expect(MonitorTypeHandlerValidators).toHaveProperty(
+                "formatMonitorDetail"
+            );
+            expect(MonitorTypeHandlerValidators).toHaveProperty(
+                "formatMonitorTitleSuffix"
+            );
+            expect(MonitorTypeHandlerValidators).toHaveProperty(
+                "getMonitorTypes"
+            );
+            expect(MonitorTypeHandlerValidators).toHaveProperty(
+                "validateMonitorData"
+            );
         });
 
         it("should have validators as functions", () => {
-            expect(typeof MonitorTypeHandlerValidators.formatMonitorDetail).toBe("function");
-            expect(typeof MonitorTypeHandlerValidators.formatMonitorTitleSuffix).toBe("function");
-            expect(typeof MonitorTypeHandlerValidators.getMonitorTypes).toBe("function");
-            expect(typeof MonitorTypeHandlerValidators.validateMonitorData).toBe("function");
+            expect(
+                typeof MonitorTypeHandlerValidators.formatMonitorDetail
+            ).toBe("function");
+            expect(
+                typeof MonitorTypeHandlerValidators.formatMonitorTitleSuffix
+            ).toBe("function");
+            expect(typeof MonitorTypeHandlerValidators.getMonitorTypes).toBe(
+                "function"
+            );
+            expect(
+                typeof MonitorTypeHandlerValidators.validateMonitorData
+            ).toBe("function");
         });
 
         describe("formatMonitorDetail validator", () => {
             it("should return null for valid two string parameters", () => {
-                const result = MonitorTypeHandlerValidators.formatMonitorDetail(["http", "details"]);
+                const result = MonitorTypeHandlerValidators.formatMonitorDetail(
+                    ["http", "details"]
+                );
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
             it("should return error array for invalid parameter count", () => {
-                const result = MonitorTypeHandlerValidators.formatMonitorDetail(["only-one"]);
+                const result = MonitorTypeHandlerValidators.formatMonitorDetail(
+                    ["only-one"]
+                );
                 expect(isValidationFailure(result)).toBe(true);
             });
         });
@@ -379,12 +483,19 @@ describe("IPC Validators - Exported Validator Groups", () => {
         describe("formatMonitorTitleSuffix validator", () => {
             it("should return null for valid string and object parameters", () => {
                 const monitor = { name: "Test Monitor" };
-                const result = MonitorTypeHandlerValidators.formatMonitorTitleSuffix(["http", monitor]);
+                const result =
+                    MonitorTypeHandlerValidators.formatMonitorTitleSuffix([
+                        "http",
+                        monitor,
+                    ]);
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
             it("should return error array for invalid parameter count", () => {
-                const result = MonitorTypeHandlerValidators.formatMonitorTitleSuffix(["only-string"]);
+                const result =
+                    MonitorTypeHandlerValidators.formatMonitorTitleSuffix([
+                        "only-string",
+                    ]);
                 expect(isValidationFailure(result)).toBe(true);
             });
         });
@@ -396,7 +507,9 @@ describe("IPC Validators - Exported Validator Groups", () => {
             });
 
             it("should return error array for non-empty parameters", () => {
-                const result = MonitorTypeHandlerValidators.getMonitorTypes(["unexpected"]);
+                const result = MonitorTypeHandlerValidators.getMonitorTypes([
+                    "unexpected",
+                ]);
                 expect(isValidationFailure(result)).toBe(true);
             });
         });
@@ -404,22 +517,38 @@ describe("IPC Validators - Exported Validator Groups", () => {
         describe("validateMonitorData validator", () => {
             it("should return null for valid string and unvalidated second parameter", () => {
                 const data = { url: "https://example.com", timeout: 30 };
-                const result = MonitorTypeHandlerValidators.validateMonitorData(["http", data]);
+                const result = MonitorTypeHandlerValidators.validateMonitorData(
+                    ["http", data]
+                );
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
             it("should accept any type for second parameter", () => {
-                const result1 = MonitorTypeHandlerValidators.validateMonitorData(["http", null]);
-                const result2 = MonitorTypeHandlerValidators.validateMonitorData(["ping", 42]);
-                const result3 = MonitorTypeHandlerValidators.validateMonitorData(["dns", "string"]);
-                
+                const result1 =
+                    MonitorTypeHandlerValidators.validateMonitorData([
+                        "http",
+                        null,
+                    ]);
+                const result2 =
+                    MonitorTypeHandlerValidators.validateMonitorData([
+                        "ping",
+                        42,
+                    ]);
+                const result3 =
+                    MonitorTypeHandlerValidators.validateMonitorData([
+                        "dns",
+                        "string",
+                    ]);
+
                 expect(isValidationSuccess(result1)).toBe(true);
                 expect(isValidationSuccess(result2)).toBe(true);
                 expect(isValidationSuccess(result3)).toBe(true);
             });
 
             it("should return error array for invalid parameter count", () => {
-                const result = MonitorTypeHandlerValidators.validateMonitorData(["only-one"]);
+                const result = MonitorTypeHandlerValidators.validateMonitorData(
+                    ["only-one"]
+                );
                 expect(isValidationFailure(result)).toBe(true);
             });
         });
@@ -428,12 +557,18 @@ describe("IPC Validators - Exported Validator Groups", () => {
     describe("StateSyncHandlerValidators", () => {
         it("should have all required validator properties", () => {
             expect(StateSyncHandlerValidators).toHaveProperty("getSyncStatus");
-            expect(StateSyncHandlerValidators).toHaveProperty("requestFullSync");
+            expect(StateSyncHandlerValidators).toHaveProperty(
+                "requestFullSync"
+            );
         });
 
         it("should have validators as functions", () => {
-            expect(typeof StateSyncHandlerValidators.getSyncStatus).toBe("function");
-            expect(typeof StateSyncHandlerValidators.requestFullSync).toBe("function");
+            expect(typeof StateSyncHandlerValidators.getSyncStatus).toBe(
+                "function"
+            );
+            expect(typeof StateSyncHandlerValidators.requestFullSync).toBe(
+                "function"
+            );
         });
 
         describe("getSyncStatus validator", () => {
@@ -443,7 +578,9 @@ describe("IPC Validators - Exported Validator Groups", () => {
             });
 
             it("should return error array for non-empty parameters", () => {
-                const result = StateSyncHandlerValidators.getSyncStatus(["unexpected"]);
+                const result = StateSyncHandlerValidators.getSyncStatus([
+                    "unexpected",
+                ]);
                 expect(isValidationFailure(result)).toBe(true);
             });
         });
@@ -455,7 +592,9 @@ describe("IPC Validators - Exported Validator Groups", () => {
             });
 
             it("should return error array for non-empty parameters", () => {
-                const result = StateSyncHandlerValidators.requestFullSync(["unexpected"]);
+                const result = StateSyncHandlerValidators.requestFullSync([
+                    "unexpected",
+                ]);
                 expect(isValidationFailure(result)).toBe(true);
             });
         });
@@ -514,9 +653,9 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
                 name: "Complex Site",
                 config: {
                     nested: {
-                        deep: "value"
-                    }
-                }
+                        deep: "value",
+                    },
+                },
             };
             const result = SiteHandlerValidators.addSite([complexSite]);
             expect(isValidationSuccess(result)).toBe(true);
@@ -531,7 +670,7 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
         it("should handle objects with functions", () => {
             const objWithFunction = {
                 name: "Site",
-                callback: () => console.log("test")
+                callback: () => console.log("test"),
             };
             const result = SiteHandlerValidators.addSite([objWithFunction]);
             expect(isValidationSuccess(result)).toBe(true);
@@ -541,43 +680,62 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
     describe("Validation consistency", () => {
         it("should produce consistent results for same inputs", () => {
             const params = ["test-site", "test-monitor"];
-            
+
             const result1 = SiteHandlerValidators.removeMonitor(params);
             const result2 = SiteHandlerValidators.removeMonitor(params);
             const result3 = MonitoringHandlerValidators.checkSiteNow(params);
-            
+
             expect(result1).toEqual(result2);
-            expect(isValidationSuccess(result1)).toBe(isValidationSuccess(result3));
+            expect(isValidationSuccess(result1)).toBe(
+                isValidationSuccess(result3)
+            );
         });
 
         it("should handle parameter mutations correctly", () => {
             const params = ["original"];
             const result1 = SiteHandlerValidators.removeSite(params);
-            
+
             params[0] = "modified";
             const result2 = SiteHandlerValidators.removeSite(["original"]);
-            
+
             expect(result1).toEqual(result2);
         });
     });
 
     describe("Type-specific validation behavior", () => {
         it("should validate string parameters with different formats", () => {
-            const validStrings = ["simple", "with spaces", "with-dashes", "with_underscores", "123", "special!@#"];
-            
+            const validStrings = [
+                "simple",
+                "with spaces",
+                "with-dashes",
+                "with_underscores",
+                "123",
+                "special!@#",
+            ];
+
             for (const str of validStrings) {
                 const result = SiteHandlerValidators.removeSite([str]);
                 expect(isValidationSuccess(result)).toBe(true);
             }
-            
+
             // Empty string should fail
             const emptyResult = SiteHandlerValidators.removeSite([""]);
             expect(isValidationFailure(emptyResult)).toBe(true);
         });
 
         it("should validate number parameters with different values", () => {
-            const validNumbers = [0, -1, 1, 100, -100, 1.5, -1.5, Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER];
-            
+            const validNumbers = [
+                0,
+                -1,
+                1,
+                100,
+                -100,
+                1.5,
+                -1.5,
+                Number.MAX_SAFE_INTEGER,
+                Number.MIN_SAFE_INTEGER,
+            ];
+
             for (const num of validNumbers) {
                 const result = DataHandlerValidators.updateHistoryLimit([num]);
                 expect(isValidationSuccess(result)).toBe(true);
@@ -590,12 +748,19 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
                 { simple: "value" },
                 { nested: { deep: { value: "test" } } },
                 { array: [1, 2, 3] },
-                { mixed: { string: "test", number: 42, boolean: true, null: null } },
+                {
+                    mixed: {
+                        string: "test",
+                        number: 42,
+                        boolean: true,
+                        null: null,
+                    },
+                },
                 new Date(),
                 new Map(),
                 new Set(),
             ];
-            
+
             for (const obj of validObjects) {
                 const result = SiteHandlerValidators.addSite([obj]);
                 expect(isValidationSuccess(result)).toBe(true);
@@ -603,8 +768,15 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
         });
 
         it("should reject primitive types for object parameters", () => {
-            const invalidObjects = [null, undefined, "string", 123, true, Symbol("test")];
-            
+            const invalidObjects = [
+                null,
+                undefined,
+                "string",
+                123,
+                true,
+                Symbol("test"),
+            ];
+
             for (const invalid of invalidObjects) {
                 const result = SiteHandlerValidators.addSite([invalid]);
                 expect(isValidationFailure(result)).toBe(true);
@@ -612,8 +784,16 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
         });
 
         it("should reject non-string types for string parameters", () => {
-            const invalidStrings = [null, undefined, 123, true, {}, [], Symbol("test")];
-            
+            const invalidStrings = [
+                null,
+                undefined,
+                123,
+                true,
+                {},
+                [],
+                Symbol("test"),
+            ];
+
             for (const invalid of invalidStrings) {
                 const result = SiteHandlerValidators.removeSite([invalid]);
                 expect(isValidationFailure(result)).toBe(true);
@@ -621,10 +801,21 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
         });
 
         it("should reject non-number types for number parameters", () => {
-            const invalidNumbers = [null, undefined, "123", true, {}, [], Symbol("test"), "not-a-number"];
-            
+            const invalidNumbers = [
+                null,
+                undefined,
+                "123",
+                true,
+                {},
+                [],
+                Symbol("test"),
+                "not-a-number",
+            ];
+
             for (const invalid of invalidNumbers) {
-                const result = DataHandlerValidators.updateHistoryLimit([invalid]);
+                const result = DataHandlerValidators.updateHistoryLimit([
+                    invalid,
+                ]);
                 expect(isValidationFailure(result)).toBe(true);
             }
         });

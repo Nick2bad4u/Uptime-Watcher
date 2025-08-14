@@ -563,7 +563,7 @@ export default [
             "format-sql": pluginFormatSQL,
             neverthrow: fixupPluginRules(pluginNeverThrow),
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
-            "deprecation": fixupPluginRules(pluginDeprecation),
+            deprecation: fixupPluginRules(pluginDeprecation),
         },
         rules: {
             // TypeScript rules
@@ -1681,7 +1681,7 @@ export default [
             "format-sql": pluginFormatSQL,
             neverthrow: fixupPluginRules(pluginNeverThrow),
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
-            "deprecation": fixupPluginRules(pluginDeprecation),
+            deprecation: fixupPluginRules(pluginDeprecation),
         },
         rules: {
             // TypeScript backend rules

@@ -41,7 +41,9 @@ vi.mock("../../../utils/logger", () => ({
 
 // Mock shared validation
 vi.mock("@shared/validation/validatorUtils", () => ({
-    isNonEmptyString: vi.fn((value) => typeof value === "string" && value.trim().length > 0),
+    isNonEmptyString: vi.fn(
+        (value) => typeof value === "string" && value.trim().length > 0
+    ),
 }));
 
 describe("IPC Utils - Comprehensive Coverage", () => {
@@ -52,43 +54,61 @@ describe("IPC Utils - Comprehensive Coverage", () => {
     describe("IpcValidators - Parameter Validation", () => {
         describe("optionalString validator", () => {
             it("should return null for undefined values", () => {
-                const result = IpcValidators.optionalString(undefined, "testParam");
+                const result = IpcValidators.optionalString(
+                    undefined,
+                    "testParam"
+                );
                 expect(result).toBeNull();
             });
 
             it("should return null for valid non-empty strings", () => {
-                const result = IpcValidators.optionalString("valid string", "testParam");
+                const result = IpcValidators.optionalString(
+                    "valid string",
+                    "testParam"
+                );
                 expect(result).toBeNull();
             });
 
             it("should return error for empty strings", () => {
                 const result = IpcValidators.optionalString("", "testParam");
-                expect(result).toBe("testParam must be a non-empty string when provided");
+                expect(result).toBe(
+                    "testParam must be a non-empty string when provided"
+                );
             });
 
             it("should return error for whitespace-only strings", () => {
                 const result = IpcValidators.optionalString("   ", "testParam");
-                expect(result).toBe("testParam must be a non-empty string when provided");
+                expect(result).toBe(
+                    "testParam must be a non-empty string when provided"
+                );
             });
 
             it("should return error for non-string values", () => {
                 const result = IpcValidators.optionalString(123, "testParam");
-                expect(result).toBe("testParam must be a non-empty string when provided");
+                expect(result).toBe(
+                    "testParam must be a non-empty string when provided"
+                );
             });
 
             it("should return error for null values", () => {
                 const result = IpcValidators.optionalString(null, "testParam");
-                expect(result).toBe("testParam must be a non-empty string when provided");
+                expect(result).toBe(
+                    "testParam must be a non-empty string when provided"
+                );
             });
 
             it("should return error for object values", () => {
                 const result = IpcValidators.optionalString({}, "testParam");
-                expect(result).toBe("testParam must be a non-empty string when provided");
+                expect(result).toBe(
+                    "testParam must be a non-empty string when provided"
+                );
             });
 
             it("should return error for array values", () => {
                 const result = IpcValidators.optionalString([], "testParam");
-                expect(result).toBe("testParam must be a non-empty string when provided");
+                expect(result).toBe(
+                    "testParam must be a non-empty string when provided"
+                );
             });
         });
 
@@ -109,7 +129,10 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return null for floating point numbers", () => {
-                const result = IpcValidators.requiredNumber(3.14159, "testParam");
+                const result = IpcValidators.requiredNumber(
+                    3.14159,
+                    "testParam"
+                );
                 expect(result).toBeNull();
             });
 
@@ -124,7 +147,10 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return error for undefined values", () => {
-                const result = IpcValidators.requiredNumber(undefined, "testParam");
+                const result = IpcValidators.requiredNumber(
+                    undefined,
+                    "testParam"
+                );
                 expect(result).toBe("testParam must be a valid number");
             });
 
@@ -146,7 +172,10 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
         describe("requiredObject validator", () => {
             it("should return null for valid objects", () => {
-                const result = IpcValidators.requiredObject({ key: "value" }, "testParam");
+                const result = IpcValidators.requiredObject(
+                    { key: "value" },
+                    "testParam"
+                );
                 expect(result).toBeNull();
             });
 
@@ -156,7 +185,10 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return null for complex objects", () => {
-                const result = IpcValidators.requiredObject({ nested: { key: "value" } }, "testParam");
+                const result = IpcValidators.requiredObject(
+                    { nested: { key: "value" } },
+                    "testParam"
+                );
                 expect(result).toBeNull();
             });
 
@@ -171,12 +203,18 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return error for array values with content", () => {
-                const result = IpcValidators.requiredObject([1, 2, 3], "testParam");
+                const result = IpcValidators.requiredObject(
+                    [1, 2, 3],
+                    "testParam"
+                );
                 expect(result).toBe("testParam must be a valid object");
             });
 
             it("should return error for string values", () => {
-                const result = IpcValidators.requiredObject("string", "testParam");
+                const result = IpcValidators.requiredObject(
+                    "string",
+                    "testParam"
+                );
                 expect(result).toBe("testParam must be a valid object");
             });
 
@@ -186,7 +224,10 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return error for undefined values", () => {
-                const result = IpcValidators.requiredObject(undefined, "testParam");
+                const result = IpcValidators.requiredObject(
+                    undefined,
+                    "testParam"
+                );
                 expect(result).toBe("testParam must be a valid object");
             });
 
@@ -198,12 +239,18 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
         describe("requiredString validator", () => {
             it("should return null for valid non-empty strings", () => {
-                const result = IpcValidators.requiredString("valid string", "testParam");
+                const result = IpcValidators.requiredString(
+                    "valid string",
+                    "testParam"
+                );
                 expect(result).toBeNull();
             });
 
             it("should return null for strings with special characters", () => {
-                const result = IpcValidators.requiredString("test@example.com", "testParam");
+                const result = IpcValidators.requiredString(
+                    "test@example.com",
+                    "testParam"
+                );
                 expect(result).toBeNull();
             });
 
@@ -223,7 +270,10 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return error for undefined values", () => {
-                const result = IpcValidators.requiredString(undefined, "testParam");
+                const result = IpcValidators.requiredString(
+                    undefined,
+                    "testParam"
+                );
                 expect(result).toBe("testParam must be a non-empty string");
             });
 
@@ -253,7 +303,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
         describe("createErrorResponse", () => {
             it("should create basic error response", () => {
                 const result = createErrorResponse("Something went wrong");
-                
+
                 expect(result).toEqual({
                     error: "Something went wrong",
                     success: false,
@@ -262,8 +312,11 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
             it("should create error response with metadata", () => {
                 const metadata = { code: 500, context: "test" };
-                const result = createErrorResponse("Error with metadata", metadata);
-                
+                const result = createErrorResponse(
+                    "Error with metadata",
+                    metadata
+                );
+
                 expect(result).toEqual({
                     error: "Error with metadata",
                     success: false,
@@ -272,8 +325,11 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should create error response with undefined metadata", () => {
-                const result = createErrorResponse("Error without metadata", undefined);
-                
+                const result = createErrorResponse(
+                    "Error without metadata",
+                    undefined
+                );
+
                 expect(result).toEqual({
                     error: "Error without metadata",
                     success: false,
@@ -281,8 +337,11 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should create error response with empty metadata", () => {
-                const result = createErrorResponse("Error with empty metadata", {});
-                
+                const result = createErrorResponse(
+                    "Error with empty metadata",
+                    {}
+                );
+
                 expect(result).toEqual({
                     error: "Error with empty metadata",
                     success: false,
@@ -296,8 +355,11 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                     array: [1, 2, 3],
                     timestamp: new Date().toISOString(),
                 };
-                const result = createErrorResponse("Complex metadata error", metadata);
-                
+                const result = createErrorResponse(
+                    "Complex metadata error",
+                    metadata
+                );
+
                 expect(result).toEqual({
                     error: "Complex metadata error",
                     success: false,
@@ -309,7 +371,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
         describe("createSuccessResponse", () => {
             it("should create success response without data", () => {
                 const result = createSuccessResponse();
-                
+
                 expect(result).toEqual({
                     success: true,
                 });
@@ -318,7 +380,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             it("should create success response with data only", () => {
                 const data = { id: 1, name: "test" };
                 const result = createSuccessResponse(data);
-                
+
                 expect(result).toEqual({
                     success: true,
                     data: { id: 1, name: "test" },
@@ -329,7 +391,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 const data = { result: "success" };
                 const metadata = { duration: 100 };
                 const result = createSuccessResponse(data, metadata);
-                
+
                 expect(result).toEqual({
                     success: true,
                     data: { result: "success" },
@@ -342,7 +404,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 const metadata = { count: 0 };
                 const warnings = ["No items found", "Using default values"];
                 const result = createSuccessResponse(data, metadata, warnings);
-                
+
                 expect(result).toEqual({
                     success: true,
                     data: { items: [] },
@@ -353,7 +415,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
             it("should create success response with undefined data", () => {
                 const result = createSuccessResponse(undefined);
-                
+
                 expect(result).toEqual({
                     success: true,
                 });
@@ -362,7 +424,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             it("should create success response with undefined metadata", () => {
                 const data = "test";
                 const result = createSuccessResponse(data, undefined);
-                
+
                 expect(result).toEqual({
                     success: true,
                     data: "test",
@@ -374,7 +436,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 const metadata = { key: "value" };
                 const warnings: string[] = [];
                 const result = createSuccessResponse(data, metadata, warnings);
-                
+
                 expect(result).toEqual({
                     success: true,
                     data: "test",
@@ -396,7 +458,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             it("should handle array data", () => {
                 const arrayData = [1, 2, 3, "test"];
                 const result = createSuccessResponse(arrayData);
-                
+
                 expect(result).toEqual({
                     success: true,
                     data: [1, 2, 3, "test"],
@@ -407,7 +469,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
         describe("createValidationResponse", () => {
             it("should create successful validation response with defaults", () => {
                 const result = createValidationResponse(true);
-                
+
                 expect(result).toEqual({
                     success: true,
                     errors: [],
@@ -419,7 +481,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             it("should create failed validation response with errors", () => {
                 const errors = ["Field is required", "Invalid format"];
                 const result = createValidationResponse(false, errors);
-                
+
                 expect(result).toEqual({
                     success: false,
                     errors: ["Field is required", "Invalid format"],
@@ -431,8 +493,12 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             it("should create validation response with warnings", () => {
                 const errors = ["Critical error"];
                 const warnings = ["Deprecated field", "Performance warning"];
-                const result = createValidationResponse(false, errors, warnings);
-                
+                const result = createValidationResponse(
+                    false,
+                    errors,
+                    warnings
+                );
+
                 expect(result).toEqual({
                     success: false,
                     errors: ["Critical error"],
@@ -445,8 +511,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 const errors: string[] = [];
                 const warnings: string[] = [];
                 const metadata = { validatedAt: "2024-01-01", fieldCount: 5 };
-                const result = createValidationResponse(true, errors, warnings, metadata);
-                
+                const result = createValidationResponse(
+                    true,
+                    errors,
+                    warnings,
+                    metadata
+                );
+
                 expect(result).toEqual({
                     success: true,
                     errors: [],
@@ -459,8 +530,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 const errors = ["Error 1"];
                 const warnings = ["Warning 1", "Warning 2"];
                 const metadata = { source: "test", validated: true };
-                const result = createValidationResponse(false, errors, warnings, metadata);
-                
+                const result = createValidationResponse(
+                    false,
+                    errors,
+                    warnings,
+                    metadata
+                );
+
                 expect(result).toEqual({
                     success: false,
                     errors: ["Error 1"],
@@ -475,9 +551,12 @@ describe("IPC Utils - Comprehensive Coverage", () => {
         describe("withIpcHandler", () => {
             it("should wrap successful handler with response formatting", async () => {
                 const mockHandler = vi.fn().mockResolvedValue({ data: "test" });
-                
-                const result = await withIpcHandler("test-channel", mockHandler);
-                
+
+                const result = await withIpcHandler(
+                    "test-channel",
+                    mockHandler
+                );
+
                 expect(result).toEqual({
                     success: true,
                     data: { data: "test" },
@@ -491,9 +570,12 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
             it("should wrap synchronous handler", async () => {
                 const mockHandler = vi.fn().mockReturnValue("sync result");
-                
-                const result = await withIpcHandler("sync-channel", mockHandler);
-                
+
+                const result = await withIpcHandler(
+                    "sync-channel",
+                    mockHandler
+                );
+
                 expect(result).toEqual({
                     success: true,
                     data: "sync result",
@@ -507,9 +589,12 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             it("should handle Error instances", async () => {
                 const error = new Error("Test error message");
                 const mockHandler = vi.fn().mockRejectedValue(error);
-                
-                const result = await withIpcHandler("error-channel", mockHandler);
-                
+
+                const result = await withIpcHandler(
+                    "error-channel",
+                    mockHandler
+                );
+
                 expect(result).toEqual({
                     success: false,
                     error: "Test error message",
@@ -522,9 +607,12 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
             it("should handle string errors", async () => {
                 const mockHandler = vi.fn().mockRejectedValue("String error");
-                
-                const result = await withIpcHandler("string-error-channel", mockHandler);
-                
+
+                const result = await withIpcHandler(
+                    "string-error-channel",
+                    mockHandler
+                );
+
                 expect(result).toEqual({
                     success: false,
                     error: "String error",
@@ -537,9 +625,12 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
             it("should handle non-string non-error values", async () => {
                 const mockHandler = vi.fn().mockRejectedValue(123);
-                
-                const result = await withIpcHandler("number-error-channel", mockHandler);
-                
+
+                const result = await withIpcHandler(
+                    "number-error-channel",
+                    mockHandler
+                );
+
                 expect(result).toEqual({
                     success: false,
                     error: "123",
@@ -552,10 +643,10 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
             it("should not log high-frequency operations in dev mode", async () => {
                 const mockHandler = vi.fn().mockResolvedValue("result");
-                
+
                 await withIpcHandler("format-monitor-detail", mockHandler);
                 await withIpcHandler("get-monitor-types", mockHandler);
-                
+
                 // These operations should not generate debug logs
                 expect(mockHandler).toHaveBeenCalledTimes(2);
             });
@@ -563,13 +654,18 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             it("should measure execution duration accurately", async () => {
                 const delay = 50;
                 const mockHandler = vi.fn().mockImplementation(async () => {
-                    await new Promise(resolve => setTimeout(resolve, delay));
+                    await new Promise((resolve) => setTimeout(resolve, delay));
                     return "delayed result";
                 });
-                
-                const result = await withIpcHandler("timing-channel", mockHandler);
-                
-                expect(result.metadata?.duration).toBeGreaterThanOrEqual(delay - 10);
+
+                const result = await withIpcHandler(
+                    "timing-channel",
+                    mockHandler
+                );
+
+                expect(result.metadata?.duration).toBeGreaterThanOrEqual(
+                    delay - 10
+                );
                 expect(result.metadata?.duration).toBeLessThan(delay + 100);
             });
         });
@@ -579,14 +675,14 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 const mockHandler = vi.fn().mockResolvedValue("valid result");
                 const mockValidator = vi.fn().mockReturnValue(null);
                 const params = ["param1", 123];
-                
+
                 const result = await withIpcHandlerValidation(
-                    "valid-channel", 
-                    mockHandler, 
-                    mockValidator, 
+                    "valid-channel",
+                    mockHandler,
+                    mockValidator,
                     params
                 );
-                
+
                 expect(mockValidator).toHaveBeenCalledWith(params);
                 expect(mockHandler).toHaveBeenCalledWith("param1", 123);
                 expect(result).toEqual({
@@ -601,16 +697,18 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
             it("should return error for validation failures", async () => {
                 const mockHandler = vi.fn();
-                const mockValidator = vi.fn().mockReturnValue(["Invalid param1", "Invalid param2"]);
+                const mockValidator = vi
+                    .fn()
+                    .mockReturnValue(["Invalid param1", "Invalid param2"]);
                 const params = ["invalid", null];
-                
+
                 const result = await withIpcHandlerValidation(
-                    "invalid-channel", 
-                    mockHandler, 
-                    mockValidator, 
+                    "invalid-channel",
+                    mockHandler,
+                    mockValidator,
                     params
                 );
-                
+
                 expect(mockValidator).toHaveBeenCalledWith(params);
                 expect(mockHandler).not.toHaveBeenCalled();
                 expect(result).toEqual({
@@ -624,17 +722,19 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should handle synchronous validated handlers", async () => {
-                const mockHandler = vi.fn().mockReturnValue("sync validated result");
+                const mockHandler = vi
+                    .fn()
+                    .mockReturnValue("sync validated result");
                 const mockValidator = vi.fn().mockReturnValue(null);
                 const params = ["test"];
-                
+
                 const result = await withIpcHandlerValidation(
-                    "sync-validated-channel", 
-                    mockHandler, 
-                    mockValidator, 
+                    "sync-validated-channel",
+                    mockHandler,
+                    mockValidator,
                     params
                 );
-                
+
                 expect(result.data).toBe("sync validated result");
                 expect(result.success).toBe(true);
             });
@@ -644,14 +744,14 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 const mockHandler = vi.fn().mockRejectedValue(error);
                 const mockValidator = vi.fn().mockReturnValue(null);
                 const params = ["valid"];
-                
+
                 const result = await withIpcHandlerValidation(
-                    "error-validated-channel", 
-                    mockHandler, 
-                    mockValidator, 
+                    "error-validated-channel",
+                    mockHandler,
+                    mockValidator,
                     params
                 );
-                
+
                 expect(result).toEqual({
                     success: false,
                     error: "Handler execution error",
@@ -665,29 +765,41 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             it("should not log high-frequency validated operations", async () => {
                 const mockHandler = vi.fn().mockResolvedValue("result");
                 const mockValidator = vi.fn().mockReturnValue(null);
-                
-                await withIpcHandlerValidation("format-monitor-detail", mockHandler, mockValidator, []);
-                await withIpcHandlerValidation("get-monitor-types", mockHandler, mockValidator, []);
-                
+
+                await withIpcHandlerValidation(
+                    "format-monitor-detail",
+                    mockHandler,
+                    mockValidator,
+                    []
+                );
+                await withIpcHandlerValidation(
+                    "get-monitor-types",
+                    mockHandler,
+                    mockValidator,
+                    []
+                );
+
                 expect(mockHandler).toHaveBeenCalledTimes(2);
             });
 
             it("should measure execution duration for validated handlers", async () => {
                 const delay = 30;
                 const mockHandler = vi.fn().mockImplementation(async () => {
-                    await new Promise(resolve => setTimeout(resolve, delay));
+                    await new Promise((resolve) => setTimeout(resolve, delay));
                     return "timed result";
                 });
                 const mockValidator = vi.fn().mockReturnValue(null);
-                
+
                 const result = await withIpcHandlerValidation(
-                    "timed-validated-channel", 
-                    mockHandler, 
-                    mockValidator, 
+                    "timed-validated-channel",
+                    mockHandler,
+                    mockValidator,
                     []
                 );
-                
-                expect(result.metadata?.duration).toBeGreaterThanOrEqual(delay - 10);
+
+                expect(result.metadata?.duration).toBeGreaterThanOrEqual(
+                    delay - 10
+                );
             });
         });
 
@@ -695,16 +807,16 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             it("should register handler without validation", () => {
                 const mockHandler = vi.fn().mockResolvedValue("test");
                 const registeredHandlers = new Set<string>();
-                
+
                 registerStandardizedIpcHandler(
-                    "test-registration", 
-                    mockHandler, 
-                    null, 
+                    "test-registration",
+                    mockHandler,
+                    null,
                     registeredHandlers
                 );
-                
+
                 expect(ipcMain.handle).toHaveBeenCalledWith(
-                    "test-registration", 
+                    "test-registration",
                     expect.any(Function)
                 );
                 expect(registeredHandlers.has("test-registration")).toBe(true);
@@ -714,67 +826,77 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 const mockHandler = vi.fn().mockResolvedValue("validated test");
                 const mockValidator = vi.fn().mockReturnValue(null);
                 const registeredHandlers = new Set<string>();
-                
+
                 registerStandardizedIpcHandler(
-                    "validated-registration", 
-                    mockHandler, 
-                    mockValidator, 
+                    "validated-registration",
+                    mockHandler,
+                    mockValidator,
                     registeredHandlers
                 );
-                
+
                 expect(ipcMain.handle).toHaveBeenCalledWith(
-                    "validated-registration", 
+                    "validated-registration",
                     expect.any(Function)
                 );
-                expect(registeredHandlers.has("validated-registration")).toBe(true);
+                expect(registeredHandlers.has("validated-registration")).toBe(
+                    true
+                );
             });
 
             it("should execute registered handler without validation", async () => {
                 const mockHandler = vi.fn().mockResolvedValue("execution test");
                 const registeredHandlers = new Set<string>();
-                
+
                 registerStandardizedIpcHandler(
-                    "execution-test", 
-                    mockHandler, 
-                    null, 
+                    "execution-test",
+                    mockHandler,
+                    null,
                     registeredHandlers
                 );
-                
+
                 // Get the registered function and execute it
-                const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                    call => call[0] === "execution-test"
-                );
+                const handleCall = vi
+                    .mocked(ipcMain.handle)
+                    .mock.calls.find((call) => call[0] === "execution-test");
                 expect(handleCall).toBeDefined();
-                
+
                 const registeredFunction = handleCall![1];
-                const result = await registeredFunction({} as any, "arg1", "arg2");
-                
+                const result = await registeredFunction(
+                    {} as any,
+                    "arg1",
+                    "arg2"
+                );
+
                 expect(mockHandler).toHaveBeenCalledWith("arg1", "arg2");
                 expect(result.success).toBe(true);
                 expect(result.data).toBe("execution test");
             });
 
             it("should execute registered handler with validation", async () => {
-                const mockHandler = vi.fn().mockResolvedValue("validated execution");
+                const mockHandler = vi
+                    .fn()
+                    .mockResolvedValue("validated execution");
                 const mockValidator = vi.fn().mockReturnValue(null);
                 const registeredHandlers = new Set<string>();
-                
+
                 registerStandardizedIpcHandler(
-                    "validated-execution", 
-                    mockHandler, 
-                    mockValidator, 
+                    "validated-execution",
+                    mockHandler,
+                    mockValidator,
                     registeredHandlers
                 );
-                
+
                 // Get the registered function and execute it
-                const handleCall = vi.mocked(ipcMain.handle).mock.calls.find(
-                    call => call[0] === "validated-execution"
-                );
+                const handleCall = vi
+                    .mocked(ipcMain.handle)
+                    .mock.calls.find(
+                        (call) => call[0] === "validated-execution"
+                    );
                 expect(handleCall).toBeDefined();
-                
+
                 const registeredFunction = handleCall![1];
                 const result = await registeredFunction({} as any, "validArg");
-                
+
                 expect(mockValidator).toHaveBeenCalledWith(["validArg"]);
                 expect(mockHandler).toHaveBeenCalledWith("validArg");
                 expect(result.success).toBe(true);
@@ -783,11 +905,26 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
             it("should track multiple registered handlers", () => {
                 const registeredHandlers = new Set<string>();
-                
-                registerStandardizedIpcHandler("handler1", vi.fn(), null, registeredHandlers);
-                registerStandardizedIpcHandler("handler2", vi.fn(), vi.fn(), registeredHandlers);
-                registerStandardizedIpcHandler("handler3", vi.fn(), null, registeredHandlers);
-                
+
+                registerStandardizedIpcHandler(
+                    "handler1",
+                    vi.fn(),
+                    null,
+                    registeredHandlers
+                );
+                registerStandardizedIpcHandler(
+                    "handler2",
+                    vi.fn(),
+                    vi.fn(),
+                    registeredHandlers
+                );
+                registerStandardizedIpcHandler(
+                    "handler3",
+                    vi.fn(),
+                    null,
+                    registeredHandlers
+                );
+
                 expect(registeredHandlers.size).toBe(3);
                 expect(registeredHandlers.has("handler1")).toBe(true);
                 expect(registeredHandlers.has("handler2")).toBe(true);

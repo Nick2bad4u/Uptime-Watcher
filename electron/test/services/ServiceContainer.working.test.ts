@@ -22,7 +22,7 @@ const mockSiteManager = vi.hoisted(() => {
         invalidate: vi.fn(),
         invalidateAll: vi.fn(),
         bulkUpdate: vi.fn(),
-        onInvalidation: vi.fn().mockReturnValue(() => {})
+        onInvalidation: vi.fn().mockReturnValue(() => {}),
     };
 
     // Create a constructor function that returns the mock object
@@ -40,7 +40,7 @@ const mockSiteManager = vi.hoisted(() => {
             reloadSites: vi.fn().mockResolvedValue(undefined),
         };
     }
-    
+
     return MockSiteManager;
 });
 
@@ -56,7 +56,7 @@ const mockEventBus = vi.hoisted(() => {
         (emitter as any).destroy = vi.fn();
         return emitter;
     }
-    
+
     return MockEventBus;
 });
 
@@ -70,7 +70,7 @@ const mockMonitorManager = vi.hoisted(() =>
     }))
 );
 
-const mockDatabaseService = vi.hoisted(() => 
+const mockDatabaseService = vi.hoisted(() =>
     vi.fn().mockImplementation(() => ({
         initialize: vi.fn().mockResolvedValue(undefined),
         isInitialized: vi.fn().mockReturnValue(true),
@@ -108,56 +108,56 @@ const mockIpcService = vi.hoisted(() =>
     vi.fn().mockImplementation(() => ({
         setupHandlers: vi.fn(),
         cleanup: vi.fn(),
-        isInitialized: vi.fn().mockReturnValue(true)
+        isInitialized: vi.fn().mockReturnValue(true),
     }))
 );
 
 // Hoisted mocks for all dependencies
 vi.mock("../../services/database/DatabaseService", () => ({
     DatabaseService: {
-        getInstance: mockDatabaseService
-    }
+        getInstance: mockDatabaseService,
+    },
 }));
 
 vi.mock("../../managers/SiteManager", () => ({
-    SiteManager: mockSiteManager
+    SiteManager: mockSiteManager,
 }));
 
 vi.mock("../../managers/MonitorManager", () => ({
-    MonitorManager: mockMonitorManager
+    MonitorManager: mockMonitorManager,
 }));
 
 vi.mock("../../managers/DatabaseManager", () => ({
-    DatabaseManager: mockDatabaseManager
+    DatabaseManager: mockDatabaseManager,
 }));
 
 vi.mock("../../UptimeOrchestrator", () => ({
-    UptimeOrchestrator: mockUptimeOrchestrator
+    UptimeOrchestrator: mockUptimeOrchestrator,
 }));
 
 vi.mock("../../services/ipc/IpcService", () => ({
-    IpcService: mockIpcService
+    IpcService: mockIpcService,
 }));
 
 vi.mock("../../events/TypedEventBus", () => ({
-    TypedEventBus: mockEventBus
+    TypedEventBus: mockEventBus,
 }));
 
 // Mock all repository services
 vi.mock("../../services/database/SettingsRepository", () => ({
-    SettingsRepository: vi.fn().mockImplementation(() => ({}))
+    SettingsRepository: vi.fn().mockImplementation(() => ({})),
 }));
 
 vi.mock("../../services/database/SiteRepository", () => ({
-    SiteRepository: vi.fn().mockImplementation(() => ({}))
+    SiteRepository: vi.fn().mockImplementation(() => ({})),
 }));
 
 vi.mock("../../services/database/MonitorRepository", () => ({
-    MonitorRepository: vi.fn().mockImplementation(() => ({}))
+    MonitorRepository: vi.fn().mockImplementation(() => ({})),
 }));
 
 vi.mock("../../services/database/HistoryRepository", () => ({
-    HistoryRepository: vi.fn().mockImplementation(() => ({}))
+    HistoryRepository: vi.fn().mockImplementation(() => ({})),
 }));
 
 vi.mock("../../services/configuration/ConfigurationManager", () => ({
@@ -165,7 +165,7 @@ vi.mock("../../services/configuration/ConfigurationManager", () => ({
         get: vi.fn(),
         set: vi.fn(),
         isInitialized: vi.fn().mockReturnValue(true),
-    }))
+    })),
 }));
 
 // Import after mocks
@@ -187,30 +187,30 @@ describe("ServiceContainer - Working Tests", () => {
     describe("Service Creation Tests", () => {
         it("should create SiteManager with getSitesCache method", () => {
             const siteManager = container.getSiteManager();
-            
+
             expect(siteManager).toBeDefined();
             expect(siteManager.getSitesCache).toBeDefined();
             expect(typeof siteManager.getSitesCache).toBe("function");
-            
+
             const cache = siteManager.getSitesCache();
             expect(cache).toBeDefined();
         });
 
         it("should create MonitorManager singleton with dependencies", () => {
             const monitorManager = container.getMonitorManager();
-            
+
             expect(monitorManager).toBeDefined();
         });
 
         it("should create UptimeOrchestrator singleton with dependencies", () => {
             const uptimeOrchestrator = container.getUptimeOrchestrator();
-            
+
             expect(uptimeOrchestrator).toBeDefined();
         });
 
         it("should create IpcService singleton with dependencies", () => {
             const ipcService = container.getIpcService();
-            
+
             expect(ipcService).toBeDefined();
         });
     });
@@ -219,7 +219,7 @@ describe("ServiceContainer - Working Tests", () => {
         it("should initialize all services in correct order", () => {
             const monitorManager = container.getMonitorManager();
             const siteManager = container.getSiteManager();
-            
+
             expect(monitorManager).toBeDefined();
             expect(siteManager).toBeDefined();
             expect(siteManager.getSitesCache).toBeDefined();
@@ -230,10 +230,10 @@ describe("ServiceContainer - Working Tests", () => {
         it("should return correct initialization status for services", () => {
             const monitorManager = container.getMonitorManager();
             const siteManager = container.getSiteManager();
-            
+
             expect(monitorManager).toBeDefined();
             expect(siteManager).toBeDefined();
-            
+
             const cache = siteManager.getSitesCache();
             expect(cache).toBeDefined();
         });
@@ -243,7 +243,7 @@ describe("ServiceContainer - Working Tests", () => {
         it("should handle orchestrator access when initialized", () => {
             const uptimeOrchestrator = container.getUptimeOrchestrator();
             const ipcService = container.getIpcService();
-            
+
             expect(uptimeOrchestrator).toBeDefined();
             expect(ipcService).toBeDefined();
         });
@@ -251,7 +251,7 @@ describe("ServiceContainer - Working Tests", () => {
         it("should handle service creation order independence", () => {
             const siteManager = container.getSiteManager();
             const monitorManager = container.getMonitorManager();
-            
+
             expect(siteManager).toBeDefined();
             expect(monitorManager).toBeDefined();
         });
@@ -259,7 +259,7 @@ describe("ServiceContainer - Working Tests", () => {
         it("should handle empty configuration", () => {
             // Test that container works even with minimal setup
             const container = ServiceContainer.getInstance();
-            
+
             expect(container).toBeDefined();
             expect(() => container.getSiteManager()).not.toThrow();
         });

@@ -1,6 +1,6 @@
 /**
  * DataImportExportService Tests - Isolated Component Testing
- * 
+ *
  * Tests DataImportExportService without ServiceContainer dependencies.
  * Focuses on data export, import validation, and persistence operations.
  */
@@ -24,15 +24,36 @@ vi.mock("../../../utils/logger", () => ({
 vi.mock("../../../../shared/utils/errorCatalog", () => ({
     ERROR_CATALOG: {
         EXPORT: {
-            INVALID_DATA: { message: "Invalid data for export", code: "EXPORT_INVALID_DATA" },
-            SITES_ERROR: { message: "Failed to export sites", code: "EXPORT_SITES_ERROR" },
-            SETTINGS_ERROR: { message: "Failed to export settings", code: "EXPORT_SETTINGS_ERROR" },
+            INVALID_DATA: {
+                message: "Invalid data for export",
+                code: "EXPORT_INVALID_DATA",
+            },
+            SITES_ERROR: {
+                message: "Failed to export sites",
+                code: "EXPORT_SITES_ERROR",
+            },
+            SETTINGS_ERROR: {
+                message: "Failed to export settings",
+                code: "EXPORT_SETTINGS_ERROR",
+            },
         },
         IMPORT: {
-            INVALID_FORMAT: { message: "Invalid import format", code: "IMPORT_INVALID_FORMAT" },
-            PARSE_ERROR: { message: "Failed to parse import data", code: "IMPORT_PARSE_ERROR" },
-            VALIDATION_FAILED: { message: "Import validation failed", code: "IMPORT_VALIDATION_FAILED" },
-            SAVE_ERROR: { message: "Failed to save imported data", code: "IMPORT_SAVE_ERROR" },
+            INVALID_FORMAT: {
+                message: "Invalid import format",
+                code: "IMPORT_INVALID_FORMAT",
+            },
+            PARSE_ERROR: {
+                message: "Failed to parse import data",
+                code: "IMPORT_PARSE_ERROR",
+            },
+            VALIDATION_FAILED: {
+                message: "Import validation failed",
+                code: "IMPORT_VALIDATION_FAILED",
+            },
+            SAVE_ERROR: {
+                message: "Failed to save imported data",
+                code: "IMPORT_SAVE_ERROR",
+            },
         },
     },
 }));
@@ -62,7 +83,7 @@ describe("DataImportExportService - Isolated Tests", () => {
             },
             {
                 identifier: "site2",
-                name: "Test Site 2", 
+                name: "Test Site 2",
                 monitoring: false,
                 monitors: [],
             },
@@ -163,7 +184,9 @@ describe("DataImportExportService - Isolated Tests", () => {
         } as any;
 
         // Import the service class dynamically to avoid hoisting issues
-        const { DataImportExportService } = require("../../../../utils/database/DataImportExportService");
+        const {
+            DataImportExportService,
+        } = require("../../../../utils/database/DataImportExportService");
         service = new DataImportExportService(mockConfig);
     });
 
@@ -176,8 +199,12 @@ describe("DataImportExportService - Isolated Tests", () => {
 
     describe("exportAllData", () => {
         it("should export sites and settings successfully", async () => {
-            const { safeJsonStringifyWithFallback } = require("../../../../shared/utils/jsonSafety");
-            safeJsonStringifyWithFallback.mockReturnValue('{"sites":[],"settings":{},"metadata":{}}');
+            const {
+                safeJsonStringifyWithFallback,
+            } = require("../../../../shared/utils/jsonSafety");
+            safeJsonStringifyWithFallback.mockReturnValue(
+                '{"sites":[],"settings":{},"metadata":{}}'
+            );
 
             const result = await service.exportAllData();
 
@@ -196,31 +223,50 @@ describe("DataImportExportService - Isolated Tests", () => {
                 2
             );
             expect(result).toBe('{"sites":[],"settings":{},"metadata":{}}');
-            expect(mockConfig.logger.info).toHaveBeenCalledWith("Data export completed successfully");
+            expect(mockConfig.logger.info).toHaveBeenCalledWith(
+                "Data export completed successfully"
+            );
         });
 
         it("should handle sites repository error", async () => {
             const error = new Error("Sites fetch failed");
             mockConfig.repositories.site.exportAll.mockRejectedValue(error);
 
-            await expect(service.exportAllData()).rejects.toThrow("Sites fetch failed");
-            expect(mockConfig.logger.error).toHaveBeenCalledWith("Failed to export data", { error });
+            await expect(service.exportAllData()).rejects.toThrow(
+                "Sites fetch failed"
+            );
+            expect(mockConfig.logger.error).toHaveBeenCalledWith(
+                "Failed to export data",
+                { error }
+            );
         });
 
         it("should handle settings repository error", async () => {
             const error = new Error("Settings fetch failed");
             mockConfig.repositories.settings.getAll.mockRejectedValue(error);
 
-            await expect(service.exportAllData()).rejects.toThrow("Settings fetch failed");
-            expect(mockConfig.logger.error).toHaveBeenCalledWith("Failed to export data", { error });
+            await expect(service.exportAllData()).rejects.toThrow(
+                "Settings fetch failed"
+            );
+            expect(mockConfig.logger.error).toHaveBeenCalledWith(
+                "Failed to export data",
+                { error }
+            );
         });
 
         it("should handle JSON stringify error", async () => {
-            const { safeJsonStringifyWithFallback } = require("../../../../shared/utils/jsonSafety");
+            const {
+                safeJsonStringifyWithFallback,
+            } = require("../../../../shared/utils/jsonSafety");
             safeJsonStringifyWithFallback.mockReturnValue(null);
 
-            await expect(service.exportAllData()).rejects.toThrow("Failed to serialize export data");
-            expect(mockConfig.logger.error).toHaveBeenCalledWith("Failed to export data", { error: expect.any(Error) });
+            await expect(service.exportAllData()).rejects.toThrow(
+                "Failed to serialize export data"
+            );
+            expect(mockConfig.logger.error).toHaveBeenCalledWith(
+                "Failed to export data",
+                { error: expect.any(Error) }
+            );
         });
     });
 
@@ -236,7 +282,9 @@ describe("DataImportExportService - Isolated Tests", () => {
         });
 
         it("should parse and validate JSON data successfully", async () => {
-            const { safeJsonParse } = require("../../../../shared/utils/jsonSafety");
+            const {
+                safeJsonParse,
+            } = require("../../../../shared/utils/jsonSafety");
             safeJsonParse.mockReturnValue({
                 sites: mockSites,
                 settings: mockSettings,
@@ -254,73 +302,119 @@ describe("DataImportExportService - Isolated Tests", () => {
                 sites: mockSites,
                 settings: mockSettings,
             });
-            expect(mockConfig.logger.info).toHaveBeenCalledWith("JSON data parsed and validated successfully");
+            expect(mockConfig.logger.info).toHaveBeenCalledWith(
+                "JSON data parsed and validated successfully"
+            );
         });
 
         it("should handle invalid JSON", async () => {
-            const { safeJsonParse } = require("../../../../shared/utils/jsonSafety");
+            const {
+                safeJsonParse,
+            } = require("../../../../shared/utils/jsonSafety");
             safeJsonParse.mockReturnValue(null);
 
-            await expect(service.importDataFromJson("invalid json")).rejects.toThrow("Failed to parse JSON data");
-            expect(mockConfig.logger.error).toHaveBeenCalledWith("Failed to parse import data", { error: expect.any(Error) });
+            await expect(
+                service.importDataFromJson("invalid json")
+            ).rejects.toThrow("Failed to parse JSON data");
+            expect(mockConfig.logger.error).toHaveBeenCalledWith(
+                "Failed to parse import data",
+                { error: expect.any(Error) }
+            );
         });
 
         it("should handle missing sites in data", async () => {
-            const { safeJsonParse } = require("../../../../shared/utils/jsonSafety");
+            const {
+                safeJsonParse,
+            } = require("../../../../shared/utils/jsonSafety");
             safeJsonParse.mockReturnValue({
                 settings: mockSettings,
                 metadata: { version: "1.0", format: "uptime-watcher-backup" },
             });
 
-            await expect(service.importDataFromJson(validJsonData)).rejects.toThrow("Invalid data format: missing sites array");
-            expect(mockConfig.logger.error).toHaveBeenCalledWith("Failed to parse import data", { error: expect.any(Error) });
+            await expect(
+                service.importDataFromJson(validJsonData)
+            ).rejects.toThrow("Invalid data format: missing sites array");
+            expect(mockConfig.logger.error).toHaveBeenCalledWith(
+                "Failed to parse import data",
+                { error: expect.any(Error) }
+            );
         });
 
         it("should handle missing settings in data", async () => {
-            const { safeJsonParse } = require("../../../../shared/utils/jsonSafety");
+            const {
+                safeJsonParse,
+            } = require("../../../../shared/utils/jsonSafety");
             safeJsonParse.mockReturnValue({
                 sites: mockSites,
                 metadata: { version: "1.0", format: "uptime-watcher-backup" },
             });
 
-            await expect(service.importDataFromJson(validJsonData)).rejects.toThrow("Invalid data format: missing settings object");
-            expect(mockConfig.logger.error).toHaveBeenCalledWith("Failed to parse import data", { error: expect.any(Error) });
+            await expect(
+                service.importDataFromJson(validJsonData)
+            ).rejects.toThrow("Invalid data format: missing settings object");
+            expect(mockConfig.logger.error).toHaveBeenCalledWith(
+                "Failed to parse import data",
+                { error: expect.any(Error) }
+            );
         });
 
         it("should handle invalid metadata format", async () => {
-            const { safeJsonParse } = require("../../../../shared/utils/jsonSafety");
+            const {
+                safeJsonParse,
+            } = require("../../../../shared/utils/jsonSafety");
             safeJsonParse.mockReturnValue({
                 sites: mockSites,
                 settings: mockSettings,
                 metadata: { version: "2.0", format: "unknown-format" },
             });
 
-            await expect(service.importDataFromJson(validJsonData)).rejects.toThrow("Unsupported backup format: unknown-format");
-            expect(mockConfig.logger.error).toHaveBeenCalledWith("Failed to parse import data", { error: expect.any(Error) });
+            await expect(
+                service.importDataFromJson(validJsonData)
+            ).rejects.toThrow("Unsupported backup format: unknown-format");
+            expect(mockConfig.logger.error).toHaveBeenCalledWith(
+                "Failed to parse import data",
+                { error: expect.any(Error) }
+            );
         });
 
         it("should handle invalid sites array", async () => {
-            const { safeJsonParse } = require("../../../../shared/utils/jsonSafety");
+            const {
+                safeJsonParse,
+            } = require("../../../../shared/utils/jsonSafety");
             safeJsonParse.mockReturnValue({
                 sites: "not an array",
                 settings: mockSettings,
                 metadata: { version: "1.0", format: "uptime-watcher-backup" },
             });
 
-            await expect(service.importDataFromJson(validJsonData)).rejects.toThrow("Invalid data format: sites must be an array");
-            expect(mockConfig.logger.error).toHaveBeenCalledWith("Failed to parse import data", { error: expect.any(Error) });
+            await expect(
+                service.importDataFromJson(validJsonData)
+            ).rejects.toThrow("Invalid data format: sites must be an array");
+            expect(mockConfig.logger.error).toHaveBeenCalledWith(
+                "Failed to parse import data",
+                { error: expect.any(Error) }
+            );
         });
 
         it("should handle invalid settings object", async () => {
-            const { safeJsonParse } = require("../../../../shared/utils/jsonSafety");
+            const {
+                safeJsonParse,
+            } = require("../../../../shared/utils/jsonSafety");
             safeJsonParse.mockReturnValue({
                 sites: mockSites,
                 settings: "not an object",
                 metadata: { version: "1.0", format: "uptime-watcher-backup" },
             });
 
-            await expect(service.importDataFromJson(validJsonData)).rejects.toThrow("Invalid data format: settings must be an object");
-            expect(mockConfig.logger.error).toHaveBeenCalledWith("Failed to parse import data", { error: expect.any(Error) });
+            await expect(
+                service.importDataFromJson(validJsonData)
+            ).rejects.toThrow(
+                "Invalid data format: settings must be an object"
+            );
+            expect(mockConfig.logger.error).toHaveBeenCalledWith(
+                "Failed to parse import data",
+                { error: expect.any(Error) }
+            );
         });
     });
 
@@ -333,13 +427,22 @@ describe("DataImportExportService - Isolated Tests", () => {
         it("should persist sites and settings successfully", async () => {
             await service.persistImportedData(importedData);
 
-            expect(mockConfig.databaseService.executeTransaction).toHaveBeenCalled();
-            expect(mockConfig.repositories.site.bulkInsertInternal).toHaveBeenCalledWith(expect.any(Object), mockSites);
-            expect(mockConfig.repositories.settings.bulkInsertInternal).toHaveBeenCalledWith(expect.any(Object), mockSettings);
-            expect(mockConfig.eventEmitter.emit).toHaveBeenCalledWith("data:imported", { 
-                sitesCount: 2, 
-                settingsUpdated: true 
-            });
+            expect(
+                mockConfig.databaseService.executeTransaction
+            ).toHaveBeenCalled();
+            expect(
+                mockConfig.repositories.site.bulkInsertInternal
+            ).toHaveBeenCalledWith(expect.any(Object), mockSites);
+            expect(
+                mockConfig.repositories.settings.bulkInsertInternal
+            ).toHaveBeenCalledWith(expect.any(Object), mockSettings);
+            expect(mockConfig.eventEmitter.emit).toHaveBeenCalledWith(
+                "data:imported",
+                {
+                    sitesCount: 2,
+                    settingsUpdated: true,
+                }
+            );
             expect(mockConfig.logger.info).toHaveBeenCalledWith(
                 "Successfully imported 2 sites and 4 settings"
             );
@@ -347,30 +450,51 @@ describe("DataImportExportService - Isolated Tests", () => {
 
         it("should handle sites creation error", async () => {
             const error = new Error("Sites creation failed");
-            mockConfig.repositories.site.bulkInsertInternal.mockImplementation(() => {
-                throw error;
-            });
+            mockConfig.repositories.site.bulkInsertInternal.mockImplementation(
+                () => {
+                    throw error;
+                }
+            );
 
-            await expect(service.persistImportedData(importedData)).rejects.toThrow("Sites creation failed");
-            expect(mockConfig.logger.error).toHaveBeenCalledWith("Failed to persist imported data", { error });
+            await expect(
+                service.persistImportedData(importedData)
+            ).rejects.toThrow("Sites creation failed");
+            expect(mockConfig.logger.error).toHaveBeenCalledWith(
+                "Failed to persist imported data",
+                { error }
+            );
         });
 
         it("should handle settings update error", async () => {
             const error = new Error("Settings update failed");
-            mockConfig.repositories.settings.bulkInsertInternal.mockImplementation(() => {
-                throw error;
-            });
+            mockConfig.repositories.settings.bulkInsertInternal.mockImplementation(
+                () => {
+                    throw error;
+                }
+            );
 
-            await expect(service.persistImportedData(importedData)).rejects.toThrow("Settings update failed");
-            expect(mockConfig.logger.error).toHaveBeenCalledWith("Failed to persist imported data", { error });
+            await expect(
+                service.persistImportedData(importedData)
+            ).rejects.toThrow("Settings update failed");
+            expect(mockConfig.logger.error).toHaveBeenCalledWith(
+                "Failed to persist imported data",
+                { error }
+            );
         });
 
         it("should handle transaction error", async () => {
             const error = new Error("Transaction failed");
-            mockConfig.databaseService.executeTransaction.mockRejectedValue(error);
+            mockConfig.databaseService.executeTransaction.mockRejectedValue(
+                error
+            );
 
-            await expect(service.persistImportedData(importedData)).rejects.toThrow("Transaction failed");
-            expect(mockConfig.logger.error).toHaveBeenCalledWith("Failed to persist imported data", { error });
+            await expect(
+                service.persistImportedData(importedData)
+            ).rejects.toThrow("Transaction failed");
+            expect(mockConfig.logger.error).toHaveBeenCalledWith(
+                "Failed to persist imported data",
+                { error }
+            );
         });
 
         it("should handle empty sites array", async () => {
@@ -381,8 +505,12 @@ describe("DataImportExportService - Isolated Tests", () => {
 
             await service.persistImportedData(dataWithEmptySites);
 
-            expect(mockConfig.repositories.site.bulkInsertInternal).toHaveBeenCalledWith(expect.any(Object), []);
-            expect(mockConfig.repositories.settings.bulkInsertInternal).toHaveBeenCalledWith(expect.any(Object), mockSettings);
+            expect(
+                mockConfig.repositories.site.bulkInsertInternal
+            ).toHaveBeenCalledWith(expect.any(Object), []);
+            expect(
+                mockConfig.repositories.settings.bulkInsertInternal
+            ).toHaveBeenCalledWith(expect.any(Object), mockSettings);
             expect(mockConfig.logger.info).toHaveBeenCalledWith(
                 "Successfully imported 0 sites and 4 settings"
             );
@@ -391,7 +519,9 @@ describe("DataImportExportService - Isolated Tests", () => {
 
     describe("Error Handling Integration", () => {
         it("should handle complete workflow errors", async () => {
-            const { safeJsonParse } = require("../../../../shared/utils/jsonSafety");
+            const {
+                safeJsonParse,
+            } = require("../../../../shared/utils/jsonSafety");
             safeJsonParse.mockReturnValue({
                 sites: mockSites,
                 settings: mockSettings,
@@ -399,9 +529,11 @@ describe("DataImportExportService - Isolated Tests", () => {
             });
 
             const error = new Error("Persistence failed");
-            mockConfig.repositories.site.bulkInsertInternal.mockImplementation(() => {
-                throw error;
-            });
+            mockConfig.repositories.site.bulkInsertInternal.mockImplementation(
+                () => {
+                    throw error;
+                }
+            );
 
             const jsonData = JSON.stringify({
                 sites: mockSites,
@@ -410,24 +542,38 @@ describe("DataImportExportService - Isolated Tests", () => {
             });
 
             const importedData = await service.importDataFromJson(jsonData);
-            await expect(service.persistImportedData(importedData)).rejects.toThrow("Persistence failed");
+            await expect(
+                service.persistImportedData(importedData)
+            ).rejects.toThrow("Persistence failed");
 
-            expect(mockConfig.logger.error).toHaveBeenCalledWith("Failed to persist imported data", { error });
+            expect(mockConfig.logger.error).toHaveBeenCalledWith(
+                "Failed to persist imported data",
+                { error }
+            );
         });
 
         it("should handle export workflow with comprehensive error scenarios", async () => {
-            const { safeJsonStringifyWithFallback } = require("../../../../shared/utils/jsonSafety");
-            
+            const {
+                safeJsonStringifyWithFallback,
+            } = require("../../../../shared/utils/jsonSafety");
+
             // Test successful path first
-            safeJsonStringifyWithFallback.mockReturnValueOnce('{"test":"data"}');
+            safeJsonStringifyWithFallback.mockReturnValueOnce(
+                '{"test":"data"}'
+            );
             const result1 = await service.exportAllData();
             expect(result1).toBe('{"test":"data"}');
 
             // Test failure path
             safeJsonStringifyWithFallback.mockReturnValueOnce(null);
-            await expect(service.exportAllData()).rejects.toThrow("Failed to serialize export data");
+            await expect(service.exportAllData()).rejects.toThrow(
+                "Failed to serialize export data"
+            );
 
-            expect(mockConfig.logger.error).toHaveBeenCalledWith("Failed to export data", { error: expect.any(Error) });
+            expect(mockConfig.logger.error).toHaveBeenCalledWith(
+                "Failed to export data",
+                { error: expect.any(Error) }
+            );
         });
     });
 });

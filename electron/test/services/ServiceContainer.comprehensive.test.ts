@@ -1,6 +1,6 @@
 /**
  * Comprehensive tests for ServiceContainer.ts
- * 
+ *
  * Tests all service creation, dependency injection, initialization flow,
  * error handling, debugging capabilities, and event forwarding mechanisms.
  */
@@ -11,19 +11,19 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 const MockTypedEventBus = vi.hoisted(() => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports, unicorn/prefer-module -- Required for mock
     const { EventEmitter } = require("node:events");
-    
+
     // Use plain constructor function instead of vi.fn().mockImplementation()
     return function MockEventBus(name?: string) {
         // Create an actual EventEmitter instance that inherits all EventEmitter methods
         // eslint-disable-next-line unicorn/prefer-event-target -- Required for Node.js EventEmitter compatibility
         const eventEmitter = new EventEmitter();
-        
+
         // Add TypedEventBus-specific methods
         eventEmitter.onTyped = vi.fn();
         eventEmitter.emitTyped = vi.fn().mockResolvedValue(undefined);
         eventEmitter.busId = name || "test-bus";
         eventEmitter.destroy = vi.fn();
-        
+
         return eventEmitter;
     };
 });
@@ -56,7 +56,10 @@ vi.mock("../events/TypedEventBus", () => ({
 
 // Now import the modules to apply mocks
 import type { Site } from "../../../shared/types";
-import { ServiceContainer, type ServiceContainerConfig } from "../../services/ServiceContainer";
+import {
+    ServiceContainer,
+    type ServiceContainerConfig,
+} from "../../services/ServiceContainer";
 import { TypedEventBus } from "../../events/TypedEventBus";
 import { UptimeOrchestrator } from "../../UptimeOrchestrator";
 // Import SiteManager to trigger the mock
@@ -69,7 +72,7 @@ vi.mock("../../managers/ConfigurationManager", () => ({
             getConfig: vi.fn().mockReturnValue({}),
             updateConfig: vi.fn().mockResolvedValue(undefined),
             resetConfig: vi.fn().mockResolvedValue(undefined),
-            isInitialized: vi.fn().mockReturnValue(true)
+            isInitialized: vi.fn().mockReturnValue(true),
         };
     },
 }));
@@ -82,7 +85,7 @@ vi.mock("../../managers/DatabaseManager", () => ({
             getHistoryLimit: vi.fn().mockReturnValue(100),
             backup: vi.fn().mockResolvedValue(undefined),
             restore: vi.fn().mockResolvedValue(undefined),
-            isInitialized: vi.fn().mockReturnValue(true)
+            isInitialized: vi.fn().mockReturnValue(true),
         };
     },
 }));
@@ -111,7 +114,7 @@ vi.mock("../../managers/MonitorManager", () => ({
             updateMonitor: vi.fn().mockResolvedValue(undefined),
             getEventBus: vi.fn().mockReturnValue(managerEventBus),
             isInitialized: vi.fn().mockReturnValue(true),
-            eventBus: managerEventBus
+            eventBus: managerEventBus,
         };
     },
 }));
@@ -133,7 +136,7 @@ const MockSiteManager = vi.hoisted(() => {
             busId: "test-site-manager-bus",
             destroy: vi.fn(),
         };
-        
+
         // Create a proper mock for StandardizedCache
         const mockStandardizedCache = {
             get: vi.fn(),
@@ -145,14 +148,16 @@ const MockSiteManager = vi.hoisted(() => {
             entries: vi.fn().mockReturnValue([][Symbol.iterator]()),
             getAll: vi.fn().mockReturnValue([]),
             size: 0,
-            getStats: vi.fn().mockReturnValue({ hits: 0, misses: 0, evictions: 0 }),
+            getStats: vi
+                .fn()
+                .mockReturnValue({ hits: 0, misses: 0, evictions: 0 }),
             cleanup: vi.fn().mockReturnValue(0),
             invalidate: vi.fn(),
             invalidateAll: vi.fn(),
             bulkUpdate: vi.fn(),
-            onInvalidation: vi.fn().mockReturnValue(() => {})
+            onInvalidation: vi.fn().mockReturnValue(() => {}),
         };
-        
+
         return {
             initialize: vi.fn().mockResolvedValue(undefined),
             getSitesCache: vi.fn().mockReturnValue(mockStandardizedCache),
@@ -161,7 +166,7 @@ const MockSiteManager = vi.hoisted(() => {
             updateSite: vi.fn().mockResolvedValue(undefined),
             deleteSite: vi.fn().mockResolvedValue(undefined),
             isInitialized: vi.fn().mockReturnValue(true),
-            eventBus: managerEventBus
+            eventBus: managerEventBus,
         };
     };
 });
@@ -177,7 +182,7 @@ vi.mock("../../UptimeOrchestrator", () => ({
             start: vi.fn().mockResolvedValue(undefined),
             stop: vi.fn().mockResolvedValue(undefined),
             restart: vi.fn().mockResolvedValue(undefined),
-            isInitialized: vi.fn().mockReturnValue(true)
+            isInitialized: vi.fn().mockReturnValue(true),
         };
     },
 }));
@@ -190,7 +195,7 @@ const mockDatabaseServiceInstance = {
     getConnection: vi.fn(),
     beginTransaction: vi.fn(),
     commitTransaction: vi.fn(),
-    rollbackTransaction: vi.fn()
+    rollbackTransaction: vi.fn(),
 };
 
 vi.mock("../../services/database/DatabaseService", () => ({
@@ -206,7 +211,7 @@ vi.mock("../../services/database/HistoryRepository", () => ({
             getAllHistory: vi.fn().mockResolvedValue([]),
             addHistoryEntry: vi.fn().mockResolvedValue(undefined),
             deleteHistory: vi.fn().mockResolvedValue(undefined),
-            isInitialized: vi.fn().mockReturnValue(true)
+            isInitialized: vi.fn().mockReturnValue(true),
         };
     },
 }));
@@ -219,7 +224,7 @@ vi.mock("../../services/database/MonitorRepository", () => ({
             createMonitor: vi.fn().mockResolvedValue(undefined),
             updateMonitor: vi.fn().mockResolvedValue(undefined),
             deleteMonitor: vi.fn().mockResolvedValue(undefined),
-            isInitialized: vi.fn().mockReturnValue(true)
+            isInitialized: vi.fn().mockReturnValue(true),
         };
     },
 }));
@@ -231,7 +236,7 @@ vi.mock("../../services/database/SettingsRepository", () => ({
             getSettings: vi.fn().mockResolvedValue({}),
             updateSettings: vi.fn().mockResolvedValue(undefined),
             resetSettings: vi.fn().mockResolvedValue(undefined),
-            isInitialized: vi.fn().mockReturnValue(true)
+            isInitialized: vi.fn().mockReturnValue(true),
         };
     },
 }));
@@ -244,7 +249,7 @@ vi.mock("../../services/database/SiteRepository", () => ({
             createSite: vi.fn().mockResolvedValue(undefined),
             updateSite: vi.fn().mockResolvedValue(undefined),
             deleteSite: vi.fn().mockResolvedValue(undefined),
-            isInitialized: vi.fn().mockReturnValue(true)
+            isInitialized: vi.fn().mockReturnValue(true),
         };
     },
 }));
@@ -256,7 +261,7 @@ vi.mock("../../services/ipc/IpcService", () => ({
             setupHandlers: vi.fn(),
             send: vi.fn(),
             handle: vi.fn(),
-            isInitialized: vi.fn().mockReturnValue(true)
+            isInitialized: vi.fn().mockReturnValue(true),
         };
     },
 }));
@@ -278,7 +283,7 @@ vi.mock("../../services/notifications/NotificationService", () => ({
             showNotification: vi.fn(),
             hideNotification: vi.fn(),
             clearAll: vi.fn(),
-            isInitialized: vi.fn().mockReturnValue(true)
+            isInitialized: vi.fn().mockReturnValue(true),
         };
     },
 }));
@@ -291,7 +296,7 @@ vi.mock("../../services/site/SiteService", () => ({
             addSite: vi.fn().mockResolvedValue(undefined),
             updateSite: vi.fn().mockResolvedValue(undefined),
             deleteSite: vi.fn().mockResolvedValue(undefined),
-            isInitialized: vi.fn().mockReturnValue(true)
+            isInitialized: vi.fn().mockReturnValue(true),
         };
     },
 }));
@@ -303,7 +308,7 @@ vi.mock("../../services/updater/AutoUpdaterService", () => ({
             checkForUpdates: vi.fn().mockResolvedValue(undefined),
             downloadUpdate: vi.fn().mockResolvedValue(undefined),
             installUpdate: vi.fn().mockResolvedValue(undefined),
-            isInitialized: vi.fn().mockReturnValue(true)
+            isInitialized: vi.fn().mockReturnValue(true),
         };
     },
 }));
@@ -315,7 +320,7 @@ vi.mock("../../services/window/WindowService", () => ({
             createWindow: vi.fn(),
             closeWindow: vi.fn(),
             focusWindow: vi.fn(),
-            isInitialized: vi.fn().mockReturnValue(true)
+            isInitialized: vi.fn().mockReturnValue(true),
         };
     },
 }));
@@ -456,7 +461,7 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
         it("should create UptimeOrchestrator singleton with dependencies", () => {
             // Create SiteManager first to avoid dependency issues
             container.getSiteManager();
-            
+
             const orchestrator1 = container.getUptimeOrchestrator();
             const orchestrator2 = container.getUptimeOrchestrator();
 
@@ -499,7 +504,7 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
         it("should create IpcService singleton with dependencies", () => {
             // Create SiteManager first to avoid dependency issues
             container.getSiteManager();
-            
+
             const service1 = container.getIpcService();
             const service2 = container.getIpcService();
 
@@ -544,7 +549,7 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
         it("should create MonitorManager singleton with complex dependencies", () => {
             // Create SiteManager first to avoid dependency error
             container.getSiteManager();
-            
+
             const manager1 = container.getMonitorManager();
             const manager2 = container.getMonitorManager();
 
@@ -558,7 +563,7 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(() => {
                 container.getMonitorManager();
             }).not.toThrow();
-            
+
             expect(container.getMonitorManager()).toBeDefined();
         });
     });
@@ -570,23 +575,35 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             container = ServiceContainer.getInstance({
                 enableDebugLogging: true,
             });
-            
+
             // Create SiteManager first to avoid dependency issues
             container.getSiteManager();
-            
+
             // Mock all async methods
-            vi.mocked(container.getDatabaseManager().initialize).mockResolvedValue();
-            vi.mocked(container.getUptimeOrchestrator().initialize).mockResolvedValue();
-            vi.mocked(container.getIpcService().setupHandlers).mockReturnValue();
+            vi.mocked(
+                container.getDatabaseManager().initialize
+            ).mockResolvedValue();
+            vi.mocked(
+                container.getUptimeOrchestrator().initialize
+            ).mockResolvedValue();
+            vi.mocked(
+                container.getIpcService().setupHandlers
+            ).mockReturnValue();
         });
 
         it("should initialize all services in correct order", async () => {
             await container.initialize();
 
             // Verify initialization order and methods were called
-            expect(container.getDatabaseService().initialize).toHaveBeenCalled();
-            expect(container.getDatabaseManager().initialize).toHaveBeenCalled();
-            expect(container.getUptimeOrchestrator().initialize).toHaveBeenCalled();
+            expect(
+                container.getDatabaseService().initialize
+            ).toHaveBeenCalled();
+            expect(
+                container.getDatabaseManager().initialize
+            ).toHaveBeenCalled();
+            expect(
+                container.getUptimeOrchestrator().initialize
+            ).toHaveBeenCalled();
             expect(container.getIpcService().setupHandlers).toHaveBeenCalled();
         });
 
@@ -611,7 +628,9 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             await container.initialize();
 
             // Verify no errors during initialization
-            expect(container.getDatabaseService().initialize).toHaveBeenCalled();
+            expect(
+                container.getDatabaseService().initialize
+            ).toHaveBeenCalled();
         });
     });
 
@@ -700,7 +719,7 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             const services = container.getInitializedServices();
 
             expect(services).toHaveLength(14); // All services except IpcService and MonitorManager
-            expect(services.every(s => s.name && s.service)).toBe(true);
+            expect(services.every((s) => s.name && s.service)).toBe(true);
         });
     });
 
@@ -757,7 +776,9 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
 
         it("should handle event forwarding error gracefully", async () => {
             // Mock getMainOrchestrator to return orchestrator that throws error
-            mockMainOrchestrator.emitTyped.mockRejectedValue(new Error("Forwarding error"));
+            mockMainOrchestrator.emitTyped.mockRejectedValue(
+                new Error("Forwarding error")
+            );
             const privateContainer = container as any;
             privateContainer.uptimeOrchestrator = mockMainOrchestrator;
 
@@ -787,10 +808,18 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             container.getSiteManager();
 
             // Mock all required dependencies
-            vi.mocked(container.getDatabaseManager().setHistoryLimit).mockResolvedValue();
-            vi.mocked(container.getMonitorManager().setupNewMonitors).mockResolvedValue();
-            vi.mocked(container.getMonitorManager().startMonitoringForSite).mockResolvedValue(true);
-            vi.mocked(container.getMonitorManager().stopMonitoringForSite).mockResolvedValue(true);
+            vi.mocked(
+                container.getDatabaseManager().setHistoryLimit
+            ).mockResolvedValue();
+            vi.mocked(
+                container.getMonitorManager().setupNewMonitors
+            ).mockResolvedValue();
+            vi.mocked(
+                container.getMonitorManager().startMonitoringForSite
+            ).mockResolvedValue(true);
+            vi.mocked(
+                container.getMonitorManager().stopMonitoringForSite
+            ).mockResolvedValue(true);
         });
 
         it("should handle setHistoryLimit operation successfully", async () => {
@@ -813,7 +842,9 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
                 new Error("Database error")
             );
 
-            await expect(databaseManager.setHistoryLimit(1000)).rejects.toThrow("Database error");
+            await expect(databaseManager.setHistoryLimit(1000)).rejects.toThrow(
+                "Database error"
+            );
         });
 
         it("should handle setupNewMonitors operation", async () => {
@@ -826,10 +857,13 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
                 monitors: [],
             };
 
-            // Mock the setupNewMonitors method 
+            // Mock the setupNewMonitors method
             vi.mocked(monitorManager.setupNewMonitors).mockResolvedValue();
 
-            await monitorManager.setupNewMonitors(testSite, ["monitor1", "monitor2"]);
+            await monitorManager.setupNewMonitors(testSite, [
+                "monitor1",
+                "monitor2",
+            ]);
 
             expect(monitorManager.setupNewMonitors).toHaveBeenCalledWith(
                 testSite,
@@ -841,9 +875,14 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             const monitorManager = container.getMonitorManager();
 
             // Mock the method to return true
-            vi.mocked(monitorManager.startMonitoringForSite).mockResolvedValue(true);
+            vi.mocked(monitorManager.startMonitoringForSite).mockResolvedValue(
+                true
+            );
 
-            const result = await monitorManager.startMonitoringForSite("site1", "monitor1");
+            const result = await monitorManager.startMonitoringForSite(
+                "site1",
+                "monitor1"
+            );
 
             expect(result).toBe(true);
             expect(monitorManager.startMonitoringForSite).toHaveBeenCalledWith(
@@ -856,13 +895,18 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             const monitorManager = container.getMonitorManager();
 
             // Mock the method to return true
-            vi.mocked(monitorManager.stopMonitoringForSite).mockResolvedValue(true);
+            vi.mocked(monitorManager.stopMonitoringForSite).mockResolvedValue(
+                true
+            );
 
-            const result = await monitorManager.stopMonitoringForSite("site1", "monitor1");
+            const result = await monitorManager.stopMonitoringForSite(
+                "site1",
+                "monitor1"
+            );
 
             expect(result).toBe(true);
             expect(monitorManager.stopMonitoringForSite).toHaveBeenCalledWith(
-                "site1", 
+                "site1",
                 "monitor1"
             );
         });
@@ -890,7 +934,7 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             container.getDatabaseService();
             container.getConfigurationManager();
 
-            // No specific debug calls should be made when disabled  
+            // No specific debug calls should be made when disabled
             // We'll just check that the container is working without debug logs
             expect(container).toBeDefined();
         });
@@ -951,7 +995,7 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
         it("should handle getMainOrchestrator when orchestrator is initialized", () => {
             // Create SiteManager first to avoid dependency issues
             container.getSiteManager();
-            
+
             const orchestrator = container.getUptimeOrchestrator();
             const privateContainer = container as any;
             const result = privateContainer.getMainOrchestrator();
@@ -962,16 +1006,24 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
         it("should handle multiple initialization calls", async () => {
             // Create SiteManager first to avoid dependency issues
             container.getSiteManager();
-            
-            vi.mocked(container.getDatabaseManager().initialize).mockResolvedValue();
-            vi.mocked(container.getUptimeOrchestrator().initialize).mockResolvedValue();
-            vi.mocked(container.getIpcService().setupHandlers).mockReturnValue();
+
+            vi.mocked(
+                container.getDatabaseManager().initialize
+            ).mockResolvedValue();
+            vi.mocked(
+                container.getUptimeOrchestrator().initialize
+            ).mockResolvedValue();
+            vi.mocked(
+                container.getIpcService().setupHandlers
+            ).mockReturnValue();
 
             await container.initialize();
             await container.initialize();
 
             // Should handle multiple calls gracefully
-            expect(container.getDatabaseManager().initialize).toHaveBeenCalledTimes(2);
+            expect(
+                container.getDatabaseManager().initialize
+            ).toHaveBeenCalledTimes(2);
         });
 
         it("should handle service creation order independence", () => {

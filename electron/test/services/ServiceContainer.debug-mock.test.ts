@@ -9,14 +9,16 @@ vi.mock("../events/TypedEventBus", () => {
     console.log("Mock being applied for ../events/TypedEventBus");
     // eslint-disable-next-line @typescript-eslint/no-require-imports, unicorn/prefer-module -- Required for mock
     const { EventEmitter } = require("node:events");
-    
+
     return {
         TypedEventBus: vi.fn().mockImplementation((name?: string) => {
-            console.log(`Creating TypedEventBus instance for: ${name || 'unnamed'}`);
+            console.log(
+                `Creating TypedEventBus instance for: ${name || "unnamed"}`
+            );
             // Create an actual EventEmitter instance
             // eslint-disable-next-line unicorn/prefer-event-target -- Required for Node.js EventEmitter compatibility
             const eventEmitter = new EventEmitter();
-            
+
             // Add TypedEventBus-specific methods
             const mockInstance = Object.assign(eventEmitter, {
                 onTyped: vi.fn(),
@@ -24,8 +26,11 @@ vi.mock("../events/TypedEventBus", () => {
                 busId: name || "test-bus",
                 destroy: vi.fn(),
             });
-            
-            console.log("Mock TypedEventBus instance created with on method:", typeof mockInstance.on);
+
+            console.log(
+                "Mock TypedEventBus instance created with on method:",
+                typeof mockInstance.on
+            );
             return mockInstance;
         }),
     };
@@ -54,7 +59,7 @@ vi.mock("../../services/database/DatabaseService", () => ({
         getInstance: vi.fn().mockReturnValue({
             initialize: vi.fn().mockResolvedValue(undefined),
             isInitialized: vi.fn().mockReturnValue(true),
-        })
+        }),
     },
 }));
 
@@ -115,10 +120,10 @@ describe("ServiceContainer - Debug Mock Test", () => {
     it("should create ServiceContainer and test SiteManager creation", async () => {
         console.log("Creating ServiceContainer instance...");
         serviceContainer = ServiceContainer.getInstance();
-        
+
         console.log("Creating SiteManager...");
         const siteManager = serviceContainer.getSiteManager();
-        
+
         console.log("SiteManager created successfully:", !!siteManager);
         expect(siteManager).toBeDefined();
     });

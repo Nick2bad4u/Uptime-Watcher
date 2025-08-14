@@ -12,16 +12,19 @@ import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler"
 describe("MonitorScheduler Debug", () => {
     it("should have performImmediateCheck method", () => {
         const scheduler = new MonitorScheduler();
-        
+
         // Debug: Log the scheduler object to see what we have
         console.log("Scheduler object:", scheduler);
         console.log("Scheduler constructor:", scheduler.constructor.name);
         console.log("Scheduler prototype:", Object.getPrototypeOf(scheduler));
-        console.log("Available methods:", Object.getOwnPropertyNames(Object.getPrototypeOf(scheduler)));
-        
+        console.log(
+            "Available methods:",
+            Object.getOwnPropertyNames(Object.getPrototypeOf(scheduler))
+        );
+
         // Check if the method exists
         expect(typeof scheduler.performImmediateCheck).toBe("function");
-        
+
         // Check all expected methods exist
         expect(typeof scheduler.setCheckCallback).toBe("function");
         expect(typeof scheduler.startMonitor).toBe("function");

@@ -26,7 +26,7 @@ vi.mock("../../utils/logger", () => ({
 const mockTypedEventBus = vi.hoisted(() => {
     function MockTypedEventBus(name?: string) {
         const eventEmitter = new EventEmitter() as any;
-        
+
         // Add TypedEventBus-specific methods
         eventEmitter.onTyped = vi.fn();
         eventEmitter.emitTyped = vi.fn().mockResolvedValue(undefined);
@@ -38,10 +38,10 @@ const mockTypedEventBus = vi.hoisted(() => {
         eventEmitter.hasListeners = vi.fn().mockReturnValue(false);
         eventEmitter.busId = name || "test-bus";
         eventEmitter.destroy = vi.fn();
-        
+
         return eventEmitter;
     }
-    
+
     return MockTypedEventBus;
 });
 
@@ -64,14 +64,16 @@ vi.mock("../../managers/SiteManager", () => ({
             entries: vi.fn().mockReturnValue([][Symbol.iterator]()),
             getAll: vi.fn().mockReturnValue([]),
             size: 0,
-            getStats: vi.fn().mockReturnValue({ hits: 0, misses: 0, evictions: 0 }),
+            getStats: vi
+                .fn()
+                .mockReturnValue({ hits: 0, misses: 0, evictions: 0 }),
             cleanup: vi.fn().mockReturnValue(0),
             invalidate: vi.fn(),
             invalidateAll: vi.fn(),
             bulkUpdate: vi.fn(),
-            onInvalidation: vi.fn().mockReturnValue(() => {})
+            onInvalidation: vi.fn().mockReturnValue(() => {}),
         };
-        
+
         return {
             initialize: vi.fn().mockResolvedValue(undefined),
             getSitesCache: vi.fn().mockReturnValue(mockStandardizedCache),
@@ -80,7 +82,7 @@ vi.mock("../../managers/SiteManager", () => ({
             updateSite: vi.fn().mockResolvedValue(undefined),
             deleteSite: vi.fn().mockResolvedValue(undefined),
             isInitialized: vi.fn().mockReturnValue(true),
-            eventBus: mockTypedEventBus()
+            eventBus: mockTypedEventBus(),
         };
     },
 }));
@@ -104,7 +106,7 @@ vi.mock("../../managers/ConfigurationManager", () => ({
         return {
             initialize: vi.fn().mockResolvedValue(undefined),
             getConfig: vi.fn().mockReturnValue({}),
-            isInitialized: vi.fn().mockReturnValue(true)
+            isInitialized: vi.fn().mockReturnValue(true),
         };
     },
 }));
@@ -145,10 +147,10 @@ describe("Debug Test - UptimeOrchestrator Creation", () => {
     it("should create UptimeOrchestrator without errors", () => {
         // Create SiteManager first to ensure proper initialization
         container.getSiteManager();
-        
+
         // Then create UptimeOrchestrator
         const orchestrator = container.getUptimeOrchestrator();
-        
+
         expect(orchestrator).toBeDefined();
     });
 });

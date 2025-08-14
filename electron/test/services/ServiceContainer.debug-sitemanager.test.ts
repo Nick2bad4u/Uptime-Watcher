@@ -9,7 +9,7 @@ import { EventEmitter } from "node:events";
 const mockTypedEventBus = vi.hoisted(() => {
     function MockTypedEventBus(name?: string) {
         const eventEmitter = new EventEmitter() as any;
-        
+
         // Add TypedEventBus-specific methods
         eventEmitter.onTyped = vi.fn();
         eventEmitter.emitTyped = vi.fn().mockResolvedValue(undefined);
@@ -21,10 +21,10 @@ const mockTypedEventBus = vi.hoisted(() => {
         eventEmitter.hasListeners = vi.fn().mockReturnValue(false);
         eventEmitter.busId = name || "test-bus";
         eventEmitter.destroy = vi.fn();
-        
+
         return eventEmitter;
     }
-    
+
     return MockTypedEventBus;
 });
 
@@ -57,14 +57,16 @@ vi.mock("../../managers/SiteManager", () => ({
             entries: vi.fn().mockReturnValue([][Symbol.iterator]()),
             getAll: vi.fn().mockReturnValue([]),
             size: 0,
-            getStats: vi.fn().mockReturnValue({ hits: 0, misses: 0, evictions: 0 }),
+            getStats: vi
+                .fn()
+                .mockReturnValue({ hits: 0, misses: 0, evictions: 0 }),
             cleanup: vi.fn().mockReturnValue(0),
             invalidate: vi.fn(),
             invalidateAll: vi.fn(),
             bulkUpdate: vi.fn(),
-            onInvalidation: vi.fn().mockReturnValue(() => {})
+            onInvalidation: vi.fn().mockReturnValue(() => {}),
         };
-        
+
         return {
             initialize: vi.fn().mockResolvedValue(undefined),
             getSitesCache: vi.fn().mockReturnValue(mockStandardizedCache),
@@ -73,7 +75,7 @@ vi.mock("../../managers/SiteManager", () => ({
             updateSite: vi.fn().mockResolvedValue(undefined),
             deleteSite: vi.fn().mockResolvedValue(undefined),
             isInitialized: vi.fn().mockReturnValue(true),
-            eventBus: mockTypedEventBus()
+            eventBus: mockTypedEventBus(),
         };
     },
 }));
@@ -104,7 +106,7 @@ describe("Debug SiteManager Mock", () => {
 
     it("should create SiteManager with getSitesCache method", () => {
         console.log("Starting test...");
-        
+
         // Get SiteManager
         const siteManager = container.getSiteManager();
         console.log("SiteManager instance:", siteManager);
@@ -112,10 +114,10 @@ describe("Debug SiteManager Mock", () => {
         console.log("SiteManager methods:", Object.keys(siteManager));
         console.log("getSitesCache method:", siteManager.getSitesCache);
         console.log("getSitesCache type:", typeof siteManager.getSitesCache);
-        
+
         expect(siteManager).toBeDefined();
         expect(typeof siteManager.getSitesCache).toBe("function");
-        
+
         // Try to call getSitesCache
         const cache = siteManager.getSitesCache();
         console.log("Cache result:", cache);

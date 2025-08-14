@@ -9,7 +9,7 @@ import { EventEmitter } from "node:events";
 const mockTypedEventBus = vi.hoisted(() => {
     function MockTypedEventBus(name?: string) {
         const eventEmitter = new EventEmitter() as any;
-        
+
         // Add TypedEventBus-specific methods
         eventEmitter.onTyped = vi.fn();
         eventEmitter.emitTyped = vi.fn().mockResolvedValue(undefined);
@@ -21,10 +21,10 @@ const mockTypedEventBus = vi.hoisted(() => {
         eventEmitter.hasListeners = vi.fn().mockReturnValue(false);
         eventEmitter.busId = name || "test-bus";
         eventEmitter.destroy = vi.fn();
-        
+
         return eventEmitter;
     }
-    
+
     return MockTypedEventBus;
 });
 
@@ -41,12 +41,14 @@ const mockSiteManager = vi.hoisted(() => {
             entries: vi.fn().mockReturnValue([][Symbol.iterator]()),
             getAll: vi.fn().mockReturnValue([]),
             size: 0,
-            getStats: vi.fn().mockReturnValue({ hits: 0, misses: 0, evictions: 0 }),
+            getStats: vi
+                .fn()
+                .mockReturnValue({ hits: 0, misses: 0, evictions: 0 }),
             cleanup: vi.fn().mockReturnValue(0),
             invalidate: vi.fn(),
             invalidateAll: vi.fn(),
             bulkUpdate: vi.fn(),
-            onInvalidation: vi.fn().mockReturnValue(() => {})
+            onInvalidation: vi.fn().mockReturnValue(() => {}),
         };
 
         return {
@@ -61,10 +63,10 @@ const mockSiteManager = vi.hoisted(() => {
             getSiteById: vi.fn().mockResolvedValue(null),
             clearCache: vi.fn(),
             reloadSites: vi.fn().mockResolvedValue(undefined),
-            eventBus: mockTypedEventBus()
+            eventBus: mockTypedEventBus(),
         };
     }
-    
+
     return MockSiteManager;
 });
 
@@ -77,16 +79,19 @@ vi.mock("../../events/TypedEventBus", () => ({
     TypedEventBus: mockTypedEventBus,
 }));
 
-vi.mock("../../managers/monitoring/services/EnhancedMonitoringServiceFactory", () => ({
-    EnhancedMonitoringServiceFactory: {
-        createServices: vi.fn().mockReturnValue({
-            enhancedHistoryRepository: {},
-            enhancedMonitoringOperations: {},
-            enhancedMonitorRepository: {},
-            enhancedSiteRepository: {},
-        }),
-    },
-}));
+vi.mock(
+    "../../managers/monitoring/services/EnhancedMonitoringServiceFactory",
+    () => ({
+        EnhancedMonitoringServiceFactory: {
+            createServices: vi.fn().mockReturnValue({
+                enhancedHistoryRepository: {},
+                enhancedMonitoringOperations: {},
+                enhancedMonitorRepository: {},
+                enhancedSiteRepository: {},
+            }),
+        },
+    })
+);
 
 vi.mock("../../utils/logger", () => ({
     logger: {
@@ -187,7 +192,7 @@ describe("ServiceContainer - Copy of Simple Test", () => {
         const siteManager = container.getSiteManager();
         expect(siteManager).toBeDefined();
         expect(siteManager.getSitesCache).toBeInstanceOf(Function);
-        
+
         const cache = siteManager.getSitesCache();
         expect(cache).toBeDefined();
         expect(cache.get).toBeInstanceOf(Function);
