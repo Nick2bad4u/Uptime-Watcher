@@ -141,12 +141,6 @@
     "references": [
         {
             "path": "./tsconfig.electron.json"
-        },
-        {
-            "path": "./tsconfig.test.json"
-        },
-        {
-            "path": "./tsconfig.electron.test.json"
         }
     ],
     "typeAcquisition": {
