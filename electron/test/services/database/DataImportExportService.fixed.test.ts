@@ -40,7 +40,7 @@ vi.mock("../operationalHooks", () => ({
 class MockSiteLoadingError extends Error {
     constructor(message: string, cause?: Error) {
         super(message);
-        this.name = "SiteLoadingError";
+        this.name = "MockSiteLoadingError";
         this.cause = cause;
     }
 }

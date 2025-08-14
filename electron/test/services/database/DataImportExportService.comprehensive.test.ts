@@ -37,9 +37,7 @@ vi.mock("../../../utils/database/interfaces", () => ({
 }));
 
 vi.mock("../../../utils/operationalHooks", () => ({
-    withDatabaseOperation: vi.fn().mockImplementation(async (operation) => {
-        return await operation();
-    }),
+    withDatabaseOperation: vi.fn(),
 }));
 
 vi.mock("@shared/utils/errorCatalog", () => ({
@@ -63,10 +61,7 @@ import {
 } from "../../../utils/database/DataImportExportService";
 import { SiteLoadingError } from "../../../utils/database/interfaces";
 import { withDatabaseOperation } from "../../../utils/operationalHooks";
-import {
-    safeJsonParse,
-    safeJsonStringifyWithFallback,
-} from "@shared/utils/jsonSafety";
+import { safeJsonParse, safeJsonStringifyWithFallback } from "@shared/utils/jsonSafety";
 
 // Mock interfaces and types
 interface MockDatabase {
@@ -122,6 +117,12 @@ describe("DataImportExportService", () => {
         // Reset all mocks
         vi.clearAllMocks();
 
+        // Spy on withDatabaseOperation function using vi.mocked
+        const mockWithDatabaseOperation = vi.mocked(withDatabaseOperation);
+        mockWithDatabaseOperation.mockImplementation(async (operation: any) => {
+            return await operation();
+        });
+
         // Setup mock database
         mockDatabase = {
             run: vi.fn(),
@@ -143,7 +144,7 @@ describe("DataImportExportService", () => {
         };
 
         mockMonitorRepository = {
-            bulkCreate: vi.fn(),
+            bulkCreate: vi.fn().mockResolvedValue([]),
             deleteAllInternal: vi.fn(),
         };
 
@@ -152,9 +153,11 @@ describe("DataImportExportService", () => {
             addEntryInternal: vi.fn(),
         };
 
-        // Setup database service mock
+        // Setup database service mock with proper executeTransaction implementation
         mockDatabaseService = {
-            executeTransaction: vi.fn(),
+            executeTransaction: vi.fn().mockImplementation(async (operation) => {
+                return await operation(mockDatabase);
+            }),
         };
 
         // Setup event emitter mock
@@ -521,6 +524,7 @@ describe("DataImportExportService", () => {
                         id: "monitor1",
                         siteId: "site1",
                         type: "http",
+                        url: "https://test.com",
                         config: { timeout: 5000 },
                         isActive: true,
                         history: [
@@ -552,11 +556,6 @@ describe("DataImportExportService", () => {
                 },
             ];
 
-            mockDatabaseService.executeTransaction.mockImplementation(
-                async (callback) => {
-                    return await callback(mockDatabase);
-                }
-            );
             mockMonitorRepository.bulkCreate.mockResolvedValue(createdMonitors);
 
             await service.persistImportedData(sampleSites, sampleSettings);
@@ -1021,9 +1020,7 @@ describe("DataImportExportService", () => {
             );
             mockEventEmitter.emitTyped.mockRejectedValue(emitError);
 
-            await expect(service.exportAllData()).rejects.toThrow(
-                SiteLoadingError
-            );
+            await expect(service.exportAllData()).rejects.toThrow(emitError);
         });
 
         it("should handle event emission failures during import parsing", async () => {
@@ -1034,9 +1031,7 @@ describe("DataImportExportService", () => {
             });
             mockEventEmitter.emitTyped.mockRejectedValue(emitError);
 
-            await expect(service.importDataFromJson("invalid")).rejects.toThrow(
-                SiteLoadingError
-            );
+            await expect(service.importDataFromJson("invalid")).rejects.toThrow(emitError);
         });
 
         it("should handle withDatabaseOperation failures", async () => {

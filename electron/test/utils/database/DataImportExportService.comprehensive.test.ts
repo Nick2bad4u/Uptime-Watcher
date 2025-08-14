@@ -812,7 +812,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             // The type guard is passed to safeJsonParse, so we test it indirectly
             (safeJsonParse as MockedFunction<any>).mockImplementation(
-                (jsonData, typeGuard) => {
+                (jsonData, guardFunction) => {
                     // Test the type guard with valid data
                     const validData = {
                         sites: [{ identifier: "test" }],
@@ -820,11 +820,11 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                     };
                     const invalidData = { notSites: "invalid" };
 
-                    expect(typeGuard(validData)).toBe(true);
-                    expect(typeGuard(invalidData)).toBe(false);
-                    expect(typeGuard(null)).toBe(false);
-                    expect(typeGuard("string")).toBe(false);
-                    expect(typeGuard({})).toBe(false); // No sites array
+                    expect(guardFunction(validData)).toBe(true);
+                    expect(guardFunction(invalidData)).toBe(false);
+                    expect(guardFunction(null)).toBe(false);
+                    expect(guardFunction("string")).toBe(false);
+                    expect(guardFunction({})).toBe(false); // No sites array
 
                     return {
                         success: true,

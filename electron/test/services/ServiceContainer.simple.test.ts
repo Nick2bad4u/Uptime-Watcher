@@ -38,11 +38,9 @@ const mockSiteManager = vi.hoisted(() => {
     }));
 });
 
-import { EventEmitter } from "node:events";
-
 const mockEventBus = vi.hoisted(() => {
     return vi.fn().mockImplementation((name?: string) => {
-        const emitter = new EventEmitter();
+        const emitter = new EventTarget();
         // Add required TypedEventBus methods
         (emitter as any).onTyped = vi.fn().mockReturnThis();
         (emitter as any).emitTyped = vi.fn().mockResolvedValue(undefined);

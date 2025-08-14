@@ -6,6 +6,8 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { DataImportExportService } from "../../../utils/database/DataImportExportService";
+import { validateImportData, isValidSite, isValidSettings } from "../../../../shared/utils/jsonValidation";
 
 import type { DataImportExportConfig } from "../../../utils/database/DataImportExportService";
 import type { Site, Settings } from "../../../../shared/types";

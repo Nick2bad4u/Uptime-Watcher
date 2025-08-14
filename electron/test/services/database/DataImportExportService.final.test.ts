@@ -42,7 +42,7 @@ vi.mock("@electron/utils/operationalHooks", () => ({
 class MockSiteLoadingError extends Error {
     constructor(message: string, cause?: Error) {
         super(message);
-        this.name = "SiteLoadingError";
+        this.name = "MockSiteLoadingError";
         if (cause) this.cause = cause;
     }
 }

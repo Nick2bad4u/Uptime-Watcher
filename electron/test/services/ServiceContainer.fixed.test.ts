@@ -3,13 +3,12 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { EventEmitter } from "node:events";
 
 // Create comprehensive hoisted mocks using constructor function pattern
 const mockEventBus = vi.hoisted(() => {
     // Return constructor function that creates new event bus instances
     function MockTypedEventBus(busId?: string) {
-        const emitter = new EventEmitter() as any;
+        const emitter = new EventTarget() as any;
 
         // Add TypedEventBus specific methods
         emitter.emitTyped = vi.fn().mockResolvedValue(undefined);
