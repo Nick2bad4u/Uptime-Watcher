@@ -70,6 +70,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             const omit = (obj: any, keys: string[]): any => {
                 const result = { ...obj };
                 for (const key of keys) {
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                     delete result[key];
                 }
                 return result;

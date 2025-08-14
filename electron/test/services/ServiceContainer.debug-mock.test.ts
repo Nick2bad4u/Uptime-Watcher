@@ -5,8 +5,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 // Use the same mocking approach as the working targeted test
-vi.mock("../../events/TypedEventBus", () => {
-    console.log("Mock being applied for ../../events/TypedEventBus");
+vi.mock("../events/TypedEventBus", () => {
+    console.log("Mock being applied for ../events/TypedEventBus");
     // eslint-disable-next-line @typescript-eslint/no-require-imports, unicorn/prefer-module -- Required for mock
     const { EventEmitter } = require("node:events");
     
@@ -50,9 +50,12 @@ vi.mock("../../managers/ConfigurationManager", () => ({
 }));
 
 vi.mock("../../services/database/DatabaseService", () => ({
-    DatabaseService: vi.fn().mockImplementation(() => ({
-        initialize: vi.fn().mockResolvedValue(undefined),
-    })),
+    DatabaseService: {
+        getInstance: vi.fn().mockReturnValue({
+            initialize: vi.fn().mockResolvedValue(undefined),
+            isInitialized: vi.fn().mockReturnValue(true),
+        })
+    },
 }));
 
 vi.mock("../../services/database/HistoryRepository", () => ({
@@ -74,6 +77,22 @@ vi.mock("../../services/database/SiteRepository", () => ({
 vi.mock("../../managers/SiteManager", () => ({
     SiteManager: vi.fn().mockImplementation(() => ({
         getSitesCache: vi.fn().mockReturnValue(new Map()),
+        getEventBus: vi.fn().mockReturnValue({
+            emit: vi.fn(),
+            on: vi.fn().mockReturnValue(undefined),
+            off: vi.fn(),
+            once: vi.fn(),
+            removeListener: vi.fn(),
+            removeAllListeners: vi.fn(),
+            listeners: vi.fn().mockReturnValue([]),
+            addListener: vi.fn(),
+            emitTyped: vi.fn().mockResolvedValue(undefined),
+            onTyped: vi.fn(),
+            busId: "test-site-manager-bus",
+            destroy: vi.fn(),
+        }),
+        initialize: vi.fn().mockResolvedValue(undefined),
+        isInitialized: vi.fn().mockReturnValue(true),
     })),
 }));
 

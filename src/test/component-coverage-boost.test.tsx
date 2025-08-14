@@ -918,7 +918,8 @@ describe("Component Coverage Boost", () => {
                 },
                 getBadgeClasses: (props: StatusBadgeProps) => {
                     const baseClasses = ["status-badge"];
-                    if (props.size > 0) baseClasses.push(`size-${props.size}`);
+                    // eslint-disable-next-line unicorn/explicit-length-check
+                    if (props.size) baseClasses.push(`size-${props.size}`);
                     baseClasses.push(`status-${props.status}`);
                     return baseClasses.join(" ");
                 },

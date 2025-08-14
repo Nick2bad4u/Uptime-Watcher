@@ -6,34 +6,27 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { ServiceContainer } from '../../services/ServiceContainer.js';
 
-// Create mock TypedEventBus class that extends EventTarget
-class MockTypedEventBus extends EventTarget {
-    public emit(event: string, ...args: any[]): boolean {
-        const customEvent = new CustomEvent(event, { detail: args });
-        return this.dispatchEvent(customEvent);
-    }
-    public on(event: string, listener: (...args: any[]) => void): this {
-        this.addEventListener(event, (e: Event) => {
-            const customEvent = e as CustomEvent;
-            listener(...(customEvent.detail || []));
-        });
-        return this;
-    }
-    public off(event: string, listener: (...args: any[]) => void): this {
-        this.removeEventListener(event, listener as EventListener);
-        return this;
-    }
-    public addMiddleware = vi.fn();
-    public removeMiddleware = vi.fn();
-    public clearMiddleware = vi.fn();
-    public getMiddleware = vi.fn().mockReturnValue([]);
-    public destroy = vi.fn();
-}
-
-// Mock the TypedEventBus module
-vi.mock('../../events/TypedEventBus.js', () => ({
-    TypedEventBus: MockTypedEventBus
-}));
+// Mock the TypedEventBus module with factory function
+vi.mock('../../events/TypedEventBus.js', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports, unicorn/prefer-module -- Required for mock
+    const { EventEmitter } = require("node:events");
+    
+    return {
+        TypedEventBus: vi.fn().mockImplementation((name?: string) => {
+            // Create an actual EventEmitter instance
+            // eslint-disable-next-line unicorn/prefer-event-target -- Required for Node.js EventEmitter compatibility
+            const eventEmitter = new EventEmitter();
+            
+            // Add TypedEventBus-specific methods
+            return Object.assign(eventEmitter, {
+                onTyped: vi.fn(),
+                emitTyped: vi.fn().mockResolvedValue(undefined),
+                busId: name || "test-bus",
+                destroy: vi.fn(),
+            });
+        }),
+    };
+});
 
 // Mock all other dependencies to focus on core service creation
 vi.mock('../../services/database/DatabaseService.js', () => ({

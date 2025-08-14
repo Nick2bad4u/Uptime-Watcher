@@ -320,7 +320,9 @@ describe("Type Guards - Comprehensive Coverage", () => {
         });
 
         it("should handle class constructors", () => {
-            class TestClass {}
+            class TestClass {
+                public name = "test";
+            }
             expect(isFunction(TestClass)).toBe(true);
         });
 

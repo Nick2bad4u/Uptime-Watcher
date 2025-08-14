@@ -1,26 +1,9 @@
 /**
- * Debug test to isolate TypedEventBus issue
+ * Debug test to understand SiteManager mocking issue
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { ServiceContainer } from "../../services/ServiceContainer";
 import { EventEmitter } from "node:events";
-
-// Mock logger to prevent noise
-vi.mock("../../utils/logger", () => ({
-    logger: {
-        info: vi.fn(),
-        debug: vi.fn(),
-        error: vi.fn(),
-        warn: vi.fn(),
-    },
-    monitorLogger: {
-        info: vi.fn(),
-        debug: vi.fn(),
-        error: vi.fn(),
-        warn: vi.fn(),
-    },
-}));
 
 // Create hoisted mock factory for TypedEventBus using constructor pattern
 const mockTypedEventBus = vi.hoisted(() => {
@@ -48,6 +31,16 @@ const mockTypedEventBus = vi.hoisted(() => {
 // Mock TypedEventBus using hoisted factory
 vi.mock("../../events/TypedEventBus", () => ({
     TypedEventBus: mockTypedEventBus,
+}));
+
+// Mock logger
+vi.mock("../../utils/logger", () => ({
+    logger: {
+        info: vi.fn(),
+        debug: vi.fn(),
+        error: vi.fn(),
+        warn: vi.fn(),
+    },
 }));
 
 // Mock SiteManager using constructor pattern
@@ -85,51 +78,18 @@ vi.mock("../../managers/SiteManager", () => ({
     },
 }));
 
-// Mock all necessary dependencies
+// Mock other dependencies
 vi.mock("../../services/database/DatabaseService", () => ({
     DatabaseService: {
-        getInstance: function mockGetInstance() {
-            return {
-                initialize: vi.fn().mockResolvedValue(undefined),
-                isInitialized: vi.fn().mockReturnValue(true),
-                close: vi.fn().mockResolvedValue(undefined),
-                getConnection: vi.fn(),
-            };
-        },
-    },
-}));
-
-vi.mock("../../managers/ConfigurationManager", () => ({
-    ConfigurationManager: function MockConfigurationManager() {
-        return {
+        getInstance: vi.fn().mockReturnValue({
             initialize: vi.fn().mockResolvedValue(undefined),
-            getConfig: vi.fn().mockReturnValue({}),
-            isInitialized: vi.fn().mockReturnValue(true)
-        };
+        }),
     },
 }));
 
-vi.mock("../../managers/MonitorManager", () => ({
-    MonitorManager: function MockMonitorManager() {
-        return {
-            initialize: vi.fn().mockResolvedValue(undefined),
-            isInitialized: vi.fn().mockReturnValue(true),
-        };
-    },
-}));
+import { ServiceContainer } from "../../services/ServiceContainer";
 
-vi.mock("../../UptimeOrchestrator", () => ({
-    UptimeOrchestrator: function MockUptimeOrchestrator() {
-        return {
-            initialize: vi.fn().mockResolvedValue(undefined),
-            start: vi.fn().mockResolvedValue(undefined),
-            stop: vi.fn().mockResolvedValue(undefined),
-            isInitialized: vi.fn().mockReturnValue(true),
-        };
-    },
-}));
-
-describe("Debug Test - UptimeOrchestrator Creation", () => {
+describe("Debug SiteManager Mock", () => {
     let container: ServiceContainer;
 
     beforeEach(() => {
@@ -142,13 +102,23 @@ describe("Debug Test - UptimeOrchestrator Creation", () => {
         ServiceContainer.resetForTesting();
     });
 
-    it("should create UptimeOrchestrator without errors", () => {
-        // Create SiteManager first to ensure proper initialization
-        container.getSiteManager();
+    it("should create SiteManager with getSitesCache method", () => {
+        console.log("Starting test...");
         
-        // Then create UptimeOrchestrator
-        const orchestrator = container.getUptimeOrchestrator();
+        // Get SiteManager
+        const siteManager = container.getSiteManager();
+        console.log("SiteManager instance:", siteManager);
+        console.log("SiteManager type:", typeof siteManager);
+        console.log("SiteManager methods:", Object.keys(siteManager));
+        console.log("getSitesCache method:", siteManager.getSitesCache);
+        console.log("getSitesCache type:", typeof siteManager.getSitesCache);
         
-        expect(orchestrator).toBeDefined();
+        expect(siteManager).toBeDefined();
+        expect(typeof siteManager.getSitesCache).toBe("function");
+        
+        // Try to call getSitesCache
+        const cache = siteManager.getSitesCache();
+        console.log("Cache result:", cache);
+        expect(cache).toBeDefined();
     });
 });

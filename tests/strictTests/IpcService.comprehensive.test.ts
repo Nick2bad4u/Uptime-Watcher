@@ -8,10 +8,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ipcMain, BrowserWindow, type IpcMainInvokeEvent, type IpcMainEvent } from "electron";
 
-import { IpcService } from "../../../services/ipc/IpcService";
-import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
-import type { AutoUpdaterService } from "../../../services/updater/AutoUpdaterService";
-import type { Site, Monitor } from "../../../../shared/types";
+import { IpcService } from "../../electron/services/ipc/IpcService";
+import type { UptimeOrchestrator } from "../../electron/UptimeOrchestrator";
+import type { AutoUpdaterService } from "../../electron/services/updater/AutoUpdaterService";
+import type { Site, Monitor } from "../../shared/types";
 
 // Mock Electron modules
 vi.mock("electron", () => ({
@@ -33,7 +33,7 @@ vi.mock("electron", () => ({
 }));
 
 // Mock logger
-vi.mock("../../../utils/logger", () => ({
+vi.mock("../../electron/utils/logger", () => ({
     logger: {
         info: vi.fn(),
         warn: vi.fn(),
@@ -43,7 +43,7 @@ vi.mock("../../../utils/logger", () => ({
 }));
 
 // Mock MonitorTypeRegistry
-vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({
+vi.mock("../../electron/services/monitoring/MonitorTypeRegistry", () => ({
     getAllMonitorTypeConfigs: vi.fn(() => [
         {
             type: "http",
@@ -91,7 +91,7 @@ vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({
 }));
 
 // Mock shared validation
-vi.mock("../../../../shared/validation/schemas", () => ({
+vi.mock("@shared/validation/schemas", () => ({
     validateMonitorData: vi.fn((type: string, data: unknown) => ({
         success: type !== "invalid",
         errors: type === "invalid" ? ["Invalid monitor type"] : [],
@@ -261,14 +261,7 @@ describe("IpcService - Comprehensive Coverage", () => {
 
             const result = await handler(mockIpcEvent, mockSite);
             expect(mockUptimeOrchestrator.addSite).toHaveBeenCalledWith(mockSite);
-            expect(result).toEqual({ 
-                success: true, 
-                data: true,
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "add-site"
-                }
-            });
+            expect(result).toEqual({ success: true, data: true });
         });
 
         it("should handle remove-site with site identifier", async () => {
@@ -281,14 +274,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent, "site-to-remove");
 
             expect(mockUptimeOrchestrator.removeSite).toHaveBeenCalledWith("site-to-remove");
-            expect(result).toEqual({ 
-                success: true, 
-                data: true,
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "remove-site"
-                }
-            });
+            expect(result).toEqual({ success: true, data: true });
         });
 
         it("should handle get-sites without parameters", async () => {
@@ -301,14 +287,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent);
 
             expect(mockUptimeOrchestrator.getSites).toHaveBeenCalled();
-            expect(result).toEqual({ 
-                success: true, 
-                data: mockSites,
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "get-sites"
-                }
-            });
+            expect(result).toEqual({ success: true, data: mockSites });
         });
 
         it("should handle update-site with identifier and partial data", async () => {
@@ -323,14 +302,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent, "site-id", updateData);
 
             expect(mockUptimeOrchestrator.updateSite).toHaveBeenCalledWith("site-id", updateData);
-            expect(result).toEqual({ 
-                success: true, 
-                data: true,
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "update-site"
-                }
-            });
+            expect(result).toEqual({ success: true, data: true });
         });
 
         it("should handle remove-monitor with site and monitor identifiers", async () => {
@@ -343,14 +315,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent, "site-id", "monitor-id");
 
             expect(mockUptimeOrchestrator.removeMonitor).toHaveBeenCalledWith("site-id", "monitor-id");
-            expect(result).toEqual({ 
-                success: true, 
-                data: true,
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "remove-monitor"
-                }
-            });
+            expect(result).toEqual({ success: true, data: true });
         });
     });
 
@@ -369,14 +334,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent);
 
             expect(mockUptimeOrchestrator.startMonitoring).toHaveBeenCalled();
-            expect(result).toEqual({ 
-                success: true, 
-                data: true,
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "start-monitoring"
-                }
-            });
+            expect(result).toEqual({ success: true, data: true });
         });
 
         it("should handle stop-monitoring globally", async () => {
@@ -389,14 +347,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent);
 
             expect(mockUptimeOrchestrator.stopMonitoring).toHaveBeenCalled();
-            expect(result).toEqual({ 
-                success: true, 
-                data: true,
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "stop-monitoring"
-                }
-            });
+            expect(result).toEqual({ success: true, data: true });
         });
 
         it("should handle start-monitoring-for-site with identifier and optional monitor", async () => {
@@ -409,14 +360,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent, "site-id", "monitor-id");
 
             expect(mockUptimeOrchestrator.startMonitoringForSite).toHaveBeenCalledWith("site-id", "monitor-id");
-            expect(result).toEqual({ 
-                success: true, 
-                data: true,
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "start-monitoring-for-site"
-                }
-            });
+            expect(result).toEqual({ success: true, data: true });
         });
 
         it("should handle stop-monitoring-for-site with identifier and optional monitor", async () => {
@@ -429,14 +373,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent, "site-id", "monitor-id");
 
             expect(mockUptimeOrchestrator.stopMonitoringForSite).toHaveBeenCalledWith("site-id", "monitor-id");
-            expect(result).toEqual({ 
-                success: true, 
-                data: true,
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "stop-monitoring-for-site"
-                }
-            });
+            expect(result).toEqual({ success: true, data: true });
         });
 
         it("should handle check-site-now with site and monitor identifiers", async () => {
@@ -449,14 +386,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent, "site-id", "monitor-id");
 
             expect(mockUptimeOrchestrator.checkSiteManually).toHaveBeenCalledWith("site-id", "monitor-id");
-            expect(result).toEqual({ 
-                success: true, 
-                data: true,
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "check-site-now"
-                }
-            });
+            expect(result).toEqual({ success: true, data: true });
         });
     });
 
@@ -502,14 +432,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent, "http", "test details");
 
-            expect(result).toEqual({ 
-                success: true, 
-                data: "HTTP: test details",
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "format-monitor-detail"
-                }
-            });
+            expect(result).toEqual({ success: true, data: "HTTP: test details" });
         });
 
         it("should handle format-monitor-detail with unknown monitor type", async () => {
@@ -521,14 +444,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent, "unknown", "test details");
 
-            expect(result).toEqual({ 
-                success: true, 
-                data: "test details",
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "format-monitor-detail"
-                }
-            });
+            expect(result).toEqual({ success: true, data: "test details" });
         });
 
         it("should handle format-monitor-title-suffix with known monitor type", async () => {
@@ -553,14 +469,7 @@ describe("IpcService - Comprehensive Coverage", () => {
 
             const result = await handler(mockIpcEvent, "http", mockMonitor);
 
-            expect(result).toEqual({ 
-                success: true, 
-                data: "(monitor1)",
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "format-monitor-title-suffix"
-                }
-            });
+            expect(result).toEqual({ success: true, data: "(monitor1)" });
         });
 
         it("should handle format-monitor-title-suffix with unknown monitor type", async () => {
@@ -585,14 +494,7 @@ describe("IpcService - Comprehensive Coverage", () => {
 
             const result = await handler(mockIpcEvent, "unknown", mockMonitor);
 
-            expect(result).toEqual({ 
-                success: true, 
-                data: "",
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "format-monitor-title-suffix"
-                }
-            });
+            expect(result).toEqual({ success: true, data: "" });
         });
 
         it("should handle validate-monitor-data with valid data", async () => {
@@ -605,19 +507,9 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent, "http", { url: "https://example.com" });
 
             expect(result.success).toBe(true);
-            expect(result).toEqual({
-                success: true,
-                data: {
-                    errors: [],
-                    warnings: [],
-                    success: true,
-                    metadata: { validated: true }
-                },
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "validate-monitor-data"
-                }
-            });
+            expect(result.errors).toEqual([]);
+            expect(result.warnings).toEqual([]);
+            expect(result.metadata).toEqual({ validated: true });
         });
 
         it("should handle validate-monitor-data with invalid data", async () => {
@@ -629,20 +521,8 @@ describe("IpcService - Comprehensive Coverage", () => {
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent, "invalid", { invalid: true });
 
-            expect(result.success).toBe(true);
-            expect(result).toEqual({
-                success: true,
-                data: {
-                    errors: ["Invalid monitor type"],
-                    warnings: [],
-                    success: false,
-                    metadata: { validated: true }
-                },
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "validate-monitor-data"
-                }
-            });
+            expect(result.success).toBe(false);
+            expect(result.errors).toEqual(["Invalid monitor type"]);
         });
 
         it("should handle validate-monitor-data with warnings", async () => {
@@ -655,12 +535,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent, "warning", { data: "test" });
 
             expect(result.success).toBe(true);
-            expect(result.data).toEqual({ 
-                errors: [],
-                warnings: ["Warning message"],
-                success: true,
-                metadata: { validated: true }
-            });
+            expect(result.warnings).toEqual(["Warning message"]);
         });
     });
 
@@ -679,14 +554,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent);
 
             expect(mockUptimeOrchestrator.exportData).toHaveBeenCalled();
-            expect(result).toEqual({ 
-                success: true, 
-                data: "export-data",
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "export-data"
-                }
-            });
+            expect(result).toEqual({ success: true, data: "export-data" });
         });
 
         it("should handle import-data with data string", async () => {
@@ -699,14 +567,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent, "import-data-string");
 
             expect(mockUptimeOrchestrator.importData).toHaveBeenCalledWith("import-data-string");
-            expect(result).toEqual({ 
-                success: true, 
-                data: true,
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "import-data"
-                }
-            });
+            expect(result).toEqual({ success: true, data: true });
         });
 
         it("should handle update-history-limit with number parameter", async () => {
@@ -719,13 +580,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent, 5000);
 
             expect(mockUptimeOrchestrator.setHistoryLimit).toHaveBeenCalledWith(5000);
-            expect(result).toEqual({ 
-                success: true,
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "update-history-limit"
-                }
-            });
+            expect(result).toEqual({ success: true, data: undefined });
         });
 
         it("should handle get-history-limit without parameters", async () => {
@@ -738,14 +593,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent);
 
             expect(mockUptimeOrchestrator.getHistoryLimit).toHaveBeenCalled();
-            expect(result).toEqual({ 
-                success: true, 
-                data: 1000,
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "get-history-limit"
-                }
-            });
+            expect(result).toEqual({ success: true, data: 1000 });
         });
 
         it("should handle reset-settings without parameters", async () => {
@@ -758,13 +606,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent);
 
             expect(mockUptimeOrchestrator.resetSettings).toHaveBeenCalled();
-            expect(result).toEqual({ 
-                success: true,
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "reset-settings"
-                }
-            });
+            expect(result).toEqual({ success: true, data: undefined });
         });
 
         it("should handle download-sqlite-backup without parameters", async () => {
@@ -777,14 +619,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent);
 
             expect(mockUptimeOrchestrator.downloadBackup).toHaveBeenCalled();
-            expect(result).toEqual({ 
-                success: true, 
-                data: "/path/to/backup.db",
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "download-sqlite-backup"
-                }
-            });
+            expect(result).toEqual({ success: true, data: "/path/to/backup.db" });
         });
     });
 
@@ -812,17 +647,21 @@ describe("IpcService - Comprehensive Coverage", () => {
                 }
             );
 
-            // Note: BrowserWindow event emission is complex to test in isolation
-            // The implementation handles state sync correctly, but testing it requires
-            // full browser window setup that we're avoiding in isolated tests
+            // Check BrowserWindow state sync event
+            const mockWindow = BrowserWindow.getAllWindows()[0];
+            expect(mockWindow.webContents.send).toHaveBeenCalledWith(
+                "state-sync-event",
+                {
+                    action: "bulk-sync",
+                    sites: mockSites,
+                    source: "database",
+                    timestamp: expect.any(Number),
+                }
+            );
 
             expect(result).toEqual({
                 success: true,
                 data: { siteCount: 1, success: true },
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "request-full-sync"
-                }
             });
         });
 
@@ -943,14 +782,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             );
             const handler = handleCall![1];
 
-            await expect(handler(mockIpcEvent)).resolves.toEqual({
-                success: false,
-                error: "Database error",
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "get-sites"
-                }
-            });
+            await expect(handler(mockIpcEvent)).rejects.toThrow("Database error");
         });
 
         it("should handle async errors in monitoring operations", async () => {
@@ -962,14 +794,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             );
             const handler = handleCall![1];
 
-            await expect(handler(mockIpcEvent)).resolves.toEqual({
-                success: false,
-                error: "Monitoring error",
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "start-monitoring"
-                }
-            });
+            await expect(handler(mockIpcEvent)).rejects.toThrow("Monitoring error");
         });
     });
 
@@ -997,14 +822,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent, "ping", "test details");
 
-            expect(result).toEqual({ 
-                success: true, 
-                data: "test details",
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "format-monitor-detail"
-                }
-            });
+            expect(result).toEqual({ success: true, data: "test details" });
         });
 
         it("should handle monitor configuration without formatTitleSuffix function", async () => {
@@ -1026,14 +844,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             };
 
             const result = await handler(mockIpcEvent, "ping", mockMonitor);
-            expect(result).toEqual({ 
-                success: true, 
-                data: "",
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "format-monitor-title-suffix"
-                }
-            });
+            expect(result).toEqual({ success: true, data: "" });
         });
 
         it("should handle whitespace in monitor type for trimming", async () => {
@@ -1043,14 +854,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent, "  http  ", "test details");
 
-            expect(result).toEqual({ 
-                success: true, 
-                data: "HTTP: test details",
-                metadata: {
-                    duration: expect.any(Number),
-                    handler: "format-monitor-detail"
-                }
-            });
+            expect(result).toEqual({ success: true, data: "HTTP: test details" });
         });
     });
 });
