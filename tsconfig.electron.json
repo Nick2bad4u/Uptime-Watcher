@@ -7,6 +7,12 @@
         "paths": {
             "@shared/*": [
                 "shared/*"
+            ],
+            "@electron/*": [
+                "electron/*"
+            ],
+            "@app/*": [
+                "src/*"
             ]
         },
         "incremental": true

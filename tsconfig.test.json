@@ -1,10 +1,17 @@
 {
     "extends": "./tsconfig.json",
     "compilerOptions": {
+        "composite": true,
         "tsBuildInfoFile": "./dist-electron/tsconfig.test.tsbuildinfo",
         "paths": {
             "@shared/*": [
                 "shared/*"
+            ],
+            "@electron/*": [
+                "electron/*"
+            ],
+            "@app/*": [
+                "src/*"
             ]
         },
         "incremental": true

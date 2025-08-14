@@ -13,9 +13,9 @@ import { defineConfig } from "vitest/config";
 const vitestConfig = defineConfig({
     resolve: {
         alias: {
-            "@shared": normalizePath(
-                path.resolve(import.meta.dirname, "./shared")
-            ),
+            "@shared": normalizePath(path.resolve(__dirname, "shared")),
+            "@electron": normalizePath(path.resolve(__dirname, "electron")),
+            "@app": normalizePath(path.resolve(__dirname, "src")),
         },
     },
     test: {
