@@ -35,7 +35,7 @@ import {
     hasValidTimeout,
     hasValidUrl,
 } from "../../../../services/monitoring/utils/monitorTypeGuards";
-import type { Site } from "../../../../types";
+import type { Site } from "../../../../../shared/types.js";
 import {
     isNonEmptyString,
     isValidFQDN,

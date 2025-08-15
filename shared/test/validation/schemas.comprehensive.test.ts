@@ -34,6 +34,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
             };
 
             expect(() => baseMonitorSchema.parse(baseMonitor)).not.toThrow();
@@ -49,6 +50,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
             };
 
             const invalidHigh = {
@@ -60,6 +62,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
             };
 
             expect(() => baseMonitorSchema.parse(invalidLow)).toThrow();
@@ -76,6 +79,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
             };
 
             const invalidHigh = {
@@ -87,6 +91,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
             };
 
             expect(() => baseMonitorSchema.parse(invalidLow)).toThrow();
@@ -103,6 +108,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
             };
 
             const invalidHigh = {
@@ -114,6 +120,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
             };
 
             expect(() => baseMonitorSchema.parse(invalidLow)).toThrow();
@@ -130,6 +137,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
             };
 
             expect(() => baseMonitorSchema.parse(monitor)).not.toThrow();
@@ -163,6 +171,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending" as const,
                 responseTime: -1,
+                history: [],
             };
 
             expect(() => httpMonitorSchema.parse(httpMonitor)).not.toThrow();
@@ -189,6 +198,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     monitoring: true,
                     status: "pending" as const,
                     responseTime: -1,
+                    history: [],
                 };
 
                 expect(() => httpMonitorSchema.parse(monitor)).toThrow();
@@ -206,6 +216,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending" as const,
                 responseTime: -1,
+                history: [],
             };
 
             const httpsUrl = {
@@ -231,6 +242,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending" as const,
                 responseTime: -1,
+                history: [],
             };
 
             expect(() => portMonitorSchema.parse(portMonitor)).not.toThrow();
@@ -259,6 +271,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     monitoring: true,
                     status: "pending" as const,
                     responseTime: -1,
+                    history: [],
                 };
 
                 expect(() => portMonitorSchema.parse(monitor)).not.toThrow();
@@ -286,6 +299,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     monitoring: true,
                     status: "pending" as const,
                     responseTime: -1,
+                    history: [],
                 };
 
                 expect(() => portMonitorSchema.parse(monitor)).toThrow();
@@ -307,6 +321,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     monitoring: true,
                     status: "pending" as const,
                     responseTime: -1,
+                    history: [],
                 };
 
                 expect(() => portMonitorSchema.parse(monitor)).not.toThrow();
@@ -328,6 +343,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     monitoring: true,
                     status: "pending" as const,
                     responseTime: -1,
+                    history: [],
                 };
 
                 expect(() => portMonitorSchema.parse(monitor)).toThrow();
@@ -347,6 +363,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending" as const,
                 responseTime: -1,
+                history: [],
             };
 
             expect(() => pingMonitorSchema.parse(pingMonitor)).not.toThrow();
@@ -372,6 +389,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     monitoring: true,
                     status: "pending" as const,
                     responseTime: -1,
+                    history: [],
                 };
 
                 expect(() => pingMonitorSchema.parse(monitor)).not.toThrow();
@@ -391,6 +409,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending" as const,
                 responseTime: -1,
+                history: [],
             };
 
             const result = monitorSchema.parse(httpMonitor);
@@ -410,6 +429,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending" as const,
                 responseTime: -1,
+                history: [],
             };
 
             const result = monitorSchema.parse(portMonitor);
@@ -428,6 +448,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending" as const,
                 responseTime: -1,
+                history: [],
             };
 
             const result = monitorSchema.parse(pingMonitor);
@@ -453,6 +474,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                         monitoring: true,
                         status: "pending" as const,
                         responseTime: -1,
+                    history: [],
                     },
                 ],
             };
@@ -476,6 +498,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                         monitoring: true,
                         status: "pending" as const,
                         responseTime: -1,
+                    history: [],
                     },
                     {
                         id: "port-monitor",
@@ -488,6 +511,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                         monitoring: true,
                         status: "pending" as const,
                         responseTime: -1,
+                    history: [],
                     },
                 ],
             };
@@ -522,6 +546,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                         monitoring: true,
                         status: "pending" as const,
                         responseTime: -1,
+                    history: [],
                     },
                 ],
             };
@@ -551,6 +576,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                         monitoring: true,
                         status: "pending" as const,
                         responseTime: -1,
+                    history: [],
                     },
                 ],
             };
@@ -577,6 +603,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
             };
 
             const result = validateMonitorData("http", data);
@@ -596,6 +623,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
             };
 
             const result = validateMonitorData("http", data);
@@ -613,6 +641,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
             };
 
             const result = validateMonitorData("unknown", data);
@@ -638,6 +667,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
                 // Missing optional lastChecked field
             };
 
@@ -658,6 +688,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
                 lastChecked: undefined, // Explicitly undefined
             };
 
@@ -755,6 +786,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
             });
             expect(httpResult.success).toBe(true);
 
@@ -769,6 +801,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
             });
             expect(portResult.success).toBe(true);
 
@@ -782,6 +815,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
             });
             expect(pingResult.success).toBe(true);
         });
@@ -804,6 +838,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                         monitoring: true,
                         status: "pending",
                         responseTime: -1,
+                    history: [],
                     },
                 ],
             };
@@ -862,6 +897,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
             };
 
             expect(httpMonitor.type).toBe("http");
@@ -880,6 +916,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
             };
 
             expect(portMonitor.type).toBe("port");
@@ -898,6 +935,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
             };
 
             expect(pingMonitor.type).toBe("ping");
@@ -915,6 +953,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
             };
 
             expect(monitor.type).toBe("http");
@@ -936,6 +975,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                         monitoring: true,
                         status: "pending",
                         responseTime: -1,
+                    history: [],
                     },
                 ],
             };
@@ -957,6 +997,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending" as const,
                 responseTime: -1,
+                history: [],
             };
 
             expect(() => httpMonitorSchema.parse(monitor)).not.toThrow();
@@ -973,6 +1014,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending" as const,
                 responseTime: 999_999, // Large response time
+                history: [],
             };
 
             expect(() => httpMonitorSchema.parse(monitor)).not.toThrow();
@@ -992,6 +1034,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     monitoring: true,
                     status,
                     responseTime: -1,
+                    history: [],
                 };
 
                 expect(() => httpMonitorSchema.parse(monitor)).not.toThrow();
@@ -1009,6 +1052,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending" as const,
                 responseTime: -1,
+                history: [],
             };
 
             const monitorWithDate = {
@@ -1039,6 +1083,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     monitoring: true,
                     status: "pending",
                     responseTime: -1,
+                    history: [],
                     // lastChecked is intentionally missing (optional field)
                 };
 
@@ -1062,6 +1107,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     monitoring: true,
                     status: "pending",
                     responseTime: -1,
+                    history: [],
                     lastChecked: undefined, // Explicitly undefined to test the optional field branch
                 };
 
@@ -1240,6 +1286,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     monitoring: true,
                     status: "pending" as const,
                     responseTime: -1,
+                    history: [],
                 });
 
                 expect(result.success).toBe(false);
@@ -1269,6 +1316,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                             monitoring: true,
                             status: "pending" as const,
                             responseTime: -1,
+                    history: [],
                         },
                     ],
                 });
@@ -1305,6 +1353,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     monitoring: true,
                     status: "pending" as const,
                     responseTime: -1,
+                    history: [],
                 });
 
                 expect(result.success).toBe(false);
@@ -1313,3 +1362,4 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         });
     });
 });
+

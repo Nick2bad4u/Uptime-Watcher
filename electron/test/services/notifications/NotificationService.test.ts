@@ -10,7 +10,7 @@ import {
     NotificationService,
     NotificationConfig,
 } from "../../../services/notifications/NotificationService";
-import { Site } from "../../../types";
+import { Site } from "../../../../shared/types.js";
 
 // Mock Electron modules
 vi.mock("electron", () => ({

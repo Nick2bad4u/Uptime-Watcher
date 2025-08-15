@@ -115,7 +115,7 @@ describe("Targeted Coverage for Missing Branches", () => {
     describe("Type System Branches", () => {
         it("should handle type checking edge cases", async () => {
             try {
-                const typesModule = await import("../types.js");
+                const typesModule = await import("../../shared/types.js");
 
                 // This tests that the types module loads without errors
                 expect(typeof typesModule).toBe("object");

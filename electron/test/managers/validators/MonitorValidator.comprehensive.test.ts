@@ -5,7 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MonitorValidator } from "../../../managers/validators/MonitorValidator";
-import type { Site, StatusHistory } from "../../../types";
+import type { Site, StatusHistory } from "../../../../shared/types.js";
 
 // Mock the MonitorTypeRegistry module
 vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({

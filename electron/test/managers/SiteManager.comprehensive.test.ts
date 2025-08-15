@@ -4,7 +4,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Site, Monitor } from "../../types";
+import type { Site, Monitor } from "../../../shared/types.js";
 import {
     SiteManager,
     type IMonitoringOperations,

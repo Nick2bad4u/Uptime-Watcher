@@ -8,7 +8,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 import type { UptimeEvents } from "../../../events/eventTypes";
 import type { TypedEventBus } from "../../../events/TypedEventBus";
-import type { Site } from "../../../types";
+import type { Site } from "../../../../shared/types.js";
 import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 import type { DatabaseServiceFactory } from "../../../services/factories/DatabaseServiceFactory";
 

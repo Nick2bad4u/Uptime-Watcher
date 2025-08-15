@@ -9,7 +9,7 @@ import {
     createHttpClient,
     setupTimingInterceptors,
 } from "../../../../services/monitoring/utils/httpClient";
-import { MonitorConfig } from "../../../../services/monitoring/types";
+import { MonitorConfig } from "../../../../services/monitoring/types.js";
 
 // Mock axios
 vi.mock("axios", () => ({

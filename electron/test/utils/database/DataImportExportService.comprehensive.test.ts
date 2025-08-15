@@ -20,7 +20,7 @@ import {
     beforeEach,
     type MockedFunction,
 } from "vitest";
-import type { Site, StatusHistory } from "../../../../shared/types";
+import type { Site, StatusHistory } from "../../../../shared/types.js";
 import type { Database } from "node-sqlite3-wasm";
 
 import { DataImportExportService } from "../../../utils/database/DataImportExportService";

@@ -13,8 +13,8 @@ import { PingMonitor } from "../../../services/monitoring/PingMonitor";
 import {
     MonitorConfig,
     MonitorCheckResult,
-} from "../../../services/monitoring/types";
-import { Site } from "../../../../shared/types";
+} from "../../../services/monitoring/types.js";
+import { Site } from "../../../../shared/types.js";
 import { isNonEmptyString } from "../../../../shared/validation/validatorUtils";
 import * as pingRetryModule from "../../../services/monitoring/utils/pingRetry";
 

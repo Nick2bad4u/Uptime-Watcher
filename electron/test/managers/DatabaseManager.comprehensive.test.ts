@@ -9,7 +9,7 @@ import {
     DatabaseManagerDependencies,
 } from "../../managers/DatabaseManager";
 import { TypedEventBus } from "../../events/TypedEventBus";
-import { UptimeEvents } from "../../events/eventTypes";
+import { UptimeEvents } from "../../events/eventTypes.js";
 
 // Mock SiteRepositoryService and SiteLoadingOrchestrator
 vi.mock("../../utils/database/SiteRepositoryService", () => ({

@@ -213,7 +213,7 @@ describe("ThemedTooltip", () => {
             const tooltipContainer =
                 screen.getByText("Hover me").parentElement!;
             expect(tooltipContainer.className).toBe(
-                "themed-tooltip   spaced-class  "
+                "themed-tooltip spaced-class"
             );
         });
 

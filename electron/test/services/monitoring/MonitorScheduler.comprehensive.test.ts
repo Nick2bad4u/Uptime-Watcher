@@ -16,7 +16,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // Unmock MonitorScheduler for this test file so we can test the real implementation
 vi.unmock("../../../services/monitoring/MonitorScheduler");
 
-import type { Site } from "@shared/types";
+import type { Site } from "../../../../shared/types.js";
 
 // Use vi.hoisted to properly initialize mocks before they're used
 const mockLogger = vi.hoisted(() => ({

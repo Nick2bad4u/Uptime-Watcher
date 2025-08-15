@@ -24,6 +24,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
                 lastChecked: undefined, // This should trigger warning logic
             };
 
@@ -106,6 +107,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
             };
             const httpResult = validateMonitorData("http", httpData);
             expect(httpResult.success).toBe(true);
@@ -122,6 +124,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
             };
             const portResult = validateMonitorData("port", portData);
             expect(portResult.success).toBe(true);
@@ -137,6 +140,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
             };
             const pingResult = validateMonitorData("ping", pingData);
             expect(pingResult.success).toBe(true);
@@ -162,6 +166,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
             };
 
             const result = validateMonitorData("http", validData);
@@ -187,6 +192,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
                         monitoring: true,
                         status: "pending",
                         responseTime: -1,
+                        history: [],
                     },
                 ],
             };

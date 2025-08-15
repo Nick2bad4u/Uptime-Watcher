@@ -24,6 +24,7 @@ describe("Validation Schemas - Final Branch Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
+                history: [],
                 lastChecked: undefined, // This should trigger a warning
             };
 

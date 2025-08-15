@@ -23,7 +23,7 @@ import {
     type IDataImportExportService,
     type ISiteRepositoryService,
 } from "../../../services/factories/DatabaseServiceFactory";
-import type { UptimeEvents } from "../../../events/eventTypes";
+import type { UptimeEvents } from "../../../events/eventTypes.js";
 import type { TypedEventBus } from "../../../events/TypedEventBus";
 import type { DatabaseService } from "../../../services/database/DatabaseService";
 import type { HistoryRepository } from "../../../services/database/HistoryRepository";

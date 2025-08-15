@@ -12,7 +12,7 @@ import {
     isValidNumeric,
     isValidIdentifierArray,
     safeInteger,
-} from "../../shared/validation/validatorUtils";
+} from "../../shared/validation/validatorUtils.js";
 
 describe("Shared Validation Utils", () => {
     describe("isNonEmptyString", () => {

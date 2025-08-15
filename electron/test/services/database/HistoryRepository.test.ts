@@ -23,7 +23,7 @@ import {
     type HistoryRepositoryDependencies,
 } from "../../../services/database/HistoryRepository";
 import type { DatabaseService } from "../../../services/database/DatabaseService";
-import type { StatusHistory } from "../../../types";
+import type { StatusHistory } from "../../../../shared/types.js";
 
 // Import mocked modules
 import * as historyManipulation from "../../../services/database/utils/historyManipulation";

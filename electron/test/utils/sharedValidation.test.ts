@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import type { Monitor, Site } from "../../../shared/types";
+import type { Monitor, Site } from "../../../shared/types.js";
 import {
     getMonitorValidationErrors,
     validateMonitorType,

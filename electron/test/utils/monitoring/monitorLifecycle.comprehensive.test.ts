@@ -19,7 +19,7 @@ import { TypedEventBus } from "../../../events/TypedEventBus";
 import { DatabaseService } from "../../../services/database/DatabaseService";
 import { MonitorRepository } from "../../../services/database/MonitorRepository";
 import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler";
-import { Site, Monitor } from "../../../types";
+import { Site, Monitor } from "../../../../shared/types.js";
 import { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 import * as operationalHooks from "../../../utils/operationalHooks";
 

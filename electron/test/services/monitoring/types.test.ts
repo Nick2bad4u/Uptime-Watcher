@@ -9,7 +9,7 @@ import type {
     IMonitorService,
     MonitorCheckResult,
     MonitorConfig,
-} from "../../../services/monitoring/types";
+} from "../../../services/monitoring/types.js";
 
 describe("Monitoring Types", () => {
     describe("MonitorCheckResult", () => {

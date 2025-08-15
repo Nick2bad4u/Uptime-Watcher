@@ -8,7 +8,7 @@
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import type { StatusHistory } from "../../../../../shared/types";
-import type { HistoryRow as DatabaseHistoryRow } from "../../../../../shared/types/database";
+import type { HistoryRow as DatabaseHistoryRow } from "../../../../../shared/types/database.js";
 import {
     historyEntryToRow,
     isValidHistoryRow,

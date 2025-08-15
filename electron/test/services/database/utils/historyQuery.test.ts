@@ -8,8 +8,8 @@
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import type { Database } from "node-sqlite3-wasm";
-import type { StatusHistory } from "../../../../types";
-import type { HistoryRow as DatabaseHistoryRow } from "../../../../../shared/types/database";
+import type { StatusHistory } from "../../../../../shared/types.js";
+import type { HistoryRow as DatabaseHistoryRow } from "../../../../../shared/types/database.js";
 import {
     findHistoryByMonitorId,
     getHistoryCount,

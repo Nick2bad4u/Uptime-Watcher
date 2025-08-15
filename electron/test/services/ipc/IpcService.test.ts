@@ -429,6 +429,7 @@ describe("IpcService", () => {
                     responseTime: 100,
                     status: "up",
                     monitoring: true,
+                    history: [], // Required field for schema validation
                 };
 
                 const result = await validateHandler(

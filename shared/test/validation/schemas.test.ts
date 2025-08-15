@@ -62,6 +62,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         it("should reject retry attempts exceeding maximum", () => {
             const invalidData = {
                 checkInterval: 30_000,
+                history: [],
                 id: "test",
                 monitoring: true,
                 responseTime: 200,
@@ -77,6 +78,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         it("should reject timeout below minimum", () => {
             const invalidData = {
                 checkInterval: 30_000,
+                history: [],
                 id: "test",
                 monitoring: true,
                 responseTime: 200,
@@ -92,6 +94,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         it("should reject timeout exceeding maximum", () => {
             const invalidData = {
                 checkInterval: 30_000,
+                history: [],
                 id: "test",
                 monitoring: true,
                 responseTime: 200,
@@ -107,6 +110,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         it("should accept -1 as sentinel value for responseTime", () => {
             const validData = {
                 checkInterval: 30_000,
+                history: [],
                 id: "test",
                 monitoring: true,
                 responseTime: -1, // Sentinel value for "never checked"
@@ -122,6 +126,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         it("should reject responseTime below -1", () => {
             const invalidData = {
                 checkInterval: 30_000,
+                history: [],
                 id: "test",
                 monitoring: true,
                 responseTime: -2, // Below minimum -1
@@ -139,6 +144,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             for (const status of statuses) {
                 const validData = {
                     checkInterval: 30_000,
+                history: [],
                     id: "test",
                     monitoring: true,
                     responseTime: 200,
@@ -157,6 +163,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             for (const type of types) {
                 const validData = {
                     checkInterval: 30_000,
+                history: [],
                     id: "test",
                     monitoring: true,
                     responseTime: 200,
@@ -185,6 +192,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             for (const fieldToRemove of fieldsToTest) {
                 const validData = {
                     checkInterval: 30_000,
+                history: [],
                     id: "test",
                     monitoring: true,
                     responseTime: 200,
@@ -205,6 +213,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         it("should allow optional lastChecked field", () => {
             const dataWithoutLastChecked = {
                 checkInterval: 30_000,
+                history: [],
                 id: "test",
                 monitoring: true,
                 responseTime: 200,
@@ -233,6 +242,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         it("should validate valid HTTP monitor", () => {
             const validData = {
                 checkInterval: 30_000,
+                history: [],
                 id: "http-monitor",
                 monitoring: true,
                 responseTime: 200,
@@ -260,6 +270,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             for (const url of validUrls) {
                 const validData = {
                     checkInterval: 30_000,
+                history: [],
                     id: "test",
                     monitoring: true,
                     responseTime: 200,
@@ -293,6 +304,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             for (const url of invalidUrls) {
                 const invalidData = {
                     checkInterval: 30_000,
+                history: [],
                     id: "test",
                     monitoring: true,
                     responseTime: 200,
@@ -310,6 +322,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         it("should enforce type literal", () => {
             const invalidData = {
                 checkInterval: 30_000,
+                history: [],
                 id: "test",
                 monitoring: true,
                 responseTime: 200,
@@ -328,6 +341,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         it("should validate valid port monitor", () => {
             const validData = {
                 checkInterval: 30_000,
+                history: [],
                 host: "example.com",
                 id: "port-monitor",
                 monitoring: true,
@@ -359,6 +373,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             for (const host of validHosts) {
                 const validData = {
                     checkInterval: 30_000,
+                history: [],
                     host,
                     id: "test",
                     monitoring: true,
@@ -391,6 +406,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             for (const host of invalidHosts) {
                 const invalidData = {
                     checkInterval: 30_000,
+                history: [],
                     host,
                     id: "test",
                     monitoring: true,
@@ -412,6 +428,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             for (const port of validPorts) {
                 const validData = {
                     checkInterval: 30_000,
+                history: [],
                     host: "example.com",
                     id: "test",
                     monitoring: true,
@@ -433,6 +450,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             for (const port of invalidPorts) {
                 const invalidData = {
                     checkInterval: 30_000,
+                history: [],
                     host: "example.com",
                     id: "test",
                     monitoring: true,
@@ -456,6 +474,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         it("should enforce type literal", () => {
             const invalidData = {
                 checkInterval: 30_000,
+                history: [],
                 host: "example.com",
                 id: "test",
                 monitoring: true,
@@ -475,6 +494,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         it("should discriminate HTTP monitors", () => {
             const httpMonitor = {
                 checkInterval: 30_000,
+                history: [],
                 id: "http-test",
                 monitoring: true,
                 responseTime: 200,
@@ -493,6 +513,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         it("should discriminate port monitors", () => {
             const portMonitor = {
                 checkInterval: 30_000,
+                history: [],
                 host: "example.com",
                 id: "port-test",
                 monitoring: true,
@@ -513,6 +534,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         it("should reject invalid discriminated unions", () => {
             const invalidMonitor = {
                 checkInterval: 30_000,
+                history: [],
                 id: "test",
                 monitoring: true,
                 responseTime: 200,
@@ -534,6 +556,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitors: [
                     {
                         checkInterval: 30_000,
+                history: [],
                         id: "monitor-1",
                         monitoring: true,
                         responseTime: 200,
@@ -557,6 +580,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitors: [
                     {
                         checkInterval: 30_000,
+                history: [],
                         id: "monitor-1",
                         monitoring: true,
                         responseTime: 200,
@@ -580,6 +604,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitors: [
                     {
                         checkInterval: 30_000,
+                history: [],
                         id: "monitor-1",
                         monitoring: true,
                         responseTime: 200,
@@ -603,6 +628,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitors: [
                     {
                         checkInterval: 30_000,
+                history: [],
                         id: "monitor-1",
                         monitoring: true,
                         responseTime: 200,
@@ -626,6 +652,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitors: [
                     {
                         checkInterval: 30_000,
+                history: [],
                         id: "monitor-1",
                         monitoring: true,
                         responseTime: 200,
@@ -660,6 +687,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitors: [
                     {
                         checkInterval: 30_000,
+                history: [],
                         id: "monitor-1",
                         monitoring: true,
                         responseTime: 200,
@@ -671,6 +699,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     },
                     {
                         checkInterval: 60_000,
+                        history: [],
                         host: "example.com",
                         id: "monitor-2",
                         monitoring: true,
@@ -700,6 +729,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         it("should validate HTTP monitor data successfully", () => {
             const httpData = {
                 checkInterval: 30_000,
+                history: [],
                 id: "http-test",
                 monitoring: true,
                 responseTime: 200,
@@ -722,6 +752,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         it("should validate port monitor data successfully", () => {
             const portData = {
                 checkInterval: 60_000,
+                history: [],
                 host: "example.com",
                 id: "port-test",
                 monitoring: true,
@@ -772,6 +803,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         it("should handle Zod errors and categorize warnings", () => {
             const dataWithOptionalMissing = {
                 checkInterval: 30_000,
+                history: [],
                 id: "test",
                 monitoring: true,
                 responseTime: 200,
@@ -901,6 +933,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitors: [
                     {
                         checkInterval: 30_000,
+                history: [],
                         id: "monitor-1",
                         monitoring: true,
                         responseTime: 200,
@@ -951,6 +984,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitors: [
                     {
                         checkInterval: 30_000,
+                history: [],
                         id: "http-monitor",
                         lastChecked: new Date(),
                         monitoring: true,
@@ -963,6 +997,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     },
                     {
                         checkInterval: 60_000,
+                        history: [],
                         host: "database.example.com",
                         id: "port-monitor",
                         monitoring: false,
@@ -989,6 +1024,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             // Test that types are correctly inferred
             const httpMonitor: HttpMonitor = {
                 checkInterval: 30_000,
+                history: [],
                 id: "http-test",
                 monitoring: true,
                 responseTime: 200,
@@ -1059,6 +1095,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         it("should handle minimum valid values", () => {
             const minValidData = {
                 checkInterval: 5000, // Minimum
+                history: [],
                 id: "a", // Minimum length 1
                 monitoring: false,
                 responseTime: -1, // Minimum (sentinel)
@@ -1075,6 +1112,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         it("should handle maximum valid values", () => {
             const maxValidData = {
                 checkInterval: 2_592_000_000, // Maximum
+                history: [],
                 id: "a".repeat(100), // Long ID
                 monitoring: true,
                 responseTime: 999_999, // High response time
@@ -1101,6 +1139,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             for (const host of specialIPs) {
                 const validData = {
                     checkInterval: 30_000,
+                history: [],
                     host,
                     id: "test",
                     monitoring: true,
@@ -1172,6 +1211,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 30_000,
+                history: [],
                 monitoring: true,
                 responseTime: 200,
                 retryAttempts: 3,

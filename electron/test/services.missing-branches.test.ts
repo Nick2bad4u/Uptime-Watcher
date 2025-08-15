@@ -27,7 +27,7 @@ vi.mock("../utils/logger", () => ({
     },
 }));
 
-import { safeInteger } from "../../shared/validation/validatorUtils";
+import { safeInteger } from "../../shared/validation/validatorUtils.js";
 
 describe("Service Edge Cases - Missing Branch Coverage", () => {
     beforeEach(() => {

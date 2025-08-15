@@ -5,7 +5,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MonitorManager } from "../../managers/MonitorManager";
-import type { Site, StatusUpdate, Monitor } from "../../types";
+import type { Site, StatusUpdate, Monitor } from "../../../shared/types.js";
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 
 /**

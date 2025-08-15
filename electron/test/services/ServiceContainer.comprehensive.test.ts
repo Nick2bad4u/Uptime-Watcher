@@ -55,7 +55,7 @@ vi.mock("../events/TypedEventBus", () => ({
 }));
 
 // Now import the modules to apply mocks
-import type { Site } from "../../../shared/types";
+import type { Site } from "../../../shared/types.js";
 import {
     ServiceContainer,
     type ServiceContainerConfig,

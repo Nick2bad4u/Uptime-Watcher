@@ -16,7 +16,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { isEventOfCategory, getEventPriority } from "../events/eventTypes";
+import { isEventOfCategory, getEventPriority } from "../events/eventTypes.js";
 
 describe("isEventOfCategory", () => {
     it("returns true for event in category", async ({ task, annotate }) => {

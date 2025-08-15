@@ -21,7 +21,7 @@ import type {
     IpcResponse,
     IpcValidationResponse,
     IpcParameterValidator,
-} from "../../../services/ipc/types";
+} from "../../../services/ipc/types.js";
 import type { ValidationResult } from "../../../../shared/types/validation";
 
 describe("IPC Types", () => {

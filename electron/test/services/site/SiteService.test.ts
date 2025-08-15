@@ -6,8 +6,8 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site } from "../../../types";
-import type { Monitor, StatusHistory } from "../../../types";
+import type { Site } from "../../../../shared/types.js";
+import type { Monitor, StatusHistory } from "../../../../shared/types.js";
 import type { DatabaseService } from "../../../services/database/DatabaseService";
 import type { HistoryRepository } from "../../../services/database/HistoryRepository";
 import type { MonitorRepository } from "../../../services/database/MonitorRepository";

@@ -19,7 +19,7 @@ import type { HistoryRepository } from "../../services/database/HistoryRepositor
 import type { MonitorRepository } from "../../services/database/MonitorRepository";
 import type { SettingsRepository } from "../../services/database/SettingsRepository";
 import type { SiteRepository } from "../../services/database/SiteRepository";
-import type { Site } from "../../types";
+import type { Site } from "../../../shared/types.js";
 import type { ConfigurationManager } from "../../managers/ConfigurationManager";
 
 import { DEFAULT_HISTORY_LIMIT } from "../../constants";

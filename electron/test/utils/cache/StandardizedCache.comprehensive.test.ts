@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 import { TypedEventBus } from "../../../events/TypedEventBus";
-import { UptimeEvents } from "../../../events/eventTypes";
+import { UptimeEvents } from "../../../events/eventTypes.js";
 
 /**
  * Comprehensive test suite for StandardizedCache

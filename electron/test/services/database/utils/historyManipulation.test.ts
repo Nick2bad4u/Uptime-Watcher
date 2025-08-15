@@ -5,7 +5,7 @@
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import type { Database } from "node-sqlite3-wasm";
-import type { StatusHistory } from "../../../../types";
+import type { StatusHistory } from "../../../../../shared/types.js";
 
 // Import functions to test
 import {

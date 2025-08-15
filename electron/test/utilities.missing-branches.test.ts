@@ -6,7 +6,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { generateCorrelationId, ValidationError } from "../utils/correlation";
 import { logger } from "../utils/logger";
-import { safeInteger } from "../../shared/validation/validatorUtils";
+import { safeInteger } from "../../shared/validation/validatorUtils.js";
 
 // Mock dependencies
 vi.mock("electron", () => ({

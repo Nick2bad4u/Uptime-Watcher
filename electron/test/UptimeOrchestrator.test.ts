@@ -12,7 +12,7 @@ import {
 import { DatabaseManager } from "../managers/DatabaseManager";
 import { MonitorManager } from "../managers/MonitorManager";
 import { SiteManager } from "../managers/SiteManager";
-import { Site, Monitor, StatusUpdate } from "../types";
+import { Site, Monitor, StatusUpdate } from "../../shared/types.js";
 
 // Mock all dependencies with proper typing
 const mockDatabaseManager = {

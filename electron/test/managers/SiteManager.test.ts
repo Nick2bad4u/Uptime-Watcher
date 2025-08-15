@@ -17,7 +17,7 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { SiteManager } from "../../managers/SiteManager";
-import type { Site } from "../../types";
+import type { Site } from "../../../shared/types.js";
 
 describe("SiteManager", () => {
     let manager: SiteManager;

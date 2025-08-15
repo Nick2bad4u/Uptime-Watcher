@@ -6,7 +6,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { SiteValidator } from "../../../managers/validators/SiteValidator";
 import { MonitorValidator } from "../../../managers/validators/MonitorValidator";
-import type { Site } from "../../../types";
+import type { Site } from "../../../../shared/types.js";
 
 // Mock MonitorValidator
 vi.mock("../../../managers/validators/MonitorValidator");

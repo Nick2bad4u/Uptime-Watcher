@@ -8,7 +8,7 @@ import {
     getBaseMonitorTypes,
     isBaseMonitorType,
 } from "../../../services/monitoring/monitorTypes";
-import type { MonitorType } from "../../../types";
+import type { MonitorType } from "../../../../shared/types.js";
 
 describe("Monitor Types Utility", () => {
     describe("getBaseMonitorTypes", () => {

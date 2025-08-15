@@ -17,7 +17,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import type { IpcParameterValidator } from "../../../services/ipc/types";
+import type { IpcParameterValidator } from "../../../services/ipc/types.js";
 
 /**
  * Import the validator creation functions we refactored

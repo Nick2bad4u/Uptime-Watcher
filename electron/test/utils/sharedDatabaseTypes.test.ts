@@ -14,7 +14,7 @@ import {
     type MonitorRow,
     type SettingsRow,
     type SiteRow,
-} from "../../../shared/types/database";
+} from "../../../shared/types/database.js";
 
 describe("Shared Database Types - Backend Coverage", () => {
     describe("isValidHistoryRow", () => {

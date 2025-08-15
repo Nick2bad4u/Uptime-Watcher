@@ -14,7 +14,7 @@ import {
     performPingCheckWithRetry,
     performSinglePingCheck,
 } from "../../../../services/monitoring/utils/pingRetry";
-import { MonitorCheckResult } from "../../../../services/monitoring/types";
+import { MonitorCheckResult } from "../../../../services/monitoring/types.js";
 import * as operationalHooksModule from "../../../../utils/operationalHooks";
 import * as errorHandlingModule from "../../../../services/monitoring/utils/pingErrorHandling";
 

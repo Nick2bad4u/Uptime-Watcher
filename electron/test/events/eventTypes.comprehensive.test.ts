@@ -10,7 +10,7 @@ import {
     EVENT_CATEGORIES,
     EVENT_PRIORITIES,
     type UptimeEvents,
-} from "../../events/eventTypes";
+} from "../../events/eventTypes.js";
 
 describe("eventTypes - Comprehensive Coverage", () => {
     describe("EVENT_CATEGORIES constant", () => {
