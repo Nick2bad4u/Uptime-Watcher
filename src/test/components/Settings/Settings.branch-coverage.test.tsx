@@ -491,7 +491,7 @@ describe("Settings - Branch Coverage Tests", () => {
 
             // Test all checkbox handlers
             const autoStartCheckbox = screen.getByLabelText(
-                "Enable auto-start with system"
+                "Start application automatically"
             );
             fireEvent.click(autoStartCheckbox);
             expect(mockSettingsStore.updateSettings).toHaveBeenCalledWith({
@@ -499,7 +499,7 @@ describe("Settings - Branch Coverage Tests", () => {
             });
 
             const minimizeToTrayCheckbox = screen.getByLabelText(
-                "Enable minimize to system tray"
+                "Minimize to system tray"
             );
             fireEvent.click(minimizeToTrayCheckbox);
             expect(mockSettingsStore.updateSettings).toHaveBeenCalledWith({
