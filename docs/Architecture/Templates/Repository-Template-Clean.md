@@ -5,7 +5,6 @@ This template provides a standard structure for implementing repository classes 
 ## Overview
 
 Repository classes manage data persistence using the dual-method pattern:
-
 - Public async methods for external API (wrapped with `withDatabaseOperation`)
 - Internal synchronous methods for transaction contexts
 - All mutations use `executeTransaction()` for consistency

@@ -139,30 +139,82 @@ Other Backend Services (via event listeners)
 
 ### 1. Site Events
 
-- `sites:added`
-- `sites:updated`
-- `sites:removed`
-- `sites:state-synchronized`
+**Public Events:**
+
+- `site:added` - When a site is successfully added
+- `site:updated` - When site properties are modified
+- `site:removed` - When a site is deleted
+- `sites:state-synchronized` - When frontend and backend state are synchronized
+- `site:cache-updated` - When site cache is refreshed
+- `site:cache-miss` - When cache lookup fails
+
+**Internal Events:**
+
+- `internal:site:added` - Internal site creation events
+- `internal:site:updated` - Internal site modification events  
+- `internal:site:removed` - Internal site deletion events
+- `internal:site:cache-updated` - Internal cache management
+- `internal:site:start-monitoring-requested` - Internal monitoring control
+- `internal:site:stop-monitoring-requested` - Internal monitoring control
+- `internal:site:restart-monitoring-requested` - Internal monitoring control
+- `internal:site:restart-monitoring-response` - Internal monitoring responses
+- `internal:site:is-monitoring-active-requested` - Internal status queries
+- `internal:site:is-monitoring-active-response` - Internal status responses
 
 ### 2. Monitor Events
 
-- `monitor:status-changed`
-- `monitor:up`
-- `monitor:down`
-- `monitor:check-started`
-- `monitor:check-completed`
+**Public Events:**
+
+- `monitor:added` - When a monitor is created
+- `monitor:removed` - When a monitor is deleted
+- `monitor:status-changed` - When monitor status changes
+- `monitor:up` - When monitor detects service is online
+- `monitor:down` - When monitor detects service is offline
+- `monitor:check-completed` - When a health check finishes
+
+**Internal Events:**
+
+- `internal:monitor:started` - Internal monitor activation
+- `internal:monitor:stopped` - Internal monitor deactivation
+- `internal:monitor:all-started` - When all monitors are activated
+- `internal:monitor:all-stopped` - When all monitors are deactivated
+- `internal:monitor:manual-check-completed` - Manual check results
+- `internal:monitor:site-setup-completed` - Site monitor setup completion
 
 ### 3. Database Events
 
-- `database:transaction-completed`
-- `database:connection-changed`
-- `database:error`
+- `database:transaction-completed` - When database transactions finish
+- `database:error` - When database operations fail
+- `database:success` - When database operations succeed
+- `database:retry` - When database operations are retried
+- `database:backup-created` - When database backups are created
+
+**Internal Database Events:**
+
+- `internal:database:initialized` - Database initialization completion
+- `internal:database:data-exported` - Data export completion
+- `internal:database:data-imported` - Data import completion
+- `internal:database:backup-downloaded` - Backup download completion
+- `internal:database:history-limit-updated` - History retention changes
+- `internal:database:sites-refreshed` - Site data refresh
+- `internal:database:get-sites-from-cache-requested` - Cache requests
+- `internal:database:get-sites-from-cache-response` - Cache responses
+- `internal:database:update-sites-cache-requested` - Cache update requests
 
 ### 4. System Events
 
-- `monitoring:started`
-- `monitoring:stopped`
-- `app:ready`
+- `monitoring:started` - When monitoring system starts
+- `monitoring:stopped` - When monitoring system stops
+- `system:startup` - Application startup
+- `system:shutdown` - Application shutdown
+- `system:error` - System-level errors
+
+### 5. Performance and Configuration Events
+
+- `performance:metric` - Performance measurements
+- `performance:warning` - Performance threshold alerts
+- `config:changed` - Configuration changes
+- `cache:invalidated` - Cache invalidation events
 
 ## Consequences
 

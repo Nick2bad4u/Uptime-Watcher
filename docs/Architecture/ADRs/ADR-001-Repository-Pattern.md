@@ -34,6 +34,11 @@ We will use the **Repository Pattern** for all database access with the followin
 ### 3. Consistent Structure
 
 ````typescript
+import { Database } from "node-sqlite3-wasm";
+import { logger } from "@shared/utils/logger";
+import { withDatabaseOperation } from "@electron/utils/operationalHooks";
+import type { DatabaseService } from "@electron/services/database/DatabaseService";
+
 /**
  * Example repository demonstrating the standard repository pattern implementation.
  *
@@ -47,11 +52,11 @@ We will use the **Repository Pattern** for all database access with the followin
  * const repository = new ExampleRepository({ databaseService });
  *
  * // Public async method - creates its own transaction
- * await repository.deleteAll();
+ * await repository.bulkInsert([data1, data2]);
  *
  * // Internal sync method - used within existing transaction
  * await databaseService.executeTransaction((db) => {
- *     repository.deleteAllInternal(db);
+ *     repository.bulkInsertInternal(db, [data1, data2]);
  *     // other operations...
  * });
  * ```
@@ -85,6 +90,105 @@ export class ExampleRepository {
  }
 
  /**
+  * Bulk inserts multiple records into the database.
+  *
+  * @remarks
+  * This is a public async method that creates its own database transaction.
+  * Uses {@link withDatabaseOperation} for retry logic and event emission.
+  * For use within existing transactions, use {@link bulkInsertInternal} instead.
+  *
+  * @param records - Array of records to insert
+  * @returns Promise that resolves when all records are successfully inserted
+  *
+  * @throws {@link Error} When database operation fails or transaction cannot be completed
+  *
+  * @example
+  * ```typescript
+  * // Bulk insert records with automatic transaction handling
+  * await repository.bulkInsert([record1, record2, record3]);
+  * ```
+  *
+  * @see {@link bulkInsertInternal} for transaction-internal operations
+  * @public
+  */
+ public async bulkInsert(records: ExampleRow[]): Promise<void> {
+  if (records.length === 0) {
+   return;
+  }
+
+  return withDatabaseOperation(
+   async () => this.databaseService.executeTransaction((db) => {
+    this.bulkInsertInternal(db, records);
+    return Promise.resolve();
+   }),
+   "ExampleRepository.bulkInsert"
+  );
+ }
+
+ /**
+  * Bulk inserts multiple records within an existing transaction context.
+  *
+  * @remarks
+  * This is an internal sync method designed for use within existing database transactions.
+  * Uses prepared statements for optimal performance with large datasets.
+  * Does not create its own transaction - must be called within a transaction context.
+  *
+  * @param db - The active {@link Database} connection within a transaction
+  * @param records - Array of records to insert
+  *
+  * @throws {@link Error} When the SQL execution fails
+  *
+  * @example
+  * ```typescript
+  * // Use within an existing transaction
+  * await databaseService.executeTransaction((db) => {
+  *     repository.bulkInsertInternal(db, records);
+  *     // other transactional operations...
+  * });
+  * ```
+  *
+  * @see {@link bulkInsert} for standalone operation with automatic transaction
+  * @public
+  */
+ public bulkInsertInternal(db: Database, records: ExampleRow[]): void {
+  const stmt = db.prepare(QUERIES.INSERT);
+  
+  try {
+   for (const record of records) {
+    stmt.run([record.id, record.name, record.createdAt]);
+   }
+   logger.debug(`[ExampleRepository] Bulk inserted ${records.length} records (internal)`);
+  } finally {
+   stmt.finalize();
+  }
+ }
+
+ /**
+  * Retrieves all records from the database.
+  *
+  * @remarks
+  * This is a read operation wrapped with {@link withDatabaseOperation} for consistent
+  * error handling and event emission.
+  *
+  * @returns Promise resolving to array of all records
+  *
+  * @throws {@link Error} When database operation fails
+  *
+  * @example
+  * ```typescript
+  * const allRecords = await repository.findAll();
+  * ```
+  *
+  * @public
+  */
+ public async findAll(): Promise<ExampleRow[]> {
+  return withDatabaseOperation(() => {
+   const db = this.getDb();
+   return Promise.resolve(db.all(QUERIES.SELECT_ALL) as ExampleRow[]);
+  }, "ExampleRepository.findAll");
+ }
+
+ /**
   * Deletes all records from the repository table.
   *
   * @remarks
@@ -106,12 +210,13 @@ export class ExampleRepository {
   * @public
   */
  public async deleteAll(): Promise<void> {
-  return withDatabaseOperation(async () => {
-   return this.databaseService.executeTransaction((db) => {
+  return withDatabaseOperation(
+   async () => this.databaseService.executeTransaction((db) => {
     this.deleteAllInternal(db);
     return Promise.resolve();
-   });
-  }, "ExampleRepository.deleteAll");
+   }),
+   "ExampleRepository.deleteAll"
+  );
  }
 
  /**
@@ -166,6 +271,18 @@ export class ExampleRepository {
 }
 
 /**
+ * Interface representing a data row structure.
+ */
+interface ExampleRow {
+ /** Unique identifier for the record */
+ id: string;
+ /** Display name of the record */
+ name: string;
+ /** Creation timestamp */
+ createdAt: number;
+}
+
+/**
  * Dependencies required for {@link ExampleRepository} instantiation.
  *
  * @remarks
@@ -194,6 +311,16 @@ interface ExampleRepositoryDependencies {
  * @private
  */
 const QUERIES = {
+ /**
+  * SQL query to insert a single record.
+  */
+ INSERT: "INSERT INTO example_table (id, name, createdAt) VALUES (?, ?, ?)",
+ 
+ /**
+  * SQL query to select all records.
+  */
+ SELECT_ALL: "SELECT id, name, createdAt FROM example_table ORDER BY createdAt DESC",
+ 
  /**
   * SQL query to delete all records from the repository table.
   *
